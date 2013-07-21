@@ -1,4 +1,37 @@
-gstudio
-=======
+gstudio_mdb
+===========
 
-gstudio is a node description framework (NDF) to create knowledge networks.  We are recreating gnowsys-studio with mongodb as storage.
+A Django application to recreate gnowsys-studio from scratch using
+mongodb as storage. It uses django_mongodb_engine. 
+
+This project will eventually metamorphose into an implementation of
+http://www.gnu.org/software/gnowsys/ framework to create generic network
+networks using Node Description Framework. 
+
+The project is released under GNU AGPL v3 license.
+
+Currently Implemented Features
+==============================
+
+- create nodes
+- comment nodes
+
+To do
+=====
+
+- create collections
+- create nested collections
+- define relation types
+- create relations
+- define attribute types
+- create attributes
+- aggregate relations and attributes
+- aggregate types
+
+Mailing list
+============
+
+Join this list if you are intersted in contributing or have problems
+in using this application.
+
+http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
