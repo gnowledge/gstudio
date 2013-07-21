@@ -1,5 +1,5 @@
-gstudio_mdb
-===========
+gstudio
+=======
 
 A Django application to recreate gnowsys-studio from scratch using
 mongodb as storage. It uses django_mongodb_engine. 
@@ -11,13 +11,13 @@ networks using Node Description Framework.
 The project is released under GNU AGPL v3 license.
 
 Currently Implemented Features
-==============================
+------------------------------
 
 - create nodes
 - comment nodes
 
 To do
-=====
+-----
 
 - create collections
 - create nested collections
@@ -29,7 +29,7 @@ To do
 - aggregate types
 
 Mailing list
-============
+------------
 
 Join this list if you are intersted in contributing or have problems
 in using this application.
