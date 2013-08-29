@@ -1,59 +1,0 @@
-
-gstudio_mdb/forms.py,200
-class CommentForm(6,116
-    def __init__(8,147
-    def save(15,406
-    class Meta:Meta21,599
-class RelationForm(24,640
-    def __init__(26,672
-    def save(33,911
-    class Meta:Meta39,1105
-
-gstudio_mdb/models.py,303
-class Node(10,171
-    def get_absolute_url(20,605
-    def __unicode__(23,697
-    class Meta:Meta26,751
-class Comment(30,804
-class Relation(35,1010
-class RelationType(41,1306
-    def __unicode__(48,1632
-    def get_absolute_url(51,1685
-    def __unicode__(54,1785
-    class Meta:Meta57,1839
-
-gstudio_mdb/views.py,168
-class NodeView(9,248
-class NodeDetailView(12,311
-    def get(15,376
-    def post(21,628
-class NodeRelationsView(33,1027
-    def get(36,1095
-    def post(42,1348
-
-gstudio_mdb/templates/gstudio_mdb/base.html,70
-GNOWSYS Node Description Framework 5,69
-NDF: Node Description15,368
-
-gstudio_mdb/templates/gstudio_mdb/node_detail.html,80
-{{ node.title }}5,91
-Comments13,264
-Add a comment25,581
-Add Relations34,804
-
-gstudio_mdb/templates/gstudio_mdb/node_list.html,22
-{{ node.title }}5,91
-
-gstudio_mdb/templates/gstudio_mdb/_forms.html,0
-
-gstudio_mdb/admin.py,0
-
-gstudio_mdb/__init__.py,0
-
-gstudio_mdb/settings.py,0
-
-gstudio_mdb/urls.py,0
-
-gstudio_mdb/wsgi.py,0
-
-manage.py,0
