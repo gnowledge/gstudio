@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Users</h1>
+
+Node Description Framework of <a href="http://www.gnu.org/software/gnowsys/">GNOWSYS</a>
+
+
+<hr>
+<form action="." method="post">
+{% csrf_token %}
+
+{{ form.as_p }}
+<input type="submit" value="+ Add User">
+</form>
+<hr>
+
+{% load url from future %}
+{% for user in authors %}
+  {% if forloop.first %}
+    <h2>{{ authors_count }} Authors</h2>
+  {% endif %}
+
+  <div>
+    <p><strong>{{ user.identity }}</strong>
+    &ndash; {{ user.creationtime|date:"j F Y" }}<br>
+    Name: {{ user.name }}<br>
+
+    </p>
+  </div>
+
+{% empty %}
+  <p><em>No authors</em></p>
+{% endfor %}
+
+
+</body>
+</html>
