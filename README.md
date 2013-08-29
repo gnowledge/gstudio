@@ -2,11 +2,11 @@ gstudio
 =======
 
 A Django application to recreate gnowsys-studio from scratch using
-mongodb as storage. It uses django_mongodb_engine. 
+mongodb as storage. It uses django_mongokit. 
 
 This project will eventually metamorphose into an implementation of
 http://www.gnu.org/software/gnowsys/ framework to create generic network
-networks using Node Description Framework. 
+networks using Node Description Framework (NDF). 
 
 The project is released under GNU AGPL v3 license.
 

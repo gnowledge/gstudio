@@ -1,9 +1,8 @@
-# Django settings for gstudio_mdb project.
-
-import os.path
+# Django settings for gnowsys-ndf project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -12,22 +11,25 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {
-   'default': {
-      'ENGINE': 'django_mongodb_engine',
-      'NAME': 'my_tumble_log'
-   }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'example-sqlite3.db',
+    },
+    'mongodb': {
+        'ENGINE': 'django_mongokit.mongodb',
+        'NAME': 'example',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    },
 }
-
-
-
-# Hosts/domain names that are valid for this site; required if DEBUG is False
-# See https://docs.djangoproject.com/en/1.4/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
+USE_TZ = True
 TIME_ZONE = 'Asia/Kolkata'
 
 # Language code for this installation. All choices can be found here:
@@ -82,7 +84,8 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '(t2(xg3z$a#@$_(y@c()d4yjtefm%r$6sejzu_%k9z!h4q1p&j'
+SECRET_KEY = '7st0sdv&amp;7yw*eh)zmaz8#t48nr$&amp;ql#ow=$0l^#b_b&amp;$9c*$4c'
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -100,34 +103,26 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'gstudio_mdb.urls'
+ROOT_URLCONF = 'gnowsys_ndf.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'gstudio_mdb.wsgi.application'
+WSGI_APPLICATION = 'gnowsys_ndf.wsgi.application'
 
-#TEMPLATE_DIRS = (
+TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-
-# TEMPLATE_DIRS = (
-#     os.path.join(os.path.realpath(__file__), '/templates'),
-#     )
-
+)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gstudio_mdb',
-    'djangotoolbox',
-    'django_mongodb_engine',
-    # Uncomment the next line to enable the admin:
-    'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'gnowsys_ndf.ndf',
+    'gnowsys_ndf.benchmarker',
 )
 
 # A sample logging configuration. The only tangible logging

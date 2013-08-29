@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+{% load url from future %}
+{% for node in nodes %}
+
+
+  <div>
+    <p><strong>{{ node.name }}</strong><br><br>
+    Created at : {{ node.created_at|date:"j F Y" }}<br>
+    Nodetype   : {{ node.node_type }}<br>
+    Tags       : {{ node.tags|join:", " }}<br>
+    <a href="{% url 'delete_node' node %}">delete</a>
+    </p>
+  </div>
+
+{% endfor %}
+</body>
+</html>
+
+<!--Write below code in wiki_node -->
+
+ <!--<div>
+    <p><a href="{% url 'wiki_node' %}">{{ node.name }}</a></p>
+  </div>-->

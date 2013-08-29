@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Wikipage</h1>
+<hr>
+Create a new wikipage
+
+<form action="." method="post">
+{% csrf_token %}
+
+{{ form.as_p }}
+<input type="submit" value="+ Add Node">
+</form>
+<hr>
+{% load url from future %}
+{% for node in nodes %}
+  {% if forloop.first %}
+    <h3>Number Of Nodes : {{ nodes_count }} </h3>
+  {% endif %}
+ 
+  <div>
+    <p><strong>{{ node.name }}</strong><br><br>
+    Created at : {{ node.created_at|date:"j F Y" }}<br>
+    Nodetype   : {{ node.node_type }}<br>
+    Tags       : {{ node.tags|join:", " }}<br>
+    <a href="{% url 'delete_node' node %}">delete</a>
+    </p>
+  </div>
+
+{% empty %}
+  <p><em>No nodes in the gnowledge base</em></p>
+{% endfor %}
+
+
+</body>
+</html>
