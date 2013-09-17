@@ -17,7 +17,7 @@ class NodeForm(DocumentForm):
 
     class Meta:
         document = Node
-        fields = ['name', 'node_type', 'tags']
+        fields = ['name', 'member_of', 'tags']
         
 
 class AuthorForm(DocumentForm):
