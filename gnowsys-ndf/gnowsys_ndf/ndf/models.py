@@ -1,13 +1,16 @@
 import datetime
+
 from django_mongokit import connection
 from django_mongokit.document import DjangoDocument
+
+from mongokit import OR
+
 from bson import ObjectId
 
-from django.contrib.auth.models import User
 
 @connection.register
 class Author(DjangoDocument):
-    collection_name = 'authors'
+    collection_name = 'Authors'
     structure = {
         'name': unicode,
         'created_at': datetime.datetime
@@ -19,22 +22,25 @@ class Author(DjangoDocument):
     use_dot_notation = True
 
     def __unicode__(self):
-		return self._id
+		return self.name
 
     def identity(self):
         return self.__unicode__()
 
+	def my_func(self, *args, **kwargs):
+		return (" my_func working...\n")
+
 
 @connection.register
 class Node(DjangoDocument):
-    collection_name = 'nodes'
+    collection_name = 'Nodes'
     structure = {
         'name': unicode,
         'altnames': unicode,
         'plural': unicode,
-      	'node_type': unicode,						# Node_Type_Choices
+      	'member_of': unicode,						# 
       	'created_at': datetime.datetime,
-        'created_by': ObjectId,						# Author Class
+        'created_by': ObjectId,						# ObjectId's of Author Class
         #'rating': 
         'start_publication': datetime.datetime,
         'content': unicode,
@@ -43,14 +49,14 @@ class Node(DjangoDocument):
         'tags': [unicode],
         'featured': bool,
         'last_update': datetime.datetime,
-        'modified_by': [ObjectId],					# list of Author Class
-      	'history': [ObjectId],						# list of Any Type of Class (Previous)
+        'modified_by': [ObjectId],					# list of ObjectId's of Author Class
+      	"""'history': [ObjectId],"""				# list of ObjectId's of Any Type of Class (Previous)
         'comment_enabled': bool,
       	'login_required': bool
       	#'password': basestring,
     }
 
-    required_fields = ['name', 'node_type']
+    required_fields = ['name', 'member_of']
     default_values = {'created_at':datetime.datetime.utcnow}
     use_dot_notation = True
     
@@ -63,14 +69,16 @@ class Node(DjangoDocument):
     def save(self, *args, **kwargs):
 		''' on save insert created_at '''
 		self.created_at = datetime.datetime.today()
+		
 		super(Node, self).save(*args, **kwargs)
 
 
 @connection.register
 class AttributeType(Node):
-	collection_name = 'attributeTypes'
+	collection_name = 'AttributeTypes'
 	structure = {
-		'dataType': basestring,						# Field_Type_Choices
+		'data_type': basestring,						# NoneType in mongokit
+		
 		'verbose_name': basestring,
 		'null': bool,
 		'blank': bool,
@@ -86,20 +94,23 @@ class AttributeType(Node):
 		'required': bool,
 		'label': unicode,
 		'unique': bool,
-		#'validators': list
+		'validators': list,
 		'default': unicode,
 		'editable': bool
 	}
 
-	#required_fields = ['dataType']
+	required_fields = ['data_type']
 	use_dot_notation = True
-	
 
+
+"""
+	This is an Aggregation class, hence we are not keeping history of it.
+"""
 @connection.register
 class Attribute(Node):
-	collection_name = 'attributes'
+	collection_name = 'Attributes'
 	structure = {
-		'attribute_type': ObjectId,					# AttributeType
+		'attribute_type': ObjectId,					# ObjectId's of AttributeType Class
 		'attribute_value': None						# To store values of created attribute type		
 	}
 	
@@ -108,7 +119,7 @@ class Attribute(Node):
 
 @connection.register
 class RelationType(Node):
-	collection_name = 'relationTypes'
+	collection_name = 'RelationTypes'
 	structure = {
 		'inverse_name': unicode,
 		'slug': basestring,
@@ -120,35 +131,40 @@ class RelationType(Node):
 	use_dot_notation = True
 	
 
+"""
+	This is an Aggregation class, hence we are not keeping history of it.
+"""
 @connection.register
 class Relation(Node):
-	collection_name = 'relations'
+	collection_name = 'Relations'
 	structure = {
-		'relation_type': ObjectId,					# RelationType Class
-		'related_object': ObjectId					# Node Class
+		'subject_object': ObjectId,					# ObjectId's of RelationType Class
+		'relation_type': ObjectId,					# ObjectId's of RelationType Class
+		'related_object': ObjectId					# ObjectId's of Any type of Class
 	}
 
 	use_dot_notation = True
+
 
 @connection.register
 class GSystemType(Node):
-	collection_name = 'gsystemTypes'
+	collection_name = 'GSystemTypes'
 	structure = {
-		'attribute_type_set': [ObjectId]			# list of Attribute Class
+		'attribute_type_set': [AttributeType]		# Embed list of AttributeType Class as Documents
 	}
 
 	use_dot_notation = True
 	
+
 @connection.register
 class GSystem(Node):
-	collection_name = 'gsystems'
+	collection_name = 'GSystems'
 	structure = {
-		'gsystem_type': ObjectId,					# GSystemType Class
-		'attribute_set': [ObjectId],				# list of Attribute Class
-		'relation_set': [ObjectId],					# list of Relation Class
-		'collection_set': [ObjectId]				# list of GSystem Class
+		'gsystem_type': ObjectId,					# ObjectId's of GSystemType Class  
+		'attribute_set': dict,						# dictionary that holds keys (with their associated values) belonging to it's 'gsystem_type'
+		'relation_set': dict,						# list of Relation Class
+		'collection_set': [ObjectId]				# list of ObjectId's of GSystem Class
 	}
 
 	use_dot_notation = True
-	
-	
+
