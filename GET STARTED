@@ -37,9 +37,9 @@ Make sure you are in the newly created virtual python environment (i.e. move to 
         (2) For more details visit - "https://pypi.python.org/pypi/django-mongokit"
         
   Install GitPython (0.3.2.RC1): easy_install GitPython
-  	NOTE:
-  		(1) It also installs additional packages - async (0.6.1), gitdb (0.5.4), and smmap (0.8.2).
-  		(2) For more details visit - "http://pythonhosted.org/GitPython/0.3.1/index.html"
+    NOTE:
+  	(1) It also installs additional packages - async (0.6.1), gitdb (0.5.4), and smmap (0.8.2).
+  	(2) For more details visit - "http://pythonhosted.org/GitPython/0.3.1/index.html"
     
   To clone "gstudio-mongokit" project (inside the virtualenv-folder): 
     (1) Visit - "https://github.com/gnowledge/gstudio"
