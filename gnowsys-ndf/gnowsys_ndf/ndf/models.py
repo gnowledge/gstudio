@@ -96,7 +96,6 @@ class Node(DjangoDocument):
 		#	Else	 : Create that path first, then proceed!
 		
 		try:
-			print("\n Openeing file... \n")
 			file_git = open( file_path, file_mode )
 			
 			file_git.write( json.dumps( self.to_json_type(), 
@@ -115,7 +114,6 @@ class Node(DjangoDocument):
 		finally:
 			if (file_git != None):
 				file_git.close()
-				print( " File closed...!!\n" )
 
 
 @connection.register
