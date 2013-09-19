@@ -54,6 +54,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the project's base directory, 
 # i.e. having settings.py file
+# Example: "/home/tissavadoot/Desktop/Tissproject/TP_MK/gstudio/gnowsys-ndf/gnowsys_ndf/"
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -89,7 +90,7 @@ STATICFILES_DIRS = (
 
 
 # List of collections (classes) whose documents' history has to be maintained.
-VERSIONING_COLLECTIONS = ['AttributeType', 'RelationType', 'GSystemType', 'GSystem']
+VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes', 'GSystemTypes', 'GSystems']
 
 
 # Absolute filesystem path to the directory that will hold all git repositories;
