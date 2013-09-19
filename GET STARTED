@@ -26,7 +26,9 @@ Install virtual python environment (python-virtualenv) and create a new one as f
         (3) To deactivate: deactivate
 
 
-Make sure you are in the newly created virtual python environment (i.e. move to virtualenv-folder and activate it). Then, after activating it - install django framework and django-mongokit (Bridging Django to MongoDB with the MongoKit ODM), and GitPython (a python library used to interact with git repositories) within it; and also perform following steps:
+Make sure you are in the newly created virtual python environment (i.e. move to virtualenv-folder and activate it). 
+Then, after activating it - install django framework & django-mongokit (Bridging Django to MongoDB with MongoKit ODM),
+and GitPython (a python library used to interact with git repositories) within it; and also perform following steps:
 
   Install django (1.5.2): pip install django
     NOTE: For more details visit - "https://www.djangoproject.com/"
