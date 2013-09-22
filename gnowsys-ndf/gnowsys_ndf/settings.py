@@ -1,6 +1,6 @@
 # Django settings for gnowsys-ndf project.
 
-import os, sys
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -92,11 +92,13 @@ STATICFILES_DIRS = (
 # List of collections (classes) whose documents' history has to be maintained.
 VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes', 'GSystemTypes', 'GSystems']
 
+# Hash level - number of sub-directories that will be created before saving the json-file
+GIT_REPO_DIR_HASH_LEVEL = 3
 
 # Absolute filesystem path to the directory that will hold all git repositories;
 # belonging to each model(class) for maintaining history of each and every documents.
 # Example: "/home/media/media.lawrence.com/static/ndf/git-repo/"
-GIT_REPO_PATH = os.path.join( PROJECT_ROOT, "ndf/static/git-repo" )
+GIT_REPO_DIR = os.path.join( PROJECT_ROOT, "ndf/static/git-repo" )
 
 
 # List of finder classes that know how to find static files in
