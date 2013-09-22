@@ -1,18 +1,11 @@
 ''' imports from python libraries '''
-<<<<<<< HEAD
 import os
 import datetime
 import json
 
 ''' imports from installed packages '''
 from django.db import models
-=======
-import os, sys
-import datetime
-import json
->>>>>>> 50041433bee53a620ba79bdc145a23e7beea01df
 
-''' imports from installed packages '''
 from django_mongokit import connection
 from django_mongokit.document import DjangoDocument
 
@@ -20,7 +13,6 @@ from mongokit import OR
 
 from bson import ObjectId
 
-<<<<<<< HEAD
 from git import Repo
 from git.exc import GitCommandError
 from git.exc import InvalidGitRepositoryError
@@ -32,12 +24,6 @@ from gnowsys_ndf.settings import GIT_REPO_DIR
 from gnowsys_ndf.settings import GIT_REPO_DIR_HASH_LEVEL
 
 ####################################################################################################
-=======
-''' imports from application folders/files '''
-from gnowsys_ndf import settings
-
-####################################################################################################################
->>>>>>> 50041433bee53a620ba79bdc145a23e7beea01df
 
 @connection.register
 class Author(DjangoDocument):
@@ -82,12 +68,7 @@ class Node(DjangoDocument):
         'tags': [unicode],
         'featured': bool,
         'last_update': datetime.datetime,
-<<<<<<< HEAD
         'modified_by': [ObjectId],		# list of ObjectId's of Author Class
-=======
-        'modified_by': [ObjectId],					# list of ObjectId's of Author Class
-      	#'history': [ObjectId],						# list of ObjectId's of Any Type of Class (Previous)
->>>>>>> 50041433bee53a620ba79bdc145a23e7beea01df
         'comment_enabled': bool,
       	'login_required': bool
       	#'password': basestring,
@@ -109,47 +90,9 @@ class Node(DjangoDocument):
         
         super(Node, self).save(*args, **kwargs)
 		
-<<<<<<< HEAD
         historyManager = HistoryManager(self)
-=======
-		super(Node, self).save(*args, **kwargs)
-		
-		''' 
-			On save, create a history file for the document 
-		    in the corresponding collection's git repository 
-		'''
-		collection_path = os.path.join( settings.GIT_REPO_PATH, 
-										self.collection_name )
-		file_name = self._id.__str__() + '.json'
-		file_path = collection_path + '/' +  file_name
-		file_mode = 'w'	# Opens a file for writing only. Overwrites the file if the file exists. If the file does not exist, creates a new file for writing.
-		file_git = None
-		
-		# Checks whether collection_path with two-level hash exists:
-		#	If exists: Proceed further...
-		#	Else	 : Create that path first, then proceed!
-		
-		try:
-			file_git = open( file_path, file_mode )
-			
-			file_git.write( json.dumps( self.to_json_type(), 
-										sort_keys=True, 
-										indent=4, 
-										separators=(',', ': ')
-									  )
-						  )
-		except IOError as ioe:
-			print( " " + str( ioe ) + "\n\n" )
-			print( " Please refer following command from \"Get Started\" file:\n\tpython manage.py initgitrepos\n" )
-		except:
-			print( "Unexpected error : " + sys.exc_info()[0] )
-		else:
-			print( " File opened successfully...\n" )
-		finally:
-			if (file_git != None):
-				file_git.close()
-
->>>>>>> 50041433bee53a620ba79bdc145a23e7beea01df
+        historyManager.store_doc_history_as_json()
+        
 
 @connection.register
 class AttributeType(Node):
@@ -365,7 +308,7 @@ class HistoryManager():
                                         separators=(',', ': ')
                                       )
                            )
-            #self.add_n_commit()
+            self.add_n_commit()
         finally:
             if file_git is not None:
                 file_git.close()
