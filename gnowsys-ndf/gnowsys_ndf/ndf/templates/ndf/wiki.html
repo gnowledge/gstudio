@@ -21,7 +21,7 @@ Create a new wikipage
   <div>
     <p><strong>{{ node.name }}</strong><br><br>
     Created at : {{ node.created_at|date:"j F Y" }}<br>
-    Nodetype   : {{ node.node_type }}<br>
+    Member of  : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>
     <a href="{% url 'delete_node' node %}">delete</a>
     </p>
