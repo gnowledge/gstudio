@@ -11,11 +11,14 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {
+    'default': 
+    {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'example-sqlite3.db',
     },
-    'mongodb': {
+    
+    'mongodb': 
+    {
         'ENGINE': 'django_mongokit.mongodb',
         'NAME': 'example',
         'USER': '',
@@ -116,6 +119,7 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
