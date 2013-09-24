@@ -1,0 +1,212 @@
+{% extends "ndf/base.html" %}
+
+{% block title %} User Registration {% endblock %}
+
+{% block style %} 
+	<style>
+		table td{	padding-left:10px;	width:150px; }
+		
+		.meta-info
+		{
+			font-style:italic; color:#BDC3C7; 
+		}
+	</style>
+{% endblock %}
+
+{% block body_content %}
+
+	<form method="post" action="{% url 'Register' %}">
+	{% csrf_token %}
+
+    <h3 class="demo-panel-title">Register</h3>
+	
+		<div id="reg-div" style="">
+			<table>
+			<tr>
+				<td class="pbm">
+					First Name : 
+				</td>
+
+				<td class="pbm">
+					<div class="control-group">
+						<input autofocus="autofocus" type="text" name="reg_Fname" placeholder="First Name" class="span3" 
+						onblur="validate(this)"/>						
+					</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="pbm">
+					Last Name : 
+				</td>
+
+				<td class="pbm">
+					<div class="control-group">
+						<input type="text" name="reg_Lname" placeholder="Last Name" class="span3 error" onblur="validate(this)"/>
+					</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="pbm">
+					Username : 
+				</td>
+
+				<td class="pbm">
+					<div class="control-group"> 
+						<input type="text" name="reg_Username" placeholder="Enter desired Username" class="span3" 
+						onblur="validate(this)"/>
+					</div>
+				</td>
+				<td class="pbm meta-info">
+					Example : JohnDoe
+				</td>
+			</tr>
+
+			<tr>
+				<td class="pbm">
+					Password : 
+				</td>
+
+				<td class="pbm">
+					<div class="control-group"> 
+						<input type="password" name="reg_Password" placeholder="Password" class="span3" onblur="validate(this)"/>
+					</div>
+				</td>
+				<td class="pbm meta-info">
+					Use Characters and numbers
+				</td>
+			</tr>
+
+			<tr>
+				<td class="pbm">
+					Re-Enter Password : 
+				</td>
+
+				<td class="pbm">
+					<div class="control-group">
+						<input type="password" name="password-re" placeholder="Password" class="span3" onblur="validate(this)"/>
+					</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td class="pbm">
+					Address : 
+				</td>
+
+				<td class="pbm">
+					<div class="control-group">
+						<input type="text" name="reg_Address" placeholder="Address" class="span3" onblur="validate(this)"/>
+					</div>
+				</td class="pbm">
+			</tr>
+
+			<tr>
+				<td class="pbm">
+					Phone :
+				</td>
+
+				<td class="pbm">
+					<div class="control-group">
+						<input type="text" name="reg_Phone" placeholder="Phone Number" class="span3" onblur="validate(this)"/>
+					</div>
+				</td>
+				<td class="pbm meta-info">
+					Example : 9912345678 
+				</td>
+
+			</tr>
+			 
+			<tr>
+				<td class="pbm">
+					Email :
+				</td>
+
+				<td class="pbm">
+					<div class="control-group">
+						<input type="text" name="reg_Email" placeholder="Email ID" class="span3" onblur="validate(this)"/>
+					</div>
+				</td>
+				<td class="pbm meta-info">
+					Example : json@gmail.com 
+				</td>
+			</tr>
+
+			</table>          
+
+			<div id="submit-btn" style="padding:10px;">
+	            <input type="submit" class="btn btn-primary btn-large btn-block" 
+	            value="Register" title="Click to get registered"/>
+            </div>
+            
+            </form>
+            
+		</div>
+		
+	</form>
+	
+	<script>
+		$(document).ready(function()
+		{
+			cell = ($(".pbm").width());
+			$("#reg-div").width(cell*4);
+			$("#reg-div").css("margin-left", (( $(".container").width() - $("#reg-div").width() ) / 2) + "px" );
+			
+		})
+		
+		var isFormValid = false;
+		
+		function validate(input)
+		{	
+			if(input.name == "reg_Password")
+			{
+				//Password should have combination of 0-9 numbers and a-z characters.
+				var re = /^(?=.*[0-9])[a-zA-Z0-9!@.#$%^&*]{6,16}$/;
+				
+				re.test(input.value)?valid():invalid();
+			}			
+			else if(input.name == "password-re")
+			{
+				(input.value && ($( ":input[name='reg_Password']" ).val() == input.value))?valid():invalid();
+			}
+			else if(input.name == "reg_Email")
+			{
+				var re = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+				
+				re.test(input.value)?valid():invalid();
+			}
+			else if(input.name == "reg_Phone")
+			{
+				re = /^[0-9]{8,10}$/
+				
+				re.test(input.value)?valid():invalid();
+			}			
+			else
+			{
+				input.value?valid():invalid();
+			}
+			
+			function valid()
+			{
+				$(input).parent().removeClass("error").addClass("success");
+				$(input).after('<i class="input-icon fui-check-inverted"></i>');
+				isFormValid = true;
+				return ;
+			}
+			
+			function invalid()
+			{
+				$(input).parent().removeClass("success").addClass("error");
+				a = $(input).siblings();
+				$(a).remove();
+				isFormValid = false;
+				return;
+			}
+		}
+		
+	</script>
+	
+{% endblock %}
+
+

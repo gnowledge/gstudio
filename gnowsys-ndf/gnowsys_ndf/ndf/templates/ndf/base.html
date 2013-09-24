@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>NUSSD - {% block title %} {% endblock %}</title>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Loading Bootstrap -->
+		<link href="/static/ndf/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+		<!-- Loading Flat UI -->
+		<link href="/static/ndf/css/flat-ui.css" rel="stylesheet">
+
+		<link rel="shortcut icon" href="/static/ndf/images/logo.png">
+
+		<script src="/static/ndf/js/jquery-1.8.3.min.js"></script>
+		<script src="/static/ndf/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="/static/ndf/js/jquery.ui.touch-punch.min.js"></script>
+		<script src="/static/ndf/js/bootstrap.min.js"></script>
+		<script src="/static/ndf/js/bootstrap-select.js"></script>
+		<script src="/static/ndf/js/bootstrap-switch.js"></script>
+		<script src="/static/ndf/js/flatui-checkbox.js"></script>
+		<script src="/static/ndf/js/flatui-radio.js"></script>
+		<script src="/static/ndf/js/jquery.tagsinput.js"></script>
+		<script src="/static/ndf/js/jquery.placeholder.js"></script>
+		<script src="/static/ndf/js/jquery.stacktable.js"></script>
+		<!--<script src="static/http://vjs.zencdn.net/c/video.js"></script>-->
+		<script src="/static/ndf/js/application.js"></script>
+
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+		<!--[if lt IE 9]>
+		  <script src="js/html5shiv.js"></script>
+		<![endif]-->
+	 
+	 	<style>
+	 		#header
+	 		{
+		 		background-color:#edeff1; top:0px; position:fixed; width:100%; z-index:100;
+	 		}
+	 	
+			#login
+			{	 
+				margin-left:93%;  text-align:center; color:gray; position:fixed;
+				 top:10px;	z-index:101; display:block; padding:15px;
+			}
+	
+			#login:hover {	cursor:pointer; }
+	
+			#login-screen
+			{	
+				display:none; margin-left:77%;  color:gray; position:fixed; top:61px; width:auto; 
+				height:auto;	background-color:#edeff1; border-radius:5px; 
+			}
+
+			/*arrow added to uparrowdiv DIV*/
+			#login-screen:after
+			{ 
+				content:''; display:block; position:absolute; top:-20px; 
+				right:30px; width:0; height:0; 
+				border-color: transparent transparent #edeff1 transparent;
+				border-style: solid; border-width: 10px;
+			}
+
+			.shadow
+			{
+				-webkit-box-shadow: 0px 3px 10px rgba(50, 50, 50, 0.75);
+				-moz-box-shadow:    0px 3px 10px rgba(50, 50, 50, 0.75);
+				box-shadow:         0px 3px 10px rgba(50, 50, 50, 0.75);	
+			}
+		
+			.menu
+			{
+				display:inline-block; padding-left:1em;
+			}
+	
+		</style>
+	
+	 	   
+		{% block style %}  {% endblock %}
+ 	   
+	</head>
+  
+	<body>
+  		<!-- Start of Hedaer Div -->
+		<div id="header">
+			<h1 align="center">Node Description Framework of <a href="http://www.gnu.org/software/gnowsys/">GNOWSYS</a></h1>
+
+			{% if User.is_authenticated %}
+				<div id="login">
+					<a>Welcome {{ User.username }}</a> 
+					<a href="{% url 'Authentication' %}">Logout</a>	
+				</div>	
+						
+		{% else %}	
+				<div id="login">
+					<a onmouseover="$('#login-screen, .arrow-up').fadeIn();">Login</a>	
+				</div>
+    	{% endif %}	
+			
+	
+			<form method="post" action="{% url 'Authentication' %}">
+			{% csrf_token %}
+
+			<div id="login-screen" class="shadow">
+			
+				<div style="padding:10px;">          
+						<div class="control-group" style="padding:20px; ">
+						  <input type="text" class="login-field" value="" placeholder="Enter your name" id="login-name" name="username"/>
+						  <label class="login-field-icon fui-user" for="login-name"></label>
+						</div>
+
+						<div class="control-group" style="padding:0px 20px ">
+						  <input type="password" class="login-field" value="" placeholder="Password" id="login-pass" name="password" />
+						  <label class="login-field-icon fui-lock" for="login-pass"></label>
+						</div>
+
+						<a class="login-link" href="#">Lost your password ?</a>
+						<br/>
+						  <input type="submit" class="btn btn-primary btn-large btn-block" value="Login"/>
+						</form>
+						
+						<a class="login-link" href="{% url 'UserRegistration' %}">New user registration</a>
+					  	<br/>
+				</div>
+			</div>
+
+			<h5 class="menu"><a href="{% url 'wikipage' %}">Wikipage</a></h5>
+			<!--<h5 class="menu"><a href="#">Loom</a></h5>-->
+
+		</div> 		
+		<!-- End of Header Div-->
+
+		<!-- Start of Body Container -->		
+		<div class="container">  
+			{% block body_content %}  {% endblock %}
+		</div>
+		<!-- End of Body Container -->		  	
+		
+		<!-- Start of Footer -->		
+		<footer>
+		  <div class="container">
+		    <div class="row">
+		      <div class="span7">
+		          this is footer
+		        <h3 class="footer-title">
+					Gnowsys
+		        </h3>
+		        <p>
+		        <br/>
+	 
+		        </p>
+
+		      </div> <!-- /span8 -->
+
+		      <div class="span5">
+		        <div class="footer-banner">
+		          <h3 class="footer-title">Descriptions</h3>
+		          <ul>
+		            <li>1</li>
+		            <li>2</li>
+		            <li>3</li>
+		            <li>4</li>
+		            <li>5</li>
+		          </ul>
+
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</footer>
+		<!-- End of Footer -->		
+	</body>
+	<script type="text/javascript">
+
+		$(document).ready(function()
+		{	
+			$(".container").css("margin-top", $("#header").height() + "px");	
+			$("#login-screen").mouseleave(function(){$("#login-screen").fadeOut()});
+					/*$("#login").mouseleave(function()
+					{
+						if(	$("#login-screen").delay(2000).is(":hover")	)
+						{	$("#login-screen").mouseleave(function(){$("#login-screen").fadeOut()});	}
+						else
+							{$("#login-screen").delay(2000).fadeOut()}
+					});*/
+			
+		});
+	</script>
+
+	  
+</html>
+
