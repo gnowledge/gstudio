@@ -2,11 +2,15 @@
 import os
 import datetime
 import json
+import random
 
 ''' imports from installed packages '''
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import check_password
 
 from django_mongokit import connection
+from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
 
 from mongokit import OR
@@ -24,30 +28,74 @@ from gnowsys_ndf.settings import GIT_REPO_DIR
 from gnowsys_ndf.settings import GIT_REPO_DIR_HASH_LEVEL
 
 ####################################################################################################
-
 @connection.register
 class Author(DjangoDocument):
+    """
+    author class modified for storing in mongokit
+    """
+    
     objects = models.Manager()
+
     collection_name = 'Authors'
     structure = {
-        'name': unicode,
-        'created_at': datetime.datetime
-    }
-
-    required_fields = ['name']
-    default_values = {'created_at':datetime.datetime.utcnow}
-
+        'username': unicode,
+        'password': unicode,
+        'email': unicode,
+        'first_name': unicode,
+        'last_name': unicode,
+        'Address': unicode,
+        'phone': long,
+        'is_active': bool,
+        'is_staff': bool,
+        'is_superuser': bool,        
+        'created_at': datetime.datetime,
+        'last_login': datetime.datetime,
+        }
+    
     use_dot_notation = True
-
-    def __unicode__(self):
-        return self.name
-
-    def identity(self):
-        return self.__unicode__()
-
-    def my_func(self, *args, **kwargs):
-        return (" my_func working...\n")
-
+    required_fields = ['username', 'password']
+    default_values = {'created_at': datetime.datetime.now}
+    
+    indexes = [
+        {'fields': 'username',
+         'unique': True}
+        ]
+    
+    def __init__(self, *args, **kwargs):
+        super(Author, self).__init__(*args, **kwargs)
+        
+    def __eq__(self, other_user):
+        # found that otherwise millisecond differences in created_at is compared
+        try:
+            other_id = other_user['_id']
+        except (AttributeError, TypeError):
+            return False
+        return self['_id'] == other_id
+        
+    # play ball with Django
+    @property
+    def id(self):
+        return self.username
+    
+    def password_crypt(self, password):
+        password_salt = str(len(password))
+        crypt = hashlib.sha1(password[::-1].upper() + password_salt).hexdigest()
+        PASSWORD = unicode(crypt, 'utf-8')
+        return PASSWORD  
+    
+    def is_anonymous(self):
+        return False
+    
+    def is_authenticated(self):
+        return True
+    
+    
+    def get_full_name(self):
+        "Returns the first_name plus the last_name, with a space in between."
+        full_name = u'%s %s' % (self.first_name, 
+                                self.last_name)
+        return full_name.strip()
+    
 
 @connection.register
 class Node(DjangoDocument):
