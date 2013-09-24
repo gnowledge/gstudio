@@ -1,18 +1,29 @@
-<!DOCTYPE html>
-<html>
-<body>
-<h1>Wikipage</h1>
-<hr>
-Create a new wikipage
+{% extends "ndf/base.html" %}
 
-<form action="." method="post">
-{% csrf_token %}
+{% block title %} Wikipage {% endblock %}
 
-{{ form.as_p }}
-<input type="submit" value="+ Add Node">
-</form>
+{% block style %}  
+
+
+{% endblock %}
+
+
+{% block body_content %} 
+	<h3 class="demo-panel-title">Wikipage</h3>
+	<h4>Create a new wikipage	</h4>
+
+	<form action="." method="post">
+	{% csrf_token %}
+	
+		{{ form.as_p }}
+
+		<input type="submit" value="+ Add Node" class="btn btn-primary">
+		
+	</form>
 <hr>
+
 {% load url from future %}
+
 {% for node in nodes %}
   {% if forloop.first %}
     <h3>Number Of Nodes : {{ nodes_count }} </h3>
@@ -21,16 +32,16 @@ Create a new wikipage
   <div>
     <p><strong>{{ node.name }}</strong><br><br>
     Created at : {{ node.created_at|date:"j F Y" }}<br>
-    Member of  : {{ node.member_of }}<br>
+    Member Of   : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>
     <a href="{% url 'delete_node' node %}">delete</a>
     </p>
   </div>
 
 {% empty %}
-  <p><em>No nodes in the gnowledge base</em></p>
+  <p><em>Currently no nodes in the gnowledge base</em></p>
 {% endfor %}
+	<br/>
 
+{% endblock %}
 
-</body>
-</html>
