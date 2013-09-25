@@ -1,13 +1,18 @@
 ''' imports from python libraries '''
-import os
+import hashlib,os
 import datetime
 import json
-import random
+from random import random
+from random import choice
 
 ''' imports from installed packages '''
-from django.db import models
+
 from django.conf import settings
+from django.contrib.auth.models import User as DjangoUser
 from django.contrib.auth.models import check_password
+from django.db import models
+
+
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -16,6 +21,7 @@ from django_mongokit.document import DjangoDocument
 from mongokit import OR
 
 from bson import ObjectId
+
 
 from git import Repo
 from git.exc import GitCommandError
@@ -35,7 +41,7 @@ class Author(DjangoDocument):
     """
     
     objects = models.Manager()
-
+    
     collection_name = 'Authors'
     structure = {
         'username': unicode,
