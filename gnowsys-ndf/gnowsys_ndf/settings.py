@@ -90,7 +90,7 @@ STATICFILES_DIRS = (
 
 
 # List of collections (classes) whose documents' history has to be maintained.
-VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes', 'GSystemTypes', 'GSystems']
+VERSIONING_COLLECTIONS = ['Authors', 'AttributeTypes', 'RelationTypes', 'GSystemTypes', 'GSystems']
 
 # Hash level - number of sub-directories that will be created before saving the json-file
 GIT_REPO_DIR_HASH_LEVEL = 3
