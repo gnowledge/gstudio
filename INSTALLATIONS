@@ -3,7 +3,10 @@
 #############################################################################################################
 
 
-To start with, first install MongoDB and git (distributed version control system) using follwoing commands:
+To start with, first install python development package, MongoDB, git (distributed version control system) and
+Revision Control System (RCS) using follwoing commands:
+
+  Install python development package: sudo apt-get install build-essential python-dev
 
   Install mongoDB (2.0.4): sudo apt-get install mongodb
     (1) To start mongodb server: sudo service mongodb start
@@ -12,6 +15,9 @@ To start with, first install MongoDB and git (distributed version control system
  
   Install git (1.7.9.5): sudo apt-get install git
     NOTE: For more details visit - "http://git-scm.com/"
+
+  Install rcs (5.7-25): sudo apt-get install rcs
+    NOTE: For more details visit - "http://oreilly.com/perl/excerpts/system-admin-with-perl/five-minute-rcs-tutorial.html"
 
 
 Install virtual python environment (python-virtualenv) and create a new one as follows:
@@ -27,8 +33,8 @@ Install virtual python environment (python-virtualenv) and create a new one as f
 
 
 Make sure you are in the newly created virtual python environment (i.e. move to virtualenv-folder and activate it). 
-Then, after activating it - install django framework & django-mongokit (Bridging Django to MongoDB with MongoKit ODM),
-and GitPython (a python library used to interact with git repositories) within it; and also perform following steps:
+Then, after activating it - install django framework and django-mongokit (Bridging Django to MongoDB with MongoKit ODM) 
+within it; and also perform following steps:
 
   Install django (1.5.2): pip install django
     NOTE: For more details visit - "https://www.djangoproject.com/"
@@ -38,10 +44,6 @@ and GitPython (a python library used to interact with git repositories) within i
         (1) It also installs additional packages - mongokit (0.9.0), and pymongo (2.6).
         (2) For more details visit - "https://pypi.python.org/pypi/django-mongokit"
         
-  Install GitPython (0.3.2.RC1): easy_install GitPython
-    NOTE:
-  	(1) It also installs additional packages - async (0.6.1), gitdb (0.5.4), and smmap (0.8.2).
-  	(2) For more details visit - "http://pythonhosted.org/GitPython/0.3.1/index.html"
     
   To clone "gstudio-mongokit" project (inside the virtualenv-folder): 
     (1) Visit - "https://github.com/gnowledge/gstudio"
@@ -53,6 +55,6 @@ and GitPython (a python library used to interact with git repositories) within i
     (1) Make sure you are in the virtual­env-folder and it's activated (source bin/activate).
     (2) Move to gnowsys-­ndf folder: cd gstudio/gnowsys-ndf
     (3) Start mongodb server: sudo service mongodb start
-    (4) Run the following command: python manage.py initgitrepos
+    (4) Run the following command: python manage.py initrcsrepo
     (5) Run the following command: python manage.py runserver
 
