@@ -1,18 +1,16 @@
 ''' imports from python libraries '''
-import hashlib,os
+import hashlib
+import os
 import datetime
 import json
 from random import random
 from random import choice
 
 ''' imports from installed packages '''
-
 from django.conf import settings
 from django.contrib.auth.models import User as DjangoUser
 from django.contrib.auth.models import check_password
 from django.db import models
-
-
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -22,22 +20,17 @@ from mongokit import OR
 
 from bson import ObjectId
 
-
-from git import Repo
-from git.exc import GitCommandError
-from git.exc import InvalidGitRepositoryError
-from git.exc import NoSuchPathError
-from git.repo.fun import is_git_dir
-
 ''' imports from application folders/files '''
-from gnowsys_ndf.settings import GIT_REPO_DIR
-from gnowsys_ndf.settings import GIT_REPO_DIR_HASH_LEVEL
+from gnowsys_ndf.settings import RCS_REPO_DIR
+from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
+
 
 ####################################################################################################
+
 @connection.register
 class Author(DjangoDocument):
     """
-    author class modified for storing in mongokit
+    Author class modified for storing in mongokit
     """
     
     objects = models.Manager()
@@ -49,7 +42,7 @@ class Author(DjangoDocument):
         'email': unicode,
         'first_name': unicode,
         'last_name': unicode,
-        'Address': unicode,
+        'address': unicode,
         'phone': long,
         'is_active': bool,
         'is_staff': bool,
@@ -94,7 +87,6 @@ class Author(DjangoDocument):
     
     def is_authenticated(self):
         return True
-    
     
     def get_full_name(self):
         "Returns the first_name plus the last_name, with a space in between."
@@ -144,12 +136,11 @@ class Node(DjangoDocument):
         
         super(Node, self).save(*args, **kwargs)
         
-        ''' on save, store history file(in json-format) for 
-        corresponding document and commit to it'srepository
+        ''' on save, store history file(in json-format) for the
+        corresponding document and update status in it's version file
         '''
-        historyManager = HistoryManager(self)
-        historyManager.store_doc_history_as_json_and_commit()
-       
+        # TODO
+
 
 @connection.register
 class AttributeType(Node):
@@ -248,115 +239,124 @@ class GSystem(Node):
 ####################################################################################################
 
 class HistoryManager():
-    """Handles history management for documents of each collection using git.
+    """Handles history management for documents of each collection 
+    using Revision Control System (RCS).
 
-      Creates/Initializes a git repository for each collection.
-
-      While maintaing history for each document, follows following steps:
-        (1) Creates json-format file for each newly created and/or modified 
-            document.
-        (2) Stores newly created file in it's corresponding collection's git
-            repository by creating required level of recursive hash 
-            directories.
-        (3) Overwrites file, if already exists.
-        (4) Adds the modified file to the git using `git add <file-name>`
-        (5) Commits the modified file to the git using `git commit -m <msg>`
     """
 
-    objects = models.Manager()
-
-
-    """ Absolute path to the directory that consists of all
-    collection repositories
-    """
-    __GIT_REPO_DIR = GIT_REPO_DIR
+    __RCS_REPO_DIR = RCS_REPO_DIR
+    __file_name = ""
+    __collection_dir = ""
     __collection_hash_dirs = ""
+    __file_path = ""
+    __json_data = ""
 
-    def __init__(self, document_object=None):
-        self.__collection_dir = (os.path.join(self.__GIT_REPO_DIR,\
-                                                  document_object.collection_name))\
-                                                  if document_object is not None\
-                                                  else document_object
-
-        self.__file_name = (document_object._id.__str__() + '.json')\
-            if document_object is not None else document_object
-
-        if document_object is not None:
-            # Example: self.__collection_hash_dirs = 5/2/3/f/
-            for pos in range(0, GIT_REPO_DIR_HASH_LEVEL):
-                self.__collection_hash_dirs += \
-                    (document_object._id.__str__()[pos] + "/")
-
-        self.__file_path = (self.__collection_dir + '/' + \
-                                self.__collection_hash_dirs + self.__file_name)\
-                                if document_object is not None else document_object
-
-        self.__collection_git_repo = self.get_repo()\
-            if document_object is not None else document_object
-
-        self.__json_data = document_object.to_json_type()\
-            if document_object is not None else document_object
-
+    def __init__(self):
+        pass
 
     def check_dir_path(self, dir_path):
+        """Checks whether path exists; and if not it creates that path.
+
+        Arguments:
+          dir_path -- a string value representing an absolute path 
+
+        Returns: Nothing
+        """
         dir_exists = os.path.isdir(dir_path)
     	
     	if not dir_exists:
             os.makedirs(dir_path)
 
+    def create_rcs_repo_collections(self, *versioning_collections):
+        """Creates Revision Control System (RCS) repository.
 
-    def create_repos(self, *versioning_collections):
-        """Creates/Initiates git repositories for each collection
+        After creating rcs-repo, it also creates sub-directories 
+        for each collection inside it.
 
-          Arguments:
-          versioning_collections -- a list representing number of collections
+        Arguments:
+          versioning_collections -- a list representing collection-names
 
-          Returns: Nothing
-        """
-        self.check_dir_path(self.__GIT_REPO_DIR)
-
-        for collection in versioning_collections:
-            collection_git_repo = \
-                Repo.init(os.path.join(self.__GIT_REPO_DIR, collection), True)
-
-
-    def get_repo(self):
-        """Returns git repository object representing current collection 
-        based on path corresponding to the document that is passed as an 
-        argument to the HistoryManager class's constructor
-
-          Arguments: Empty
-
-          Returns: Repo object
+        Returns: Nothing
         """
         try:
-            return Repo(self.__collection_dir)
-        except InvalidGitRepositoryError as igre:
-            print("\n {0}_get_repo : {1}".format(InvalidGitRepositoryError.__name__, igre.message))
-            return None
+            self.check_dir_path(self.__RCS_REPO_DIR)
+        except OSError as ose:
+            print("\n\n RCS repository not created!!!\n {0}: {1}\n"\
+                      .format(ose.errno, ose.strerror))
+        else:
+            print("\n\n RCS repository created @ following path:\n {0}\n"\
+                      .format(self.__RCS_REPO_DIR))
 
+        for collection in versioning_collections:
+            rcs_repo_collection = os.path.join(self.__RCS_REPO_DIR, \
+                                                   collection)
+            try:
+                os.makedirs(rcs_repo_collection)
+            except OSError as ose:
+                print("\n {0} collection-directory under RCS repository "\
+                          "not created!!!\n Error #{1}: {2}"\
+                          .format(collection, ose.errno, ose.strerror))
+            else:
+                print("\n {0} collection-directory under RCS repository "\
+                          "created @ following path:\n {1}"\
+                          .format(collection, rcs_repo_collection))
+               
+    def create_or_replace_json_file(self, document_object=None):
+        """Creates/Overwrites a json-file for passed document object in 
+        its respective hashed-directory structure.
 
-    def store_doc_history_as_json_and_commit(self):
-        """On save, creates/overwrites a history file in json-format for 
-        the document in the corresponding collection's git repository.
+        Arguments:
+          document_object -- an instance of document of a collection
 
-        TODO: 
-        (1) Reduce HASH-DIR LEVEL by 1, if the current-dir size is full
+        Returns: Nothing
         """
-        
-        # file_mode as w
-        # Opens a file for writing only. 
-        # Overwrites the file if the file exists. 
-        # If the file does not exist, creates a new file for writing.
-        file_mode = 'w'	 
+        collection_tuple = (AttributeType, RelationType, GSystemType, GSystem)
 
-        file_git = None
+        if document_object is not None and \
+                isinstance(document_object, collection_tuple):
+            self.__file_name = (document_object._id.__str__() + '.json')
+            #print("\n file_name      : {0}".format(self.__file_name))
+
+            self.__collection_dir = \
+                (os.path.join(self.__RCS_REPO_DIR, \
+                                  document_object.collection_name)) 
+            #print("\n collection_dir : {0}".format(self.__collection_dir))
+
+            # Example: 
+            # if -- self.__file_name := "523f59685a409213818e3ec6.json"
+            # then -- self.__collection_hash_dirs := "6/c/3/8/ 
+            # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
+            # here n := hash_level_num
+            self.__collection_hash_dirs = ""
+            for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
+                self.__collection_hash_dirs += \
+                    (document_object._id.__str__()[-2**pos] + "/")
+            #print("\n collection_hash_dirs : {0}".format(self.__collection_hash_dirs))
+
+            self.__file_path = \
+                os.path.join(self.__collection_dir, \
+                                 (self.__collection_hash_dirs + \
+                                      self.__file_name))
+            #print("\n file_path      : {0}".format(self.__file_path))
+
+            self.__json_data = document_object.to_json_type()
+            #print("\n json_data      : {0}".format(self.__json_data))
+
+            # file_mode as w
+        # Opens a file for writing only.
+        # Overwrites the file if the file exists.
+        # If the file does not exist, creates a new file for writing.
+        file_mode = 'w'	
+        rcs_file = None
         
         try:
             self.check_dir_path(os.path.dirname(self.__file_path))
 
             file_git = open(self.__file_path, file_mode)
-	except IOError as ioe:
+        except OSError as ose:
+            print("\n\n RCS repository not created!!!\n {0}: {1}\n"\
+                      .format(ose.errno, ose.strerror))
+        except IOError as ioe:
             print(" " + str( ioe ) + "\n\n")
             print(" Please refer following command from \"Get Started\"" \
                        "file:\n\tpython manage.py initgitrepos\n")
@@ -376,20 +376,9 @@ class HistoryManager():
             if file_git is not None:
                 file_git.close()
 
-    def add_n_commit(self):
-        """Adds and committs list of files to staging area. 
-        """
+        else:
+            print("\n Error: Either invalid instance or not matching given instances list!!!")
 
-        collection_git_index = None
-        file_list            = []
+            
 
-        # creates index (stage area)
-        collection_git_index = self.__collection_git_repo.index
-        
-        # prepares a list of files to be committed and adds them
-        file_list.append((self.__collection_hash_dirs + self.__file_name))
-        collection_git_index.add(file_list)
-
-        # commits to git repository 
-        collection_git_index.commit(" " + (self.__collection_hash_dirs + self.__file_name) + " added/modofied.")
 
