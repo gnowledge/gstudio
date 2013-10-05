@@ -24,6 +24,8 @@ from bson import ObjectId
 from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 
+''' default object creations '''
+#history_manager = HistoryManager()
 
 ####################################################################################################
 
@@ -135,11 +137,6 @@ class Node(DjangoDocument):
         self.created_at = datetime.datetime.today()
         
         super(Node, self).save(*args, **kwargs)
-        
-        ''' on save, store history file(in json-format) for the
-        corresponding document and update status in it's version file
-        '''
-        # TODO
 
 
 @connection.register
@@ -243,6 +240,7 @@ class HistoryManager():
     using Revision Control System (RCS).
 
     """
+    objects = models.Manager()
 
     __RCS_REPO_DIR = RCS_REPO_DIR
     __file_name = ""
@@ -255,20 +253,20 @@ class HistoryManager():
         pass
 
     def check_dir_path(self, dir_path):
-        """Checks whether path exists; and if not it creates that path.
+        '''Checks whether path exists; and if not it creates that path.
 
         Arguments:
           dir_path -- a string value representing an absolute path 
 
         Returns: Nothing
-        """
+        '''
         dir_exists = os.path.isdir(dir_path)
     	
     	if not dir_exists:
             os.makedirs(dir_path)
 
     def create_rcs_repo_collections(self, *versioning_collections):
-        """Creates Revision Control System (RCS) repository.
+        '''Creates Revision Control System (RCS) repository.
 
         After creating rcs-repo, it also creates sub-directories 
         for each collection inside it.
@@ -277,7 +275,7 @@ class HistoryManager():
           versioning_collections -- a list representing collection-names
 
         Returns: Nothing
-        """
+        '''
         try:
             self.check_dir_path(self.__RCS_REPO_DIR)
         except OSError as ose:
@@ -302,15 +300,16 @@ class HistoryManager():
                           .format(collection, rcs_repo_collection))
                
     def create_or_replace_json_file(self, document_object=None):
-        """Creates/Overwrites a json-file for passed document object in 
+        '''Creates/Overwrites a json-file for passed document object in 
         its respective hashed-directory structure.
 
         Arguments:
           document_object -- an instance of document of a collection
 
         Returns: Nothing
-        """
+        '''
         collection_tuple = (AttributeType, RelationType, GSystemType, GSystem)
+        file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
                 isinstance(document_object, collection_tuple):
@@ -342,42 +341,55 @@ class HistoryManager():
             self.__json_data = document_object.to_json_type()
             #print("\n json_data      : {0}".format(self.__json_data))
 
-            # file_mode as w
-        # Opens a file for writing only.
-        # Overwrites the file if the file exists.
-        # If the file does not exist, creates a new file for writing.
-        file_mode = 'w'	
-        rcs_file = None
-        
-        try:
-            self.check_dir_path(os.path.dirname(self.__file_path))
+            #------------------------------------------------------------------
+            # Creating/Overwriting data into json-file and rcs-file
+            #------------------------------------------------------------------
 
-            file_git = open(self.__file_path, file_mode)
-        except OSError as ose:
-            print("\n\n RCS repository not created!!!\n {0}: {1}\n"\
-                      .format(ose.errno, ose.strerror))
-        except IOError as ioe:
-            print(" " + str( ioe ) + "\n\n")
-            print(" Please refer following command from \"Get Started\"" \
-                       "file:\n\tpython manage.py initgitrepos\n")
-        except Exception as e:
-            print(" Unexpected error : " + str(e))
+            # file_mode as w:-
+            #    Opens a file for writing only.
+            #    Overwrites the file if the file exists.
+            #    If the file does not exist, creates a new file for writing.
+            file_mode = 'w'	
+            rcs_file = None
+            
+            try:
+                self.check_dir_path(os.path.dirname(self.__file_path))
+
+                rcs_file = open(self.__file_path, file_mode)
+            except OSError as ose:
+                print("\n\n Json-File not created: Hashed directory "\
+                          "structure doesn't exists!!!")
+                print("\n {0}: {1}\n".format(ose.errno, ose.strerror))
+            except IOError as ioe:
+                print(" " + str(ioe))
+                print("\n\n Please refer following command from "\
+                          "\"Get Started\" file:\n"\
+                          "\tpython manage.py initrcsrepo\n")
+            except Exception as e:
+                print(" Unexpected error : " + str(e))
+            else:
+                rcs_file.write(json.dumps(self.__json_data,
+                                          sort_keys=True,
+                                          indent=4,
+                                          separators=(',', ': ')
+                                          )
+                               )
+                
+                # TODO: Commit modifications done to the file into 
+                # it's rcs-version-file
+
+                file_res = True
+            finally:
+                if rcs_file is not None:
+                    rcs_file.close()
+
         else:
-            file_git.write(json.dumps(self.__json_data,
-                                        sort_keys=True,
-                                        indent=4,
-                                        separators=(',', ': ')
-                                      )
-                           )
+            # if document_object is None or
+            # !isinstance(document_object, collection_tuple)
+            print("\n Error: Either invalid instance or "\
+                      "not matching given instances list!!!")
 
-            # Commit modifications done to the file to it's git repository
-            self.add_n_commit()
-        finally:
-            if file_git is not None:
-                file_git.close()
-
-        else:
-            print("\n Error: Either invalid instance or not matching given instances list!!!")
+        return file_res
 
             
 
