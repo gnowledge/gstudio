@@ -169,11 +169,14 @@ class RCS:
         """
         name, rev = self._unmangle(name_rev)
         new = not self.isvalid(name)
+
         if not message: 
             message = "<none>"
         if message and message[-1] != '\n':
             message = message + '\n'
+
         lockflag = "-u"
+
         if new:
             #f = tempfile.NamedTemporaryFile()
 
@@ -307,15 +310,20 @@ class RCS:
             namev = name
         else: 
             namev = name + ',v'
+
         if os.path.isfile(namev): 
             return namev
+
+        '''
         namev = os.path.join('RCS', os.path.basename(namev))
         if os.path.isfile(namev): 
             return namev
+
         if os.path.isdir('RCS'):
             return os.path.join('RCS', namev)
         else:
             return namev
+        '''
 
     def realname(self, namev):
         """Return the pathname of the work file for NAME.
@@ -386,19 +394,23 @@ class RCS:
     def _unmangle(self, name_rev):
         """INTERNAL: Normalize NAME_REV argument to (NAME, REV) tuple.
 
-        Raise an exception if NAME contains invalid characters.
+        Raises an exception if NAME contains invalid characters.
 
         A NAME_REV argument is either NAME string (implying REV='') or
         a tuple of the form (NAME, REV).
 
+        Example:
+        (a) string: _unmangle('5252648f5a40920c160bc774.json')
+        (b) tuple : _unmangle('5252648f5a40920c160bc774.json', '1.3')
         """
         if type(name_rev) == type(''):
             name_rev = name, rev = name_rev, ''
         else:
             name, rev = name_rev
+
         for c in rev:
             if c not in self.okchars:
-                raise ValueError, "bad char in rev"
+                raise ValueError, "Bad character in revision number!!!"
         return name_rev
 
     def _closepipe(self, f):
@@ -464,3 +476,5 @@ class RCS:
     def _isrcs(self, name):
         """INTERNAL: Test whether NAME ends in ',v'."""
         return name[-2:] == ',v'
+
+    def _filepath()

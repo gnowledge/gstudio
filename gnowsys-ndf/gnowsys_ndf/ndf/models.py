@@ -306,7 +306,9 @@ class HistoryManager():
         Arguments:
           document_object -- an instance of document of a collection
 
-        Returns: Nothing
+        Returns: A boolean value indicating whether created successfully
+          True - if created
+          False - Otherwise
         '''
         collection_tuple = (AttributeType, RelationType, GSystemType, GSystem)
         file_res = False    # True, if no error/exception occurred
