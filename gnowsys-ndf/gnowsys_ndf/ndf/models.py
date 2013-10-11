@@ -1,18 +1,16 @@
 ''' imports from python libraries '''
-import hashlib,os
+import hashlib
+import os
 import datetime
 import json
 from random import random
 from random import choice
 
 ''' imports from installed packages '''
-
 from django.conf import settings
 from django.contrib.auth.models import User as DjangoUser
 from django.contrib.auth.models import check_password
 from django.db import models
-
-
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -22,17 +20,11 @@ from mongokit import OR
 
 from bson import ObjectId
 
-
-from git import Repo
-from git.exc import GitCommandError
-from git.exc import InvalidGitRepositoryError
-from git.exc import NoSuchPathError
-from git.repo.fun import is_git_dir
-
 ''' imports from application folders/files '''
+from gnowsys_ndf.settings import RCS_REPO_DIR
+from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 
-
-###############################################################################
+####################################################################################################
 
 NODE_TYPE_CHOICES = (
     ('Nodes'),
@@ -52,11 +44,12 @@ NODE_TYPE_CHOICES = (
     ('Process')
    )
 
+####################################################################################################
 
 @connection.register
 class Author(DjangoDocument):
     """
-    author class modified for storing in mongokit
+    Author class modified for storing in mongokit
     """
     
     objects = models.Manager()
@@ -114,7 +107,6 @@ class Author(DjangoDocument):
     def is_authenticated(self):
         return True
     
-    
     def get_full_name(self):
         "Returns the first_name plus the last_name, with a space in between."
         full_name = u'%s %s' % (self.first_name, 
@@ -166,10 +158,8 @@ class Node(DjangoDocument):
         ''' on save, store history file(in json-format) for 
         corresponding document and commit to it'srepository
         '''
-        #historyManager = HistoryManager(self)
-        #historyManager.store_doc_history_as_json_and_commit()
-        
-        
+
+
 @connection.register
 class AttributeType(Node):
     collection_name = 'AttributeTypes'
@@ -265,4 +255,164 @@ class GSystem(Node):
         }
     
     use_dot_notation = True
- 
+
+####################################################################################################
+
+class HistoryManager():
+    """Handles history management for documents of each collection 
+    using Revision Control System (RCS).
+
+    """
+    objects = models.Manager()
+
+    __RCS_REPO_DIR = RCS_REPO_DIR
+    __file_name = ""
+    __collection_dir = ""
+    __collection_hash_dirs = ""
+    __file_path = ""
+    __json_data = ""
+
+    def __init__(self):
+        pass
+
+    def check_dir_path(self, dir_path):
+        '''Checks whether path exists; and if not it creates that path.
+
+        Arguments:
+          dir_path -- a string value representing an absolute path 
+
+        Returns: Nothing
+        '''
+        dir_exists = os.path.isdir(dir_path)
+    	
+    	if not dir_exists:
+            os.makedirs(dir_path)
+
+    def create_rcs_repo_collections(self, *versioning_collections):
+        '''Creates Revision Control System (RCS) repository.
+
+        After creating rcs-repo, it also creates sub-directories 
+        for each collection inside it.
+
+        Arguments:
+          versioning_collections -- a list representing collection-names
+
+        Returns: Nothing
+        '''
+        try:
+            self.check_dir_path(self.__RCS_REPO_DIR)
+        except OSError as ose:
+            print("\n\n RCS repository not created!!!\n {0}: {1}\n"\
+                      .format(ose.errno, ose.strerror))
+        else:
+            print("\n\n RCS repository created @ following path:\n {0}\n"\
+                      .format(self.__RCS_REPO_DIR))
+
+        for collection in versioning_collections:
+            rcs_repo_collection = os.path.join(self.__RCS_REPO_DIR, \
+                                                   collection)
+            try:
+                os.makedirs(rcs_repo_collection)
+            except OSError as ose:
+                print("\n {0} collection-directory under RCS repository "\
+                          "not created!!!\n Error #{1}: {2}"\
+                          .format(collection, ose.errno, ose.strerror))
+            else:
+                print("\n {0} collection-directory under RCS repository "\
+                          "created @ following path:\n {1}"\
+                          .format(collection, rcs_repo_collection))
+               
+    def create_or_replace_json_file(self, document_object=None):
+        '''Creates/Overwrites a json-file for passed document object in 
+        its respective hashed-directory structure.
+
+        Arguments:
+          document_object -- an instance of document of a collection
+
+        Returns: A boolean value indicating whether created successfully
+          True - if created
+          False - Otherwise
+        '''
+        collection_tuple = (AttributeType, RelationType, GSystemType, GSystem)
+        file_res = False    # True, if no error/exception occurred
+
+        if document_object is not None and \
+                isinstance(document_object, collection_tuple):
+            self.__file_name = (document_object._id.__str__() + '.json')
+            #print("\n file_name      : {0}".format(self.__file_name))
+
+            self.__collection_dir = \
+                (os.path.join(self.__RCS_REPO_DIR, \
+                                  document_object.collection_name)) 
+            #print("\n collection_dir : {0}".format(self.__collection_dir))
+
+            # Example: 
+            # if -- self.__file_name := "523f59685a409213818e3ec6.json"
+            # then -- self.__collection_hash_dirs := "6/c/3/8/ 
+            # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
+            # here n := hash_level_num
+            self.__collection_hash_dirs = ""
+            for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
+                self.__collection_hash_dirs += \
+                    (document_object._id.__str__()[-2**pos] + "/")
+            #print("\n collection_hash_dirs : {0}".format(self.__collection_hash_dirs))
+
+            self.__file_path = \
+                os.path.join(self.__collection_dir, \
+                                 (self.__collection_hash_dirs + \
+                                      self.__file_name))
+            #print("\n file_path      : {0}".format(self.__file_path))
+
+            self.__json_data = document_object.to_json_type()
+            #print("\n json_data      : {0}".format(self.__json_data))
+
+            #------------------------------------------------------------------
+            # Creating/Overwriting data into json-file and rcs-file
+            #------------------------------------------------------------------
+
+            # file_mode as w:-
+            #    Opens a file for writing only.
+            #    Overwrites the file if the file exists.
+            #    If the file does not exist, creates a new file for writing.
+            file_mode = 'w'	
+            rcs_file = None
+            
+            try:
+                self.check_dir_path(os.path.dirname(self.__file_path))
+
+                rcs_file = open(self.__file_path, file_mode)
+            except OSError as ose:
+                print("\n\n Json-File not created: Hashed directory "\
+                          "structure doesn't exists!!!")
+                print("\n {0}: {1}\n".format(ose.errno, ose.strerror))
+            except IOError as ioe:
+                print(" " + str(ioe))
+                print("\n\n Please refer following command from "\
+                          "\"Get Started\" file:\n"\
+                          "\tpython manage.py initrcsrepo\n")
+            except Exception as e:
+                print(" Unexpected error : " + str(e))
+            else:
+                rcs_file.write(json.dumps(self.__json_data,
+                                          sort_keys=True,
+                                          indent=4,
+                                          separators=(',', ': ')
+                                          )
+                               )
+                
+                # TODO: Commit modifications done to the file into 
+                # it's rcs-version-file
+
+                file_res = True
+            finally:
+                if rcs_file is not None:
+                    rcs_file.close()
+
+        else:
+            # if document_object is None or
+            # !isinstance(document_object, collection_tuple)
+            print("\n Error: Either invalid instance or "\
+                      "not matching given instances list!!!")
+
+        return file_res
+
