@@ -51,10 +51,6 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-# Absolute filesystem path to the project's base directory, 
-# i.e. having settings.py file
-# Example: "/home/tissavadoot/Desktop/Tissproject/TP_MK/gstudio/gnowsys-ndf/gnowsys_ndf/"
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -162,6 +158,12 @@ LOGGING = {
     }
 }
 
+# Absolute filesystem path to the project's base directory, 
+# i.e. having settings.py file
+# Example: "/home/username/Desktop/gstudio/gnowsys-ndf/gnowsys_ndf/"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+
 """ ----- Revision Control System (RCS) configuration -----
 
 It operates only on single files; and hence used in this project 
@@ -170,15 +172,16 @@ collections (models).
 
 """
 
-# List of collections whose documents' history has to be maintained.
-VERSIONING_COLLECTIONS = ['Authors', 'AttributeTypes', 'RelationTypes', 'GSystemTypes', 'GSystems']
+# Indicates list of collection-names whose documents' history has to be 
+# maintained.
+VERSIONING_COLLECTIONS = ['Authors', 'AttributeTypes', 'RelationTypes', 
+                          'GSystemTypes', 'GSystems']
 
-# Hash level - number of sub-directories that will be created before saving the json-file
+# Indicates the "hash-level-number", i.e. number of sub-directories that 
+# will be created before saving the json-file into it 
 RCS_REPO_DIR_HASH_LEVEL = 3
 
-# Absolute filesystem path to the directory that will hold all git repositories;
-# belonging to each model(class) for maintaining history of each and every documents.
-# Example: "/home/media/media.lawrence.com/static/ndf/rcs-repo/"
-RCS_REPO_DIR = os.path.join( PROJECT_ROOT, "ndf/static/rcs-repo" )
-
-
+# Absolute filesystem path to the directory that will hold all rcs-files 
+# (history-files corresponding to each json-files created for every document
+#  belonging to a collection).
+RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/static/rcs-repo")
