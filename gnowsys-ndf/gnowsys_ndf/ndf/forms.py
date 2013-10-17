@@ -5,6 +5,7 @@ from django import forms
 from django_mongokit.forms import DocumentForm
 from models import Node
 from models import Author
+from models import GSystemType
 
 
 class NodeForm(DocumentForm):

@@ -24,7 +24,7 @@ from bson import ObjectId
 from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 
-####################################################################################################
+############################################################################
 
 NODE_TYPE_CHOICES = (
     ('Nodes'),
@@ -44,7 +44,8 @@ NODE_TYPE_CHOICES = (
     ('Process')
    )
 
-####################################################################################################
+#############################################################################
+
 
 @connection.register
 class Author(DjangoDocument):
@@ -113,6 +114,9 @@ class Author(DjangoDocument):
                                 self.last_name)
         return full_name.strip()
     
+    def __unicode__(self):
+        return self._id
+
     
 @connection.register
 class Node(DjangoDocument):
@@ -158,8 +162,8 @@ class Node(DjangoDocument):
         ''' on save, store history file(in json-format) for 
         corresponding document and commit to it'srepository
         '''
-
-
+        
+        
 @connection.register
 class AttributeType(Node):
     collection_name = 'AttributeTypes'
@@ -208,6 +212,8 @@ class RelationType(Node):
     collection_name = 'RelationTypes'
     structure = {
         'inverse_name': unicode,
+        'subject_type': [ObjectId],	       # ObjectId's of GSystemType Class
+        'object_type': [ObjectId],	       # ObjectId's of GSystemType Class
         'slug': basestring,
         'subject_type': [ObjectId],	       # ObjectId's of GSystemType Class
         'object_type': [ObjectId],	       # ObjectId's of GSystemType Class        
@@ -255,8 +261,8 @@ class GSystem(Node):
         }
     
     use_dot_notation = True
-
-####################################################################################################
+    
+######################################################################################################
 
 class HistoryManager():
     """Handles history management for documents of a collection 
@@ -435,3 +441,4 @@ class HistoryManager():
 
         return file_res
 
+      

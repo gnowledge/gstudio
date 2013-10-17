@@ -55,6 +55,9 @@ within it; and also perform following steps:
     (1) Make sure you are in the virtual­env-folder and it's activated (source bin/activate).
     (2) Move to gnowsys-­ndf folder: cd gstudio/gnowsys-ndf
     (3) Start mongodb server: sudo service mongodb start
-    (4) Run the following command: python manage.py initrcsrepo
-    (5) Run the following command: python manage.py runserver
+    (4) Run the following command: python manage.py initgitrepos
+    (5) Run the following command: python manage.py gsystemtypewiki
+    (6) Run the following command: python manage.py syncdb
+	NOTE: Its essential to execute (6) command before executing following command      
+    (7) Run the following command: python manage.py runserver
 
