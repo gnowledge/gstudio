@@ -259,18 +259,13 @@ class GSystem(Node):
 ####################################################################################################
 
 class HistoryManager():
-    """Handles history management for documents of each collection 
+    """Handles history management for documents of a collection 
     using Revision Control System (RCS).
 
     """
     objects = models.Manager()
 
     __RCS_REPO_DIR = RCS_REPO_DIR
-    __file_name = ""
-    __collection_dir = ""
-    __collection_hash_dirs = ""
-    __file_path = ""
-    __json_data = ""
 
     def __init__(self):
         pass
@@ -287,6 +282,49 @@ class HistoryManager():
     	
     	if not dir_exists:
             os.makedirs(dir_path)
+
+    def get_file_path(self, document_object):
+        '''Returns absolute filesystem path for a json-file.
+
+        This path is combination of :-
+        (a) collection_directory_path: path to the collection-directory
+        to which the given instance belongs
+        (b) hashed_directory_structure: path built from object id based 
+        on the set hashed-directory-level
+        (c) file_name: '.json' extension concatenated with object id of
+        the given instance
+
+        Arguments:
+          document_object -- an instance of a collection
+
+        Returns: a string representing json-file's path
+          
+        '''
+        file_name = (document_object._id.__str__() + '.json')
+        #print("\n file_name      : {0}".format(file_name))
+
+        collection_dir = \
+            (os.path.join(self.__RCS_REPO_DIR, \
+                              document_object.collection_name)) 
+        #print("\n collection_dir : {0}".format(collection_dir))
+
+        # Example: 
+        # if -- file_name := "523f59685a409213818e3ec6.json"
+        # then -- collection_hash_dirs := "6/c/3/8/ 
+        # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
+        # here n := hash_level_num
+        collection_hash_dirs = ""
+        for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
+            collection_hash_dirs += \
+                (document_object._id.__str__()[-2**pos] + "/")
+        #print("\n collection_hash_dirs : {0}".format(collection_hash_dirs))
+
+        file_path = \
+            os.path.join(collection_dir, \
+                             (collection_hash_dirs + file_name))
+        #print("\n file_path      : {0}".format(file_path))
+
+        return file_path
 
     def create_rcs_repo_collections(self, *versioning_collections):
         '''Creates Revision Control System (RCS) repository.
@@ -314,12 +352,12 @@ class HistoryManager():
             try:
                 os.makedirs(rcs_repo_collection)
             except OSError as ose:
-                print("\n {0} collection-directory under RCS repository "\
-                          "not created!!!\n Error #{1}: {2}"\
+                print(" {0} collection-directory under RCS repository "\
+                          "not created!!!\n Error #{1}: {2}\n"\
                           .format(collection, ose.errno, ose.strerror))
             else:
-                print("\n {0} collection-directory under RCS repository "\
-                          "created @ following path:\n {1}"\
+                print(" {0} collection-directory under RCS repository "\
+                          "created @ following path:\n {1}\n"\
                           .format(collection, rcs_repo_collection))
                
     def create_or_replace_json_file(self, document_object=None):
@@ -333,37 +371,16 @@ class HistoryManager():
           True - if created
           False - Otherwise
         '''
-        collection_tuple = (AttributeType, RelationType, GSystemType, GSystem)
+
+        collection_tuple = (Author, AttributeType, RelationType, GSystemType, GSystem)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
                 isinstance(document_object, collection_tuple):
-            self.__file_name = (document_object._id.__str__() + '.json')
-            #print("\n file_name      : {0}".format(self.__file_name))
 
-            self.__collection_dir = \
-                (os.path.join(self.__RCS_REPO_DIR, \
-                                  document_object.collection_name)) 
-            #print("\n collection_dir : {0}".format(self.__collection_dir))
+            file_path = self.get_file_path(document_object)
 
-            # Example: 
-            # if -- self.__file_name := "523f59685a409213818e3ec6.json"
-            # then -- self.__collection_hash_dirs := "6/c/3/8/ 
-            # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
-            # here n := hash_level_num
-            self.__collection_hash_dirs = ""
-            for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
-                self.__collection_hash_dirs += \
-                    (document_object._id.__str__()[-2**pos] + "/")
-            #print("\n collection_hash_dirs : {0}".format(self.__collection_hash_dirs))
-
-            self.__file_path = \
-                os.path.join(self.__collection_dir, \
-                                 (self.__collection_hash_dirs + \
-                                      self.__file_name))
-            #print("\n file_path      : {0}".format(self.__file_path))
-
-            self.__json_data = document_object.to_json_type()
+            json_data = document_object.to_json_type()
             #print("\n json_data      : {0}".format(self.__json_data))
 
             #------------------------------------------------------------------
@@ -378,9 +395,9 @@ class HistoryManager():
             rcs_file = None
             
             try:
-                self.check_dir_path(os.path.dirname(self.__file_path))
+                self.check_dir_path(os.path.dirname(file_path))
 
-                rcs_file = open(self.__file_path, file_mode)
+                rcs_file = open(file_path, file_mode)
             except OSError as ose:
                 print("\n\n Json-File not created: Hashed directory "\
                           "structure doesn't exists!!!")
@@ -393,7 +410,7 @@ class HistoryManager():
             except Exception as e:
                 print(" Unexpected error : " + str(e))
             else:
-                rcs_file.write(json.dumps(self.__json_data,
+                rcs_file.write(json.dumps(json_data,
                                           sort_keys=True,
                                           indent=4,
                                           separators=(',', ': ')
@@ -409,8 +426,10 @@ class HistoryManager():
                     rcs_file.close()
 
         else:
+            # TODO: Throw/raise error having following message!
             # if document_object is None or
             # !isinstance(document_object, collection_tuple)
+
             print("\n Error: Either invalid instance or "\
                       "not matching given instances list!!!")
 
