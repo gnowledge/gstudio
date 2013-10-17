@@ -54,5 +54,9 @@ and GitPython (a python library used to interact with git repositories) within i
     (2) Move to gnowsys-­ndf folder: cd gstudio/gnowsys-ndf
     (3) Start mongodb server: sudo service mongodb start
     (4) Run the following command: python manage.py initgitrepos
-    (5) Run the following command: python manage.py runserver
+    (5) Run the following command: python manage.py gsystemtypewiki
+    (6) Run the following command: python manage.py syncdb
+	NOTE: Its essential to execute (6) command before executing following command 
+	     
+    (7) Run the following command: python manage.py runserver
 
