@@ -164,7 +164,7 @@ LOGGING = {
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-""" ----- Revision Control System (RCS) configuration -----
+""" ----- Revision Control System (RCS) Configuration -----
 
 It operates only on single files; and hence used in this project 
 to keep track of history of each document belonging to different 
@@ -177,11 +177,11 @@ collections (models).
 VERSIONING_COLLECTIONS = ['Authors', 'AttributeTypes', 'RelationTypes', 
                           'GSystemTypes', 'GSystems']
 
-# Indicates the "hash-level-number", i.e. number of sub-directories that 
-# will be created before saving the json-file into it 
-RCS_REPO_DIR_HASH_LEVEL = 3
-
 # Absolute filesystem path to the directory that will hold all rcs-files 
-# (history-files corresponding to each json-files created for every document
-#  belonging to a collection).
+# (history-files corresponding to every json-file created for each document)
 RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/static/rcs-repo")
+
+# Indicates the "hash-level-number", i.e the number of sub-directories that 
+# will be created for the corresponding document under it's 
+# collection-directory; in order to store json-files in an effective manner
+RCS_REPO_DIR_HASH_LEVEL = 3
