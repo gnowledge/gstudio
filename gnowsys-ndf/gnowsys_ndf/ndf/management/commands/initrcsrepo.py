@@ -1,7 +1,3 @@
-''' imports from python libraries '''
-#import os
-
-
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
 
