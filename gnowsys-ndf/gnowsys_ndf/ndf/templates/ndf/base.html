@@ -83,54 +83,57 @@
   
 	<body>
   		<!-- Start of Hedaer Div -->
+		
 		<div id="header">
-			<h1 align="center">Node Description Framework of <a href="http://www.gnu.org/software/gnowsys/">GNOWSYS</a></h1>
-
-			{% if User.is_authenticated %}
-				<div id="login">
-					<a>Welcome {{ User.username }}</a> 
-					<a href="{% url 'Authentication' %}">Logout</a>	
-				</div>	
-						
-		{% else %}	
-				<div id="login">
-					<a onmouseover="$('#login-screen, .arrow-up').fadeIn();">Login</a>	
-				</div>
-    	{% endif %}	
-			
-	
-			<form method="post" action="{% url 'Authentication' %}">
-			{% csrf_token %}
-
-			<div id="login-screen" class="shadow">
-			
-				<div style="padding:10px;">          
-						<div class="control-group" style="padding:20px; ">
-						  <input type="text" class="login-field" value="" placeholder="Enter your name" id="login-name" name="username"/>
-						  <label class="login-field-icon fui-user" for="login-name"></label>
-						</div>
-
-						<div class="control-group" style="padding:0px 20px ">
-						  <input type="password" class="login-field" value="" placeholder="Password" id="login-pass" name="password" />
-						  <label class="login-field-icon fui-lock" for="login-pass"></label>
-						</div>
-
-						<a class="login-link" href="#">Lost your password ?</a>
-						<br/>
-						  <input type="submit" class="btn btn-primary btn-large btn-block" value="Login"/>
-						</form>
-						
-						<a class="login-link" href="{% url 'UserRegistration' %}">New user registration</a>
-					  	<br/>
-				</div>
+		 <h1 align="center">Node Description Framework of <a href="http://www.gnu.org/software/gnowsys/">GNOWSYS</a></h1>
+		 
+		  {% if user.is_authenticated %}
+		  <div id="login">
+		    
+		    <a>Welcome {{ user.username }}</a> 
+		    <a href="{% url 'logout_view' %}">Logout</a>	
+		  </div>
+		  <h5 class="menu"><a href="{% url 'wikipage' %}">WIKIPAGE</a></h5>		
+		  
+		  {% else %}	
+		  <div id="login">
+		    <a onmouseover="$('#login-screen, .arrow-up').fadeIn();">Login</a>	
+		  </div>
+		  <h5 class="menu"><a href="{% url 'wikipage' %}">WIKIPAGE</a></h5>
+    		 
+		  {% endif %}
+		  
+		  <form method="post" action="{% url 'Authentication' %}">
+		    {% csrf_token %}
+		    
+		    <div id="login-screen" class="shadow">
+		      
+		      <div style="padding:10px;">          
+			<div class="control-group" style="padding:20px; ">
+			  <input type="text" class="login-field" value="" placeholder="Enter your name" id="login-name" name="username"/>
+			  <label class="login-field-icon fui-user" for="login-name"></label>
 			</div>
-
-			<h5 class="menu"><a href="{% url 'wikipage' %}">Wikipage</a></h5>
-			<!--<h5 class="menu"><a href="#">Loom</a></h5>-->
-
+			
+			<div class="control-group" style="padding:0px 20px ">
+			  <input type="password" class="login-field" value="" placeholder="Password" id="login-pass" name="password" />
+			  <label class="login-field-icon fui-lock" for="login-pass"></label>
+			</div>
+			
+			<a class="login-link" href="#">Lost your password ?</a>
+			<br/>
+			<input type="submit" class="btn btn-primary btn-large btn-block" value="Login"/>
+		  </form>
+						
+		  <a class="login-link" href="{% url 'UserRegistration' %}">New user registration</a>
+		  <br/>
+		  </div>
+		  </div>
+		  
+		
+		  
 		</div> 		
 		<!-- End of Header Div-->
-
+		
 		<!-- Start of Body Container -->		
 		<div class="container">  
 			{% block body_content %}  {% endblock %}
