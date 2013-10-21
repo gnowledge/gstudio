@@ -1,0 +1,38 @@
+{% extends "ndf/base.html" %}
+
+{% block title %} Wikipage {% endblock %}
+
+{% block body_content %} 
+
+<form method="post" action="{% url 'create_wiki' %}">
+	{% csrf_token %}
+	
+	<div style='display:table; padding-top:40px;'>	
+
+		<div style='display:table-row;'>			
+			<div style='display:table-cell;'>	Name	</div>
+			<div style='display:table-cell; padding-left:20px;'>	<input type="text" name="wiki_name">	</div>
+		</div>	
+	
+		<!--<div style='display:table-row;'> 
+			<div style='display:table-cell;'>	Member Of	</div>
+			<div style='display:table-cell; padding-left:20px;'>	<input type="text" name="member_of">	</div>
+		</div>-->
+		
+		<div style='display:table-row;'>
+			<div style='display:table-cell;'>	Tags 	</div>
+			<div style='display:table-cell; padding-left:20px;'>	<input type="text" name="tags">	 </div>
+		</div>		
+		
+	</div>
+	<br/>
+	
+	<input type="submit" value="Add Node" class="btn btn-primary btn-large" style="width:32%;">
+
+			
+</form>
+
+
+
+{% endblock %}
+
