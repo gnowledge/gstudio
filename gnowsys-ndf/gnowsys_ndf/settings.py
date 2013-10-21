@@ -51,10 +51,6 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
-# Absolute filesystem path to the project's base directory, 
-# i.e. having settings.py file
-# Example: "/home/tissavadoot/Desktop/Tissproject/TP_MK/gstudio/gnowsys-ndf/gnowsys_ndf/"
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -121,6 +117,12 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.request',
+)
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.admin',
@@ -162,7 +164,13 @@ LOGGING = {
     }
 }
 
-""" ----- Revision Control System (RCS) configuration -----
+# Absolute filesystem path to the project's base directory, 
+# i.e. having settings.py file
+# Example: "/home/username/Desktop/gstudio/gnowsys-ndf/gnowsys_ndf/"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+
+""" ----- Revision Control System (RCS) Configuration -----
 
 It operates only on single files; and hence used in this project 
 to keep track of history of each document belonging to different 
@@ -170,15 +178,16 @@ collections (models).
 
 """
 
-# List of collections whose documents' history has to be maintained.
-VERSIONING_COLLECTIONS = ['Authors', 'AttributeTypes', 'RelationTypes', 'GSystemTypes', 'GSystems']
+# Indicates list of collection-names whose documents' history has to be 
+# maintained.
+VERSIONING_COLLECTIONS = ['Authors', 'AttributeTypes', 'RelationTypes', 
+                          'GSystemTypes', 'GSystems']
 
-# Hash level - number of sub-directories that will be created before saving the json-file
+# Absolute filesystem path to the directory that will hold all rcs-files 
+# (history-files corresponding to every json-file created for each document)
+RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/static/rcs-repo")
+
+# Indicates the "hash-level-number", i.e the number of sub-directories that 
+# will be created for the corresponding document under it's 
+# collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
-
-# Absolute filesystem path to the directory that will hold all git repositories;
-# belonging to each model(class) for maintaining history of each and every documents.
-# Example: "/home/media/media.lawrence.com/static/ndf/rcs-repo/"
-RCS_REPO_DIR = os.path.join( PROJECT_ROOT, "ndf/static/rcs-repo" )
-
-
