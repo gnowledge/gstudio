@@ -1,0 +1,76 @@
+{% extends "ndf/base.html" %}
+
+{% block title %} Wikipage {% endblock %}
+
+
+{% block head %}
+	
+	<!-- orgitdown! -->
+	<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+	<!-- orgitdown! toolbar settings -->
+	<script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+	<!-- orgitdown! skin -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+	<!--  orgitdown! toolbar skin -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+
+{% endblock %}
+
+
+{% block body_content %} 
+
+<div style="display:inline-block; float:left; padding-top:40px; ">
+<form method="post" action="{% url 'create_wiki' %}">
+  {% csrf_token %}
+  
+	<div style='display:table; '>	
+    
+		<div style='display:table-row;'>			
+			<div style='display:table-cell;'>	Name	</div>
+			<div style='display:table-cell; padding-left:20px;'>	
+				<input type="text" name="wiki_name" autofocus="autofocus" placeholder="Enter name to add content">	
+			</div>
+		</div>	
+		<br/>
+		<div style='display:table-row;'>
+			<div style='display:table-cell;'>	Tags 	</div>
+			<div style='display:table-cell; padding-left:20px;'>	
+				<input type="text" name="tags" placeholder="Example: abc, XYZ">	 </div>
+		</div>		
+		
+    </div>
+    <br/>
+    <!-- <input type="submit" value="Add Node" class="btn btn-primary btn-large" style="width:28%;" > -->			
+</form>
+
+<input type="button" value="Save" class="btn btn-primary btn-large btn-block">
+</div>
+
+<!--<div id="text-editor" style="float:left; display:inline-block; width:400px; height:300px; background-color:lightgray; padding:30px; margin:38px; display:none;"> 
+
+</div>-->
+
+<div id="text-editor" style="display:inline-block; float:left; padding:30px 40px;">
+	<textarea id="orgitdown" > </textarea>
+</div>
+<script>
+
+	$(document).ready(function()
+	{  
+				
+		/*$("input:text[name='wiki_name']").keypress(function()
+		{
+			if(this.value.length > 0 )
+			{
+				$("input[type='button']").fadeIn(1000);
+			}
+		});*/
+		
+		$('#orgitdown').orgitdown(mySettings);
+	})
+	
+	
+</script>
+
+{% endblock %}
+
