@@ -6,13 +6,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<!-- Loading Bootstrap -->
+		<link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png">
+		
 		<link href="/static/ndf/bootstrap/css/bootstrap.css" rel="stylesheet">
-
-		<!-- Loading Flat UI -->
-		<link href="/static/ndf/css/flat-ui.css" rel="stylesheet">
-
-		<link rel="shortcut icon" href="/static/ndf/images/logo.png">
+		<link href="/static/ndf/css/default.css" rel="stylesheet">
 
 		<script src="/static/ndf/js/jquery-1.8.3.min.js"></script>
 		<script src="/static/ndf/js/jquery-ui-1.10.3.custom.min.js"></script>
@@ -27,6 +24,8 @@
 		<script src="/static/ndf/js/jquery.stacktable.js"></script>
 		<!--<script src="static/http://vjs.zencdn.net/c/video.js"></script>-->
 		<script src="/static/ndf/js/application.js"></script>
+		
+		{% block head %}  {% endblock %}
 
 		<!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
 		<!--[if lt IE 9]>
