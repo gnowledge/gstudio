@@ -40,31 +40,33 @@
 		
     </div>
     <br/>
-    <!-- <input type="submit" value="Add Node" class="btn btn-primary btn-large" style="width:28%;" > -->			
+
 </form>
 
-<input type="button" value="Save" class="btn btn-primary btn-large btn-block">
+<input type="button" value="Save" class="btn btn-large btn-block disabled">
 </div>
 
-<!--<div id="text-editor" style="float:left; display:inline-block; width:400px; height:300px; background-color:lightgray; padding:30px; margin:38px; display:none;"> 
-
-</div>-->
-
 <div id="text-editor" style="display:inline-block; float:left; padding:30px 40px;">
-	<textarea id="orgitdown" > </textarea>
+	<textarea id="orgitdown" disabled="disabled"> </textarea>
 </div>
 <script>
 
 	$(document).ready(function()
 	{  
 				
-		/*$("input:text[name='wiki_name']").keypress(function()
+		$("input:text[name='wiki_name']").keypress(function()
 		{
-			if(this.value.length > 0 )
-			{
-				$("input[type='button']").fadeIn(1000);
+			if(	$.trim(this.value).length > 0 )
+			{			
+				$("input[type='button']").removeClass("disabled").addClass("btn-primary");
+				$("#orgitdown").removeAttr("disabled");
 			}
-		});*/
+			else
+			{
+				$("input[type='button']").removeClass("btn-primary").addClass("disabled");
+				$("#orgitdown").attr("disabled", "disabled");
+			}
+		});
 		
 		$('#orgitdown').orgitdown(mySettings);
 	})
