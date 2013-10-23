@@ -11,17 +11,19 @@
 	width:500px;
 	margin:5px 0 5px 0;
 	border:5px solid #F5F5F5;	
+	border-radius: 5px;
 }
 .orgitdownContainer  {
-	border:1px solid #3C769D;	
+	border:1px solid gray;	
 	background:#FFF url(images/bg-container.png) repeat-x top left;
 	padding:5px 5px 2px 5px;
 	font:11px Verdana, Arial, Helvetica, sans-serif;
+	border-radius: 5px;
 }
 .orgitdownEditor {
 	font:12px 'Courier New', Courier, monospace;
 	padding:5px 5px 5px 35px;
-	border:3px solid #3C769D;
+	border:3px solid #1ABC9C;
 	width:442px;
 	height:320px;
 	background:#FFF url(images/bg-editor.png) no-repeat;
