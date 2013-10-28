@@ -1,12 +1,14 @@
-''' imports from python libraries '''
-import hashlib
+''' -- imports from python libraries -- '''
 import os
+import hashlib
 import datetime
 import json
+
 from random import random
 from random import choice
 
-''' imports from installed packages '''
+
+''' -- imports from installed packages -- '''
 from django.conf import settings
 from django.contrib.auth.models import User as DjangoUser
 from django.contrib.auth.models import check_password
@@ -16,11 +18,13 @@ from django_mongokit import connection
 from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
 
-from mongokit import OR
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
 
-from bson import ObjectId
 
-''' imports from application folders/files '''
+''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 
@@ -46,78 +50,6 @@ NODE_TYPE_CHOICES = (
 
 #############################################################################
 
-
-@connection.register
-class Author(DjangoDocument):
-    """
-    Author class modified for storing in mongokit
-    """
-    
-    objects = models.Manager()
-    
-    collection_name = 'Authors'
-    structure = {
-        'username': unicode,
-        'password': unicode,
-        'email': unicode,
-        'first_name': unicode,
-        'last_name': unicode,
-        'address': unicode,
-        'phone': long,
-        'is_active': bool,
-        'is_staff': bool,
-        'is_superuser': bool,        
-        'created_at': datetime.datetime,
-        'last_login': datetime.datetime,
-        }
-    
-    use_dot_notation = True
-    required_fields = ['username', 'password']
-    default_values = {'created_at': datetime.datetime.now}
-    
-    indexes = [
-        {'fields': 'username',
-         'unique': True}
-        ]
-    
-    def __init__(self, *args, **kwargs):
-        super(Author, self).__init__(*args, **kwargs)
-        
-    def __eq__(self, other_user):
-        # found that otherwise millisecond differences in created_at is compared
-        try:
-            other_id = other_user['_id']
-        except (AttributeError, TypeError):
-            return False
-        return self['_id'] == other_id
-    
-    # play ball with Django
-    @property
-    def id(self):
-        return self.username
-    
-    def password_crypt(self, password):
-        password_salt = str(len(password))
-        crypt = hashlib.sha1(password[::-1].upper() + password_salt).hexdigest()
-        PASSWORD = unicode(crypt, 'utf-8')
-        return PASSWORD  
-    
-    def is_anonymous(self):
-        return False
-    
-    def is_authenticated(self):
-        return True
-    
-    def get_full_name(self):
-        "Returns the first_name plus the last_name, with a space in between."
-        full_name = u'%s %s' % (self.first_name, 
-                                self.last_name)
-        return full_name.strip()
-    
-    def __unicode__(self):
-        return self._id
-
-    
 @connection.register
 class Node(DjangoDocument):
     objects = models.Manager()
@@ -128,7 +60,7 @@ class Node(DjangoDocument):
         'plural': unicode,
       	'member_of': unicode, 			# 
       	'created_at': datetime.datetime,
-        'created_by': ObjectId,			# ObjectId's of Author Class
+        'created_by': int,			# Primary Key of User(django's) Class
         #'rating': 
         'start_publication': datetime.datetime,
         'content': unicode,
@@ -137,13 +69,13 @@ class Node(DjangoDocument):
         'tags': [unicode],
         'featured': bool,
         'last_update': datetime.datetime,
-        'modified_by': [ObjectId],		# list of ObjectId's of Author Class
+        'modified_by': [ObjectId],		# list of Primary Keys of User(django's) Class
         'comment_enabled': bool,
       	'login_required': bool
       	#'password': basestring,
         }
     
-    required_fields = ['name', 'member_of']
+    required_fields = ['name']
     default_values = {'created_at':datetime.datetime.utcnow}
     use_dot_notation = True
     
@@ -160,7 +92,7 @@ class Node(DjangoDocument):
         super(Node, self).save(*args, **kwargs)
         
         ''' on save, store history file(in json-format) for 
-        corresponding document and commit to it'srepository
+        corresponding document and commit to it's rcs repository
         '''
         
         
@@ -169,6 +101,8 @@ class AttributeType(Node):
     collection_name = 'AttributeTypes'
     structure = {
 	'data_type': basestring,		# NoneType in mongokit
+        'subject_type': [ObjectId],
+	'applicable_node_type': [basestring],	# NODE_TYPE_CHOICES
 		
 	'verbose_name': basestring,
 	'null': bool,
@@ -177,7 +111,7 @@ class AttributeType(Node):
 	'max_digits': int,
 	'decimal_places': int,
 	'auto_now': bool,
-	'auto_now_at': bool,
+	'auto_now_add': bool,
 	'upload_to': unicode,
 	'path': unicode,
 	'verify_exist': bool,
@@ -190,10 +124,11 @@ class AttributeType(Node):
 	'editable': bool
         }
 
-    required_fields = ['data_type']
+    required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
 
 
+'''
 """This is an Aggregation class, hence we are not keeping history of it.
 """
 @connection.register
@@ -205,27 +140,29 @@ class Attribute(Node):
 	}
     
     use_dot_notation = True 
-    
-    
+'''
+ 
 @connection.register
 class RelationType(Node):
     collection_name = 'RelationTypes'
     structure = {
         'inverse_name': unicode,
-        'subject_type': [ObjectId],	       # ObjectId's of GSystemType Class
-        'object_type': [ObjectId],	       # ObjectId's of GSystemType Class
+        'subject_type': [ObjectId],	       # ObjectId's of Any Class
+        'object_type': [ObjectId],	       # ObjectId's of Any Class
+        'subject_cardinality': int,				
+	'object_cardinality': int,
+	'subject_applicable_nodetype': basestring,		# NODE_TYPE_CHOICES [default (GST)]
+	'object_applicable_nodetype': basestring,
         'slug': basestring,
-        'subject_type': [ObjectId],	       # ObjectId's of GSystemType Class
-        'object_type': [ObjectId],	       # ObjectId's of GSystemType Class        
         'is_symmetric': bool,
         'is_reflexive': bool,
         'is_transitive': bool        
 	}
 
-    required_fields = ['inverse_name']
+    required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
 	
-
+'''
 """This is an Aggregation class, hence we are not keeping history of it.
 """
 @connection.register
@@ -238,7 +175,7 @@ class Relation(Node):
 	}
 
     use_dot_notation = True
-
+'''
 
 @connection.register
 class GSystemType(Node):
@@ -378,7 +315,7 @@ class HistoryManager():
           False - Otherwise
         '''
 
-        collection_tuple = (Author, AttributeType, RelationType, GSystemType, GSystem)
+        collection_tuple = (AttributeType, RelationType, GSystemType, GSystem)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
