@@ -29,7 +29,7 @@ class Command(BaseCommand):
         c_gt = db[GSystemType.collection_name]
         o_gt = c_gt.GSystemType()
         o_gt.name = u"Wikipage"
-        o_gt.member_of = u"GT"
+        o_gt.member_of = u"GSystemType"
         o_gt.save()
 
         if not hm.create_or_replace_json_file(o_gt):
