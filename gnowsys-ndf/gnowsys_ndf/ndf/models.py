@@ -163,7 +163,19 @@ class Node(DjangoDocument):
         corresponding document and commit to it'srepository
         '''
         
-        
+@connection.register
+class MetaType(Node):
+    """
+    MetaType class - A collection of Types 
+    """
+
+    collection_name = 'MetaTypes'
+    structure = {
+        'description': basestring,		# Description (name)
+        'parent': ObjectId                      # Foreign key to self 
+         }
+    use_dot_notation = True
+
 @connection.register
 class AttributeType(Node):
     collection_name = 'AttributeTypes'
@@ -215,8 +227,6 @@ class RelationType(Node):
         'subject_type': [ObjectId],	       # ObjectId's of GSystemType Class
         'object_type': [ObjectId],	       # ObjectId's of GSystemType Class
         'slug': basestring,
-        'subject_type': [ObjectId],	       # ObjectId's of GSystemType Class
-        'object_type': [ObjectId],	       # ObjectId's of GSystemType Class        
         'is_symmetric': bool,
         'is_reflexive': bool,
         'is_transitive': bool        
@@ -234,17 +244,35 @@ class Relation(Node):
     structure = {
         'subject_type_value': ObjectId,		# ObjectId's of GSystemType Class
         'relation_type_value': ObjectId,	# ObjectId's of RelationType Class
-        'object_type_value': ObjectId		# ObjectId's of GSystemType Class
+        'object_type_value': ObjectId,		# ObjectId's of GSystemType Class
 	}
 
+    use_dot_notation = True
+
+class ProcessType(Node):
+    """
+    A kind of nodetype for defining processes or events or temporal                                                                             objects involving change.
+    """  
+    collection_name = 'ProcessTypes'
+    structure = { 
+        'changing_attributetype_set':[AttributeType],  # List of Attribute Types
+        'changing_relationtype_set':[RelationType]    # List of Relation Types
+        }
     use_dot_notation = True
 
 
 @connection.register
 class GSystemType(Node):
+    """                                                                                                                                         class to organize Systems                                                                                                                
+    """
     collection_name = 'GSystemTypes'
     structure = {
-        'attribute_type_set': [AttributeType]	# Embed list of AttributeType Class as Documents
+        'meta_type_set': [MetaType],            #List of Metatypes
+        'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
+        'relation_type_set':[RelationType],      # Holds list of Relation Types
+        'process_type_set':[ProcessType],        # List of Process Types 
+        'author_set':[Author]                   # List of Authors
+         
 	}
     
     use_dot_notation = True
@@ -252,9 +280,13 @@ class GSystemType(Node):
     
 @connection.register
 class GSystem(Node):
+    """
+    GSystemType instance
+    """
+
     collection_name = 'GSystems'
     structure = {
-        'gsystem_type': ObjectId,		# ObjectId's of GSystemType Class  
+        'gsystem_type': [GSystemType],		# ObjectId's of GSystemType Class  
         'attribute_set': [dict],		# dict that holds AT name & its values
         'relation_set': [dict],			# dict that holds RT name & its related_object value
         'collection_set': [ObjectId]		# list of ObjectId's of GSystem Class
@@ -262,7 +294,12 @@ class GSystem(Node):
     
     use_dot_notation = True
     
+
 ######################################################################################################
+
+
+
+
 
 class HistoryManager():
     """Handles history management for documents of a collection 
