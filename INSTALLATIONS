@@ -43,6 +43,15 @@ within it; and also perform following steps:
     NOTE: 
         (1) It also installs additional packages - mongokit (0.9.0), and pymongo (2.6).
         (2) For more details visit - "https://pypi.python.org/pypi/django-mongokit"
+
+  Install django-registration(1.0) : pip install django-registration  
+	NOTE: 
+		(1) For more information visit - "https://bitbucket.org/ubernostrum/django-registration"
+		(2) To make SMTP server ready for sending mail (development purpose only) -
+				(a) Go to settings.py file and search for "#SMTP setting for sending mail".
+				(b) Edit following with your gmail credentials and save settings.py file - 
+						 EMAIL_HOST_USER = 'yourcompleteusername'
+						 EMAIL_HOST_PASSWORD = 'yourpassword'
         
   To clone "gstudio-mongokit" project (inside the virtualenv-folder): 
     (1) Visit - "https://github.com/gnowledge/gstudio"
@@ -61,3 +70,6 @@ within it; and also perform following steps:
     	(d) python manage.py runserver
         NOTE: Always run (c) & (d) commands together. 
 
+
+
+	
