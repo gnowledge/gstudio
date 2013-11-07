@@ -1,10 +1,17 @@
-# Django settings for gnowsys-ndf project.
+ # Django settings for gnowsys-ndf project.
 
 import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
+
+#SMTP setting for sending mail
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'yourcompleteemailid'
+EMAIL_HOST_PASSWORD = 'yourpassword'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -81,8 +88,8 @@ STATICFILES_DIRS = (
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -123,7 +130,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = (	
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -133,7 +140,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'gnowsys_ndf.ndf',
     'gnowsys_ndf.benchmarker',
+    'registration',
 )
+
+ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -164,9 +174,12 @@ LOGGING = {
     }
 }
 
+LOGIN_REDIRECT_URL = "/"
+
 # Absolute filesystem path to the project's base directory, 
 # i.e. having settings.py file
 # Example: "/home/username/Desktop/gstudio/gnowsys-ndf/gnowsys_ndf/"
+
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
