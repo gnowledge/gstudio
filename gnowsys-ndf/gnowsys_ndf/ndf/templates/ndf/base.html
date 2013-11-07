@@ -13,7 +13,6 @@
 
 		<script src="/static/ndf/js/jquery-1.8.3.min.js"></script>
 		<script src="/static/ndf/js/jquery-ui-1.10.3.custom.min.js"></script>
-		<script src="/static/ndf/js/jquery.ui.touch-punch.min.js"></script>
 		<script src="/static/ndf/js/bootstrap.min.js"></script>
 		<script src="/static/ndf/js/bootstrap-select.js"></script>
 		<script src="/static/ndf/js/bootstrap-switch.js"></script>
@@ -33,111 +32,101 @@
 		<![endif]-->
 	 
 	 	<style>
+	 	
+	 		.home { text-align:center; 	}
+	 		
+	 		.home a{ color:#34495E;	}
+	 	
+	 		.home a:hover { text-decoration:none !important }
+	 		
 	 		#header
 	 		{
 		 		background-color:#edeff1; top:0px; position:fixed; width:100%; z-index:100;
 	 		}
+	 		
+	 		.loginInfo {	display:inline-block; margin-left:80%; width:12%; text-align:right; cursor:pointer;	}
 	 	
-			#login
-			{	 
-				margin-left:93%;  text-align:center; color:gray; position:fixed;
-				 top:10px;	z-index:101; display:block; padding:15px;
+			.menu  {	display:inline-block; padding-left:1em;	}
+			
+			#loginPanel
+			{
+				display:none; background-color:lightgray; right:0.5%; 
+				margin-left:80%; width:12%; position:fixed; font-size:1.1em; 
+				text-align:center; 
+				border-radius:6px; 
 			}
-	
-			#login:hover {	cursor:pointer; }
-	
-			#login-screen
-			{	
-				display:none; margin-left:77%;  color:gray; position:fixed; top:61px; width:auto; 
-				height:auto;	background-color:#edeff1; border-radius:5px; 
-			}
-
-			/*arrow added to uparrowdiv DIV*/
-			#login-screen:after
-			{ 
+			
+			#loginPanel div	{	width:100%;	padding:8px 0px; }
+			
+			#loginPanel div:hover {	background-color:#1ABC9C;	}
+			
+			#loginPanel a{	color:#34495E;	}
+			
+			#loginPanel a:hover { text-decoration:none !important; color:white; }
+			
+			#loginPanel:after
+			{
 				content:''; display:block; position:absolute; top:-20px; 
 				right:30px; width:0; height:0; 
-				border-color: transparent transparent #edeff1 transparent;
+				border-color: transparent transparent lightgray transparent;
 				border-style: solid; border-width: 10px;
 			}
+						
+			{% block style %}  {% endblock %}
 
-			.shadow
-			{
-				-webkit-box-shadow: 0px 3px 10px rgba(50, 50, 50, 0.75);
-				-moz-box-shadow:    0px 3px 10px rgba(50, 50, 50, 0.75);
-				box-shadow:         0px 3px 10px rgba(50, 50, 50, 0.75);	
-			}
-		
-			.menu
-			{
-				display:inline-block; padding-left:1em;
-			}
-	
 		</style>
-	
-	 	   
-		{% block style %}  {% endblock %}
- 	   
+   
 	</head>
   
 	<body>
-  		<!-- Start of Hedaer Div -->
+
+		<!-- Start of Hedaer Div -->
 		
 		<div id="header">
-		 <h1 align="center">Node Description Framework of <a href="http://www.gnu.org/software/gnowsys/">GNOWSYS</a></h1>
-		 
-		  {% if user.is_authenticated %}
-		  <div id="login">
-		    
-		    <a>Welcome {{ user.username }}</a> 
-		    <a href="{% url 'logout_view' %}">Logout</a>	
-		  </div>
-		  <h5 class="menu"><a href="{% url 'wikipage' %}">WIKIPAGE</a></h5>		
-		  
-		  {% else %}	
-		  <div id="login">
-		    <a onmouseover="$('#login-screen, .arrow-up').fadeIn();">Login</a>	
-		  </div>
-		  <h5 class="menu"><a href="{% url 'wikipage' %}">WIKIPAGE</a></h5>
-    		 
-		  {% endif %}
-		  
-		  <form method="post" action="{% url 'Authentication' %}">
-		    {% csrf_token %}
-		    
-		    <div id="login-screen" class="shadow">
-		      
-		      <div style="padding:10px;">          
-			<div class="control-group" style="padding:20px; ">
-			  <input type="text" class="login-field" value="" placeholder="Enter your name" id="login-name" name="username"/>
-			  <label class="login-field-icon fui-user" for="login-name"></label>
-			</div>
-			
-			<div class="control-group" style="padding:0px 20px ">
-			  <input type="password" class="login-field" value="" placeholder="Password" id="login-pass" name="password" />
-			  <label class="login-field-icon fui-lock" for="login-pass"></label>
-			</div>
-			
-			<a class="login-link" href="#">Lost your password ?</a>
-			<br/>
-			<input type="submit" class="btn btn-primary btn-large btn-block" value="Login"/>
-		  </form>
-						
-		  <a class="login-link" href="{% url 'UserRegistration' %}">New user registration</a>
-		  <br/>
-		  </div>
-		  </div>
-		  
+			<h1 class="home">
+				<a href="{%url 'homepage' %}" title="Home">Node Description Framework of</a> 
+				<a href="http://www.gnu.org/software/gnowsys/" title="Look at GNOWSYS project">GNOWSYS</a>
+			</h1>
 		
+			<h5 class="menu"><a href="{% url 'wikipage' %}">WIKIPAGE</a></h5>
+	
+			{% if user.is_authenticated %}
 		  
+				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
+					<h4>Hello, {{ user.username }}</h4> 						
+				</div>	
+				
+				<div id="loginPanel" >
+					<br/>										
+					<a href="{% url 'auth_password_change' %}" >
+						<div>Change Password</div>
+					</a>
+					
+					<a href="{% url 'auth_logout' %}" >
+						<div>Log Out</div>
+					</a>										
+					<br/>				
+				</div>		    
+  					  
+			{% else %}	
+			
+				<div class="loginInfo"  title="Click here to Login">
+		  			<h5 ><a href="{% url 'auth_login' %}">Login</a></h5>		    		 
+		  		</div>
+		  				  
+			{% endif %}
+				  
 		</div> 		
 		<!-- End of Header Div-->
 		
+		
 		<!-- Start of Body Container -->		
-		<div class="container">  
+		<div class="container" id="body">  
+			
 			{% block body_content %}  {% endblock %}
 		</div>
 		<!-- End of Body Container -->		  	
+		
 		
 		<!-- Start of Footer -->		
 		<footer>
@@ -147,13 +136,8 @@
 		          this is footer
 		        <h3 class="footer-title">
 					Gnowsys
-		        </h3>
-		        <p>
-		        <br/>
-	 
-		        </p>
-
-		      </div> <!-- /span8 -->
+		        </h3>		        
+		      </div> 
 
 		      <div class="span5">
 		        <div class="footer-banner">
@@ -173,23 +157,22 @@
 		</footer>
 		<!-- End of Footer -->		
 	</body>
+	
+	
+	<!-- Your script goes here -->
+	
 	<script type="text/javascript">
 
-		$(document).ready(function()
-		{	
-			$(".container").css("margin-top", $("#header").height() + "px");	
-			$("#login-screen").mouseleave(function(){$("#login-screen").fadeOut()});
-					/*$("#login").mouseleave(function()
-					{
-						if(	$("#login-screen").delay(2000).is(":hover")	)
-						{	$("#login-screen").mouseleave(function(){$("#login-screen").fadeOut()});	}
-						else
-							{$("#login-screen").delay(2000).fadeOut()}
-					});*/
-			
+		$("#body").css("margin-top", $("#header").height() + "px");	
+		$("#body").css("min-height", ( $(window).height() - $("#header").height() - $("footer").height() ) + "px");
+		
+		$("#loginPanel").mouseleave(function(){
+			$("#loginPanel").fadeOut()	
 		});
+		
+		{% block script %} {% endblock %}	
+	
 	</script>
-
-	  
+  
 </html>
 
