@@ -91,10 +91,19 @@ ENCRYPTION_POLICY=(
 
 class RatingField(CustomType):
     mongo_type = unicode
-    python_type = RatingField()
-#    validators={
-#        'python_type' :lambda x: x > 0 and x < 6 }
+    python_type = int
+    def to_bson(self, value):
+        """convert type to a mongodb type"""
+        return unicode(value)
+
+    def to_python(self, value):
+        """convert type to a python object"""
+        if value is not None:
+            return value
+        # else:
+        #     return "value must be between 0 and 5"
 #/*################################### */
+
 
 @connection.register
 class Author(DjangoDocument):
@@ -214,19 +223,6 @@ class Node(DjangoDocument):
         corresponding document and commit to it'srepository
         '''
         
-@connection.register
-class File(Node):
-    """
-    File class to hold any resource 
-    """
-    collection_name = 'Files'
-    structure = {
-    'mime_type' : basestring            # Holds the type of file
-        }
-    gridfs = {
-    'containers' : ['files']
-    }
-    use_dot_notation = True
 
 @connection.register
 class MetaType(Node):
@@ -336,8 +332,6 @@ class GSystemType(Node):
         'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
         'relation_type_set':[RelationType],      # Holds list of Relation Types
         'process_type_set':[ProcessType],        # List of Process Types 
-        'author_set':[Author]                   # List of Authors
-         
 	}
     
     use_dot_notation = True
@@ -354,9 +348,25 @@ class GSystem(Node):
         'gsystem_type': [GSystemType],		# ObjectId's of GSystemType Class  
         'attribute_set': [dict],		# dict that holds AT name & its values
         'relation_set': [dict],			# dict that holds RT name & its related_object value
-        'collection_set': [ObjectId]		# list of ObjectId's of GSystem Class
+        'collection_set': [ObjectId],		# list of ObjectId's of GSystem Class
+        'author_set':[Author]                   # List of Authors
+
         }
     
+    use_dot_notation = True
+
+@connection.register
+class File(GSystem):
+    """
+    File class to hold any resource 
+    """
+    collection_name = 'Files'
+    structure = {
+    'mime_type' : basestring            # Holds the type of file
+        }
+    gridfs = {
+    'containers' : ['files']
+    }
     use_dot_notation = True
     
 
