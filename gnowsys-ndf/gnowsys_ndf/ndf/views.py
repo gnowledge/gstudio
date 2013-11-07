@@ -16,6 +16,9 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.backends.db import SessionStore
 from django.contrib.sessions.models import Session
 from django.contrib.auth import logout
+import os
+import shutil
+import urllib
 import datetime
 
 from django.http import HttpResponse
@@ -26,14 +29,14 @@ from random import choice
 from django_mongokit import get_database
 
 from models import *
-from forms import NodeForm, AuthorForm
+#from forms import NodeForm, AuthorForm
 
 from string import maketrans 
 
 
 def homepage(request):
 
-    return render_to_response("ndf/base.html",context_instance=RequestContext(request))
+    return render_to_response("ndf/home.html",context_instance=RequestContext(request))
       
 
 def create_wiki(request):
@@ -44,18 +47,18 @@ def create_wiki(request):
         col_GST = get_database()[GSystemType.collection_name]
         
         if request.method == "POST":
-        
+            
             page = col_GSystem.GSystem()
             wiki_name = request.POST.get('wiki_name')
             wiki_member = request.POST.get('member_of')
             wiki_tags = request.POST.get('tags')
-            
+      
             page.name = unicode(wiki_name)
             page.member_of = unicode(wiki_member)
             page.tags.append(unicode(wiki_tags))
-            page.gsystem_type = col_GST.GSystemType.one({'name':u"WIKIPAGE"})._id        
+            page.gsystem_type = col_GST.GSystemType.one({'name':u"WIKIPAGE"})._id               
             page.save()
-        
+            
             return HttpResponseRedirect(reverse('wikipage'))
         
         else:
@@ -63,7 +66,6 @@ def create_wiki(request):
     else:
         
         return HttpResponseRedirect(reverse('wikipage'))
-
 
 
 def wikipage(request):
@@ -79,57 +81,46 @@ def wikipage(request):
 def UserRegistration(request):
 	
 	return render_to_response("ndf/UserRegistration.html",context_instance=RequestContext(request))
-        
+
 
 def Register(request):
 
 	if request.method == 'POST':
-	
-		col_author = get_database()[Author.collection_name]
-		auth = col_author.Author()								#Constructor of Author class
-		user = User()
+								
+            user = User()                       #Constructor of Author class
 
 		# Take values from textboxes
-		fname = request.POST.get('reg_Fname')
-		lname = request.POST.get('reg_Lname')
-		username = request.POST.get('reg_Username')
-		password = request.POST.get('reg_Password')
-		phone = request.POST.get('reg_Phone')
-		email = request.POST.get('reg_Email')
+            fname = request.POST.get('reg_Fname')
+            lname = request.POST.get('reg_Lname')
+            username = request.POST.get('reg_Username')
+            password = request.POST.get('reg_Password')
+            phone = request.POST.get('reg_Phone')
+            email = request.POST.get('reg_Email')
 
-                
-
-
-		if username and password:
-			username_exist = col_author.Author.one({'username': unicode(username)})
+            if username and password:
+                username_exist = User.objects.get(username = unicode(username))
 		
-			if username_exist:
-				return HttpResponse("username is already taken, try another")
-				
-			else:	# Store these values in Mongodb Database
-				auth.username = unicode(username)				
-				auth.password = auth.password_crypt(password)
-				auth.phone = long(phone)
-				auth.email = unicode(email)
-				auth.save()
-				
-                                # Store these values in sqlite Database
-                                user.first_name = unicode(fname)
-                                user.last_name = unicode(lname)
-                                user.username = unicode(username)
-                                user.set_password(password)
-                                user.email = unicode(email)
-                                user.save()
-				
-				return render_to_response("ndf/base.html",context_instance=RequestContext(request))		
-		else:
-			
-			return HttpResponse("all fields are required")
+                if username_exist:
+                    return HttpResponse("username is already taken, try another")
+                
+                else:	
+                    # Store these values in django User table 
+                    user.first_name = unicode(fname)
+                    user.last_name = unicode(lname)
+                    user.username = unicode(username)
+                    user.set_password(password)
+                    user.email = unicode(email)
+                    user.save()
+                    
+                    return render_to_response("ndf/base.html",context_instance=RequestContext(request))		
+            else:
+                
+                return HttpResponse("all fields are required")
 
-
+'''
 def Authentication(request):
     if request.method == 'POST':
-        
+        print "authentictn"
         # Takes values from templates
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -159,7 +150,7 @@ def logout_view(request):
     request.user = AnonymousUser()
     
     return render_to_response("ndf/base.html",context_instance=RequestContext(request))    
-
+'''
 		
 def delete_node(request, _id):
     collection = get_database()[GSystem.collection_name]
