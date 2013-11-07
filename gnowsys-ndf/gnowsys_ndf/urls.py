@@ -7,4 +7,5 @@ urlpatterns = patterns('',
     (r'^ndf/', include('gnowsys_ndf.ndf.urls')),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
     (r'^admin/', include(admin.site.urls)),
+    (r'^accounts/', include('gnowsys_ndf.registration.backends.default.urls')),
 )
