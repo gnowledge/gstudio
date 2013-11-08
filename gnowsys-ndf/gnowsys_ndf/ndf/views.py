@@ -32,7 +32,7 @@ from models import *
 #from forms import NodeForm, AuthorForm
 
 from string import maketrans 
-
+import magic #for this install python-magic example:pip install python-magic
 
 def homepage(request):
 
@@ -157,6 +157,26 @@ def delete_node(request, _id):
     node = collection.GSystem.one({"_id": ObjectId(_id)})
     node.delete()
     return HttpResponseRedirect(reverse("wikipage"))
+
+def submitDoc(request):
+	db=get_database()[File.collection_name]
+	fileobj=db.File()
+	if request.method=="POST":
+		title = request.POST.get("docTitle","")
+		user = request.POST.get("user","")
+		memberOf = request.POST.get("memberOf","")
+		files=request.FILES.get("doc","")
+		#this code is for creating file document and saving
+		fileobj.name=unicode(title)
+		fileobj.user=unicode(user)
+		fileobj.member_of=unicode(memberOf)
+		fileobj.save()
+		filetype=magic.from_buffer(files.read()) #Gusing filetype by python-magic
+		print "test",title,user,memberOf	
+		#this code is for storing Document in gridfs
+		objectid=fileobj.fs.files.put(files.read(),filename=title,content_type=filetype)
+		#print "objectid:",objectid
+	return HttpResponse("File uploaded succesfully and your object id:"+str(objectid))
 
 
 
