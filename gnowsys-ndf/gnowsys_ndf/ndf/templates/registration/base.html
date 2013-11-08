@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>NUSSD - {% block title %} {% endblock %}</title>
+		
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png">
+		
+		<link href="/static/ndf/bootstrap/css/bootstrap.css" rel="stylesheet">
+		<link href="/static/ndf/css/default.css" rel="stylesheet">
+
+		<script src="/static/ndf/js/jquery-1.8.3.min.js"></script>
+		<script src="/static/ndf/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="/static/ndf/js/bootstrap.min.js"></script>
+		<script src="/static/ndf/js/bootstrap-select.js"></script>
+		<script src="/static/ndf/js/bootstrap-switch.js"></script>
+		<script src="/static/ndf/js/flatui-checkbox.js"></script>
+		<script src="/static/ndf/js/flatui-radio.js"></script>
+		<script src="/static/ndf/js/jquery.tagsinput.js"></script>
+		<script src="/static/ndf/js/jquery.placeholder.js"></script>
+		<script src="/static/ndf/js/jquery.stacktable.js"></script>
+		<!--<script src="static/http://vjs.zencdn.net/c/video.js"></script>-->
+		<script src="/static/ndf/js/application.js"></script>
+		
+		{% block head %}  {% endblock %}
+
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+		<!--[if lt IE 9]>
+		  <script src="js/html5shiv.js"></script>
+		<![endif]-->
+	 
+	 	<style>
+	 	
+	 		.home { text-align:center; 	}
+	 		
+	 		.home a{ color:#34495E;	}
+	 	
+	 		.home a:hover { text-decoration:none !important }
+	 		
+	 		#header
+	 		{
+		 		background-color:#edeff1; top:0px; position:fixed; width:100%; z-index:100;
+	 		}
+	 		
+	 		.loginInfo {	display:inline-block; margin-left:80%; width:12%; text-align:right; cursor:pointer;	}
+	 	
+			.menu  {	display:inline-block; padding-left:1em;	}
+			
+			#loginPanel
+			{
+				display:none; background-color:lightgray; right:0.5%; 
+				margin-left:80%; width:12%; position:fixed; font-size:1.1em; 
+				text-align:center; 
+				border-radius:6px; 
+			}
+			
+			#loginPanel div	{	width:100%;	padding:8px 0px; }
+			
+			#loginPanel div:hover {	background-color:#1ABC9C;	}
+			
+			#loginPanel a{	color:#34495E;	}
+			
+			#loginPanel a:hover { text-decoration:none !important; color:white; }
+			
+			#loginPanel:after
+			{
+				content:''; display:block; position:absolute; top:-20px; 
+				right:30px; width:0; height:0; 
+				border-color: transparent transparent lightgray transparent;
+				border-style: solid; border-width: 10px;
+			}
+						
+			{% block style %}  {% endblock %}
+
+		</style>
+   
+	</head>
+  
+	<body>
+
+		<!-- Start of Hedaer Div -->
+		
+		<div id="header">
+			<h1 class="home">
+				<a href="{%url 'homepage' %}" title="Home">Node Description Framework of</a> 
+				<a href="http://www.gnu.org/software/gnowsys/" title="Look at GNOWSYS project">GNOWSYS</a>
+			</h1>
+		
+			<h5 class="menu"><a href="{% url 'wikipage' %}">WIKIPAGE</a></h5>
+	
+			{% if user.is_authenticated %}
+		  
+				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
+					<h4>Hello, {{ user.username }}</h4> 						
+				</div>	
+				
+				<div id="loginPanel" >
+					<br/>										
+					<a href="{% url 'auth_password_change' %}" >
+						<div>Change Password</div>
+					</a>
+					
+					<a href="{% url 'auth_logout' %}" >
+						<div>Log Out</div>
+					</a>										
+					<br/>				
+				</div>		    
+  					  
+			{% else %}	
+			
+				<div class="loginInfo"  title="Click here to Login">
+		  			<h5 ><a href="{% url 'auth_login' %}">Login</a></h5>		    		 
+		  		</div>
+		  				  
+			{% endif %}
+				  
+		</div> 		
+		<!-- End of Header Div-->
+		
+		
+		<!-- Start of Body Container -->		
+		<div class="container" id="body">  
+			
+			{% block body_content %}  {% endblock %}
+		</div>
+		<!-- End of Body Container -->		  	
+		
+		
+		<!-- Start of Footer -->		
+		<footer>
+		  <div class="container">
+		    <div class="row">
+		      <div class="span7">
+		          this is footer
+		        <h3 class="footer-title">
+					Gnowsys
+		        </h3>		        
+		      </div> 
+
+		      <div class="span5">
+		        <div class="footer-banner">
+		          <h3 class="footer-title">Descriptions</h3>
+		          <ul>
+		            <li>1</li>
+		            <li>2</li>
+		            <li>3</li>
+		            <li>4</li>
+		            <li>5</li>
+		          </ul>
+
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</footer>
+		<!-- End of Footer -->		
+	</body>
+	
+	
+	<!-- Your script goes here -->
+	
+	<script type="text/javascript">
+
+		$("#body").css("margin-top", $("#header").height() + "px");	
+		$("#body").css("min-height", ( $(window).height() - $("#header").height() - $("footer").height() ) + "px");
+		
+		$("#loginPanel").mouseleave(function(){
+			$("#loginPanel").fadeOut()	
+		});
+		
+		{% block script %} {% endblock %}	
+	
+	</script>
+  
+</html>
+
