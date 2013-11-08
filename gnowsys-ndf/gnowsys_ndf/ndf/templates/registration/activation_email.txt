@@ -1,0 +1,21 @@
+{% load i18n %}
+{% url 'registration_activate' activation_key as activation_key_url%}
+
+{% blocktrans with sitename=site.name siteurl=site.domain %}
+You (or someone pretending to be you) have asked to register an account at
+{{ sitename }}.  If this wasn't you, please ignore this email
+and your address will be removed from our records.
+
+To activate this account, please click the following link within the next 
+{{ expiration_days }} days:
+
+http://{{ siteurl }}{{ activation_key_url }}
+
+(NOTE:
+	 This is being development version, when link gets opened in new tab please change "www.example.com" with "127.0.0.1:<PORT_NO> in address bar"
+	 <PORT_NO> is port number. By default it is 8000.
+)
+
+Sincerely,
+{{ sitename }} Management
+{% endblocktrans %}
