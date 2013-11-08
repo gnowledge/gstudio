@@ -50,8 +50,12 @@ within it; and also perform following steps:
 		(2) To make SMTP server ready for sending mail (development purpose only) -
 				(a) Go to settings.py file and search for "#SMTP setting for sending mail".
 				(b) Edit following with your gmail credentials and save settings.py file - 
-						 EMAIL_HOST_USER = 'yourcompleteusername'
+						 EMAIL_HOST_USER = 'yourcompleteemailid'
 						 EMAIL_HOST_PASSWORD = 'yourpassword'
+						 
+  Install django-ratings(0.3.7) : pip install django-ratings
+  	NOTE:
+  		(1) For more information visit - "https://github.com/dcramer/django-ratings"
         
   To clone "gstudio-mongokit" project (inside the virtualenv-folder): 
     (1) Visit - "https://github.com/gnowledge/gstudio"
