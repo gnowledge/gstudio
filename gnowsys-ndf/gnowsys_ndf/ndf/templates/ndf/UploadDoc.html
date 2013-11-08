@@ -1,0 +1,29 @@
+{% extends "ndf/base.html" %}
+{% block title %} Upload Document {% endblock %}
+{% block body_content %} 
+{% if user.is_authenticated %}
+<div id="divpost">
+  <form id ="docPost" enctype="multipart/form-data" method="post" action="/ndf/submitDoc/">{% csrf_token %}
+   <h4>Submit Documents</h4>
+   <b> Title:&nbsp; </b><input type="text" name="docTitle" id ="docTitle"><br/><br/>
+    <b> Member Of:&nbsp; </b><input type="text" name="memberOf" id ="memberOf"><br/><br/>	
+   <b> File:&nbsp; </b><input type="file" name="doc"  id="docFile"/><br/><br/>
+   <input type="hidden" name="user" value={{user.username}}>
+    <input type="submit" id="submitpostid" value="Submit" size="900" name="post">
+  </form>
+</div>
+{% endif %}
+<!--
+<hr>
+<h4>Image Gallery</h4>
+
+<div id="imageGallery">
+
+
+<img src=" ">
+
+
+
+</div>-->
+{% endblock %}
+
