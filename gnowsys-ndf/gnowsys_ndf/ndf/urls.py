@@ -1,5 +1,6 @@
-#from django.conf.urls.defaults import patterns, url, include
-from django.conf.urls import patterns, url, include
+
+from django.conf.urls import patterns, url
+from django.views.generic import TemplateView
 
 import views
 
@@ -11,4 +12,7 @@ urlpatterns = patterns('',
                        url(r'^UserRegistration/', views.UserRegistration, name='UserRegistration'),
                        url(r'^Register/', views.Register, name='Register'),                       
                        url(r'^delete/(?P<_id>[\w-]+)$', views.delete_node, name='delete_node'),
+		       url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')),#Direct ot html template
+		       url(r'^submitDoc/', views.submitDoc, name='submitDoc'),	
+			url(r'^submit/', views.submitDoc, name='submitDoc')	
                        )

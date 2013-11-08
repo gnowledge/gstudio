@@ -12,10 +12,15 @@ from django.contrib.auth.models import User as DjangoUser
 from django.contrib.auth.models import check_password
 from django.db import models
 
+
 from django_mongokit import connection
 from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
 
+from djangoratings.fields import RatingField
+
+from django.core.validators import RegexValidator
+from mongokit import CustomType
 from mongokit import OR
 
 from bson import ObjectId
@@ -24,7 +29,17 @@ from bson import ObjectId
 from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 
+
+
+
 ############################################################################
+
+STATUS_CHOICES =(
+    ('DRAFT'),
+    ('HIDDEN'),
+    ('PUBLISHED')
+    )
+
 
 NODE_TYPE_CHOICES = (
     ('Nodes'),
@@ -44,7 +59,50 @@ NODE_TYPE_CHOICES = (
     ('Process')
    )
 
+TYPES_OF_GROUP=(
+    ('ANONYMOUS'),
+    ('PUBLIC'),
+    ('PRIVATE')
+    )
+EDIT_POLICY=(
+    ('NON_EDITABLE'),
+    ('EDITABLE_MODERATED'),
+    ('EDITABLE_NON_MODERATED')
+    )
+SUBSCRIPTION_POLICY=(
+    ('OPEN'),
+    ('BY_REQUEST'),
+    ('BY_INVITATION'),
+    )
+EXISTANCE_POLICY=(
+    ('ANNOUNCED'),
+    ('NOT_ANNOUNCED')
+    )
+LIST_MEMBER_POLICY=(
+    ('DISCLOSED_TO_MEM'),
+    ('NOT_DISCLOSED_TO_MEM')
+    )
+ENCRYPTION_POLICY=(
+    ('ENCRYPTED'),
+    ('NOT_ENCRYPTED')
+    )
 #############################################################################
+# /* Create all Custom Data types here */
+
+class RatingField(CustomType):
+    mongo_type = unicode
+    python_type = int
+    def to_bson(self, value):
+        """convert type to a mongodb type"""
+        return unicode(value)
+
+    def to_python(self, value):
+        """convert type to a python object"""
+        if value is not None:
+            return value
+        # else:
+        #     return "value must be between 0 and 5"
+#/*################################### */
 
 
 @connection.register
@@ -74,7 +132,8 @@ class Author(DjangoDocument):
     use_dot_notation = True
     required_fields = ['username', 'password']
     default_values = {'created_at': datetime.datetime.now}
-    
+    #validators={
+    #'phone': lambda x: x > 0 and x < 10 }
     indexes = [
         {'fields': 'username',
          'unique': True}
@@ -129,7 +188,7 @@ class Node(DjangoDocument):
       	'member_of': unicode, 			# 
       	'created_at': datetime.datetime,
         'created_by': ObjectId,			# ObjectId's of Author Class
-        #'rating': 
+        #'rating': RatingField(),
         'start_publication': datetime.datetime,
         'content': unicode,
         'content_org': unicode,
@@ -139,8 +198,9 @@ class Node(DjangoDocument):
         'last_update': datetime.datetime,
         'modified_by': [ObjectId],		# list of ObjectId's of Author Class
         'comment_enabled': bool,
-      	'login_required': bool
+      	'login_required': bool,
       	#'password': basestring,
+        'status':STATUS_CHOICES
         }
     
     required_fields = ['name', 'member_of']
@@ -163,6 +223,7 @@ class Node(DjangoDocument):
         corresponding document and commit to it'srepository
         '''
         
+
 @connection.register
 class MetaType(Node):
     """
@@ -271,8 +332,6 @@ class GSystemType(Node):
         'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
         'relation_type_set':[RelationType],      # Holds list of Relation Types
         'process_type_set':[ProcessType],        # List of Process Types 
-        'author_set':[Author]                   # List of Authors
-         
 	}
     
     use_dot_notation = True
@@ -289,11 +348,45 @@ class GSystem(Node):
         'gsystem_type': [GSystemType],		# ObjectId's of GSystemType Class  
         'attribute_set': [dict],		# dict that holds AT name & its values
         'relation_set': [dict],			# dict that holds RT name & its related_object value
-        'collection_set': [ObjectId]		# list of ObjectId's of GSystem Class
+        'collection_set': [ObjectId],		# list of ObjectId's of GSystem Class
+        'author_set':[Author]                   # List of Authors
+
         }
     
     use_dot_notation = True
+
+@connection.register
+class File(GSystem):
+    """
+    File class to hold any resource 
+    """
+    collection_name = 'Files'
+    structure = {
+    'mime_type' : basestring            # Holds the type of file
+        }
+    gridfs = {
+    'containers' : ['files']
+    }
+    use_dot_notation = True
     
+
+class Group(GSystem):
+    """
+    Group class to create collection (group) of members
+    """
+    collection_name='Groups'
+    structure={
+        'type':TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
+        'edit_policy':EDIT_POLICY,                   # Editing policy of the group- non editable, moderately editable, editable
+        'sub_policy':SUBSCRIPTION_POLICY,            # Subscription policy to this group- open, by invitation, by request
+        'ex_policy':EXISTANCE_POLICY,                # Existance of the group -announced or not announced
+        'list_member_policy':LIST_MEMBER_POLICY,     # Members of this group - disclosed or not 
+        'encr_policy':ENCRYPTION_POLICY              # Encryption - yes or no
+        }
+
+    use_dot_notation = True
+
+
 
 ######################################################################################################
 
