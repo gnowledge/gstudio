@@ -10,7 +10,7 @@ DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'yourcompleteemailid'
+EMAIL_HOST_USER = 'yourcompletegmailaddr'
 EMAIL_HOST_PASSWORD = 'yourpassword'
 
 ADMINS = (
@@ -131,16 +131,17 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 INSTALLED_APPS = (	
+    'gnowsys_ndf.ndf',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'gnowsys_ndf.ndf',
+    'django.contrib.staticfiles',    
     'gnowsys_ndf.benchmarker',
     'registration',
+    'djangoratings'
 )
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
