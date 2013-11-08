@@ -1,0 +1,19 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Activation complete" %}{% endblock %}
+
+{% block body_content %}
+
+	{% url 'auth_login' as auth_login_url %}
+	
+	{% blocktrans %}
+		<br/>
+		<h3>Thanks, activation complete! </h3>
+		<br/>
+		<h4> You may now <a href='{{ auth_login_url }}'>login</a> using the username and password you set at registration.</h4>
+	{% endblocktrans %}
+
+{% endblock %}
+
+

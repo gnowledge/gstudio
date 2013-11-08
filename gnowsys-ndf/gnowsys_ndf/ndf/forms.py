@@ -4,7 +4,7 @@ from django import forms
 
 from django_mongokit.forms import DocumentForm
 from models import Node
-from models import Author
+
 from models import GSystemType
 
 
@@ -21,9 +21,3 @@ class NodeForm(DocumentForm):
         fields = ['name', 'member_of', 'tags']
         
 
-class AuthorForm(DocumentForm):
-    '''   '''
-
-    class Meta:
-        document = Author
-        fields = ['_id', 'name']

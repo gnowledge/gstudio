@@ -4,11 +4,17 @@
 
 {% block body_content %} 
 
+<br/>
+
 {% if user.is_authenticated %}
-<a href="{% url 'create_wiki' %}"><input type="submit" class="btn btn-primary btn-large btn-block" value="Create a new wikipage " /></a>
+	<br/>
+	<a href="{% url 'create_wiki' %}">
+		<input type="submit" class="btn btn-primary btn-large btn-block" value="Create a new wikipage " />
+	</a>
+	<hr/>
 {% endif %}
 
-<hr>
+
 {% load url from future %}
 {% for node in nodes %}
 {% if forloop.first %}
