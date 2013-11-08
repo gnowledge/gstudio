@@ -77,80 +77,6 @@ def wikipage(request):
     #if member_id is not None:
     return render_to_response("ndf/wiki.html",{'nodes': nodes, 'nodes_count': nodes_count},context_instance=RequestContext(request))    
     
-
-def UserRegistration(request):
-	
-	return render_to_response("ndf/UserRegistration.html",context_instance=RequestContext(request))
-
-
-def Register(request):
-
-	if request.method == 'POST':
-								
-            user = User()                       #Constructor of Author class
-
-		# Take values from textboxes
-            fname = request.POST.get('reg_Fname')
-            lname = request.POST.get('reg_Lname')
-            username = request.POST.get('reg_Username')
-            password = request.POST.get('reg_Password')
-            phone = request.POST.get('reg_Phone')
-            email = request.POST.get('reg_Email')
-
-            if username and password:
-                username_exist = User.objects.get(username = unicode(username))
-		
-                if username_exist:
-                    return HttpResponse("username is already taken, try another")
-                
-                else:	
-                    # Store these values in django User table 
-                    user.first_name = unicode(fname)
-                    user.last_name = unicode(lname)
-                    user.username = unicode(username)
-                    user.set_password(password)
-                    user.email = unicode(email)
-                    user.save()
-                    
-                    return render_to_response("ndf/base.html",context_instance=RequestContext(request))		
-            else:
-                
-                return HttpResponse("all fields are required")
-
-'''
-def Authentication(request):
-    if request.method == 'POST':
-        print "authentictn"
-        # Takes values from templates
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        request.session.flush()
-
-	user = authenticate(username=username, password=password)
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                # Redirect to a success page.
-                return render_to_response("ndf/base.html",context_instance=RequestContext(request))
-            else:
-                # Return a 'disabled account' error message
-                return HttpResponse("You are not authorised user ")
-        else:
-            # Return an 'invalid login' error message.			
-            return HttpResponse("Please enter valid username & password")
-
-    
-    else:
-        return render_to_response("ndf/base.html",context_instance=RequestContext(request))        
-
-        
-def logout_view(request):
-    
-    logout(request)
-    request.user = AnonymousUser()
-    
-    return render_to_response("ndf/base.html",context_instance=RequestContext(request))    
-'''
 		
 def delete_node(request, _id):
     collection = get_database()[GSystem.collection_name]
@@ -177,9 +103,3 @@ def submitDoc(request):
 		objectid=fileobj.fs.files.put(files.read(),filename=title,content_type=filetype)
 		#print "objectid:",objectid
 	return HttpResponse("File uploaded succesfully and your object id:"+str(objectid))
-
-
-
-
-
-
