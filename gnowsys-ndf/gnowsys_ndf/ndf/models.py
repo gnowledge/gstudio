@@ -132,8 +132,8 @@ class Author(DjangoDocument):
     use_dot_notation = True
     required_fields = ['username', 'password']
     default_values = {'created_at': datetime.datetime.now}
-    validators={
-    'phone': lambda x: x > 0 and x < 10 }
+    #validators={
+    #'phone': lambda x: x > 0 and x < 10 }
     indexes = [
         {'fields': 'username',
          'unique': True}
@@ -188,7 +188,7 @@ class Node(DjangoDocument):
       	'member_of': unicode, 			# 
       	'created_at': datetime.datetime,
         'created_by': ObjectId,			# ObjectId's of Author Class
-        'rating': RatingField(),
+        #'rating': RatingField(),
         'start_publication': datetime.datetime,
         'content': unicode,
         'content_org': unicode,
