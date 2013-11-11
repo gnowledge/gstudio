@@ -15,5 +15,7 @@ urlpatterns = patterns('',
                        url(r'^delete/(?P<_id>[\w-]+)$', views.delete_node, name='delete_node'),
 		       url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')),#Direct ot html template
 		       url(r'^submitDoc/', views.submitDoc, name='submitDoc'),	
-			url(r'^submit/', views.submitDoc, name='submitDoc')	
+		       url(r'^submit/', views.submitDoc, name='submitDoc'),
+		       url(r'^documentList/', views.GetDoc, name='documentList'),
+		       url(r'^readDoc/(?P<_id>[\w-]+)$', views.readDoc, name='read_file'),	
                        )
