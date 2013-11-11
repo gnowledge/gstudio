@@ -1,0 +1,56 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %}{% endblock %}
+
+{% block style %}
+	table td {	padding:0.5em;	}
+	table {	margin-left:auto; margin-right:auto; }
+{% endblock %}
+
+{% block body_content %} 
+{% url 'auth_password_reset' as auth_pwd_reset_url %}
+{% url 'registration_register' as register_url%}
+
+<br/>
+{% if form.errors %}
+
+<p>{% blocktrans %}Your username and password didn't match. Please try again.{% endblocktrans %}</p>
+{% endif %}
+
+<form method="post" action="{% url 'auth_login' %}">{% csrf_token %}
+<table>
+	<tr>
+		<td>{% trans form.username.label_tag %}</td>
+		<td>{{ form.username }}</td>
+		<td><label class="login-field-icon fui-user" for="login-name"></label></td>
+	</tr>
+	<tr>
+		<td>{% trans form.password.label_tag %}</td>
+		<td>{{ form.password }}</td>
+		<td><label class="login-field-icon fui-lock" for="login-pass"></label></td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			{% blocktrans %}
+				<a href="{{ auth_pwd_reset_url }}" title="Recover your password" >Forgot</a> your password ?
+			{% endblocktrans %}
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3"><input type="submit" class="btn btn-primary btn-large btn-block" value="{% trans "login" %}" /></td>
+	</tr>
+	<tr>
+		<td colspan="3"> 
+			{% blocktrans %}
+				Not having account ? <a title="Click here to register" href="{{ register_url }}">Register yourself now.</a> 
+			{% endblocktrans %}
+		</td>
+	</tr>
+</table>
+    
+<input type="hidden" name="next" value="{{ next }}" />
+		
+</form>
+
+{% endblock %}
