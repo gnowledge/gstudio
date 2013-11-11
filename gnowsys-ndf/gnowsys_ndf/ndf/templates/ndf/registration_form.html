@@ -1,0 +1,23 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Register for an account" %}{% endblock %}
+
+{% block style %}
+	table{	margin:5em auto;}
+	th {	text-align:left;	}
+	table td {	padding:0.5em;	}
+	table ul   {	color:#ff3232;	}
+{% endblock %}
+
+{% block body_content %}
+
+<table>
+    <form method='post' action=''>{% csrf_token %}
+        {{ form }}
+        <tr><td colspan="2"><input type="submit" class="btn btn-primary btn-large btn-block" value="{% trans "Send activation email" %}" /></td>
+    </form>
+</table>
+
+{% endblock %}
+

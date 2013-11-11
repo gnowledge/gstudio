@@ -53,7 +53,7 @@
 	$(document).ready(function()
 	{  
 				
-		$("input:text[name='wiki_name']").keypress(function()
+		$("input:text[name='wiki_name']").bind("keypress change keyup", function()
 		{
 			if(	$.trim(this.value).length > 0 )
 			{			
