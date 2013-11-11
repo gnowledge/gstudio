@@ -105,7 +105,6 @@ def submitDoc(request):
 		#files.seek(0)		
 		#print "fileread:",files.read()
 		#print "objectid:",objectid
-<<<<<<< HEAD
 	return HttpResponseRedirect("/ndf/documentList/")
 	#return HttpResponse("File uploaded succesfully and your object id:"+str(objectid))
 
@@ -121,6 +120,3 @@ def readDoc(request,_id):
 	fileobj=filecollection.File.one({"_id": ObjectId(_id)})  
 	fl=fileobj.fs.files.get_last_version(fileobj.name)
 	return HttpResponse(fl.read(),content_type=fl.content_type)
-=======
-	return HttpResponse("File uploaded succesfully and your object id:"+str(objectid))
->>>>>>> 4da6a7769d212d3b1b2af4e1ee8593b5d88c1543
