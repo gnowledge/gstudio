@@ -410,14 +410,14 @@ class File(GSystem):
 
     use_dot_notation = True
     
-
+@connection.register
 class Group(GSystem):
     """
     Group class to create collection (group) of members
     """
 
     collection_name='Groups'
-    structure={
+    structure = {
         'type': TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
         'edit_policy': EDIT_POLICY,                   # Editing policy of the group- non editable, moderately editable, editable
         'sub_policy': SUBSCRIPTION_POLICY,            # Subscription policy to this group- open, by invitation, by request
@@ -427,6 +427,15 @@ class Group(GSystem):
     }
 
     use_dot_notation = True
+
+    validators = {
+        'gtype':lambda x: x in TYPES_OF_GROUP,
+        'edit_policy':lambda x: x in EDIT_POLICY,
+        'sub_policy':lambda x: x in SUBSCRIPTION_POLICY,
+        'ex_policy':lambda x: x in EXISTANCE_POLICY,
+        'list_member_policy':lambda x: x in LIST_MEMBER_POLICY,
+        'encr_policy':lambda x: x in ENCRYPTION_POLICY
+        } 
 
 ######################################################################################################
 

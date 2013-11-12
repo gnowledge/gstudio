@@ -88,10 +88,10 @@
 				<a href="http://www.gnu.org/software/gnowsys/" title="Look at GNOWSYS project">GNOWSYS</a>
 			</h1>
 		
-			<h5 class="menu"><a href="{% url 'wikipage' %}">WIKIPAGE</a></h5>
-	
+			<h5 class="menu" ><a href="{% url 'wikipage' %}">WIKIPAGE</a>&nbsp;
+			<a href="{% url 'create_group' %}">CREATE GROUP</a> </h5>
+
 			{% if user.is_authenticated %}
-		  
 				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
 					<h4>Hello, {{ user.username }}</h4> 						
 				</div>	
@@ -122,7 +122,6 @@
 		
 		<!-- Start of Body Container -->		
 		<div class="container" id="body">  
-			
 			{% block body_content %}  {% endblock %}
 		</div>
 		<!-- End of Body Container -->		  	
