@@ -1,4 +1,5 @@
 {% extends "registration/registration_base.html" %}
+
 {% load i18n %}
 
 {% block title %}{% trans "Register for an account" %}{% endblock %}
@@ -13,10 +14,17 @@
 {% block body_content %}
 
 <table>
-    <form method='post' action=''>{% csrf_token %}
-        {{ form }}
-        <tr><td colspan="2"><input type="submit" class="btn btn-primary btn-large btn-block" value="{% trans "Send activation email" %}" /></td>
-    </form>
+  <form method='post' action=''>
+    {% csrf_token %}
+    {{ form }}
+    <tr>
+      <td colspan="2"><p>Use at least one uppercase letter, one numeral, and 8 characters.</p> </td>
+    </tr>
+    
+    <tr>
+      <td colspan="2"><input type="submit" class="btn btn-primary btn-large btn-block" value="{% trans 'Send activation email' %}" /></td>
+    </tr>
+  </form>
 </table>
 
 {% endblock %}
