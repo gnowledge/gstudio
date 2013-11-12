@@ -179,12 +179,12 @@ LOGIN_REDIRECT_URL = "/"
 
 # Absolute filesystem path to the project's base directory, 
 # i.e. having settings.py file
-# Example: "/home/username/Desktop/gstudio/gnowsys-ndf/gnowsys_ndf/"
+# Example: "/.../project-name/app-name/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-""" ----- Revision Control System (RCS) Configuration -----
+"""Revision Control System (RCS) Configuration
 
 It operates only on single files; and hence used in this project 
 to keep track of history of each document belonging to different 
@@ -194,7 +194,7 @@ collections (models).
 
 # Indicates list of collection-names whose documents' history has to be 
 # maintained.
-VERSIONING_COLLECTIONS = ['Authors', 'AttributeTypes', 'RelationTypes', 
+VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes', 
                           'GSystemTypes', 'GSystems']
 
 # Absolute filesystem path to the directory that will hold all rcs-files 
@@ -205,3 +205,4 @@ RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/static/rcs-repo")
 # will be created for the corresponding document under it's 
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
+
