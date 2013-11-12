@@ -11,7 +11,10 @@ urlpatterns = patterns('',
                        url(r'^create_wiki/', views.create_wiki, name='create_wiki'),
                        url(r'^wikipage/', views.wikipage, name='wikipage'),
                        url(r'^delete/(?P<_id>[\w-]+)$', views.delete_node, name='delete_node'),
-                       url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')),#Direct ot html template
-                       url(r'^submitDoc/', views.submitDoc, name='submitDoc'),
-                       url(r'^submit/', views.submitDoc, name='submitDoc')	
+
+		       url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')),#Direct ot html template
+		       url(r'^submitDoc/', views.submitDoc, name='submitDoc'),	
+		       url(r'^submit/', views.submitDoc, name='submitDoc'),
+		       url(r'^documentList/', views.GetDoc, name='documentList'),
+		       url(r'^readDoc/(?P<_id>[\w-]+)$', views.readDoc, name='read_file'),	
                        )
