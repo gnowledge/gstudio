@@ -418,7 +418,7 @@ class Group(GSystem):
 
     collection_name='Groups'
     structure = {
-        'type': TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
+        'gtype': TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
         'edit_policy': EDIT_POLICY,                   # Editing policy of the group- non editable, moderately editable, editable
         'sub_policy': SUBSCRIPTION_POLICY,            # Subscription policy to this group- open, by invitation, by request
         'ex_policy': EXISTANCE_POLICY,                # Existance of the group -announced or not announced

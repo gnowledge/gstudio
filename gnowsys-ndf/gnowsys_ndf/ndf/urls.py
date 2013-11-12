@@ -8,7 +8,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.home',
                        url(r'^$', 'homepage', name='homepage'),
 )
 
-urlpatterns = patterns('gnowsys_ndf.ndf.views.group',
+urlpatterns += patterns('gnowsys_ndf.ndf.views.group',
                        url(r'^create_group/', 'create_group', name='create_group'),
 )
 
