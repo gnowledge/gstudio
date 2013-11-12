@@ -37,6 +37,22 @@ import magic #for this install python-magic example:pip install python-magic
 def homepage(request):
 
     return render_to_response("ndf/home.html",context_instance=RequestContext(request))
+
+def create_group(request):
+    if request.method == "POST":
+        db=get_database()
+        col_Group = db[Group.collection_name]
+        colg=col_Group.Group()
+        colg.name= request.POST.get('groupname',"")
+        colg.member_of=u"test"
+        colg.gtype=request.POST.get('group_type',"")
+        colg.edit_policy=request.POST.get('edit_policy',"")
+        colg.sub_policy=request.POST.get('subscription',"")
+        colg.ex_policy=request.POST.get('existance',"")
+        colg.list_member_policy=request.POST.get('member',"")
+        colg.encr_policy=request.POST.get('encryption',"")
+        colg.save()
+    return render_to_response("ndf/creategroup.html",RequestContext(request))
       
 
 def create_wiki(request):
