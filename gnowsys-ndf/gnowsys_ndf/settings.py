@@ -6,12 +6,14 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
+"""
 #SMTP setting for sending mail
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'yourcompletegmailaddr'
-EMAIL_HOST_PASSWORD = 'yourpassword'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+"""
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -183,6 +185,30 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+###########################################################################
+
+"""Settings for org-editor-content-to-html
+
+Default settings required for uploading org-editor content into 
+exported html form 
+"""
+
+from django.conf import settings
+
+MARKUP_LANGUAGE = getattr(settings, 'GSTUDIO_MARKUP_LANGUAGE', 'html')
+
+MARKDOWN_EXTENSIONS = getattr(settings, 'GSTUDIO_MARKDOWN_EXTENSIONS', '')
+
+WYSIWYG_MARKUP_MAPPING = {
+    'textile': 'markitup',
+    'markdown': 'markitup',
+    'restructuredtext': 'markitup',
+    'html': 'tinymce' in settings.INSTALLED_APPS and 'tinymce' or 'wymeditor'}
+
+WYSIWYG = getattr(settings, 'GSTUDIO_WYSIWYG',
+                  WYSIWYG_MARKUP_MAPPING.get(MARKUP_LANGUAGE))
+
+###########################################################################
 
 """Revision Control System (RCS) Configuration
 
