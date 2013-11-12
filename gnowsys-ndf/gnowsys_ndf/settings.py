@@ -13,6 +13,14 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'yourcompletegmailaddr'
 EMAIL_HOST_PASSWORD = 'yourpassword'
 
+# strength of a password
+PASSWORD_MIN_LENGTH = 8
+PASSWORD_COMPLEXITY = { # You can ommit any or all of these for no limit for that particular set
+    "UPPER": 1,       # Uppercase                                                                                                                           
+    "LOWER": 1,       # Lowercase                                                                                                 
+    "DIGITS": 1,      # Digits                                                                                                    
+}
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
