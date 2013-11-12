@@ -1,5 +1,5 @@
 /* =============================================================
- * flatui-radio.js v0.0.3
+ * flatui-radio.js v0.0.2
  * ============================================================ */
 
 !function ($) {
@@ -131,7 +131,7 @@
 		}
 	});
 	
-	$(function () {
+	$(window).on('load', function () {
 		$('[data-toggle="radio"]').each(function () {
 			var $radio = $(this);
 			$radio.radio();

@@ -51,7 +51,7 @@ class Command(BaseCommand):
             o_gs.append(c_gs. GSystem())
             o_gs[i].name = unicode("demo_wiki_" + str(i+1))
             o_gs[i].member_of = unicode("Wikipage")
-            o_gs[i].gsystem_type = objid
+            o_gs[i].gsystem_type.append(objid)
             o_gs[i].save()
 
             if not hm.create_or_replace_json_file(o_gs[i]):
