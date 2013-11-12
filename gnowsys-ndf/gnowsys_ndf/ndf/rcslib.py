@@ -183,7 +183,7 @@ class RCS:
 
         The optional OTHERFLAGS argument is passed to ci without
         interpretation.
-x
+
         Any output from ci goes to directly to stdout.
 
         """

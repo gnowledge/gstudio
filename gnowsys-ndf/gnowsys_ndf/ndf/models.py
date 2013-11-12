@@ -10,44 +10,37 @@ from random import choice
 
 ''' -- imports from installed packages -- '''
 from django.conf import settings
-from django.contrib.auth.models import User as DjangoUser
 from django.contrib.auth.models import check_password
+from django.core.validators import RegexValidator
 from django.db import models
 
+from djangoratings.fields import RatingField
 
 from django_mongokit import connection
 from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
 
-<<<<<<< HEAD
-from djangoratings.fields import RatingField
-
-from django.core.validators import RegexValidator
 from mongokit import CustomType
-from mongokit import OR
-=======
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
->>>>>>> c2df2e7f0cb9abeb1f54a7a11073099f83332542
 
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
+from gnowsys_ndf.settings import MARKUP_LANGUAGE
+from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 
+######################################################################################
 
-
-
-############################################################################
-
-STATUS_CHOICES =(
+STATUS_CHOICES = (
     ('DRAFT'),
     ('HIDDEN'),
     ('PUBLISHED')
-    )
-
+)
 
 NODE_TYPE_CHOICES = (
     ('Nodes'),
@@ -65,36 +58,43 @@ NODE_TYPE_CHOICES = (
     ('Union'),
     ('Process Types'),
     ('Process')
-   )
+)
 
-TYPES_OF_GROUP=(
+TYPES_OF_GROUP = (
     ('ANONYMOUS'),
     ('PUBLIC'),
     ('PRIVATE')
-    )
-EDIT_POLICY=(
+)
+
+EDIT_POLICY = (
     ('NON_EDITABLE'),
     ('EDITABLE_MODERATED'),
     ('EDITABLE_NON_MODERATED')
-    )
-SUBSCRIPTION_POLICY=(
+)
+
+SUBSCRIPTION_POLICY = (
     ('OPEN'),
     ('BY_REQUEST'),
     ('BY_INVITATION'),
-    )
-EXISTANCE_POLICY=(
+)
+
+EXISTANCE_POLICY = (
     ('ANNOUNCED'),
     ('NOT_ANNOUNCED')
-    )
-LIST_MEMBER_POLICY=(
+)
+
+LIST_MEMBER_POLICY = (
     ('DISCLOSED_TO_MEM'),
     ('NOT_DISCLOSED_TO_MEM')
-    )
+)
+
 ENCRYPTION_POLICY=(
     ('ENCRYPTED'),
     ('NOT_ENCRYPTED')
     )
+
 #############################################################################
+
 # /* Create all Custom Data types here */
 
 class RatingField(CustomType):
@@ -110,9 +110,8 @@ class RatingField(CustomType):
             return value
         # else:
         #     return "value must be between 0 and 5"
-#/*################################### */
 
-<<<<<<< HEAD
+##############################################################################
 
 @connection.register
 class Author(DjangoDocument):
@@ -136,7 +135,7 @@ class Author(DjangoDocument):
         'is_superuser': bool,        
         'created_at': datetime.datetime,
         'last_login': datetime.datetime,
-        }
+    }
     
     use_dot_notation = True
     required_fields = ['username', 'password']
@@ -144,9 +143,11 @@ class Author(DjangoDocument):
     #validators={
     #'phone': lambda x: x > 0 and x < 10 }
     indexes = [
-        {'fields': 'username',
-         'unique': True}
-        ]
+        {
+            'fields': 'username',
+            'unique': True
+        }
+    ]
     
     def __init__(self, *args, **kwargs):
         super(Author, self).__init__(*args, **kwargs)
@@ -157,7 +158,7 @@ class Author(DjangoDocument):
             other_id = other_user['_id']
         except (AttributeError, TypeError):
             return False
-        return self['_id'] == other_id
+            return self['_id'] == other_id
     
     # play ball with Django
     @property
@@ -185,12 +186,12 @@ class Author(DjangoDocument):
     def __unicode__(self):
         return self._id
 
-    
-=======
->>>>>>> c2df2e7f0cb9abeb1f54a7a11073099f83332542
+
 @connection.register
 class Node(DjangoDocument):
+
     objects = models.Manager()
+
     collection_name = 'Nodes'
     structure = {
         'name': unicode,
@@ -198,13 +199,10 @@ class Node(DjangoDocument):
         'plural': unicode,
       	'member_of': unicode, 			# 
       	'created_at': datetime.datetime,
-<<<<<<< HEAD
         'created_by': ObjectId,			# ObjectId's of Author Class
         #'rating': RatingField(),
-=======
         'created_by': int,			# Primary Key of User(django's) Class
         #'rating': 
->>>>>>> c2df2e7f0cb9abeb1f54a7a11073099f83332542
         'start_publication': datetime.datetime,
         'content': unicode,
         'content_org': unicode,
@@ -216,8 +214,8 @@ class Node(DjangoDocument):
         'comment_enabled': bool,
       	'login_required': bool,
       	#'password': basestring,
-        'status':STATUS_CHOICES
-        }
+        'status': STATUS_CHOICES
+    }
     
     required_fields = ['name']
     default_values = {'created_at':datetime.datetime.utcnow}
@@ -228,6 +226,17 @@ class Node(DjangoDocument):
     
     def identity(self):
         return self.__unicode__()
+
+    @property
+    def html_content(self):
+        """Return the content correctly formatted"""
+        if MARKUP_LANGUAGE == 'markdown':
+            return markdown(self.content, MARKDOWN_EXTENSIONS)
+        elif MARKUP_LANGUAGE == 'textile':
+            return textile(self.content)
+        elif MARKUP_LANGUAGE == 'restructuredtext':
+            return restructuredtext(self.content)
+        return str(self.content)
     
     def save(self, *args, **kwargs):
         ''' on save, set created_at to current date'''
@@ -235,7 +244,8 @@ class Node(DjangoDocument):
         
         super(Node, self).save(*args, **kwargs)
         
-        ''' on save, store history file(in json-format) for 
+        ''' 
+        TODO: on save, store history file(in json-format) for 
         corresponding document and commit to it's rcs repository
         '''
         
@@ -250,8 +260,9 @@ class MetaType(Node):
     structure = {
         'description': basestring,		# Description (name)
         'parent': ObjectId                      # Foreign key to self 
-         }
+    }
     use_dot_notation = True
+
 
 @connection.register
 class AttributeType(Node):
@@ -279,22 +290,23 @@ class AttributeType(Node):
 	'validators': list,
 	'default': unicode,
 	'editable': bool
-        }
+    }
 
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
 
 
 '''
-"""This is an Aggregation class, hence we are not keeping history of it.
-"""
+# **********************************************************************
+#  This is an Aggregation class, hence we are not keeping history of it.
+# **********************************************************************
 @connection.register
 class Attribute(Node):
     collection_name = 'Attributes'
     structure = {
         'attribute_type': ObjectId,		# ObjectId's of AttributeType Class
         'attribute_value': None                 # To store values of created attribute type		
-	}
+    }
     
     use_dot_notation = True 
 '''
@@ -314,14 +326,16 @@ class RelationType(Node):
         'is_symmetric': bool,
         'is_reflexive': bool,
         'is_transitive': bool        
-	}
+    }
 
     required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
 	
 '''
-"""This is an Aggregation class, hence we are not keeping history of it.
-"""
+# **********************************************************************
+#  This is an Aggregation class, hence we are not keeping history of it.
+# **********************************************************************
+
 @connection.register
 class Relation(Node):
     collection_name = 'Relations'
@@ -332,7 +346,7 @@ class Relation(Node):
 	}
 
     use_dot_notation = True
-<<<<<<< HEAD
+'''
 
 class ProcessType(Node):
     """
@@ -340,26 +354,23 @@ class ProcessType(Node):
     """  
     collection_name = 'ProcessTypes'
     structure = { 
-        'changing_attributetype_set':[AttributeType],  # List of Attribute Types
-        'changing_relationtype_set':[RelationType]    # List of Relation Types
-        }
+        'changing_attributetype_set': [AttributeType],  # List of Attribute Types
+        'changing_relationtype_set': [RelationType]    # List of Relation Types
+    }
     use_dot_notation = True
 
-=======
-'''
->>>>>>> c2df2e7f0cb9abeb1f54a7a11073099f83332542
 
 @connection.register
 class GSystemType(Node):
-    """                                                                                                                                         class to organize Systems                                                                                                                
+    """                                                                                                                                         Class to organize Systems                                                                                                            
     """
     collection_name = 'GSystemTypes'
     structure = {
         'meta_type_set': [MetaType],            #List of Metatypes
         'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
-        'relation_type_set':[RelationType],      # Holds list of Relation Types
-        'process_type_set':[ProcessType],        # List of Process Types 
-	}
+        'relation_type_set': [RelationType],     # Holds list of Relation Types
+        'process_type_set': [ProcessType]        # List of Process Types 
+    }
     
     use_dot_notation = True
     
@@ -372,28 +383,31 @@ class GSystem(Node):
 
     collection_name = 'GSystems'
     structure = {
-        'gsystem_type': [GSystemType],		# ObjectId's of GSystemType Class  
+        'gsystem_type': [ObjectId],		# ObjectId's of GSystemType Class  
         'attribute_set': [dict],		# dict that holds AT name & its values
         'relation_set': [dict],			# dict that holds RT name & its related_object value
         'collection_set': [ObjectId],		# list of ObjectId's of GSystem Class
         'author_set':[Author]                   # List of Authors
-
-        }
+    }
     
     use_dot_notation = True
+
 
 @connection.register
 class File(GSystem):
     """
     File class to hold any resource 
     """
+
     collection_name = 'Files'
     structure = {
-    'mime_type' : basestring            # Holds the type of file
-        }
-    gridfs = {
-    'containers' : ['files']
+        'mime_type' : basestring            # Holds the type of file
     }
+
+    gridfs = {
+        'containers' : ['files']
+    }
+
     use_dot_notation = True
     
 
@@ -401,31 +415,26 @@ class Group(GSystem):
     """
     Group class to create collection (group) of members
     """
+
     collection_name='Groups'
     structure={
-        'type':TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
-        'edit_policy':EDIT_POLICY,                   # Editing policy of the group- non editable, moderately editable, editable
-        'sub_policy':SUBSCRIPTION_POLICY,            # Subscription policy to this group- open, by invitation, by request
-        'ex_policy':EXISTANCE_POLICY,                # Existance of the group -announced or not announced
-        'list_member_policy':LIST_MEMBER_POLICY,     # Members of this group - disclosed or not 
-        'encr_policy':ENCRYPTION_POLICY              # Encryption - yes or no
-        }
+        'type': TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
+        'edit_policy': EDIT_POLICY,                   # Editing policy of the group- non editable, moderately editable, editable
+        'sub_policy': SUBSCRIPTION_POLICY,            # Subscription policy to this group- open, by invitation, by request
+        'ex_policy': EXISTANCE_POLICY,                # Existance of the group -announced or not announced
+        'list_member_policy': LIST_MEMBER_POLICY,     # Members of this group - disclosed or not 
+        'encr_policy': ENCRYPTION_POLICY              # Encryption - yes or no
+    }
 
     use_dot_notation = True
 
-
-
 ######################################################################################################
-
-
-
-
 
 class HistoryManager():
     """Handles history management for documents of a collection 
     using Revision Control System (RCS).
-
     """
+
     objects = models.Manager()
 
     __RCS_REPO_DIR = RCS_REPO_DIR
@@ -464,12 +473,10 @@ class HistoryManager():
           
         '''
         file_name = (document_object._id.__str__() + '.json')
-        #print("\n file_name      : {0}".format(file_name))
 
         collection_dir = \
             (os.path.join(self.__RCS_REPO_DIR, \
                               document_object.collection_name)) 
-        #print("\n collection_dir : {0}".format(collection_dir))
 
         # Example: 
         # if -- file_name := "523f59685a409213818e3ec6.json"
@@ -480,12 +487,10 @@ class HistoryManager():
         for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
             collection_hash_dirs += \
                 (document_object._id.__str__()[-2**pos] + "/")
-        #print("\n collection_hash_dirs : {0}".format(collection_hash_dirs))
 
         file_path = \
             os.path.join(collection_dir, \
                              (collection_hash_dirs + file_name))
-        #print("\n file_path      : {0}".format(file_path))
 
         return file_path
 
@@ -544,7 +549,6 @@ class HistoryManager():
             file_path = self.get_file_path(document_object)
 
             json_data = document_object.to_json_type()
-            #print("\n json_data      : {0}".format(self.__json_data))
 
             #------------------------------------------------------------------
             # Creating/Overwriting data into json-file and rcs-file
