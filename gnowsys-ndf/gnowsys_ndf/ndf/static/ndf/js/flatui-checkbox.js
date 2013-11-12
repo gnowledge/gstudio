@@ -1,5 +1,5 @@
 /* =============================================================
- * flatui-checkbox.js v0.0.3
+ * flatui-checkbox.js v0.0.2
  * ============================================================ */
  
 !function ($) {
@@ -102,7 +102,7 @@
 		}
 	});
 	
-	$(function () {
+	$(window).on('load', function () {
 		$('[data-toggle="checkbox"]').each(function () {
 			var $checkbox = $(this);
 			$checkbox.checkbox();

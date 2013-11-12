@@ -4,29 +4,24 @@
 
 {% block body_content %} 
 
-<br/>
-
 {% if user.is_authenticated %}
-	<br/>
-	<a href="{% url 'create_wiki' %}">
-		<input type="submit" class="btn btn-primary btn-large btn-block" value="Create a new wikipage " />
-	</a>
-	<hr/>
+<a href="{% url 'create_wiki' %}"><input type="submit" class="btn btn-primary btn-large btn-block" value="Create a new wikipage " /></a>
 {% endif %}
 
-
+<hr>
 {% load url from future %}
 {% for node in nodes %}
 {% if forloop.first %}
-<h3>Number Of Nodes : {{ nodes_count }} </h3>
+  <h5>Number Of Nodes : {{ nodes_count }} </h5>
 {% endif %}
-
 <div>
-  <p><strong>{{ node.name }}</strong><br><br>
+  <p><strong><a href="{% url 'display_page' node %}">{{ node.name }}</a></strong><br>
+    <!--
     Created at : {{ node.created_at|date:"j F Y" }}<br>
     Member Of   : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>
     <a href="{% url 'delete_node' node %}">delete</a>
+    -->
   </p>
 </div>
 

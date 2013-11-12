@@ -22,10 +22,8 @@ String.prototype.repeat = function(num) {
         $(this).toggleClass("todo-done");
     });
 
-    // Custom Selects
-    $("select[name='huge']").selectpicker({style: 'btn-hg btn-primary', menuStyle: 'dropdown-inverse'});
+    // Custom Select
     $("select[name='herolist']").selectpicker({style: 'btn-primary', menuStyle: 'dropdown-inverse'});
-    $("select[name='info']").selectpicker({style: 'btn-info'});
 
     // Tooltips
     $("[data-toggle=tooltip]").tooltip("show");
