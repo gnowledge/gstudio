@@ -4,14 +4,14 @@
 
 {% block head %}
 	
-	<!-- orgitdown! -->
-	<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
-	<!-- orgitdown! toolbar settings -->
-	<script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
-	<!-- orgitdown! skin -->
-	<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
-	<!--  orgitdown! toolbar skin -->
-	<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+<!-- orgitdown! -->
+<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+<!-- orgitdown! toolbar settings -->
+<script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+<!-- orgitdown! skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+<!--  orgitdown! toolbar skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
 
 {% endblock %}
 
@@ -22,34 +22,38 @@
 <form method="post" action="{% url 'create_wiki' %}">
   {% csrf_token %}
   
-	<div style='display:table; '>	
+  <div style='display:table; '>	
     
-		<div style='display:table-row;'>			
-			<div style='display:table-cell;'>	Name	</div>
-			<div style='display:table-cell; padding-left:20px;'>	
-				<input type="text" name="wiki_name" autofocus="autofocus" placeholder="Enter name to add content">	
-			</div>
-		</div>	
-		<br/>
-		<div style='display:table-row;'>
-			<div style='display:table-cell;'>	Tags 	</div>
-			<div style='display:table-cell; padding-left:20px;'>	
-				<input type="text" name="tags" placeholder="Example: abc, XYZ">	 </div>
-		</div>		
-		
-    </div>
+    <div style='display:table-row;'>			
+      <div style='display:table-cell;'>	Name	</div>
+      <div style='display:table-cell; padding-left:20px;'>	
+	<input type="text" name="wiki_name" autofocus="autofocus" placeholder="Enter name to add content">	
+      </div>
+    </div>	
     <br/>
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'>	Tags 	</div>
+      <div style='display:table-cell; padding-left:20px;'>	
+	<input type="text" name="tags" placeholder="Example: abc, XYZ">	 </div>
+    </div>		
+
+  </div>
+
+  <div id="text-editor" style="display:inline-block; float:left; padding:30px 40px;">
+    <textarea id="orgitdown" name="content_org" disabled="disabled"> </textarea>
+  </div>
+
+  <input type="hidden" id="usrid_id" name="usrid" value={{user.id}} />
+  <input type="hidden" id="usrname_id" name="usrname" value={{user.username}} />
+  <input type="submit" value="Save" class="btn btn-large btn-block disabled">
+  
+</div>
 
 </form>
 
-<input type="button" value="Save" class="btn btn-large btn-block disabled">
-</div>
-
-<div id="text-editor" style="display:inline-block; float:left; padding:30px 40px;">
-	<textarea id="orgitdown" disabled="disabled"> </textarea>
-</div>
 <script>
 
+<<<<<<< HEAD
 	$(document).ready(function()
 	{  
 				
@@ -71,6 +75,27 @@
 	})
 	
 	
+=======
+  $(document).ready(function()
+  {  
+    $("input:text[name='wiki_name']").keypress(function()
+    {
+      if($.trim(this.value).length > 0)
+      {			
+        $("input[type='submit']").removeClass("disabled").addClass("btn-primary");
+        $("#orgitdown").removeAttr("disabled");
+      }
+      else
+      {
+        $("input[type='submit']").removeClass("btn-primary").addClass("disabled");
+        $("#orgitdown").attr("disabled", "disabled");
+      }
+    });
+  
+    $('#orgitdown').orgitdown(mySettings);
+  })
+  
+>>>>>>> c2df2e7f0cb9abeb1f54a7a11073099f83332542
 </script>
 
 {% endblock %}
