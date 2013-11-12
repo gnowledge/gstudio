@@ -116,6 +116,23 @@ def submitDoc(request):
 		filetype=magic.from_buffer(files.read()) #Gusing filetype by python-magic
 		print "test",title,user,memberOf	
 		#this code is for storing Document in gridfs
+		files.seek(0) #moving files cursor to start
 		objectid=fileobj.fs.files.put(files.read(),filename=title,content_type=filetype)
+		#files.seek(0)		
+		#print "fileread:",files.read()
 		#print "objectid:",objectid
-	return HttpResponse("File uploaded succesfully and your object id:"+str(objectid))
+	return HttpResponseRedirect("/ndf/documentList/")
+	#return HttpResponse("File uploaded succesfully and your object id:"+str(objectid))
+
+def GetDoc(request):
+	filecollection=get_database()[File.collection_name]
+	files=filecollection.File.find()
+	template="ndf/DocumentList.html"
+	variable=RequestContext(request,{'filecollection':files})
+	return render_to_response(template,variable)
+
+def readDoc(request,_id):
+	filecollection=get_database()[File.collection_name]
+	fileobj=filecollection.File.one({"_id": ObjectId(_id)})  
+	fl=fileobj.fs.files.get_last_version(fileobj.name)
+	return HttpResponse(fl.read(),content_type=fl.content_type)
