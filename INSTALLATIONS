@@ -56,6 +56,16 @@ within it; and also perform following steps:
   Install django-ratings(0.3.7) : pip install django-ratings
   	NOTE:
   		(1) For more information visit - "https://github.com/dcramer/django-ratings"
+  		
+  Install python-magic(0.4.6) : pip install python-magic
+  	NOTE:
+  		(1) For more information visit - "https://pypi.python.org/pypi/python-magic/0.4.6"
+  		
+  Install MathJax(2.2) :
+    NOTE:
+      (1) Refer this to download the MathJax folder - "http://docs.mathjax.org/en/latest/installation.html" 
+      (2) Once you have the MathJax folder, rename it to 'mathjax' (all in smallcaps) and put it under application's
+          static directory.
         
   To clone "gstudio-mongokit" project (inside the virtualenv-folder): 
     (1) Visit - "https://github.com/gnowledge/gstudio"
