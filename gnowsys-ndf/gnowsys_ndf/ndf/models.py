@@ -369,24 +369,31 @@ class File(GSystem):
     }
     use_dot_notation = True
     
-
+@connection.register
 class Group(GSystem):
     """
     Group class to create collection (group) of members
     """
     collection_name='Groups'
     structure={
-        'type':TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
-        'edit_policy':EDIT_POLICY,                   # Editing policy of the group- non editable, moderately editable, editable
-        'sub_policy':SUBSCRIPTION_POLICY,            # Subscription policy to this group- open, by invitation, by request
-        'ex_policy':EXISTANCE_POLICY,                # Existance of the group -announced or not announced
-        'list_member_policy':LIST_MEMBER_POLICY,     # Members of this group - disclosed or not 
-        'encr_policy':ENCRYPTION_POLICY              # Encryption - yes or no
+        'gtype':basestring,                       # Types of groups - Anonymous,public or private
+        'edit_policy':basestring,                 # Editing policy of the group- non editable, moderately editable, editable
+        'sub_policy':basestring,                  # Subscription policy to this group- open, by invitation, by request
+        'ex_policy':basestring,                   # Existance of the group -announced or not announced
+        'list_member_policy':basestring,          # Members of this group - disclosed or not 
+        'encr_policy':basestring                  # Encryption - yes or no
         }
-
+    
     use_dot_notation = True
 
-
+    validators={
+        'gtype':lambda x: x in TYPES_OF_GROUP,
+        'edit_policy':lambda x: x in EDIT_POLICY,
+        'sub_policy':lambda x: x in SUBSCRIPTION_POLICY,
+        'ex_policy':lambda x: x in EXISTANCE_POLICY,
+        'list_member_policy':lambda x: x in LIST_MEMBER_POLICY,
+        'encr_policy':lambda x: x in ENCRYPTION_POLICY
+        } 
 
 ######################################################################################################
 
