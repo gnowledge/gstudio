@@ -48,10 +48,20 @@ within it; and also perform following steps:
 	NOTE: 
 		(1) For more information visit - "https://bitbucket.org/ubernostrum/django-registration"
 		(2) To make SMTP server ready for sending mail (development purpose only) -
-				(a) Go to settings.py file and search for "#SMTP setting for sending mail".
-				(b) Edit following with your gmail credentials and save settings.py file - 
-						 EMAIL_HOST_USER = 'yourcompleteemailid'
-						 EMAIL_HOST_PASSWORD = 'yourpassword'
+			There are two options : (Option:1 is default but you can use any of them)
+			
+			(OPTION:1) After running project, run following command :
+					   		python -m smtpd -n -c DebuggingServer localhost:1025
+					   (This will ready to listen smtp messages and will print in terminal)
+					   
+			OR
+			
+			(OPTION:2) To use gmail smtp server :   			   		
+							(a) Go to settings.py file and search for "#SMTP setting for sending mail" 
+								and uncomment gmail smtp setting and comment default python smtp settings.
+							(b) Edit following with your gmail credentials and save settings.py file - 
+								 EMAIL_HOST_USER = 'yourcompleteemailid'
+								 EMAIL_HOST_PASSWORD = 'yourpassword'
 						 
   Install django-ratings(0.3.7) : pip install django-ratings
   	NOTE:
@@ -87,6 +97,11 @@ within it; and also perform following steps:
     	(c) python manage.py syncdb
     	(d) python manage.py runserver
         NOTE: Always run (c) & (d) commands together. 
+        
+  To use django-registration module :
+  	(1) Run project from terminal.
+  	(2) 
+
 
 
 
