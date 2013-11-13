@@ -10,9 +10,6 @@ from models import GSystemType
 from registration.forms import RegistrationForm
 from passwords.fields import PasswordField
 
-
-
-
 class NodeForm(DocumentForm):
 
     tags = forms.CharField(max_length=250)
@@ -25,7 +22,6 @@ class NodeForm(DocumentForm):
         document = Node
         fields = ['name', 'member_of', 'tags']
         
-
 class UserRegistrationForm(RegistrationForm):
     password1 = PasswordField(label="Password")
 

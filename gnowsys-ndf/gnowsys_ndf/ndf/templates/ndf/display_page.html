@@ -1,0 +1,51 @@
+{% extends "ndf/base.html" %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+<!-- Loading django template tags -->
+{% load ndf_tags %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block title %} Wikipage - {{ node.name }}  {% endblock %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block body_content %} 
+
+<h2>{{node.name}}</h2> [Place Edit button] <br/>
+  Wikipage posted on : {{ node.created_at|date:"j F Y" }} <br/>
+                Tags : {{ node.tags|join:", " }} <br>
+             Versions: [Show history as No. of times * printed where each * represesnts corresponding history_version] <br/>
+
+<hr/>
+
+<div class="tabcontents">
+
+  <!-- ########## Start of div - tabcontents ########## -->
+  
+  <div id="view1" class="tabcontent">
+    {% edit_content %}
+	</div>
+	     
+	<div id="view2" class="tabcontent">
+	</div>  
+	
+	<div id="view3" class="tabcontent">
+	</div>
+	
+	<div id="view4" class="tabcontent">
+	</div>
+	
+	<div id="view5" class="tabcontent">
+	</div>  
+	
+	<div id="view6" class="tabcontent">
+	</div>		
+	
+	<!-- ##### end of div - tabcontents ##### -->
+	
+</div>
+
+{% endblock %}
+

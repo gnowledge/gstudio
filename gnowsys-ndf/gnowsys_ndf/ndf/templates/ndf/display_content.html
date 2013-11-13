@@ -1,0 +1,22 @@
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% with node.html_content|safe as page_org2html_content %}
+  {% if page_org2html_content != "None" %}
+    <font size="3">{{ page_org2html_content }}</font>
+  {% else %}
+    <font size="3">No Content to display!!<br/>Please click on "Edit" to add content...</font>
+  {% endif %}
+{% endwith %}
+
+<!-- 
+    Kept in this template instead of "edit_content.html", because we need updated content_org; as
+    it is going to be reflected into the org-editor (after user clicks on "Edit" button) 
+    
+    {{node.content_org}} assigned to 'name' attribute because having problem when assigned with 'value' attribute
+-->
+
+<input type="hidden" id="node_content_org" name="{{node.content_org}}" />
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+

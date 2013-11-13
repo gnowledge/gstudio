@@ -6,17 +6,19 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
+"""
 #SMTP setting for sending mail
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'yourcompletegmailaddr'
-EMAIL_HOST_PASSWORD = 'yourpassword'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+"""
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
 PASSWORD_COMPLEXITY = { # You can ommit any or all of these for no limit for that particular set
-    "UPPER": 1,       # Uppercase                                                                                                                           
+    "UPPER": 1,       # Uppercase                 
     "LOWER": 1,       # Lowercase                                                                                                 
     "DIGITS": 1,      # Digits                                                                                                    
 }
@@ -187,12 +189,36 @@ LOGIN_REDIRECT_URL = "/"
 
 # Absolute filesystem path to the project's base directory, 
 # i.e. having settings.py file
-# Example: "/home/username/Desktop/gstudio/gnowsys-ndf/gnowsys_ndf/"
+# Example: "/.../project-name/app-name/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+###########################################################################
 
-""" ----- Revision Control System (RCS) Configuration -----
+"""Settings for org-editor-content-to-html
+
+Default settings required for uploading org-editor content into 
+exported html form 
+"""
+
+from django.conf import settings
+
+MARKUP_LANGUAGE = getattr(settings, 'GSTUDIO_MARKUP_LANGUAGE', 'html')
+
+MARKDOWN_EXTENSIONS = getattr(settings, 'GSTUDIO_MARKDOWN_EXTENSIONS', '')
+
+WYSIWYG_MARKUP_MAPPING = {
+    'textile': 'markitup',
+    'markdown': 'markitup',
+    'restructuredtext': 'markitup',
+    'html': 'tinymce' in settings.INSTALLED_APPS and 'tinymce' or 'wymeditor'}
+
+WYSIWYG = getattr(settings, 'GSTUDIO_WYSIWYG',
+                  WYSIWYG_MARKUP_MAPPING.get(MARKUP_LANGUAGE))
+
+###########################################################################
+
+"""Revision Control System (RCS) Configuration
 
 It operates only on single files; and hence used in this project 
 to keep track of history of each document belonging to different 
@@ -202,7 +228,7 @@ collections (models).
 
 # Indicates list of collection-names whose documents' history has to be 
 # maintained.
-VERSIONING_COLLECTIONS = ['Authors', 'AttributeTypes', 'RelationTypes', 
+VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes', 
                           'GSystemTypes', 'GSystems']
 
 # Absolute filesystem path to the directory that will hold all rcs-files 
@@ -213,3 +239,4 @@ RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/static/rcs-repo")
 # will be created for the corresponding document under it's 
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
+

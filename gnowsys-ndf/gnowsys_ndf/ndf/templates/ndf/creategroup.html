@@ -1,96 +1,106 @@
 {% extends "ndf/base.html" %}
+
 {% load ndf_tags %}
 
 {% block title %} Wikipage {% endblock %}
-
 
 {% block body_content %} 
 
 <div style="display:inline-block; float:left; padding-top:40px; ">
 <form method="post" action="{% url 'create_group' %}">
   {% csrf_token %}
-{% get_existing_groups as groups%}
-{% if groups %}
-Existing Groups:
+  {% get_existing_groups as groups%}
 
-{% for items in groups %}
- {{items}} ,
-{% endfor %}
-{% endif %}
-<div style='display:table;  border:1px;   border-spacing:10px; '>
- <div style='display:table-row;' >
+  {% if groups %}
+    Existing Groups:
 
-   <div style='display:table-cell;'> 
-   <font size="1" >Group Name</font> </div>
-   <div style='display:table-cell;'> 
-   <input type="text"  name="groupname" placeholder="Enter Group Name">
-   
-   </div>
-   <div style='display:table-cell;'> 
-   <font size="1" >Group Type</font></div>
-   <div style='display:table-cell;'> 
-     <select name="group_type" class="gtype">
-       <option id="ANONYMOUS">ANONYMOUS</option>
-       <option id="PUBLIC">PUBLIC</option>
-       <option id="PRIVATE">PRIVATE</option>
-     </select> 
-   
-   </div>
- </div>
- <div style='display:table-row;'>
-   <div style='display:table-cell;'> 
-   <font size="1" >Group Editing policy</font></div>
-   <div style='display:table-cell;'> 
-     <select name="edit_policy" class="editp">
-       <option id="NON_EDITABLE">NON_EDITABLE</option>
-       <option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
-       <option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
-     </select> 
-   </div>
-   <div style='display:table-cell;'> 
-   <font size="1" >Group Subscription policy</font></div>
-   <div style='display:table-cell;'> 
-     <select name="subscription" class="subscptn">
-       <option id="OPEN">OPEN</option>
-       <option id="BY_REQUEST">BY_REQUEST</option>
-       <option id="BY_INVITATION">BY_INVITATION</option>
-     </select>
-   </div>
- </div>
- <div style='display:table-row;'>
-   <div style='display:table-cell;'> 
-     <font size="1" >Group Existance visibility</font></div>
-   <div style='display:table-cell;'> 
-       <select name="existance" class="existance">
-	 <option id="ANNOUNCED">ANNOUNCED</option>                                                                                          	     <option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
-	 </select>
+    {% for items in groups %}
+      {{items}} ,
+    {% endfor %}
+  {% endif %}
+
+  <div style='display:table;  border:1px;   border-spacing:10px; '>
+    
+    <div style='display:table-row;' >
+      <div style='display:table-cell;'> 
+        <font size="1" >Group Name</font> 
+      </div>
+      <div style='display:table-cell;'> 
+        <input type="text"  name="groupname" placeholder="Enter Group Name">
+      </div>
+      <div style='display:table-cell;'> 
+        <font size="1" >Group Type</font>
+      </div>
+      <div style='display:table-cell;'> 
+        <select name="group_type" class="gtype">
+          <option id="ANONYMOUS">ANONYMOUS</option>
+          <option id="PUBLIC">PUBLIC</option>
+          <option id="PRIVATE">PRIVATE</option>
+        </select> 
+      </div>
     </div>
-   <div style='display:table-cell;'> 
-     <font size="1">  Group Member Visibility</font></div>
-   <div style='display:table-cell;'> 
-       <select name="member" class="mem">
-	 <option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
-	 <option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
-       </select>
-   </div>
- </div>
- <div style='display:table-row;'>
-   <div style='display:table-cell;'> 
-     <font size="1" >Group Encryption policy</font></div>
-   <div style='display:table-cell;'> 
-      <select name="encryption" class="encr">
-	<option id="ENCRYPTED">ENCRYPTED</option>
-        <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
-      </select>
-   </div>  
-   <div style='display:table-cell;'> 
-<input type="submit" value="Create Group" class="btn btn-small ">
-</div>
-</div>
-</div>
+    
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'> 
+        <font size="1" >Group Editing policy</font>
+      </div>
+      <div style='display:table-cell;'> 
+        <select name="edit_policy" class="editp">
+          <option id="NON_EDITABLE">NON_EDITABLE</option>
+          <option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
+          <option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
+        </select> 
+      </div>
+      <div style='display:table-cell;'> 
+        <font size="1" >Group Subscription policy</font>
+      </div>
+      <div style='display:table-cell;'> 
+        <select name="subscription" class="subscptn">
+          <option id="OPEN">OPEN</option>
+          <option id="BY_REQUEST">BY_REQUEST</option>
+          <option id="BY_INVITATION">BY_INVITATION</option>
+        </select>
+      </div>
+    </div>
+    
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'> 
+        <font size="1" >Group Existance visibility</font>
+      </div>
+      <div style='display:table-cell;'> 
+        <select name="existance" class="existance">
+	        <option id="ANNOUNCED">ANNOUNCED</option>
+	        <option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
+	      </select>
+      </div>
+      <div style='display:table-cell;'> 
+        <font size="1">  Group Member Visibility</font>
+      </div>
+      <div style='display:table-cell;'> 
+        <select name="member" class="mem">
+	        <option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
+	        <option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
+        </select>
+      </div>
+    </div>
+ 
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'> 
+        <font size="1" >Group Encryption policy</font>
+      </div>
+      <div style='display:table-cell;'> 
+        <select name="encryption" class="encr">
+	        <option id="ENCRYPTED">ENCRYPTED</option>
+          <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
+        </select>
+      </div>  
+      <div style='display:table-cell;'> 
+        <input type="submit" value="Create Group" class="btn btn-small ">
+      </div>
+    </div>
+  </div>
 
 </form>
-
 
 {% endblock %}
 
