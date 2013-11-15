@@ -34,9 +34,9 @@ def submitDoc(request):
         memberOf = request.POST.get("memberOf","")
         files=request.FILES.get("doc","")
         #this code is for creating file document and saving
-        fileobj.name=unicode(title)
-        fileobj.user=unicode(user)
-        fileobj.member_of=unicode(memberOf)
+        fileobj.name = unicode(title)
+        fileobj.user = unicode(user)
+        fileobj.member_of.append(unicode(memberOf))
         fileobj.save()
         filetype=magic.from_buffer(files.read()) #Gusing filetype by python-magic
         print "test",title,user,memberOf	
