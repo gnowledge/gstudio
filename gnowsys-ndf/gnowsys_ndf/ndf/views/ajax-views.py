@@ -52,15 +52,15 @@ def edit_content(request):
         # Updating the above instance with modified data
         col_GSystem.update({'_id': obj_id}, {'$set': {'content_org': content_org, 'content': content}}, upsert=False)
 
+        # Must fetch from database again, otherwise you won't get the updated data
+        node = col_GSystem.GSystem.one({'_id': obj_id})
+
         # Storing histroy in rcs-version-file
         fp = history_manager.get_file_path(node)
         rcs_obj.checkout(fp)
 
         if history_manager.create_or_replace_json_file(node):
-            rcs_obj.checkin(fp, 0, "Document " + node_name + " modified by " + usrname)
-
-        # Must fetch from database again, otherwise you won't get the updated data
-        node = col_GSystem.GSystem.one({'_id': obj_id})
+            rcs_obj.checkin(fp, 1, "Document " + node_name + " modified by " + usrname)
 
         return render_to_response('ndf/display_content.html', {'node': node})
     else:
