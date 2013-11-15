@@ -73,9 +73,10 @@ within it; and also perform following steps:
   		
   Install MathJax(2.2) :
     NOTE:
-      (1) Refer this to download the MathJax folder - "http://docs.mathjax.org/en/latest/installation.html" 
-      (2) Once you have the MathJax folder, rename it to 'mathjax' (all in smallcaps) and put it under application's
-          static directory.
+      (1) To install MathJax on your own server, download the distribution from the following 
+          link: "http://www.mathjax.org/download/"
+      (2) Simply unzip the downloaded archive, rename it to 'mathjax' (all in smallcaps) and 
+          put it under django-application's "static" directory.
 
   Install django-passwords(0.2.0) : pip install django-passwords 
     NOTE:
@@ -97,12 +98,4 @@ within it; and also perform following steps:
     	(c) python manage.py syncdb
     	(d) python manage.py runserver
         NOTE: Always run (c) & (d) commands together. 
-        
-  To use django-registration module :
-  	(1) Run project from terminal.
-  	(2) 
 
-
-
-
-	

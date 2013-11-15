@@ -197,20 +197,28 @@ class Node(DjangoDocument):
         'name': unicode,
         'altnames': unicode,
         'plural': unicode,
-      	'member_of': unicode, 			# 
+        'prior_node': [ObjectId],
+        
+        'type_of': unicode,
+      	'member_of': [unicode], 		 
+
       	'created_at': datetime.datetime,
         'created_by': ObjectId,			# ObjectId's of Author Class
         #'rating': RatingField(),
         'created_by': int,			# Primary Key of User(django's) Class
         #'rating': 
+
         'start_publication': datetime.datetime,
+
         'content': unicode,
         'content_org': unicode,
         #'image': 
         'tags': [unicode],
         'featured': bool,
+
         'last_update': datetime.datetime,
         'modified_by': [ObjectId],		# list of Primary Keys of User(django's) Class
+
         'comment_enabled': bool,
       	'login_required': bool,
       	#'password': basestring,

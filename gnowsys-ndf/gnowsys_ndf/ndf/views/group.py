@@ -29,7 +29,7 @@ def create_group(request):
         col_Group = DB[Group.collection_name]
         colg = col_Group.Group()
         colg.name = request.POST.get('groupname', "")
-        colg.member_of = u"test"
+        colg.member_of.append(u"test")
         colg.gtype = request.POST.get('group_type', "")
         colg.edit_policy = request.POST.get('edit_policy', "")
         colg.sub_policy = request.POST.get('subscription', "")
