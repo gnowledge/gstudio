@@ -64,7 +64,7 @@ def create_wiki(request):
             doc_page = col_GSystem.GSystem()
             doc_page.name = unicode(wiki_name)
             doc_page.tags.append(unicode(wiki_tags))
-            doc_page.member_of = wiki_member_of
+            doc_page.member_of.append(wiki_member_of)
             doc_page.gsystem_type.append(id_wiki_gsystem_type)
             doc_page.created_by = usrid          # Confirm the data-type for this field in models.py file is changed from ObjectId (Prev-{Author, django_mongokit}) to int (Curr-{User, django})
             
@@ -80,7 +80,7 @@ def create_wiki(request):
             ''' -- Storing history of this current document's instance -- '''
             if history_manager.create_or_replace_json_file(doc_page):
                 fp = history_manager.get_file_path(doc_page)
-                rcs_obj.checkin(fp, 0, "This document("+str(doc_page.name)+") is of GSystem(" + doc_page.member_of  +").", "-i")
+                rcs_obj.checkin(fp, 1, "This document("+str(doc_page.name)+") is of GSystem(" + str(doc_page.member_of)  +").", "-i")
 
             #create_wikipage(wiki_name, usrid, wiki_org_content, usrname, collection=False, list=[], private=False)
 
