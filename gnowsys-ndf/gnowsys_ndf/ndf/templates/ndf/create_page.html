@@ -24,7 +24,7 @@
 {% block body_content %} 
 
 <div style="display:inline-block; float:left; padding-top:40px; ">
-<form method="post" action="{% url 'create_wiki' %}">
+<form method="post" action="{% url 'create_page' %}">
   {% csrf_token %}
   
   <div style='display:table; '>	
@@ -32,21 +32,21 @@
     <div style='display:table-row;'>			
       <div style='display:table-cell;'>	Name	</div>
       <div style='display:table-cell; padding-left:20px;'>	
-	      <input type="text" name="wiki_name" autofocus="autofocus" placeholder="Enter name to add content">	
+	      <input type="text" name="page_name" autofocus="autofocus" placeholder="Enter title">	
       </div>
     </div>	
     <br/>
     <div style='display:table-row;'>
       <div style='display:table-cell;'>	Tags 	</div>
       <div style='display:table-cell; padding-left:20px;'>	
-	      <input type="text" name="tags" placeholder="Example: abc, XYZ">	 
+	      <input type="text" name="page_tags" placeholder="Example: abc, XYZ">	 
 	    </div>
     </div>		
 
   </div>
   
-  <div id="text-editor" style="display:none; float:left; padding-top:10px">
-    <textarea id="orgitdown" name="content_org"> </textarea>
+  <div id="text-editor" style="display:inline-block; float:left; padding-top:10px">
+    <textarea id="orgitdown" name="content_org" disabled> </textarea>
   </div>
 
   <br/>
@@ -67,18 +67,19 @@
 
   $(document).ready(function()
   {  
-    $("input:text[name='wiki_name']").keypress(function()
+    $("input:text[name='page_name']").keypress(function()
     {
       if($.trim(this.value).length > 0)
-      {			
-        $("#orgitdown").val("Please enter some content as description...")
-        $("#text-editor").css("display", "inline-block")
+      {	
+        $("#orgitdown").val("")		
+        $("#orgitdown").attr("placeholder", "Please enter some content as description...")
+        $("#orgitdown").removeAttr("disabled");
         $("input[type='submit']").removeClass("disabled");
       }
       else
       {
-        $("#text-editor").css("display", "none")
         $("input[type='submit']").addClass("disabled");
+        $("#orgitdown").attr("disabled", "disabled");
       }
     });
   
