@@ -1,0 +1,92 @@
+{% extends "ndf/base.html" %}
+
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block head %}
+	
+<!-- orgitdown! -->
+<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+<!-- orgitdown! toolbar settings -->
+<script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+<!-- orgitdown! skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+<!--  orgitdown! toolbar skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+
+{% endblock %}
+
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block title %} Wikipage {% endblock %}
+
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block body_content %} 
+
+<div style="display:inline-block; float:left; padding-top:40px; ">
+<form method="post" action="{% url 'create_page' %}">
+  {% csrf_token %}
+  
+  <div style='display:table; '>	
+    
+    <div style='display:table-row;'>			
+      <div style='display:table-cell;'>	Name	</div>
+      <div style='display:table-cell; padding-left:20px;'>	
+	      <input type="text" name="page_name" autofocus="autofocus" placeholder="Enter title">	
+      </div>
+    </div>	
+    <br/>
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'>	Tags 	</div>
+      <div style='display:table-cell; padding-left:20px;'>	
+	      <input type="text" name="page_tags" placeholder="Example: abc, XYZ">	 
+	    </div>
+    </div>		
+
+  </div>
+  
+  <div id="text-editor" style="display:inline-block; float:left; padding-top:10px">
+    <textarea id="orgitdown" name="content_org" disabled> </textarea>
+  </div>
+
+  <br/>
+
+  <div style="display:inline-block; padding-top:10px">
+  <input type="hidden" id="usrid_id" name="usrid" value={{user.id}} />
+  <input type="hidden" id="usrname_id" name="usrname" value={{user.username}} />
+  <input type="submit" value="Save" class="btn btn-large btn-primary disabled">
+  </div>
+  
+</div>
+
+</form>
+
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+<script>
+
+  $(document).ready(function()
+  {  
+    $("input:text[name='page_name']").keypress(function()
+    {
+      if($.trim(this.value).length > 0)
+      {	
+        $("#orgitdown").val("")		
+        $("#orgitdown").attr("placeholder", "Please enter some content as description...")
+        $("#orgitdown").removeAttr("disabled");
+        $("input[type='submit']").removeClass("disabled");
+      }
+      else
+      {
+        $("input[type='submit']").addClass("disabled");
+        $("#orgitdown").attr("disabled", "disabled");
+      }
+    });
+  
+    $("#orgitdown").orgitdown(mySettings);
+  });
+  
+</script>
+
+{% endblock %}
+

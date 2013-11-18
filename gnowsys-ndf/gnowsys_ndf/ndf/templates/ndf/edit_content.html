@@ -88,8 +88,15 @@
       
       if($(this).val() == "Edit Content"){
         var node_content_org = $("#node_content_org").attr('name')
-      
-        $('#orgitdown').val(node_content_org)
+        
+        if(node_content_org == "None"){
+          $("#orgitdown").val("")		
+          $("#orgitdown").attr("placeholder", "Please enter some content as description...")
+        }
+        
+        else {
+          $('#orgitdown').val(node_content_org)
+        }
         
         $("#text-editor").css("display", "block");
 
@@ -107,7 +114,7 @@
         var usrname = $("#usrname").val();
 
         $.ajax({
-          url : "/ndf/ajax/edit_content/",
+          url : "{% url 'edit_content' %}",
           type : "POST",
           dataType: "html",
           
@@ -118,12 +125,16 @@
             csrfmiddlewaretoken: '{{ csrf_token }}'
           },
           
-          /*success : function(json) {
-            $('#html-content').append('Html Content: \n\n' + json.server_response);
-          },*/
           success : function(data) {
+            
             $('#html-content-div').html(data);
             //location.reload()
+            
+            /*
+            $(data).filter('.ajax').each(function(){
+              $.globalEval($(this).text())
+            }); 
+            */
           },
           
           error : function(xhr,errmsg,err) {
