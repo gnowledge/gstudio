@@ -39,18 +39,13 @@ def org2html(org_content, file_prefix="", file_delete=True):
 
     """
     
-    #--print "\n\n org_content : ", org_content
-
-    #enocode_org_content = unicode(org_content.encode('utf8') + "\n\n")
-    encode_org_content = org_content.encode('utf8') + "\n\n"
-    #--print "\n\n encode_org_content : ", encode_org_content
+    encode_org_content = org_content.encode('utf8')
 
     # org editor content manipulation for temporary file (".org")
     org_content_header_for_file = "#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" \
         + "\n#+TITLE: "
 
     org_content_for_file = (encode_org_content).replace("\r", "")
-    #--print "\n\n org_content_for_file : ", org_content_for_file
 
     # Creating a temporary file with ".org" extension 
     file_suffix=".org"        # ".org" suffix must; otherwise emacs command won't work!
