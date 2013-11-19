@@ -23,6 +23,7 @@ from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_drawers
 
 ###########################################################################
 
@@ -59,10 +60,7 @@ def create_page(request):
         ###
         collection = None
         private = None
-        pageId = ""
-        test1 = get_pdrawer()
-        get_page_drawer = get_pg_drawer()
-
+        drawer1 = get_drawers(None)
         ###
 
         if request.method == "POST":
@@ -133,13 +131,14 @@ def create_page(request):
             return HttpResponseRedirect(reverse('page', kwargs={'page_id': gst_page._id}))
         else:
             # if request.method is not "POST"!!!
-            return render_to_response("ndf/create_page.html", {'test1': test1,'get_page_drawer': get_page_drawer}, context_instance=RequestContext(request))
+            #return render_to_response("ndf/create_page.html", {'test1': test1,'get_page_drawer': get_page_drawer}, context_instance=RequestContext(request))
+            return render_to_response("ndf/create_page.html", {'drawer1': drawer1}, context_instance=RequestContext(request))
     else:
         # if user is not authenticated!!!
         return HttpResponseRedirect(reverse('page'))
 
 
-###
+"""
 def get_pdrawer():
     pagedrawer = []
     dict1={}
@@ -162,7 +161,7 @@ def get_pg_drawer():
 	pagedrawer.append(str(each.name))
 
     return pagedrawer
-###
+"""
 
 
 def display_page(request, node_id):

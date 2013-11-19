@@ -63,17 +63,22 @@ def get_drawers(node):
 
     col_GSystem = db[GSystem.collection_name]
     drawer = col_GSystem.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}})
-    
-    for each in drawer:
-      if each._id != node._id:
-        if each._id not in node.collection_set:
-          dict1[each._id]=str(each.name)
+
+    if node is None:
+      for each in drawer:
+        dict_drawer[each._id] = str(each.name)
+
+    else:
+      for each in drawer:
+        if each._id != node._id:
+          if each._id not in node.collection_set:
+            dict1[each._id]=str(each.name)
           
-        else:
-          dict2[each._id]=str(each.name)
+          else:
+            dict2[each._id]=str(each.name)
       
-    dict_drawer['1'] = dict1
-    dict_drawer['2'] = dict2
+      dict_drawer['1'] = dict1
+      dict_drawer['2'] = dict2
 
     return dict_drawer
 
