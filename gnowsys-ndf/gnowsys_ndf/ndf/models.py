@@ -401,7 +401,8 @@ class File(GSystem):
 
     collection_name = 'Files'
     structure = {
-        'mime_type' : basestring            # Holds the type of file
+        'mime_type' : basestring,            # Holds the type of file
+        'fs_file_ids' : [ObjectId]              # Holds the List of  ids of file stored in gridfs 
     }
 
     gridfs = {
