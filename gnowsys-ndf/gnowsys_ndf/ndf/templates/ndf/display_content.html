@@ -1,21 +1,38 @@
+
+  <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
+  <script class="ajax-1" type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['\\[','\\]'], ['$$','$$']]}
+      });
+  </script>
+
+  <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+  <script class="ajax-2" type="text/javascript"
+    src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
 
 {% with node.html_content|safe as page_org2html_content %}
   {% if page_org2html_content != "None" %}
     <font size="3">{{ page_org2html_content }}</font>
   {% else %}
-    <font size="3">No Content to display!!<br/>Please click on "Edit" to add content...</font>
+    <font size="3">No description available!!</font>
   {% endif %}
 {% endwith %}
 
 <!-- 
-    Kept in this template instead of "edit_content.html", because we need updated content_org; as
-    it is going to be reflected into the org-editor (after user clicks on "Edit" button) 
+    * Kept in this template instead of "edit_content.html", because we need updated content_org; as
+      it is going to be reflected into the org-editor (after user clicks on "Edit" button) 
     
-    {{node.content_org}} assigned to 'name' attribute because having problem when assigned with 'value' attribute
+    * "node.content_org" assigned to 'name' attribute because having problem when assigned with 'value' attribute
 -->
 
 <input type="hidden" id="node_content_org" name="{{node.content_org}}" />
+
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 

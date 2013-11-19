@@ -6,14 +6,21 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
-"""
-#SMTP setting for sending mail
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+#SMTP setting for sending mail (Using python default SMTP server)
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
-"""
+DEFAULT_FROM_EMAIL = 'testing@example.com'
+
+
+#SMTP setting for sending mail (Using gmail SMTP server)
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_PORT = 587
+#EMAIL_HOST_USER = 'yourcompletegmailaddr'
+#EMAIL_HOST_PASSWORD = 'yourpassword'
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
@@ -192,6 +199,8 @@ LOGIN_REDIRECT_URL = "/"
 # Example: "/.../project-name/app-name/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+GAPPS = [u"Page", u"Doc", "Group"]
 
 ###########################################################################
 

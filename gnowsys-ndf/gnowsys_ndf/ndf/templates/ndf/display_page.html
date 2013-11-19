@@ -7,16 +7,18 @@
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
-{% block title %} Wikipage - {{ node.name }}  {% endblock %}
+{% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
-{% block body_content %} 
+{% block body_content %}
 
-<h2>{{node.name}}</h2> [Place Edit button] <br/>
-  Wikipage posted on : {{ node.created_at|date:"j F Y" }} <br/>
-                Tags : {{ node.tags|join:", " }} <br>
-             Versions: [Show history as No. of times * printed where each * represesnts corresponding history_version] <br/>
+<h2>{{node.name}}[Place Edit button]</h2>  <br/>
+<pre>
+ Posted on : {{ node.created_at|date:"j F Y" }}
+      Tags : {{ node.tags|join:", " }}
+  Versions : [Show history as No. of times * printed where each * represesnts corresponding history_version]
+</pre>
 
 <hr/>
 
