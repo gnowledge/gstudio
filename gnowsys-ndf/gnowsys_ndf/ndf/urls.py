@@ -20,7 +20,7 @@ urlpatterns += patterns('gnowsys_ndf.ndf.views.wikipage',
 )
 
 urlpatterns += patterns('gnowsys_ndf.ndf.views.doc',
-                        url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')), #Direct ot html template
+                        url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html'),name='uploadDoc'), #Direct ot html template
                         url(r'^submitDoc/', 'submitDoc', name='submitDoc'),
                         url(r'^submit/', 'submitDoc', name='submitDoc'),
                         url(r'^documentList/', 'GetDoc', name='documentList'),

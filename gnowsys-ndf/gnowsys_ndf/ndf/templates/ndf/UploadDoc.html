@@ -1,18 +1,52 @@
 {% extends "ndf/base.html" %}
 {% block title %} Upload Document {% endblock %}
 {% block body_content %} 
-{% if user.is_authenticated %}
-<div id="divpost">
-  <form id ="docPost" enctype="multipart/form-data" method="post" action="/ndf/submitDoc/">{% csrf_token %}
-   <h4>Submit Documents</h4>
-   <b> Title:&nbsp; </b><input type="text" name="docTitle" id ="docTitle"><br/><br/>
-    <b> Member Of:&nbsp; </b><input type="text" name="memberOf" id ="memberOf"><br/><br/>	
-   <b> File:&nbsp; </b><input type="file" name="doc"  id="docFile"/><br/><br/>
-   <input type="hidden" name="user" value={{user.username}}>
-    <input type="submit" id="submitpostid" value="Submit" size="900" name="post">
-  </form>
-</div>
-{% endif %}
+{#{% if user.is_authenticated %}#}
+<h4>Submit Documents</h4>
+<div style='display:table;  border:1px;   border-spacing:10px; '>
+	<form id ="docPost" enctype="multipart/form-data" method="post" action="/ndf/submitDoc/">{% csrf_token %}
+	<div style='display:table-row;' >
+      		<div style='display:table-cell;'> 
+        		<font size="3" >Title</font> 
+		</div>
+		<div style='display:table-cell;'> 
+        		<input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File"> 
+		</div>
+	</div>
+	<div style='display:table-row;' >
+      		<div style='display:table-cell;'> 
+        		<font size="3" >Choose File</font> 
+		</div>
+		<div style='display:table-cell;'> 
+        		<input type="file" name="doc[]"  id="docFile" multiple/>
+		</div>
+	</div>
+	<div style='display:table-row;' >
+      		<div style='display:table-cell;'> 
+        		<font size="3" >Descrption</font> 
+		</div>
+		<div style='display:table-cell;'> 
+        		<input type="text"  name="Tags" placeholder="Write Description about File">
+		</div>
+	</div>
+	<div style='display:table-row;' >
+      		<div style='display:table-cell;'> 
+        		<font size="3" >Tags</font> 
+		</div>
+		<div style='display:table-cell;'> 
+        		<input type="text"  name="Tags" placeholder="Enter Tags for File">
+		</div>
+	</div>
+	<div style='display:table-row;' >
+      		 <div style='display:table-cell;' colspan="2"> 
+			<input type="hidden" name="user" value={{user.id}}>
+        		<input type="submit" id="submitpostid" value="Upload" class="btn btn-primary btn-large btn-block">
+      		</div>
+	</div>
+	</form>
+</div>	
+		
+{#{% endif %}#}
 <!--
 <hr>
 <h4>Image Gallery</h4>
