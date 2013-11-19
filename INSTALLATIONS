@@ -60,7 +60,12 @@ within it; and also perform following steps:
   Install python-magic(0.4.6) : pip install python-magic
   	NOTE:
   		(1) For more information visit - "https://pypi.python.org/pypi/python-magic/0.4.6"
-  		
+ 
+  Install Python Imaging Library(PIL) : pip install PIL
+  	NOTE:
+  		(1) For more information visit - "http://www.pythonware.com/products/pil/"
+ 	
+ 		
   Install MathJax(2.2) :
     NOTE:
       (1) Refer this to download the MathJax folder - "http://docs.mathjax.org/en/latest/installation.html" 
