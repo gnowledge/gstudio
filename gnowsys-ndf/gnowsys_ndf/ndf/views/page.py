@@ -55,6 +55,16 @@ def create_page(request):
 
     """
     if request.user.is_authenticated():
+
+        ###
+        collection = None
+        private = None
+        pageId = ""
+        test1 = get_pdrawer()
+        get_page_drawer = get_pg_drawer()
+
+        ###
+
         if request.method == "POST":
             # Creating Collection-objects
             gst_collection = db[GSystemType.collection_name]
@@ -66,10 +76,32 @@ def create_page(request):
             tags_list = []
             tags_list.append(tags)     # Necessary to extend retrieved tags as list
             tags = [unicode(t) for t in tags_list]
-            print tags_list
             content_org = request.POST.get('content_org')
             usrid = int(request.POST.get('usrid'))
             usrname = request.POST.get('usrname')
+            collection_list = request.POST['collection-list']
+
+            ### checkbox inputs for collection & private
+            collection = request.POST.get("collection", '')
+            private = request.POST.get("private", '')
+            
+            boolean = False
+            boolean = collection
+
+            collection_list = collection_list.split(",")
+            i = 0                    
+
+            if private:
+                private = True
+            else:
+                private = False
+
+            if collection:
+                collection = True
+            else:
+                collection = False
+
+            ###
             
             # Instantiating & Initializing GSystem object
             page_node = gs_collection.GSystem()
@@ -85,15 +117,52 @@ def create_page(request):
 
             page_node.content_org = unicode(content_org.encode('utf8'))
 
+            ###
+            if boolean:
+                while i<len(collection_list):                    
+                    c_name = str(collection_list[i])
+                    c_name = c_name.replace("'","")                    
+                    objs = gs_collection.GSystem.one({'name': unicode(c_name)})
+                    page_node.collection_set.append(objs._id)
+                    i = i+1
+
+            ###
+
             page_node.save()
 
             return HttpResponseRedirect(reverse('page', kwargs={'page_id': gst_page._id}))
         else:
             # if request.method is not "POST"!!!
-            return render_to_response("ndf/create_page.html", context_instance=RequestContext(request))
+            return render_to_response("ndf/create_page.html", {'test1': test1,'get_page_drawer': get_page_drawer}, context_instance=RequestContext(request))
     else:
         # if user is not authenticated!!!
         return HttpResponseRedirect(reverse('page'))
+
+
+###
+def get_pdrawer():
+    pagedrawer = []
+    dict1={}
+    
+    col_GSystem = db[GSystem.collection_name]    
+    drawer = col_GSystem.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}}) 
+            
+    for each in drawer:
+	pagedrawer.append(str(each.name))
+	dict1[each._id]=str(each.name)
+        
+    return dict1
+
+def get_pg_drawer():
+    pagedrawer = []
+    col_GSystem = db[GSystem.collection_name]
+    drawer = col_GSystem.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}}) 
+
+    for each in drawer:
+	pagedrawer.append(str(each.name))
+
+    return pagedrawer
+###
 
 
 def display_page(request, node_id):
@@ -110,10 +179,24 @@ def display_page(request, node_id):
     gs_collection = db[GSystem.collection_name]
     node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
 
+    collection_obj_dict = {}
+    collection_list = node.collection_set
+    
+    for each_id in collection_list:
+        if each_id != node._id:
+    
+            node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+            dict_key = node_collection_object._id
+            dict_value = node_collection_object
+
+            collection_obj_dict[dict_key] = dict_value        
+   
     return render_to_response("ndf/display_page.html", \
-                              {'node': node}, \
-                              context_instance=RequestContext(request) \
-    )
+                               { 'node': node, \
+                                 'collection_obj_dict': collection_obj_dict, \
+                               }, \
+                               context_instance=RequestContext(request) \
+                             )   
 
 """
 def delete_node(request, _id):
