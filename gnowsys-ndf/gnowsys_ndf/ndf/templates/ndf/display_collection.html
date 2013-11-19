@@ -1,7 +1,6 @@
 Collection_list : 
 
 {% for each_id, each_node in collection_obj_dict.items %}
-    <br/>
     {% if each_node.collection_set %}		     
     <li class="list"><abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
       <a href="{% url 'display_page' each_id %}">{{ each_node.name }}</a></li>

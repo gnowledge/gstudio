@@ -54,15 +54,13 @@
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <input type="checkbox" id="coll" name="collection" />&nbsp;Collection<br/>
 
-      <!-- <input type="hidden" id="list" name="list1" value=""/> -->
-
       <div id="drawertable" style="display:none">
       <table style="width:370px;" >
 	<tr>
           <td style='width:160px;'>
 	    <b>Pages:</b><br/>
 	    <select multiple="multiple" id='lstBox1'>    <!---->
-	      {% for key,value in test1.items %}
+	      {% for key,value in drawer1.items %}
 	      <option id={{key}}>{{value}}</option>
 	      {% endfor %}
 	    </select>
@@ -112,8 +110,8 @@
   <div style="display:inline-block; padding-top:10px">
   <input type="hidden" id="usrid_id" name="usrid" value={{user.id}} />
   <input type="hidden" id="usrname_id" name="usrname" value={{user.username}} />
-  <input type="hidden" id="list" name="list1" value=""/>
-  <input type="submit" id="lst" value="Save" class="btn btn-large btn-primary disabled">
+  <input type="hidden" id="collection-list" name="collection-list" value="" />  
+  <input type="submit" id="save-page" value="Save" class="btn btn-large btn-primary disabled">
   </div>
   
 </div>
@@ -203,14 +201,17 @@
 
     });
 
-    $("#lst").click(function(){
+    $("#save-page").click(function(){
         opts = lstBox2.options, len = opts.length;
-        for (var i = 0; i < len; i++) {
-		arr[i] = "'"+opts[i].value+"'";
-	}
-	var abc=arr.join(',');
-	$("#list").val(abc);
-	
+        
+        if (len > 0){
+                var arr = [];
+                for (var i = 0; i < len; i++) {
+		            arr[i] = "'"+opts[i].value+"'";
+	            }
+	            var abc=arr.join(',');
+	            $("#collection-list").val(abc)
+	    }
     });
  
  });
