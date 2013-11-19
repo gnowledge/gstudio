@@ -20,6 +20,9 @@ urlpatterns += patterns('gnowsys_ndf.ndf.views.group',
 )
 
 urlpatterns += patterns('gnowsys_ndf.ndf.views.doc',
+
+
+
                         url(r'^gapp/doc/(?P<doc_id>[\w-]+)$', 'doc', name='doc'),
                         url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')), #Direct ot html template
                         url(r'^submitDoc/', 'submitDoc', name='submitDoc'),
