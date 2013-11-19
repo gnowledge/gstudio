@@ -32,5 +32,6 @@ urlpatterns += patterns('gnowsys_ndf.ndf.views.doc',
 )
                        
 urlpatterns += patterns('gnowsys_ndf.ndf.views.ajax-views',
+                        url(r'^ajax/edit_collection/', 'edit_collection', name='edit_collection'),
                         url(r'^ajax/edit_content/', 'edit_content', name='edit_content'),
 )
