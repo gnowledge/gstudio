@@ -1,0 +1,37 @@
+{% extends "ndf/base.html" %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block body_content %} 
+
+{% if user.is_authenticated %}
+<a href="{% url 'create_group' %}">
+  <input type="submit" class="btn btn-large btn-primary" value="Create a {{title}}" />
+</a>
+<hr />
+{% endif %}
+
+{% load url from future %}
+{% for node in group_nodes %}
+  {% if forloop.first %}
+    <h5>Number Of Nodes : {{ group_nodes_count }} </h5>
+  {% endif %}
+  <div>
+    <p><strong><a href="">{{ node.name }}</a></strong><br>
+    <!--
+    Created at : {{ node.created_at|date:"j F Y" }}<br>
+    Member Of   : {{ node.member_of }}<br>
+    Tags       : {{ node.tags|join:", " }}<br>
+    <a href="{#% url 'delete_node' node %#}">delete</a>
+    -->
+    </p>
+  </div>
+
+{% empty %}
+  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
+{% endfor %}
+
+<br/>
+
+{% endblock %}
+

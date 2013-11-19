@@ -34,6 +34,8 @@ from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 
+from gnowsys_ndf.ndf.rcslib import RCS
+
 ######################################################################################
 
 STATUS_CHOICES = (
@@ -197,20 +199,28 @@ class Node(DjangoDocument):
         'name': unicode,
         'altnames': unicode,
         'plural': unicode,
-      	'member_of': unicode, 			# 
+        'prior_node': [ObjectId],
+        
+        'type_of': unicode,
+      	'member_of': [unicode], 		 
+
       	'created_at': datetime.datetime,
         'created_by': ObjectId,			# ObjectId's of Author Class
         #'rating': RatingField(),
         'created_by': int,			# Primary Key of User(django's) Class
         #'rating': 
+
         'start_publication': datetime.datetime,
+
         'content': unicode,
         'content_org': unicode,
         #'image': 
         'tags': [unicode],
         'featured': bool,
+
         'last_update': datetime.datetime,
         'modified_by': [ObjectId],		# list of Primary Keys of User(django's) Class
+
         'comment_enabled': bool,
       	'login_required': bool,
       	#'password': basestring,
@@ -241,14 +251,30 @@ class Node(DjangoDocument):
     def save(self, *args, **kwargs):
         ''' on save, set created_at to current date'''
         self.created_at = datetime.datetime.today()
+
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
+
+        is_new = False
+
+        if not self.has_key('_id'):
+            is_new = True               # It's a new document, hence yet no ID!"
         
         super(Node, self).save(*args, **kwargs)
         
-        ''' 
-        TODO: on save, store history file(in json-format) for 
-        corresponding document and commit to it's rcs repository
-        '''
-        
+        if is_new:
+            # Create history-version-file
+            if history_manager.create_or_replace_json_file(self):
+                fp = history_manager.get_file_path(self)
+                rcs_obj.checkin(fp, 1, "This document ("+str(self.name)+") is of GSystem(" + str(self.member_of)  +").", "-i")
+        else:
+            # Update history-version-file
+            fp = history_manager.get_file_path(self)
+            rcs_obj.checkout(fp)
+
+            if history_manager.create_or_replace_json_file(self):
+                rcs_obj.checkin(fp, 1, "Document (" + self.name + ") updated successfully.")
+
 
 @connection.register
 class MetaType(Node):
