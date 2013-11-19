@@ -45,6 +45,64 @@
 
   </div>
   
+  <!--      Collection part                       -->
+    
+    <br/>
+    
+    <div>
+      <input type="checkbox" name="private" id="private" />&nbsp;Private 
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <input type="checkbox" id="coll" name="collection" />&nbsp;Collection<br/>
+
+      <!-- <input type="hidden" id="list" name="list1" value=""/> -->
+
+      <div id="drawertable" style="display:none">
+      <table style="width:370px;" >
+	<tr>
+          <td style='width:160px;'>
+	    <b>Pages:</b><br/>
+	    <select multiple="multiple" id='lstBox1'>    <!---->
+	      {% for key,value in test1.items %}
+	      <option id={{key}}>{{value}}</option>
+	      {% endfor %}
+	    </select>
+	  </td>
+	  <td style='width:50px;text-align:center;vertical-align:middle;'>
+	    <input type='button' id='btnUp' value ='  ^  '><br/>
+	    <input type='button' id='btnRight' value ='  >  '><br/>
+	    <input type='button' id='btnLeft' value ='  <  '><br/>
+		   <input type='button' id='btnDown' value ='  v  '><br/>
+		   
+	  </td>
+
+	  <td style='width:160px;'>
+            <b>Added to Drawer: </b><br/>
+	    
+            <select multiple="multiple" name="lstb2" id='lstBox2'>
+	      
+            </select>
+	  </td><br>
+	</tr>
+
+    <!--
+	<tr>
+	  <td>
+	    <input type="button"  value="Reset" id="resetdrawer" style="display:none" />
+	    <input type="button"  value="Submit" id="lstvalue" style="display:none" />
+	    
+	    <input type="submit"  value="Submit" id="submitcollection" style="visibility:hidden;"/>
+	  </td>
+	</tr>
+	-->
+	
+      </table>
+      </div>
+	      
+    </div><br/> 
+
+    
+    <!--                             -->
+  
   <div id="text-editor" style="display:inline-block; float:left; padding-top:10px">
     <textarea id="orgitdown" name="content_org" disabled> </textarea>
   </div>
@@ -54,7 +112,8 @@
   <div style="display:inline-block; padding-top:10px">
   <input type="hidden" id="usrid_id" name="usrid" value={{user.id}} />
   <input type="hidden" id="usrname_id" name="usrname" value={{user.username}} />
-  <input type="submit" value="Save" class="btn btn-large btn-primary disabled">
+  <input type="hidden" id="list" name="list1" value=""/>
+  <input type="submit" id="lst" value="Save" class="btn btn-large btn-primary disabled">
   </div>
   
 </div>
@@ -63,7 +122,99 @@
 
 <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
 
-<script>
+<!--                    -->
+
+
+<script type="text/javascript">
+    var arr = [];
+
+ $(function()
+ {
+   $("#coll").change(function()
+   {     
+      if (this.checked){
+        $("#drawertable").css("display", "block")
+        //$("#lstvalue").css("display", "block")
+        $("#resetdrawer").css("display", "block")  
+        
+      }
+      else{
+        $("#drawertable").css("display", "none")
+        //$("#lstvalue").css("display", "none")
+        $("#resetdrawer").css("display", "none")
+       
+      }
+   });
+ 
+   $("#btnRight").click(function() { 
+       var selectedOpts = $("#lstBox1 option:selected");
+       if (selectedOpts.length == 0){
+           alert("Nothing to move.");
+           e.preventDefault();
+       }
+       $("#lstBox2").append($(selectedOpts).clone());
+       $(selectedOpts).remove();
+       e.preventDefault();
+
+   });   
+   
+   $("#btnUp").click(function() {
+       
+      $("#lstBox1 :selected").each(function (i, selected) {
+            $(this).insertBefore($(this).prev());
+	    $("#lstbox2").options.att("selected",false);
+      });
+      $("#lstBox1 select").focus().blur();
+      $("#lstBox2 :selected").each(function (i, selected) {
+            $(this).insertBefore($(this).prev());
+	    $("#lstbox1").options.att("selected",false);
+      });
+      $("#lstBox2 select").focus().blur();
+   });
+
+    $("#btnDown").click(function() {
+      $("#lstBox1 :selected").each(function (i, selected) {
+            $(this).insertAfter($(this).next());
+	    $("#lstbox2").options.att("selected",false);	
+      });
+      $("#lstBox1 select").focus().blur();
+      $("#lstBox2 :selected").each(function (i, selected) {
+            $(this).insertAfter($(this).next());
+	    $("#lstbox1").options.att("selected",false);
+      });
+      $("#lstBox2 select").focus().blur();
+ 
+    });
+    
+    $("#btnLeft").click(function() {
+      var selectedOpts = $("#lstBox2 option:selected");
+        if (selectedOpts.length == 0) {
+            alert("Nothing to move.");
+            e.preventDefault();
+        }
+
+        $("#lstBox1").append($(selectedOpts).clone());
+        $(selectedOpts).remove();
+        e.preventDefault();
+    });
+
+    $("#resetdrawer").click(function(){
+        $("#lstBox2").empty();
+
+    });
+
+    $("#lst").click(function(){
+        opts = lstBox2.options, len = opts.length;
+        for (var i = 0; i < len; i++) {
+		arr[i] = "'"+opts[i].value+"'";
+	}
+	var abc=arr.join(',');
+	$("#list").val(abc);
+	
+    });
+ 
+ });
+
 
   $(document).ready(function()
   {  
