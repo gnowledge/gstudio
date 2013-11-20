@@ -19,12 +19,10 @@ urlpatterns += patterns('gnowsys_ndf.ndf.views.group',
                         url(r'^create_group/', 'create_group', name='create_group'),
 )
 
-urlpatterns += patterns('gnowsys_ndf.ndf.views.doc',
-
-
-
-                        url(r'^gapp/doc/(?P<doc_id>[\w-]+)$', 'doc', name='doc'),
-                        url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')), #Direct ot html template
+urlpatterns += patterns('gnowsys_ndf.ndf.views.file',
+                        url(r'^gapp/file/(?P<file_id>[\w-]+)$', 'file', name='file'),
+                        #url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')), #Direct ot html template
+                        url(r'^uploadDoc/$', 'uploadDoc', name='uploadDoc'), #Direct ot html template
                         url(r'^submitDoc/', 'submitDoc', name='submitDoc'),
                         url(r'^submit/', 'submitDoc', name='submitDoc'),
                         url(r'^documentList/', 'GetDoc', name='documentList'),
