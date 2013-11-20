@@ -36,24 +36,26 @@ db = get_database()
 gst_collection = db[GSystemType.collection_name]
 gst_doc = gst_collection.GSystemType.one({'name': GAPPS[1]})
 
-def doc(request, doc_id):
+def file(request, file_id):
     """
     * Renders a list of all 'Group-type-GSystems' available within the database.
 
     """
-
-    if gst_doc._id == ObjectId(doc_id):
+    if gst_doc._id == ObjectId(file_id):
         title = gst_doc.name
         
         gs_collection = db[GSystem.collection_name]
-        doc_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(doc_id)]}})
-        doc_nodes.sort('creationtime', -1)
-        doc_nodes_count = doc_nodes.count()
+        file_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]}})
+        file_nodes.sort('creationtime', -1)
+        file_nodes_count = file_nodes.count()
 
-        return render_to_response("ndf/doc.html", {'title': title, 'doc_nodes': doc_nodes, 'doc_nodes_count': doc_nodes_count}, context_instance=RequestContext(request))
+        return render_to_response("ndf/file.html", {'title': title, 'file_nodes': file_nodes, 'file_nodes_count': file_nodes_count}, context_instance=RequestContext(request))
     else:
         return HttpResponseRedirect(reverse('homepage'))
 
+
+def uploadDoc(request):
+    return render_to_response("ndf/UploadDoc.html", context_instance=RequestContext(request))
 
 def submitDoc(request):
     if request.method=="POST":

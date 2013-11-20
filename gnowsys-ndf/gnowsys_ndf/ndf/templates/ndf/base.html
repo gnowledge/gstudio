@@ -90,17 +90,9 @@
 				<a href="http://www.gnu.org/software/gnowsys/" title="Look at GNOWSYS project">GNOWSYS</a>
 			</h1>
 		
-
-			<h5 class="menu" >
-			<a href="{% url 'wikipage' %}">WIKIPAGE</a>&nbsp;
-			<a href="{% url 'create_group' %}">CREATE GROUP</a>&nbsp;
-			<a href="{% url 'uploadDoc' %}">Upload File</a>&nbsp;
-			</h5>
-
-		  
-		  <!-- GApps Toolbar -->
+          <!-- GApps Toolbar -->
 		  {% get_gapps_toolbar %}
-      <!-- ============= -->
+          <!-- ============= -->
 
 			{% if user.is_authenticated %}
 				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
