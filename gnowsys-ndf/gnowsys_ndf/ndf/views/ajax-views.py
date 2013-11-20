@@ -90,7 +90,7 @@ def edit_content(request):
         col_GSystem = db[GSystem.collection_name]
         node = col_GSystem.GSystem.one({'_id': obj_id})
 
-        filename = slugify(node_name) + "-" + usrname + "-"
+        filename = slugify(node.name) + "-" + usrname + "-"
         node.content = unicode(org2html(org_content, file_prefix=filename))
         node.content_org = unicode(org_content.encode('utf8'))
 
