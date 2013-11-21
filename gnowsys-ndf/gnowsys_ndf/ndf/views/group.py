@@ -50,7 +50,7 @@ def group(request, group_id):
 
 def create_group(request):
     if request.method == "POST":
-        col_Group = DB[Group.collection_name]
+        col_Group = db[Group.collection_name]
         colg = col_Group.Group()
         colg.name = request.POST.get('groupname', "")
         colg.member_of.append(u"test")
