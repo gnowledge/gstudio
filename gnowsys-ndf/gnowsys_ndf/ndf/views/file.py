@@ -75,24 +75,16 @@ def save_file(files,title,userid,memberOf):
 	fileobj=db.File()
 	filemd5= hashlib.md5(files.read()).hexdigest()
         files.seek(0)
-        files=request.FILES.get("doc","")
-        #this code is for creating file document and saving
-        fileobj.name = unicode(title)
-        fileobj.user = unicode(user)
-        fileobj.member_of.append(unicode(memberOf))
-        fileobj.save()
-        filetype=magic.from_buffer(files.read()) #Gusing filetype by python-magic
-        print "filetype1:",filetype
+        filetype=magic.from_buffer(files.read())               #Gusing filetype by python-magic
 	if fileobj.fs.files.exists({"md5":filemd5}):
 		return "True"
 	else:
 		fileobj.name=unicode(title)
         	fileobj.created_by=int(userid)
-        	fileobj.member_of=unicode(memberOf)
+        	#fileobj.member_of=unicode(memberOf)           #shuold be group 
                 fileobj.mime_type=filetype
         	fileobj.save()
-		#mime = magic.Magic(mime=True)
-		files.seek(0)  #moving files cursor to start
+                files.seek(0)                                  #moving files cursor to start
 		filename=files.name
 		#this code is for storing Document in gridfs
 		objectid=fileobj.fs.files.put(files.read(),filename=filename,content_type=filetype)
@@ -105,6 +97,7 @@ def save_file(files,title,userid,memberOf):
 		fileobj.save()
                 print "filetype:",filetype
                 return "False"
+
 
 def convert_image_thumbnail(files):
     files.seek(0)
