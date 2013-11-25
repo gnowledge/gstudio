@@ -32,7 +32,7 @@
     <div style='display:table-row;'>			
       <div style='display:table-cell;'>	Name	</div>
       <div style='display:table-cell; padding-left:20px;'>	
-	      <input type="text" name="page_name" autofocus="autofocus" placeholder="Enter title">	
+	      <input type="text" id="page_name_id" name="page_name" autofocus="autofocus" placeholder="Enter title">	
       </div>
     </div>	
     <br/>
@@ -82,17 +82,6 @@
 	  </td><br>
 	</tr>
 
-    <!--
-	<tr>
-	  <td>
-	    <input type="button"  value="Reset" id="resetdrawer" style="display:none" />
-	    <input type="button"  value="Submit" id="lstvalue" style="display:none" />
-	    
-	    <input type="submit"  value="Submit" id="submitcollection" style="visibility:hidden;"/>
-	  </td>
-	</tr>
-	-->
-	
       </table>
       </div>
 	      
@@ -111,7 +100,7 @@
   <input type="hidden" id="usrid_id" name="usrid" value={{user.id}} />
   <input type="hidden" id="usrname_id" name="usrname" value={{user.username}} />
   <input type="hidden" id="collection-list" name="collection-list" value="" />  
-  <input type="submit" id="save-page" value="Save" class="btn btn-large btn-primary disabled">
+  <input type="submit" id="save-page" value="Save" class="btn btn-large btn-primary" disabled>
   </div>
   
 </div>
@@ -203,38 +192,42 @@
 
     $("#save-page").click(function(){
         opts = lstBox2.options, len = opts.length;
-        
-        if (len > 0){
-                var arr = [];
-                for (var i = 0; i < len; i++) {
-		            arr[i] = "'"+opts[i].value+"'";
-	            }
-	            var abc=arr.join(',');
-	            $("#collection-list").val(abc)
-	    }
+
+        save_enabled = $("#save-page").attr("disabled")
+
+        if (len > 0 && save_enabled != "disabled") 
+        {
+          var arr = [];
+          
+          for (var i = 0; i < len; i++) {
+		        arr[i] = "'"+opts[i].value+"'";
+	        }
+	        
+	        var abc=arr.join(',');
+	        $("#collection-list").val(abc)
+	      }
     });
  
  });
 
 
   $(document).ready(function()
-  {  
-    $("input:text[name='page_name']").keypress(function()
-    {
+  {
+    $("#page_name_id").change(function() { 
       if($.trim(this.value).length > 0)
       {	
         $("#orgitdown").val("")		
         $("#orgitdown").attr("placeholder", "Please enter some content as description...")
         $("#orgitdown").removeAttr("disabled");
-        $("input[type='submit']").removeClass("disabled");
+        $("#save-page").removeAttr("disabled");
       }
       else
       {
-        $("input[type='submit']").addClass("disabled");
+        $("#save-page").attr("disabled", "disabled");
         $("#orgitdown").attr("disabled", "disabled");
       }
     });
-  
+    
     $("#orgitdown").orgitdown(mySettings);
   });
   
