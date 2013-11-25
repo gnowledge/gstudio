@@ -445,12 +445,12 @@ class Group(GSystem):
 
     collection_name='Groups'
     structure = {
-        'gtype': TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
-        'edit_policy': EDIT_POLICY,                   # Editing policy of the group- non editable, moderately editable, editable
-        'sub_policy': SUBSCRIPTION_POLICY,            # Subscription policy to this group- open, by invitation, by request
-        'ex_policy': EXISTANCE_POLICY,                # Existance of the group -announced or not announced
-        'list_member_policy': LIST_MEMBER_POLICY,     # Members of this group - disclosed or not 
-        'encr_policy': ENCRYPTION_POLICY              # Encryption - yes or no
+        'gtype': basestring,                       # Types of groups - Anonymous,public or private
+        'edit_policy': basestring,                   # Editing policy of the group- non editable, moderately editable, editable
+        'sub_policy': basestring,            # Subscription policy to this group- open, by invitation, by request
+        'ex_policy': basestring,                # Existance of the group -announced or not announced
+        'list_member_policy': basestring,     # Members of this group - disclosed or not 
+        'encr_policy': basestring              # Encryption - yes or no
     }
 
     use_dot_notation = True

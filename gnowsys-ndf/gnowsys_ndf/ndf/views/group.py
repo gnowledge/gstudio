@@ -53,7 +53,7 @@ def create_group(request):
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
         colg.name = request.POST.get('groupname', "")
-        colg.member_of.append(u"test")
+        colg.member_of.append(u"Ggroup")
         colg.gtype = request.POST.get('group_type', "")
         colg.edit_policy = request.POST.get('edit_policy', "")
         colg.sub_policy = request.POST.get('subscription', "")
@@ -61,6 +61,5 @@ def create_group(request):
         colg.list_member_policy = request.POST.get('member', "")
         colg.encr_policy = request.POST.get('encryption', "")
         colg.save()
-    else:
-        return render_to_response("ndf/create_group.html", RequestContext(request))
+    return render_to_response("ndf/create_group.html", RequestContext(request))
     
