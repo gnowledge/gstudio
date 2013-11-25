@@ -1,0 +1,138 @@
+{% extends "ndf/base.html" %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+<!-- ######### Loading django template tags ######### -->
+{% load ndf_tags %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block body_content %}
+
+<form id="form_edit_page" method="POST" action="{% url 'edit_page' node %}">
+{% csrf_token %}
+
+<div style="display:inline-block;">
+  <div style="display:inline-block; float:left; margin:0.8em 0.8em 0.8em 0;">
+    <h2>{{node.name}}</h2>
+  </div>
+  {% if user.is_authenticated %}
+  <div style="display:inline-block; padding-left:2em; float:left; margin:1.25em;">
+    <input type="hidden" id="node_id" name="nodeid" value="{{node}}" />
+    <input id="edit-node" type="button" value="Edit" class="btn btn-large btn-primary" />
+  </div>
+  {% endif %}
+  
+  </div>
+
+<div class="tabcontents">
+
+  <!-- ########## Start of div - tabcontents ########## -->
+  
+  <div id="view1" class="tabcontent">
+  
+    <div style="display:inline-block; float:left;">
+    
+    {% include "ndf/edit_node_details.html" %}
+    
+    {% include "ndf/edit_collection.html" %}
+    
+    {% include "ndf/edit_content.html" %}
+
+    <input id="save-node" type="submit" value="Save" class="btn btn-large btn-primary" style="display:none" />
+    <br/>
+    </div>
+
+	</div>
+	     
+	<div id="view2" class="tabcontent">
+	</div>  
+	
+	<div id="view3" class="tabcontent">
+	</div>
+	
+	<div id="view4" class="tabcontent">
+	</div>
+	
+	<div id="view5" class="tabcontent">
+	</div>  
+	
+	<div id="view6" class="tabcontent">
+	</div>		
+	
+	<!-- ##### end of div - tabcontents ##### -->
+	
+</div>
+
+</form>
+
+<script>
+  $(document).ready(function(){ 
+    
+    $("#edit-node").click(function(){
+    
+      if ($(this).val() == "Edit"){
+        //alert($(this).val() + " clicked...!")
+        //$("#view1").html($(this).val() + " clicked...!");
+        
+        var node_content_org = $("#node_content_org").attr('name')
+        
+        if(node_content_org == "None") {
+          $("#orgitdown").val("")
+          $("#orgitdown").attr("placeholder", "Please enter some content as description...")
+        }
+        
+        else {
+          $('#orgitdown').val(node_content_org)
+        }
+
+        $('#drawertable').css('display', 'block')
+
+        $("#node-details-edit-div").css("display", "block");
+        $("#text-editor").css("display", "block");
+
+        $("#node-details-view-div").css("display", "none");
+        $("#edit-node").css("display", "none");
+        
+        $("#save-node").css("display", "block");
+      }
+    });
+      
+    $("#save-node").click(function(){
+    
+      if ($(this).val() == "Save"){
+        //alert($(this).val() + " clicked...!")
+        //$("#view1").html($(this).val() + " clicked...!");
+        
+        opts = drawer2.options;
+        len = opts.length;
+            
+        if (len > 0){
+          var arr = [];
+          for (var i = 0; i < len; i++) {
+		        arr[i] = "'"+opts[i].value+"'";
+	        }
+	        var abc = arr.join(',');
+	        $("#collection-list").val(abc)
+	      }
+
+        $("#text-editor").css("display", "none");
+        
+        $("#save-node").css("display", "none");
+        $("#edit-node").css("display", "block");
+        
+        
+        //$("#form_edit_page").submit();
+      }
+    });
+    
+  });
+</script>
+
+{% endblock %}
+
+
