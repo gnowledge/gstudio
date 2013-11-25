@@ -15,7 +15,7 @@
     Existing Groups:
 
     {% for items in groups %}
-      {{items}} ,
+      {{items}} {% if not forloop.last %} ,{% endif %}
     {% endfor %}
   {% endif %}
 
@@ -32,9 +32,9 @@
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="group_type" class="gtype">
-          			<option id="ANONYMOUS">ANONYMOUS</option>
           			<option id="PUBLIC">PUBLIC</option>
           			<option id="PRIVATE">PRIVATE</option>
+          			<option id="ANONYMOUS">ANONYMOUS</option>
         		</select> 
       		</div>
     	</div>
@@ -45,9 +45,9 @@
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="edit_policy" class="editp">
-          			<option id="NON_EDITABLE">NON_EDITABLE</option>
-          			<option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
           			<option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
+          			<option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
+          			<option id="NON_EDITABLE">NON_EDITABLE</option>
         		</select> 
       		</div>
  	       <div style='display:table-cell;'> 
@@ -89,8 +89,8 @@
       		</div>
       		<div style='display:table-cell;'> 
        			<select name="encryption" class="encr">
-			        <option id="ENCRYPTED">ENCRYPTED</option>
-       			   	<option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
+			        <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
+       			   	<option id="ENCRYPTED">ENCRYPTED</option>
        		 	</select>
       		</div>  
 	</div>

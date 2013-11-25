@@ -105,6 +105,7 @@ def get_existing_groups():
   group = []
   col_Group = db[Group.collection_name]
   colg = col_Group.Group.find()
+  colg.sort('name')
   gr=list(colg)
   for items in gr:
     group.append(items.name)
