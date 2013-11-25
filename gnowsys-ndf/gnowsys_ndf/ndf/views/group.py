@@ -23,11 +23,17 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import Group
 
-###########################################################################
+#######################################################################################################################################
 
 db = get_database()
 gst_collection = db[GSystemType.collection_name]
 gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
+gs_collection = db[GSystem.collection_name]
+
+#######################################################################################################################################
+#                                                                          V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
+#######################################################################################################################################
+
 
 def group(request, group_id):
     """
@@ -40,7 +46,7 @@ def group(request, group_id):
         
         gs_collection = db[GSystem.collection_name]
         group_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(group_id)]}})
-        group_nodes.sort('creationtime', -1)
+        group_nodes.sort('last_update', -1)
         group_nodes_count = group_nodes.count()
 
         return render_to_response("ndf/group.html", {'title': title, 'group_nodes': group_nodes, 'group_nodes_count': group_nodes_count}, context_instance=RequestContext(request))
