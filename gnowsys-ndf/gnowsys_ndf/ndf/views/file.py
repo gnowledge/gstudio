@@ -55,24 +55,41 @@ def file(request, file_id):
 
 
 def uploadDoc(request):
-    return render_to_response("ndf/UploadDoc.html", context_instance=RequestContext(request))
+    stId,mainPageUrl="",""
+    if request.method=="POST":
+        stId=request.POST.get("stId","")
+        mainPageUrl=request.POST.get("pageUrl","")
+    template="ndf/UploadDoc.html"
+    if stId and mainPageUrl:
+        variable=RequestContext(request,{'stId':stId,'mainPageUrl':mainPageUrl})
+    else:
+        print "else"
+        variable=RequestContext(request,{})
+    return render_to_response(template,variable)
+      
+    
 
 def submitDoc(request):
     if request.method=="POST":
         title = request.POST.get("docTitle","")
         userid = request.POST.get("user","")
-	print "userid",userid
+	stId = request.POST.get("stId","")
+        mainPageUrl = request.POST.get("mainPageUrl","")
         memberOf = request.POST.get("memberOf","")
 	for each in request.FILES.getlist("doc[]",""):
-		checkmd5=save_file(each,title,userid,memberOf)
+		checkmd5=save_file(each,title,userid,memberOf,stId)
                 if (checkmd5=="True"):
-                    return HttpResponse("File alreaday uploaded")
-                else:
-                    return HttpResponseRedirect("/ndf/documentList/")
+                    return HttpResponse("File already uploaded")
+        if mainPageUrl:
+            return HttpResponseRedirect(mainPageUrl)
+        else:
+            return HttpResponseRedirect("/ndf/documentList/")
 
-def save_file(files,title,userid,memberOf):
-	db=get_database()[File.collection_name]
-	fileobj=db.File()
+def save_file(files,title,userid,memberOf,stId):
+        fcol=db[File.collection_name]
+        print "stid",stId
+	fileobj=fcol.File()
+        #gst=gst_collection.GSystemType.one({"_id":ObjectId(stId)})
 	filemd5= hashlib.md5(files.read()).hexdigest()
         files.seek(0)
         filetype=magic.from_buffer(files.read())               #Gusing filetype by python-magic
@@ -83,6 +100,8 @@ def save_file(files,title,userid,memberOf):
         	fileobj.created_by=int(userid)
         	#fileobj.member_of=unicode(memberOf)           #shuold be group 
                 fileobj.mime_type=filetype
+                if stId:
+                    fileobj.gsystem_type.append(ObjectId(stId))
         	fileobj.save()
                 files.seek(0)                                  #moving files cursor to start
 		filename=files.name

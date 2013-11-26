@@ -200,7 +200,7 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-GAPPS = [u"Page", u"File", "Group"]
+GAPPS = [u"Page", u"File", u"Group",u"Image"]
 
 ###########################################################################
 

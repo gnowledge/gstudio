@@ -1,0 +1,34 @@
+{% extends "ndf/base.html" %}
+{% block title %} Image Gallery {% endblock %}
+
+{% block body_content %} 
+<center>
+<div>
+	<input type="text" name="imgSearch" id ="imgSearch"  placeholder="Enter title to search"> 
+	<input type="submit" class="btn btn-large btn-primary" value="search" />	
+	<form id ="imgPost" enctype="multipart/form-data" method="post" action="/ndf/uploadDoc/">{% csrf_token %}
+	  <input type="hidden" name="stId" value={{stId}}>
+	  <input type="hidden" name="pageUrl" value={{pageUrl}}>
+	  <a href="{% url 'uploadDoc' %}">
+  	    <input type="submit" class="btn btn-large btn-primary" value="upload" />
+	</a>
+</form>
+</div>
+</center>
+<div style='display:table;'>
+	<div style='display:table-row;' >
+		{% for image in imageCollection %}
+			<div style='display:table-cell;'> 
+				<a href="{% url 'getFullImage' image %}">
+				<img src="{% url 'getImageThumbnail' image %}"></img><br/>
+				<span align="center">{{image.name}}</span></a>
+			</div>
+	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}
+			</div>
+			<div style='display:table-row;' >
+			{% endif %} 
+		{% endfor %} 	
+	</div>
+</div>
+
+{% endblock %}
