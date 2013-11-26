@@ -22,18 +22,30 @@ from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import Group
+
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups
 ###########################################################################
+
+
+###########################################################################
+
 
 db = get_database()
 gst_collection = db[GSystemType.collection_name]
 gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
+gs_collection = db[GSystem.collection_name]
+
+##############################################################
+# V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
+##############################################################
+
 
 def group(request, group_id):
     """
     * Renders a list of all 'Group-type-GSystems' available within the database.
 
     """
+
     group_nodes=get_existing_groups()
     group_nodes_count = len(group_nodes)
     return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_count': group_nodes_count}, context_instance=RequestContext(request))

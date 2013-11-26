@@ -93,7 +93,7 @@ LIST_MEMBER_POLICY = (
 ENCRYPTION_POLICY=(
     ('ENCRYPTED'),
     ('NOT_ENCRYPTED')
-    )
+)
 
 #############################################################################
 
@@ -205,37 +205,32 @@ class Node(DjangoDocument):
       	'member_of': [unicode], 		 
 
       	'created_at': datetime.datetime,
-        'created_by': ObjectId,			# ObjectId's of Author Class
+        'last_update': datetime.datetime,
         #'rating': RatingField(),
         'created_by': int,			# Primary Key of User(django's) Class
-        #'rating': 
+        'modified_by': [int],		# list of Primary Keys of User(django's) Class
 
         'start_publication': datetime.datetime,
 
         'content': unicode,
         'content_org': unicode,
         #'image': 
+
         'tags': [unicode],
         'featured': bool,
-
-        'last_update': datetime.datetime,
-        'modified_by': [ObjectId],		# list of Primary Keys of User(django's) Class
 
         'comment_enabled': bool,
       	'login_required': bool,
       	#'password': basestring,
+
         'status': STATUS_CHOICES
     }
     
     required_fields = ['name']
-    default_values = {'created_at':datetime.datetime.utcnow}
+    default_values = {'created_at': datetime.datetime.utcnow}
     use_dot_notation = True
-    
-    def __unicode__(self):
-        return self._id
-    
-    def identity(self):
-        return self.__unicode__()
+
+    ########## Setter(@x.setter) & Getter(@property) ##########
 
     @property
     def html_content(self):
@@ -247,18 +242,28 @@ class Node(DjangoDocument):
         elif MARKUP_LANGUAGE == 'restructuredtext':
             return restructuredtext(self.content)
         return str(self.content)
+
+    ########## Built-in Functions (Defined/Overridden) ##########
+    
+    def __unicode__(self):
+        return self._id
+    
+    def identity(self):
+        return self.__unicode__()
     
     def save(self, *args, **kwargs):
-        ''' on save, set created_at to current date'''
-        self.created_at = datetime.datetime.today()
-
-        history_manager = HistoryManager()
-        rcs_obj = RCS()
-
         is_new = False
 
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
+
+            ''' on save, set created_at to current date'''
+            self.created_at = datetime.datetime.today()
+
+        self.last_update = datetime.datetime.today()
+
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
         
         super(Node, self).save(*args, **kwargs)
         
