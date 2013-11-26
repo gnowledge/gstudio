@@ -1,0 +1,71 @@
+
+<div id="node-details-div">
+
+  <div id="node-details-view-div" style="display:block">
+
+  <table cellpadding="8">
+
+  <tr>
+    <td>
+    <pre>
+    Posted by : {{ node.created_by }} on {{ node.created_at|date:"j F Y" }}
+    Member of : {{ node.member_of|join:', ' }}
+ Contributors : {{ node.modified_by|join:', ' }}
+  Last update : {{ node.last_update|date:"j F Y" }}
+     Versions : </pre>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+    {% if node.tags|length_is:"0" %}
+      <h4><strong>Tag:</strong></h4>
+      <font size="3">No tags available!!</font>
+    {% else %}
+      <h4><strong>Tag{{ node.tags|length|pluralize }}:</strong></h4>
+      <font size="3">{{ node.tags|join:', ' }}</font>
+    {% endif %}
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+    {% if node.prior_node|length_is:"0" %}
+      <h4><strong>Prior Node:</strong></h4>
+      <font size="3">No prior node available!!</font>
+    {% else %}
+      <h4><strong>Prior Node{{ node.prior_node|length|pluralize }}:</strong></h4>
+      <font size="3">{{ node.prior_node|join:', ' }}</font>
+    {% endif %}
+    </td>
+  </tr>
+    
+  </table>
+
+  </div>
+
+  <div id="node-details-edit-div" style="display:none"> 
+
+  <table cellpadding="8">
+    <tr>
+      <td align="right"><h4><strong>Name:</strong></h4></td>
+      <td><input id="name_id" name="name" type="text" value="{{ node.name}}"></td>
+    </tr>
+    
+    <tr>
+      <td align="right"><h4><strong>Prior node{{ node.prior_node|pluralize }}:</strong></h4></td>
+      <td><input id="prior_node_id" name="prior_node" type="text" value="{{ node.prior_node|join:', ' }}"></td>
+    </tr>
+    
+    <tr>
+      <td align="right"><h4><strong>Tag{{ node.tags|pluralize }}:</strong></h4></td>
+      <td><input id="tags_id" name="tags" type="text" value="{{ node.tags|join:', ' }}"></td>
+    </tr>
+  </table>
+  
+  </div>
+  
+  <hr />
+
+</div>  
+
