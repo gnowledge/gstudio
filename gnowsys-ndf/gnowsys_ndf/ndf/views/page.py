@@ -127,10 +127,10 @@ def edit_page(request, node_id):
     """
     * Displays/Modifies details about the given page.
     """
+    
+    page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
 
     if request.user.is_authenticated():
-
-        page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
 
         if request.method == "POST":
             print "\n From the given page(modify)...\n"
@@ -197,6 +197,14 @@ def edit_page(request, node_id):
                                   }, 
                                   context_instance = RequestContext(request)
         )
+
+    else:
+        return render_to_response("ndf/edit_page.html", 
+                                  { 'node': page_node
+                                  }, 
+                                  context_instance = RequestContext(request)
+        )
+        
 
 """
 def delete_node(request, _id):
