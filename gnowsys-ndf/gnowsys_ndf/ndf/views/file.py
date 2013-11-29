@@ -60,15 +60,14 @@ def file(request, file_id):
 
 
 def uploadDoc(request):
-    stId,mainPageUrl="",""
+    stId, mainPageUrl = "", ""
     if request.method=="POST":
         stId=request.POST.get("stId","")
         mainPageUrl=request.POST.get("pageUrl","")
     template="ndf/UploadDoc.html"
     if stId and mainPageUrl:
-        variable=RequestContext(request,{'stId':stId,'mainPageUrl':mainPageUrl})
+        variable = RequestContext(request, {'stId': stId, 'mainPageUrl': mainPageUrl})
     else:
-        print "else"
         variable=RequestContext(request,{})
     return render_to_response(template,variable)
       
@@ -81,7 +80,7 @@ def submitDoc(request):
 	stId = request.POST.get("stId","")
         mainPageUrl = request.POST.get("mainPageUrl","")
         memberOf = request.POST.get("memberOf","")
-	for each in request.FILES.getlist("doc[]",""):
+	for each in request.FILES.getlist("doc[]", ""):
 		checkmd5=save_file(each,title,userid,memberOf,stId)
                 if (checkmd5=="True"):
                     return HttpResponse("File already uploaded")
@@ -97,7 +96,7 @@ def save_file(files,title,userid,memberOf,stId):
         #gst=gst_collection.GSystemType.one({"_id":ObjectId(stId)})
 	filemd5= hashlib.md5(files.read()).hexdigest()
         files.seek(0)
-        filetype=magic.from_buffer(files.read())               #Gusing filetype by python-magic
+        filetype=magic.from_buffer(files.read())               #using filetype by python-magic
 	if fileobj.fs.files.exists({"md5":filemd5}):
 		return "True"
 	else:

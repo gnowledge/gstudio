@@ -13,13 +13,11 @@ db=get_database()
 
 ##################################################################################################
 
-"""
-/**
- * Get GApps toolbar
- */
-"""
-@register.inclusion_tag('ndf/gapps_toolbar.html')
-def get_gapps_toolbar():
+@register.inclusion_tag('ndf/gapps_menubar.html')
+def get_gapps_menubar():
+  """Get Gapps menu-bar
+  """
+
   gst_collection = db[GSystemType.collection_name]
   gst_cur = gst_collection.GSystemType.find()
 
@@ -27,12 +25,28 @@ def get_gapps_toolbar():
   for app in gst_cur:
     gapps[app._id] = app.name.lower()
 
-  return {'template': 'ndf/gapps_toolbar.html', 'gapps': gapps}
+  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps}
 
-"""
-/**
- * Get common template for editing and displaying collection
- */
+
+@register.assignment_tag
+def get_existing_groups():
+  """Get Existing Groups
+  """
+
+  group = []
+  col_Group = db[Group.collection_name]
+  colg = col_Group.Group.find()
+  colg.sort('name')
+  gr=list(colg)
+  for items in gr:
+    group.append(items.name)
+  group.append("abcd")
+  group.append("cdef")
+  return group
+
+#######################################################################################################################################
+
+
 """
 @register.inclusion_tag('ndf/edit_collection.html', takes_context=True)
 def edit_collection(context):
@@ -48,11 +62,6 @@ def edit_collection(context):
   
   return {'template': 'ndf/edit_collection.html', 'user': user, 'node': node, 'drawer1':drawer1,'drawer2':drawer2, 'collection_obj_dict': collection_obj_dict}
 
-"""
-/**
- * Get both the collection drawers-list
- */
-"""
 def get_drawers(node):
     dict_drawer={}
     dict1={}
@@ -82,11 +91,6 @@ def get_drawers(node):
 
     return dict_drawer
 
-"""
-/**
- * Get common template for editing and displaying content
- */
-"""
 @register.inclusion_tag('ndf/edit_content.html', takes_context=True)
 def edit_content(context):
   request = context['request']
@@ -94,21 +98,4 @@ def edit_content(context):
   
   doc_obj = context['node']
   return {'template': 'ndf/edit_content.html', 'user': user, 'node': doc_obj}
-
 """
-/**
- * Get Existing Groups
- */
-"""
-@register.assignment_tag
-def get_existing_groups():
-  group = []
-  col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find()
-  colg.sort('name')
-  gr=list(colg)
-  for items in gr:
-    group.append(items.name)
-  group.append("abcd")
-  group.append("cdef")
-  return group

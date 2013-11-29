@@ -5,9 +5,12 @@
 {% block body_content %} 
 
 {% if user.is_authenticated %}
-<a href="{% url 'create_page' %}">
-  <input type="submit" class="btn btn-large btn-primary" value="Create a {{title}}" />
-</a>
+<div style='padding-top:10px'>
+  <a href="{% url 'create_page' %}">
+    <input type="submit" class="btn btn-large btn-primary" value="Create a {{title}}" />
+  </a>
+</div>
+
 <hr />
 {% endif %}
 
