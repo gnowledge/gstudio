@@ -271,6 +271,35 @@ def delete_node(request, _id):
 #                                                                                                     H E L P E R  -  F U N C T I O N S
 #######################################################################################################################################
 
+def get_drawers(nid=None, nlist=[]):
+    """
+    * Get both drawers-list.
+    """
+
+    dict_drawer={}
+    dict1={}
+    dict2={}
+
+    drawer = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}})
+
+    if (nid is None) and (not nlist):
+      for each in drawer:
+        dict_drawer[each._id] = str(each.name)
+
+    else:
+      for each in drawer:
+        if each._id != nid:
+          if each._id not in nlist:
+            dict1[each._id]=str(each.name)
+          
+          else:
+            dict2[each._id]=str(each.name)
+      
+      dict_drawer['1'] = dict1
+      dict_drawer['2'] = dict2
+
+    return dict_drawer
+
 '''
 def get_drawers(node):
     """
@@ -301,32 +330,3 @@ def get_drawers(node):
 
     return dict_drawer
 '''
-
-def get_drawers(nid=None, nlist=[]):
-    """
-    * Get both drawers-list.
-    """
-
-    dict_drawer={}
-    dict1={}
-    dict2={}
-
-    drawer = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}})
-
-    if (nid is None) and (not nlist):
-      for each in drawer:
-        dict_drawer[each._id] = str(each.name)
-
-    else:
-      for each in drawer:
-        if each._id != nid:
-          if each._id not in nlist:
-            dict1[each._id]=str(each.name)
-          
-          else:
-            dict2[each._id]=str(each.name)
-      
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
-
-    return dict_drawer
