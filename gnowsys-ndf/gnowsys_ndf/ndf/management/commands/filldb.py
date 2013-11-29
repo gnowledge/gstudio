@@ -30,21 +30,10 @@ class Command(BaseCommand):
         gst_collection = db[GSystemType.collection_name]
         gst_node = []
 
-        gs_collection = db[GSystem.collection_name]
-
         for i in range(0, len(GAPPS)):
             gst_node.append(gst_collection.GSystemType())
             
             gst_node[i].name = unicode(GAPPS[i])
             gst_node[i].save()
-
-            gs_node = []
-            for j in range(0, 2):
-                gs_node.append(gs_collection.GSystem())
-                
-                gs_node[j].name = unicode(GAPPS[i]) + unicode(j + 1)
-                gs_node[j].gsystem_type.append(gst_node[i]._id)
-                gs_node[j].member_of.append(gst_node[i].name)
-                gs_node[j].save()
 
         # --- End of handle() ---

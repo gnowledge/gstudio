@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
+from django.contrib.auth.models import User
 
 from django_mongokit import get_database
 
@@ -82,7 +83,18 @@ def create_page(request):
             tags = request.POST.get('page_tags')
             page_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
-            ### checkbox inputs for collection & private
+            prior_node_list = request.POST['prior-node-list']
+            if prior_node_list != '':
+                prior_node_list = prior_node_list.split(",")
+
+            i = 0                    
+            while (i < len(prior_node_list)):                    
+                pn_name = str(prior_node_list[i])
+                pn_name = pn_name.replace("'", "")
+                page_node.prior_node.append(gs_collection.GSystem.one({'name': unicode(pn_name)})._id)
+                i = i+1
+
+
             private = request.POST.get("private", '')
             if private:
                 private = True
@@ -90,7 +102,6 @@ def create_page(request):
                 private = False
 
             collection = request.POST.get("collection", '')
-
             if collection:
                 collection_list = request.POST['collection-list']
                 if collection_list != '':
@@ -119,18 +130,23 @@ def create_page(request):
         else:
             # if request.method is not "POST"!!!
 
-            drawer1 = get_drawers(None)
-            return render_to_response("ndf/create_page.html", {'drawer1': drawer1}, context_instance=RequestContext(request))
+            drawer1 = get_drawers()
+            return render_to_response("ndf/create_page.html", 
+                                      { 'pn_drawer1': drawer1,
+                                        'c_drawer1': drawer1
+                                      }, 
+                                      context_instance=RequestContext(request)
+            )
 
 
 def edit_page(request, node_id):
     """
     * Displays/Modifies details about the given page.
     """
+    
+    page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
 
     if request.user.is_authenticated():
-
-        page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
 
         if request.method == "POST":
             print "\n From the given page(modify)...\n"
@@ -145,15 +161,19 @@ def edit_page(request, node_id):
             tags = request.POST.get('tags')
             page_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
-            # TODO: Code needs to be written to retrieve & save value for prio_node 
+            prior_node_list = request.POST['prior-node-list']
+            page_node.prior_node = []
 
-            content_org = request.POST.get('content_org')
-            page_node.content_org = unicode(content_org.encode('utf8'))
+            if prior_node_list != '':
+                prior_node_list = prior_node_list.split(",")
 
-            usrname = request.user.username
-            # Required to link temporary files with the current user who is modifying this document
-            filename = slugify(name) + "-" + usrname + "-"
-            page_node.content = unicode(org2html(content_org, file_prefix=filename))
+            i = 0
+            while (i < len(prior_node_list)):
+                pn_name = str(prior_node_list[i])
+                pn_name = pn_name.replace("'", "")
+                page_node.prior_node.append(gs_collection.GSystem.one({'name': unicode(pn_name)})._id)
+                i = i+1
+
 
             collection_list = request.POST['collection-list']
             page_node.collection_set = []
@@ -165,18 +185,52 @@ def edit_page(request, node_id):
             while (i < len(collection_list)):
                 c_name = str(collection_list[i])
                 c_name = c_name.replace("'", "")
-                objs = gs_collection.GSystem.one({'name': unicode(c_name)})
-                page_node.collection_set.append(objs._id)
+                #objs = gs_collection.GSystem.one({'name': unicode(c_name)})
+                page_node.collection_set.append(gs_collection.GSystem.one({'name': unicode(c_name)})._id)
                 i = i+1
+
+            content_org = request.POST.get('content_org')
+            page_node.content_org = unicode(content_org.encode('utf8'))
+
+            usrname = request.user.username
+            # Required to link temporary files with the current user who is modifying this document
+            filename = slugify(name) + "-" + usrname + "-"
+            page_node.content = unicode(org2html(content_org, file_prefix=filename))
 
             page_node.save()
 
         else:
             print "\n From page's home page(display)...\n"
 
-        drawers = get_drawers(page_node)
-        drawer1 = drawers['1']
-        drawer2 = drawers['2']
+        # Retrieving names of created-by & modified-by users, and appending to 'user_details' dict-variable
+        user_details = {}
+        user_details['created_by'] = User.objects.get(pk=page_node.created_by).username
+
+        modified_by_usernames = []
+        for each_pk in page_node.modified_by:
+            modified_by_usernames.append(User.objects.get(pk=each_pk).username)
+        user_details['modified_by'] = modified_by_usernames
+
+        # Based on prior-nodes, constructing drawers & prior-node-dictionary-variable  
+        pn_drawers = get_drawers(page_node._id, page_node.prior_node)
+        pn_drawer1 = pn_drawers['1']
+        pn_drawer2 = pn_drawers['2']
+
+        prior_node_obj_dict = {}
+        prior_node_list = page_node.prior_node
+        
+        for each_id in prior_node_list:
+            if each_id != page_node._id:
+                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                dict_key = node_collection_object._id
+                dict_value = node_collection_object
+                
+                prior_node_obj_dict[dict_key] = dict_value
+
+        # Based on collection-elements, constructing drawers & collection-dictionary-variable  
+        c_drawers = get_drawers(page_node._id, page_node.collection_set)
+        c_drawer1 = c_drawers['1']
+        c_drawer2 = c_drawers['2']
 
         collection_obj_dict = {}
         collection_list = page_node.collection_set
@@ -190,13 +244,20 @@ def edit_page(request, node_id):
                 collection_obj_dict[dict_key] = dict_value
 
         return render_to_response("ndf/edit_page.html", 
-                                  { 'node': page_node,
-                                    'drawer1': drawer1,
-                                    'drawer2': drawer2,
-                                    'collection_obj_dict': collection_obj_dict
+                                  { 'node': page_node, 'user_details': user_details,
+                                    'pn_drawer1': pn_drawer1, 'pn_drawer2': pn_drawer2, 'prior_node_obj_dict': prior_node_obj_dict,
+                                    'c_drawer1': c_drawer1, 'c_drawer2': c_drawer2, 'collection_obj_dict': collection_obj_dict
                                   }, 
                                   context_instance = RequestContext(request)
         )
+
+    else:
+        return render_to_response("ndf/edit_page.html", 
+                                  { 'node': page_node
+                                  }, 
+                                  context_instance = RequestContext(request)
+        )
+        
 
 """
 def delete_node(request, _id):
@@ -210,6 +271,36 @@ def delete_node(request, _id):
 #                                                                                                     H E L P E R  -  F U N C T I O N S
 #######################################################################################################################################
 
+def get_drawers(nid=None, nlist=[]):
+    """
+    * Get both drawers-list.
+    """
+
+    dict_drawer={}
+    dict1={}
+    dict2={}
+
+    drawer = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}})
+
+    if (nid is None) and (not nlist):
+      for each in drawer:
+        dict_drawer[each._id] = str(each.name)
+
+    else:
+      for each in drawer:
+        if each._id != nid:
+          if each._id not in nlist:
+            dict1[each._id]=str(each.name)
+          
+          else:
+            dict2[each._id]=str(each.name)
+      
+      dict_drawer['1'] = dict1
+      dict_drawer['2'] = dict2
+
+    return dict_drawer
+
+'''
 def get_drawers(node):
     """
     * Get both the collection drawers-list.
@@ -238,4 +329,4 @@ def get_drawers(node):
       dict_drawer['2'] = dict2
 
     return dict_drawer
-
+'''

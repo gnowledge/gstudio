@@ -1,10 +1,14 @@
 {% for each_id, each_node in collection_obj_dict.items %}
     {% if each_node.collection_set %}		     
-    <li class="list"><abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-      <a href="{% url 'edit_page' each_id %}">{{ each_node.name }}</a></li>
+    <li class="list" style="list-style-type:none;">
+      <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+      <a href="{% url 'edit_page' each_id %}" style="padding-left:10px;">{{ each_node.name }}</a>
+    </li>
     {% else %}
-    <li class="list"><abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-      <a href="{% url 'edit_page' each_id %}">{{ each_node.name }}</a></li>
+    <li class="list" style="list-style-type:none;">
+      <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+      <a href="{% url 'edit_page' each_id %}" style="padding-left:12px;">{{ each_node.name }}</a>
+    </li>
     {% endif %}
 {% empty %}
     <font size="3">No collection available!!</font>

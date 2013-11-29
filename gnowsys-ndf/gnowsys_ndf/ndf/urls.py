@@ -30,6 +30,7 @@ urlpatterns += patterns('gnowsys_ndf.ndf.views.file',
                         url(r'^documentList/', 'GetDoc', name='documentList'),
                         url(r'^readDoc/(?P<_id>[\w-]+)$', 'readDoc', name='read_file'),
 )
+
 urlpatterns += patterns('gnowsys_ndf.ndf.views.imageDashboard',
                         url(r'^gapp/image/(?P<image_id>[\w-]+)$', 'imageDashboard', name='image'),
                         #url(r'^images/', 'imageDashboard', name='imageDashboard'),
