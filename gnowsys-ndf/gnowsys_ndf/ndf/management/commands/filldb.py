@@ -29,11 +29,13 @@ class Command(BaseCommand):
         
         gst_collection = db[GSystemType.collection_name]
         gst_node = []
-
+        user_id = 1 
         for i in range(0, len(GAPPS)):
             gst_node.append(gst_collection.GSystemType())
             
             gst_node[i].name = unicode(GAPPS[i])
+            gst_node[i].created_by = user_id
+            gst_node[i].modified_by.append(user_id)
             gst_node[i].save()
 
         # --- End of handle() ---
