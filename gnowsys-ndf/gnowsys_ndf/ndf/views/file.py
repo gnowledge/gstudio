@@ -41,7 +41,7 @@ gst_file = gst_collection.GSystemType.one({'name': GAPPS[1]})
 #######################################################################################################################################
 
 
-def file(request, file_id):
+def file(request, group_name,file_id):
     """
     * Renders a list of all 'Group-type-GSystems' available within the database.
 
@@ -59,7 +59,7 @@ def file(request, file_id):
         return HttpResponseRedirect(reverse('homepage'))
 
 
-def uploadDoc(request):
+def uploadDoc(request,group_name):
     stId,mainPageUrl="",""
     if request.method=="POST":
         stId=request.POST.get("stId","")
@@ -74,7 +74,7 @@ def uploadDoc(request):
       
     
 
-def submitDoc(request):
+def submitDoc(request,group_name):
     if request.method=="POST":
         title = request.POST.get("docTitle","")
         userid = request.POST.get("user","")
@@ -88,7 +88,7 @@ def submitDoc(request):
         if mainPageUrl:
             return HttpResponseRedirect(mainPageUrl)
         else:
-            return HttpResponseRedirect("/ndf/documentList/")
+            return HttpResponseRedirect("/"+group_name+"/file/documentList/")
 
 def save_file(files,title,userid,memberOf,stId):
         fcol=db[File.collection_name]
@@ -135,14 +135,14 @@ def convert_image_thumbnail(files):
 		
 
 	
-def GetDoc(request):
+def GetDoc(request,group_name):
     filecollection=get_database()[File.collection_name]
     files=filecollection.File.find()
     template="ndf/DocumentList.html"
     variable=RequestContext(request,{'filecollection':files})
     return render_to_response(template,variable)
 
-def readDoc(request,_id):
+def readDoc(request,_id,group_name):
     filecollection=get_database()[File.collection_name]
     fileobj=filecollection.File.one({"_id": ObjectId(_id)})  
     fl=fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))

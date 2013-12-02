@@ -1,0 +1,15 @@
+{% extends "ndf/base.html" %}
+
+{% block title %} Group Dashboard {% endblock %}
+
+{% block body_content %}
+<div>
+<h3> {{request.path|cut:"/"|cut:"dashboard"}} </h3>
+</div>
+
+<h4> Group Policies: </h4>
+
+{% if user.is_authenticated %}
+{% endif %}
+
+{% endblock %}

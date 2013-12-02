@@ -14,21 +14,21 @@ from gnowsys_ndf.ndf.models import *
 
 db = get_database()
 collection=db[File.collection_name]
-def imageDashboard(request,image_id):
+def imageDashboard(request,group_name,image_id):
     imgcol=collection.File.find({'mime_type': {'$regex': 'image'}})
     template="ndf/ImageDashboard.html"
     url=request.get_full_path()
     variable=RequestContext(request,{'imageCollection':imgcol,'pageUrl':url,'stId':image_id})
     return render_to_response(template,variable)
 
-def getImageThumbnail(request,_id):
+def getImageThumbnail(request,group_name,_id):
         imgobj=collection.File.one({"_id": ObjectId(_id)})
         if (imgobj.fs.files.exists(imgobj.fs_file_ids[1])):
             fl=imgobj.fs.files.get(ObjectId(imgobj.fs_file_ids[1]))
             return HttpResponse(fl.read())
                 
     
-def getFullImage(request,_id):
+def getFullImage(request,group_name,_id):
     imgobj=collection.File.one({"_id": ObjectId(_id)})
     if (imgobj.fs.files.exists(imgobj.fs_file_ids[0])):
         fl=imgobj.fs.files.get(ObjectId(imgobj.fs_file_ids[0]))

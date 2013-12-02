@@ -7,7 +7,7 @@
 {% block body_content %} 
 
 <div style="display:inline-block; float:left; padding-top:40px; ">
-<form method="post" action="{% url 'create_group' %}">
+<form method="post" action="{% url 'create_group' 'group' %}">
   {% csrf_token %}
   {% get_existing_groups as groups%}
 

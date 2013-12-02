@@ -1,9 +1,9 @@
 {% extends "ndf/base.html" %}
-
+{% load ndf_tags %}
 <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block head %}
-	
+{% get_group_name request.path as group_name %}	
 <!-- orgitdown! -->
 <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
 <!-- orgitdown! toolbar settings -->
@@ -24,7 +24,7 @@
 {% block body_content %} 
 
 <div style="display:inline-block; float:left; padding-top:40px; ">
-<form method="post" action="{% url 'create_page' %}">
+<form method="post" action="{% url 'create_page' group_name %}">
   {% csrf_token %}
   
   <div style='display:table; '>	

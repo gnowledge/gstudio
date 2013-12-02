@@ -19,7 +19,7 @@ db=get_database()
  */
 """
 @register.inclusion_tag('ndf/gapps_toolbar.html')
-def get_gapps_toolbar():
+def get_gapps_toolbar(request):
   gst_collection = db[GSystemType.collection_name]
   gst_cur = gst_collection.GSystemType.find()
 
@@ -27,7 +27,7 @@ def get_gapps_toolbar():
   for app in gst_cur:
     gapps[app._id] = app.name.lower()
 
-  return {'template': 'ndf/gapps_toolbar.html', 'gapps': gapps}
+  return {'template': 'ndf/gapps_toolbar.html', 'gapps': gapps,'request':request}
 
 """
 /**
@@ -101,6 +101,31 @@ def edit_content(context):
  */
 """
 @register.assignment_tag
+def check_group(groupname):
+  col_Group = db[Group.collection_name]
+  colg = col_Group.Group.one({"name":groupname})
+  if colg:
+    return True
+  else:
+    return False
+
+@register.assignment_tag
+def get_group_name(groupurl):
+  print "SADF",groupurl
+  sp=groupurl.split("/",2)
+  print "sp=",sp,len(sp)
+  if len(sp)<=1:
+    return "home"
+  if sp[1]:
+    chsp=check_group(sp[1])
+    if chsp:
+      return sp[1]
+    else:
+      return "home"
+  else:
+      return "home"
+
+@register.assignment_tag
 def get_existing_groups():
   group = []
   col_Group = db[Group.collection_name]
@@ -109,6 +134,4 @@ def get_existing_groups():
   gr=list(colg)
   for items in gr:
     group.append(items.name)
-  group.append("abcd")
-  group.append("cdef")
   return group

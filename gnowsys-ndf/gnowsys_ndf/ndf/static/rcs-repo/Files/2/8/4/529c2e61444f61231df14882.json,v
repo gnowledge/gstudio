@@ -1,0 +1,61 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2013.12.02.06.53.21;	author anujag;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (pop) is of GSystem([]).
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "529c2e61444f61231df14882"
+    },
+    "altnames": null,
+    "attribute_set": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "created_at": 1385987001285,
+    "created_by": 1,
+    "featured": null,
+    "fs_file_ids": [],
+    "gsystem_type": [
+        {
+            "$oid": "52987d2f444f612bf0076b04"
+        }
+    ],
+    "last_update": 1385987001285,
+    "login_required": null,
+    "member_of": [],
+    "mime_type": "JPEG image data, JFIF standard 1.01",
+    "modified_by": [],
+    "name": "pop",
+    "plural": null,
+    "prior_node": [],
+    "relation_set": [],
+    "start_publication": null,
+    "status": [
+        null,
+        null,
+        null
+    ],
+    "tags": [],
+    "type_of": null
+}@

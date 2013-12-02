@@ -1,0 +1,80 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2013.12.02.06.01.54;	author anujag;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2013.12.02.06.01.54;	author anujag;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (bcsd) is of GSystem([]).
+@
+
+
+1.2
+log
+@Document (bcsd) updated successfully.
+@
+text
+@{
+    "_id": {
+        "$oid": "529c2252444f611f47b2f5b6"
+    },
+    "altnames": null,
+    "attribute_set": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "created_at": 1385983914726,
+    "created_by": 1,
+    "featured": null,
+    "fs_file_ids": [
+        {
+            "$oid": "529c2252444f611f47b2f5b7"
+        }
+    ],
+    "gsystem_type": [],
+    "last_update": 1385983914777,
+    "login_required": null,
+    "member_of": [],
+    "mime_type": "PDF document, version 1.4",
+    "modified_by": [],
+    "name": "bcsd",
+    "plural": null,
+    "prior_node": [],
+    "relation_set": [],
+    "start_publication": null,
+    "status": [
+        null,
+        null,
+        null
+    ],
+    "tags": [],
+    "type_of": null
+}@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d15 5
+a19 1
+    "fs_file_ids": [],
+d21 1
+a21 1
+    "last_update": 1385983914726,
+@
