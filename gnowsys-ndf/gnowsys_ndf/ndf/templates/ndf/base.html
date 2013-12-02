@@ -25,6 +25,9 @@
 		<script src="/static/ndf/js/jquery.stacktable.js"></script>
 		<!--<script src="static/http://vjs.zencdn.net/c/video.js"></script>-->
 		<script src="/static/ndf/js/application.js"></script>
+<link type="text/css" href="/static/ndf/css/menu.css" rel="stylesheet" />
+<script type="text/javascript" src="/static/ndf/js/jquery.js"></script>
+<script type="text/javascript" src="/static/ndf/js/menu.js"></script>
 		
 		{% block head %}  {% endblock %}
 
@@ -41,14 +44,18 @@
 	 	
 	 		.home a:hover { text-decoration:none !important }
 	 		
-	 		#header
+	 		.header
 	 		{
-		 		background-color:#edeff1; top:0px; position:fixed; width:100%; z-index:100;
+		 		background-color:#0B6580; top:0px;  width:100%; z-index:100;
 	 		}
 	 		
-	 		.loginInfo {	display:inline-block; margin-left:80%; width:12%; text-align:right; cursor:pointer;	}
+	 		.loginInfo {	margin-left:80%; width:12%; text-align:right; cursor:pointer;color:#BAC1C8;}
+			.groupchange {  display:inline-block; width:0%; text-align:right; cursor:pointer;padding-left:10px;color:#BAC1C8;
+			font-family:'Georgia';}
+
 	 	
-			.menu  {	display:inline-block; padding-left:1em;	}
+	                .loginInfo,.headertitle,.groupchange {
+			display:inline; }
 			
 			#loginPanel
 			{
@@ -57,6 +64,14 @@
 				text-align:center; 
 				border-radius:6px; 
 			}
+			#groupoptions
+			{
+                                display:none; background-color:lightgray; right:0.5%;
+			        margin-left:80%; width:12%; position:fixed; font-size:1.1em;
+			        text-align:center;
+			        border-radius:6px;
+                        }
+
 			
 			#loginPanel div	{	width:100%;	padding:8px 0px; }
 			
@@ -73,6 +88,21 @@
 				border-color: transparent transparent lightgray transparent;
 				border-style: solid; border-width: 10px;
 			}
+                        #groupoptions div       {       width:100%;     padding:8px 0px; }
+
+			#groupoptions div:hover {       background-color:#1ABC9C;       }
+
+			#groupoptions a{        color:#34495E;  }
+
+			#groupoptions a:hover { text-decoration:none !important; color:white; }
+
+			#groupoptions:after
+                        {
+                                content:''; display:block; position:absolute; top:-20px;
+                                right:30px; width:0; height:0;
+                                border-color: transparent transparent lightgray transparent;
+                                border-style: solid; border-width: 10px;
+                        }
 						
 			{% block style %}  {% endblock %}
 
@@ -84,20 +114,29 @@
 
 		<!-- Start of Hedaer Div -->
 		
-		<div id="header">
-			<h1 class="home">
-				Node Description Framework of
-				<a href="http://www.gnu.org/software/gnowsys/" title="Look at GNOWSYS project">GNOWSYS</a>
-			</h1>
-		
-          <!-- GApps Toolbar -->
-		  {% get_gapps_toolbar %}
-          <!-- ============= -->
+		<div class="header">
+			<div class="headertitle">
+			  NUSSD
+			
+			</div>
+			{% get_group_name request.path as group_name %}
 
-			{% if user.is_authenticated %}
+                         {% if user.is_authenticated %}
 				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
-					<h4>Hello, {{ user.username }}</h4> 						
+				  {{ user.username }} 						
 				</div>	
+                                
+                                 <div class="groupchange" onmouseover="$('#groupoptions').fadeIn();" >
+                                    {{group_name}}
+				    </div>
+				{% get_existing_groups as groups %}
+				<div id="groupoptions" style="display:none">
+				  {% for gp_id in groups %}
+				  <a href="{% url 'groupchange' gp_id %}">
+				    <div id="{{gp_id}}">{{gp_id}}</div> </a>
+				  {% endfor %}
+				</div>&nbsp;
+          
 				
 				<div id="loginPanel" >
 					<br/>										
@@ -113,12 +152,32 @@
   					  
 			{% else %}	
 			
-				<div class="loginInfo"  title="Click here to Login">
-		  			<h5 ><a href="{% url 'auth_login' %}">Login</a></h5>		    		 
-		  		</div>
+				<div class="loginInfo">
+
+		  			<a href="{% url 'auth_login' %}">Login</a>		    		 
+				</div>
+                                
+                                 <div class="groupchange" onmouseover="$('#groupoptions').fadeIn();" >
+                                      {{group_name}}  
+				  </div>
+                                
+{% get_existing_groups as groups %}
+<div id="groupoptions" style="display:none">
+{% for gp_id in groups %}
+<a href="{% url 'groupchange' gp_id %}">
+<div id="{{gp_id}}">{{gp_id}}</div> </a>
+{% endfor %}
+ </div>
+		  		
 		  				  
 			{% endif %}
-				  
+
+		<div id="menu">
+          <!-- GApps Toolbar -->
+		  {% get_gapps_toolbar request %}
+          <!-- ============= -->
+</div>
+			                 
 		</div> 		
 		<!-- End of Header Div-->
 		
@@ -131,32 +190,17 @@
 		
 		
 		<!-- Start of Footer -->		
-		<footer>
-		  <div class="container">
-		    <div class="row">
-		      <div class="span7">
-		          this is footer
-		        <h3 class="footer-title">
-					Gnowsys
-		        </h3>		        
-		      </div> 
 
-		      <div class="span5">
-		        <div class="footer-banner">
-		          <h3 class="footer-title">Descriptions</h3>
-		          <ul>
-		            <li>1</li>
-		            <li>2</li>
-		            <li>3</li>
-		            <li>4</li>
-		            <li>5</li>
-		          </ul>
 
-		        </div>
-		      </div>
-		    </div>
-		  </div>
-		</footer>
+                <div class="footer" align="center">
+                <p>
+A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab</a>,<a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a><br/>
+  	        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.<br/>
+                </p>
+                </div>
+
+
+
 		<!-- End of Footer -->		
 	</body>
 	
@@ -166,11 +210,15 @@
 	<script type="text/javascript">
 
 		$("#body").css("margin-top", $("#header").height() + "px");	
-		$("#body").css("min-height", ( $(window).height() - $("#header").height() - $("footer").height() ) + "px");
+		$("#body").css("min-height", ( $(window).height() - $("#header").height() - $(".footer").height() ) + "px");
 		
 		$("#loginPanel").mouseleave(function(){
 			$("#loginPanel").fadeOut()	
 		});
+                $("#groupoptions").mouseleave(function(){
+		$("#groupoptions").fadeOut()
+		});
+
 		
 		{% block script %} {% endblock %}	
 	

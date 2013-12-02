@@ -5,7 +5,7 @@
 {% block body_content %} 
 
 {% if user.is_authenticated %}
-<a href="{% url 'create_group' %}">
+<a href="{% url 'create_group' 'group' %}">
   <input type="submit" class="btn btn-large btn-primary" value="Create a group" />
 </a>
 <hr />
