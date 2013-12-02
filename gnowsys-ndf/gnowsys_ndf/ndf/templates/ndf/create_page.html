@@ -30,186 +30,314 @@
   <div style='display:table; '>	
     
     <div style='display:table-row;'>			
-      <div style='display:table-cell;'>	Name	</div>
-      <div style='display:table-cell; padding-left:20px;'>	
+      <div style='display:table-cell;'><h4><strong>Name</strong></h4></div>
+      <div style='display:table-cell;padding-left:20px;'>	
 	      <input type="text" id="page_name_id" name="page_name" autofocus="autofocus" placeholder="Enter title">	
       </div>
     </div>	
+    
     <br/>
+    
     <div style='display:table-row;'>
-      <div style='display:table-cell;'>	Tags 	</div>
-      <div style='display:table-cell; padding-left:20px;'>	
+      <div style='display:table-cell;'><h4><strong>Tags</strong></h4></div>
+      <div style='display:table-cell;padding-left:20px;'>	
 	      <input type="text" name="page_tags" placeholder="Example: abc, XYZ">	 
 	    </div>
     </div>		
 
-  </div>
-  
-  <!--      Collection part                       -->
-    
     <br/>
     
-    <div>
-      <input type="checkbox" name="private" id="private" />&nbsp;Private 
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <input type="checkbox" id="coll" name="collection" />&nbsp;Collection<br/>
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'><h4><strong>Prior Node</strong></h4></div>
+      <div style='display:table-cell;padding-left:20px;'>	
 
-      <div id="drawertable" style="display:none">
-      <table style="width:370px;" >
-	<tr>
-          <td style='width:160px;'>
-	    <b>Pages:</b><br/>
-	    <select multiple="multiple" id='lstBox1'>    <!---->
-	      {% for key,value in drawer1.items %}
-	      <option id={{key}}>{{value}}</option>
-	      {% endfor %}
-	    </select>
-	  </td>
-	  <td style='width:50px;text-align:center;vertical-align:middle;'>
-	    <input type='button' id='btnUp' value ='  ^  '><br/>
-	    <input type='button' id='btnRight' value ='  >  '><br/>
-	    <input type='button' id='btnLeft' value ='  <  '><br/>
-		   <input type='button' id='btnDown' value ='  v  '><br/>
-		   
-	  </td>
+        <div id="pn_drawertable">
+        <table style="width:370px;" >
+  	      <tr>
+            <td style='width:160px;'>
+  	          <b>Pages:</b><br/>
+  	          <select id='pn_drawer1' multiple="multiple">    <!---->
+  	          {% for key,value in pn_drawer1.items %}
+  	            <option id={{key}}>{{value}}</option>
+  	          {% endfor %}
+  	          </select>
+  	        </td>
+	  
+  	        <td style='width:50px;text-align:center;vertical-align:middle;'>
+  	          <input id='pn_btnUp' type='button' value ='  ^  '><br/>
+  	          <input id='pn_btnRight' type='button' value ='  >  '><br/>
+  	          <input id='pn_btnLeft' type='button' value ='  <  '><br/>
+  		        <input id='pn_btnDown' type='button' value ='  v  '><br/>
+  	        </td>
+	  
+  	        <td style='width:160px;'>
+  	          <b>Added to Drawer: </b><br/>
+  	          <select id='pn_drawer2' multiple="multiple">
+  	          </select>
+  	        </td><br>
+  	      </tr>
+        </table>
+        </div>
 
-	  <td style='width:160px;'>
-            <b>Added to Drawer: </b><br/>
-	    
-            <select multiple="multiple" name="lstb2" id='lstBox2'>
-	      
-            </select>
-	  </td><br>
-	</tr>
+	    </div>
+    </div>		
 
-      </table>
+    <br/>
+
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'><h4><strong>Privacy</strong></h4></div>
+      <div style='display:table-cell;padding-left:20px;'>	
+        <input type="checkbox" name="private" id="private" />&nbsp;Private 
+	    </div>
+    </div>		
+
+    <br/>
+
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'><h4><strong>Collection</strong></h4></div>
+      <div style='display:table-cell;padding-left:20px;'>	
+        <input type="checkbox" id="collection" name="collection" />&nbsp;Collection<br/>
+        
+        <div id="c_drawertable" style="display:none">
+        <table style="width:370px;" >
+	        <tr>
+            <td style='width:160px;'>
+	            <b>Pages:</b><br/>
+	            <select id='c_drawer1' multiple="multiple">    <!---->
+	            {% for key,value in c_drawer1.items %}
+	              <option id={{key}}>{{value}}</option>
+	            {% endfor %}
+	            </select>
+	          </td>
+	  
+	          <td style='width:50px;text-align:center;vertical-align:middle;'>
+	            <input id='c_btnUp' type='button' value ='  ^  '><br/>
+	            <input id='c_btnRight' type='button' value ='  >  '><br/>
+	            <input id='c_btnLeft' type='button' value ='  <  '><br/>
+		          <input id='c_btnDown' type='button' value ='  v  '><br/>
+	          </td>
+	  
+	          <td style='width:160px;'>
+	            <b>Added to Drawer: </b><br/>
+	            <select id='c_drawer2' multiple="multiple">
+	            </select>
+	          </td><br>
+          </tr>
+        </table>
+        </div>
+
+	    </div>
+    </div>		
+
+    <br/>
+
+    <div style='display:table-row;'>
+      <div style='display:table-cell;vertical-align:top;padding-top:10px'><h4><strong>Description</strong></h4></div>
+      <div style='display:table-cell;padding-left:20px;'>
+        <div id="text-editor" >
+          <textarea id="orgitdown" name="content_org"> </textarea>
+        </div>
       </div>
-	      
-    </div><br/> 
-
+    </div>	
     
-    <!--                             -->
-  
-  <div id="text-editor" style="display:inline-block; float:left; padding-top:10px">
-    <textarea id="orgitdown" name="content_org" disabled> </textarea>
+    <br/>
+
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'>
+        <input type="hidden" id="prior-node-list" name="prior-node-list" value="" />
+        <input type="hidden" id="collection-list" name="collection-list" value="" />
+        <input type="submit" id="save-page" value="Save" class="btn btn-large btn-primary" disabled>
+      </div>
+      <div style='display:table-cell;'>
+      </div>
+    </div>	
+
   </div>
-
-  <br/>
-
-  <div style="display:inline-block; padding-top:10px">
-  <input type="hidden" id="usrid_id" name="usrid" value={{user.id}} />
-  <input type="hidden" id="usrname_id" name="usrname" value={{user.username}} />
-  <input type="hidden" id="collection-list" name="collection-list" value="" />  
-  <input type="submit" id="save-page" value="Save" class="btn btn-large btn-primary" disabled>
-  </div>
   
-</div>
-
 </form>
 
-<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+</div>
 
-<!--                    -->
 
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 
 <script type="text/javascript">
-    var arr = [];
 
- $(function()
- {
-   $("#coll").change(function()
-   {     
+  $(function()
+  {
+    $("#collection").change(function()
+    {     
       if (this.checked){
-        $("#drawertable").css("display", "block")
-        //$("#lstvalue").css("display", "block")
-        $("#resetdrawer").css("display", "block")  
-        
+        $("#c_drawertable").css("display", "block")
       }
+      
       else{
-        $("#drawertable").css("display", "none")
-        //$("#lstvalue").css("display", "none")
-        $("#resetdrawer").css("display", "none")
-       
+        $("#c_drawertable").css("display", "none")
       }
-   });
- 
-   $("#btnRight").click(function() { 
-       var selectedOpts = $("#lstBox1 option:selected");
-       if (selectedOpts.length == 0){
-           alert("Nothing to move.");
-           e.preventDefault();
-       }
-       $("#lstBox2").append($(selectedOpts).clone());
-       $(selectedOpts).remove();
-       e.preventDefault();
+    });
 
-   });   
+//------------------------------------------------------------------------------------------------------------------------------------
+
+    $("#pn_btnRight").click(function() { 
+      var selectedOpts = $("#pn_drawer1 option:selected");
+
+      if (selectedOpts.length == 0){
+        alert("Nothing to move.");
+        e.preventDefault();
+      }
+
+      $("#pn_drawer2").append($(selectedOpts).clone());
+      $(selectedOpts).remove();
+      e.preventDefault();
+    });   
    
-   $("#btnUp").click(function() {
+    $("#pn_btnUp").click(function() {
        
-      $("#lstBox1 :selected").each(function (i, selected) {
-            $(this).insertBefore($(this).prev());
-	    $("#lstbox2").options.att("selected",false);
+      $("#pn_drawer1 :selected").each(function (i, selected) {
+        $(this).insertBefore($(this).prev());
+	      $("#pn_drawer2").options.att("selected",false);
       });
-      $("#lstBox1 select").focus().blur();
-      $("#lstBox2 :selected").each(function (i, selected) {
-            $(this).insertBefore($(this).prev());
-	    $("#lstbox1").options.att("selected",false);
+      
+      $("#pn_drawer1 select").focus().blur();
+      
+      $("#pn_drawer2 :selected").each(function (i, selected) {
+        $(this).insertBefore($(this).prev());
+	      $("#pn_drawer1").options.att("selected",false);
       });
-      $("#lstBox2 select").focus().blur();
-   });
+      
+      $("#pn_drawer2 select").focus().blur();
+    });
 
-    $("#btnDown").click(function() {
-      $("#lstBox1 :selected").each(function (i, selected) {
-            $(this).insertAfter($(this).next());
-	    $("#lstbox2").options.att("selected",false);	
+    $("#pn_btnDown").click(function() {
+      $("#pn_drawer1 :selected").each(function (i, selected) {
+        $(this).insertAfter($(this).next());
+	      $("#pn_drawer2").options.att("selected",false);	
       });
-      $("#lstBox1 select").focus().blur();
-      $("#lstBox2 :selected").each(function (i, selected) {
-            $(this).insertAfter($(this).next());
-	    $("#lstbox1").options.att("selected",false);
+      
+      $("#pn_drawer1 select").focus().blur();
+      
+      $("#pn_drawer2 :selected").each(function (i, selected) {
+        $(this).insertAfter($(this).next());
+	      $("#pn_drawer1").options.att("selected",false);
       });
-      $("#lstBox2 select").focus().blur();
- 
+      
+      $("#pn_drawer2 select").focus().blur();
     });
     
-    $("#btnLeft").click(function() {
-      var selectedOpts = $("#lstBox2 option:selected");
-        if (selectedOpts.length == 0) {
-            alert("Nothing to move.");
-            e.preventDefault();
-        }
-
-        $("#lstBox1").append($(selectedOpts).clone());
-        $(selectedOpts).remove();
+    $("#pn_btnLeft").click(function() {
+      var selectedOpts = $("#pn_drawer2 option:selected");
+      if (selectedOpts.length == 0) {
+        alert("Nothing to move.");
         e.preventDefault();
+      }
+
+      $("#pn_drawer1").append($(selectedOpts).clone());
+      $(selectedOpts).remove();
+      e.preventDefault();
     });
 
-    $("#resetdrawer").click(function(){
-        $("#lstBox2").empty();
+//------------------------------------------------------------------------------------------------------------------------------------
 
+    $("#c_btnRight").click(function() { 
+      var selectedOpts = $("#c_drawer1 option:selected");
+
+      if (selectedOpts.length == 0){
+        alert("Nothing to move.");
+        e.preventDefault();
+      }
+
+      $("#c_drawer2").append($(selectedOpts).clone());
+      $(selectedOpts).remove();
+      e.preventDefault();
+    });   
+   
+    $("#c_btnUp").click(function() {
+       
+      $("#c_drawer1 :selected").each(function (i, selected) {
+        $(this).insertBefore($(this).prev());
+	      $("#c_drawer2").options.att("selected",false);
+      });
+      
+      $("#c_drawer1 select").focus().blur();
+      
+      $("#c_drawer2 :selected").each(function (i, selected) {
+        $(this).insertBefore($(this).prev());
+	      $("#c_drawer1").options.att("selected",false);
+      });
+      
+      $("#c_drawer2 select").focus().blur();
     });
+
+    $("#c_btnDown").click(function() {
+      $("#c_drawer1 :selected").each(function (i, selected) {
+        $(this).insertAfter($(this).next());
+	      $("#c_drawer2").options.att("selected",false);	
+      });
+      
+      $("#c_drawer1 select").focus().blur();
+      
+      $("#c_drawer2 :selected").each(function (i, selected) {
+        $(this).insertAfter($(this).next());
+	      $("#c_drawer1").options.att("selected",false);
+      });
+      
+      $("#c_drawer2 select").focus().blur();
+    });
+    
+    $("#c_btnLeft").click(function() {
+      var selectedOpts = $("#c_drawer2 option:selected");
+      if (selectedOpts.length == 0) {
+        alert("Nothing to move.");
+        e.preventDefault();
+      }
+
+      $("#c_drawer1").append($(selectedOpts).clone());
+      $(selectedOpts).remove();
+      e.preventDefault();
+    });
+
+// -----------------------------------------------------------------------------------------------------------------------------------
 
     $("#save-page").click(function(){
-        opts = lstBox2.options, len = opts.length;
 
         save_enabled = $("#save-page").attr("disabled")
 
-        if (len > 0 && save_enabled != "disabled") 
+        // -- For prior-node
+        pn_opts = pn_drawer2.options;
+        pn_len = pn_opts.length;
+        
+        if (pn_len > 0 && save_enabled != "disabled") 
         {
-          var arr = [];
-          
-          for (var i = 0; i < len; i++) {
-		        arr[i] = "'"+opts[i].value+"'";
+          var pn_arr = [];
+
+          for (var i = 0; i < pn_len; i++) {
+		        pn_arr[i] = "'" + pn_opts[i].value + "'";
 	        }
 	        
-	        var abc=arr.join(',');
-	        $("#collection-list").val(abc)
+	        var pn_list = pn_arr.join(',');
+	        $("#prior-node-list").val(pn_list)
+	      }
+
+        // -- For collection
+        c_opts = c_drawer2.options;
+        c_len = c_opts.length;
+        
+        if (c_len > 0 && save_enabled != "disabled") 
+        {
+          var c_arr = [];
+
+          for (var i = 0; i < c_len; i++) {
+		        c_arr[i] = "'" + c_opts[i].value + "'";
+	        }
+	        
+	        var c_list = c_arr.join(',');
+	        $("#collection-list").val(c_list)
 	      }
     });
  
- });
+  });
 
+// -----------------------------------------------------------------------------------------------------------------------------------
 
   $(document).ready(function()
   {
@@ -218,7 +346,6 @@
       {	
         $("#orgitdown").val("")		
         $("#orgitdown").attr("placeholder", "Please enter some content as description...")
-        $("#orgitdown").removeAttr("disabled");
         $("#save-page").removeAttr("disabled");
       }
       else

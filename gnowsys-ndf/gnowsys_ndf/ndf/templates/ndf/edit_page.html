@@ -31,13 +31,15 @@
 
 <div class="tabcontents">
 
-  <!-- ########## Start of div - tabcontents ########## -->
+  <!-- ################################################################################################ Start of div - tabcontents -->
   
   <div id="view1" class="tabcontent">
   
     <div style="display:inline-block; float:left;">
     
     {% include "ndf/edit_node_details.html" %}
+
+    {% include "ndf/edit_prior_node.html" %}
     
     {% include "ndf/edit_collection.html" %}
     
@@ -64,7 +66,7 @@
 	<div id="view6" class="tabcontent">
 	</div>		
 	
-	<!-- ##### end of div - tabcontents ##### -->
+  <!-- ################################################################################################# End of div - tabcontents  -->
 	
 </div>
 
@@ -76,9 +78,6 @@
     $("#edit-node").click(function(){
     
       if ($(this).val() == "Edit"){
-        //alert($(this).val() + " clicked...!")
-        //$("#view1").html($(this).val() + " clicked...!");
-        
         var node_content_org = $("#node_content_org").attr('name')
         
         if(node_content_org == "None") {
@@ -90,7 +89,8 @@
           $('#orgitdown').val(node_content_org)
         }
 
-        $('#drawertable').css('display', 'block')
+        $('#pn_drawertable').css('display', 'block')
+        $('#c_drawertable').css('display', 'block')
 
         $("#node-details-edit-div").css("display", "block");
         $("#text-editor").css("display", "block");
@@ -105,34 +105,43 @@
     $("#save-node").click(function(){
     
       if ($(this).val() == "Save"){
-        //alert($(this).val() + " clicked...!")
-        //$("#view1").html($(this).val() + " clicked...!");
         
-        opts = drawer2.options;
-        len = opts.length;
-            
-        if (len > 0){
-          var arr = [];
-          for (var i = 0; i < len; i++) {
-		        arr[i] = "'"+opts[i].value+"'";
-	        }
-	        var abc = arr.join(',');
-	        $("#collection-list").val(abc)
-	      }
+        // -- For prior-node
+        pn_opts = pn_drawer2.options;
+        pn_len = pn_opts.length;
+        
+        var pn_arr = [];
 
+        for (var i = 0; i < pn_len; i++) {
+		      pn_arr[i] = "'" + pn_opts[i].value + "'";
+	      }
+	        
+	      var pn_list = pn_arr.join(',');
+	      $("#prior-node-list").val(pn_list)
+
+        // -- For collection
+        c_opts = c_drawer2.options;
+        c_len = c_opts.length;
+        
+        var c_arr = [];
+
+        for (var i = 0; i < c_len; i++) {
+          c_arr[i] = "'" + c_opts[i].value + "'";
+        }
+	        
+        var c_list = c_arr.join(',');
+        $("#collection-list").val(c_list)
+        
         $("#text-editor").css("display", "none");
-        
         $("#save-node").css("display", "none");
+
         $("#edit-node").css("display", "block");
-        
-        
-        //$("#form_edit_page").submit();
       }
+
     });
     
   });
 </script>
 
 {% endblock %}
-
 
