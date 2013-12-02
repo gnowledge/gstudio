@@ -20,7 +20,7 @@
     <td>
 
     <h4><strong>Description:</strong></h4>
-    <!-- #################### -- Section (A) : Display org to HTML content -- ############################# -->
+    <!-- ##################################################################### Section (A) : Display HTML (converted from org) content -->
     <div id="html-content-div">
       {% include "ndf/display_content.html" %}
     </div>
@@ -28,7 +28,7 @@
     <br />
   
     {% if user.is_authenticated %}
-      <!-- ########### -- Section (B) : Display org-editor (with content if object exists) -- ############# -->
+      <!-- ######################################################################################### Section (B) : Display org-editor -->
       <div id="text-editor" style="display:none">
         <textarea id="orgitdown" name="content_org"> </textarea>
       </div>

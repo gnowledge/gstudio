@@ -4,40 +4,39 @@
     <td>
 
     <h4><strong>Collection:</strong></h4>
-
-    <div id="collection-display-div" style="">
+    <!-- ################################################################################### Section (A) : Display collection-elements -->
+    <div id="collection-display-div">
       {% include "ndf/display_collection.html" %}
     </div>
 
     <br />
   
     {% if user.is_authenticated %}
-      {% csrf_token %}
-    
-      <div id="drawertable" style="display:none">
+    <!-- ################################################################ Section (B) : Display drawer-widget to select/unselect nodes -->
+      <div id="c_drawertable" style="display:none">
 
       <table style="width:370px;" >
 	      <tr>
           <td style='width:160px;'>
 	          <b>Pages:</b><br/>
-	          <select id='drawer1' multiple="multiple">    <!---->
-	          {% for key,value in drawer1.items %}
+	          <select id='c_drawer1' multiple="multiple">    <!---->
+	          {% for key,value in c_drawer1.items %}
 	            <option id={{key}}>{{value}}</option>
 	          {% endfor %}
 	          </select>
 	        </td>
 	  
 	        <td style='width:50px;text-align:center;vertical-align:middle;'>
-	          <input id='btnUp' type='button' value ='  ^  '><br/>
-	          <input id='btnRight' type='button' value ='  >  '><br/>
-	          <input id='btnLeft' type='button' value ='  <  '><br/>
-		        <input id='btnDown' type='button' value ='  v  '><br/>
+	          <input id='c_btnUp' type='button' value ='  ^  '><br/>
+	          <input id='c_btnRight' type='button' value ='  >  '><br/>
+	          <input id='c_btnLeft' type='button' value ='  <  '><br/>
+		        <input id='c_btnDown' type='button' value ='  v  '><br/>
 	        </td>
 	  
 	        <td style='width:160px;'>
 	          <b>Added to Drawer: </b><br/>
-	          <select id='drawer2' multiple="multiple">
-	          {% for key,value in drawer2.items %}
+	          <select id='c_drawer2' multiple="multiple">
+	          {% for key,value in c_drawer2.items %}
 	            <option id={{key}}>{{value}}</option>
 	          {% endfor %}
 	          </select>
@@ -63,60 +62,60 @@
   $(function()
   {
 
-    $("#btnRight").click(function() { 
-      var selectedOpts = $("#drawer1 option:selected");
+    $("#c_btnRight").click(function() { 
+      var selectedOpts = $("#c_drawer1 option:selected");
 
       if (selectedOpts.length == 0){
         alert("Nothing to move.");
         e.preventDefault();
       }
 
-      $("#drawer2").append($(selectedOpts).clone());
+      $("#c_drawer2").append($(selectedOpts).clone());
       $(selectedOpts).remove();
       e.preventDefault();
     });   
    
-    $("#btnUp").click(function() {
+    $("#c_btnUp").click(function() {
        
-      $("#drawer1 :selected").each(function (i, selected) {
+      $("#c_drawer1 :selected").each(function (i, selected) {
         $(this).insertBefore($(this).prev());
-	      $("#drawer2").options.att("selected",false);
+	      $("#c_drawer2").options.att("selected",false);
       });
       
-      $("#drawer1 select").focus().blur();
+      $("#c_drawer1 select").focus().blur();
       
-      $("#drawer2 :selected").each(function (i, selected) {
+      $("#c_drawer2 :selected").each(function (i, selected) {
         $(this).insertBefore($(this).prev());
-	      $("#drawer1").options.att("selected",false);
+	      $("#c_drawer1").options.att("selected",false);
       });
       
-      $("#drawer2 select").focus().blur();
+      $("#c_drawer2 select").focus().blur();
     });
 
-    $("#btnDown").click(function() {
-      $("#drawer1 :selected").each(function (i, selected) {
+    $("#c_btnDown").click(function() {
+      $("#c_drawer1 :selected").each(function (i, selected) {
         $(this).insertAfter($(this).next());
-	      $("#drawer2").options.att("selected",false);	
+	      $("#c_drawer2").options.att("selected",false);	
       });
       
-      $("#drawer1 select").focus().blur();
+      $("#c_drawer1 select").focus().blur();
       
-      $("#drawer2 :selected").each(function (i, selected) {
+      $("#c_drawer2 :selected").each(function (i, selected) {
         $(this).insertAfter($(this).next());
-	      $("#drawer1").options.att("selected",false);
+	      $("#c_drawer1").options.att("selected",false);
       });
       
-      $("#drawer2 select").focus().blur();
+      $("#c_drawer2 select").focus().blur();
     });
     
-    $("#btnLeft").click(function() {
-      var selectedOpts = $("#drawer2 option:selected");
+    $("#c_btnLeft").click(function() {
+      var selectedOpts = $("#c_drawer2 option:selected");
       if (selectedOpts.length == 0) {
         alert("Nothing to move.");
         e.preventDefault();
       }
 
-      $("#drawer1").append($(selectedOpts).clone());
+      $("#c_drawer1").append($(selectedOpts).clone());
       $(selectedOpts).remove();
       e.preventDefault();
     });  

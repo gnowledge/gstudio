@@ -5,9 +5,13 @@
 {% block body_content %} 
 {% get_group_name request.path as group_name %}
 {% if user.is_authenticated %}
+
+<div style='padding-top:10px'>
 <a href="{% url 'create_page' group_name %}">
   <input type="submit" class="btn btn-large btn-primary" value="Create a {{title}}" />
 </a>
+</div>
+
 <hr />
 {% endif %}
 

@@ -114,12 +114,19 @@
 
 		<!-- Start of Hedaer Div -->
 		
+
 		<div class="header">
 			<div class="headertitle">
 			  NUSSD
 			
 			</div>
 			{% get_group_name request.path as group_name %}
+
+		
+      <!-- GApps Menubar -->
+
+      <!-- ============= -->
+
 
                          {% if user.is_authenticated %}
 				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
@@ -174,7 +181,7 @@
 
 		<div id="menu">
           <!-- GApps Toolbar -->
-		  {% get_gapps_toolbar request %}
+		  {% get_gapps_menubar request %}
           <!-- ============= -->
 </div>
 			                 
