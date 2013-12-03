@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.views.generic import RedirectView
+
 
 from registration.backends.default.views import RegistrationView
 
@@ -8,8 +10,7 @@ from gnowsys_ndf.ndf.forms import *
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^$', 'django.views.generic.simple.redirect_to',
-    {'url': '/home/'}),
+    (r'^$', RedirectView.as_view(url= '/home/')),
 #     (r'^(?P<gp_id>[\w-]+)/', include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_name>[\w-]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_name>[\w-]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
