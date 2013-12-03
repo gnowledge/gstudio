@@ -10,11 +10,12 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^$', 'django.views.generic.simple.redirect_to',
     {'url': '/home/'}),
-    (r'^(?P<group_name>[\w-]+)/',include('gnowsys_ndf.ndf.urls.group')),
 #     (r'^(?P<gp_id>[\w-]+)/', include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_name>[\w-]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_name>[\w-]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_name>[\w-]+)/page/', include('gnowsys_ndf.ndf.urls.page')),
+    (r'^(?P<group_name>[\w-]+)/group/', include('gnowsys_ndf.ndf.urls.group')),
+
 #   (r'^page/', include('gnowsys_ndf.ndf.urls.wiki')),
 
     (r'^(?P<group_name>[\w-]+)/',include('gnowsys_ndf.ndf.urls.group')),
