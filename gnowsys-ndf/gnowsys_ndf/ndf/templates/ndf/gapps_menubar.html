@@ -1,7 +1,16 @@
+
+
+{% block head %}
+{% load ndf_tags %}
+
 <!-- GApps Menubar -->
 
-{% for app_id, app_name in gapps.items %}
-  &nbsp;&#124;&nbsp;<a href="{% url app_name app_id %}">{{app_name|title}}</a>
-{% endfor %}
 
+{% endblock %}
+<ul>
+{% for app_id, app_name in gapps.items %}
+{% get_group_name request.path as group_name %}
+<li><a href="{% url app_name group_name app_id %}  ">{{app_name|title}}</span></a></li>
+{% endfor %}
+</ul>
 <!-- ============= -->

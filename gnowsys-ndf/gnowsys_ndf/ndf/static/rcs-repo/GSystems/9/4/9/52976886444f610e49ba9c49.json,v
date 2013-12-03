@@ -1,0 +1,61 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2013.11.28.16.00.06;	author anujag;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (File1) is of GSystem([u'File']).
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "52976886444f610e49ba9c49"
+    },
+    "altnames": null,
+    "attribute_set": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "created_at": 1385674206048,
+    "created_by": null,
+    "featured": null,
+    "gsystem_type": [
+        {
+            "$oid": "52976886444f610e49ba9c48"
+        }
+    ],
+    "last_update": 1385674206048,
+    "login_required": null,
+    "member_of": [
+        "File"
+    ],
+    "modified_by": [],
+    "name": "File1",
+    "plural": null,
+    "prior_node": [],
+    "relation_set": [],
+    "start_publication": null,
+    "status": [
+        null,
+        null,
+        null
+    ],
+    "tags": [],
+    "type_of": null
+}@

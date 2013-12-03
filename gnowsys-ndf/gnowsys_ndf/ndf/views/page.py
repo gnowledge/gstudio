@@ -36,11 +36,12 @@ gs_collection = db[GSystem.collection_name]
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
 #######################################################################################################################################
 
-def page(request, page_id):
+def page(request, group_name,app_id):
     """
     * Renders a list of all 'Page-type-GSystems' available within the database.
     """
-
+    page_id=app_id
+    print "aa",app_id,gst_page._id
     if gst_page._id == ObjectId(page_id):
         title = gst_page.name
         
@@ -53,11 +54,11 @@ def page(request, page_id):
     return HttpResponseRedirect(reverse('homepage'))
 
     
-def create_page(request):
+def create_page(request,group_name):
     """
     * Creates a new page.
     """
-
+    print "gropname",group_name
     if request.user.is_authenticated():
 
         page_node = gs_collection.GSystem()
@@ -126,20 +127,21 @@ def create_page(request):
 
             page_node.save()
 
-            return HttpResponseRedirect(reverse('page', kwargs={'page_id': gst_page._id}))
+            return HttpResponseRedirect(reverse('page', kwargs={'app_id': gst_page._id,'group_name':group_name}))
         else:
             # if request.method is not "POST"!!!
 
             drawer1 = get_drawers()
             return render_to_response("ndf/create_page.html", 
                                       { 'pn_drawer1': drawer1,
-                                        'c_drawer1': drawer1
+                                        'c_drawer1': drawer1,
+                                        'group_name':group_name
                                       }, 
                                       context_instance=RequestContext(request)
             )
 
 
-def edit_page(request, node_id):
+def edit_page(request, group_name,node_id):
     """
     * Displays/Modifies details about the given page.
     """

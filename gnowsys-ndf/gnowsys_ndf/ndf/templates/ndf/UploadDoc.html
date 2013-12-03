@@ -4,8 +4,8 @@
 {#{% if user.is_authenticated %}#}
 <h4>Submit Documents</h4>
 <div style='display:table;  border:1px;   border-spacing:10px; '>
-	<form id ="docPost" enctype="multipart/form-data" method="post" action="/ndf/submitDoc/">
-	{% csrf_token %}
+
+	<form id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' 'group' %}">{% csrf_token %}
 	<div style='display:table-row;' >
       		<div style='display:table-cell;'> 
         		<font size="3" >Title</font> 

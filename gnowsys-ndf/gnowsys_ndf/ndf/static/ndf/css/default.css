@@ -2965,62 +2965,24 @@ input.todo-search-field.placeholder {
     background-image: url(../images/todo/done-2x.png);
   }
 }
-footer {
-  background-color: #edeff1;
+.headertitle{
+font-family:"Georgia";
+font-size:20px;
+padding-left:3px;
+padding-top:3px;
+color:#BAC1C8;
+}
+.footer {
+  background-color: #0B6580;
   color: #bac1c8;
-  font-size: 15px;
-  padding: 0;
+  font-size: 10px;
+  font-color:#446CB3;
+  padding: 3;
+  padding-top:10px;
+  height:43px;
+  bottom:0px;
 }
-footer a {
-  color: #9aa4af;
-  font-weight: 700;
-}
-footer p {
-  font-size: 15px;
-  line-height: 20px;
-}
-.footer-title {
-  margin: 0 0 22px;
-  padding-top: 21px;
-}
-.footer-brand {
-  display: block;
-  margin-bottom: 26px;
-  width: 220px;
-}
-.footer-brand img {
-  width: 216px;
-}
-.footer-banner {
-  background-color: #1abc9c;
-  color: #d1f2eb;
-  margin-left: 42px;
-  min-height: 286px;
-  padding: 0 30px 30px;
-}
-.footer-banner .footer-title {
-  color: #ffffff;
-}
-.footer-banner a {
-  color: #b7f5e9;
-  text-decoration: underline;
-}
-.footer-banner a:hover {
-  text-decoration: none;
-}
-.footer-banner ul {
-  list-style-type: none;
-  margin: 0 0 26px;
-}
-.footer-banner ul li {
-  border-top: 1px solid #1bc5a3;
-  line-height: 19px;
-  padding: 6px 0;
-}
-.footer-banner ul li:first-child {
-  border-top: none;
-  padding-top: 1px;
-}
+
 .video-js {
   background-color: transparent;
   margin-top: -95px;

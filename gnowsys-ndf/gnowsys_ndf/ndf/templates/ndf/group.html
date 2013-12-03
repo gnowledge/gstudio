@@ -6,9 +6,9 @@
 
 {% if user.is_authenticated %}
 <div style='padding-top:10px'>
-  <a href="{% url 'create_group' %}">
-    <input type="submit" class="btn btn-large btn-primary" value="Create a group" />
-  </a>
+<a href="{% url 'create_group' 'group' %}">
+  <input type="submit" class="btn btn-large btn-primary" value="Create a group" />
+</a>
 </div>
 
 <hr />

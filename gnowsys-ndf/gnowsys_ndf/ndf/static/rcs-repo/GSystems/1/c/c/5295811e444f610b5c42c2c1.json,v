@@ -1,0 +1,61 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2013.11.27.05.20.30;	author anujag;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (Image2) is of GSystem([u'Image']).
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "5295811e444f610b5c42c2c1"
+    },
+    "altnames": null,
+    "attribute_set": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "created_at": 1385549430387,
+    "created_by": null,
+    "featured": null,
+    "gsystem_type": [
+        {
+            "$oid": "5295811e444f610b5c42c2bf"
+        }
+    ],
+    "last_update": 1385549430387,
+    "login_required": null,
+    "member_of": [
+        "Image"
+    ],
+    "modified_by": [],
+    "name": "Image2",
+    "plural": null,
+    "prior_node": [],
+    "relation_set": [],
+    "start_publication": null,
+    "status": [
+        null,
+        null,
+        null
+    ],
+    "tags": [],
+    "type_of": null
+}@

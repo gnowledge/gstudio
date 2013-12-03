@@ -40,7 +40,7 @@ gs_collection = db[GSystem.collection_name]
 ##############################################################
 
 
-def group(request, group_id):
+def group(request, group_name,app_id):
     """
     * Renders a list of all 'Group-type-GSystems' available within the database.
 
@@ -52,12 +52,14 @@ def group(request, group_id):
     
 
 
-def create_group(request):
+def create_group(request,group_name):
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
         colg.name = request.POST.get('groupname', "")
-        colg.member_of.append(u"Ggroup")
+        colg.member_of.append(u"Group")
+        usrid = int(request.user.id)
+        colg.created_by=usrid
         colg.gtype = request.POST.get('group_type', "")
         colg.edit_policy = request.POST.get('edit_policy', "")
         colg.sub_policy = request.POST.get('subscription', "")
@@ -67,3 +69,5 @@ def create_group(request):
         colg.save()
     return render_to_response("ndf/create_group.html", RequestContext(request))
     
+def group_dashboard(request,group_name):
+    return render_to_response("ndf/groupdashboard.html",RequestContext(request))
