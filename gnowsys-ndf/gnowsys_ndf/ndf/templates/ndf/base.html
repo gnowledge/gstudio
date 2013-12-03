@@ -138,6 +138,7 @@
 				    </div>
 				{% get_existing_groups as groups %}
 				<div id="groupoptions" style="display:none">
+				  <br/>
 				  {% for gp_id in groups %}
 				  <a href="{% url 'groupchange' gp_id %}">
 				    <div id="{{gp_id}}">{{gp_id}}</div> </a>
@@ -170,6 +171,7 @@
                                 
 {% get_existing_groups as groups %}
 <div id="groupoptions" style="display:none">
+<br/>
 {% for gp_id in groups %}
 <a href="{% url 'groupchange' gp_id %}">
 <div id="{{gp_id}}">{{gp_id}}</div> </a>

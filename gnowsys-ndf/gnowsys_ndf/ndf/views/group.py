@@ -57,7 +57,9 @@ def create_group(request,group_name):
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
         colg.name = request.POST.get('groupname', "")
-        colg.member_of.append(u"Ggroup")
+        colg.member_of.append(u"Group")
+        usrid = int(request.user.id)
+        colg.created_by=usrid
         colg.gtype = request.POST.get('group_type', "")
         colg.edit_policy = request.POST.get('edit_policy', "")
         colg.sub_policy = request.POST.get('subscription', "")

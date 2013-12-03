@@ -5,6 +5,8 @@ from django.template import Library
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import check_existing_group
+
 
 ##################################################################################################
 
@@ -32,21 +34,6 @@ def get_gapps_menubar(request):
   return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps,'request':request}
 
 
-@register.assignment_tag
-def get_existing_groups():
-  """Get Existing Groups
-  """
-
-  group = []
-  col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find()
-  colg.sort('name')
-  gr=list(colg)
-  for items in gr:
-    group.append(items.name)
-  group.append("abcd")
-  group.append("cdef")
-  return group
 
 #######################################################################################################################################
 
@@ -106,12 +93,8 @@ def edit_content(context):
 
 @register.assignment_tag
 def check_group(groupname):
-  col_Group = db[Group.collection_name]
-  colg = col_Group.Group.one({"name":groupname})
-  if colg:
-    return True
-  else:
-    return False
+  fl=check_existing_group(groupname)
+  return fl
 
 @register.assignment_tag
 def get_group_name(groupurl):
@@ -121,7 +104,7 @@ def get_group_name(groupurl):
   if len(sp)<=1:
     return "home"
   if sp[1]:
-    chsp=check_group(sp[1])
+    chsp=check_existing_group(sp[1])
     if chsp:
       return sp[1]
     else:
