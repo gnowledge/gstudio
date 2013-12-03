@@ -1,0 +1,65 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2013.11.29.09.48.25;	author anujag;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (nashjjj) is of GSystem([u'Page']).
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "529862e9444f612220c4ef80"
+    },
+    "altnames": null,
+    "attribute_set": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": "<div id=\"preamble\">\n</div>\n<div id=\"content\">\n<h1 class=\"title\">basjkfds</h1>\n</div>\n<div id=\"postamble\">\n<a href=\"http://validator.w3.org/check?uri=referer\">Validate XHTML 1.0</a>\n</div>\n",
+    "content_org": "basjkfds",
+    "created_at": 1385738305316,
+    "created_by": 1,
+    "featured": null,
+    "gsystem_type": [
+        {
+            "$oid": "52976885444f610e49ba9c45"
+        }
+    ],
+    "last_update": 1385738305316,
+    "login_required": null,
+    "member_of": [
+        "Page"
+    ],
+    "modified_by": [
+        1
+    ],
+    "name": "nashjjj",
+    "plural": null,
+    "prior_node": [],
+    "relation_set": [],
+    "start_publication": null,
+    "status": [
+        null,
+        null,
+        null
+    ],
+    "tags": [
+        "ree"
+    ],
+    "type_of": null
+}@

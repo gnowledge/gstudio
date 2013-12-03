@@ -1,0 +1,84 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2013.12.02.06.49.03;	author anujag;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2013.12.02.06.49.03;	author anujag;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (jkl) is of GSystem([]).
+@
+
+
+1.2
+log
+@Document (jkl) updated successfully.
+@
+text
+@{
+    "_id": {
+        "$oid": "529c2d5f444f61212d3b3dce"
+    },
+    "altnames": null,
+    "attribute_set": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "created_at": 1385986743714,
+    "created_by": 1,
+    "featured": null,
+    "fs_file_ids": [
+        {
+            "$oid": "529c2d5f444f61212d3b3dcf"
+        }
+    ],
+    "gsystem_type": [
+        {
+            "$oid": "52987d2f444f612bf0076b04"
+        }
+    ],
+    "last_update": 1385986743804,
+    "login_required": null,
+    "member_of": [],
+    "mime_type": "Macromedia Flash data (compressed), version 9",
+    "modified_by": [],
+    "name": "jkl",
+    "plural": null,
+    "prior_node": [],
+    "relation_set": [],
+    "start_publication": null,
+    "status": [
+        null,
+        null,
+        null
+    ],
+    "tags": [],
+    "type_of": null
+}@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d15 5
+a19 1
+    "fs_file_ids": [],
+d25 1
+a25 1
+    "last_update": 1385986743714,
+@

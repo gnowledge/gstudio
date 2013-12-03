@@ -6,9 +6,9 @@
 
 {% if user.is_authenticated %}
 <div style='padding-top:10px'>
-  <a href="{% url 'uploadDoc' %}">
-    <input type="submit" class="btn btn-large btn-primary" value="Upload a {{title}}" />
-  </a>
+<a href="{% url 'uploadDoc' 'file' %}">
+  <input type="submit" class="btn btn-large btn-primary" value="Upload a {{title}}" />
+</a>
 </div>
 
 <hr />

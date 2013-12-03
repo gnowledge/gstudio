@@ -12,8 +12,8 @@
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block body_content %}
-
-<form id="form_edit_page" method="POST" action="{% url 'edit_page' node %}">
+{% get_group_name request.path as group_name %}
+<form id="form_edit_page" method="POST" action="{% url 'edit_page' group_name node.name node.id %}">
 {% csrf_token %}
 
 <div style="display:inline-block;">
