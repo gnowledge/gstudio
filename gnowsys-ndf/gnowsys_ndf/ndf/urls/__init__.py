@@ -11,22 +11,14 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^$', RedirectView.as_view(url= '/home/')),
-#     (r'^(?P<gp_id>[\w-]+)/', include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_name>[\w-]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_name>[\w-]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_name>[\w-]+)/page/', include('gnowsys_ndf.ndf.urls.page')),
     (r'^(?P<group_name>[\w-]+)/group/', include('gnowsys_ndf.ndf.urls.group')),
-
-#   (r'^page/', include('gnowsys_ndf.ndf.urls.wiki')),
-
     (r'^(?P<group_name>[\w-]+)/',include('gnowsys_ndf.ndf.urls.group')),
     (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
-#
-#    (r'^ndf/', include('gnowsys_ndf.ndf.urls')),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
-
     (r'^admin/', include(admin.site.urls)),
-
     url(r'^accounts/password/change/done/', auth_views.password_change_done),
     url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
     url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form':UserResetform}),

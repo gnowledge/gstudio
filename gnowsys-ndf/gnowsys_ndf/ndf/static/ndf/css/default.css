@@ -2972,6 +2972,18 @@ padding-left:3px;
 padding-top:3px;
 color:#BAC1C8;
 }
+
+.sidebar {
+float:right;
+margin-right:2px;
+margin-top:62px;
+top:10px;
+background-color:#BAC1C8;
+vertical-align:top;
+position:fixed;
+right:133px;
+
+}
 .footer {
   background-color: #0B6580;
   color: #bac1c8;
