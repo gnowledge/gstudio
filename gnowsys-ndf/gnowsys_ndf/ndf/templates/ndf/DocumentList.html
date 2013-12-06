@@ -19,7 +19,7 @@
 	{% for doc in filecollection %}
 		<tr>
 			<td>{{doc.name}}</td>
-			<td><a href="{% url 'read_file' doc %}">view</a></td>
+			<td><a href="{% url 'read_file' 'group' doc %}">view</a></td>
 			
 		<tr/> 
 	{% endfor %} 	

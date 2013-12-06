@@ -1,0 +1,57 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2013.11.29.09.58.31;	author anujag;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (re) is of GSystem([]).
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "52986547444f6123879e2a01"
+    },
+    "altnames": null,
+    "attribute_set": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "created_at": 1385738911694,
+    "created_by": 1,
+    "featured": null,
+    "fs_file_ids": [],
+    "gsystem_type": [],
+    "last_update": 1385738911695,
+    "login_required": null,
+    "member_of": [],
+    "mime_type": "PNG image data, 1280 x 800, 8-bit/color RGB, non-interlaced",
+    "modified_by": [],
+    "name": "re",
+    "plural": null,
+    "prior_node": [],
+    "relation_set": [],
+    "start_publication": null,
+    "status": [
+        null,
+        null,
+        null
+    ],
+    "tags": [],
+    "type_of": null
+}@

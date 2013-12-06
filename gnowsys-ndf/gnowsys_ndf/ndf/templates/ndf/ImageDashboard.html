@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load ndf_tags %}
 {% block title %} Image Gallery {% endblock %}
 {% block body_content %} 
 
@@ -12,15 +13,17 @@
   </ul>
 </div>
 {% endif %}
+{% get_group_name request.path as group_name %}
+
 
 <center>
 <div>
 	<input type="text" name="imgSearch" id ="imgSearch"  placeholder="Enter title to search"> 
 	<input type="submit" class="btn btn-large btn-primary" value="search" />	
-	<form id ="imgPost" enctype="multipart/form-data" method="post" action="/ndf/uploadDoc/">{% csrf_token %}
+	<form id ="imgPost" enctype="multipart/form-data" method="post" action="{% url 'uploadDoc' group_name %}">{% csrf_token %}
 	  <input type="hidden" name="stId" value={{stId}}>
 	  <input type="hidden" name="pageUrl" value={{pageUrl}}>
-	  <a href="{% url 'uploadDoc' %}">
+	  <a href="{% url 'uploadDoc' group_name %}">
   	    <input type="submit" class="btn btn-large btn-primary" value="upload" />
 	</a>
 </form>
@@ -30,8 +33,8 @@
 	<div style='display:table-row;' >
 		{% for image in imageCollection %}
 			<div style='display:table-cell;'> 
-				<a href="{% url 'getFullImage' image %}">
-				<img src="{% url 'getImageThumbnail' image %}"></img><br/>
+				<a href="{% url 'getFullImage' group_name image %}">
+				<img src="{% url 'getImageThumbnail' group_name image %}"></img><br/>
 				<span align="center">{{image.name}}</span></a>
 			</div>
 	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}

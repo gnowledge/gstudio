@@ -1,22 +1,5 @@
-<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block head %}
-
-  <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        displayMath: [['\\[','\\]'], ['$$','$$']]}
-      });
-  </script>
-
-  <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
-  <script type="text/javascript"
-    src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-  </script>
-
-<!-- ================================================================================================ -->
 
   <!-- orgitdown! -->
   <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
@@ -29,125 +12,39 @@
 
 {% endblock %}
 
-<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 
-<div style="display:inline-block; float:left;">
-
-  <!-- ################### -- Section (C) : Display org to HTML content -- ############################# -->
-
-  <div id="html-content-div" style="">
-    {% include "ndf/display_content.html" %}
-  </div>
-
-  <!-- ================================================================================================ -->
-
-  <br />
+  <table cellpadding="3">
   
-  {% if user.is_authenticated %}
-  <form method="post" action="">
-    {% csrf_token %}
-  
-    <!-- ########## -- Section (A) : Display org - editor (with content if object exists) -- ############ -->
+  <tr>
+    <td>
 
-    <div id="text-editor" style="display:none">
-      <textarea id="orgitdown" name="content_org"> </textarea>
+    <h4><strong>Description:</strong></h4>
+    <!-- ##################################################################### Section (A) : Display HTML (converted from org) content -->
+    <div id="html-content-div">
+      {% include "ndf/display_content.html" %}
     </div>
-
-    <!-- ================================================================================================ -->
 
     <br />
-
-    <!-- #################### -- Section (B) : Button that toggles the org-editor -- #################### -->
   
-    <div id="editor-toggle-button">
-      <p>
-      <input type="hidden" id="node_id" name="nodeid" value={{node}} />
-      <input type="hidden" id="usrname" name="usrname" value={{user.username}} />
-      <input type="button" id="toggle-text-editor" value="Edit Content" class="btn btn-large btn-primary" />
-      </p>
-    </div>
-  
-    <!-- ================================================================================================ -->
-  </form>
-  {% endif %}
+    {% if user.is_authenticated %}
+      <!-- ######################################################################################### Section (B) : Display org-editor -->
+      <div id="text-editor" style="display:none">
+        <textarea id="orgitdown" name="content_org"> </textarea>
+      </div>
+    {% endif %}
 
-</div>
+    </td>
+  </tr>
+      
+  </table>
 
-<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 
 <script>
 
   $(document).ready(function()
   { 
-    
-    $("#toggle-text-editor").click(function(){
-      
-      /**
-        * Toggles org-editor on click of "toggle-editor button"
-        */  
-      
-      if($(this).val() == "Edit Content"){
-        var node_content_org = $("#node_content_org").attr('name')
-        
-        if(node_content_org == "None"){
-          $("#orgitdown").val("")		
-          $("#orgitdown").attr("placeholder", "Please enter some content as description...")
-        }
-        
-        else {
-          $('#orgitdown').val(node_content_org)
-        }
-        
-        $("#text-editor").css("display", "block");
-
-        $(this).val('Save Content');
-      
-      }
-      
-      else{
-        // $(this).val() == "Save Content"
-        
-        var org_content = $("#orgitdown").val();
-        $('#orgitdown').attr('value', "")
-        
-        var node_id = $("#node_id").val();
-        var usrname = $("#usrname").val();
-
-        $.ajax({
-          url : "{% url 'edit_content' %}",
-          type : "POST",
-          dataType: "html",
-          
-          data : {
-            client_org_content : org_content,
-            client_object_id : node_id,
-            client_username : usrname,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
-          
-          success : function(data) {
-            
-            $('#html-content-div').html(data);
-            //location.reload()
-            
-            /*
-            $(data).filter('.ajax').each(function(){
-              $.globalEval($(this).text())
-            }); 
-            */
-          },
-          
-          error : function(xhr,errmsg,err) {
-            alert(xhr.status + ": " + xhr.responseText);
-          }
-        });
-        
-        $("#text-editor").css("display", "none");
-        
-        $(this).val('Edit Content');
-      }
-    });
-    
     // Must be there to display org-editor shortcuts
     $('#orgitdown').orgitdown(mySettings);
     
@@ -155,4 +52,3 @@
   
 </script>
 
-<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
