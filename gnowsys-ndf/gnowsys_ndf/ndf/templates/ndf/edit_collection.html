@@ -1,162 +1,126 @@
-<div>
-  <!-- Display Collection List-->
-
-  <div id="collection-display-div" style="">
-        
-    {% include "ndf/display_collection.html" %}
-
-  </div>
+  <table cellpadding="3">
   
+  <tr>
+    <td>
 
-  <!--    Collection List Ends         -->
+    <h4><strong>Collection:</strong></h4>
+    <!-- ################################################################################### Section (A) : Display collection-elements -->
+    <div id="collection-display-div">
+      {% include "ndf/display_collection.html" %}
+    </div>
 
-  <br />
+    <br />
   
-  {% if user.is_authenticated %}
-  <form method="post" id="form_id" action="{% url 'edit_collection' %}">
-    {% csrf_token %}
-    
-    <div id="drawertable" style="display:none">
+    {% if user.is_authenticated %}
+    <!-- ################################################################ Section (B) : Display drawer-widget to select/unselect nodes -->
+      <div id="c_drawertable" style="display:none">
+
       <table style="width:370px;" >
-	<tr>
+	      <tr>
           <td style='width:160px;'>
-	    <b>Pages:</b><br/>
-	    <select multiple="multiple" id='drawer1'>    <!---->
-	      {% for key,value in drawer1.items %}
-	            
-	      <option id={{key}}>{{value}}</option>
-	      {% endfor %}
-	    </select>
-	  </td>
-	  
-	  <td style='width:50px;text-align:center;vertical-align:middle;'>
-	    <input type='button' id='btnUp' value ='  ^  '><br/>
-	    <input type='button' id='btnRight' value ='  >  '><br/>
-	    <input type='button' id='btnLeft' value ='  <  '><br/>
-		<input type='button' id='btnDown' value ='  v  '><br/>
-	  </td>
-	  
-	  <td style='width:160px;'>
-	    <b>Added to Drawer: </b><br/>
-	    
-	    <select multiple="multiple" id='drawer2'>
-	        {% for key,value in drawer2.items %}
-	            
+	          <b>Pages:</b><br/>
+	          <select id='c_drawer1' multiple="multiple">    <!---->
+	          {% for key,value in c_drawer1.items %}
 	            <option id={{key}}>{{value}}</option>
-	      {% endfor %}
-	    </select>
-	  </td><br>
-	</tr>
-	
+	          {% endfor %}
+	          </select>
+	        </td>
+	  
+	        <td style='width:50px;text-align:center;vertical-align:middle;'>
+	          <input id='c_btnUp' type='button' value ='  ^  '><br/>
+	          <input id='c_btnRight' type='button' value ='  >  '><br/>
+	          <input id='c_btnLeft' type='button' value ='  <  '><br/>
+		        <input id='c_btnDown' type='button' value ='  v  '><br/>
+	        </td>
+	  
+	        <td style='width:160px;'>
+	          <b>Added to Drawer: </b><br/>
+	          <select id='c_drawer2' multiple="multiple">
+	          {% for key,value in c_drawer2.items %}
+	            <option id={{key}}>{{value}}</option>
+	          {% endfor %}
+	          </select>
+	        </td><br>
+	      </tr>
       </table>
-    </div>
-    
-    <!-- Toggle buttons for edit collection list -->
-  
-    <div id="collection-toggle-button">    
-      <input type="hidden" id="collection-list" name="collection-list" value="" />
-      <input type="hidden" id="node_id" name="node_id" value={{node}} />
-      <input type="button" id="toggle-collection" value="Edit Collection" class="btn btn-large btn-primary" />      
-      
-    </div>
-    
-  </form>
-  {% endif %}
-  
-</div>
 
-<!-- ##################################################################################################### -->
+      </div>
+    
+      <input id="collection-list" type="hidden" name="collection-list" value="" />
+    
+    {% endif %}
+
+    </td>
+  </tr>
+      
+  </table>
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
 
 <script type="text/javascript">
 
- $(function()
- {
-   $("#btnRight").click(function() { 
-       var selectedOpts = $("#drawer1 option:selected");
-       if (selectedOpts.length == 0){
-           alert("Nothing to move.");
-           e.preventDefault();
-       }
-       $("#drawer2").append($(selectedOpts).clone());
-       $(selectedOpts).remove();
-       e.preventDefault();
+  $(function()
+  {
 
-   });   
+    $("#c_btnRight").click(function() { 
+      var selectedOpts = $("#c_drawer1 option:selected");
+
+      if (selectedOpts.length == 0){
+        alert("Nothing to move.");
+        e.preventDefault();
+      }
+
+      $("#c_drawer2").append($(selectedOpts).clone());
+      $(selectedOpts).remove();
+      e.preventDefault();
+    });   
    
-   $("#btnUp").click(function() {
+    $("#c_btnUp").click(function() {
        
-      $("#drawer1 :selected").each(function (i, selected) {
-            $(this).insertBefore($(this).prev());
-	    $("#drawer2").options.att("selected",false);
+      $("#c_drawer1 :selected").each(function (i, selected) {
+        $(this).insertBefore($(this).prev());
+	      $("#c_drawer2").options.att("selected",false);
       });
-      $("#drawer1 select").focus().blur();
-      $("#drawer2 :selected").each(function (i, selected) {
-            $(this).insertBefore($(this).prev());
-	    $("#drawer1").options.att("selected",false);
+      
+      $("#c_drawer1 select").focus().blur();
+      
+      $("#c_drawer2 :selected").each(function (i, selected) {
+        $(this).insertBefore($(this).prev());
+	      $("#c_drawer1").options.att("selected",false);
       });
-      $("#drawer2 select").focus().blur();
-   });
+      
+      $("#c_drawer2 select").focus().blur();
+    });
 
-    $("#btnDown").click(function() {
-      $("#drawer1 :selected").each(function (i, selected) {
-            $(this).insertAfter($(this).next());
-	    $("#drawer2").options.att("selected",false);	
+    $("#c_btnDown").click(function() {
+      $("#c_drawer1 :selected").each(function (i, selected) {
+        $(this).insertAfter($(this).next());
+	      $("#c_drawer2").options.att("selected",false);	
       });
-      $("#drawer1 select").focus().blur();
-      $("#drawer2 :selected").each(function (i, selected) {
-            $(this).insertAfter($(this).next());
-	    $("#drawer1").options.att("selected",false);
+      
+      $("#c_drawer1 select").focus().blur();
+      
+      $("#c_drawer2 :selected").each(function (i, selected) {
+        $(this).insertAfter($(this).next());
+	      $("#c_drawer1").options.att("selected",false);
       });
-      $("#drawer2 select").focus().blur();
- 
+      
+      $("#c_drawer2 select").focus().blur();
     });
     
-    $("#btnLeft").click(function() {
-      var selectedOpts = $("#drawer2 option:selected");
-        if (selectedOpts.length == 0) {
-            alert("Nothing to move.");
-            e.preventDefault();
-        }
-
-        $("#drawer1").append($(selectedOpts).clone());
-        $(selectedOpts).remove();
+    $("#c_btnLeft").click(function() {
+      var selectedOpts = $("#c_drawer2 option:selected");
+      if (selectedOpts.length == 0) {
+        alert("Nothing to move.");
         e.preventDefault();
+      }
+
+      $("#c_drawer1").append($(selectedOpts).clone());
+      $(selectedOpts).remove();
+      e.preventDefault();
     });  
     
-    
- });
-
-
-  $(document).ready(function()
-  { 
-    
-    $("#toggle-collection").click(function(){
-      
-        if($(this).val() == "Edit Collection"){
-            $(this).val('Save Collection');
-            $('#drawertable').css('display', 'block')
-        }
-      
-        else{
-            // $(this).val() == "Save Collection"
-
-            opts = drawer2.options;
-            len = opts.length;
-            
-            if (len > 0){
-                var arr = [];
-                for (var i = 0; i < len; i++) {
-		            arr[i] = "'"+opts[i].value+"'";
-	            }
-	            var abc=arr.join(',');
-	            $("#collection-list").val(abc)
-	        }
-	        
-            $("#form_id").submit();
-        }
-    });
-    
   });
-  
+
 </script>
-<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+

@@ -130,7 +130,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'gnowsys_ndf.urls'
+ROOT_URLCONF = 'gnowsys_ndf.ndf.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'gnowsys_ndf.wsgi.application'
@@ -200,7 +200,7 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-GAPPS = [u"Page", u"File", u"Group",u"Image"]
+GAPPS = [u"Page", u"File", u"Group", u"Image"]
 
 ###########################################################################
 

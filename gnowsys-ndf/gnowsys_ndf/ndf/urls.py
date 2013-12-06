@@ -9,18 +9,19 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.home',
 )
 
 urlpatterns += patterns('gnowsys_ndf.ndf.views.page',
-                        url(r'^gapp/page/(?P<page_id>[\w-]+)$', 'page', name='page'),
+                        url(r'^apps/page/(?P<page_id>[\w-]+)$', 'page', name='page'),
                         url(r'^create_page/', 'create_page', name='create_page'),
-                        url(r'^resources/page/(?P<node_id>[\w-]+)$', 'display_page', name='display_page'),
+                        url(r'^page/(?P<node_id>[\w-]+)$', 'edit_page', name='edit_page'),
+                        #url(r'^page/(?P<node_id>[\w-]+)$', 'display_page', name='display_page'),
 )
 
 urlpatterns += patterns('gnowsys_ndf.ndf.views.group',
-                        url(r'^gapp/group/(?P<group_id>[\w-]+)$', 'group', name='group'),
+                        url(r'^apps/group/(?P<group_id>[\w-]+)$', 'group', name='group'),
                         url(r'^create_group/', 'create_group', name='create_group'),
 )
 
 urlpatterns += patterns('gnowsys_ndf.ndf.views.file',
-                        url(r'^gapp/file/(?P<file_id>[\w-]+)$', 'file', name='file'),
+                        url(r'^apps/file/(?P<file_id>[\w-]+)$', 'file', name='file'),
                         #url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')), #Direct ot html template
                         # url(r'^uploadDoc/(?P<pageurl>\w+)/$', 'uploadDoc', name='uploadDoc'), #Direct ot html template
                         url(r'^uploadDoc/$', 'uploadDoc', name='uploadDoc'), #Direct ot html template
@@ -29,6 +30,7 @@ urlpatterns += patterns('gnowsys_ndf.ndf.views.file',
                         url(r'^documentList/', 'GetDoc', name='documentList'),
                         url(r'^readDoc/(?P<_id>[\w-]+)$', 'readDoc', name='read_file'),
 )
+
 urlpatterns += patterns('gnowsys_ndf.ndf.views.imageDashboard',
                         url(r'^gapp/image/(?P<image_id>[\w-]+)$', 'imageDashboard', name='image'),
                         #url(r'^images/', 'imageDashboard', name='imageDashboard'),
@@ -37,6 +39,5 @@ urlpatterns += patterns('gnowsys_ndf.ndf.views.imageDashboard',
 )
                        
 urlpatterns += patterns('gnowsys_ndf.ndf.views.ajax-views',
-                        url(r'^ajax/edit_collection/', 'edit_collection', name='edit_collection'),
-                        url(r'^ajax/edit_content/', 'edit_content', name='edit_content'),
+                        #url(r'^ajax/.../', '...', name='...'),
 )

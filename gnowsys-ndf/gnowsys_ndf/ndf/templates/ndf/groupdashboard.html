@@ -1,0 +1,15 @@
+{% extends "ndf/base.html" %}
+
+{% block title %} Group Dashboard {% endblock %}
+
+{% block body_content %}
+<div>
+<font size="4px" color="#BAC1C8"> {{request.path|cut:"/"|cut:"dashboard"}} </font>
+</div>
+
+<font size="2px" color="black"> Members in this group : 0 </font>
+
+{% if user.is_authenticated %}
+{% endif %}
+
+{% endblock %}

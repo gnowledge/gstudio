@@ -4,18 +4,19 @@
 
 {% block title %} Wikipage {% endblock %}
 
+
 {% block body_content %} 
-
+{% get_existing_groups as groups%}
+{% get_group_name request.path as group %}
 <div style="display:inline-block; float:left; padding-top:40px; ">
-<form method="post" action="{% url 'create_group' %}">
+<form method="post" action="{% url 'create_group' 'group' %}">
   {% csrf_token %}
-  {% get_existing_groups as groups%}
-
+ 
   {% if groups %}
     Existing Groups:
 
     {% for items in groups %}
-      {{items}} ,
+      {{items}} {% if not forloop.last %} ,{% endif %}
     {% endfor %}
   {% endif %}
 
@@ -25,16 +26,16 @@
 	        	<font size="1" >Group Name</font> 
 	      	 </div>
       		<div style='display:table-cell;'> 
-        		<input type="text"  name="groupname" placeholder="Enter Group Name">
+        		<input type="text"  id="group_name" name="groupname" placeholder="Enter Group Name">
       		</div>
       		<div style='display:table-cell;'> 
         		<font size="1" >Group Type</font>
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="group_type" class="gtype">
-          			<option id="ANONYMOUS">ANONYMOUS</option>
           			<option id="PUBLIC">PUBLIC</option>
           			<option id="PRIVATE">PRIVATE</option>
+          			<option id="ANONYMOUS">ANONYMOUS</option>
         		</select> 
       		</div>
     	</div>
@@ -45,9 +46,9 @@
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="edit_policy" class="editp">
-          			<option id="NON_EDITABLE">NON_EDITABLE</option>
-          			<option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
           			<option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
+          			<option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
+          			<option id="NON_EDITABLE">NON_EDITABLE</option>
         		</select> 
       		</div>
  	       <div style='display:table-cell;'> 
@@ -89,8 +90,8 @@
       		</div>
       		<div style='display:table-cell;'> 
        			<select name="encryption" class="encr">
-			        <option id="ENCRYPTED">ENCRYPTED</option>
-       			   	<option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
+			        <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
+       			   	<option id="ENCRYPTED">ENCRYPTED</option>
        		 	</select>
       		</div>  
 	</div>
@@ -105,3 +106,30 @@
 
 {% endblock %}
 
+{% block head %}
+<script type="text/javascript">
+$(document).ready(function()
+{
+
+$("#group_name").focusout(function(){
+
+var gname=$("#group_name").val();
+$.ajax({
+url: '/home/group/check_group/',
+data: {gname:gname},
+success: function(data){
+if (data=="success"){
+     alert("group already exists");
+     $("#group_name").val("");
+     $("#res_relation").focus();
+}
+}
+});  //end_ajax
+ 
+
+}); //end_focusout
+
+}); //end_document_ready
+</script>
+
+{% endblock %}

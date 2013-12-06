@@ -30,60 +30,51 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import File
 
-###########################################################################
+#######################################################################################################################################
 
 db = get_database()
 gst_collection = db[GSystemType.collection_name]
-gst_doc = gst_collection.GSystemType.one({'name': GAPPS[1]})
+gst_file = gst_collection.GSystemType.one({'name': GAPPS[1]})
 
-# def file(request, file_id):
-#     """
-#     * Renders a list of all 'Group-type-GSystems' available within the database.
 
-#     """
-#     if gst_doc._id == ObjectId(file_id):
-#         title = gst_doc.name
+#######################################################################################################################################
+#         V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
+#######################################################################################################################################
+
+
+def file(request, group_name,file_id):
+    """
+    * Renders a list of all 'Group-type-GSystems' available within the database.
+
+    """
+    if gst_file._id == ObjectId(file_id):
+        title = gst_file.name
         
-#         gs_collection = db[GSystem.collection_name]
-#         file_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]}})
-#         file_nodes.sort('creationtime', -1)
-#         file_nodes_count = file_nodes.count()
+        gs_collection = db[GSystem.collection_name]
+        file_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]}})
+        file_nodes.sort('last_update', -1)
+        file_nodes_count = file_nodes.count()
 
-#         return render_to_response("ndf/file.html", {'title': title, 'file_nodes': file_nodes, 'file_nodes_count': file_nodes_count}, context_instance=RequestContext(request))
-#     else:
-#         return HttpResponseRedirect(reverse('homepage'))
+        return render_to_response("ndf/file.html", {'title': title, 'file_nodes': file_nodes, 'file_nodes_count': file_nodes_count}, context_instance=RequestContext(request))
+    else:
+        return HttpResponseRedirect(reverse('homepage'))
 
-def file(request,file_id):
-#     lstImg,lstVid,lstPdf,lstHtml,lstAudio,lstSpreadsheet,lstPresentation=[]
-#     if gst_doc._id==ObjectId(file_id):
-    # if gst_doc._id == ObjectId(file_id):
-    #     title = gst_doc.name
-        
-    #     gs_collection = db[GSystem.collection_name]
-    #     file_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]}})
-    #     file_nodes.sort('creationtime', -1)
-    #     file_nodes_count = file_nodes.count()
-    #     return render_to_response("ndf/file.html", {'title': title, 'file_nodes': file_nodes, 'file_nodes_count': file_nodes_count}, context_instance=RequestContext(request))
-    # else:
-    #     return HttpResponseRedirect(reverse('homepage'))
-    variable=RequestContext(request,{})
-    template="ndf/file.html"
-    return render_to_response(template,variable)
 
-def uploadDoc(request):
-    stId,mainPageUrl="",""
+
+def uploadDoc(request,group_name):
+    stId, mainPageUrl = "", ""
     if request.method=="POST":
         stId=request.POST.get("stId","")
         mainPageUrl=request.POST.get("pageUrl","")
     template="ndf/UploadDoc.html"
     if stId and mainPageUrl:
-        variable=RequestContext(request,{'stId':stId,'mainPageUrl':mainPageUrl})
+        variable = RequestContext(request, {'stId': stId, 'mainPageUrl': mainPageUrl})
     else:
-        print "else"
         variable=RequestContext(request,{})
     return render_to_response(template,variable)
       
     
+
 
 def submitDoc(request):
     alreadyUploadedFiles=[]
@@ -172,7 +163,7 @@ def convert_image_thumbnail(files):
 		
 
 	
-def GetDoc(request):
+def GetDoc(request,group_name):
     filecollection=get_database()[File.collection_name]
     files=filecollection.File.find()
     #return files
@@ -180,7 +171,7 @@ def GetDoc(request):
     variable=RequestContext(request,{'filecollection':files})
     return render_to_response(template,variable)
 
-def readDoc(request,_id):
+def readDoc(request,_id,group_name):
     filecollection=get_database()[File.collection_name]
     fileobj=filecollection.File.one({"_id": ObjectId(_id)})  
     fl=fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))

@@ -1,4 +1,4 @@
-''' -- imports from python libraries -- '''
+# imports from python libraries #######################################################################################################
 import os
 import hashlib
 import datetime
@@ -7,9 +7,9 @@ import json
 from random import random
 from random import choice
 
-
-''' -- imports from installed packages -- '''
+# imports from installed packages #####################################################################################################
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.auth.models import check_password
 from django.core.validators import RegexValidator
 from django.db import models
@@ -28,7 +28,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 
-''' -- imports from application folders/files -- '''
+# imports from application folders/files ##############################################################################################
 from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
@@ -36,7 +36,7 @@ from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 
 from gnowsys_ndf.ndf.rcslib import RCS
 
-######################################################################################
+#######################################################################################################################################
 
 STATUS_CHOICES = (
     ('DRAFT'),
@@ -93,11 +93,11 @@ LIST_MEMBER_POLICY = (
 ENCRYPTION_POLICY=(
     ('ENCRYPTED'),
     ('NOT_ENCRYPTED')
-    )
+)
 
-#############################################################################
-
-# /* Create all Custom Data types here */
+#######################################################################################################################################
+#                                                                            C U S T O M    D A T A    T Y P E    D E F I N I T I O N S
+#######################################################################################################################################
 
 class RatingField(CustomType):
     mongo_type = unicode
@@ -113,7 +113,9 @@ class RatingField(CustomType):
         # else:
         #     return "value must be between 0 and 5"
 
-##############################################################################
+#######################################################################################################################################
+#                                                                                                    C L A S S    D E F I N I T I O N S
+#######################################################################################################################################
 
 @connection.register
 class Author(DjangoDocument):
@@ -205,37 +207,32 @@ class Node(DjangoDocument):
       	'member_of': [unicode], 		 
 
       	'created_at': datetime.datetime,
-        'created_by': ObjectId,			# ObjectId's of Author Class
+        'last_update': datetime.datetime,
         #'rating': RatingField(),
         'created_by': int,			# Primary Key of User(django's) Class
-        #'rating': 
+        'modified_by': [int],		# list of Primary Keys of User(django's) Class
 
         'start_publication': datetime.datetime,
 
         'content': unicode,
         'content_org': unicode,
         #'image': 
+
         'tags': [unicode],
         'featured': bool,
-
-        'last_update': datetime.datetime,
-        'modified_by': [ObjectId],		# list of Primary Keys of User(django's) Class
 
         'comment_enabled': bool,
       	'login_required': bool,
       	#'password': basestring,
+
         'status': STATUS_CHOICES
     }
     
     required_fields = ['name']
-    default_values = {'created_at':datetime.datetime.utcnow}
+    default_values = {'created_at': datetime.datetime.utcnow}
     use_dot_notation = True
-    
-    def __unicode__(self):
-        return self._id
-    
-    def identity(self):
-        return self.__unicode__()
+
+    ########## Setter(@x.setter) & Getter(@property) ##########
 
     @property
     def html_content(self):
@@ -247,18 +244,28 @@ class Node(DjangoDocument):
         elif MARKUP_LANGUAGE == 'restructuredtext':
             return restructuredtext(self.content)
         return str(self.content)
+
+    ########## Built-in Functions (Defined/Overridden) ##########
+    
+    def __unicode__(self):
+        return self._id
+    
+    def identity(self):
+        return self.__unicode__()
     
     def save(self, *args, **kwargs):
-        ''' on save, set created_at to current date'''
-        self.created_at = datetime.datetime.today()
-
-        history_manager = HistoryManager()
-        rcs_obj = RCS()
-
         is_new = False
 
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
+
+            ''' on save, set created_at to current date'''
+            self.created_at = datetime.datetime.today()
+
+        self.last_update = datetime.datetime.today()
+
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
         
         super(Node, self).save(*args, **kwargs)
         
@@ -266,14 +273,17 @@ class Node(DjangoDocument):
             # Create history-version-file
             if history_manager.create_or_replace_json_file(self):
                 fp = history_manager.get_file_path(self)
-                rcs_obj.checkin(fp, 1, "This document ("+str(self.name)+") is of GSystem(" + str(self.member_of)  +").", "-i")
+                user = User.objects.get(pk=self.created_by).username
+                message = "This document ("+str(self.name)+") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+                rcs_obj.checkin(fp, 1, message, "-i")
         else:
             # Update history-version-file
             fp = history_manager.get_file_path(self)
             rcs_obj.checkout(fp)
 
             if history_manager.create_or_replace_json_file(self):
-                rcs_obj.checkin(fp, 1, "Document (" + self.name + ") updated successfully.")
+                message = "This document ("+str(self.name)+") is lastly updated on " + self.last_update.strftime("%d %B %Y")
+                rcs_obj.checkin(fp, 1, message)
 
 
 @connection.register
@@ -392,10 +402,10 @@ class GSystemType(Node):
     """
     collection_name = 'GSystemTypes'
     structure = {
-        'meta_type_set': [MetaType],            #List of Metatypes
+        'meta_type_set': [MetaType],            # List of Metatypes
         'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
-        'relation_type_set': [RelationType],     # Holds list of Relation Types
-        'process_type_set': [ProcessType]        # List of Process Types 
+        'relation_type_set': [RelationType],    # Holds list of Relation Types
+        'process_type_set': [ProcessType]       # List of Process Types 
     }
     
     use_dot_notation = True
@@ -428,7 +438,7 @@ class File(GSystem):
     collection_name = 'Files'
     structure = {
         'mime_type' : basestring,            # Holds the type of file
-        'fs_file_ids' : [ObjectId]              # Holds the List of  ids of file stored in gridfs 
+        'fs_file_ids' : [ObjectId]           # Holds the List of  ids of file stored in gridfs 
     }
 
     gridfs = {
@@ -436,6 +446,7 @@ class File(GSystem):
     }
 
     use_dot_notation = True
+
     
 @connection.register
 class Group(GSystem):
@@ -445,12 +456,12 @@ class Group(GSystem):
 
     collection_name='Groups'
     structure = {
-        'gtype': TYPES_OF_GROUP,                       # Types of groups - Anonymous,public or private
-        'edit_policy': EDIT_POLICY,                   # Editing policy of the group- non editable, moderately editable, editable
-        'sub_policy': SUBSCRIPTION_POLICY,            # Subscription policy to this group- open, by invitation, by request
-        'ex_policy': EXISTANCE_POLICY,                # Existance of the group -announced or not announced
-        'list_member_policy': LIST_MEMBER_POLICY,     # Members of this group - disclosed or not 
-        'encr_policy': ENCRYPTION_POLICY              # Encryption - yes or no
+        'gtype': basestring,                 # Types of groups - Anonymous,public or private
+        'edit_policy': basestring,           # Editing policy of the group- non editable, moderately editable, editable
+        'sub_policy': basestring,            # Subscription policy to this group- open, by invitation, by request
+        'ex_policy': basestring,             # Existance of the group -announced or not announced
+        'list_member_policy': basestring,    # Members of this group - disclosed or not 
+        'encr_policy': basestring            # Encryption - yes or no
     }
 
     use_dot_notation = True
@@ -462,9 +473,11 @@ class Group(GSystem):
         'ex_policy':lambda x: x in EXISTANCE_POLICY,
         'list_member_policy':lambda x: x in LIST_MEMBER_POLICY,
         'encr_policy':lambda x: x in ENCRYPTION_POLICY
-        } 
+    } 
 
-######################################################################################################
+#######################################################################################################################################
+#                                                                                  H E L P E R  --   C L A S S    D E F I N I T I O N S
+#######################################################################################################################################
 
 class HistoryManager():
     """Handles history management for documents of a collection 
