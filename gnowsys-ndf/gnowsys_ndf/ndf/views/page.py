@@ -40,6 +40,8 @@ def page(request, group_name,app_id):
     """
     * Renders a list of all 'Page-type-GSystems' available within the database.
     """
+    page_node = gs_collection.GSystem.one({"_id": ObjectId(app_id)})
+    print app_id,"appid"
     page_id=app_id
     print "aa",app_id,gst_page._id
     if gst_page._id == ObjectId(page_id):
@@ -51,7 +53,9 @@ def page(request, group_name,app_id):
 
         return render_to_response("ndf/page.html", {'title': title, 'page_nodes': page_nodes, 'page_nodes_count': page_nodes_count}, context_instance=RequestContext(request))
 
-    return HttpResponseRedirect(reverse('homepage'))
+#    edit_page(request, group_name,app_id)
+    return render_to_response("ndf/edit_page.html",{'node':page_node,'node_id':app_id},context_instance=RequestContext(request))
+#    return HttpResponseRedirect(reverse('edit_page',kwargs={'node_id':app_id,'group_name':group_name}))
 
     
 def create_page(request,group_name):
@@ -145,7 +149,7 @@ def edit_page(request, group_name,node_id):
     """
     * Displays/Modifies details about the given page.
     """
-    
+    print "inside edit_page"
     page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
 
     if request.user.is_authenticated():
@@ -248,14 +252,14 @@ def edit_page(request, group_name,node_id):
         return render_to_response("ndf/edit_page.html", 
                                   { 'node': page_node, 'user_details': user_details,
                                     'pn_drawer1': pn_drawer1, 'pn_drawer2': pn_drawer2, 'prior_node_obj_dict': prior_node_obj_dict,
-                                    'c_drawer1': c_drawer1, 'c_drawer2': c_drawer2, 'collection_obj_dict': collection_obj_dict
+                                    'c_drawer1': c_drawer1, 'c_drawer2': c_drawer2, 'collection_obj_dict': collection_obj_dict,'group_name':group_name,'node_id':node_id
                                   }, 
                                   context_instance = RequestContext(request)
         )
 
     else:
         return render_to_response("ndf/edit_page.html", 
-                                  { 'node': page_node
+                                  { 'node': page_node,'group_name':group_name,'node_id':node_id
                                   }, 
                                   context_instance = RequestContext(request)
         )
