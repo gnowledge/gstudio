@@ -1,15 +1,37 @@
 {% extends "ndf/base.html" %}
-
+{% load ndf_tags %}
 {% block title %} Group Dashboard {% endblock %}
 
 {% block body_content %}
+{% get_group_name request.path as group %}
 <div>
-<font size="4px" color="#BAC1C8"> {{request.path|cut:"/"|cut:"dashboard"}} </font>
+<font size="4px" color="#BAC1C8"> {{group}} </font>
 </div>
 
 <font size="2px" color="black"> Members in this group : 0 </font>
 
-{% if user.is_authenticated %}
-{% endif %}
+{% get_group_policy group request.user as policy %}
+{{policy}}
+ 
+<div class="sidebar">
+   <div style='display:table;  border:1px;   border-spacing:10px; '>
+        <div style='display:table-row;' >
+             {% ifequal policy "OPEN"  %}
+
+                <div style='display:table-cell;' colspan='2' align="middle">
+
+                        <input type="submit" value="Join" class="btn btn-primary btn-small btn-block" align="center">
+                </div> 
+              {% else %}
+               
+                 <div style='display:table-cell;' colspan='2' align="middle">
+                        <input type="submit" value="Invite" class="btn btn-primary btn-small btn-block" align="center">
+                </div> 
+              {% endifequal %}
+        </div>
+
+   </div>
+</div>
 
 {% endblock %}
+

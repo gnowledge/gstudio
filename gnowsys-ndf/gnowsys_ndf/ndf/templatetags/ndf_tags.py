@@ -123,3 +123,12 @@ def get_existing_groups():
     group.append(items.name)
   return group
 
+@register.assignment_tag
+def get_group_policy(group_name,user):
+  policy =""
+  col_Group = db[Group.collection_name]
+  colg=col_Group.Group.one({"name":group_name})
+  if colg:
+    policy=str(colg.sub_policy)
+  return policy
+  
