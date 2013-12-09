@@ -5,12 +5,12 @@
 {% block body_content %} 
 
 {% if user.is_authenticated %}
+
 <div style='padding-top:10px'>
 <a href="{% url 'uploadDoc' 'file' %}">
   <input type="submit" class="btn btn-large btn-primary" value="Upload a {{title}}" />
 </a>
 </div>
-
 <hr />
 {% endif %}
 
