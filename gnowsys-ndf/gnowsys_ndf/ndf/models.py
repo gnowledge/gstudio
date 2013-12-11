@@ -437,8 +437,9 @@ class File(GSystem):
 
     collection_name = 'Files'
     structure = {
-        'mime_type' : basestring,            # Holds the type of file
-        'fs_file_ids' : [ObjectId]           # Holds the List of  ids of file stored in gridfs 
+        'mime_type' : basestring,           # Holds the type of file
+        'fs_file_ids' : [ObjectId],           # Holds the List of  ids of file stored in gridfs 
+        'file_size'   :{'size':float,'unit':unicode} #dict used to hold file size in int and unit palace in term of KB,MB,GB
     }
 
     gridfs = {

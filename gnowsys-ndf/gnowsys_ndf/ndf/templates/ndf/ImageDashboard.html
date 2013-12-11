@@ -1,9 +1,20 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% block title %} Image Gallery {% endblock %}
-
 {% block body_content %} 
+
+{% if alreadyUploadedFiles %} 
+<div id="message">
+  <span style="color:red">Listed below files are already uploaded please choose different files</span>
+  <ul>
+    {% for each in alreadyUploadedFiles %}
+    <li>{{each}}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
 {% get_group_name request.path as group_name %}
+
 
 <center>
 <div>
