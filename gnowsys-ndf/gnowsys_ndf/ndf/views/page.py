@@ -1,6 +1,7 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-
+import json
+from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -23,7 +24,10 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
+from gnowsys_ndf.ndf.models import HistoryManager
+from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
+
 
 #######################################################################################################################################
 
@@ -31,38 +35,29 @@ db = get_database()
 gst_collection = db[GSystemType.collection_name]
 gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
 gs_collection = db[GSystem.collection_name]
+history_manager = HistoryManager()
+rcs = RCS()
 
 #######################################################################################################################################
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
 #######################################################################################################################################
 
-def page(request, group_name,app_id):
+def page(request, group_name, app_id):
+    """Renders a list of all 'Page-type-GSystems' available within the database.
     """
-    * Renders a list of all 'Page-type-GSystems' available within the database.
-    """
-    page_node = gs_collection.GSystem.one({"_id": ObjectId(app_id)})
-    print app_id,"appid"
-    page_id=app_id
-    print "aa",app_id,gst_page._id
-    if gst_page._id == ObjectId(page_id):
+    if gst_page._id == ObjectId(app_id):
         title = gst_page.name
         
-        page_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(page_id)]}})
+        page_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(app_id)]}})
         page_nodes.sort('last_update', -1)
         page_nodes_count = page_nodes.count()
 
         return render_to_response("ndf/page.html", {'title': title, 'page_nodes': page_nodes, 'page_nodes_count': page_nodes_count}, context_instance=RequestContext(request))
 
-#    edit_page(request, group_name,app_id)
-    return render_to_response("ndf/edit_page.html",{'node':page_node,'node_id':app_id},context_instance=RequestContext(request))
-#    return HttpResponseRedirect(reverse('edit_page',kwargs={'node_id':app_id,'group_name':group_name}))
-
     
-def create_page(request,group_name):
+def create_page(request, group_name):
+    """Creates a new page.
     """
-    * Creates a new page.
-    """
-    print "gropname",group_name
     if request.user.is_authenticated():
 
         page_node = gs_collection.GSystem()
@@ -131,7 +126,7 @@ def create_page(request,group_name):
 
             page_node.save()
 
-            return HttpResponseRedirect(reverse('page', kwargs={'app_id': gst_page._id,'group_name':group_name}))
+            return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
         else:
             # if request.method is not "POST"!!!
 
@@ -145,11 +140,9 @@ def create_page(request,group_name):
             )
 
 
-def edit_page(request, group_name,node_id):
+def edit_page(request, group_name, node_id):
+    """Displays/Modifies details about the given page.
     """
-    * Displays/Modifies details about the given page.
-    """
-    print "inside edit_page"
     page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
 
     if request.user.is_authenticated():
@@ -204,66 +197,112 @@ def edit_page(request, group_name,node_id):
             page_node.content = unicode(org2html(content_org, file_prefix=filename))
 
             page_node.save()
+            
+            return HttpResponseRedirect(reverse('edit_page', kwargs={'group_name': group_name, 'node_id': page_node._id}))
 
         else:
             print "\n From page's home page(display)...\n"
 
-        # Retrieving names of created-by & modified-by users, and appending to 'user_details' dict-variable
-        user_details = {}
-        user_details['created_by'] = User.objects.get(pk=page_node.created_by).username
+            # Retrieving names of created-by & modified-by users, and appending to 'user_details' dict-variable
+            user_details = {}
+            user_details['created_by'] = User.objects.get(pk=page_node.created_by).username
 
-        modified_by_usernames = []
-        for each_pk in page_node.modified_by:
-            modified_by_usernames.append(User.objects.get(pk=each_pk).username)
-        user_details['modified_by'] = modified_by_usernames
+            modified_by_usernames = []
+            for each_pk in page_node.modified_by:
+                modified_by_usernames.append(User.objects.get(pk=each_pk).username)
+            user_details['modified_by'] = modified_by_usernames
 
-        # Based on prior-nodes, constructing drawers & prior-node-dictionary-variable  
-        pn_drawers = get_drawers(page_node._id, page_node.prior_node)
-        pn_drawer1 = pn_drawers['1']
-        pn_drawer2 = pn_drawers['2']
+            # Based on prior-nodes, constructing drawers & prior-node-dictionary-variable  
+            pn_drawers = get_drawers(page_node._id, page_node.prior_node)
+            pn_drawer1 = pn_drawers['1']
+            pn_drawer2 = pn_drawers['2']
 
-        prior_node_obj_dict = {}
-        prior_node_list = page_node.prior_node
+            prior_node_obj_dict = {}
+            prior_node_list = page_node.prior_node
         
-        for each_id in prior_node_list:
-            if each_id != page_node._id:
-                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
-                dict_key = node_collection_object._id
-                dict_value = node_collection_object
+            for each_id in prior_node_list:
+                if each_id != page_node._id:
+                    node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                    dict_key = node_collection_object._id
+                    dict_value = node_collection_object
                 
-                prior_node_obj_dict[dict_key] = dict_value
+                    prior_node_obj_dict[dict_key] = dict_value
 
-        # Based on collection-elements, constructing drawers & collection-dictionary-variable  
-        c_drawers = get_drawers(page_node._id, page_node.collection_set)
-        c_drawer1 = c_drawers['1']
-        c_drawer2 = c_drawers['2']
+            # Based on collection-elements, constructing drawers & collection-dictionary-variable  
+            c_drawers = get_drawers(page_node._id, page_node.collection_set)
+            c_drawer1 = c_drawers['1']
+            c_drawer2 = c_drawers['2']
 
-        collection_obj_dict = {}
-        collection_list = page_node.collection_set
+            collection_obj_dict = {}
+            collection_list = page_node.collection_set
         
-        for each_id in collection_list:
-            if each_id != page_node._id:
-                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
-                dict_key = node_collection_object._id
-                dict_value = node_collection_object
+            for each_id in collection_list:
+                if each_id != page_node._id:
+                    node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                    dict_key = node_collection_object._id
+                    dict_value = node_collection_object
                 
-                collection_obj_dict[dict_key] = dict_value
+                    collection_obj_dict[dict_key] = dict_value
 
-        return render_to_response("ndf/edit_page.html", 
-                                  { 'node': page_node, 'user_details': user_details,
-                                    'pn_drawer1': pn_drawer1, 'pn_drawer2': pn_drawer2, 'prior_node_obj_dict': prior_node_obj_dict,
-                                    'c_drawer1': c_drawer1, 'c_drawer2': c_drawer2, 'collection_obj_dict': collection_obj_dict,'group_name':group_name,'node_id':node_id
-                                  }, 
-                                  context_instance = RequestContext(request)
-        )
+            # Version dictionary required to display number of versions created
+            version_dict = {}
+            version_dict = history_manager.get_version_dict(page_node)
 
+            return render_to_response("ndf/edit_page.html", 
+                                      { 'node': page_node, 'user_details': user_details,
+                                        'version_dict': version_dict,
+                                        'pn_drawer1': pn_drawer1, 'pn_drawer2': pn_drawer2, 'prior_node_obj_dict': prior_node_obj_dict,
+                                        'c_drawer1': c_drawer1, 'c_drawer2': c_drawer2, 'collection_obj_dict': collection_obj_dict,
+                                        'group_name': group_name
+                                      }, 
+                                      context_instance = RequestContext(request)
+            )
     else:
         return render_to_response("ndf/edit_page.html", 
-                                  { 'node': page_node,'group_name':group_name,'node_id':node_id
+                                  { 'node': page_node,'group_name': group_name
                                   }, 
                                   context_instance = RequestContext(request)
         )
         
+
+def version_page(request, group_name, node_id, version_no):
+
+    view = ""          # either single or compare
+
+    if request.method == "POST":
+        print "\n if -- version page\n"
+        view = "compare"
+
+    else:
+        print "\n else -- version page\n"
+        view = "single"
+
+        page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
+        fp = history_manager.get_file_path(page_node)
+
+        diff = get_html_diff(fp, version_no)
+
+        # Retrieve rcs-file for a given version-number
+        rcs.checkout((fp, version_no))
+
+        # Copy content from rcs-version-file
+        data = None
+        with open(fp, 'r') as sf:
+            data = sf.read()
+
+        # Used json.loads(x) -- to covert string to dictionary object
+        # If want to use key from this converted dictionay, use array notation because dot notation doesn't works!
+        data = json.loads(data)
+
+        # Remove retrieved rcs-file belonging to the given version-number
+        rcs.checkin(fp)
+
+    return render_to_response("ndf/version_page.html",
+                              {'view': "compare",
+                               'node': diff
+                              },
+                              context_instance = RequestContext(request)
+    )
 
 """
 def delete_node(request, _id):
@@ -276,6 +315,47 @@ def delete_node(request, _id):
 #######################################################################################################################################
 #                                                                                                     H E L P E R  -  F U N C T I O N S
 #######################################################################################################################################
+
+def get_html_diff(versionfile, fromfile="", tofile=""):
+    if versionfile != "":
+        if fromfile == "":
+            fromfile = rcs.head(versionfile)
+
+        if tofile == "":
+            tofile = rcs.head(versionfile)
+
+        # fromfile ----------------------------------------------------------
+
+        # Retrieve rcs-file for a given version-number (here, version-number <--> fromfile)
+        rcs.checkout((versionfile, fromfile))
+
+        # Copy content from rcs-version-file
+        fromlines = None
+        with open(versionfile, 'r') as ff:
+            fromlines = ff.readlines()
+
+        # Remove retrieved rcs-file belonging to the given version-number
+        rcs.checkin(versionfile)
+
+        # tofile ------------------------------------------------------------
+
+        # Retrieve rcs-file for a given version-number (here, version-number <--> tofile)
+        rcs.checkout((versionfile, tofile))
+
+        # Copy content from rcs-version-file
+        tolines = None
+        with open(versionfile, 'r') as tf:
+            tolines = tf.readlines()
+
+        # Remove retrieved rcs-file belonging to the given version-number
+        rcs.checkin(versionfile)
+
+        return HtmlDiff(wrapcolumn=60).make_file(fromlines, tolines, fromfile, tofile)
+
+    else:
+        print "\n Please pass a valid rcs-version-file!!!\n"
+        #TODO: Throw an error indicating the above message!
+        return ""
 
 def get_drawers(nid=None, nlist=[]):
     """

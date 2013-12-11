@@ -3,7 +3,7 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block body_content %} 
-{% get_group_name request.path as group_name %}
+
 {% if user.is_authenticated %}
 
 <div style='padding-top:10px'>
@@ -21,7 +21,7 @@
     <h5>Number Of Nodes : {{ page_nodes_count }} </h5>
   {% endif %}
   <div>
-    <p><strong><a href="{% url 'page' group_name node %}">{{ node.name }}</a></strong><br>
+    <p><strong><a href="{% url 'edit_page' group_name node %}">{{ node.name }}</a></strong><br>
     <!--
     Created at : {{ node.created_at|date:"j F Y" }}<br>
     Member Of   : {{ node.member_of }}<br>
