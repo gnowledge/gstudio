@@ -44,23 +44,32 @@ gst_file = gst_collection.GSystemType.one({'name': GAPPS[1]})
 
 def file(request, group_name,file_id):
     """
-    * Renders a list of all 'Group-type-GSystems' available within the database.
+    * Renders a list of all 'Files' available withinthe database  and group them acording to mimetype.
+
+    """
+   
+    # mime_types=[]
+    # if gst_file._id == ObjectId(file_id):
+    #     title = gst_file.name
+    #     filecollection=db[File.collection_name]
+    #     for each in filecollection.distinct("mime_type"):
+    #         mime_types.append(filecollection.find({"mime_type":each}))
+    #     return render_to_response("ndf/file.html", {'title': title,'files':mime_types}, context_instance=RequestContext(request))
+    # else:
+    #     return HttpResponseRedirect(reverse('homepage'))
+    
+    """
+    * Renders a list of all 'Files' available within the database.
 
     """
     if gst_file._id == ObjectId(file_id):
         title = gst_file.name
-        
-        gs_collection = db[GSystem.collection_name]
-        file_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]}})
-        file_nodes.sort('last_update', -1)
-        file_nodes_count = file_nodes.count()
-
-        return render_to_response("ndf/file.html", {'title': title, 'file_nodes': file_nodes, 'file_nodes_count': file_nodes_count}, context_instance=RequestContext(request))
+        filecollection=db[File.collection_name]
+        files=filecollection.File.find()
+        return render_to_response("ndf/file.html", {'title': title,'files':files}, context_instance=RequestContext(request))
     else:
         return HttpResponseRedirect(reverse('homepage'))
-
-
-
+    
 def uploadDoc(request,group_name):
     stId, mainPageUrl = "", ""
     if request.method=="POST":
@@ -76,17 +85,16 @@ def uploadDoc(request,group_name):
     
 
 
-def submitDoc(request):
+def submitDoc(request,group_name):
     alreadyUploadedFiles=[]
     if request.method=="POST":
         title = request.POST.get("docTitle","")
         userid = request.POST.get("user","")
-	stId = request.POST.get("stId","")
         mainPageUrl = request.POST.get("mainPageUrl","")
         print "url",mainPageUrl
         memberOf = request.POST.get("memberOf","")
 	for each in request.FILES.getlist("doc[]",""):
-            f=save_file(each,title,userid,memberOf,stId)
+            f=save_file(each,title,userid,group_name,gst_file._id.__str__())
             if f:
                 alreadyUploadedFiles.append(f)
         if 'image' in mainPageUrl:
@@ -96,11 +104,12 @@ def submitDoc(request):
             template="ndf/ImageDashboard.html"
             return render_to_response(template,variable)
         else:
-            filecollection=get_database()[File.collection_name]
-            files=filecollection.File.find()
-            variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'filecollection':files})
-            template='ndf/DocumentList.html'
-            return render_to_response(template,variable)
+            return HttpResponseRedirect("/"+group_name+"/file"+"/"+gst_file._id.__str__())
+            # filecollection=get_database()[File.collection_name]
+            # files=filecollection.File.find()
+            # variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'filecollection':files})
+            # template='ndf/DocumentList.html'
+            # return render_to_response(template,variable)
 
 def save_file(files,title,userid,memberOf,stId):
     fcol=db[File.collection_name]
@@ -109,17 +118,21 @@ def save_file(files,title,userid,memberOf,stId):
     #gst=gst_collection.GSystemType.one({"_id":ObjectId(stId)})
     filemd5= hashlib.md5(files.read()).hexdigest()
     files.seek(0)
-    size,ext=getFileSize(files)
+    size,unit=getFileSize(files)
+    size={'size':round(size,2),'unit':unicode(unit)}
     if fileobj.fs.files.exists({"md5":filemd5}):
             return files.name
     else:
         try:
             files.seek(0)
             filetype=magic.from_buffer(files.read(100000),mime='true')               #Gusing filetype by python-magic
-            print "filetype:",filetype
             filename=files.name
-            fileobj.name=unicode(title)
+            if title:
+                fileobj.name=unicode(title)
+            else:
+                fileobj.name=unicode(filename)
             fileobj.created_by=int(userid)
+            fileobj.file_size=size
             #fileobj.member_of=unicode(memberOf)           #shuold be group 
             fileobj.mime_type=filetype
             if stId:
