@@ -53,10 +53,6 @@ def page(request, group_name,app_id):
 
         return render_to_response("ndf/page.html", {'title': title, 'page_nodes': page_nodes, 'page_nodes_count': page_nodes_count}, context_instance=RequestContext(request))
 
-#    edit_page(request, group_name,app_id)
-    return render_to_response("ndf/edit_page.html",{'node':page_node,'node_id':app_id},context_instance=RequestContext(request))
-#    return HttpResponseRedirect(reverse('edit_page',kwargs={'node_id':app_id,'group_name':group_name}))
-
     
 def create_page(request,group_name):
     """
@@ -204,52 +200,54 @@ def edit_page(request, group_name,node_id):
             page_node.content = unicode(org2html(content_org, file_prefix=filename))
 
             page_node.save()
+            
+            return HttpResponseRedirect(reverse('edit_page', kwargs={'group_name':group_name,'node_id': node_id}))
 
         else:
             print "\n From page's home page(display)...\n"
 
-        # Retrieving names of created-by & modified-by users, and appending to 'user_details' dict-variable
-        user_details = {}
-        user_details['created_by'] = User.objects.get(pk=page_node.created_by).username
+            # Retrieving names of created-by & modified-by users, and appending to 'user_details' dict-variable
+            user_details = {}
+            user_details['created_by'] = User.objects.get(pk=page_node.created_by).username
 
-        modified_by_usernames = []
-        for each_pk in page_node.modified_by:
-            modified_by_usernames.append(User.objects.get(pk=each_pk).username)
-        user_details['modified_by'] = modified_by_usernames
+            modified_by_usernames = []
+            for each_pk in page_node.modified_by:
+                modified_by_usernames.append(User.objects.get(pk=each_pk).username)
+            user_details['modified_by'] = modified_by_usernames
 
-        # Based on prior-nodes, constructing drawers & prior-node-dictionary-variable  
-        pn_drawers = get_drawers(page_node._id, page_node.prior_node)
-        pn_drawer1 = pn_drawers['1']
-        pn_drawer2 = pn_drawers['2']
+            # Based on prior-nodes, constructing drawers & prior-node-dictionary-variable  
+            pn_drawers = get_drawers(page_node._id, page_node.prior_node)
+            pn_drawer1 = pn_drawers['1']
+            pn_drawer2 = pn_drawers['2']
 
-        prior_node_obj_dict = {}
-        prior_node_list = page_node.prior_node
+            prior_node_obj_dict = {}
+            prior_node_list = page_node.prior_node
         
-        for each_id in prior_node_list:
-            if each_id != page_node._id:
-                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
-                dict_key = node_collection_object._id
-                dict_value = node_collection_object
+            for each_id in prior_node_list:
+                if each_id != page_node._id:
+                    node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                    dict_key = node_collection_object._id
+                    dict_value = node_collection_object
                 
-                prior_node_obj_dict[dict_key] = dict_value
+                    prior_node_obj_dict[dict_key] = dict_value
 
-        # Based on collection-elements, constructing drawers & collection-dictionary-variable  
-        c_drawers = get_drawers(page_node._id, page_node.collection_set)
-        c_drawer1 = c_drawers['1']
-        c_drawer2 = c_drawers['2']
+            # Based on collection-elements, constructing drawers & collection-dictionary-variable  
+            c_drawers = get_drawers(page_node._id, page_node.collection_set)
+            c_drawer1 = c_drawers['1']
+            c_drawer2 = c_drawers['2']
 
-        collection_obj_dict = {}
-        collection_list = page_node.collection_set
+            collection_obj_dict = {}
+            collection_list = page_node.collection_set
         
-        for each_id in collection_list:
-            if each_id != page_node._id:
-                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
-                dict_key = node_collection_object._id
-                dict_value = node_collection_object
+            for each_id in collection_list:
+                if each_id != page_node._id:
+                    node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                    dict_key = node_collection_object._id
+                    dict_value = node_collection_object
                 
-                collection_obj_dict[dict_key] = dict_value
+                    collection_obj_dict[dict_key] = dict_value
 
-        return render_to_response("ndf/edit_page.html", 
+            return render_to_response("ndf/edit_page.html", 
                                   { 'node': page_node, 'user_details': user_details,
                                     'pn_drawer1': pn_drawer1, 'pn_drawer2': pn_drawer2, 'prior_node_obj_dict': prior_node_obj_dict,
                                     'c_drawer1': c_drawer1, 'c_drawer2': c_drawer2, 'collection_obj_dict': collection_obj_dict,'group_name':group_name,'node_id':node_id
