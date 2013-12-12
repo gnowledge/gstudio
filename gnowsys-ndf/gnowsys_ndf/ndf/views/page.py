@@ -257,6 +257,7 @@ def edit_page(request, group_name, node_id):
                                       }, 
                                       context_instance = RequestContext(request)
             )
+
     else:
         return render_to_response("ndf/edit_page.html", 
                                   { 'node': page_node,'group_name': group_name
@@ -385,34 +386,3 @@ def get_drawers(nid=None, nlist=[]):
       dict_drawer['2'] = dict2
 
     return dict_drawer
-
-'''
-def get_drawers(node):
-    """
-    * Get both the collection drawers-list.
-    """
-
-    dict_drawer={}
-    dict1={}
-    dict2={}
-
-    drawer = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}})
-
-    if node is None:
-      for each in drawer:
-        dict_drawer[each._id] = str(each.name)
-
-    else:
-      for each in drawer:
-        if each._id != node._id:
-          if each._id not in node.collection_set:
-            dict1[each._id]=str(each.name)
-          
-          else:
-            dict2[each._id]=str(each.name)
-      
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
-
-    return dict_drawer
-'''

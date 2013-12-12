@@ -219,7 +219,6 @@ class MetaType(Node):
     """MetaType class - A collection of Types 
     """
 
-    #collection_name = 'MetaTypes'
     structure = {
         'description': basestring,		# Description (name)
         'parent': ObjectId                      # Foreign key to self 
@@ -230,7 +229,6 @@ class MetaType(Node):
 @connection.register
 class AttributeType(Node):
     
-    #collection_name = 'AttributeTypes'
     structure = {
 	'data_type': basestring,		# NoneType in mongokit
         'subject_type': [ObjectId],
@@ -267,7 +265,6 @@ class AttributeType(Node):
 @connection.register
 class Attribute(Node):
 
-    #collection_name = 'Attributes'
     structure = {
         'attribute_type': ObjectId,		# ObjectId's of AttributeType Class
         'attribute_value': None                 # To store values of created attribute type		
@@ -279,7 +276,6 @@ class Attribute(Node):
 @connection.register
 class RelationType(Node):
 
-    #collection_name = 'RelationTypes'
     structure = {
         'inverse_name': unicode,
         'subject_type': [ObjectId],	       # ObjectId's of Any Class
@@ -305,7 +301,6 @@ class RelationType(Node):
 @connection.register
 class Relation(Node):
 
-    #collection_name = 'Relations'
     structure = {
         'subject_type_value': ObjectId,		# ObjectId's of GSystemType Class
         'relation_type_value': ObjectId,	# ObjectId's of RelationType Class
@@ -320,7 +315,6 @@ class ProcessType(Node):
     objects involving change.
     """
   
-    #collection_name = 'ProcessTypes'
     structure = { 
         'changing_attributetype_set': [AttributeType],  # List of Attribute Types
         'changing_relationtype_set': [RelationType]    # List of Relation Types
@@ -333,7 +327,6 @@ class GSystemType(Node):
     """Class to organize Systems
     """
 
-    #collection_name = 'GSystemTypes'
     structure = {
         'meta_type_set': [MetaType],            # List of Metatypes
         'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
@@ -349,7 +342,6 @@ class GSystem(Node):
     """GSystemType instance
     """
 
-    #collection_name = 'GSystems'
     structure = {
         'gsystem_type': [ObjectId],		# ObjectId's of GSystemType Class  
         'attribute_set': [dict],		# dict that holds AT name & its values
@@ -366,10 +358,10 @@ class File(GSystem):
     """File class to hold any resource
     """
 
-    #collection_name = 'Files'
     structure = {
-        'mime_type' : basestring,            # Holds the type of file
-        'fs_file_ids' : [ObjectId]           # Holds the List of  ids of file stored in gridfs 
+        'mime_type' : basestring,           # Holds the type of file
+        'fs_file_ids' : [ObjectId],           # Holds the List of  ids of file stored in gridfs 
+        'file_size'   :{'size':float,'unit':unicode} #dict used to hold file size in int and unit palace in term of KB,MB,GB
     }
 
     gridfs = {
@@ -384,7 +376,6 @@ class Group(GSystem):
     """Group class to create collection (group) of members
     """
 
-    #collection_name='Groups'
     structure = {
         'gtype': basestring,                 # Types of groups - Anonymous,public or private
         'edit_policy': basestring,           # Editing policy of the group- non editable, moderately editable, editable
