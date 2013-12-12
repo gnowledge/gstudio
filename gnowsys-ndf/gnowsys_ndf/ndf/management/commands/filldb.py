@@ -24,9 +24,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         db = get_database()
 
-        db.drop_collection(GSystem.collection_name)
-        db.drop_collection(GSystemType.collection_name)
-        
         gst_collection = db[GSystemType.collection_name]
         gst_node = []
         user_id = 1 

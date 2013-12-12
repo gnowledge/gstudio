@@ -1,0 +1,60 @@
+{% extends "ndf/base.html" %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
+
+{% block body_content %}
+
+  <div style="padding-top:1.6em">
+  <font size="5"><strong>View & Compare History</strong></font>
+  <hr style="height:5px;background-color: #1ABC9C;" />
+  </div>
+
+  {% ifequal view "single" %}
+    <div id="single-view" style="">
+    
+    <table cellpadding="8">
+      <tr>
+        <th align="right">Fields</th>
+        <th align="left">Version #</th>
+      </tr>
+      {% for k, v in node.items %}
+      <tr>
+        <td align="right" valign="top">{{k}}</td>
+        <td>{{v}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    </div>
+  
+  {% else %}
+    <div id="compare-view" style="">
+      {{node|safe}}
+    </div>
+  
+  {% endifequal %}
+
+  <hr style="height:5px;background-color: #1ABC9C;" />
+
+  <form method="POST" action="">
+
+    <div style="display:inline-block;text-align:center">
+      <div style="display:inline-block; float:left; margin:1em 0 1.5em 0;">
+        <font size="3">Compare</font>&nbsp;&nbsp;
+        <input id="version-1" type="text" name="version-1" placeholder="version #1" />&nbsp;&nbsp;
+        <font size="3">with</font>&nbsp;&nbsp;
+        <input id="version-2" type="text" name="version-2" placeholder="version #2" />&nbsp;&nbsp;
+      </div>
+
+      <div style="display:inline-block; float:left; margin:0.8em;">
+        <input id="enter-compare" type="submit"  value="Enter" class="btn btn-large btn-primary" />
+      </div>
+    </div>
+    
+  </form>
+
+{% endblock %}
+

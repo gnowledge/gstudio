@@ -1,9 +1,7 @@
 {% extends "ndf/base.html" %}
-{% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 
 {% block body_content %} 
-{% get_group_name request.path as group_name %}
 {% if user.is_authenticated %}
 
 <div style='padding-top:10px'>
