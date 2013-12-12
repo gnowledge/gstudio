@@ -237,8 +237,8 @@ collections (models).
 
 # Indicates list of collection-names whose documents' history has to be 
 # maintained.
-VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes', 
-                          'GSystemTypes', 'GSystems']
+VERSIONING_COLLECTIONS = ['AttributeType', 'RelationType', 
+                          'GSystemType', 'GSystem']
 
 # Absolute filesystem path to the directory that will hold all rcs-files 
 # (history-files corresponding to every json-file created for each document)

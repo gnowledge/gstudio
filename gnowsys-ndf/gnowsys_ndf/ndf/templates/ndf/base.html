@@ -191,10 +191,11 @@
   <script type="text/javascript">
     
     var margin_top = $("#header").height() + 80;
-    var margin_bottom = $(".footer").height() + 15;
+    var margin_bottom = $(".footer").height() + 300;
+
     $("#body").css("margin", margin_top + "px" + " 15px " + margin_bottom + "px 15px");
     $("#body").css("min-height", ( $(window).height() - $("#header").height() - $(".footer").height() ) + "px");
-    
+
     $("#loginPanel").mouseleave(function(){
       $("#loginPanel").fadeOut()	
     });

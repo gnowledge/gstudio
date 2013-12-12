@@ -454,14 +454,15 @@ class HistoryManager():
         file_name = (document_object._id.__str__() + '.json')
 
         collection_dir = \
-            (os.path.join(self.__RCS_REPO_DIR, \
-                              document_object.collection_name)) 
+             (os.path.join(self.__RCS_REPO_DIR, \
+                               document_object.collection_name))
 
         # Example: 
         # if -- file_name := "523f59685a409213818e3ec6.json"
         # then -- collection_hash_dirs := "6/c/3/8/ 
         # -- from last (2^0)pos/(2^1)pos/(2^2)pos/(2^3)pos/../(2^n)pos"
         # here n := hash_level_num
+
         collection_hash_dirs = ""
         for pos in range(0, RCS_REPO_DIR_HASH_LEVEL):
             collection_hash_dirs += \
@@ -515,19 +516,19 @@ class HistoryManager():
             print("\n\n RCS repository created @ following path:\n {0}\n"\
                       .format(self.__RCS_REPO_DIR))
 
-        for collection in versioning_collections:
-            rcs_repo_collection = os.path.join(self.__RCS_REPO_DIR, \
-                                                   collection)
-            try:
-                os.makedirs(rcs_repo_collection)
-            except OSError as ose:
-                print(" {0} collection-directory under RCS repository "\
-                          "not created!!!\n Error #{1}: {2}\n"\
-                          .format(collection, ose.errno, ose.strerror))
-            else:
-                print(" {0} collection-directory under RCS repository "\
-                          "created @ following path:\n {1}\n"\
-                          .format(collection, rcs_repo_collection))
+        # for collection in versioning_collections:
+        #     rcs_repo_collection = os.path.join(self.__RCS_REPO_DIR, \
+        #                                            collection)
+        #     try:
+        #         os.makedirs(rcs_repo_collection)
+        #     except OSError as ose:
+        #         print(" {0} collection-directory under RCS repository "\
+        #                   "not created!!!\n Error #{1}: {2}\n"\
+        #                   .format(collection, ose.errno, ose.strerror))
+        #     else:
+        #         print(" {0} collection-directory under RCS repository "\
+        #                   "created @ following path:\n {1}\n"\
+        #                   .format(collection, rcs_repo_collection))
                
     def create_or_replace_json_file(self, document_object=None):
         """Creates/Overwrites a json-file for passed document object in 

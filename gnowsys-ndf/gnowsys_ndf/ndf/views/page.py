@@ -198,7 +198,7 @@ def edit_page(request, group_name, node_id):
 
             page_node.save()
             
-            return HttpResponseRedirect(reverse('edit_page', kwargs={'group_name': group_name, 'node_id': page_node._id}))
+            return HttpResponseRedirect(reverse('page-detail', kwargs={'group_name': group_name, 'node_id': page_node._id}))
 
         else:
             print "\n From page's home page(display)...\n"
