@@ -2984,6 +2984,15 @@ position:fixed;
 right:133px;
 
 }
+
+.header {
+  background-color:#0B6580; 
+  top:0px; 
+  position:fixed;
+  width:100%; 
+  z-index:100;
+}
+
 .footer {
   background-color: #0B6580;
   color: #bac1c8;
@@ -2992,7 +3001,10 @@ right:133px;
   padding: 3;
   padding-top:10px;
   height:43px;
+  position:fixed;
   bottom:0px;
+  width:100%; 
+  z-index:100;
 }
 
 .video-js {

@@ -1,5 +1,5 @@
 {% for each_id, each_node in prior_node_obj_dict.items %}
-    <a href="{% url 'edit_page' group_name each_id %}">{{ each_node.name }}</a>,&nbsp;
+    <a href="{% url 'page-detail' group_name each_id %}">{{ each_node.name }}</a>,&nbsp;
 {% empty %}
     <font size="3">No prior-node available!!</font>
 {% endfor %}

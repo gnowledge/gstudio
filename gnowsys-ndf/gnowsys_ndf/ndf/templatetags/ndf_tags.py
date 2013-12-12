@@ -15,25 +15,59 @@ db=get_database()
 
 ##################################################################################################
 
-"""
-/**
- * Get GApps toolbar
- */
-"""
 @register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(request):
+def get_gapps_menubar(group_name):
   """Get Gapps menu-bar
   """
   gst_collection = db[GSystemType.collection_name]
-  gst_cur = gst_collection.GSystemType.find()
+  gst_cur = gst_collection.GSystemType.find({'_type': u"GSystemType"})
 
   gapps = {}
   for app in gst_cur:
     gapps[app._id] = app.name.lower()
 
-  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps,'request':request}
+  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'group_name': group_name}
 
+@register.assignment_tag
+def check_group(groupname):
+  fl=check_existing_group(groupname)
+  return fl
 
+@register.assignment_tag
+def get_group_name(groupurl):
+  print "SADF",groupurl
+  sp=groupurl.split("/",2)
+  print "sp=",sp,len(sp)
+  if len(sp)<=1:
+    return "home"
+  if sp[1]:
+    chsp=check_existing_group(sp[1])
+    if chsp:
+      return sp[1]
+    else:
+      return "home"
+  else:
+      return "home"
+
+@register.assignment_tag
+def get_existing_groups():
+  group = []
+  col_Group = db[Group.collection_name]
+  colg = col_Group.Group.find({'type': u"Group"})
+  colg.sort('name')
+  gr=list(colg)
+  for items in gr:
+    group.append(items.name)
+  return group
+
+@register.assignment_tag
+def get_group_policy(group_name,user):
+  policy = ""
+  col_Group = db[Group.collection_name]
+  colg=col_Group.Group.one({"name":group_name})
+  if colg:
+    policy=str(colg.sub_policy)
+  return policy
 
 #######################################################################################################################################
 
@@ -91,44 +125,5 @@ def edit_content(context):
   return {'template': 'ndf/edit_content.html', 'user': user, 'node': doc_obj}
 """
 
-@register.assignment_tag
-def check_group(groupname):
-  fl=check_existing_group(groupname)
-  return fl
 
-@register.assignment_tag
-def get_group_name(groupurl):
-  print "SADF",groupurl
-  sp=groupurl.split("/",2)
-  print "sp=",sp,len(sp)
-  if len(sp)<=1:
-    return "home"
-  if sp[1]:
-    chsp=check_existing_group(sp[1])
-    if chsp:
-      return sp[1]
-    else:
-      return "home"
-  else:
-      return "home"
-
-@register.assignment_tag
-def get_existing_groups():
-  group = []
-  col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find()
-  colg.sort('name')
-  gr=list(colg)
-  for items in gr:
-    group.append(items.name)
-  return group
-
-@register.assignment_tag
-def get_group_policy(group_name,user):
-  policy =""
-  col_Group = db[Group.collection_name]
-  colg=col_Group.Group.one({"name":group_name})
-  if colg:
-    policy=str(colg.sub_policy)
-  return policy
   
