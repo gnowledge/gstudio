@@ -74,6 +74,9 @@ within it; and also perform following steps:
   Install Python Imaging Library(PIL) : pip install PIL
   	NOTE:
   		(1) For more information visit - "http://www.pythonware.com/products/pil/"
+  		(2) If you get error (like, "IOError: decoder jpeg/zip not available!"), try following:
+  		    - Install libjpeg-dev with apt: sudo apt-get install libjpeg-dev
+          - Reinstall PIL: pip install -I PIL 
  	
  		
   Install MathJax(2.2) :
