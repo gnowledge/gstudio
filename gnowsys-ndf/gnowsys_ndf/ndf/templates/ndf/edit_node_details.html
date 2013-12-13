@@ -12,7 +12,7 @@
     Member of : {{ node.member_of|join:', ' }}
  Contributors : {{ user_details.modified_by|join:', ' }}
   Last update : {{ node.last_update|date:"j F Y" }}
-     Versions : </pre>
+     Versions : {% for seq_no, version_no in version_dict.items reversed %}<abbr title={{version_no}}><a href="{% url 'version_page' group_name node.pk version_no %}">*</a></abbr> {% endfor %}</pre>
     </td>
   </tr>
 
