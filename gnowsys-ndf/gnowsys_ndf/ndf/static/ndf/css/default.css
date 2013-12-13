@@ -3833,3 +3833,47 @@ body.vjs-full-window {
 .mal {
   margin-left: 20px;
 }
+
+/* CSS for Image Galary */
+.gallery-wrap { 
+	height:auto; width:780px; float:left; padding:0px; background:url(../Images/Layout/piclibrepeaty.gif) repeat-y 23px -29px;
+}
+
+.gallery-item-group { 
+	height:235px; width:172px; float:left; position:relative; margin:0px 0px 27px 23px; padding:0px;
+}
+
+.gallery-item-group img.picture { 
+	height:172px; width:172px; float:left; background-color:#333;
+}
+
+.gallery-item-group img.edge-img { 
+	height:172px; width:172px; float:left; z-index:100;
+}
+
+.gallery-item-caption { 
+	float:left; margin:9px 0px 0px 0px; padding:6px 0px 0px 0px; height:33px; width:172px; color:#CCCCCC; border-top:2px solid #ffffff; overflow:hidden;
+}
+
+.gallery-item-caption p { 
+	margin:0px; padding:0px; line-height:16px; font-size:13px;
+}
+
+.gallery-item-caption p a { 
+	color:#CCCCCC; font-weight:bold; text-decoration:none;
+}
+
+.gallery-item-caption p a:hover { 
+	color:#00CCFF; font-weight:bold; text-decoration:none;
+}
+.exhibitionrepeater { 
+	width:960px !important; background:url(/Images/Layout/piclibrepeaty.gif) repeat-y 0px -29px !important;
+}
+
+.exitemrepeater { 
+	margin:0px 25px 27px 0px !important; 
+}
+.lastitemrepeater { 
+	margin:0px 0px 27px 0px !important; 
+}      
+
