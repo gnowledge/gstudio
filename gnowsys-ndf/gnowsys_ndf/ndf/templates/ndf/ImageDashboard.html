@@ -42,7 +42,7 @@
 <div style='display:table;' >
 	<div style='display:table-row;' >
 		{% for image in imageCollection %}
-			<div style='display:table-cell; padding-left:10px'> 
+			<div style='display:table-cell; padding-left:25px'> 
 				<a href="{% url 'getFullImage' group_name image %}">
 				<img src="{% url 'getImageThumbnail' group_name image %}"></img><br/>
 				<span align="left">{{image.name}}</span></a>
