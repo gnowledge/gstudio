@@ -65,8 +65,9 @@ def file(request, group_name, file_id):
     if gst_file._id == ObjectId(file_id):
         title = gst_file.name
         filecollection=db[File.collection_name]
-        files=filecollection.File.find()
-        return render_to_response("ndf/file.html", {'title': title,'files':files, 'group_name':group_name}, context_instance=RequestContext(request))
+        files=filecollection.File.find({'_type': u'File'})
+        return render_to_response("ndf/file.html", {'title': title,'files':files}, context_instance=RequestContext(request))
+
     else:
         return HttpResponseRedirect(reverse('homepage'))
     
@@ -106,7 +107,7 @@ def submitDoc(request,group_name):
         else:
             return HttpResponseRedirect("/"+group_name+"/file"+"/"+gst_file._id.__str__())
             # filecollection=get_database()[File.collection_name]
-            # files=filecollection.File.find()
+            # files=filecollection.File.find('_type': u'File')
             # variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'filecollection':files})
             # template='ndf/DocumentList.html'
             # return render_to_response(template,variable)
@@ -178,7 +179,7 @@ def convert_image_thumbnail(files):
 	
 def GetDoc(request,group_name):
     filecollection=get_database()[File.collection_name]
-    files=filecollection.File.find()
+    files=filecollection.File.find({'_type': u'File'})
     #return files
     template="ndf/DocumentList.html"
     variable=RequestContext(request,{'filecollection':files})
