@@ -1,0 +1,45 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+{% block body_content %} 
+<div style='padding-top:10px;'>
+  <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url view_name  group_name %}">
+    <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
+    <input type="submit" class="btn btn-large btn-primary" value="search" />
+  </form> 
+</div>
+<hr />
+<div name="search">
+  {% for file in file_collection %}
+  <h3> {{file.name}}</h3>
+  <div style='display:table;'>
+    <div style='display:table-row;'>
+      <div style='display:table-cell;'>
+	{% if "image" in  file.mime_type %}
+	<img src="{% url 'getImageThumbnail' group_name file %}" vertical-align="top"></img>
+	{% endif %}
+	<!-- {% if "pdf" in  file.mime_type %} -->
+	<!-- <img src="/home/file/readDoc/52aacbfd1606ea57ec7c40f6" vertical-align="top"></img> -->
+	<!-- {% endif %} -->
+	
+      </div>
+      <div style='display:table-cell;'>
+	{% get_user_object file.created_by as user_obj %}
+	<span style="padding-left:10px"><b>Posted by:</b> {{ user_obj.username}}</span><br />
+	<span style="padding-left:10px"><b>size:</b> {{file.file_size.size}}{{file.file_size.unit}}</span><br />
+	<span style="padding-left:10px"><b>file Type:</b> {{file.mime_type}}</span><br />
+	<span style="padding-left:10px"><b>Tags:</b> 
+	  {% for each in file.tags %} 
+	  {{each}},
+	  {% endfor %}
+	</span>
+      </div>
+    </div>
+  </div>
+<hr />
+{% empty %}
+    <span>No file found. Please try using some other keyword</span>
+{% endfor %}
+</div>
+{% endblock %}
+ 

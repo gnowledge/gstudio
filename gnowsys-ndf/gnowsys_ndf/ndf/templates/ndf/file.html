@@ -1,18 +1,17 @@
 {% extends "ndf/base.html" %}
-
 {% block title %} {{title}} {% endblock %}
-
 {% block body_content %} 
-
 {% if user.is_authenticated %}
 <center>
-<div style='padding-top:10px'>
-<input type="text" style="width:400px" placeholder="Enter keyword to search" />
- <input type="submit" class="btn btn-large btn-primary" value="search" />
-<a href="{% url 'uploadDoc' 'file' %}">
-  <input type="button" class="btn btn-large btn-primary" value="Upload" />
-</a>
-</div>
+  <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'file_search' 'group_name' %}">
+    <div style="padding-top:10px">
+      <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
+      <input type="submit" class="btn btn-large btn-primary" value="search" />
+      <a href="{% url 'uploadDoc' 'file' %}">
+	<input type="button" class="btn btn-large btn-primary" value="Upload" />
+      </a>
+    </div>
+  </form>
 </center>
 <hr />
 {% endif %}

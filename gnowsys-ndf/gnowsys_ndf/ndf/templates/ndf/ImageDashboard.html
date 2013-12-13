@@ -17,32 +17,58 @@
 
 
 <center>
-<div>
-	<input type="text" name="imgSearch" id ="imgSearch"  placeholder="Enter title to search"> 
-	<input type="submit" class="btn btn-large btn-primary" value="search" />	
+  <div style='display:table; padding-top:20px'>
+    <div style='display:table-row;'>
+      <div style='display:table-cell; padding-left:5px'>
+	<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
+	  <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
+	  <input type="submit" class="btn btn-large btn-primary" value="search" />
+	</form> 
+      </div>
+      <div style='display:table-cell; padding-left:5px'>
 	<form id ="imgPost" enctype="multipart/form-data" method="post" action="{% url 'uploadDoc' group_name %}">{% csrf_token %}
 	  <input type="hidden" name="stId" value={{stId}}>
 	  <input type="hidden" name="pageUrl" value={{pageUrl}}>
 	  <a href="{% url 'uploadDoc' group_name %}">
   	    <input type="submit" class="btn btn-large btn-primary" value="upload" />
-	</a>
-</form>
-</div>
+	  </a>
+	</form>
+      </div>
+    </div>
+  </div>
 </center>
-<div style='display:table;'>
+<hr />
+
+<div style='display:table;' >
 	<div style='display:table-row;' >
 		{% for image in imageCollection %}
-			<div style='display:table-cell;'> 
+			<div style='display:table-cell; padding-left:10px'> 
 				<a href="{% url 'getFullImage' group_name image %}">
 				<img src="{% url 'getImageThumbnail' group_name image %}"></img><br/>
-				<span align="center">{{image.name}}</span></a>
+				<span align="left">{{image.name}}</span></a>
 			</div>
 	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}
 			</div>
 			<div style='display:table-row;' >
-			{% endif %} 
+			{% endif %}
 		{% endfor %} 	
 	</div>
+			
 </div>
 
+<!--
+<div class="gallery-wrap exhibitionrepeater">
+  {% for image in imageCollection %}
+  <div class="gallery-item-group exitemrepeater">
+    <a href="{% url 'getFullImage' group_name image %}">
+      <img class="picture" src="{% url 'getImageThumbnail' group_name image %}"></img>
+    </a>
+    <div class="gallery-item-caption">
+      <p>
+	<a href="{{image.name}}"></a>
+      </p>
+    </div>
+  </div>
+  {% endfor %}
+</div>-->
 {% endblock %}
