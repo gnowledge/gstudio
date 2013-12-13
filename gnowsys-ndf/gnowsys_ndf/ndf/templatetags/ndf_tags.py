@@ -71,4 +71,14 @@ def get_group_policy(group_name,user):
   if colg:
     policy = str(colg.sub_policy)
   return policy
+
+'''this template function is used to get the user object from template''' 
+@register.assignment_tag 
+def get_user_object(user_id):
+  user_obj=""
+  try:
+    user_obj=User.objects.get(id=user_id)
+  except Exception as e:
+    print "User Not found in User Table",e
+  return user_obj
   

@@ -6,7 +6,7 @@ import hashlib # for calculating md5
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
 
 from django_mongokit import get_database
@@ -27,7 +27,7 @@ import os
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 
-from gnowsys_ndf.ndf.models import GSystemType, GSystem
+from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 
 #######################################################################################################################################
@@ -42,12 +42,12 @@ gst_file = gst_collection.GSystemType.one({'name': GAPPS[1]})
 #######################################################################################################################################
 
 
-def file(request, group_name,file_id):
+def file(request, group_name, file_id):
     """
     * Renders a list of all 'Files' available withinthe database  and group them acording to mimetype.
 
     """
-   
+    print 'check:', 
     # mime_types=[]
     # if gst_file._id == ObjectId(file_id):
     #     title = gst_file.name
@@ -67,6 +67,7 @@ def file(request, group_name,file_id):
         filecollection=db[File.collection_name]
         files=filecollection.File.find({'_type': u'File'})
         return render_to_response("ndf/file.html", {'title': title,'files':files}, context_instance=RequestContext(request))
+
     else:
         return HttpResponseRedirect(reverse('homepage'))
     
@@ -92,7 +93,7 @@ def submitDoc(request,group_name):
         userid = request.POST.get("user","")
         mainPageUrl = request.POST.get("mainPageUrl","")
         print "url",mainPageUrl
-        memberOf = request.POST.get("memberOf","")
+        #memberOf = request.POST.get("memberOf","")
 	for each in request.FILES.getlist("doc[]",""):
             f=save_file(each,title,userid,group_name,gst_file._id.__str__())
             if f:
@@ -189,3 +190,14 @@ def readDoc(request,_id,group_name):
     fileobj=filecollection.File.one({"_id": ObjectId(_id)})  
     fl=fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))
     return HttpResponse(fl.read(),content_type=fl.content_type)
+
+def file_search(request, group_name):
+    if request.method=="GET":
+        keyword=request.GET.get("search","")
+        files=db[File.collection_name]
+        file_search=files.File.find({'$or':[{'name':{'$regex': keyword}},{'tags':{'$regex':keyword}}]}) #search result from file
+        template="ndf/file_search.html"
+        variable=RequestContext(request,{'file_collection':file_search,'view_name':'file_search'})
+        return render_to_response(template,variable)
+
+        
