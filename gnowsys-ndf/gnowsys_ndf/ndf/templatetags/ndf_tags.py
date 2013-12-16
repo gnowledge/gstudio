@@ -6,6 +6,7 @@ from django.template import Library
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
+from django.contrib.auth.models import User
 
 
 ##################################################################################################
@@ -92,20 +93,50 @@ def edit_content(context):
 """
 
 @register.assignment_tag
+def check_user_join(request,groupname):
+  if not request.user:
+    return "null"
+  user=request.user
+  print "grna=",groupname
+  usern=User.objects.filter(username=user)
+  if usern:
+    usern=User.objects.get(username=user)
+    user_id=usern.id
+  else:
+    return "null"
+  print "userid",user_id
+  col_Group = db[Group.collection_name]
+  colg = col_Group.Group.one({"name":groupname})
+  print colg
+  if colg:
+    if colg.created_by == user_id:
+      print "auth"
+      return "author"
+    if colg.author_set:
+      if user_id in colg.author_set:
+        print "join" 
+        return "joined"
+      else:
+        return "not"
+    else:
+      return "not"
+  else:
+    return "nullobj"
+  
+@register.assignment_tag
 def check_group(groupname):
   fl=check_existing_group(groupname)
   return fl
 
 @register.assignment_tag
 def get_group_name(groupurl):
-  print "SADF",groupurl
   sp=groupurl.split("/",2)
-  print "sp=",sp,len(sp)
   if len(sp)<=1:
     return "home"
   if sp[1]:
     chsp=check_existing_group(sp[1])
     if chsp:
+      print "gname=",sp[1]
       return sp[1]
     else:
       return "home"
@@ -122,6 +153,20 @@ def get_existing_groups():
   for items in gr:
     group.append(items.name)
   return group
+
+@register.assignment_tag
+def get_existing_groups_excluded(grname):
+  group = []
+  col_Group = db[Group.collection_name]
+  colg = col_Group.Group.find()
+  colg.sort('name')
+  gr=list(colg)
+  for items in gr:
+    if items.name != grname:
+      group.append(items.name)
+  return group
+
+
 
 @register.assignment_tag
 def get_group_policy(group_name,user):

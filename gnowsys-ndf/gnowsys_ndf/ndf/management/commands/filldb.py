@@ -12,6 +12,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import GSystemType
 from gnowsys_ndf.ndf.models import GSystem
+from gnowsys_ndf.ndf.models import Group
 
 from gnowsys_ndf.settings import GAPPS
 
@@ -26,6 +27,7 @@ class Command(BaseCommand):
 
         db.drop_collection(GSystem.collection_name)
         db.drop_collection(GSystemType.collection_name)
+        db.drop_collection(Group.collection_name)
         
         gst_collection = db[GSystemType.collection_name]
         gst_node = []
@@ -37,5 +39,10 @@ class Command(BaseCommand):
             gst_node[i].created_by = user_id
             gst_node[i].modified_by.append(user_id)
             gst_node[i].save()
-
+        gs_collection = db[Group.collection_name]
+        gs_node = gs_collection.Group()
+        gs_node.name = u'home'
+        gs_node.created_by = user_id
+        gs_node.member_of.append(u"Group")
+        gs_node.save()
         # --- End of handle() ---
