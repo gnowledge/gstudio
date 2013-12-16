@@ -2,18 +2,12 @@
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
-<!-- ######### Loading django template tags ######### -->
-{% load ndf_tags %}
-
-<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
-
 {% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block body_content %}
-{% get_group_name request.path as group_name %}
-<form id="form_edit_page" method="POST" action="{% url 'edit_page' group_name node.pk %}">
+<form id="form_edit_page" method="POST" action="{% url 'edit_page' group_name node %}">
 {% csrf_token %}
 
 <div style="display:inline-block;">

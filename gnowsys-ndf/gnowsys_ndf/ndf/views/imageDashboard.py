@@ -33,3 +33,12 @@ def getFullImage(request, group_name, _id):
     if (imgobj.fs.files.exists(imgobj.fs_file_ids[0])):
         f = imgobj.fs.files.get(ObjectId(imgobj.fs_file_ids[0]))
         return HttpResponse(f.read(), content_type=f.content_type)
+
+def image_search(request,group_name):
+    imgcol=collection.File.find({'mime_type':{'$regex': 'image'}})
+    if request.method=="GET":
+        keyword=request.GET.get("search","")
+        img_search=collection.File.find({'$and':[{'mime_type':{'$regex': 'image'}},{'$or':[{'name':{'$regex':keyword}},{'tags':{'$regex':keyword}}]}]})
+        template="ndf/file_search.html"
+        variable=RequestContext(request,{'file_collection':img_search,'view_name':'image_search'})
+        return render_to_response(template,variable)
