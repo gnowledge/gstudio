@@ -49,8 +49,8 @@
 		 		background-color:#0B6580; top:0px;  width:100%; z-index:100;
 	 		}
 	 		
-	 		.loginInfo {	margin-left:80%; width:12%; text-align:right; cursor:pointer;color:#BAC1C8;}
-			.groupchange {  display:inline-block; width:0%; text-align:right; cursor:pointer;padding-left:10px;color:#BAC1C8;
+	 		.loginInfo {	margin-left:70%; width:12%; text-align:right; cursor:pointer;color:#BAC1C8;}
+			.groupchange {  display:inline-block; width:0%; text-align:right; cursor:pointer;padding-left:30px;color:#BAC1C8;
 			font-family:'Georgia';}
 
 	 	
@@ -67,7 +67,7 @@
 			#groupoptions
 			{
                                 display:none; background-color:lightgray; right:0.5%;
-			        margin-left:80%; width:12%; position:fixed; font-size:1.1em;
+			        margin-left:85%; width:15%; position:fixed; font-size:1.1em;
 			        text-align:center;
 			        border-radius:6px;
                         }
@@ -122,7 +122,8 @@
 			</div>
 			{% get_group_name request.path as group_name %}
 
-		
+		 <center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
+
       <!-- GApps Menubar -->
 
       <!-- ============= -->
@@ -133,16 +134,17 @@
 				  {{ user.username }} 						
 				</div>	
                                 
-                                 <div class="groupchange" onmouseover="$('#groupoptions').fadeIn();" >
+                                 <div class="groupchange" onmouseover="grover();" >
                                     {{group_name}}
 				    </div>
-				{% get_existing_groups as groups %}
+				{% get_existing_groups_excluded group_name as groups %}
 				<div id="groupoptions" style="display:none">
 				  <br/>
 				  {% for gp_id in groups %}
 				  <a href="{% url 'groupchange' gp_id %}">
 				    <div id="{{gp_id}}">{{gp_id}}</div> </a>
 				  {% endfor %}
+                                 <br/>
 				</div>&nbsp;
           
 				
@@ -165,7 +167,7 @@
 		  			<a href="{% url 'auth_login' %}">Login</a>		    		 
 				</div>
                                 
-                                 <div class="groupchange" onmouseover="$('#groupoptions').fadeIn();" >
+                                 <div class="groupchange" onmouseover="grover();" >
                                       {{group_name}}  
 				  </div>
                                 
@@ -176,6 +178,7 @@
 <a href="{% url 'groupchange' gp_id %}">
 <div id="{{gp_id}}">{{gp_id}}</div> </a>
 {% endfor %}
+<br/>
  </div>
 		  		
 		  				  
@@ -200,7 +203,7 @@
 		
 		<!-- Start of Footer -->		
 
-
+               
                 <div class="footer" align="center">
                 <p>
 A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab</a>,<a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a><br/>
@@ -217,7 +220,15 @@ A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab<
 	<!-- Your script goes here -->
 	
 	<script type="text/javascript">
+               function grover(){
+               timeout = setTimeout(disp,500);
+                }
+                function disp(){
+                $('#groupoptions').fadeIn()}
+                function dispout(){
+		$("#groupoptions").fadeOut()
 
+	        }
 		$("#body").css("margin-top", $("#header").height() + "px");	
 		$("#body").css("min-height", ( $(window).height() - $("#header").height() - $(".footer").height() ) + "px");
 		
@@ -225,7 +236,7 @@ A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab<
 			$("#loginPanel").fadeOut()	
 		});
                 $("#groupoptions").mouseleave(function(){
-		$("#groupoptions").fadeOut()
+                 timeout = setTimeout(dispout,10000);
 		});
 
 		

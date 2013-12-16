@@ -56,7 +56,7 @@ def create_group(request,group_name):
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
-        colg.name = request.POST.get('groupname', "")
+        colg.name = unicode(request.POST.get('groupname', ""))
         colg.member_of.append(u"Group")
         usrid = int(request.user.id)
         colg.created_by=usrid
