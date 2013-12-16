@@ -24,11 +24,8 @@ from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import Group
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups
-###########################################################################
-
 
 ###########################################################################
-
 
 db = get_database()
 gst_collection = db[GSystemType.collection_name]
@@ -41,9 +38,7 @@ gs_collection = db[GSystem.collection_name]
 
 
 def group(request, group_name,app_id):
-    """
-    * Renders a list of all 'Group-type-GSystems' available within the database.
-
+    """Renders a list of all 'Group-type-GSystems' available within the database.
     """
 
     group_nodes=get_existing_groups()

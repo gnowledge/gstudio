@@ -1,40 +1,57 @@
 {% extends "ndf/base.html" %}
-
 {% block title %} {{title}} {% endblock %}
-
 {% block body_content %} 
-
 {% if user.is_authenticated %}
-<div style='padding-top:10px'>
-<a href="{% url 'uploadDoc' 'file' %}">
-  <input type="submit" class="btn btn-large btn-primary" value="Upload a {{title}}" />
-</a>
-</div>
-
+<center>
+  <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'file_search' 'group_name' %}">
+    <div style="padding-top:10px">
+      <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
+      <input type="submit" class="btn btn-large btn-primary" value="search" />
+      <a href="{% url 'uploadDoc' 'file' %}">
+	<input type="button" class="btn btn-large btn-primary" value="Upload" />
+      </a>
+    </div>
+  </form>
+</center>
 <hr />
 {% endif %}
-
 {% load url from future %}
-{% for node in doc_nodes %}
-  {% if forloop.first %}
-    <h5>Number Of Nodes : {{ doc_nodes_count }} </h5>
-  {% endif %}
-  <div>
-    <p><strong><a href="">{{ node.name }}</a></strong><br>
-    <!--
-    Created at : {{ node.created_at|date:"j F Y" }}<br>
-    Member Of   : {{ node.member_of }}<br>
-    Tags       : {{ node.tags|join:", " }}<br>
-    <a href="{#% url 'delete_node' node %#}">delete</a>
-    -->
-    </p>
+
+{% if files %}
+<div style='display:table;  border:2px;   border-spacing:10px; '>
+  <div style='display:table-row;' >
+    <div style='display:table-cell;' align="middle">
+      <h4>File Name </h4>
+    </div>
+    <div style='display:table-cell;' align="middle">
+      <h4>File Size </h4>
+    </div>  
+    <div style='display:table-cell;' align="middle">
+      <h4>File Type </h4>
+    </div>
+    <div style='display:table-cell;' align="middle">
+	    <h4 >Download </h4>
+    </div>
   </div>
-
-{% empty %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
-{% endfor %}
-
-<br/>
-
+    {% for file in files %}
+    <div style='display:table-row;' >
+      <div style='display:table-cell;' align="middle">
+	<lable>{{file.name}} </lable>
+      </div>
+      <div style='display:table-cell;' align="middle">
+	<lable>{{file.file_size.size}}{{file.file_size.unit}} </lable>
+      </div>  
+      <div style='display:table-cell;' align="middle">
+	<lable>{{file.mime_type}}</lable>
+      </div>
+      <div style='display:table-cell;' align="middle">
+	<a href="{% url 'read_file' 'group' file %}">Download </a>
+      </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+   <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
+{% endif %}
 {% endblock %}
 
