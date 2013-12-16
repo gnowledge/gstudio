@@ -1,0 +1,48 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %} video Gallery {% endblock %}
+{% block body_content %} 
+
+{% if alreadyUploadedFiles %} 
+<div id="message">
+  <span style="color:red">Listed below files are already uploaded please choose different files</span>
+  <ul>
+    {% for each in alreadyUploadedFiles %}
+    <li>{{each}}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% get_group_name request.path as group_name %}
+
+
+<center>
+<div>
+	<input type="text" name="imgSearch" id ="imgSearch"  placeholder="Enter title to search"> 
+	<input type="submit" class="btn btn-large btn-primary" value="search" />	
+	<form id ="imgPost" enctype="multipart/form-data" method="post" action="{% url 'uploadDoc' group_name %}">{% csrf_token %}
+	  <input type="hidden" name="stId" value={{stId}}>
+	  <input type="hidden" name="pageUrl" value={{pageUrl}}>
+	  <a href="{% url 'uploadDoc' group_name %}">
+  	    <input type="submit" class="btn btn-large btn-primary" value="upload" />
+	</a>
+</form>
+</div>
+</center>
+<div style='display:table;'>
+	<div style='display:table-row;' >
+		{% for video in videoCollection %}
+			<div style='display:table-cell;'> 
+				<a href="{% url 'getFullvideo' group_name video %}">
+				<img src="{% url 'getvideoThumbnail' group_name video %}"></img><br/>
+				<span align="center">{{video.name}}</span></a>
+			</div>
+	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}
+			</div>
+			<div style='display:table-row;' >
+			{% endif %} 
+		{% endfor %} 	
+	</div>
+</div>
+
+{% endblock %}
