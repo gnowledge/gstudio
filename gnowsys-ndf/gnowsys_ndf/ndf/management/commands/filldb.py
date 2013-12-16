@@ -29,6 +29,7 @@ class Command(BaseCommand):
         db.drop_collection(GSystemType.collection_name)
         db.drop_collection(Group.collection_name)
         
+
         gst_collection = db[GSystemType.collection_name]
         gst_node = []
         user_id = 1 

@@ -4,7 +4,7 @@
 from gnowsys_ndf.ndf.models import *
 from django.contrib.auth.models import User
 
-db=get_database()
+db = get_database()
 
 def check_existing_group(groupname):
   col_Group = db[Group.collection_name]

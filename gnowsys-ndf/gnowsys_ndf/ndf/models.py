@@ -117,79 +117,6 @@ class RatingField(CustomType):
 #                                                                                                    C L A S S    D E F I N I T I O N S
 #######################################################################################################################################
 
-@connection.register
-class Author(DjangoDocument):
-    """
-    Author class modified for storing in mongokit
-    """
-    
-    objects = models.Manager()
-    
-    collection_name = 'Authors'
-    structure = {
-        'username': unicode,
-        'password': unicode,
-        'email': unicode,
-        'first_name': unicode,
-        'last_name': unicode,
-        'address': unicode,
-        'phone': long,
-        'is_active': bool,
-        'is_staff': bool,
-        'is_superuser': bool,        
-        'created_at': datetime.datetime,
-        'last_login': datetime.datetime,
-    }
-    
-    use_dot_notation = True
-    required_fields = ['username', 'password']
-    default_values = {'created_at': datetime.datetime.now}
-    #validators={
-    #'phone': lambda x: x > 0 and x < 10 }
-    indexes = [
-        {
-            'fields': 'username',
-            'unique': True
-        }
-    ]
-    
-    def __init__(self, *args, **kwargs):
-        super(Author, self).__init__(*args, **kwargs)
-        
-    def __eq__(self, other_user):
-        # found that otherwise millisecond differences in created_at is compared
-        try:
-            other_id = other_user['_id']
-        except (AttributeError, TypeError):
-            return False
-            return self['_id'] == other_id
-    
-    # play ball with Django
-    @property
-    def id(self):
-        return self.username
-    
-    def password_crypt(self, password):
-        password_salt = str(len(password))
-        crypt = hashlib.sha1(password[::-1].upper() + password_salt).hexdigest()
-        PASSWORD = unicode(crypt, 'utf-8')
-        return PASSWORD  
-    
-    def is_anonymous(self):
-        return False
-    
-    def is_authenticated(self):
-        return True
-    
-    def get_full_name(self):
-        "Returns the first_name plus the last_name, with a space in between."
-        full_name = u'%s %s' % (self.first_name, 
-                                self.last_name)
-        return full_name.strip()
-    
-    def __unicode__(self):
-        return self._id
-
 
 @connection.register
 class Node(DjangoDocument):
@@ -198,6 +125,7 @@ class Node(DjangoDocument):
 
     collection_name = 'Nodes'
     structure = {
+        '_type': unicode,
         'name': unicode,
         'altnames': unicode,
         'plural': unicode,
@@ -258,7 +186,7 @@ class Node(DjangoDocument):
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
 
-            ''' on save, set created_at to current date'''
+            # On save, set created_at to current date
             self.created_at = datetime.datetime.today()
 
         self.last_update = datetime.datetime.today()
@@ -287,11 +215,9 @@ class Node(DjangoDocument):
 
 @connection.register
 class MetaType(Node):
-    """
-    MetaType class - A collection of Types 
+    """MetaType class - A collection of Types 
     """
 
-    collection_name = 'MetaTypes'
     structure = {
         'description': basestring,		# Description (name)
         'parent': ObjectId                      # Foreign key to self 
@@ -301,7 +227,7 @@ class MetaType(Node):
 
 @connection.register
 class AttributeType(Node):
-    collection_name = 'AttributeTypes'
+
     structure = {
 	'data_type': basestring,		# NoneType in mongokit
         'subject_type': [ObjectId],
@@ -348,7 +274,7 @@ class Attribute(Node):
  
 @connection.register
 class RelationType(Node):
-    collection_name = 'RelationTypes'
+
     structure = {
         'inverse_name': unicode,
         'subject_type': [ObjectId],	       # ObjectId's of Any Class
@@ -373,7 +299,7 @@ class RelationType(Node):
 
 @connection.register
 class Relation(Node):
-    collection_name = 'Relations'
+
     structure = {
         'subject_type_value': ObjectId,		# ObjectId's of GSystemType Class
         'relation_type_value': ObjectId,	# ObjectId's of RelationType Class
@@ -384,10 +310,10 @@ class Relation(Node):
 '''
 
 class ProcessType(Node):
-    """
-    A kind of nodetype for defining processes or events or temporal                                                                             objects involving change.
+    """A kind of nodetype for defining processes or events or temporal
+    objects involving change.
     """  
-    collection_name = 'ProcessTypes'
+
     structure = { 
         'changing_attributetype_set': [AttributeType],  # List of Attribute Types
         'changing_relationtype_set': [RelationType]    # List of Relation Types
@@ -397,9 +323,9 @@ class ProcessType(Node):
 
 @connection.register
 class GSystemType(Node):
-    """                                                                                                                                         Class to organize Systems                                                                                                            
+    """Class to organize Systems
     """
-    collection_name = 'GSystemTypes'
+
     structure = {
         'meta_type_set': [MetaType],            # List of Metatypes
         'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
@@ -412,11 +338,9 @@ class GSystemType(Node):
     
 @connection.register
 class GSystem(Node):
-    """
-    GSystemType instance
+    """GSystemType instance
     """
 
-    collection_name = 'GSystems'
     structure = {
         'gsystem_type': [ObjectId],		# ObjectId's of GSystemType Class  
         'attribute_set': [dict],		# dict that holds AT name & its values
@@ -431,14 +355,13 @@ class GSystem(Node):
 
 @connection.register
 class File(GSystem):
-    """
-    File class to hold any resource 
+    """File class to hold any resource 
     """
 
-    collection_name = 'Files'
     structure = {
-        'mime_type' : basestring,            # Holds the type of file
-        'fs_file_ids' : [ObjectId]           # Holds the List of  ids of file stored in gridfs 
+        'mime_type': basestring,             # Holds the type of file
+        'fs_file_ids': [ObjectId],           # Holds the List of  ids of file stored in gridfs 
+        'file_size': {'size':float,'unit':unicode}  #dict used to hold file size in int and unit palace in term of KB,MB,GB
     }
 
     gridfs = {
@@ -451,11 +374,9 @@ class File(GSystem):
     
 @connection.register
 class Group(GSystem):
-    """
-    Group class to create collection (group) of members
+    """Group class to create collection (group) of members
     """
 
-    collection_name='Groups'
     structure = {
         'gtype': basestring,                 # Types of groups - Anonymous,public or private
         'edit_policy': basestring,           # Editing policy of the group- non editable, moderately editable, editable
@@ -504,6 +425,28 @@ class HistoryManager():
     	
     	if not dir_exists:
             os.makedirs(dir_path)
+
+    def get_version_dict(self, document_object):
+        '''Returns a dictionary containing list of revision numbers.
+        
+        Example:
+        {
+         "1": "1.1",
+         "2": "1.2",
+         "3": "1.3",
+        }
+        '''
+        fp = self.get_file_path(document_object)
+
+        rcs = RCS()
+        current_rev = rcs.head(fp)          # Say, 1.4
+        total_no_of_rev = int(rcs.info(fp)["total revisions"])         # Say, 4
+        
+        version_dict = {}
+        for i, j in zip(range(total_no_of_rev), reversed(range(total_no_of_rev))):
+            version_dict[(j+1)] = rcs.calculateVersionNumber(fp, (i))
+
+        return version_dict
 
     def get_file_path(self, document_object):
         '''Returns absolute filesystem path for a json-file.
@@ -564,19 +507,19 @@ class HistoryManager():
             print("\n\n RCS repository created @ following path:\n {0}\n"\
                       .format(self.__RCS_REPO_DIR))
 
-        for collection in versioning_collections:
-            rcs_repo_collection = os.path.join(self.__RCS_REPO_DIR, \
-                                                   collection)
-            try:
-                os.makedirs(rcs_repo_collection)
-            except OSError as ose:
-                print(" {0} collection-directory under RCS repository "\
-                          "not created!!!\n Error #{1}: {2}\n"\
-                          .format(collection, ose.errno, ose.strerror))
-            else:
-                print(" {0} collection-directory under RCS repository "\
-                          "created @ following path:\n {1}\n"\
-                          .format(collection, rcs_repo_collection))
+        # for collection in versioning_collections:
+        #     rcs_repo_collection = os.path.join(self.__RCS_REPO_DIR, \
+        #                                            collection)
+        #     try:
+        #         os.makedirs(rcs_repo_collection)
+        #     except OSError as ose:
+        #         print(" {0} collection-directory under RCS repository "\
+        #                   "not created!!!\n Error #{1}: {2}\n"\
+        #                   .format(collection, ose.errno, ose.strerror))
+        #     else:
+        #         print(" {0} collection-directory under RCS repository "\
+        #                   "created @ following path:\n {1}\n"\
+        #                   .format(collection, rcs_repo_collection))
                
     def create_or_replace_json_file(self, document_object=None):
         '''Creates/Overwrites a json-file for passed document object in 

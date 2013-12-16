@@ -29,11 +29,5 @@ gst_collection = db[GSystemType.collection_name]
 
 
 def homepage(request):
-    gst_collection = db[GSystemType.collection_name]
-    gst_cur = gst_collection.GSystemType.find()
-    
-    gapps = {}
-    for app in gst_cur:
-        gapps[app._id] = app.name.lower()
 
-    return render_to_response("ndf/base.html", {'gapps': gapps}, context_instance=RequestContext(request))
+    return render_to_response("ndf/base.html", context_instance=RequestContext(request))

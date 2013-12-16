@@ -2,18 +2,12 @@
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
-<!-- ######### Loading django template tags ######### -->
-{% load ndf_tags %}
-
-<!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
-
 {% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block body_content %}
-{% get_group_name request.path as group_name %}
-<form id="form_edit_page" method="POST" action="{% url 'edit_page' group_name node_id %}">
+<form id="form_edit_page" method="POST" action="{% url 'edit_page' group_name node %}">
 {% csrf_token %}
 
 <div style="display:inline-block;">
@@ -22,7 +16,6 @@
   </div>
   {% if user.is_authenticated %}
   <div style="display:inline-block; padding-left:2em; float:left; margin:1.25em;">
-    <input type="hidden" id="node_id" name="nodeid" value="{{node}}" />
     <input id="edit-node" type="button" value="Edit" class="btn btn-large btn-primary" />
   </div>
   {% endif %}
