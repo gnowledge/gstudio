@@ -74,6 +74,14 @@ within it; and also perform following steps:
   Install Python Imaging Library(PIL) : pip install PIL
   	NOTE:
   		(1) For more information visit - "http://www.pythonware.com/products/pil/"
+
+ Install Python ox : pip install ox
+ 	 NOTE: 
+		(1) For more information visit - "https://pypi.python.org/pypi/ox"
+
+ Install ffmpeg : apt-get install ffmpeg
+ 	 NOTE: 
+	        (1) For more information visit - "http://www.ffmpeg.org/"
  	
  		
   Install MathJax(2.2) :
