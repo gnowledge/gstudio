@@ -74,35 +74,7 @@
 			        border-radius:6px;
                         }
 
-      .loginInfo {
-        margin-left:80%; width:12%; text-align:right; cursor:pointer;color:#BAC1C8;
-      }
-
-      .groupchange {  
-        display:inline-block; width:0%; text-align:right; cursor:pointer;padding-left:10px;color:#BAC1C8;
-        font-family:'Georgia';
-      }
-
-	 	
-      .loginInfo,.headertitle,.groupchange {
-        display:inline; 
-      }
 			
-      #loginPanel
-      {
-        display:none; background-color:lightgray; right:0.5%; 
-        margin-left:80%; width:12%; position:fixed; font-size:1.1em; 
-        text-align:center; 
-        border-radius:6px; 
-      }
-
-      #groupoptions
-      {
-        display:none; background-color:lightgray; right:0.5%;
-        margin-left:80%; width:12%; position:fixed; font-size:1.1em;
-        text-align:center;
-        border-radius:6px;
-      }
 
       #loginPanel div
       {	
@@ -146,32 +118,25 @@
   </head>
   
 	<body>
+<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
 
+      
 		<!-- Start of Hedaer Div -->
-		
-
 		<div class="header">
 			<div class="headertitle">
 			  NUSSD
-			
 			</div>
 			{% get_group_name request.path as group_name %}
 
-		 <center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
-
       <!-- GApps Menubar -->
-
       <!-- ============= -->
-
-
                          {% if user.is_authenticated %}
 				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
 				  {{ user.username }} 						
 				</div>	
-                                
                                  <div class="groupchange" onmouseover="grover();" >
                                     {{group_name}}
-				    </div>
+				 </div>
 				{% get_existing_groups_excluded group_name as groups %}
 				<div id="groupoptions" style="display:none">
 				  <br/>
@@ -181,34 +146,6 @@
 				  {% endfor %}
                                  <br/>
 				</div>&nbsp;
-
-  <body>
-    <!-- Start of Hedaer Div -->
-    <div class="header">
-      <div class="headertitle">
-	NUSSD
-      </div>
-      
-      {% get_group_name request.path as group_name %}
-
-      {% if user.is_authenticated %}
-        <div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
-	  {{ user.username }} 						
-	</div>	
-                                
-        <div class="groupchange" onmouseover="$('#groupoptions').fadeIn();" >
-          {{group_name}}
-	</div>
-	
-	{% get_existing_groups as groups %}
-	<div id="groupoptions" style="display:none">
-	  <br/>
-	  {% for gp_id in groups %}
-	    <a href="{% url 'groupchange' gp_id %}">
-	      <div id="{{gp_id}}">{{gp_id}}</div>
-	    </a>
-	    {% endfor %}
-	</div>&nbsp;
           
 	<div id="loginPanel" >
 	  <br/>										
@@ -226,13 +163,11 @@
 	<div class="loginInfo">
 	  <a href="{% url 'auth_login' %}">Login</a>		    		 
 	</div>
-                                
-
                                  <div class="groupchange" onmouseover="grover();" >
                                       {{group_name}}  
 				  </div>
                                 
-{% get_existing_groups as groups %}
+{% get_existing_groups_excluded group_name as groups %}
 <div id="groupoptions" style="display:none">
 <br/>
 {% for gp_id in groups %}
@@ -247,30 +182,10 @@
 
 		<div id="menu">
           <!-- GApps Toolbar -->
-		  {% get_gapps_menubar request %}
+		  {% get_gapps_menubar group_name %}
           <!-- ============= -->
-</div>
-        <div class="groupchange" onmouseover="$('#groupoptions').fadeIn();" >
-          {{group_name}}  
-	</div>
-                                
-	{% get_existing_groups as groups %}
-	<div id="groupoptions" style="display:none">
-	  <br/>
-	  {% for gp_id in groups %}
-	    <a href="{% url 'groupchange' gp_id %}">
-	      <div id="{{gp_id}}">{{gp_id}}</div>
-	    </a>
-	  {% endfor %}
-	</div>
+                </div>
 
-      {% endif %}
-
-      <div id="menu">
-        <!-- GApps Toolbar -->
-	{% get_gapps_menubar group_name %}
-        <!-- ============= -->
-      </div>
 			                 
     </div> 		
     <!-- End of Header Div-->
@@ -281,21 +196,6 @@
     </div>
     <!-- End of Body Container -->		  	
 		
-
-		
-		<!-- Start of Footer -->		
-
-               
-                <div class="footer" align="center">
-                <p>
-A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab</a>,<a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a><br/>
-  	        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.<br/>
-                </p>
-                </div>
-
-
-
-		<!-- End of Footer -->		
 	</body>
     <!-- Start of Footer -->		
     
@@ -327,7 +227,7 @@ A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab<
 		$("#groupoptions").fadeOut()
 
 	        }
-		$("#body").css("margin-top", $("#header").height() + "px");	
+	       $("#body").css("margin-top", $("#header").height() + 80 + "px");	
 		$("#body").css("min-height", ( $(window).height() - $("#header").height() - $(".footer").height() ) + "px");
 		
 		$("#loginPanel").mouseleave(function(){
@@ -339,22 +239,6 @@ A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab<
 
 		
 		{% block script %} {% endblock %}	
-
-  <script type="text/javascript">
-    
-    $("#body").css("margin-top", $("#header").height() + 80 + "px");	
-    $("#body").css("min-height", ( $(window).height() - $("#header").height() - $(".footer").height() ) + "px");
-    
-    $("#loginPanel").mouseleave(function(){
-      $("#loginPanel").fadeOut()	
-    });
-    
-    $("#groupoptions").mouseleave(function(){
-      $("#groupoptions").fadeOut()
-    });
-
-    {% block script %} {% endblock %}	
-
 	
   </script>
   
