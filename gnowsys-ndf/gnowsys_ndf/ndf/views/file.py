@@ -89,13 +89,19 @@ def uploadDoc(request,group_name):
 def submitDoc(request,group_name):
     alreadyUploadedFiles=[]
     if request.method=="POST":
-        title = request.POST.get("docTitle","")
+        mtitle = request.POST.get("docTitle","")
         userid = request.POST.get("user","")
         mainPageUrl = request.POST.get("mainPageUrl","")
         print "url",mainPageUrl
         #memberOf = request.POST.get("memberOf","")
-	for each in request.FILES.getlist("doc[]",""):
-            f=save_file(each,title,userid,group_name,gst_file._id.__str__())
+        i=1
+	for index,each in enumerate(request.FILES.getlist("doc[]","")):
+            if index==0:
+                f=save_file(each,mtitle,userid,group_name,gst_file._id.__str__())
+            else:
+                title=mtitle+"_"+str(i)
+                f=save_file(each,title,userid,group_name,gst_file._id.__str__())
+                i=i+1
             if f:
                 alreadyUploadedFiles.append(f)
         if 'image' in mainPageUrl:
