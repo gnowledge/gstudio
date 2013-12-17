@@ -1,0 +1,121 @@
+{% extends "ndf/base.html" %}
+
+{% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
+
+{% block head %}
+
+  <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['\\[','\\]'], ['$$','$$']]
+      }
+    });
+  </script>
+
+  <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+  <script type="text/javascript"
+	  src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+{% endblock %}
+
+{% block body_content %}
+
+<div style="display:inline-block;">
+  <div style="display:inline-block; float:left; margin:0.8em 0.8em 0.8em 0;">
+    <h2>{{node.name}}</h2>
+  </div>
+  {% if user.is_authenticated %}
+  <div style="display:inline-block; padding-left:2em; float:left; margin:1.25em;">
+    <h3><a href="{% block url %} {% endblock %}">[ Edit ]</a></h3>
+  </div>
+  {% endif %}
+  
+</div>
+
+<div id="node-details-view-div" style="display:block">
+
+  <table cellpadding="8">
+
+  <tr>
+    <td>
+    <pre>
+    Posted by : {{ user_details.created_by }} on {{ node.created_at|date:"j F Y" }}
+    Member of : {{ node.member_of|join:', ' }}
+ Contributors : {{ user_details.modified_by|join:', ' }}
+  Last update : {{ node.last_update|date:"j F Y" }}
+     Versions : {% for seq_no, version_no in version_dict.items reversed %}<abbr title={{version_no}}><a href="{% url 'page_version' group_name node.pk version_no %}">*</a></abbr> {% endfor %}</pre>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+    <h4><strong>Description:</strong></h4>
+    {% with node.html_content|safe as page_org2html_content %}
+    {% if page_org2html_content != "None" %}
+      <font size="3">{{ page_org2html_content }}</font>
+    {% else %}
+      <font size="3">No description available!!</font>
+    {% endif %}
+    {% endwith %}
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+    {% if node.prior_node|length_is:"0" %}
+      <h4><strong>Prior Node:</strong></h4>
+    {% else %}
+      <h4><strong>Prior Node{{ node.prior_node|length|pluralize }}:</strong></h4>
+    {% endif %}
+    {% for each_id, each_node in prior_node_obj_dict.items %}
+      <a href="{% url 'page_details' group_name each_id %}">{{ each_node.name }}</a>,&nbsp;
+    {% empty %}
+      <font size="3">No prior-node available!!</font>
+    {% endfor %}
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+    <h4><strong>Collection:</strong></h4>
+    {% for each_id, each_node in collection_obj_dict.items %}
+      {% if each_node.collection_set %}
+      <li class="list" style="list-style-type:none;">
+	<abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+	<a href="{% url 'page_details' group_name each_id %}" style="padding-left:10px;">{{ each_node.name }}</a>
+      </li>
+      {% else %}
+      <li class="list" style="list-style-type:none;">
+        <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+	<a href="{% url 'page_details' group_name each_id %}" style="padding-left:12px;">{{ each_node.name }}</a>
+      </li>
+      {% endif %}
+    {% empty %}
+      <font size="3">No collection available!!</font>
+    {% endfor %}
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+    {% if node.tags|length_is:"0" %}
+      <h4><strong>Tag:</strong></h4>
+      <font size="3">No tags available!!</font>
+    {% else %}
+      <h4><strong>Tag{{ node.tags|length|pluralize }}:</strong></h4>
+      <font size="3">{{ node.tags|join:', ' }}</font>
+    {% endif %}
+    </td>
+  </tr>
+
+  </table>
+
+</div>
+
+{% block add_fields %} {% endblock %}
+
+{% endblock %}
+
