@@ -6,14 +6,36 @@ from django.template import Library
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
+from gnowsys_ndf.ndf.views.methods import get_drawers
 
+#######################################################################################################################################
 
-##################################################################################################
+register = Library()
+db = get_database()
 
-register=Library()
-db=get_database()
+#######################################################################################################################################
 
-##################################################################################################
+@register.inclusion_tag('ndf/drawer_widget.html')
+def edit_drawer_widget(field, node):
+
+  drawers = None
+  drawer1 = None
+  drawer2 = None
+
+  if node :
+    if field == "collection":
+      drawers = get_drawers(node._id, node.collection_set)
+
+    elif field == "prior_node":
+      drawers = get_drawers(node._id, node.prior_node)
+    
+    drawer1 = drawers['1']
+    drawer2 = drawers['2']
+
+  else:
+    drawer1 = get_drawers()
+
+  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2}
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(group_name):
