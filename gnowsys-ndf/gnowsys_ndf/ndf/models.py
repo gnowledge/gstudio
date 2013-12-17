@@ -144,11 +144,10 @@ class Node(DjangoDocument):
 
         'content': unicode,
         'content_org': unicode,
-        #'image': 
 
         'tags': [unicode],
         'featured': bool,
-
+        'url':unicode,
         'comment_enabled': bool,
       	'login_required': bool,
       	#'password': basestring,
@@ -347,9 +346,11 @@ class GSystem(Node):
         'attribute_set': [dict],		# dict that holds AT name & its values
         'relation_set': [dict],			# dict that holds RT name & its related_object value
         'collection_set': [ObjectId],		# list of ObjectId's of GSystem Class
+        'author_set':[int]                   # List of Authors
     }
     
     use_dot_notation = True
+    
 
 
 @connection.register
@@ -369,6 +370,7 @@ class File(GSystem):
 
     use_dot_notation = True
 
+    
     
 @connection.register
 class Group(GSystem):

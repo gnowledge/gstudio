@@ -9,6 +9,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import GSystemType
 from gnowsys_ndf.ndf.models import GSystem
+from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.settings import GAPPS
 
 ####################################################################################################################
@@ -32,5 +33,15 @@ class Command(BaseCommand):
                     gst_node.created_by = user_id
                     gst_node.modified_by.append(user_id)
                     gst_node.save()
+        gs_collection = db[Group.collection_name]
+        a=collection.GSystemType.find({'$and':[{'_type':'Group'},{'name':'home'}]})
+        if a.count() < 1:
+            gs_node = collection.Group()
+            gs_node.name = u'home'
+            gs_node.created_by = user_id
+            gs_node.member_of.append(u"Group")
+            gs_node.save()
+
 
             # --- End of handle() ---
+
