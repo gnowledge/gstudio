@@ -22,7 +22,6 @@ def get_gapps_menubar(group_name):
   """
   gst_collection = db[GSystemType.collection_name]
   gst_cur = gst_collection.GSystemType.find({'_type': u'GSystemType'})
-
   gapps = {}
   for app in gst_cur:
     gapps[app._id] = app.name.lower()
@@ -35,24 +34,19 @@ def check_user_join(request,groupname):
   if not request.user:
     return "null"
   user=request.user
-  print "grna=",groupname
   usern=User.objects.filter(username=user)
   if usern:
     usern=User.objects.get(username=user)
     user_id=usern.id
   else:
     return "null"
-  print "userid",user_id
   col_Group = db[Group.collection_name]
   colg = col_Group.Group.one({"name":groupname})
-  print colg
   if colg:
     if colg.created_by == user_id:
-      print "auth"
       return "author"
     if colg.author_set:
       if user_id in colg.author_set:
-        print "join" 
         return "joined"
       else:
         return "not"
@@ -75,7 +69,6 @@ def get_group_name(groupurl):
   if sp[1]:
     chsp = check_existing_group(sp[1])
     if chsp:
-      print "gname=",sp[1]
       return sp[1]
     else:
       return "home"
@@ -99,12 +92,14 @@ def get_existing_groups():
 def get_existing_groups_excluded(grname):
   group = []
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find()
+  colg = col_Group.Group.find({'_type':u'Group'})
   colg.sort('name')
   gr=list(colg)
   for items in gr:
     if items.name != grname:
       group.append(items.name)
+  if not group:
+    group.append("None")
   return group
 
 
