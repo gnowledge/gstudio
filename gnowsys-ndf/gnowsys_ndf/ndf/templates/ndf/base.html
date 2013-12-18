@@ -120,14 +120,14 @@
 	<body>
 <center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
 
-      
+      		{% get_group_name request.path as group_name %}
+
 		<!-- Start of Hedaer Div -->
 		<div class="header">
 			<div class="headertitle">
-			  NUSSD
+			  {{group_name}}
 			</div>
-			{% get_group_name request.path as group_name %}
-
+	
       <!-- GApps Menubar -->
       <!-- ============= -->
                          {% if user.is_authenticated %}
