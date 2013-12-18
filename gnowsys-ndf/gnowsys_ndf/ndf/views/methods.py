@@ -19,7 +19,7 @@ def check_existing_group(groupname):
   else:
     return False
 
-def get_drawers(nid=None, nlist=[]):
+def get_drawers(nid=None, nlist=[], checked=None):
     """Get both drawers-list.
     """
 
@@ -30,7 +30,24 @@ def get_drawers(nid=None, nlist=[]):
     gst_collection = db[GSystemType.collection_name]
     gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
     gs_collection = db[GSystem.collection_name]
-    drawer = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}})
+    
+    #drawer = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}})
+    #drawer = gs_collection.GSystem.find({'_type': { '$in' : [u"GSystem", u"File"]}})
+    
+    drawer = None    
+        
+    if checked == "Page":        
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem"})
+        
+    if checked == "File":         
+        drawer = gs_collection.GSystem.find({'_type': u"File"})    
+        
+    if checked == "Image":         
+        drawer = gs_collection.GSystem.find({'_type': u"File",'mime_type': u"image/jpeg"})       
+    
+    if checked == None:
+        drawer = gs_collection.GSystem.find({'_type': { '$in' : [u"GSystem", u"File"]}})   
+           
 
     if (nid is None) and (not nlist):
       for each in drawer:
@@ -49,3 +66,4 @@ def get_drawers(nid=None, nlist=[]):
       dict_drawer['2'] = dict2
 
     return dict_drawer
+    
