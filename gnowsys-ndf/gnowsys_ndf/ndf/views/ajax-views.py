@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group
+from gnowsys_ndf.ndf.views.methods import check_existing_group,get_drawers
 
 def checkgroup(request,group_name):
     print "insidechekgr"
@@ -34,4 +34,19 @@ def checkgroup(request,group_name):
         return HttpResponse("failure")
     
 
-
+def select_drawer(request, group_name):
+    
+    if request.is_ajax() and request.method == "POST":
+        #homo_collection = json.loads(request.POST["hetro_collection"])
+        checked = request.POST.get("homo_collection", '')
+        
+        print "\n=================================================\n"
+        print "\n homo_collection : ", checked
+        #print "\n type : ", type(homo_collection)
+        
+        drawer = get_drawers(None,None,checked)
+        
+        return render_to_response("ndf/drawer_widget.html", {"drawer1":drawer, "group_name": group_name}, 
+                                      context_instance=RequestContext(request))
+                   
+       

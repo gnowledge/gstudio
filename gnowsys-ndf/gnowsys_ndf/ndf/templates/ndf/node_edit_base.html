@@ -78,7 +78,7 @@
       </td>
       <td>
 	<div id="prior_node_drawer">
-	  {% edit_drawer_widget "prior_node" node %}
+	  {% edit_drawer_widget "prior_node" group_name node %}
 	</div>
       </td>
     </tr>
@@ -90,13 +90,21 @@
       <td>
         <div style="padding-left:3px">
 	{% if node.collection_set %}
-	  <input type="checkbox" id="collection_cb" name="collection_cb" checked />&nbsp;Do you want to create a collection?<br/>
+	  <input type="checkbox" id="collection_cb" name="collection_cb" checked="checked" />&nbsp;Do you want to create a collection?<br/>
 	{% else %}
 	  <input type="checkbox" id="collection_cb" name="collection_cb" />&nbsp;Do you want to create a collection?<br/>
 	{% endif %}
 	</div>
+	
+	<div id="SelectApp" style="display:none; height: 50px"> 
+            <br/>&nbsp;&nbsp;
+            <input type="radio" id="Page_collection" name="col" value="Page" checked="checked" />&nbsp;Page &nbsp;
+            <input type="radio" id="File_collection" name="col" value="File" />&nbsp;File &nbsp;
+            <input type="radio" id="Image_collection" name="col" value="Image" />&nbsp;Image &nbsp;
+    </div>
+	
 	<div id="collection_drawer">
-	  {% edit_drawer_widget "collection" node %}
+	  {% edit_drawer_widget "collection" group_name node %}
 	</div>
       </td>
     </tr>
@@ -119,20 +127,39 @@
 
 if ( $("#collection_cb").prop("checked") ) {
     $("#collection_drawer").css("display", "block")
+    $("#SelectApp").css("display", "block")
 }
 else {
     $("#collection_drawer").css("display", "none")
+    $("#SelectApp").css("display", "none")
 }
 
 $("#collection_cb").change(function() {
     if (this.checked) {
         $("#collection_drawer").css("display", "block")
+        $("#SelectApp").css("display", "block")
     }
     else{
         $("#collection_drawer").css("display", "none")
+        $("#SelectApp").css("display", "none")
     }
 });
 
+$('input:radio').click(function() {
+        
+        $.ajax({
+            type: "POST",
+            url: "{% url 'select_drawer' group_name %}",
+            datatype: "html",
+            data : {
+                homo_collection: this.value,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+                $('#collection_drawer').html(data);
+            }
+        });
+});
 
 $("#save-node").click(function() {
     
