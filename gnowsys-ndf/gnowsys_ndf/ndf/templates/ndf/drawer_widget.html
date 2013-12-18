@@ -1,0 +1,105 @@
+
+  <table cellpadding="3" style="width:370px;">
+    <tr>
+      <td style="width:160px;">
+      	<div style="padding-bottom:8px"><b>Pages:</b></div>
+      	<select id="{{widget_for}}_drawer1" multiple="multiple">    <!---->
+	  {% if drawer1 != "None" %}
+    	  {% for key,value in drawer1.items %}
+      	  <option id={{key}}>{{value}}</option>
+    	  {% endfor %}
+	  {% endif%}
+      	</select>
+      </td>
+	  
+      <td style="width:50px; text-align:center; vertical-align:middle;">
+      	<input id="{{widget_for}}_btnUp" type="button" value ="  ^  "><br/>
+      	<input id="{{widget_for}}_btnRight" type="button" value ="  >  "><br/>
+      	<input id="{{widget_for}}_btnLeft" type="button" value ="  <  "><br/>
+      	<input id="{{widget_for}}_btnDown" type="button" value ="  v  "><br/>
+      </td>
+	  
+      <td style="width:160px;">
+      	<div style="padding-bottom:8px"><b>Added to Drawer:</b></div>
+      	<select id="{{widget_for}}_drawer2" multiple="multiple">
+	  {% if drawer2 != "None" %}
+    	  {% for key,value in drawer2.items %}
+	  <option id={{key}}>{{value}}</option>
+	  {% endfor %}
+	  {% endif %}
+	</select>
+      </td><br>
+    </tr>
+  </table>
+      
+  <input id="{{widget_for}}_list" type="hidden" name="{{widget_for}}_list" value="" />
+
+<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+<script type="text/javascript">
+
+  $(function()
+  {
+
+    $("#{{widget_for}}_btnRight").click(function() { 
+      var selectedOpts = $("#{{widget_for}}_drawer1 option:selected");
+
+      if (selectedOpts.length == 0){
+        alert("Nothing to move.");
+        e.preventDefault();
+      }
+
+      $("#{{widget_for}}_drawer2").append($(selectedOpts).clone());
+      $(selectedOpts).remove();
+      e.preventDefault();
+    });   
+   
+    $("#{{widget_for}}_btnUp").click(function() {
+       
+      $("#{{widget_for}}_drawer1 :selected").each(function (i, selected) {
+        $(this).insertBefore($(this).prev());
+	      $("#{{widget_for}}_drawer2").options.att("selected",false);
+      });
+      
+      $("#{{widget_for}}_drawer1 select").focus().blur();
+      
+      $("#{{widget_for}}_drawer2 :selected").each(function (i, selected) {
+        $(this).insertBefore($(this).prev());
+	      $("#{{widget_for}}_drawer1").options.att("selected",false);
+      });
+      
+      $("#{{widget_for}}_drawer2 select").focus().blur();
+    });
+
+    $("#{{widget_for}}_btnDown").click(function() {
+      $("#{{widget_for}}_drawer1 :selected").each(function (i, selected) {
+        $(this).insertAfter($(this).next());
+	      $("#{{widget_for}}_drawer2").options.att("selected",false);	
+      });
+      
+      $("#{{widget_for}}_drawer1 select").focus().blur();
+      
+      $("#{{widget_for}}_drawer2 :selected").each(function (i, selected) {
+        $(this).insertAfter($(this).next());
+	      $("#{{widget_for}}_drawer1").options.att("selected",false);
+      });
+      
+      $("#{{widget_for}}_drawer2 select").focus().blur();
+    });
+    
+    $("#{{widget_for}}_btnLeft").click(function() {
+      var selectedOpts = $("#{{widget_for}}_drawer2 option:selected");
+      if (selectedOpts.length == 0) {
+        alert("Nothing to move.");
+        e.preventDefault();
+      }
+
+      $("#{{widget_for}}_drawer1").append($(selectedOpts).clone());
+      $(selectedOpts).remove();
+      e.preventDefault();
+    });  
+    
+  });
+
+</script>
+
