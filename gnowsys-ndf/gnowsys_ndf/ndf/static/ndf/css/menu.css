@@ -1,25 +1,4 @@
-/**
- *********************************************
- * Prototype of styles for horizontal CSS-menu
- * @data 25.01.2010
- *********************************************
- * (X)HTML-scheme:
- *  <div id="menu">
- *      <ul class="menu">
- *          <li><a href="#" class="parent"><span>level 1</span></a>
- *              <div><ul>
- *                  <li><a href="#" class="parent"><span>level 2</span></a>
- *                      <div><ul><li><a href="#"><span>level 3</span></a></li></ul></div>
- *                  </li>
- *              </ul></div>
- *          </li>
- *          <li class="last"><a href="#"><span>level 1</span></a></li>
- *      </ul>
- *  </div>
- *********************************************
- */
 
-/* menu::base */
 #menu {
     position:relative;
     z-index:100;
@@ -28,7 +7,7 @@
 #menu .menu {
     position:absolute;
     padding-left: 10px;
-    background: url(/ndf/images/header.gif) right top no-repeat; 
+
 }
 #menu * {
     list-style:none;
@@ -72,20 +51,20 @@
     z-index:77;
 }
 #menu a:hover {
-    background:url(/ndf/images/header.gif) left -43px repeat-x;
+    background:left -43px repeat-x;
     color:white;
 }
 #menu a:hover span { color:#FFF; }
 #menu li.current a {
-    background: transparent url(/ndf/images/header_active.gif) repeat-x;
+    background: repeat-x;
     color:#3C4955;
 }
 #menu li.current span {
     color:#3C4955;
 }
 #menu>ul>li:hover>a {
-    background:url(/ndf/images/header.gif) left -43px repeat-x;
-    color:#CACFD3;
+    background:left -43px repeat-x;
+    color:white;
 }
 #menu>ul>li:hover>a span { color:#FFF; }
 #menu span {
@@ -95,7 +74,7 @@
     text-decoration:none;
     color:#BAC1C8;
 }
-#menu li { background: url(images/header.gif) left top no-repeat;}
+#menu li { background:left top no-repeat;}
 /* menu::level >= 2 */
 #menu ul ul {width: 150px;}
 #menu li li{

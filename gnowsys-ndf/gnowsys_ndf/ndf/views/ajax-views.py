@@ -24,10 +24,8 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_drawers
 
 def checkgroup(request,group_name):
-    print "insidechekgr"
     titl=request.GET.get("gname","")
     retfl=check_existing_group(titl)
-    print "retfl",retfl
     if retfl:
         return HttpResponse("success")
     else:
