@@ -158,7 +158,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',    
     'gnowsys_ndf.benchmarker',
     'registration',
-    'djangoratings'
+    'djangoratings',
+    'notification'
 )
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
