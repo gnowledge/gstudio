@@ -1,0 +1,169 @@
+{% extends "ndf/base.html" %}
+
+{% load ndf_tags %}
+
+{% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
+
+{% block head %}
+
+  <!-- orgitdown! -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+  <!-- orgitdown! toolbar skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+
+{% endblock %}
+
+{% block body_content %}
+
+<form id="form-edit-node" method="POST" action="">
+{% csrf_token %}
+
+<div style="display:inline-block;">
+  <div style="display:inline-block; float:left; margin:0.8em 0.8em 0.8em 0;">
+    {% if node %}
+    <h2>{{node.name}}</h2>
+    {% else %}
+    <h2>Create...</h2>
+    {% endif %}
+  </div>
+</div>
+
+<div id="node-details-edit-div"> 
+
+  <table cellpadding="5">
+
+    <tr>
+      <td style="text-align:right; vertical-align:top; padding-top:12px;">
+	<h4><strong>Name:</strong></h4>
+      </td>
+      <td>
+	<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter title">
+      </td>
+    </tr>
+
+    <tr>
+      <td style="text-align:right; vertical-align:top; padding-top:12px;">
+	<h4><strong>Privacy:</strong></h4>
+      </td>
+      <td>
+	<input type="checkbox" id="private_cb" name="private_cb" />&nbsp;Make it private?<br/>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="text-align:right; vertical-align:top; padding-top:20px;">
+	<h4><strong>Description:</strong></h4>
+      </td>
+      <td>
+	<textarea id="orgitdown" name="content_org" placeholder="Please enter description...">{{node.content_org|default_if_none:""}}</textarea>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="text-align:right; vertical-align:top; padding-top:12px;">
+	<h4><strong>Tag{{node.tags|pluralize|default_if_none:"s"}}:</strong></h4>
+      </td>
+      <td>
+	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ">
+      </td>
+    </tr>
+
+    <tr>
+      <td style="text-align:right; vertical-align:top; padding-top:25px;">
+	<h4><strong>Prior Node:</strong></h4>
+      </td>
+      <td>
+	<div id="prior_node_drawer">
+	  {% edit_drawer_widget "prior_node" node %}
+	</div>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="text-align:right; vertical-align:top; padding-top:10px;">
+	<h4><strong>Collection:</strong></h4>
+      </td>
+      <td>
+        <div style="padding-left:3px">
+	{% if node.collection_set %}
+	  <input type="checkbox" id="collection_cb" name="collection_cb" checked />&nbsp;Do you want to create a collection?<br/>
+	{% else %}
+	  <input type="checkbox" id="collection_cb" name="collection_cb" />&nbsp;Do you want to create a collection?<br/>
+	{% endif %}
+	</div>
+	<div id="collection_drawer">
+	  {% edit_drawer_widget "collection" node %}
+	</div>
+      </td>
+    </tr>
+
+  </table>
+  
+</div>
+
+{% block add_fields %} {% endblock %}
+
+<div style="padding: 20px 0px 20px 280px">
+  <input type="submit" id="save-node" value="Save" class="btn btn-large btn-primary">
+</div>
+
+</form>
+
+{% endblock %}
+
+{% block script %} 
+
+if ( $("#collection_cb").prop("checked") ) {
+    $("#collection_drawer").css("display", "block")
+}
+else {
+    $("#collection_drawer").css("display", "none")
+}
+
+$("#collection_cb").change(function() {
+    if (this.checked) {
+        $("#collection_drawer").css("display", "block")
+    }
+    else{
+        $("#collection_drawer").css("display", "none")
+    }
+});
+
+
+$("#save-node").click(function() {
+    
+    // -- For prior-node
+    pn_opts = prior_node_drawer2.options;
+    pn_len = pn_opts.length;
+    var pn_arr = [];
+    for (var i = 0; i < pn_len; i++) {
+	pn_arr[i] = "'" + pn_opts[i].value + "'";
+    }
+    var pn_list = pn_arr.join(',');
+    $("#prior_node_list").val(pn_list)
+    
+    // -- For collection
+    c_opts = collection_drawer2.options;
+    c_len = c_opts.length;
+    var c_arr = [];
+    for (var i = 0; i < c_len; i++) {
+        c_arr[i] = "'" + c_opts[i].value + "'";
+    }
+    var c_list = c_arr.join(',');
+    $("#collection_list").val(c_list)
+});
+
+
+$(document).ready(function() {
+    
+    // Must be there to display org-editor shortcuts
+    $('#orgitdown').orgitdown(mySettings);
+    
+});
+
+{% endblock %}
+
