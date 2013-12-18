@@ -63,7 +63,7 @@ def check_user_join(request,groupname):
   else:
     return "null"
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.one({"name":groupname})
+  colg = col_Group.Group.one({'$and':[{'_type':'Group'},{'name':groupname}]})
   if colg:
     if colg.created_by == user_id:
       return "author"
@@ -130,7 +130,7 @@ def get_existing_groups_excluded(grname):
 def get_group_policy(group_name,user):
   policy = ""
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.one({"name":group_name})
+  colg = col_Group.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
   if colg:
     policy = str(colg.sub_policy)
   return policy
