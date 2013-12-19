@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
-
+from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 
 try:
@@ -28,7 +28,7 @@ import ox
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
@@ -73,7 +73,8 @@ def file(request, group_name, file_id):
 
     else:
         return HttpResponseRedirect(reverse('homepage'))
-    
+        
+@login_required    
 def uploadDoc(request,group_name):
     stId, mainPageUrl = "", ""
     if request.method=="POST":
@@ -88,7 +89,7 @@ def uploadDoc(request,group_name):
       
     
 
-
+@login_required
 def submitDoc(request,group_name):
     alreadyUploadedFiles=[]
     if request.method=="POST":
@@ -112,6 +113,12 @@ def submitDoc(request,group_name):
             imgcol=collection.File.find({'mime_type': {'$regex': 'image'}})
             variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'imageCollection':imgcol})
             template="ndf/ImageDashboard.html"
+            return render_to_response(template,variable)
+        if 'video' in mainPageUrl:
+            collection=db[File.collection_name]
+            videocol=collection.File.find({'mime_type': {'$regex': 'video'}})
+            variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'videoCollection':videocol})
+            template="ndf/videoDashboard.html"
             return render_to_response(template,variable)
         else:
             return HttpResponseRedirect("/"+group_name+"/file"+"/"+gst_file._id.__str__())
@@ -142,9 +149,7 @@ def save_file(files,title,userid,memberOf,stId):
             else :
                 filetype1 = ""
             filename=files.name
-            # code for converting video into webm and converted video assigning to varible files
-            if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
-            	files,filetype,thumbnailvideo = convertVideo(files,userid)
+
             if title:
                 fileobj.name=unicode(title)
             else:
@@ -156,22 +161,34 @@ def save_file(files,title,userid,memberOf,stId):
             if stId:
                 fileobj.gsystem_type.append(ObjectId(stId))
             fileobj.save()
+            
+
             files.seek(0)   #moving files cursor to start
             #this code is for storing Document in gridfs
             objectid=fileobj.fs.files.put(files.read(),filename=filename,content_type=filetype)
             fileobj.fs_file_ids.append(objectid)
             fileobj.save()
+            # code for converting video into webm and converted video assigning to varible files
+            if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
+            	fileobj.mime_type="video"
+       	        fileobj.save()
+            	webmfiles,filetype,thumbnailvideo = convertVideo(files,userid)
+	        #storing thumbnail of video with duration in saved object
+       	        tobjectid=fileobj.fs.files.put(thumbnailvideo.read(),filename=filename+"-thumbnail",content_type="thumbnail-image") # saving thumbnail in grid fs
+       	        fileobj.fs_file_ids.append(tobjectid) # saving thumbnail's id into file object
+       	        fileobj.save()
+       	        if filename.endswith('.webm') == False:
+      	        	tobjectid=fileobj.fs.files.put(webmfiles.read(),filename=filename,content_type=filetype) # saving webm video in grid fs
+      	        	fileobj.fs_file_ids.append(tobjectid) # saving webm video id into file object
+       	        	fileobj.save()
+
             #storing thumbnail of image in saved object
             if 'image' in filetype:
                 thumbnailimg=convert_image_thumbnail(files)
                 tobjectid=fileobj.fs.files.put(thumbnailimg,filename=filename+"-thumbnail",content_type=filetype)
                 fileobj.fs_file_ids.append(tobjectid)
                 fileobj.save()
-            #storing thumbnail of video with duration in saved object
-            if thumbnailvideo: 
-                tobjectid=fileobj.fs.files.put(thumbnailvideo.read(),filename=filetype+"-thumbnail",content_type="thumbnail-image") # saving thumbnail in grid fs
-                fileobj.fs_file_ids.append(tobjectid) # saving thumbnail's id into file object
-                fileobj.save()
+
         except Exception as e:
             print "Not Uploaded files:",files.name,"Execption:",e
 
@@ -203,7 +220,7 @@ def convertVideo(files,userid):
     z = ""
     for each1 in fileVideoName:
         if each1==" ":
-            z=z+'\ '
+            z=z+'-'
         else:
             z=z+each1
     fileVideoName = z
@@ -214,7 +231,7 @@ def convertVideo(files,userid):
     fd.close()
     initialFileName = fileVideoName.split(".")[0]
     if fileVideoName.endswith('.webm') == False:
-        proc = subprocess.Popen(['ffmpeg', '-y', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-an', str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")])
+        proc = subprocess.Popen(['ffmpeg', '-y', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")])
         proc.wait()
         files = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
     else : 
@@ -232,12 +249,19 @@ def convertVideo(files,userid):
             mins = mins % 60 
     else:
         secs = duration
+    videoDuration = ""
     durationTime = str(str(hrs)+":"+str(mins)+":"+str(secs)) # calculating Time duration of video in hrs,mins,secs
-    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', "00:00:30", "-s", "128*128",  "-f", "image2", "-frames:v", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # creating thumbnail of video using ffmpeg
+    if duration > 30 :
+	videoDuration = "00:00:30"
+    else :
+    	videoDuration = "00:00:00"    	
+    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # creating thumbnail of video using ffmpeg
     proc.wait()
     background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
+    fore = Image.open(MEDIA_ROOT+"ndf/images/poster.jpg")
+    background.paste(fore,(120,100))
     draw = ImageDraw.Draw(background)
-    draw.text((80, 100),durationTime,(255,255,255)) # drawing duration time on thumbnail image
+    draw.text((120, 100),durationTime,(255,255,255)) # drawing duration time on thumbnail image
     background.save("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
     thumbnailvideo = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
     return files,filetype,thumbnailvideo
