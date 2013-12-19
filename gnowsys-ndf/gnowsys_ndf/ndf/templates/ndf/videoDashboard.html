@@ -17,32 +17,42 @@
 
 
 <center>
-<div>
-	<input type="text" name="imgSearch" id ="imgSearch"  placeholder="Enter title to search"> 
-	<input type="submit" class="btn btn-large btn-primary" value="search" />	
+  <div style='display:table; padding-top:20px'>
+    <div style='display:table-row;'>
+      <div style='display:table-cell; padding-left:5px'>
+	<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'video_search' group_name %}">
+	  <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
+	  <input type="submit" class="btn btn-large btn-primary" value="search" />
+	</form> 
+      </div>
+      <div style='display:table-cell; padding-left:5px'>
 	<form id ="imgPost" enctype="multipart/form-data" method="post" action="{% url 'uploadDoc' group_name %}">{% csrf_token %}
 	  <input type="hidden" name="stId" value={{stId}}>
 	  <input type="hidden" name="pageUrl" value={{pageUrl}}>
 	  <a href="{% url 'uploadDoc' group_name %}">
   	    <input type="submit" class="btn btn-large btn-primary" value="upload" />
-	</a>
-</form>
-</div>
+	  </a>
+	</form>
+      </div>
+    </div>
+  </div>
 </center>
-<div style='display:table;'>
+<hr />
+
+<div style='display:table;' >
 	<div style='display:table-row;' >
 		{% for video in videoCollection %}
-			<div style='display:table-cell;'> 
+			<div style='display:table-cell; padding-left:25px'> 
 				<a href="{% url 'getFullvideo' group_name video %}">
-				<img src="{% url 'getvideoThumbnail' group_name video %}"></img><br/>
-				<span align="center">{{video.name}}</span></a>
+				<img src="{% url 'getvideoThumbnail' group_name video %}" style="border-radius:10px;"></img><br/>
+				<span align="left">{{video.name}}</span></a>
 			</div>
 	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}
 			</div>
 			<div style='display:table-row;' >
-			{% endif %} 
+			{% endif %}
 		{% endfor %} 	
 	</div>
+			
 </div>
-
 {% endblock %}
