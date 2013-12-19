@@ -13,4 +13,8 @@ urlpatterns +=patterns('gnowsys_ndf.ndf.views.ajax-views',
                         url(r'^check_group/', 'checkgroup', name='check_group'),
 
 )
+urlpatterns +=patterns('gnowsys_ndf.ndf.views.notify',
+                        url(r'^notify/join/$', 'notifyuser', name='notifyuser'),
+                        url(r'^notify/remove/$', 'notify_remove_user', name='notifyremuser'),
 
+)
