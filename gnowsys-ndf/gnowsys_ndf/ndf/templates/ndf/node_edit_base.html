@@ -98,9 +98,9 @@
 	
 	<div id="SelectApp" style="display:none; height: 50px"> 
             <br/>&nbsp;&nbsp;
-            <input type="radio" id="Page_collection" name="col" value="Page" checked="checked" />&nbsp;Page &nbsp;
-            <input type="radio" id="File_collection" name="col" value="File" />&nbsp;File &nbsp;
-            <input type="radio" id="Image_collection" name="col" value="Image" />&nbsp;Image &nbsp;
+            <input type="radio" name="col" value="Page" />&nbsp;Page &nbsp;
+            <input type="radio" name="col" value="File" />&nbsp;File &nbsp;
+            <input type="radio" name="col" value="Image" />&nbsp;Image &nbsp;
     </div>
 	
 	<div id="collection_drawer">
@@ -121,9 +121,7 @@
 
 </form>
 
-{% endblock %}
-
-{% block script %} 
+<script type="text/javascript">
 
 if ( $("#collection_cb").prop("checked") ) {
     $("#collection_drawer").css("display", "block")
@@ -135,9 +133,9 @@ else {
 }
 
 $("#collection_cb").change(function() {
-    if (this.checked) {
+    if (this.checked) {        
         $("#collection_drawer").css("display", "block")
-        $("#SelectApp").css("display", "block")
+        $("#SelectApp").css("display", "block")       
     }
     else{
         $("#collection_drawer").css("display", "none")
@@ -145,21 +143,33 @@ $("#collection_cb").change(function() {
     }
 });
 
+
 $('input:radio').click(function() {
+    // For collection
+    c_opts = collection_drawer2.options;
+    c_len = c_opts.length;
+    var c_arr = [];
+    for (var i = 0; i < c_len; i++) {
+        c_arr[i] = "'" + c_opts[i].value + "'";
+    }
+    var c_list = c_arr.join(',');
+    alert("collection-set: " + c_list)
         
-        $.ajax({
-            type: "POST",
-            url: "{% url 'select_drawer' group_name %}",
-            datatype: "html",
-            data : {
-                homo_collection: this.value,
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function(data) {
-                $('#collection_drawer').html(data);
-            }
-        });
+    $.ajax({
+        type: "POST",
+        url: "{% url 'select_drawer' group_name %}",
+        datatype: "html",
+        data:{
+            homo_collection: this.value,
+            collection_list: c_list,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
+            $('#collection_drawer').html(data);
+        }
+    });
 });
+
 
 $("#save-node").click(function() {
     
@@ -191,6 +201,8 @@ $(document).ready(function() {
     $('#orgitdown').orgitdown(mySettings);
     
 });
+
+</script>
 
 {% endblock %}
 

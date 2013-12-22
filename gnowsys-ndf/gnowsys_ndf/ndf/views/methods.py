@@ -32,28 +32,36 @@ def get_drawers(nid=None, nlist=[], checked=None):
     gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
     gs_collection = db[GSystem.collection_name]
     
-    #drawer = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(gst_page._id)]}})
-    #drawer = gs_collection.GSystem.find({'_type': { '$in' : [u"GSystem", u"File"]}})
-    
     drawer = None    
-        
-    if checked == "Page":        
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem"})
-        
-    if checked == "File":         
-        drawer = gs_collection.GSystem.find({'_type': u"File"})    
-        
-    if checked == "Image":         
-        drawer = gs_collection.GSystem.find({'_type': u"File",'mime_type': u"image/jpeg"})       
     
-    if checked == None:
+    if checked:     
+        if checked == "Page":        
+            drawer = gs_collection.GSystem.find({'_type': u"GSystem"})
+        
+        elif checked == "File":         
+            drawer = gs_collection.GSystem.find({'_type': u"File"})    
+        
+        elif checked == "Image":         
+            drawer = gs_collection.GSystem.find({'_type': u"File",'mime_type': u"image/jpeg"})       
+    else:
         drawer = gs_collection.GSystem.find({'_type': { '$in' : [u"GSystem", u"File"]}})   
            
-
+    
     if (nid is None) and (not nlist):
       for each in drawer:
         dict_drawer[each._id] = str(each.name)
 
+    elif (nid is None) and (nlist):
+      for each in drawer:
+        if each._id not in nlist:
+          dict1[each._id]=str(each.name)
+
+      for oid in nlist:          
+          dict2[oid]=str(gs_collection.GSystem.one({'_id': oid}).name)
+
+      dict_drawer['1'] = dict1
+      dict_drawer['2'] = dict2
+    
     else:
       for each in drawer:
         if each._id != nid:
@@ -67,4 +75,5 @@ def get_drawers(nid=None, nlist=[], checked=None):
       dict_drawer['2'] = dict2
 
     return dict_drawer
-    
+
+
