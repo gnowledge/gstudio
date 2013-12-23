@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
-
+from django.core.urlresolvers import reverse
 from django_mongokit import get_database
 
 try:
@@ -47,21 +47,6 @@ gst_file = gst_collection.GSystemType.one({'name': GAPPS[1]})
 
 def file(request, group_name, file_id):
     """
-    * Renders a list of all 'Files' available withinthe database  and group them acording to mimetype.
-
-    """
-    print 'check:', 
-    # mime_types=[]
-    # if gst_file._id == ObjectId(file_id):
-    #     title = gst_file.name
-    #     filecollection=db[File.collection_name]
-    #     for each in filecollection.distinct("mime_type"):
-    #         mime_types.append(filecollection.find({"mime_type":each}))
-    #     return render_to_response("ndf/file.html", {'title': title,'files':mime_types}, context_instance=RequestContext(request))
-    # else:
-    #     return HttpResponseRedirect(reverse('homepage'))
-    
-    """
     * Renders a list of all 'Files' available within the database.
 
     """
@@ -69,19 +54,19 @@ def file(request, group_name, file_id):
         title = gst_file.name
         filecollection=db[File.collection_name]
         files=filecollection.File.find({'_type': u'File'})
-        return render_to_response("ndf/file.html", {'title': title,'files':files}, context_instance=RequestContext(request))
-
+        already_uploaded=request.GET.get("already_uploaded","")
+        already_uploaded=list(already_uploaded)
+        print already_uploaded
+        return render_to_response("ndf/file.html", {'title': title,'files':files,'already_uploaded':already_uploaded}, context_instance=RequestContext(request))
     else:
         return HttpResponseRedirect(reverse('homepage'))
     
 def uploadDoc(request,group_name):
-    stId, mainPageUrl = "", ""
-    if request.method=="POST":
-        stId=request.POST.get("stId","")
-        mainPageUrl=request.POST.get("pageUrl","")
-    template="ndf/UploadDoc.html"
-    if stId and mainPageUrl:
-        variable = RequestContext(request, {'stId': stId, 'mainPageUrl': mainPageUrl})
+    if request.method=="GET":
+        page_url=request.GET.get("next","")
+        template="ndf/UploadDoc.html"
+    if  page_url:
+        variable = RequestContext(request, {'page_url': page_url})
     else:
         variable=RequestContext(request,{})
     return render_to_response(template,variable)
@@ -94,8 +79,8 @@ def submitDoc(request,group_name):
     if request.method=="POST":
         mtitle = request.POST.get("docTitle","")
         userid = request.POST.get("user","")
-        mainPageUrl = request.POST.get("mainPageUrl","")
-        print "url",mainPageUrl
+        page_url = request.POST.get("page_url","")
+        print "url",page_url
         #memberOf = request.POST.get("memberOf","")
         i=1
 	for index,each in enumerate(request.FILES.getlist("doc[]","")):
@@ -107,23 +92,14 @@ def submitDoc(request,group_name):
                 i=i+1
             if f:
                 alreadyUploadedFiles.append(f)
-        if 'image' in mainPageUrl:
-            collection=db[File.collection_name]
-            imgcol=collection.File.find({'mime_type': {'$regex': 'image'}})
-            variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'imageCollection':imgcol})
-            template="ndf/ImageDashboard.html"
-            return render_to_response(template,variable)
-        else:
-            return HttpResponseRedirect("/"+group_name+"/file"+"/"+gst_file._id.__str__())
-            # filecollection=get_database()[File.collection_name]
-            # files=filecollection.File.find('_type': u'File')
-            # variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'filecollection':files})
-            # template='ndf/DocumentList.html'
-            # return render_to_response(template,variable)
+        #url = reverse(page_url, kwargs={'alreadyUploadedFiles':alreadyUploadedFiles})
+        return HttpResponseRedirect(page_url+'?already_uploaded='+str(alreadyUploadedFiles))
+    else:
+        return HttpResponseRedirect(reverse('homepage'))
+            
 
 def save_file(files,title,userid,memberOf,stId):
     fcol=db[File.collection_name]
-    print "stid",stId
     fileobj=fcol.File()
     #gst=gst_collection.GSystemType.one({"_id":ObjectId(stId)})
     filemd5= hashlib.md5(files.read()).hexdigest()
@@ -233,7 +209,7 @@ def convertVideo(files,userid):
     else:
         secs = duration
     durationTime = str(str(hrs)+":"+str(mins)+":"+str(secs)) # calculating Time duration of video in hrs,mins,secs
-    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', "00:00:30", "-s", "128*128",  "-f", "image2", "-frames:v", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # creating thumbnail of video using ffmpeg
+    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', "00:00:30", "-s", "128*128",  "-f", "image2", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # creating thumbnail of video using ffmpeg
     proc.wait()
     background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
     draw = ImageDraw.Draw(background)
@@ -266,4 +242,18 @@ def file_search(request, group_name):
         variable=RequestContext(request,{'file_collection':file_search,'view_name':'file_search'})
         return render_to_response(template,variable)
 
-        
+def delete_file(request,group_name,_id):
+  """Delete file and its data
+  """
+  file_collection = db[File.collection_name]
+  pageurl=request.GET.get("next","")
+  print "testurl",pageurl
+  try:
+    cur=file_collection.File.one({'_id':ObjectId(_id)})
+    if cur.fs_file_ids:
+        for each in cur.fs_file_ids:
+            cur.fs.files.delete(each)
+    cur.delete()
+  except Exception as e:
+    print "Exception:",e
+  return HttpResponseRedirect(pageurl) 
