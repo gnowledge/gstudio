@@ -24,16 +24,17 @@
 {% block body_content %}
 
 <div style="display:inline-block;">
-  <div style="display:inline-block; float:left; margin:0.8em 0.8em 0.8em 0;">
+  <div style="display:inline-block; float:left; margin:0.8em 0.8em 0 0;">
     <h2>{{node.name}}</h2>
   </div>
   {% if user.is_authenticated %}
-  <div style="display:inline-block; padding-left:2em; float:left; margin:1.25em;">
-    <h3><a href="{% block url %} {% endblock %}">[ Edit ]</a></h3>
+  <div style="display:inline-block; padding-left:2em; float:left; margin:0.8em 0.8em 0 0;">
+    <h2><a href="{% block url %} {% endblock %}">[ Edit ]</a></h2>
   </div>
   {% endif %}
-  
 </div>
+
+<hr />
 
 <div id="node-details-view-div" style="display:block">
 
@@ -42,11 +43,11 @@
   <tr>
     <td>
     <pre>
-    Posted by : {{ user_details.created_by }} on {{ node.created_at|date:"j F Y" }}
+    Posted by : {{ node.user_details_dict.created_by }} on {{ node.created_at|date:"j F Y" }}
     Member of : {{ node.member_of|join:', ' }}
- Contributors : {{ user_details.modified_by|join:', ' }}
+ Contributors : {{ node.user_details_dict.modified_by|join:', ' }}
   Last update : {{ node.last_update|date:"j F Y" }}
-     Versions : {% for seq_no, version_no in version_dict.items reversed %}<abbr title={{version_no}}><a href="{% url 'page_version' group_name node.pk version_no %}">*</a></abbr> {% endfor %}</pre>
+     Versions : {% for seq_no, version_no in node.version_dict.items reversed %}<abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}">*</a></abbr> {% endfor %}</pre>
     </td>
   </tr>
 
@@ -70,7 +71,7 @@
     {% else %}
       <h4><strong>Prior Node{{ node.prior_node|length|pluralize }}:</strong></h4>
     {% endif %}
-    {% for each_id, each_node in prior_node_obj_dict.items %}
+    {% for each_id, each_node in node.prior_node_dict.items %}
       <a href="{% url 'page_details' group_name each_id %}">{{ each_node.name }}</a>,&nbsp;
     {% empty %}
       <font size="3">No prior-node available!!</font>
@@ -81,7 +82,7 @@
   <tr>
     <td>
     <h4><strong>Collection:</strong></h4>
-    {% for each_id, each_node in collection_obj_dict.items %}
+    {% for each_id, each_node in node.collection_dict.items %}
       {% if each_node.collection_set %}
       <li class="list" style="list-style-type:none;">
 	<abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
