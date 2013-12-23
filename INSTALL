@@ -66,6 +66,10 @@ within it; and also perform following steps:
   Install django-ratings(0.3.7) : pip install django-ratings
   	NOTE:
   		(1) For more information visit - "https://github.com/dcramer/django-ratings"
+
+  Install django-notification(1.1.1)  : pip install django-notification
+        NOTE
+	        (1) For more information visit - "https://pypi.python.org/pypi/django-notification/1.1.1" 
   		
   Install python-magic(0.4.6) : pip install python-magic
   	NOTE:
