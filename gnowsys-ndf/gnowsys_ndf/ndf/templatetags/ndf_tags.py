@@ -7,7 +7,6 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
-
 #######################################################################################################################################
 
 register = Library()
