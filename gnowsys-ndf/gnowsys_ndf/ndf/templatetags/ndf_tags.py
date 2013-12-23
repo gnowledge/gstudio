@@ -17,7 +17,9 @@ db = get_database()
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, node):
+def edit_drawer_widget(field, group_name, node, checked=""):
+
+  print "\n group_name : ", group_name, "\n"
 
   drawers = None
   drawer1 = None
@@ -25,10 +27,10 @@ def edit_drawer_widget(field, node):
 
   if node :
     if field == "collection":
-      drawers = get_drawers(node._id, node.collection_set)
+      drawers = get_drawers(node._id, node.collection_set, checked)
 
     elif field == "prior_node":
-      drawers = get_drawers(node._id, node.prior_node)
+      drawers = get_drawers(node._id, node.prior_node, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
@@ -36,7 +38,7 @@ def edit_drawer_widget(field, node):
   else:
     drawer1 = get_drawers()
 
-  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2}
+  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(group_name):
