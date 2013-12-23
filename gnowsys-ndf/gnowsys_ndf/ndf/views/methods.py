@@ -1,8 +1,15 @@
+''' -- imports from python libraries -- '''
+# import os -- Keep such imports here
+
+''' -- imports from installed packages -- '''
+from django.contrib.auth.models import User
+from django.template.defaultfilters import slugify
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
-from django.contrib.auth.models import User
+from gnowsys_ndf.ndf.org2any import org2html
+
 
 ######################################################################################################################################
 
@@ -14,7 +21,7 @@ db = get_database()
 
 def check_existing_group(groupname):
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find({"name":groupname})
+  colg = col_Group.Group.find({'_type': u'Group', "name":groupname})
   if colg.count() >= 1:
     return True
   else:
@@ -50,3 +57,80 @@ def get_drawers(nid=None, nlist=[]):
       dict_drawer['2'] = dict2
 
     return dict_drawer
+
+def get_node_common_fields(request, node, group_name, node_type):
+  gs_collection = db[GSystem.collection_name]
+
+  collection = None
+  private = None
+
+  name = request.POST.get('name')
+  usrid = int(request.user.id)
+  private = request.POST.get("private_cb", '')
+  tags = request.POST.get('tags')
+  prior_node_list = request.POST['prior_node_list']
+  collection = request.POST.get("collection_cb", '')
+  content_org = request.POST.get('content_org')
+
+  # --------------------------------------------------------------------------- For create only
+  if not node.has_key('_id'):
+    
+    node.created_by = usrid
+    node.member_of.append(node_type.name)
+    node.gsystem_type.append(node_type._id)
+  
+    if private:
+      private = True
+    else:
+      private = False
+
+    # End of if
+
+  # --------------------------------------------------------------------------- For create/edit
+  node.name = unicode(name)
+
+  if usrid not in node.modified_by:
+    node.modified_by.append(usrid)
+
+  if group_name not in node.group_set:
+    node.group_set.append(group_name)
+
+  node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+
+  # -------------------------------------------------------------------------------- prior_node
+  node.prior_node = []
+  if prior_node_list != '':
+    prior_node_list = prior_node_list.split(",")
+  
+  i = 0
+  while (i < len(prior_node_list)):
+    pn_name = str(prior_node_list[i])
+    pn_name = pn_name.replace("'", "")
+    node.prior_node.append(gs_collection.GSystem.one({'_type': u'GSystem', 'name': unicode(pn_name)})._id)
+    i = i+1
+
+  # -------------------------------------------------------------------------------- collection
+  if collection:
+    collection_list = request.POST['collection_list']
+    node.collection_set = []
+      
+    if collection_list != '':
+      collection_list = collection_list.split(",")
+
+    i = 0                    
+    while (i < len(collection_list)):                    
+      c_name = str(collection_list[i])
+      c_name = c_name.replace("'", "")
+      objs = gs_collection.GSystem.one({'name': unicode(c_name)})
+      node.collection_set.append(objs._id)
+      i = i+1
+
+  # ------------------------------------------------------------------------------- org-content
+  node.content_org = unicode(content_org.encode('utf8'))
+
+  # Required to link temporary files with the current user who is modifying this document
+  usrname = request.user.username
+  filename = slugify(name) + "-" + usrname + "-"
+  node.content = unicode(org2html(content_org, file_prefix=filename))
+
+
