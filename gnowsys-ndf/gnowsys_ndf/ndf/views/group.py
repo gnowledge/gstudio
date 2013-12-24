@@ -62,7 +62,8 @@ def create_group(request,group_name):
         colg.list_member_policy = request.POST.get('member', "")
         colg.encr_policy = request.POST.get('encryption', "")
         colg.save()
+        return render_to_response("ndf/groupdashboard.html",RequestContext(request))
     return render_to_response("ndf/create_group.html", RequestContext(request))
     
-def group_dashboard(request,group_name):
+def group_dashboard(request, group_name):
     return render_to_response("ndf/groupdashboard.html",RequestContext(request))

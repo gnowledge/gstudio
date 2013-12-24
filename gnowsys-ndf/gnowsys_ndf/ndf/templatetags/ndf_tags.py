@@ -23,16 +23,18 @@ def edit_drawer_widget(field, group_name, node, checked=""):
 
   if node :
     if field == "collection":
-      drawers = get_drawers(node._id, node.collection_set, checked)
+      #drawers = get_drawers(node._id, node.collection_set, checked)
+      drawers = get_drawers(group_name, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
-      drawers = get_drawers(node._id, node.prior_node, checked)
+      #drawers = get_drawers(node._id, node.prior_node, checked)
+      drawers = get_drawers(group_name, node._id, node.prior_node, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
 
   else:
-    drawer1 = get_drawers()
+    drawer1 = get_drawers(group_name)
 
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
 

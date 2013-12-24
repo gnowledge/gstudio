@@ -41,13 +41,13 @@ gst_file = gst_collection.GSystemType.one({'name': GAPPS[1]})
 
 
 #######################################################################################################################################
-#         V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
+#                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
 #######################################################################################################################################
 
 
 def file(request, group_name, file_id):
     """
-    * Renders a list of all 'Files' available withinthe database  and group them acording to mimetype.
+    * Renders a list of all 'Files' available within the database and group them acording to mimetype.
 
     """
     print 'check:', 
@@ -63,31 +63,28 @@ def file(request, group_name, file_id):
     
     """
     * Renders a list of all 'Files' available within the database.
-
     """
     if gst_file._id == ObjectId(file_id):
         title = gst_file.name
-        filecollection=db[File.collection_name]
-        files=filecollection.File.find({'_type': u'File'})
+        file_collection = db[File.collection_name]
+        files = file_collection.File.find({'_type': u'File'})
         return render_to_response("ndf/file.html", {'title': title,'files':files}, context_instance=RequestContext(request))
 
     else:
         return HttpResponseRedirect(reverse('homepage'))
         
 @login_required    
-def uploadDoc(request,group_name):
+def uploadDoc(request, group_name):
     stId, mainPageUrl = "", ""
-    if request.method=="POST":
-        stId=request.POST.get("stId","")
-        mainPageUrl=request.POST.get("pageUrl","")
-    template="ndf/UploadDoc.html"
+    if request.method == "POST":
+        stId = request.POST.get("stId","")
+        mainPageUrl = request.POST.get("pageUrl","")
+    template = "ndf/UploadDoc.html"
     if stId and mainPageUrl:
         variable = RequestContext(request, {'stId': stId, 'mainPageUrl': mainPageUrl})
     else:
-        variable=RequestContext(request,{})
+        variable = RequestContext(request, {})
     return render_to_response(template,variable)
-      
-    
 
 @login_required
 def submitDoc(request,group_name):
@@ -96,30 +93,30 @@ def submitDoc(request,group_name):
         mtitle = request.POST.get("docTitle","")
         userid = request.POST.get("user","")
         mainPageUrl = request.POST.get("mainPageUrl","")
-        print "url",mainPageUrl
+        print "url", mainPageUrl
         #memberOf = request.POST.get("memberOf","")
         i=1
 	for index,each in enumerate(request.FILES.getlist("doc[]","")):
-            if index==0:
-                f=save_file(each,mtitle,userid,group_name,gst_file._id.__str__())
+            if index == 0:
+                f = save_file(each, mtitle, userid, group_name, gst_file._id.__str__())
             else:
-                title=mtitle+"_"+str(i)
-                f=save_file(each,title,userid,group_name,gst_file._id.__str__())
-                i=i+1
+                title = mtitle+"_"+str(i)
+                f = save_file(each, title, userid, group_name, gst_file._id.__str__())
+                i = i+1
             if f:
                 alreadyUploadedFiles.append(f)
         if 'image' in mainPageUrl:
-            collection=db[File.collection_name]
-            imgcol=collection.File.find({'mime_type': {'$regex': 'image'}})
-            variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'imageCollection':imgcol})
-            template="ndf/ImageDashboard.html"
-            return render_to_response(template,variable)
+            collection = db[File.collection_name]
+            imgcol = collection.File.find({'mime_type': {'$regex': 'image'}})
+            variable = RequestContext(request, {'alreadyUploadedFiles': alreadyUploadedFiles, 'imageCollection': imgcol})
+            template = "ndf/ImageDashboard.html"
+            return render_to_response(template, variable)
         if 'video' in mainPageUrl:
-            collection=db[File.collection_name]
-            videocol=collection.File.find({'mime_type': {'$regex': 'video'}})
-            variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'videoCollection':videocol})
-            template="ndf/videoDashboard.html"
-            return render_to_response(template,variable)
+            collection = db[File.collection_name]
+            videocol = collection.File.find({'mime_type': {'$regex': 'video'}})
+            variable = RequestContext(request, {'alreadyUploadedFiles': alreadyUploadedFiles, 'videoCollection': videocol})
+            template = "ndf/videoDashboard.html"
+            return render_to_response(template, variable)
         else:
             return HttpResponseRedirect("/"+group_name+"/file"+"/"+gst_file._id.__str__())
             # filecollection=get_database()[File.collection_name]
@@ -128,21 +125,21 @@ def submitDoc(request,group_name):
             # template='ndf/DocumentList.html'
             # return render_to_response(template,variable)
 
-def save_file(files,title,userid,memberOf,stId):
-    fcol=db[File.collection_name]
+def save_file(files, title, userid, memberOf, stId):
+    fcol = db[File.collection_name]
     print "stid",stId
-    fileobj=fcol.File()
+    fileobj = fcol.File()
     #gst=gst_collection.GSystemType.one({"_id":ObjectId(stId)})
-    filemd5= hashlib.md5(files.read()).hexdigest()
+    filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
-    size,unit=getFileSize(files)
-    size={'size':round(size,2),'unit':unicode(unit)}
-    if fileobj.fs.files.exists({"md5":filemd5}):
-            return files.name
+    size, unit = getFileSize(files)
+    size = {'size': round(size,2), 'unit': unicode(unit)}
+    if fileobj.fs.files.exists({"md5": filemd5}):
+        return files.name
     else:
         try:
             files.seek(0)
-            filetype=magic.from_buffer(files.read(100000),mime='true')               #Gusing filetype by python-magic
+            filetype = magic.from_buffer(files.read(100000), mime='true')               #Gusing filetype by python-magic
             filetype1 = mimetypes.guess_type(files.name)[0]
             if filetype1:
                 filetype1 = filetype1
@@ -193,12 +190,12 @@ def save_file(files,title,userid,memberOf,stId):
             print "Not Uploaded files:",files.name,"Execption:",e
 
 def getFileSize(File):
-        File.seek(0,os.SEEK_END)
-        num=File.tell() 
-        for x in ['bytes','KB','MB','GB','TB']:
-                if num < 1024.0:
-                        return  (num, x)
-                num /= 1024.0
+    File.seek(0,os.SEEK_END)
+    num=File.tell() 
+    for x in ['bytes','KB','MB','GB','TB']:
+        if num < 1024.0:
+            return  (num, x)
+        num /= 1024.0
 
 
 def convert_image_thumbnail(files):

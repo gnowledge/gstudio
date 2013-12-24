@@ -72,7 +72,7 @@
       <h4><strong>Prior Node{{ node.prior_node|length|pluralize }}:</strong></h4>
     {% endif %}
 
-    {% for each_id, each_node in prior_node_obj_dict.items %}
+    {% for each_id, each_node in node.prior_node_dict.items %}
         {% if each_node.mime_type %}
             <a href="{% url 'read_file' group_name each_id %}">{{ each_node.name }}</a>,&nbsp;
         {% else %}
@@ -87,7 +87,7 @@
   <tr>
     <td>
     <h4><strong>Collection:</strong></h4>
-    {% for each_id, each_node in collection_obj_dict.items %}
+    {% for each_id, each_node in node.collection_dict.items %}
         {% if each_node.mime_type %}
             {% if each_node.collection_set %}
             <li class="list" style="list-style-type:none;">
