@@ -176,44 +176,44 @@ class Node(DjangoDocument):
 
         return user_details
         
-
-    @property
-    def field_dict(self, node_ids_list):
+    def prior_node_dict(self):
         """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-        pair respectively.
-        
-        Arguments:
-        (1) node_ids_list -- list of ObjectIds belonging either to prior_node or 
-        collection_set fields of the given node
+        pair respectively for prior_node objects of the given node.
         """
         db = get_database()
         gs_collection = db[GSystem.collection_name]
         
         obj_dict = {}
-        
-        for each_id in node_ids_list:
+
+        for each_id in self.prior_node:
             if each_id != self._id:
                 node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
                 dict_key = node_collection_object._id
                 dict_value = node_collection_object
                 
                 obj_dict[dict_key] = dict_value
-                
-        return obj_dict
 
-    @property
-    def prior_node_dict(self):
-        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-        pair respectively for prior_node objects of the given node.
-        """
-        return self.field_dict(self.prior_node)
+        return obj_dict
 
     @property
     def collection_dict(self):
         """Returns a dictionary consisting of key-value pair as ObjectId-Document 
         pair respectively for collection_set objects of the given node.
         """
-        return self.field_dict(self.collection_set)
+        db = get_database()
+        gs_collection = db[GSystem.collection_name]
+        
+        obj_dict = {}
+
+        for each_id in self.collection_set:
+            if each_id != self._id:
+                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                dict_key = node_collection_object._id
+                dict_value = node_collection_object
+                
+                obj_dict[dict_key] = dict_value
+
+        return obj_dict
 
     @property
     def html_content(self):
@@ -241,7 +241,6 @@ class Node(DjangoDocument):
         """
         history_manager = HistoryManager()
         return history_manager.get_version_dict(self)
-
 
     ########## Built-in Functions (Defined/Overridden) ##########
     
@@ -417,7 +416,7 @@ class GSystem(Node):
         'attribute_set': [dict],		# Dict that holds AT name & its values
         'relation_set': [dict],			# Dict that holds RT name & its related_object value
         'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class
-        'group_set': [unicode],                # List of ObjectId's of Groups to which this document belongs
+        'group_set': [unicode],                 # List of ObjectId's of Groups to which this document belongs
         'author_set': [int]                     # List of Authors
     }
     
