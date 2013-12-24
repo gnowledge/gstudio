@@ -14,7 +14,6 @@ EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'testing@example.com'
 
-
 #SMTP setting for sending mail (Using gmail SMTP server)
 #EMAIL_USE_TLS = True
 #EMAIL_HOST = 'smtp.gmail.com'

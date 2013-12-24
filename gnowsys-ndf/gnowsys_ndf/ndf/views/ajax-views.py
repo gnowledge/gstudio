@@ -41,7 +41,7 @@ def select_drawer(request, group_name):
         
         checked = request.POST.get("homo_collection", '')
         selected_collection_list = request.POST.get("collection_list", '')
-        
+
         if selected_collection_list:
             selected_collection_list = selected_collection_list.split(",")
             collection_list_ids = []
@@ -50,20 +50,31 @@ def select_drawer(request, group_name):
             while (i < len(selected_collection_list)):
                 c_name = str(selected_collection_list[i])
                 c_name = c_name.replace("'", "")
-                print "\n c_name : ", c_name, "\n"
                 collection_list_ids.append(gs_collection.GSystem.one({'name': unicode(c_name)})._id)
                 i = i+1
 
-            drawer = get_drawers(None, collection_list_ids, checked)
+            drawer = get_drawers(group_name, None, collection_list_ids, checked)
         
             drawer1 = drawer['1']
             drawer2 = drawer['2']
                                       
-            return render_to_response("ndf/drawer_widget.html", {"drawer1":drawer1, "drawer2":drawer2,"widget_for": "collection","group_name": group_name},context_instance=RequestContext(request))
+            return render_to_response("ndf/drawer_widget.html", 
+                                      {"widget_for": "collection",
+                                       "drawer1": drawer1, 
+                                       "drawer2": drawer2,
+                                       "group_name": group_name
+                                      },
+                                      context_instance=RequestContext(request)
+            )
             
         else:
             
-            drawer = get_drawers(None, None, checked)   
+            drawer = get_drawers(group_name, None, None, checked)   
        
-            return render_to_response("ndf/drawer_widget.html", {"widget_for": "collection", "drawer1":drawer, "group_name": group_name}, 
-                                      context_instance=RequestContext(request))
+            return render_to_response("ndf/drawer_widget.html", 
+                                      {"widget_for": "collection", 
+                                       "drawer1": drawer, 
+                                       "group_name": group_name
+                                      }, 
+                                      context_instance=RequestContext(request)
+            )

@@ -27,13 +27,12 @@ def check_existing_group(groupname):
   else:
     return False
 
-def get_drawers(nid=None, nlist=[], checked=None):
+def get_drawers(group_name, nid=None, nlist=[], checked=None):
     """Get both drawers-list.
     """
-
-    dict_drawer={}
-    dict1={}
-    dict2={}
+    dict_drawer = {}
+    dict1 = {}
+    dict2 = {}
 
     gst_collection = db[GSystemType.collection_name]
     gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
@@ -42,16 +41,21 @@ def get_drawers(nid=None, nlist=[], checked=None):
     drawer = None    
     
     if checked:     
-        if checked == "Page":        
-            drawer = gs_collection.GSystem.find({'_type': u"GSystem"})
+      if checked == "Page":
+        # drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'gsystem_type': {'$all': [ObjectId(gst_page._id)]}, 'group_set': {'$all': [group_name]}})
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'group_set': {'$all': [group_name]}})
         
-        elif checked == "File":         
-            drawer = gs_collection.GSystem.find({'_type': u"File"})    
+      elif checked == "File":         
+        #drawer = gs_collection.GSystem.find({'_type': u"File", 'group_set': {'$all': [group_name]}})
+        drawer = gs_collection.GSystem.find({'_type': u"File"})
         
-        elif checked == "Image":         
-            drawer = gs_collection.GSystem.find({'_type': u"File",'mime_type': u"image/jpeg"})       
+      elif checked == "Image":         
+        #drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg", 'group_set': {'$all': [group_name]}})
+        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg"})
+        print "\n drawer.count : ", drawer.count(), "\n"
+
     else:
-        drawer = gs_collection.GSystem.find({'_type': { '$in' : [u"GSystem", u"File"]}})   
+      drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
            
     
     if (nid is None) and (not nlist):
@@ -61,10 +65,10 @@ def get_drawers(nid=None, nlist=[], checked=None):
     elif (nid is None) and (nlist):
       for each in drawer:
         if each._id not in nlist:
-          dict1[each._id]=str(each.name)
+          dict1[each._id] = str(each.name)
 
       for oid in nlist:          
-          dict2[oid]=str(gs_collection.GSystem.one({'_id': oid}).name)
+          dict2[oid] = str(gs_collection.GSystem.one({'_id': oid}).name)
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -73,10 +77,10 @@ def get_drawers(nid=None, nlist=[], checked=None):
       for each in drawer:
         if each._id != nid:
           if each._id not in nlist:
-            dict1[each._id]=str(each.name)
+            dict1[each._id] = str(each.name)
           
           else:
-            dict2[each._id]=str(each.name)
+            dict2[each._id] = str(each.name)
       
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2

@@ -144,7 +144,7 @@ $("#collection_cb").change(function() {
 });
 
 
-$('input:radio').click(function() {
+$("input:radio").click(function() {
     // For collection
     c_opts = collection_drawer2.options;
     c_len = c_opts.length;
@@ -152,8 +152,9 @@ $('input:radio').click(function() {
     for (var i = 0; i < c_len; i++) {
         c_arr[i] = "'" + c_opts[i].value + "'";
     }
-    var c_list = c_arr.join(',');
-    alert("collection-set: " + c_list)
+    var c_list = c_arr.join(",");
+
+    alert("\n c_list : " + c_list + "\n\n radio button : " + this.value)
         
     $.ajax({
         type: "POST",
@@ -165,20 +166,25 @@ $('input:radio').click(function() {
             csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function(data) {
-            $('#collection_drawer').html(data);
+            $("#collection_drawer").html(data);
         }
     });
 });
 
 
+$(document).ready(function() {
+    // Must be there to display org-editor shortcuts
+    $("#orgitdown").orgitdown(mySettings);
+});
+
+
 $("#save-node").click(function() {
-    
     // -- For prior-node
     pn_opts = prior_node_drawer2.options;
     pn_len = pn_opts.length;
     var pn_arr = [];
     for (var i = 0; i < pn_len; i++) {
-	pn_arr[i] = "'" + pn_opts[i].value + "'";
+    	pn_arr[i] = "'" + pn_opts[i].value + "'";
     }
     var pn_list = pn_arr.join(',');
     $("#prior_node_list").val(pn_list)
@@ -192,14 +198,8 @@ $("#save-node").click(function() {
     }
     var c_list = c_arr.join(',');
     $("#collection_list").val(c_list)
-});
 
-
-$(document).ready(function() {
-    
-    // Must be there to display org-editor shortcuts
-    $('#orgitdown').orgitdown(mySettings);
-    
+    {% block base_save_on_click %}{% endblock %}
 });
 
 </script>
