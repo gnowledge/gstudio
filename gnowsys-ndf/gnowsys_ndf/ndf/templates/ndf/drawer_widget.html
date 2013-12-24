@@ -1,36 +1,40 @@
 
   <table cellpadding="3" style="width:500px;">
     <tr>
+      <td colspan="3">
+      	<input type="text" id="{{widget_for}}_search" style="width:290px;" placeholder="Search in From Drawer">
+      </td>
+    </tr>
+
+    <tr>
       <td style="width:160px;">
-      	<div style="padding-bottom:8px"><b>Pages:</div>
-      	<input type="text" id="{{widget_for}}_search" style="width: 290px; height: 20px;" value=""></b>
-      	
+      	<div style="padding-bottom:8px"><b>From Drawer:</b></div>
       	<select id="{{widget_for}}_drawer1" multiple="multiple" style="width: 300px; height: 200px;">    <!---->
 	  {% if drawer1 != "None" %}
-    	  {% for key,value in drawer1.items %}
-      	  <option id={{key}} style="height:50px; background-image: url({% url 'getImageThumbnail' group_name key %}),url(/static/ndf/images/doc.png); background-repeat:no-repeat; background-position:left; padding-left:50px; background-size: 50px 50px">{{value}}</option>
+    	  {% for key, value in drawer1.items %}
+      	  <option id={{key}} style="height:50px; background-image: url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); background-repeat:no-repeat; background-position:left; padding-left:50px; background-size: 50px 50px">{{value}}</option>
     	  {% endfor %}
 	  {% endif%}
       	</select>
       </td>
 	  
-      <td style="width:50px; text-align:center; vertical-align:middle;"><br/><br/><br/>
-      	<input id="{{widget_for}}_btnUp" type="button" style='width:50px;height:30px;' value ="  ^  "><br/><br/>
-      	<input id="{{widget_for}}_btnRight" type="button" style='width:50px;height:30px;' value ="  >  "><br/><br/>
-      	<input id="{{widget_for}}_btnLeft" type="button" style='width:50px;height:30px;' value ="  <  "><br/><br/>
-      	<input id="{{widget_for}}_btnDown" type="button" style='width:50px;height:30px;' value ="  v  "><br/>
-      </td><br/><br/>
+      <td style="width:50px; text-align:center; vertical-align:middle;">
+      	<input id="{{widget_for}}_btnUp" type="button" style="width:50px; height:30px;" value ="  ^  "><br/><br/>
+      	<input id="{{widget_for}}_btnRight" type="button" style="width:50px; height:30px;" value ="  >  "><br/><br/>
+      	<input id="{{widget_for}}_btnLeft" type="button" style="width:50px; height:30px;" value ="  <  "><br/><br/>
+      	<input id="{{widget_for}}_btnDown" type="button" style="width:50px; height:30px;" value ="  v  "><br/>
+      </td>
 	  
-      <td style="width:160px;"><br/><br/>
-      	<div style="padding-bottom:8px"><b>Added to Drawer:</b></div><br/><br/>
+      <td style="width:160px;">
+      	<div style="padding-bottom:8px"><b>To Drawer:</b></div>
       	<select id="{{widget_for}}_drawer2" multiple="multiple" style="width: 300px; height: 200px;">
 	  {% if drawer2 != "None" %}
-    	  {% for key,value in drawer2.items %}
+    	  {% for key, value in drawer2.items %}
 	  <option id={{key}} style="height:50px; background-image:url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); background-repeat:no-repeat; background-position:left; padding-left:50px; background-size: 50px 50px">{{value}}</option>
 	  {% endfor %}
 	  {% endif %}
 	</select>
-      </td><br>
+      </td>
     </tr>
   </table>
       
