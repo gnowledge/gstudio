@@ -24,7 +24,7 @@ from StringIO import StringIO
 import os
 import subprocess
 import ox
-
+import urllib
 #from string import maketrans 
 
 
@@ -55,9 +55,7 @@ def file(request, group_name, file_id):
         title = gst_file.name
         filecollection=db[File.collection_name]
         files=filecollection.File.find({'_type': u'File'})
-        already_uploaded=request.GET.get("already_uploaded","")
-        already_uploaded=list(already_uploaded)
-        print already_uploaded
+        already_uploaded=request.GET.getlist('var',"")
         return render_to_response("ndf/file.html", {'title': title,'files':files,'already_uploaded':already_uploaded}, context_instance=RequestContext(request))
     else:
         return HttpResponseRedirect(reverse('homepage'))
@@ -94,33 +92,15 @@ def submitDoc(request,group_name):
                 i=i+1
             if f:
                 alreadyUploadedFiles.append(f)
-<<<<<<< HEAD
         #url = reverse(page_url, kwargs={'alreadyUploadedFiles':alreadyUploadedFiles})
-        return HttpResponseRedirect(page_url+'?already_uploaded='+str(alreadyUploadedFiles))
+        str1=''
+        for each in alreadyUploadedFiles:
+            str1=str1+'var='+each+'&'
+        print str1
+        return HttpResponseRedirect(page_url+'?'+str1)
     else:
         return HttpResponseRedirect(reverse('homepage'))
             
-=======
-        if 'image' in mainPageUrl:
-            collection=db[File.collection_name]
-            imgcol=collection.File.find({'mime_type': {'$regex': 'image'}})
-            variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'imageCollection':imgcol})
-            template="ndf/ImageDashboard.html"
-            return render_to_response(template,variable)
-        if 'video' in mainPageUrl:
-            collection=db[File.collection_name]
-            videocol=collection.File.find({'mime_type': {'$regex': 'video'}})
-            variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'videoCollection':videocol})
-            template="ndf/videoDashboard.html"
-            return render_to_response(template,variable)
-        else:
-            return HttpResponseRedirect("/"+group_name+"/file"+"/"+gst_file._id.__str__())
-            # filecollection=get_database()[File.collection_name]
-            # files=filecollection.File.find('_type': u'File')
-            # variable=RequestContext(request,{'alreadyUploadedFiles':alreadyUploadedFiles,'filecollection':files})
-            # template='ndf/DocumentList.html'
-            # return render_to_response(template,variable)
->>>>>>> 81cd317afc582df478cf25eab36f3327d0451a63
 
 def save_file(files,title,userid,memberOf,stId):
     fcol=db[File.collection_name]
@@ -244,15 +224,12 @@ def convertVideo(files,userid):
         secs = duration
     videoDuration = ""
     durationTime = str(str(hrs)+":"+str(mins)+":"+str(secs)) # calculating Time duration of video in hrs,mins,secs
-<<<<<<< HEAD
-    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', "00:00:30", "-s", "128*128",  "-f", "image2", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # creating thumbnail of video using ffmpeg
-=======
+
     if duration > 30 :
 	videoDuration = "00:00:30"
     else :
     	videoDuration = "00:00:00"    	
     proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # creating thumbnail of video using ffmpeg
->>>>>>> 81cd317afc582df478cf25eab36f3327d0451a63
     proc.wait()
     background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
     fore = Image.open(MEDIA_ROOT+"ndf/images/poster.jpg")

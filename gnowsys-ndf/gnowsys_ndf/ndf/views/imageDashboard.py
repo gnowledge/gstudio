@@ -17,7 +17,7 @@ collection = db[File.collection_name]
 def imageDashboard(request, group_name, image_id):
     imgcol = collection.File.find({'mime_type': {'$regex': 'image'}})
     template = "ndf/ImageDashboard.html"
-    already_uploaded=request.GET.get("already_uploaded","")
+    already_uploaded=request.GET.getlist('var',"")
     variable = RequestContext(request, {'imageCollection':imgcol,'already_uploaded':already_uploaded })
     return render_to_response(template, variable)
 

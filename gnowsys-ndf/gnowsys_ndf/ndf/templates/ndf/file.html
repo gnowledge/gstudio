@@ -68,9 +68,14 @@
       <div style='display:table-cell;' align="middle">
 	<a href="{% url 'read_file' 'group' file %}">Download </a>
       </div>
+      
       <div style='display:table-cell;' align="middle">
+	{% get_user_object file.created_by as user_obj %}
+	{% ifequal  user_obj.username  user.username  %}
 	<a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
+	{% endifequal %}
       </div>
+      
     </div>
     {% endfor %}
 </div>
