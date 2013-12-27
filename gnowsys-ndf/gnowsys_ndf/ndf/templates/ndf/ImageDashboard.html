@@ -3,18 +3,17 @@
 {% block title %} Image Gallery {% endblock %}
 {% block body_content %} 
 
-{% if alreadyUploadedFiles %} 
+{% if already_uploaded %} 
 <div id="message">
   <span style="color:red">Listed below files are already uploaded please choose different files</span>
   <ul>
-    {% for each in alreadyUploadedFiles %}
+    {% for each in already_uploaded %}
     <li>{{each}}</li>
     {% endfor %}
   </ul>
 </div>
 {% endif %}
 {% get_group_name request.path as group_name %}
-
 
 <center>
   <div style='display:table; padding-top:20px'>
@@ -26,13 +25,9 @@
 	</form> 
       </div>
       <div style='display:table-cell; padding-left:5px'>
-	<form id ="imgPost" enctype="multipart/form-data" method="post" action="{% url 'uploadDoc' group_name %}">{% csrf_token %}
-	  <input type="hidden" name="stId" value={{stId}}>
-	  <input type="hidden" name="pageUrl" value={{pageUrl}}>
-	  <a href="{% url 'uploadDoc' group_name %}">
-  	    <input type="submit" class="btn btn-large btn-primary" value="upload" />
+	  <a class="btn btn-large btn-primary"  href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+  	   Upload
 	  </a>
-	</form>
       </div>
     </div>
   </div>
@@ -46,6 +41,10 @@
 				<a href="{% url 'getFullImage' group_name image %}">
 				<img src="{% url 'getImageThumbnail' group_name image %}"></img><br/>
 				<span align="left">{{image.name}}</span></a>
+				{% get_user_object image.created_by as user_obj %}
+				{% ifequal  user_obj.username  user.username  %}
+				<a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group_name' image %}?next={{request.path}}">Delete </a>
+				{% endifequal %}
 			</div>
 	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}
 			</div>

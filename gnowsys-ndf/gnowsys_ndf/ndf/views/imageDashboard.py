@@ -17,8 +17,8 @@ collection = db[File.collection_name]
 def imageDashboard(request, group_name, image_id):
     imgcol = collection.File.find({'mime_type': {'$regex': 'image'}})
     template = "ndf/ImageDashboard.html"
-    url = request.get_full_path()
-    variable = RequestContext(request, {'imageCollection':imgcol, 'pageUrl':url, 'stId':image_id})
+    already_uploaded=request.GET.getlist('var',"")
+    variable = RequestContext(request, {'imageCollection':imgcol,'already_uploaded':already_uploaded })
     return render_to_response(template, variable)
 
 def getImageThumbnail(request, group_name, _id):
