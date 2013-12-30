@@ -44,7 +44,11 @@
 	<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter title">
       </td>
     </tr>
+  </table>
 
+  {% block add_fields %} {% endblock %}
+
+  <table cellpadding="5">
     <tr>
       <td style="text-align:right; vertical-align:top; padding-top:12px;">
 	<h4><strong>Privacy:</strong></h4>
@@ -112,8 +116,6 @@
   </table>
   
 </div>
-
-{% block add_fields %} {% endblock %}
 
 <div style="padding: 20px 0px 20px 280px">
   <input type="submit" id="save-node" value="Save" class="btn btn-large btn-primary">

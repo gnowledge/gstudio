@@ -97,7 +97,7 @@ def page(request, group_name, app_id):
         version_dict = {}
         version_dict = history_manager.get_version_dict(page_node)
         
-        return render_to_response("ndf/page_details.html", 
+        return render_to_response("ndf/node_details_base.html", 
                                   { 'node': page_node, 'user_details': user_details,
                                     'version_dict': version_dict,
                                     'prior_node_obj_dict': prior_node_obj_dict,

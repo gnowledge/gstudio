@@ -34,7 +34,6 @@
   {% endif %}
   
 </div>
-
 <div id="node-details-view-div" style="display:block">
 
   <table cellpadding="8">
@@ -62,7 +61,9 @@
     {% endwith %}
     </td>
   </tr>
-
+</table>
+{% block add_fields %} {% endblock %}
+<table>
   <tr>
     <td>
     {% if node.prior_node|length_is:"0" %}
@@ -132,8 +133,6 @@
   </table>
 
 </div>
-
-{% block add_fields %} {% endblock %}
 
 {% endblock %}
 
