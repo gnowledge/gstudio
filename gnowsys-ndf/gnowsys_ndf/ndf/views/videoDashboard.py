@@ -17,8 +17,8 @@ collection = db[File.collection_name]
 def videoDashboard(request, group_name, video_id):
     videocol = collection.File.find({'mime_type': {'$regex': 'video'}})
     template = "ndf/videoDashboard.html"
-    url = request.get_full_path()
-    variable = RequestContext(request, {'videoCollection':videocol, 'pageUrl':url, 'stId':video_id})
+    already_uploaded=request.GET.getlist('var',"")
+    variable = RequestContext(request, {'videoCollection':videocol,'already_uploaded':already_uploaded})
     return render_to_response(template, variable)
 
 def getvideoThumbnail(request, group_name, _id):
