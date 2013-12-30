@@ -40,15 +40,12 @@ GST_COLLECTION = db[GSystemType.collection_name]
 GST_FILE = GST_COLLECTION.GSystemType.one({'name': GAPPS[1]})
 
 
-#######################################################################################################################################
-#         V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
-#######################################################################################################################################
-
+####################################################################################################################################                                             V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
+###################################################################################################################################
 
 def file(request, group_name, file_id):
     """
-    * Renders a list of all 'Files' available within the database.
-
+   * Renders a list of all 'Files' available within the database.
     """
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
@@ -161,12 +158,13 @@ def save_file(files, title, userid, memberOf, stId):
             print "Some Exception:", files.name, "Execption:", e
 
 def getFileSize(File):
-        File.seek(0, os.SEEK_END)
-        num = File.tell() 
-        for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-                if num < 1024.0:
-                        return  (num, x)
-                num /= 1024.0
+    File.seek(0, os.SEEK_END)
+    num = File.tell() 
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return  (num, x)
+            num /= 1024.0
+
 
 
 def convert_image_thumbnail(files):
