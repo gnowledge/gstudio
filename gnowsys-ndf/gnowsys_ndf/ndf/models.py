@@ -162,8 +162,63 @@ class Node(DjangoDocument):
     ########## Setter(@x.setter) & Getter(@property) ##########
 
     @property
+    def user_details_dict(self):
+        """Retrieves names of created-by & modified-by users from the given node, 
+        and appends those to 'user_details' dict-variable
+        """
+        user_details = {}
+        user_details['created_by'] = User.objects.get(pk=self.created_by).username
+
+        modified_by_usernames = []
+        for each_pk in self.modified_by:
+            modified_by_usernames.append(User.objects.get(pk=each_pk).username)
+        user_details['modified_by'] = modified_by_usernames
+
+        return user_details
+        
+    def prior_node_dict(self):
+        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+        pair respectively for prior_node objects of the given node.
+        """
+        db = get_database()
+        gs_collection = db[GSystem.collection_name]
+        
+        obj_dict = {}
+
+        for each_id in self.prior_node:
+            if each_id != self._id:
+                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                dict_key = node_collection_object._id
+                dict_value = node_collection_object
+                
+                obj_dict[dict_key] = dict_value
+
+        return obj_dict
+
+    @property
+    def collection_dict(self):
+        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+        pair respectively for collection_set objects of the given node.
+        """
+        db = get_database()
+        gs_collection = db[GSystem.collection_name]
+        
+        obj_dict = {}
+
+        for each_id in self.collection_set:
+            if each_id != self._id:
+                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                dict_key = node_collection_object._id
+                dict_value = node_collection_object
+                
+                obj_dict[dict_key] = dict_value
+
+        return obj_dict
+
+    @property
     def html_content(self):
-        """Return the content correctly formatted"""
+        """Returns the content in proper html-format.
+        """
         if MARKUP_LANGUAGE == 'markdown':
             return markdown(self.content, MARKDOWN_EXTENSIONS)
         elif MARKUP_LANGUAGE == 'textile':
@@ -171,6 +226,21 @@ class Node(DjangoDocument):
         elif MARKUP_LANGUAGE == 'restructuredtext':
             return restructuredtext(self.content)
         return str(self.content)
+
+    @property
+    def version_dict(self):
+        """Returns a dictionary containing list of revision numbers of
+        the given node.
+        
+        Example:
+        {
+         "1": "1.1",
+         "2": "1.2",
+         "3": "1.3",
+        }
+        """
+        history_manager = HistoryManager()
+        return history_manager.get_version_dict(self)
 
     ########## Built-in Functions (Defined/Overridden) ##########
     
@@ -343,10 +413,11 @@ class GSystem(Node):
 
     structure = {
         'gsystem_type': [ObjectId],		# ObjectId's of GSystemType Class  
-        'attribute_set': [dict],		# dict that holds AT name & its values
-        'relation_set': [dict],			# dict that holds RT name & its related_object value
-        'collection_set': [ObjectId],		# list of ObjectId's of GSystem Class
-        'author_set':[int]                   # List of Authors
+        'attribute_set': [dict],		# Dict that holds AT name & its values
+        'relation_set': [dict],			# Dict that holds RT name & its related_object value
+        'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class
+        'group_set': [unicode],                 # List of ObjectId's of Groups to which this document belongs
+        'author_set': [int]                     # List of Authors
     }
     
     use_dot_notation = True
@@ -361,7 +432,10 @@ class File(GSystem):
     structure = {
         'mime_type': basestring,             # Holds the type of file
         'fs_file_ids': [ObjectId],           # Holds the List of  ids of file stored in gridfs 
-        'file_size': {'size':float,'unit':unicode}  #dict used to hold file size in int and unit palace in term of KB,MB,GB
+        'file_size': {
+            'size': float,
+            'unit': unicode
+        }  #dict used to hold file size in int and unit palace in term of KB,MB,GB
     }
 
     gridfs = {
@@ -371,17 +445,16 @@ class File(GSystem):
     use_dot_notation = True
 
     
-    
 @connection.register
 class Group(GSystem):
     """Group class to create collection (group) of members
     """
 
     structure = {
-        'gtype': basestring,                 # Types of groups - Anonymous,public or private
-        'edit_policy': basestring,           # Editing policy of the group- non editable, moderately editable, editable
-        'sub_policy': basestring,            # Subscription policy to this group- open, by invitation, by request
-        'ex_policy': basestring,             # Existance of the group -announced or not announced
+        'gtype': basestring,                 # Types of groups - Anonymous, public or private
+        'edit_policy': basestring,           # Editing policy of the group - non editable, moderately editable, editable
+        'sub_policy': basestring,            # Subscription policy to this group - open, by invitation, by request
+        'ex_policy': basestring,             # Existance of the group - announced or not announced
         'list_member_policy': basestring,    # Members of this group - disclosed or not 
         'encr_policy': basestring            # Encryption - yes or no
     }
@@ -414,20 +487,20 @@ class HistoryManager():
         pass
 
     def check_dir_path(self, dir_path):
-        '''Checks whether path exists; and if not it creates that path.
+        """Checks whether path exists; and if not it creates that path.
 
         Arguments:
-          dir_path -- a string value representing an absolute path 
+        (1) dir_path -- a string value representing an absolute path 
 
         Returns: Nothing
-        '''
+        """
         dir_exists = os.path.isdir(dir_path)
     	
     	if not dir_exists:
             os.makedirs(dir_path)
 
     def get_version_dict(self, document_object):
-        '''Returns a dictionary containing list of revision numbers.
+        """Returns a dictionary containing list of revision numbers.
         
         Example:
         {
@@ -435,7 +508,7 @@ class HistoryManager():
          "2": "1.2",
          "3": "1.3",
         }
-        '''
+        """
         fp = self.get_file_path(document_object)
 
         rcs = RCS()
@@ -449,7 +522,7 @@ class HistoryManager():
         return version_dict
 
     def get_file_path(self, document_object):
-        '''Returns absolute filesystem path for a json-file.
+        """Returns absolute filesystem path for a json-file.
 
         This path is combination of :-
         (a) collection_directory_path: path to the collection-directory
@@ -460,11 +533,10 @@ class HistoryManager():
         the given instance
 
         Arguments:
-          document_object -- an instance of a collection
+        (1) document_object -- an instance of a collection
 
         Returns: a string representing json-file's path
-          
-        '''
+        """
         file_name = (document_object._id.__str__() + '.json')
 
         collection_dir = \
@@ -488,16 +560,16 @@ class HistoryManager():
         return file_path
 
     def create_rcs_repo_collections(self, *versioning_collections):
-        '''Creates Revision Control System (RCS) repository.
+        """Creates Revision Control System (RCS) repository.
 
         After creating rcs-repo, it also creates sub-directories 
         for each collection inside it.
 
         Arguments:
-          versioning_collections -- a list representing collection-names
+        (1) versioning_collections -- a list representing collection-names
 
         Returns: Nothing
-        '''
+        """
         try:
             self.check_dir_path(self.__RCS_REPO_DIR)
         except OSError as ose:
@@ -522,16 +594,16 @@ class HistoryManager():
         #                   .format(collection, rcs_repo_collection))
                
     def create_or_replace_json_file(self, document_object=None):
-        '''Creates/Overwrites a json-file for passed document object in 
+        """Creates/Overwrites a json-file for passed document object in 
         its respective hashed-directory structure.
 
         Arguments:
-          document_object -- an instance of document of a collection
+        (1) document_object -- an instance of document of a collection
 
         Returns: A boolean value indicating whether created successfully
-          True - if created
-          False - Otherwise
-        '''
+        (a) True - if created
+        (b) False - Otherwise
+        """
 
         collection_tuple = (AttributeType, RelationType, GSystemType, GSystem)
         file_res = False    # True, if no error/exception occurred
