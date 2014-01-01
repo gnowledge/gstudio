@@ -106,6 +106,7 @@ def save_file(files, title, userid, memberOf, stId):
     #gst=GST_COLLECTION.GSystemType.one({"_id":ObjectId(stId)})
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
+    print "f",files,type(files)
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
     if fileobj.fs.files.exists({"md5":filemd5}):
@@ -163,7 +164,7 @@ def getFileSize(File):
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if num < 1024.0:
             return  (num, x)
-            num /= 1024.0
+        num /= 1024.0
 
 
 
