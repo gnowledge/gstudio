@@ -1,0 +1,12 @@
+{% extends "ndf/node_details_base.html" %}
+
+{% block url %}{% url 'video_edit' group_name node %}{% endblock %}
+{% block add_fields %}
+<div>
+  <video width="640px" controls buffered>
+  <source src="{% url 'getFullvideo' group_name node %}" type="video/webm">
+  <source src="{% url 'getFullvideo' group_name node %}" type="video/ogg">    
+Your browser does not support the video tag.
+</video> 
+</div>
+{% endblock %}

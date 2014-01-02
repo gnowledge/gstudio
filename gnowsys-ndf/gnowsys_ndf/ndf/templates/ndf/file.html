@@ -52,6 +52,7 @@
   </div>
     {% for file in files %}
     {% get_user_object file.created_by as user_obj %}
+    {% get_grid_fs_object file as grid_fs_obj %}
     <div style='display:table-row;' >
       <div style='display:table-cell;' align="middle">
 	<lable>{{file.name}} </lable>
@@ -66,7 +67,7 @@
 	<lable>{{ user_obj.username }}</lable>
       </div>
       <div style='display:table-cell;' align="middle">
-	<a href="{% url 'read_file' 'group' file %}">Download </a>
+	<a href="{% url 'read_file' 'group' file %}" download="{{ grid_fs_obj.filename }}">Download </a>
       </div>
       
       <div style='display:table-cell;' align="middle">

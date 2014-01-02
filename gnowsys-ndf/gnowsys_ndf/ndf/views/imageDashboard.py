@@ -1,6 +1,7 @@
 ''' -- imports from installed packages -- '''
-#from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 
@@ -12,8 +13,14 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 from gnowsys_ndf.ndf.models import File
 
+''' -- imports from application folders/files -- '''
+from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+
 db = get_database()
 collection = db[File.collection_name]
+GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+
 def imageDashboard(request, group_name, image_id):
     imgcol = collection.File.find({'mime_type': {'$regex': 'image'}})
     template = "ndf/ImageDashboard.html"
@@ -45,3 +52,26 @@ def image_search(request,group_name):
         template="ndf/file_search.html"
         variable=RequestContext(request,{'file_collection':img_search,'view_name':'image_search'})
         return render_to_response(template,variable)
+
+def image_detail(request, group_name, _id):
+    img_node = collection.File.one({"_id": ObjectId(_id)})
+    return render_to_response("ndf/image_detail.html",
+                                  { 'node': img_node,
+                                    'group_name': group_name
+                                  },
+                                  context_instance = RequestContext(request)
+        )
+def image_edit(request,group_name,_id):
+    img_node = collection.File.one({"_id": ObjectId(_id)})
+    if request.method == "POST":
+        get_node_common_fields(request, img_node, group_name, GST_IMAGE)
+        img_node.save()
+        return HttpResponseRedirect(reverse('image_detail', kwargs={'group_name': group_name, '_id': img_node._id}))
+        
+    else:
+        return render_to_response("ndf/image_edit.html",
+                                  { 'node': img_node,
+                                    'group_name': group_name
+                                },
+                                  context_instance=RequestContext(request)
+                              )
