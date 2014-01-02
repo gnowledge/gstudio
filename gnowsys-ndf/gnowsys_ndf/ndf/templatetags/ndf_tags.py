@@ -141,3 +141,17 @@ def get_user_object(user_id):
     print "User Not found in User Table",e
   return user_obj
   
+
+'''this template function is used to get the user object from template''' 
+@register.assignment_tag 
+def get_grid_fs_object(f):
+  '''get the gridfs object by object id'''
+  grid_fs_obj = ""
+  try:
+    file_collection = db[File.collection_name]
+    file_obj = file_collection.File.one({'_id':ObjectId(f['_id'])})
+    grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
+  except Exception as e:
+    print "Object does not exist", e
+  return grid_fs_obj
+  
