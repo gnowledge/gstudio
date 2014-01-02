@@ -39,7 +39,7 @@
 	<div style='display:table-row;' >
 		{% for video in videoCollection %}
 			<div style='display:table-cell; padding-left:25px'> 
-				<a class="video" id="{{video}}" href="#{#% url 'getFullvideo' group_name video %#}">
+				<a class="video" id="{{video}}" href="#">
 				<img src="{% url 'getvideoThumbnail' group_name video %}" style="border-radius:10px;"></img><br/>
 				<span align="left">{{video.name}}</span></a>
 				{% get_user_object video.created_by as user_obj %}

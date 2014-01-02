@@ -63,11 +63,38 @@ def page(request, group_name, app_id):
 
     else:
         page_node = gs_collection.GSystem.one({"_id": ObjectId(app_id)})
+        prior_node_obj_dict = {}
+        prior_node_list = page_node.prior_node
+        
+        for each_id in prior_node_list:
+            if each_id != page_node._id:
+                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                dict_key = node_collection_object._id
+                dict_value = node_collection_object
+                
+                prior_node_obj_dict[dict_key] = dict_value
 
+        collection_obj_dict = {}
+        collection_list = page_node.collection_set
+        
+        for each_id in collection_list:
+            if each_id != page_node._id:
+                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                dict_key = node_collection_object._id
+                dict_value = node_collection_object
+                
+                collection_obj_dict[dict_key] = dict_value
 
-        return render_to_response("ndf/page_details.html", 
-                                  { 'node': page_node,
-                                    'group_name': group_name
+        # Version dictionary required to display number of versions created
+        version_dict = {}
+        version_dict = history_manager.get_version_dict(page_node)
+        
+        return render_to_response("ndf/node_details_base.html", 
+                                  { 'node': page_node, 'user_details': user_details,
+                                    'version_dict': version_dict,
+                                    'prior_node_obj_dict': prior_node_obj_dict,
+                                    'collection_obj_dict': collection_obj_dict,
+                                   'group_name': group_name
                                   },
                                   context_instance = RequestContext(request)
         )        

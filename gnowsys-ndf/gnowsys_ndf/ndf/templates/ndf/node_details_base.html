@@ -35,7 +35,6 @@
 </div>
 
 <hr />
-
 <div id="node-details-view-div" style="display:block">
 
   <table cellpadding="8">
@@ -50,7 +49,9 @@
      Versions : {% for seq_no, version_no in node.version_dict.items reversed %}<abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}">*</a></abbr> {% endfor %}</pre>
     </td>
   </tr>
-
+</table>
+{% block add_fields %} {% endblock %}
+<table>
   <tr>
     <td>
     <h4><strong>Description:</strong></h4>
@@ -63,7 +64,6 @@
     {% endwith %}
     </td>
   </tr>
-
   <tr>
     <td>
     {% if node.prior_node|length_is:"0" %}
@@ -134,8 +134,6 @@
   </table>
 
 </div>
-
-{% block add_fields %} {% endblock %}
 
 {% endblock %}
 
