@@ -1,9 +1,8 @@
 {% extends "ndf/node_details_base.html" %}
 
-{% block url %}{% url 'page_edit' group_name node %}{% endblock %}
+{% block url %}{% url 'image_edit' group_name node %}{% endblock %}
 {% block add_fields %}
-{{node}}
 <div>
-  <img src="{% url 'getImageThumbnail' group_name node %}" altname=""></img>
+  <img src="{% url 'getFullImage' group_name node %}" altname="{{node.name}}"></img>
 </div>
 {% endblock %}

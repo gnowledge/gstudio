@@ -38,6 +38,8 @@ from gnowsys_ndf.ndf.models import File
 db = get_database()
 GST_COLLECTION = db[GSystemType.collection_name]
 GST_FILE = GST_COLLECTION.GSystemType.one({'name': GAPPS[1]})
+GST_IMAGE = GST_COLLECTION.GSystemType.one({'name': GAPPS[3]})
+GST_VIDEO = GST_COLLECTION.GSystemType.one({'name': GAPPS[4]})
 
 
 ####################################################################################################################################                                             V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
@@ -72,6 +74,7 @@ def uploadDoc(request, group_name):
 @login_required
 def submitDoc(request, group_name):
     alreadyUploadedFiles = []
+    str1 = ''
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
@@ -83,16 +86,16 @@ def submitDoc(request, group_name):
             if mtitle:
                 if index == 0:
                     f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__())
-                title = mtitle + "_" + str(i) #increament title        
-                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__())
-                i = i + 1
+                else:
+                    title = mtitle + "_" + str(i) #increament title        
+                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__())
+                    i = i + 1
             else:
                 title = each.name
                 f = save_file(each, title, userid, group_name, GST_FILE._id.__str__())
             if f:
                 alreadyUploadedFiles.append(f)
                 title = mtitle
-        str1 = ''
         for each in alreadyUploadedFiles:
             str1 = str1 + 'var=' + each + '&'
         print str1
@@ -100,17 +103,19 @@ def submitDoc(request, group_name):
     else:
         return HttpResponseRedirect(reverse('homepage'))
             
-def save_file(files, title, userid, memberOf, stId):
+def save_file(files, title, userid, memberOf,st_id):
     fcol = db[File.collection_name]
     fileobj = fcol.File()
-    #gst=GST_COLLECTION.GSystemType.one({"_id":ObjectId(stId)})
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
+    print "file:",files.name
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
     if fileobj.fs.files.exists({"md5":filemd5}):
-            return files.name
+        print "inside if:"
+        return files.name
     else:
+        print " inside else:",files.name
         try:
             files.seek(0)
             filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
@@ -125,8 +130,8 @@ def save_file(files, title, userid, memberOf, stId):
             fileobj.file_size = size
             #fileobj.member_of=unicode(memberOf)           #shuold be group 
             fileobj.mime_type = filetype
-            if stId:
-                fileobj.gsystem_type.append(ObjectId(stId))
+            if st_id:
+                fileobj.gsystem_type.append(ObjectId(st_id))
             fileobj.save()
             files.seek(0)   #moving files cursor to start
             #this code is for storing Document in gridfs
@@ -143,9 +148,10 @@ def save_file(files, title, userid, memberOf, stId):
        	        fileobj.fs_file_ids.append(tobjectid) # saving thumbnail's id into file object
        	        fileobj.save()
        	        if filename.endswith('.webm') == False:
-      	        	tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename, content_type=filetype)
-      	        	fileobj.fs_file_ids.append(tobjectid) # saving webm video id into file object
-       	        	fileobj.save()
+                    print webmfiles.name
+                    tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+                    fileobj.fs_file_ids.append(tobjectid) # saving webm video id into file object
+                    fileobj.save()
 
             #storing thumbnail of image in saved object
             if 'image' in filetype:
@@ -158,15 +164,18 @@ def save_file(files, title, userid, memberOf, stId):
             print "Some Exception:", files.name, "Execption:", e
 
 def getFileSize(File):
-    File.seek(0, os.SEEK_END)
-    num = File.tell() 
-    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-        if num < 1024.0:
-            return  (num, x)
+    try:
+        File.seek(0,os.SEEK_END)
+        num=int(File.tell())
+        print "size:",num
+        for x in ['bytes','KB','MB','GB','TB']:
+            if num < 1024.0:
+                return  (num, x)
             num /= 1024.0
-
-
-
+    except Exception as e:
+        print "Unabe to calucalate size",e
+        return 0,'bytes'
+                     
 def convert_image_thumbnail(files):
     files.seek(0)
     thumb_io = StringIO()
