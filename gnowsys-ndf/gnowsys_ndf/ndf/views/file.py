@@ -108,7 +108,6 @@ def save_file(files, title, userid, memberOf,st_id):
     fileobj = fcol.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
-    print "file:",files.name
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
     if fileobj.fs.files.exists({"md5":filemd5}):
@@ -164,18 +163,14 @@ def save_file(files, title, userid, memberOf,st_id):
             print "Some Exception:", files.name, "Execption:", e
 
 def getFileSize(File):
-    try:
-        File.seek(0,os.SEEK_END)
-        num=int(File.tell())
-        print "size:",num
-        for x in ['bytes','KB','MB','GB','TB']:
-            if num < 1024.0:
-                return  (num, x)
-            num /= 1024.0
-    except Exception as e:
-        print "Unabe to calucalate size",e
-        return 0,'bytes'
-                     
+    File.seek(0, os.SEEK_END)
+    num = File.tell() 
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return  (num, x)
+        num /= 1024.0
+
+
 def convert_image_thumbnail(files):
     files.seek(0)
     thumb_io = StringIO()
