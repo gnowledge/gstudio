@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+from django.template.defaultfilters import slugify
 
 from django_mongokit import get_database
 
@@ -51,7 +52,9 @@ def create_group(request,group_name):
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
-        colg.name = unicode(request.POST.get('groupname', ""))
+        cname=request.POST.get('groupname', "")
+        colg.altnames=cname
+        colg.name = unicode(slugify(cname))
         colg.member_of.append(u"Group")
         usrid = int(request.user.id)
         colg.created_by=usrid
@@ -65,4 +68,5 @@ def create_group(request,group_name):
     return render_to_response("ndf/create_group.html", RequestContext(request))
     
 def group_dashboard(request,group_name):
+    print "fsafsdafs"
     return render_to_response("ndf/groupdashboard.html",RequestContext(request))

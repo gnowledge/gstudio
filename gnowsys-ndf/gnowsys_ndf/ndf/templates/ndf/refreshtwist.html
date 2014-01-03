@@ -1,0 +1,19 @@
+{% load ndf_tags %}
+
+<script type="text/javascript">
+$(document).ready(function(){
+ $('#orgitdown{{each}}').orgitdown(mySettings);
+});
+</script>
+<div id="twistd">
+{% get_forum_twists forum as replies %}
+{% for each in replies %}
+      <div class="reply{{each}}" id="div1">
+          <font size="3" color="darkblue" >{{each.name}}</font>
+          {% with each.content|safe as twist_content %}
+              <font size ="1" >{{twist_content}} </font>
+          {% endwith %}
+          {% include "ndf/reply_to_reply.html" %}
+      </div>
+{% endfor %}
+</div>
