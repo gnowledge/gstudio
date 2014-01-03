@@ -44,7 +44,11 @@
 	<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter title">
       </td>
     </tr>
+  </table>
 
+  {% block add_fields %} {% endblock %}
+
+  <table cellpadding="5">
     <tr>
       <td style="text-align:right; vertical-align:top; padding-top:12px;">
 	<h4><strong>Privacy:</strong></h4>
@@ -78,7 +82,7 @@
       </td>
       <td>
 	<div id="prior_node_drawer">
-	  {% edit_drawer_widget "prior_node" node %}
+	  {% edit_drawer_widget "prior_node" group_name node %}
 	</div>
       </td>
     </tr>
@@ -90,13 +94,21 @@
       <td>
         <div style="padding-left:3px">
 	{% if node.collection_set %}
-	  <input type="checkbox" id="collection_cb" name="collection_cb" checked />&nbsp;Do you want to create a collection?<br/>
+	  <input type="checkbox" id="collection_cb" name="collection_cb" checked="checked" />&nbsp;Do you want to create a collection?<br/>
 	{% else %}
 	  <input type="checkbox" id="collection_cb" name="collection_cb" />&nbsp;Do you want to create a collection?<br/>
 	{% endif %}
 	</div>
+	
+	<div id="SelectApp" style="display:none; height: 50px"> 
+            <br/>&nbsp;&nbsp;
+            <input type="radio" name="col" value="Page" />&nbsp;Page &nbsp;
+            <input type="radio" name="col" value="File" />&nbsp;File &nbsp;
+            <input type="radio" name="col" value="Image" />&nbsp;Image &nbsp;
+	</div>
+	
 	<div id="collection_drawer">
-	  {% edit_drawer_widget "collection" node %}
+	  {% edit_drawer_widget "collection" group_name node %}
 	</div>
       </td>
     </tr>
@@ -105,43 +117,76 @@
   
 </div>
 
-{% block add_fields %} {% endblock %}
-
 <div style="padding: 20px 0px 20px 280px">
   <input type="submit" id="save-node" value="Save" class="btn btn-large btn-primary">
 </div>
 
 </form>
 
-{% endblock %}
-
-{% block script %} 
+<script type="text/javascript">
 
 if ( $("#collection_cb").prop("checked") ) {
     $("#collection_drawer").css("display", "block")
+    $("#SelectApp").css("display", "block")
 }
 else {
     $("#collection_drawer").css("display", "none")
+    $("#SelectApp").css("display", "none")
 }
 
 $("#collection_cb").change(function() {
-    if (this.checked) {
+    if (this.checked) {        
         $("#collection_drawer").css("display", "block")
+        $("#SelectApp").css("display", "block")       
     }
     else{
         $("#collection_drawer").css("display", "none")
+        $("#SelectApp").css("display", "none")
     }
 });
 
 
+$("input:radio").click(function() {
+    // For collection
+    c_opts = collection_drawer2.options;
+    c_len = c_opts.length;
+    var c_arr = [];
+    for (var i = 0; i < c_len; i++) {
+        c_arr[i] = "'" + c_opts[i].value + "'";
+    }
+    var c_list = c_arr.join(",");
+
+    alert("\n c_list : " + c_list + "\n\n radio button : " + this.value)
+        
+    $.ajax({
+        type: "POST",
+        url: "{% url 'select_drawer' group_name %}",
+        datatype: "html",
+        data:{
+            homo_collection: this.value,
+            collection_list: c_list,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
+            $("#collection_drawer").html(data);
+        }
+    });
+});
+
+
+$(document).ready(function() {
+    // Must be there to display org-editor shortcuts
+    $("#orgitdown").orgitdown(mySettings);
+});
+
+
 $("#save-node").click(function() {
-    
     // -- For prior-node
     pn_opts = prior_node_drawer2.options;
     pn_len = pn_opts.length;
     var pn_arr = [];
     for (var i = 0; i < pn_len; i++) {
-	pn_arr[i] = "'" + pn_opts[i].value + "'";
+    	pn_arr[i] = "'" + pn_opts[i].value + "'";
     }
     var pn_list = pn_arr.join(',');
     $("#prior_node_list").val(pn_list)
@@ -155,15 +200,11 @@ $("#save-node").click(function() {
     }
     var c_list = c_arr.join(',');
     $("#collection_list").val(c_list)
+
+    {% block base_save_on_click %}{% endblock %}
 });
 
-
-$(document).ready(function() {
-    
-    // Must be there to display org-editor shortcuts
-    $('#orgitdown').orgitdown(mySettings);
-    
-});
+</script>
 
 {% endblock %}
 

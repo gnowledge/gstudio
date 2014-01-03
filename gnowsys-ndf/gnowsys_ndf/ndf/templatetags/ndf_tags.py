@@ -11,14 +11,11 @@ from django.contrib.auth.models import User
 
 from gnowsys_ndf.ndf.views.methods import get_drawers
 
-
-
 register = Library()
 db = get_database()
 
-
 @register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, node):
+def edit_drawer_widget(field, group_name, node, checked=""):
 
   drawers = None
   drawer1 = None
@@ -26,18 +23,20 @@ def edit_drawer_widget(field, node):
 
   if node :
     if field == "collection":
-      drawers = get_drawers(node._id, node.collection_set)
+      #drawers = get_drawers(node._id, node.collection_set, checked)
+      drawers = get_drawers(group_name, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
-      drawers = get_drawers(node._id, node.prior_node)
+      #drawers = get_drawers(node._id, node.prior_node, checked)
+      drawers = get_drawers(group_name, node._id, node.prior_node, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
 
   else:
-    drawer1 = get_drawers()
+    drawer1 = get_drawers(group_name)
 
-  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2}
+  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(group_name):
@@ -115,7 +114,6 @@ def check_group(groupname):
   fl = check_existing_group(groupname)
   return fl
 
-
 @register.assignment_tag
 def get_group_name(groupurl):
   sp=groupurl.split("/",2)
@@ -129,7 +127,6 @@ def get_group_name(groupurl):
       return "home"
   else:
       return "home"
-
 
 @register.assignment_tag
 def get_existing_groups():
@@ -158,8 +155,6 @@ def get_existing_groups_excluded(grname):
     group.append("None")
   return group
 
-
-
 @register.assignment_tag
 def get_group_policy(group_name,user):
   policy = ""
@@ -178,4 +173,18 @@ def get_user_object(user_id):
   except Exception as e:
     print "User Not found in User Table",e
   return user_obj
+  
+
+'''this template function is used to get the user object from template''' 
+@register.assignment_tag 
+def get_grid_fs_object(f):
+  '''get the gridfs object by object id'''
+  grid_fs_obj = ""
+  try:
+    file_collection = db[File.collection_name]
+    file_obj = file_collection.File.one({'_id':ObjectId(f['_id'])})
+    grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
+  except Exception as e:
+    print "Object does not exist", e
+  return grid_fs_obj
   

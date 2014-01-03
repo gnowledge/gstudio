@@ -28,6 +28,8 @@ from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_drawers
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+
 
 #######################################################################################################################################
 
@@ -48,7 +50,7 @@ def page(request, group_name, app_id):
     if gst_page._id == ObjectId(app_id):
         title = gst_page.name
         
-        page_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(app_id)]}})
+        page_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
         page_nodes.sort('last_update', -1)
         page_nodes_count = page_nodes.count()
 
@@ -60,48 +62,11 @@ def page(request, group_name, app_id):
         )
 
     else:
+        #page_detail_url=request.GET.get('v',"")
+        #print "test url:",page_detail_url
         page_node = gs_collection.GSystem.one({"_id": ObjectId(app_id)})
-
-        # Retrieving names of created-by & modified-by users, and appending to 'user_details' dict-variable
-        user_details = {}
-        user_details['created_by'] = User.objects.get(pk=page_node.created_by).username
-
-        modified_by_usernames = []
-        for each_pk in page_node.modified_by:
-            modified_by_usernames.append(User.objects.get(pk=each_pk).username)
-        user_details['modified_by'] = modified_by_usernames
-
-        prior_node_obj_dict = {}
-        prior_node_list = page_node.prior_node
-        
-        for each_id in prior_node_list:
-            if each_id != page_node._id:
-                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
-                dict_key = node_collection_object._id
-                dict_value = node_collection_object
-                
-                prior_node_obj_dict[dict_key] = dict_value
-
-        collection_obj_dict = {}
-        collection_list = page_node.collection_set
-        
-        for each_id in collection_list:
-            if each_id != page_node._id:
-                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
-                dict_key = node_collection_object._id
-                dict_value = node_collection_object
-                
-                collection_obj_dict[dict_key] = dict_value
-
-        # Version dictionary required to display number of versions created
-        version_dict = {}
-        version_dict = history_manager.get_version_dict(page_node)
-        
-        return render_to_response("ndf/page_details.html", 
-                                  { 'node': page_node, 'user_details': user_details,
-                                    'version_dict': version_dict,
-                                    'prior_node_obj_dict': prior_node_obj_dict,
-                                    'collection_obj_dict': collection_obj_dict,
+        return render_to_response('ndf/page_details.html', 
+                                  { 'node': page_node,
                                     'group_name': group_name
                                   },
                                   context_instance = RequestContext(request)
@@ -112,74 +77,14 @@ def create_page(request, group_name):
     """Creates a new page.
     """
     if request.user.is_authenticated():
-        collection = None
-        private = None
+        page_node = gs_collection.GSystem()
 
         if request.method == "POST":
-            page_node = gs_collection.GSystem()
-            
-            name = request.POST.get('name')
-            page_node.name = unicode(name)
-
-            page_node.member_of.append(gst_page.name)
-
-            page_node.gsystem_type.append(gst_page._id)
-
-            usrid = int(request.user.id)
-            page_node.created_by = usrid          # Confirm the data-type for this field in models.py file is changed from ObjectId (Prev-{Author, django_mongokit}) to int (Curr-{User, django})
-
-            if usrid not in page_node.modified_by:
-                page_node.modified_by.append(usrid)
-
-            tags = request.POST.get('tags')
-            page_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-
-            prior_node_list = request.POST['prior_node_list']
-            if prior_node_list != '':
-                prior_node_list = prior_node_list.split(",")
-
-            i = 0                    
-            while (i < len(prior_node_list)):                    
-                pn_name = str(prior_node_list[i])
-                pn_name = pn_name.replace("'", "")
-                page_node.prior_node.append(gs_collection.GSystem.one({'name': unicode(pn_name)})._id)
-                i = i+1
-
-
-            private = request.POST.get("private_cb", '')
-            if private:
-                private = True
-            else:
-                private = False
-
-            collection = request.POST.get("collection_cb", '')
-            if collection:
-                collection_list = request.POST['collection_list']
-                if collection_list != '':
-                    collection_list = collection_list.split(",")
-
-                i = 0                    
-                while (i < len(collection_list)):                    
-                    c_name = str(collection_list[i])
-                    c_name = c_name.replace("'", "")
-                    objs = gs_collection.GSystem.one({'name': unicode(c_name)})
-                    page_node.collection_set.append(objs._id)
-                    i = i+1
-
-            content_org = request.POST.get('content_org')
-            usrname = request.user.username
-            # Required to link temporary files with the current user who is modifying this document
-            filename = slugify(name) + "-" + usrname + "-"
-
-            page_node.content = unicode(org2html(content_org, file_prefix=filename))
-
-            page_node.content_org = unicode(content_org.encode('utf8'))
-
+            get_node_common_fields(request, page_node, group_name, gst_page)
             page_node.save()
-
             return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
-        else:
 
+        else:
             return render_to_response("ndf/page_create.html",
                                       { 'title': gst_page.name,
                                         'group_name': group_name
@@ -192,63 +97,14 @@ def create_page(request, group_name):
 def edit_page(request, group_name, node_id):
     """Displays/Modifies details about the given page.
     """
-    page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
-
     if request.user.is_authenticated():
-
+        page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
         if request.method == "POST":
-
-            name = request.POST.get('name')
-            page_node.name = unicode(name)
-
-            usrid = int(request.user.id)
-            if usrid not in page_node.modified_by:
-                page_node.modified_by.append(int(request.user.id))
-
-            tags = request.POST.get('tags')
-            page_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
-
-            prior_node_list = request.POST['prior_node_list']
-            page_node.prior_node = []
-
-            if prior_node_list != '':
-                prior_node_list = prior_node_list.split(",")
-
-            i = 0
-            while (i < len(prior_node_list)):
-                pn_name = str(prior_node_list[i])
-                pn_name = pn_name.replace("'", "")
-                page_node.prior_node.append(gs_collection.GSystem.one({'name': unicode(pn_name)})._id)
-                i = i+1
-
-
-            collection_list = request.POST['collection_list']
-            page_node.collection_set = []
-
-            if collection_list != '':
-                collection_list = collection_list.split(",")
-
-            i = 0
-            while (i < len(collection_list)):
-                c_name = str(collection_list[i])
-                c_name = c_name.replace("'", "")
-                page_node.collection_set.append(gs_collection.GSystem.one({'name': unicode(c_name)})._id)
-                i = i+1
-
-            content_org = request.POST.get('content_org')
-            page_node.content_org = unicode(content_org.encode('utf8'))
-
-            usrname = request.user.username
-            # Required to link temporary files with the current user who is modifying this document
-            filename = slugify(name) + "-" + usrname + "-"
-            page_node.content = unicode(org2html(content_org, file_prefix=filename))
-
+            get_node_common_fields(request, page_node, group_name, gst_page)
             page_node.save()
-            
             return HttpResponseRedirect(reverse('page_details', kwargs={'group_name': group_name, 'app_id': page_node._id}))
 
         else:
-
             return render_to_response("ndf/page_edit.html",
                                       { 'node': page_node,
                                         'group_name': group_name
@@ -256,27 +112,37 @@ def edit_page(request, group_name, node_id):
                                       context_instance=RequestContext(request)
             )
 
-    else:
-        # TODO: Show error page - Invalid access!!
-        print "\n Invalid access!"
 
+def version_node(request, group_name, node_id, version_no):
+    """Renders either a single or compared version-view based on request.
 
-def version_page(request, group_name, node_id, version_no):
+    In single version-view, all information of the node for the given version-number 
+    is provided.
 
+    In compared version-view, comparitive information in tabular form about the node 
+    for the given version-numbers is provided.
+    """
     view = ""          # either single or compare
+    selected_versions = {}
+    node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
+
+    fp = history_manager.get_file_path(node)
 
     if request.method == "POST":
         print "\n if -- version page\n"
         view = "compare"
 
+        version_1 = request.POST["version_1"]
+        version_2 = request.POST["version_2"]
+
+        diff = get_html_diff(fp, version_1, version_2)
+
+        selected_versions = {"1": version_1, "2": version_2}
+        content = diff
+
     else:
         print "\n else -- version page\n"
         view = "single"
-
-        page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
-        fp = history_manager.get_file_path(page_node)
-
-        diff = get_html_diff(fp, version_no)
 
         # Retrieve rcs-file for a given version-number
         rcs.checkout((fp, version_no))
@@ -293,12 +159,19 @@ def version_page(request, group_name, node_id, version_no):
         # Remove retrieved rcs-file belonging to the given version-number
         rcs.checkin(fp)
 
+        selected_versions = {"1": version_no, "2": ""}
+        content = data
+
     return render_to_response("ndf/version_page.html",
-                              {'view': "compare",
-                               'node': diff
+                              {'view': view,
+                               'node': node,
+                               'selected_versions': selected_versions,
+                               'content': content
                               },
                               context_instance = RequestContext(request)
     )        
+
+
 
 #######################################################################################################################################
 #                                                                                                     H E L P E R  -  F U N C T I O N S
@@ -337,6 +210,9 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
 
         # Remove retrieved rcs-file belonging to the given version-number
         rcs.checkin(versionfile)
+
+        fromfile = "Version #" + fromfile
+        tofile = "Version #" + tofile
 
         return HtmlDiff(wrapcolumn=60).make_file(fromlines, tolines, fromfile, tofile)
 
