@@ -46,6 +46,10 @@
         		<input type="submit" id="submitpostid" value="Upload" class="btn btn-primary btn-large btn-block">
       		</div>
 	</div>
+		 <p id="message" style="display:none"> It will take time to upload and process files, you can continue your work on this site
+		 <br/>
+		 For fast uploading of videos, upload videos in webm format </p>
+
 	</form>
 </div>	
 		
@@ -62,5 +66,25 @@
 
 
 </div>-->
+{% endblock %}
+{% block script %}
+jQuery(document).ready(function($){
+	$(document).on('submit',"form",function(){
+	if($("#docFile").val() != "")
+	{	
+		$("#message").show();
+		$("#submitpostid").hide();
+		$("#submitpostid").submit();
+		
+	}
+	else
+	{
+	alert("select a file");
+	return false;
+	}
+	
+	});
+});
+
 {% endblock %}
 

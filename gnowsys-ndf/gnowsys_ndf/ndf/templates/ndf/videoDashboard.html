@@ -57,23 +57,26 @@
 </div>
 {% endblock %}
 {% block extra_content %} 
-<a id="close" href="#" style="display: none;"><img width="19px;" style="position: absolute; top: 27%; left: calc(25% + 638px);" src="/static/ndf/images/close.jpeg"></a>
-<div id="pop_video" style="display:none;position:absolute; top: 30%; left: 25%; background: black;">
-<video id="play_video" src="" controls="controls" style="display:inline-block;width:640px;"></video>
+
+<div id="pop_video" style="display:none;position:absolute; top: 30%; left: 25%; background: black;z-index:10000;">
+<a id="close" href="#"><img width="19px;" style="position: absolute; top: -3%; left: calc(638px);" src="/static/ndf/images/close.jpeg"></a>
+<video id="play_video" src="" controls="controls" style="display:inline-block;width:650px;height:450px;"></video>
 <br/>
 <span style="float:left"> <a class="video_pre" href="#">&lt;&lt;&lt; previous</a>  </span>  
 <center><span> <a class="video_details_link" href="#"> more details </a></span>
  <span style="float:right"> <a class="video_next" href="#">next &gt;&gt;&gt;</a> </span> 
 </div>
+
+<div id="backcover" style="position: absolute; top: 0px; left: 0px; width: 150%; height: 150%; display: none; z-index: 9998; background-color: rgb(0, 0, 0); opacity: 0.8;"></div>
 {% endblock %}
 {% block script %}
 var eventhandler = function(e) { e.preventDefault();}
 jQuery(document).ready(function($){
 	$(document).on('click',".video",function(){
-	$('#body').css({opacity: "0.4"});
+	//$('#body').css({opacity: "0.4"});
+	$("#backcover").show();
 	$('#body').bind('click', eventhandler);
 	$('#pop_video').show();
-	$('#close').show();
 	var video_id = this.id;
 	var video_index = $('.video').index(this)
 	var video_total = $('.video').length;
@@ -103,8 +106,8 @@ jQuery(document).ready(function($){
 	});
 
 $(document).on('click',"#close",function(){
-	$("#close").hide();
 	$('#pop_video').hide();
+	$("#backcover").hide();
 	$("#play_video").attr("src","");
 	$('#body').css({opacity: "1"});
 	$('#body').unbind('click', eventhandler);

@@ -141,7 +141,7 @@ def save_file(files, title, userid, memberOf,st_id):
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
             	fileobj.mime_type = "video"
        	        fileobj.save()
-            	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid)
+            	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id)
 	        #storing thumbnail of video with duration in saved object
                 tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
        	        fileobj.fs_file_ids.append(tobjectid) # saving thumbnail's id into file object
@@ -182,18 +182,12 @@ def convert_image_thumbnail(files):
     return thumb_io
     
     
-def convertVideo(files, userid):
+def convertVideo(files, userid, objid):
     """
     converting video into webm format, if video already in webm format ,then pass to create thumbnails
     """
-    fileVideoName = files._get_name()
-    z = ""
-    for each1 in fileVideoName:
-        if each1 == " ":
-            z = z+'-'
-        else:
-            z = z+each1
-    fileVideoName = z
+    fileVideoName = str(objid)
+    initialFileName = str(objid)
     os.system("mkdir -p "+ "/tmp"+"/"+str(userid)+"/"+fileVideoName+"/")
     fd = open('%s/%s/%s/%s' % (str("/tmp"), str(userid),str(fileVideoName), str(fileVideoName)), 'wb')
     for chunk in files.chunks():
