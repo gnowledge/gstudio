@@ -39,7 +39,7 @@
 	<div style='display:table-row;' >
 		{% for video in videoCollection %}
 			<div style='display:table-cell; padding-left:25px'> 
-				<a href="{% url 'video_detail' group_name video %}">
+				<a class="video" id="{{video}}" href="#">
 				<img src="{% url 'getvideoThumbnail' group_name video %}" style="border-radius:10px;"></img><br/>
 				<span align="left">{{video.name}}</span></a>
 				{% get_user_object video.created_by as user_obj %}
@@ -55,4 +55,131 @@
 	</div>
 			
 </div>
+{% endblock %}
+{% block extra_content %} 
+
+<div id="pop_video" style="display:none;position:absolute; top: 30%; left: 25%; background: black;z-index:10000;">
+<a id="close" href="#"><img width="19px;" style="position: absolute; top: -3%; left: calc(638px);" src="/static/ndf/images/close.jpeg"></a>
+<video id="play_video" src="" controls="controls" style="display:inline-block;width:650px;height:450px;"></video>
+<br/>
+<span style="float:left"> <a class="video_pre" href="#">&lt;&lt;&lt; previous</a>  </span>  
+<center><span> <a class="video_details_link" href="#"> more details </a></span>
+ <span style="float:right"> <a class="video_next" href="#">next &gt;&gt;&gt;</a> </span> 
+</div>
+
+<div id="backcover" style="position: absolute; top: 0px; left: 0px; width: 150%; height: 150%; display: none; z-index: 9998; background-color: rgb(0, 0, 0); opacity: 0.8;"></div>
+{% endblock %}
+{% block script %}
+var eventhandler = function(e) { e.preventDefault();}
+jQuery(document).ready(function($){
+	$(document).on('click',".video",function(){
+	//$('#body').css({opacity: "0.4"});
+	$("#backcover").show();
+	$('#body').bind('click', eventhandler);
+	$('#pop_video').show();
+	var video_id = this.id;
+	var video_index = $('.video').index(this)
+	var video_total = $('.video').length;
+	var pre = $(".video_pre");
+	var next = $(".video_next");
+	var url = "/{{group_name}}/video/fullvideo/"+video_id
+	$("#play_video").attr("src",url);
+	$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_id)
+	if(video_index >= 1 && video_index < video_total-1)
+	{
+	pre.attr("id",video_index-1);
+	next.attr("id",video_index+1);
+	}
+	else if(video_index == 0)
+	{
+	pre.hide();
+	next.attr("id",video_index+1);
+	}
+	else if(video_index == video_total-1){
+	pre.attr("id",video_index-1);
+	next.hide();
+	}
+	else{
+	pre.hide();
+	next.hide();
+	}
+	});
+
+$(document).on('click',"#close",function(){
+	$('#pop_video').hide();
+	$("#backcover").hide();
+	$("#play_video").attr("src","");
+	$('#body').css({opacity: "1"});
+	$('#body').unbind('click', eventhandler);
+
+});
+});
+jQuery(document).ready(function($){
+	$(document).on('click',".video_pre",function(){
+	var video_id = this.id;
+	var video_index = parseInt(this.id);
+	var video_total = $('.video').length;
+	var pre = $(".video_pre");
+	var next = $(".video_next");
+	pre.show();
+	next.show();
+	var video_url = $(".video")[this.id].id
+	var url = "/{{group_name}}/video/fullvideo/"+video_url
+	$("#play_video").attr("src",url);
+	$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_url)
+	if(video_index >= 1 && video_index < video_total-1)
+	{
+	pre.attr("id",video_index-1);
+	next.attr("id",video_index + 1);
+	}
+	else if(video_index == 0)
+	{
+	pre.hide();
+	next.attr("id",video_index+1);
+	}
+	else if(video_index == video_total-1){
+	pre.attr("id",video_index-1);
+	next.hide();
+	}
+	else{
+	pre.hide();
+	next.hide();
+	}
+
+	});
+});
+jQuery(document).ready(function($){
+	$(document).on('click',".video_next",function(){
+	var video_id = this.id;
+	var video_index = parseInt(this.id);
+	var video_total = $('.video').length;
+	var pre = $(".video_pre");
+	var next = $(".video_next");
+	pre.show();
+	next.show();
+	var video_url = $(".video")[this.id].id
+	var url = "/{{group_name}}/video/fullvideo/"+video_url
+	$("#play_video").attr("src",url);
+	$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_url)
+	if(video_index >= 1 && video_index < video_total-1)
+	{
+	pre.attr("id",video_index-1);
+	next.attr("id",video_index+1);
+	}
+	else if(video_index == 0)
+	{
+	pre.hide();
+	next.attr("id",video_index+1);
+	}
+	else if(video_index == video_total-1){
+	pre.attr("id",video_index-1);
+	next.hide();
+	}
+	else{
+	pre.hide();
+	next.hide();
+	}
+
+	});
+});
 {% endblock %}
