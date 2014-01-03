@@ -198,8 +198,7 @@ def convertVideo(files, userid, objid):
     for chunk in files.chunks():
         fd.write(chunk)
     fd.close()
-    initialFileName = fileVideoName.split(".")[0]
-    if fileVideoName.endswith('.webm') == False:
+    if files._get_name().endswith('.webm') == False:
         proc = subprocess.Popen(['ffmpeg', '-y', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")])
         proc.wait()
         files = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".webm")
