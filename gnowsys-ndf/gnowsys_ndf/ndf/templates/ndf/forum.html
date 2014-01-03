@@ -1,0 +1,28 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %}Forum{% endblock %}
+{% block body_content %}
+
+{% if user.is_authenticated %}
+
+<div style='padding-top:10px'>
+<a href="{% url 'create_forum' group_name %}">
+  <input type="submit" class="btn btn-large btn-primary" value="Create a forum" />
+</a>
+</div>
+
+<hr />
+{% endif %}
+{% get_group_name request.path as group_name %}
+<div id="existing_forums">
+{% for each in existing_forums %}
+{% if forloop.first %}
+Existing Forums:
+{% endif %} 
+<p><strong><a href="{% url 'show' group_name each %}"</a>{{each.name}}</strong><br>
+
+{% endfor %}
+</div>
+
+{% endblock %}
+
