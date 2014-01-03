@@ -1,20 +1,31 @@
 {% extends "ndf/base.html" %}
 {% block title %} {{title}} {% endblock %}
-{% block body_content %} 
-{% if user.is_authenticated %}
+{% block body_content %}
+{% load ndf_tags %}
+{% if already_uploaded %} 
+<div id="message">
+  <span style="color:red">Listed below files are already uploaded please choose different files</span>
+  <ul>
+    {% for each in already_uploaded %}
+    <li>{{each}}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %} 
 <center>
   <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'file_search' 'group_name' %}">
     <div style="padding-top:10px">
       <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
       <input type="submit" class="btn btn-large btn-primary" value="search" />
-      <a href="{% url 'uploadDoc' 'file' %}">
+      {% if user.is_authenticated %}
+      <a href="{% url 'uploadDoc' 'file' %}?next={{request.path}}">
 	<input type="button" class="btn btn-large btn-primary" value="Upload" />
       </a>
+      {% endif %}
     </div>
   </form>
 </center>
 <hr />
-{% endif %}
 {% load url from future %}
 
 {% if files %}
@@ -30,10 +41,18 @@
       <h4>File Type </h4>
     </div>
     <div style='display:table-cell;' align="middle">
+      <h4>Posted by </h4>
+    </div>
+    <div style='display:table-cell;' align="middle">
 	    <h4 >Download </h4>
+    </div>
+    <div style='display:table-cell;' align="middle">
+	    <h4 >Delete </h4>
     </div>
   </div>
     {% for file in files %}
+    {% get_user_object file.created_by as user_obj %}
+    {% get_grid_fs_object file as grid_fs_obj %}
     <div style='display:table-row;' >
       <div style='display:table-cell;' align="middle">
 	<lable>{{file.name}} </lable>
@@ -45,8 +64,19 @@
 	<lable>{{file.mime_type}}</lable>
       </div>
       <div style='display:table-cell;' align="middle">
-	<a href="{% url 'read_file' 'group' file %}">Download </a>
+	<lable>{{ user_obj.username }}</lable>
       </div>
+      <div style='display:table-cell;' align="middle">
+	<a href="{% url 'read_file' 'group' file %}" download="{{ grid_fs_obj.filename }}">Download </a>
+      </div>
+      
+      <div style='display:table-cell;' align="middle">
+	{% get_user_object file.created_by as user_obj %}
+	{% ifequal  user_obj.username  user.username  %}
+	<a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
+	{% endifequal %}
+      </div>
+      
     </div>
     {% endfor %}
 </div>

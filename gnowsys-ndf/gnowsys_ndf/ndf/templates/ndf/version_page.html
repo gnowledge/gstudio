@@ -8,53 +8,90 @@
 
 {% block body_content %}
 
-  <div style="padding-top:1.6em">
-  <font size="5"><strong>View & Compare History</strong></font>
-  <hr style="height:5px;background-color: #1ABC9C;" />
+  <div style="padding-top:0.8em">
+    <h2>
+      {% ifequal view "single" %}
+      View
+      {% else %}
+      Compare
+      {% endifequal %}
+      History
+    </h2>
+  </div>
+
+  <hr style="height:5px;background-color: #0B6580;" />
+
+  <div id="compare_versions_div" style="">
+  <form method="POST" action="">
+    {% csrf_token %}
+
+    <table cellpadding="8">
+      <tr>
+        <td><font size="3">Compare</font></td>
+	<td valign="bottom">
+	  <select class="" id="version_1" name="version_1">
+	    {% for version_no in node.version_dict.values %}
+	      {% ifequal version_no selected_versions.1 %}
+	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
+	      {% else %}
+	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
+	      {% endifequal %}
+	    {% endfor %}
+	  </select>
+	</td>
+        <td><font size="3">with</font></td>
+	<td valign="bottom">
+	  <select id="version_2" name="version_2">
+	    {% for version_no in node.version_dict.values reversed %}
+	      {% ifequal version_no selected_versions.2 %}
+	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
+	      {% else %}
+	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
+	      {% endifequal %}
+	    {% endfor %}
+	  </select>
+	</td>
+        <td>
+	  <input id="compare_versions" type="submit"  value="Go" class="btn btn-large btn-primary" />
+	</td>
+      </tr>
+    </table>
+
+  </form>
   </div>
 
   {% ifequal view "single" %}
-    <div id="single-view" style="">
-    
-    <table cellpadding="8">
-      <tr>
-        <th align="right">Fields</th>
-        <th align="left">Version #</th>
-      </tr>
-      {% for k, v in node.items %}
-      <tr>
-        <td align="right" valign="top">{{k}}</td>
-        <td>{{v}}</td>
-      </tr>
-      {% endfor %}
-    </table>
+    <div id="single-view" style="padding-bottom: 20px">
+      <table cellpadding="8">
+	<tr>
+          <th align="right">Fields</th>
+          <th align="left">Version #{{selected_versions.1}}</th>
+	</tr>
+	{% for k, v in content.items %}
+	<tr>
+          <td align="right" valign="top">{{k}}</td>
+          <td>{{v}}</td>
+	</tr>
+	{% endfor %}
+      </table>
     </div>
   
   {% else %}
-    <div id="compare-view" style="">
-      {{node|safe}}
+    <div id="compare-view" style="padding-bottom: 20px">
+      {{content|safe}}
     </div>
   
   {% endifequal %}
 
-  <hr style="height:5px;background-color: #1ABC9C;" />
-
-  <form method="POST" action="">
-
-    <div style="display:inline-block;text-align:center">
-      <div style="display:inline-block; float:left; margin:1em 0 1.5em 0;">
-        <font size="3">Compare</font>&nbsp;&nbsp;
-        <input id="version-1" type="text" name="version-1" placeholder="version #1" />&nbsp;&nbsp;
-        <font size="3">with</font>&nbsp;&nbsp;
-        <input id="version-2" type="text" name="version-2" placeholder="version #2" />&nbsp;&nbsp;
-      </div>
-
-      <div style="display:inline-block; float:left; margin:0.8em;">
-        <input id="enter-compare" type="submit"  value="Enter" class="btn btn-large btn-primary" />
-      </div>
-    </div>
-    
-  </form>
-
 {% endblock %}
 
+{% block script %}
+
+$("#compare_versions").click(function() {
+    if ($("#version_1").val() === $("#version_2").val()) {
+	alert ("Please select different versions!!!")
+	return false;
+    }
+});
+
+{% endblock%}
