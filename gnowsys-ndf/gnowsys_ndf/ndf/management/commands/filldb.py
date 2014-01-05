@@ -27,13 +27,17 @@ class Command(BaseCommand):
         a=""
         for each in GAPPS:
             a=collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':each}]})
-            if (a == None or each!=a['name']):
-                    gst_node=collection.GSystemType()
-                    gst_node.name = unicode(each)
-                    gst_node.created_by = user_id
-                    gst_node.member_of.append(u"GAPP")
-                    gst_node.modified_by.append(user_id)
-                    gst_node.save()
+            if (a == None or each != a['name']):
+                gst_node=collection.GSystemType()
+                gst_node.name = unicode(each)
+                gst_node.created_by = user_id
+                gst_node.member_of.append(u"GAPP")
+                gst_node.modified_by.append(user_id)
+                gst_node.save()
+            elif('GAPP' not in a.member_of): # it will append GAPP already created GSystemType
+                a.member_of.append(u'GAPP')
+                a.save()
+                   
         #Create default group 'home'
         a=collection.GSystemType.find({'$and':[{'_type':'Group'},{'name':'home'}]})
         if a.count() < 1:
