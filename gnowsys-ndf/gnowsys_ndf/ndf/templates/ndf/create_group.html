@@ -23,13 +23,13 @@
  <div style='display:table;  border:1px;   border-spacing:10px; '>
 	<div style='display:table-row;' >
 	     	<div style='display:table-cell;'> 
-	        	<font size="1" >Group Name</font> 
+	        	<font size="3" >Group Name</font> 
 	      	 </div>
       		<div style='display:table-cell;'> 
         		<input type="text"  id="group_name" name="groupname" placeholder="Enter Group Name">
       		</div>
       		<div style='display:table-cell;'> 
-        		<font size="1" >Group Type</font>
+        		<font size="3" >Group Type</font>
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="group_type" class="gtype">
@@ -42,7 +42,7 @@
     
     	<div style='display:table-row;'>
       		<div style='display:table-cell;'> 
-        		<font size="1" >Group Editing policy</font>
+        		<font size="3" >Group Editing policy</font>
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="edit_policy" class="editp">
@@ -52,7 +52,7 @@
         		</select> 
       		</div>
  	       <div style='display:table-cell;'> 
-        		<font size="1" >Group Subscription policy</font>
+        		<font size="3" >Group Subscription policy</font>
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="subscription" class="subscptn">
@@ -65,7 +65,7 @@
     
     	<div style='display:table-row;'>
       		<div style='display:table-cell;'> 
-        		<font size="1" >Group Existance visibility</font>
+        		<font size="3" >Group Existance visibility</font>
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="existance" class="existance">
@@ -74,7 +74,7 @@
 	      		</select>
       		</div>
       		<div style='display:table-cell;'> 
-        		<font size="1">  Group Member Visibility</font>
+        		<font size="3">  Group Member Visibility</font>
       		</div>
       		<div style='display:table-cell;'> 
         		<select name="member" class="mem">
@@ -86,7 +86,7 @@
  
    	 <div style='display:table-row;'>
       		<div style='display:table-cell;'> 
-        		<font size="1" >Group Encryption policy</font>
+        		<font size="3" >Group Encryption policy</font>
       		</div>
       		<div style='display:table-cell;'> 
        			<select name="encryption" class="encr">
@@ -97,7 +97,8 @@
 	</div>
 	<div style='display:table-row;'>
       		<div style='display:table-cell;' colspan='2' align="middle"> 
-       		 	<input type="submit" value="Create Group" class="btn btn-primary btn-large btn-block" align="center">
+                        <input type="button" id="savegrp" value="Create Group"  onClick="check_values()">
+       		 	<input type="submit" id="grpsubmit" value="Create Group" class="btn btn-primary btn-large btn-block" style="visibility:hidden" >
       		</div>
     	</div>
 </div>
@@ -108,9 +109,21 @@
 
 {% block head %}
 <script type="text/javascript">
+function check_values()
+{
+var gpname=$("#group_name").val();
+if (gpname == "")
+{
+ alert("Group name can not be empty")
+ $("#group_name").focus();
+}
+else
+{
+$("#grpsubmit").trigger("click");
+}
+}
 $(document).ready(function()
 {
-
 $("#group_name").focusout(function(){
 
 var gname=$("#group_name").val();
@@ -121,7 +134,7 @@ success: function(data){
 if (data=="success"){
      alert("group already exists");
      $("#group_name").val("");
-     $("#res_relation").focus();
+     $("#group_name").focus();
 }
 }
 });  //end_ajax

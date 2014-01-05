@@ -43,12 +43,44 @@ def get_gapps_menubar(group_name):
   """Get Gapps menu-bar
   """
   gst_collection = db[GSystemType.collection_name]
-  gst_cur = gst_collection.GSystemType.find({'_type': u'GSystemType'})
+  gst_cur = gst_collection.GSystemType.find({'$and':[{'_type':'GSystemType'},{'member_of':'GAPP'}]})
   gapps = {}
   for app in gst_cur:
     gapps[app._id] = app.name.lower()
 
   return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'group_name': group_name}
+
+
+@register.assignment_tag
+def get_forum_twists(forum):
+  gs_collection = db[Node.collection_name]
+  ret_replies=[]
+  exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+  for each in exstng_reply:
+    ret_replies.append(each)
+  return ret_replies
+
+lp=[]
+def get_rec_objs(ob_id):
+  lp.append(ob_id)
+  exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(ob_id)}]})
+  for each in exstng_reply:
+    get_rec_objs(each)
+  return lp
+
+@register.assignment_tag
+def get_twist_replies(twist):
+  print "twist=",twist,twist.name
+  gs_collection = db[Node.collection_name]
+  ret_replies={}
+  entries=[]
+  exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(twist._id)}]})
+  for each in exstng_reply:
+    lst=get_rec_objs(each)
+        
+      
+  return ret_replies
+
 
 
 @register.assignment_tag
@@ -104,7 +136,8 @@ def get_existing_groups():
   colg.sort('name')
   gr = list(colg)
   for items in gr:
-    group.append(items.name)
+    if items.name:
+      group.append(items.name)
   return group
 
 
