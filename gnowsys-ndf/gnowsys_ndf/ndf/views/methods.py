@@ -11,6 +11,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 
 
+
 ######################################################################################################################################
 
 db = get_database()
@@ -19,6 +20,20 @@ db = get_database()
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
 
+def get_forum_repl_type(forrep_id):
+  coln=db[GSystem.collection_name]
+  forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
+  obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
+  if obj:
+    if obj.member_of in forum_st.name:
+          if obj.member_of in "Forum":
+             return "Forum"
+          else:    
+             return "Reply"
+    else:
+          return "None"
+  else:
+          return "None"
 def check_existing_group(groupname):
   col_Group = db[Group.collection_name]
   colg = col_Group.Group.find({'_type': u'Group', "name":groupname})

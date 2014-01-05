@@ -1,0 +1,56 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %}{{forum.name}}{% endblock %}
+{% block head %}
+<script type="text/javascript">
+
+</script>
+
+{% endblock %}
+{% block body_content %}
+<style type="text/css">
+#div2
+{
+ background-color:#E8E8E8 ;
+}
+#div1
+{
+ background-color:#F4F4F4;
+}
+
+</style>
+
+<font size="5" color="green">{{forum.name}}</font>
+{% with forum.content|safe as forum_content %}
+<font size ="2" >{{forum_content}} </font>
+{% endwith %}
+
+
+{% include "ndf/replyforum.html" %}
+
+{% if forum %}
+
+<div id="twistd">
+{% get_forum_twists forum as replies %}
+{% for each in replies %}
+      <div class="reply{{each}}" id="div1">
+          <font size="3" color="darkblue" >{{each.name}}</font>
+          {% with each.content|safe as twist_content %}
+              <font size ="1" >{{twist_content}} </font>
+          {% endwith %}
+              <div id="twist_replies" > 
+	
+                {% for eachtw_rep in twist_repls %}
+                {% include "ndf/reply_to_reply.html" %}
+		{% endfor %}
+	      </div>
+         {% include "ndf/reply_to_reply.html" %}
+	
+      </div>
+{% endfor %}
+</div>
+
+{% endif %}
+<!-- end of if forum -->
+
+{% endblock %}

@@ -1,0 +1,102 @@
+{% load ndf_tags %}
+{% block head %}
+<!-- orgitdown! -->
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+  <!-- orgitdown! toolbar skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+
+
+
+
+<script src="/static/ndf/js/jquery.tools.min.js"></script>
+<script src="/static/ndf/js/loadeditor.js"></script>
+ <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+ $('#orgitdown').orgitdown(mySettings);
+$("#savereply").click(function(){
+var content=$('#orgitdown').val()
+$('#orgitdown').val("");
+var grp=$("#grptxt").val();
+var forum=$("#forum").val();
+var tw_name=$("#twist_name").val();
+var ajurl="/"+grp+"/forum/add_node/"
+
+$.ajax({
+        url: ajurl,
+        type: 'POST',
+        data: {node:'Twist',supnode:forum,reply:content,twistname:tw_name,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {
+              $("#ajax_load_image").show();
+              $("#body").css({"opacity":"0.1",})
+                              },
+        success: function(data){
+                       
+                       $(".close").trigger('click');
+                       $('#twistd').html(data);
+      
+           },
+       complete: function(){
+                    $("#ajax_load_image").hide();
+                $("#body").css({"opacity":"",})
+
+          }
+   })
+
+});
+});
+</script>
+
+
+
+{% endblock %}
+
+<style type="text/css">
+.orgitdown{
+height:100px;
+}
+.orgitdownContainer{
+height:100px;
+}
+.orgitdownEditor{
+height:60px;
+}
+div.overlay {
+        width:500px;
+        display:none;
+        color:Blue;
+        padding:10px;
+        background-color:white;
+}
+img{
+position:absolute;
+}
+
+div.overlay a.close {
+        background-image:url("/static/ndf/images/close.png");
+        position:absolute;
+        right:5px;
+        top:5px;
+        cursor:pointer;
+        height:27px;
+        width:27px;
+}
+</style>
+{% if forum %}
+{% get_group_name request.path as group %}
+<button rel="#reply" id="reply_forum" type="button" >Add a Twist</button>
+</p>
+<div class="overlay" id="reply">
+Add a twist to Forum:<br/>
+Twist Details : <input type="text" id="twist_name"> 
+  <textarea id="orgitdown" name="content_org" placeholder="Please enter description..."></textarea>
+<input type="text" id="grptxt" style="visibility:hidden" value="{{group}}">
+<input id="savereply" type="button" value="Save">
+<input type="text" id="forum" style="visibility:hidden" value="{{forum}}">
+</div>
+{% endif %}
