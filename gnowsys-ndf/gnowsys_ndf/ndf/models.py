@@ -185,10 +185,13 @@ class Node(DjangoDocument):
         
         obj_dict = {}
 
+        i = 0
         for each_id in self.prior_node:
+            i = i + 1
+
             if each_id != self._id:
                 node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
-                dict_key = node_collection_object._id
+                dict_key = i
                 dict_value = node_collection_object
                 
                 obj_dict[dict_key] = dict_value
@@ -205,10 +208,13 @@ class Node(DjangoDocument):
         
         obj_dict = {}
 
+        i = 0;
         for each_id in self.collection_set:
+            i = i + 1
+
             if each_id != self._id:
                 node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
-                dict_key = node_collection_object._id
+                dict_key = i
                 dict_value = node_collection_object
                 
                 obj_dict[dict_key] = dict_value
@@ -225,7 +231,7 @@ class Node(DjangoDocument):
             return textile(self.content)
         elif MARKUP_LANGUAGE == 'restructuredtext':
             return restructuredtext(self.content)
-        return str(self.content)
+        return self.content
 
     @property
     def version_dict(self):
@@ -271,16 +277,16 @@ class Node(DjangoDocument):
             if history_manager.create_or_replace_json_file(self):
                 fp = history_manager.get_file_path(self)
                 user = User.objects.get(pk=self.created_by).username
-                message = "This document ("+str(self.name)+") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message, "-i")
+                message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
         else:
             # Update history-version-file
             fp = history_manager.get_file_path(self)
             rcs_obj.checkout(fp)
 
             if history_manager.create_or_replace_json_file(self):
-                message = "This document ("+str(self.name)+") is lastly updated on " + self.last_update.strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message)
+                message = "This document (" + self.name + ") is lastly updated on " + self.last_update.strftime("%d %B %Y")
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
 
 @connection.register
@@ -666,5 +672,4 @@ class HistoryManager():
                       "not matching given instances list!!!")
 
         return file_res
-
       
