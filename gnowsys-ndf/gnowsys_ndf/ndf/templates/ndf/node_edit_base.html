@@ -102,7 +102,7 @@
 	
 	<div id="SelectApp" style="display:none; height: 50px"> 
             <br/>&nbsp;&nbsp;
-            <input type="radio" name="col" value="Page" />&nbsp;Page &nbsp;
+            <input type="radio" name="col" value="Page" checked/>&nbsp;Page &nbsp;
             <input type="radio" name="col" value="File" />&nbsp;File &nbsp;
             <input type="radio" name="col" value="Image" />&nbsp;Image &nbsp;
 	</div>
@@ -156,8 +156,6 @@ $("input:radio").click(function() {
     }
     var c_list = c_arr.join(",");
 
-    alert("\n c_list : " + c_list + "\n\n radio button : " + this.value)
-        
     $.ajax({
         type: "POST",
         url: "{% url 'select_drawer' group_name %}",
