@@ -22,10 +22,10 @@ collection = db[File.collection_name]
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 
 def imageDashboard(request, group_name, image_id):
-    imgcol = collection.File.find({'mime_type': {'$regex': 'image'}})
+    img_col= collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(image_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'imageCollection':imgcol,'already_uploaded':already_uploaded })
+    variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded })
     return render_to_response(template, variable)
 
 def getImageThumbnail(request, group_name, _id):
