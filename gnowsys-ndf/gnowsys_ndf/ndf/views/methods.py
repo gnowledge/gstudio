@@ -10,8 +10,6 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 
-
-
 ######################################################################################################################################
 
 db = get_database()
@@ -67,7 +65,6 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       elif checked == "Image":         
         #drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg", 'group_set': {'$all': [group_name]}})
         drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg"})
-        print "\n drawer.count : ", drawer.count(), "\n"
 
     else:
       drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
@@ -75,15 +72,15 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     
     if (nid is None) and (not nlist):
       for each in drawer:
-        dict_drawer[each._id] = str(each.name)
+        dict_drawer[each._id] = each.name
 
     elif (nid is None) and (nlist):
       for each in drawer:
         if each._id not in nlist:
-          dict1[each._id] = str(each.name)
+          dict1[each._id] = each.name
 
       for oid in nlist:          
-          dict2[oid] = str(gs_collection.GSystem.one({'_id': oid}).name)
+        dict2[oid] = gs_collection.GSystem.one({'_id': oid}).name
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -92,10 +89,10 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       for each in drawer:
         if each._id != nid:
           if each._id not in nlist:
-            dict1[each._id] = str(each.name)
+            dict1[each._id] = each.name
           
           else:
-            dict2[each._id] = str(each.name)
+            dict2[each._id] = each.name
       
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -150,9 +147,9 @@ def get_node_common_fields(request, node, group_name, node_type):
   
   i = 0
   while (i < len(prior_node_list)):
-    pn_name = str(prior_node_list[i])
+    pn_name = prior_node_list[i]
     pn_name = pn_name.replace("'", "")
-    node.prior_node.append(gs_collection.GSystem.one({'_type': u'GSystem', 'name': unicode(pn_name)})._id)
+    node.prior_node.append(gs_collection.GSystem.one({'_type': u'GSystem', 'name': pn_name})._id)
     i = i+1
 
   # -------------------------------------------------------------------------------- collection
@@ -165,18 +162,18 @@ def get_node_common_fields(request, node, group_name, node_type):
 
     i = 0                    
     while (i < len(collection_list)):                    
-      c_name = str(collection_list[i])
+      c_name = collection_list[i]
       c_name = c_name.replace("'", "")
-      objs = gs_collection.GSystem.one({'name': unicode(c_name)})
+      objs = gs_collection.GSystem.one({'name': c_name})
       node.collection_set.append(objs._id)
       i = i+1
-
+      
   # ------------------------------------------------------------------------------- org-content
-  node.content_org = unicode(content_org.encode('utf8'))
+  node.content_org = unicode(content_org)
 
   # Required to link temporary files with the current user who is modifying this document
   usrname = request.user.username
   filename = slugify(name) + "-" + usrname + "-"
-  node.content = unicode(org2html(content_org, file_prefix=filename))
+  node.content = org2html(content_org, file_prefix=filename)
 
-
+  

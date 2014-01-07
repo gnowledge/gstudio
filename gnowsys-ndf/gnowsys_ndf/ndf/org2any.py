@@ -35,17 +35,15 @@ def org2html(org_content, file_prefix="", file_delete=True):
     file_prefix[optional] - required to create temporary file with the given prefix
     file_delete[optional] - whether to delete the temporary file once it is closed or not 
 
-    Returns: a string representing org-mode content exported to HTML-formatted content. 
+    Returns: a unicode representing org-mode content exported to HTML-formatted content. 
 
     """
-    
-    encode_org_content = org_content.encode('utf8')
-
+            
     # org editor content manipulation for temporary file (".org")
     org_content_header_for_file = "#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" \
         + "\n#+TITLE: "
 
-    org_content_for_file = (encode_org_content).replace("\r", "")
+    org_content_for_file = org_content.replace("\r", "")
 
     # Creating a temporary file with ".org" extension 
     file_suffix=".org"        # ".org" suffix must; otherwise emacs command won't work!
@@ -54,8 +52,7 @@ def org2html(org_content, file_prefix="", file_delete=True):
     filename_org = org_file_obj.name
     # Example (filename_org): "/tmp/wikiname-usrname-tmptCd4aq.org"
 
-    org_file_obj.write(org_content_header_for_file + \
-                           org_content_for_file)
+    org_file_obj.write((org_content_header_for_file + org_content_for_file).encode('utf-8'))
     # NOTE: Don't close this file till the time, html file is created
 
     # Move the cursor - pointing to start of the file
@@ -89,6 +86,6 @@ def org2html(org_content, file_prefix="", file_delete=True):
     start_index = html_data.index("<body>\n") + 1         # Start copying data after <body>\n element
     end_index = html_data.index("</body>\n")              # Copy data until you reach before </body>\n element
     for line in html_data[start_index:end_index]:
-        strip_html_data += line.lstrip()
+        strip_html_data += line.decode('utf-8').lstrip()
 
     return strip_html_data
