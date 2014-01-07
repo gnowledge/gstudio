@@ -23,10 +23,10 @@ collection = db[File.collection_name]
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4]})
 
 def videoDashboard(request, group_name, video_id):
-    videocol = collection.File.find({'mime_type': {'$regex': 'video'}})
+    vid_col = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(video_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
     template = "ndf/videoDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'videoCollection':videocol,'already_uploaded':already_uploaded})
+    variable = RequestContext(request, {'videoCollection':vid_col, 'already_uploaded':already_uploaded})
     return render_to_response(template, variable)
 
 def getvideoThumbnail(request, group_name, _id):
