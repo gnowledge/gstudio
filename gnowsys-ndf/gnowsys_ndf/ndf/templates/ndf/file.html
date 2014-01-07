@@ -13,12 +13,12 @@
 </div>
 {% endif %} 
 <center>
-  <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'file_search' 'group_name' %}">
+  <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'file_search' group_name %}">
     <div style="padding-top:10px">
       <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
       <input type="submit" class="btn btn-large btn-primary" value="search" />
       {% if user.is_authenticated %}
-      <a href="{% url 'uploadDoc' 'file' %}?next={{request.path}}">
+      <a href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
 	<input type="button" class="btn btn-large btn-primary" value="Upload" />
       </a>
       {% endif %}
