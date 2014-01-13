@@ -1,0 +1,174 @@
+{% extends "ndf/base.html" %}
+
+{% load ndf_tags %}
+
+{% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
+
+{% block style %}
+
+.quiz-type-based-div{
+    display: none;
+}
+
+{% endblock %}
+
+{% block body_content %}
+
+<form id="quiz_item_create_form" method="POST" action="">
+{% csrf_token %}
+
+<div style="display:table; border-collapse:separate; border-spacing:10px; width:100%;">
+  <div style="display:table-row; width:100%">
+    <div style="display:table-cell; width:20%;">
+      <label for="" style="font-size:large; font-weight:bold;">Type of Quiz</label>
+    </div>
+    <div style="display:table-cell; width:80%;">
+      <select id="quiz_type" name="quiz_type" autofocus>
+	{% for choice in quiz_type_choices %}
+	<option value="{{choice}}">{{choice}}</option>
+	{% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<div id="question_set" style="padding-left:10px;">
+
+  <!-- Question-set -->
+  <fieldset id="question" style="padding-bottom:10px;">
+    <legend style="font-size:large; font-weight:bold; color:#1ABC9C;">Question :</legend>
+    {% include "ndf/add_editor.html" with var_name="question" var_placeholder="Please enter question" var_value=quiz_type_choices %}
+  </fieldset>
+
+  <!-- Options-set (If required) --> 
+  <fieldset id="options" style="display:none; padding-bottom:10px;">
+    <legend style="font-size:large; font-weight:bold; color:#1ABC9C;">Options :</legend>
+    <div id="option_div">
+      <label for="option" style="font-size:medium;">1.</label>
+      {% include "ndf/add_editor.html" with var_name="option" var_placeholder="Please enter option" %}
+    </div>
+    <div id="option_div_2">
+      <label for="option_2" style="font-size:medium;">2.</label>
+      {% include "ndf/add_editor.html" with var_name="option_2" var_placeholder="Please enter option" %}
+    </div>
+    <input id="add_option" name="add_option" type="button" class="btn btn-large btn-primary" style="float:right;" value="+ Add Option"/>
+  </fieldset>
+
+  <!-- Answer-set -->
+  <fieldset id="answer" style="padding-bottom:10px;">
+    <legend style="font-size:large; font-weight:bold; color:#1ABC9C;">Correct Answer : </legend>
+
+    <!-- Short-Response-set -->
+    <div id="Short-Response" class="quiz-type-based-div">
+      {% include "ndf/add_editor.html" with var_name="correct_answer_short" var_placeholder="Please enter answer" %}
+    </div>
+
+    <!-- Single-Choice-set -->
+    <div id="Single-Choice" class="quiz-type-based-div">
+      <select id="correct_answer_single" name="correct_answer_single">
+	<option value="1">1</option>
+	<option value="2">2</option>
+      </select>
+    </div>
+
+    <!-- Multiple-Choice-set -->
+    <div id="Multiple-Choice" class="quiz-type-based-div">
+      <select id="correct_answer_multiple" name="correct_answer_multiple" multiple>
+	<option value="1" selected>1</option>
+	<option value="2">2</option>
+      </select>
+    </div>
+
+    <!--
+    <div class="quiz-type-based-div">
+      <input id="correct_answer_tx" name="correct_answer_tx" type="text" style="width:40%" placeholder="Enter correct option number as... 2[<space>4]"/>
+    </div>
+    -->
+  </fieldset>
+</div>
+
+</form>
+
+<script type="text/javascript">
+
+/*
+ * Element     : quiz_type
+ * Type        : select (Drop-down list)
+ * Event       : on change
+ * Description : 
+   (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
+ */
+$('#quiz_type').change(function (){
+
+    if ($(this).val() != $('#' + $(this).attr('id') + ' option:nth-child(1)').val()) {
+	$('#options').css('display', 'block');
+    }
+    else {
+	$('#options').css('display', 'none');
+    }
+
+    $('.quiz-type-based-div').hide('fast');
+    var targetDivId = $(this).val();
+    $('div#' + targetDivId).show('fast');
+
+}).change();
+
+/*
+ * Element     : quiz_type
+ * Type        : select (Drop-down list)
+ * Event       : on change
+ * Description : 
+   (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
+ */
+$('#quiz_type').blur(function (){
+    $(this).attr('disabled', 'disabled');
+});
+
+var no_of_options = 2;
+/*
+ * Element     : add_option
+ * Type        : button
+ * Event       : on click
+ * Description : 
+   (1) It clones the structure of very first option element (div) and does the necessary renaming of it's elements; and then after pastes it above 
+       the '+ Add Option' button.
+   (2) Also adds the corresponding option number to the correct answer's drop-down list.
+ */
+$('#add_option').click(function (){
+    no_of_options = no_of_options + 1;
+
+    // Cloneing the very first option's div
+    var option_div_clone = $('#option_div').clone();
+
+    // Performing renaming of it's various elements
+    var name_val = 'option_div_' + no_of_options;
+    option_div_clone.attr({id: name_val, name: name_val});
+
+    option_div_clone.children('label').text(no_of_options + '.');
+    option_div_clone.children('label').attr('for', 'option_' + no_of_options);
+
+    var orgitdownOrgitdown_option_div = option_div_clone.find('div#orgitdownOrgitdown_option');
+    var orgitdownOrgitdown_option_div_id = orgitdownOrgitdown_option_div.attr('id');
+    orgitdownOrgitdown_option_div_id = orgitdownOrgitdown_option_div_id + "_" + no_of_options;
+    orgitdownOrgitdown_option_div.attr('id', orgitdownOrgitdown_option_div_id);
+
+    var orgitdown_option_div = option_div_clone.find('textarea#orgitdown_option');
+    var orgitdown_option_div_id = orgitdown_option_div.attr('id');
+    orgitdown_option_div_id = orgitdown_option_div_id + "_" + no_of_options;
+    orgitdown_option_div.attr({id: orgitdown_option_div_id, name: 'option_' + no_of_options});
+
+    // Pasting the cloned element, after modifying it, above the '+ Add Option' button
+    $(this).before(option_div_clone);
+
+    // Fetching the appropriate correct answer (having drop-down list) based on the option selected (Single-choice/Multiple-choice) 
+    drop_down_answer_list_div_id = $('div#' + $('#quiz_type').val()).attr('id');
+    
+    // Fetching the corresponding drop-down list & appending the option number to it
+    drop_down_answer_list = $("#" + drop_down_answer_list_div_id).children('select');
+    drop_down_answer_list.append($('<option>', {value:no_of_options, text:no_of_options}));
+});
+
+</script>
+
+{% endblock %}
+
