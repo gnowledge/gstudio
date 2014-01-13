@@ -21,6 +21,7 @@ from django_mongokit import get_database
 from django_mongokit.document import DjangoDocument
 
 from mongokit import CustomType
+from mongokit import IS
 
 try:
     from bson import ObjectId
@@ -94,6 +95,9 @@ ENCRYPTION_POLICY=(
     ('ENCRYPTED'),
     ('NOT_ENCRYPTED')
 )
+
+QUIZ_TYPE_CHOICES_TU = IS(u"Short-Response", u"Single-Choice", u"Multiple-Choice")
+QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 
 #######################################################################################################################################
 #                                                                            C U S T O M    D A T A    T Y P E    D E F I N I T I O N S

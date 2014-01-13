@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 
-
 from registration.backends.default.views import RegistrationView
 
 from gnowsys_ndf.ndf.forms import *
@@ -17,6 +16,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_name>[\w-]+)/page/', include('gnowsys_ndf.ndf.urls.page')),
     (r'^(?P<group_name>[\w-]+)/group/', include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_name>[\w-]+)/forum/', include('gnowsys_ndf.ndf.urls.forum')),
+    (r'^(?P<group_name>[\w-]+)/quiz/', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_name>[\w-]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_name>[\w-]+)/',include('gnowsys_ndf.ndf.urls.group')),
     (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
