@@ -44,9 +44,12 @@ def get_gapps_menubar(group_name):
   """
   gst_collection = db[GSystemType.collection_name]
   gst_cur = gst_collection.GSystemType.find({'$and':[{'_type':'GSystemType'},{'member_of':'GAPP'}]})
+
   gapps = {}
+  i = 0;
   for app in gst_cur:
-    gapps[app._id] = app.name.lower()
+    i = i+1;
+    gapps[i] = {'id': app._id, 'name': app.name.lower()}
 
   return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'group_name': group_name}
 

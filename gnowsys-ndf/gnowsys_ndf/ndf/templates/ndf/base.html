@@ -117,136 +117,132 @@
    
   </head>
   
-	<body>
-<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
+  <body>
+    <center>
+      <img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif">
+    </center>
 
-      		{% get_group_name request.path as group_name %}
-
-		<!-- Start of Hedaer Div -->
-		<div class="header">
-			<div class="headertitle">
-			  {{group_name}}
-			</div>
+    {% get_group_name request.path as group_name %}
+    
+    <!-- Start of Hedaer Div -->
+    <div class="header">
+      <div class="headertitle">{{group_name}}</div>
 	
-      <!-- GApps Menubar -->
-      <!-- ============= -->
-                         {% if user.is_authenticated %}
-				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
-				  {{ user.username }} 						
-				</div>	
-                                 <div class="groupchange" onmouseover="grover();" >
-                                    {{group_name}}
-				 </div>
-				{% get_existing_groups_excluded group_name as groups %}
-				<div id="groupoptions" style="display:none">
-				  <br/>
-				  {% for gp_id in groups %}
-				  <a href="{% url 'groupchange' gp_id %}">
-				    <div id="{{gp_id}}">{{gp_id}}</div> </a>
-				  {% endfor %}
-                                 <br/>
-				</div>&nbsp;
-          
-	<div id="loginPanel" >
-	  <br/>										
-	  <a href="{% url 'auth_password_change' %}" >
-	    <div>Change Password</div>
-	  </a>
-	  
-	  <a href="{% url 'auth_logout' %}" >
-	    <div>Log Out</div>
-	  </a>										
-	  <br/>				
-	</div>		    
-  					  
+      {% if user.is_authenticated %}
+      <div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
+	{{ user.username }} 						
+      </div>	
+      <div class="groupchange" onmouseover="grover();" >
+        {{group_name}}
+      </div>
+      
+      {% get_existing_groups_excluded group_name as groups %}
+      <div id="groupoptions" style="display:none">
+	<br/>
+	{% for gp_id in groups %}
+	<a href="{% url 'groupchange' gp_id %}">
+	  <div id="{{gp_id}}">{{gp_id}}</div>
+	</a>
+	{% endfor %}
+        <br/>
+      </div>&nbsp;
+      
+      <div id="loginPanel" >
+	<br/>										
+	<a href="{% url 'auth_password_change' %}" >
+	  <div>Change Password</div>
+	</a>
+	
+	<a href="{% url 'auth_logout' %}" >
+	  <div>Log Out</div>
+	</a>										
+	<br/>				
+      </div>		    
+      
       {% else %}	
-	<div class="loginInfo">
-	  <a href="{% url 'auth_login' %}">Login</a>		    		 
-	</div>
-                                 <div class="groupchange" onmouseover="grover();" >
-                                      {{group_name}}  
-				  </div>
-                                
-{% get_existing_groups_excluded group_name as groups %}
-<div id="groupoptions" style="display:none">
-<br/>
-{% for gp_id in groups %}
-<a href="{% url 'groupchange' gp_id %}">
-<div id="{{gp_id}}">{{gp_id}}</div> </a>
-{% endfor %}
-<br/>
- </div>
-		  		
-		  				  
-			{% endif %}
-
-		<div id="menu">
-          <!-- GApps Toolbar -->
-		  {% get_gapps_menubar group_name %}
-          <!-- ============= -->
-                </div>
-
-			                 
+      <div class="loginInfo">
+	<a href="{% url 'auth_login' %}">Login</a>		    		 
+      </div>
+      <div class="groupchange" onmouseover="grover();" >
+        {{group_name}}  
+      </div>
+      
+      {% get_existing_groups_excluded group_name as groups %}
+      <div id="groupoptions" style="display:none">
+	<br/>
+	{% for gp_id in groups %}
+	<a href="{% url 'groupchange' gp_id %}">
+	  <div id="{{gp_id}}">{{gp_id}}</div>
+	</a>
+	{% endfor %}
+	<br/>
+      </div>
+      
+      {% endif %}
+      
+      <div id="menu">
+        <!-- GApps Toolbar -->
+	{% get_gapps_menubar group_name %}
+        <!-- ============= -->
+      </div>
+      
     </div> 		
     <!-- End of Header Div-->
-		
+    
     <!-- Start of Body Container -->		
     <div class="container" id="body">  
       {% block body_content %}  {% endblock %}
     </div>
     <!-- End of Body Container -->		  	
-		
+    
     <!-- Start of extra Container -->		
     <div class="container" id="extra_content">  
       {% block extra_content %}  {% endblock %}
     </div>
     <!-- End of extra Container -->		  	
-		
-		
-	</body>
-    <!-- Start of Footer -->		
     
+    <!-- Start of Footer -->		
     <div class="footer" align="center">
       <p>
 	A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab</a>,<a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a>
 	<br/>
+	
   	<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
 	<br/>
       </p>
     </div>
-
     <!-- End of Footer -->		
+    
   </body>
-
-	
+  
   <!-- Your script goes here -->
-	
+  <script type="text/javascript">
+    function grover() {
+	timeout = setTimeout(disp,500);
+    }
 
-	<!-- Your script goes here -->
-	
-	<script type="text/javascript">
-               function grover(){
-               timeout = setTimeout(disp,500);
-                }
-                function disp(){
-                $('#groupoptions').fadeIn()}
-                function dispout(){
-		$("#groupoptions").fadeOut()
+    function disp() {
+	$('#groupoptions').fadeIn();
+    }
 
-	        }
-	       $("#body").css("margin-top", $("#header").height() + 80 + "px");	
-		$("#body").css("min-height", ( $(window).height() - $("#header").height() - $(".footer").height() ) + "px");
-		
-		$("#loginPanel").mouseleave(function(){
-			$("#loginPanel").fadeOut()	
-		});
-                $("#groupoptions").mouseleave(function(){
-                 timeout = setTimeout(dispout,10000);
-		});
+    function dispout() {
+	$("#groupoptions").fadeOut();
+    }
 
-		
-		{% block script %} {% endblock %}	
-	
+    $("#body").css("margin-top", $("#header").height() + 80 + "px");	
+    $("#body").css("min-height", ( $(window).height() - $("#header").height() - $(".footer").height() ) + "px");
+    
+    $("#loginPanel").mouseleave(function() {
+	$("#loginPanel").fadeOut();
+    });
+
+    $("#groupoptions").mouseleave(function() {
+	timeout = setTimeout(dispout,10000);
+    });
+    
+    // In order to add more scripting-code add this block in the corresponding extended html-files.
+    {% block script %} {% endblock %}	
+    
   </script>
   
 </html>
