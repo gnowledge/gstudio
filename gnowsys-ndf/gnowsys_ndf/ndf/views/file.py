@@ -51,8 +51,8 @@ def file(request, group_name, file_id):
     """
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
-        filecollection = db[File.collection_name]
-        files = filecollection.File.find({'_type': u'File'})
+        collection = db[File.collection_name]
+        files = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
         already_uploaded = request.GET.getlist('var', "")
         return render_to_response("ndf/file.html", {'title': title, 'files':files, 'already_uploaded':already_uploaded}, context_instance = RequestContext(request))
     else:
@@ -73,13 +73,15 @@ def uploadDoc(request, group_name):
 
 @login_required
 def submitDoc(request, group_name):
+    """
+    submit files for saving into gridfs and creating object
+    """
     alreadyUploadedFiles = []
     str1 = ''
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
         page_url = request.POST.get("page_url", "")
-        print "url", page_url
         #memberOf = request.POST.get("memberOf", "")
         i = 1
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
@@ -98,24 +100,23 @@ def submitDoc(request, group_name):
                 title = mtitle
         for each in alreadyUploadedFiles:
             str1 = str1 + 'var=' + each + '&'
-        print str1
         return HttpResponseRedirect(page_url+'?'+str1)
     else:
         return HttpResponseRedirect(reverse('homepage'))
             
-def save_file(files, title, userid, memberOf,st_id):
+def save_file(files, title, userid, group_name,st_id):
+    """
+    this will create file object and save files in gridfs collection
+    """
     fcol = db[File.collection_name]
     fileobj = fcol.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
-    print "file:",files.name
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
     if fileobj.fs.files.exists({"md5":filemd5}):
-        print "inside if:"
-        return files.name
+        return files.name                                                                #return already exist file
     else:
-        print " inside else:",files.name
         try:
             files.seek(0)
             filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
@@ -128,33 +129,36 @@ def save_file(files, title, userid, memberOf,st_id):
             fileobj.name = unicode(title)
             fileobj.created_by = int(userid)
             fileobj.file_size = size
-            #fileobj.member_of=unicode(memberOf)           #shuold be group 
+            fileobj.group_set.append(unicode(group_name))                                  #group name stored in group_set field
+            fileobj.gsystem_type.append(GST_FILE._id)
             fileobj.mime_type = filetype
-            if st_id:
-                fileobj.gsystem_type.append(ObjectId(st_id))
             fileobj.save()
-            files.seek(0)   #moving files cursor to start
-            #this code is for storing Document in gridfs
-            objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype)
+            files.seek(0)                                                                  #moving files cursor to start
+            objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
             fileobj.fs_file_ids.append(objectid)
             fileobj.save()
-            # code for converting video into webm and converted video assigning to varible files
+
+            """ 
+            code for converting video into webm and converted video assigning to varible files
+            """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
             	fileobj.mime_type = "video"
+                fileobj.gsystem_type.append(GST_VIDEO._id)
        	        fileobj.save()
             	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id)
-	        #storing thumbnail of video with duration in saved object
+	       
+                '''storing thumbnail of video with duration in saved object'''
                 tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
-       	        fileobj.fs_file_ids.append(tobjectid) # saving thumbnail's id into file object
+       	        fileobj.fs_file_ids.append(tobjectid)                                      #saving thumbnail's id into file object
        	        fileobj.save()
        	        if filename.endswith('.webm') == False:
-                    print webmfiles.name
                     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
                     fileobj.fs_file_ids.append(tobjectid) # saving webm video id into file object
                     fileobj.save()
 
-            #storing thumbnail of image in saved object
+            '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
+                fileobj.gsystem_type.append(GST_IMAGE._id)
                 thumbnailimg = convert_image_thumbnail(files)
                 tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
                 fileobj.fs_file_ids.append(tobjectid)
@@ -164,10 +168,12 @@ def save_file(files, title, userid, memberOf,st_id):
             print "Some Exception:", files.name, "Execption:", e
 
 def getFileSize(File):
+    """
+    obtain file size if provided file object
+    """
     try:
         File.seek(0,os.SEEK_END)
         num=int(File.tell())
-        print "size:",num
         for x in ['bytes','KB','MB','GB','TB']:
             if num < 1024.0:
                 return  (num, x)
@@ -177,6 +183,9 @@ def getFileSize(File):
         return 0,'bytes'
                      
 def convert_image_thumbnail(files):
+    """
+    convert image file into thumbnail
+    """
     files.seek(0)
     thumb_io = StringIO()
     size = 128, 128
@@ -265,7 +274,6 @@ def delete_file(request, group_name, _id):
   """
   file_collection = db[File.collection_name]
   pageurl = request.GET.get("next", "")
-  print "testurl", pageurl
   try:
     cur = file_collection.File.one({'_id':ObjectId(_id)})
     if cur.fs_file_ids:
