@@ -1,253 +1,201 @@
 <!DOCTYPE html>
-<html>
-  {% load ndf_tags %}
+<html lang="en">
+{% load ndf_tags %}
 
-  <head>
-    <title>NUSSD - {% block title %} {% endblock %}</title>
-		
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+	<title>NUSSD - {% block title %} {% endblock %}</title>
 
-    <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png">
-		
-    <link href="/static/ndf/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/static/ndf/css/default.css" rel="stylesheet">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="/static/ndf/js/jquery-1.8.3.min.js"></script>
-    <script src="/static/ndf/js/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="/static/ndf/js/bootstrap.min.js"></script>
-    <script src="/static/ndf/js/bootstrap-select.js"></script>
-    <script src="/static/ndf/js/bootstrap-switch.js"></script>
-    <script src="/static/ndf/js/flatui-checkbox.js"></script>
-    <script src="/static/ndf/js/flatui-radio.js"></script>
-    <script src="/static/ndf/js/jquery.tagsinput.js"></script>
-    <script src="/static/ndf/js/jquery.placeholder.js"></script>
-    <script src="/static/ndf/js/jquery.stacktable.js"></script>
-    <!--<script src="static/http://vjs.zencdn.net/c/video.js"></script>-->
-    <script src="/static/ndf/js/application.js"></script>
+	<link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png">
 
-    <link type="text/css" href="/static/ndf/css/menu.css" rel="stylesheet" />
-    <script type="text/javascript" src="/static/ndf/js/jquery.js"></script>
-    <script type="text/javascript" src="/static/ndf/js/menu.js"></script>
-		
-    {% block head %}  {% endblock %}
+	<!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
+	<link rel="stylesheet" href="/static/ndf/foundation/css/normalize.css">
+	<link rel="stylesheet" href="/static/ndf/foundation/css/foundation.css">
 
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
-    <!--[if lt IE 9]>
-    <script src="js/html5shiv.js"></script>
-    <![endif]-->
-	 
-    <style>
-      
-      .home { text-align:center; 	}
-      
-      .home a{ color:#34495E;	}
-      
-      .home a:hover { text-decoration:none !important }
-      
-      .header
-      {
-        background-color:#0B6580; position:fixed; top:0px;  width:100%; z-index:100;
-      }
-	 		
+	<!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
+	<link rel="stylesheet" href="/static/ndf/foundation-icons/foundation-icons.css">
 
-	 		.loginInfo {	margin-left:70%; width:12%; text-align:right; cursor:pointer;color:#BAC1C8;}
-			.groupchange {  display:inline-block; width:0%; text-align:right; cursor:pointer;padding-left:30px;color:#BAC1C8;
-			font-family:'Georgia';}
+	<!-- Modernizr - Browser detection JS http://modernizr.com/ -->
+	<script src="/static/ndf/foundation/js/vendor/custom.modernizr.js"></script>
 
-	 	
-	                .loginInfo,.headertitle,.groupchange {
-			display:inline; }
-			
-			#loginPanel
-			{
-				display:none; background-color:lightgray; right:0.5%; 
-				margin-left:80%; width:12%; position:fixed; font-size:1.1em; 
-				text-align:center; 
-				border-radius:6px; 
-			}
-			#groupoptions
-			{
-                                display:none; background-color:lightgray; right:0.5%;
-			        margin-left:85%; width:15%; position:fixed; font-size:1.1em;
-			        text-align:center;
-			        border-radius:6px;
-                        }
+	<!-- External default stylesheet-->
+	<link href="/static/ndf/css/default.css" rel="stylesheet">
 
-			
+	<!-- Enable HTML5 on old browsers -->
+	<!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
-      #loginPanel div
-      {	
-        width:100%; padding:8px 0px; 
-      }
-			
-      #loginPanel div:hover {	background-color:#1ABC9C;	}
-			
-      #loginPanel a{	color:#34495E;	}
-			
-      #loginPanel a:hover { text-decoration:none !important; color:white; }
-			
-      #loginPanel:after
-      {
-        content:''; display:block; position:absolute; top:-20px; 
-        right:30px; width:0; height:0; 
-        border-color: transparent transparent lightgray transparent;
-        border-style: solid; border-width: 10px;
-      }
+	{% block head %}  {% endblock %}
 
-      #groupoptions div       {       width:100%;     padding:8px 0px; }
-      
-      #groupoptions div:hover {       background-color:#1ABC9C;       }
-      
-      #groupoptions a{        color:#34495E;  }
+	<style>
 
-      #groupoptions a:hover { text-decoration:none !important; color:white; }
+		html, body {
+			height: 100%;
+		}
 
-      #groupoptions:after
-      {
-        content:''; display:block; position:absolute; top:-20px;
-        right:30px; width:0; height:0;
-        border-color: transparent transparent lightgray transparent;
-        border-style: solid; border-width: 10px;
-      }
-						
-      {% block style %}  {% endblock %}
+		header
+		{
+		}
 
-    </style>
-   
-  </head>
-  
-	<body>
-<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
+		section#content{
+			min-height: 100%;
+			margin-bottom: -90px;
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+		}
 
-      		{% get_group_name request.path as group_name %}
+		footer{
+			background-color:#222;
+			color: #888;
+			padding:20px 0;
+		}
 
-		<!-- Start of Hedaer Div -->
-		<div class="header">
-			<div class="headertitle">
-			  {{group_name}}
+		footer a{
+			color: #bbb;
+		}
+
+		{% block style %}  {% endblock %}
+
+	</style>
+
+</head>
+
+<body class="container">
+	<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
+
+	{% get_group_name request.path as group_name %}
+
+	<header>
+
+		<nav class="top-bar" data-topbar>
+			<ul class="title-area">
+				<li class="name">
+					<h1><a href="#">MetaStudio</a></h1>
+				</li>
+				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+			</ul>
+
+			<section class="top-bar-section">
+
+				<!-- Right Nav Section -->
+				<ul class="right">
+
+					<!--li class="has-form">
+						<div class="row collapse">
+							<div class="large-8 small-9 columns">
+								<input type="text" placeholder="Find Stuff">
+							</div>
+							<div class="large-4 small-3 columns">
+								<a href="#" class="alert button expand">Search</a>
+							</div>
+						</div>
+					</li-->
+
+					<!-- If logged in show user options -->
+					{% if user.is_authenticated %}
+
+					<li class="has-dropdown">
+						<a href="#"><i class="fi-torso"></i> {{ user.username }}</a>
+						<ul class="dropdown">
+							<li><a href="{% url 'auth_password_change' %}">Change password</a></li>
+							<li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
+						</ul>
+					</li>
+
+					<!-- Else show login link -->
+					{% else %}
+
+					<li class="active"><a href="{% url 'auth_login' %}"><i class="fi-key"></i> Login</a></li>
+
+					{% endif %}
+
+				</ul>
+
+				<!-- Left Nav Section -->
+				<ul class="left">
+					<li class="has-form">
+						<a href="http://foundation.zurb.com/docs" class="button">Getting Started</a>
+					</li>
+					<li><a href="#"><i class="fi-home"></i> {{group_name}}</a>
+
+						<!-- If logged in show user groups -->
+						{% if user.is_authenticated %}
+						{% get_existing_groups_excluded group_name as groups %}
+
+						<ul class="dropdown">
+
+							<!-- Create dropdown item for each group -->
+							{% for gp_id in groups %}
+							<li id="{{gp_id}}"><a href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
+							{% endfor %}
+
+						</ul>
+					</li>
+
+					{% endif %}
+
+					{% get_gapps_menubar group_name %}
+				</ul>
+			</section>
+		</nav>
+
+	</header> 		
+
+	<!-- Start of content section -->		
+	<section id="content" class="row">  
+
+		{% block body_content %}  {% endblock %}
+
+	</section>
+	<!-- End of content section -->		  	
+
+	<!-- Start of extra content section -->		
+	<section id="extra_content" class="row">  
+
+		{% block extra_content %}  {% endblock %}
+
+	</section>
+	<!-- End of extra content -->		  	
+
+	<!-- Start of Footer -->		
+
+	<footer>
+		<div class="row">
+
+			<div class="medium-6 columns"><p>
+				A project from the <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>/<a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
 			</div>
-	
-      <!-- GApps Menubar -->
-      <!-- ============= -->
-                         {% if user.is_authenticated %}
-				<div class="loginInfo" onmouseover="$('#loginPanel').fadeIn();">		    
-				  {{ user.username }} 						
-				</div>	
-                                 <div class="groupchange" onmouseover="grover();" >
-                                    {{group_name}}
-				 </div>
-				{% get_existing_groups_excluded group_name as groups %}
-				<div id="groupoptions" style="display:none">
-				  <br/>
-				  {% for gp_id in groups %}
-				  <a href="{% url 'groupchange' gp_id %}">
-				    <div id="{{gp_id}}">{{gp_id}}</div> </a>
-				  {% endfor %}
-                                 <br/>
-				</div>&nbsp;
-          
-	<div id="loginPanel" >
-	  <br/>										
-	  <a href="{% url 'auth_password_change' %}" >
-	    <div>Change Password</div>
-	  </a>
-	  
-	  <a href="{% url 'auth_logout' %}" >
-	    <div>Log Out</div>
-	  </a>										
-	  <br/>				
-	</div>		    
-  					  
-      {% else %}	
-	<div class="loginInfo">
-	  <a href="{% url 'auth_login' %}">Login</a>		    		 
-	</div>
-                                 <div class="groupchange" onmouseover="grover();" >
-                                      {{group_name}}  
-				  </div>
-                                
-{% get_existing_groups_excluded group_name as groups %}
-<div id="groupoptions" style="display:none">
-<br/>
-{% for gp_id in groups %}
-<a href="{% url 'groupchange' gp_id %}">
-<div id="{{gp_id}}">{{gp_id}}</div> </a>
-{% endfor %}
-<br/>
- </div>
-		  		
-		  				  
-			{% endif %}
 
-		<div id="menu">
-          <!-- GApps Toolbar -->
-		  {% get_gapps_menubar group_name %}
-          <!-- ============= -->
-                </div>
+			<div class="medium-6 columns">
+				<small>
+					<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
+				</small>
+			</div>
 
-			                 
-    </div> 		
-    <!-- End of Header Div-->
-		
-    <!-- Start of Body Container -->		
-    <div class="container" id="body">  
-      {% block body_content %}  {% endblock %}
-    </div>
-    <!-- End of Body Container -->		  	
-		
-    <!-- Start of extra Container -->		
-    <div class="container" id="extra_content">  
-      {% block extra_content %}  {% endblock %}
-    </div>
-    <!-- End of extra Container -->		  	
-		
-		
-	</body>
-    <!-- Start of Footer -->		
-    
-    <div class="footer" align="center">
-      <p>
-	A project of  <a href="http://lab.gnowledge.org/" target="_blank">gnowledge lab</a>,<a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a>
-	<br/>
-  	<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
-	<br/>
-      </p>
-    </div>
+		</div>
+	</footer>
 
-    <!-- End of Footer -->		
-  </body>
+	<!-- End of Footer -->		
 
-	
-  <!-- Your script goes here -->
-	
 
-	<!-- Your script goes here -->
-	
+	<!-- JS -->
+	<script src="/static/ndf/js/jquery.js"></script>
+	<script src="/static/ndf/foundation/js/foundation.min.js"></script>
+	<script src="/static/ndf/foundation/js/foundation/foundation.topbar.js"></script>
+	<script src="/static/ndf/js/application.js"></script>
+
 	<script type="text/javascript">
-               function grover(){
-               timeout = setTimeout(disp,500);
-                }
-                function disp(){
-                $('#groupoptions').fadeIn()}
-                function dispout(){
-		$("#groupoptions").fadeOut()
 
-	        }
-	       $("#body").css("margin-top", $("#header").height() + 80 + "px");	
-		$("#body").css("min-height", ( $(window).height() - $("#header").height() - $(".footer").height() ) + "px");
-		
-		$("#loginPanel").mouseleave(function(){
-			$("#loginPanel").fadeOut()	
-		});
-                $("#groupoptions").mouseleave(function(){
-                 timeout = setTimeout(dispout,10000);
-		});
+		// Initialize Foundation CSS
+		$(document).foundation();
 
 		
 		{% block script %} {% endblock %}	
-	
-  </script>
-  
+
+	</script>
+
+</body>
 </html>
 
