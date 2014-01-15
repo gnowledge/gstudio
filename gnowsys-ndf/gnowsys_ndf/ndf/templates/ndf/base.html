@@ -58,12 +58,12 @@
 			height:90px;
 		}
 
-		main>section{
-			background-color: white;
+		article{
 		}
 
-		main>aside{
-			min-height:300px;
+		h2{
+			margin-top:2rem;
+			border-bottom: 1px solid gray;
 		}
 
 		footer{
@@ -74,6 +74,16 @@
 
 		footer a{
 			color: #bbb;
+		}
+
+		li.card a{
+			margin:2px;
+			padding:5px;
+			border: 1px solid #eaeaea;
+			display: block;
+		}
+		li.card a:hover{
+			border: 1px solid #ddd;
 		}
 
 		{% block style %}  {% endblock %}
@@ -165,29 +175,37 @@
 		</nav>
 
 	</header> 		
-		
+
 	<main class="row">  
 
 		<!-- Start of content section -->
-		<section class="medium-9 columns">
+		<article class="medium-9 columns">
 
 			{% block body_content %}  {% endblock %}
 
-		</section>
+		</article>
 		<!-- End of content section -->	
 
-		<!-- Start of related content section -->
-		<aside  class="medium-3 columns">
+		<!-- Start of sidebar section -->
+		<section  class="medium-3 columns">
 
-			{% block extra_content %}  {% endblock %}
+			<nav>
 
-		</aside>
+			</nav>
+
+			<aside>
+
+				{% block extra_content %}  {% endblock %}
+
+			</aside>
+
+
+		</section>
 		<!-- End of related content -->	
 
 	</main>
-		  			
-	<footer>
-		<div class="row">
+
+	<footer class="row">
 
 			<div class="medium-6 columns"><p>
 				A project from the <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>/<a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
@@ -199,7 +217,6 @@
 				</small>
 			</div>
 
-		</div>
 	</footer>
 
 	<!-- JS -->
