@@ -40,10 +40,16 @@
 
 		main{
 			min-height: 100%;
-			margin-bottom: -90px;
+			margin-bottom: -90px!important;
 			-webkit-box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
+		}
+
+		main:after{
+			content:"";
+			display:block;
+			height:90px;
 		}
 
 		footer{
@@ -146,23 +152,23 @@
 
 	</header> 		
 		
-	<main>  
+	<main class="row">  
 
 		<!-- Start of content section -->
-		<section id="content">
+		<section>
 
 			{% block body_content %}  {% endblock %}
 
 		</section>
 		<!-- End of content section -->	
 
-		<!-- Start of extra content section -->
-		<aside id="extra_content" class="small-12 medium-4 columns">
+		<!-- Start of related content section -->
+		<aside>
 
 			{% block extra_content %}  {% endblock %}
 
 		</aside>
-		<!-- End of extra content -->	
+		<!-- End of related content -->	
 
 	</main>
 		  			
