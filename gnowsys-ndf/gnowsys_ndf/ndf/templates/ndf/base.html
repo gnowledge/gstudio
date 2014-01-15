@@ -3,10 +3,11 @@
 {% load ndf_tags %}
 
 <head>
-	<title>NUSSD - {% block title %} {% endblock %}</title>
-
 	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<title>NUSSD - {% block title %} {% endblock %}</title>	
 
 	<link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png">
 
@@ -20,11 +21,15 @@
 	<!-- Modernizr - Browser detection JS http://modernizr.com/ -->
 	<script src="/static/ndf/foundation/js/vendor/custom.modernizr.js"></script>
 
+	<!-- jQuery -->
+	<script src="/static/ndf/js/jquery.js"></script>
+
 	<!-- External default stylesheet-->
 	<link href="/static/ndf/css/default.css" rel="stylesheet">
 
 	<!-- Enable HTML5 on old browsers -->
 	<!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
 
 	{% block head %}  {% endblock %}
 
@@ -39,6 +44,7 @@
 		}
 
 		main{
+			background-color:#fbfbfc;
 			min-height: 100%;
 			margin-bottom: -90px!important;
 			-webkit-box-sizing: border-box;
@@ -50,6 +56,14 @@
 			content:"";
 			display:block;
 			height:90px;
+		}
+
+		main>section{
+			background-color: white;
+		}
+
+		main>aside{
+			min-height:300px;
 		}
 
 		footer{
@@ -155,7 +169,7 @@
 	<main class="row">  
 
 		<!-- Start of content section -->
-		<section>
+		<section class="medium-9 columns">
 
 			{% block body_content %}  {% endblock %}
 
@@ -163,7 +177,7 @@
 		<!-- End of content section -->	
 
 		<!-- Start of related content section -->
-		<aside>
+		<aside  class="medium-3 columns">
 
 			{% block extra_content %}  {% endblock %}
 
@@ -189,7 +203,6 @@
 	</footer>
 
 	<!-- JS -->
-	<script src="/static/ndf/js/jquery.js"></script>
 	<script src="/static/ndf/foundation/js/foundation.min.js"></script>
 	<script src="/static/ndf/foundation/js/foundation/foundation.topbar.js"></script>
 	<script src="/static/ndf/js/application.js"></script>
