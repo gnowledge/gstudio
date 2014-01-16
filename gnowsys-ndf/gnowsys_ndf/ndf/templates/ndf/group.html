@@ -4,37 +4,31 @@
 
 {% block body_content %} 
 
-{% if user.is_authenticated %}
-<div style='padding-top:10px'>
-<a href="{% url 'create_group' 'group' %}">
-  <input type="submit" class="btn btn-large btn-primary" value="Create a group" />
-</a>
-</div>
-
-<hr />
-{% endif %}
+<h2>My Groups</h2>
+<h5>Number Of Groups : {{ group_nodes_count }} </h5>
 
 {% load url from future %}
-{% for node in group_nodes %}
-  {% if forloop.first %}
-    <h5>Number Of Groups : {{ group_nodes_count }} </h5>
-  {% endif %}
-  <div>
-    <p><strong><a href="/{{node}}">{{ node }}</a></strong><br>
+<ul class="small-block-grid-4">
+  {% if user.is_authenticated %}
+    <li>
+    <a href="{% url 'create_group' 'group' %}">
+    <input type="submit" class="small button expand" value="Create new group" />
+    </a>
+    </li>
+    {% endif %}
+    {% for node in group_nodes %}
+    <li class="card"><a href="/{{node}}">{{ node }}</a>
     <!--
     Created at : {{ node.created_at|date:"j F Y" }}<br>
     Member Of   : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>
     <a href="{#% url 'delete_node' node %#}">delete</a>
-    -->
-    </p>
-  </div>
+  -->
+</li>
 
 {% empty %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
+<p><em>Currently NO nodes in the gnowledge base!!!</em></p>
 {% endfor %}
-
-<br/>
-
+</ul>
 {% endblock %}
 
