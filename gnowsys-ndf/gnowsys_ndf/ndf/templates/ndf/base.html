@@ -39,6 +39,10 @@
 			height: 100%;
 		}
 
+		nav h1 img{
+			height: 2rem;
+		}
+
 		header
 		{
 		}
@@ -77,19 +81,6 @@
 			color: #bbb;
 		}
 
-		li.card a{
-			margin:2px;
-			padding:5px;
-			border: 1px solid #eaeaea;
-			display: block;
-		}
-		li.card a:hover{
-			border: 1px solid #ddd;
-		}
-		.row{
-			max-width:inherit;
-		}
-
 		{% block style %}  {% endblock %}
 
 	</style>
@@ -107,7 +98,7 @@
 		<nav class="top-bar" data-topbar>
 			<ul class="title-area">
 				<li class="name">
-					<h1><a href="#">MetaStudio</a></h1>
+					<h1><a href="#"><img src="/static/ndf/images/icon/meta.svg"> MetaStudio</a></h1>
 				</li>
 				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
 			</ul>
@@ -124,7 +115,7 @@
 								<input type="text" placeholder="Find Stuff">
 							</div>
 							<div class="large-4 small-3 columns">
-								<a href="#" class="alert button expand">Search</a>
+								<a href="#" class="button expand">Search</a>
 							</div>
 						</div>
 					</li>
