@@ -4,7 +4,7 @@
   Foundation.libs.topbar = {
     name : 'topbar',
 
-    version: '5.0.0',
+    version: '5.0.3',
 
     settings : {
       index : 0,
@@ -35,7 +35,7 @@
         var topbarContainer = topbar.parent();
         if(topbarContainer.hasClass('fixed') || topbarContainer.hasClass(settings.sticky_class)) {
           self.settings.sticky_class = settings.sticky_class;
-          self.settings.stick_topbar = topbar;
+          self.settings.sticky_topbar = topbar;
           topbar.data('height', topbarContainer.outerHeight());
           topbar.data('stickyoffset', topbarContainer.offset().top);
         } else {
@@ -90,7 +90,7 @@
           .css('height', '');
       }
 
-      if(settings.scrolltop) {
+      if (settings.scrolltop) {
         if (!topbar.hasClass('expanded')) {
           if (topbar.hasClass('fixed')) {
             topbar.parent().addClass('fixed');
@@ -121,6 +121,7 @@
           } else {
             topbar.addClass('fixed');
             topbar.parent().addClass('expanded');
+            $('body').addClass('f-topbar-fixed');
           }
         }
       }
@@ -285,7 +286,7 @@
     },
 
     breakpoint : function () {
-      return matchMedia(Foundation.media_queries['medium']).matches;
+      return !matchMedia(Foundation.media_queries['topbar']).matches;
     },
 
     assemble : function (topbar) {
@@ -303,9 +304,9 @@
             url = $link.attr('href');
 
         if (settings.mobile_show_parent_link && url && url.length > 1) {
-          var $titleLi = $('<li class="title back js-generated"><h5><a href="#"></a></h5></li><li><a class="parent-link js-generated" href="' + url + '">' + $link.text() +'</a></li>');
+          var $titleLi = $('<li class="title back js-generated"><h5><a href="javascript:void(0)"></a></h5></li><li><a class="parent-link js-generated" href="' + url + '">' + $link.text() +'</a></li>');
         } else {
-          var $titleLi = $('<li class="title back js-generated"><h5><a href="#"></a></h5></li>');
+          var $titleLi = $('<li class="title back js-generated"><h5><a href="javascript:void(0)"></a></h5></li>');
         }
 
         // Copy link to subnav
