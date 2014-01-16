@@ -1,0 +1,89 @@
+{% extends "ndf/base.html" %}
+{% block title %} {{title}} {% endblock %}
+{% block body_content %}
+{% load ndf_tags %}
+{% if already_uploaded %} 
+<div id="message">
+  <span style="color:red">Listed below files are already uploaded please choose different files</span>
+  <ul>
+    {% for each in already_uploaded %}
+    <li>{{each}}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %} 
+<center>
+  <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'file_search' group_name %}">
+    <div style="padding-top:10px">
+      <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
+      
+      <button type="submit"><i class="fi-magnifying-glass"></i> Search</button>
+
+      {% if user.is_authenticated %}
+      <a class="button secondary" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+<i class="fi-paperclip"></i> Upload
+      </a>
+      {% endif %}
+    </div>
+  </form>
+</center>
+<hr />
+{% load url from future %}
+
+{% if files %}
+<div style='display:table;  border:2px;   border-spacing:10px; '>
+  <div style='display:table-row;' >
+    <div style='display:table-cell;' align="middle">
+      <h4>File Name </h4>
+    </div>
+    <div style='display:table-cell;' align="middle">
+      <h4>File Size </h4>
+    </div>  
+    <div style='display:table-cell;' align="middle">
+      <h4>File Type </h4>
+    </div>
+    <div style='display:table-cell;' align="middle">
+      <h4>Posted by </h4>
+    </div>
+    <div style='display:table-cell;' align="middle">
+	    <h4 >Download </h4>
+    </div>
+    <div style='display:table-cell;' align="middle">
+	    <h4 >Delete </h4>
+    </div>
+  </div>
+    {% for file in files %}
+    {% get_user_object file.created_by as user_obj %}
+    {% get_grid_fs_object file as grid_fs_obj %}
+    <div style='display:table-row;' >
+      <div style='display:table-cell;' align="middle">
+	<lable>{{file.name}} </lable>
+      </div>
+      <div style='display:table-cell;' align="middle">
+	<lable>{{file.file_size.size}}{{file.file_size.unit}} </lable>
+      </div>  
+      <div style='display:table-cell;' align="middle">
+	<lable>{{file.mime_type}}</lable>
+      </div>
+      <div style='display:table-cell;' align="middle">
+	<lable>{{ user_obj.username }}</lable>
+      </div>
+      <div style='display:table-cell;' align="middle">
+	<a href="{% url 'read_file' 'group' file %}" download="{{ grid_fs_obj.filename }}">Download </a>
+      </div>
+      
+      <div style='display:table-cell;' align="middle">
+	{% get_user_object file.created_by as user_obj %}
+	{% ifequal  user_obj.username  user.username  %}
+	<a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
+	{% endifequal %}
+      </div>
+      
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+   <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
+{% endif %}
+{% endblock %}
+
