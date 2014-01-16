@@ -1,12 +1,9 @@
 
 <!-- GApps Menubar -->
 
-<ul>
 {% for app_id, app_name in gapps.items %}
   <li>
-    <a href="{% url app_name group_name app_id %}  ">{{app_name|title}}</a>
+    <a href="{% url app_name group_name app_id %}">{{app_name|title}}</a>
   </li>
 {% endfor %}
-</ul>
-
 <!-- ============= -->
