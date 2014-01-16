@@ -19,7 +19,7 @@
 	<link rel="stylesheet" href="/static/ndf/foundation-icons/foundation-icons.css">
 
 	<!-- Modernizr - Browser detection JS http://modernizr.com/ -->
-	<script src="/static/ndf/foundation/js/vendor/modernizr.js"></script>
+	<script src="/static/ndf/foundation/js/modernizr.js"></script>
 
 	<!-- jQuery -->
 	<script src="/static/ndf/js/jquery.js"></script>
@@ -89,6 +89,11 @@
 		.row{
 			max-width:inherit;
 		}
+		.top-bar input{
+			height:auto;
+			padding-top:.35rem;
+			padding-bottom:.35rem;
+		}
 
 		{% block style %}  {% endblock %}
 
@@ -124,7 +129,7 @@
 								<input type="text" placeholder="Find Stuff">
 							</div>
 							<div class="large-4 small-3 columns">
-								<a href="#" class="alert button expand">Search</a>
+								<a href="#" class="button expand">Search</a>
 							</div>
 						</div>
 					</li>
