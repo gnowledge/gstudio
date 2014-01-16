@@ -13,11 +13,6 @@ nav.top-bar .has-dropdown .button{ /* Needs testing */
 
 /* End Foundation hacks */
 
-#search-bar{
-}
-#search-bar i{
-	padding:6px;
-}
 /* Card block */
 li.card a{
 	margin:2px;
