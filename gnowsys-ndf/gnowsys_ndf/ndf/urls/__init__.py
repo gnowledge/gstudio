@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
+from django.views.generic import TemplateView
 
 
 from registration.backends.default.views import RegistrationView
@@ -36,4 +37,5 @@ urlpatterns = patterns('',
     ),
     url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
     (r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )
