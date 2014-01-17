@@ -3,6 +3,8 @@
 {% block url %}{% url 'image_edit' group_name node %}{% endblock %}
 {% block add_fields %}
 <div>
-  <img src="{% url 'getFullImage' group_name node %}" altname="{{node.name}}"></img>
+  <a href="{% url 'getFullImage' group_name node %}">
+    <img src="{% url 'getFullImage' group_name node %}" altname="{{node.name}}"></img>
+  </a>
 </div>
 {% endblock %}
