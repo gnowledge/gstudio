@@ -1,3 +1,39 @@
-nav.top-bar .has-dropdown .button{
-  top:0;
+/* Foundation hacks */
+.row{
+	max-width:inherit;/* Expand to full browser width instead of 960px */
+}
+.top-bar input{	/* Issue filed at github */
+	height:auto;
+	padding-top:.35rem;
+	padding-bottom:.35rem;
+}
+nav.top-bar .has-dropdown .button{ /* Needs testing */
+	top:0;
+}
+
+/* End Foundation hacks */
+
+/* Theme */
+.top-bar{
+	background-color: #1d293f;
+}
+.top-bar-section li:not(.has-form) a:not(.button){
+	background-color: #1d293f;
+}
+.top-bar-section li:not(.has-form) a:not(.button):hover{
+	background-color: #253544;
+}
+.top-bar-section .has-form{
+	background-color: #1d293f;
+}
+
+/* Card block */
+li.card a{
+	margin:2px;
+	padding:5px;
+	border: 1px solid #eaeaea;
+	display: block;
+}
+li.card a:hover{
+	border: 1px solid #ddd;
 }
