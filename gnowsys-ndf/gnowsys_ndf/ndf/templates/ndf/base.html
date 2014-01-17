@@ -19,7 +19,7 @@
 	<link rel="stylesheet" href="/static/ndf/foundation-icons/foundation-icons.css">
 
 	<!-- Modernizr - Browser detection JS http://modernizr.com/ -->
-	<script src="/static/ndf/foundation/js/vendor/custom.modernizr.js"></script>
+	<script src="/static/ndf/foundation/js/modernizr.js"></script>
 
 	<!-- jQuery -->
 	<script src="/static/ndf/js/jquery.js"></script>
@@ -37,6 +37,10 @@
 
 		html, body {
 			height: 100%;
+		}
+
+		nav h1 img{
+			height: 1.8rem;
 		}
 
 		header
@@ -77,23 +81,13 @@
 			color: #bbb;
 		}
 
-		li.card a{
-			margin:2px;
-			padding:5px;
-			border: 1px solid #eaeaea;
-			display: block;
-		}
-		li.card a:hover{
-			border: 1px solid #ddd;
-		}
-
 		{% block style %}  {% endblock %}
 
 	</style>
 
 </head>
 
-<body class="container">
+<body>
 	<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
 
 	{% get_group_name request.path as group_name %}
@@ -104,7 +98,7 @@
 		<nav class="top-bar" data-topbar>
 			<ul class="title-area">
 				<li class="name">
-					<h1><a href="#">MetaStudio</a></h1>
+					<h1><a href="#"><img src="/static/ndf/images/icon/meta.svg"> MetaStudio</a></h1>
 				</li>
 				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
 			</ul>
@@ -116,13 +110,11 @@
 
 					<!-- Top bar search form -->
 					<li class="has-form">
-						<div class="row collapse">
-							<div class="large-8 small-9 columns">
-								<input type="text" placeholder="Find Stuff">
+						<div id="search-bar" class="row collapse">
+							<div class="large-12 small-12 columns">
+								<input type="text" placeholder="Find Anything">
 							</div>
-							<div class="large-4 small-3 columns">
-								<a href="#" class="alert button expand">Search</a>
-							</div>
+
 						</div>
 					</li>
 
@@ -180,15 +172,16 @@
 	<main class="row">  
 
 		<!-- Start of content section -->
-		<article class="medium-9 columns">
+		<article class="medium-12 columns">
 
 			{% block body_content %}  {% endblock %}
+			{% block extra_content %}  {% endblock %}
 
 		</article>
 		<!-- End of content section -->	
 
 		<!-- Start of sidebar section -->
-		<section  class="medium-3 columns">
+		<!--section  class="medium-3 columns">
 
 			<nav>
 
@@ -196,36 +189,42 @@
 
 			<aside>
 
-				{% block extra_content %}  {% endblock %}
+				{% block sidebar %}  {% endblock %}
 
 			</aside>
 
 
-		</section>
+		</section-->
 		<!-- End of related content -->	
 
 	</main>
 
 	<footer class="row">
 
-			<div class="medium-6 columns"><p>
+
+		<div class="medium-8 columns">
+
+			<p>
 				A project from the <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>/<a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
+				<p><small>
+					<a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio">File a bug</a>
+				</small></p>
 			</div>
 
-			<div class="medium-6 columns">
+			<div class="medium-4 columns">
 				<small>
 					<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
 				</small>
 			</div>
 
-	</footer>
+		</footer>
 
-	<!-- JS -->
-	<script src="/static/ndf/foundation/js/foundation.min.js"></script>
-	<script src="/static/ndf/foundation/js/foundation/foundation.topbar.js"></script>
-	<script src="/static/ndf/js/application.js"></script>
+		<!-- JS -->
+		<script src="/static/ndf/foundation/js/foundation.min.js"></script>
+		<script src="/static/ndf/foundation/js/foundation/foundation.topbar.js"></script>
+		<script src="/static/ndf/js/application.js"></script>
 
-	<script type="text/javascript">
+		<script type="text/javascript">
 
 		// Initialize Foundation CSS
 		$(document).foundation();

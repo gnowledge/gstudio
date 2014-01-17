@@ -4,11 +4,11 @@
 
 {% block body_content %} 
 
-<h2>My Groups</h2>
+<h2>Groups</h2>
 <h5>Number Of Groups : {{ group_nodes_count }} </h5>
 
 {% load url from future %}
-<ul class="small-block-grid-4">
+<ul class="small-block-grid-2 medium-block-grid-4">
   {% if user.is_authenticated %}
     <li>
     <a href="{% url 'create_group' 'group' %}">
