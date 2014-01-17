@@ -14,7 +14,14 @@
 </div>
 {% endif %}
 {% get_group_name request.path as group_name %}
-
+<script type="text/javascript">
+  document.ready(function(){
+  (
+  //$('.visible-img img').click(function(){ 
+    
+  //});
+  });
+</script>
 <center>
   <div style='display:table; padding-top:20px'>
     <div style='display:table-row;'>
@@ -34,40 +41,14 @@
 </center>
 <hr />
 
-<div style='display:table;' >
-	<div style='display:table-row;' >
-		{% for image in imageCollection %}
-			<div style='display:table-cell; padding-left:25px'> 
-				<a href="{% url 'image_detail' group_name image %}">
-				<img src="{% url 'getImageThumbnail' group_name image %}"></img><br/>
-				<span align="left">{{image.name}}</span></a>
-				{% get_user_object image.created_by as user_obj %}
-				{% ifequal  user_obj.username  user.username  %}
-				<a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group_name' image %}?next={{request.path}}">Delete </a>
-				{% endifequal %}
-			</div>
-	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}
-			</div>
-			<div style='display:table-row;' >
-			{% endif %}
-		{% endfor %} 	
-	</div>
-			
-</div>
-
-<!--
-<div class="gallery-wrap exhibitionrepeater">
+<!--<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-6">-->
+<ul class="clearing-thumbs" data-clearing>
   {% for image in imageCollection %}
-  <div class="gallery-item-group exitemrepeater">
+  <li>
     <a href="{% url 'getFullImage' group_name image %}">
-      <img class="picture" src="{% url 'getImageThumbnail' group_name image %}"></img>
+      <img src="{% url 'getImageThumbnail' group_name image %}"  class="th" data-caption="<a href='{% url 'image_detail' group_name image %}'>{{image.name}}</a>"></img>
     </a>
-    <div class="gallery-item-caption">
-      <p>
-	<a href="{{image.name}}"></a>
-      </p>
-    </div>
-  </div>
+  </li>
   {% endfor %}
-</div>-->
+</ul> 	
 {% endblock %}
