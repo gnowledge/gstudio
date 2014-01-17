@@ -1,130 +1,81 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
-{% block title %}Forum{% endblock %}
-{% block head %}
+{% block title %}Create Forum{% endblock %}
+
+{% block body_content %} 
+
+<script src="/static/ndf/foundation/js/foundation/foundation-datepicker.js"></script>
+<link rel="stylesheet" href="/static/ndf/foundation/css/foundation-datepicker.css">
 <script type="text/javascript">
-function saveforum(){
-var name=$("#forum_name").val();
-if (name=="" )
-{
-alert("Please enter forum name");
-}
-else
-{
-$("#forum").trigger('click');
-}
-}
+$(document).ready(function(){
+
+$('#startdate').fdatepicker({closeButton:true});
+$('#enddate').fdatepicker({closeButton:true});
+
+});
 </script>
-{% endblock %}
-{% block body_content %}
-<style type="text/css">
-#div2
-{
- background-color:#E8E8E8 ;
-}
-#div1
-{
- background-color:#F4F4F4;
-}
 
-</style>
 
-create forum
-<div id="creatediv">
-<form action="" method="post">
-{% csrf_token %}
-<div style='display:table;  border:1px;   border-spacing:-3px; '>
-  <div style='display:table-row;' >
-    <div style='display:table-cell;'> 
-      <font size ="3" >Name of the Forum:</font> 
+
+<form >
+<br/><br/><br/><br/>
+  <div class="row">
+    <div class="large-6 columns">
+     <label>Name of the Forum</label>
+      <input type="text" id="forum_name" name="forum_name">
     </div>
-    <div style='display:table-cell;'> 
-      <input type="text" id="forum_name" name="forum_name"></p>
+
+    <div class="large-6 columns">
+      <label>Description</label>
+     {% include "ndf/loadeditor.html" %}
+       
+<textarea id="editor_content" type="hidden" name="content_org" rows="10" cols="50" style="display:none"></textarea>
+ </div>
+</div>
+
+ <div class="row">
+    <div class="large-4 columns">
+  <label>Start time:</label>
+<div class="small-2 columns">
+ <label>Date:</label></div>
+<div class="small-9 columns">
+ <input type="text" class="span2" value="" id="startdate" data-date-format="mm/dd/yyyy">
+</div>
+</div>
+
+    <div class="large-4 columns">
+        <label>Hours:</label>
+  <input id="starthrs" type="text" name="shrs">
+</div>
+    <div class="large-4 columns">
+        <label>Minutes:</label>
+       <input id = "startmts" type = "text" name = "smts">
+     </div>
+</div>
+ <div class="row">
+    <div class="large-4 columns">
+       <label> End time:  </label>
+       <div class="small-2 columns"> 
+        <label>Date: </label>
+       </div>
+       <div class="small-8 columns"> 
+
+        <input type="text" class="span2" value="" id="enddate" data-date-format="mm/dd/yyyy">
+
+        </div>
     </div>
-    <div style='display:table-cell;'> 
-<font size ="3" >Description:</font>
-</div>
- <div style='display:table-cell;'> 
-<textarea id="editor_content" name="content_org" rows="10" cols="50" style="display:none"></textarea>
 
-{% include "ndf/loadeditor.html" %}
-
-</div>
-
-<input type="button" id="forumsave" name="savecontent" value="Save" style="display:none"><br/>
-</div>
-<div style='display:table-row;' >
-<div style='display:table-cell;'> 
-    
-  <font size ="3" >Start time:</font>
-</div>
-</div>
-<div style='display:table-row;' >
-<div style='display:table-cell;'> 
-
-        <font size ="2" > Date:</font>
-</div>
-<div style='display:table-cell;'> 
-
-<span class="datetimeshortcuts">
-                <a href="javascript:DateTimeShortcuts.openCalendar(0);"id = "calendarlink0"></a>
-        
- <input id="id_start_date" type="text" class="vTimeField hasTimepicker hasDatepicker" name="sdate" size ="8">
-
-</span>
-
-</div>
-<div style='display:table-cell;'> 
-        <font size ="2" >Hours:</font>
-</div>
-<div style='display:table-cell;'> 
-<input id = "starthrs" type = "text" name = "shrs">
-</div>
-<div style='display:table-cell;'> 
-        <font size ="2" >Minutes:</font>
-</div>
-<div style='display:table-cell;'> 
-<input id = "startmts" type = "text" name = "smts">
-</div>
-</div>
-
-<div style='display:table-row;' >
-
-<div style='display:table-cell;'> 
-       <font size ="3" > End time:  </font>
-</div>
-</div>
-<div style='display:table-row;' >
-<div style='display:table-cell;'> 
-
-        <font size ="2" >Date: </font>
-</div>
-<div style='display:table-cell;'> 
-<input id="end_date" type="text" class="vTimeField hasTimepicker" name="edate" size ="8">
-</div>
-<div style='display:table-cell;'> 
-
-        <font size ="2" >Hours:</font>
-</div>
-<div style='display:table-cell;'> 
-
-<input id = "endhrs"  type = "text" name = "ehrs">
-</div>
-     <div style='display:table-cell;'> 
-
-        <font size ="2" >Minutes:</font>
+    <div class="large-4 columns">
+        <label>Hours:</label>
+       <input id = "endhrs"  type = "text" name = "ehrs">
+    </div>
+    <div class="large-4 columns">
+           <label>Minutes:</label>
+          <input id = "endmts"  type = "text" name = "emts">
      </div>
-     <div style='display:table-cell;'> 
-       <input id = "endmts"  type = "text" name = "emts">
-     </div>
-   </div>
-   <div style='display:table-row;'>
-      		<div style='display:table-cell;' colspan='2' align="middle"> 
+</div>
+   
 <input type="button" id="save_forum" class="btn btn-primary btn-large btn-block" value="Create Forum" onclick="saveforum()">
        		 	<input type="submit" id="forum" value="Create Forum" class="btn btn-primary btn-large btn-block" style="visibility:hidden">
-      		</div>
-   </div>
-</div>
 </form>
-</div>
 {% endblock %}
