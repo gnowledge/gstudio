@@ -14,34 +14,29 @@
 </div>
 {% endif %}
 {% get_group_name request.path as group_name %}
-<script type="text/javascript">
-  document.ready(function(){
-  (
-  //$('.visible-img img').click(function(){ 
-    
-  //});
-  });
-</script>
-<center>
-  <div style='display:table; padding-top:20px'>
-    <div style='display:table-row;'>
-      <div style='display:table-cell; padding-left:5px'>
-	<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
-	  <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
-	  <input type="submit" class="btn btn-large btn-primary" value="search" />
-	</form> 
-      </div>
-      <div style='display:table-cell; padding-left:5px'>
-	  <a class="btn btn-large btn-primary"  href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
-  	   Upload
-	  </a>
+
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
+  <div class="row"  style="padding-top:20px">
+    <div class="large-7 columns">
+      <div class="row collapse">
+	  <div class="small-8 columns">
+            <input type="text" placeholder="search images" name="search">
+	  </div>
+	  <div class="small-2 columns">
+            <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
+	      <i class="fi-magnifying-glass large">search</i>
+	    </a>
+	  </div>
+	  <div class="small-2 columns">
+            <a href="{% url 'uploadDoc' group_name %}?next={{request.path}}" class="button postfix secondary">
+	      <i class="fi-paperclip">upload</i>
+	    </a>
+	  </div>
       </div>
     </div>
   </div>
-</center>
-<hr />
+</form>
 
-<!--<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-6">-->
 <ul class="clearing-thumbs" data-clearing>
   {% for image in imageCollection %}
   <li>
