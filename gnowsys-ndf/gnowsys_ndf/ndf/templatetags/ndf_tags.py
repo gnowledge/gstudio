@@ -188,3 +188,14 @@ def get_grid_fs_object(f):
     print "Object does not exist", e
   return grid_fs_obj
   
+#textb
+@register.filter("mongo_id")
+def mongo_id(value):
+     # Retrieve _id value
+    if type(value) == type({}):
+        if value.has_key('_id'):
+            value = value['_id']
+   
+    # Return value
+    return unicode(str(value['_id']))
+#textb 

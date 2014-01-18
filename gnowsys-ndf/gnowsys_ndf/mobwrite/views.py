@@ -4,7 +4,6 @@ import socket
 
 from django.conf import settings
 from django.template import RequestContext, Context
-from django.template.loader import get_template
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.http import HttpResponseBadRequest
@@ -84,10 +83,3 @@ def html(request, name):
     t = models.fetchText(name)
     response = HttpResponse(t.html(), content_type='text/html')
     return response
-
-def testingtextb(request):
-    #t=get_template("testtextb.html")
-    #html = t.render(Context({}))
-    #return HttpResponse(html)
-    context = RequestContext(request, {})
-    return render_to_response("testtextb.html", context)

@@ -22,8 +22,10 @@
 <script>
 mobwrite.syncGateway = '/mobwrite/';
 $(function(){
-        mobwrite.share('orgitdown');
-   });
+     {% if node %}
+        mobwrite.share('{{node|mongo_id}}');
+     {% endif %}
+});
 </script>
 
 {% endblock %}
@@ -74,7 +76,11 @@ $(function(){
 	<h4><strong>Description:</strong></h4>
       </td>
       <td>
+      {% if node %}
+	<textarea id="{{node|mongo_id}}" name="content_org" placeholder="Please enter description...">{{node.content_org|default_if_none:""}}</textarea>
+      {% else %}
 	<textarea id="orgitdown" name="content_org" placeholder="Please enter description...">{{node.content_org|default_if_none:""}}</textarea>
+      {% endif %}
       </td>
     </tr>
 
@@ -185,7 +191,11 @@ $("input:radio").click(function() {
 
 $(document).ready(function() {
     // Must be there to display org-editor shortcuts
+    {% if node %}
+    $("#{{node|mongo_id}}").orgitdown(mySettings);
+    {% else %}
     $("#orgitdown").orgitdown(mySettings);
+    {% endif %}
 });
 
 

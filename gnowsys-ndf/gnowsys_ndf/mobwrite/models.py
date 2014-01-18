@@ -62,8 +62,8 @@ class TextObj(mobwrite_core.TextObj, models.Model):
 
   def setText(self, newtext):
     if timezone.now()-self.updated > datetime.timedelta(seconds=10) and self.text != newtext:       #textb
-        with revision:
-            self.save()
+        r = revision        #textb
+        self.save()         #textb
 
     mobwrite_core.TextObj.setText(self, newtext)
 

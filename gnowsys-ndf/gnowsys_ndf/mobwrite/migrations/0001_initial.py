@@ -1,7 +1,7 @@
 
 from south.db import db
 from django.db import models
-from mobwrite.models import *
+from gnowsys_ndf.mobwrite.models import *
 
 class Migration:
     
