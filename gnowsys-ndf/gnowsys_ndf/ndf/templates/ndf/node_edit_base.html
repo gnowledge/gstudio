@@ -14,6 +14,17 @@
   <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
   <!-- orgitdown! skin -->
   <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+  
+<script src="/static/js/mobwrite/diff_match_patch.js"></script>
+<script src="/static/js/mobwrite/core.js"></script>
+<script src="/static/js/mobwrite/form.js"></script>
+<script src="/static/js/mobwrite/iframe.js"></script>
+<script>
+mobwrite.syncGateway = '/mobwrite/';
+$(function(){
+        mobwrite.share('orgitdown');
+   });
+</script>
 
 {% endblock %}
 
