@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+    <head>
+	<script  type="text/javascript" src="/static/js/jquery.js">
+        </script>
+	<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+	</script>-->
+	<script src="/static/js/mobwrite/diff_match_patch.js">
+        </script>
+	<script src="/static/js/mobwrite/core.js">
+        </script>
+	<script src="/static/js/mobwrite/form.js">
+        </script>
+	<script src="/static/js/mobwrite/iframe.js">
+        </script>
+
+<script type="text/javascript">
+mobwrite.syncGateway = '/mobwrite/';
+$(document).ready(function(){
+
+mobwrite.share('q1');
+
+function insertTab(e) {
+        if (e.keyCode == 9) {
+            var tab = "    ";
+            var txt = e.currentTarget;
+            var pos = txt.selectionStart;
+            var scrollTop = txt.scrollTop;
+            txt.value = txt.value.substring(0, pos) + tab + txt.value.substring(txt.selectionEnd, txt.textLength);
+            txt.focus();
+            txt.selectionStart = pos + tab.length;
+            txt.selectionEnd = pos + tab.length;
+            txt.scrollTop = scrollTop;
+            return false;
+        }
+        return true;
+    }
+    $("#q1").keydown(insertTab);
+});
+</script>
+    </head>
+
+
+    <body>
+    <textarea id="q1" style="width: 100%; height: 100%"></textarea>
+    </body>
+</html>

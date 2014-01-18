@@ -42,7 +42,7 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
-        'NAME': 'example',
+        'NAME': 'test1',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -158,7 +158,12 @@ INSTALLED_APPS = (
     'gnowsys_ndf.benchmarker',
     'registration',
     'djangoratings',
-    'notification'
+    'notification',
+    'gnowsys_ndf.mobwrite',	#textb
+    'south',			#textb
+    'django_extensions',	#textb
+    'reversion',		#textb
+    'django.contrib.flatpages',	#textb
 )
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
@@ -256,3 +261,9 @@ except:
     #print "Default settings applied"
     pass
 
+#textb
+import warnings
+warnings.filterwarnings(
+        'error', r"DateTimeField received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields')
+#textb

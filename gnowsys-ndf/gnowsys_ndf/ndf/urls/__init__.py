@@ -11,6 +11,12 @@ from gnowsys_ndf.ndf.forms import *
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
+    (r'^r/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
+    (r'^m/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.html'),
+    (r'^t/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.text'),
+    (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
+    (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
     (r'^$', RedirectView.as_view(url= '/home/')),
     (r'^(?P<group_name>[\w-]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_name>[\w-]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
