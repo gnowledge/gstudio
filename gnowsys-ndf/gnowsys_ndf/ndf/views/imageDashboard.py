@@ -22,6 +22,9 @@ collection = db[File.collection_name]
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 
 def imageDashboard(request, group_name, image_id):
+    '''
+    fetching image acording to group name
+    '''
     img_col= collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(image_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
@@ -29,6 +32,9 @@ def imageDashboard(request, group_name, image_id):
     return render_to_response(template, variable)
 
 def getImageThumbnail(request, group_name, _id):
+    '''
+    this funciton can be called to get thumbnail of image throw url
+    '''
     imgobj = collection.File.one({"_type": u"File", "_id": ObjectId(_id)})
     if imgobj is not None:
         if (imgobj.fs.files.exists(imgobj.fs_file_ids[1])):
