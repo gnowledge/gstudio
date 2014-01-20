@@ -14,19 +14,44 @@
 <script src="/static/ndf/js/loadeditor.js"></script>
  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
 
+<style type="text/css">
+.orgitdown {
+height:155px;
+width:466px;
+}
+.orgitdownEditor{
+height:100px;
+}
+
+.orgitdownContainer{
+height:145px;
+width:457px;
+}
+
+#Editor{
+width:530px;
+height=250px;
+top:50px;
+left:645px;
+}
+
+</style>
+
+
 {% endblock %}
 
 
 
 
-<input type="text"  data-reveal-id="Editor">
+<input type="text"  class="description" data-reveal-id="Editor">
  
 
 
 <div id="Editor" class="reveal-modal" data-reveal="">
 
   <textarea id="orgitdown" name="content_org" placeholder="Please enter description..."></textarea>
-<a id="savecontent" href="#" class="button [radius round]">Save</a>
+
+<input type="button" id="save_edit_cont" class="btn btn-primary btn-large btn-block" value="Save">
 
 <a  class="close-reveal-modal">×</a>
 </div>

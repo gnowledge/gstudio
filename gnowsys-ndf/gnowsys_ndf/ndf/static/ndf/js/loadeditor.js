@@ -10,12 +10,18 @@ $("#forum").trigger('click');
 }
 }
 $(document).ready(function(){
-$('#orgitdown').orgitdown(mySettings);
 $("#orgitdown").change(function(){
 var content=$('#orgitdown').val()
-$('#editor_content').val(content);
+alert(content);
+$('#forum_edit_cont').val(content);
+
 });
-$("#savecontent").click(function(){
+
+
+$("#save_edit_cont").click(function(){
 $('a.close-reveal-modal').trigger('click');
 });
+$('#orgitdown').orgitdown(mySettings);
+
+
 });

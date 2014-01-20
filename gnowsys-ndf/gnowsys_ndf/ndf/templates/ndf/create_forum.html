@@ -2,34 +2,43 @@
 {% load ndf_tags %}
 {% block title %}Create Forum{% endblock %}
 
-{% block body_content %} 
-
+{% block head %}
 <script src="/static/ndf/foundation/js/foundation/foundation-datepicker.js"></script>
 <link rel="stylesheet" href="/static/ndf/foundation/css/foundation-datepicker.css">
 <script type="text/javascript">
 $(document).ready(function(){
 
-$('#startdate').fdatepicker({closeButton:true});
-$('#enddate').fdatepicker({closeButton:true});
+$('#startdate').fdatepicker();
+$('#enddate').fdatepicker();
 
 });
 </script>
+<style type="text/css">
+#forum_div{
+left:100px;
 
+}
+</style>
+{% endblock %}
 
+{% block body_content %} 
 
-<form >
-<br/><br/><br/><br/>
+<div id="forum_div" style='padding-top:40px;'>
+<form id="create_forum" method="POST">
+{% csrf_token %}
   <div class="row">
-    <div class="large-6 columns">
+
+     
+    <div class="large-4 columns">
      <label>Name of the Forum</label>
       <input type="text" id="forum_name" name="forum_name">
     </div>
 
-    <div class="large-6 columns">
+    <div class="large-4 small-2 columns">
       <label>Description</label>
      {% include "ndf/loadeditor.html" %}
        
-<textarea id="editor_content" type="hidden" name="content_org" rows="10" cols="50" style="display:none"></textarea>
+<textarea id="forum_edit_cont" type="hidden" value="" name="content_org" style="display:none"></textarea>
  </div>
 </div>
 
@@ -39,7 +48,7 @@ $('#enddate').fdatepicker({closeButton:true});
 <div class="small-2 columns">
  <label>Date:</label></div>
 <div class="small-9 columns">
- <input type="text" class="span2" value="" id="startdate" data-date-format="mm/dd/yyyy">
+ <input type="text" class="span2" value="" id="startdate" data-date-format="mm/dd/yyyy" name="sdate">
 </div>
 </div>
 
@@ -58,9 +67,9 @@ $('#enddate').fdatepicker({closeButton:true});
        <div class="small-2 columns"> 
         <label>Date: </label>
        </div>
-       <div class="small-8 columns"> 
+       <div class="small-9 columns"> 
 
-        <input type="text" class="span2" value="" id="enddate" data-date-format="mm/dd/yyyy">
+        <input type="text" class="span2" value="" id="enddate" data-date-format="mm/dd/yyyy" name="edate">
 
         </div>
     </div>
@@ -76,6 +85,8 @@ $('#enddate').fdatepicker({closeButton:true});
 </div>
    
 <input type="button" id="save_forum" class="btn btn-primary btn-large btn-block" value="Create Forum" onclick="saveforum()">
-       		 	<input type="submit" id="forum" value="Create Forum" class="btn btn-primary btn-large btn-block" style="visibility:hidden">
+       		 	<input type="submit" id="forum" value="Create Forum" class="btn btn-primary btn-large btn-block" style="display:none">
 </form>
+</div>
+
 {% endblock %}
