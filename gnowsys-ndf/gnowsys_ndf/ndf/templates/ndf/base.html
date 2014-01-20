@@ -41,6 +41,10 @@
 
 		nav h1 img{
 			height: 1.8rem;
+			margin-right: 5px;
+		}
+		nav h1 a{
+			color:white!important;
 		}
 
 		header
@@ -98,7 +102,7 @@
 		<nav class="top-bar" data-topbar>
 			<ul class="title-area">
 				<li class="name">
-					<h1><a href="#"><img src="/static/ndf/images/icon/meta.svg"> MetaStudio</a></h1>
+					<h1><a href="#"><img src="/static/ndf/images/icon/meta.svg"> Meta<b>Studio</b></a></h1>
 				</li>
 				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
 			</ul>
@@ -140,17 +144,17 @@
 
 				<!-- Left Nav Section -->
 				<ul class="left">
-					<li class="has-form">
+					<li class="has-from">
 						<a href="http://foundation.zurb.com/docs" class="button">Getting Started</a>
 					</li>
-					<li><a href="#"><i class="fi-home"></i> {{group_name}}</a>
+					<li class="has-dropdown">
+					  <a href="#"><i class="fi-home"></i> {{group_name}}</a>
 
 						<!-- If logged in show user groups -->
 						{% if user.is_authenticated %}
 						{% get_existing_groups_excluded group_name as groups %}
 
 						<ul class="dropdown">
-
 							<!-- Create dropdown item for each group -->
 							{% for gp_id in groups %}
 							<li id="{{gp_id}}"><a href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
@@ -160,7 +164,7 @@
 
 						{% endif %}
 
-					</li>
+				</li>
 
 					{% get_gapps_menubar group_name %}
 				</ul>
@@ -170,15 +174,6 @@
 	</header> 		
 
 	<main class="row">  
-
-		<!-- Start of content section -->
-		<article class="medium-12 columns">
-
-			{% block body_content %}  {% endblock %}
-			{% block extra_content %}  {% endblock %}
-
-		</article>
-		<!-- End of content section -->	
 
 		<!-- Start of sidebar section -->
 		<!--section  class="medium-3 columns">
@@ -197,6 +192,17 @@
 		</section-->
 		<!-- End of related content -->	
 
+		<!-- Start of content section -->
+		<article class="medium-12 columns">
+
+			{% block body_content %}  {% endblock %}
+			{% block extra_content %}  {% endblock %}
+
+		</article>
+		<!-- End of content section -->	
+
+		
+
 	</main>
 
 	<footer class="row">
@@ -205,7 +211,7 @@
 		<div class="medium-8 columns">
 
 			<p>
-				A project from the <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>/<a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
+				A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
 				<p><small>
 					<a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio">File a bug</a>
 				</small></p>
