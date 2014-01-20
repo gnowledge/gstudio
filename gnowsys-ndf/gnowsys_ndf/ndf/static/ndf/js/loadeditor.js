@@ -12,7 +12,6 @@ $("#forum").trigger('click');
 $(document).ready(function(){
 $("#orgitdown").change(function(){
 var content=$('#orgitdown').val()
-alert(content);
 $('#forum_edit_cont').val(content);
 
 });
