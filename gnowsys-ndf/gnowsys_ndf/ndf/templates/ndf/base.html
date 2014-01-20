@@ -140,17 +140,17 @@
 
 				<!-- Left Nav Section -->
 				<ul class="left">
-					<li class="has-form">
+					<li class="has-from">
 						<a href="http://foundation.zurb.com/docs" class="button">Getting Started</a>
 					</li>
-					<li><a href="#"><i class="fi-home"></i> {{group_name}}</a>
+					<li class="has-dropdown">
+					  <a href="#"><i class="fi-home"></i> {{group_name}}</a>
 
 						<!-- If logged in show user groups -->
 						{% if user.is_authenticated %}
 						{% get_existing_groups_excluded group_name as groups %}
 
 						<ul class="dropdown">
-
 							<!-- Create dropdown item for each group -->
 							{% for gp_id in groups %}
 							<li id="{{gp_id}}"><a href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
@@ -160,7 +160,7 @@
 
 						{% endif %}
 
-					</li>
+				</li>
 
 					{% get_gapps_menubar group_name %}
 				</ul>
