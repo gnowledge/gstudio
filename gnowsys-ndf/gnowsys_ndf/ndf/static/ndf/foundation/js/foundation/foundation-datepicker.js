@@ -325,7 +325,7 @@
 		        }).first().css('z-index'))+10;
 		  var textbox = this.component ? this.component : this.element;
 		  var offset = textbox.offset();
-		  var height = textbox.outerHeight() + parseInt(textbox.css('margin-top'))+20;
+		  var height = textbox.outerHeight() + parseInt(textbox.css('margin-top'));
 		  var width = textbox.outerWidth() + parseInt(textbox.css('margin-left'));
 		  var fullOffsetTop = offset.top + height;
 		  var offsetLeft = offset.left;
@@ -340,7 +340,7 @@
 		  	offsetLeft = (offset.left + width)  - this.picker.width();
 		  }
 		  this.picker.css({
-		    top: fullOffsetTop,
+		    top: fullOffsetTop+30,
 		    left: offsetLeft,
 		    zIndex: zIndex
 		  });

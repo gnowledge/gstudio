@@ -8,23 +8,15 @@
   <!-- orgitdown! skin -->
   <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
 
-
-
-
-<script src="/static/ndf/js/jquery.tools.min.js"></script>
-<script src="/static/ndf/js/loadeditor.js"></script>
- <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
-
-
 <script type="text/javascript">
 $(document).ready(function(){
- $('#orgitdown').orgitdown(mySettings);
-$("#savereply").click(function(){
+$("#twist_save_reply").click(function(){
+alert("aaaa");
 var content=$('#orgitdown').val()
 $('#orgitdown').val("");
 var grp=$("#grptxt").val();
 var forum=$("#forum").val();
-var tw_name=$("#twist_name").val();
+var tw_name=$("#thread_name").val();
 var ajurl="/"+grp+"/forum/add_node/"
 
 $.ajax({
@@ -36,9 +28,8 @@ $.ajax({
               $("#body").css({"opacity":"0.1",})
                               },
         success: function(data){
-                       
-                       $(".close").trigger('click');
                        $('#twistd').html(data);
+                      $('a.close-reveal-modal').trigger('click');
       
            },
        complete: function(){
@@ -49,6 +40,19 @@ $.ajax({
    })
 
 });
+
+});
+</script>
+
+<!--
+<script src="/static/ndf/js/twist_scripts.js"></script>
+-->
+ <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+ $('#orgitdown').orgitdown(mySettings);
 });
 </script>
 
@@ -58,45 +62,41 @@ $.ajax({
 
 <style type="text/css">
 .orgitdown{
-height:100px;
+height:140px;
+width:463px;
 }
 .orgitdownContainer{
-height:100px;
+height:130px;
+width:453px;
 }
 .orgitdownEditor{
-height:60px;
+height:100px;
 }
-div.overlay {
-        width:500px;
-        display:none;
-        color:Blue;
-        padding:10px;
-        background-color:white;
-}
-img{
-position:absolute;
-}
-
-div.overlay a.close {
-        background-image:url("/static/ndf/images/close.png");
-        position:absolute;
-        right:5px;
-        top:5px;
-        cursor:pointer;
-        height:27px;
-        width:27px;
+#reply {
+width:600px;
+height:277px;
+top:50px;
+left:645px;
 }
 </style>
-{% if forum %}
+
 {% get_group_name request.path as group %}
-<button rel="#reply" id="reply_forum" type="button" >Add a Twist</button>
+<a href="#" id="reply_forum" data-reveal-id="reply">Add a Thread</a>
 </p>
-<div class="overlay" id="reply">
-Add a twist to Forum:<br/>
-Twist Details : <input type="text" id="twist_name"> 
-  <textarea id="orgitdown" name="content_org" placeholder="Please enter description..."></textarea>
-<input type="text" id="grptxt" style="visibility:hidden" value="{{group}}">
-<input id="savereply" type="button" value="Save">
-<input type="text" id="forum" style="visibility:hidden" value="{{forum}}">
+<div id="reply" class="reveal-modal" data-reveal="">
+Add a thread to the Forum:<br/>
+<div class="row">
+<div class="large-3 small-2 columns">
+<label>Thread Name :</label>
 </div>
-{% endif %}
+<div class="large-9 small-2 columns">
+ <input type="text" id="thread_name"> 
+</div>
+</div>
+  <textarea id="orgitdown" name="content_org" placeholder="Please enter description..."></textarea>
+<input id="grptxt" type="hidden" value="{{group}}">
+<input id="twist_save_reply" type="button" value="Save">
+<input id="forum" type="hidden" value="{{forum}}">
+<a  class="close-reveal-modal">×</a>
+</div>
+
