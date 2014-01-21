@@ -14,6 +14,14 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 register = Library()
 db = get_database()
 
+
+@register.inclusion_tag('ndf/twist_replies.html')
+def get_reply(parent,ind,token):
+  print "token=",token
+  return {'reply': parent,'indent':ind+10,'csrf_token':token}
+
+
+
 @register.inclusion_tag('ndf/drawer_widget.html')
 def edit_drawer_widget(field, group_name, node, checked=""):
 

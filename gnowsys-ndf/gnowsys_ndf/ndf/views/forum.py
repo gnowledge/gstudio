@@ -45,14 +45,18 @@ def forum(request,group_name,node_id):
     return render_to_response("ndf/forum.html",variables)
 
 def create_forum(request,group_name):
+    print request
     if request.method == "POST":
         colf=gs_collection.GSystem()
         name=unicode(request.POST.get('forum_name',""))
         colf.name=name
         content_org = "\n"+request.POST.get('content_org')
+        strng='<div id="postamble">\n<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>\n</div>\n'
         filename = slugify(name) + "-" + request.user.username + "-"
-        colf.content = unicode(org2html(content_org, file_prefix=filename))
-        colf.content_org = unicode(content_org.encode('utf8'))
+        colfcont = unicode(org2html(content_org, file_prefix=filename))
+        fixstr=colfcont.split(strng)
+        colf.content_org = unicode(colfcont.encode('utf8'))
+        colf.content=unicode(fixstr[0])
         usrid=int(request.user.id)
         colf.created_by=usrid
         colf.member_of.append(forum_st.name)
@@ -65,10 +69,19 @@ def create_forum(request,group_name):
         emts=request.POST.get('emts',"")
         start_dt={}
         end_dt={}
+        if not shrs:
+            shrs=0
+        if not smts:
+            smts=0
         if sdate:
             sdate1=sdate.split("/") 
+            print sdate1[2],sdate1[0],sdate1[1]
             st_date = datetime.datetime(int(sdate1[2]),int(sdate1[0]),int(sdate1[1]),int(shrs),int(smts))
             start_dt[start_time.name]=st_date
+        if not ehrs:
+            ehrs=0
+        if not emts:
+            emts=0
         if edate:
             edate1=edate.split("/")
             en_date= datetime.datetime(int(edate1[2]),int(edate1[0]),int(edate1[1]),int(ehrs),int(emts))
@@ -83,7 +96,9 @@ def create_forum(request,group_name):
 
 def display_forum(request,group_name,forum_id):
     forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
-    variables=RequestContext(request,{'forum':forum})
+    print "csrf=",request
+    token=request
+    variables=RequestContext(request,{'forum':forum,'csrf_token':token})
     return render_to_response("ndf/forumdetails.html",variables)
 
 def add_node(request,group_name):
@@ -96,8 +111,9 @@ def add_node(request,group_name):
         if not sup :        
             return HttpResponse("failure")
         colrep=gs_collection.GSystem()
+        print "tw_n=",tw_name,sup_id,node
         if node == "Twist":
-            name=slugify(tw_name)
+            name=tw_name
             colrep.name=unicode(name)
             colrep.member_of.append(twist_st.name)
             colrep.gsystem_type.append(twist_st._id)
