@@ -40,8 +40,7 @@ def org2html(org_content, file_prefix="", file_delete=True):
     """
             
     # org editor content manipulation for temporary file (".org")
-    org_content_header_for_file = "#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" \
-        + "\n#+TITLE: "
+    org_content_header_for_file = "#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" + "\n#+BIND: org-export-html-auto-postamble nil" + "\n#+TITLE: \n"
 
     org_content_for_file = org_content.replace("\r", "")
 
@@ -66,6 +65,8 @@ def org2html(org_content, file_prefix="", file_delete=True):
     # Example (filename_html): "/tmp/wiliname-usrname-tmptCd4aq.html"
     
     cmd = "emacs --batch " + filename_org + " --eval '(org-export-as-html nil)'"
+    # (org-export-as-html nil)
+    # (setq org-export-html-postamble nil) 
     cmd_res = call((cmd + ' </dev/null'), shell=True)
             
     # Close ".org" temporary file
