@@ -96,6 +96,26 @@ ENCRYPTION_POLICY=(
     ('NOT_ENCRYPTED')
 )
 
+DATA_TYPE_CHOICES = (
+    'None',
+    'bool',
+    'int',
+    'float',
+    'long',
+    'basestring',
+    'unicode',
+    'list',
+    'dict',
+    'datetime.datetime',
+    'bson.binary.Binary',
+    'pymongo.objectid.ObjectId',
+    'bson.dbref.DBRef',
+    'bson.code.Code',
+    'type(re.compile(""))',
+    'uuid.UUID',
+    'CustomType'
+)
+
 QUIZ_TYPE_CHOICES_TU = IS(u"Short-Response", u"Single-Choice", u"Multiple-Choice")
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 
@@ -266,16 +286,53 @@ class Node(DjangoDocument):
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
 
-            # On save, set created_at to current date
+            # On save, set "created_at" to current date
             self.created_at = datetime.datetime.today()
 
         self.last_update = datetime.datetime.today()
 
-        history_manager = HistoryManager()
-        rcs_obj = RCS()
+        # Check the fields which are not present in the class structure, 
+        # whether do they exists in their GSystemType's "attribute_type_set";
+        #    If exists, add them to the document
+        #    Otherwise, throw an error -- " Illegal access: Invalid field found!!! "
+        nc = get_database()[Node.collection_name]
+        for key, value in self.iteritems():
+            if key == '_id':
+                continue
+
+            if not self.structure.has_key(key):
+                print "\n Key (not in the structure): ", key
+                print " type(key): ", type(key)
+                print " GSystem Type: ", self.gsystem_type 
+                field_found = False
+                for gst_id in self.gsystem_type:
+                    attribute_set_list = nc.Node.one({'_id': gst_id}).attribute_type_set
+                    
+                    for attribute in attribute_set_list:
+                        # print " type(attribute['name']): ", type(attribute['name'])
+                        # print " type(key) == type(attribute['name']) ? ", (type(key) == type(attribute['name']))
+                        if key == attribute['name']:
+                            field_found = True
+                            print "\n Field exists in the attribute list...\n"
+
+                            # TODO: Check whether type of "value" matches with that of "attribute['data_type']"
+
+                            # Don't continue searching from list of remaining attributes 
+                            break
+
+                    if field_found:
+                        # Don't continue searching from list of remaining gsystem-types 
+                        break
+
+                if not field_found:
+                    print "\n Invalid field(", key, ") found!!!\n"
+                    # Throw an error: " Illegal access: Invalid field found!!! "
         
         super(Node, self).save(*args, **kwargs)
         
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
+
         if is_new:
             # Create history-version-file
             if history_manager.create_or_replace_json_file(self):
@@ -309,7 +366,7 @@ class MetaType(Node):
 class AttributeType(Node):
 
     structure = {
-	'data_type': basestring,		# NoneType in mongokit
+	'data_type': basestring,
         'subject_type': [ObjectId],
 	'applicable_node_type': [basestring],	# NODE_TYPE_CHOICES
 		
@@ -414,12 +471,14 @@ class GSystemType(Node):
     }
     
     use_dot_notation = True
-    
+    use_autorefs = True                         # To support Embedding of Documents
+
     
 @connection.register
 class GSystem(Node):
     """GSystemType instance
     """
+    use_schemaless = True
 
     structure = {
         'gsystem_type': [ObjectId],		# ObjectId's of GSystemType Class  
@@ -431,7 +490,6 @@ class GSystem(Node):
     }
     
     use_dot_notation = True
-    
 
 
 @connection.register
