@@ -4,40 +4,64 @@
 {% block body_content %} 
 {% if user.is_authenticated %}
 
-<div style="padding-top:10px; display:inline-block; width:100%;">
-<a href="">
-  <input type="submit" class="btn btn-large btn-primary" style="float:left;" value="Create a {{title}}" />
-</a>
-
-<a href="{% url 'quiz_item_create' group_name %}">
-  <input type="button" class="btn btn-large btn-primary" style="float:right;" value="+ Add Quiz Item" />
-</a>
+<div class="row" style="padding-top:15px;">
+  <div class="small-6 large-6 columns">
+    <a href="">
+      <input type="submit" class="button small" style="float:left;" value="Create new {{title}} Category" />
+    </a>
+  </div>
+  <div class="small-6 large-6 columns">
+    <a href="{% url 'quiz_item_create' group_name %}">
+      <input type="button" class="button small" style="float:right;" value="+ Add Question" />
+    </a>
+  </div>
+  <hr />
 </div>
 
-<hr />
 {% endif %}
 
 {% load url from future %}
-{% for node in quiz_nodes %}
-  {% if forloop.first %}
-    <h5>Number Of Nodes : {{ quiz_nodes_count }} </h5>
-  {% endif %}
-  <div>
-    <p><strong><a href="">{{ node.name }}</a></strong><br>
-    <!--
-    Created at : {{ node.created_at|date:"j F Y" }}<br>
-    Member Of   : {{ node.member_of }}<br>
-    Tags       : {{ node.tags|join:", " }}<br>
-    <a href="{#% url 'delete_node' node %#}">delete</a>
-    -->
-    </p>
+
+<div class="row">
+  <div class="small-4 columns">
+    {% for node in quiz_nodes %}
+    <div class="row">
+      <div class="small-8 columns">
+	<p><strong><a href="">{{ node.name }}</a></strong></p>
+      </div>
+      <div class="small-4 columns">
+	<input type="button" class="button small" value="+ Add Question" />
+      </div>
+    </div>
+    {% empty %}
+    <div class="row">
+      <div class="small-12 columns">
+	<p>Currently <b>NO Quiz Categories</b> in the gnowledge base!!!</p>
+      </div>
+    </div>
+    {% endfor %}
   </div>
+  <div class="small-8 columns" >
+    <div class="row"  style="padding-left:8px;">
+      <div class="small-12 columns">
+	{% for node in quiz_item_nodes %}
+	<div class="row">
+	  <div class="small-12 columns">
+	    <p><strong><a href="">{{ node.html_content|safe|truncatewords:10 }}</a></strong></p>
+	  </div>
+	</div>
+	{% empty %}
+	<div class="row">
+	  <div class="small-12 columns">
+	    <p>Currently <b>NO Miscellaneous Quiz Questions</b> in the gnowledge base!!!</p>
+	  </div>
+	</div>
+	{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
 
-{% empty %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
-{% endfor %}
-
-<br/>
 
 {% endblock %}
 
