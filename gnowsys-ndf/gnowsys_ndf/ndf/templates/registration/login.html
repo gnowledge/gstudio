@@ -23,12 +23,12 @@
 	<tr>
 		<td>{% trans form.username.label_tag %}</td>
 		<td>{{ form.username }}</td>
-		<td><label class="login-field-icon fui-user" for="login-name"></label></td>
+		<td><i class="fi-torso"></i></td>
 	</tr>
 	<tr>
 		<td>{% trans form.password.label_tag %}</td>
 		<td>{{ form.password }}</td>
-		<td><label class="login-field-icon fui-lock" for="login-pass"></label></td>
+		<td><i class="fi-key"></i></td>
 	</tr>
 	<tr>
 		<td colspan="3">
@@ -38,12 +38,12 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan="3"><input type="submit" class="btn btn-primary btn-large btn-block" value="{% trans "login" %}" /></td>
+		<td colspan="3"><input type="submit" class="button expand" value="{% trans "Login" %}" /></td>
 	</tr>
 	<tr>
 		<td colspan="3"> 
 			{% blocktrans %}
-				Not having account ? <a title="Click here to register" href="{{ register_url }}">Register yourself now.</a> 
+				Don't have an account ? <a title="Click here to register" href="{{ register_url }}">Register yourself now.</a> 
 			{% endblocktrans %}
 		</td>
 	</tr>
