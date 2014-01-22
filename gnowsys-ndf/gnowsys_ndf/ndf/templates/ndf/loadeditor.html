@@ -11,59 +11,47 @@
   <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
 
 
-
-
-<script src="/static/ndf/js/jquery.tools.min.js"></script>
 <script src="/static/ndf/js/loadeditor.js"></script>
  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
 
-<script type="text/javascript">
-$(document).ready(function(){
- $('#orgitdown').orgitdown(mySettings);
+<style type="text/css">
+.orgitdown {
+height:155px;
+width:466px;
+}
+.orgitdownEditor{
+height:100px;
+}
 
-$("#orgitdown").change(function(){
-var content=$('#orgitdown').val()
-$('#editor_content').val(content);
-});
-$("#savecontent").click(function(){
-$(".close").trigger('click');
-});
-});
-</script>
+.orgitdownContainer{
+height:145px;
+width:457px;
+}
 
+#Editor{
+width:530px;
+height=250px;
+top:50px;
+left:645px;
+}
+
+</style>
 
 
 {% endblock %}
 
-<style type="text/css">
 
-div.overlay {
-        width:500px;
-        display:none;
-        color:Blue;
-        padding:10px;
-        background-color:white;
-}
-img{
-position:absolute;
-}
 
-div.overlay a.close {
-        background-image:url("/static/ndf/images/close.png");
-        position:absolute;
-        right:5px;
-        top:5px;
-        cursor:pointer;
-        height:27px;
-        width:27px;
-}
-</style>
-<button rel="#editor" id="loadeditor" type="button" >Click to add content</button>
-</p>
-<div class="overlay" id="editor">
+
+<input type="text"  class="description" data-reveal-id="Editor" placeholder="Please click to add content">
+ 
+
+
+<div id="Editor" class="reveal-modal" data-reveal="">
 
   <textarea id="orgitdown" name="content_org" placeholder="Please enter description..."></textarea>
 
-<input id="savecontent" type="button" value="Save">
+<input type="button" id="save_edit_cont" class="btn btn-primary btn-large btn-block" value="Save">
 
+<a  class="close-reveal-modal">×</a>
 </div>
