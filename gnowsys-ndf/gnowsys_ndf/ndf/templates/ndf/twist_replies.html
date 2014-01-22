@@ -1,58 +1,23 @@
 {% load ndf_tags %}
-{% block head %}
-<script type="text/javascript">
-function addreply(prior_nd)
-{
-  alert(prior_nd);
-var content=$("#editor").val()
-var ajurl="/"+grp+"forum/add_node/"
-$.ajax({
-        url: ajurl,
-        type: 'POST',
-        data: {node:'Reply',supnode:repobj,reply:content,csrfmiddlewaretoken: '{{ csrf_token }}'},
-        beforeSend: function() {
-              $("#ajax_load_image").show();
-              $("#body").css({"opacity":"0.1",})
-                              },
-        success: function(data){
-                if(data=="success")
-                    {
-                       $(".close").trigger('click');
-                    }
-                else
-                    {
-                    alert(data);
-                    $(".close").trigger('click');
-                    }
-           },
-       complete: function(){
-                $("#ajax_load_image").hide();
-                $("#body").css({"opacity":"",})
-          }
-})
 
-}
-</script>
-{% endblock %}
+
 {% block body_content %}
-<style type="text/css">
-#div2
-{
- background-color:#E8E8E8 ;
-}
-#div1
-{
- background-color:#F4F4F4;
-}
+<div class="row">
+<div class="large-12 columns">
+{% include "ndf/replytwistrep.html" %}
+{% get_all_replies reply as replies %}
 
-</style>
-
-<br/> This starts
-	      <div id="twist_replies" > 
-		{% get twist_replies each as twist_repls %} 
-                {% include "ndf/reply_to_reply.html" %}
-	      </div>
-
-
-
+{% for eachrep in replies %}
+ <font size="1" color="darkblue" >
+          {% with eachrep.content|safe as rep_content %}
+              {{rep_content}}
+          {% endwith %}
+</font>
+              
+<div class="large-10 columns">
+		{% get_reply thread eachrep indent csrf_token %}
+              </div>
+{% endfor %}
+</div>
+</div>
 {% endblock %}

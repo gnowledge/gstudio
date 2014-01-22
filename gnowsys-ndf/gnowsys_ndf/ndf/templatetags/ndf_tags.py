@@ -16,10 +16,17 @@ db = get_database()
 
 
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(parent,ind,token):
-  print "token=",token
-  return {'reply': parent,'indent':ind+10,'csrf_token':token}
+def get_reply(thread,parent,ind,token):
+  return {'thread':thread,'reply': parent,'indent':ind+10,'csrf_token':token,'eachrep':parent}
 
+@register.assignment_tag
+def get_all_replies(parent):
+   gs_collection = db[Node.collection_name]
+   ex_reply=""
+   if parent:
+     ex_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}]})
+   print "exrep=",ex_reply.count()
+   return ex_reply
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
@@ -165,11 +172,14 @@ def get_existing_groups_excluded(grname):
 
 @register.assignment_tag
 def get_group_policy(group_name,user):
-  policy = ""
-  col_Group = db[Group.collection_name]
-  colg = col_Group.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
-  if colg:
-    policy = str(colg.sub_policy)
+  try:
+    policy = ""
+    col_Group = db[Group.collection_name]
+    colg = col_Group.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
+    if colg:
+      policy = str(colg.subscription_policy)
+  except:
+    pass
   return policy
 
 '''this template function is used to get the user object from template''' 

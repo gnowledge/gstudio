@@ -1,0 +1,14 @@
+{% load ndf_tags %}
+
+{% get_group_name request.path as group_name %}
+
+{% get_forum_twists forum as twists %}
+{% for each in twists %}
+      <div class="reply{{each}}" id="div1">
+<p>          <a href="/{{group_name}}/forum/thread/{{each}}">{{each.name}}</a></p>
+
+      </div>
+{% endfor %}
+
+
+
