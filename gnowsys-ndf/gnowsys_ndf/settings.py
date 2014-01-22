@@ -202,6 +202,8 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz"]
 
+EMACS_INIT_FILE_PATH = "~/.emacs"
+
 ###########################################################################
 
 """Settings for org-editor-content-to-html
