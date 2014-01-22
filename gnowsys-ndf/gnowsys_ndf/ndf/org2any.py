@@ -11,6 +11,8 @@ from tempfile import NamedTemporaryFile
 from subprocess import call
 import urllib
 
+from gnowsys_ndf.settings import EMACS_INIT_FILE_PATH
+
 ###########################################################################
 
 def org2html(org_content, file_prefix="", file_delete=True):
@@ -40,8 +42,8 @@ def org2html(org_content, file_prefix="", file_delete=True):
     """
             
     # org editor content manipulation for temporary file (".org")
-    org_content_header_for_file = "#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" + "\n#+BIND: org-export-html-auto-postamble nil" + "\n#+TITLE: \n"
-
+    org_content_header_for_file = "\n#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" \
+                                + "\n#+TITLE: \n"
     org_content_for_file = org_content.replace("\r", "")
 
     # Creating a temporary file with ".org" extension 
@@ -59,14 +61,11 @@ def org2html(org_content, file_prefix="", file_delete=True):
     org_file_obj.seek(0)
 
     # Exporting the above created ".org" file to html
-    
+    # Example (filename_html): "/tmp/wiliname-usrname-tmptCd4aq.html"
     ext_html = ".html"
     filename_html = filename_org[:-4] + ext_html
-    # Example (filename_html): "/tmp/wiliname-usrname-tmptCd4aq.html"
     
-    cmd = "emacs --batch " + filename_org + " --eval '(org-export-as-html nil)'"
-    # (org-export-as-html nil)
-    # (setq org-export-html-postamble nil) 
+    cmd = "emacs -l " + EMACS_INIT_FILE_PATH  + " --batch " + filename_org + " --eval '(org-export-as-html nil)'"
     cmd_res = call((cmd + ' </dev/null'), shell=True)
             
     # Close ".org" temporary file
@@ -88,5 +87,7 @@ def org2html(org_content, file_prefix="", file_delete=True):
     end_index = html_data.index("</body>\n")              # Copy data until you reach before </body>\n element
     for line in html_data[start_index:end_index]:
         strip_html_data += line.decode('utf-8').lstrip()
+
+    #strip_html_data = strip_html_data.replace("<a href=\"http://validator.w3.org/check?uri=referer\">Validate XHTML 1.0</a>\n", "")
 
     return strip_html_data
