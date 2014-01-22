@@ -62,10 +62,19 @@ notify(groupn,"remove")
 
 {% block body_content %}
 {% get_group_name request.path as group %}
-<div>
-<font size="4px" color="#BAC1C8"> {{group}} </font>
-</div>
-
+{% if group != "home" %}
+<p>
+<font size="4px" color="#BAC1C8">
+{{groupobj.altnames}}
+</font>
+</p>
+{% else %}
+<p>
+<font size="4px" color="#BAC1C8">
+home
+</font>
+</p>
+{% endif %}
 <font size="2px" color="black"> Members in this group : 0 </font>
 
 {% get_group_policy group request.user as policy %}

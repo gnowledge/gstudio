@@ -1,0 +1,17 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %}{{thread.name}}{% endblock %}
+{% block body_content %}
+
+
+<font size="5" color="green">{{thread.name}}</font>
+{% with thread.content|safe as thread_content %}
+<font size ="2" >{{thread_content}} </font>
+{% endwith %}
+
+<div id="refreshthread">   
+
+{% get_reply thread thread 15 csrf_token %}
+</div>
+
+{% endblock %}
