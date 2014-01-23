@@ -32,52 +32,53 @@
   </div>
 </div>
 
-<div id="node-details-edit-div"> 
+<ul class="nav nav-tabs nav-justified ">
+  <li class="active"><a href="#namedescription" data-toggle="tab"><b>Name and Description</b></a></li>
+  <li><a href="#priornode" data-toggle="tab"><b>Prior Node</b></a></li>
+  <li><a href="#collection" data-toggle="tab"><b>Collection</b></a></li>
+</ul>
 
-  <table cellpadding="5">
-
-    <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:12px;">
-	<h4><strong>Name:</strong></h4>
+<div id="node-details-edit-div" class="tab-content"> 
+  
+  <div class="tab-pane active" id="namedescription">  
+    <table cellpadding="5">
+      <tr>
+      <td style="vertical-align:top; padding-top:12px;">
+	<h4><strong>Name:</strong></h4> 
       </td>
       <td>
-	<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter title">
-      </td>
-    </tr>
-  </table>
-
-  {% block add_fields %} {% endblock %}
-
-  <table cellpadding="5">
-    <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:12px;">
-	<h4><strong>Privacy:</strong></h4>
-      </td>
-      <td>
-	<input type="checkbox" id="private_cb" name="private_cb" />&nbsp;Make it private?<br/>
+	<span style="dislpay:inline; float:left;"><input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter title"></span>
+	<span style="dislpay:inline; float:left;  vertical-align:middle; padding-left:2em;"><h4><strong>Privacy : </strong></h4></span>
+	<span style="dislpay:inline; float:left; padding:5px 1em;"><input type="checkbox" id="private_cb" name="private_cb" />&nbsp;Make it private?<br/></span>
       </td>
     </tr>
 
+    {% block add_fields %} {% endblock %}
+
     <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:20px;">
+      <td style="vertical-align:top; padding-top:20px;">
 	<h4><strong>Description:</strong></h4>
       </td>
       <td>
 	<textarea id="orgitdown" name="content_org" placeholder="Please enter description...">{{node.content_org|default_if_none:""}}</textarea>
       </td>
     </tr>
-
+    
     <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:12px;">
+      <td style="vertical-align:top; padding-top:12px;">
 	<h4><strong>Tag{{node.tags|pluralize|default_if_none:"s"}}:</strong></h4>
       </td>
       <td>
 	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ">
       </td>
     </tr>
+    </table>
+  </div>
 
+  <div class="tab-pane" id="priornode">
+    <table>
     <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:25px;">
+      <td style="vertical-align:top; padding-top:25px;">
 	<h4><strong>Prior Node:</strong></h4>
       </td>
       <td>
@@ -86,9 +87,13 @@
 	</div>
       </td>
     </tr>
+    </table>
+  </div>
 
+  <div class="tab-pane" id="collection">
+    <table>
     <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:10px;">
+      <td style="vertical-align:top; padding-top:10px;">
 	<h4><strong>Collection:</strong></h4>
       </td>
       <td>
@@ -112,14 +117,16 @@
 	</div>
       </td>
     </tr>
-
-  </table>
-  
+    </table>
+  </div>
 </div>
 
-<div style="padding: 20px 0px 20px 280px">
-  <input type="submit" id="save-node" value="Save" class="btn btn-large btn-primary">
+<hr>
+
+<div>
+  <input type="submit" id="save-node" value="Save" class="btn btn-large btn-block btn-primary">
 </div>
+<br/><br/>
 
 </form>
 
