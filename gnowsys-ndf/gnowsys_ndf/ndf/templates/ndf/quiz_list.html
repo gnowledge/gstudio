@@ -12,7 +12,7 @@
   </div>
   <div class="small-6 large-6 columns">
     <a href="{% url 'quiz_item_create_edit' group_name %}">
-      <input type="button" class="button small" style="float:right;" value="+ Add Question" />
+      <input type="button" class="button small" style="float:right;" value="+ Add Miscellaneous Question" />
     </a>
   </div>
   <hr />
@@ -23,15 +23,20 @@
 {% load url from future %}
 
 <div class="row">
-  <div class="small-4 columns">
+  <div class="small-5 columns">
+    <h5>Quiz Catgories</h5>
     {% for node in quiz_nodes %}
     <div class="row">
       <div class="small-8 columns">
-	<p><strong><a href="">{{ node.name }}</a></strong></p>
+	<label class="inline"><strong><a href="{% url 'quiz_details' group_name node %}">{{ node.name }}</a></strong></label>
       </div>
+      {% if user.is_authenticated %}
       <div class="small-4 columns">
-	<input type="button" class="button small" value="+ Add Question" />
+	<a href="{% url 'quiz_item_create_edit' group_name node %}">
+	  <input type="button" class="button small" style="float:right;" value="+ Add Question" />
+	</a>
       </div>
+      {% endif %}
     </div>
     {% empty %}
     <div class="row">
@@ -41,24 +46,21 @@
     </div>
     {% endfor %}
   </div>
-  <div class="small-8 columns" >
-    <div class="row"  style="padding-left:8px;">
+  <div class="small-7 columns" >
+    <h5>Miscellaneous Quiz Questions</h5>
+    {% for node in quiz_item_nodes %}
+    <div class="row" style="padding-left:8px;">
       <div class="small-12 columns">
-	{% for node in quiz_item_nodes %}
-	<div class="row">
-	  <div class="small-12 columns">
-	    <p><strong><a href="{% url 'quiz_item_create_edit' group_name node %}">{{ node.html_content|safe|truncatewords:30 }}</a></strong></p>
-	  </div>
-	</div>
-	{% empty %}
-	<div class="row">
-	  <div class="small-12 columns">
-	    <p>Currently <b>NO Miscellaneous Quiz Questions</b> in the gnowledge base!!!</p>
-	  </div>
-	</div>
-	{% endfor %}
+	<label><strong><a href="{% url 'quiz_item_create_edit' group_name node %}">{{ node.html_content|safe|truncatewords:30 }}</a></strong></label>
       </div>
     </div>
+    {% empty %}
+    <div class="row">
+      <div class="small-12 columns">
+	<p>Currently <b>NO Miscellaneous Quiz Questions</b> in the gnowledge base!!!</p>
+      </div>
+    </div>
+    {% endfor %}
   </div>
 </div>
 

@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 gst_node.member_of.append(u'GAPP')
                 gst_node.modified_by.append(user_id)
                 gst_node.save()
-            elif('ST' not in node_doc.member_of): # it will append 'ST' to already created GSystemType's member_of field
+            elif('GAPP' not in node_doc.member_of):
                 node_doc.member_of.append(u'GAPP')
                 node_doc.save()
                    
@@ -80,7 +80,7 @@ class Command(BaseCommand):
             gs_node.save()
 
         # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
-        quiz_type_id = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Quiz'})._id
+        quiz_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Quiz'})
 
         # Create 'QuizItem' GSystemType, if didn't exists 
         quiz_item_type = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})
@@ -89,7 +89,7 @@ class Command(BaseCommand):
             gs_node.name = u'QuizItem'
             gs_node.created_by = user_id
             gs_node.member_of.append(u"ST")
-            # gs_node.meta_type_set.append(quiz_type_id)
+            # gs_node.meta_type_set.append(quiz_type._id)
             gs_node.save()
 
         quiz_item_type = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})
@@ -143,7 +143,7 @@ class Command(BaseCommand):
             # gs_node.data_type = "datetime.datetime"
             gs_node.data_type = DATA_TYPE_CHOICES[9]   # datetime.datetime
             gs_node.subject_type.append(forum_type._id)
-            gs_node.subject_type.append(quiz_type_id)
+            gs_node.subject_type.append(quiz_type._id)
             gs_node.save()
 
         node_doc = collection.GSystemType.one({'$and':[{'_type': u'AttributeType'},{'name': u'end_time'}]})
@@ -156,8 +156,13 @@ class Command(BaseCommand):
             # gs_node.data_type = "datetime.datetime"
             gs_node.data_type = DATA_TYPE_CHOICES[9]   # datetime.datetime
             gs_node.subject_type.append(forum_type._id)
-            gs_node.subject_type.append(quiz_type_id)
+            gs_node.subject_type.append(quiz_type._id)
             gs_node.save()
+
+        # Append start_time & end_time to attribute_type_set of 'Quiz'
+        quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'start_time'}))
+        quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'}))
+        quiz_type.save()
 
 
         # --- End of handle() ---
