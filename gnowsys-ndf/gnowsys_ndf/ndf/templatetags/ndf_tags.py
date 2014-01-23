@@ -39,18 +39,20 @@ def edit_drawer_widget(field, group_name, node, checked=""):
 
   if node :
     if field == "collection":
-      #drawers = get_drawers(node._id, node.collection_set, checked)
+      if checked == "Quiz":
+        checked = "QuizItem"
       drawers = get_drawers(group_name, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
-      #drawers = get_drawers(node._id, node.prior_node, checked)
       drawers = get_drawers(group_name, node._id, node.prior_node, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
 
   else:
-    drawer1 = get_drawers(group_name)
+    if field == "collection" and checked == "Quiz":
+      checked = "QuizItem"
+    drawer1 = get_drawers(group_name, None, [], checked)
 
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
 
@@ -60,9 +62,12 @@ def get_gapps_menubar(group_name):
   """
   gst_collection = db[GSystemType.collection_name]
   gst_cur = gst_collection.GSystemType.find({'$and':[{'_type':'GSystemType'},{'member_of':'GAPP'}]})
+
   gapps = {}
+  i = 0;
   for app in gst_cur:
-    gapps[app._id] = app.name.lower()
+    i = i+1;
+    gapps[i] = {'id': app._id, 'name': app.name.lower()}
 
   return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'group_name': group_name}
 
