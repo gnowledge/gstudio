@@ -1,9 +1,10 @@
-
+ 
 <!-- GApps Menubar -->
 
-{% for app_id, app_name in gapps.items %}
+{% for index_key, app_dict in gapps.items %}
   <li>
-    <a href="{% url app_name group_name app_id %}">{{app_name|title}}</a>
+    <a href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
   </li>
 {% endfor %}
+
 <!-- ============= -->

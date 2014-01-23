@@ -57,19 +57,25 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     if checked:     
       if checked == "Page":
         # drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'gsystem_type': {'$all': [ObjectId(gst_page._id)]}, 'group_set': {'$all': [group_name]}})
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'group_set': {'$all': [group_name]}})
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Page']}, 'group_set': {'$all': [group_name]}})
         
       elif checked == "File":         
-        #drawer = gs_collection.GSystem.find({'_type': u"File", 'group_set': {'$all': [group_name]}})
-        drawer = gs_collection.GSystem.find({'_type': u"File"})
+        drawer = gs_collection.GSystem.find({'_type': u"File", 'group_set': {'$all': [group_name]}})
+        # drawer = gs_collection.GSystem.find({'_type': u"File"})
         
       elif checked == "Image":         
-        #drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg", 'group_set': {'$all': [group_name]}})
-        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg"})
+        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg", 'group_set': {'$all': [group_name]}})
+        # drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg"})
+
+      elif checked == "Quiz":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Quiz']}, 'group_set': {'$all': [group_name]}})
+
+      elif checked == "QuizItem":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'QuizItem']}, 'group_set': {'$all': [group_name]}})
 
     else:
       drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
-           
+
     
     if (nid is None) and (not nlist):
       for each in drawer:   
@@ -133,6 +139,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       dict_drawer['2'] = dict2
 
     return dict_drawer
+
 
 def get_node_common_fields(request, node, group_name, node_type):
   """Updates the retrieved values of common fields from request into the given node.
