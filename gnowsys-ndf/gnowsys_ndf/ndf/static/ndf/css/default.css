@@ -13,6 +13,20 @@ nav.top-bar .has-dropdown .button{ /* Needs testing */
 
 /* End Foundation hacks */
 
+/* Theme */
+.top-bar{
+	background-color: #1d293f;
+}
+.top-bar-section li:not(.has-form) a:not(.button){
+	background-color: #1d293f;
+}
+.top-bar-section li:not(.has-form) a:not(.button):hover{
+	background-color: #253544;
+}
+.top-bar-section .has-form{
+	background-color: #1d293f;
+}
+
 /* Card block */
 li.card a{
 	margin:2px;

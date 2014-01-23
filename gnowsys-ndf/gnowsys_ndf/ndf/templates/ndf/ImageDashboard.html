@@ -15,59 +15,35 @@
 {% endif %}
 {% get_group_name request.path as group_name %}
 
-<center>
-  <div style='display:table; padding-top:20px'>
-    <div style='display:table-row;'>
-      <div style='display:table-cell; padding-left:5px'>
-	<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
-	  <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
-	  <input type="submit" class="btn btn-large btn-primary" value="search" />
-	</form> 
-      </div>
-      <div style='display:table-cell; padding-left:5px'>
-	  <a class="btn btn-large btn-primary"  href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
-  	   Upload
-	  </a>
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
+  <div class="row"  style="padding-top:20px">
+    <div class="large-7 columns">
+      <div class="row collapse">
+	  <div class="small-8 columns">
+            <input type="text" placeholder="search images" name="search">
+	  </div>
+	  <div class="small-2 columns">
+            <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
+	      <i class="fi-magnifying-glass large">search</i>
+	    </a>
+	  </div>
+	  <div class="small-2 columns">
+            <a href="{% url 'uploadDoc' group_name %}?next={{request.path}}" class="button postfix secondary">
+	      <i class="fi-paperclip">upload</i>
+	    </a>
+	  </div>
       </div>
     </div>
   </div>
-</center>
-<hr />
+</form>
 
-<div style='display:table;' >
-	<div style='display:table-row;' >
-		{% for image in imageCollection %}
-			<div style='display:table-cell; padding-left:25px'> 
-				<a href="{% url 'image_detail' group_name image %}">
-				<img src="{% url 'getImageThumbnail' group_name image %}"></img><br/>
-				<span align="left">{{image.name}}</span></a>
-				{% get_user_object image.created_by as user_obj %}
-				{% ifequal  user_obj.username  user.username  %}
-				<a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group_name' image %}?next={{request.path}}">Delete </a>
-				{% endifequal %}
-			</div>
-	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}
-			</div>
-			<div style='display:table-row;' >
-			{% endif %}
-		{% endfor %} 	
-	</div>
-			
-</div>
-
-<!--
-<div class="gallery-wrap exhibitionrepeater">
+<ul class="clearing-thumbs" data-clearing>
   {% for image in imageCollection %}
-  <div class="gallery-item-group exitemrepeater">
+  <li>
     <a href="{% url 'getFullImage' group_name image %}">
-      <img class="picture" src="{% url 'getImageThumbnail' group_name image %}"></img>
+      <img src="{% url 'getImageThumbnail' group_name image %}"  class="th" data-caption="<a href='{% url 'image_detail' group_name image %}'>{{image.name}}</a>"></img>
     </a>
-    <div class="gallery-item-caption">
-      <p>
-	<a href="{{image.name}}"></a>
-      </p>
-    </div>
-  </div>
+  </li>
   {% endfor %}
-</div>-->
+</ul> 	
 {% endblock %}
