@@ -18,7 +18,7 @@ if (tw_name != "")
 {
 var grp=$("#grptxt").val();
 var forum=$("#forum").val();
-var thd = ""
+var thd = "";
 $("#thread_name").val("");
 var ajurl="/"+grp+"/forum/add_node/"
 
@@ -31,10 +31,8 @@ $.ajax({
               $("#body").css({"opacity":"0.1",})
                               },
         success: function(data){
-                       $('#twistd').html(data);
-                        $('a.close-reveal-modal').trigger('click');
-                      
-      
+                       $('#thread').html(data);
+                      $('a.close-reveal-modal').trigger('click');
            },
        complete: function(){
                     $("#ajax_load_image").hide();
