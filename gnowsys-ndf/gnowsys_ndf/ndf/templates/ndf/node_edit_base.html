@@ -6,14 +6,44 @@
 
 {% block head %}
 
-  <!-- orgitdown! -->
-  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
-  <!-- orgitdown! toolbar settings -->
-  <script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
-  <!-- orgitdown! toolbar skin -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
-  <!-- orgitdown! skin -->
-  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+<!-- orgitdown! -->
+<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+<!-- orgitdown! toolbar settings -->
+<script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+<!-- orgitdown! toolbar skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+<!-- orgitdown! skin -->
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+
+{% endblock %}
+
+{% block style %}
+
+	.divider-line { font-size: xx-large; color:lightgray; }
+	.line-height-2 { line-height:2; }
+	.line-height-2pt5 { line-height:2.5; }
+	.fontsize-x-large { font-size: x-large; }
+
+	.margin-0 { margin: 0 !important ;}
+
+	.resource-drawer { 
+		border-color: #D3D3D3; border-style: solid; 
+		padding: 0 !important; 
+		overflow-y: auto;
+	}
+
+	.resource-drawer li.bullet-item:hover{
+		background-color: #ecf0f1; cursor:pointer;
+	}
+
+	.posted-by{ color: #808080; font-size: small; }
+
+	.selected-resource { background-color:lightgray !important ; }
+
+	.resource-type-image {
+		height:40px; 		
+		background-repeat:no-repeat; background-size: 48px 48px
+	}
 
 {% endblock %}
 
@@ -22,187 +52,202 @@
 <form id="form-edit-node" method="POST" action="">
 {% csrf_token %}
 
-<div style="display:inline-block;">
-  <div style="display:inline-block; float:left; margin:0.8em 0.8em 0.8em 0;">
-    {% if node %}
-    <h2>{{node.name}}</h2>
-    {% else %}
-    <h2>Create...</h2>
-    {% endif %}
-  </div>
+<div>
+{% if node %}
+<h2>{{node.name}}</h2>
+{% else %}
+<h2>Create one now</h2>
+{% endif %}
 </div>
 
-<div id="node-details-edit-div"> 
+<dl class="tabs" data-tab>
+<dd title="Click here to add Name, Description, Privacy and Tags">
+<a href="#panel-name-description"><h5><b> Name and Description </b></h5></a>
+</dd>
+<dd title="Click here to add/edit Prior Node">
+<a href="#panel-prior-node"><h5><b> Prior Node </b></h5></a>
+</dd>
+<dd class="active" title="Click here to add/edit collection">
+<a href="#panel-collection"><h5><b> Collection </b></h5></a>
+</dd>  
+</dl>
+<br/>
 
-  <table cellpadding="5">
+<div id="node-details-edit-div" class="tabs-content" > 
 
-    <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:12px;">
-	<h4><strong>Name:</strong></h4>
-      </td>
-      <td>
-	<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter title">
-      </td>
-    </tr>
-  </table>
+<div class="content" id="panel-name-description"  style="width:95%;">
 
-  {% block add_fields %} {% endblock %}
-
-  <table cellpadding="5">
-    <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:12px;">
-	<h4><strong>Privacy:</strong></h4>
-      </td>
-      <td>
-	<input type="checkbox" id="private_cb" name="private_cb" />&nbsp;Make it private?<br/>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:20px;">
-	<h4><strong>Description:</strong></h4>
-      </td>
-      <td>
-	<textarea id="orgitdown" name="content_org" placeholder="Please enter description...">{{node.content_org|default_if_none:""}}</textarea>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:12px;">
-	<h4><strong>Tag{{node.tags|pluralize|default_if_none:"s"}}:</strong></h4>
-      </td>
-      <td>
-	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ">
-      </td>
-    </tr>
-
-    <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:25px;">
-	<h4><strong>Prior Node:</strong></h4>
-      </td>
-      <td>
-	<div id="prior_node_drawer">
-	  {% edit_drawer_widget "prior_node" group_name node %}
-	</div>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="text-align:right; vertical-align:top; padding-top:10px;">
-	<h4><strong>Collection:</strong></h4>
-      </td>
-      <td>
-        <div style="padding-left:3px">
-	{% if node.collection_set %}
-	  <input type="checkbox" id="collection_cb" name="collection_cb" checked="checked" />&nbsp;Do you want to create a collection?<br/>
-	{% else %}
-	  <input type="checkbox" id="collection_cb" name="collection_cb" />&nbsp;Do you want to create a collection?<br/>
-	{% endif %}
-	</div>
-	
-	<div id="SelectApp" style="display:none; height: 50px"> 
-            <br/>&nbsp;&nbsp;
-            <input type="radio" name="col" value="Page" checked/>&nbsp;Page &nbsp;
-            <input type="radio" name="col" value="File" />&nbsp;File &nbsp;
-            <input type="radio" name="col" value="Image" />&nbsp;Image &nbsp;
-	</div>
-	
-	<div id="collection_drawer">
-	  {% edit_drawer_widget "collection" group_name node %}
-	</div>
-      </td>
-    </tr>
-
-  </table>
-  
+<div class="row">
+<div class="small-3 columns text-right">
+<h5>Name : </h5>
+</div>
+<div class="small-4  small-offset-5 small-pull-5 columns">
+<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter the title">
+</div>
 </div>
 
-<div style="padding: 20px 0px 20px 280px">
-  <input type="submit" id="save-node" value="Save" class="btn btn-large btn-primary">
+<div class="row">
+<div class="small-3 columns text-right">
+<h5>Privacy : </h5>
+</div>
+<div class="small-4 small-offset-5 small-pull-5 columns line-height-2">
+<input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
+</div>
+</div>
+<br/>
+
+<div class="row">
+<div class="small-3 columns text-right">
+<h5>Description : </h5>
+</div>
+<div class="small-9 columns">
+<textarea id="orgitdown" name="content_org" placeholder="Please enter description here.">{{node.content_org|default_if_none:""}}</textarea>				
+</div>
+</div>
+<br/>
+
+<div class="row">
+<div class="small-3 columns text-right">
+<h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
+</div>
+<div class="small-4 small-offset-5 small-pull-5 columns">
+<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ">
+</div>
+</div>
+</div>
+
+<div class="content" id="panel-prior-node"  style="width:95%;">
+<div class="row">
+<div class="small-12 columns">
+<h5>Add or edit Prior Node : </h5>
+</div>
+<br/>
+
+<div class="small-12 columns">
+<div id="prior_node_drawer">
+{% edit_drawer_widget "prior_node" group_name node %}
+</div>
+</div>
+</div>
+</div>
+
+<div class="content active" id="panel-collection"  style="width:95%;">
+<div class="row">
+<div class="small-12 columns">
+<h5>Add or edit Collection : </h5>
+</div>				
+<br/><br/>
+
+<div class="small-12 columns">
+<div id="SelectApp" class="row">
+<div class="small-2 columns line-height-2pt5">
+Classify by :
+</div>
+<div class="small-2 columns">
+<input type="radio" name="col" value="Page" />
+Page <span class="divider-line">|</span>
+<span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
+</div>
+<div class="small-2 columns">
+<input type="radio" name="col" value="File" />
+File <span class="divider-line">|</span>
+<span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
+</div>
+<div class="small-2 small-pull-4 columns">
+<input type="radio" name="col" value="Image" />
+Image <span class="divider-line">|</span>
+<span class="fontsize-x-large"><i class="step fi-photo"></i>
+</span>
+</div>
+</div>
+</div>
+
+<div class="small-12 columns">
+<div id="collection_drawer" >
+{% edit_drawer_widget "collection" group_name node %}
+</div>
+</div>
+</div>
+<br/>
+
+</div>
+
+</div>
+
+{% block add_fields %} {% endblock %}
+
+<div class="row" >
+<input type="submit" id="save-node" value="Save" class="button small-10 small-push-1 column"/>
 </div>
 
 </form>
 
 <script type="text/javascript">
 
-if ( $("#collection_cb").prop("checked") ) {
-    $("#collection_drawer").css("display", "block")
-    $("#SelectApp").css("display", "block")
-}
-else {
-    $("#collection_drawer").css("display", "none")
-    $("#SelectApp").css("display", "none")
-}
+$("input:radio").click(function() 
+{
+	// For collection
+	c_opts = $("#collection_drawer2 b");        
+	c_len = c_opts.length;
 
-$("#collection_cb").change(function() {
-    if (this.checked) {        
-        $("#collection_drawer").css("display", "block")
-        $("#SelectApp").css("display", "block")       
-    }
-    else{
-        $("#collection_drawer").css("display", "none")
-        $("#SelectApp").css("display", "none")
-    }
-});
+	c_arr = [];
+	for (var i = 0; i < c_len; i++) {
+		c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
+	}
+	var c_list = c_arr.join(',');   
 
+	$.ajax({
+		type: "POST",
+		url: "{% url 'select_drawer' group_name %}",
+		datatype: "html",
+		data:{
+			homo_collection: this.value,
+			collection_list: c_list,
+			csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				$("#collection_drawer").html(data);
+			}
+			});
 
-$("input:radio").click(function() {
-    // For collection
-    c_opts = collection_drawer2.options;
-    c_len = c_opts.length;
-    var c_arr = [];
-    for (var i = 0; i < c_len; i++) {
-        c_arr[i] = "'" + c_opts[i].value + "'";
-    }
-    var c_list = c_arr.join(",");
-
-    $.ajax({
-        type: "POST",
-        url: "{% url 'select_drawer' group_name %}",
-        datatype: "html",
-        data:{
-            homo_collection: this.value,
-            collection_list: c_list,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function(data) {
-            $("#collection_drawer").html(data);
-        }
-    });
-});
+	});
 
 
 $(document).ready(function() {
-    // Must be there to display org-editor shortcuts
-    $("#orgitdown").orgitdown(mySettings);
-});
+	// Must be there to display org-editor shortcuts
+	$("#orgitdown").orgitdown(mySettings);
+	});
 
 
 $("#save-node").click(function() {
-    // -- For prior-node
-    pn_opts = prior_node_drawer2.options;
-    pn_len = pn_opts.length;
-    var pn_arr = [];
-    for (var i = 0; i < pn_len; i++) {
-    	pn_arr[i] = "'" + pn_opts[i].value + "'";
-    }
-    var pn_list = pn_arr.join(',');
-    $("#prior_node_list").val(pn_list)
-    
-    // -- For collection
-    c_opts = collection_drawer2.options;
-    c_len = c_opts.length;
-    var c_arr = [];
-    for (var i = 0; i < c_len; i++) {
-        c_arr[i] = "'" + c_opts[i].value + "'";
-    }
-    var c_list = c_arr.join(',');
-    $("#collection_list").val(c_list)
+	
+	// For prior-node
+	pn_opts = $("#prior_node_drawer2 b");
+	pn_len = pn_opts.length;
 
-    {% block base_save_on_click %}{% endblock %}
-});
+	var pn_arr = [];
+	for (var i = 0; i < pn_len; i++) {
+		pn_arr[i] = "'" + pn_opts[i].innerHTML.trim() + "'";
+	}
+	var pn_list = pn_arr.join(',');
+	$("#prior_node_list").val(pn_list)
+
+	// For collection
+	c_opts = $("#collection_drawer2 b");
+	c_len = c_opts.length;
+
+	c_arr = [];
+	for (var i = 0; i < c_len; i++) {
+		c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
+	}
+	var c_list = c_arr.join(',');
+
+	$("#collection_list").val(c_list)
+
+
+	{% block base_save_on_click %}{% endblock %}
+	});
 
 </script>
 
 {% endblock %}
-
