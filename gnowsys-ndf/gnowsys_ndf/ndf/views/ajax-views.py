@@ -66,7 +66,7 @@ def select_drawer(request, group_name):
                                       },
                                       context_instance=RequestContext(request)
             )
-            
+          
         else:
             
             drawer = get_drawers(group_name, None, None, checked)   
@@ -78,3 +78,4 @@ def select_drawer(request, group_name):
                                       }, 
                                       context_instance=RequestContext(request)
             )
+            
