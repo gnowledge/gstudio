@@ -45,6 +45,12 @@ class Command(BaseCommand):
             gs_node.name = u'home'
             gs_node.created_by = user_id
             gs_node.member_of.append(u"Group")
+            gs_node.disclosure_policy=u'DISCLOSED_TO_MEM'
+            gs_node.subscription_policy=u'OPEN'
+            gs_node.visibility_policy=u'ANNOUNCED'
+            gs_node.encryption_policy=u'NOT_ENCRYPTED'
+            gs_node.group_type=u'PRIVATE'
+            gs_node.edit_policy =u'NON_EDITABLE'
             gs_node.save()
         a=collection.GSystemType.find({'$and':[{'_type':'AttributeType'},{'name':'start_time'}]})
         forumtype=collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':'Forum'}]})
