@@ -75,13 +75,14 @@ within it; and also perform following steps:
   	NOTE:
   		(1) For more information visit - "https://pypi.python.org/pypi/python-magic/0.4.6"
  
-  Install Python Imaging Library(PIL) : pip install PIL
+  Install Python Imaging Library(PIL) : pip install PIL or pip install pillow 
   	NOTE:
   		(1) For more information visit - "http://www.pythonware.com/products/pil/"
 
   		(2) If you get error (like, "IOError: decoder jpeg/zip not available!"), try following:
           - Install libjpeg-dev with apt: sudo apt-get install libjpeg-dev
           - Reinstall PIL: pip install -I PIL 
+	    
 
  	
  Install Python ox : pip install ox

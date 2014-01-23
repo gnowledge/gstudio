@@ -2,12 +2,23 @@
 {% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 {% block body_content %} 
-<div style='padding-top:10px;'>
-  <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url view_name  group_name %}">
-    <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
-    <input type="submit" class="btn btn-large btn-primary" value="search" />
-  </form> 
-</div>
+
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url view_name  group_name %}">
+  <div class="row"  style="padding-top:20px">
+    <div class="large-6 columns">
+      <div class="row collapse">
+	<div class="small-10 columns">
+          <input type="text" placeholder="search images" name="search">
+	</div>
+	<div class="small-2 columns">
+          <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
+	    <i class="fi-magnifying-glass large">search</i>
+	  </a>
+	</div>
+      </div>
+    </div>
+  </div>  
+</form> 
 <hr />
 <div name="search">
   {% for file in file_collection %}
