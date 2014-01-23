@@ -34,7 +34,8 @@ def get_forum_repl_type(forrep_id):
           return "None"
 def check_existing_group(groupname):
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find({'_type': u'Group', "name":groupname})
+  gpn=slugify(groupname)
+  colg = col_Group.Group.find({'_type': u'Group', "name":gpn})
   if colg.count() >= 1:
     return True
   else:
@@ -71,28 +72,62 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
            
     
     if (nid is None) and (not nlist):
-      for each in drawer:
-        dict_drawer[each._id] = each.name
+      for each in drawer:   
+        user = User.objects.get(pk=each.created_by).username 
+        content = each.content_org        
+        if content != None:
+            content = content[:100] 
+        else: 
+            content = u"No description !"
+            
+        dict_drawer[each._id] = [each.name, user, each.created_at, content]
 
     elif (nid is None) and (nlist):
       for each in drawer:
         if each._id not in nlist:
-          dict1[each._id] = each.name
+          user = User.objects.get(pk=each.created_by).username
+          content = each.content_org        
+          if content != None:
+            content = content[:100] 
+          else: 
+            content = u"No description."
+            
+          dict1[each._id] = [each.name, user, each.created_at, content]
 
-      for oid in nlist:          
-        dict2[oid] = gs_collection.GSystem.one({'_id': oid}).name
+      for oid in nlist: 
+        obj = gs_collection.GSystem.one({'_id': oid})
+        user = User.objects.get(pk=obj.created_by).username
+        content = obj.content_org        
+        if content != None:
+            content = content[:100] 
+        else: 
+            content = u"No description."
+                 
+        dict2[oid] = [obj.name, user, obj.created_at, content]
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
-    
+        
     else:
       for each in drawer:
         if each._id != nid:
-          if each._id not in nlist:
-            dict1[each._id] = each.name
+          user = User.objects.get(pk=each.created_by).username
+          content = each.content_org  
+          if each._id not in nlist:                    
+            if content != None:
+                content = content[:100] 
+            else: 
+                content = u"No description."
+            
+            dict1[each._id] = [each.name, user, each.created_at, content]
           
-          else:
-            dict2[each._id] = each.name
+          else:            
+            if content != None:
+                content = content[:100] 
+            else: 
+                content = u"No description."
+                
+            dict2[each._id] = [each.name, user, each.created_at, content]
       
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -112,7 +147,7 @@ def get_node_common_fields(request, node, group_name, node_type):
   private = request.POST.get("private_cb", '')
   tags = request.POST.get('tags')
   prior_node_list = request.POST['prior_node_list']
-  collection = request.POST.get("collection_cb", '')
+  collection_list = request.POST['collection_list']
   content_org = request.POST.get('content_org')
 
   # --------------------------------------------------------------------------- For create only
@@ -147,26 +182,24 @@ def get_node_common_fields(request, node, group_name, node_type):
   
   i = 0
   while (i < len(prior_node_list)):
-    pn_name = prior_node_list[i]
-    pn_name = pn_name.replace("'", "")
-    node.prior_node.append(gs_collection.GSystem.one({'_type': u'GSystem', 'name': pn_name})._id)
+    pn_name = prior_node_list[i]    
+    pn_name = pn_name.replace("'", "")        
+    objs = gs_collection.GSystem.one({'_type': {'$in' : [u"GSystem", u"File"]}, 'name': pn_name})       
+    node.prior_node.append(objs._id)    
     i = i+1
 
   # -------------------------------------------------------------------------------- collection
-  if collection:
-    collection_list = request.POST['collection_list']
-    node.collection_set = []
-      
-    if collection_list != '':
+  node.collection_set = []
+  if collection_list != '':
       collection_list = collection_list.split(",")
 
-    i = 0                    
-    while (i < len(collection_list)):                    
-      c_name = collection_list[i]
-      c_name = c_name.replace("'", "")
-      objs = gs_collection.GSystem.one({'name': c_name})
-      node.collection_set.append(objs._id)
-      i = i+1
+  i = 0                    
+  while (i < len(collection_list)):                    
+    c_name = collection_list[i]    
+    c_name = c_name.replace("'", "")
+    objs = gs_collection.GSystem.one({'_type': {'$in' : [u"GSystem", u"File"]}, 'name': c_name})
+    node.collection_set.append(objs._id)
+    i = i+1
       
   # ------------------------------------------------------------------------------- org-content
   node.content_org = unicode(content_org)

@@ -16,45 +16,42 @@
 {% get_group_name request.path as group_name %}
 
 
-<center>
-  <div style='display:table; padding-top:20px'>
-    <div style='display:table-row;'>
-      <div style='display:table-cell; padding-left:5px'>
-	<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'video_search' group_name %}">
-	  <input type="text" style="width:400px" placeholder="Enter keyword to search" name="search" />
-	  <input type="submit" class="btn btn-large btn-primary" value="search" />
-	</form> 
-      </div>
-      <div style='display:table-cell; padding-left:5px'>
-	  <a class="btn btn-large btn-primary"  href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
-  	   Upload
-	  </a>
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
+  <div class="row"  style="padding-top:20px">
+    <div class="large-7 columns">
+      <div class="row collapse">
+	  <div class="small-8 columns">
+            <input type="text" placeholder="search images" name="search">
+	  </div>
+	  <div class="small-2 columns">
+            <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
+	      <i class="fi-magnifying-glass large">search</i>
+	    </a>
+	  </div>
+	  <div class="small-2 columns">
+            <a href="{% url 'uploadDoc' group_name %}?next={{request.path}}" class="button postfix secondary">
+	      <i class="fi-paperclip">upload</i>
+	    </a>
+	  </div>
       </div>
     </div>
   </div>
-</center>
-<hr />
+</form>
 
-<div style='display:table;' >
-	<div style='display:table-row;' >
-		{% for video in videoCollection %}
-			<div style='display:table-cell; padding-left:25px'> 
-				<a class="video" id="{{video}}" href="#">
-				<img src="{% url 'getvideoThumbnail' group_name video %}" style="border-radius:10px;"></img><br/>
-				<span align="left">{{video.name}}</span></a>
-				{% get_user_object video.created_by as user_obj %}
-				{% ifequal  user_obj.username  user.username  %}
-				<a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group' video %}?next={{request.path}}">Delete </a>
-				{% endifequal %}
-			</div>
-	     		{% if not forloop.last and forloop.counter|divisibleby:"6" %}
-			</div>
-			<div style='display:table-row;' >
-			{% endif %}
-		{% endfor %} 	
-	</div>
-			
-</div>
+<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-6">
+  {% for video in videoCollection %}
+  <li>
+    <a class="video" id="{{video}}" href="#">
+      <img src="{% url 'getvideoThumbnail' group_name video %}" style="border-radius:10px;"></img>
+      <span align="left">{{video.name}}</span>
+    </a>
+    {% get_user_object video.created_by as user_obj %}
+    {% ifequal  user_obj.username  user.username  %}
+    <a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group' video %}?next={{request.path}}">Delete </a>
+    {% endifequal %}
+    </li>
+  {% endfor %}
+</ui>
 {% endblock %}
 {% block extra_content %} 
 
