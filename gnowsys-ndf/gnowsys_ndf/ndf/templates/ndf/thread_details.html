@@ -24,7 +24,9 @@ padding-left:5px;
 {% endwith %}
 </div>
 <div id="smalldiv" class="large-6 columns">
-{% include "ndf/replytwistrep.html" %}
+	 {% if user.is_authenticated %}
+	 {% include "ndf/replytwistrep.html" %}
+	 {% endif %}
 </div>
 
 
