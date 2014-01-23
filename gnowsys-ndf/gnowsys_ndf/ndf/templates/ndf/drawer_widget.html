@@ -1,119 +1,261 @@
+<br/><br/>
 
-  <table cellpadding="3" style="width:500px;">
-    <tr>
-      <td colspan="3">
-      	<input type="text" id="{{widget_for}}_search" style="width:290px;" placeholder="Search in From Drawer">
-      </td>
-    </tr>
+<div>
 
-    <tr>
-      <td style="width:160px;">
-      	<div style="padding-bottom:8px"><b>From Drawer:</b></div>
-      	<select id="{{widget_for}}_drawer1" multiple="multiple" style="width: 300px; height: 200px;">    <!---->
-	  {% if drawer1 != "None" %}
-    	  {% for key, value in drawer1.items %}
-      	  <option id={{key}} style="height:50px; background-image: url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); background-repeat:no-repeat; background-position:left; padding-left:50px; background-size: 50px 50px">{{value}}</option>
-    	  {% endfor %}
-	  {% endif%}
-      	</select>
-      </td>
-	  
-      <td style="width:50px; text-align:center; vertical-align:middle;">
-      	<input id="{{widget_for}}_btnUp" type="button" style="width:50px; height:30px;" value ="  ^  "><br/><br/>
-      	<input id="{{widget_for}}_btnRight" type="button" style="width:50px; height:30px;" value ="  >  "><br/><br/>
-      	<input id="{{widget_for}}_btnLeft" type="button" style="width:50px; height:30px;" value ="  <  "><br/><br/>
-      	<input id="{{widget_for}}_btnDown" type="button" style="width:50px; height:30px;" value ="  v  "><br/>
-      </td>
-	  
-      <td style="width:160px;">
-      	<div style="padding-bottom:8px"><b>To Drawer:</b></div>
-      	<select id="{{widget_for}}_drawer2" multiple="multiple" style="width: 300px; height: 200px;">
-	  {% if drawer2 != "None" %}
-    	  {% for key, value in drawer2.items %}
-	  <option id={{key}} style="height:50px; background-image:url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); background-repeat:no-repeat; background-position:left; padding-left:50px; background-size: 50px 50px">{{value}}</option>
-	  {% endfor %}
-	  {% endif %}
-	</select>
-      </td>
-    </tr>
-  </table>
+  <!-- Title only row -->
+  <div class="row">
+    <div class="small-5 columns">
+      Select from following resources :
+    </div>
+
+    <div class="small-5 columns">
+      Add selected to following Collection : 
+    </div>
+  </div>  
+  <br/>
+  
+
+  <!-- Row containing LHS Resources and middle Navigation and RHS Collection -->
+  <div class="row">
+
+    <!-- LHS Resources drawer -->
+    <div class="small-6 columns resource-drawer">
       
-  <input id="{{widget_for}}_list" type="hidden" name="{{widget_for}}_list" value="" />
+      <ul class="pricing-table" id="{{widget_for}}_drawer1">        
 
-<!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- Searchbox as first li in the  Resources drawer -->
+        {% if drawer1 != "None" %}
+        <li class="price">
+          <input type="text" class="margin-0" id="{{widget_for}}_search" placeholder="Type here to search in the resources"/>
+        </li>
+
+        {% for key, value in drawer1.items %}
+
+        <li class="bullet-item text-left" value={{key}} > 
+
+          <div class="row">
+            <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); ">
+            </div>
+
+            <div class="small-11 columns">
+
+              <div class="row">
+                <div class="small-5 columns">
+                  &nbsp;&nbsp; <b> {{value.0}} </b>   
+                </div>                
+                <div class="small-7 columns text-right">
+                  <i class="posted-by" > By : {{value.1}} on {{value.2}} </i>
+                </div>     
+              </div>
+
+              <div class="row">
+                <div class="small-12 columns text-left" style="padding-top:0.5rem;">
+                  {% if value.3|length > 90 %}
+                  &nbsp;&nbsp; {{value.3}}. . .
+                  {% else %}
+                  &nbsp;&nbsp; {{value.3}}
+                  {% endif %}        
+                </div>  
+              </div>
+            </div>
+          </div>
+
+        </li>
+        {% endfor %}
+        
+        {% else %}  
+        <li class="bullet-item" > <i>No content of selected type ! </i> </li>
+        {% endif %}
+
+      </ul>
+      
+    </div>
+
+    <!-- For arrows Up, Down, Left, Right -->
+    <div class="small-1 columns  text-center" id="">
+
+     <input id="{{widget_for}}_btnUp" type="button" style="width:50px; height:30px;" value ="  ^  "><br/>
+     <input id="{{widget_for}}_btnRight" type="button" style="width:50px; height:30px;" value ="  >  "><br/>
+     <input id="{{widget_for}}_btnLeft" type="button" style="width:50px; height:30px;" value ="  <  "><br/>
+     <input id="{{widget_for}}_btnDown" type="button" style="width:50px; height:30px;" value ="  v  "><br/>    
+     
+   </div>
+
+   <!-- For collection created on RHS -->
+   <div class="small-5 columns resource-drawer">
+
+    <ul class="pricing-table" id="{{widget_for}}_drawer2">        
+      {% if drawer2 != "None" %}
+
+      {% for key, value in drawer2.items %}
+      <li class="bullet-item" value={{key}} > 
+
+        <div class="row">
+          <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); ">
+          </div>
+
+          <div class="small-11 columns">
+
+            <div class="row">
+              <div class="small-5 columns text-left">
+                &nbsp;&nbsp; <b> {{value.0}} </b>   
+              </div>                
+              <div class="small-7 columns">
+                <i class="posted-by" >By:{{value.1}} on {{value.2}}</i>
+              </div>     
+            </div>
+
+            <div class="row">
+              <div class="small-12 columns text-left">
+                {% if value.3|length > 90 %}
+                &nbsp;&nbsp; {{value.3}}. . .
+                {% else %}
+                &nbsp;&nbsp; {{value.3}}
+                {% endif %}        
+              </div>  
+            </div>
+          </div>
+        </div>
+
+      </li>
+      {% endfor %}
+
+      {% endif %}
+    </ul>
+
+  </div>
+  <!-- End of Collection created on RHS -->
+
+</div>
+</div>
+
+<input id="{{widget_for}}_list" type="hidden" name="{{widget_for}}_list" value="" />
+
 
 <script type="text/javascript">
 
-  $(function()
-  {
+    //To allocate space of 10 resources listing for drawers.
+    liHeight = $("#{{widget_for}}_drawer1 > li.bullet-item").outerHeight();
+    $(".resource-drawer").height(liHeight * 15);
 
-    $("#{{widget_for}}_btnRight").click(function() { 
-      var selectedOpts = $("#{{widget_for}}_drawer1 option:selected");
+    //For clicked or selected resource item
+    $("#{{widget_for}}_drawer1 li.bullet-item").click(function(){
+      $(this).toggleClass("selected-resource") ;
+    });
 
-      if (selectedOpts.length == 0){
-        alert("Nothing to move.");
-        e.preventDefault();
+    $("#{{widget_for}}_drawer2 li.bullet-item").click(function(){
+      $(this).toggleClass("selected-resource") ;
+    });
+    
+    
+      //For left drawer selected resources and right button click
+      $("#{{widget_for}}_btnRight").click(function() { 
+        var selectedOpts = $("#{{widget_for}}_drawer1 li.selected-resource"); 
+        $("#{{widget_for}}_drawer1 li.selected-resource").removeClass("selected-resource");
+
+        if (selectedOpts.length == 0){
+          alert("Nothing to move.");
+        }
+
+        $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
+        $(selectedOpts).remove();
+      });  
+
+      //For right drawer selected resources and left button click
+      $("#{{widget_for}}_btnLeft").click(function() {
+
+        var selectedOpts = $("#{{widget_for}}_drawer2 li.selected-resource");
+        $("#{{widget_for}}_drawer2 li.selected-resource").removeClass("selected-resource");
+
+        if (selectedOpts.length == 0) {
+          alert("Nothing to move.");
+        }
+
+        $("#{{widget_for}}_drawer1").append($(selectedOpts).clone(true));
+        $(selectedOpts).remove();
+      });  
+
+
+      function checkUpDownButton()
+      {
+        for(var i=0; i<collSelected.length-1; i++)
+        {
+          var flag;
+          if( (collSelected[i].nextElementSibling) == (collSelected[i+1]) ){
+            flag = true;
+          }
+          else{
+            flag = false;
+          }
+        }
+        return flag;
       }
 
-      $("#{{widget_for}}_drawer2").append($(selectedOpts).clone());
-      $(selectedOpts).remove();
-      e.preventDefault();
-    });   
-   
-    $("#{{widget_for}}_btnUp").click(function() {
-       
-      $("#{{widget_for}}_drawer1 :selected").each(function (i, selected) {
-        $(this).insertBefore($(this).prev());
-	      $("#{{widget_for}}_drawer2").options.att("selected",false);
-      });
-      
-      $("#{{widget_for}}_drawer1 select").focus().blur();
-      
-      $("#{{widget_for}}_drawer2 :selected").each(function (i, selected) {
-        $(this).insertBefore($(this).prev());
-	      $("#{{widget_for}}_drawer1").options.att("selected",false);
-      });
-      
-      $("#{{widget_for}}_drawer2 select").focus().blur();
-    });
+      //For UP Button pressed :
+      $("#{{widget_for}}_btnUp").click(function() {
 
-    $("#{{widget_for}}_btnDown").click(function() {
-      $("#{{widget_for}}_drawer1 :selected").each(function (i, selected) {
-        $(this).insertAfter($(this).next());
-	      $("#{{widget_for}}_drawer2").options.att("selected",false);	
-      });
-      
-      $("#{{widget_for}}_drawer1 select").focus().blur();
-      
-      $("#{{widget_for}}_drawer2 :selected").each(function (i, selected) {
-        $(this).insertAfter($(this).next());
-	      $("#{{widget_for}}_drawer1").options.att("selected",false);
-      });
-      
-      $("#{{widget_for}}_drawer2 select").focus().blur();
-    });
-    
-    $("#{{widget_for}}_btnLeft").click(function() {
-      var selectedOpts = $("#{{widget_for}}_drawer2 option:selected");
-      if (selectedOpts.length == 0) {
-        alert("Nothing to move.");
-        e.preventDefault();
-      }
+        collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
 
-      $("#{{widget_for}}_drawer1").append($(selectedOpts).clone());
-      $(selectedOpts).remove();
-      e.preventDefault();
-    });  
-    
-    $("#{{widget_for}}_search").keyup(function () {        
-        if($.trim(this.value).length > 1){        
-            $("#{{widget_for}}_drawer1 option").show();
-            $("#{{widget_for}}_drawer1 option:not(option:contains('" + $("#{{widget_for}}_search").val() + "'))").hide();
-        }       
-        
-    });
-    
+        if( collSelected ){
+
+          //If multiple element's are selected :
+          if( collSelected.length > 1 ){
+
+            if( checkUpDownButton ){
+              prevFirstSel = collSelected[0].previousElementSibling;
+              lastSel = collSelected[collSelected.length-1];
+
+              $(prevFirstSel).insertAfter(lastSel);  
+            }
+          } 
+          
+          //If only one element is selected :
+          else{
+            currSel =  collSelected[0];
+            $(currSel).insertBefore(currSel.previousElementSibling);
+          }
+        }
+      });
+
+      //For DOWN Button pressed :
+      $("#{{widget_for}}_btnDown").click(function() {
+
+        collSelected = $("#{{widget_for}}_drawer2 li.selected-resource");
+
+        if( collSelected ){
+
+          //If multiple element's are selected :
+          if( collSelected.length > 1 ){
+
+            if( checkUpDownButton ){
+              FirstSel = collSelected[0];
+              nexttoLastSel = collSelected[collSelected.length-1].nextElementSibling;
+
+              $(nexttoLastSel).insertBefore(FirstSel);  
+            }
+          } 
+          
+          //If only one element is selected :
+          else{
+            currSel =  collSelected[0];
+            $(currSel).insertAfter(currSel.nextElementSibling);
+          }
+        }
+      });
+
+
+
+
+  // Search-Box for LHS drawer of resources
+  $('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
+    var search = (this.value).toLowerCase();
+    var $li = $("#{{widget_for}}_drawer1 li.bullet-item").hide();
+    $li.filter(function() {
+      return $(this).text().toLowerCase().indexOf(search) >= 0;
+    }).show();
   });
 
 </script>
+
+
 
