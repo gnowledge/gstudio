@@ -13,22 +13,27 @@ $(document).ready(function(){
 $("#twist_save_reply").click(function(){
 var content=$('#orgitdown').val()
 $('#orgitdown').val("");
+var tw_name=$("#thread_name").val();
+if (tw_name != "")
+{
 var grp=$("#grptxt").val();
 var forum=$("#forum").val();
-var tw_name=$("#thread_name").val();
+var thd = ""
+$("#thread_name").val("");
 var ajurl="/"+grp+"/forum/add_node/"
 
 $.ajax({
         url: ajurl,
         type: 'POST',
-        data: {node:'Twist',supnode:forum,reply:content,twistname:tw_name,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        data: {node:'Twist',thread:thd,forumid:forum,supnode:forum,reply:content,twistname:tw_name,csrfmiddlewaretoken: '{{ csrf_token }}'},
         beforeSend: function() {
               $("#ajax_load_image").show();
               $("#body").css({"opacity":"0.1",})
                               },
         success: function(data){
                        $('#twistd').html(data);
-                      $('a.close-reveal-modal').trigger('click');
+                        $('a.close-reveal-modal').trigger('click');
+                      
       
            },
        complete: function(){
@@ -38,8 +43,15 @@ $.ajax({
           }
    })
 
-});
 
+}
+else
+{
+alert("Thread name can't be blank");
+$('a.close-reveal-modal').trigger('click');
+
+}
+});
 });
 </script>
 

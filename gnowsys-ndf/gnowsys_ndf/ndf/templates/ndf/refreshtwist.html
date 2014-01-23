@@ -1,16 +1,7 @@
+
+
 {% load ndf_tags %}
+<div class="row">
+{% get_reply thread thread 15 csrf_token %}
 
-<script type="text/javascript">
-$(document).ready(function(){
- $('#orgitdown{{each}}').orgitdown(mySettings);
-});
-</script>
-<div id="twistd">
-{% get_forum_twists forum as twists %}
-{% for each in twists %}
-      <div class="reply{{each}}" id="div1">
-       <p>   <font size="4" color="darkblue" >{{each.name}}</font></p>
-
-      </div>
-{% endfor %}
 </div>
