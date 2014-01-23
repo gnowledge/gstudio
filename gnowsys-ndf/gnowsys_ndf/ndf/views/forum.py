@@ -39,7 +39,7 @@ twist_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':
 
 
 def forum(request,group_name,node_id):
-    existing_forums=gs_collection.GSystem.find({'$and':[{'_type':u'GSystem'},{'member_of':'Forum'}]})
+    existing_forums = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [group_name]}})
     existing_forums.sort('name')
     variables=RequestContext(request,{'existing_forums':existing_forums})
     return render_to_response("ndf/forum.html",variables)
@@ -58,6 +58,7 @@ def create_forum(request,group_name):
         colf.content=unicode(fixstr[0])
         usrid=int(request.user.id)
         colf.created_by=usrid
+        colf.group_set.append(unicode(group_name))
         colf.member_of.append(forum_st.name)
         colf.gsystem_type.append(forum_st._id)
         sdate=request.POST.get('sdate',"")
