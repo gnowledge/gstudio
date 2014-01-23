@@ -42,6 +42,9 @@ $("#org{{eachrep}}").css("display","block");
                               },
         success: function(data){
                 $("#ajax_load_image").hide();
+document.getElementById('org{{eachrep}}').style.visibility='hidden';
+$("#org{{eachrep}}").css("display","none");
+
            $('#refreshthread').html(data);
   $('a.close-reveal-modal').trigger('click');
 
