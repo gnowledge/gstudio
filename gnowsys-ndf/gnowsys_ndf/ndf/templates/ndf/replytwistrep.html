@@ -1,0 +1,96 @@
+{% load ndf_tags %}
+{% block head %}
+
+
+<!-- orgitdown! -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
+ <!-- jquery migrate js to solve deprication -->
+<script type="text/javascript" src="/static/ndf/js/jquery-migrate-1.0.0.js"></script>
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
+  <!-- orgitdown! toolbar skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
+
+<script type="text/javascript">
+  $(document).ready(function(){
+  $("#orgitdownreps{{eachrep}}").orgitdown(mySettings);
+$("#reply_forum{{eachrep}}").on("click",function(){
+document.getElementById('org{{eachrep}}').style.visibility='visible';
+$("#org{{eachrep}}").css("display","block");
+});
+  $("#savereply{{eachrep}}").on("click",function(){
+  var contento=$('#orgitdownreps{{eachrep}}').val()
+  $('#orgitdownreps{{eachrep}}').val("");
+  if (contento != "")
+  {
+  var grp=$("#grptxt{{eachrep}}").val();
+  var repl=$("#rep{{eachrep}}").val();
+  var thd=$("#thd{{eachrep}}").val();
+  var twname=""
+  var fid=""
+  var ajurl="/"+grp+"/forum/add_node/"
+  $.ajax({
+  url: ajurl,
+  type: 'POST',
+        data: {node:'Reply',thread:thd,forumid:fid,supnode:repl,reply:contento,twistname:twname,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {
+              $("#ajax_load_image").show();
+              $("#body").css({"opacity":"0.1",})
+                              },
+        success: function(data){
+                $("#ajax_load_image").hide();
+document.getElementById('org{{eachrep}}').style.visibility='hidden';
+$("#org{{eachrep}}").css("display","none");
+
+           $('#refreshthread').html(data);
+  $('a.close-reveal-modal').trigger('click');
+
+
+           },
+
+       complete: function(){
+                $("#ajax_load_image").hide();
+                $("#body").css({"opacity":"",})
+          }
+   })
+
+
+}
+else
+{alert("Reply can't be empty");}
+$('a.close-reveal-modal').trigger('click');
+
+});
+});
+
+
+
+</script>
+
+<style type="text/css">
+.orgitdown{
+height:100px;
+}
+.orgitdownContainer{
+height:100px;
+}
+.orgitdownEditor{
+height:60px;
+}
+</style>
+{% endblock %}
+{% get_group_name request.path as group %}
+
+<input type="button" id="reply_forum{{eachrep}}" value="Reply" >
+<div id="org{{eachrep}}" style="display:none">
+<div id="showorgeditor{{eachrep}}" class="orgcont" data-reveal="">
+Reply :
+  <textarea id="orgitdownreps{{eachrep}}" name="content_org" placeholder="Please enter description..."></textarea>
+<input type="hidden" id="grptxt{{eachrep}}" style="visibility:hidden" value="{{group}}">
+<input id="savereply{{eachrep}}" type="button" value="Save">
+<input type="hidden" id="rep{{eachrep}}" style="visibility:hidden" value="{{eachrep}}">
+<input type="hidden" id="thd{{eachrep}}" style="visibility:hidden" value="{{thread}}">
+</div>
+</div>

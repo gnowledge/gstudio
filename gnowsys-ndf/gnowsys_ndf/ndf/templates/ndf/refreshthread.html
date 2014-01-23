@@ -1,32 +1,4 @@
- {% extends "ndf/base.html" %}
 {% load ndf_tags %}
-{% block title %}{{forum.name}}{% endblock %}
-{% block head %}
-
-{% endblock %}
-
-{% block body_content %}
-<div class="row" style="background-color:#E5E6E8">
-  <div class="small-6 large-6 columns">
-    <h4>
-      <a title="{{forum.name}}" href="#">
-	{{forum.name}}
-      </a>
-    </h4>
-  </div>
-  <div class="small-6 large-6 columns" style="height:40px">
-    <ul class="sub-nav">
-      <li>
-	<h5>
-	 {% if user.is_authenticated %}
-	  {% include "ndf/replyforum.html" %}
-	 {% endif %}
-	</h5>
-      </li>
-    </ul>
-  </div>
-</div>
-{% get_group_name request.path as group_name %}
 <div class="row" style="padding-top:10px" id="thread">
 {% get_forum_twists forum as thread %}
 {% for each in thread %}
@@ -38,8 +10,8 @@
 </div>
 <div class= "small-10 large-10 columns">
   <h4>
-    <a href="/{{group_name}}/forum/thread/{{each}}">
-      {{each.name}}
+    <a href="#" id="reply_forum" data-reveal-id="thread">
+      {{each.name}}{{each}}
     </a><br/>
     <small>
       by:<strong>{{user_obj.username}}</strong>
@@ -55,4 +27,3 @@
 <hr>
 {% endfor %}
 </div>
-{% endblock %}

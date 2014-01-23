@@ -34,7 +34,7 @@ gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
 gs_collection = db[GSystem.collection_name]
 
 #######################################################################################################################################
-#                                                                          V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
+#      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
 #######################################################################################################################################
 
 
@@ -58,16 +58,23 @@ def create_group(request,group_name):
         colg.member_of.append(u"Group")
         usrid = int(request.user.id)
         colg.created_by=usrid
-        colg.gtype = request.POST.get('group_type', "")
+        colg.group_type = request.POST.get('group_type', "")
         colg.edit_policy = request.POST.get('edit_policy', "")
-        colg.sub_policy = request.POST.get('subscription', "")
-        colg.ex_policy = request.POST.get('existance', "")
-        colg.list_member_policy = request.POST.get('member', "")
-        colg.encr_policy = request.POST.get('encryption', "")
+        colg.subscription_policy = request.POST.get('subscription', "")
+        colg.visibility_policy = request.POST.get('existance', "")
+        colg.disclosure_policy = request.POST.get('member', "")
+        colg.encryption_policy = request.POST.get('encryption', "")
         colg.save()
-        return render_to_response("ndf/groupdashboard.html",RequestContext(request))
+        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", RequestContext(request))
     
 
 def group_dashboard(request,group_name):
-    return render_to_response("ndf/groupdashboard.html",RequestContext(request))
+    try:
+        gp=unicode(group_name)
+        groupobj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':gp}]})
+    except:
+        groupobj=""
+        pass
+    return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj},context_instance=RequestContext(request))
+

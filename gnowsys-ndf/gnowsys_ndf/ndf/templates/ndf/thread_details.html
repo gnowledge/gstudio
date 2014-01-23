@@ -1,0 +1,40 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %}{{thread.name}}{% endblock %}
+{% block body_content %}
+<style type="text/css">
+#maindiv
+{
+ background-color:#E8E8E8 ;
+}
+#smalldiv
+background-color:#F4F4F4;
+}
+#refreshthread{
+padding-left:5px;
+}
+</style>
+
+<div class="row">
+<div class="large-12 columns">
+<div id="maindiv" class="large-6 columns">
+<font size="5" color="green">{{thread.name}}</font>
+{% with thread.content|safe as thread_content %}
+<font size ="2" >{{thread_content}} </font>
+{% endwith %}
+</div>
+<div id="smalldiv" class="large-6 columns">
+	 {% if user.is_authenticated %}
+	 {% include "ndf/replytwistrep.html" %}
+	 {% endif %}
+</div>
+
+
+   
+<div id="refreshthread" class="large-12 columns">
+{% get_reply thread thread 15 csrf_token %}
+</div>
+
+{% endblock %}
+</div>
+</div>

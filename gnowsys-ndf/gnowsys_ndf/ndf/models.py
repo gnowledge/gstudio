@@ -519,23 +519,23 @@ class Group(GSystem):
     """
 
     structure = {
-        'gtype': basestring,                 # Types of groups - Anonymous, public or private
-        'edit_policy': basestring,           # Editing policy of the group - non editable, moderately editable, editable
-        'sub_policy': basestring,            # Subscription policy to this group - open, by invitation, by request
-        'ex_policy': basestring,             # Existance of the group - announced or not announced
-        'list_member_policy': basestring,    # Members of this group - disclosed or not 
-        'encr_policy': basestring            # Encryption - yes or no
+        'group_type': basestring,            # Types of groups - Anonymous, public or private
+        'edit_policy': basestring,           # Editing policy of the group - non editable,editable moderated or editable non-moderated
+        'subscription_policy': basestring,   # Subscription policy to this group - open, by invitation, by request
+        'visibility_policy': basestring,     # Existance of the group - announced or not announced
+        'disclosure_policy': basestring,    # Members of this group - disclosed or not 
+        'encryption_policy': basestring            # Encryption - yes or no
     }
 
     use_dot_notation = True
 
     validators = {
-        'gtype':lambda x: x in TYPES_OF_GROUP,
+        'group_type':lambda x: x in TYPES_OF_GROUP,
         'edit_policy':lambda x: x in EDIT_POLICY,
-        'sub_policy':lambda x: x in SUBSCRIPTION_POLICY,
-        'ex_policy':lambda x: x in EXISTANCE_POLICY,
-        'list_member_policy':lambda x: x in LIST_MEMBER_POLICY,
-        'encr_policy':lambda x: x in ENCRYPTION_POLICY
+        'subscription_policy':lambda x: x in SUBSCRIPTION_POLICY,
+        'visibility_policy':lambda x: x in EXISTANCE_POLICY,
+        'disclosure_policy':lambda x: x in LIST_MEMBER_POLICY,
+        'encryption_policy':lambda x: x in ENCRYPTION_POLICY
     } 
 
 #######################################################################################################################################

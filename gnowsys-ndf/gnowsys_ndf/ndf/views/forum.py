@@ -39,13 +39,12 @@ twist_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':
 
 
 def forum(request,group_name,node_id):
-    existing_forums=gs_collection.GSystem.find({'$and':[{'_type':u'GSystem'},{'member_of':'Forum'}]})
+    existing_forums = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [group_name]}})
     existing_forums.sort('name')
     variables=RequestContext(request,{'existing_forums':existing_forums})
     return render_to_response("ndf/forum.html",variables)
 
 def create_forum(request,group_name):
-    print request
     if request.method == "POST":
         colf=gs_collection.GSystem()
         name=unicode(request.POST.get('forum_name',""))
@@ -59,6 +58,7 @@ def create_forum(request,group_name):
         colf.content=unicode(fixstr[0])
         usrid=int(request.user.id)
         colf.created_by=usrid
+        colf.group_set.append(unicode(group_name))
         colf.member_of.append(forum_st.name)
         colf.gsystem_type.append(forum_st._id)
         sdate=request.POST.get('sdate',"")
@@ -96,58 +96,68 @@ def create_forum(request,group_name):
 
 def display_forum(request,group_name,forum_id):
     forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
-    print "csrf=",request
-    token=request
-    variables=RequestContext(request,{'forum':forum,'csrf_token':token})
+    variables=RequestContext(request,{'forum':forum})
     return render_to_response("ndf/forumdetails.html",variables)
+
+def display_thread(request,group_name,thread_id):
+    thread = gs_collection.GSystemType.one({'_id': ObjectId(thread_id)})
+    variables=RequestContext(request,{'thread':thread,'eachrep':thread})
+    return render_to_response("ndf/thread_details.html",variables)
 
 def add_node(request,group_name):
     try:
-        content_org="\n"+request.POST["reply"]
-        node=request.POST["node"]
-        sup_id=request.POST["supnode"]
-        tw_name=request.POST["twistname"]
+        content_org="\n"+request.POST.get("reply","")
+        node=request.POST.get("node","")
+        thread=request.POST.get("thread","")
+        forumid=request.POST.get("forumid","")
+        sup_id=request.POST.get("supnode","")
+        tw_name=request.POST.get("twistname","")
+        print "supid",sup_id
+        if forumid:
+            forumobj=gs_collection.GSystem.one({"_id": ObjectId(forumid)})
         sup=gs_collection.GSystem.one({"_id": ObjectId(sup_id)})
+        strng='<div id="postamble">\n<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>\n</div>\n'
         if not sup :        
             return HttpResponse("failure")
         colrep=gs_collection.GSystem()
-        print "tw_n=",tw_name,sup_id,node
         if node == "Twist":
             name=tw_name
             colrep.name=unicode(name)
             colrep.member_of.append(twist_st.name)
             colrep.gsystem_type.append(twist_st._id)
-        elif node == "Reply_Twist":
-            name="Reply of Twist:"+str(sup._id)
-            colrep.name=unicode(name)
-            colrep.member_of.append(reply_st.name)
-            colrep.gsystem_type.append(reply_st._id)
         elif node == "Reply":
+            print "ins reply"
             name="Reply of:"+str(sup._id)
             colrep.name=unicode(name)
             colrep.member_of.append(reply_st.name)
             colrep.gsystem_type.append(reply_st._id)
+        if node=="Reply":
+            exstng_reply=gs_collection.GSystem.one({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(sup._id)}]})
         colrep.prior_node.append(sup._id)
         filename = slugify(name) + "-" + request.user.username + "-"
-        colrep.content = unicode(org2html(content_org, file_prefix=filename))
+        colrepcont = unicode(org2html(content_org, file_prefix=filename))
+        fixstr=colrepcont.split(strng)
+        colrep.content=unicode(fixstr[0])
         colrep.content_org = unicode(content_org.encode('utf8'))
         usrid=int(request.user.id)
         colrep.created_by=usrid
         colrep.save()
         if node == "Reply":
-            exstng_reply=gs_collection.GSystem.one({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(sup._id)}]})
             if exstng_reply:
                 exstng_reply.prior_node =[]
                 exstng_reply.prior_node.append(colrep._id)
                 exstng_reply.save()
-        if node == "Twist":
-            forum=sup
-            templ=get_template('ndf/refreshtwist.html')
-            html = templ.render(Context({'forum':forum,'user':request.user}))
-            return HttpResponse(html)
+          
+
+            threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
+            variables=RequestContext(request,{'thread':threadobj,'user':request.user})
+            return render_to_response("ndf/refreshtwist.html",variables)
         else:
-             return HttpResponse("success")
+            templ=get_template('ndf/refreshthread.html')
+            html = templ.render(Context({'forum':forumobj,'user':request.user}))
+            return HttpResponse(html)
+
 
     except Exception as e:
-        return HttpResponse("")
+        return HttpResponse(""+e)
     return HttpResponse("success")
