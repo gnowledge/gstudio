@@ -301,19 +301,13 @@ class Node(DjangoDocument):
                 continue
 
             if not self.structure.has_key(key):
-                print "\n Key (not in the structure): ", key
-                print " type(key): ", type(key)
-                print " GSystem Type: ", self.gsystem_type 
                 field_found = False
                 for gst_id in self.gsystem_type:
                     attribute_set_list = nc.Node.one({'_id': gst_id}).attribute_type_set
                     
                     for attribute in attribute_set_list:
-                        # print " type(attribute['name']): ", type(attribute['name'])
-                        # print " type(key) == type(attribute['name']) ? ", (type(key) == type(attribute['name']))
                         if key == attribute['name']:
                             field_found = True
-                            print "\n Field exists in the attribute list...\n"
 
                             # TODO: Check whether type of "value" matches with that of "attribute['data_type']"
 
