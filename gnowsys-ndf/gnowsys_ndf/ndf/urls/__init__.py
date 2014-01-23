@@ -25,7 +25,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
     url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
-    url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form':UserResetform}),
+                       url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form':UserResetform},name='password_reset_done'),
     url(r'^accounts/password/reset/$',
         auth_views.password_reset,
         {
