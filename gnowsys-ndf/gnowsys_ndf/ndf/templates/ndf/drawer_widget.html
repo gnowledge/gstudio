@@ -49,7 +49,7 @@
               </div>
 
               <div class="row">
-                <div class="small-12 columns text-left">
+                <div class="small-12 columns text-left" style="padding-top:0.5rem;">
                   {% if value.3|length > 90 %}
                   &nbsp;&nbsp; {{value.3}}. . .
                   {% else %}
@@ -136,7 +136,7 @@
 
     //To allocate space of 10 resources listing for drawers.
     liHeight = $("#{{widget_for}}_drawer1 > li.bullet-item").outerHeight();
-    $(".resource-drawer").height(liHeight * 9);
+    $(".resource-drawer").height(liHeight * 15);
 
     //For clicked or selected resource item
     $("#{{widget_for}}_drawer1 li.bullet-item").click(function(){
