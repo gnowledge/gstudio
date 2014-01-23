@@ -27,7 +27,9 @@
 </font>
 </div>
         <div class="large-6 columns">
+	  	 {% if user.is_authenticated %}
              {% include "ndf/replytwistrep.html" %}
+		 {% endif %}
         </div>
 </div>
 
