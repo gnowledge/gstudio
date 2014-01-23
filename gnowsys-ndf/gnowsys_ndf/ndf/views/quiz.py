@@ -80,7 +80,7 @@ def quiz(request, group_name, app_id):
 
 @login_required
 def create_edit_quiz_item(request, group_name, node_id=None):
-    """Displays/Modifies details about the given quiz-item.
+    """Creates/Modifies details about the given quiz-item.
     """
 
     gst_quiz_item = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})
@@ -90,10 +90,33 @@ def create_edit_quiz_item(request, group_name, node_id=None):
                           'group_name': group_name
                       }
 
+    # if node_id:
+    #     quiz_item_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
+    # else:
+    #     quiz_item_node = collection.GSystem()
+
+    node = None
+    quiz_node = None
+    quiz_item_node = None
+
     if node_id:
-        quiz_item_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
+        node = collection.Node.one({'_id': ObjectId(node_id)})
+
+        if "Quiz" in node.member_of:
+            # Add question from a given Quiz category's context
+            print "\n Add question from a given Quiz category's context...\n"
+            quiz_node = node
+            quiz_item_node = collection.GSystem()
+
+        else:
+            # Edit a question
+            print "\n Edit a question...\n"
+            quiz_item_node = node
     else:
+        # Add miscellaneous question
+        print "\n Add miscellaneous question...\n"
         quiz_item_node = collection.GSystem()
+
 
     if request.method == "POST":
         usrid = int(request.user.id)
@@ -151,6 +174,11 @@ def create_edit_quiz_item(request, group_name, node_id=None):
         quiz_item_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
         
         quiz_item_node.save()
+
+        if quiz_node:
+            quiz_node.collection_set.append(quiz_item_node._id)
+            quiz_node.save()
+            print "\n Successfully added to miscellaneous list as well as to the quiz category...\n"
         
         return HttpResponseRedirect(reverse('quiz', kwargs={'group_name': group_name, 'app_id': gst_quiz._id}))
         
