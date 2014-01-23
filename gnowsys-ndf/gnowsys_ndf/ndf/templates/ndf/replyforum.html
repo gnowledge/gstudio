@@ -13,9 +13,11 @@ $(document).ready(function(){
 $("#twist_save_reply").click(function(){
 var content=$('#orgitdown').val()
 $('#orgitdown').val("");
+var tw_name=$("#thread_name").val();
+if (tw_name != "")
+{
 var grp=$("#grptxt").val();
 var forum=$("#forum").val();
-var tw_name=$("#thread_name").val();
 var thd = ""
 $("#thread_name").val("");
 var ajurl="/"+grp+"/forum/add_node/"
@@ -41,8 +43,15 @@ $.ajax({
           }
    })
 
-});
 
+}
+else
+{
+alert("Thread name can't be blank");
+$('a.close-reveal-modal').trigger('click');
+
+}
+});
 });
 </script>
 

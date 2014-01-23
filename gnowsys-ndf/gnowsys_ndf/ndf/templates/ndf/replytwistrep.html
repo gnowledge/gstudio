@@ -16,6 +16,10 @@
 <script type="text/javascript">
   $(document).ready(function(){
   $("#orgitdownreps{{eachrep}}").orgitdown(mySettings);
+$("#reply_forum{{eachrep}}").on("click",function(){
+document.getElementById('org{{eachrep}}').style.visibility='visible';
+$("#org{{eachrep}}").css("display","block");
+});
   $("#savereply{{eachrep}}").on("click",function(){
   var contento=$('#orgitdownreps{{eachrep}}').val()
   $('#orgitdownreps{{eachrep}}').val("");
@@ -26,9 +30,8 @@
   var thd=$("#thd{{eachrep}}").val();
   var twname=""
   var fid=""
-  alert(grp);
-  alert(thd);
   var ajurl="/"+grp+"/forum/add_node/"
+  alert("aa");
   $.ajax({
   url: ajurl,
   type: 'POST',
@@ -39,8 +42,10 @@
                               },
         success: function(data){
                 $("#ajax_load_image").hide();
-  $('a.close-reveal-modal').trigger('click');
            $('#refreshthread').html(data);
+  $('a.close-reveal-modal').trigger('click');
+
+
            },
 
        complete: function(){
@@ -53,6 +58,8 @@
 }
 else
 {alert("Reply can't be empty");}
+$('a.close-reveal-modal').trigger('click');
+
 });
 });
 
@@ -74,15 +81,14 @@ height:60px;
 {% endblock %}
 {% get_group_name request.path as group %}
 
-<input type="button" id="reply_forum{{eachrep}}" value="Reply" data-reveal-id="showorgeditor{{eachrep}}">
-
-<div id="showorgeditor{{eachrep}}" class="reveal-modal" data-reveal="">
-Reply to {{eachrep.name}}
+<input type="button" id="reply_forum{{eachrep}}" value="Reply" >
+<div id="org{{eachrep}}" style="display:none">
+<div id="showorgeditor{{eachrep}}" class="orgcont" data-reveal="">
+Reply :
   <textarea id="orgitdownreps{{eachrep}}" name="content_org" placeholder="Please enter description..."></textarea>
 <input type="hidden" id="grptxt{{eachrep}}" style="visibility:hidden" value="{{group}}">
 <input id="savereply{{eachrep}}" type="button" value="Save">
 <input type="hidden" id="rep{{eachrep}}" style="visibility:hidden" value="{{eachrep}}">
 <input type="hidden" id="thd{{eachrep}}" style="visibility:hidden" value="{{thread}}">
-<a  class="close-reveal-modal">×</a>
 </div>
-
+</div>

@@ -2,22 +2,39 @@
 
 
 {% block body_content %}
-<div class="row">
-<div class="large-12 columns">
-{% include "ndf/replytwistrep.html" %}
+<style type="text/css">
+#replydiv
+{
+ background-color:#F4F4F4;
+ left-padding:5px;
+}
+#insidediv
+{
+ background-color:#CBCBCB ;
+
+}
+</style>
+
 {% get_all_replies reply as replies %}
 
 {% for eachrep in replies %}
+<div class="row">
+<div id="insidediv" class="large-6 columns">
  <font size="1" color="darkblue" >
           {% with eachrep.content|safe as rep_content %}
               {{rep_content}}
           {% endwith %}
 </font>
-              
-<div class="large-10 columns">
-		{% get_reply thread eachrep indent csrf_token %}
-              </div>
+</div>
+        <div class="large-6 columns">
+             {% include "ndf/replytwistrep.html" %}
+        </div>
+</div>
+
+
+{% get_reply thread eachrep indent csrf_token %}
+
 {% endfor %}
-</div>
-</div>
+
+
 {% endblock %}
