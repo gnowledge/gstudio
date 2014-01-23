@@ -125,26 +125,26 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	<div class="small-12 columns">
 	  <div id="prior_node_drawer">
-	    {% edit_drawer_widget "prior_node" group_name node %}
+	    {% edit_drawer_widget "prior_node" group_name node title %}
 	  </div>
 	</div>
       </div>
     </div>
 
-    <div class="content" id="panel-collection"  style="width:95%;">
+    <div class="content" id="panel-collection" style="width:95%;">
       <div class="row">
 	<div class="small-12 columns">
 	  <h5>Add or edit Collection : </h5>
 	</div>				
 	<br/><br/>
 	
-	<div class="small-12 columns">
+	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 	  <div id="SelectApp" class="row">
 	    <div class="small-2 columns line-height-2pt5">
 	      Classify by :
 	    </div>
 	    <div class="small-2 columns">
-	      <input type="radio" name="col" value="Page" />
+	      <input type="radio" name="col" value="Page" selected/>
 	      Page <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
 	    </div>
@@ -164,7 +164,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	<div class="small-12 columns">
 	  <div id="collection_drawer" >
-	    {% edit_drawer_widget "collection" group_name node %}
+	    {% edit_drawer_widget "collection" group_name node title %}
 	  </div>
 	</div>
       </div>
@@ -241,7 +241,6 @@ $("#save-node").click(function() {
 	c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
     }
     var c_list = c_arr.join(',');
-    
     $("#collection_list").val(c_list)
 
     {% block base_save_on_click %}{% endblock %}
