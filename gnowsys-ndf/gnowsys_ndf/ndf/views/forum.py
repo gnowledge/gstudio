@@ -104,9 +104,7 @@ def display_thread(request,group_name,thread_id):
     return render_to_response("ndf/thread_details.html",variables)
 
 def add_node(request,group_name):
-    print "aaa"
     try:
-        print "bbbbb"
         content_org="\n"+request.POST.get("reply","")
         node=request.POST.get("node","")
         thread=request.POST.get("thread","")
@@ -148,17 +146,17 @@ def add_node(request,group_name):
                 exstng_reply.prior_node =[]
                 exstng_reply.prior_node.append(colrep._id)
                 exstng_reply.save()
-            templ=get_template('ndf/refreshtwist.html')
+          
+
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
-            html = templ.render(Context({'thread':threadobj,'user':request.user}))
-            return HttpResponse(html)
+            variables=RequestContext(request,{'thread':threadobj,'user':request.user})
+            return render_to_response("ndf/refreshtwist.html",variables)
         else:
-            print "twist d",forumobj,request.user
             templ=get_template('ndf/refreshthread.html')
             html = templ.render(Context({'forum':forumobj,'user':request.user}))
             return HttpResponse(html)
 
 
     except Exception as e:
-        return HttpResponse("")
+        return HttpResponse(""+e)
     return HttpResponse("success")
