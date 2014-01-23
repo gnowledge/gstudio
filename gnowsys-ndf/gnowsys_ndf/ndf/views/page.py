@@ -4,13 +4,14 @@ import json
 from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User
 
 from django_mongokit import get_database
 
@@ -23,20 +24,18 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 
-from gnowsys_ndf.ndf.models import GSystemType, GSystem
+from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 
 #######################################################################################################################################
 
 db = get_database()
-gst_collection = db[GSystemType.collection_name]
-gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
-gs_collection = db[GSystem.collection_name]
+collection = db[Node.collection_name]
+gst_page = collection.Node.one({'_type': u'GSystemType', 'name': GAPPS[0]})
 history_manager = HistoryManager()
 rcs = RCS()
 
@@ -50,7 +49,7 @@ def page(request, group_name, app_id):
     if gst_page._id == ObjectId(app_id):
         title = gst_page.name
         
-        page_nodes = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
+        page_nodes = collection.Node.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
         page_nodes.sort('last_update', -1)
         page_nodes_count = page_nodes.count()
 
@@ -62,55 +61,43 @@ def page(request, group_name, app_id):
         )
 
     else:
-        #page_detail_url=request.GET.get('v',"")
-        #print "test url:",page_detail_url
-        page_node = gs_collection.GSystem.one({"_id": ObjectId(app_id)})
+        page_node = collection.Node.one({"_id": ObjectId(app_id)})
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_name': group_name
                                   },
                                   context_instance = RequestContext(request)
         )        
+
+
+@login_required
+def create_edit_page(request, group_name, node_id=None):
+    """Creates/Modifies details about the given quiz-item.
+    """
+
+    context_variables = { 'title': gst_page.name,
+                          'group_name': group_name
+                      }
+
+    if node_id:
+        page_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
+    else:
+        page_node = collection.GSystem()
+
+    if request.method == "POST":
+        get_node_common_fields(request, page_node, group_name, gst_page)
+        page_node.save()
         
-    
-def create_page(request, group_name):
-    """Creates a new page.
-    """
-    if request.user.is_authenticated():
-        page_node = gs_collection.GSystem()
-
-        if request.method == "POST":
-            get_node_common_fields(request, page_node, group_name, gst_page)
-            page_node.save()
-            return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
-
-        else:
-            return render_to_response("ndf/page_create.html",
-                                      { 'title': gst_page.name,
-                                        'group_name': group_name
-                                      },
-                                      context_instance=RequestContext(request)
-            )
-
-
-
-def edit_page(request, group_name, node_id):
-    """Displays/Modifies details about the given page.
-    """
-    if request.user.is_authenticated():
-        page_node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
-        if request.method == "POST":
-            get_node_common_fields(request, page_node, group_name, gst_page)
-            page_node.save()
-            return HttpResponseRedirect(reverse('page_details', kwargs={'group_name': group_name, 'app_id': page_node._id}))
-
-        else:
-            return render_to_response("ndf/page_edit.html",
-                                      { 'node': page_node,
-                                        'group_name': group_name
-                                      },
-                                      context_instance=RequestContext(request)
-            )
+        return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
+        
+    else:
+        if node_id:
+            context_variables['node'] = page_node
+            
+        return render_to_response("ndf/page_create_edit.html",
+                                  context_variables,
+                                  context_instance=RequestContext(request)
+                              )
 
 
 def version_node(request, group_name, node_id, version_no):
@@ -124,12 +111,11 @@ def version_node(request, group_name, node_id, version_no):
     """
     view = ""          # either single or compare
     selected_versions = {}
-    node = gs_collection.GSystem.one({"_id": ObjectId(node_id)})
+    node = collection.Node.one({"_id": ObjectId(node_id)})
 
     fp = history_manager.get_file_path(node)
 
     if request.method == "POST":
-        print "\n if -- version page\n"
         view = "compare"
 
         version_1 = request.POST["version_1"]
@@ -141,7 +127,6 @@ def version_node(request, group_name, node_id, version_no):
         content = diff
 
     else:
-        print "\n else -- version page\n"
         view = "single"
 
         # Retrieve rcs-file for a given version-number
