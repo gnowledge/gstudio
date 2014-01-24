@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
+from django.contrib.auth.decorators import login_required
 
 from django_mongokit import get_database
 
@@ -78,3 +79,36 @@ def select_drawer(request, group_name):
                                       }, 
                                       context_instance=RequestContext(request)
             )
+
+@login_required
+def change_group_settings(request, group_name):
+    '''
+	changing group's object data
+    '''
+    if request.is_ajax() and request.method =="POST":
+        try:
+            edit_policy = request.POST['edit_policy']
+            group_type = request.POST['group_type']
+            subscription_policy = request.POST['subscription_policy']
+            visibility_policy = request.POST['visibility_policy']
+            disclosure_policy = request.POST['disclosure_policy']
+            encryption_policy = request.POST['encryption_policy']
+            group_id = request.POST['group_id']
+            group_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+            if group_node :
+                group_node.edit_policy = edit_policy
+                group_node.group_type = group_type
+                group_node.subscription_policy = subscription_policy
+                group_node.visibility_policy = visibility_policy
+                group_node.disclosure_policy = disclosure_policy
+                group_node.encryption_policy = encryption_policy
+                group_node.save()
+                return HttpResponse("changed successfully")
+        except:
+            return HttpResponse("failed")
+    return HttpResponse("failed") 
+	    
+	
+
+ 
+
