@@ -158,5 +158,5 @@ def add_node(request,group_name):
 
 
     except Exception as e:
-        return HttpResponse(""+e)
+        return HttpResponse(""+str(e))
     return HttpResponse("success")

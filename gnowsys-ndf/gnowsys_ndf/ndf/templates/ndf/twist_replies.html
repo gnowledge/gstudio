@@ -44,16 +44,16 @@ border-radius: 5px;
 </font>
 </div>
         <div class="large-6 columns">
-user{{user}}new
-	  
+
+          {% if user.is_authenticated %}
              {% include "ndf/replytwistrep.html" %}
-	
+	  {% endif %}
         </div>
 </div>
 
 <div class="response_change" id="refreshthread" class="large-12 columns">
 
-{% get_reply thread eachrep indent csrf_token %}
+{% get_reply thread eachrep indent csrf_token user %}
 
 </div>
 {% endfor %}
