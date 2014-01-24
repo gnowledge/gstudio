@@ -1,48 +1,58 @@
-{% extends "ndf/base.html" %}
+ {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% block title %}{{forum.name}}{% endblock %}
 {% block head %}
 
-<script type="text/javascript">
-
-</script>
-
 {% endblock %}
+
 {% block body_content %}
-<style type="text/css">
-#div2
-{
- background-color:#E8E8E8 ;
-}
-#div1
-{
- background-color:#F4F4F4;
-}
-
-</style>
-<p>
-<font size="5" color="green">{{forum.name}}</font>
-{% with forum.content|safe as forum_content %}
-<font size ="2" >{{forum_content}} </font>
-{% endwith %}
-</p>
-<div id="threadrep">
-{% include "ndf/replyforum.html" %}
+<div class="row" style="background-color:#E5E6E8">
+  <div class="small-6 large-6 columns">
+    <h4>
+      <a title="{{forum.name}}" href="#">
+	{{forum.name}}
+      </a>
+    </h4>
+  </div>
+  <div class="small-6 large-6 columns" style="height:40px">
+    <ul class="sub-nav">
+      <li>
+	<h5>
+	 {% if user.is_authenticated %}
+	  {% include "ndf/replyforum.html" %}
+	 {% endif %}
+	</h5>
+      </li>
+    </ul>
+  </div>
 </div>
-{% if forum %}
 {% get_group_name request.path as group_name %}
-
-<div id="twistd">
-{% get_forum_twists forum as twists %}
-{% for each in twists %}
-      <div class="reply{{each}}" id="div1">
-<p>          <a href="/{{group_name}}/forum/thread/{{each}}">{{each.name}}</a></p>
-
-      </div>
+<div class="row" style="padding-top:10px" id="thread">
+{% get_forum_twists forum as thread %}
+{% for each in thread %}
+{% get_user_object each.created_by as user_obj %}
+<div class ="small-1 large-1 columns"> 
+  <div class="post-count-container new already-checked">
+    <span class="reply-count new-post already-checked">NEW</span>
+  </div>
+</div>
+<div class= "small-10 large-10 columns">
+  <h4>
+    <a href="/{{group_name}}/forum/thread/{{each}}">
+      {{each.name}}
+    </a><br/>
+    <small>
+      by:<strong>{{user_obj.username}}</strong>
+    </small>
+  </h4>
+  {% with each.content|safe as twist_content %}
+  <font size ="1" >{{twist_content}} </font>
+  {% endwith %}
+  {% for tag in each.tags %}
+  <span class="radius secondary label">{{tag}}</span>
+  {% endfor %}
+</div>
+<hr>
 {% endfor %}
 </div>
-
-{% endif %}
-<!-- end of if forum -->
-
 {% endblock %}

@@ -10,29 +10,41 @@
 #smalldiv
 background-color:#F4F4F4;
 }
-#refreshthread{
-padding-left:5px;
-}
+.response_change{
+margin-bottom:1px;
+padding-left:25px;
+padding-right:2px;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+} 
 </style>
 
 <div class="row">
-<div class="large-12 columns">
-<div id="maindiv" class="large-6 columns">
-<font size="5" color="green">{{thread.name}}</font>
-{% with thread.content|safe as thread_content %}
-<font size ="2" >{{thread_content}} </font>
-{% endwith %}
+      <div class="large-12 columns">
+	<div id="maindiv" class="large-6 columns">
+	  <font size="5" color="green">{{thread.name}}</font>
+	  {% with thread.content|safe as thread_content %}
+	  <font size ="2" >{{thread_content}} </font>
+	  {% endwith %}
+	</div>
+       <div id="smalldiv" class="large-6 columns">
+	 {% if user.is_authenticated %}
+	 {% if thread %}
+	 {% include "ndf/replytwistrep.html" %}
+	 {% endif %}
+	 {% endif %}
+       </div>
+    </div>
 </div>
-<div id="smalldiv" class="large-6 columns">
-{% include "ndf/replytwistrep.html" %}
+<div class="row">
+
+<div class="response_change" id="refreshthread" class="large-12 columns">
+  <div style="margin-left:40px;margin-bottom:1px">  
+    {% get_reply thread thread 15 csrf_token request.user %}
+  </div>
 </div>
-
-
-   
-<div id="refreshthread" class="large-12 columns">
-{% get_reply thread thread 15 csrf_token %}
 </div>
 
 {% endblock %}
-</div>
-</div>
+

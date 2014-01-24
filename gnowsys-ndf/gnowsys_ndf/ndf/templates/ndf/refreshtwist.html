@@ -1,7 +1,10 @@
 
 
 {% load ndf_tags %}
-<div class="row">
-{% get_reply thread thread 15 csrf_token %}
+<div class="response_change" id="refreshthread" class="large-12 columns">
 
+<div class="row">
+{% get_reply thread thread 15 csrf_token request.user %}
+
+</div>
 </div>
