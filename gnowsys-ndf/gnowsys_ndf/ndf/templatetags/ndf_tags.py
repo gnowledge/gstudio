@@ -26,7 +26,7 @@ def get_all_replies(parent):
    ex_reply=""
    if parent:
      ex_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}]})
-   print "exrep=",ex_reply.count()
+     ex_reply.sort('created_at',-1)
    return ex_reply
 
 
@@ -77,6 +77,7 @@ def get_forum_twists(forum):
   gs_collection = db[Node.collection_name]
   ret_replies=[]
   exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+  exstng_reply.sort('created_at')
   for each in exstng_reply:
     ret_replies.append(each)
   return ret_replies

@@ -3,6 +3,7 @@
 {% get_forum_twists forum as thread %}
 {% for each in thread %}
 {% get_user_object each.created_by as user_obj %}
+{% get_group_name request.path as group_name %}
 <div class ="small-1 large-1 columns"> 
   <div class="post-count-container new already-checked">
     <span class="reply-count new-post already-checked">NEW</span>
@@ -10,8 +11,8 @@
 </div>
 <div class= "small-10 large-10 columns">
   <h4>
-    <a href="#" id="reply_forum" data-reveal-id="thread">
-      {{each.name}}{{each}}
+  <a href="/{{group_name}}/forum/thread/{{each}}">
+        {{each.name}}
     </a><br/>
     <small>
       by:<strong>{{user_obj.username}}</strong>
