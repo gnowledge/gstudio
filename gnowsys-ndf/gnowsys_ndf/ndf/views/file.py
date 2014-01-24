@@ -19,7 +19,7 @@ except ImportError:  # old pymongo
 
 import magic  #for this install python-magic example:pip install python-magic
 import mimetypes
-from PIL import Image, ImageDraw #install PIL example:pip install PIL
+from PIL import Image, ImageDraw, ImageFile #install PIL example:pip install PIL
 from StringIO import StringIO
 import os
 import subprocess
@@ -163,6 +163,13 @@ def save_file(files, title, userid, group_name,st_id):
                 tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
                 fileobj.fs_file_ids.append(tobjectid)
                 fileobj.save()
+                files.seek(0)
+                #print "test - reading file:",files.read()
+                mid_size_img = convert_mid_size_image(files)
+                mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
+                print "mid_img/-id:",mid_img_id
+                fileobj.fs_file_ids.append(mid_img_id)
+                fileobj.save()
 
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
@@ -194,6 +201,25 @@ def convert_image_thumbnail(files):
     img.save(thumb_io, "JPEG")
     thumb_io.seek(0)
     return thumb_io
+
+def convert_mid_size_image(files):
+    '''
+    convert image into 1000 pixel size userd for image gallery
+    '''
+    mid_size_img = StringIO()
+    img = Image.open(StringIO(files.read()))
+    width , height = img.size
+    diff = width - height
+    if (diff > 0):
+        diviser = width / 1000
+    else:
+        diviser = height / 1000
+    size = int(width / diviser),int(height / diviser)
+    img.resize(size,Image.ANTIALIAS)
+    img.save(mid_size_img, "JPEG")
+    mid_size_img.seek(0)
+    return mid_size_img
+    
     
     
 def convertVideo(files, userid, objid):

@@ -11,6 +11,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.imageDashboard',
                         #url(r'^images/', 'imageDashboard', name='imageDashboard'),                                                 
                         url(r'^imageThumbnail/(?P<_id>[\w-]+)$', 'getImageThumbnail', name='getImageThumbnail'),
                         url(r'^fullImage/(?P<_id>[\w-]+)$', 'getFullImage', name='getFullImage'),
+                        url(r'^get_mid_size_img/(?P<_id>[\w-]+)$', 'get_mid_size_img', name='get_mid_size_img'),
                         url(r'^image_search/$', 'image_search', name='image_search'),
                         url(r'^image_detail/(?P<_id>[\w-]+)$', 'image_detail', name='image_detail'),
                         url(r'^image_edit/(?P<_id>[\w-]+)$', 'image_edit', name='image_edit')
