@@ -1,0 +1,86 @@
+{% extends "ndf/base.html" %}
+{% block title %} {{title}} {% endblock %}
+
+{% block body_content %} 
+{% if user.is_authenticated %}
+
+<div class="row" style="padding-top:15px;">
+  <div class="small-6 large-6 columns">
+    <a href="{% url 'quiz_create_edit' group_name %}">
+      <input type="button" class="button small" style="float:left;" value="Create new {{title}} Category" />
+    </a>
+  </div>
+  <div class="small-6 large-6 columns">
+    <a href="{% url 'quiz_item_create_edit' group_name %}">
+      <input type="button" class="button small" style="float:right;" value="+ Add Miscellaneous Question" />
+    </a>
+  </div>
+  <hr />
+</div>
+
+{% endif %}
+
+{% load url from future %}
+
+<div class="row">
+  <div class="small-5 columns">
+    <h5>Quiz Catgories</h5>
+    {% for node in quiz_nodes %}
+    <div class="row">
+      <div class="small-8 columns">
+	<label class="inline"><strong><a href="{% url 'quiz_details' group_name node %}">{{ node.name }}</a></strong></label>
+      </div>
+      {% if user.is_authenticated %}
+      <div class="small-4 columns">
+	<a href="{% url 'quiz_item_create_edit' group_name node %}">
+	  <input type="button" class="button small" style="float:right;" value="+ Add Question" />
+	</a>
+      </div>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div class="row">
+      <div class="small-12 columns">
+	<p>Currently <b>NO Quiz Categories</b> in the gnowledge base!!!</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="small-7 columns" >
+    <h5>Miscellaneous Quiz Questions</h5>
+    {% for node in quiz_item_nodes %}
+    <div class="row" style="padding-left:8px;">
+      <div class="small-12 columns">
+	<label><strong><a href="{% url 'quiz_item_create_edit' group_name node %}">{{ node.html_content|safe|truncatewords:30 }}</a></strong></label>
+      </div>
+    </div>
+    {% empty %}
+    <div class="row">
+      <div class="small-12 columns">
+	<p>Currently <b>NO Miscellaneous Quiz Questions</b> in the gnowledge base!!!</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+{% endblock %}
+
+<script>
+var triggers = $(".modalInput").overlay({
+ 
+      // some mask tweaks suitable for modal dialogs
+      mask: {
+        color: '#ebecff',
+        loadSpeed: 200,
+        opacity: 0.9
+      },
+ 
+      closeOnClick: false
+  });
+</script>
+
+{% block script %}
+
+{% endblock %}

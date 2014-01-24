@@ -67,7 +67,7 @@ def select_drawer(request, group_name):
                                       },
                                       context_instance=RequestContext(request)
             )
-            
+          
         else:
             
             drawer = get_drawers(group_name, None, None, checked)   
@@ -107,8 +107,3 @@ def change_group_settings(request, group_name):
         except:
             return HttpResponse("failed")
     return HttpResponse("failed") 
-	    
-	
-
- 
-

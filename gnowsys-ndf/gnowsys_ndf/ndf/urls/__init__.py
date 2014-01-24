@@ -4,7 +4,6 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 
-
 from registration.backends.default.views import RegistrationView
 
 from gnowsys_ndf.ndf.forms import *
@@ -18,6 +17,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_name>[\w-]+)/page/', include('gnowsys_ndf.ndf.urls.page')),
     (r'^(?P<group_name>[\w-]+)/group/', include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_name>[\w-]+)/forum/', include('gnowsys_ndf.ndf.urls.forum')),
+    (r'^(?P<group_name>[\w-]+)/quiz/', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_name>[\w-]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_name>[\w-]+)/',include('gnowsys_ndf.ndf.urls.group')),
    # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
@@ -25,7 +25,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
     url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
-    url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form':UserResetform}),
+                       url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form':UserResetform},name='password_reset_done'),
     url(r'^accounts/password/reset/$',
         auth_views.password_reset,
         {
