@@ -16,9 +16,9 @@ db = get_database()
 
 
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(thread,parent,ind,token):
+def get_reply(thread,parent,ind,token,user):
   print "parent=",parent,"token=",token
-  return {'thread':thread,'reply': parent,'indent':ind+10,'csrf_token':token,'eachrep':parent}
+  return {'thread':thread,'reply': parent,'user':user,'indent':ind+10,'csrf_token':token,'eachrep':parent}
 
 @register.assignment_tag
 def get_all_replies(parent):
