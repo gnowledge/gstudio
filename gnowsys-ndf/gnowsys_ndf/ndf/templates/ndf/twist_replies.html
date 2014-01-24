@@ -13,29 +13,49 @@
  background-color:#CBCBCB ;
 
 }
+
+.response_change{
+margin-bottom:1px;
+padding-left:25px;
+padding-right:2px;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+}
 </style>
+
 
 {% get_all_replies reply as replies %}
 
 {% for eachrep in replies %}
+{% get_user_object eachrep.created_by as userobj %}
+
 <div class="row">
 <div id="insidediv" class="large-6 columns">
  <font size="1" color="darkblue" >
           {% with eachrep.content|safe as rep_content %}
               {{rep_content}}
           {% endwith %}
+       <font size="0.5">
+      by:<strong>{{userobj.username}}</strong>
+      <br/>
+      on:<strong>{{eachrep.created_at}}</strong>
+    </font>
 </font>
 </div>
         <div class="large-6 columns">
-	  	 {% if user.is_authenticated %}
+user{{user}}new
+	  
              {% include "ndf/replytwistrep.html" %}
-		 {% endif %}
+	
         </div>
 </div>
 
+<div class="response_change" id="refreshthread" class="large-12 columns">
 
 {% get_reply thread eachrep indent csrf_token %}
 
+</div>
 {% endfor %}
 
 
