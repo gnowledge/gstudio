@@ -1,0 +1,231 @@
+{% extends "ndf/base.html" %}
+
+{% load ndf_tags %}
+
+{% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
+
+{% block style %}
+
+.quiz-type-based-div{
+    display: none;
+}
+
+{% endblock %}
+
+{% block body_content %}
+
+<form id="quiz_item_create_form" method="POST" action="">
+{% csrf_token %}
+
+<div class="row">
+  <div class="small-12 large-12 columns">
+  <fieldset id="type_tag">
+    <legend>Quiz Item</legend>
+    <div class="row">
+      <div class="small-4 large-2 columns">
+	<label for="quiz_type" class="right inline">Type of Quiz</label>
+      </div>
+      <div class="small-8 large-10 columns">
+	<select id="quiz_type" name="quiz_type" autofocus {% if node.quiz_type %}disabled{% endif %}>
+	  {% for choice in quiz_type_choices %}
+	  <option value="{{choice}}" {% ifequal node.quiz_type choice %}selected{% endifequal %}>{{choice}}</option>
+	  {% endfor %}
+	</select>
+	<input id="quiz_type_val" name="quiz_type_val" type="hidden" value="{{node.quiz_type|default_if_none:""}}" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-4 large-2 columns">
+	<label for="quiz_type" class="right inline">Tags</label>
+      </div>
+      <div class="small-8 large-10 columns">
+
+	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" />
+      </div>
+    </div>
+  </fieldset>
+  </div>
+</div>
+
+<div class="row">
+  <div class="small-12 large-12 columns">
+    <fieldset id="question">
+      <legend>Question</legend>
+      <div class="row">
+	<div class="small-12 large-11 columns end">
+	  {% include "ndf/add_editor.html" with var_name="question" var_placeholder="Please enter question" var_value=node.content_org %}
+	</div>
+      </div>
+    </fieldset>
+
+    <fieldset id="options" style="display:none;">
+      <legend>Options</legend>
+      {% for option in node.options %}
+
+      <div class="row" id="option_div{% if not forloop.first %}_{{forloop.counter}}{% endif %}">
+	<div class="small-1 large-1 columns">
+	  <label for="option" class="right inline">{{forloop.counter}}.</label>
+	</div>
+	<div class="small-11 large-11 columns">
+	  <textarea id="option{% if not forloop.first %}_{{forloop.counter}}{% endif %}" name="option{% if not forloop.first %}_{{forloop.counter}}{% endif %}" rows="2" placeholder="Enter option here...">{{option}}</textarea>
+	  <!-- {#% include "ndf/add_editor.html" with var_name="option" var_placeholder="Please enter option" %#} -->
+	</div>
+      </div>
+
+      {% empty %}
+
+      <div class="row" id="option_div">
+	<div class="small-1 large-1 columns">
+	  <label for="option" class="right inline">1.</label>
+	</div>
+	<div class="small-11 large-11 columns">
+	  <textarea id="option" name="option" rows="2" placeholder="Enter option here..."></textarea>
+	  <!-- {#% include "ndf/add_editor.html" with var_name="option" var_placeholder="Please enter option" %#} -->
+	</div>
+      </div>
+      <div class="row" id="option_div_2">
+	<div class="small-1 large-1 columns">
+	  <label for="option_2" class="right inline">2.</label>
+	</div>
+	<div class="small-11 large-11 columns">
+	  <textarea id="option_2" name="option_2" rows="2" placeholder="Enter option here..."></textarea>
+	  <!-- {#% include "ndf/add_editor.html" with var_name="option_2" var_placeholder="Please enter option" %#} -->
+	</div>
+      </div>
+
+      {% endfor %}
+
+      <input id="add_option" name="add_option" type="button" class="button small" style="float:right;" value="+ Add Option"/>
+      <input id="no_of_options" name="no_of_options" type="hidden" value="{{node.options|length|default_if_none:"2"}}" />
+    </fieldset>
+
+    <fieldset id="answer">
+      <legend>Correct Answer</legend>
+      <div class="row">
+	<div class="quiz-type-based-div small-11 large-11 columns end" id="Short-Response">
+	  <textarea id="correct_answer_short" name="correct_answer_short" rows="2" placeholder="Enter correct answer here...">{{node.correct_answer.0|default_if_none:""}}</textarea>
+	  <!-- {#% include "ndf/add_editor.html" with var_name="correct_answer_short" var_placeholder="Please enter answer" %#} -->
+	</div>
+	<div class="quiz-type-based-div small-11 large-11 columns end" id="Single-Choice">
+	  <select id="correct_answer_single" name="correct_answer_single">
+	    {% for option in node.options %}
+	    <option value="{{forloop.counter}}" {% ifequal node.correct_answer.0 forloop.counter|slugify %}selected{% endifequal %} >{{forloop.counter}}</option>
+	    {% empty %}
+	    <option value="1">1</option>
+	    <option value="2">2</option>
+	    {% endfor %}
+	  </select>
+	</div>
+	<div class="quiz-type-based-div small-11 large-11 columns end" id="Multiple-Choice">
+	  <select id="correct_answer_multiple" name="correct_answer_multiple" multiple>
+	    {% for option in node.options %}
+	    <option value="{{forloop.counter}}" {% if forloop.counter|slugify in node.correct_answer %}selected{% endif %} >{{forloop.counter}}</option>
+	    {% empty %}
+	    <option value="1" selected>1</option>
+	    <option value="2">2</option>
+	    {% endfor %}
+	  </select>
+	</div>
+      </div>
+    </fieldset>
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="small-1 columns">
+    <input id="save_quiz_item" name="save_quiz_item" type="submit" class="button small" value="Save"/>
+  </div>
+</div>
+
+</form>
+
+<script type="text/javascript">
+
+/*
+ * Element     : quiz_type
+ * Type        : select (Drop-down list)
+ * Event       : on change
+ * Description : 
+   (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
+ */
+$('#quiz_type').change(function (){
+
+    if ($(this).val() != $('#' + $(this).attr('id') + ' option:nth-child(1)').val()) {
+	$('#options').css('display', 'block');
+    }
+    else {
+	$('#options').css('display', 'none');
+    }
+
+    $('.quiz-type-based-div').hide('fast');
+    var targetDivId = $(this).val();
+    $('div#' + targetDivId).show('fast');
+
+}).change();
+
+/*
+ * Element     : quiz_type
+ * Type        : select (Drop-down list)
+ * Event       : on change
+ * Description : 
+   (1) Based on which type of quiz is selected, it's corresponding answer-div is displayed (along with options, wherever required). 
+ */
+$('#quiz_type').blur(function (){
+    $(this).attr('disabled', true);
+    $("#quiz_type_val").val($(this).val())
+});
+
+var no_of_options = 2;
+/*
+ * Element     : add_option
+ * Type        : button
+ * Event       : on click
+ * Description : 
+   (1) It clones the structure of very first option element (div) and does the necessary renaming of it's elements; and then after pastes it above 
+       the '+ Add Option' button.
+   (2) Also adds the corresponding option number to the correct answer's drop-down list.
+ */
+$('#add_option').click(function (){
+    no_of_options = no_of_options + 1;
+
+    // Cloneing the very first option's div
+    var option_div_clone = $('#option_div').clone();
+
+    // Performing renaming of it's various elements
+    var name_val = 'option_div_' + no_of_options;
+    option_div_clone.attr({id: name_val, name: name_val});
+
+    option_div_clone.children().children('label').text(no_of_options + '.');
+    option_div_clone.children().children('label').attr('for', 'option_' + no_of_options);
+
+    // var orgitdownOrgitdown_option_div = option_div_clone.find('div#orgitdownOrgitdown_option');
+    // var orgitdownOrgitdown_option_div_id = orgitdownOrgitdown_option_div.attr('id');
+    // orgitdownOrgitdown_option_div_id = orgitdownOrgitdown_option_div_id + "_" + no_of_options;
+    // orgitdownOrgitdown_option_div.attr('id', orgitdownOrgitdown_option_div_id);
+
+    // var orgitdown_option_div = option_div_clone.find('textarea#orgitdown_option');
+    // var orgitdown_option_div_id = orgitdown_option_div.attr('id');
+    // orgitdown_option_div_id = orgitdown_option_div_id + "_" + no_of_options;
+    // orgitdown_option_div.attr({id: orgitdown_option_div_id, name: 'option_' + no_of_options});
+
+    option_div_clone.children().children('textarea').attr({id: 'option_' + no_of_options, name: 'option_' + no_of_options});
+
+    // Pasting the cloned element, after modifying it, above the '+ Add Option' button
+    $(this).before(option_div_clone);
+
+    // Fetching the appropriate correct answer (having drop-down list) based on the option selected (Single-choice/Multiple-choice) 
+    drop_down_answer_list_div_id = $('div#' + $('#quiz_type').val()).attr('id');
+    
+    // Fetching the corresponding drop-down list & appending the option number to it
+    drop_down_answer_list = $("#" + drop_down_answer_list_div_id).children('select');
+    drop_down_answer_list.append($('<option>', {value:no_of_options, text:no_of_options}));
+
+    // Updating number of options value to hidden element
+    $("#no_of_options").val(no_of_options);
+});
+
+</script>
+
+{% endblock %}
+

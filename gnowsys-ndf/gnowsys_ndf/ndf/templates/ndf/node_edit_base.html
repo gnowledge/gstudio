@@ -50,203 +50,200 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% block body_content %}
 
 <form id="form-edit-node" method="POST" action="">
-	{% csrf_token %}
+  {% csrf_token %}
+  
+  <div>
+    {% if node %}
+    <h2>{{node.name}}</h2>
+    {% else %}
+    <h3>Create New {{title}}</h3>
+    {% endif %}
+  </div>
 
-	<div>
-		{% if node %}
-		<h2>{{node.name}}</h2>
-		{% else %}
-		<h3>Create New {{title}}</h3>
-		{% endif %}
+  <dl class="tabs" data-tab>
+    <dd class="active" title="Click here to add Name, Description, Privacy and Tags">
+      <a href="#panel-name-description"><h5><b> Basic </b></h5></a>
+    </dd>
+    <dd title="Click here to add/edit Prior Node">
+      <a href="#panel-prior-node"><h5><b> Prior Node </b></h5></a>
+    </dd>
+    <dd title="Click here to add/edit collection">
+      <a href="#panel-collection"><h5><b> Collection </b></h5></a>
+    </dd>  
+  </dl>
+  <br/>
+
+  <div id="node-details-edit-div" class="tabs-content" > 
+    
+    <div class="active content" id="panel-name-description"  style="width:95%;">
+      
+      <div class="row">
+	<div class="small-3 columns text-right">
+	  <h5>Name : </h5>
 	</div>
+	<div class="small-4  small-offset-5 small-pull-5 columns">
+	  <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter the title">
+	</div>
+      </div>
+      
+      <div class="row">
+	<div class="small-3 columns text-right">
+	  <h5>Privacy : </h5>
+	</div>
+	<div class="small-4 small-offset-5 small-pull-5 columns line-height-2">
+	  <input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
+	</div>
+      </div>
+      <br/>
+      
+      <div class="row">
+	<div class="small-3 columns text-right">
+	  <h5>Description : </h5>
+	</div>
+	<div class="small-9 columns">
+	  <textarea id="orgitdown" name="content_org" placeholder="Please enter description here.">{{node.content_org|default_if_none:""}}</textarea>				
+	</div>
+      </div>
+      <br/>
+      
+      <div class="row">
+	<div class="small-3 columns text-right">
+	  <h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
+	</div>
+	<div class="small-4 small-offset-5 small-pull-5 columns">
+	  <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ">
+	</div>
+      </div>
+    </div>
 
-	<dl class="tabs" data-tab>
-		<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
-			<a href="#panel-name-description"><h5><b> Basic </b></h5></a>
-		</dd>
-		<dd title="Click here to add/edit Prior Node">
-			<a href="#panel-prior-node"><h5><b> Prior Node </b></h5></a>
-		</dd>
-		<dd title="Click here to add/edit collection">
-			<a href="#panel-collection"><h5><b> Collection </b></h5></a>
-		</dd>  
-	</dl>
+    <div class="content" id="panel-prior-node"  style="width:95%;">
+      <div class="row">
+	<div class="small-12 columns">
+	  <h5>Add or edit Prior Node : </h5>
+	</div>
 	<br/>
 
-	<div id="node-details-edit-div" class="tabs-content" > 
-
-		<div class="active content" id="panel-name-description"  style="width:95%;">
-
-			<div class="row">
-				<div class="small-3 columns text-right">
-					<h5>Name : </h5>
-				</div>
-				<div class="small-4  small-offset-5 small-pull-5 columns">
-					<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter the title">
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="small-3 columns text-right">
-					<h5>Privacy : </h5>
-				</div>
-				<div class="small-4 small-offset-5 small-pull-5 columns line-height-2">
-					<input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
-				</div>
-			</div>
-			<br/>
-
-			<div class="row">
-				<div class="small-3 columns text-right">
-					<h5>Description : </h5>
-				</div>
-				<div class="small-9 columns">
-					<textarea id="orgitdown" name="content_org" placeholder="Please enter description here.">{{node.content_org|default_if_none:""}}</textarea>				
-				</div>
-			</div>
-			<br/>
-
-			<div class="row">
-				<div class="small-3 columns text-right">
-					<h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
-				</div>
-				<div class="small-4 small-offset-5 small-pull-5 columns">
-					<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ">
-				</div>
-			</div>
-		</div>
-
-		<div class="content" id="panel-prior-node"  style="width:95%;">
-			<div class="row">
-				<div class="small-12 columns">
-					<h5>Add or edit Prior Node : </h5>
-				</div>
-				<br/>
-
-				<div class="small-12 columns">
-					<div id="prior_node_drawer">
-						{% edit_drawer_widget "prior_node" group_name node %}
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="content" id="panel-collection"  style="width:95%;">
-			<div class="row">
-				<div class="small-12 columns">
-					<h5>Add or edit Collection : </h5>
-				</div>				
-				<br/><br/>
-
-				<div class="small-12 columns">
-					<div id="SelectApp" class="row">
-						<div class="small-2 columns line-height-2pt5">
-							Classify by :
-						</div>
-						<div class="small-2 columns">
-							<input type="radio" name="col" value="Page" />
-							Page <span class="divider-line">|</span>
-							<span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
-						</div>
-						<div class="small-2 columns">
-							<input type="radio" name="col" value="File" />
-							File <span class="divider-line">|</span>
-							<span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
-						</div>
-						<div class="small-2 small-pull-4 columns">
-							<input type="radio" name="col" value="Image" />
-							Image <span class="divider-line">|</span>
-							<span class="fontsize-x-large"><i class="step fi-photo"></i>
-							</span>
-						</div>
-					</div>
-				</div>
-
-				<div class="small-12 columns">
-					<div id="collection_drawer" >
-						{% edit_drawer_widget "collection" group_name node %}
-					</div>
-				</div>
-			</div>
-			<br/>
-
-		</div>
-
+	<div class="small-12 columns">
+	  <div id="prior_node_drawer">
+	    {% edit_drawer_widget "prior_node" group_name node title %}
+	  </div>
 	</div>
+      </div>
+    </div>
 
-	{% block add_fields %} {% endblock %}
-
-	<div class="row" >
-		<input type="submit" id="save-node" value="Save" class="button small-10 small-push-1 column"/>
-	</div>
+    <div class="content" id="panel-collection" style="width:95%;">
+      <div class="row">
+	<div class="small-12 columns">
+	  <h5>Add or edit Collection : </h5>
+	</div>				
 	<br/><br/>
+	
+	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
+	  <div id="SelectApp" class="row">
+	    <div class="small-2 columns line-height-2pt5">
+	      Classify by :
+	    </div>
+	    <div class="small-2 columns">
+	      <input type="radio" name="col" value="Page" selected/>
+	      Page <span class="divider-line">|</span>
+	      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
+	    </div>
+	    <div class="small-2 columns">
+	      <input type="radio" name="col" value="File" />
+	      File <span class="divider-line">|</span>
+	      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
+	    </div>
+	    <div class="small-2 small-pull-4 columns">
+	      <input type="radio" name="col" value="Image" />
+	      Image <span class="divider-line">|</span>
+	      <span class="fontsize-x-large"><i class="step fi-photo"></i>
+	      </span>
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="small-12 columns">
+	  <div id="collection_drawer" >
+	    {% edit_drawer_widget "collection" group_name node title %}
+	  </div>
+	</div>
+      </div>
+      <br/>
+      
+    </div>
+    
+  </div>
+  
+  {% block add_fields %} {% endblock %}
+
+  <div class="row" >
+    <input type="submit" id="save-node" value="Save" class="button small-10 small-push-1 column"/>
+  </div>
+  <br/><br/>
 
 </form>
 
 <script type="text/javascript">
 
-	$("input:radio").click(function() 
-	{
-	// For collection
-	c_opts = $("#collection_drawer2 b");        
-	c_len = c_opts.length;
-
-	c_arr = [];
-	for (var i = 0; i < c_len; i++) {
-		c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
+$("input:radio").click(function() {
+    // For collection
+    c_opts = $("#collection_drawer2 b");        
+    c_len = c_opts.length;
+    
+    c_arr = [];
+    for (var i = 0; i < c_len; i++) {
+	c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
+    }
+    var c_list = c_arr.join(',');   
+    
+    $.ajax({
+	type: "POST",
+	url: "{% url 'select_drawer' group_name %}",
+	datatype: "html",
+	data:{
+	    homo_collection: this.value,
+	    collection_list: c_list,
+	    csrfmiddlewaretoken: '{{ csrf_token }}'
+	},
+	success: function(data) {
+	    $("#collection_drawer").html(data);
 	}
-	var c_list = c_arr.join(',');   
-
-	$.ajax({
-		type: "POST",
-		url: "{% url 'select_drawer' group_name %}",
-		datatype: "html",
-		data:{
-			homo_collection: this.value,
-			collection_list: c_list,
-			csrfmiddlewaretoken: '{{ csrf_token }}'
-		},
-		success: function(data) {
-			$("#collection_drawer").html(data);
-		}
-	});
-
+    });
+    
 });
 
 
-	$(document).ready(function() {
-	// Must be there to display org-editor shortcuts
-	$("#orgitdown").orgitdown(mySettings);
+$(document).ready(function() {
+    // Must be there to display org-editor shortcuts
+    $("#orgitdown").orgitdown(mySettings);
 });
 
 
-	$("#save-node").click(function() {
+$("#save-node").click(function() {
+    
+    // For prior-node
+    pn_opts = $("#prior_node_drawer2 b");
+    pn_len = pn_opts.length;
+    
+    var pn_arr = [];
+    for (var i = 0; i < pn_len; i++) {
+	pn_arr[i] = "'" + pn_opts[i].innerHTML.trim() + "'";
+    }
+    var pn_list = pn_arr.join(',');
+    $("#prior_node_list").val(pn_list)
+    
+    // For collection
+    c_opts = $("#collection_drawer2 b");
+    c_len = c_opts.length;
+    
+    c_arr = [];
+    for (var i = 0; i < c_len; i++) {
+	c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
+    }
+    var c_list = c_arr.join(',');
+    $("#collection_list").val(c_list)
 
-	// For prior-node
-	pn_opts = $("#prior_node_drawer2 b");
-	pn_len = pn_opts.length;
-
-	var pn_arr = [];
-	for (var i = 0; i < pn_len; i++) {
-		pn_arr[i] = "'" + pn_opts[i].innerHTML.trim() + "'";
-	}
-	var pn_list = pn_arr.join(',');
-	$("#prior_node_list").val(pn_list)
-
-	// For collection
-	c_opts = $("#collection_drawer2 b");
-	c_len = c_opts.length;
-
-	c_arr = [];
-	for (var i = 0; i < c_len; i++) {
-		c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
-	}
-	var c_list = c_arr.join(',');
-
-	$("#collection_list").val(c_list)
-
-
-	{% block base_save_on_click %}{% endblock %}
+    {% block base_save_on_click %}{% endblock %}
 });
 
 </script>
