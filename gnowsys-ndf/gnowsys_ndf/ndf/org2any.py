@@ -88,6 +88,6 @@ def org2html(org_content, file_prefix="", file_delete=True):
     for line in html_data[start_index:end_index]:
         strip_html_data += line.decode('utf-8').lstrip()
 
-    #strip_html_data = strip_html_data.replace("<a href=\"http://validator.w3.org/check?uri=referer\">Validate XHTML 1.0</a>\n", "")
+    strip_html_data = strip_html_data.replace("\n", "")
 
     return strip_html_data
