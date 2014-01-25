@@ -1,0 +1,105 @@
+{% extends "ndf/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+
+  <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['\\[','\\]'], ['$$','$$']]
+      }
+    });
+  </script>
+
+  <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+  <script type="text/javascript"
+	  src="http://atlas.metastudio.org/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+{% endblock %}
+
+{% block body_content %}
+
+  <div class="row" style="padding-top:15px">
+
+    <div class="small-12 large-6 columns text-right">
+      <div class="row">
+	<div class="small-12 large-12 columns text-left">
+	  <p>Posted by : {{ node.user_details_dict.created_by }} on {{ node.created_at|date:"j F Y" }}</p>
+	</div>
+	<div class="small-12 large-12 columns text-left">
+	  Member of : {{ node.member_of|join:', ' }}
+	</div>
+	<div class="small-12 large-12 columns text-left">
+	  Contributors : {{ node.user_details_dict.modified_by|join:', ' }}
+	</div>
+	<div class="small-12 large-12 columns text-left">
+	  Versions : {% for seq_no, version_no in node.version_dict.items reversed %}<abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}">*</a></abbr> {% endfor %}
+	</div>
+      </div>
+    </div>
+
+    <div class="small-12 large-6 columns text-right">
+      <div class="row">
+	<div class="small-12 large-12 columns text-right">
+	  <p>Last update : {{ node.last_update|date:"j F Y" }}</p>
+	</div>
+	<div class="small-12 large-12 columns text-right">
+	  <a href="{% url 'quiz_item_create_edit' group_name node %}" class="button small">Edit this Question<a>
+	</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+    
+    <div class="small-12 columns" id="question_fs">
+      <h4>Question</h4>
+
+      <div class="panel">
+	{{node.html_content|safe}}
+	
+	{% if node.options %}
+          {% for option in node.options %}
+            <p style="padding-left:30px;">{{forloop.counter}}.&nbsp{{option}}</p>
+          {% endfor %}
+	{% endif %}
+      </div>
+    </div>
+    
+    <div class="small-12 columns" id="answer_fs">
+      <h4>Answer</h4>
+      <div class="panel callout radius">
+	{% for ca in node.correct_answer %}
+          {% if node.options %}
+            {% if not forloop.last %}
+              {{ca}},&nbsp
+            {% else %}
+              {{ca}}
+            {% endif %}
+          {% else %}
+            {{ca|linebreaks}}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="small-12 columns" id="question_fs">
+      <h4>Tags</h4>
+      <div class="panel">
+	{% if node.tags %}
+          {% for tag in node.tags %}
+            <span class="radius label">{{tag}}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+{% endblock %}
+
