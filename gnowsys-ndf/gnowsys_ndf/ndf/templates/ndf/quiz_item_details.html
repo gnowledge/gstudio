@@ -48,7 +48,9 @@
 	  <p>Last update : {{ node.last_update|date:"j F Y" }}</p>
 	</div>
 	<div class="small-12 large-12 columns text-right">
+	  {% if user.is_authenticated %}
 	  <a href="{% url 'quiz_item_create_edit' group_name node %}" class="button small">Edit this Question<a>
+	  {% endif %}
 	</div>
       </div>
     </div>
