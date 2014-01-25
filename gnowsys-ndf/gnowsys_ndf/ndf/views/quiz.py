@@ -69,11 +69,25 @@ def quiz(request, group_name, app_id):
         )
 
     else:
-        quiz_node = collection.Node.one({"_id": ObjectId(app_id)})
-        return render_to_response('ndf/quiz_details.html', 
-                                  { 'node': quiz_node,
-                                    'group_name': group_name
-                                  },
+        node = collection.Node.one({"_id": ObjectId(app_id)})
+
+        title = gst_quiz.name #+ " - " + node.name
+        print "\n title: ", title
+
+        template_name = ""
+        context_variables = { 'node': node,
+                              'title': title,
+                              'group_name': group_name
+                          }
+        
+        if gst_quiz._id in node.gsystem_type:
+            template_name = "ndf/quiz_details.html"
+
+        else:
+            template_name = "ndf/quiz_item_details.html"
+
+        return render_to_response(template_name, 
+                                  context_variables,                          
                                   context_instance = RequestContext(request)
         )        
 
