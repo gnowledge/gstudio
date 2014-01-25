@@ -4,19 +4,6 @@
 
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
 
-{% block head %}
-
-<!-- orgitdown! -->
-<script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown.js"></script>
-<!-- orgitdown! toolbar settings -->
-<script type="text/javascript" src="/static/ndf/orgitdown/sets/org/set.js"></script>
-<!-- orgitdown! toolbar skin -->
-<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/sets/org/style.css" />
-<!-- orgitdown! skin -->
-<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/orgitdown/style.css" />
-
-{% endblock %}
-
 {% block style %}
 
 .divider-line { font-size: xx-large; color:lightgray; }
@@ -101,7 +88,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  <h5>Description : </h5>
 	</div>
 	<div class="small-9 columns">
-	  <textarea id="orgitdown" name="content_org" placeholder="Please enter description here.">{{node.content_org|default_if_none:""}}</textarea>				
+	  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter description" var_value=node.content_org|default_if_none:"" %}
 	</div>
       </div>
       <br/>
@@ -216,12 +203,6 @@ $("input:radio").click(function() {
 	}
     });
     
-});
-
-
-$(document).ready(function() {
-    // Must be there to display org-editor shortcuts
-    $("#orgitdown").orgitdown(mySettings);
 });
 
 

@@ -31,7 +31,7 @@ def get_all_replies(parent):
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_name, node, checked):
+def edit_drawer_widget(field, group_name, node, checked=None):
 
   drawers = None
   drawer1 = None
@@ -41,40 +41,22 @@ def edit_drawer_widget(field, group_name, node, checked):
     if field == "collection":
       if checked == "Quiz":
         checked = "QuizItem"
-      else:
-        checked = None   
 
       drawers = get_drawers(group_name, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
-      if checked == "Quiz":
-        checked = "QuizItem"
-      else:
-        checked = None
-
       drawers = get_drawers(group_name, node._id, node.prior_node, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
 
   else:
-    if field == "collection": 
-      if checked == "Quiz":
-        checked = "QuizItem"
-      else: 
-        checked = None
-
-    elif field == "prior_node":
-      if checked == "Quiz":
-        checked = "QuizItem"
-      else:
-        checked = None
+    if field == "collection" and checked == "Quiz":
+      checked = "QuizItem"
 
     drawer1 = get_drawers(group_name, None, [], checked)
 
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
-
-
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
