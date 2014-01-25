@@ -25,43 +25,35 @@
 
   <div class="row" style="padding-top:15px">
 
-    <div class="small-12 large-6 columns text-right">
-      <div class="row">
-	<div class="small-12 large-12 columns text-left">
-	  <p>Posted by : {{ node.user_details_dict.created_by }} on {{ node.created_at|date:"j F Y" }}</p>
-	</div>
-	<div class="small-12 large-12 columns text-left">
-	  Member of : {{ node.member_of|join:', ' }}
-	</div>
-	<div class="small-12 large-12 columns text-left">
-	  Contributors : {{ node.user_details_dict.modified_by|join:', ' }}
-	</div>
-	<div class="small-12 large-12 columns text-left">
-	  Versions : {% for seq_no, version_no in node.version_dict.items reversed %}<abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}">*</a></abbr> {% endfor %}
-	</div>
-      </div>
+    <div class="small-12 columns">
+      <ul class="inline-list">
+	<li><h3>Question</h3></li>
+	{% if user.is_authenticated %}
+	<li><a href="{% url 'quiz_item_create_edit' group_name node %}" class="button small">Edit this Question<a></li>
+	{% endif %}
+	</ul>
+      
+      <p>
+	{{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
+      </p>
+      <p>
+	Version{{ node.version_dict|length|pluralize }}: 
+	{% for seq_no, version_no in node.version_dict.items reversed %}
+	<abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+	{% endfor %}
+      </p>
+      {% if node.tags|length > 0 %}
+      <p>
+	Tag{{ node.tags|length|pluralize }}: 
+        {% for tag in node.tags %}
+        <span class="radius label">{{tag}}</span>
+        {% endfor %}
+      </p>
+      {% endif %}
+      <hr style="border-width:1.4px; border-color:black;"/>
     </div>
-
-    <div class="small-12 large-6 columns text-right">
-      <div class="row">
-	<div class="small-12 large-12 columns text-right">
-	  <p>Last update : {{ node.last_update|date:"j F Y" }}</p>
-	</div>
-	<div class="small-12 large-12 columns text-right">
-	  {% if user.is_authenticated %}
-	  <a href="{% url 'quiz_item_create_edit' group_name node %}" class="button small">Edit this Question<a>
-	  {% endif %}
-	</div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="row">
     
     <div class="small-12 columns" id="question_fs">
-      <h4>Question</h4>
-
       <div class="panel">
 	{{node.html_content|safe}}
 	
@@ -84,7 +76,7 @@
               {{ca}}
             {% endif %}
           {% else %}
-            {{ca|linebreaks}}
+            {{ca|linebreaksbr}}
           {% endif %}
         {% endfor %}
       </div>
