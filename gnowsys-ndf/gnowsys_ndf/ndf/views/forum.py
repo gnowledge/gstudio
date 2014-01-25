@@ -101,7 +101,7 @@ def display_forum(request,group_name,forum_id):
 
 def display_thread(request,group_name,thread_id):
     thread = gs_collection.GSystemType.one({'_id': ObjectId(thread_id)})
-    variables=RequestContext(request,{'thread':thread,'eachrep':thread})
+    variables=RequestContext(request,{'thread':thread,'eachrep':thread,'user':request.user})
     return render_to_response("ndf/thread_details.html",variables)
 
 def add_node(request,group_name):
@@ -131,8 +131,8 @@ def add_node(request,group_name):
             colrep.name=unicode(name)
             colrep.member_of.append(reply_st.name)
             colrep.gsystem_type.append(reply_st._id)
-        if node=="Reply":
-            exstng_reply=gs_collection.GSystem.one({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(sup._id)}]})
+#        if node=="Reply":
+#            exstng_reply=gs_collection.GSystem.one({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(sup._id)}]})
         colrep.prior_node.append(sup._id)
         filename = slugify(name) + "-" + request.user.username + "-"
         colrepcont = unicode(org2html(content_org, file_prefix=filename))
@@ -141,14 +141,13 @@ def add_node(request,group_name):
         colrep.content_org = unicode(content_org.encode('utf8'))
         usrid=int(request.user.id)
         colrep.created_by=usrid
+        colrep.group_set.append(unicode(group_name))
         colrep.save()
         if node == "Reply":
-            if exstng_reply:
-                exstng_reply.prior_node =[]
-                exstng_reply.prior_node.append(colrep._id)
-                exstng_reply.save()
-          
-
+            # if exstng_reply:
+            #     exstng_reply.prior_node =[]
+            #     exstng_reply.prior_node.append(colrep._id)
+            #     exstng_reply.save()
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
             variables=RequestContext(request,{'thread':threadobj,'user':request.user})
             return render_to_response("ndf/refreshtwist.html",variables)
@@ -159,5 +158,5 @@ def add_node(request,group_name):
 
 
     except Exception as e:
-        return HttpResponse(""+e)
+        return HttpResponse(""+str(e))
     return HttpResponse("success")

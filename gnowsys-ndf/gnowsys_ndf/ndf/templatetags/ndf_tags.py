@@ -16,9 +16,9 @@ db = get_database()
 
 
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(thread,parent,ind,token):
+def get_reply(thread,parent,ind,token,user):
   print "parent=",parent,"token=",token
-  return {'thread':thread,'reply': parent,'indent':ind+10,'csrf_token':token,'eachrep':parent}
+  return {'thread':thread,'reply': parent,'user':user,'indent':ind+10,'csrf_token':token,'eachrep':parent}
 
 @register.assignment_tag
 def get_all_replies(parent):
@@ -26,12 +26,12 @@ def get_all_replies(parent):
    ex_reply=""
    if parent:
      ex_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}]})
-   print "exrep=",ex_reply.count()
+     ex_reply.sort('created_at',-1)
    return ex_reply
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_name, node, checked=""):
+def edit_drawer_widget(field, group_name, node, checked):
 
   drawers = None
   drawer1 = None
@@ -41,20 +41,41 @@ def edit_drawer_widget(field, group_name, node, checked=""):
     if field == "collection":
       if checked == "Quiz":
         checked = "QuizItem"
+      else:
+        checked = None   
+
       drawers = get_drawers(group_name, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
+      if checked == "Quiz":
+        checked = "QuizItem"
+      else:
+        checked = None
+
       drawers = get_drawers(group_name, node._id, node.prior_node, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
 
   else:
-    if field == "collection" and checked == "Quiz":
-      checked = "QuizItem"
+    if field == "collection": 
+      if checked == "Quiz":
+        checked = "QuizItem"
+      else: 
+        checked = None
+
+    elif field == "prior_node":
+      if checked == "Quiz":
+        checked = "QuizItem"
+      else:
+        checked = None
+
     drawer1 = get_drawers(group_name, None, [], checked)
 
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
+
+
+
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(group_name):
@@ -77,6 +98,7 @@ def get_forum_twists(forum):
   gs_collection = db[Node.collection_name]
   ret_replies=[]
   exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+  exstng_reply.sort('created_at')
   for each in exstng_reply:
     ret_replies.append(each)
   return ret_replies
