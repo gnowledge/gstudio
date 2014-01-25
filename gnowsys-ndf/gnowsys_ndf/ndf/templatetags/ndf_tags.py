@@ -78,9 +78,10 @@ def edit_drawer_widget(field, group_name, node, checked):
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(group_name):
+def get_gapps_menubar(group_name, selectedGapp):
   """Get Gapps menu-bar
   """
+
   gst_collection = db[GSystemType.collection_name]
   gst_cur = gst_collection.GSystemType.find({'$and':[{'_type':'GSystemType'},{'member_of':'GAPP'}]})
 
@@ -90,7 +91,9 @@ def get_gapps_menubar(group_name):
     i = i+1;
     gapps[i] = {'id': app._id, 'name': app.name.lower()}
 
-  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'group_name': group_name}
+  selectedGapp = selectedGapp.split("/")[2]
+  
+  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp, 'group_name': group_name}
 
 
 @register.assignment_tag
