@@ -213,11 +213,12 @@ def get_node_common_fields(request, node, group_name, node_type):
     i = i+1
       
   # ------------------------------------------------------------------------------- org-content
-  node.content_org = unicode(content_org)
-
-  # Required to link temporary files with the current user who is modifying this document
-  usrname = request.user.username
-  filename = slugify(name) + "-" + usrname + "-"
-  node.content = org2html(content_org, file_prefix=filename)
+  if content_org:
+    node.content_org = unicode(content_org)
+    
+    # Required to link temporary files with the current user who is modifying this document
+    usrname = request.user.username
+    filename = slugify(name) + "-" + usrname + "-"
+    node.content = org2html(content_org, file_prefix=filename)
 
   
