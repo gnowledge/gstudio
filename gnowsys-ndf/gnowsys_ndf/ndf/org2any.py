@@ -44,6 +44,7 @@ def org2html(org_content, file_prefix="", file_delete=True):
     # org editor content manipulation for temporary file (".org")
     org_content_header_for_file = "\n#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" \
                                 + "\n#+TITLE: \n"
+
     org_content_for_file = org_content.replace("\r", "")
 
     # Creating a temporary file with ".org" extension 
@@ -53,7 +54,9 @@ def org2html(org_content, file_prefix="", file_delete=True):
     filename_org = org_file_obj.name
     # Example (filename_org): "/tmp/wikiname-usrname-tmptCd4aq.org"
 
-    org_file_obj.write((org_content_header_for_file + org_content_for_file).encode('utf-8'))
+    encode_content = (org_content_header_for_file + org_content_for_file).encode('utf-8')
+
+    org_file_obj.write(encode_content)
     # NOTE: Don't close this file till the time, html file is created
 
     # Move the cursor - pointing to start of the file
@@ -87,7 +90,5 @@ def org2html(org_content, file_prefix="", file_delete=True):
     end_index = html_data.index("</body>\n")              # Copy data until you reach before </body>\n element
     for line in html_data[start_index:end_index]:
         strip_html_data += line.decode('utf-8').lstrip()
-
-    #strip_html_data = strip_html_data.replace("<a href=\"http://validator.w3.org/check?uri=referer\">Validate XHTML 1.0</a>\n", "")
 
     return strip_html_data
