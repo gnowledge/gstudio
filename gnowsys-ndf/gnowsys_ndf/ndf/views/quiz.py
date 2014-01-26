@@ -69,11 +69,24 @@ def quiz(request, group_name, app_id):
         )
 
     else:
-        quiz_node = collection.Node.one({"_id": ObjectId(app_id)})
-        return render_to_response('ndf/quiz_details.html', 
-                                  { 'node': quiz_node,
-                                    'group_name': group_name
-                                  },
+        node = collection.Node.one({"_id": ObjectId(app_id)})
+
+        title = gst_quiz.name #+ " - " + node.name
+
+        template_name = ""
+        context_variables = { 'node': node,
+                              'title': title,
+                              'group_name': group_name
+                          }
+        
+        if gst_quiz._id in node.gsystem_type:
+            template_name = "ndf/quiz_details.html"
+
+        else:
+            template_name = "ndf/quiz_item_details.html"
+
+        return render_to_response(template_name, 
+                                  context_variables,                          
                                   context_instance = RequestContext(request)
         )        
 
@@ -104,17 +117,14 @@ def create_edit_quiz_item(request, group_name, node_id=None):
 
         if "Quiz" in node.member_of:
             # Add question from a given Quiz category's context
-            print "\n Add question from a given Quiz category's context...\n"
             quiz_node = node
             quiz_item_node = collection.GSystem()
 
         else:
             # Edit a question
-            print "\n Edit a question...\n"
             quiz_item_node = node
     else:
         # Add miscellaneous question
-        print "\n Add miscellaneous question...\n"
         quiz_item_node = collection.GSystem()
 
 
@@ -178,7 +188,6 @@ def create_edit_quiz_item(request, group_name, node_id=None):
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
             quiz_node.save()
-            print "\n Successfully added to miscellaneous list as well as to the quiz category...\n"
         
         return HttpResponseRedirect(reverse('quiz', kwargs={'group_name': group_name, 'app_id': gst_quiz._id}))
         
