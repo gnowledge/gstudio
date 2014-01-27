@@ -1,10 +1,23 @@
- 
 <!-- GApps Menubar -->
 
 {% for index_key, app_dict in gapps.items %}
-  <li>
-    <a href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
-  </li>
+
+ 	<li>
+	{% if app_dict.name|lower == selectedGapp|lower %}
+	
+		<a class="active-menu" href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
+
+	{% elif app_dict.id|safe == selectedGapp|safe %}
+
+		<a class="active-menu" href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
+	
+	{% else %}
+		
+		<a href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
+
+	{% endif %}
+	</li>
+
 {% endfor %}
 
 <!-- ============= -->
