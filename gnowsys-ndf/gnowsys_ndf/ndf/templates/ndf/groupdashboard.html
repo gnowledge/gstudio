@@ -84,21 +84,18 @@ notify(groupn,"remove")
                      <input type="hidden" id="groupname" value="{{group}}">
                       {% if user_is_joined == "joined" %}
                         <input type="submit" id="remove" value="Unsubscribe" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible">
-       <input type="submit" id="notify"value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden" >
+       <input type="submit" id="notify" value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden" >
                  
 		      {% elif user_is_joined == "not"  %}
                         <input type="submit" id="remove" value="Unsubscribe" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden">
-
-                        <input type="submit" id="notify"value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible" >
-                      {% elif user_is_joined == "author" %}
+<input type="submit" id="notify"value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible" >
+       
+			{% endif %}
+                      {% if user_is_joined == "author" %}
    			Group Owner
-                      {% endif %}		
+                       {% include "ndf/invite_users.html" %}   
+                     {% endif %}		
 
-                </div> 
-              {% else %}
-               
-                 <div style='display:table-cell;' colspan='2' align="middle">
-                        <input type="submit" id="invite" value="Invite" class="btn btn-primary btn-small btn-block" align="center">
                 </div> 
               {% endif %}
         </div>

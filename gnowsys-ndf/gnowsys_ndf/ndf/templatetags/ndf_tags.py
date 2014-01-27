@@ -14,6 +14,19 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 register = Library()
 db = get_database()
 
+@register.simple_tag
+def get_all_users_to_invite():
+  try:
+    allusers={}
+    users=User.objects.all()
+    for each in users:
+      allusers[each.id]=each.username.__str__()+"<"+each.email.__str__()+">"
+    inv_users={v: k for k, v in allusers.items()}
+
+    return inv_users
+  except Exception as e:
+    print str(e)
+ 
 
 @register.inclusion_tag('ndf/twist_replies.html')
 def get_reply(thread,parent,ind,token,user):
