@@ -72,13 +72,27 @@
     </div>
 
     <!-- For arrows Up, Down, Left, Right -->
-    <div class="small-1 columns  text-center" id="">
+    <div class="small-1 columns  text-center" >
 
-     <input id="{{widget_for}}_btnUp" type="button" style="width:50px; height:30px;" value ="  ^  "><br/>
-     <input id="{{widget_for}}_btnRight" type="button" style="width:50px; height:30px;" value ="  >  "><br/>
-     <input id="{{widget_for}}_btnLeft" type="button" style="width:50px; height:30px;" value ="  <  "><br/>
-     <input id="{{widget_for}}_btnDown" type="button" style="width:50px; height:30px;" value ="  v  "><br/>    
+    	<span id="{{widget_for}}_btnUp" class="fontsize-x-large">
+     		<i class="fi-arrow-up coll-arrows"></i>
+    	</span>
+    	<br/>
      
+	    <span id="{{widget_for}}_btnRight" class="fontsize-x-large">
+     		<i class="fi-arrow-right coll-arrows"></i>
+     	</span>
+     	<br/>
+     
+	    <span id="{{widget_for}}_btnLeft" class="fontsize-x-large">
+     		<i class="fi-arrow-left coll-arrows"></i>
+     	</span>
+     	<br/>	
+     
+	    <span id="{{widget_for}}_btnDown" class="fontsize-x-large">
+     		<i class="fi-arrow-down coll-arrows"></i>
+     	</span>
+     	     
    </div>
 
    <!-- For collection created on RHS -->
@@ -100,14 +114,14 @@
               <div class="small-5 columns text-left">
                 &nbsp;&nbsp; <b> {{value.0}} </b>   
               </div>                
-              <div class="small-7 columns">
-                <i class="posted-by" >By:{{value.1}} on {{value.2}}</i>
+              <div class="small-7 columns text-right">
+                <i class="posted-by" >By : {{value.1}} on {{value.2}}</i>
               </div>     
             </div>
 
             <div class="row">
-              <div class="small-12 columns text-left">
-                {% if value.3|length > 90 %}
+              <div class="small-12 columns text-left" style="padding-top:0.5rem;">
+                {% if value.3|length > 40 %}
                 &nbsp;&nbsp; {{value.3}}. . .
                 {% else %}
                 &nbsp;&nbsp; {{value.3}}
@@ -135,7 +149,7 @@
 <script type="text/javascript">
 
     //To allocate space of 10 resources listing for drawers.
-    liHeight = $("#{{widget_for}}_drawer1 > li.bullet-item").outerHeight();
+    liHeight = $("#{{widget_for}}_drawer1 > li").outerHeight();
     $(".resource-drawer").height(liHeight * 15);
 
     //For clicked or selected resource item

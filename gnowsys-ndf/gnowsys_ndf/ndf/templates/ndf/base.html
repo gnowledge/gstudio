@@ -85,6 +85,20 @@
 			color: #bbb;
 		}
 
+		.active-menu{
+			background-color: #16A085 !important; 
+		}
+
+		.coll-arrows{
+			cursor:pointer;
+    		display: block;
+    		padding: 0.5rem;
+		}
+
+		.coll-arrows:hover{
+			background-color: #D3D3D3;
+		}
+
 		{% block style %}  {% endblock %}
 
 	</style>
@@ -102,7 +116,7 @@
 		<nav class="top-bar" data-topbar>
 			<ul class="title-area">
 				<li class="name">
-					<h1><a href="/"><img src="/static/ndf/images/icon/meta.png"> Meta<b>Studio</b></a></h1>
+					<h1><a href="/"><img src="/static/ndf/images/icon/meta.png"> meta<b>Studio</b></a></h1>
 				</li>
 				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
 			</ul>
@@ -166,7 +180,7 @@
 
 				</li>
 
-					{% get_gapps_menubar group_name %}
+					{% get_gapps_menubar group_name request.META.PATH_INFO %}
 				</ul>
 			</section>
 		</nav>
@@ -194,7 +208,7 @@
 
 		<!-- Start of content section -->
 		<article class="medium-12 columns">
-
+			
 			{% block body_content %}  {% endblock %}
 			{% block extra_content %}  {% endblock %}
 
@@ -226,17 +240,15 @@
 		<!-- JS -->
 		<script src="/static/ndf/foundation/js/foundation.min.js"></script>
 		<script src="/static/ndf/foundation/js/foundation/foundation.topbar.js"></script>
-		<!--<script src="/static/ndf/js/application.js"></script> -->
 
 		<script type="text/javascript">
 
 		// Initialize Foundation CSS
 		$(document).foundation();
 
-		
 		{% block script %} {% endblock %}	
 
-	</script>
+		</script>
 
 </body>
 

@@ -16,9 +16,9 @@ db = get_database()
 
 
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(thread,parent,ind,token):
+def get_reply(thread,parent,ind,token,user):
   print "parent=",parent,"token=",token
-  return {'thread':thread,'reply': parent,'indent':ind+10,'csrf_token':token,'eachrep':parent}
+  return {'thread':thread,'reply': parent,'user':user,'indent':ind+10,'csrf_token':token,'eachrep':parent}
 
 @register.assignment_tag
 def get_all_replies(parent):
@@ -31,7 +31,7 @@ def get_all_replies(parent):
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_name, node, checked=""):
+def edit_drawer_widget(field, group_name, node, checked=None):
 
   drawers = None
   drawer1 = None
@@ -41,6 +41,7 @@ def edit_drawer_widget(field, group_name, node, checked=""):
     if field == "collection":
       if checked == "Quiz":
         checked = "QuizItem"
+
       drawers = get_drawers(group_name, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
@@ -52,14 +53,17 @@ def edit_drawer_widget(field, group_name, node, checked=""):
   else:
     if field == "collection" and checked == "Quiz":
       checked = "QuizItem"
+
     drawer1 = get_drawers(group_name, None, [], checked)
 
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
 
+
 @register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(group_name):
+def get_gapps_menubar(group_name, selectedGapp):
   """Get Gapps menu-bar
   """
+
   gst_collection = db[GSystemType.collection_name]
   gst_cur = gst_collection.GSystemType.find({'$and':[{'_type':'GSystemType'},{'member_of':'GAPP'}]})
 
@@ -69,7 +73,9 @@ def get_gapps_menubar(group_name):
     i = i+1;
     gapps[i] = {'id': app._id, 'name': app.name.lower()}
 
-  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'group_name': group_name}
+  selectedGapp = selectedGapp.split("/")[2]
+  
+  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp, 'group_name': group_name}
 
 
 @register.assignment_tag
