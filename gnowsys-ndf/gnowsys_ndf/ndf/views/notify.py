@@ -40,7 +40,8 @@ def send_invitation(request,group_name):
         sending_user=User.objects.get(id=sender.id)
         list_of_users=list_of_invities.split(",")
         activ="invitation to join in group"
-        msg="As invited by"+str(sending_user.username)+ ", you are joined in the group '"+str(group_name)+"'"
+        msg="'This is to inform you that " +str(sending_user.username)+ " has subscribed you to the group " +str(group_name)+"'"
+
         colg = col_Group.Group.one({'name':group_name})
         ret=""
         for each in list_of_users:
