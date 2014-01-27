@@ -16,5 +16,6 @@ urlpatterns += patterns('gnowsys_ndf.ndf.views.ajax-views',
 urlpatterns += patterns('gnowsys_ndf.ndf.views.notify',
                         url(r'^notify/join/$', 'notifyuser', name='notifyuser'),
                         url(r'^notify/remove/$', 'notify_remove_user', name='notifyremuser'),
+                        url(r'^notify/send_invitation/$', 'send_invitation', name='sendinvitation'),
 
 )
