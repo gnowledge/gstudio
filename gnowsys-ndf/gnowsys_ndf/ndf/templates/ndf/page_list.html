@@ -57,11 +57,14 @@
             <i class="posted-by" >Posted by {{node.user_details_dict.created_by}} on {{node.created_at|date:"j F Y"}} </i>
           </div>     
 	
-          <div class="small-12 columns" style="padding-top:0.5rem;">
-	    {{ node.html_content|removetags:"p"|safe|truncatewords:20 }}
+          <div class="small-12 columns" style="padding-bottom:8px;">
+	    {{ node.html_content|removetags:"p"|safe|truncatewords:15 }}
           </div>  
-	</div>
+
 	<hr/>
+
+	</div>
+
     {% empty %}
 
     {% if not searching %}
@@ -73,12 +76,12 @@
 
     </div>
     {% endif %}
+
     {% endfor %}
 
   </div>
 
   <div class="small-6 columns end">
-
   </div>
 
 </div>
