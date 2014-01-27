@@ -1,0 +1,11 @@
+<form id="node_search_form" method="POST" action="{{search_url}}">
+{% csrf_token %}
+  <div class="row collapse">
+    <div class="small-11 columns" style="padding-top:6px;">
+      <input id="search_field" name="search_field" type="text" placeholder="Search node" value="{{query|default_if_none:""}}" />
+    </div>
+    <div class="small-1 columns" style="padding-top:6px;">
+      <button type="submit" class="button tiny"><i class="fi-magnifying-glass"></i></button>
+    </div>
+  </div>
+</form>
