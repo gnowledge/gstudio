@@ -17,12 +17,10 @@ db = get_database()
 @register.simple_tag
 def get_all_users_to_invite():
   try:
-    allusers={}
+    inv_users={}
     users=User.objects.all()
     for each in users:
-      allusers[each.id]=each.username.__str__()+"<"+each.email.__str__()+">"
-    inv_users={v: k for k, v in allusers.items()}
-
+      inv_users[each.username.__str__()+"<"+each.email.__str__()+">"]=each.id
     return inv_users
   except Exception as e:
     print str(e)
@@ -161,6 +159,7 @@ def get_group_name(groupurl):
   if len(sp)<=1:
     return "home"
   if sp[1]:
+    print "sp1=",sp[1]
     chsp = check_existing_group(sp[1])
     if chsp:
       return sp[1]
