@@ -33,6 +33,28 @@ def set_notif_val(request,group_name,msg,activ,bx):
     except:
         return False
 
+def send_invitation(request,group_name):
+    try:
+        list_of_invities=request.POST.get("users","") 
+        sender=request.user
+        sending_user=User.objects.get(id=sender.id)
+        list_of_users=list_of_invities.split(",")
+        activ="invitation to join in group"
+        msg="As invited by"+str(sending_user.username)+ ", you are joined in the group '"+str(group_name)+"'"
+        colg = col_Group.Group.one({'name':group_name})
+        ret=""
+        for each in list_of_users:
+            bx=User.objects.get(id=each)
+            ret = set_notif_val(request,group_name,msg,activ,bx)
+            colg.author_set.append(bx.id)
+            colg.save()
+        if ret :
+            return HttpResponse("success")
+        else:
+            return HttpResponse("failure")
+    except Exception as e:
+        return HttpResponse(str(e))
+
 def notifyuser(request,group_name):
 #    usobj=User.objects.filter(username=usern)
     activ="joined in group"
