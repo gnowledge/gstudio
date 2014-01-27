@@ -30,9 +30,8 @@ beforeSend: function() {
               $("#body").css({"opacity":"0.1",})
 },
 success: function(data){
-if (data=="success"){
-     alert("success");
-}
+$("#ajax_load_image").hide();
+$("#body").css({"opacity":"",})
 },
 complete: function(){
 $("#ajax_load_image").hide();

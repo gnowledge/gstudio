@@ -89,7 +89,7 @@ $.ajax({
                               },
        success: function(data){
                 if(data=="success")
-                    { alert("Successfully send invitation");
+                    { alert("Successfully subscribed members and e-mail notification send");
 			  $(".invitation").hide();
 			  }
 
@@ -125,7 +125,7 @@ margin-left:-563px;
 
 {% get_group_name request.path as group %}
 
-<input type="button" id="UserInvitation" value="Subscribe" onclick="UserInvitation()">
+<input type="button" id="UserInvitation" value="Subscribe Registered Members" onclick="UserInvitation()">
 <br/>
 <input type="button" id="hideUserInvitation" Value= "Hide Invitation" onclick="HideUserInvitation()" style="display:none;">
 <div class="invitation" style="display:none">
@@ -133,7 +133,7 @@ margin-left:-563px;
 <input id="userInvite">
 <input type="button" class="addToList" value="Add">
 <b>Click on an item to remove it from the list</b>
-<input type="button" class="submitUserInvite" value="Subscribe Registered Members" style="display:none"/>
+<input type="button" class="submitUserInvite" value="Subscribe" style="display:none"/>
 <p class="responseToInvite"></p>
 
 <select id="selectOfInviteUser" multiple="multiple" style="display:none" onchange="handle()">
