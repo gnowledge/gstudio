@@ -2,143 +2,284 @@
 
 {% load ndf_tags %}
 
-{% block title %} Wikipage {% endblock %}
+{% block title %} Create a new group {% endblock %}
 
+{% block meta_content %}
 
-{% block body_content %} 
-{% get_existing_groups as groups%}
-{% get_group_name request.path as group %}
-<div style="display:inline-block; float:left; padding-top:40px; ">
-<form method="post" action="{% url 'create_group' 'group' %}">
-  {% csrf_token %}
- 
+<h3>Configuration</h3>
+
+<h5>Group Types</h5>
+<p>You can create a group and customize who has viewing and editing access.
+  {% endblock %}
+
+  {%block side_content %}
+
   {% if groups %}
-    Existing Groups:
+  Existing Groups:
 
-    {% for items in groups %}
-      {{items}} {% if not forloop.last %} ,{% endif %}
-    {% endfor %}
+  {% get_existing_groups as groups%}
+  {% for items in groups %}
+  {{items}} {% if not forloop.last %} ,{% endif %}
+  {% endfor %}
   {% endif %}
 
- <div style='display:table;  border:1px;   border-spacing:10px; '>
-	<div style='display:table-row;' >
-	     	<div style='display:table-cell;'> 
-	        	<font size="3" >Group Name</font> 
-	      	 </div>
-      		<div style='display:table-cell;'> 
-        		<input type="text"  id="group_name" name="groupname" placeholder="Enter Group Name">
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Group Type</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="group_type" class="gtype">
-          			<option id="PUBLIC">PUBLIC</option>
-          			<option id="PRIVATE">PRIVATE</option>
-          			<option id="ANONYMOUS">ANONYMOUS</option>
-        		</select> 
-      		</div>
-    	</div>
-    
-    	<div style='display:table-row;'>
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Group Editing policy</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="edit_policy" class="editp">
-          			<option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
-          			<option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
-          			<option id="NON_EDITABLE">NON_EDITABLE</option>
-        		</select> 
-      		</div>
- 	       <div style='display:table-cell;'> 
-        		<font size="3" >Group Subscription policy</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="subscription" class="subscptn">
-          			<option id="OPEN">OPEN</option>
-          			<option id="BY_REQUEST">BY_REQUEST</option>
-          			<option id="BY_INVITATION">BY_INVITATION</option>
-        		</select>
-      		</div>
-    	</div>
-    
-    	<div style='display:table-row;'>
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Group Existance visibility</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="existance" class="existance">
-	        		<option id="ANNOUNCED">ANNOUNCED</option>
-	        		<option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
-	      		</select>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<font size="3">  Group Member Visibility</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="member" class="mem">
-	        		<option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
-	        		<option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
-        		</select>
-      		</div>
-    	</div>
- 
-   	 <div style='display:table-row;'>
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Group Encryption policy</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-       			<select name="encryption" class="encr">
-			        <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
-       			   	<option id="ENCRYPTED">ENCRYPTED</option>
-       		 	</select>
-      		</div>  
-	</div>
-	<div style='display:table-row;'>
-      		<div style='display:table-cell;' colspan='2' align="middle"> 
-                        <input type="button" id="savegrp" value="Create Group"  class="button" onClick="check_values()">
-       		 	<input type="submit" id="grpsubmit" value="Create Group" class="button" style="visibility:hidden" >
-      		</div>
-    	</div>
+  {% endblock %}
+
+  {% block body_content %} 
+
+  <h2>Create a new user group</h2>
+  {% get_existing_groups as groups%}
+  {% get_group_name request.path as group %}
+
+  <form class="row" method="post" action="{% url 'create_group' 'group' %}">
+    {% csrf_token %}
+
+    <!-- New Form design -->
+    <!--div class="medium-6 columns">
+
+      <h4>Group Name</h4>
+      <input type="text" placeholder="Give your group a nice name" />
+      
+      <h5>Group authentication</h5>
+      <div class="switch large round">
+
+        <input id="ANONYMOUS" name="login-mode" class="login-mode" type="radio">
+        <label for="ANONYMOUS" onclick="">Universal access</label>
+
+        <input id="PUBLIC" name="login-mode" class="login-mode" type="radio" checked>
+        <label for="PUBLIC" onclick="">Users require login</label>
+
+        <span></span>
+      </div>
+
+      <div id="closed-group">
+
+        <h5>Set your group's membership policy</h5>
+
+        <div class="switch large round">
+
+          <input id="OPEN" name="join-mode" type="radio" checked>
+          <label for="OPEN" onclick="">Open membership</label>
+
+          <input id="BY_REQUEST" name="join-mode" type="radio">
+          <label for="BY_REQUEST" onclick="">Membership needs approval</label>
+
+          <span></span>
+        </div>
+
+
+        <div id="member-mode" class="switch large round">
+
+          <input id="BY_INVITATION" name="member-mode" type="radio" checked>
+          <label for="BY_INVITATION" onclick="">Members can approve</label>
+
+          <input id="PRIVATE"  name="member-mode" type="radio">
+          <label for="PRIVATE" onclick="">Owner must approve</label>
+
+          <span></span>
+        </div>
+
+
+
+        <h5>Set your group's content editing policy</h5>
+
+        <div class="switch large round">
+
+          <input id="NON_EDITABLE" name="edit-mode" type="radio" >
+          <label for="NON_EDITABLE" onclick="">Members cannot edit</label>
+
+          <input id="EDITABLE" name="edit-mode" type="radio" checked>
+          <label for="EDITABLE" onclick="">Members can edit</label>
+
+          <span></span>
+        </div>
+
+        <div id="moderate-mode" class="switch large round">
+
+          <input id="EDITABLE" name="moderate-mode" type="radio" checked>
+          <label for="EDITABLE" onclick="">Without moderation</label>
+
+          <input id="EDITABLE_MODERATED" name="moderate-mode" type="radio">
+          <label for="EDITABLE_MODERATED" onclick="">With moderation</label>
+
+          <span></span>
+        </div>
+
+        <div class="hide">
+
+          <select name="existance" class="existance">
+           <option id="ANNOUNCED">ANNOUNCED</option>
+           <option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
+         </select>
+
+         <select name="member" class="mem">
+           <option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
+           <option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
+         </select>
+       </div>
+
+
+       <h5>Data Encryption</h5>
+       <div class="switch large round">
+
+         <input id="NOT_ENCRYPTED" name="encryption" type="radio" checked>
+         <label for="NOT_ENCRYPTED" onclick="">No Encryption</label>
+
+         <span></span>
+       </div>
+
+       <input type="button" id="savegrp" value="Create Group"  class="button" onClick="check_values()">
+       <input type="submit" id="grpsubmit" value="Create Group" class="button" style="visibility:hidden" >
+
+     </div-->
+
+
+     <!-- Old Form -->
+
+     <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
+       <div style='display:table-row;' >
+         <div style='display:table-cell;'> 
+          <font size="3">Name of the Group</font> 
+        </div>
+        <div style='display:table-cell;'> 
+          <input type="text"  id="group_name" name="groupname" placeholder="Enter Group Name">
+        </div>
+        <div style='display:table-cell;'> 
+          <font size="3" >Group Type</font>
+        </div>
+        <div style='display:table-cell;'> 
+          <select name="group_type" class="gtype">
+           <option id="PUBLIC">PUBLIC</option>
+           <option id="PRIVATE">PRIVATE</option>
+           <option id="ANONYMOUS">ANONYMOUS</option>
+         </select> 
+       </div>
+     </div>
+
+     <div style='display:table-row;'>
+      <div style='display:table-cell;'> 
+        <font size="3" >Group Editing policy</font>
+      </div>
+      <div style='display:table-cell;'> 
+        <select name="edit_policy" class="editp">
+         <option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
+         <option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
+         <option id="NON_EDITABLE">NON_EDITABLE</option>
+       </select> 
+     </div>
+     <div style='display:table-cell;'> 
+      <font size="3" >Group Subscription policy</font>
+    </div>
+    <div style='display:table-cell;'> 
+      <select name="subscription" class="subscptn">
+       <option id="OPEN">OPEN</option>
+       <option id="BY_REQUEST">BY_REQUEST</option>
+       <option id="BY_INVITATION">BY_INVITATION</option>
+     </select>
+   </div>
+ </div>
+
+ <div style='display:table-row;'>
+  <div style='display:table-cell;'> 
+    <font size="3" >Group Existance visibility</font>
+  </div>
+  <div style='display:table-cell;'> 
+    <select name="existance" class="existance">
+     <option id="ANNOUNCED">ANNOUNCED</option>
+     <option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
+   </select>
+ </div>
+ <div style='display:table-cell;'> 
+  <font size="3">  Group Member Visibility</font>
+</div>
+<div style='display:table-cell;'> 
+  <select name="member" class="mem">
+   <option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
+   <option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
+ </select>
 </div>
 </div>
+
+<div style='display:table-row;'>
+  <div style='display:table-cell;'> 
+    <font size="3" >Group Encryption policy</font>
+  </div>
+  <div style='display:table-cell;'> 
+    <select name="encryption" class="encr">
+     <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
+     <option id="ENCRYPTED">ENCRYPTED</option>
+   </select>
+ </div>  
+</div>
+
+
+<div style='display:table-row;'>
+  <div style='display:table-cell;' colspan='2' align="middle"> 
+    <input type="button" id="savegrp" value="Create Group"  class="button" onClick="check_values()">
+    <input type="submit" id="grpsubmit" value="Create Group" class="button" style="visibility:hidden" >
+  </div>
+</div>
+</div>
+
 </form>
 
 {% endblock %}
 
 {% block head %}
 <script type="text/javascript">
-function check_values()
-{
-var gpname=$("#group_name").val();
-if (gpname == "")
-{
- alert("Group name can not be empty")
- $("#group_name").focus();
+  function check_values()
+  {
+    var gpname=$("#group_name").val();
+    if (gpname == "")
+    {
+     alert("Group name can not be empty")
+     $("#group_name").focus();
+   }
+   else
+   {
+    $("#grpsubmit").trigger("click");
+  }
 }
-else
-{
-$("#grpsubmit").trigger("click");
-}
-}
+
+
 $(document).ready(function()
 {
-$("#group_name").focusout(function(){
 
-var gname=$("#group_name").val();
-$.ajax({
-url: '/home/group/check_group/',
-data: {gname:gname},
-success: function(data){
-if (data=="success"){
-     alert("group already exists");
-     $("#group_name").val("");
-     $("#group_name").focus();
-}
-}
+  /* New Form: Conditional Display */
+
+  $(".login-mode").change(function(){
+    /* Hide other options if anonymous login is allowed */
+    $("#closed-group").slideToggle();     
+  });
+
+  $("#member-mode").slideToggle();
+  $("[name='join-mode']").change(function(){
+    /* Hide invitation options if open membership */
+    $("#member-mode").slideToggle();     
+  });
+
+  $("[name='edit-mode']").change(function(){
+    /* Hide moderation options if editing is disabled */
+    $("#moderate-mode").slideToggle();     
+  });
+
+
+
+  $("#group_name").focusout(function(){
+
+    var gname=$("#group_name").val();
+    $.ajax({
+      url: '/home/group/check_group/',
+      data: {gname:gname},
+      success: function(data){
+        if (data=="success"){
+         alert("group already exists");
+         $("#group_name").val("");
+         $("#group_name").focus();
+       }
+     }
 });  //end_ajax
- 
+
 
 }); //end_focusout
 
