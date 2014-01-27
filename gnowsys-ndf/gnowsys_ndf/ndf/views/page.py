@@ -88,7 +88,7 @@ def create_edit_page(request, group_name, node_id=None):
         get_node_common_fields(request, page_node, group_name, gst_page)
         page_node.save()
         
-        return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
+        return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': page_node._id}))
         
     else:
         if node_id:
