@@ -34,7 +34,7 @@ def get_forum_repl_type(forrep_id):
           return "None"
 def check_existing_group(groupname):
   col_Group = db[Group.collection_name]
-  gpn=slugify(groupname)
+  gpn=groupname
   colg = col_Group.Group.find({'_type': u'Group', "name":gpn})
   if colg.count() >= 1:
     return True
