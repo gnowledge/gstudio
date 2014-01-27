@@ -190,24 +190,26 @@
 	<main class="row">  
 
 		<!-- Start of sidebar section -->
-		<!--section  class="medium-3 columns">
+		<section  class="medium-3 columns">
 
 			<nav>
+
+				{% block content_nav %}  {% endblock %}
 
 			</nav>
 
 			<aside>
 
-				{% block sidebar %}  {% endblock %}
+				{% block side_content %}  {% endblock %}
 
 			</aside>
 
 
-		</section-->
+		</section>
 		<!-- End of related content -->	
 
 		<!-- Start of content section -->
-		<article class="medium-12 columns">
+		<article class="medium-9 columns">
 			
 			{% block body_content %}  {% endblock %}
 			{% block extra_content %}  {% endblock %}

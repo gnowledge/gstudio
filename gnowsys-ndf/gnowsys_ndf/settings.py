@@ -42,7 +42,7 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
-        'NAME': 'example',
+        'NAME': 'studio-dev',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
