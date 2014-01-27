@@ -37,9 +37,10 @@ def send_invitation(request,group_name):
     try:
         list_of_invities=request.POST.get("users","") 
         sender=request.user
+        sending_user=User.objects.get(id=sender.id)
         list_of_users=list_of_invities.split(",")
         activ="invitation to join in group"
-        msg="You are requested to join in the group '"+str(group_name)+"'"
+        msg="As invited by"+str(sending_user.username)+ ", you are joined in the group '"+str(group_name)+"'"
         colg = col_Group.Group.one({'name':group_name})
         ret=""
         for each in list_of_users:
