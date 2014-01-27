@@ -50,6 +50,15 @@ def getFullImage(request, group_name, _id):
         f = imgobj.fs.files.get(ObjectId(imgobj.fs_file_ids[0]))
         return HttpResponse(f.read(), content_type=f.content_type)
 
+def get_mid_size_img(request, group_name, _id):
+    imgobj = collection.File.one({"_id": ObjectId(_id)})
+    if (imgobj.fs.files.exists(imgobj.fs_file_ids[2])):
+        f = imgobj.fs.files.get(ObjectId(imgobj.fs_file_ids[2]))
+        print f.filename
+        return HttpResponse(f.read(), content_type=f.content_type)
+    else:
+        print "image dose not exist"
+
 def image_search(request,group_name):
     imgcol=collection.File.find({'mime_type':{'$regex': 'image'}})
     if request.method=="GET":

@@ -1,4 +1,4 @@
-{% extends "ndf/base.html" %}
+{% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
 {% block title %} Group Dashboard {% endblock %}
 {% block head %}
@@ -59,23 +59,17 @@ notify(groupn,"remove")
 
 </script>
 {% endblock %}
-
+{% block url %}
+{% get_user_object node.created_by as user_obj %}
+{% ifequal  user_obj.username  user.username  %}
+{% url 'edit_group' groupobj.name groupobj %}
+{% else %}
+#
+{% endifequal %}
+{% endblock %}
 {% block body_content %}
 {% get_group_name request.path as group %}
-{% if group != "home" %}
-<p>
-<font size="4px" color="#BAC1C8">
-{{groupobj.altnames}}
-</font>
-</p>
-{% else %}
-<p>
-<font size="4px" color="#BAC1C8">
-home
-</font>
-</p>
-{% endif %}
-<font size="2px" color="black"> Members in this group : 0 </font>
+<font size="3" color="black"> Members in this group : 0 </font>
 
 {% get_group_policy group request.user as policy %}
 
@@ -111,6 +105,6 @@ home
 
    </div>
 </div>
-
+{{ block.super }}
 {% endblock %}
 
