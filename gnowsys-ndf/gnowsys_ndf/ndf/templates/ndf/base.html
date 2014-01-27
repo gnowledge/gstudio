@@ -166,7 +166,7 @@
 					  <a href="#"><i class="fi-home"></i> {{group_name}}</a>
 
 						<!-- If logged in show user groups -->
-						{% if user.is_authenticated %}
+						
 						{% get_existing_groups_excluded group_name as groups %}
 
 						<ul class="dropdown">
@@ -177,7 +177,7 @@
 
 						</ul>
 
-						{% endif %}
+						
 
 				</li>
 
