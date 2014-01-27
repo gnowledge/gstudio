@@ -1,3 +1,5 @@
+/*************************** 1. Foundation CSS overrides ***********************/
+
 /* Foundation hacks */
 .row{
 	max-width:inherit;/* Expand to full browser width instead of 960px */
@@ -9,6 +11,10 @@
 }
 nav.top-bar .has-dropdown .button{ /* Needs testing */
 	top:0;
+}
+
+p{
+	margin-bottom: 1.25rem;
 }
 
 /* End Foundation hacks */
@@ -25,6 +31,25 @@ nav.top-bar .has-dropdown .button{ /* Needs testing */
 }
 .top-bar-section .has-form{
 	background-color: #1d293f;
+}
+
+/*************************** 2. Foundation CSS overrides ***********************/
+
+
+/*************************** 3. Custom CSS Below ***********************/
+
+main>aside{
+	padding-top: 1rem;
+}
+aside>section{
+	margin-bottom:5px;
+	border: 1px solid #e0e0e0;
+	background-color: #f9f9f9;
+	
+}
+
+aside>section>div{
+	padding: 15px;
 }
 
 /* Card block */

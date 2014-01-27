@@ -66,11 +66,8 @@
 			height:90px;
 		}
 
-		article{
-		}
-
 		h2{
-			margin-top:2rem;
+			margin-top:1rem;
 			padding-bottom: 8px;
 			border-bottom: 2px solid #333;
 		}
@@ -91,8 +88,8 @@
 
 		.coll-arrows{
 			cursor:pointer;
-    		display: block;
-    		padding: 0.5rem;
+			display: block;
+			padding: 0.5rem;
 		}
 
 		.coll-arrows:hover{
@@ -162,7 +159,7 @@
 						<a href="http://foundation.zurb.com/docs" class="button">Getting Started</a>
 					</li>-->
 					<li class="has-dropdown">
-					  <a href="#"><i class="fi-home"></i> {{group_name}}</a>
+						<a href="#"><i class="fi-home"></i> {{group_name}}</a>
 
 						<!-- If logged in show user groups -->
 						{% if user.is_authenticated %}
@@ -178,7 +175,7 @@
 
 						{% endif %}
 
-				</li>
+					</li>
 
 					{% get_gapps_menubar group_name request.META.PATH_INFO %}
 				</ul>
@@ -190,22 +187,26 @@
 	<main class="row">  
 
 		<!-- Start of sidebar section -->
-		<section  class="medium-3 columns">
+		<aside  class="medium-3 columns">
 
-			<nav>
+			<section>
 
-				{% block content_nav %}  {% endblock %}
+				<div class="row">
+					{% block meta_content %}  {% endblock %}
+				</div>
 
-			</nav>
+			</section>
 
-			<aside>
+			<section>
 
-				{% block side_content %}  {% endblock %}
+				<div class="row">
+					{% block side_content %}  {% endblock %}
+				</div>
 
-			</aside>
+			</section>
 
 
-		</section>
+		</aside>
 		<!-- End of related content -->	
 
 		<!-- Start of content section -->
@@ -250,7 +251,7 @@
 
 		{% block script %} {% endblock %}	
 
-		</script>
+	</script>
 
 </body>
 
