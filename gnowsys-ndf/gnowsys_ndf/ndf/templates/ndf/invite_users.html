@@ -35,7 +35,7 @@ i=i+1
         $( "#userInvite" ).autocomplete({
             source: user_list
         });
-$(".invitation").show()
+$(".invitation").show();
 
 }
 
@@ -89,13 +89,14 @@ $.ajax({
                               },
        success: function(data){
                 if(data=="success")
-                    { alert("Successfully send invitation");}
+                    { alert("Successfully send invitation");
+			  $(".invitation").hide();
+			  }
 
                 else{
-                        $('.responseToInvite').text(data+"is invalid email");
-                        $('.responseToInvite').html("'"+data+"'is invalid email"); 
-                        $('.responseToInvite').css("color","red");
-                        $('#selectOfInviteUser').empty();
+			  $(".invitation").hide();
+			  alert("failed to subscribe");
+
                         }
 
                              },
