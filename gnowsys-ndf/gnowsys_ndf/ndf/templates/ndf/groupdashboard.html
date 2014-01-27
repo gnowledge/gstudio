@@ -62,7 +62,7 @@ notify(groupn,"remove")
 {% block url %}
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
-{% url 'edit_group' groupobj.altnames groupobj %}
+{% url 'edit_group' groupobj.name groupobj %}
 {% else %}
 #
 {% endifequal %}
