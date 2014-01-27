@@ -1,6 +1,8 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
+
 {% block title %} Group Dashboard {% endblock %}
+
 {% block head %}
 <script type="text/javascript">
 function hide_btn(label)
@@ -30,9 +32,8 @@ beforeSend: function() {
               $("#body").css({"opacity":"0.1",})
 },
 success: function(data){
-if (data=="success"){
-     alert("success");
-}
+$("#ajax_load_image").hide();
+$("#body").css({"opacity":"",})
 },
 complete: function(){
 $("#ajax_load_image").hide();
@@ -59,12 +60,26 @@ notify(groupn,"remove")
 
 </script>
 {% endblock %}
+
+
 {% block url %}
 {% url 'edit_group' groupobj.name groupobj %}
 {% endblock %}
+
+
+{% block meta_content %}
+
+<div class="medium-12 columns">
+    <h3>Group Details</h3>
+    <p> Members in this group : 0 </p>
+</div>
+
+
+{% endblock %}
+
 {% block body_content %}
 {% get_group_name request.path as group %}
-<font size="3" color="black"> Members in this group : 0 </font>
+
 
 {% get_group_policy group request.user as policy %}
 
