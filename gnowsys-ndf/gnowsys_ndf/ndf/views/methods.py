@@ -34,7 +34,7 @@ def get_forum_repl_type(forrep_id):
           return "None"
 def check_existing_group(groupname):
   col_Group = db[Group.collection_name]
-  gpn=slugify(groupname)
+  gpn=groupname
   colg = col_Group.Group.find({'_type': u'Group', "name":gpn})
   if colg.count() >= 1:
     return True
@@ -67,8 +67,12 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
         drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg", 'group_set': {'$all': [group_name]}})
         # drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg"})
 
+      elif checked == "Video":         
+        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [group_name]}})
+        # drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"video"})
+
       elif checked == "Quiz":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Quiz']}, 'group_set': {'$all': [group_name]}})
+        drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "QuizItem":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'QuizItem']}, 'group_set': {'$all': [group_name]}})
@@ -209,11 +213,12 @@ def get_node_common_fields(request, node, group_name, node_type):
     i = i+1
       
   # ------------------------------------------------------------------------------- org-content
-  node.content_org = unicode(content_org)
-
-  # Required to link temporary files with the current user who is modifying this document
-  usrname = request.user.username
-  filename = slugify(name) + "-" + usrname + "-"
-  node.content = org2html(content_org, file_prefix=filename)
+  if content_org:
+    node.content_org = unicode(content_org)
+    
+    # Required to link temporary files with the current user who is modifying this document
+    usrname = request.user.username
+    filename = slugify(name) + "-" + usrname + "-"
+    node.content = org2html(content_org, file_prefix=filename)
 
   

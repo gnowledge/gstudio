@@ -25,6 +25,7 @@ from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import Group
 
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups
+from gnowsys_ndf.ndf.views.methods import *
 
 #######################################################################################################################################
 
@@ -65,7 +66,7 @@ def create_group(request,group_name):
         colg.disclosure_policy = request.POST.get('member', "")
         colg.encryption_policy = request.POST.get('encryption', "")
         colg.save()
-        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg},context_instance=RequestContext(request))
+        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", RequestContext(request))
     
 
@@ -76,5 +77,21 @@ def group_dashboard(request,group_name):
     except:
         groupobj=""
         pass
-    return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj},context_instance=RequestContext(request))
+    return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'node':groupobj},context_instance=RequestContext(request))
+
+def edit_group(request,group_name,group_id):
+    page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+    if request.method == "POST":
+            get_node_common_fields(request, page_node, group_name, gst_group)
+            page_node.save()
+            return HttpResponseRedirect(reverse('groupchange', kwargs={'group_name': group_name}))
+
+    return render_to_response("ndf/edit_group.html",
+                                      { 'node': page_node,
+                                        'group_name': group_name
+                                        },
+                                      context_instance=RequestContext(request)
+                                      )
+
+
 
