@@ -40,7 +40,7 @@
 <ul class="clearing-thumbs" data-clearing>
   {% for image in imageCollection %}
   <li>
-    <a href="{% url 'getFullImage' group_name image %}">
+    <a href="{% url 'get_mid_size_img' group_name image %}">
       <img src="{% url 'getImageThumbnail' group_name image %}"  class="th" data-caption="<a href='{% url 'image_detail' group_name image %}'>{{image.name}}</a>"></img>
     </a>
   </li>
