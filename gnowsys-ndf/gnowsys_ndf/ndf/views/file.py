@@ -164,10 +164,8 @@ def save_file(files, title, userid, group_name,st_id):
                 fileobj.fs_file_ids.append(tobjectid)
                 fileobj.save()
                 files.seek(0)
-                #print "test - reading file:",files.read()
                 mid_size_img = convert_mid_size_image(files)
                 mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-                print "mid_img/-id:",mid_img_id
                 fileobj.fs_file_ids.append(mid_img_id)
                 fileobj.save()
 
