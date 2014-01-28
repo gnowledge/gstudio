@@ -19,6 +19,36 @@ Revision Control System (RCS) using follwoing commands:
   Install rcs (5.7-25): sudo apt-get install rcs
     NOTE: For more details visit - "http://oreilly.com/perl/excerpts/system-admin-with-perl/five-minute-rcs-tutorial.html"
 
+  Install emacs24 (24.3.1): 
+    (1) sudo add-apt-repository ppa:cassou/emacs
+    (2) sudo apt-get update
+    (3) sudo apt-get install emacs24 emacs24-el emacs24-common-non-dfsg
+    (4) Create a init file for emacs default settings @ path "~/.emacs" with following code in it:
+        (a) For org-version < 8.0
+            (custom-set-variables
+             ;; custom-set-variables was added by Custom.
+             ;; If you edit it by hand, you could mess it up, so be careful.
+             ;; Your init file should contain only one such instance.
+             ;; If there is more than one, they won't work right.
+             '(inhibit-startup-screen t)
+  
+             '(org-export-html-preamble nil)
+             '(org-export-html-postamble nil)
+             '(org-export-html-validation-link nil)
+            )
+
+        (b) For org-version >= 8.0
+            (custom-set-variables
+             ;; custom-set-variables was added by Custom.
+             ;; If you edit it by hand, you could mess it up, so be careful.
+             ;; Your init file should contain only one such instance.
+             ;; If there is more than one, they won't work right.
+             '(inhibit-startup-screen t)
+  
+             '(org-html-preamble nil)
+             '(org-html-postamble nil)
+             '(org-html-validation-link nil)
+            )
 
 Install virtual python environment (python-virtualenv) and create a new one as follows:
 
