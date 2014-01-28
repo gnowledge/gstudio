@@ -177,9 +177,10 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, usrnam
                 fileobj.save()
                 files.seek(0)
                 mid_size_img = convert_mid_size_image(files)
-                mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-                fileobj.fs_file_ids.append(mid_img_id)
-                fileobj.save()
+                if mid_size_img:
+                    mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
+                    fileobj.fs_file_ids.append(mid_img_id)
+                    fileobj.save()
 
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
