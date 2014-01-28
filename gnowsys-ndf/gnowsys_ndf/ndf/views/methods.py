@@ -208,7 +208,9 @@ def get_node_common_fields(request, node, group_name, node_type):
   while (i < len(collection_list)):                    
     c_name = collection_list[i]    
     c_name = c_name.replace("'", "")
+    print c_name
     objs = gs_collection.GSystem.one({'_type': {'$in' : [u"GSystem", u"File"]}, 'name': c_name})
+    print objs
     node.collection_set.append(objs._id)
     i = i+1
       
