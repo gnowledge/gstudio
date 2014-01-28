@@ -17,6 +17,10 @@ p{
 	margin-bottom: 1.25rem;
 }
 
+input[type="checkbox"] + label, input[type="radio"] + label{
+	margin: inherit!important;
+}
+
 /* End Foundation hacks */
 
 /* Theme */
@@ -39,6 +43,7 @@ main>aside{
 	padding-top: 1rem;
 }
 aside>section{
+	margin:inherit!important;
 	margin-bottom:5px;
 	border: 1px solid #e0e0e0;
 	background-color: #f9f9f9;
