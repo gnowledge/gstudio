@@ -14,6 +14,17 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 register = Library()
 db = get_database()
 
+@register.simple_tag
+def get_all_users_to_invite():
+  try:
+    inv_users={}
+    users=User.objects.all()
+    for each in users:
+      inv_users[each.username.__str__()+"<"+each.email.__str__()+">"]=each.id
+    return inv_users
+  except Exception as e:
+    print str(e)
+ 
 
 @register.inclusion_tag('ndf/twist_replies.html')
 def get_reply(thread,parent,ind,token,user):
@@ -154,6 +165,7 @@ def get_group_name(groupurl):
   if len(sp)<=1:
     return "home"
   if sp[1]:
+    print "sp1=",sp[1]
     chsp = check_existing_group(sp[1])
     if chsp:
       return sp[1]

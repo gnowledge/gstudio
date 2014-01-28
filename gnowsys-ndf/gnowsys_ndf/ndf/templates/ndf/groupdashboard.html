@@ -1,6 +1,8 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
+
 {% block title %} Group Dashboard {% endblock %}
+
 {% block head %}
 <script type="text/javascript">
 function hide_btn(label)
@@ -30,9 +32,8 @@ beforeSend: function() {
               $("#body").css({"opacity":"0.1",})
 },
 success: function(data){
-if (data=="success"){
-     alert("success");
-}
+$("#ajax_load_image").hide();
+$("#body").css({"opacity":"",})
 },
 complete: function(){
 $("#ajax_load_image").hide();
@@ -59,17 +60,23 @@ notify(groupn,"remove")
 
 </script>
 {% endblock %}
+
+
 {% block url %}
-{% get_user_object node.created_by as user_obj %}
-{% ifequal  user_obj.username  user.username  %}
 {% url 'edit_group' groupobj.name groupobj %}
-{% else %}
-#
-{% endifequal %}
 {% endblock %}
+
+
+{% block meta_content %}
+
+    <h3>Group Details</h3>
+    <p> Members in this group : 0 </p>
+
+{% endblock %}
+
 {% block body_content %}
 {% get_group_name request.path as group %}
-<font size="3" color="black"> Members in this group : 0 </font>
+
 
 {% get_group_policy group request.user as policy %}
 
@@ -84,21 +91,18 @@ notify(groupn,"remove")
                      <input type="hidden" id="groupname" value="{{group}}">
                       {% if user_is_joined == "joined" %}
                         <input type="submit" id="remove" value="Unsubscribe" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible">
-       <input type="submit" id="notify"value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden" >
+       <input type="submit" id="notify" value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden" >
                  
 		      {% elif user_is_joined == "not"  %}
                         <input type="submit" id="remove" value="Unsubscribe" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden">
-
-                        <input type="submit" id="notify"value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible" >
-                      {% elif user_is_joined == "author" %}
+<input type="submit" id="notify"value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible" >
+       
+			{% endif %}
+                      {% if user_is_joined == "author" %}
    			Group Owner
-                      {% endif %}		
+                       {% include "ndf/invite_users.html" %}   
+                     {% endif %}		
 
-                </div> 
-              {% else %}
-               
-                 <div style='display:table-cell;' colspan='2' align="middle">
-                        <input type="submit" id="invite" value="Invite" class="btn btn-primary btn-small btn-block" align="center">
                 </div> 
               {% endif %}
         </div>
