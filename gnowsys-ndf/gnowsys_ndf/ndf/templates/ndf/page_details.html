@@ -11,10 +11,10 @@
     <p>Number of Pages : {{ page_nodes_count }} </p>
 
     <!-- Search field -->
-    <p>
+    <h3>Search</h3>
     {% url 'page_search' group_name as search_url %}
     {% include "ndf/node_search_base.html" %}
-    </p>
+    
 
     <!-- Add button -->
     {% if user.is_authenticated %}
