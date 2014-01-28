@@ -49,7 +49,6 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     dict2 = {}
 
     gst_collection = db[GSystemType.collection_name]
-    gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
     gs_collection = db[GSystem.collection_name]
     
     drawer = None    
@@ -64,7 +63,8 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
         # drawer = gs_collection.GSystem.find({'_type': u"File"})
         
       elif checked == "Image":         
-        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg", 'group_set': {'$all': [group_name]}})
+        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [group_name]}})
+        # drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg", 'group_set': {'$all': [group_name]}})
         # drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg"})
 
       elif checked == "Video":         

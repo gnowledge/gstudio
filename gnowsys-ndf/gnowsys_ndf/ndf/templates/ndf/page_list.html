@@ -27,58 +27,67 @@
 
 <div class="row">
 
+  <div class="small-6 columns">
 
-  <div class="small-6 columns" >
+    <ul class="pricing-table">
 
     {% if searching and page_nodes_count > 0 %}
+    <li class="bullet-item text-left">
     <div class="row">
-      <div class="small-12 columns end" style="padding-bottom:8px;">
+      <div class="small-12 columns end">
 	<p>Search Results: <span class="label success round large">Found {{page_nodes_count}} {{title|lower}}{{page_nodes_count|pluralize}}.</span></p>
-	<hr/>
       </div>
-    </div>  
+    </div>
+    </li>
+
     {% elif searching and page_nodes_count == 0 %}
+    <li class="bullet-item text-left">
     <div class="row">
-      <div class="small-12 columns" style="padding-bottom:8px;">
+      <div class="small-12 columns">
 	<p>Search Results: <span class="label alert">No {{title|lower}}{{page_nodes_count|pluralize}} matched your search criteria!!!</span></p>
-	<hr/>
       </div>  
     </div>  
+    </li>
+
     {% endif %}
 
     {% for node in page_nodes %}
-        <div class="row">
-          <div class="small-5 columns">
-            <a href="{% url 'page_details' group_name node %}">
-	      <b>{{node.name}}</b>
-	    </a>
-          </div>                
-          <div class="small-7 columns text-right">
-            <i class="posted-by" >Posted by {{node.user_details_dict.created_by}} on {{node.created_at|date:"j F Y"}} </i>
-          </div>     
+    <li class="bullet-item text-left">
+      <div class="row">
+        <div class="small-5 columns ">
+          <a href="{% url 'page_details' group_name node %}">
+	    <b>{{node.name}}</b>
+	  </a>
+        </div>                
+        <div class="small-7 columns text-right">
+          <i class="posted-by" >Posted by {{node.user_details_dict.created_by}} on {{node.created_at|date:"j F Y"}} </i>
+        </div>     
 	
-          <div class="small-12 columns" style="padding-top:0.5rem;">
-	    {{ node.html_content|removetags:"p"|safe|truncatewords:20 }}
-          </div>  
-	</div>
-	<hr/>
+        <div class="small-12 columns">
+	  {{ node.html_content|removetags:"h1 p"|safe|truncatewords:15 }}
+        </div>  
+      </div>
+    </li>
+
     {% empty %}
 
     {% if not searching %}
+    <li class="bullet-item text-left">
     <div class="row">
-
       <div class="small-12 columns">
 	<p>Currently <b>NO Pages</b>!!!</p>
       </div>
-
     </div>
+    </li>
     {% endif %}
+
     {% endfor %}
+
+    </ul>
 
   </div>
 
   <div class="small-6 columns end">
-
   </div>
 
 </div>
