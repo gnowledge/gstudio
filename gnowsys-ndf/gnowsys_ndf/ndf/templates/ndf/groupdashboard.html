@@ -1,6 +1,8 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
+
 {% block title %} Group Dashboard {% endblock %}
+
 {% block head %}
 <script type="text/javascript">
 function hide_btn(label)
@@ -58,17 +60,23 @@ notify(groupn,"remove")
 
 </script>
 {% endblock %}
+
+
 {% block url %}
-{% get_user_object node.created_by as user_obj %}
-{% ifequal  user_obj.username  user.username  %}
 {% url 'edit_group' groupobj.name groupobj %}
-{% else %}
-#
-{% endifequal %}
 {% endblock %}
+
+
+{% block meta_content %}
+
+    <h3>Group Details</h3>
+    <p> Members in this group : 0 </p>
+
+{% endblock %}
+
 {% block body_content %}
 {% get_group_name request.path as group %}
-<font size="3" color="black"> Members in this group : 0 </font>
+
 
 {% get_group_policy group request.user as policy %}
 

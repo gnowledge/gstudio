@@ -1,3 +1,5 @@
+/*************************** 1. Foundation CSS overrides ***********************/
+
 /* Foundation hacks */
 .row{
 	max-width:inherit;/* Expand to full browser width instead of 960px */
@@ -9,6 +11,14 @@
 }
 nav.top-bar .has-dropdown .button{ /* Needs testing */
 	top:0;
+}
+
+p{
+	margin-bottom: 1.25rem;
+}
+
+input[type="checkbox"] + label, input[type="radio"] + label{
+	margin: inherit!important;
 }
 
 /* End Foundation hacks */
@@ -26,6 +36,42 @@ nav.top-bar .has-dropdown .button{ /* Needs testing */
 .top-bar-section .has-form{
 	background-color: #1d293f;
 }
+
+/*************************** 2. Custom CSS overrides ***********************/
+
+main>aside{
+	padding-top: 1rem;
+}
+aside>section{
+	margin:inherit!important;
+	margin-bottom:5px;
+	border: 1px solid #e0e0e0;
+	background-color: #f9f9f9;
+	
+}
+
+aside>section>div{
+	padding: 15px;
+}
+
+pre{
+	width:92%;
+	overflow: auto;
+	margin 2rem 0;
+	border: 1px solid #eee;
+	border-left: 1rem solid #eee;
+	font: lighter 1.2rem/2rem Monaco;
+	background: url('/static/ndf/images/pre.png');
+	background-size:1px 4rem;
+	padding-left:0.5rem;
+}
+
+/*************************** 3. Custom CSS Below ***********************/
+
+
+
+
+
 
 /* Card block */
 li.card a{
