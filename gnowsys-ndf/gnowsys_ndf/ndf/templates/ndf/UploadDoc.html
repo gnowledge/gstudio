@@ -1,7 +1,35 @@
 {% extends "ndf/base.html" %}
 {% block title %} Upload Document {% endblock %}
 {% block body_content %} 
-{#{% if user.is_authenticated %}#}
+{% if user.is_authenticated %}
+
+
+<form id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
+  <fieldset>
+    <legend>Upload File</legend>
+    <label>Choose File</label>
+    <input type="file" name="doc[]"  id="docFile" multiple/>
+    <label>Title of File</label>
+    <input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File"> 
+  </fieldset>
+  <fieldset>
+    <legend>Add Description</legend>
+    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}  
+  </fieldset>
+  <fieldset>
+    <legend>Add Tag</legend>
+    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" />
+  </fieldset>
+  <input type="hidden" name="user" value="{{user.id}}">
+  <input type="hidden" name="page_url" value="{{page_url}}">
+  <input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
+  <p id="message" style="display:none"> It will take time to upload and process files, you can continue your work on this site
+    <br/>
+    For fast uploading of videos, upload videos in webm format </p>
+</form>
+
+
+<!--
 <h4>Submit Documents</h4>
 <div style='display:table;  border:1px;   border-spacing:10px; '>
 
@@ -51,20 +79,11 @@
 
 	</form>
 </div>	
-		
-{#{% endif %}#}
-<!--
-<hr>
-<h4>Image Gallery</h4>
+-->	
 
-<div id="imageGallery">
-
-
-<img src=" ">
-
-
-
-</div>-->
+{% else %}
+<p><em>You are Not Authorised user please login to upload files </em></p>
+{% endif %}
 {% endblock %}
 {% block script %}
 jQuery(document).ready(function($){
@@ -84,6 +103,5 @@ jQuery(document).ready(function($){
 	
 	});
 });
-
 {% endblock %}
 

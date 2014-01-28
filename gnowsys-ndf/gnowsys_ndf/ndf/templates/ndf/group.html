@@ -2,20 +2,32 @@
 
 {% block title %} Group {% endblock %}
 
+
+{% block meta_content %}
+<div class="medium-12 columns">
+    <h3>About</h3>
+
+    <p>Groups help to arrange your content for a particular set of users. Members can subscribe to updates and even collaborate on content.</p>
+
+    <p>Number of Groups : {{ group_nodes_count }} </p>
+
+    {% if user.is_authenticated %}
+    <a href="{% url 'create_group' 'group' %}">
+        <input type="submit" class="small button expand" value="Create a new group" />
+    </a>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+
 {% block body_content %} 
 
 <h2>Groups</h2>
-<h5>Number of Groups : {{ group_nodes_count }} </h5>
 
 {% load url from future %}
 <ul class="small-block-grid-2 medium-block-grid-4">
-  {% if user.is_authenticated %}
-    <li>
-    <a href="{% url 'create_group' 'group' %}">
-    <input type="submit" class="small button expand" value="Create new group" />
-    </a>
-    </li>
-    {% endif %}
+
     {% for node in group_nodes %}
     <li class="card"><a href="/{{node}}">{{ node }}</a>
     <!--
@@ -23,7 +35,7 @@
     Member Of   : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>
     <a href="{#% url 'delete_node' node %#}">delete</a>
-  -->
+-->
 </li>
 
 {% empty %}

@@ -21,6 +21,10 @@
 
 {% endblock %}
 
+{% block meta_content %}
+
+{% endblock %}
+
 {% block body_content %}
 
 <!-- Outer Main Row -->
@@ -37,6 +41,7 @@
 	  <li><h3>{{node.name}}</h3></li>
 	  {% if user.is_authenticated %}
 	  <li><a href="{% block url %}{% endblock %}" class="button tiny">Edit<a></li>
+	  {% block add_list %}{% endblock %}
 	  {% endif %}
 	</ul>
 
