@@ -35,29 +35,35 @@ def getImageThumbnail(request, group_name, _id):
     '''
     this funciton can be called to get thumbnail of image throw url
     '''
-    imgobj = collection.File.one({"_type": u"File", "_id": ObjectId(_id)})
-    if imgobj is not None:
-        if (imgobj.fs.files.exists(imgobj.fs_file_ids[1])):
-            f = imgobj.fs.files.get(ObjectId(imgobj.fs_file_ids[1]))
-            return HttpResponse(f.read())
+    img_obj = collection.File.one({"_type": u"File", "_id": ObjectId(_id)})
+    if img_obj is not None:
+        if (img_obj.fs.files.exists(img_obj.fs_file_ids[1])):
+            f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[1]))
+            return HttpResponse(f.read(),content_type=f.content_type)
     else:
         return HttpResponse("")
         
     
 def getFullImage(request, group_name, _id):
-    imgobj = collection.File.one({"_id": ObjectId(_id)})
-    if (imgobj.fs.files.exists(imgobj.fs_file_ids[0])):
-        f = imgobj.fs.files.get(ObjectId(imgobj.fs_file_ids[0]))
-        return HttpResponse(f.read(), content_type=f.content_type)
+    img_obj = collection.File.one({"_id": ObjectId(_id)})
+    if img_obj is not None:
+        if (img_obj.fs.files.exists(img_obj.fs_file_ids[0])):
+            f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[0]))
+            return HttpResponse(f.read(), content_type=f.content_type)
+        else:
+            return HttpResponse("")
+    else:
+        return HttpResponse("")
 
 def get_mid_size_img(request, group_name, _id):
-    imgobj = collection.File.one({"_id": ObjectId(_id)})
-    if (imgobj.fs.files.exists(imgobj.fs_file_ids[2])):
-        f = imgobj.fs.files.get(ObjectId(imgobj.fs_file_ids[2]))
-        print f.filename
+    img_obj = collection.File.one({"_id": ObjectId(_id)})
+    try:
+        f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[2]))
         return HttpResponse(f.read(), content_type=f.content_type)
-    else:
-        print "image dose not exist"
+    except IndexError:
+        f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[0]))
+        return HttpResponse(f.read(), content_type=f.content_type)
+        
 
 def image_search(request,group_name):
     imgcol=collection.File.find({'mime_type':{'$regex': 'image'}})
