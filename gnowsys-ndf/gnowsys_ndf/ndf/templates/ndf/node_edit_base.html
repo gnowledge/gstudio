@@ -196,6 +196,7 @@ $("input:radio").click(function() {
 	data:{
 	    homo_collection: this.value,
 	    collection_list: c_list,
+	    node_id: '{{node.pk}}',
 	    csrfmiddlewaretoken: '{{ csrf_token }}'
 	},
 	success: function(data) {

@@ -52,10 +52,13 @@ def edit_drawer_widget(field, group_name, node, checked=None):
     if field == "collection":
       if checked == "Quiz":
         checked = "QuizItem"
+      else:
+        checked = None
 
       drawers = get_drawers(group_name, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
+      checked = None
       drawers = get_drawers(group_name, node._id, node.prior_node, checked)
     
     drawer1 = drawers['1']
@@ -64,6 +67,9 @@ def edit_drawer_widget(field, group_name, node, checked=None):
   else:
     if field == "collection" and checked == "Quiz":
       checked = "QuizItem"
+    else:
+      # To make the collection work as Heterogenous one, by default
+      checked = None
 
     drawer1 = get_drawers(group_name, None, [], checked)
 
