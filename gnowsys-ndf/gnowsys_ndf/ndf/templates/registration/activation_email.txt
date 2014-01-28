@@ -11,11 +11,6 @@ To activate this account, please click the following link within the next
 
 http://{{ siteurl }}{{ activation_key_url }}
 
-(NOTE:
-	 This is being development version, when link gets opened in new tab please change "www.example.com" with "127.0.0.1:<PORT_NO> in address bar"
-	 <PORT_NO> is port number. By default it is 8000.
-)
-
 Sincerely,
 {{ sitename }} Management
 {% endblocktrans %}
