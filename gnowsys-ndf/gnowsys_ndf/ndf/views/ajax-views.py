@@ -42,6 +42,12 @@ def select_drawer(request, group_name):
         
         checked = request.POST.get("homo_collection", '')
         selected_collection_list = request.POST.get("collection_list", '')
+        node_id = request.POST.get("node_id", '')
+
+        if node_id:
+            node_id = ObjectId(node_id)
+        else:
+            node_id = None
 
         if selected_collection_list:
             selected_collection_list = selected_collection_list.split(",")
@@ -54,7 +60,7 @@ def select_drawer(request, group_name):
                 collection_list_ids.append(gs_collection.GSystem.one({'name': unicode(c_name)})._id)
                 i = i+1
 
-            drawer = get_drawers(group_name, None, collection_list_ids, checked)
+            drawer = get_drawers(group_name, node_id, collection_list_ids, checked)
         
             drawer1 = drawer['1']
             drawer2 = drawer['2']
@@ -70,11 +76,11 @@ def select_drawer(request, group_name):
           
         else:
             
-            drawer = get_drawers(group_name, None, None, checked)   
+            drawer = get_drawers(group_name, node_id, [], checked)   
        
             return render_to_response("ndf/drawer_widget.html", 
                                       {"widget_for": "collection", 
-                                       "drawer1": drawer, 
+                                       "drawer1": drawer['1'], 
                                        "group_name": group_name
                                       }, 
                                       context_instance=RequestContext(request)
