@@ -1,4 +1,5 @@
 ''' -- imports from python libraries -- '''
+from django.template.defaultfilters import slugify
 import hashlib # for calculating md5
 # import os -- Keep such imports here
 
@@ -11,6 +12,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
+from gnowsys_ndf.ndf.org2any import org2html
 
 try:
     from bson import ObjectId
@@ -81,20 +83,24 @@ def submitDoc(request, group_name):
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
+        usrname = request.user.username
         page_url = request.POST.get("page_url", "")
+        content_org = request.POST.get('content_org', '')
+        print "content:", content_org
+        tags = request.POST.get('tags')
         #memberOf = request.POST.get("memberOf", "")
         i = 1
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__())
+                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__())
+                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__())
+                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
             if f:
                 alreadyUploadedFiles.append(f)
                 title = mtitle
@@ -104,7 +110,7 @@ def submitDoc(request, group_name):
     else:
         return HttpResponseRedirect(reverse('homepage'))
             
-def save_file(files, title, userid, group_name,st_id):
+def save_file(files, title, userid, group_name, st_id, content_org, tags, usrname):
     """
     this will create file object and save files in gridfs collection
     """
@@ -129,9 +135,15 @@ def save_file(files, title, userid, group_name,st_id):
             fileobj.name = unicode(title)
             fileobj.created_by = int(userid)
             fileobj.file_size = size
-            fileobj.group_set.append(unicode(group_name))                                  #group name stored in group_set field
+            fileobj.group_set.append(unicode(group_name))        #group name stored in group_set field
             fileobj.gsystem_type.append(GST_FILE._id)
             fileobj.mime_type = filetype
+            if content_org:
+                fileobj.content_org = unicode(content_org)
+                # Required to link temporary files with the current user who is modifying this document
+                filename = slugify(title) + "-" + usrname + "-"
+                fileobj.content = org2html(content_org, file_prefix=filename)
+            fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
             fileobj.save()
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
@@ -164,10 +176,8 @@ def save_file(files, title, userid, group_name,st_id):
                 fileobj.fs_file_ids.append(tobjectid)
                 fileobj.save()
                 files.seek(0)
-                #print "test - reading file:",files.read()
                 mid_size_img = convert_mid_size_image(files)
                 mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-                print "mid_img/-id:",mid_img_id
                 fileobj.fs_file_ids.append(mid_img_id)
                 fileobj.save()
 
