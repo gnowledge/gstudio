@@ -189,7 +189,7 @@ def create_edit_quiz_item(request, group_name, node_id=None):
             quiz_node.collection_set.append(quiz_item_node._id)
             quiz_node.save()
         
-        return HttpResponseRedirect(reverse('quiz', kwargs={'group_name': group_name, 'app_id': gst_quiz._id}))
+        return HttpResponseRedirect(reverse('quiz', kwargs={'group_name': group_name, 'app_id': quiz_item_node._id}))
         
     else:
         if node_id:
