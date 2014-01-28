@@ -21,6 +21,38 @@
 
 {% endblock %}
 
+{% block meta_content %}
+
+    <h3>About</h3>
+
+    <p>Using <b>Quiz Items</b>, you can create a miscellaneous quiz-question. These quiz-questions can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
+
+    <p>Using <b>Quiz</b>, you can build a quiz having list of quiz-items. Quiz-Items can be added to quiz in two ways:
+      <ol>
+	<li>By editing, Quiz node.</li>
+	<li>By using Quiz-Item button corresponding to the Quiz node (i.e. this will automatically add the quiz-item node to your quiz node).</li>
+      </ol>
+    </p>
+
+    <p>Number of Quiz nodes : {{ quiz_nodes_count }} </p>
+
+    <!-- Search field -->
+    <p>
+    <!--{#% url 'quiz_search' group_name as search_url %} -->
+    {% include "ndf/node_search_base.html" %}
+    <span class="label alert small">NOTE: Search not implemented yet!!!</span>
+    </p>
+
+    <!-- Add button -->
+    {% if user.is_authenticated %}
+    <p>
+    <a href="{% url 'quiz_create_edit' group_name %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create_edit' group_name %}" class="button small right">+ Add {{title}} Item</a>
+    </p>
+    {% endif %}
+    
+{% endblock %}
+
 {% block body_content %}
 
   <div class="row" style="padding-top:15px">
@@ -79,17 +111,6 @@
             {{ca|linebreaksbr}}
           {% endif %}
         {% endfor %}
-      </div>
-    </div>
-
-    <div class="small-12 columns" id="question_fs">
-      <h4>Tags</h4>
-      <div class="panel">
-	{% if node.tags %}
-          {% for tag in node.tags %}
-            <span class="radius label">{{tag}}</span>
-          {% endfor %}
-        {% endif %}
       </div>
     </div>
 
