@@ -2,7 +2,7 @@
 {% load ndf_tags %}
 {% block title %} Image Gallery {% endblock %}
 {% block body_content %} 
-
+<script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script>
 {% if already_uploaded %} 
 <div id="message">
   <span style="color:red">Listed below files are already uploaded please choose different files</span>
@@ -39,11 +39,19 @@
 
 <ul class="clearing-thumbs" data-clearing>
   {% for image in imageCollection %}
-  <li>
+  <li  class="clearing-featured-img">
     <a href="{% url 'get_mid_size_img' group_name image %}">
-      <img src="{% url 'getImageThumbnail' group_name image %}"  class="th" data-caption="<a href='{% url 'image_detail' group_name image %}'>{{image.name}}</a>"></img>
+      <img  src="{% url 'getImageThumbnail' group_name image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' group_name image %}'>{{image.name}}</a> <script type='text/javascript'>
+											   var angle = 0;
+											   $('.img_rotate').on('click', function() {
+											   angle += 90;
+											   $('.visible-img img').rotate(angle);
+											   });
+											   </script>" >
+      </img>
     </a>
   </li>
   {% endfor %}
-</ul> 	
+</ul>
+
 {% endblock %}
