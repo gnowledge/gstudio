@@ -43,10 +43,33 @@ rcs = RCS()
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
 #######################################################################################################################################
 
-def page(request, group_name, app_id):
+def page(request, group_name, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
-    if gst_page._id == ObjectId(app_id):
+    if request.method == "POST":
+        print "\n Search url worked...\n"
+        title = gst_page.name
+        
+        search_field = request.POST['search_field']
+        print "\n search field : ", search_field
+        print "\n group name : ", group_name
+
+        page_nodes = collection.Node.find({'member_of': {'$all':[title]},
+                                           '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                           'group_set': {'$all': [group_name]}
+                                       })
+        page_nodes.sort('last_update', -1)
+        page_nodes_count = page_nodes.count()
+
+        return render_to_response("ndf/page_list.html",
+                                  {'title': title, 
+                                   'searching': True, 'query': search_field,
+                                   'page_nodes': page_nodes, 'page_nodes_count': page_nodes_count
+                                  }, 
+                                  context_instance=RequestContext(request)
+        )
+
+    elif gst_page._id == ObjectId(app_id):
         title = gst_page.name
         
         page_nodes = collection.Node.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})

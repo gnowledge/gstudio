@@ -26,7 +26,9 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
     url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
-                       url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form':UserResetform},name='password_reset_done'),
+    url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form': UserResetform},name='password_reset_confirm'),
+    url(r'^accounts/password/reset/complete/$', auth_views.password_reset_complete, name='password_reset_complete'),
+    url(r'^accounts/password/reset/done/$',auth_views.password_reset_done,name="password_reset_done"),
     url(r'^accounts/password/reset/$',
         auth_views.password_reset,
         {
@@ -34,9 +36,9 @@ urlpatterns = patterns('',
             'email_template_name': 'registration/password_reset_email.html',
             'subject_template_name':'registration/password_reset_email_subject.txt'
         },
-        name='auth_password_reset'
+        name='password_reset'
     ),
     url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
-    (r'^accounts/', include('registration.backends.default.urls')),
+     (r'^accounts/', include('registration.backends.default.urls')),
     url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )

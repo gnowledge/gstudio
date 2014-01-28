@@ -7,6 +7,7 @@ from gnowsys_ndf.ndf.views import *
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.page',
                        url(r'^(?P<app_id>[\w-]+)/list$', 'page', name='page'),
+                       url(r'^search$', 'page', name='page_search'),
                        url(r'^create/', 'create_edit_page', name='page_create_edit'),
                        url(r'^(?P<app_id>[\w-]+)/details$', 'page', name='page_details'),
                        url(r'^(?P<node_id>[\w-]+)/edit$', 'create_edit_page', name='page_create_edit'),
