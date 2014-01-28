@@ -9,38 +9,89 @@
 
     <p>Number of Pages : {{ page_nodes_count }} </p>
 
-    {% if user.is_authenticated %}
-    <a href="{% url 'page_create_edit' group_name %}">
-  <input type="submit" class="button small" value="Create a {{title}}" />
+    <!-- Search field -->
+    <p>
+    {% url 'page_search' group_name as search_url %}
+    {% include "ndf/node_search_base.html" %}
+    </p>
 
+    <!-- Add button -->
+    {% if user.is_authenticated %}
+    <p>
+    <a href="{% url 'page_create_edit' group_name %}" class="button small">+ Add {{title}}</a>
+    </p>
     {% endif %}
 
-</div>
 {% endblock %}
 
 {% block body_content %} 
 
-{% load url from future %}
-{% for node in page_nodes %}
-  {% if forloop.first %}
-    <h5>Number Of Nodes : {{ page_nodes_count }} </h5>
-  {% endif %}
-  <div>
-    <p><strong><a href="{% url 'page_details' group_name node %}">{{ node.name }}</a></strong><br>
-    <!--
-    Created at : {{ node.created_at|date:"j F Y" }}<br>
-    Member Of   : {{ node.member_of }}<br>
-    Tags       : {{ node.tags|join:", " }}<br>
-    <a href="{#% url 'delete_node' node %#}">delete</a>
-    -->
-    </p>
+<div class="row">
+
+  <div class="small-6 columns">
+
+    <ul class="pricing-table">
+
+    {% if searching and page_nodes_count > 0 %}
+    <li class="bullet-item text-left">
+    <div class="row">
+      <div class="small-12 columns end">
+	<p>Search Results: <span class="label success round">Found {{page_nodes_count}} {{title|lower}}{{page_nodes_count|pluralize}}.</span></p>
+      </div>
+    </div>
+    </li>
+
+    {% elif searching and page_nodes_count == 0 %}
+    <li class="bullet-item text-left">
+    <div class="row">
+      <div class="small-12 columns">
+	<p>Search Results: <span class="label alert">No {{title|lower}}{{page_nodes_count|pluralize}} matched your search criteria!!!</span></p>
+      </div>  
+    </div>  
+    </li>
+
+    {% endif %}
+
+    {% for node in page_nodes %}
+    <li class="bullet-item text-left">
+      <div class="row">
+        <div class="small-5 columns ">
+          <a href="{% url 'page_details' group_name node %}">
+	    <b>{{node.name}}</b>
+	  </a>
+        </div>                
+        <div class="small-7 columns text-right">
+          <i class="label secondary" >Posted by {{node.user_details_dict.created_by}} on {{node.created_at|date:"j F Y"}} </i>
+        </div>     
+	
+        <div class="small-12 columns" style="padding-top:5px;">
+	  {{ node.html_content|removetags:"h1 p"|safe|truncatewords:15 }}
+        </div>  
+      </div>
+    </li>
+
+    {% empty %}
+
+    {% if not searching %}
+    <li class="bullet-item text-left">
+    <div class="row">
+      <div class="small-12 columns">
+	<p>Currently <b>NO Pages</b>!!!</p>
+      </div>
+    </div>
+    </li>
+    {% endif %}
+
+    {% endfor %}
+
+    </ul>
+
   </div>
 
-{% empty %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
-{% endfor %}
+  <div class="small-6 columns end">
+  </div>
 
-<br/>
+</div>
 
 {% endblock %}
 
