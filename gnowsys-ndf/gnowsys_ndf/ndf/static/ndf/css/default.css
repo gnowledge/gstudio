@@ -1,6 +1,7 @@
 /*************************** 1. Foundation CSS overrides ***********************/
 
 /* Foundation hacks */
+
 .row{
 	max-width:inherit;/* Expand to full browser width instead of 960px */
 }
@@ -21,22 +22,40 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
 }
 
-/* End Foundation hacks */
 
 /* Theme */
+header{
+}
 .top-bar,.top-bar-section ul,header{
-	background-color: #1d293f;
+	background-color: #222;
 }
-.top-bar-section li:not(.has-form) a:not(.button){
-	background-color: #1d293f;
-}
-.top-bar-section li:not(.has-form) a:not(.button):hover{
-	background-color: #253544;
+.top-bar-section li:not(.has-form) a{
+	background-color: #222!important;
 }
 .top-bar-section .has-form{
-	background-color: #1d293f;
+	background-color: #222;
 }
 
+
+.top-bar-section a.active-menu.button{
+	/* Active App */
+	background-color: #008759!important;
+	font-weight: bold;
+}
+.top-bar-section ul.left>li>a{ 
+	/* Apps */
+	background-color: inherit!important;
+	top:0;
+}
+.top-bar-section li.group a.active-menu{ 
+	/* Active group */
+	background-color: #154534!important;
+	font-weight: bold!important;
+}
+.top-bar-section li:not(.has-form) a:hover{
+	/* Top bar hover */
+	background-color: #008759!important;
+}
 /*************************** 2. Custom CSS overrides ***********************/
 
 main>aside{
@@ -45,13 +64,33 @@ main>aside{
 aside>section{
 	margin:inherit!important;
 	margin-bottom:5px;
-	border: 1px solid #e0e0e0;
-	background-color: #f9f9f9;
-	
+	background-color: #003b27;
+	-webkit-box-shadow: 2px 2px 4px 1px #bbb;
+			box-shadow: 2px 2px 4px 1px #bbb;
+			color:white;
 }
 
 aside>section>div{
 	padding: 15px;
+}
+
+aside>section h3,aside>section h4,aside>section h5 {
+color:white;
+}
+
+aside section .button{
+	background-color:#008759 ;
+}
+aside section .button:hover{
+	background-color:#00ba7b ;
+}
+
+/* Content area */
+article{
+	margin-top: 1rem;
+	background-color: white;
+	border:solid 1px #ddd;
+	padding: 20px; 
 }
 
 pre{
@@ -70,7 +109,10 @@ pre{
 
 
 
-
+a.user i{
+	padding: 2px 5px;
+	margin-right:6px;
+}
 
 
 /* Card block */
