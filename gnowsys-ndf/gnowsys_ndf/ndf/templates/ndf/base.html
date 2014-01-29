@@ -23,6 +23,8 @@
 
 	<!-- jQuery -->
 	<script src="/static/ndf/js/jquery.js"></script>
+	<!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
+	<script src="/static/ndf/js/jquery-migrate-1.0.0.js"></script>
 
 	<!-- External default stylesheet-->
 	<link href="/static/ndf/css/default.css" rel="stylesheet">
@@ -108,7 +110,7 @@
 
 	{% get_group_name request.path as group_name %}
 
-	<header>
+	<header class="row">
 
 		<!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
 		<nav class="top-bar" data-topbar>
@@ -138,7 +140,7 @@
 					{% if user.is_authenticated %}
 
 					<li class="has-dropdown">
-						<a href="#"><i class="fi-torso"></i> {{ user.username }}</a>
+						<a href="{% url 'userDashboard' group_name user.username %}"><i class="fi-torso"></i> {{ user.username }}</a>
 						<ul class="dropdown">
 							<li><a href="{% url 'auth_password_change' %}">Change password</a></li>
 							<li class="has-form"><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
