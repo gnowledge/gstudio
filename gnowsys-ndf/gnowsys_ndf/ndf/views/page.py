@@ -47,15 +47,13 @@ def page(request, group_name, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     if request.method == "POST":
-        print "\n Search url worked...\n"
         title = gst_page.name
         
         search_field = request.POST['search_field']
-        print "\n search field : ", search_field
-        print "\n group name : ", group_name
 
         page_nodes = collection.Node.find({'member_of': {'$all':[title]},
-                                           '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                           '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                   {'tags': {'$regex':search_field, '$options': 'i'}}], 
                                            'group_set': {'$all': [group_name]}
                                        })
         page_nodes.sort('last_update', -1)

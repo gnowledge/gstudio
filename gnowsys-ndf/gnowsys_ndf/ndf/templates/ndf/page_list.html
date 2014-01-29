@@ -5,15 +5,16 @@
 
     <h3>About</h3>
 
-    <p><b>Pages</b> are just like the page of your notebook. You can write your content here.</p>
+    <p class="text-justify"><b>Pages</b> are just like the page of your notebook. You can write your content here.</p>
 
-    <p>Number of Pages : {{ page_nodes_count }} </p>
+    <p><h5>Number of Pages: <b>{{ page_nodes_count }}</b></h5></p>
 
 {% endblock %}
 
 {% block side_content %}
     <!-- Search field -->
     <p>
+    <h3>Search</h3>
     {% url 'page_search' group_name as search_url %}
     {% include "ndf/node_search_base.html" %}
     </p>
@@ -62,11 +63,12 @@
 	  </a>
         </div>                
         <div class="small-7 columns text-right">
-          <i class="label secondary" >Posted by <a href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</a> on {{node.created_at|date:"j F Y"}} </i>
+        
+          <i class="label secondary" >{{ node.member_of|join:', ' }} by <a href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</a> on {{node.created_at|date:"j F Y"}} </i>
         </div>     
 	
         <div class="small-12 columns" style="padding-top:5px;">
-	  {{ node.html_content|removetags:"h1 p"|safe|truncatewords:15 }}
+	  {{ node.html_content|removetags:"h1 p"|safe|truncatewords:12 }}
         </div>  
       </div>
     </li>

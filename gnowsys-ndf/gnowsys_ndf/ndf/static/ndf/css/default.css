@@ -27,13 +27,13 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 header{
 }
 .top-bar,.top-bar-section ul,header{
-	background-color: #003b27;
+	background-color: #222;
 }
 .top-bar-section li:not(.has-form) a{
-	background-color: #003b27!important;
+	background-color: #222!important;
 }
 .top-bar-section .has-form{
-	background-color: #003b27;
+	background-color: #222;
 }
 
 
@@ -49,9 +49,8 @@ header{
 }
 .top-bar-section li.group a.active-menu{ 
 	/* Active group */
-	/*background-color: #154534!important;*/
+	background-color: #154534!important;
 	font-weight: bold!important;
-	border-bottom: 2px solid #00ba7b;
 }
 .top-bar-section li:not(.has-form) a:hover{
 	/* Top bar hover */
