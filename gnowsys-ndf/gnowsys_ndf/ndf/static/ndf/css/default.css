@@ -70,7 +70,10 @@ pre{
 
 
 
-
+a.user i{
+	padding: 2px 5px;
+	margin-right:5px;
+}
 
 
 /* Card block */

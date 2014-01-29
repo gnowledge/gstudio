@@ -140,7 +140,7 @@
 					{% if user.is_authenticated %}
 
 					<li class="has-dropdown">
-						<a href="{% url 'userDashboard' group_name user.username %}"><i class="fi-torso"></i> {{ user.username }}</a>
+						<a class="user" data-user-gnow="#aabb44" href="{% url 'userDashboard' group_name user.username %}">{{ user.username }}</a>
 						<ul class="dropdown">
 							<li><a href="{% url 'auth_password_change' %}">Change password</a></li>
 							<li class="has-form"><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
@@ -251,6 +251,10 @@
 
 		// Initialize Foundation CSS
 		$(document).foundation();
+		$("a.user").prepend(function(){
+			console.log($(this).html());
+			return "<i class='fi-torso' style='background-color:"+$(this).attr("data-user-gnow")+"'></i>"
+		});
 
 		{% block script %} {% endblock %}	
 
