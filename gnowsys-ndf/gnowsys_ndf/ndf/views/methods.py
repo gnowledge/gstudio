@@ -80,8 +80,44 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     else:
       drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
 
-    
+
     if (nid is None) and (not nlist):
+      for each in drawer:                      
+        
+        dict_drawer[each._id] = each
+
+    elif (nid is None) and (nlist):
+      for each in drawer:
+        if each._id not in nlist:          
+            
+          dict1[each._id] = each
+
+      for oid in nlist: 
+        obj = gs_collection.GSystem.one({'_id': oid})        
+                 
+        dict2[oid] = obj
+
+      dict_drawer['1'] = dict1
+      dict_drawer['2'] = dict2
+        
+    else:
+      for each in drawer:
+        if each._id != nid:          
+          if each._id not in nlist:  
+            
+            dict1[each._id] = each
+          
+          else: 
+                
+            dict2[each._id] = each
+      
+      dict_drawer['1'] = dict1
+      dict_drawer['2'] = dict2
+
+    return dict_drawer
+
+
+    '''if (nid is None) and (not nlist):
       for each in drawer:   
         user = User.objects.get(pk=each.created_by).username 
         content = each.content_org        
@@ -90,7 +126,8 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
         else: 
             content = u"No description !"
             
-        dict_drawer[each._id] = [each.name, user, each.created_at, content]
+        #dict_drawer[each._id] = [each.name, user, each.created_at, content]
+        dict_drawer[each._id] = each
 
     elif (nid is None) and (nlist):
       for each in drawer:
@@ -142,7 +179,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
 
-    return dict_drawer
+    return dict_drawer'''
 
 
 def get_node_common_fields(request, node, group_name, node_type):
@@ -208,7 +245,9 @@ def get_node_common_fields(request, node, group_name, node_type):
   while (i < len(collection_list)):                    
     c_name = collection_list[i]    
     c_name = c_name.replace("'", "")
+    print c_name
     objs = gs_collection.GSystem.one({'_type': {'$in' : [u"GSystem", u"File"]}, 'name': c_name})
+    print objs
     node.collection_set.append(objs._id)
     i = i+1
       
