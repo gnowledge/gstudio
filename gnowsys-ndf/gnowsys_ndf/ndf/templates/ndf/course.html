@@ -1,0 +1,34 @@
+{% extends "ndf/base.html" %}
+{% block title %} {{title}} {% endblock %}
+{% block body_content %}
+<div class="row">
+  <div class="small-3 large-3 columns">
+    <a href="#" class="button">create</a>
+  </div>
+</div>
+<div class="row">
+  <div class="small-6 large-12 columns">
+    <ul class="pricing-table">
+      {% for course in course_coll %}
+      <li class="bullet-item text-left">
+	<div class="row">
+          <div class="small-5 columns ">
+            <a href="{% url 'page_details' group_name course %}">
+	      <b>{{course.name}}</b>
+	    </a>
+          </div>                
+          <div class="small-7 columns text-right">
+            <i class="label secondary" >Created by {{course.user_details_dict.created_by}} on {{course.created_at|date:"j F Y"}} </i>
+          </div>    
+          <div class="small-12 columns" style="padding-top:5px;">
+	    {{ course.html_content|removetags:"h1 p"|safe|truncatewords:15 }}
+          </div>
+	</div>
+      </li>
+      { % empty %}
+      <p> <em> No Course available in this group !!</em></P>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
