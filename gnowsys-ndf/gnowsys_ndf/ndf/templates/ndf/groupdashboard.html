@@ -76,17 +76,17 @@ $(document).ready(function()
   <div style='display:table-row;' >
    {% if policy == "OPEN" or group == "home"  %}
    {% check_user_join request group as user_is_joined %}
-   
+
    <div style='display:table-cell;' colspan='5' align="middle">
      <input type="hidden" id="groupname" value="{{group}}">
      {% if user_is_joined == "joined" %}
-     <input type="submit" id="remove" value="Unsubscribe" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible">
-     <input type="submit" id="notify" value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden" >
-     
+     <input type="submit" id="remove" value="Unsubscribe" class="button" align="center" style="visibility:visible">
+     <input type="submit" id="notify" value="Join" class="button" align="center" style="visibility:hidden" >
+
      {% elif user_is_joined == "not"  %}
-     <input type="submit" id="remove" value="Unsubscribe" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden">
-     <input type="submit" id="notify"value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible" >
-     
+     <input type="submit" id="remove" value="Unsubscribe" class="button" align="center" style="visibility:hidden">
+     <input type="submit" id="notify"value="Join" class="button" align="center" style="visibility:visible" >
+
      {% endif %}
      {% if user_is_joined == "author" %}
      Group Owner
