@@ -13,17 +13,17 @@ $('#enddate').fdatepicker();
 
 });
 </script>
-<style type="text/css">
-#forum_div{
-left:100px;
-
-}
 </style>
 {% endblock %}
 
-{% block body_content %} 
+{% block meta_content %} 
+<h3>Starting Discussions</h3>
+<p>Use a relevant topic for the forum so that interested people can join the discussion</p>
+{% endblock %}
 
-<div id="forum_div" style='padding-top:40px;'>
+{% block body_content %} 
+<h2>Create a new Forum Discussion</h2>
+
 <form id="create_forum" method="POST">
 {% csrf_token %}
   <div class="row">
@@ -87,6 +87,5 @@ left:100px;
 <input type="button" id="save_forum" class="btn btn-primary btn-large btn-block" value="Create Forum" onclick="saveforum()">
        		 	<input type="submit" id="forum" value="Create Forum" class="btn btn-primary btn-large btn-block" style="display:none">
 </form>
-</div>
 
 {% endblock %}
