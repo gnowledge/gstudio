@@ -16,7 +16,7 @@
 
   <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
   <script type="text/javascript"
-	  src="http://atlas.metastudio.org/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	  src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
   </script>
 
 {% endblock %}
@@ -40,13 +40,18 @@
 	<ul class="inline-list">
 	  <li><h3>{{node.name}}</h3></li>
 	  {% if user.is_authenticated %}
-	  <li><a href="{% block url %}{% endblock %}" class="button tiny">Edit<a></li>
+	  <li><a href="{% block url %}{% endblock %}" class="button tiny">Edit</a></li>
 	  {% block add_list %}{% endblock %}
 	  {% endif %}
 	</ul>
-
 	<p>
 	  {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
+	</p>
+	<p>
+	  Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
+	</p>
+	<p>
+	  Last update: {{ node.last_update|date:"j F Y" }}
 	</p>
 	<p>
 	  Version{{ node.version_dict|length|pluralize }}: 
