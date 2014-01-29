@@ -9,6 +9,9 @@
 
     <p>Number of Pages : {{ page_nodes_count }} </p>
 
+{% endblock %}
+
+{% block side_content %}
     <!-- Search field -->
     <p>
     {% url 'page_search' group_name as search_url %}
