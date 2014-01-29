@@ -1,0 +1,192 @@
+{% extends "ndf/base.html" %}
+
+{% block title %} {{username}}'s - Dashboard  {% endblock %}
+
+{% block meta_content %}
+
+    <h3>About</h3>
+
+    <p><b>Dashboard</b> shows users own activities in Metastudio also it explicitly shows what you have for creating a course</p>   
+
+{% endblock %}
+
+{% block body_content %}
+
+<div class="row">
+
+	<!-- Users General Information -->
+	<div class="row">
+		<div class="small-3 columns">
+			<a href="#"><img src="/static/ndf/images/user.png"></a>
+		</div>
+		<div class="small-9 columns" style="padding-top:30px;">
+			<h4><a href="#">Welcome {{username}}</a></h4>
+			Registerd on : &nbsp;{{DOJ}}
+		</div>
+	</div>
+	<br/>
+	<div class="row">
+		<div class="small-12 columns" style="padding-top:10px;">
+			<b><a>{{username}}'s Dashboard</a></b>
+			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
+		</div>
+	</div>
+
+	<!-- Created Resources by user -->
+	<div class="row">
+		<div class="small-12 columns" style="padding-top:10px;">
+			Created Resources by {{username}}:						
+		</div>
+	</div>
+	<div class="row" style="padding-top:10px;">
+		<div class="small-3 columns">
+			<h6 align="center"><b>Pages</b></h6>
+			<ul class="pricing-table">
+				{% for key, value in page_drawer.items %}
+					{% if user_id == value.created_by %}        
+						<li class="bullet-item" value={{key}}> 					
+							{{value.name}}					
+						</li>
+					{% endif %}
+				{% endfor %}				
+			</ul>
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Images</b></h6>
+			<ul class="pricing-table">        
+				{% for key, value in image_drawer.items %}
+					{% if user_id == value.created_by %}        
+						<li class="bullet-item" value={{key}}> 					
+							{{value.name}}					
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Videos</b></h6>
+			<ul class="pricing-table">        
+				{% for key, value in video_drawer.items %}
+					{% if user_id == value.created_by %}        
+						<li class="bullet-item" value={{key}}> 					
+							{{value.name}}					
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Files</b></h6>
+			<ul class="pricing-table">        
+				{% for key, value in file_drawer.items %}
+					{% if user_id == value.created_by %}        
+						<li class="bullet-item" value={{key}}> 					
+							{{value.name}}					
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<br/>
+
+	<!-- Contributed Resources by user -->
+	<div class="row">
+		<div class="small-12 columns" style="padding-top:10px;">
+			Contributed Resources :						
+		</div>
+	</div>
+	<div class="row" style="padding-top:10px;">
+		<div class="small-3 columns">
+			<h6 align="center"><b>Pages</b></h6>
+			<ul class="pricing-table">
+				{% for key, value in page_drawer.items %} 
+					{% if user_id in value.modified_by %}       
+						<li class="bullet-item" value={{key}}> 					
+							{{value.name}}					
+						</li>
+					{% endif %}
+				{% endfor %}				
+			</ul>
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Images</b></h6>
+			<ul class="pricing-table">        
+				{% for key, value in image_drawer.items %} 
+					{% if user_id in value.modified_by %}       
+						<li class="bullet-item" value={{key}}> 					
+							{{value.name}}					
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Videos</b></h6>
+			<ul class="pricing-table">        
+				{% for key, value in video_drawer.items %} 
+					{% if user_id in value.modified_by %}       
+						<li class="bullet-item" value={{key}}> 					
+							{{value.name}}					
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Files</b></h6>
+			<ul class="pricing-table">        
+				{% for key, value in file_drawer.items %} 
+					{% if user_id in value.modified_by %}       
+						<li class="bullet-item" value={{key}}> 					
+							{{value.name}}					
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<!-- Create a course -->
+	<div class="row">
+		<div class="small-12 columns" style="padding-top:10px;">
+			<b><a>Create Course</a></b>
+			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
+		</div>
+	</div>
+	<div class="row">
+		<div class="small-3 columns text-left">
+	  		<h5>Course Name  : </h5>
+		</div>
+		<div class="small-4  small-offset-5 small-pull-5 columns">
+	  		<input id="name_id" name="name" type="text" placeholder="Enter the name of course">
+		</div>
+   	</div>
+   	<!-- Shelves -->
+   	<div class="row">
+		<div class="small-12 columns text-left">
+	  		<h5>Course Shelf : </h5>
+		</div>		
+   	</div>
+   	<div class="row" style="padding-top:10px;">
+		<div class="small-3 columns">
+			<h6 align="center"><b>Pages</b></h6>			
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Images</b></h6>			
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Videos</b></h6>			
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Files</b></h6>			
+		</div>
+	</div><br/><br/>
+	<!-- Saving course -->
+	<div class="row" >		
+    	<input type="submit" value="Save Course" class="button small-10 small-push-1 column"/>
+  	</div>
+  	<br/><br/>
+
+</div>
+
+{% endblock %}
