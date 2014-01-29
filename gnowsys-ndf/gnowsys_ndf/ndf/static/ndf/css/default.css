@@ -24,7 +24,7 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 /* End Foundation hacks */
 
 /* Theme */
-.top-bar,header{
+.top-bar,.top-bar-section ul,header{
 	background-color: #1d293f;
 }
 .top-bar-section li:not(.has-form) a:not(.button){

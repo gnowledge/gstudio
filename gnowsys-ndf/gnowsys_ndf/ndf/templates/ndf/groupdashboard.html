@@ -5,7 +5,10 @@
 
 {% block head %}
 <script type="text/javascript">
+
+
   function hide_btn(label)
+  // Looks like this section needs a rewrite using jQuery
   {
     if(label == "Join")
     {
@@ -46,6 +49,7 @@ function notify(group,activity)
 
 $(document).ready(function()
 {
+  // Please document this piece of code
   document.getElementById('notify').style.marginTop = '-35px'
   var groupn=$("#groupname").val();
   $("#notify").click(function(){
@@ -72,6 +76,7 @@ $(document).ready(function()
 <h3>Group Details</h3>
 <p> Members in this group : 0 </p>
 
+<!-- Code needs optimization -->
 <div style='display:table;  border:1px;   border-spacing:10px; '>
   <div style='display:table-row;' >
    {% if policy == "OPEN" or group == "home"  %}
