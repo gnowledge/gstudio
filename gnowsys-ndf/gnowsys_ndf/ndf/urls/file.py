@@ -6,9 +6,6 @@ from django.views.generic import TemplateView
 
 from gnowsys_ndf.ndf.views import *
 
-
-
-
 urlpatterns = patterns('gnowsys_ndf.ndf.views.file',
                         url(r'^(?P<file_id>[\w-]+)$', 'file', name='file'),
                         #url(r'^uploadDoc/$', TemplateView.as_view(template_name='ndf/UploadDoc.html')), #Direct ot html template  
