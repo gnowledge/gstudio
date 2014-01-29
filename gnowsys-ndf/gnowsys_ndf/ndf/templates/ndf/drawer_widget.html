@@ -41,19 +41,19 @@
 
               <div class="row">
                 <div class="small-5 columns">
-                  &nbsp;&nbsp; <b> {{value.0}} </b>   
+                  &nbsp;&nbsp; <b> {{value.name}} </b>   
                 </div>                
                 <div class="small-7 columns text-right">
-                  <i class="posted-by" > By : {{value.1}} on {{value.2}} </i>
+                  <i class="posted-by" > By : {{request.user.username}} on {{value.created_at}} </i>
                 </div>     
               </div>
 
               <div class="row">
                 <div class="small-12 columns text-left" style="padding-top:0.5rem;">
-                  {% if value.3|length > 90 %}
-                  &nbsp;&nbsp; {{value.3}}. . .
+                  {% if value.content_org|length > 90 %}
+                  &nbsp;&nbsp; {{value.content_org}}. . .
                   {% else %}
-                  &nbsp;&nbsp; {{value.3}}
+                  &nbsp;&nbsp; {{value.content_org}}
                   {% endif %}        
                 </div>  
               </div>
@@ -112,19 +112,19 @@
 
             <div class="row">
               <div class="small-5 columns text-left">
-                &nbsp;&nbsp; <b> {{value.0}} </b>   
+                &nbsp;&nbsp; <b> {{value.name}} </b>   
               </div>                
               <div class="small-7 columns text-right">
-                <i class="posted-by" >By : {{value.1}} on {{value.2}}</i>
+                <i class="posted-by" >By : {{request.user.username}} on {{value.created_at}}</i>
               </div>     
             </div>
 
             <div class="row">
               <div class="small-12 columns text-left" style="padding-top:0.5rem;">
-                {% if value.3|length > 40 %}
-                &nbsp;&nbsp; {{value.3}}. . .
+                {% if value.content_org|length > 40 %}
+                &nbsp;&nbsp; {{value.content_org}}. . .
                 {% else %}
-                &nbsp;&nbsp; {{value.3}}
+                &nbsp;&nbsp; {{value.content_org}}
                 {% endif %}        
               </div>  
             </div>
