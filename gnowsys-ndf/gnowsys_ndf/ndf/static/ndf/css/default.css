@@ -56,6 +56,13 @@ header{
 	/* Top bar hover */
 	background-color: #008759!important;
 }
+
+aside a{
+color: #008759;
+}
+aside a:hover{
+	color: inherit;
+}
 /*************************** 2. Custom CSS overrides ***********************/
 
 main>aside{
@@ -112,6 +119,7 @@ pre{
 a.user i{
 	padding: 2px 5px;
 	margin-right:6px;
+	color:white;
 }
 
 
