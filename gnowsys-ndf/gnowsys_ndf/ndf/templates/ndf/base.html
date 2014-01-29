@@ -51,10 +51,13 @@
 
 		header
 		{
+			position: relative;
+			-webkit-box-shadow: 2px 2px 4px 1px #C7C7C7;
+			box-shadow: 2px 2px 4px 1px #C7C7C7;
 		}
 
 		main{
-			background-color:#fbfbfc;
+			background-color:#eee;
 			min-height: 100%;
 			margin-bottom: -90px!important;
 			-webkit-box-sizing: border-box;
@@ -75,6 +78,7 @@
 		}
 
 		footer{
+			border-top:6px solid #008759;
 			background-color:#222;
 			color: #888;
 			padding:20px 0;
@@ -82,11 +86,6 @@
 
 		footer a{
 			color: #bbb;
-		}
-
-		.active-menu{
-			//background-color: #16A085 !important;
-			background-color: rgb(0, 140, 186) !important;
 		}
 
 		.coll-arrows{
@@ -116,7 +115,7 @@
 		<nav class="top-bar" data-topbar>
 			<ul class="title-area">
 				<li class="name">
-					<h1><a href="/"><img src="/static/ndf/images/icon/meta.png"> meta<b>Studio</b></a></h1>
+					<h1><a href="/"><img src="/static/ndf/images/icon/meta.svg"> meta<b>Studio</b></a></h1>
 				</li>
 				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
 			</ul>
@@ -158,11 +157,8 @@
 
 				<!-- Left Nav Section -->
 				<ul class="left">
-					<!--<li class="has-from">
-						<a href="http://foundation.zurb.com/docs" class="button">Getting Started</a>
-					</li>-->
-					<li class="has-dropdown">
-						<a href="#"><i class="fi-home"></i> {{group_name}}</a>
+					<li class="has-dropdown group">
+						<a class="active-menu" href="#">{{group_name}}</a>
 
 						<!-- If logged in show user groups -->
 						
@@ -247,10 +243,19 @@
 
 		// Initialize Foundation CSS
 		$(document).foundation();
+
 		$("a.user").prepend(function(){
-			console.log($(this).html());
+			/* Attaches user icon with gnow level color for every user link */
 			return "<i class='fi-torso' style='background-color:"+$(this).attr("data-gnow")+"'></i>"
 		});
+
+		/* Makes header links look like radio button */
+		$(".top-bar ul.left>li:not(.group) a").addClass("small button round")
+
+		/* Add home icon to home group */
+		$(".top-bar li.has-dropdown.group a:contains('home')").prepend("<i class='fi-home></i>")
+
+
 
 		{% block script %} {% endblock %}	
 
