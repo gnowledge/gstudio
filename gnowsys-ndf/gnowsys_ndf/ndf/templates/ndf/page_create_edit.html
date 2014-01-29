@@ -4,15 +4,7 @@
 
     <h3>About</h3>
 
-    <p><b>Pages</b> are just like the page of your notebook. You can write your content here.</p>
-
-    <p>Number of Pages : {{ page_nodes_count }} </p>
-
-    <!-- Search field -->
-    <p>
-    {% url 'page_search' group_name as search_url %}
-    {% include "ndf/node_search_base.html" %}
-    </p>
+    <p class="text-justify"><b>Pages</b> are just like the page of your notebook. You can write your content here.</p>
 
     <!-- Add button -->
     {% if user.is_authenticated %}
