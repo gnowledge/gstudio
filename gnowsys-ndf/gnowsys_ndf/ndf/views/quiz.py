@@ -71,7 +71,7 @@ def quiz(request, group_name, app_id):
     else:
         node = collection.Node.one({"_id": ObjectId(app_id)})
 
-        title = gst_quiz.name #+ " - " + node.name
+        title = gst_quiz.name
 
         template_name = ""
         context_variables = { 'node': node,
@@ -102,11 +102,6 @@ def create_edit_quiz_item(request, group_name, node_id=None):
                           'quiz_type_choices': QUIZ_TYPE_CHOICES,
                           'group_name': group_name
                       }
-
-    # if node_id:
-    #     quiz_item_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
-    # else:
-    #     quiz_item_node = collection.GSystem()
 
     node = None
     quiz_node = None
