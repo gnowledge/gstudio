@@ -290,7 +290,7 @@ def GetDoc(request, group_name):
     variable = RequestContext(request, {'filecollection':files})
     return render_to_response(template, variable)
 
-def readDoc(request, _id, group_name):
+def readDoc(request, _id, group_name, file_name = ""):
     filecollection = get_database()[File.collection_name]
     fileobj = filecollection.File.one({"_id": ObjectId(_id)})  
     grid_fs_obj = fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))

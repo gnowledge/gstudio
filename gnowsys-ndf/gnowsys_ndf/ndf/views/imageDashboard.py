@@ -30,7 +30,6 @@ def imageDashboard(request, group_name, image_id):
     already_uploaded=request.GET.getlist('var',"")
     variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded })
     return render_to_response(template, variable)
-
 def getImageThumbnail(request, group_name, _id):
     '''
     this funciton can be called to get thumbnail of image throw url
@@ -44,7 +43,7 @@ def getImageThumbnail(request, group_name, _id):
         return HttpResponse("")
         
     
-def getFullImage(request, group_name, _id):
+def getFullImage(request, group_name, _id, file_name = ""):
     img_obj = collection.File.one({"_id": ObjectId(_id)})
     if img_obj is not None:
         if (img_obj.fs.files.exists(img_obj.fs_file_ids[0])):

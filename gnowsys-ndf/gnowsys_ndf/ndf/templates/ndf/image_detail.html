@@ -4,15 +4,16 @@
 {% block add_list %}
 {% get_grid_fs_object node as grid_fs_obj %}
 <li>
-<a href="{% url 'read_file' 'group' node %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
+<a href="{% url 'read_file' 'group' node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
   <i class="fi-download large"> download  </i>
 </a>
 </li>
 {% endblock %}
 {% block add_fields %}
+{% get_grid_fs_object node as grid_fs_obj %}x
 <div>
-  <a href="{% url 'getFullImage' group_name node %}">
-    <img src="{% url 'getFullImage' group_name node %}" altname="{{node.name}}"></img>
+  <a href="{% url 'getFullImage' group_name node grid_fs_obj.filename %}">
+    <img src="{% url 'getFullImage' group_name node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
   </a>
 </div>
 {% endblock %}
