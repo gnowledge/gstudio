@@ -63,6 +63,14 @@ color: #008759;
 aside a:hover{
 	color: inherit;
 }
+
+h2{
+		color: #003b27;
+			margin-top:1rem;
+			padding-bottom: 8px;
+			border-bottom: 2px solid #003b27;
+		}
+
 /*************************** 2. Custom CSS overrides ***********************/
 
 main>aside{
@@ -126,11 +134,17 @@ a.user i{
 
 /* Card block */
 li.card a{
+	background-color: #eee;
 	margin:2px;
 	padding:5px;
 	border: 1px solid #eaeaea;
 	display: block;
+	color:inherit;
+	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
+			box-shadow: 2px 2px 4px 1px #ddd;
+			opacity:0.8;
 }
 li.card a:hover{
 	border: 1px solid #ddd;
+	opacity:1;
 }
