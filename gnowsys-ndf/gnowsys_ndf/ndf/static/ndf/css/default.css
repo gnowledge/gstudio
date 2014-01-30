@@ -98,6 +98,7 @@ article{
 	background-color: white;
 	border:solid 1px #ddd;
 	padding: 20px; 
+	margin: 17px 0;
 }
 
 pre{
@@ -115,11 +116,11 @@ pre{
 /*************************** 3. Custom CSS Below ***********************/
 
 
-
 a.user i{
 	padding: 2px 5px;
 	margin-right:6px;
 	color:white;
+	background-color:#ddd;
 }
 
 
