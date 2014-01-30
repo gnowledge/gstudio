@@ -158,7 +158,7 @@
 				<!-- Left Nav Section -->
 				<ul class="left">
 					<li class="has-dropdown group">
-						<a class="active-menu" href="#">{{group_name}}</a>
+						<a class="active-menu" href="#"><i class="fi-home"></i> {{group_name}}</a>
 
 						<!-- If logged in show user groups -->
 						
@@ -205,7 +205,7 @@
 		<!-- End of related content -->	
 
 		<!-- Start of content section -->
-		<article class="medium-12 large-9 columns"  style="padding-top:17px;">
+		<article class="medium-12 large-9 columns">
 			
 			{% block body_content %}  {% endblock %}
 			{% block extra_content %}  {% endblock %}
@@ -217,8 +217,13 @@
 
 	<footer class="row">
 
+<div class="medium-3 columns">
+				<small>
+					<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
+				</small>
+			</div>
 
-		<div class="medium-8 columns">
+		<div class="medium-9 columns">
 
 			<p>
 				A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
@@ -227,11 +232,7 @@
 				</small></p>
 			</div>
 
-			<div class="medium-4 columns">
-				<small>
-					<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
-				</small>
-			</div>
+			
 
 		</footer>
 
@@ -251,11 +252,6 @@
 
 		/* Makes header links look like radio button */
 		$(".top-bar ul.left>li:not(.group) a").addClass("small button round")
-
-		/* Add home icon to home group */
-		$(".top-bar li.has-dropdown.group a:contains('home')").prepend("<i class='fi-home></i>")
-
-
 
 		{% block script %} {% endblock %}	
 
