@@ -32,7 +32,7 @@
         {% for key, value in drawer1.items %}
 
         <li class="bullet-item text-left" value={{key}} > 
-
+          <input type="hidden" class="node_id" value={{key}} />
           <div class="row">
             <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); ">
             </div>
@@ -99,7 +99,7 @@
 
       {% for key, value in drawer2.items %}
       <li class="bullet-item" value={{key}} > 
-
+        <input type="hidden" class="node_id" value={{key}} />
         <div class="row">
           <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); ">
           </div>
