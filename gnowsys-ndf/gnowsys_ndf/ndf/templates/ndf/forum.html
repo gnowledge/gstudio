@@ -22,12 +22,9 @@
 <h2>Join a Room</h2>
 {% get_group_name request.path as group_name %}
 <div id="existing_forums">
-<ul>
+<ul class="small-block-grid-1 medium-block-grid-2">
 {% for each in existing_forums %}
-{% if forloop.first %}
-Existing Forums:
-{% endif %} 
-<li><h3><a href="{% url 'show' group_name each %}">{{each.name}}</a></h3></li>
+<li class="card"><h4><a href="{% url 'show' group_name each %}">{{each.name}}</a></h4></li>
 
 {% endfor %}
 </ul>

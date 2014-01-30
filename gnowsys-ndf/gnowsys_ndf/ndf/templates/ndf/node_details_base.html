@@ -22,6 +22,42 @@
 {% endblock %}
 
 {% block meta_content %}
+{% endblock %}
+
+{% block side_content %}
+
+{% if node.collection_dict|length > 0 %}
+    <h3>Collection</h3>
+    
+    {% for index_key, each_node in node.collection_dict.items %}
+    {% if each_node.mime_type %}
+          {% if each_node.collection_set %}
+          <li class="list" style="list-style-type:none;">
+      <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+      <a href="{% url 'read_file' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+          </li>
+          {% else %}
+          <li class="list" style="list-style-type:none;">
+            <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+      <a href="{% url 'read_file' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+          </li>
+          {% endif %}
+    {% else %}
+          {% if each_node.collection_set %}
+          <li class="list" style="list-style-type:none;">
+      <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+      <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+          </li>
+          {% else %}
+          <li class="list" style="list-style-type:none;">
+            <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+      <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+          </li>
+          {% endif %}
+    {% endif %}
+    {% endfor %}
+
+      {% endif %}
 
 {% endblock %}
 
@@ -99,40 +135,7 @@
       {% endif %}
       {% endwith %}
 
-      {% if node.collection_dict|length > 0 %}
-      <div class="small-12 columns">
-	<fieldset>
-	  <legend><h5><strong>Collection</strong></h5></legend>
-	  {% for index_key, each_node in node.collection_dict.items %}
-	  {% if each_node.mime_type %}
-          {% if each_node.collection_set %}
-          <li class="list" style="list-style-type:none;">
-	    <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-	    <a href="{% url 'read_file' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
-          </li>
-          {% else %}
-          <li class="list" style="list-style-type:none;">
-            <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-	    <a href="{% url 'read_file' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
-          </li>
-          {% endif %}
-	  {% else %}
-          {% if each_node.collection_set %}
-          <li class="list" style="list-style-type:none;">
-	    <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-	    <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
-          </li>
-          {% else %}
-          <li class="list" style="list-style-type:none;">
-            <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-	    <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
-          </li>
-          {% endif %}
-	  {% endif %}
-	  {% endfor %}
-	</fieldset>
-      </div>
-      {% endif %}
+      
 
     </div>
     <!-- End: Inner Main Row -->
