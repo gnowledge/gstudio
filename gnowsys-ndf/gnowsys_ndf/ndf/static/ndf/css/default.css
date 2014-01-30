@@ -85,10 +85,10 @@ aside>section h3,aside>section h4,aside>section h5 {
 color:white;
 }
 
-aside section .button{
+article .button{
 	background-color:#008759 ;
 }
-aside section .button:hover{
+article .button:hover{
 	background-color:#00ba7b ;
 }
 
