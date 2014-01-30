@@ -1,6 +1,7 @@
 /*************************** 1. Foundation CSS overrides ***********************/
 
 /* Foundation hacks */
+
 .row{
 	max-width:inherit;/* Expand to full browser width instead of 960px */
 }
@@ -21,21 +22,54 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
 }
 
-/* End Foundation hacks */
 
 /* Theme */
-.top-bar,header{
-	background-color: #1d293f;
+header{
 }
-.top-bar-section li:not(.has-form) a:not(.button){
-	background-color: #1d293f;
+.top-bar,.top-bar-section ul,header{
+	background-color: #222;
 }
-.top-bar-section li:not(.has-form) a:not(.button):hover{
-	background-color: #253544;
+.top-bar-section li:not(.has-form) a{
+	background-color: #222!important;
 }
 .top-bar-section .has-form{
-	background-color: #1d293f;
+	background-color: #222;
 }
+
+
+.top-bar-section a.active-menu.button{
+	/* Active App */
+	background-color: #008759!important;
+	font-weight: bold;
+}
+.top-bar-section ul.left>li>a{ 
+	/* Apps */
+	background-color: inherit!important;
+	top:0;
+}
+.top-bar-section li.group a.active-menu{ 
+	/* Active group */
+	background-color: #154534!important;
+	font-weight: bold!important;
+}
+.top-bar-section li:not(.has-form) a:hover{
+	/* Top bar hover */
+	background-color: #008759!important;
+}
+
+aside a{
+color: #008759;
+}
+aside a:hover{
+	color: inherit;
+}
+
+h2{
+		color: #003b27;
+			margin-top:1rem;
+			padding-bottom: 8px;
+			border-bottom: 2px solid #003b27;
+		}
 
 /*************************** 2. Custom CSS overrides ***********************/
 
@@ -45,13 +79,34 @@ main>aside{
 aside>section{
 	margin:inherit!important;
 	margin-bottom:5px;
-	border: 1px solid #e0e0e0;
-	background-color: #f9f9f9;
-	
+	background-color: #003b27;
+	-webkit-box-shadow: 2px 2px 4px 1px #bbb;
+			box-shadow: 2px 2px 4px 1px #bbb;
+			color:white;
 }
 
 aside>section>div{
 	padding: 15px;
+}
+
+aside>section h3,aside>section h4,aside>section h5 {
+color:white;
+}
+
+main .button{
+	background-color:#008759 ;
+}
+main .button:hover{
+	background-color:#00ba7b ;
+}
+
+/* Content area */
+article{
+	margin-top: 1rem;
+	background-color: white;
+	border:solid 1px #ddd;
+	padding: 20px; 
+	margin: 17px 0;
 }
 
 pre{
@@ -69,17 +124,27 @@ pre{
 /*************************** 3. Custom CSS Below ***********************/
 
 
-
-
+a.user i{
+	padding: 2px 5px;
+	margin-right:6px;
+	color:white;
+	background-color:#ddd;
+}
 
 
 /* Card block */
 li.card a{
+	background-color: #eee;
 	margin:2px;
 	padding:5px;
 	border: 1px solid #eaeaea;
 	display: block;
+	color:inherit;
+	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
+			box-shadow: 2px 2px 4px 1px #ddd;
+			opacity:0.8;
 }
 li.card a:hover{
 	border: 1px solid #ddd;
+	opacity:1;
 }

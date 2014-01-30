@@ -41,20 +41,16 @@
 
               <div class="row">
                 <div class="small-5 columns">
-                  &nbsp;&nbsp; <b> {{value.name}} </b>   
+                  <b> {{value.name}} </b>
                 </div>                
                 <div class="small-7 columns text-right">
-                  <i class="posted-by" > By : {{request.user.username}} on {{value.created_at}} </i>
+                  <i class="posted-by" >{{ value.member_of|join:', ' }} by {{value.user_details_dict.created_by}} on {{value.created_at|date:"j F Y"}} </i>
                 </div>     
               </div>
 
               <div class="row">
-                <div class="small-12 columns text-left" style="padding-top:0.5rem;">
-                  {% if value.content_org|length > 90 %}
-                  &nbsp;&nbsp; {{value.content_org}}. . .
-                  {% else %}
-                  &nbsp;&nbsp; {{value.content_org}}
-                  {% endif %}        
+                <div class="small-12 columns text-left" style="padding-top:5px;">
+		  {{ value.html_content|removetags:"h1 p"|safe|truncatewords:12 }}
                 </div>  
               </div>
             </div>
@@ -115,17 +111,13 @@
                 &nbsp;&nbsp; <b> {{value.name}} </b>   
               </div>                
               <div class="small-7 columns text-right">
-                <i class="posted-by" >By : {{request.user.username}} on {{value.created_at}}</i>
+                <i class="posted-by">{{ value.member_of|join:', ' }} by {{value.user_details_dict.created_by}} on {{value.created_at|date:"j F Y"}} </i>
               </div>     
             </div>
 
             <div class="row">
-              <div class="small-12 columns text-left" style="padding-top:0.5rem;">
-                {% if value.content_org|length > 40 %}
-                &nbsp;&nbsp; {{value.content_org}}. . .
-                {% else %}
-                &nbsp;&nbsp; {{value.content_org}}
-                {% endif %}        
+              <div class="small-12 columns text-left" style="padding-top:5px;">
+		{{ node.html_content|removetags:"h1 p"|safe|truncatewords:12 }}
               </div>  
             </div>
           </div>

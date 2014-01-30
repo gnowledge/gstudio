@@ -5,40 +5,43 @@
 
 {% block head %}
 <script type="text/javascript">
-function hide_btn(label)
-{
-if(label == "Join")
-{
 
- document.getElementById('remove').style.visibility = 'visible'
- document.getElementById('notify').style.visibility = 'hidden'
 
-}
-else
-{
- document.getElementById('notify').style.visibility = 'visible'
+  function hide_btn(label)
+  // Looks like this section needs a rewrite using jQuery
+  {
+    if(label == "Join")
+    {
+
+     document.getElementById('remove').style.visibility = 'visible'
+     document.getElementById('notify').style.visibility = 'hidden'
+
+   }
+   else
+   {
+     document.getElementById('notify').style.visibility = 'visible'
 // document.getElementById('notify').style.marginTop = '-32px'
- document.getElementById('remove').style.visibility = 'hidden'
+document.getElementById('remove').style.visibility = 'hidden'
 }
 }
 function notify(group,activity)
 {
 
-var surl="/"+group+"/group/notify/"+activity+"/"
-$.ajax({
-url: surl,
-beforeSend: function() {
-              $("#ajax_load_image").show();
-              $("#body").css({"opacity":"0.1",})
-},
-success: function(data){
-$("#ajax_load_image").hide();
-$("#body").css({"opacity":"",})
-},
-complete: function(){
-$("#ajax_load_image").hide();
-$("#body").css({"opacity":"",})
-}
+  var surl="/"+group+"/group/notify/"+activity+"/"
+  $.ajax({
+    url: surl,
+    beforeSend: function() {
+      $("#ajax_load_image").show();
+      $("#body").css({"opacity":"0.1",})
+    },
+    success: function(data){
+      $("#ajax_load_image").hide();
+      $("#body").css({"opacity":"",})
+    },
+    complete: function(){
+      $("#ajax_load_image").hide();
+      $("#body").css({"opacity":"",})
+    }
 });  //end_ajax
 
 
@@ -46,16 +49,17 @@ $("#body").css({"opacity":"",})
 
 $(document).ready(function()
 {
-document.getElementById('notify').style.marginTop = '-35px'
-var groupn=$("#groupname").val();
-$("#notify").click(function(){
-hide_btn("Join")
-notify(groupn,"join");
-});
-$("#remove").click(function(){
-hide_btn("Remove");
-notify(groupn,"remove")
-});
+  // Please document this piece of code
+  document.getElementById('notify').style.marginTop = '-35px'
+  var groupn=$("#groupname").val();
+  $("#notify").click(function(){
+    hide_btn("Join")
+    notify(groupn,"join");
+  });
+  $("#remove").click(function(){
+    hide_btn("Remove");
+    notify(groupn,"remove")
+  });
 });
 
 </script>
@@ -69,8 +73,39 @@ notify(groupn,"remove")
 
 {% block meta_content %}
 
-    <h3>Group Details</h3>
-    <p> Members in this group : 0 </p>
+<h3>Group Details</h3>
+<p> Members in this group : 0 </p>
+
+<!-- Code needs optimization -->
+<div style='display:table;  border:1px;   border-spacing:10px; '>
+  <div style='display:table-row;' >
+   {% if policy == "OPEN" or group == "home"  %}
+   {% check_user_join request group as user_is_joined %}
+
+   <div style='display:table-cell;' colspan='5' align="middle">
+     <input type="hidden" id="groupname" value="{{group}}">
+     {% if user_is_joined == "joined" %}
+     <input type="submit" id="remove" value="Unsubscribe" class="button" align="center" style="visibility:visible">
+     <input type="submit" id="notify" value="Join" class="button" align="center" style="visibility:hidden" >
+
+     {% elif user_is_joined == "not"  %}
+     <input type="submit" id="remove" value="Unsubscribe" class="button" align="center" style="visibility:hidden">
+     <input type="submit" id="notify"value="Join" class="button" align="center" style="visibility:visible" >
+
+     {% endif %}
+     {% if user_is_joined == "author" %}
+     Group Owner
+     {% include "ndf/invite_users.html" %}   
+     {% endif %}    
+
+   </div> 
+   {% endif %}
+ </div>
+ <div class="divinvite" style='display:table-row; visibility :hidden '>
+  invite
+</div>
+
+</div>
 
 {% endblock %}
 
@@ -80,38 +115,8 @@ notify(groupn,"remove")
 
 {% get_group_policy group request.user as policy %}
 
- 
-<div class="sidebar">
-   <div style='display:table;  border:1px;   border-spacing:10px; '>
-        <div style='display:table-row;' >
-             {% if policy == "OPEN" or group == "home"  %}
-              {% check_user_join request group as user_is_joined %}
-              
-                <div style='display:table-cell;' colspan='5' align="middle">
-                     <input type="hidden" id="groupname" value="{{group}}">
-                      {% if user_is_joined == "joined" %}
-                        <input type="submit" id="remove" value="Unsubscribe" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible">
-       <input type="submit" id="notify" value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden" >
-                 
-		      {% elif user_is_joined == "not"  %}
-                        <input type="submit" id="remove" value="Unsubscribe" class="btn btn-primary btn-small btn-block" align="center" style="visibility:hidden">
-<input type="submit" id="notify"value="Join" class="btn btn-primary btn-small btn-block" align="center" style="visibility:visible" >
-       
-			{% endif %}
-                      {% if user_is_joined == "author" %}
-   			Group Owner
-                       {% include "ndf/invite_users.html" %}   
-                     {% endif %}		
 
-                </div> 
-              {% endif %}
-        </div>
-       <div class="divinvite" style='display:table-row; visibility :hidden '>
-          invite
-       </div>
 
-   </div>
-</div>
 {{ block.super }}
 {% endblock %}
 
