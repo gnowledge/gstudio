@@ -148,3 +148,7 @@ li.card a:hover{
 	border: 1px solid #ddd;
 	opacity:1;
 }
+
+div.group{
+	width: auto;
+}

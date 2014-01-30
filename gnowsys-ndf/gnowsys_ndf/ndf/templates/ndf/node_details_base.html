@@ -28,7 +28,7 @@
 
 {% if node.collection_dict|length > 0 %}
     <h3>Collection</h3>
-    
+
     {% for index_key, each_node in node.collection_dict.items %}
     {% if each_node.mime_type %}
           {% if each_node.collection_set %}
@@ -74,7 +74,7 @@
 
       <div class="small-12 columns">
 	<ul class="inline-list">
-	  <li><h3>{{node.name}}</h3></li>
+	  <li><h4>{{node.name}}</h4></li>
 	  {% if user.is_authenticated %}
 	  <li><a href="{% block url %}{% endblock %}" class="button tiny">Edit</a></li>
 	  {% block add_list %}{% endblock %}
