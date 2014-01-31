@@ -26,7 +26,7 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 /* Theme */
 header{
 }
-.top-bar,.top-bar-section ul,header{
+.top-bar,.top-bar-section ul,body>header{
 	background-color: #222;
 }
 .top-bar-section li:not(.has-form) a{
@@ -68,6 +68,9 @@ header{
 
 main>aside{
 	margin-bottom: 0.5rem;
+}
+main>aside header{
+	margin-top: 1rem;
 }
 main>aside a{
 	color: #008759;
@@ -138,7 +141,7 @@ article{
 	padding-bottom: 20px; 
 }
 
-main header{
+article>header{
 	/* Using http://www.colorzilla.com/gradient-editor/ */
 	background: #003b27; /* Old browsers */
 	background: -moz-linear-gradient(-45deg, #003b27 0%, #005700 49%); /* FF3.6+ */
@@ -154,7 +157,7 @@ main header{
 	margin-bottom:2rem!important;
 }
 
-main header h2{
+article>header h2{
 	color: white;
 	margin-top:1rem;
 	padding-bottom: 8px;
