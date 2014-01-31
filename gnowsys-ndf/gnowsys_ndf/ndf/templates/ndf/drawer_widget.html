@@ -49,8 +49,8 @@
               </div>
 
               <div class="row">
-                <div class="small-12 columns text-left" style="padding-top:5px;">
-		  {{ value.html_content|removetags:"h1 p"|safe|truncatewords:12 }}
+               <div class="small-12 columns text-left" style="padding-top:5px;">
+	      {# {{ value.html_content|removetags:"h1 p"|safe|truncatewords:12 }} #}  <!-- commented content -->
                 </div>  
               </div>
             </div>
@@ -117,8 +117,8 @@
 
             <div class="row">
               <div class="small-12 columns text-left" style="padding-top:5px;">
-		{{ node.html_content|removetags:"h1 p"|safe|truncatewords:12 }}
-              </div>  
+	      {# {{ node.html_content|removetags:"h1 p"|safe|truncatewords:12 }} #} <!-- commented contend -->
+              </div>
             </div>
           </div>
         </div>
