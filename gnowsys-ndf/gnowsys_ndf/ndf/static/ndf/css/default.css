@@ -96,9 +96,13 @@ a.right-off-canvas-toggle{
 	right: 10px;
 	top:20px;
 }
+a.right-off-canvas-toggle:hover{
+	color: white;
+}
 a.right-off-canvas-toggle i{
 	font-size: 30px;
 }
+
 .inner-wrap>aside h4{
 	color: white;
 	padding:10px;
