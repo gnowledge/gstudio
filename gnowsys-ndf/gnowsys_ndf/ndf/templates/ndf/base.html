@@ -180,17 +180,39 @@
 	<main class="row">  
 
 		<!-- Start of sidebar section -->
+
 		<aside  class="medium-12 large-3 columns">
 
 			<section class="row">
 
+<div class="off-canvas-wrap">
+  <div class="inner-wrap">
+
+    
+
+    <!-- Off Canvas Menu -->
+    <aside class="left-off-canvas-menu">
+        <!-- whatever you want goes here -->
+        <ul>
+          <li><a href="#">Item 1</a></li>
+        ...
+        </ul>
+    </aside>
+
 				<div class="medium-6 large-12 columns">
+				<a class="left-off-canvas-toggle" ><i class='fi-list'></i> Menu</a> 
 					{% block meta_content %}  {% endblock %}
 				</div>
 
 				<div class="medium-6 large-12 columns">
 					{% block side_content %}  {% endblock %}
 				</div>
+
+  <!-- close the off-canvas menu -->
+  <a class="exit-off-canvas"></a>
+
+  </div>
+</div>
 
 			</section>
 
@@ -244,13 +266,13 @@
 			return "<i class='fi-torso' style='background-color:"+$(this).attr("data-gnow")+"'></i>"
 		});
 
-		$(".top-bar ul.left>li:not(.group) a").prepend(function(){
-			/* Attaches user icon with gnow level color for every user link */
-			return "<i class='fi-torso></i>"
+		$(".top-bar a.app").prepend(function(){
+			/* Attaches app icons */
+			return "<i class='fi-torso left'></i>"
 		});
 
 		/* Makes header links look like radio button */
-		$(".top-bar ul.left>li:not(.group) a").addClass("small button round")
+		$(".top-bar a.app").addClass("")
 
 		{% block script %} {% endblock %}	
 
