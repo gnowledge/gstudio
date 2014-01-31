@@ -94,7 +94,7 @@ a.right-off-canvas-toggle{
 	position: absolute;
 	z-index: 1000;
 	right: 10px;
-	top:20px;
+	top:28px;
 }
 a.right-off-canvas-toggle:hover{
 	color: white;
@@ -205,7 +205,8 @@ a.app i{
 
 
 /* Card block */
-li.card a{
+.card>a{
+	position: relative;
 	background-color: white;
 	margin:2px;
 	padding:5px;
@@ -216,7 +217,24 @@ li.card a{
 	box-shadow: 2px 2px 4px 1px #ddd;
 	opacity:0.8;
 }
-li.card a:hover{
+.card>a:hover{
 	border: 1px solid #ddd;
 	opacity:1;
+}
+.card header{
+	text-align: center;
+}
+.card .th{
+	margin:30px auto;
+	width:80px;
+	height: 80px;
+	overflow: hidden;
+	display: block;
+
+}
+.card .th img{
+	width: 100%;
+}
+.card section{
+background-color: #ddd;
 }
