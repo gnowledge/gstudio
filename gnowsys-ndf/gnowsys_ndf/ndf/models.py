@@ -199,7 +199,8 @@ class Node(DjangoDocument):
         user_details['modified_by'] = modified_by_usernames
 
         return user_details
-        
+
+    @property        
     def prior_node_dict(self):
         """Returns a dictionary consisting of key-value pair as ObjectId-Document 
         pair respectively for prior_node objects of the given node.
@@ -478,7 +479,7 @@ class GSystem(Node):
         'gsystem_type': [ObjectId],		# ObjectId's of GSystemType Class  
         'attribute_set': [dict],		# Dict that holds AT name & its values
         'relation_set': [dict],			# Dict that holds RT name & its related_object value
-        'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class
+        'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class [(ObjectId, version_no)]
         'group_set': [unicode],                 # List of ObjectId's of Groups to which this document belongs
         'author_set': [int]                     # List of Authors
     }
