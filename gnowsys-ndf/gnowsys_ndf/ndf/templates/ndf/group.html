@@ -29,7 +29,13 @@
 <ul class="small-block-grid-2 medium-block-grid-4">
 
     {% for node in group_nodes %}
-    <li class="card"><a href="/{{node}}">{{ node }}</a>
+    <li class="card"><a href="/{{node}}">
+
+    <div class="medium-6 columns">somet</div>
+    <div class="medium-6 columns">somet</div>
+    {{ node }}
+
+    </a>
     <!--
     Created at : {{ node.created_at|date:"j F Y" }}<br>
     Member Of   : {{ node.member_of }}<br>
