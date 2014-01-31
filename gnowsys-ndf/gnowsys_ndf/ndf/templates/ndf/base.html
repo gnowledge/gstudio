@@ -49,14 +49,14 @@
 			color:white!important;
 		}
 
-		header
+		body>header
 		{
 			position: relative;
 			-webkit-box-shadow: 2px 2px 4px 1px #C7C7C7;
 			box-shadow: 2px 2px 4px 1px #C7C7C7;
 		}
 
-		main{
+		.main{
 			background-color:#eee;
 			min-height: 100%;
 			margin-bottom: -100px!important;
@@ -65,20 +65,21 @@
 			box-sizing: border-box;
 		}
 
-		main:after{
+		.main:after{
 			content:"";
 			display:block;
 			height:100px;
 		}
 
-		footer{
+		body>footer{
 			border-top:6px solid #008759;
 			background-color:#222;
 			color: #888;
 			padding:20px 0;
+			position: relative;
 		}
 
-		footer a{
+		body>footer a{
 			color: #bbb;
 		}
 
@@ -176,100 +177,94 @@
 		</nav>
 
 	</header> 		
+	<div class="main">
+		<div class="off-canvas-wrap">
+			<div class="inner-wrap">
 
-	<main class="row">  
+				<!-- Off Canvas Meta Map -->
+				<aside class="left-off-canvas-menu">
+					<!-- whatever you want goes here -->
+					<h4>Prior nodes</h4>
+					<ul class="off-canvas-list">
+						<li><a href="#">Item 1</a></li>
+					</ul>
+				</aside>
 
-		<!-- Start of sidebar section -->
+				<main class="row">  
 
-		<aside  class="medium-12 large-3 columns">
+					<!-- Start of sidebar section -->
 
-			<section class="row">
+					<aside  class="medium-12 large-3 columns">
 
-				<div class="off-canvas-wrap">
-					<div class="inner-wrap">
-
-
-
-						<!-- Off Canvas Menu -->
-						<aside class="left-off-canvas-menu">
-							<!-- whatever you want goes here -->
-							<h4>Prior nodes</h4>
-							<ul class="off-canvas-list">
-								<li><a href="#">Item 1</a></li>
-								...
-							</ul>
-						</aside>
-
-						<div class="medium-6 large-12 columns">
-
-							{% block meta_content %}  {% endblock %}
-
-							<a class="left-off-canvas-toggle" ><i class='fi-compass'></i> Learn more..</a> 
-						</div>
-
-						<div class="medium-6 large-12 columns">
-
-							<!--Content search -->
-							{% include "ndf/node_search_base.html" %}
-
-
-							{% block search_content %}  {% endblock %}
-						</div>
-
-						<div class="medium-6 large-12 columns">
-							{% block side_content %}  {% endblock %}
-						</div>
-
-						<!-- close the off-canvas menu -->
-						<a class="exit-off-canvas"></a>
-
-					</div>
-				</div>
-
-			</section>
-
-
-		</aside>
-		<!-- End of related content -->	
-
-		
-
-		<!-- Start of content section -->
-		<article class="medium-12 large-9 columns">
-
-			<div class="off-canvas-wrap row">
-				<div class="inner-wrap small-12 columns">
+						<section class="row">
 
 
 
-					<!-- Off Canvas Menu -->
-					<aside class="right-off-canvas-menu">
-						<h4>Shelf</h4>
-						<ul class="off-canvas-list">
-							<li><a href="#">Item 1</a></li>
-							...
-						</ul>
+							<header class="medium-6 large-12 columns">
+
+								{% block meta_content %}  {% endblock %}
+
+								<a class="left-off-canvas-toggle" ><i class='fi-compass'></i> Learn more..</a> 
+							</header>
+
+							<section class="medium-6 large-12 columns">
+
+								<!--Content search -->
+								{% include "ndf/node_search_base.html" %}
+
+
+								{% block search_content %}  {% endblock %}
+							</section>
+
+							<section class="medium-6 large-12 columns">
+								{% block related_content %}  {% endblock %}
+							</section>
+
+
+
+						</section>
+
 					</aside>
+					<!-- End of related content -->	
 
-					<a class="right-off-canvas-toggle" ><i class='fi-star'></i></a> 
 
-					<!-- The actual body content -->
-					{% block body_content %}  {% endblock %}
-					{% block extra_content %}  {% endblock %}
 
-					<!-- close the off-canvas menu -->
-					<a class="exit-off-canvas"></a>
+					<!-- Start of content section -->
+					<article class="medium-12 large-9 columns">
 
-				</div>
+
+
+
+						<a class="right-off-canvas-toggle" ><i class='fi-star'></i></a> 
+
+						<!-- The actual body content -->
+						{% block body_content %}  {% endblock %}
+						{% block extra_content %}  {% endblock %}
+
+
+
+					</article>
+					<!-- End of content section -->	
+
+
+
+				</main>
+
+				<!-- Off Canvas User Shelf -->
+				<aside class="right-off-canvas-menu">
+					<h4>Shelf</h4>
+					<ul class="off-canvas-list">
+						<li><a href="#">Item 1</a></li>
+						...
+					</ul>
+				</aside>
+
+				<!-- close the off-canvas menu -->
+				<a class="exit-off-canvas"></a>
+
 			</div>
-
-		</article>
-		<!-- End of content section -->	
-
-
-		
-	</main>
-
+		</div>
+	</div>
 	<footer class="row">
 
 		<div class="medium-3 columns">
@@ -288,7 +283,7 @@
 				</small></p>
 			</div>
 
-			
+
 
 		</footer>
 
@@ -307,7 +302,7 @@
 		});
 
 		/* Makes header links look like radio button */
-		$(".top-bar a.app").addClass("")
+		
 
 		{% block script %} {% endblock %}	
 

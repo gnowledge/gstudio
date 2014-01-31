@@ -4,11 +4,11 @@
 
 
 {% block meta_content %}
-    <h3>About</h3>
+<h3>About</h3>
 
-    <p>Groups help to arrange your content for a particular set of users. Members can subscribe to updates and even collaborate on content.</p>
+<p>Groups help to arrange your content for a particular set of users. Members can subscribe to updates and even collaborate on content.</p>
 
-    <p>Number of Groups : {{ group_nodes_count }} </p>
+<p>Number of Groups : {{ group_nodes_count }} </p>
 
 {% endblock %}
 
@@ -26,10 +26,25 @@
 </header>
 
 {% load url from future %}
-<ul class="small-block-grid-2 medium-block-grid-4">
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
     {% for node in group_nodes %}
-    <li class="card"><a href="/{{node}}">{{ node }}</a>
+    <li class="card">
+        <a href="/{{node}}">
+            <header>
+            <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+                <h4>{{ node }}</h4>
+                {{ node.tags|join:", " }}
+                <small>Created <em>33 days ago</em></small>
+            </header>
+            <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
+            <div class="button expand">Join</div> 
+            <footer class="row">
+               <div class="medium-6 columns"><strong>24</strong> Members</div>
+               <div class="medium-3 columns">somet</div> 
+           </footer>
+
+       </a>
     <!--
     Created at : {{ node.created_at|date:"j F Y" }}<br>
     Member Of   : {{ node.member_of }}<br>

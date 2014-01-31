@@ -26,7 +26,7 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 /* Theme */
 header{
 }
-.top-bar,.top-bar-section ul,header{
+.top-bar,.top-bar-section ul,body>header{
 	background-color: #222;
 }
 .top-bar-section li:not(.has-form) a{
@@ -66,10 +66,16 @@ header{
 	background-color: #008759!important;
 }
 
-aside a{
+main>aside{
+	margin-bottom: 0.5rem;
+}
+main>aside header{
+	margin-top: 1rem;
+}
+main>aside a{
 	color: #008759;
 }
-aside a:hover{
+main>aside a:hover{
 	color: inherit;
 }
 
@@ -88,11 +94,15 @@ a.right-off-canvas-toggle{
 	position: absolute;
 	z-index: 1000;
 	right: 10px;
-	top:20px;
+	top:28px;
+}
+a.right-off-canvas-toggle:hover{
+	color: white;
 }
 a.right-off-canvas-toggle i{
 	font-size: 30px;
 }
+
 .inner-wrap>aside h4{
 	color: white;
 	padding:10px;
@@ -135,7 +145,7 @@ article{
 	padding-bottom: 20px; 
 }
 
-main header{
+article>header{
 	/* Using http://www.colorzilla.com/gradient-editor/ */
 	background: #003b27; /* Old browsers */
 	background: -moz-linear-gradient(-45deg, #003b27 0%, #005700 49%); /* FF3.6+ */
@@ -151,7 +161,7 @@ main header{
 	margin-bottom:2rem!important;
 }
 
-main header h2{
+article>header h2{
 	color: white;
 	margin-top:1rem;
 	padding-bottom: 8px;
@@ -195,7 +205,8 @@ a.app i{
 
 
 /* Card block */
-li.card a{
+.card>a{
+	position: relative;
 	background-color: white;
 	margin:2px;
 	padding:5px;
@@ -206,7 +217,24 @@ li.card a{
 	box-shadow: 2px 2px 4px 1px #ddd;
 	opacity:0.8;
 }
-li.card a:hover{
+.card>a:hover{
 	border: 1px solid #ddd;
 	opacity:1;
+}
+.card header{
+	text-align: center;
+}
+.card .th{
+	margin:30px auto;
+	width:80px;
+	height: 80px;
+	overflow: hidden;
+	display: block;
+
+}
+.card .th img{
+	width: 100%;
+}
+.card section{
+background-color: #ddd;
 }
