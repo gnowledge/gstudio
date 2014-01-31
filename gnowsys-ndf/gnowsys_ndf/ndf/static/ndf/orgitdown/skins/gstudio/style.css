@@ -39,6 +39,9 @@
 	width:5px;
 	height: 1px;
 }
+.orgitdown textarea{
+	min-height: 100px;
+}
 
 
 /*
