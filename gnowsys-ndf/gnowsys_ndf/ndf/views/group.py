@@ -55,7 +55,7 @@ def create_group(request,group_name):
         colg = col_Group.Group()
         cname=request.POST.get('groupname', "")
         colg.altnames=cname
-        colg.name = unicode(slugify(cname))
+        colg.name = unicode(cname)
         colg.member_of.append(u"Group")
         usrid = int(request.user.id)
         colg.created_by=usrid
@@ -84,8 +84,8 @@ def edit_group(request,group_name,group_id):
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_name, gst_group)
             page_node.save()
+            group_name=page_node.name
             return HttpResponseRedirect(reverse('groupchange', kwargs={'group_name': group_name}))
-
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
                                         'group_name': group_name
