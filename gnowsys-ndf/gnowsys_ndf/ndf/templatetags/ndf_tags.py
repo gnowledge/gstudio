@@ -28,7 +28,6 @@ def get_all_users_to_invite():
 
 @register.inclusion_tag('ndf/twist_replies.html')
 def get_reply(thread,parent,ind,token,user):
-  print "parent=",parent,"token=",token
   return {'thread':thread,'reply': parent,'user':user,'indent':ind+10,'csrf_token':token,'eachrep':parent}
 
 @register.assignment_tag
@@ -115,7 +114,6 @@ def get_rec_objs(ob_id):
 
 @register.assignment_tag
 def get_twist_replies(twist):
-  print "twist=",twist,twist.name
   gs_collection = db[Node.collection_name]
   ret_replies={}
   entries=[]
@@ -165,7 +163,6 @@ def get_group_name(groupurl):
   if len(sp)<=1:
     return "home"
   if sp[1]:
-    print "sp1=",sp[1]
     chsp = check_existing_group(sp[1])
     if chsp:
       return sp[1]
