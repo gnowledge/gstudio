@@ -36,6 +36,7 @@ def checkgroup(request,group_name):
         return HttpResponse("failure")
     
 
+
 def select_drawer(request, group_name):
     
     if request.is_ajax() and request.method == "POST":
@@ -43,6 +44,8 @@ def select_drawer(request, group_name):
         checked = request.POST.get("homo_collection", '')
         selected_collection_list = request.POST.get("collection_list", '')
         node_id = request.POST.get("node_id", '')
+
+        gcollection = db[Node.collection_name]
 
         if node_id:
             node_id = ObjectId(node_id)
@@ -55,9 +58,11 @@ def select_drawer(request, group_name):
         
             i = 0
             while (i < len(selected_collection_list)):
-                c_name = str(selected_collection_list[i])
-                c_name = c_name.replace("'", "")
-                collection_list_ids.append(gs_collection.GSystem.one({'name': unicode(c_name)})._id)
+                cn_node_id = ObjectId(selected_collection_list[i])
+                
+                if gcollection.Node.one({"_id": cn_node_id}):
+                    collection_list_ids.append(cn_node_id)
+
                 i = i+1
 
             drawer = get_drawers(group_name, node_id, collection_list_ids, checked)
@@ -80,11 +85,12 @@ def select_drawer(request, group_name):
        
             return render_to_response("ndf/drawer_widget.html", 
                                       {"widget_for": "collection", 
-                                       "drawer1": drawer['1'], 
+                                       "drawer1": drawer, 
                                        "group_name": group_name
                                       }, 
                                       context_instance=RequestContext(request)
             )
+
 
 @login_required
 def change_group_settings(request, group_name):

@@ -32,7 +32,7 @@
         {% for key, value in drawer1.items %}
 
         <li class="bullet-item text-left" value={{key}} > 
-
+          <input type="hidden" class="node_id" value={{key}} />
           <div class="row">
             <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); ">
             </div>
@@ -40,18 +40,19 @@
             <div class="small-11 columns">
 
               <div class="row">
-                <div class="small-5 columns">
+                <div class="small-12 columns">
                   <b> {{value.name}} </b>
                 </div>                
-                <div class="small-7 columns text-right">
-                  <i class="posted-by" >{{ value.member_of|join:', ' }} by {{value.user_details_dict.created_by}} on {{value.created_at|date:"j F Y"}} </i>
+                <div class="small-12 columns text-left" style="padding-top:3px">
+                  <i class="posted-by" >{{ value.member_of|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
                 </div>     
               </div>
 
               <div class="row">
+
                <div class="small-12 columns text-left" style="padding-top:5px;">
 	      {# {{ value.html_content|removetags:"h1 p"|safe|truncatewords:12 }} #}  <!-- commented content -->
-                </div>  
+               </div>  
               </div>
             </div>
           </div>
@@ -97,21 +98,23 @@
     <ul class="pricing-table" id="{{widget_for}}_drawer2">        
       {% if drawer2 != "None" %}
 
-      {% for key, value in drawer2.items %}
-      <li class="bullet-item" value={{key}} > 
-
+      {% for value in drawer2 %}
+      <li class="bullet-item" value={{value.pk}} > 
+        <input type="hidden" class="node_id" value={{value.pk}} />
         <div class="row">
-          <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' group_name key %}), url(/static/ndf/images/doc.png); ">
+          <div class="small-1 columns resource-type-image" style="background-image: url({% url 'getImageThumbnail' group_name value.pk %}), url(/static/ndf/images/doc.png); ">
           </div>
 
           <div class="small-11 columns">
 
             <div class="row">
-              <div class="small-5 columns text-left">
-                &nbsp;&nbsp; <b> {{value.name}} </b>   
+              <!-- <div class="small-5 columns text-left"> -->
+              <div class="small-12 columns text-left">
+                <b> {{value.name}} </b>   
               </div>                
-              <div class="small-7 columns text-right">
-                <i class="posted-by">{{ value.member_of|join:', ' }} by {{value.user_details_dict.created_by}} on {{value.created_at|date:"j F Y"}} </i>
+              <!-- <div class="small-7 columns text-right"> -->
+              <div class="small-12 columns text-left" style="padding-top:3px">
+                <i class="posted-by">{{ value.member_of|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
               </div>     
             </div>
 
@@ -119,7 +122,7 @@
               <div class="small-12 columns text-left" style="padding-top:5px;">
 	      {# {{ node.html_content|removetags:"h1 p"|safe|truncatewords:12 }} #} <!-- commented contend -->
               </div>
-            </div>
+           </div>
           </div>
         </div>
 
