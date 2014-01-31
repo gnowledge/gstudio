@@ -3,20 +3,20 @@
 {% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
 {% block head %}
 
-<!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [['$','$'], ['\\(','\\)']],
-      displayMath: [['\\[','\\]'], ['$$','$$']]
-    }
-  });
-</script>
+  <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['\\[','\\]'], ['$$','$$']]
+      }
+    });
+  </script>
 
-<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
-<script type="text/javascript"
-src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
+  <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+  <script type="text/javascript"
+	  src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
 
 {% endblock %}
 
@@ -26,7 +26,6 @@ src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 {% block side_content %}
 
 {% if node.collection_dict|length > 0 %}
-
     <h3>Collection</h3>
     
     {% for index_key, each_node in node.collection_dict.items %}
@@ -61,54 +60,11 @@ src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 
       {% endif %}
 
-
 {% endblock %}
 
 {% block body_content %}
 
 <!-- Outer Main Row -->
-<header class="row">
-<a class="node" href="#">
-    <h2 class="medium-12 columns">
-
-      {{node.name}}
-      {% if user.is_authenticated %}
-      <a class="edit" href="{% block url %}{% endblock %}" class="small button right">Edit</a>
-      {% block add_list %}{% endblock %}
-      {% endif %}
-
-    </h2>
-  </a>
-  <div class="medium-4 columns">
-
-  </div>
-
-  <div class="medium-8 columns">
-    <p>
-      {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by <a href="#" class="user">{{ node.user_details_dict.created_by }}</a>
-      <br>
-      Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
-      <br>
-      Last update: {{ node.last_update|date:"j F Y" }}
-    </p>
-    <p>
-      Version{{ node.version_dict|length|pluralize }}: 
-      {% for seq_no, version_no in node.version_dict.items reversed %}
-      <abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
-      {% endfor %}
-    </p>
-    {% if node.tags|length > 0 %}
-    <p>
-      Tag{{ node.tags|length|pluralize }}: 
-      {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span>
-      {% endfor %}
-    </p>
-    {% endif %}
-  </div>
-
-</header>
-
 <div class="row">
 
   <!-- Outer Main Column -->
@@ -167,42 +123,27 @@ src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
       </div>
       {% endif %}
 
-      {% if node.prior_node|length > 0 %}
       <div class="small-12 columns">
-       <fieldset>
-         <legend><h5><strong>Things to know before going ahead</strong></h5></legend>
-         {% for index_key, each_node in node.prior_node_dict.items %}
-         {% if each_node.mime_type %}
-         <a href="{% url 'read_file' each_node.pk group_name each_node.name %}">{{ each_node.name }}</a>,&nbsp;
-         {% else %}
-         <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-         {% endif %}
-         {% endfor %}
-       </fieldset>
-     </div>
-     {% endif %}
+	{% block add_fields %} {% endblock %}
+      </div>
 
-     <div class="small-12 columns">
-       {% block add_fields %} {% endblock %}
-     </div>
+      {% with node.html_content|safe as description %}
+      {% if description != "None" %}
+      <div class="small-12 columns">
+	<div class="panel callout radius">
+	  {{ description }}
+	</div>
+      </div>
+      {% endif %}
+      {% endwith %}
 
-     {% with node.html_content|safe as description %}
-     {% if description != "None" %}
-     <div class="small-12 columns">
-       <div class="panel callout radius">
-         {{ description }}
-       </div>
-     </div>
-     {% endif %}
-     {% endwith %}
+      
 
+    </div>
+    <!-- End: Inner Main Row -->
 
-
-   </div>
-   <!-- End: Inner Main Row -->
-
- </div>
- <!-- End: Outer Main Column -->
+  </div>
+  <!-- End: Outer Main Column -->
 
 </div>
 <!-- End: Outer Main Row -->
