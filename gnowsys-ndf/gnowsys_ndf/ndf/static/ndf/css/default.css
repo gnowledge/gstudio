@@ -79,6 +79,13 @@ h2{
 	padding-bottom: 8px;
 }
 
+/* Off canvas navigation */
+aside.left-off-canvas-menu{
+	background-color: #222;
+}
+a.left-off-canvas-toggle{
+	
+}
 /*************************** 2. Custom CSS overrides ***********************/
 
 main>aside{

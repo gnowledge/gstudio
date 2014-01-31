@@ -15,25 +15,28 @@
 
     <p><h5>Number of Quiz nodes: <b>{{ quiz_nodes_count }}</b></h5></p>
 
-    <!-- Search field -->
-    <p>
-    <h3>Search</h3>
-    <!--{#% url 'quiz_search' group_name as search_url %} -->
-    {% include "ndf/node_search_base.html" %}
-    <span class="label alert small">NOTE: Search not implemented yet!!!</span>
-    </p>
 
-    <!-- Add button -->
-    {% if user.is_authenticated %}
-    <p>
-    <a href="{% url 'quiz_create_edit' group_name %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create_edit' group_name %}" class="button small right">+ Add {{title}} Item</a>
-    </p>
-    {% endif %}
+   
     
 {% endblock %}
 
 {% block body_content %} 
+
+<header class="row">
+    <h2 class="medium-12 columns">Quiz
+
+    </h2>
+
+    <div class="medium-12 columns">
+         <!-- Add button -->
+    {% if user.is_authenticated %}
+    <p>
+    <a href="{% url 'quiz_create_edit' group_name %}" class="button small left">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create_edit' group_name %}" class="button small left">+ Add {{title}} Item</a>
+    </p>
+    {% endif %}
+    </div>
+</header>
 
 <div class="row">
 
