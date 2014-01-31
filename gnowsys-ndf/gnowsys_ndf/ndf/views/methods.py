@@ -47,7 +47,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     """
     dict_drawer = {}
     dict1 = {}
-    dict2 = {}
+    dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
     gst_collection = db[GSystemType.collection_name]
     gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
@@ -57,21 +57,16 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     
     if checked:     
       if checked == "Page":
-        # drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'gsystem_type': {'$all': [ObjectId(gst_page._id)]}, 'group_set': {'$all': [group_name]}})
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Page']}, 'group_set': {'$all': [group_name]}})
         
       elif checked == "File":         
         drawer = gs_collection.GSystem.find({'_type': u"File", 'group_set': {'$all': [group_name]}})
-        # drawer = gs_collection.GSystem.find({'_type': u"File"})
         
       elif checked == "Image":         
         drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [group_name]}})
-        # drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg", 'group_set': {'$all': [group_name]}})
-        # drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"image/jpeg"})
 
       elif checked == "Video":         
         drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [group_name]}})
-        # drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"video"})
 
       elif checked == "Quiz":
         drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})
@@ -97,7 +92,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
 
       for oid in nlist: 
         obj = gs_collection.GSystem.one({'_id': oid})
-        dict2[oid] = obj
+        dict2.append(obj)
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -110,14 +105,12 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
           
       for oid in nlist: 
         obj = gs_collection.GSystem.one({'_id': oid})
-        dict2[oid] = obj
-
+        dict2.append(obj)
       
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
 
     return dict_drawer
-
 
 
 def get_node_common_fields(request, node, group_name, node_type):
@@ -172,9 +165,7 @@ def get_node_common_fields(request, node, group_name, node_type):
   while (i < len(prior_node_list)):
     node_id = ObjectId(prior_node_list[i])
     if gcollection.Node.one({"_id": node_id}):
-      print "\n objid prior ", i, " : ", node_id
       node.prior_node.append(node_id)
-      print " np: ", node.prior_node
     
     i = i+1
  
@@ -190,9 +181,7 @@ def get_node_common_fields(request, node, group_name, node_type):
     node_id = ObjectId(collection_list[i])
     
     if gcollection.Node.one({"_id": node_id}):
-      print "\n objid collection ", i, " : ", node_id
       node.collection_set.append(node_id)
-      print " nc: ", node.collection_set
     
     i = i+1  
       
