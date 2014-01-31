@@ -66,10 +66,13 @@ header{
 	background-color: #008759!important;
 }
 
-aside a{
+main>aside{
+	margin-bottom: 0.5rem;
+}
+main>aside a{
 	color: #008759;
 }
-aside a:hover{
+main>aside a:hover{
 	color: inherit;
 }
 

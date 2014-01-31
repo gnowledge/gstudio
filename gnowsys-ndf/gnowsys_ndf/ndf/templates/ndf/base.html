@@ -177,6 +177,18 @@
 
 	</header> 		
 
+<div class="off-canvas-wrap">
+					<div class="inner-wrap">
+
+						<!-- Off Canvas Meta Map -->
+						<aside class="left-off-canvas-menu">
+							<!-- whatever you want goes here -->
+							<h4>Prior nodes</h4>
+							<ul class="off-canvas-list">
+								<li><a href="#">Item 1</a></li>
+							</ul>
+						</aside>
+
 	<main class="row">  
 
 		<!-- Start of sidebar section -->
@@ -185,20 +197,7 @@
 
 			<section class="row">
 
-				<div class="off-canvas-wrap">
-					<div class="inner-wrap">
-
-
-
-						<!-- Off Canvas Menu -->
-						<aside class="left-off-canvas-menu">
-							<!-- whatever you want goes here -->
-							<h4>Prior nodes</h4>
-							<ul class="off-canvas-list">
-								<li><a href="#">Item 1</a></li>
-								...
-							</ul>
-						</aside>
+				
 
 						<div class="medium-6 large-12 columns">
 
@@ -220,11 +219,7 @@
 							{% block side_content %}  {% endblock %}
 						</div>
 
-						<!-- close the off-canvas menu -->
-						<a class="exit-off-canvas"></a>
-
-					</div>
-				</div>
+						
 
 			</section>
 
@@ -237,12 +232,25 @@
 		<!-- Start of content section -->
 		<article class="medium-12 large-9 columns">
 
-			<div class="off-canvas-wrap row">
-				<div class="inner-wrap small-12 columns">
+
+					
+
+					<a class="right-off-canvas-toggle" ><i class='fi-star'></i></a> 
+
+					<!-- The actual body content -->
+					{% block body_content %}  {% endblock %}
+					{% block extra_content %}  {% endblock %}
+
+					
+
+		</article>
+		<!-- End of content section -->	
 
 
+		
+	</main>
 
-					<!-- Off Canvas Menu -->
+	<!-- Off Canvas User Shelf -->
 					<aside class="right-off-canvas-menu">
 						<h4>Shelf</h4>
 						<ul class="off-canvas-list">
@@ -251,24 +259,11 @@
 						</ul>
 					</aside>
 
-					<a class="right-off-canvas-toggle" ><i class='fi-star'></i></a> 
+	<!-- close the off-canvas menu -->
+						<a class="exit-off-canvas"></a>
 
-					<!-- The actual body content -->
-					{% block body_content %}  {% endblock %}
-					{% block extra_content %}  {% endblock %}
-
-					<!-- close the off-canvas menu -->
-					<a class="exit-off-canvas"></a>
-
+					</div>
 				</div>
-			</div>
-
-		</article>
-		<!-- End of content section -->	
-
-
-		
-	</main>
 
 	<footer class="row">
 
