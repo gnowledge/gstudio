@@ -68,7 +68,7 @@
         </div>     
 	
         <div class="small-12 columns" style="padding-top:5px;">
-	  {{ node.html_content|removetags:"h1 p"|safe|truncatewords:12 }}
+	  {{ node.html_content|safe|striptags|truncatechars:150 }}
         </div>  
       </div>
     </li>
