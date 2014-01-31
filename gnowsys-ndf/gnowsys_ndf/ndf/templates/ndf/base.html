@@ -177,121 +177,121 @@
 		</nav>
 
 	</header> 		
+	<div class="main">
+		<div class="off-canvas-wrap">
+			<div class="inner-wrap">
 
-	<div class="off-canvas-wrap main">
-		<div class="inner-wrap">
+				<!-- Off Canvas Meta Map -->
+				<aside class="left-off-canvas-menu">
+					<!-- whatever you want goes here -->
+					<h4>Prior nodes</h4>
+					<ul class="off-canvas-list">
+						<li><a href="#">Item 1</a></li>
+					</ul>
+				</aside>
 
-			<!-- Off Canvas Meta Map -->
-			<aside class="left-off-canvas-menu">
-				<!-- whatever you want goes here -->
-				<h4>Prior nodes</h4>
-				<ul class="off-canvas-list">
-					<li><a href="#">Item 1</a></li>
-				</ul>
-			</aside>
+				<main class="row">  
 
-			<main class="row">  
+					<!-- Start of sidebar section -->
 
-				<!-- Start of sidebar section -->
+					<aside  class="medium-12 large-3 columns">
 
-				<aside  class="medium-12 large-3 columns">
-
-					<section class="row">
-
-
-
-						<header class="medium-6 large-12 columns">
-
-							{% block meta_content %}  {% endblock %}
-
-							<a class="left-off-canvas-toggle" ><i class='fi-compass'></i> Learn more..</a> 
-						</header>
-
-						<section class="medium-6 large-12 columns">
-
-							<!--Content search -->
-							{% include "ndf/node_search_base.html" %}
+						<section class="row">
 
 
-							{% block search_content %}  {% endblock %}
+
+							<header class="medium-6 large-12 columns">
+
+								{% block meta_content %}  {% endblock %}
+
+								<a class="left-off-canvas-toggle" ><i class='fi-compass'></i> Learn more..</a> 
+							</header>
+
+							<section class="medium-6 large-12 columns">
+
+								<!--Content search -->
+								{% include "ndf/node_search_base.html" %}
+
+
+								{% block search_content %}  {% endblock %}
+							</section>
+
+							<section class="medium-6 large-12 columns">
+								{% block side_content %}  {% endblock %}
+							</section>
+
+
+
 						</section>
 
-						<section class="medium-6 large-12 columns">
-							{% block side_content %}  {% endblock %}
-						</section>
-
-						
-
-					</section>
-
-			</aside>
-			<!-- End of related content -->	
+					</aside>
+					<!-- End of related content -->	
 
 
 
-			<!-- Start of content section -->
-			<article class="medium-12 large-9 columns">
+					<!-- Start of content section -->
+					<article class="medium-12 large-9 columns">
 
 
 
 
-				<a class="right-off-canvas-toggle" ><i class='fi-star'></i></a> 
+						<a class="right-off-canvas-toggle" ><i class='fi-star'></i></a> 
 
-				<!-- The actual body content -->
-				{% block body_content %}  {% endblock %}
-				{% block extra_content %}  {% endblock %}
-
-
-
-			</article>
-			<!-- End of content section -->	
+						<!-- The actual body content -->
+						{% block body_content %}  {% endblock %}
+						{% block extra_content %}  {% endblock %}
 
 
 
-		</main>
+					</article>
+					<!-- End of content section -->	
 
-		<!-- Off Canvas User Shelf -->
-		<aside class="right-off-canvas-menu">
-			<h4>Shelf</h4>
-			<ul class="off-canvas-list">
-				<li><a href="#">Item 1</a></li>
-				...
-			</ul>
-		</aside>
 
-		<!-- close the off-canvas menu -->
-		<a class="exit-off-canvas"></a>
 
+				</main>
+
+				<!-- Off Canvas User Shelf -->
+				<aside class="right-off-canvas-menu">
+					<h4>Shelf</h4>
+					<ul class="off-canvas-list">
+						<li><a href="#">Item 1</a></li>
+						...
+					</ul>
+				</aside>
+
+				<!-- close the off-canvas menu -->
+				<a class="exit-off-canvas"></a>
+
+			</div>
+		</div>
 	</div>
-</div>
+	<footer class="row">
 
-<footer class="row">
-
-	<div class="medium-3 columns">
-		<small>
-			<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> 
-			All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
-		</small>
-	</div>
-
-	<div class="medium-9 columns">
-
-		<p>
-			A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
-			<p><small>
-				<a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio">File a bug</a>
-			</small></p>
+		<div class="medium-3 columns">
+			<small>
+				<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> 
+				All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
+			</small>
 		</div>
 
+		<div class="medium-9 columns">
+
+			<p>
+				A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
+				<p><small>
+					<a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio">File a bug</a>
+				</small></p>
+			</div>
 
 
-	</footer>
 
-	<!-- JS -->
-	<script src="/static/ndf/foundation/js/foundation.min.js"></script>
-	<script src="/static/ndf/foundation/js/foundation/foundation.topbar.js"></script>
+		</footer>
 
-	<script type="text/javascript">
+		<!-- JS -->
+		<script src="/static/ndf/foundation/js/foundation.min.js"></script>
+		<script src="/static/ndf/foundation/js/foundation/foundation.topbar.js"></script>
+
+		<script type="text/javascript">
 
 		// Initialize Foundation CSS
 		$(document).foundation();
