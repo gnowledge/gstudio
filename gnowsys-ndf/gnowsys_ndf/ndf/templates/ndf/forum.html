@@ -7,27 +7,33 @@
 <h3>About</h3>
 <p>The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others.</p>
 
-{% if user.is_authenticated %}
-
-<a href="{% url 'create_forum' group_name %}">
-  <input type="submit" class="button" value="Create a New forum" />
-</a>
-
-{% endif %}
-
-
 {% endblock %}
 
 {% block body_content %}
+
+<header class="row">
+	<h2 class="medium-12 columns">Forums</h2>
+
+	<div class="medium-12 columns">
+		{% if user.is_authenticated %}
+
+		<a href="{% url 'create_forum' group_name %}">
+			<input type="submit" class="button" value="Create a New forum" />
+		</a>
+
+		{% endif %}
+	</div>
+</header>
+
 <h2>Join a Room</h2>
 {% get_group_name request.path as group_name %}
 <div id="existing_forums">
-<ul class="small-block-grid-1 medium-block-grid-2">
-{% for each in existing_forums %}
-<li class="card"><h4><a href="{% url 'show' group_name each %}">{{each.name}}</a></h4></li>
+	<ul class="small-block-grid-1 medium-block-grid-2">
+		{% for each in existing_forums %}
+		<li class="card"><h4><a href="{% url 'show' group_name each %}">{{each.name}}</a></h4></li>
 
-{% endfor %}
-</ul>
+		{% endfor %}
+	</ul>
 </div>
 {% endblock %}
 

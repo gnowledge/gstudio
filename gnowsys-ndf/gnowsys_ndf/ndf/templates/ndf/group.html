@@ -11,19 +11,24 @@
 
     <p>Number of Groups : {{ group_nodes_count }} </p>
 
-    {% if user.is_authenticated %}
-    <a href="{% url 'create_group' 'group' %}">
-        <input type="submit" class="small button expand" value="Create a new group" />
-    </a>
-    {% endif %}
-
 </div>
 {% endblock %}
 
 
 {% block body_content %} 
+<header class="row">
+    <h2 class="medium-12 columns">Groups</h2>
+        {% if user.is_authenticated %}
+        <a href="{% url 'create_group' 'group' %}">
+            <input type="submit" class="small button right" value="Create a new group" />
+        </a>
+        {% endif %}
+    
 
-<h2>Groups</h2>
+    <div class="medium-12 columns">
+
+    </div>
+</header>
 
 {% load url from future %}
 <ul class="small-block-grid-2 medium-block-grid-4">

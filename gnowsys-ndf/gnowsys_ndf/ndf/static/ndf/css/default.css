@@ -37,14 +37,23 @@ header{
 }
 
 
-.top-bar-section a.active-menu.button{
+.top-bar-section a.app.active-menu{
 	/* Active App */
 	background-color: #008759!important;
 	font-weight: bold;
+	color:white;
+	opacity:1;
+	border-bottom: 1px solid gray;
+	margin-bottom: -1px;
 }
-.top-bar-section ul.left>li>a{ 
+.top-bar-section a.app:hover{
+	color:white;
+	opacity:1;
+}
+.top-bar-section a.app{ 
 	/* Apps */
-	background-color: inherit!important;
+	opacity:0.7;
+	background-color: inherit;
 	top:0;
 }
 .top-bar-section li.group a.active-menu{ 
@@ -58,19 +67,25 @@ header{
 }
 
 aside a{
-color: #008759;
+	color: #008759;
 }
 aside a:hover{
 	color: inherit;
 }
 
 h2{
-		color: #003b27;
-			margin-top:1rem;
-			padding-bottom: 8px;
-			border-bottom: 2px solid #003b27;
-		}
+	color: black;
+	margin-top:1rem;
+	padding-bottom: 8px;
+}
 
+/* Off canvas navigation */
+aside.left-off-canvas-menu{
+	background-color: #222;
+}
+a.left-off-canvas-toggle{
+	
+}
 /*************************** 2. Custom CSS overrides ***********************/
 
 main>aside{
@@ -81,8 +96,8 @@ aside>section{
 	margin-bottom:5px;
 	background-color: #003b27;
 	-webkit-box-shadow: 2px 2px 4px 1px #bbb;
-			box-shadow: 2px 2px 4px 1px #bbb;
-			color:white;
+	box-shadow: 2px 2px 4px 1px #bbb;
+	color:white;
 }
 
 aside>section>div{
@@ -90,7 +105,7 @@ aside>section>div{
 }
 
 aside>section h3,aside>section h4,aside>section h5 {
-color:white;
+	color:white;
 }
 
 main .button{
@@ -105,8 +120,30 @@ article{
 	margin-top: 1rem;
 	background-color: white;
 	border:solid 1px #ddd;
-	padding: 20px; 
-	margin: 17px 0;
+	padding-bottom: 20px; 
+}
+
+main header{
+	/* Using http://www.colorzilla.com/gradient-editor/ */
+	background: #003b27; /* Old browsers */
+	background: -moz-linear-gradient(-45deg, #003b27 0%, #005700 49%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#003b27), color-stop(49%,#005700)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(-45deg, #003b27 0%,#005700 49%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(-45deg, #003b27 0%,#005700 49%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(-45deg, #003b27 0%,#005700 49%); /* IE10+ */
+	background: linear-gradient(135deg, #003b27 0%,#005700 49%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#003b27', endColorstr='#005700',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	
+	border-bottom: 4px solid #008759;
+	color:white;
+	margin-bottom:2rem!important;
+}
+
+main header h2{
+	color: white;
+	margin-top:1rem;
+	padding-bottom: 8px;
+	background-color: rgba(0,0,0,0.2);
 }
 
 pre{
@@ -131,6 +168,19 @@ a.user i{
 	background-color:#ddd;
 }
 
+a.node{
+	display:block;
+}
+
+a.app{
+	overflow: hidden;
+}
+a.app i{
+	font-size:20px;
+	color:white;
+	margin-right:8px;
+}
+
 
 /* Card block */
 li.card a{
@@ -141,8 +191,8 @@ li.card a{
 	display: block;
 	color:inherit;
 	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
-			box-shadow: 2px 2px 4px 1px #ddd;
-			opacity:0.8;
+	box-shadow: 2px 2px 4px 1px #ddd;
+	opacity:0.8;
 }
 li.card a:hover{
 	border: 1px solid #ddd;

@@ -71,12 +71,6 @@
 			height:100px;
 		}
 
-		h2{
-			margin-top:1rem;
-			padding-bottom: 8px;
-			border-bottom: 2px solid #333;
-		}
-
 		footer{
 			border-top:6px solid #008759;
 			background-color:#222;
@@ -167,7 +161,7 @@
 						<ul class="dropdown">
 							<!-- Create dropdown item for each group -->
 							{% for gp_id in groups %}
-							<li id="{{gp_id}}"><a href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
+							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
 							{% endfor %}
 
 						</ul>
@@ -186,16 +180,50 @@
 	<main class="row">  
 
 		<!-- Start of sidebar section -->
+
 		<aside  class="medium-12 large-3 columns">
 
 			<section class="row">
 
-				<div class="medium-6 large-12 columns">
-					{% block meta_content %}  {% endblock %}
-				</div>
+				<div class="off-canvas-wrap">
+					<div class="inner-wrap">
 
-				<div class="medium-6 large-12 columns">
-					{% block side_content %}  {% endblock %}
+
+
+						<!-- Off Canvas Menu -->
+						<aside class="left-off-canvas-menu">
+							<!-- whatever you want goes here -->
+							<ul>
+								<li><a href="#">Item 1</a></li>
+								...
+							</ul>
+						</aside>
+
+						<div class="medium-6 large-12 columns">
+
+							{% block meta_content %}  {% endblock %}
+
+							<a class="left-off-canvas-toggle" ><i class='fi-compass'></i> Learn more..</a> 
+						</div>
+
+						<div class="medium-6 large-12 columns">
+
+							<h3>Search</h3>
+							<!--{#% url 'quiz_search' group_name as search_url %} -->
+							{% include "ndf/node_search_base.html" %}
+							
+
+							{% block search_content %}  {% endblock %}
+						</div>
+
+						<div class="medium-6 large-12 columns">
+							{% block side_content %}  {% endblock %}
+						</div>
+
+						<!-- close the off-canvas menu -->
+						<a class="exit-off-canvas"></a>
+
+					</div>
 				</div>
 
 			</section>
@@ -217,11 +245,12 @@
 
 	<footer class="row">
 
-<div class="medium-3 columns">
-				<small>
-					<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
-				</small>
-			</div>
+		<div class="medium-3 columns">
+			<small>
+				<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> 
+				All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
+			</small>
+		</div>
 
 		<div class="medium-9 columns">
 
@@ -250,8 +279,13 @@
 			return "<i class='fi-torso' style='background-color:"+$(this).attr("data-gnow")+"'></i>"
 		});
 
+		$(".top-bar a.app").prepend(function(){
+			/* Attaches app icons */
+			return "<i class='fi-torso left'></i>"
+		});
+
 		/* Makes header links look like radio button */
-		$(".top-bar ul.left>li:not(.group) a").addClass("small button round")
+		$(".top-bar a.app").addClass("")
 
 		{% block script %} {% endblock %}	
 
