@@ -41,6 +41,7 @@ def check_existing_group(groupname):
   else:
     return False
 
+
 def get_drawers(group_name, nid=None, nlist=[], checked=None):
     """Get both drawers-list.
     """
@@ -49,6 +50,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     dict2 = {}
 
     gst_collection = db[GSystemType.collection_name]
+    gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
     gs_collection = db[GSystem.collection_name]
     
     drawer = None    
@@ -74,27 +76,27 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       elif checked == "Quiz":
         drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})
 
+      elif checked == "QuizObj":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$in':[u'Quiz',u'QuizItem']}, 'group_set': {'$all': [group_name]}})
+
       elif checked == "QuizItem":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'QuizItem']}, 'group_set': {'$all': [group_name]}})
 
     else:
       drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
-
-
+           
+    
     if (nid is None) and (not nlist):
-      for each in drawer:                      
-        
+      for each in drawer:               
         dict_drawer[each._id] = each
 
     elif (nid is None) and (nlist):
       for each in drawer:
-        if each._id not in nlist:          
-            
+        if each._id not in nlist:
           dict1[each._id] = each
 
       for oid in nlist: 
-        obj = gs_collection.GSystem.one({'_id': oid})        
-                 
+        obj = gs_collection.GSystem.one({'_id': oid})
         dict2[oid] = obj
 
       dict_drawer['1'] = dict1
@@ -102,14 +104,14 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
         
     else:
       for each in drawer:
-        if each._id != nid:          
+        if each._id != nid:
           if each._id not in nlist:  
-            
             dict1[each._id] = each
           
-          else: 
-                
-            dict2[each._id] = each
+      for oid in nlist: 
+        obj = gs_collection.GSystem.one({'_id': oid})
+        dict2[oid] = obj
+
       
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
@@ -117,75 +119,12 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     return dict_drawer
 
 
-    '''if (nid is None) and (not nlist):
-      for each in drawer:   
-        user = User.objects.get(pk=each.created_by).username 
-        content = each.content_org        
-        if content != None:
-            content = content[:100] 
-        else: 
-            content = u"No description !"
-            
-        #dict_drawer[each._id] = [each.name, user, each.created_at, content]
-        dict_drawer[each._id] = each
-
-    elif (nid is None) and (nlist):
-      for each in drawer:
-        if each._id not in nlist:
-          user = User.objects.get(pk=each.created_by).username
-          content = each.content_org        
-          if content != None:
-            content = content[:100] 
-          else: 
-            content = u"No description."
-            
-          dict1[each._id] = [each.name, user, each.created_at, content]
-
-      for oid in nlist: 
-        obj = gs_collection.GSystem.one({'_id': oid})
-        user = User.objects.get(pk=obj.created_by).username
-        content = obj.content_org        
-        if content != None:
-            content = content[:100] 
-        else: 
-            content = u"No description."
-                 
-        dict2[oid] = [obj.name, user, obj.created_at, content]
-
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
-        
-    else:
-      for each in drawer:
-        if each._id != nid:
-          user = User.objects.get(pk=each.created_by).username
-          content = each.content_org  
-          if each._id not in nlist:                    
-            if content != None:
-                content = content[:100] 
-            else: 
-                content = u"No description."
-            
-            dict1[each._id] = [each.name, user, each.created_at, content]
-          
-          else:            
-            if content != None:
-                content = content[:100] 
-            else: 
-                content = u"No description."
-                
-            dict2[each._id] = [each.name, user, each.created_at, content]
-      
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
-
-    return dict_drawer'''
-
 
 def get_node_common_fields(request, node, group_name, node_type):
   """Updates the retrieved values of common fields from request into the given node.
   """
-  gs_collection = db[GSystem.collection_name]
+  
+  gcollection = db[Node.collection_name]
 
   collection = None
   private = None
@@ -224,32 +163,38 @@ def get_node_common_fields(request, node, group_name, node_type):
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
   # -------------------------------------------------------------------------------- prior_node
+
   node.prior_node = []
   if prior_node_list != '':
     prior_node_list = prior_node_list.split(",")
-  
+
   i = 0
   while (i < len(prior_node_list)):
-    pn_name = prior_node_list[i]    
-    pn_name = pn_name.replace("'", "")        
-    objs = gs_collection.GSystem.one({'_type': {'$in' : [u"GSystem", u"File"]}, 'name': pn_name})       
-    node.prior_node.append(objs._id)    
+    node_id = ObjectId(prior_node_list[i])
+    if gcollection.Node.one({"_id": node_id}):
+      print "\n objid prior ", i, " : ", node_id
+      node.prior_node.append(node_id)
+      print " np: ", node.prior_node
+    
     i = i+1
+ 
 
   # -------------------------------------------------------------------------------- collection
+
   node.collection_set = []
   if collection_list != '':
       collection_list = collection_list.split(",")
 
   i = 0                    
-  while (i < len(collection_list)):                    
-    c_name = collection_list[i]    
-    c_name = c_name.replace("'", "")
-    print c_name
-    objs = gs_collection.GSystem.one({'_type': {'$in' : [u"GSystem", u"File"]}, 'name': c_name})
-    print objs
-    node.collection_set.append(objs._id)
-    i = i+1
+  while (i < len(collection_list)):
+    node_id = ObjectId(collection_list[i])
+    
+    if gcollection.Node.one({"_id": node_id}):
+      print "\n objid collection ", i, " : ", node_id
+      node.collection_set.append(node_id)
+      print " nc: ", node.collection_set
+    
+    i = i+1  
       
   # ------------------------------------------------------------------------------- org-content
   if content_org:
