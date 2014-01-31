@@ -3,19 +3,19 @@
 {% for index_key, app_dict in gapps.items %}
 
  	<li>
+ 	<a class="
 	{% if app_dict.name|lower == selectedGapp|lower %}
 	
-		<a class="active-menu app" href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
+		active-menu 
 
 	{% elif app_dict.id|safe == selectedGapp|safe %}
 
-		<a class="active-menu app" href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
+		active-menu
 	
-	{% else %}
-		
-		<a class="app" href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
-
 	{% endif %}
+
+	app" href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
+
 	</li>
 
 {% endfor %}
