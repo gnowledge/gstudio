@@ -3,94 +3,58 @@
 
 {% block head %}
 <!-- Dropzonejs : Enable dropping of files with thumbnails and progress bar http://www.dropzonejs.com/ MIT LICENSE-->
-
-<!-- script src="/static/ndf/dropzonejs/dropzone.js"></script>
-<link rel="stylesheet" href="/static/ndf/dropzonejs/css/dropzone.css" -->
-
+<!--
+<script src="/static/ndf/dropzonejs/dropzone.js"></script>
+<link rel="stylesheet" href="/static/ndf/dropzonejs/css/dropzone.css">
+-->
 {% endblock %}
+
+{% block meta_content %} 
+<h3>Uploading</h3>
+<p>You can upload files of any format to your group library.</p>
+
+{% endblock %} 
+
 {% block body_content %} 
 {% if user.is_authenticated %}
-
-
-<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
-	<fieldset>
-		<legend>Upload File</legend>
-
-		<div class="fallback">
-			<label>Choose File</label>
-			<input type="file" name="doc[]"  id="docFile" multiple/>
-			<label>Title of File</label>
-			<input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File"> 
-		</div>
-	</fieldset>
-	<fieldset>
-		<legend>Add Description</legend>
-		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}  
-	</fieldset>
-	<fieldset>
-		<legend>Add Tag</legend>
-		<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" />
-	</fieldset>
-	<input type="hidden" name="user" value="{{user.id}}">
-	<input type="hidden" name="page_url" value="{{page_url}}">
-	<input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
-	<p id="message" style="display:none"> It will take time to upload and process files, you can continue your work on this site
-		<br/>
-		For fast uploading of videos, upload videos in webm format </p>
-	</form>
-
-
 <!--
-<h4>Submit Documents</h4>
-<div style='display:table;  border:1px;   border-spacing:10px; '>
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
+  <div class="fallback">
+    <input type="file" name="doc[]"  id="docFile" multiple/>
+    <input type="hidden" name="user" value="{{user.id}}">
+    <input type="hidden" name="page_url" value="{{page_url}}">
+  </div>
+</form>
+-->
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
+  <div class ="row">
+    <fieldset small-6 large-12 coloumns>
+      <legend>Upload File</legend>
+      <div class="fallback">
+        <label>Choose File</label>
+        <input type="file" name="doc[]"  id="docFile" multiple/>
+        <label>Title of File</label>
+        <input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File">
+      </div>
+    </fieldset>
+    <fieldset>
+          <legend>Add Description</legend>
+                {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
+        </fieldset>
+        <fieldset>
+          <legend>Add Tag</legend>
+          <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" \
+		 />
+        </fieldset>
+        <input type="hidden" name="user" value="{{user.id}}">
+        <input type="hidden" name="page_url" value="{{page_url}}">
+        <input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
+    <p id="message" style="display:none"> It will take time to upload and process files, you can continue your work on this site
+      <br/>
+      For fast uploading of videos, upload videos in webm format </p>
+</form>
 
-	<form id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
-	<div style='display:table-row;' >
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Title</font> 
-		</div>
-		<div style='display:table-cell;'> 
-        		<input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File"> 
-		</div>
-	</div>
-	<div style='display:table-row;' >
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Choose File</font> 
-		</div>
-		<div style='display:table-cell;'> 
-        		<input type="file" name="doc[]"  id="docFile" multiple/>
-		</div>
-	</div>
-	<div style='display:table-row;' >
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Descrption</font> 
-		</div>
-		<div style='display:table-cell;'> 
-        		<input type="text"  name="Tags" placeholder="Write Description about File">
-		</div>
-	</div>
-	<div style='display:table-row;' >
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Tags</font> 
-		</div>
-		<div style='display:table-cell;'> 
-        		<input type="text"  name="Tags" placeholder="Enter Tags for File">
-		</div>
-	</div>
-	<div style='display:table-row;' >
-      		 <div style='display:table-cell;' colspan="2"> 
-			<input type="hidden" name="user" value="{{user.id}}">
-			<input type="hidden" name="page_url" value="{{page_url}}">
-        		<input type="submit" id="submitpostid" value="Upload" class="btn btn-primary btn-large btn-block">
-      		</div>
-	</div>
-		 <p id="message" style="display:none"> It will take time to upload and process files, you can continue your work on this site
-		 <br/>
-		 For fast uploading of videos, upload videos in webm format </p>
 
-	</form>
-</div>	
--->	
 
 {% else %}
 <p><em>You are Not Authorised user please login to upload files </em></p>

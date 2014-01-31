@@ -81,18 +81,12 @@ width:453px;
 .orgitdownEditor{
 height:100px;
 }
-#reply {
-width:600px;
-height:277px;
-top:50px;
-left:645px;
-}
 </style>
 
 {% get_group_name request.path as group %}
-<a href="#" id="reply_forum" data-reveal-id="reply">Add a Thread</a>
+<a href="#" id="reply_forum" class="button" data-reveal-id="reply">Add a Thread</a>
 </p>
-<div id="reply" class="reveal-modal" data-reveal="">
+<div id="reply" class="reveal-modal medium" data-reveal="">
 Add a thread to the Forum:<br/>
 <div class="row">
 <div class="large-3 small-2 columns">

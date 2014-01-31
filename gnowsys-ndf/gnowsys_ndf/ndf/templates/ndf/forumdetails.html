@@ -5,22 +5,32 @@
 
 {% endblock %}
 
+{% block meta_content %}
+
+<a href="#">< Browse forums</a>
+<h3>Threads</h3>
+<p>Threads are new ideas on the topic</p>
+{% if user.is_authenticated %}
+    {% include "ndf/replyforum.html" %}
+   {% endif %}
+
+<h4>Top Contributors</h4>
+{% endblock %}
+
 {% block body_content %}
-<div class="row" style="background-color:#E5E6E8">
+<div class="row">
   <div class="small-6 large-6 columns">
-    <h4>
+    
       <a title="{{forum.name}}" href="#">
-	{{forum.name}}
+	<h2>{{forum.name}}</h2>
       </a>
-    </h4>
+    
   </div>
   <div class="small-6 large-6 columns" style="height:40px">
     <ul class="sub-nav">
       <li>
 	<h5>
-	 {% if user.is_authenticated %}
-	  {% include "ndf/replyforum.html" %}
-	 {% endif %}
+	 
 	</h5>
       </li>
     </ul>
@@ -42,7 +52,7 @@
       {{each.name}}
     </a><br/>
     <small>
-      by:<strong>{{user_obj.username}}</strong>
+      by:<a class="user" href="#" data-gnow="#337700">{{user_obj.username}}</a>
     </small>
   </h4>
   {% with each.content|safe as twist_content %}

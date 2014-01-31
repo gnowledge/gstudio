@@ -112,7 +112,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	<div class="small-12 columns">
 	  <div id="prior_node_drawer">
-	    {% edit_drawer_widget "prior_node" group_name node title %}
+	    	{% edit_drawer_widget "prior_node" group_name node title %}
 	  </div>
 	</div>
       </div>
@@ -146,10 +146,16 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      <span class="fontsize-x-large"><i class="step fi-photo"></i>
 	      </span>
 	    </div>
-	    <div class="small-2 small-pull-2 columns">
+	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="Video" />
 	      Video <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-video"></i>
+	      </span>
+	    </div>
+	    <div class="small-2 columns">
+	      <input type="radio" name="col" value="QuizObj" />
+	      Quiz <span class="divider-line">|</span>
+	      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
 	      </span>
 	    </div>
 	  </div>
@@ -157,7 +163,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	<div class="small-12 columns">
 	  <div id="collection_drawer" >
-	    {% edit_drawer_widget "collection" group_name node title %}
+	    	{% edit_drawer_widget "collection" group_name node title %}
 	  </div>
 	</div>
       </div>
@@ -180,14 +186,25 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 $("input:radio").click(function() {
     // For collection
-    c_opts = $("#collection_drawer2 b");        
+    /*c_opts = $("#collection_drawer2 b");        
     c_len = c_opts.length;
     
     c_arr = [];
     for (var i = 0; i < c_len; i++) {
 	c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
     }
-    var c_list = c_arr.join(',');   
+    var c_list = c_arr.join(','); */
+
+    cn_arr = []
+
+    $(".node_id").each(function (){
+	if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+	    cn_arr.push($(this).val());
+	}
+    });
+
+    var cn_list = cn_arr.join(',');
+
     
     $.ajax({
 	type: "POST",
@@ -195,7 +212,7 @@ $("input:radio").click(function() {
 	datatype: "html",
 	data:{
 	    homo_collection: this.value,
-	    collection_list: c_list,
+	    collection_list: cn_list,
 	    node_id: '{{node.pk}}',
 	    csrfmiddlewaretoken: '{{ csrf_token }}'
 	},
@@ -210,7 +227,7 @@ $("input:radio").click(function() {
 $("#save-node").click(function() {
     
     // For prior-node
-    pn_opts = $("#prior_node_drawer2 b");
+    /*pn_opts = $("#prior_node_drawer2 b");
     pn_len = pn_opts.length;
     
     var pn_arr = [];
@@ -229,7 +246,23 @@ $("#save-node").click(function() {
 	c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
     }
     var c_list = c_arr.join(',');
-    $("#collection_list").val(c_list)
+    $("#collection_list").val(c_list)*/
+
+	pn_arr = []
+    cn_arr = []
+
+    $(".node_id").each(function (){
+	if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+	    pn_arr.push($(this).val());
+	}
+
+	if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+	    cn_arr.push($(this).val());
+	}
+    });
+
+    $("#prior_node_list").val(pn_arr)
+    $("#collection_list").val(cn_arr)    
 
     {% block base_save_on_click %}{% endblock %}
 });

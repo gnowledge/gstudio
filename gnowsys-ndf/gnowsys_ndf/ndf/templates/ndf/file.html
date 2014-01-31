@@ -53,11 +53,11 @@
     {% get_user_object file.created_by as user_obj %}
     {% get_grid_fs_object file as grid_fs_obj %}
     <tr>
-      <td>{{file.name}}</td>
+      <td><a href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">{{file.name}}</a></td>
       <td>{{file.file_size.size}}{{file.file_size.unit}}</td>
       <td>{{file.mime_type}}</td>
       <td>{{ user_obj.username }}</td>
-      <td><a href="{% url 'read_file' 'group' file %}" download="{{ grid_fs_obj.filename }}">Download </a></td>
+      <td><a href="{% url 'read_file' group_name file grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">Download </a></td>
       <td>
 	{% get_user_object file.created_by as user_obj %}
 	{% ifequal  user_obj.username  user.username  %}
@@ -69,7 +69,7 @@
   </tbody>
 </table>
 {% else %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
+  <p><em>Currently NO files uploaded!!!</em></p>
 {% endif %}
 {% endblock %}
 

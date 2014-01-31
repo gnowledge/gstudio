@@ -16,7 +16,7 @@
 
   <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
   <script type="text/javascript"
-	  src="http://atlas.metastudio.org/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	  src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
   </script>
 
 {% endblock %}
@@ -25,22 +25,13 @@
 
     <h3>About</h3>
 
-    <p>Using <b>Quiz Items</b>, you can create a miscellaneous quiz-question. These quiz-questions can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
+    <p class="text-justify">By <b>Quiz Item</b>, you can create a miscellaneous quiz-question. This quiz-question can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
 
-    <p>Using <b>Quiz</b>, you can build a quiz having list of quiz-items. Quiz-Items can be added to quiz in two ways:
-      <ol>
-	<li>By editing, Quiz node.</li>
+    <p class="text-justify">By <b>Quiz</b>, you can build a quiz having list of quiz-items. Quiz-Items can be added to quiz in two ways:
+      <ol  class="text-justify">
+	<li>By editing, Quiz node (via collection-list).</li>
 	<li>By using Quiz-Item button corresponding to the Quiz node (i.e. this will automatically add the quiz-item node to your quiz node).</li>
       </ol>
-    </p>
-
-    <p>Number of Quiz nodes : {{ quiz_nodes_count }} </p>
-
-    <!-- Search field -->
-    <p>
-    <!--{#% url 'quiz_search' group_name as search_url %} -->
-    {% include "ndf/node_search_base.html" %}
-    <span class="label alert small">NOTE: Search not implemented yet!!!</span>
     </p>
 
     <!-- Add button -->
@@ -61,12 +52,17 @@
       <ul class="inline-list">
 	<li><h3>Question</h3></li>
 	{% if user.is_authenticated %}
-	<li><a href="{% url 'quiz_item_create_edit' group_name node %}" class="button small">Edit this Question<a></li>
+	<li><a href="{% url 'quiz_item_create_edit' group_name node %}" class="button small">Edit this Question</a></li>
 	{% endif %}
-	</ul>
-      
+      </ul>
       <p>
 	{{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
+      </p>
+      <p>
+	Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
+      </p>
+      <p>
+	Last update: {{ node.last_update|date:"j F Y" }}
       </p>
       <p>
 	Version{{ node.version_dict|length|pluralize }}: 
