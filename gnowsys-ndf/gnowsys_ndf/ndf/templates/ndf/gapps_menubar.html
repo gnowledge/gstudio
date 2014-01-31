@@ -2,21 +2,40 @@
 
 {% for index_key, app_dict in gapps.items %}
 
- 	<li>
- 	<a class="
+<li>
+	<a class="
+
+	{% comment %} Sets active-menu class on active app{% endcomment %}
 	{% if app_dict.name|lower == selectedGapp|lower %}
 	
-		active-menu 
+	active-menu 
 
 	{% elif app_dict.id|safe == selectedGapp|safe %}
 
-		active-menu
+	active-menu
 	
 	{% endif %}
 
-	app" href="{% url app_dict.name group_name app_dict.id %}">{{app_dict.name|title}}</a>
+	app" href="{% url app_dict.name group_name app_dict.id %}">
 
-	</li>
+	{% comment %} Includes an app icon if found{% endcomment %}
+	{% if app_dict.name|lower == "page" %}
+	<i class='fi-page-filled left'></i>
+	{% elif app_dict.name|lower == "group" %}
+	<i class='fi-torsos left'></i>
+	{% elif app_dict.name|lower == "file" %}
+	<i class='fi-play-video'></i>
+	{% elif app_dict.name|lower == "forum" %}
+	<i class='fi-comments'></i>
+	{% elif app_dict.name|lower == "course" %}
+	<i class='fi-page-multiple'></i>
+	{% elif app_dict.name|lower == "quiz" %}
+	<i class='fi-graph-bar'></i>
+	{% endif %}
+
+	{{app_dict.name|title}}</a>
+
+</li>
 
 {% endfor %}
 
