@@ -51,7 +51,7 @@
               <div class="row">
 
                <div class="small-12 columns text-left" style="padding-top:5px;">
-	      {# {{ value.html_content|removetags:"h1 p"|safe|truncatewords:12 }} #}  <!-- commented content -->
+		 {{ value.html_content|safe|striptags|truncatechars:50 }}
                </div>  
               </div>
             </div>
@@ -120,7 +120,7 @@
 
             <div class="row">
               <div class="small-12 columns text-left" style="padding-top:5px;">
-	      {# {{ node.html_content|removetags:"h1 p"|safe|truncatewords:12 }} #} <!-- commented contend -->
+		{{ value.html_content|safe|striptags|truncatechars:50 }}
               </div>
            </div>
           </div>
