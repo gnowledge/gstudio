@@ -83,9 +83,21 @@ h2{
 aside.left-off-canvas-menu{
 	background-color: #222;
 }
-a.left-off-canvas-toggle{
-	
+a.right-off-canvas-toggle{
+	color: black;
+	position: absolute;
+	z-index: 1000;
+	right: 10px;
+	top:20px;
 }
+a.right-off-canvas-toggle i{
+	font-size: 30px;
+}
+.inner-wrap>aside h4{
+	color: white;
+	padding:10px;
+}
+
 /*************************** 2. Custom CSS overrides ***********************/
 
 main>aside{
@@ -118,7 +130,7 @@ main .button:hover{
 /* Content area */
 article{
 	margin-top: 1rem;
-	background-color: white;
+	background-color: #f9f9f9;
 	border:solid 1px #ddd;
 	padding-bottom: 20px; 
 }
@@ -176,7 +188,7 @@ a.app{
 	overflow: hidden;
 }
 a.app i{
-	font-size:20px;
+	font-size:15px;
 	color:white;
 	margin-right:8px;
 }
@@ -184,7 +196,7 @@ a.app i{
 
 /* Card block */
 li.card a{
-	background-color: #eee;
+	background-color: white;
 	margin:2px;
 	padding:5px;
 	border: 1px solid #eaeaea;

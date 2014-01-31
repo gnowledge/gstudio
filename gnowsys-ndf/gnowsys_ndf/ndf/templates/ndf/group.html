@@ -4,29 +4,24 @@
 
 
 {% block meta_content %}
-<div class="medium-12 columns">
     <h3>About</h3>
 
     <p>Groups help to arrange your content for a particular set of users. Members can subscribe to updates and even collaborate on content.</p>
 
     <p>Number of Groups : {{ group_nodes_count }} </p>
 
-</div>
 {% endblock %}
 
 
 {% block body_content %} 
 <header class="row">
     <h2 class="medium-12 columns">Groups</h2>
+    <div class="medium-12 columns">
         {% if user.is_authenticated %}
         <a href="{% url 'create_group' 'group' %}">
-            <input type="submit" class="small button right" value="Create a new group" />
+            <input type="submit" class="small button" value="Create a new group" />
         </a>
         {% endif %}
-    
-
-    <div class="medium-12 columns">
-
     </div>
 </header>
 

@@ -193,7 +193,8 @@
 						<!-- Off Canvas Menu -->
 						<aside class="left-off-canvas-menu">
 							<!-- whatever you want goes here -->
-							<ul>
+							<h4>Prior nodes</h4>
+							<ul class="off-canvas-list">
 								<li><a href="#">Item 1</a></li>
 								...
 							</ul>
@@ -208,10 +209,9 @@
 
 						<div class="medium-6 large-12 columns">
 
-							<h3>Search</h3>
-							<!--{#% url 'quiz_search' group_name as search_url %} -->
+							<!--Content search -->
 							{% include "ndf/node_search_base.html" %}
-							
+
 
 							{% block search_content %}  {% endblock %}
 						</div>
@@ -232,14 +232,41 @@
 		</aside>
 		<!-- End of related content -->	
 
+		
+
 		<!-- Start of content section -->
 		<article class="medium-12 large-9 columns">
-			
-			{% block body_content %}  {% endblock %}
-			{% block extra_content %}  {% endblock %}
+
+			<div class="off-canvas-wrap row">
+				<div class="inner-wrap small-12 columns">
+
+
+
+					<!-- Off Canvas Menu -->
+					<aside class="right-off-canvas-menu">
+						<h4>Shelf</h4>
+						<ul class="off-canvas-list">
+							<li><a href="#">Item 1</a></li>
+							...
+						</ul>
+					</aside>
+
+					<a class="right-off-canvas-toggle" ><i class='fi-star'></i></a> 
+
+					<!-- The actual body content -->
+					{% block body_content %}  {% endblock %}
+					{% block extra_content %}  {% endblock %}
+
+					<!-- close the off-canvas menu -->
+					<a class="exit-off-canvas"></a>
+
+				</div>
+			</div>
 
 		</article>
 		<!-- End of content section -->	
+
+
 		
 	</main>
 
@@ -277,11 +304,6 @@
 		$("a.user").prepend(function(){
 			/* Attaches user icon with gnow level color for every user link */
 			return "<i class='fi-torso' style='background-color:"+$(this).attr("data-gnow")+"'></i>"
-		});
-
-		$(".top-bar a.app").prepend(function(){
-			/* Attaches app icons */
-			return "<i class='fi-torso left'></i>"
 		});
 
 		/* Makes header links look like radio button */
