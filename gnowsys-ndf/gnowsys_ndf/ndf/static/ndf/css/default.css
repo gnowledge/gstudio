@@ -232,6 +232,10 @@ a.app i{
 	display: block;
 
 }
+.card .th:hover{
+	width: 150px;
+	height: 150px;
+}
 .card .th img{
 	width: 100%;
 }
