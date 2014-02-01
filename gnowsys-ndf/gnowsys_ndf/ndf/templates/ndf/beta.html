@@ -69,7 +69,7 @@
 	<lable>{{ user_obj.username }}</lable>
       </div>
       <div style='display:table-cell;' align="middle">
-	<a href="{% url 'read_file' 'group' file %}" download="{{ grid_fs_obj.filename }}">Download </a>
+	<a href="{% url 'read_file' 'group' file grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">Download </a>
       </div>
       
       <div style='display:table-cell;' align="middle">

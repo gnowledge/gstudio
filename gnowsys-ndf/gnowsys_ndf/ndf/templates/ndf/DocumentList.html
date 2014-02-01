@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load ndf_tags %}
 {% block title %} List of Documents {% endblock %}
 {% block body_content %}
 {% if alreadyUploadedFiles %} 
@@ -17,9 +18,10 @@
 		<th>View</th>
 	</tr>
 	{% for doc in filecollection %}
+	{% get_grid_fs_object doc as grid_fs_obj %}
 		<tr>
 			<td>{{doc.name}}</td>
-			<td><a href="{% url 'read_file' 'group' doc %}">view</a></td>
+			<td><a href="{% url 'read_file' 'group' doc grid_fs_obj.filename %}">view</a></td>
 			
 		<tr/> 
 	{% endfor %} 	

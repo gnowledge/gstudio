@@ -3,6 +3,7 @@
 
 {% block head %}
 <!-- Dropzonejs : Enable dropping of files with thumbnails and progress bar http://www.dropzonejs.com/ MIT LICENSE-->
+
 <!--
 <script src="/static/ndf/dropzonejs/dropzone.js"></script>
 <link rel="stylesheet" href="/static/ndf/dropzonejs/css/dropzone.css">
@@ -17,6 +18,7 @@
 
 {% block body_content %} 
 {% if user.is_authenticated %}
+
 <!--
 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
   <div class="fallback">
@@ -27,52 +29,52 @@
 </form>
 -->
 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
-  <div class ="row">
-    <fieldset small-6 large-12 coloumns>
-      <legend>Upload File</legend>
-      <div class="fallback">
-        <label>Choose File</label>
-        <input type="file" name="doc[]"  id="docFile" multiple/>
-        <label>Title of File</label>
-        <input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File">
-      </div>
-    </fieldset>
-    <fieldset>
-          <legend>Add Description</legend>
-                {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
-        </fieldset>
-        <fieldset>
-          <legend>Add Tag</legend>
-          <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" \
-		 />
-        </fieldset>
-        <input type="hidden" name="user" value="{{user.id}}">
-        <input type="hidden" name="page_url" value="{{page_url}}">
-        <input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
-    <p id="message" style="display:none"> It will take time to upload and process files, you can continue your work on this site
-      <br/>
-      For fast uploading of videos, upload videos in webm format </p>
-</form>
+	<div class ="row">
+		<fieldset small-6 large-12 coloumns>
+			<legend>Upload File</legend>
+			<div class="fallback">
+				<label>Choose File</label>
+				<input type="file" name="doc[]"  id="docFile" multiple/>
+				<label>Title of File</label>
+				<input type="text" name="docTitle" id ="docTitle"  placeholder="Enter Title of File">
+			</div>
+		</fieldset>
+		<fieldset>
+			<legend>Add Description</legend>
+			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
+		</fieldset>
+		<fieldset>
+			<legend>Add Tag</legend>
+			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" \
+			/>
+		</fieldset>
+		<input type="hidden" name="user" value="{{user.id}}">
+		<input type="hidden" name="page_url" value="{{page_url}}">
+		<input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
+		<p id="message" style="display:none"> It will take time to upload and process files, you can continue your work on this site
+			<br/>
+			For fast uploading of videos, upload videos in webm format </p>
+		</form>
 
 
 
-{% else %}
-<p><em>You are Not Authorised user please login to upload files </em></p>
-{% endif %}
-{% endblock %}
-{% block script %}
+		{% else %}
+		<p><em>You are Not Authorised user please login to upload files </em></p>
+		{% endif %}
+		{% endblock %}
+		{% block script %}
 
-jQuery(document).ready(function($){
-$(document).on('submit',"form",function(){
-if($("#docFile").val() != "")
-{	
-	$("#message").show();
-	$("#submitpostid").hide();
-	$("#submitpostid").submit();
+		jQuery(document).ready(function($){
+		$(document).on('submit',"form",function(){
+		if($("#docFile").val() != "")
+		{	
+		$("#message").show();
+		$("#submitpostid").hide();
+		$("#submitpostid").submit();
 
-}
-else
-{
+	}
+	else
+	{
 	alert("select a file");
 	return false;
 }

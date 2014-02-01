@@ -49,14 +49,14 @@
 			color:white!important;
 		}
 
-		header
+		body>header
 		{
 			position: relative;
 			-webkit-box-shadow: 2px 2px 4px 1px #C7C7C7;
 			box-shadow: 2px 2px 4px 1px #C7C7C7;
 		}
 
-		main{
+		.main{
 			background-color:#eee;
 			min-height: 100%;
 			margin-bottom: -100px!important;
@@ -65,26 +65,21 @@
 			box-sizing: border-box;
 		}
 
-		main:after{
+		.main:after{
 			content:"";
 			display:block;
 			height:100px;
 		}
 
-		h2{
-			margin-top:1rem;
-			padding-bottom: 8px;
-			border-bottom: 2px solid #333;
-		}
-
-		footer{
+		body>footer{
 			border-top:6px solid #008759;
 			background-color:#222;
 			color: #888;
 			padding:20px 0;
+			position: relative;
 		}
 
-		footer a{
+		body>footer a{
 			color: #bbb;
 		}
 
@@ -167,7 +162,7 @@
 						<ul class="dropdown">
 							<!-- Create dropdown item for each group -->
 							{% for gp_id in groups %}
-							<li id="{{gp_id}}"><a href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
+							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
 							{% endfor %}
 
 						</ul>
@@ -182,46 +177,102 @@
 		</nav>
 
 	</header> 		
+	<div class="main">
+		<div class="off-canvas-wrap">
+			<div class="inner-wrap">
 
-	<main class="row">  
+				<!-- Off Canvas Meta Map -->
+				<aside class="left-off-canvas-menu">
+					<!-- whatever you want goes here -->
+					<h4>Prior nodes</h4>
+					<ul class="off-canvas-list">
+						<li><a href="#">Item 1</a></li>
+					</ul>
+				</aside>
 
-		<!-- Start of sidebar section -->
-		<aside  class="medium-12 large-3 columns">
+				<main class="row">  
 
-			<section class="row">
+					<!-- Start of sidebar section -->
 
-				<div class="medium-6 large-12 columns">
-					{% block meta_content %}  {% endblock %}
-				</div>
+					<aside  class="medium-12 large-3 columns">
 
-				<div class="medium-6 large-12 columns">
-					{% block side_content %}  {% endblock %}
-				</div>
-
-			</section>
+						<section class="row">
 
 
-		</aside>
-		<!-- End of related content -->	
 
-		<!-- Start of content section -->
-		<article class="medium-12 large-9 columns">
-			
-			{% block body_content %}  {% endblock %}
-			{% block extra_content %}  {% endblock %}
+							<header class="medium-6 large-12 columns">
 
-		</article>
-		<!-- End of content section -->	
-		
-	</main>
+								{% block meta_content %}  {% endblock %}
 
+								<a class="left-off-canvas-toggle" ><i class='fi-compass'></i> Learn more..</a> 
+							</header>
+
+							<section class="medium-6 large-12 columns">
+
+								<!--Content search -->
+								{% include "ndf/node_search_base.html" %}
+
+
+								{% block search_content %}  {% endblock %}
+							</section>
+
+							<section class="medium-6 large-12 columns">
+								{% block related_content %}  {% endblock %}
+							</section>
+
+
+
+						</section>
+
+					</aside>
+					<!-- End of related content -->	
+
+
+
+					<!-- Start of content section -->
+					<article class="medium-12 large-9 columns">
+
+
+
+
+						<a class="right-off-canvas-toggle" ><i class='fi-star'></i></a> 
+
+						<!-- The actual body content -->
+						{% block body_content %}  {% endblock %}
+						{% block extra_content %}  {% endblock %}
+
+
+
+					</article>
+					<!-- End of content section -->	
+
+
+
+				</main>
+
+				<!-- Off Canvas User Shelf -->
+				<aside class="right-off-canvas-menu">
+					<h4>Shelf</h4>
+					<ul class="off-canvas-list">
+						<li><a href="#">Item 1</a></li>
+						...
+					</ul>
+				</aside>
+
+				<!-- close the off-canvas menu -->
+				<a class="exit-off-canvas"></a>
+
+			</div>
+		</div>
+	</div>
 	<footer class="row">
 
-<div class="medium-3 columns">
-				<small>
-					<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
-				</small>
-			</div>
+		<div class="medium-3 columns">
+			<small>
+				<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> 
+				All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
+			</small>
+		</div>
 
 		<div class="medium-9 columns">
 
@@ -232,7 +283,7 @@
 				</small></p>
 			</div>
 
-			
+
 
 		</footer>
 
@@ -251,7 +302,7 @@
 		});
 
 		/* Makes header links look like radio button */
-		$(".top-bar ul.left>li:not(.group) a").addClass("small button round")
+		
 
 		{% block script %} {% endblock %}	
 
