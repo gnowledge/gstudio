@@ -108,6 +108,27 @@ a.right-off-canvas-toggle i{
 	padding:10px;
 }
 
+/* Should be in Foundation */
+/* Inline label list */
+.label{
+	background-color: #aaa;
+	border-left:1px solid #999;
+}
+.label:hover{
+	background-color: #999;
+}
+
+.label-list{
+	text-align: left;
+}
+
+.card .label{
+	opacity:0.5;
+}
+.card:hover .label{
+	opacity:1;
+}
+
 /*************************** 2. Custom CSS overrides ***********************/
 
 main>aside{
