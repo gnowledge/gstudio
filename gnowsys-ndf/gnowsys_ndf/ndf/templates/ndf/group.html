@@ -17,36 +17,78 @@
 <header class="row">
     <h2 class="medium-12 columns">Groups</h2>
     <div class="medium-12 columns">
-        {% if user.is_authenticated %}
-        <a href="{% url 'create_group' 'group' %}">
-            <input type="submit" class="small button" value="Create a new group" />
-        </a>
-        {% endif %}
-    </div>
+       <dl class="tabs" data-tab>
+          <dd class="active"><a href="#panel2-1">Active Groups</a></dd>
+          <dd><a href="#panel2-3">Special Groups</a></dd>
+          <dd><a href="#panel2-4">Group Tree</a></dd>
+      </dl>
+
+  </div>
 </header>
+
+
 
 {% load url from future %}
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
+    <!-- Node create card-->
+    <li class="create card">
+        <div>
+        <h4><i class="fi-plus"></i> New</h4>
+            <div class="row">
+                <div class="large-12 columns">
+
+                  <input type="text" placeholder="Name of the Group" />
+                  <textarea placeholder="Describe the Group"></textarea>
+                  <input id="ANONYMOUS" type="checkbox"><label for="ANONYMOUS">Anonymous (No login required)</label>
+
+                  <div class="login-mode switch round">
+
+                    <input id="PUBLIC" name="login-mode" type="radio" checked>
+                    <label for="PUBLIC" onclick="">Public Group <i class="fi-torsos-all"></i></label>
+
+                    <input id="PRIVATE" name="login-mode" type="radio">
+                    <label for="PRIVATE" onclick="">Private Group <i class="fi-lock"></i></label>
+
+                    <span></span>
+                    <script>
+
+                        $("#ANONYMOUS").change(function(){
+                            /* Hide type group type options if anonymous*/
+                            $(".login-mode").slideToggle();     
+                        });
+                    </script>
+
+                </div>
+
+            </div>
+        </div>
+        {% if user.is_authenticated %}
+        <a class="button expand" href="{% url 'create_group' 'group' %}">
+            Create Group
+        </a>
+        {% endif %}
+    </li>
+
+    <!-- Existing card list-->
     {% for node in group_nodes %}
     <li class="card">
         <a href="/{{node}}">
             <header>
-            <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+                <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
+                <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
                 <h4>{{ node }}</h4>
-                {{ node.tags|join:", " }}
                 <small>Created <em>33 days ago</em></small>
             </header>
             <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
-            <div class="button expand">Join</div> 
+            <div class="button expand">Join Group</div> 
             <footer class="row">
-               <div class="medium-6 columns"><strong>24</strong> Members</div>
-               <div class="medium-3 columns">somet</div> 
-           </footer>
+             <div class="small-6 columns"><strong>24</strong> Members</div>
+             <div class="small-6 columns"><strong>56</strong> Objects</div> 
+         </footer>
 
-       </a>
+     </a>
     <!--
-    Created at : {{ node.created_at|date:"j F Y" }}<br>
     Member Of   : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>
     <a href="{#% url 'delete_node' node %#}">delete</a>
@@ -58,4 +100,3 @@
 {% endfor %}
 </ul>
 {% endblock %}
-

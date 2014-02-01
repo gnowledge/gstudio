@@ -108,6 +108,27 @@ a.right-off-canvas-toggle i{
 	padding:10px;
 }
 
+/* Should be in Foundation */
+/* Inline label list */
+.label{
+	background-color: #aaa;
+	border-left:1px solid #999;
+}
+.label:hover{
+	background-color: #999;
+}
+
+.label-list{
+	text-align: left;
+}
+
+.card .label{
+	opacity:0.5;
+}
+.card:hover .label{
+	opacity:1;
+}
+
 /*************************** 2. Custom CSS overrides ***********************/
 
 main>aside{
@@ -140,7 +161,7 @@ main .button:hover{
 /* Content area */
 article{
 	margin-top: 1rem;
-	background-color: #f9f9f9;
+	background-color: #f5f5f5;
 	border:solid 1px #ddd;
 	padding-bottom: 20px; 
 }
@@ -183,9 +204,9 @@ pre{
 /*************************** 3. Custom CSS Below ***********************/
 
 
-a.user i{
-	padding: 2px 5px;
-	margin-right:6px;
+.user i{
+	padding: 0.2em 0.5em;
+	margin-right:0.4em;
 	color:white;
 	background-color:#ddd;
 }
@@ -205,24 +226,54 @@ a.app i{
 
 
 /* Card block */
-.card>a{
+.card>*{
 	position: relative;
 	background-color: white;
 	margin:2px;
-	padding:5px;
+	padding:10px;
 	border: 1px solid #eaeaea;
 	display: block;
-	color:inherit;
+	color:inherit!important;
 	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
 	box-shadow: 2px 2px 4px 1px #ddd;
 	opacity:0.8;
+	transition: opacity .5s ease-out;
+    -moz-transition: opacity .5s ease-out;
+    -webkit-transition: opacity .5s ease-out;
+    -o-transition: opacity .5s ease-out;
+
 }
-.card>a:hover{
+.card:hover>*{
 	border: 1px solid #ddd;
 	opacity:1;
 }
+/* Create card */
+.create.card>*{
+	background-color: #999;
+	opacity:1;
+}
+.create.card:hover>*{
+	background-color: #008759;
+}
+.create.card h4{
+	color:white;
+}
+.create.card .button{
+	border:1px solid #00ba7b;
+}
+.create.card label{
+	color:white;
+}
+.create.card .switch label{
+	color:inherit;
+}
+
+/* Default card */
 .card header{
 	text-align: center;
+}
+.card h4{
+	font-weight: bold;
 }
 .card .th{
 	margin:30px auto;
@@ -232,9 +283,22 @@ a.app i{
 	display: block;
 
 }
+.card .th:hover{
+	width: 150px;
+	height: 150px;
+}
 .card .th img{
 	width: 100%;
 }
 .card section{
 background-color: #ddd;
+}
+.card .button{
+	opacity:0.1;
+}
+.card.create .button{
+	opacity:0.5;
+}
+.card:hover .button{
+	opacity:1;
 }
