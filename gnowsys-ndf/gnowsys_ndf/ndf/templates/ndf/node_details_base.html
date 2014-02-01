@@ -12,13 +12,14 @@
         displayMath: [['\\[','\\]'], ['$$','$$']]
       }
     });
+
   </script>
 
   <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
   <script type="text/javascript"
 	  src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
   </script>
-
+  
 {% endblock %}
 
 {% block meta_content %}
@@ -58,7 +59,7 @@
     {% endfor %}
 
       {% endif %}
-
+      
 {% endblock %}
 
 {% block body_content %}
@@ -135,7 +136,12 @@
       {% endif %}
       {% endwith %}
 
-      
+
+      <!--  ###### Graph ###### -->      
+      <div class="small-12 columns" id="graph-div">
+        {% include "ndf/relational_graph.html" with graphData=graphData %}        
+      </div>
+      <!--  ###### Graph ###### -->
 
     </div>
     <!-- End: Inner Main Row -->
