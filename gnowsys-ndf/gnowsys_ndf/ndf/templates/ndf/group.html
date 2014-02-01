@@ -19,9 +19,8 @@
     <div class="medium-12 columns">
        <dl class="tabs" data-tab>
           <dd class="active"><a href="#panel2-1">Active Groups</a></dd>
-          <dd><a href="#panel2-2">Latest Groups</a></dd>
           <dd><a href="#panel2-3">Special Groups</a></dd>
-          <dd><a href="#panel2-4">Meta Groups</a></dd>
+          <dd><a href="#panel2-4">Group Tree</a></dd>
       </dl>
 
   </div>
@@ -32,9 +31,10 @@
 {% load url from future %}
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
+    <!-- Node create card-->
     <li class="create card">
         <div>
-            <h4>New Group <i class="fi-plus right"></i></h4>
+        <h4><i class="fi-plus"></i> New</h4>
             <div class="row">
                 <div class="large-12 columns">
 
@@ -44,11 +44,11 @@
 
                   <div class="login-mode switch round">
 
-                    <input id="PRIVATE" name="login-mode" type="radio">
-                    <label for="PRIVATE" onclick="">Private Group</label>
-
                     <input id="PUBLIC" name="login-mode" type="radio" checked>
-                    <label for="PUBLIC" onclick="">Public Group</label>
+                    <label for="PUBLIC" onclick="">Public Group <i class="fi-torsos-all"></i></label>
+
+                    <input id="PRIVATE" name="login-mode" type="radio">
+                    <label for="PRIVATE" onclick="">Private Group <i class="fi-lock"></i></label>
 
                     <span></span>
                     <script>
@@ -70,6 +70,7 @@
         {% endif %}
     </li>
 
+    <!-- Existing card list-->
     {% for node in group_nodes %}
     <li class="card">
         <a href="/{{node}}">

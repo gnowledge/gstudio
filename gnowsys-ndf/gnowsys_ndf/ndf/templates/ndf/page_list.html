@@ -20,10 +20,14 @@
   </h2>
 
   <div class="medium-12 columns">
-    <!-- Add button -->
-    {% if user.is_authenticated %}
-    <a href="{% url 'page_create_edit' group_name %}" class="button small">+ Add {{title}}</a>
-    {% endif %}
+
+  <dl class="tabs" data-tab>
+          <dd class="active"><a href="#panel2-1">Active Pages</a></dd>
+          <dd><a href="#panel2-3">Special Pages</a></dd>
+          <dd><a href="#panel2-4">Page Tree</a></dd>
+          <dd><a href="#panel2-4">Recently Viewed</a></dd>
+      </dl>
+
   </div>
 </header>
 
@@ -53,7 +57,39 @@
 
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-  <h4>Single Pages</h4>
+
+  <!-- Node create card-->
+ <li class="create card">
+        <div>
+            <h4><i class="fi-plus"></i> New</h4>
+            <div class="row">
+                <div class="large-12 columns">
+
+                  <input type="text" placeholder="Name of the {{title}}" />
+                  <textarea placeholder="Describe the {{title}}"></textarea>
+
+                  <div class="login-mode switch round">
+
+                    <input id="PUBLIC" name="login-mode" type="radio" checked>
+                    <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+                    <input id="PRIVATE" name="login-mode" type="radio">
+                    <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+
+                    <span></span>
+
+                </div>
+
+            </div>
+        </div>
+        {% if user.is_authenticated %}
+        <a class="button expand" href="{% url 'page_create_edit' group_name %}">
+            Create {{title}}
+        </a>
+        {% endif %}
+    </li>
+
+<!-- Existing card list-->
   {% for node in page_nodes %}
   <li class="card">
     <a href="{% url 'page_details' group_name node %}">

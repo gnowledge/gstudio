@@ -233,12 +233,17 @@ a.app i{
 	padding:10px;
 	border: 1px solid #eaeaea;
 	display: block;
-	color:inherit;
+	color:inherit!important;
 	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
 	box-shadow: 2px 2px 4px 1px #ddd;
 	opacity:0.8;
+	transition: opacity .5s ease-out;
+    -moz-transition: opacity .5s ease-out;
+    -webkit-transition: opacity .5s ease-out;
+    -o-transition: opacity .5s ease-out;
+
 }
-.card>*:hover{
+.card:hover>*{
 	border: 1px solid #ddd;
 	opacity:1;
 }
@@ -256,8 +261,11 @@ a.app i{
 .create.card .button{
 	border:1px solid #00ba7b;
 }
-.create.card div:not(.switch) label {
+.create.card label{
 	color:white;
+}
+.create.card .switch label{
+	color:inherit;
 }
 
 /* Default card */
@@ -285,8 +293,11 @@ a.app i{
 .card section{
 background-color: #ddd;
 }
-.card:not(.create) .button{
+.card .button{
 	opacity:0.1;
+}
+.card.create .button{
+	opacity:0.5;
 }
 .card:hover .button{
 	opacity:1;
