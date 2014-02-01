@@ -2,12 +2,7 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block meta_content %}
-
-<h3>About</h3>
-
 <p class="text-justify"><b>Pages</b> are just like the page of your notebook. You can write your content here.</p>
-
-<p><h5>Number of Pages: <b>{{ page_nodes_count }}</b></h5></p>
 
 {% endblock %}
 
@@ -22,7 +17,7 @@
   <div class="medium-12 columns">
 
   <dl class="tabs" data-tab>
-          <dd class="active"><a href="#panel2-1">Active Pages</a></dd>
+          <dd class="active"><a href="#panel2-1">Active Pages ({{ page_nodes_count }})</a></dd>
           <dd><a href="#panel2-3">Special Pages</a></dd>
           <dd><a href="#panel2-4">Page Tree</a></dd>
           <dd><a href="#panel2-4">Recently Viewed</a></dd>
@@ -60,7 +55,7 @@
 
   <!-- Node create card-->
  <li class="create card">
-        <div>
+        <div class="page">
             <h4><i class="fi-plus"></i> New</h4>
             <div class="row">
                 <div class="large-12 columns">
@@ -92,7 +87,7 @@
 <!-- Existing card list-->
   {% for node in page_nodes %}
   <li class="card">
-    <a href="{% url 'page_details' group_name node %}">
+    <a class="page" href="{% url 'page_details' group_name node %}">
       <header>
         <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div> <!-- {{ node.tags|join:", " }} -->
 
