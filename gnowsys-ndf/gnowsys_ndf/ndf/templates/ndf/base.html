@@ -57,7 +57,7 @@
 		}
 
 		.main{
-			background-color:#ddd;
+			background-color:#e0e0e0;
 			min-height: 100%;
 			margin-bottom: -100px!important;
 			-webkit-box-sizing: border-box;
@@ -184,9 +184,10 @@
 				<!-- Off Canvas Meta Map -->
 				<aside class="left-off-canvas-menu">
 					<!-- whatever you want goes here -->
-					<h4>Prior nodes</h4>
+					<h4>Read this first</h4>
 					<ul class="off-canvas-list">
-						<li><a href="#">Item 1</a></li>
+						<li><a href="#">Help Topics</a></li>
+						<li><a href="#">Prior Nodes</a></li>
 					</ul>
 				</aside>
 
@@ -201,10 +202,11 @@
 
 
 							<header class="medium-6 large-12 columns">
+							<a class="left-off-canvas-toggle meta" ><h3><i class='fi-asterisk'></i> About</h3></a> 
 
 								{% block meta_content %}  {% endblock %}
 
-								<a class="left-off-canvas-toggle" ><i class='fi-compass'></i> Learn more..</a> 
+								
 							</header>
 
 							<section class="medium-6 large-12 columns">
@@ -300,6 +302,21 @@
 			/* Attaches user icon with gnow level color for every user link */
 			return "<i class='fi-torso' style='background-color:"+$(this).attr("data-gnow")+"'></i>"
 		});
+
+		$(".card .group").prepend(function(){
+			/* Attaches icon for node type */
+			return "<i class='fi-torsos'></i>"
+		});
+
+		$(".card .page").prepend(function(){
+			/* Attaches icon for node type */
+			return "<i class='fi-page'></i>"
+		});
+		$(".card .file").prepend(function(){
+			/* Attaches icon for node type */
+			return "<i class='fi-play-video'></i>"
+		});
+
 
 		/* Makes header links look like radio button */
 		
