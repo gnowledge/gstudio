@@ -244,14 +244,20 @@ a.app i{
 }
 /* Create card */
 .create.card>*{
-	background-color: #008759;
+	background-color: #999;
 	opacity:1;
+}
+.create.card:hover>*{
+	background-color: #008759;
 }
 .create.card h4{
 	color:white;
 }
 .create.card .button{
 	border:1px solid #00ba7b;
+}
+.create.card div:not(.switch) label {
+	color:white;
 }
 
 /* Default card */
@@ -278,4 +284,10 @@ a.app i{
 }
 .card section{
 background-color: #ddd;
+}
+.card:not(.create) .button{
+	opacity:0.1;
+}
+.card:hover .button{
+	opacity:1;
 }

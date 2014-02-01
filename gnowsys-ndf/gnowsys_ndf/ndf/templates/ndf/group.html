@@ -17,7 +17,7 @@
 <header class="row">
     <h2 class="medium-12 columns">Groups</h2>
     <div class="medium-12 columns">
-               <dl class="tabs" data-tab>
+       <dl class="tabs" data-tab>
           <dd class="active"><a href="#panel2-1">Active Groups</a></dd>
           <dd><a href="#panel2-2">Latest Groups</a></dd>
           <dd><a href="#panel2-3">Special Groups</a></dd>
@@ -34,37 +34,59 @@
 
     <li class="create card">
         <div>
-        <h4>New Group <i class="fi-plus right"></i></h4>
+            <h4>New Group <i class="fi-plus right"></i></h4>
             <div class="row">
                 <div class="large-12 columns">
+
                   <input type="text" placeholder="Name of the Group" />
                   <textarea placeholder="Describe the Group"></textarea>
-              </div>
-              </div>
-          {% if user.is_authenticated %}
+                  <input id="ANONYMOUS" type="checkbox"><label for="ANONYMOUS">Anonymous (No login required)</label>
+
+                  <div class="login-mode switch round">
+
+                    <input id="PRIVATE" name="login-mode" type="radio">
+                    <label for="PRIVATE" onclick="">Private Group</label>
+
+                    <input id="PUBLIC" name="login-mode" type="radio" checked>
+                    <label for="PUBLIC" onclick="">Public Group</label>
+
+                    <span></span>
+                    <script>
+
+                        $("#ANONYMOUS").change(function(){
+                            /* Hide type group type options if anonymous*/
+                            $(".login-mode").slideToggle();     
+                        });
+                    </script>
+
+                </div>
+
+            </div>
+        </div>
+        {% if user.is_authenticated %}
         <a class="button expand" href="{% url 'create_group' 'group' %}">
             Create Group
         </a>
         {% endif %}
-  </li>
+    </li>
 
-  {% for node in group_nodes %}
-  <li class="card">
-    <a href="/{{node}}">
-        <header>
-            <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
-            <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-            <h4>{{ node }}</h4>
-            <small>Created <em>33 days ago</em></small>
-        </header>
-        <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
-        <div class="button expand">Join Group</div> 
-        <footer class="row">
-         <div class="small-6 columns"><strong>24</strong> Members</div>
-         <div class="small-6 columns"><strong>56</strong> Objects</div> 
-     </footer>
+    {% for node in group_nodes %}
+    <li class="card">
+        <a href="/{{node}}">
+            <header>
+                <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
+                <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+                <h4>{{ node }}</h4>
+                <small>Created <em>33 days ago</em></small>
+            </header>
+            <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
+            <div class="button expand">Join Group</div> 
+            <footer class="row">
+             <div class="small-6 columns"><strong>24</strong> Members</div>
+             <div class="small-6 columns"><strong>56</strong> Objects</div> 
+         </footer>
 
- </a>
+     </a>
     <!--
     Member Of   : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>
