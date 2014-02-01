@@ -13,13 +13,14 @@
 <header class="row">
     <h2 class="medium-12 columns">Groups</h2>
     <div class="medium-12 columns">
-     <dl class="tabs" data-tab>
-      <dd class="active"><a href="#panel2-1">Active Groups ({{ group_nodes_count }})</a></dd>
-      <dd><a href="#panel2-3">Special Groups</a></dd>
-      <dd><a href="#panel2-4">Group Tree</a></dd>
-  </dl>
+        
+       <dl class="tabs" data-tab>
+          <dd class="active"><a href="#panel2-1">Active Groups ({{ group_nodes_count }})</a></dd>
+          <dd><a href="#panel2-3">Special Groups</a></dd>
+          <dd><a href="#panel2-4">Group Tree</a></dd>
+      </dl>
 
-</div>
+  </div>
 </header>
 
 
@@ -69,20 +70,23 @@
     {% for node in group_nodes %}
     <li class="card">
         <a class="group" ref="/{{node}}">
+
             <header>
                 <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
                 <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
                 <h4>{{ node }}</h4>
                 <small>Created <em>33 days ago</em></small>
             </header>
+
             <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
             <div class="button expand">Join Group</div> 
-            <footer class="row">
-               <div class="small-6 columns"><strong>24</strong> Members</div>
-               <div class="small-6 columns"><strong>56</strong> Objects</div> 
-           </footer>
 
-       </a>
+            <footer class="row">
+             <div class="small-6 columns"><strong>24</strong> Members</div>
+             <div class="small-6 columns"><strong>56</strong> Objects</div> 
+         </footer>
+
+     </a>
     <!--
     Member Of   : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>

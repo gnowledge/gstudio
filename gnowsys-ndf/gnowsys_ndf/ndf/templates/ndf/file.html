@@ -7,30 +7,38 @@
 {% endblock %}
 
 {% block search_content %}
-
 <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
 
-      <div class="row collapse">
-        <div class="small-8 columns">
-          <input type="text" placeholder="search files" name="search">
-        </div>
-        <div class="small-2 columns">
-          <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
-            <i class="fi-magnifying-glass large">search</i>
-          </a>
-        </div>
-        <div class="small-2 columns">
-          <a href="{% url 'uploadDoc' group_name %}?next={{request.path}}" class="button postfix secondary">
-            <i class="fi-paperclip">upload</i>
-          </a>
-        </div>
-      </div>
+  <div class="row collapse">
+    <div class="small-10 columns">
+      <input type="text" placeholder="search files" name="search">
+    </div>
+    <div class="small-2 columns">
+      <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
+        <i class="fi-magnifying-glass large"></i>
+      </a>
+    </div>
+  </div>
 
 </form>
 
 {% endblock %}
 
 {% block body_content %}
+
+<header class="row">
+  <h2 class="medium-12 columns">Gallery</h2>
+  <div class="medium-12 columns">
+   <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1">All files</a></dd>
+    <dd><a href="#panel2-3">Documents</a></dd>
+    <dd><a href="#panel2-3">Images</a></dd>
+    <dd><a href="#panel2-4">Videos</a></dd>
+  </dl>
+
+</div>
+</header>
+
 {% load ndf_tags %}
 {% if already_uploaded %} 
 <div id="message">
@@ -51,42 +59,35 @@
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-    <!-- Node create card-->
-    <li class="create card">
-        <div class="file">
-            <h4><i class="fi-plus"></i> New</h4>
-            <div class="row">
-                <div class="large-12 columns">
+  <!-- Node create card-->
+  <li class="create card">
+    <div class="file">
+      <h4><i class="fi-plus"></i> New Upload</h4>
+      <div class="row">
+        <div class="large-12 columns">
 
-                  <input type="text" placeholder="Name of the File" />
-                  <textarea placeholder="Describe the File"></textarea>
-                  <input id="ANONYMOUS" type="checkbox"><label for="ANONYMOUS">Anonymous (No login required)</label>
+          <input type="text" placeholder="Name of the File" />
+          <textarea placeholder="Describe the File"></textarea>
 
-                  <div class="login-mode switch round">
+          <div class="login-mode switch round">
 
-                    <input id="PUBLIC" name="login-mode" type="radio" checked>
-                    <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+            <input id="PUBLIC" name="login-mode" type="radio" checked>
+            <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
 
-                    <input id="PRIVATE" name="login-mode" type="radio">
-                    <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+            <input id="PRIVATE" name="login-mode" type="radio">
+            <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
 
-                    <span></span>
+            <span></span>
 
-                </div>
-                <script>
+          </div>
 
-                    $("#ANONYMOUS").change(function(){
-                        /* Hide type group type options if anonymous*/
-                        $(".login-mode").slideToggle();     
-                    });
-                </script>
-            </div>
         </div>
-        {% if user.is_authenticated %}
-        <a class="button expand" href="{% url 'create_group' 'group' %}">
-            Create Group
-        </a>
-        {% endif %}
+      </div>
+      {% if user.is_authenticated %}
+      <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+        Upload File
+      </a>
+      {% endif %}
     </li>
 
     <!-- Existing card list-->
@@ -94,34 +95,39 @@
     {% get_user_object file.created_by as user_obj %}
     {% get_grid_fs_object file as grid_fs_obj %}
     <li class="card">
-        <div class="file">
+      <div class="file">
 
-            <header>
-                <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
-                <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-                <h4>{{file.name}}</h4>
-                <small>Created <em>33 days ago</em></small>
-            </header>
-            <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
-            <a class="button expand" href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">File details</a>
-            {% get_user_object file.created_by as user_obj %}
-       {% ifequal  user_obj.username  user.username  %}
-       <a  class="button alert tiny" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
-       {% endifequal %}
-            <footer class="row">
-               <div class="small-6 columns">{{file.mime_type}}</div>
-               <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
-           </footer>
+        <header>
 
-       </div>
-</li>
+          <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
+          <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+          <h4>{{file.name}}</h4>
+          <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
 
-{% endfor %}
+        </header>
 
-{% else %}
-<p><em>Currently NO files uploaded!!!</em></p>
-{% endif %}
-</ul>
+        <p>This file is a..</p>
 
-{% endblock %}
+        <a class="button expand" href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">File details</a>
+        {% get_user_object file.created_by as user_obj %}
+        {% ifequal  user_obj.username  user.username  %}
+        <a  class="button alert tiny" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
+        {% endifequal %}
+
+        <footer class="row">
+         <div class="small-6 columns">{{file.mime_type}}</div>
+         <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
+       </footer>
+
+     </div>
+   </li>
+
+   {% endfor %}
+
+   {% else %}
+   <p><em>Currently NO files uploaded!!!</em></p>
+   {% endif %}
+ </ul>
+
+ {% endblock %}
 
