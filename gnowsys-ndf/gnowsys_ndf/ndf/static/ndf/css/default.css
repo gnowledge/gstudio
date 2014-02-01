@@ -161,7 +161,7 @@ main .button:hover{
 /* Content area */
 article{
 	margin-top: 1rem;
-	background-color: #f9f9f9;
+	background-color: #f5f5f5;
 	border:solid 1px #ddd;
 	padding-bottom: 20px; 
 }
@@ -226,11 +226,11 @@ a.app i{
 
 
 /* Card block */
-.card>a{
+.card>*{
 	position: relative;
 	background-color: white;
 	margin:2px;
-	padding:5px;
+	padding:10px;
 	border: 1px solid #eaeaea;
 	display: block;
 	color:inherit;
@@ -238,12 +238,28 @@ a.app i{
 	box-shadow: 2px 2px 4px 1px #ddd;
 	opacity:0.8;
 }
-.card>a:hover{
+.card>*:hover{
 	border: 1px solid #ddd;
 	opacity:1;
 }
+/* Create card */
+.create.card>*{
+	background-color: #008759;
+	opacity:1;
+}
+.create.card h4{
+	color:white;
+}
+.create.card .button{
+	border:1px solid #00ba7b;
+}
+
+/* Default card */
 .card header{
 	text-align: center;
+}
+.card h4{
+	font-weight: bold;
 }
 .card .th{
 	margin:30px auto;
