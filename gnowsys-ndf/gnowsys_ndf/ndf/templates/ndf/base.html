@@ -184,9 +184,10 @@
 				<!-- Off Canvas Meta Map -->
 				<aside class="left-off-canvas-menu">
 					<!-- whatever you want goes here -->
-					<h4>Prior nodes</h4>
+					<h4>Read this first</h4>
 					<ul class="off-canvas-list">
-						<li><a href="#">Item 1</a></li>
+						<li><a href="#">Help Topics</a></li>
+						<li><a href="#">Prior Nodes</a></li>
 					</ul>
 				</aside>
 
@@ -310,6 +311,10 @@
 		$(".card .page").prepend(function(){
 			/* Attaches icon for node type */
 			return "<i class='fi-page'></i>"
+		});
+		$(".card .file").prepend(function(){
+			/* Attaches icon for node type */
+			return "<i class='fi-play-video'></i>"
 		});
 
 
