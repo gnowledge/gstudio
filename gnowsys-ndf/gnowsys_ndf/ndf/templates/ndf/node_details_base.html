@@ -3,150 +3,138 @@
 {% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
 {% block head %}
 
-  <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        inlineMath: [['$','$'], ['\\(','\\)']],
-        displayMath: [['\\[','\\]'], ['$$','$$']]
-      }
-    });
-  </script>
+<!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['\\[','\\]'], ['$$','$$']]
+    }
+  });
+</script>
 
-  <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
-  <script type="text/javascript"
-	  src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-  </script>
+<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+<script type="text/javascript"
+src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 {% endblock %}
 
 {% block meta_content %}
+<!--This content possible comes from page_details.html-->
+<p>
+  {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
+</p>
+<p>
+  Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
+</p>
+<p>
+  Last update: {{ node.last_update|date:"j F Y" }}
+</p>
+<p>
+  Version{{ node.version_dict|length|pluralize }}: 
+  {% for seq_no, version_no in node.version_dict.items reversed %}
+  <abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+  {% endfor %}
+</p>
+
 {% endblock %}
 
 {% block related_content %}
 
 {% if node.collection_dict|length > 0 %}
-    <h3>Collection</h3>
-    
-    {% for index_key, each_node in node.collection_dict.items %}
-     {% get_grid_fs_object each_node as grid_fs_obj %}
-    {% if each_node.mime_type %}
-          {% if each_node.collection_set %}
-          <li class="list" style="list-style-type:none;">
-      <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-      <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
-         </li>
-          {% else %}
-          <li class="list" style="list-style-type:none;">
-            <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+<h3>Collection</h3>
 
-      <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
-         </li>
-          {% endif %}
-    {% else %}
-          {% if each_node.collection_set %}
-          <li class="list" style="list-style-type:none;">
-      <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-      <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
-          </li>
-          {% else %}
-          <li class="list" style="list-style-type:none;">
-            <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-      <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
-          </li>
-          {% endif %}
-    {% endif %}
-    {% endfor %}
+{% for index_key, each_node in node.collection_dict.items %}
+{% get_grid_fs_object each_node as grid_fs_obj %}
+{% if each_node.mime_type %}
+{% if each_node.collection_set %}
+<li class="list" style="list-style-type:none;">
+  <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+  <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
+</li>
+{% else %}
+<li class="list" style="list-style-type:none;">
+  <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
 
-      {% endif %}
+  <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
+</li>
+{% endif %}
+{% else %}
+{% if each_node.collection_set %}
+<li class="list" style="list-style-type:none;">
+  <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+  <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+</li>
+{% else %}
+<li class="list" style="list-style-type:none;">
+  <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+  <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+</li>
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{% endif %}
 
 {% endblock %}
 
 {% block body_content %}
-
-<!-- Outer Main Row -->
-<div class="row">
-
-  <!-- Outer Main Column -->
-  <div class="small-12 columns" style="padding-top:10px;">
-
-    <!-- Inner Main Row -->
-    <div class="row">
-
-      <div class="small-12 columns">
-	<ul class="inline-list">
-	  <li><h3>{{node.name}}</h3></li>
-	  {% if user.is_authenticated %}
-	  <li><a href="{% block url %}{% endblock %}" class="button tiny">Edit</a></li>
-	  {% block add_list %}{% endblock %}
-	  {% endif %}
-	</ul>
-	<p>
-	  {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
-	</p>
-	<p>
-	  Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
-	</p>
-	<p>
-	  Last update: {{ node.last_update|date:"j F Y" }}
-	</p>
-	<p>
-	  Version{{ node.version_dict|length|pluralize }}: 
-	  {% for seq_no, version_no in node.version_dict.items reversed %}
-	  <abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
-	  {% endfor %}
-	</p>
-	{% if node.tags|length > 0 %}
-	<p>
-	  Tag{{ node.tags|length|pluralize }}: 
-          {% for tag in node.tags %}
-            <span class="radius label">{{tag}}</span>
-          {% endfor %}
-	</p>
-	{% endif %}
-	<hr style="border-width:1.4px; border-color:black;"/>
-      </div>
-
-      {% if node.prior_node|length > 0 %}
-      <div class="small-12 columns">
-	<fieldset>
-	  <legend><h5><strong>Things to know before going ahead</strong></h5></legend>
-	  {% for index_key, each_node in node.prior_node_dict.items %}
-	  {% get_grid_fs_object each_node as grid_fs_obj %}
-	  {% if each_node.mime_type %}
-          <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-	  {% else %}
-          <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-	  {% endif %}
-	  {% endfor %}
-	</fieldset>
-      </div>
-      {% endif %}
-
-      <div class="small-12 columns">
-	{% block add_fields %} {% endblock %}
-      </div>
-
-      {% with node.html_content|safe as description %}
-      {% if description != "None" %}
-      <div class="small-12 columns">
-	<div class="panel callout radius">
-	  {{ description }}
-	</div>
-      </div>
-      {% endif %}
-      {% endwith %}
-
-      
-
-    </div>
-    <!-- End: Inner Main Row -->
+<header class="row page">
+  <h2 class="medium-12 columns">{{node.name}} <div><small>Updated on {{ node.last_update|date:"j F Y" }} by <a class="user">User</a></small></div></h2>
+  <div class="medium-12 columns">
+    <a href="{% block url %}{% endblock %}" class="button edit left">Edit</a>
+    <dl class="tabs" data-tab>
+      <dd><a href="#panel2-3"><i class="fi-rewind"></i> Revision</a></dd>
+    </dl>
 
   </div>
-  <!-- End: Outer Main Column -->
+</header>
 
+<!-- Outer Main Row -->
+<ul class="inline-list">
+
+ {% if user.is_authenticated %}
+ {% block add_list %}{% endblock %}
+ {% endif %}
+</ul>
+
+{% if node.tags|length > 0 %}
+<p>
+  Tag{{ node.tags|length|pluralize }}: 
+  {% for tag in node.tags %}
+  <span class="radius label">{{tag}}</span>
+  {% endfor %}
+</p>
+{% endif %}
+
+
+{% if node.prior_node|length > 0 %}
+<fieldset>
+ <legend><h5><strong>Things to know before going ahead</strong></h5></legend>
+ {% for index_key, each_node in node.prior_node_dict.items %}
+ {% get_grid_fs_object each_node as grid_fs_obj %}
+ {% if each_node.mime_type %}
+ <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+ {% else %}
+ <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+ {% endif %}
+ {% endfor %}
+</fieldset>
+{% endif %}
+
+{% block add_fields %} {% endblock %}
+
+
+{% with node.html_content|safe as description %}
+{% if description != "None" %}
+<div class="card">
+ {{ description }}
 </div>
-<!-- End: Outer Main Row -->
+{% endif %}
+{% endwith %}
+
+
 
 
 {% endblock %}

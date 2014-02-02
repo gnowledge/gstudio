@@ -296,11 +296,15 @@ article>header{
 	margin-bottom:2rem!important;
 }
 
-article>header h2{
+article h2{
 	color: white;
 	margin-top:1rem;
 	padding-bottom: 8px;
 	background-color: rgba(0,0,0,0.2);
+}
+article h2 small{
+	font-size: 40%;
+	color:white;
 }
 
 pre{
@@ -321,7 +325,9 @@ textarea{
 
 /*************************** 3. Custom CSS Below ***********************/
 
-
+.user{
+	color: inherit;
+}
 .user i{
 	padding: 0.2em 0.5em;
 	margin-right:0.4em;
@@ -341,5 +347,7 @@ a.app i{
 	color:white;
 	margin-right:8px;
 }
-
+.button.edit{
+	margin-bottom: 0;
+}
 
