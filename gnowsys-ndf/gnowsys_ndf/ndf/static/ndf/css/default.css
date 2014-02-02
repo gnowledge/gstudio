@@ -262,6 +262,8 @@ aside>section>div{
 aside>section h3,aside>section h4,aside>section h5 {
 	color:white;
 }
+aside .meta i{color: #ccc;}
+aside:hover .meta i{color: white;}
 
 main .button{
 	background-color:#008759 ;
