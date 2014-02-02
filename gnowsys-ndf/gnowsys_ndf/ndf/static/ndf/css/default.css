@@ -253,6 +253,7 @@ aside>section{
 	-webkit-box-shadow: 2px 2px 4px 1px #bbb;
 	box-shadow: 2px 2px 4px 1px #bbb;
 	color:white;
+	padding-bottom: 3rem;
 }
 
 aside>section>div{
@@ -328,11 +329,18 @@ textarea{
 .user{
 	color: inherit;
 }
+.user{
+	color: inherit;
+}
 .user i{
 	padding: 0.2em 0.5em;
 	margin-right:0.4em;
 	color:white;
 	background-color:#ddd;
+	opacity:0.8;
+}
+.user:hover i{
+	opacity:1;
 }
 
 a.node{
@@ -351,3 +359,25 @@ a.app i{
 	margin-bottom: 0;
 }
 
+/* Sidebar Search Results */
+main .search{
+	margin:0;
+}
+main .search div>*{
+	margin: 0;
+}
+#search-results{
+	list-style: none;
+	margin:0;
+}
+#search-results li{
+
+}
+#search-results a{
+	background-color: black;
+	padding: 0.5rem;
+	display: block;
+}
+#search-results a:hover{
+	background-color: #444;
+}

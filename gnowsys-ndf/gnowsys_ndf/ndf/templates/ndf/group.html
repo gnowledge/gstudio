@@ -15,15 +15,15 @@
 
 {% block body_content %} 
 <header class="row">
-    <h2 class="medium-12 columns">Groups</h2>
-    <div class="medium-12 columns">
-        
-       <dl class="tabs" data-tab>
-          <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
-          <dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>
-      </dl>
+  <h2 class="medium-12 columns">Groups</h2>
+  <div class="medium-12 columns">
 
-  </div>
+   <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
+    <dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>
+  </dl>
+
+</div>
 </header>
 
 
@@ -31,74 +31,75 @@
 {% load url from future %}
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-    <!-- Node create card-->
-    <li class="create card">
-        <div class="group">
-            <h4><i class="fi-plus"></i> New</h4>
-            <div class="row">
-                <div class="large-12 columns">
+  <!-- Node create card-->
+  <li class="create card">
+    <div class="group">
+      <h4><i class="fi-plus"></i> New</h4>
+      <div class="row">
+        <div class="large-12 columns">
 
-                  <input type="text" placeholder="Name of the Group" />
-                  <textarea placeholder="Describe the Group"></textarea>
-                  <input id="ANONYMOUS" type="checkbox"><label for="ANONYMOUS">Anonymous (No login required)</label>
+          <input type="text" placeholder="Name of the Group" />
+          <textarea placeholder="Describe the Group"></textarea>
+          <input id="ANONYMOUS" type="checkbox"><label for="ANONYMOUS">Anonymous (No login required)</label>
 
-                  <div class="login-mode switch round">
+          <div class="login-mode switch round">
 
-                    <input id="PUBLIC" name="login-mode" type="radio" checked>
-                    <label for="PUBLIC" onclick="">Public Group <i class="fi-torsos-all"></i></label>
+            <input id="PUBLIC" name="login-mode" type="radio" checked>
+            <label for="PUBLIC" onclick="">Public Group <i class="fi-torsos-all"></i></label>
 
-                    <input id="PRIVATE" name="login-mode" type="radio">
-                    <label for="PRIVATE" onclick="">Private Group <i class="fi-lock"></i></label>
+            <input id="PRIVATE" name="login-mode" type="radio">
+            <label for="PRIVATE" onclick="">Private Group <i class="fi-lock"></i></label>
 
-                    <span></span>
+            <span></span>
 
-                </div>
-                <script>
+          </div>
+          <script>
 
-                    $("#ANONYMOUS").change(function(){
-                        /* Hide type group type options if anonymous*/
-                        $(".login-mode").slideToggle();     
-                    });
-                </script>
-            </div>
+            $("#ANONYMOUS").change(function(){
+              /* Hide type group type options if anonymous*/
+              $(".login-mode").slideToggle();     
+            });
+          </script>
         </div>
-        {% if user.is_authenticated %}
-        <a class="button expand" href="{% url 'create_group' 'group' %}">
-            Create Group
-        </a>
-        {% endif %}
+      </div>
+      {% if user.is_authenticated %}
+      <a class="button expand" href="{% url 'create_group' 'group' %}">
+        Create Group
+      </a>
+      {% endif %}
     </li>
 
     <!-- Existing card list-->
     {% for node in group_nodes %}
     <li class="card">
-        <a class="group" ref="/{{node}}">
+      <a class="group" href="/{{node}}">
 
-            <header>
-                <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
-                <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-                <h4>{{ node }}</h4>
-                <small>Created <em>33 days ago</em></small>
-            </header>
+        <header>
+          <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
+          <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+          <h4>{{ node }}</h4>
+          <small>Created <em>33 days ago</em></small>
+        </header>
 
-            <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
-            <div class="button expand">Join Group</div> 
+        <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
+        <div class="button expand">View Group</div> 
 
-            <footer class="row">
-             <div class="small-6 columns"><strong>24</strong> Members</div>
-             <div class="small-6 columns"><strong>56</strong> Objects</div> 
-         </footer>
+        <footer class="row">
+         <div class="small-6 columns"><strong>24</strong> Members</div>
+         <div class="small-6 columns"><strong>56</strong> Objects</div> 
+       </footer>
 
      </a>
     <!--
     Member Of   : {{ node.member_of }}<br>
     Tags       : {{ node.tags|join:", " }}<br>
     <a href="{#% url 'delete_node' node %#}">delete</a>
--->
+  -->
 </li>
 
 {% empty %}
 <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
 {% endfor %}
+
 </ul>
 {% endblock %}
