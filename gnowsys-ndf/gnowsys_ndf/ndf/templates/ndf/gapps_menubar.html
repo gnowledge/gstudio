@@ -20,15 +20,15 @@
 
 	{% comment %} Includes an app icon if found{% endcomment %}
 	{% if app_dict.name|lower == "page" %}
-	<i class='fi-page-filled left'></i>
+	<i class='fi-page left'></i>
 	{% elif app_dict.name|lower == "group" %}
 	<i class='fi-torsos left'></i>
 	{% elif app_dict.name|lower == "file" %}
-	<i class='fi-play-video'></i>
+	<i class='fi-play'></i>
 	{% elif app_dict.name|lower == "forum" %}
 	<i class='fi-comments'></i>
 	{% elif app_dict.name|lower == "course" %}
-	<i class='fi-page-multiple'></i>
+	<i class='fi-book'></i>
 	{% elif app_dict.name|lower == "quiz" %}
 	<i class='fi-graph-bar'></i>
 	{% endif %}

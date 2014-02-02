@@ -4,7 +4,11 @@
 
 
 {% block meta_content %}
-<p>Groups help to arrange your content for a particular set of users. Members can subscribe to updates and even collaborate on content.</p>
+
+<p>Groups are an easy way to share content and conversation, either privately or with the world. Many times, a group already exist for a specific interest or topic. If you can't find one you like, feel free to start your own.</p>
+
+<h5>How do groups work?</h5>
+<p>Groups can either be public, restricted (users may read a brief description or overview but not view content) or completely private. Every group has a wiki, a pool for resources, and a discussion board for talking.</p>
 
 {% endblock %}
 
@@ -15,9 +19,8 @@
     <div class="medium-12 columns">
         
        <dl class="tabs" data-tab>
-          <dd class="active"><a href="#panel2-1">Active Groups ({{ group_nodes_count }})</a></dd>
-          <dd><a href="#panel2-3">Special Groups</a></dd>
-          <dd><a href="#panel2-4">Group Tree</a></dd>
+          <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
+          <dd><a href="#panel2-3"><i class="fi-trophy"></i> Featured Groups</a></dd>
       </dl>
 
   </div>

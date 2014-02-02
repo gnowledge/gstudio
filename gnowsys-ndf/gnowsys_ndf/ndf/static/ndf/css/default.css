@@ -111,9 +111,15 @@ a.right-off-canvas-toggle i{
 /* Content Tabs */
 header .tabs{
 }
+.tabs i{
+	margin-right: 5px;
+	font-size: 1.3rem;
+}
 header .tabs dd a{
 	background-color: inherit ;
 	color: white;
+	padding-top: 0.5rem;
+	padding-bottom: 0.8rem;
 }
 header .tabs dd a:hover{
 	background-color: #008759 ;
@@ -136,13 +142,13 @@ header .tabs dd.active a{
 	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
 	box-shadow: 2px 2px 4px 1px #ddd;
 	opacity:0.8;
-	transition: opacity .5s ease-out;
-    -moz-transition: opacity .5s ease-out;
-    -webkit-transition: opacity .5s ease-out;
-    -o-transition: opacity .5s ease-out;
+	transition: opacity .5s ease-in ease-in;
+	-moz-transition: opacity .5s ease-in;
+	-webkit-transition: opacity .5s ease-in;
+	-o-transition: opacity .5s ease-in;
 
 }
-.card:hover>*{
+.card>*:hover{
 	border: 1px solid #ddd;
 	opacity:1;
 }
@@ -151,7 +157,7 @@ header .tabs dd.active a{
 	background-color: #999;
 	opacity:1;
 }
-.create.card:hover>*{
+.create.card>*:hover{
 	background-color: #008759;
 }
 .create.card h4{
@@ -172,6 +178,7 @@ header .tabs dd.active a{
 	text-align: center;
 }
 .card h4{
+	word-break:break-all;
 	font-weight: bold;
 }
 .card .th{
@@ -190,7 +197,7 @@ header .tabs dd.active a{
 	width: 100%;
 }
 .card section{
-background-color: #ddd;
+	background-color: #ddd;
 }
 .card .button{
 	opacity:0.1;
@@ -198,8 +205,12 @@ background-color: #ddd;
 .card.create .button{
 	opacity:0.5;
 }
-.card:hover .button{
+.card>*:hover .button{
 	opacity:1;
+	transition: opacity .5s ease-in ease-in;
+	-moz-transition: opacity .5s ease-in;
+	-webkit-transition: opacity .5s ease-in;
+	-o-transition: opacity .5s ease-in;
 }
 /* Card icons */
 .card>*>i{
@@ -226,7 +237,7 @@ background-color: #ddd;
 .card .label{
 	opacity:0.5;
 }
-.card:hover .label{
+.card>:hover .label{
 	opacity:1;
 }
 
