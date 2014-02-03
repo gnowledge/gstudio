@@ -45,7 +45,7 @@ $(document).on('click',"#addToList",function() {
            $("#userInvite").val("");
            $("#selectOfInviteUser").show();
            $(".removeList").show()
-           $(".submitUserInvite").show();
+           $("#submitUserInvite").show();
       }
       else{
 $('.responseToInvite').html("select users to invite");
@@ -57,7 +57,7 @@ $('.responseToInvite').css("color","red");
 
 
 
-$(document).on('click',".submitUserInvite",function(){
+$(document).on('click',"#submitUserInvite",function(){
       var listobject, listobjectLength
       list_users=[]
       listobject = selectOfInviteUser.options,
@@ -122,8 +122,7 @@ height:150px;
 
 <input type="button" id="addToList" class="button tiny" value="Add">
 
-<br/>
-<input type="button" class="button small" value="Subscribe" style="display:none"/>
+<input type="button" class="button tiny" id="submitUserInvite" value="Subscribe" style="display:none"/>
 <p class="responseToInvite"></p>
 
 <select id="selectOfInviteUser" multiple="multiple" style="display:none" onchange="handle()">
