@@ -147,8 +147,13 @@ def get_node_common_fields(request, node, group_name, node_type):
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
 
+  #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
-    node.modified_by.append(usrid)
+  #if usrid in node.modified_by:
+    node.modified_by.insert(0,usrid)
+  else:
+    node.modified_by.remove(usrid)
+    node.modified_by.insert(0,usrid)
 
   if group_name not in node.group_set:
     node.group_set.append(group_name)
