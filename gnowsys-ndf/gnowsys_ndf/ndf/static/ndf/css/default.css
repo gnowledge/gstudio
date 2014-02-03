@@ -23,7 +23,7 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 }
 
 
-/* Theme */
+/* Top bar */
 header{
 }
 .top-bar,.top-bar-section ul,body>header{
@@ -66,6 +66,7 @@ header{
 	background-color: #008759!important;
 }
 
+/* Sections */
 main>aside{
 	margin-bottom: 0.5rem;
 }
@@ -126,6 +127,9 @@ header .tabs dd a:hover{
 }
 header .tabs dd.active a{
 	background-color: #008759;
+}
+.tabs-content>.content{/* Overrides tab content floating lef */
+	float: none;
 }
 
 /* Should be in Foundation */
