@@ -43,15 +43,16 @@
                 <div class="small-12 columns">
                   <b> {{value.name}} </b>
                 </div>                
-                <div class="small-12 columns text-left">
+                <div class="small-12 columns text-left" style="padding-top:3px">
                   <i class="posted-by" >{{ value.member_of|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
                 </div>     
               </div>
 
               <div class="row">
-                <div class="small-12 columns text-left" style="padding-top:5px;">
-		  {{ value.html_content|removetags:"h1 p"|safe|truncatewords:12 }}
-                </div>  
+
+               <div class="small-12 columns text-left" style="padding-top:5px;">
+		 {{ value.html_content|safe|striptags|truncatechars:50 }}
+               </div>  
               </div>
             </div>
           </div>
@@ -119,9 +120,9 @@
 
             <div class="row">
               <div class="small-12 columns text-left" style="padding-top:5px;">
-		{{ value.html_content|removetags:"h1 p"|safe|truncatewords:12 }}
-              </div>  
-            </div>
+		{{ value.html_content|safe|striptags|truncatechars:50 }}
+              </div>
+           </div>
           </div>
         </div>
 
