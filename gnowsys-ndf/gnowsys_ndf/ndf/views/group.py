@@ -65,8 +65,9 @@ def create_group(request,group_name):
         colg.visibility_policy = request.POST.get('existance', "")
         colg.disclosure_policy = request.POST.get('member', "")
         colg.encryption_policy = request.POST.get('encryption', "")
+        print "sub Pol",colg.subscription_policy
         colg.save()
-        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg},context_instance=RequestContext(request))
+        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", RequestContext(request))
     
 
@@ -77,7 +78,7 @@ def group_dashboard(request,group_name):
     except:
         groupobj=""
         pass
-    return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'node':groupobj},context_instance=RequestContext(request))
+    return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'node':groupobj,'user':request.user},context_instance=RequestContext(request))
 
 def edit_group(request,group_name,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
