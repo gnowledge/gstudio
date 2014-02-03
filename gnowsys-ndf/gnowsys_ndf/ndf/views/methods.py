@@ -177,6 +177,7 @@ def get_node_common_fields(request, node, group_name, node_type):
       collection_list = collection_list.split(",")
 
   i = 0                    
+
   while (i < len(collection_list)):
     node_id = ObjectId(collection_list[i])
     
@@ -184,6 +185,7 @@ def get_node_common_fields(request, node, group_name, node_type):
       node.collection_set.append(node_id)
     
     i = i+1  
+
       
   # ------------------------------------------------------------------------------- org-content
   if content_org:
@@ -194,4 +196,59 @@ def get_node_common_fields(request, node, group_name, node_type):
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
 
-  
+
+
+# ------ Some work for graph ------
+def neighbourhood_nodes(page_node):
+
+  collection = db[Node.collection_name]
+        
+  gs = collection.Node.find( {'$or':[{'_type':'GSystem'},{'_type':'File'}]}  )
+  gs_cur = []
+
+  for each in gs:
+      gs_cur.append(each)
+
+  gs.rewind()
+
+  flag = False
+
+  # Initiate and append this line compulsory for viewing node.
+  graphData = '{"name":"'+ page_node.name +'", "degree":1, "children":['
+
+  # Scan each document in cursor 'gs'
+  for val in gs:
+    
+    # If vieving page _id exist in collection set of current document
+    if page_node._id in val.collection_set:
+      
+      flag = True      
+      # Start adding children 
+      graphData += '{"name":"'+ val.name +'","degree" : 2'   #},'
+      
+      # If there is only one matching item in collection set
+      if len(val.collection_set) == 1:
+        graphData += '},'
+        
+      # If there is more than one _id in collection set, start adding children of children.
+      elif len(val.collection_set) > 1:
+        graphData += ', "children":['
+        
+        for each in val.collection_set:
+          node_name = (filter( lambda x: x['_id'] == each, gs_cur ))[0].name
+          
+          # Escape name matching current page node name
+          if(page_node._id == each):
+            pass
+          else:
+            graphData += '{"name":"'+ node_name + '"},'
+
+        graphData = graphData[:-1] + ']},'
+
+  if flag:
+    graphData = graphData[:-1] + ']}' 
+  else:
+    graphData += ']}' 
+
+  return graphData
+# ------ End of processing for graph ------
