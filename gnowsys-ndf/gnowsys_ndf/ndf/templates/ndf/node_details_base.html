@@ -135,8 +135,13 @@ Updated on {{ node.last_update|date:"j F Y" }} by <a class="user">User</a><br>
 {% endif %}
 {% endwith %}
 
-
-
+  <!--  ###### Graph ###### -->      
+  <div class="row">
+    <div class="small-12 columns" id="graph-div">
+      {% include "ndf/relational_graph.html" with graphData=graphData %}        
+    </div>
+  </div>
+    <!--  ###### Graph ###### -->
 
 {% endblock %}
 
