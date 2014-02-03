@@ -30,10 +30,11 @@
   <h2 class="medium-12 columns">Gallery</h2>
   <div class="medium-12 columns">
    <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1">All files</a></dd>
-    <dd><a href="#panel2-3">Documents</a></dd>
-    <dd><a href="#panel2-3">Images</a></dd>
-    <dd><a href="#panel2-4">Videos</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All files</a></dd>
+    <dd><a href="#panel2-3"><i class="fi-page-filled"></i> Documents</a></dd>
+    <dd><a href="#panel2-3"><i class="fi-camera"></i>Images</a></dd>
+    <dd><a href="#panel2-4"><i class="fi-video"></i> Videos</a></dd>
+    <dd><a href="#panel2-4"><i class="fi-list-thumbnails"></i> File list</a></dd>
   </dl>
 
 </div>
@@ -52,7 +53,6 @@
 {% endif %}
 
 {% load url from future %}
-{% if files.count != 0 %}
 
 
 <!-- Card -->
@@ -90,6 +90,7 @@
       {% endif %}
     </li>
 
+{% if files.count != 0 %}
     <!-- Existing card list-->
     {% for file in files %}
     {% get_user_object file.created_by as user_obj %}

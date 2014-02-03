@@ -5,25 +5,15 @@
 
 {% block head %}
 <script type="text/javascript">
-
-
-  function hide_btn(label)
-  // Looks like this section needs a rewrite using jQuery
-  {
+//function to toggle the lable Join and Unsubscribe
+function change_label(label)
+{
     if(label == "Join")
-    {
-
-     document.getElementById('remove').style.visibility = 'visible'
-     document.getElementById('notify').style.visibility = 'hidden'
-
-   }
-   else
-   {
-     document.getElementById('notify').style.visibility = 'visible'
-// document.getElementById('notify').style.marginTop = '-32px'
-document.getElementById('remove').style.visibility = 'hidden'
+    { $("#notify").val("Unsubscribe");}
+    else
+    { $("#notify").val("Join");}
 }
-}
+//function for sending notifications for Join and Unsubscribe
 function notify(group,activity)
 {
 
@@ -49,18 +39,22 @@ function notify(group,activity)
 
 $(document).ready(function()
 {
-  // Please document this piece of code
-  document.getElementById('notify').style.marginTop = '-35px'
-  var groupn=$("#groupname").val();
+  var groupn = $("#groupname").val();
+  var label = $("#notify").val();
   $("#notify").click(function(){
-    hide_btn("Join")
-    notify(groupn,"join");
-  });
-  $("#remove").click(function(){
-    hide_btn("Remove");
-    notify(groupn,"remove")
-  });
-});
+   if (label == "Join")
+    {
+     notify(groupn,"join");
+    change_label("Join");
+    label="Unsubscribed"
+    }
+    else {
+      notify(groupn,"remove");
+      change_label("remove");
+      label="Join"
+    }
+  }); //end notify_click()
+}); //end document_ready()
 
 </script>
 {% endblock %}
@@ -74,46 +68,26 @@ $(document).ready(function()
 {% block meta_content %}
 
 <h3>Group Details</h3>
-<p> Members in this group : 0 </p>
-
-<!-- Code needs optimization -->
-<div style='display:table;  border:1px;   border-spacing:10px; '>
-  <div style='display:table-row;' >
-   {% if policy == "OPEN" or group == "home"  %}
-   {% check_user_join request group as user_is_joined %}
-
-   <div style='display:table-cell;' colspan='5' align="middle">
-     <input type="hidden" id="groupname" value="{{group}}">
-     {% if user_is_joined == "joined" %}
-     <input type="submit" id="remove" value="Unsubscribe" class="button" align="center" style="visibility:visible">
-     <input type="submit" id="notify" value="Join" class="button" align="center" style="visibility:hidden" >
-
-     {% elif user_is_joined == "not"  %}
-     <input type="submit" id="remove" value="Unsubscribe" class="button" align="center" style="visibility:hidden">
-     <input type="submit" id="notify"value="Join" class="button" align="center" style="visibility:visible" >
-
-     {% endif %}
-     {% if user_is_joined == "author" %}
-     Group Owner
+<p> Members in this group :{{node.author_set|length}} </p>
+{% get_group_name request.path as group %}
+{% get_group_policy group request.user as policy %}
+{% check_user_join request group as user_is_joined %}
+<input type="hidden" id="groupname" value="{{group}}">
+{% if user_is_joined == "joined" %}
+     <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible" >
+{% elif user_is_joined == "not"  %}
+     <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
+{% endif %}
+{% get_user_object node.created_by as user_obj %}
+{% ifequal  user_obj.username  user.username  %}
+     <b>     You are the owner of this group</b>
      {% include "ndf/invite_users.html" %}   
-     {% endif %}    
-
-   </div> 
-   {% endif %}
- </div>
- <div class="divinvite" style='display:table-row; visibility :hidden '>
-  invite
-</div>
-
-</div>
-
+{% endifequal %}    
 {% endblock %}
 
 {% block body_content %}
-{% get_group_name request.path as group %}
 
 
-{% get_group_policy group request.user as policy %}
 
 
 
