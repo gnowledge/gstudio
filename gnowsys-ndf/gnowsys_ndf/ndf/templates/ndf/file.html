@@ -30,105 +30,129 @@
   <h2 class="medium-12 columns">Gallery</h2>
   <div class="medium-12 columns">
    <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All files</a></dd>
+    <dd class="active"><a href="#view-all"><i class="fi-eye"></i> All files</a></dd>
     <dd><a href="#panel2-3"><i class="fi-page-filled"></i> Documents</a></dd>
-    <dd><a href="#panel2-3"><i class="fi-camera"></i>Images</a></dd>
+    <dd><a href="#view-image"><i class="fi-camera"></i>Images</a></dd>
     <dd><a href="#panel2-4"><i class="fi-video"></i> Videos</a></dd>
     <dd><a href="#panel2-4"><i class="fi-list-thumbnails"></i> File list</a></dd>
   </dl>
-
 </div>
 </header>
 
-{% load ndf_tags %}
-{% if already_uploaded %} 
-<div id="message">
-  <span style="color:red">Listed below files are already uploaded please choose different files</span>
-  <ul>
-    {% for each in already_uploaded %}
-    <li>{{each}}</li>
-    {% endfor %}
-  </ul>
-</div>
-{% endif %}
+<div class="tabs-content">
 
-{% load url from future %}
+  <!-- View 1 -->
+    {% load ndf_tags %}
+    {% if already_uploaded %} 
+    <div id="message">
+      <span style="color:red">Listed below files are already uploaded please choose different files</span>
+      <ul>
+        {% for each in already_uploaded %}
+        <li>{{each}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% load url from future %}
 
 
-<!-- Card -->
+    <!-- Card -->
+<div class="content active" id="view-all">
+    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+      <!-- Node create card-->
+      <li class="create card">
+        <div class="file">
+          <h4><i class="fi-plus"></i> New Upload</h4>
+          <div class="row">
+            <div class="large-12 columns">
 
-  <!-- Node create card-->
-  <li class="create card">
-    <div class="file">
-      <h4><i class="fi-plus"></i> New Upload</h4>
-      <div class="row">
-        <div class="large-12 columns">
+              <input type="text" placeholder="Name of the File" />
+              <textarea placeholder="Describe the File"></textarea>
 
-          <input type="text" placeholder="Name of the File" />
-          <textarea placeholder="Describe the File"></textarea>
+              <div class="login-mode switch round">
 
-          <div class="login-mode switch round">
+                <input id="PUBLIC" name="login-mode" type="radio" checked>
+                <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
 
-            <input id="PUBLIC" name="login-mode" type="radio" checked>
-            <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+                <input id="PRIVATE" name="login-mode" type="radio">
+                <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
 
-            <input id="PRIVATE" name="login-mode" type="radio">
-            <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+                <span></span>
 
-            <span></span>
+              </div>
 
+            </div>
           </div>
+          {% if user.is_authenticated %}
+          <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+            Upload File
+          </a>
+          {% endif %}
+        </li>
 
-        </div>
-      </div>
-      {% if user.is_authenticated %}
-      <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
-        Upload File
-      </a>
-      {% endif %}
-    </li>
-
-{% if files.count != 0 %}
-    <!-- Existing card list-->
-    {% for file in files %}
-    {% get_user_object file.created_by as user_obj %}
-    {% get_grid_fs_object file as grid_fs_obj %}
-    <li class="card">
-      <div class="file">
-
-        <header>
-
-          <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
-          <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-          <h4>{{file.name}}</h4>
-          <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
-
-        </header>
-
-        <p>This file is a..</p>
-
-        <a class="button expand" href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">File details</a>
+        {% if files.count != 0 %}
+        <!-- Existing card list-->
+        {% for file in files %}
         {% get_user_object file.created_by as user_obj %}
-        {% ifequal  user_obj.username  user.username  %}
-        <a  class="button alert tiny" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
-        {% endifequal %}
+        {% get_grid_fs_object file as grid_fs_obj %}
+        <li class="card">
+          <div class="file">
 
-        <footer class="row">
-         <div class="small-6 columns">{{file.mime_type}}</div>
-         <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
-       </footer>
+            <header>
 
-     </div>
-   </li>
+              <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
+              <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+              <h4>{{file.name}}</h4>
+              <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
 
-   {% endfor %}
+            </header>
 
-   {% else %}
-   <p><em>Currently NO files uploaded!!!</em></p>
-   {% endif %}
- </ul>
+            <p>This file is a..</p>
+
+            <a class="button expand" href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">File details</a>
+            {% get_user_object file.created_by as user_obj %}
+            {% ifequal  user_obj.username  user.username  %}
+            <a  class="button alert tiny" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
+            {% endifequal %}
+
+            <footer class="row">
+             <div class="small-6 columns">{{file.mime_type}}</div>
+             <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
+           </footer>
+
+         </div>
+       </li>
+
+       {% endfor %}
+
+       {% else %}
+       <p><em>Currently NO files uploaded!!!</em></p>
+       {% endif %}
+     </ul>
+   </div>
+
+   <!-- View 2 -->
+   <div class="content" id="view-image">
+     {% for image in imageCollection %}
+  <li  class="clearing-featured-img">
+    <a href="{% url 'get_mid_size_img' group_name image %}">
+      <img  src="{% url 'getImageThumbnail' group_name image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' group_name image %}'>{{image.name}}</a> <script type='text/javascript'>
+                         var angle = 0;
+                         $('.img_rotate').on('click', function() {
+                         angle += 90;
+                         $('.visible-img img').rotate(angle);
+                         });
+                         </script>" >
+      </img>
+    </a>
+  </li>
+  {% endfor %}
+   </div>
+
+ </div>
+
 
  {% endblock %}
 
