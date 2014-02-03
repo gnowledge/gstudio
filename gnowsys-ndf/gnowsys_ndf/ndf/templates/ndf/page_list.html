@@ -2,12 +2,10 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block meta_content %}
+<p>Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.</p>
 
-    <h3>About</h3>
-
-    <p class="text-justify"><b>Pages</b> are just like the page of your notebook. You can write your content here.</p>
-
-    <p><h5>Number of Pages: <b>{{ page_nodes_count }}</b></h5></p>
+<h5>Who can make a page?</h5>
+<p>Anyone with an account can create a new article. When creating a new article, the initial contributor can choose to have a defined list of authors, all of whom can edit the page, or have an open, wiki-like format where anyone can contribute.</p>
 
 {% endblock %}
 
@@ -20,70 +18,115 @@
   </h2>
 
   <div class="medium-12 columns">
-    <!-- Add button -->
-    {% if user.is_authenticated %}
-    <a href="{% url 'page_create_edit' group_name %}" class="button small">+ Add {{title}}</a>
-    {% endif %}
-</div>
+
+  <dl class="tabs" data-tab>
+          <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages ({{ page_nodes_count }})</a></dd>
+          <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
+      </dl>
+
+  </div>
 </header>
 
+<ul class="pricing-table">
 
-    <ul class="pricing-table">
-
-    {% if searching and page_nodes_count > 0 %}
-    <li class="bullet-item text-left">
+  {% if searching and page_nodes_count > 0 %}
+  <li class="bullet-item text-left">
     <div class="row">
       <div class="small-12 columns end">
-	<p>Search Results: <span class="label success round">Found {{page_nodes_count}} {{title|lower}}{{page_nodes_count|pluralize}}.</span></p>
-      </div>
-    </div>
+       <p>Search Results: <span class="label success round">Found {{page_nodes_count}} {{title|lower}}{{page_nodes_count|pluralize}}.</span></p>
+     </div>
+   </div>
+ </li>
+
+ {% elif searching and page_nodes_count == 0 %}
+ <li class="bullet-item text-left">
+  <div class="row">
+    <div class="small-12 columns">
+     <p>Search Results: <span class="label alert">No {{title|lower}}{{page_nodes_count|pluralize}} matched your search criteria!!!</span></p>
+   </div>  
+ </div>  
+</li>
+
+{% endif %}
+
+</ul>
+
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+  <!-- Node create card-->
+ <li class="create card">
+        <div class="page">
+            <h4><i class="fi-plus"></i> New</h4>
+            <div class="row">
+                <div class="large-12 columns">
+
+                  <input type="text" placeholder="Name of the {{title}}" />
+                  <textarea placeholder="Describe the {{title}}"></textarea>
+
+                  <div class="login-mode switch round">
+
+                    <input id="PUBLIC" name="login-mode" type="radio" checked>
+                    <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+                    <input id="PRIVATE" name="login-mode" type="radio">
+                    <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+
+                    <span></span>
+
+                </div>
+
+            </div>
+        </div>
+        {% if user.is_authenticated %}
+        <a class="button expand" href="{% url 'page_create_edit' group_name %}">
+            Create {{title}}
+        </a>
+        {% endif %}
     </li>
 
-    {% elif searching and page_nodes_count == 0 %}
-    <li class="bullet-item text-left">
-    <div class="row">
-      <div class="small-12 columns">
-	<p>Search Results: <span class="label alert">No {{title|lower}}{{page_nodes_count|pluralize}} matched your search criteria!!!</span></p>
-      </div>  
-    </div>  
-    </li>
+<!-- Existing card list-->
+  {% for node in page_nodes %}
+  <li class="card">
+    <a class="page" href="{% url 'page_details' group_name node %}">
+      <header>
+        <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div> <!-- {{ node.tags|join:", " }} -->
 
-    {% endif %}
+        <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+        <h4>{{ node.name }}</h4>
 
-    {% for node in page_nodes %}
-    <li class="bullet-item text-left">
-      <div class="row">
-        <div class="small-5 columns ">
-          <a href="{% url 'page_details' group_name node %}">
-	    <b>{{node.name}}</b>
-	  </a>
-        </div>                
-        <div class="small-7 columns text-right">
+        <small>{{ node.member_of|join:', ' }} created by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> on {{node.created_at|date:"j F Y"}} 
+        </small>
+      </header>
 
-          <i class="label secondary" >{{ node.member_of|join:', ' }} by <a href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</a> on {{node.created_at|date:"j F Y"}} </i>
-        </div>     
-	
-        <div class="small-12 columns" style="padding-top:5px;">
-	  {{ node.html_content|safe|striptags|truncatechars:150 }}
-        </div>  
-      </div>
-    </li>
+      <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
 
-    {% empty %}
+      <div class="button expand">View Page</div> 
+      <footer class="row">
+       <div class="small-6 columns"><strong>2</strong> Contributors</div>
+       <div class="small-6 columns"><strong>9</strong> Changes</div> 
+     </footer>
 
-    {% if not searching %}
-    <li class="bullet-item text-left">
-    <div class="row">
-      <div class="small-12 columns">
-	<p>Currently <b>NO Pages</b>!!!</p>
-      </div>
-    </div>
-    </li>
-    {% endif %}
+   </a>
+ </li>
 
-    {% endfor %}
+ {% empty %}
 
-    </ul>
+ {% if not searching %}
+ <li class="bullet-item text-left">
+  <div class="row">
+    <div class="small-12 columns">
+     <p>Currently <b>NO Pages</b>!!!</p>
+   </div>
+ </div>
+</li>
+{% endif %}
+
+{% endfor %}
+</ul>
+
+
+
 
 
 
