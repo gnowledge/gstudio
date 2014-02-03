@@ -134,6 +134,22 @@ header .tabs dd.active a{
 
 /* Should be in Foundation */
 
+/* Effects */
+.drop-shadow{
+	-webkit-box-shadow: 2px 2px 4px 1px #bbb;
+	box-shadow: 2px 2px 4px 1px #bbb;
+}
+.rounded{
+	border-radius: 2px;
+	-webkit-border-radius:2px;
+}
+.transition-opacity{
+	transition: opacity .5s ease-in ease-in;
+	-moz-transition: opacity .5s ease-in;
+	-webkit-transition: opacity .5s ease-in;
+	-o-transition: opacity .5s ease-in;
+}
+
 /* Card block */
 .card>*{
 	position: relative;
@@ -254,8 +270,6 @@ aside>section{
 	margin:inherit!important;
 	margin-bottom:5px;
 	background-color: #003b27;
-	-webkit-box-shadow: 2px 2px 4px 1px #bbb;
-	box-shadow: 2px 2px 4px 1px #bbb;
 	color:white;
 	padding-bottom: 3rem;
 }
@@ -286,6 +300,11 @@ article{
 }
 
 article>header{
+	border-bottom: 4px solid #008759;
+	color:white;
+	margin-bottom:2rem!important;
+}
+article>header>div{
 	/* Using http://www.colorzilla.com/gradient-editor/ */
 	background: #003b27; /* Old browsers */
 	background: -moz-linear-gradient(-45deg, #003b27 0%, #005700 49%); /* FF3.6+ */
@@ -295,17 +314,13 @@ article>header{
 	background: -ms-linear-gradient(-45deg, #003b27 0%,#005700 49%); /* IE10+ */
 	background: linear-gradient(135deg, #003b27 0%,#005700 49%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#003b27', endColorstr='#005700',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-	
-	border-bottom: 4px solid #008759;
-	color:white;
-	margin-bottom:2rem!important;
-}
 
+
+}
 article h2{
-	color: white;
-	margin-top:1rem;
+	margin-top:3rem;
 	padding-bottom: 8px;
-	background-color: rgba(0,0,0,0.2);
+	font-size: 3rem;
 }
 article h2 small{
 	font-size: 40%;
