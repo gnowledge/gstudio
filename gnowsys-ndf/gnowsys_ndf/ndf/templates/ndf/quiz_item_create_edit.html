@@ -60,8 +60,7 @@
 	<label for="quiz_type" class="right inline">Tags</label>
       </div>
       <div class="small-8 large-10 columns">
-
-	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" />
+	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas..." />
       </div>
     </div>
   </fieldset>
@@ -74,7 +73,7 @@
       <legend>Question</legend>
       <div class="row">
 	<div class="small-12 large-11 columns end">
-	  {% include "ndf/add_editor.html" with var_name="question" var_placeholder="Please enter question" var_value=node.content_org %}
+	  {% include "ndf/add_editor.html" with var_name="question" var_placeholder="Enter question" var_value=node.content_org %}
 	</div>
       </div>
     </fieldset>
@@ -124,7 +123,7 @@
       <legend>Correct Answer</legend>
       <div class="row">
 	<div class="quiz-type-based-div small-11 large-11 columns end" id="Short-Response">
-	  <textarea id="correct_answer_short" name="correct_answer_short" rows="2" placeholder="Enter correct answer here...">{{node.correct_answer.0|default_if_none:""}}</textarea>
+	  <textarea id="correct_answer_short" name="correct_answer_short" rows="2" placeholder="Enter correct answer...">{{node.correct_answer.0|default_if_none:""}}</textarea>
 	  <!-- {#% include "ndf/add_editor.html" with var_name="correct_answer_short" var_placeholder="Please enter answer" %#} -->
 	</div>
 	<div class="quiz-type-based-div small-11 large-11 columns end" id="Single-Choice">
