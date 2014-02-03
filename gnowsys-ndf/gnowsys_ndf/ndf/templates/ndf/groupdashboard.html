@@ -68,7 +68,7 @@ $(document).ready(function()
 {% block meta_content %}
 
 <h3>Group Details</h3>
-<p> Members in this group : 0 </p>
+<p> Members in this group :{{node.author_set|length}} </p>
 {% get_group_name request.path as group %}
 {% get_group_policy group request.user as policy %}
 {% check_user_join request group as user_is_joined %}
