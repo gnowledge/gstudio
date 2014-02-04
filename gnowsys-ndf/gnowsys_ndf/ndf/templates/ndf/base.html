@@ -329,6 +329,16 @@
 			return "<i class='fi-page'></i>"
 		});
 
+		$("aside").addClass("active").queue(function(){
+			$(this).delay(5000).removeClass("activex");
+			$(this).dequeue();
+		});
+		//$("aside").delay(5000).removeClass("active");
+		$("aside").prepend(function(){
+			/* Make asides transparent on no activity */
+			
+		});
+
 
 		/* Makes header links look like radio button */
 		

@@ -20,6 +20,7 @@
   <nav class="medium-12 columns">
 
     <dl class="tabs" data-tab>
+      <dd class="medium-2 columns"><h3>View:</h3></dd>
       <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages ({{ page_nodes_count }})</a></dd>
       <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
     </dl>
@@ -90,7 +91,7 @@
     <li class="card">
       <a class="page" href="{% url 'page_details' group_name node %}">
         <header>
-          
+
           <div class="label-list">
             {% for tag in node.tags %}
             <span class="label">{{tag}}</span>
