@@ -3,6 +3,11 @@
 {% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
 {% block head %}
 
+<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+<script type="text/javascript"
+src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
 <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -13,15 +18,10 @@
   });
 </script>
 
-<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
-<script type="text/javascript"
-src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
 {% endblock %}
 
 {% block meta_content %}
-<!--This content possible comes from page_details.html-->
+<!--This content possibly comes from page_details.html-->
 <p>
   {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
 </p>
@@ -80,8 +80,9 @@ src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 {% endblock %}
 
 {% block body_content %}
+
 <header class="row page">
-<h2 class="medium-12 columns">{{node.name}}</h2>
+  <h2 class="medium-12 columns">{{node.name}}</h2>
   <div class="medium-12 columns">
     <a href="{% block url %}{% endblock %}" class="button edit left">Edit</a>
     <dl class="tabs" data-tab>
@@ -101,7 +102,7 @@ src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 
 {% if node.tags|length > 0 %}
 <p>
-Updated on {{ node.last_update|date:"j F Y" }} by <a class="user">User</a><br>
+  Updated on {{ node.last_update|date:"j F Y" }} by <a class="user">User</a><br>
   Tag{{ node.tags|length|pluralize }}: 
   {% for tag in node.tags %}
   <span class="radius label">{{tag}}</span>
@@ -135,13 +136,13 @@ Updated on {{ node.last_update|date:"j F Y" }} by <a class="user">User</a><br>
 {% endif %}
 {% endwith %}
 
-  <!--  ###### Graph ###### -->      
-  <div class="row">
-    <div class="small-12 columns" id="graph-div">
-      {% include "ndf/relational_graph.html" with graphData=graphData %}        
-    </div>
+<!--  ###### Graph ###### -->      
+<div class="row">
+  <div class="small-12 columns" id="graph-div">
+    {% include "ndf/relational_graph.html" with graphData=graphData %}        
   </div>
-    <!--  ###### Graph ###### -->
+</div>
+<!--  ###### Graph ###### -->
 
 {% endblock %}
 
