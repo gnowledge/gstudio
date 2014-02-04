@@ -101,7 +101,7 @@
           <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
           <h4>{{ node.name }}</h4>
 
-          <small>{{ node.member_of|join:', ' }} created by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> on {{node.created_at|date:"j F Y"}} 
+          <small>{{ node.member_of|join:', ' }} created on {{node.created_at|date:"j F Y"}} by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
           </small>
         </header>
 
@@ -109,8 +109,8 @@
 
         <div class="button expand">View Page</div> 
         <footer class="row">
-         <div class="small-6 columns"><strong>2</strong> Contributors</div>
-         <div class="small-6 columns"><strong>9</strong> Changes</div> 
+         <div class="small-6 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
+         <div class="small-6 columns"><strong>{{node.version_dict|length}}</strong> Versions</div> 
        </footer>
 
      </a>
