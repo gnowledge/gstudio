@@ -79,6 +79,40 @@ class Command(BaseCommand):
             # gs_node.meta_type_set.append(forum_type._id)
             gs_node.save()
 
+        # Create 'Author' GSystemType, if it didn't exists
+        auth = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'}) 
+        if auth is None:
+            auth = collection.GSystemType()
+            auth.name = u"Author"
+            auth.created_by = user_id
+            auth.member_of.append(u"ST")
+            auth.save()
+
+        auth = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'}) 
+
+        # Create 'shelf' GSystemType, if it didn't exists
+        shelf = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Shelf'}) 
+        if shelf is None:
+            gst_node = collection.GSystemType()
+            gst_node.name = u"Shelf"
+            gst_node.created_by = user_id
+            gst_node.member_of.append(u"ST")
+            gst_node.save()
+
+        shelf = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Shelf'})    
+
+        # Create 'has_shelf' RelationType, if it didn't exists    
+        has_shelf_RT = collection.RelationType.one({'_type': u'RelationType', 'name': u'has_shelf'}) 
+        if has_shelf_RT is None:
+            rt_node = collection.RelationType()
+            rt_node.name = u"has_shelf"
+            rt_node.inverse_name = u"shelf_of"
+            rt_node.subject_type.append(auth._id)
+            rt_node.object_type.append(shelf._id)
+            rt_node.created_by = user_id
+            rt_node.member_of.append(u"RT")
+            rt_node.save()            
+
         # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
         quiz_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Quiz'})
 
@@ -128,10 +162,11 @@ class Command(BaseCommand):
             gs_node.save()
 
         # Append quiz_type, options & correct_answer to attribute_type_set of 'QuizItem'
-        quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'quiz_type'}))
-        quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'options'}))
-        quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'correct_answer'}))
-        quiz_item_type.save()
+        if not quiz_item_type.attribute_type_set:
+            quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'quiz_type'}))
+            quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'options'}))
+            quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'correct_answer'}))
+            quiz_item_type.save()
 
         node_doc = collection.GSystemType.one({'$and':[{'_type': u'AttributeType'},{'name': u'start_time'}]})
         if node_doc is None:
@@ -160,9 +195,10 @@ class Command(BaseCommand):
             gs_node.save()
 
         # Append start_time & end_time to attribute_type_set of 'Quiz'
-        quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'start_time'}))
-        quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'}))
-        quiz_type.save()
+        if not quiz_type.attribute_type_set:
+            quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'start_time'}))
+            quiz_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'}))
+            quiz_type.save()
 
 
         # --- End of handle() ---
