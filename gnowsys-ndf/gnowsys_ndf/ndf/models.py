@@ -759,8 +759,6 @@ class HistoryManager():
         if version_no == "":
             version_no = self.get_current_version(document_object)
 
-        print "\n version no : ", version_no, "\n"
-
         fp = self.get_file_path(document_object)
         rcs = RCS()
         rcs.checkout((fp, version_no))
@@ -774,8 +772,8 @@ class HistoryManager():
         # Converts the json-formatted data into python-specific format
         doc_obj = nc.Node.from_json(json_data)
 
-        # # print "\n type of : ", type(doc_obj)
-        # # print "\n document object (", version_no, ") \n", doc_obj
+        # print "\n type of : ", type(doc_obj)
+        # print "\n document object (", version_no, ") \n", doc_obj
 
         rcs.checkin(fp)
 
