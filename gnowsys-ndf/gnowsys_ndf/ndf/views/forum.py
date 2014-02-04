@@ -100,10 +100,16 @@ def display_forum(request,group_name,forum_id):
     return render_to_response("ndf/forumdetails.html",variables)
 
 def display_thread(request,group_name,thread_id):
-    thread = gs_collection.GSystemType.one({'_id': ObjectId(thread_id)})
-    forum=""
-    variables=RequestContext(request,{'forum':forum,'thread':thread,'eachrep':thread,'user':request.user})
-    return render_to_response("ndf/thread_details.html",variables)
+    try:
+        thread = gs_collection.GSystemType.one({'_id': ObjectId(thread_id)})
+        forum=""
+        for each in thread.prior_node:
+            forum=gs_collection.GSystem.one({'$and':[{'member_of':'Forum'},{'_id':ObjectId(each)}]})
+            if forum:
+                variables=RequestContext(request,{'forum':forum,'thread':thread,'eachrep':thread,'user':request.user})
+                return render_to_response("ndf/thread_details.html",variables)
+    except:
+        pass
 
 def add_node(request,group_name):
     try:
