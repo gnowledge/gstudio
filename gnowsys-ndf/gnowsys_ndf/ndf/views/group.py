@@ -42,8 +42,13 @@ gs_collection = db[GSystem.collection_name]
 def group(request, group_name,app_id):
     """Renders a list of all 'Group-type-GSystems' available within the database.
     """
-
-    group_nodes=get_existing_groups()
+    group_nodes = []
+    col_Group = db[Group.collection_name]
+    colg = col_Group.Group.find({'_type': u'Group'})
+    colg.sort('name')
+    gr = list(colg)
+    for items in gr:
+            group_nodes.append(items)
     group_nodes_count = len(group_nodes)
     return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_count': group_nodes_count}, context_instance=RequestContext(request))
     
