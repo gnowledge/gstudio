@@ -74,8 +74,17 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       elif checked == "QuizObj":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$in':[u'Quiz',u'QuizItem']}, 'group_set': {'$all': [group_name]}})
 
+      elif checked == "OnlyQuiz":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Quiz']}, 'group_set': {'$all': [group_name]}})
+
       elif checked == "QuizItem":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'QuizItem']}, 'group_set': {'$all': [group_name]}})
+
+      elif checked == "Group":
+        drawer = gs_collection.GSystem.find({'_type': u"Group"})
+
+      elif checked == "Forum":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Forum']}, 'group_set': {'$all': [group_name]}})
 
     else:
       drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
@@ -147,8 +156,13 @@ def get_node_common_fields(request, node, group_name, node_type):
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
 
+  #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
-    node.modified_by.append(usrid)
+  #if usrid in node.modified_by:
+    node.modified_by.insert(0,usrid)
+  else:
+    node.modified_by.remove(usrid)
+    node.modified_by.insert(0,usrid)
 
   if group_name not in node.group_set:
     node.group_set.append(group_name)
@@ -195,3 +209,58 @@ def get_node_common_fields(request, node, group_name, node_type):
     node.content = org2html(content_org, file_prefix=filename)
 
   
+
+# ------ Some work for graph ------
+def neighbourhood_nodes(page_node):
+
+  collection = db[Node.collection_name]
+        
+  gs = collection.Node.find( {'$or':[{'_type':'GSystem'},{'_type':'File'}]}  )
+  gs_cur = []
+
+  for each in gs:
+      gs_cur.append(each)
+
+  gs.rewind()
+
+  flag = False
+
+  # Initiate and append this line compulsory for viewing node.
+  graphData = '{"name":"'+ page_node.name +'", "degree":1, "children":['
+
+  # Scan each document in cursor 'gs'
+  for val in gs:
+    
+    # If vieving page _id exist in collection set of current document
+    if page_node._id in val.collection_set:
+      
+      flag = True      
+      # Start adding children 
+      graphData += '{"name":"'+ val.name +'","degree" : 2'   #},'
+      
+      # If there is only one matching item in collection set
+      if len(val.collection_set) == 1:
+        graphData += '},'
+        
+      # If there is more than one _id in collection set, start adding children of children.
+      elif len(val.collection_set) > 1:
+        graphData += ', "children":['
+        
+        for each in val.collection_set:
+          node_name = (filter( lambda x: x['_id'] == each, gs_cur ))[0].name
+          
+          # Escape name matching current page node name
+          if(page_node._id == each):
+            pass
+          else:
+            graphData += '{"name":"'+ node_name + '"},'
+
+        graphData = graphData[:-1] + ']},'
+
+  if flag:
+    graphData = graphData[:-1] + ']}' 
+  else:
+    graphData += ']}' 
+
+  return graphData
+# ------ End of processing for graph ------

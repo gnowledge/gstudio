@@ -66,8 +66,6 @@ $(document).ready(function()
 
 
 {% block meta_content %}
-
-<h3>Group Details</h3>
 <p> Members in this group :{{node.author_set|length}} </p>
 {% get_group_name request.path as group %}
 {% get_group_policy group request.user as policy %}
@@ -80,16 +78,14 @@ $(document).ready(function()
 {% endif %}
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
-     <b>     You are the owner of this group</b>
+     <h3>Manage</h3>
+     <p>You can invite other members to be a part of this group</p>
      {% include "ndf/invite_users.html" %}   
-{% endifequal %}    
+{% endifequal %} 
+   
 {% endblock %}
 
 {% block body_content %}
-
-
-
-
 
 {{ block.super }}
 {% endblock %}

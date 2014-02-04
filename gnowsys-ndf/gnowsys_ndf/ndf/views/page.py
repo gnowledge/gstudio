@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes
 
 
 #######################################################################################################################################
@@ -83,12 +83,18 @@ def page(request, group_name, app_id=None):
 
     else:
         page_node = collection.Node.one({"_id": ObjectId(app_id)})
+
+        # ------ Some work for graph ------
+        graphData = neighbourhood_nodes(page_node)
+        
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
-                                    'group_name': group_name
+                                    'group_name': group_name,
+                                    'graphData': graphData
                                   },
                                   context_instance = RequestContext(request)
         )        
+
 
 
 @login_required
@@ -109,7 +115,7 @@ def create_edit_page(request, group_name, node_id=None):
         get_node_common_fields(request, page_node, group_name, gst_page)
         page_node.save()
         
-        return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': page_node._id}))
+        return HttpResponseRedirect(reverse('page_details', kwargs={'group_name': group_name, 'app_id': page_node._id}))
         
     else:
         if node_id:

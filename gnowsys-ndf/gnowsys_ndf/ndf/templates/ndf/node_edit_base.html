@@ -36,7 +36,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 {% block body_content %}
 
-<form id="form-edit-node" method="POST" action="">
+<form data-abide id="form-edit-node" method="POST" action="">
   {% csrf_token %}
   
   <div>
@@ -65,40 +65,41 @@ background-repeat:no-repeat; background-size: 48px 48px
     <div class="active content" id="panel-name-description"  style="width:95%;">
       
       <div class="row">
-	<div class="small-3 columns text-right">
+	<div class="small-2 columns text-right">
 	  <h5>Name : </h5>
 	</div>
-	<div class="small-4  small-offset-5 small-pull-5 columns">
-	  <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter the title">
+	<div class="small-4  small-offset-6 small-pull-6 columns">
+	  <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+	  <small class="error">Value missing: Name is required!!!</small>
 	</div>
       </div>
       
       <div class="row">
-	<div class="small-3 columns text-right">
+	<div class="small-2 columns text-right">
 	  <h5>Privacy : </h5>
 	</div>
-	<div class="small-4 small-offset-5 small-pull-5 columns line-height-2">
+	<div class="small-4 small-offset-6 small-pull-6 columns line-height-2">
 	  <input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
 	</div>
       </div>
       <br/>
       
       <div class="row">
-	<div class="small-3 columns text-right">
+	<div class="small-2 columns text-right">
 	  <h5>Description : </h5>
 	</div>
-	<div class="small-9 columns">
-	  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter description" var_value=node.content_org|default_if_none:"" %}
+	<div class="small-10 columns" style="padding:0px 23px;">
+	  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter description..." var_value=node.content_org|default_if_none:"" %}
 	</div>
       </div>
       <br/>
       
       <div class="row">
-	<div class="small-3 columns text-right">
+	<div class="small-2 columns text-right">
 	  <h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
 	</div>
-	<div class="small-4 small-offset-5 small-pull-5 columns">
-	  <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ">
+	<div class="small-4 small-offset-6 small-pull-6 columns">
+	  <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
 	</div>
       </div>
     </div>
@@ -131,7 +132,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      Classify by :
 	    </div>
 	    <div class="small-2 columns">
-	      <input type="radio" name="col" value="Page" selected/>
+	      <input type="radio" name="col" value="Page"/>
 	      Page <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
 	    </div>
@@ -185,16 +186,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 <script type="text/javascript">
 
 $("input:radio").click(function() {
-    // For collection
-    /*c_opts = $("#collection_drawer2 b");        
-    c_len = c_opts.length;
     
-    c_arr = [];
-    for (var i = 0; i < c_len; i++) {
-	c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
-    }
-    var c_list = c_arr.join(','); */
-
     cn_arr = []
 
     $(".node_id").each(function (){
@@ -225,28 +217,6 @@ $("input:radio").click(function() {
 
 
 $("#save-node").click(function() {
-    
-    // For prior-node
-    /*pn_opts = $("#prior_node_drawer2 b");
-    pn_len = pn_opts.length;
-    
-    var pn_arr = [];
-    for (var i = 0; i < pn_len; i++) {
-	pn_arr[i] = "'" + pn_opts[i].innerHTML.trim() + "'";
-    }
-    var pn_list = pn_arr.join(',');
-    $("#prior_node_list").val(pn_list)
-    
-    // For collection
-    c_opts = $("#collection_drawer2 b");
-    c_len = c_opts.length;
-    
-    c_arr = [];
-    for (var i = 0; i < c_len; i++) {
-	c_arr[i] = "'" + c_opts[i].innerHTML.trim() + "'";
-    }
-    var c_list = c_arr.join(',');
-    $("#collection_list").val(c_list)*/
 
 	pn_arr = []
     cn_arr = []
