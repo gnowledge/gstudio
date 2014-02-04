@@ -43,7 +43,7 @@ header{
 	font-weight: bold;
 	color:white;
 	opacity:1;
-	border-bottom: 1px solid gray;
+	border-bottom: 1px solid black;
 	margin-bottom: -1px;
 }
 .top-bar-section a.app:hover{
@@ -80,11 +80,12 @@ main>aside a:hover{
 	color: inherit;
 }
 
-h2{
+h2:not(.subheader){
 	color: black;
-	margin-top:1rem;
-	padding-bottom: 8px;
+	font-size: 2rem;
+	margin-bottom: 0;
 }
+
 
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
@@ -92,10 +93,6 @@ aside.left-off-canvas-menu{
 }
 a.right-off-canvas-toggle{
 	color: black;
-	position: absolute;
-	z-index: 1000;
-	right: 10px;
-	top:28px;
 }
 a.right-off-canvas-toggle:hover{
 	color: white;
@@ -109,45 +106,24 @@ a.right-off-canvas-toggle i{
 	padding:10px;
 }
 
-/* Content Tabs */
-header .tabs{
-}
-.tabs i{
-	margin-right: 5px;
-	font-size: 1.3rem;
-}
-header .tabs dd a{
-	background-color: inherit ;
-	color: white;
-	padding-top: 0.5rem;
-	padding-bottom: 0.8rem;
-}
-header .tabs dd a:hover{
-	background-color: #008759 ;
-}
-header .tabs dd.active a{
-	background-color: #008759;
-}
-.tabs-content>.content{/* Overrides tab content floating lef */
-	float: none;
-}
+
 
 /* Should be in Foundation */
 
 /* Effects */
 .drop-shadow{
-	-webkit-box-shadow: 2px 2px 4px 1px #bbb;
-	box-shadow: 2px 2px 4px 1px #bbb;
+	-webkit-box-shadow: 2px 2px 4px 1px #333;
+	box-shadow: 2px 2px 4px 1px #333;
 }
 .rounded{
 	border-radius: 2px;
 	-webkit-border-radius:2px;
 }
 .transition-opacity{
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
+	transition: opacity .5s ease-out;
+	-moz-transition: opacity .5s ease-out;
+	-webkit-transition: opacity .5s ease-out;
+	-o-transition: opacity .5s ease-out;
 }
 
 /* Card block */
@@ -192,7 +168,36 @@ header .tabs dd.active a{
 .create.card .switch label{
 	color:inherit;
 }
-
+/* Content Tabs */
+header .tabs{
+}
+header .tabs i{
+	margin-right: 5px;
+	font-size: 1.3rem;
+}
+header .tabs h3{
+	font-size: 1rem;
+	font-weight: bold;
+	padding: 0.7rem 3rem 0 0.5rem;
+	color: #777;
+	display: none;
+}
+header .tabs dd a{
+	color: white;
+	padding-top: 0.5rem;
+	padding-bottom: 0.8rem;
+	background-color: #aaa;
+}
+header .tabs dd a:hover{
+	background-color: #999 ;
+}
+header .tabs dd.active a{
+	background-color: #888;
+	font-weight: bold;
+}
+.tabs-content>.content{/* Overrides tab content floating lef */
+	float: none;
+}
 /* Default card */
 .card header{
 	text-align: center;
@@ -245,6 +250,7 @@ header .tabs dd.active a{
 .label{
 	background-color: #aaa;
 	border-left:1px solid #999;
+	display: inline-block;
 }
 .label:hover{
 	background-color: #999;
@@ -262,14 +268,16 @@ header .tabs dd.active a{
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-
-main>aside{
+main aside{
 	padding-top: 1rem;
+}
+
+main aside.fade{
+	opacity:0.5;
 }
 aside>section{
 	margin:inherit!important;
 	margin-bottom:5px;
-	background-color: #003b27;
 	color:white;
 	padding-bottom: 3rem;
 }
@@ -300,23 +308,12 @@ article{
 }
 
 article>header{
-	border-bottom: 4px solid #008759;
+	border-bottom: 4px solid #777;
 	color:white;
 	margin-bottom:2rem!important;
 }
 article nav{
 
-background-color: #555;
-
-}
-article h2{
-	margin-top:3rem;
-	padding-bottom: 8px;
-	font-size: 3rem;
-}
-article h2 small{
-	font-size: 40%;
-	color:white;
 }
 
 pre{
@@ -367,8 +364,12 @@ a.app i{
 	margin-right:8px;
 }
 .button.edit{
+	margin-left:1rem;
 	margin-bottom: 0;
+	vertical-align: middle;
 }
+.button.edit span{display: none;}
+.button.edit:hover span{display: inline;}
 
 /* Sidebar Search Results */
 main .search{
@@ -391,4 +392,14 @@ main .search div>*{
 }
 #search-results a:hover{
 	background-color: #444;
+}
+
+/************ Forms **************/
+
+/* Node edit */
+input.node-title{
+	font-size: 3rem;
+	height:  4rem;
+	display: inline-block;
+	width: 
 }

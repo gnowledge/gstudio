@@ -17,13 +17,13 @@
 <header class="row">
   <h2 class="medium-12 columns">Groups</h2>
   <nav class="medium-12 columns">
-
    <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
-    <dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>
-  </dl>
+     <dd><h3>View:</h3></dd>
+     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
+     <dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>
+   </dl>
 
-</nav>
+ </nav>
 </header>
 
 
@@ -75,10 +75,14 @@
       <a class="group" href="/{{node.name}}">
 
         <header>
-          <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div>
+          <div class="label-list">
+            {% for tag in node.tags %}
+            <span class="label">{{tag}}</span>
+            {% endfor %}
+          </div>
           <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
           <h4>{{ node.name }}</h4>
-          <small>Created <em>33 days ago</em></small>
+          <small>Created <em>? days ago</em> by <span class="user">{{ node.user_details_dict.created_by }}</span></small>
         </header>
 
         <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>

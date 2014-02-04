@@ -26,7 +26,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
 </p>
 <p>
-  Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
+  Contributed by: {{ node.user_details_dict.modified_by|join:', ' }}
 </p>
 <p>
   Last update: {{ node.last_update|date:"j F Y" }}
@@ -82,18 +82,27 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% block body_content %}
 
 <header class="row page">
-{% if node.tags|length > 0 %}
-  <div class="tag-list"> 
-    {% for tag in node.tags %}
-  <span class="radius label">{{tag}}</span> 
-  {% endfor %}
-  </div>
-  {% endif %}
-  <h2 class="medium-12 columns">{{node.name}}</h2>
+
+
+
+  <h2 class="medium-12 columns">
+  <div class="label-list"> 
+      {% for tag in node.tags %}
+      <span class="radius label">{{tag}}</span> 
+      {% endfor %}
+      <a class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+    </div>
+    <span class='node'>{{node.name}}</span> <a href="{% block url %}{% endblock %}" class="button edit"><i class="fi-pencil"></i> <span>Edit</span></a>
+  </h2>
+  <h3 class="medium-12 columns subheader">
+    <small>Edited {{ node.last_update|timesince }} ago by <a class="user">User</a></small>
+  </h3>
   <nav class="medium-12 columns">
-    <a href="{% block url %}{% endblock %}" class="button edit left">Edit</a>
     <dl class="tabs" data-tab>
-      <dd><a href="#panel2-3"><i class="fi-rewind"></i> Revision</a></dd>
+      <dd class="medium-2 columns"><h3>View:</h3></dd>
+      <dd class="active"><a href="#panel2-3"><i class="fi-page-filled"></i> Page</a></dd>
+      <dd><a href="#panel2-3"><i class="fi-clock"></i> Revision</a></dd>
+      <dd><a href="#panel2-3"><i class="fi-comment"></i> Comment</a></dd>
     </dl>
 
   </nav>
@@ -106,12 +115,6 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
  {% block add_list %}{% endblock %}
  {% endif %}
 </ul>
-
-
-<p>
-  Updated on {{ node.last_update|date:"j F Y" }} by <a class="user">User</a><br>
-  
-</p>
 
 
 {% if node.prior_node|length > 0 %}
