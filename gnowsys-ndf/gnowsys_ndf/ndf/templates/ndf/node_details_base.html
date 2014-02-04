@@ -3,6 +3,11 @@
 {% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
 {% block head %}
 
+<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+<script type="text/javascript"
+src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
 <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -11,11 +16,6 @@
       displayMath: [['\\[','\\]'], ['$$','$$']]
     }
   });
-</script>
-
-<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
-<script type="text/javascript"
-src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 
 {% endblock %}
