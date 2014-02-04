@@ -36,73 +36,75 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 {% block body_content %}
 
-
-<header class="row">
-
-	<h2 class="medium-12 columns">
-		{% if node %}
-		Edit {{title}}: {{node.name}}
-		{% else %}
-		Create a New {{title}}
-		{% endif %}
-	</h2>
-	<nav class="medium-12 columns">
-		<dl class="tabs" data-tab>
-			<dd><h3>View:</h3></dd>
-			<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
-			<a href="#panel-name-description">Page</a>
-		</dd>
-		<dd title="Click here to add/edit Prior Node">
-			<a href="#panel-prior-node">Prior Node</a>
-		</dd>
-		<dd title="Click here to add/edit collection">
-			<a href="#panel-collection">Collection</a>
-		</dd>  
-		</dl>
-	</nav>
-</header>
-
 <form data-abide id="form-edit-node" method="POST" action="">
+
+	<header class="row">
+
+
+		
+		<h2 class="medium-12 columns">
+			{% if node %}
+			Editing {{title}}: {{node.name}}
+			{% else %}
+			Create a New {{title}}
+			{% endif %}
+		</h2>
+		<nav class="medium-12 columns">
+			<dl class="tabs" data-tab>
+				<dd><h3>View:</h3></dd>
+				<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
+					<a href="#panel-name-description">Page</a>
+				</dd>
+				<dd title="Click here to add/edit Prior Node">
+					<a href="#panel-prior-node">Prior Node</a>
+				</dd>
+				<dd title="Click here to add/edit collection">
+					<a href="#panel-collection">Collection</a>
+				</dd>  
+			</dl>
+		</nav>
+	</header>
+
+
 	{% csrf_token %}
 
 	<div id="node-details-edit-div" class="tabs-content" > 
 
-		<div class="active content" id="panel-name-description"  style="width:95%;">
+		<div class="active content row" id="panel-name-description">
 
-			<div class="row">
-				<div class="small-2 columns text-right">
-					<h5>Name : </h5>
-				</div>
-				<div class="small-4  small-offset-6 small-pull-6 columns">
-					<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-					<small class="error">Value missing: Name is required!!!</small>
-				</div>
-			</div>
+			<div class="medium-6 columns">
 
-			<div class="row">
-				<div class="small-2 columns text-right">
-					<h5>Privacy : </h5>
-				</div>
-				<div class="small-4 small-offset-6 small-pull-6 columns line-height-2">
-					<input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
-				</div>
-			</div>
+				<div class="row">
+					<div class="medium-12 columns">
+						<label>{{title}} Name</label>
+						<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+						<small class="error">Value missing: Name is required!!!</small>
 
-			<div class="row">
-				<div class="small-2 columns text-right">
-					<h5>Description : </h5>
-				</div>
-				<div class="small-10 columns" style="padding:0px 23px;">
-					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter description..." var_value=node.content_org|default_if_none:"" %}
-				</div>
-			</div>
+						{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
 
-			<div class="row">
-				<div class="small-2 columns text-right">
-					<h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
+					</div>
 				</div>
-				<div class="small-4 small-offset-6 small-pull-6 columns">
-					<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+
+				<div class="row">
+					<div class="medium-12 columns">
+						<label>Privacy</label>
+						<input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="medium-12 columns">
+
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="small-2 columns text-right">
+						<h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
+					</div>
+					<div class="small-4 small-offset-6 small-pull-6 columns">
+						<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+					</div>
 				</div>
 			</div>
 		</div>

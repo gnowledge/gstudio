@@ -82,9 +82,10 @@ main>aside a:hover{
 
 h2:not(.subheader){
 	color: black;
-	font-size: 3rem;
+	font-size: 2rem;
 	margin-bottom: 0;
 }
+
 
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
@@ -314,9 +315,6 @@ article>header{
 article nav{
 
 }
-article h2 small{
-
-}
 
 pre{
 	width:92%;
@@ -366,8 +364,12 @@ a.app i{
 	margin-right:8px;
 }
 .button.edit{
+	margin-left:1rem;
 	margin-bottom: 0;
+	vertical-align: middle;
 }
+.button.edit span{display: none;}
+.button.edit:hover span{display: inline;}
 
 /* Sidebar Search Results */
 main .search{
@@ -390,4 +392,14 @@ main .search div>*{
 }
 #search-results a:hover{
 	background-color: #444;
+}
+
+/************ Forms **************/
+
+/* Node edit */
+input.node-title{
+	font-size: 3rem;
+	height:  4rem;
+	display: inline-block;
+	width: 
 }

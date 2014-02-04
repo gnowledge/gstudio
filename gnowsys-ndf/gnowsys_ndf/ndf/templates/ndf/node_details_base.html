@@ -92,11 +92,11 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
       {% endfor %}
       <a class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
     </div>
-    <span class='node'>{{node.name}}</span> <a href="{% block url %}{% endblock %}" class="button edit"><i class="fi-pencil"></i> Edit</a>
+    <span class='node'>{{node.name}}</span> <a href="{% block url %}{% endblock %}" class="button edit"><i class="fi-pencil"></i> <span>Edit</span></a>
   </h2>
-  <h2 class="medium-12 columns subheader">
+  <h3 class="medium-12 columns subheader">
     <small>Edited {{ node.last_update|timesince }} ago by <a class="user">User</a></small>
-  </h2>
+  </h3>
   <nav class="medium-12 columns">
     <dl class="tabs" data-tab>
       <dd class="medium-2 columns"><h3>View:</h3></dd>
