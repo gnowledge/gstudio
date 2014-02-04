@@ -480,6 +480,8 @@ class GSystem(Node):
         'attribute_set': [dict],		# Dict that holds AT name & its values
         'relation_set': [dict],			# Dict that holds RT name & its related_object value
         'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class [(ObjectId, version_no)]
+        'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
+                                                # along with their sub-collection elemnts too 
         'group_set': [unicode],                 # List of ObjectId's of Groups to which this document belongs
         'author_set': [int]                     # List of Authors
     }
@@ -561,6 +563,13 @@ class HistoryManager():
     	
     	if not dir_exists:
             os.makedirs(dir_path)
+
+    def get_current_version(self, document_object):
+        """Returns the current version/revision number of the given document instance.
+        """
+        fp = self.get_file_path(document_object)
+        rcs = RCS()
+        return rcs.head(fp)
 
     def get_version_dict(self, document_object):
         """Returns a dictionary containing list of revision numbers.
@@ -730,3 +739,30 @@ class HistoryManager():
 
         return file_res
       
+    def get_version_document(self, document_object, version_no=""):
+        """Returns an object representing mongodb document instance of a given version number.
+        """
+        if version_no == "":
+            version_no = self.get_current_version(document_object)
+
+        print "\n version no : ", version_no, "\n"
+
+        fp = self.get_file_path(document_object)
+        rcs = RCS()
+        rcs.checkout((fp, version_no))
+
+        json_data = ""
+        with open(fp, 'r') as version_file:
+            json_data = version_file.read()
+
+        nc = get_database()[Node.collection_name]
+
+        # Converts the json-formatted data into python-specific format
+        doc_obj = nc.Node.from_json(json_data)
+
+        # # print "\n type of : ", type(doc_obj)
+        # # print "\n document object (", version_no, ") \n", doc_obj
+
+        rcs.checkin(fp)
+
+        return doc_obj 
