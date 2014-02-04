@@ -56,7 +56,7 @@
 			box-shadow: 2px 2px 4px 1px #C7C7C7;
 		}
 
-		.main{
+		.workspace{
 			background-color:#e0e0e0;
 			min-height: 100%;
 			margin-bottom: -100px!important;
@@ -65,7 +65,7 @@
 			box-sizing: border-box;
 		}
 
-		.main:after{
+		.workspace:after{
 			content:"";
 			display:block;
 			height:100px;
@@ -177,7 +177,7 @@
 		</nav>
 
 	</header> 		
-	<div class="main">
+	<div class="workspace">
 		<div class="off-canvas-wrap">
 			<div class="inner-wrap">
 
@@ -193,15 +193,14 @@
 
 				<main class="row">  
 
-					<!-- Start of sidebar section -->
-
+					<!-- Start of sidebar section (main aside) -->
 					<aside  class="medium-12 large-3 columns">
 
 						<section class="row rounded drop-shadow">
 
-
-
+							<!-- Meta content in the (main aside header)-->
 							<header class="medium-6 large-12 columns">
+
 								<a class="left-off-canvas-toggle meta" ><h3><i class='fi-asterisk'></i> Meta</h3></a> 
 
 								{% block meta_content %}  {% endblock %}
