@@ -80,10 +80,10 @@ main>aside a:hover{
 	color: inherit;
 }
 
-h2{
+h2:not(.subheader){
 	color: black;
-	margin-top:1rem;
-	padding-bottom: 8px;
+	font-size: 3rem;
+	margin-bottom: 0;
 }
 
 /* Off canvas navigation */
@@ -92,10 +92,6 @@ aside.left-off-canvas-menu{
 }
 a.right-off-canvas-toggle{
 	color: black;
-	position: absolute;
-	z-index: 1000;
-	right: 10px;
-	top:28px;
 }
 a.right-off-canvas-toggle:hover{
 	color: white;
@@ -123,10 +119,10 @@ a.right-off-canvas-toggle i{
 	-webkit-border-radius:2px;
 }
 .transition-opacity{
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
+	transition: opacity .5s ease-out;
+	-moz-transition: opacity .5s ease-out;
+	-webkit-transition: opacity .5s ease-out;
+	-o-transition: opacity .5s ease-out;
 }
 
 /* Card block */
@@ -253,6 +249,7 @@ header .tabs dd.active a{
 .label{
 	background-color: #aaa;
 	border-left:1px solid #999;
+	display: inline-block;
 }
 .label:hover{
 	background-color: #999;
@@ -317,14 +314,8 @@ article>header{
 article nav{
 
 }
-article h2{
-	margin-top:3rem;
-	padding-bottom: 8px;
-	font-size: 3rem;
-}
 article h2 small{
-	font-size: 40%;
-	color:white;
+
 }
 
 pre{

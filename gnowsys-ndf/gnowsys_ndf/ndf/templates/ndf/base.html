@@ -243,7 +243,7 @@
 
 
 
-							<a class="right-off-canvas-toggle" ><i class='fi-book-bookmark'></i></a> 
+							
 
 							<!-- The actual body content -->
 							{% block body_content %}  {% endblock %}
@@ -327,17 +327,16 @@
 			return "<i class='fi-page'></i>"
 		});
 
+/* */
 		$("aside").delay(3000).queue(function(){
 			$(this).addClass("fade");
 			$(this).dequeue();
 		});
 		$("aside").hover(function(){
-			$(this).toggleClass("fade");
-		});
-		//$("aside").delay(5000).removeClass("active");
-		$("aside").prepend(function(){
-			/* Make asides transparent on no activity */
-			
+			$(this).removeClass("fade");
+		},
+		function(){
+			$(this).addClass("fade");
 		});
 
 
