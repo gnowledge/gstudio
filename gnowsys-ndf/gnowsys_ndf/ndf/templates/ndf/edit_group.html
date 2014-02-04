@@ -7,93 +7,102 @@
 {% get_user_object node.created_by as user_obj %}
 
 {% block body_content %} 
+
 <dl class="accordion" data-accordion>
-<dd>
-<a href="#change_settings">Click here to change {{node.name}}'s settings </a>
-<div id="change_settings" class="content">
- <div style='display:table;  border:1px;   border-spacing:10px; '>
-	<div style='display:table-row;' >
-	     	<div style='display:table-cell;'> 
-        		<font size="3" >Group Type</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="group_type" id="group_type">
-          			<option id="PUBLIC">PUBLIC</option>
-          			<option id="PRIVATE">PRIVATE</option>
-          			<option id="ANONYMOUS">ANONYMOUS</option>
-        		</select> 
-      		</div>
-		<div style='display:table-cell;'> 
-        		<font size="3" >Group Editing policy</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="edit_policy" id="edit_policy">
-          			<option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
-          			<option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
-          			<option id="NON_EDITABLE">NON_EDITABLE</option>
-        		</select> 
-      		</div>
- 	       
-    	</div>
+
+  <dd>
+    <a href="#change_settings">Click here to change {{node.name}}'s settings </a>
     
-    	<div style='display:table-row;'>
-      		<div style='display:table-cell;'> 
-        		<font size="3" >Group Subscription policy</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="subscription_policy" id="subscription_policy">
-          			<option id="OPEN">OPEN</option>
-          			<option id="BY_REQUEST">BY_REQUEST</option>
-          			<option id="BY_INVITATION">BY_INVITATION</option>
-        		</select>
-      		</div>
-		<div style='display:table-cell;'> 
-        		<font size="3" >Group Existance visibility</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="visibility_policy" id="visibility_policy">
-	        		<option id="ANNOUNCED">ANNOUNCED</option>
-	        		<option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
-	      		</select>
-      		</div>
-      		
-    	</div>
-    
-    	<div style='display:table-row;'>
-      		<div style='display:table-cell;'> 
-        		<font size="3">  Group Member Visibility</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-        		<select name="disclosure_policy" id="disclosure_policy">
-	        		<option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
-	        		<option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
-        		</select>
-      		</div>
-		<div style='display:table-cell;'> 
-        		<font size="3" >Group Encryption policy</font>
-      		</div>
-      		<div style='display:table-cell;'> 
-       			<select name="encryption_policy" id="encryption_policy">
-			        <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
-       			   	<option id="ENCRYPTED">ENCRYPTED</option>
-       		 	</select>
-      		</div>
-    	</div>
- 
-   	 <div style='display:table-row;'>
-      		  
-	</div>
-	<div style='display:table-row;'>
-      		<div style='display:table-cell;' colspan='2' align="middle"> 
-                        <input type="button" id="changeButton" value="Change"  class="button">
-			<img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
-			<font id="status"></font>
-      		</div>
-    	</div>
+    <div id="change_settings" class="content">
+
+     <div style='display:table;  border:1px;   border-spacing:10px; '>
+
+       <div style='display:table-row;' >
+         <div style='display:table-cell;'> 
+          <font size="3" >Group Type</font>
+        </div>
+
+        <div style='display:table-cell;'> 
+          <select name="group_type" id="group_type">
+           <option id="PUBLIC">PUBLIC</option>
+           <option id="PRIVATE">PRIVATE</option>
+           <option id="ANONYMOUS">ANONYMOUS</option>
+         </select> 
+       </div>
+
+       <div style='display:table-cell;'> 
+        <font size="3" >Group Editing policy</font>
+      </div>
+
+      <div style='display:table-cell;'> 
+        <select name="edit_policy" id="edit_policy">
+         <option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
+         <option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
+         <option id="NON_EDITABLE">NON_EDITABLE</option>
+       </select> 
+     </div>
+
+   </div>
+
+   <div style='display:table-row;'>
+
+    <div style='display:table-cell;'> 
+      <font size="3" >Group Subscription policy</font>
+    </div>
+
+    <div style='display:table-cell;'> 
+      <select name="subscription_policy" id="subscription_policy">
+       <option id="OPEN">OPEN</option>
+       <option id="BY_REQUEST">BY_REQUEST</option>
+       <option id="BY_INVITATION">BY_INVITATION</option>
+     </select>
+   </div>
+
+   <div style='display:table-cell;'> 
+    <font size="3" >Group Existance visibility</font>
+  </div>
+
+  <div style='display:table-cell;'> 
+    <select name="visibility_policy" id="visibility_policy">
+     <option id="ANNOUNCED">ANNOUNCED</option>
+     <option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
+   </select>
+ </div>
+
 </div>
+
+<div style='display:table-row;'>
+
+  <div style='display:table-cell;'> 
+    <font size="3">  Group Member Visibility</font>
+  </div>
+
+  <div style='display:table-cell;'> 
+    <select name="disclosure_policy" id="disclosure_policy">
+     <option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
+     <option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
+   </select>
+ </div>
+
+ <div style='display:table-cell;'> 
+  <font size="3" >Group Encryption policy</font>
 </div>
-</form>
+
+<div style='display:table-cell;'> 
+  <select name="encryption_policy" id="encryption_policy">
+   <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
+   <option id="ENCRYPTED">ENCRYPTED</option>
+ </select>
+ </div>
+
+<div style='display:table-row;'>
+  <div style='display:table-cell;' colspan='2' align="middle"> 
+    <input type="button" id="changeButton" value="Change"  class="button">
+    <img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
+    <font id="status"></font>
+  </div>
 </div>
+
 </dd>
 </dl>
 
@@ -134,18 +143,18 @@ encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_po
 
 $(document).on('click',"#changeButton",function(){
 
-		$.ajax({
-		url:'/{{node.altnames}}/ajax/change_group_settings/',
-		type: 'POST',
-		data: {edit_policy:edit_policy.value, group_type:group_type.value, subscription_policy:subscription_policy.value, visibility_policy:visibility_policy.value, disclosure_policy:disclosure_policy.value, encryption_policy:encryption_policy.value, csrfmiddlewaretoken: '{{ csrf_token }}', group_id:"{{node}}"},
-		beforeSend: function() {
-        	$("#ajax_search").show();
-        	},
-		success: function(result){
-		$("#ajax_search").hide();
-		$("#status").html(result);
-		}
-		});
+$.ajax({
+url:'/{{node.altnames}}/ajax/change_group_settings/',
+type: 'POST',
+data: {edit_policy:edit_policy.value, group_type:group_type.value, subscription_policy:subscription_policy.value, visibility_policy:visibility_policy.value, disclosure_policy:disclosure_policy.value, encryption_policy:encryption_policy.value, csrfmiddlewaretoken: '{{ csrf_token }}', group_id:"{{node}}"},
+beforeSend: function() {
+$("#ajax_search").show();
+},
+success: function(result){
+$("#ajax_search").hide();
+$("#status").html(result);
+}
+});
 });
 
 {% else %}
