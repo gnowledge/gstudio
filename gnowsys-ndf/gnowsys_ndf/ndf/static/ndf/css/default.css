@@ -272,11 +272,10 @@ header .tabs dd.active a{
 /*************************** 2. Custom CSS overrides ***********************/
 main aside{
 	padding-top: 1rem;
-	opacity:0.2;
 }
 
-main aside.active{
-	opacity:1;
+main aside.fade{
+	opacity:0.5;
 }
 aside>section{
 	margin:inherit!important;

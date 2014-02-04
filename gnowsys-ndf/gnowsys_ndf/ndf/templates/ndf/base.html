@@ -192,7 +192,7 @@
 				<main class="row">  
 
 					<!-- Start of sidebar section (main aside) -->
-					<aside  class="medium-12 large-3 columns">
+					<aside  class="medium-12 large-3 columns transition-opacity">
 
 						<section class="row">
 
@@ -327,9 +327,12 @@
 			return "<i class='fi-page'></i>"
 		});
 
-		$("aside").addClass("active").queue(function(){
-			$(this).delay(5000).removeClass("activex");
+		$("aside").delay(3000).queue(function(){
+			$(this).addClass("fade");
 			$(this).dequeue();
+		});
+		$("aside").hover(function(){
+			$(this).toggleClass("fade");
 		});
 		//$("aside").delay(5000).removeClass("active");
 		$("aside").prepend(function(){
