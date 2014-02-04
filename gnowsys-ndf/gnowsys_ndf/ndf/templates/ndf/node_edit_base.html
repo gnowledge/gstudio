@@ -36,206 +36,207 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 {% block body_content %}
 
+
+<header class="row">
+
+	<h2 class="medium-12 columns">
+		{% if node %}
+		Edit {{title}}: {{node.name}}
+		{% else %}
+		Create a New {{title}}
+		{% endif %}
+	</h2>
+	<nav class="medium-12 columns">
+		<dl class="tabs" data-tab>
+			<dd><h3>View:</h3></dd>
+			<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
+			<a href="#panel-name-description">Page</a>
+		</dd>
+		<dd title="Click here to add/edit Prior Node">
+			<a href="#panel-prior-node">Prior Node</a>
+		</dd>
+		<dd title="Click here to add/edit collection">
+			<a href="#panel-collection">Collection</a>
+		</dd>  
+		</dl>
+	</nav>
+</header>
+
 <form data-abide id="form-edit-node" method="POST" action="">
-  {% csrf_token %}
-  
-  <div>
-    {% if node %}
-    <h2>{{node.name}}</h2>
-    {% else %}
-    <h3>Create New {{title}}</h3>
-    {% endif %}
-  </div>
+	{% csrf_token %}
 
-  <dl class="tabs" data-tab>
-    <dd class="active" title="Click here to add Name, Description, Privacy and Tags">
-      <a href="#panel-name-description"><h5><b> Basic </b></h5></a>
-    </dd>
-    <dd title="Click here to add/edit Prior Node">
-      <a href="#panel-prior-node"><h5><b> Prior Node </b></h5></a>
-    </dd>
-    <dd title="Click here to add/edit collection">
-      <a href="#panel-collection"><h5><b> Collection </b></h5></a>
-    </dd>  
-  </dl>
-  <br/>
+	<div id="node-details-edit-div" class="tabs-content" > 
 
-  <div id="node-details-edit-div" class="tabs-content" > 
-    
-    <div class="active content" id="panel-name-description"  style="width:95%;">
-      
-      <div class="row">
-	<div class="small-2 columns text-right">
-	  <h5>Name : </h5>
-	</div>
-	<div class="small-4  small-offset-6 small-pull-6 columns">
-	  <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	  <small class="error">Value missing: Name is required!!!</small>
-	</div>
-      </div>
-      
-      <div class="row">
-	<div class="small-2 columns text-right">
-	  <h5>Privacy : </h5>
-	</div>
-	<div class="small-4 small-offset-6 small-pull-6 columns line-height-2">
-	  <input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
-	</div>
-      </div>
-      <br/>
-      
-      <div class="row">
-	<div class="small-2 columns text-right">
-	  <h5>Description : </h5>
-	</div>
-	<div class="small-10 columns" style="padding:0px 23px;">
-	  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter description..." var_value=node.content_org|default_if_none:"" %}
-	</div>
-      </div>
-      <br/>
-      
-      <div class="row">
-	<div class="small-2 columns text-right">
-	  <h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
-	</div>
-	<div class="small-4 small-offset-6 small-pull-6 columns">
-	  <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-	</div>
-      </div>
-    </div>
+		<div class="active content" id="panel-name-description"  style="width:95%;">
 
-    <div class="content" id="panel-prior-node"  style="width:95%;">
-      <div class="row">
-	<div class="small-12 columns">
-	  <h5>Add or edit Prior Node : </h5>
-	</div>
-	<br/>
+			<div class="row">
+				<div class="small-2 columns text-right">
+					<h5>Name : </h5>
+				</div>
+				<div class="small-4  small-offset-6 small-pull-6 columns">
+					<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+					<small class="error">Value missing: Name is required!!!</small>
+				</div>
+			</div>
 
-	<div class="small-12 columns">
-	  <div id="prior_node_drawer">
-	    	{% edit_drawer_widget "prior_node" group_name node title %}
-	  </div>
-	</div>
-      </div>
-    </div>
+			<div class="row">
+				<div class="small-2 columns text-right">
+					<h5>Privacy : </h5>
+				</div>
+				<div class="small-4 small-offset-6 small-pull-6 columns line-height-2">
+					<input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
+				</div>
+			</div>
 
-    <div class="content" id="panel-collection" style="width:95%;">
-      <div class="row">
-	<div class="small-12 columns">
-	  <h5>Add or edit Collection : </h5>
-	</div>				
-	<br/><br/>
-	
-	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
-	  <div id="SelectApp" class="row">
-	    <div class="small-2 columns line-height-2pt5">
-	      Classify by :
-	    </div>
-	    <div class="small-2 columns">
-	      <input type="radio" name="col" value="Page"/>
-	      Page <span class="divider-line">|</span>
-	      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
-	    </div>
-	    <div class="small-2 columns">
-	      <input type="radio" name="col" value="File" />
-	      File <span class="divider-line">|</span>
-	      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
-	    </div>
-	    <div class="small-2 columns">
-	      <input type="radio" name="col" value="Image" />
-	      Image <span class="divider-line">|</span>
-	      <span class="fontsize-x-large"><i class="step fi-photo"></i>
-	      </span>
-	    </div>
-	    <div class="small-2 columns">
-	      <input type="radio" name="col" value="Video" />
-	      Video <span class="divider-line">|</span>
-	      <span class="fontsize-x-large"><i class="step fi-video"></i>
-	      </span>
-	    </div>
-	    <div class="small-2 columns">
-	      <input type="radio" name="col" value="QuizObj" />
-	      Quiz <span class="divider-line">|</span>
-	      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
-	      </span>
-	    </div>
-	  </div>
-	</div>
-	
-	<div class="small-12 columns">
-	  <div id="collection_drawer" >
-	    	{% edit_drawer_widget "collection" group_name node title %}
-	  </div>
-	</div>
-      </div>
-      <br/>
-      
-    </div>
-    
-  </div>
-  
-  {% block add_fields %} {% endblock %}
+			<div class="row">
+				<div class="small-2 columns text-right">
+					<h5>Description : </h5>
+				</div>
+				<div class="small-10 columns" style="padding:0px 23px;">
+					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter description..." var_value=node.content_org|default_if_none:"" %}
+				</div>
+			</div>
 
-  <div class="row" >
-    <input type="submit" id="save-node" value="Save" class="button small-10 small-push-1 column"/>
-  </div>
-  <br/><br/>
+			<div class="row">
+				<div class="small-2 columns text-right">
+					<h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
+				</div>
+				<div class="small-4 small-offset-6 small-pull-6 columns">
+					<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+				</div>
+			</div>
+		</div>
+
+		<div class="content" id="panel-prior-node"  style="width:95%;">
+			<div class="row">
+				<div class="small-12 columns">
+					<h5>Add or edit Prior Node : </h5>
+				</div>
+				<br/>
+
+				<div class="small-12 columns">
+					<div id="prior_node_drawer">
+						{% edit_drawer_widget "prior_node" group_name node title %}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="content" id="panel-collection" style="width:95%;">
+			<div class="row">
+				<div class="small-12 columns">
+					<h5>Add or edit Collection : </h5>
+				</div>				
+				<br/><br/>
+
+				<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
+					<div id="SelectApp" class="row">
+						<div class="small-2 columns line-height-2pt5">
+							Classify by :
+						</div>
+						<div class="small-2 columns">
+							<input type="radio" name="col" value="Page"/>
+							Page <span class="divider-line">|</span>
+							<span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
+						</div>
+						<div class="small-2 columns">
+							<input type="radio" name="col" value="File" />
+							File <span class="divider-line">|</span>
+							<span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
+						</div>
+						<div class="small-2 columns">
+							<input type="radio" name="col" value="Image" />
+							Image <span class="divider-line">|</span>
+							<span class="fontsize-x-large"><i class="step fi-photo"></i>
+							</span>
+						</div>
+						<div class="small-2 columns">
+							<input type="radio" name="col" value="Video" />
+							Video <span class="divider-line">|</span>
+							<span class="fontsize-x-large"><i class="step fi-video"></i>
+							</span>
+						</div>
+						<div class="small-2 columns">
+							<input type="radio" name="col" value="QuizObj" />
+							Quiz <span class="divider-line">|</span>
+							<span class="fontsize-x-large"><i class="step fi-pencil"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="small-12 columns">
+					<div id="collection_drawer" >
+						{% edit_drawer_widget "collection" group_name node title %}
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	{% block add_fields %} {% endblock %}
+
+	<div class="row" >
+		<input type="submit" id="save-node" value="Save" class="button small-10 small-push-1 column"/>
+	</div>
 
 </form>
 
 <script type="text/javascript">
 
-$("input:radio").click(function() {
-    
-    cn_arr = []
+	$("input:radio").click(function() {
 
-    $(".node_id").each(function (){
-	if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
-	    cn_arr.push($(this).val());
-	}
-    });
+		cn_arr = []
 
-    var cn_list = cn_arr.join(',');
+		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+				cn_arr.push($(this).val());
+			}
+		});
 
-    
-    $.ajax({
-	type: "POST",
-	url: "{% url 'select_drawer' group_name %}",
-	datatype: "html",
-	data:{
-	    homo_collection: this.value,
-	    collection_list: cn_list,
-	    node_id: '{{node.pk}}',
-	    csrfmiddlewaretoken: '{{ csrf_token }}'
-	},
-	success: function(data) {
-	    $("#collection_drawer").html(data);
-	}
-    });
-    
-});
+		var cn_list = cn_arr.join(',');
 
 
-$("#save-node").click(function() {
+		$.ajax({
+			type: "POST",
+			url: "{% url 'select_drawer' group_name %}",
+			datatype: "html",
+			data:{
+				homo_collection: this.value,
+				collection_list: cn_list,
+				node_id: '{{node.pk}}',
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				$("#collection_drawer").html(data);
+			}
+		});
 
-	pn_arr = []
-    cn_arr = []
+	});
 
-    $(".node_id").each(function (){
-	if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
-	    pn_arr.push($(this).val());
-	}
 
-	if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
-	    cn_arr.push($(this).val());
-	}
-    });
+	$("#save-node").click(function() {
 
-    $("#prior_node_list").val(pn_arr)
-    $("#collection_list").val(cn_arr)    
+		pn_arr = []
+		cn_arr = []
 
-    {% block base_save_on_click %}{% endblock %}
-});
+		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+				pn_arr.push($(this).val());
+			}
+
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+				cn_arr.push($(this).val());
+			}
+		});
+
+		$("#prior_node_list").val(pn_arr)
+		$("#collection_list").val(cn_arr)    
+
+		{% block base_save_on_click %}{% endblock %}
+	});
 
 </script>
 

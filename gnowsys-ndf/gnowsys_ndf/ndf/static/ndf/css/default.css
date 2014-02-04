@@ -196,6 +196,7 @@ header .tabs dd a:hover{
 }
 header .tabs dd.active a{
 	background-color: #888;
+	font-weight: bold;
 }
 .tabs-content>.content{/* Overrides tab content floating lef */
 	float: none;
