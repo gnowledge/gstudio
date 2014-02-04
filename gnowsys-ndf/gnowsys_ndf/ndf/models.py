@@ -536,16 +536,16 @@ class Group(GSystem):
     } 
 
 
-'''@connection.register
+@connection.register
 class Author(Group):
     """Author class to store django user instances
     """
     structure = {
-        
-        
+        'username': unicode,
+        'email': unicode        
     }
 
-    use_dot_notation = True'''
+    use_dot_notation = True
 
 
 
