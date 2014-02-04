@@ -535,6 +535,20 @@ class Group(GSystem):
         'encryption_policy':lambda x: x in ENCRYPTION_POLICY
     } 
 
+
+'''@connection.register
+class Author(Group):
+    """Author class to store django user instances
+    """
+    structure = {
+        
+        
+    }
+
+    use_dot_notation = True'''
+
+
+
 #######################################################################################################################################
 #                                                                                  H E L P E R  --   C L A S S    D E F I N I T I O N S
 #######################################################################################################################################
