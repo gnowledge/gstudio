@@ -21,7 +21,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% endblock %}
 
 {% block meta_content %}
-<!--This content possible comes from page_details.html-->
+<!--This content possibly comes from page_details.html-->
 <p>
   {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
 </p>
@@ -80,6 +80,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% endblock %}
 
 {% block body_content %}
+
 <header class="row page">
   <h2 class="medium-12 columns">{{node.name}}</h2>
   <div class="medium-12 columns">
