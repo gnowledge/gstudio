@@ -10,6 +10,10 @@
 
 {% endblock %}
 
+{% block style %}
+	.resource-drawer { max-height: 202px; overflow-y: auto; }
+{% endblock %}
+
 {% block body_content %}
 
 <div class="row">
@@ -41,56 +45,150 @@
 	<div class="row" style="padding-top:10px;">
 		<div class="small-3 columns">
 			<h6 align="center"><b>Pages</b></h6>
-			<ul class="pricing-table">
+			<ul class="pricing-table resource-drawer" id="page_drawer">
+			{% if page_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="page" placeholder="Search Page"/>
+        		</li>
 				{% for key, value in page_drawer.items %}
 					{% if user_id == value.created_by %}        
-						<li class="bullet-item" value={{key}}> 					
-							{{value.name}}					
+						<li class="bullet-item" value={{key}}> 												
+							<a href="{% url 'page_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
+							[Group : {{value.group_set|join:", "}} ]							
 						</li>
 					{% endif %}
-				{% endfor %}				
+				{% endfor %}	
+			{% else %}  
+        		<li class="bullet-item" > <i>Page not found ! </i> </li>
+        	{% endif %}			
 			</ul>
 		</div>
 		<div class="small-3 columns">
 			<h6 align="center"><b>Images</b></h6>
-			<ul class="pricing-table">        
+			<ul class="pricing-table resource-drawer" id="image_drawer">  
+			{% if image_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="image" placeholder="Search Image"/>
+        		</li>      
 				{% for key, value in image_drawer.items %}
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
-							{{value.name}}					
+							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
+							[Group : {{value.group_set|join:", "}} ]
 						</li>
 					{% endif %}
 				{% endfor %}
+			{% else %}  
+        		<li class="bullet-item" > <i>Image not found ! </i> </li>
+        	{% endif %}
 			</ul>
 		</div>
 		<div class="small-3 columns">
 			<h6 align="center"><b>Videos</b></h6>
-			<ul class="pricing-table">        
+			<ul class="pricing-table resource-drawer" id="video_drawer">  
+			{% if video_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="video" placeholder="Search Video"/>
+        		</li>      
 				{% for key, value in video_drawer.items %}
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
-							{{value.name}}					
+							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
+							[Group : {{value.group_set|join:", "}} ]				
 						</li>
 					{% endif %}
 				{% endfor %}
+			{% else %}  
+        		<li class="bullet-item" > <i>Video not found ! </i> </li>
+        	{% endif %}
 			</ul>
 		</div>
 		<div class="small-3 columns">
 			<h6 align="center"><b>Files</b></h6>
-			<ul class="pricing-table">        
+			<ul class="pricing-table resource-drawer" id="file_drawer">       
+			{% if file_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="file" placeholder="Search File"/>
+        		</li>  
 				{% for key, value in file_drawer.items %}
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
-							{{value.name}}					
+							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
+							[Group : {{value.group_set|join:", "}} ]			
 						</li>
 					{% endif %}
 				{% endfor %}
+			{% else %}  
+        		<li class="bullet-item" > <i>File not found ! </i> </li>
+        	{% endif %}
+			</ul>
+		</div>		
+	</div>	
+
+	<div class="row" style="padding-top:10px;">
+		<div class="small-3 columns">
+			<h6 align="center"><b>Quizzes</b></h6>
+			<ul class="pricing-table resource-drawer" id="quiz_drawer">
+			{% if quiz_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="quiz" placeholder="Search Quiz"/>
+        		</li>
+				{% for key, value in quiz_drawer.items %}
+					{% if user_id == value.created_by %}        
+						<li class="bullet-item" value={{key}}> 												
+							<a href="{% url 'quiz_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
+							[Group : {{value.group_set|join:", "}} ]							
+						</li>
+					{% endif %}
+				{% endfor %}	
+			{% else %}  
+        		<li class="bullet-item" > <i>Quiz not found ! </i> </li>
+        	{% endif %}			
+			</ul>
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Groups</b></h6>
+			<ul class="pricing-table resource-drawer" id="group_drawer">
+			{% if group_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="group" placeholder="Search Group"/>
+        		</li>
+				{% for key, value in group_drawer.items %}
+					{% if user_id == value.created_by %}        
+						<li class="bullet-item" value={{key}}> 												
+							<a href="{% url 'groupchange' value.name %}">{{value.name}} </a>  							
+						</li>
+					{% endif %}
+				{% endfor %}	
+			{% else %}  
+        		<li class="bullet-item" > <i>Group not found ! </i> </li>
+        	{% endif %}			
+			</ul>
+		</div>
+		<div class="small-3 columns small-pull-3 columns">
+			<h6 align="center"><b>Forums</b></h6>
+			<ul class="pricing-table resource-drawer" id="forum_drawer">
+			{% if forum_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="forum" placeholder="Search Forum"/>
+        		</li>
+				{% for key, value in forum_drawer.items %}
+					{% if user_id == value.created_by %}        
+						<li class="bullet-item" value={{key}}> 												
+							<a href="{% url 'show' value.group_set|join:', ' value %}">{{value.name}} </a>  							
+						</li>
+					{% endif %}
+				{% endfor %}	
+			{% else %}  
+        		<li class="bullet-item" > <i>Forum not found ! </i> </li>
+        	{% endif %}			
 			</ul>
 		</div>
 	</div>
 	<br/>
 
 	<!-- Contributed Resources by user -->
+	<hr/>
 	<div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
 			Contributed Resources :						
@@ -99,53 +197,173 @@
 	<div class="row" style="padding-top:10px;">
 		<div class="small-3 columns">
 			<h6 align="center"><b>Pages</b></h6>
-			<ul class="pricing-table">
+			<ul class="pricing-table resource-drawer" id="pg_contrib_drawer">
+			{% if page_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="pg_contrib" placeholder="Search Page"/>
+        		</li>
 				{% for key, value in page_drawer.items %} 
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
-							{{value.name}}					
+							<a href="{% url 'page_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
+							[Group : {{value.group_set|join:", "}} ]				
 						</li>
 					{% endif %}
-				{% endfor %}				
+				{% endfor %}
+			{% else %}  
+        		<li class="bullet-item" > <i>Page not found ! </i> </li>
+        	{% endif %}				
 			</ul>
 		</div>
 		<div class="small-3 columns">
 			<h6 align="center"><b>Images</b></h6>
-			<ul class="pricing-table">        
+			<ul class="pricing-table resource-drawer" id="img_contrib_drawer">    
+			{% if image_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="img_contrib" placeholder="Search Image"/>
+        		</li>    
 				{% for key, value in image_drawer.items %} 
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
-							{{value.name}}					
+							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
+							[Group : {{value.group_set|join:", "}} ]				
 						</li>
 					{% endif %}
 				{% endfor %}
+			{% else %}  
+        		<li class="bullet-item" > <i>Image not found ! </i> </li>
+        	{% endif %}
 			</ul>
 		</div>
 		<div class="small-3 columns">
 			<h6 align="center"><b>Videos</b></h6>
-			<ul class="pricing-table">        
+			<ul class="pricing-table resource-drawer" id="vid_contrib_drawer"> 
+			{% if video_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="vid_contrib" placeholder="Search Video"/>
+        		</li>        
 				{% for key, value in video_drawer.items %} 
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
-							{{value.name}}					
+							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
+							[Group : {{value.group_set|join:", "}} ]			
 						</li>
 					{% endif %}
 				{% endfor %}
+			{% else %}  
+        		<li class="bullet-item" > <i>Video not found ! </i> </li>
+        	{% endif %}
 			</ul>
 		</div>
 		<div class="small-3 columns">
 			<h6 align="center"><b>Files</b></h6>
-			<ul class="pricing-table">        
+			<ul class="pricing-table resource-drawer" id="file_contrib_drawer"> 
+			{% if file_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="file_contrib" placeholder="Search File"/>
+        		</li>       
 				{% for key, value in file_drawer.items %} 
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
-							{{value.name}}					
+							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
+							[Group : {{value.group_set|join:", "}} ]				
 						</li>
 					{% endif %}
 				{% endfor %}
+			{% else %}  
+        		<li class="bullet-item" > <i>File not found ! </i> </li>
+        	{% endif %}
 			</ul>
 		</div>
 	</div>
+
+	<div class="row" style="padding-top:10px;">
+		<div class="small-3 columns">
+			<h6 align="center"><b>Quizzes</b></h6>
+			<ul class="pricing-table resource-drawer" id="quiz_contrib_drawer">
+			{% if quiz_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="quiz_contrib" placeholder="Search Quiz"/>
+        		</li>
+				{% for key, value in quiz_drawer.items %}
+					{% if user_id in value.modified_by %}        
+						<li class="bullet-item" value={{key}}> 												
+							<a href="{% url 'quiz_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
+							[Group : {{value.group_set|join:", "}} ]							
+						</li>
+					{% endif %}
+				{% endfor %}	
+			{% else %}  
+        		<li class="bullet-item" > <i>Quiz not found ! </i> </li>
+        	{% endif %}			
+			</ul>
+		</div>
+		<div class="small-3 columns">
+			<h6 align="center"><b>Groups</b></h6>
+			<ul class="pricing-table resource-drawer" id="group_contrib_drawer">
+			{% if group_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="group_contrib" placeholder="Search Group"/>
+        		</li>
+				{% for key, value in group_drawer.items %}
+					{% if user_id in value.modified_by %}        
+						<li class="bullet-item" value={{key}}> 												
+							<a href="{% url 'groupchange' value.name %}">{{value.name}} </a>  							
+						</li>
+					{% endif %}
+				{% endfor %}	
+			{% else %}  
+        		<li class="bullet-item" > <i>Group not found ! </i> </li>
+        	{% endif %}			
+			</ul>
+		</div>
+		<div class="small-3 columns small-pull-3 columns">
+			<h6 align="center"><b>Forums</b></h6>
+			<ul class="pricing-table resource-drawer" id="forum_contrib_drawer">
+			{% if forum_drawer != "None" %}
+        		<li class="price">
+          			<input type="text" class="margin-0" name="forum_contrib" placeholder="Search Forum"/>
+        		</li>
+				{% for key, value in forum_drawer.items %}
+					{% if user_id in value.modified_by %}        
+						<li class="bullet-item" value={{key}}> 												
+							<a href="{% url 'show' value.group_set|join:', ' value %}">{{value.name}} </a>  							
+						</li>
+					{% endif %}
+				{% endfor %}	
+			{% else %}  
+        		<li class="bullet-item" > <i>Forum not found ! </i> </li>
+        	{% endif %}			
+			</ul>
+		</div>
+	</div>
+	<br/>
+
+
+	<!-- Collaborators -->
+	<hr/>
+	<div class="row">
+		<div class="small-2 columns" style="padding-top:10px;">
+			Collaborators :						
+		</div>
+		<div class="small-5 columns small-pull-5 columns" style="padding-top:10px;">
+			<ul class="pricing-table resource-drawer" id="collaborators_drawer"> 
+				{% for each in collab_drawer %}
+					<li class="bullet-item text-left"> 					
+						<div class="row">
+							<div class="small-6 columns">
+								<a href="">{{each}}  </a> 						
+							</div>
+							<div class="small-6 columns">
+								<a href="">modified:  </a>
+							</div>
+						</div>
+					</li>
+				{% endfor %}
+			</ul>					
+		</div>
+	</div>	
+
 	<!-- Shelf -->
 	<div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
@@ -156,5 +374,21 @@
 	
 
 </div>
+
+<script type="text/javascript">
+	$("input").each(function() {
+
+		$(this).bind('keydown keypress keyup change', function() {
+			var search = (this.value).toLowerCase();    	
+    		var resource = (this.name); 
+    		var $li = $("#"+resource+"_drawer li.bullet-item").hide();  
+
+    		$li.filter(function() {    		    		
+      			return $(this).text().toLowerCase().indexOf(search) >= 0;
+    		}).show();
+  		});
+    });
+	
+</script>
 
 {% endblock %}

@@ -74,8 +74,17 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       elif checked == "QuizObj":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$in':[u'Quiz',u'QuizItem']}, 'group_set': {'$all': [group_name]}})
 
+      elif checked == "OnlyQuiz":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Quiz']}, 'group_set': {'$all': [group_name]}})
+
       elif checked == "QuizItem":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'QuizItem']}, 'group_set': {'$all': [group_name]}})
+
+      elif checked == "Group":
+        drawer = gs_collection.GSystem.find({'_type': u"Group"})
+
+      elif checked == "Forum":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Forum']}, 'group_set': {'$all': [group_name]}})
 
     else:
       drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
