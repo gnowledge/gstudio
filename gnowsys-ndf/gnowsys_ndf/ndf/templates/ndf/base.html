@@ -52,12 +52,10 @@
 		body>header
 		{
 			position: relative;
-			-webkit-box-shadow: 2px 2px 4px 1px #C7C7C7;
-			box-shadow: 2px 2px 4px 1px #C7C7C7;
 		}
 
 		.workspace{
-			background-color:#e0e0e0;
+			background-color:#333;
 			min-height: 100%;
 			margin-bottom: -100px!important;
 			-webkit-box-sizing: border-box;
@@ -104,7 +102,7 @@
 
 	{% get_group_name request.path as group_name %}
 
-	<header class="row">
+	<header class="row drop-shadow">
 
 		<!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
 		<nav class="top-bar" data-topbar>
@@ -196,12 +194,12 @@
 					<!-- Start of sidebar section (main aside) -->
 					<aside  class="medium-12 large-3 columns">
 
-						<section class="row rounded drop-shadow">
+						<section class="row">
 
 							<!-- Meta content in the (main aside header)-->
 							<header class="medium-6 large-12 columns">
 
-								<a class="left-off-canvas-toggle meta" ><h3><i class='fi-asterisk'></i> Meta</h3></a> 
+								<a class="left-off-canvas-toggle meta" ><h3><i class='fi-puzzle'></i> Meta</h3></a> 
 
 								{% block meta_content %}  {% endblock %}
 

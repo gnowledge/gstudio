@@ -26,7 +26,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
 </p>
 <p>
-  Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
+  Contributed by: {{ node.user_details_dict.modified_by|join:', ' }}
 </p>
 <p>
   Last update: {{ node.last_update|date:"j F Y" }}
@@ -90,11 +90,13 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   </div>
   {% endif %}
   <h2 class="medium-12 columns">{{node.name}}</h2>
+  <a href="{% block url %}{% endblock %}" class="button edit left"><i class="fi-pencil"></i> Edit</a>
   <nav class="medium-12 columns">
-    <a href="{% block url %}{% endblock %}" class="button edit left">Edit</a>
     <dl class="tabs" data-tab>
       <dd class="medium-2 columns"><h3>View:</h3></dd>
-      <dd><a href="#panel2-3"><i class="fi-rewind"></i> Revision</a></dd>
+      <dd class="active"><a href="#panel2-3"><i class="fi-page-filled"></i> Page</a></dd>
+      <dd><a href="#panel2-3"><i class="fi-clock"></i> Revision</a></dd>
+      <dd><a href="#panel2-3"><i class="fi-comment"></i> Comment</a></dd>
     </dl>
 
   </nav>
