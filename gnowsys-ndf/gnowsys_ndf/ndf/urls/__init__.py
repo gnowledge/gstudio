@@ -10,6 +10,7 @@ from gnowsys_ndf.ndf.forms import *
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^admin/', include(admin.site.urls)),
     (r'^$', RedirectView.as_view(url= '/home/')),
     (r'^(?P<group_name>[^/]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_name>[^/]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
@@ -24,7 +25,6 @@ urlpatterns = patterns('',
     (r'^(?P<group_name>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
    # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
-    (r'^admin/', include(admin.site.urls)),
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
     url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
     url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form': UserResetform},name='password_reset_confirm'),
