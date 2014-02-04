@@ -82,14 +82,21 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% block body_content %}
 
 <header class="row page">
+{% if node.tags|length > 0 %}
+  <div class="tag-list"> 
+    {% for tag in node.tags %}
+  <span class="radius label">{{tag}}</span> 
+  {% endfor %}
+  </div>
+  {% endif %}
   <h2 class="medium-12 columns">{{node.name}}</h2>
-  <div class="medium-12 columns">
+  <nav class="medium-12 columns">
     <a href="{% block url %}{% endblock %}" class="button edit left">Edit</a>
     <dl class="tabs" data-tab>
       <dd><a href="#panel2-3"><i class="fi-rewind"></i> Revision</a></dd>
     </dl>
 
-  </div>
+  </nav>
 </header>
 
 <!-- Outer Main Row -->
@@ -100,15 +107,11 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
  {% endif %}
 </ul>
 
-{% if node.tags|length > 0 %}
+
 <p>
   Updated on {{ node.last_update|date:"j F Y" }} by <a class="user">User</a><br>
-  Tag{{ node.tags|length|pluralize }}: 
-  {% for tag in node.tags %}
-  <span class="radius label">{{tag}}</span>
-  {% endfor %}
+  
 </p>
-{% endif %}
 
 
 {% if node.prior_node|length > 0 %}

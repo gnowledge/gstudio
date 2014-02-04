@@ -304,17 +304,9 @@ article>header{
 	color:white;
 	margin-bottom:2rem!important;
 }
-article>header>div{
-	/* Using http://www.colorzilla.com/gradient-editor/ */
-	background: #003b27; /* Old browsers */
-	background: -moz-linear-gradient(-45deg, #003b27 0%, #005700 49%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#003b27), color-stop(49%,#005700)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(-45deg, #003b27 0%,#005700 49%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(-45deg, #003b27 0%,#005700 49%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(-45deg, #003b27 0%,#005700 49%); /* IE10+ */
-	background: linear-gradient(135deg, #003b27 0%,#005700 49%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#003b27', endColorstr='#005700',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+article nav{
 
+background-color: #555;
 
 }
 article h2{
