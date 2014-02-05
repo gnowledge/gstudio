@@ -120,13 +120,16 @@ a.right-off-canvas-toggle i{
 	-webkit-border-radius:2px;
 }
 .transition-opacity{
-	transition: opacity .5s ease-out;
-	-moz-transition: opacity .5s ease-out;
-	-webkit-transition: opacity .5s ease-out;
-	-o-transition: opacity .5s ease-out;
+	transition: opacity .3s ease;
+	-moz-transition: opacity .3s ease;
+	-webkit-transition: opacity .3s ease;
+	-o-transition: opacity .3s ease;
 }
 
 /* Card block */
+li.card{
+	min-height: 26rem;
+}
 .card>*{
 	position: relative;
 	background-color: white;
@@ -203,9 +206,15 @@ header .tabs dd.active a{
 	text-align: center;
 }
 .card h4{
+	font-weight: bold;
+	font-size: 1rem;
+	margin: 0;
+}
+.card p{
+	font-size: 0.9rem;
 }
 .card .th{
-	margin:30px auto;
+	margin:20px auto;
 	width:80px;
 	height: 80px;
 	overflow: hidden;
@@ -327,7 +336,9 @@ pre{
 textarea{
 	min-height: 6rem;
 }
-
+.orgitdown textarea{
+	min-height: 15rem!important;
+}
 #content{
 	min-height: 10rem;
 
