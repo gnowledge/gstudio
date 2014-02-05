@@ -1,18 +1,15 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
-from collections import Counter
 from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
-from django.template.defaultfilters import slugify
+
 
 from django_mongokit import get_database
 
@@ -23,24 +20,15 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
-
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.models import HistoryManager
-from gnowsys_ndf.ndf.rcslib import RCS
-from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 from gnowsys_ndf.ndf.views.methods import get_drawers
 
 
 #######################################################################################################################################
 
 db = get_database()
-collection = db[Node.collection_name]
-gst_page = collection.Node.one({'_type': u'GSystemType', 'name': GAPPS[0]})
 gs_collection = db[GSystem.collection_name]
-history_manager = HistoryManager()
-rcs = RCS()
+
 
 #######################################################################################################################################
 #                                                                     V I E W S   D E F I N E D   F O R   U S E R   D A S H B O A R D

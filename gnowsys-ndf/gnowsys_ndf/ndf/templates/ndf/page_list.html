@@ -17,14 +17,15 @@
 
   </h2>
 
-  <div class="medium-12 columns">
+  <nav class="medium-12 columns">
 
-  <dl class="tabs" data-tab>
-          <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages ({{ page_nodes_count }})</a></dd>
-          <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
-      </dl>
+    <dl class="tabs" data-tab>
+      <dd><h3>View:</h3></dd>
+      <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages ({{ page_nodes_count }})</a></dd>
+      <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
+    </dl>
 
-  </div>
+  </nav>
 </header>
 
 <ul class="pricing-table">
@@ -55,74 +56,79 @@
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   <!-- Node create card-->
- <li class="create card">
-        <div class="page">
-            <h4><i class="fi-plus"></i> New</h4>
-            <div class="row">
-                <div class="large-12 columns">
+  <li class="create card">
+    <div class="page">
+      <h4><i class="fi-plus"></i> New</h4>
+      <div class="row">
+        <div class="large-12 columns">
 
-                  <input type="text" placeholder="Name of the {{title}}" />
-                  <textarea placeholder="Describe the {{title}}"></textarea>
+          <input type="text" placeholder="Name of the {{title}}" />
+          <textarea placeholder="Describe the {{title}}"></textarea>
 
-                  <div class="login-mode switch round">
+          <div class="login-mode switch round">
 
-                    <input id="PUBLIC" name="login-mode" type="radio" checked>
-                    <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+            <input id="PUBLIC" name="login-mode" type="radio" checked>
+            <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
 
-                    <input id="PRIVATE" name="login-mode" type="radio">
-                    <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+            <input id="PRIVATE" name="login-mode" type="radio">
+            <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
 
-                    <span></span>
+            <span></span>
 
-                </div>
+          </div>
 
-            </div>
         </div>
-        {% if user.is_authenticated %}
-        <a class="button expand" href="{% url 'page_create_edit' group_name %}">
-            Create {{title}}
-        </a>
-        {% endif %}
+      </div>
+      {% if user.is_authenticated %}
+      <a class="button expand" href="{% url 'page_create_edit' group_name %}">
+        Create {{title}}
+      </a>
+      {% endif %}
     </li>
 
-<!-- Existing card list-->
-  {% for node in page_nodes %}
-  <li class="card">
-    <a class="page" href="{% url 'page_details' group_name node %}">
-      <header>
-        <div class="label-list"><span class="label">citizen-science</span><span class="label">education</span></div> <!-- {{ node.tags|join:", " }} -->
+    <!-- Existing card list-->
+    {% for node in page_nodes %}
+    <li class="card">
+      <a class="page" href="{% url 'page_details' group_name node %}">
+        <header>
 
-        <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-        <h4>{{ node.name }}</h4>
+          <div class="label-list">
+            {% for tag in node.tags %}
+            <span class="label">{{tag}}</span>
+            {% endfor %}
+          </div>
 
-        <small>{{ node.member_of|join:', ' }} created by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> on {{node.created_at|date:"j F Y"}} 
-        </small>
-      </header>
+          <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+          <h4>{{ node.name }}</h4>
 
-      <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
+          <small>{{ node.member_of|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </header>
 
-      <div class="button expand">View Page</div> 
-      <footer class="row">
-       <div class="small-6 columns"><strong>2</strong> Contributors</div>
-       <div class="small-6 columns"><strong>9</strong> Changes</div> 
-     </footer>
+        <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
 
-   </a>
- </li>
+        <div class="button expand">View Page</div> 
+        <footer class="row">
+         <div class="small-6 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
+         <div class="small-6 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
+       </footer>
 
- {% empty %}
+     </a>
+   </li>
 
- {% if not searching %}
- <li class="bullet-item text-left">
-  <div class="row">
-    <div class="small-12 columns">
-     <p>Currently <b>NO Pages</b>!!!</p>
+   {% empty %}
+
+   {% if not searching %}
+   <li class="bullet-item text-left">
+    <div class="row">
+      <div class="small-12 columns">
+       <p>Currently <b>NO Pages</b>!!!</p>
+     </div>
    </div>
- </div>
-</li>
-{% endif %}
+ </li>
+ {% endif %}
 
-{% endfor %}
+ {% endfor %}
 </ul>
 
 
