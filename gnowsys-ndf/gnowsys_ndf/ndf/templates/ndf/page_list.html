@@ -101,7 +101,7 @@
           <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
           <h4>{{ node.name }}</h4>
 
-          <small>{{ node.member_of|join:', ' }} created on {{node.created_at|date:"j F Y"}} by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          <small>{{ node.member_of|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
           </small>
         </header>
 
