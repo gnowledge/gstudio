@@ -22,6 +22,7 @@ from django_mongokit.document import DjangoDocument
 
 from mongokit import CustomType
 from mongokit import IS
+from mongokit import OR
 
 try:
     from bson import ObjectId
@@ -156,7 +157,8 @@ class Node(DjangoDocument):
         'prior_node': [ObjectId],
         
         'type_of': unicode,
-      	'member_of': [unicode], 		 
+      	# 'member_of': [unicode], 		 
+      	'member_of': [OR(GSystemType, MetaType)] 		 
 
       	'created_at': datetime.datetime,
         'last_update': datetime.datetime,
