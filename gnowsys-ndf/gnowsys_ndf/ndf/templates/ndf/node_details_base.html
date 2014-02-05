@@ -86,7 +86,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
   <h2 class="medium-12 columns">
-  <div class="label-list"> 
+    <div class="label-list"> 
       {% for tag in node.tags %}
       <span class="radius label">{{tag}}</span> 
       {% endfor %}
@@ -100,13 +100,18 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   <nav class="medium-12 columns">
     <dl class="tabs" data-tab>
       <dd class="medium-2 columns"><h3>View:</h3></dd>
-      <dd class="active"><a href="#panel2-3"><i class="fi-page-filled"></i> Page</a></dd>
-      <dd><a href="#panel2-3"><i class="fi-clock"></i> Revision</a></dd>
-      <dd><a href="#panel2-3"><i class="fi-comment"></i> Comment</a></dd>
+      <dd class="active"><a href="#view-page"><i class="fi-page-filled"></i> Page</a></dd>
+      <dd><a href="#view-graph"><i class="fi-share"></i> Graph</a></dd>
+      <dd><a href="#view-comments"><i class="fi-comment"></i> Comments</a></dd>
+       <dd><a href="#view-revisions"><i class="fi-clock"></i> Revisions</a></dd>
     </dl>
 
   </nav>
 </header>
+
+<div class="tabs-content">
+<!-- Tab content -->
+ <div class="content active" id="view-page">
 
 <!-- Outer Main Row -->
 <ul class="inline-list">
@@ -135,20 +140,27 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
 {% with node.html_content|safe as description %}
-{% if description != "None" %}
-<div class="card">
- {{ description }}
-</div>
-{% endif %}
-{% endwith %}
 
-<!--  ###### Graph ###### -->      
+<div class="card">
+{% if description != "None" %}
+ {{ description }}
+ {% endif %}
+</div>
+
+{% endwith %}
+</div>
+
+<!-- Tab View Graph -->
+ <div class="content" id="view-graph">    
 <div class="row">
   <div class="small-12 columns" id="graph-div">
     {% include "ndf/relational_graph.html" with graphData=graphData %}        
   </div>
 </div>
+</div>
+</div>
 <!--  ###### Graph ###### -->
+
 
 {% endblock %}
 

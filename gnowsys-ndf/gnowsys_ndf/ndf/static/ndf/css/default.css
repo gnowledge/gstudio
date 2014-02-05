@@ -203,8 +203,6 @@ header .tabs dd.active a{
 	text-align: center;
 }
 .card h4{
-	word-break:break-all;
-	font-weight: bold;
 }
 .card .th{
 	margin:30px auto;
@@ -301,19 +299,17 @@ main .button:hover{
 
 /* Content area */
 article{
-	margin-top: 1rem;
+	margin-top: 1.5rem;
 	background-color: #f5f5f5;
 	border:solid 1px #ddd;
+	padding:2rem!important;
 	padding-bottom: 20px; 
 }
 
 article>header{
-	border-bottom: 4px solid #777;
-	color:white;
-	margin-bottom:2rem!important;
 }
 article nav{
-
+	margin-top: 1rem;
 }
 
 pre{
@@ -330,6 +326,11 @@ pre{
 
 textarea{
 	min-height: 6rem;
+}
+
+#content{
+	min-height: 10rem;
+
 }
 
 /*************************** 3. Custom CSS Below ***********************/
