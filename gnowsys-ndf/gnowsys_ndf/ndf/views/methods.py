@@ -74,8 +74,17 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       elif checked == "QuizObj":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$in':[u'Quiz',u'QuizItem']}, 'group_set': {'$all': [group_name]}})
 
+      elif checked == "OnlyQuiz":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Quiz']}, 'group_set': {'$all': [group_name]}})
+
       elif checked == "QuizItem":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'QuizItem']}, 'group_set': {'$all': [group_name]}})
+
+      elif checked == "Group":
+        drawer = gs_collection.GSystem.find({'_type': u"Group"})
+
+      elif checked == "Forum":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Forum']}, 'group_set': {'$all': [group_name]}})
 
     else:
       drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
@@ -147,8 +156,13 @@ def get_node_common_fields(request, node, group_name, node_type):
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
 
+  #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
-    node.modified_by.append(usrid)
+  #if usrid in node.modified_by:
+    node.modified_by.insert(0,usrid)
+  else:
+    node.modified_by.remove(usrid)
+    node.modified_by.insert(0,usrid)
 
   if group_name not in node.group_set:
     node.group_set.append(group_name)

@@ -3,6 +3,11 @@
 {% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
 {% block head %}
 
+<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
+<script type="text/javascript"
+src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
 <!-- MathJax-In-Line-Configuration: Specifying the configuration settings -->
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -13,20 +18,15 @@
   });
 </script>
 
-<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
-<script type="text/javascript"
-src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
 {% endblock %}
 
 {% block meta_content %}
-<!--This content possible comes from page_details.html-->
+<!--This content possibly comes from page_details.html-->
 <p>
   {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
 </p>
 <p>
-  Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
+  Contributed by: {{ node.user_details_dict.modified_by|join:', ' }}
 </p>
 <p>
   Last update: {{ node.last_update|date:"j F Y" }}
@@ -80,68 +80,87 @@ src="/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 {% endblock %}
 
 {% block body_content %}
+
 <header class="row page">
-<h2 class="medium-12 columns">{{node.name}}</h2>
-  <div class="medium-12 columns">
-    <a href="{% block url %}{% endblock %}" class="button edit left">Edit</a>
+
+
+
+  <h2 class="medium-12 columns">
+    <div class="label-list"> 
+      {% for tag in node.tags %}
+      <span class="radius label">{{tag}}</span> 
+      {% endfor %}
+      <a class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+    </div>
+    <span class='node'>{{node.name}}</span> <a href="{% block url %}{% endblock %}" class="button edit"><i class="fi-pencil"></i> <span>Edit</span></a>
+  </h2>
+  <h3 class="medium-12 columns subheader">
+    <small>Edited {{ node.last_update|timesince }} ago by <a class="user">User</a></small>
+  </h3>
+  <nav class="medium-12 columns">
     <dl class="tabs" data-tab>
-      <dd><a href="#panel2-3"><i class="fi-rewind"></i> Revision</a></dd>
+      <dd class="medium-2 columns"><h3>View:</h3></dd>
+      <dd class="active"><a href="#view-page"><i class="fi-page-filled"></i> Content</a></dd>
+      <dd><a href="#view-graph"><i class="fi-share"></i> Graph</a></dd>
+      <dd><a href="#view-comments"><i class="fi-comment"></i> Comments</a></dd>
+      <dd><a href="#view-revisions"><i class="fi-clock"></i> Revisions</a></dd>
     </dl>
 
-  </div>
+  </nav>
 </header>
 
-<!-- Outer Main Row -->
-<ul class="inline-list">
+<div class="tabs-content">
+  <!-- Tab content -->
+  <div class="content active" id="view-page">
 
- {% if user.is_authenticated %}
- {% block add_list %}{% endblock %}
- {% endif %}
-</ul>
+    <!-- Outer Main Row -->
+    <ul class="inline-list">
 
-{% if node.tags|length > 0 %}
-<p>
-Updated on {{ node.last_update|date:"j F Y" }} by <a class="user">User</a><br>
-  Tag{{ node.tags|length|pluralize }}: 
-  {% for tag in node.tags %}
-  <span class="radius label">{{tag}}</span>
-  {% endfor %}
-</p>
-{% endif %}
+     {% if user.is_authenticated %}
+     {% block add_list %}{% endblock %}
+     {% endif %}
+   </ul>
 
 
-{% if node.prior_node|length > 0 %}
-<fieldset>
- <legend><h5><strong>Things to know before going ahead</strong></h5></legend>
- {% for index_key, each_node in node.prior_node_dict.items %}
- {% get_grid_fs_object each_node as grid_fs_obj %}
- {% if each_node.mime_type %}
- <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
- {% else %}
- <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
- {% endif %}
- {% endfor %}
-</fieldset>
-{% endif %}
+   {% if node.prior_node|length > 0 %}
+   <fieldset>
+     <legend><h5><strong>Things to know before going ahead</strong></h5></legend>
+     {% for index_key, each_node in node.prior_node_dict.items %}
+     {% get_grid_fs_object each_node as grid_fs_obj %}
+     {% if each_node.mime_type %}
+     <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+     {% else %}
+     <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+     {% endif %}
+     {% endfor %}
+   </fieldset>
+   {% endif %}
 
-{% block add_fields %} {% endblock %}
+   {% block add_fields %} {% endblock %}
 
 
-{% with node.html_content|safe as description %}
-{% if description != "None" %}
-<div class="card">
- {{ description }}
+   {% with node.html_content|safe as description %}
+
+   <div class="card">
+    {% if description != "None" %}
+    {{ description }}
+    {% endif %}
+  </div>
+
+  {% endwith %}
 </div>
-{% endif %}
-{% endwith %}
 
-  <!--  ###### Graph ###### -->      
+<!-- Tab View Graph -->
+<div class="content" id="view-graph">    
   <div class="row">
     <div class="small-12 columns" id="graph-div">
       {% include "ndf/relational_graph.html" with graphData=graphData %}        
     </div>
   </div>
-    <!--  ###### Graph ###### -->
+</div>
+</div>
+<!--  ###### Graph ###### -->
+
 
 {% endblock %}
 

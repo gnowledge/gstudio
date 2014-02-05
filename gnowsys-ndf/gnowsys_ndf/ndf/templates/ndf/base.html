@@ -52,12 +52,10 @@
 		body>header
 		{
 			position: relative;
-			-webkit-box-shadow: 2px 2px 4px 1px #C7C7C7;
-			box-shadow: 2px 2px 4px 1px #C7C7C7;
 		}
 
-		.main{
-			background-color:#e0e0e0;
+		.workspace{
+			background-color:#333;
 			min-height: 100%;
 			margin-bottom: -100px!important;
 			-webkit-box-sizing: border-box;
@@ -65,7 +63,7 @@
 			box-sizing: border-box;
 		}
 
-		.main:after{
+		.workspace:after{
 			content:"";
 			display:block;
 			height:100px;
@@ -104,7 +102,7 @@
 
 	{% get_group_name request.path as group_name %}
 
-	<header class="row">
+	<header class="row drop-shadow">
 
 		<!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
 		<nav class="top-bar" data-topbar>
@@ -180,7 +178,7 @@
 		</nav>
 
 	</header> 		
-	<div class="main">
+	<div class="workspace">
 		<div class="off-canvas-wrap">
 			<div class="inner-wrap">
 
@@ -196,16 +194,15 @@
 
 				<main class="row">  
 
-					<!-- Start of sidebar section -->
+					<!-- Start of sidebar section (main aside) -->
+					<aside  class="medium-12 large-3 columns transition-opacity">
 
-					<aside  class="medium-12 large-3 columns">
+						<section class="row">
 
-						<section class="row rounded drop-shadow">
-
-
-
+							<!-- Meta content in the (main aside header)-->
 							<header class="medium-6 large-12 columns">
-								<a class="left-off-canvas-toggle meta" ><h3><i class='fi-asterisk'></i> Meta</h3></a> 
+
+								<a class="left-off-canvas-toggle meta" ><h3><i class='fi-puzzle'></i> Meta</h3></a> 
 
 								{% block meta_content %}  {% endblock %}
 
@@ -249,7 +246,7 @@
 
 
 
-							<a class="right-off-canvas-toggle" ><i class='fi-book-bookmark'></i></a> 
+							
 
 							<!-- The actual body content -->
 							{% block body_content %}  {% endblock %}
@@ -331,6 +328,18 @@
 		$("aside.page").prepend(function(){
 			/* Attaches icon for node type */
 			return "<i class='fi-page'></i>"
+		});
+
+/* */
+		$("aside").delay(3000).queue(function(){
+			$(this).addClass("fade");
+			$(this).dequeue();
+		});
+		$("aside").hover(function(){
+			$(this).removeClass("fade");
+		},
+		function(){
+			$(this).addClass("fade");
 		});
 
 
