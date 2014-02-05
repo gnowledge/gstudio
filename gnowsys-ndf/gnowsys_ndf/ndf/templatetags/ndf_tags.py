@@ -214,26 +214,17 @@ def get_group_policy(group_name,user):
 def get_user_group(user):
 
   group = []
-  author_id=""	
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find({'_type': u'Group'})
-  colg1 = col_Group.Group.find({'_type': u'Group','author_set':user.id})
-  colg.sort('name')
-  gr1=list(colg1)
-  gr = list(colg)
-   	  
-  for items in gr:	
-     
-	if items.name!='home':
-		if items.group_type=='PUBLIC' or items.created_by==user.id:
-					group.append(items)
-  		
-  for items in gr1:
-	if items.name!='home':
-		group.append(items)		 
-  
-  return group
 
+  colg = col_Group.Group.find({ '_type': u'Group', 
+                                'name': {'$nin': ['home']},
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}] 
+                              })
+
+  for g in colg:
+    group.append(g)
+    
+  return group
 
 
 
