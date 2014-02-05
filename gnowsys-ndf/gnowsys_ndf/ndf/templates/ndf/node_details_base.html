@@ -140,11 +140,13 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
 {% with node.html_content|safe as description %}
-{% if description != "None" %}
+
 <div class="card">
+{% if description != "None" %}
  {{ description }}
+ {% endif %}
 </div>
-{% endif %}
+
 {% endwith %}
 </div>
 

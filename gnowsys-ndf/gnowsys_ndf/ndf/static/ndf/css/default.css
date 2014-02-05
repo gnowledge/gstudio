@@ -328,6 +328,11 @@ textarea{
 	min-height: 6rem;
 }
 
+#content{
+	min-height: 10rem;
+
+}
+
 /*************************** 3. Custom CSS Below ***********************/
 
 .user{
