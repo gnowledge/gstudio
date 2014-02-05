@@ -100,63 +100,63 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   <nav class="medium-12 columns">
     <dl class="tabs" data-tab>
       <dd class="medium-2 columns"><h3>View:</h3></dd>
-      <dd class="active"><a href="#view-page"><i class="fi-page-filled"></i> Page</a></dd>
+      <dd class="active"><a href="#view-page"><i class="fi-page-filled"></i> Content</a></dd>
       <dd><a href="#view-graph"><i class="fi-share"></i> Graph</a></dd>
       <dd><a href="#view-comments"><i class="fi-comment"></i> Comments</a></dd>
-       <dd><a href="#view-revisions"><i class="fi-clock"></i> Revisions</a></dd>
+      <dd><a href="#view-revisions"><i class="fi-clock"></i> Revisions</a></dd>
     </dl>
 
   </nav>
 </header>
 
 <div class="tabs-content">
-<!-- Tab content -->
- <div class="content active" id="view-page">
+  <!-- Tab content -->
+  <div class="content active" id="view-page">
 
-<!-- Outer Main Row -->
-<ul class="inline-list">
+    <!-- Outer Main Row -->
+    <ul class="inline-list">
 
- {% if user.is_authenticated %}
- {% block add_list %}{% endblock %}
- {% endif %}
-</ul>
-
-
-{% if node.prior_node|length > 0 %}
-<fieldset>
- <legend><h5><strong>Things to know before going ahead</strong></h5></legend>
- {% for index_key, each_node in node.prior_node_dict.items %}
- {% get_grid_fs_object each_node as grid_fs_obj %}
- {% if each_node.mime_type %}
- <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
- {% else %}
- <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
- {% endif %}
- {% endfor %}
-</fieldset>
-{% endif %}
-
-{% block add_fields %} {% endblock %}
+     {% if user.is_authenticated %}
+     {% block add_list %}{% endblock %}
+     {% endif %}
+   </ul>
 
 
-{% with node.html_content|safe as description %}
+   {% if node.prior_node|length > 0 %}
+   <fieldset>
+     <legend><h5><strong>Things to know before going ahead</strong></h5></legend>
+     {% for index_key, each_node in node.prior_node_dict.items %}
+     {% get_grid_fs_object each_node as grid_fs_obj %}
+     {% if each_node.mime_type %}
+     <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+     {% else %}
+     <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+     {% endif %}
+     {% endfor %}
+   </fieldset>
+   {% endif %}
 
-<div class="card">
-{% if description != "None" %}
- {{ description }}
- {% endif %}
-</div>
+   {% block add_fields %} {% endblock %}
 
-{% endwith %}
+
+   {% with node.html_content|safe as description %}
+
+   <div class="card">
+    {% if description != "None" %}
+    {{ description }}
+    {% endif %}
+  </div>
+
+  {% endwith %}
 </div>
 
 <!-- Tab View Graph -->
- <div class="content" id="view-graph">    
-<div class="row">
-  <div class="small-12 columns" id="graph-div">
-    {% include "ndf/relational_graph.html" with graphData=graphData %}        
+<div class="content" id="view-graph">    
+  <div class="row">
+    <div class="small-12 columns" id="graph-div">
+      {% include "ndf/relational_graph.html" with graphData=graphData %}        
+    </div>
   </div>
-</div>
 </div>
 </div>
 <!--  ###### Graph ###### -->
