@@ -4,15 +4,18 @@
 {% block title %} Group Dashboard {% endblock %}
 
 {% block head %}
+
 <script type="text/javascript">
 //function to toggle the lable Join and Unsubscribe
+
 function change_label(label)
-{
+{   
     if(label == "Join")
     { $("#notify").val("Unsubscribe");}
     else
     { $("#notify").val("Join");}
 }
+
 //function for sending notifications for Join and Unsubscribe
 function notify(group,activity)
 {
@@ -36,6 +39,7 @@ function notify(group,activity)
 
 
 }
+
 
 $(document).ready(function()
 {
@@ -73,7 +77,8 @@ $(document).ready(function()
 <input type="hidden" id="groupname" value="{{group}}">
 {% if user_is_joined == "joined" %}
      <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible" >
-{% elif user_is_joined == "not"  %}
+{% elif user_is_joined == "not" or not user.is_authenticated  %}
+
      <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
 {% endif %}
 {% get_user_object node.created_by as user_obj %}

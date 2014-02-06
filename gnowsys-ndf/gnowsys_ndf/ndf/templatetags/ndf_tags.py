@@ -180,7 +180,7 @@ def get_existing_groups():
   gr = list(colg)
   for items in gr:
     if items.name:
-      group.append(items.name)
+      group.append(items)
   return group
 
 
@@ -188,12 +188,12 @@ def get_existing_groups():
 def get_existing_groups_excluded(grname):
   group = []
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find({'_type':u'Group'})
+  colg = col_Group.Group.find({'_type':u'Group','group_type':"PUBLIC"})
   colg.sort('name')
   gr=list(colg)
   for items in gr:
     if items.name != grname:
-      group.append(items.name)
+      group.append(items)
   if not group:
     group.append("None")
   return group
@@ -209,6 +209,24 @@ def get_group_policy(group_name,user):
   except:
     pass
   return policy
+
+@register.assignment_tag
+def get_user_group(user):
+
+  group = []
+  col_Group = db[Group.collection_name]
+
+  colg = col_Group.Group.find({ '_type': u'Group', 
+                                'name': {'$nin': ['home']},
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}] 
+                              })
+
+  for g in colg:
+    group.append(g)
+    
+  return group
+
+
 
 '''this template function is used to get the user object from template''' 
 @register.assignment_tag 
