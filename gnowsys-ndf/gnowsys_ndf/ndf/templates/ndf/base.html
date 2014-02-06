@@ -183,10 +183,10 @@
 				<!-- Off Canvas Meta Map -->
 				<aside class="left-off-canvas-menu">
 					<!-- whatever you want goes here -->
-					<h4>Read this first</h4>
+					<h4>Help</h4>
 					<ul class="off-canvas-list">
-						<li><a href="#">Help Topics</a></li>
-						<li><a href="#">Prior Nodes</a></li>
+					{% block help_topics %}  {% endblock %}
+						<li><a href="#">About metaStudio</a></li>
 					</ul>
 				</aside>
 
@@ -201,6 +201,9 @@
 							<header class="medium-6 large-12 columns">
 
 								<a class="left-off-canvas-toggle meta" ><h3><i class='fi-puzzle'></i> Meta</h3></a> 
+
+								
+								{% block help_content %}  {% endblock %}
 
 								{% block meta_content %}  {% endblock %}
 
