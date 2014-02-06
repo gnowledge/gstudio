@@ -98,23 +98,25 @@
       <a class="page" href="{% url 'page_details' group_name node %}">
 
         <header>
-
-          <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-          <h4>{{ node.name }}
-<div>
-          <small class="subheader">{{ node.member_of|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-          </small>
-          </div>
-</h4>
-        </header>
-
-        <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
-
-        <div class="label-list">
+        
+<div class="label-list">
           {% for tag in node.tags %}
           <span class="label">{{tag}}</span>
           {% endfor %}
         </div>
+
+          <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+          <h4>{{ node.name }}
+            <div>
+              <small class="subheader">{{ node.member_of|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+              </small>
+            </div>
+          </h4>
+        </header>
+
+        <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
+
+
 
         <div class="small button">View Page</div> 
 

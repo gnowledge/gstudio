@@ -80,8 +80,11 @@ main>aside a:hover{
 
 h2:not(.subheader){
 	color: black;
-	font-size: 2rem;
 	margin-bottom: 0;
+	font-weight: bold;
+	padding-right: 3rem;
+	font-size: 1.5rem;
+	font-family: "Georgia Serif"
 }
 
 
@@ -89,13 +92,17 @@ h2:not(.subheader){
 aside.left-off-canvas-menu{
 	background-color: #222;
 }
-a.right-off-canvas-toggle{
+a#toggle-shelf{
+	position: absolute;
+	top:1rem;
+	right: 1rem;
 	color: black;
+	z-index: 10;
 }
-a.right-off-canvas-toggle:hover{
-	color: white;
+a#toggle-shelf:hover{
+	color: #aaa;
 }
-a.right-off-canvas-toggle i{
+a#toggle-shelf i{
 	font-size: 30px;
 }
 
@@ -167,38 +174,36 @@ a.right-off-canvas-toggle i{
 	color:inherit;
 }
 /* Content Tabs */
-header .tabs{
+article .tabs{
 }
-header .tabs i{
+article .tabs i{
 	margin-right: 5px;
 	font-size: 1.3rem;
 }
-header .tabs h3{
-	font-size: 1rem;
-	font-weight: bold;
-	padding: 0.7rem 3rem 0 0.5rem;
-	color: #777;
-	display: none;
-}
-header .tabs dd a{
-	color: white;
-	padding-top: 0.5rem;
-	padding-bottom: 0.8rem;
-	background-color: #aaa;
-}
-header .tabs dd a:hover{
-	background-color: #999 ;
-}
-header .tabs dd.active a{
-	background-color: #888;
-	font-weight: bold;
-}
-.tabs-content>.content{/* Overrides tab content floating lef */
+article .tabs dd{
+	width: 100%;
 	float: none;
 }
+article .tabs dd a{
+	color:#aaa;
+	background-color: inherit;
+	padding: 1rem;
+	border-bottom: 1px solid #aaa;
+}
+article .tabs dd a:hover{
+	background-color: inherit;
+	color:#222;
+}
+article .tabs dd.active a{
+	color:green;
+	font-weight: bold;
+	background-color: inherit;
+	border-bottom: 1px solid green;
+}
+
 /* Default card */
 .card header{
-	text-align: center;
+	margin-bottom: 0;
 }
 .card h4{
 	font-weight: bold;
@@ -249,16 +254,18 @@ header .tabs dd.active a{
 }
 /* Inline label list */
 .label{
-	background-color: #aaa;
-	border-left:1px solid #999;
+	color: green;
+	background-color: inherit;
+	border-left:1px solid ye;
 	display: inline-block;
 }
 .label:hover{
-	background-color: #999;
+	background-color: orange;
 }
 
 .label-list{
 	text-align: left;
+	height:2rem;
 }
 
 .card .label{
@@ -302,19 +309,19 @@ main .button:hover{
 
 /* Content area */
 article{
-	margin-top: 1.5rem;
+	margin-top: 0.5rem;
 	background-color: #f5f5f5;
 	border:solid 1px #ddd;
-	padding:2rem!important;
-	padding-bottom: 20px; 
+	padding-top: 1rem;
+	padding-bottom: 4rem; 
 }
 
 article header{
-	margin-bottom: 1rem!important;
-	border-bottom: 1px solid #aaa;
+	border-bottom: 1px solid #ddd;
+	
 }
 article nav{
-	margin-top: 1rem;
+	
 }
 
 pre{
@@ -327,8 +334,11 @@ pre{
 	background: url('/static/ndf/images/pre.png');
 	background-size:1px 4rem;
 	padding-left:0.5rem;
+	font-family: monospace;
 }
+article p{
 
+}
 textarea{
 	min-height: 6rem;
 }
