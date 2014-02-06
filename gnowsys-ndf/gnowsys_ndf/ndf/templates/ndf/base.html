@@ -154,15 +154,20 @@
 						<li class="has-dropdown group">
 							<a class="active-menu" href="#"><i class="fi-home"></i> {{group_name}}</a>
 
-							<!-- If logged in show user groups -->
 
-							{% get_existing_groups_excluded group_name as groups %}
+						<!-- If logged in show user groups -->
+						
+						{% if user.is_authenticated %}
+						  	{% get_user_group  request.user as groups %}
+						  {% else %}	
+							 {% get_existing_groups_excluded group_name as groups %}
+					         {% endif %} 
+						<ul class="dropdown">
+							<!-- Create dropdown item for each group -->
+							{% for gp_id in groups %}
+							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id.name %}">{{gp_id.name}}</a></li>
+							{% endfor %}
 
-							<ul class="dropdown">
-								<!-- Create dropdown item for each group -->
-								{% for gp_id in groups %}
-								<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
-								{% endfor %}
 
 							</ul>
 
