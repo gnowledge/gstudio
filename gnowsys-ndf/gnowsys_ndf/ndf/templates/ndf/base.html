@@ -102,77 +102,78 @@
 
 	{% get_group_name request.path as group_name %}
 
-	<header class="row drop-shadow">
+	<header class="drop-shadow">
 
 		<!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
-		<nav class="top-bar" data-topbar>
-			<ul class="title-area">
-				<li class="name">
-					<h1><a href="/"><img src="/static/ndf/images/icon/meta.svg"> meta<b>Studio</b></a></h1>
-				</li>
-				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
-			</ul>
+		
+			<nav class="top-bar row" data-topbar>
+				<ul class="title-area">
+					<li class="name">
+						<h1><a href="/"><img src="/static/ndf/images/icon/meta.svg"> meta<b>Studio</b></a></h1>
+					</li>
+					<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+				</ul>
 
-			<section class="top-bar-section">
+				<section class="top-bar-section">
 
-				<!-- Right Nav Section -->
-				<ul class="right">
+					<!-- Right Nav Section -->
+					<ul class="right">
 
-					<!-- Top bar search form -->
-					<li class="has-form">
-						<div id="search-bar" class="row collapse">
-							<div class="large-12 small-12 columns">
-								<input type="text" placeholder="coming soon ..">
+						<!-- Top bar search form -->
+						<li class="has-form">
+							<div id="search-bar" class="row collapse">
+								<div class="large-12 small-12 columns">
+									<input type="text" placeholder="coming soon ..">
+								</div>
+
 							</div>
+						</li>
 
-						</div>
-					</li>
+						<!-- If logged in show user options -->
+						{% if user.is_authenticated %}
 
-					<!-- If logged in show user options -->
-					{% if user.is_authenticated %}
+						<li class="has-dropdown">
+							<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_name user.username %}">{{ user.username }}</a>
+							<ul class="dropdown">
+								<li><a href="{% url 'auth_password_change' %}">Change password</a></li>
+								<li class="has-form"><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
+							</ul>
+						</li>
 
-					<li class="has-dropdown">
-						<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_name user.username %}">{{ user.username }}</a>
-						<ul class="dropdown">
-							<li><a href="{% url 'auth_password_change' %}">Change password</a></li>
-							<li class="has-form"><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
-						</ul>
-					</li>
+						<!-- Else show login link -->
+						{% else %}
 
-					<!-- Else show login link -->
-					{% else %}
+						<li class="has-form"><a class="button" href="{% url 'auth_login' %}"><i class="fi-key"></i> Login</a></li>
 
-					<li class="has-form"><a class="button" href="{% url 'auth_login' %}"><i class="fi-key"></i> Login</a></li>
+						{% endif %}
 
-					{% endif %}
+					</ul>
 
-				</ul>
+					<!-- Left Nav Section -->
+					<ul class="left">
+						<li class="has-dropdown group">
+							<a class="active-menu" href="#"><i class="fi-home"></i> {{group_name}}</a>
 
-				<!-- Left Nav Section -->
-				<ul class="left">
-					<li class="has-dropdown group">
-						<a class="active-menu" href="#"><i class="fi-home"></i> {{group_name}}</a>
+							<!-- If logged in show user groups -->
 
-						<!-- If logged in show user groups -->
-						
-						{% get_existing_groups_excluded group_name as groups %}
+							{% get_existing_groups_excluded group_name as groups %}
 
-						<ul class="dropdown">
-							<!-- Create dropdown item for each group -->
-							{% for gp_id in groups %}
-							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
-							{% endfor %}
+							<ul class="dropdown">
+								<!-- Create dropdown item for each group -->
+								{% for gp_id in groups %}
+								<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id}}</a></li>
+								{% endfor %}
 
-						</ul>
+							</ul>
 
-						
 
-					</li>
 
-					{% get_gapps_menubar group_name request.META.PATH_INFO %}
-				</ul>
-			</section>
-		</nav>
+						</li>
+
+						{% get_gapps_menubar group_name request.META.PATH_INFO %}
+					</ul>
+				</section>
+			</nav>
 
 	</header> 		
 	<div class="workspace">
@@ -273,25 +274,25 @@
 				</div>
 			</div>
 		</div>
-		<footer class="row">
-
-			<div class="medium-3 columns">
-				<small>
-					<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> 
-					All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
-				</small>
-			</div>
-
-			<div class="medium-9 columns">
-
-				<p>
-					A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
-					<p><small>
-						<a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio">File a bug</a>
-					</small></p>
+		<footer>
+			<div class="row">
+				<div class="medium-3 columns">
+					<small>
+						<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a> 
+						All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
+					</small>
 				</div>
 
+				<div class="medium-9 columns">
 
+					<p>
+						A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in" target="_blank">TIFR</a>.</p>
+						<p><small>
+							<a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio">File a bug</a>
+						</small></p>
+					</div>
+
+				</div>
 
 			</footer>
 
@@ -327,7 +328,7 @@
 			return "<i class='fi-page'></i>"
 		});
 
-/* */
+		/* Fade sidebar when not in use */
 		$("aside").delay(3000).queue(function(){
 			$(this).addClass("fade");
 			$(this).dequeue();
@@ -339,8 +340,17 @@
 			$(this).addClass("fade");
 		});
 
+		/* Expand create card on hover */
+		$(".create.card").find(">div>div").slideUp()
+		$(".create.card").hover(function(){
+			$(this).find(">div>div").slideDown();
+		},
+		function(){
+			$(this).find(">div>div").slideUp();
+		});
 
-		/* Makes header links look like radio button */
+
+		
 		
 
 		{% block script %} {% endblock %}	

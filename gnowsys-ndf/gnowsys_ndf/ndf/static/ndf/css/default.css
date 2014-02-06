@@ -24,7 +24,8 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 
 
 /* Top bar */
-header{
+body>header{
+border-bottom: 1px solid black;
 }
 .top-bar,.top-bar-section ul,body>header{
 	background-color: #222;
@@ -127,9 +128,6 @@ a.right-off-canvas-toggle i{
 }
 
 /* Card block */
-li.card{
-	min-height: 26rem;
-}
 .card>*{
 	position: relative;
 	background-color: white;
@@ -218,7 +216,7 @@ header .tabs dd.active a{
 	width:80px;
 	height: 80px;
 	overflow: hidden;
-	display: block;
+	display: none;
 
 }
 .card .th:hover{
@@ -315,7 +313,9 @@ article{
 	padding-bottom: 20px; 
 }
 
-article>header{
+article header{
+	margin-bottom: 1rem!important;
+	border-bottom: 1px solid #aaa;
 }
 article nav{
 	margin-top: 1rem;
