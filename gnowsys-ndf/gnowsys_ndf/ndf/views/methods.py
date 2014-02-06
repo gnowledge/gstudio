@@ -101,11 +101,12 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
 
       for oid in nlist: 
         obj = gs_collection.GSystem.one({'_id': oid})
-        dict2.append(obj)
+        dict2.append(obj)        
 
       dict_drawer['1'] = dict1
       dict_drawer['2'] = dict2
-        
+
+    
     else:
       for each in drawer:
         if each._id != nid:
