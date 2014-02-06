@@ -14,9 +14,6 @@ nav.top-bar .has-dropdown .button{ /* Needs testing */
 	top:0;
 }
 
-p{
-	margin-bottom: 1.25rem;
-}
 
 input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
