@@ -24,12 +24,11 @@ class Command(BaseCommand):
         print "\n In progress... \n"
 
         # [A] Get the " GSystemType/AttributeType/RelationType " nodes (for whom 'gsystem_type' field doesn't exist)
-        cur_ty_mo = nc.Node.find({'_type': {'$in': ['GSystemType', 'AttributeType', 'RelationType']}})
+        cur_ty_mo = collection.Node.find({'_type': {'$in': ['GSystemType', 'AttributeType', 'RelationType']}})
 
         # Listing the nodes
         for n in cur_ty_mo:
-
-            # Replace 'member_of' field with Embedded document of MetaType to which that document belongs
+            # Replace 'member_of' field with ObjectId of MetaType to which that document belongs
             # - But right now we don't have such MetaType documents
             # - Currently going to keep 'member_of' field... EMPTY!
 
@@ -47,14 +46,14 @@ class Command(BaseCommand):
         # Listing the nodes
         for n in cur_nc_mo:
 
-            # Replace 'member_of' field with Embedded document of GSystemType to which that document belongs
+            # Replace 'member_of' field with ObjectId of GSystemType to which that document belongs
 
             if not n.gsystem_type:
                 # If 'gsystem_type' field is EMPTY
                 #   - Special case: Exists with 'Group' documents, they consists of value only for 'member_of' field (not for 'gsystem_type' field)
                 #   - In this case, 'member_of' field is a list that consists of name of the GSystemType (i.e. 'Group')
                 #   - So extract this value first from 'member_of' field, then assign/override 'member_of' field with an empty list.
-                #   - For extracted value (i.e. name of the GSystemType), fetch it's corresponding document from database; and append this document as an embedded document to the 'member_of' field
+                #   - For extracted value (i.e. name of the GSystemType), fetch it's documents ObjectId from database; and append this ObjectId to the 'member_of' field
                 # print "\n Group document: "
 
                 gsystem_name_list = n.member_of
@@ -63,27 +62,29 @@ class Command(BaseCommand):
                 # Iterate name list
                 for name in gsystem_name_list:
                     gsystem_node = collection.Node.one({'_type': 'GSystemType', 'name': name})
-                    n.member_of.append(gsystem_node)
+                    n.member_of.append(gsystem_node._id)
 
             else:
                 # Else 'gsystem_type' field is NOT empty
                 #   - This field contains list of ObjectIds' of GSystemType to which the document belongs
                 #   - Assign/Override 'member_of' field with an empty list
-                #   - For each ObjectId, fetch it's corresponding document from database; and append this document as an embedded document to the 'member_of' field
+                #   - Append these ObjectIds to the 'member_of' field
                 # print "\n Other GAPP document: "
 
                 gsystem_oid_list = n.gsystem_type
                 n.member_of = []
 
-                # Iterate ObjectId list
-                for oid in gsystem_oid_list:
-                    gsystem_node = collection.Node.one({'_id': oid})
-                    n.member_of.append(gsystem_node)
+                n.member_of = gsystem_oid_list
+                # # Iterate ObjectId list
+                # for oid in gsystem_oid_list:
+                #     gsystem_node = collection.Node.one({'_id': oid})
+                #     n.member_of.append(gsystem_node)
                 
             # print "  ", n._id, " - ", n.name, " - ", n.gsystem_type, " - ", n.member_of
             n.save()
 
-        # Remove 
+        # Remove 'gsystem_type' field from already existing documents where ever it exists!
+        collection.update({'gsystem_type': {'$exists': True}}, {'$unset': {'gsystem_type': ""}}, multi=True)
 
         # --- End of handle() ---
 
