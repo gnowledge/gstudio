@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load ndf_tags %}
 {% block title %} Group {% endblock %}
 
 
@@ -12,7 +12,7 @@
 
 {% endblock %}
 
-
+{% get_user_group  request.user as groups %}
 {% block body_content %} 
 <header class="row">
   <h2 class="medium-12 columns">Groups</h2>
@@ -70,7 +70,7 @@
     </li>
 
     <!-- Existing card list-->
-    {% for node in group_nodes %}
+    {% for node in groups %}
     <li class="card">
       <a class="group" href="/{{node.name}}">
 

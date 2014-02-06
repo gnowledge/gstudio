@@ -85,7 +85,7 @@ def select_drawer(request, group_name):
        
             return render_to_response("ndf/drawer_widget.html", 
                                       {"widget_for": "collection", 
-                                       "drawer1": drawer, 
+                                       "drawer1": drawer['1'], 
                                        "group_name": group_name
                                       }, 
                                       context_instance=RequestContext(request)
