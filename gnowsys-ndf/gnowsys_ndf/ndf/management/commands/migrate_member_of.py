@@ -33,8 +33,6 @@ class Command(BaseCommand):
             # - Currently going to keep 'member_of' field... EMPTY!
 
             n.member_of = []
-    
-            # print "  ", n._id, " - ", n.name, " - ", n.gsystem_type, " - ", n.member_of
             n.save()
 
         # ===================================================================================================================================
@@ -54,7 +52,6 @@ class Command(BaseCommand):
                 #   - In this case, 'member_of' field is a list that consists of name of the GSystemType (i.e. 'Group')
                 #   - So extract this value first from 'member_of' field, then assign/override 'member_of' field with an empty list.
                 #   - For extracted value (i.e. name of the GSystemType), fetch it's documents ObjectId from database; and append this ObjectId to the 'member_of' field
-                # print "\n Group document: "
 
                 gsystem_name_list = n.member_of
                 n.member_of = []
@@ -69,18 +66,12 @@ class Command(BaseCommand):
                 #   - This field contains list of ObjectIds' of GSystemType to which the document belongs
                 #   - Assign/Override 'member_of' field with an empty list
                 #   - Append these ObjectIds to the 'member_of' field
-                # print "\n Other GAPP document: "
 
                 gsystem_oid_list = n.gsystem_type
                 n.member_of = []
 
                 n.member_of = gsystem_oid_list
-                # # Iterate ObjectId list
-                # for oid in gsystem_oid_list:
-                #     gsystem_node = collection.Node.one({'_id': oid})
-                #     n.member_of.append(gsystem_node)
-                
-            # print "  ", n._id, " - ", n.name, " - ", n.gsystem_type, " - ", n.member_of
+
             n.save()
 
         # Remove 'gsystem_type' field from already existing documents where ever it exists!
