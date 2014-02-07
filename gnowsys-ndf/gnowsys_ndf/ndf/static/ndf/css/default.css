@@ -81,12 +81,12 @@ main>aside a:hover{
 h2:not(.subheader){
 	color: black;
 	margin-bottom: 0;
-	font-weight: bold;
 	padding-right: 3rem;
-	font-size: 1.5rem;
 	font-family: "Georgia Serif"
 }
-
+h3{
+	font-size: 1.4rem;
+}
 
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
@@ -349,7 +349,9 @@ textarea{
 	min-height: 10rem;
 
 }
-
+#content>p:first-of-type{
+	font-weight: bold;
+}
 /*************************** 3. Custom CSS Below ***********************/
 
 .user{
@@ -382,12 +384,8 @@ a.app i{
 	margin-right:8px;
 }
 .button.edit{
-	margin-left:1rem;
 	margin-bottom: 0;
-	vertical-align: middle;
 }
-.button.edit span{display: none;}
-.button.edit:hover span{display: inline;}
 
 /* Sidebar Search Results */
 main .search{
