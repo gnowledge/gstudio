@@ -82,7 +82,8 @@ h2:not(.subheader){
 	color: black;
 	margin-bottom: 0;
 	padding-right: 3rem;
-	font-family: "Georgia Serif"
+	font-family: "Georgia Serif";
+	font-size: :2rem;
 }
 h3{
 	font-size: 1.4rem;
@@ -198,7 +199,7 @@ article .tabs dd.active a{
 	color:green;
 	font-weight: bold;
 	background-color: inherit;
-	border-bottom: 1px solid green;
+	border-bottom: 2px solid green;
 }
 
 /* Default card */
@@ -254,8 +255,8 @@ article .tabs dd.active a{
 }
 /* Inline label list */
 .label{
-	color: green;
-	background-color: inherit;
+	color: white;
+	background-color: #aaa;
 	border-left:1px solid ye;
 	display: inline-block;
 }
@@ -265,7 +266,7 @@ article .tabs dd.active a{
 
 .label-list{
 	text-align: left;
-	height:2rem;
+	padding: 0.5rem 0;
 }
 
 .card .label{
@@ -312,12 +313,12 @@ article{
 	margin-top: 0.5rem;
 	background-color: #f5f5f5;
 	border:solid 1px #ddd;
-	padding-top: 1rem;
 	padding-bottom: 4rem; 
 }
 
 article header{
-	border-bottom: 1px solid #ddd;
+	background-color: #eaeaea;
+	border-bottom: 2px solid #ddd;
 	
 }
 article nav{

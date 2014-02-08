@@ -86,19 +86,16 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <header class="row page">
 
 
-  <section class="medium-3 columns">
+  <section class="medium-2 columns">
 
     <div class="label-list"> 
       {% for tag in node.tags %}
       <span class="radius label">{{tag}}</span> 
       {% endfor %}
     </div>
-    <h3>
-      by {{ node.user_details_dict.modified_by|join:', ' }}
-    </h3>
   </section>
 
-  <section class="medium-9 columns" >
+  <section class="medium-10 columns" >
     <h2>
       <span class='node'>{{node.name}}</span>
     </h2>
@@ -106,7 +103,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     <h3 class="subheader">
       <small>
 
-        Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View changes</a></small>
+        Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a></small>
       </h3>
 
     </section>
@@ -115,15 +112,15 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
   <div class="row">
 
-    <nav class="medium-3 columns">
-      <dl class="tabs" data-tab>
+    <nav class="medium-2 columns">
+      <dl class="row tabs" data-tab>
         <dd class="active"><a href="#view-page"><i class="fi-page-filled"></i> Content</a></dd>
         <dd><a href="#view-graph"><i class="fi-share"></i> Graph</a></dd>
         <dd><a href="#view-comments"><i class="fi-comment"></i> Discussion</a></dd>
       </dl>
     </nav>
 
-    <section class="medium-6 columns">
+    <section class="medium-7 columns">
       <div class="tabs-content">
 
         <!-- Tab content -->
@@ -180,9 +177,12 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
   </section>
 
+
 </div>
 
-
+ <footer class="row">
+  <h5>Contriubted by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
+  </footer>
 
 {% endblock %}
 
