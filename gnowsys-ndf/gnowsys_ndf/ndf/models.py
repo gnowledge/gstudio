@@ -158,7 +158,7 @@ class Node(DjangoDocument):
         
         'type_of': unicode,
       	# 'member_of': [unicode],
-      	# 'member_of': [OR(GSystemType, MetaType)]
+      	# 'member_of': [OR(GSystemType, MetaType)]     # Not possible to achieve this -- Because GSystemType & MetaType inherts from Node
         'member_of': [ObjectId],
 
       	'created_at': datetime.datetime,
@@ -203,13 +203,27 @@ class Node(DjangoDocument):
 
         return user_details
 
+    @property
+    def member_of_names_list(self):
+        """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
+        built from 'member_of' field (list of ObjectIds)
+        """
+        member_of_names = []
+
+        collection = get_database()[Node.collection_name]
+
+        for each_member_id in self.member_of:
+            member_of_names.append(collection.Node.one({'_id': each_member_id}).name)
+
+        return member_of_names
+
     @property        
     def prior_node_dict(self):
         """Returns a dictionary consisting of key-value pair as ObjectId-Document 
         pair respectively for prior_node objects of the given node.
         """
-        db = get_database()
-        gs_collection = db[GSystem.collection_name]
+        
+        collection = get_database()[Node.collection_name]
         
         obj_dict = {}
 
@@ -218,7 +232,7 @@ class Node(DjangoDocument):
             i = i + 1
 
             if each_id != self._id:
-                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
                 dict_key = i
                 dict_value = node_collection_object
                 
@@ -231,8 +245,8 @@ class Node(DjangoDocument):
         """Returns a dictionary consisting of key-value pair as ObjectId-Document 
         pair respectively for collection_set objects of the given node.
         """
-        db = get_database()
-        gs_collection = db[GSystem.collection_name]
+
+        collection = get_database()[Node.collection_name]
         
         obj_dict = {}
 
@@ -241,7 +255,7 @@ class Node(DjangoDocument):
             i = i + 1
 
             if each_id != self._id:
-                node_collection_object = gs_collection.GSystem.one({"_id": ObjectId(each_id)})
+                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
                 dict_key = i
                 dict_value = node_collection_object
                 
@@ -306,7 +320,7 @@ class Node(DjangoDocument):
 
             if not self.structure.has_key(key):
                 field_found = False
-                for gst_id in self.gsystem_type:
+                for gst_id in self.member_of:
                     attribute_set_list = nc.Node.one({'_id': gst_id}).attribute_type_set
                     
                     for attribute in attribute_set_list:
@@ -479,7 +493,6 @@ class GSystem(Node):
     use_schemaless = True
 
     structure = {
-        #'gsystem_type': [ObjectId],		# ObjectId's of GSystemType Class  
         'attribute_set': [dict],		# Dict that holds AT name & its values
         'relation_set': [dict],			# Dict that holds RT name & its related_object value
         'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class [(ObjectId, version_no)]
