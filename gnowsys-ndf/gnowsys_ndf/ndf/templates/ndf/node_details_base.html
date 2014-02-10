@@ -43,40 +43,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 {% block related_content %}
 
-{% if node.collection_dict|length > 0 %}
-<h3>Collection</h3>
 
-{% for index_key, each_node in node.collection_dict.items %}
-{% get_grid_fs_object each_node as grid_fs_obj %}
-{% if each_node.mime_type %}
-{% if each_node.collection_set %}
-<li class="list" style="list-style-type:none;">
-  <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-  <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
-</li>
-{% else %}
-<li class="list" style="list-style-type:none;">
-  <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-
-  <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
-</li>
-{% endif %}
-{% else %}
-{% if each_node.collection_set %}
-<li class="list" style="list-style-type:none;">
-  <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-  <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
-</li>
-{% else %}
-<li class="list" style="list-style-type:none;">
-  <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-  <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
-</li>
-{% endif %}
-{% endif %}
-{% endfor %}
-
-{% endif %}
 
 {% endblock %}
 
@@ -96,11 +63,11 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   </section>
 
   <section class="medium-10 columns" >
-  <ul class="breadcrumbs">
-  <li><a href="#">Group Name</a></li>
-  <li><a href="#">Collection Name</a></li>
-  <li><a href="#" class="current">{{node.name}}</a></li>
-  </ul>
+    <ul class="breadcrumbs">
+      <li><a href="#">Group Name</a></li>
+      <li><a href="#">Collection Name</a></li>
+    </ul>
+
     <h2>
       <span class='node'>{{node.name}}</span>
     </h2>
@@ -118,11 +85,46 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   <div class="row">
 
     <nav class="medium-2 columns">
-      <dl class="row tabs" data-tab>
-        <dd class="active"><a href="#view-page"><i class="fi-page-filled"></i> Content</a></dd>
-        <dd><a href="#view-graph"><i class="fi-share"></i> Graph</a></dd>
-        <dd><a href="#view-comments"><i class="fi-comment"></i> Discussion</a></dd>
-      </dl>
+      <ul class="side-nav">
+        {% if node.collection_dict|length > 0 %}
+        <h3>Contents</h3>
+        {% for index_key, each_node in node.collection_dict.items %}
+        {% get_grid_fs_object each_node as grid_fs_obj %}
+
+        {% if each_node.mime_type %}
+        {% if each_node.collection_set %}
+        <li class="list" style="list-style-type:none;">
+          <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+          <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
+        </li>
+
+        {% else %}
+        <li class="list" style="list-style-type:none;">
+          <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+
+          <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
+        </li>
+        {% endif %}
+
+        {% else %}
+        {% if each_node.collection_set %}
+        <li class="list" style="list-style-type:none;">
+          <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+          <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+        </li>
+
+        {% else %}
+        <li class="list" style="list-style-type:none;">
+          <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+          <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+        </li>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        {% endif %}
+      </ul>
+
     </nav>
 
     <section class="medium-7 columns">
@@ -131,11 +133,23 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
         <!-- Tab content -->
         <div class="content active" id="view-page">
 
+         {% if node.prior_node|length > 0 %}
+         <div class="panel">
+           <h6>You may want to read these first:</h5>
+            {% for index_key, each_node in node.prior_node_dict.items %}
+            {% get_grid_fs_object each_node as grid_fs_obj %}
+            {% if each_node.mime_type %}
+            <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+            {% else %}
+            <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
 
-         {% block add_fields %} {% endblock %}
+          {% block add_fields %} {% endblock %}
 
-         <!-- Outer Main Row -->
-         <ul class="inline-list">
+          <ul class="inline-list">
            {% if user.is_authenticated %}
            {% block add_list %}{% endblock %}
            {% endif %}
@@ -161,33 +175,29 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     </section>
 
     <section class="medium-3 columns">
-     <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a><br>
-     <ul id="edit-options" class="f-dropdown">
-      <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
-    </ul>
+      <div class="panel">
+        <h6>Page Options</h6>
 
-    {% if node.prior_node|length > 0 %}
-    <div class="panel">
-      <h5>Background reading:</h5>
-      {% for index_key, each_node in node.prior_node_dict.items %}
-      {% get_grid_fs_object each_node as grid_fs_obj %}
-      {% if each_node.mime_type %}
-      <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-      {% else %}
-      <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-      {% endif %}
-      {% endfor %}
-    </div>
-    {% endif %}
+        <dl class="row tabs" data-tab>
+          <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+          <dd><a href="#view-graph"><i class="fi-share"></i> Explore</a></dd>
+          <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+        </dl>
+      </div>
 
-  </section>
+      <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+      <ul id="edit-options" class="f-dropdown">
+        <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
+      </ul>
+
+    </section>
 
 
-</div>
+  </div>
 
-<footer class="row">
-  <h5>Contriubted by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
-</footer>
+  <footer class="row">
+    <h5>Contriubted by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
+  </footer>
 
-{% endblock %}
+  {% endblock %}
 

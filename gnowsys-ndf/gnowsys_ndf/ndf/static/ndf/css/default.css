@@ -79,16 +79,20 @@ main>aside a:hover{
 }
 
 h2:not(.subheader){
-	color: black;
-	margin-bottom: 0;
-	padding-right: 3rem;
-	font-family: "Georgia Serif";
-	font-size: :2rem;
+	color: #222;
+	font-family: "Georgia Serif", Serif;
+	font-size: :1.2rem;
+	font-weight: bold;
+	margin: 0;
 }
 h3{
 	font-size: 1.4rem;
 }
 
+p{
+	font-size: 0.9rem;
+	line-height: 1.5;
+}
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
 	background-color: #222;
@@ -175,7 +179,11 @@ a#toggle-shelf i{
 	color:inherit;
 }
 /* Content Tabs */
+article nav{
+	padding-top: 2rem;
+}
 article .tabs{
+
 }
 article .tabs i{
 	margin-right: 5px;
@@ -188,18 +196,20 @@ article .tabs dd{
 article .tabs dd a{
 	color:#aaa;
 	background-color: inherit;
-	padding: 1rem;
-	border-bottom: 1px solid #aaa;
+	padding: 0.5rem;
+	padding-left: 1rem;
 }
 article .tabs dd a:hover{
 	background-color: inherit;
-	color:#222;
+	color:#999;
 }
 article .tabs dd.active a{
-	color:green;
-	font-weight: bold;
+	color:#222;
 	background-color: inherit;
-	border-bottom: 2px solid green;
+}
+
+.tabs-content>.content{
+	padding-top: 0;
 }
 
 /* Default card */
@@ -317,9 +327,9 @@ article{
 }
 
 article header{
-	background-color: #eaeaea;
-	border-bottom: 2px solid #ddd;
-	padding-top: 0.5rem;
+}
+article .breadcrumbs{
+	background-color: #eee;
 }
 article nav{
 	
@@ -351,7 +361,9 @@ textarea{
 
 }
 #content>p:first-of-type{
-	font-weight: bold;
+	font-size: 120%;
+	line-height: 1.4;
+	color: #222;
 }
 /*************************** 3. Custom CSS Below ***********************/
 
