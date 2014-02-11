@@ -165,7 +165,7 @@
 						<ul class="dropdown">
 							<!-- Create dropdown item for each group -->
 							{% for gp_id in groups %}
-							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id.name}}</a></li>
+							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id.name %}">{{gp_id.name}}</a></li>
 							{% endfor %}
 
 
