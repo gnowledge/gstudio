@@ -163,7 +163,7 @@
 						<ul class="dropdown">
 							<!-- Create dropdown item for each group -->
 							{% for gp_id in groups %}
-							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id.name %}">{{gp_id.name}}</a></li>
+							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id.name}}</a></li>
 							{% endfor %}
 
 						</ul>
@@ -263,12 +263,12 @@
 
 					<!-- Off Canvas User Shelf -->
 					<aside class="right-off-canvas-menu">
-						<h4>Shelf</h4>
-						<ul class="off-canvas-list">
-							<li><a href="#">Item 1</a></li>
-							...
-						</ul>
-					</aside>
+						<!-- Shelf content code and logic -->
+						{% block shelf_content %}
+
+						{% endblock %}
+						
+ 					</aside>
 
 					<!-- close the off-canvas menu -->
 					<a class="exit-off-canvas"></a>

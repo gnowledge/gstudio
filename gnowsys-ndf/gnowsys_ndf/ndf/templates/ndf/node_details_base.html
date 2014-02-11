@@ -79,6 +79,41 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 {% endblock %}
 
+
+{% block shelf_content %}
+<h4 class="text-center">Shelf</h4>
+<dl id="shelf-items" class="accordion" data-accordion>
+  <!-- Adding new shelf text input and add button -->
+  <dd>  
+    <div class="row">
+      <div class="row collapse">
+        <div class="small-10 columns">
+          <input type="text" id="new-shelf-text" onkeyup="(this.value).trim().length?$('#add-shelf-btn').removeClass('disabled'):$('#add-shelf-btn').addClass('disabled');" placeholder="Add new shelf">
+        </div>
+        <div class="small-2 columns">
+          <div onclick="$(this).hasClass('disabled')?'':addNewShelf($('#new-shelf-text').val().trim())" id="add-shelf-btn" class="button postfix disabled">Add</div>
+        </div>
+      </div>
+    </div>
+  </dd>
+
+  <dd>
+    <a href="#panel2">Shelf - 1</a>
+    <div id="panel2" class="content">
+      <a href="" class="button expand"> Add to this shelf </a>
+    </div>
+  </dd>
+  
+  <dd>
+    <a href="#panel3">Shelf - 2</a>
+    <div id="panel3" class="content">
+      <a href="" class="button expand"> Add to this shelf </a>
+    </div>
+  </dd>
+</dl>
+
+{% endblock %}
+
 {% block body_content %}
 
 <header class="row page">
@@ -164,3 +199,24 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 {% endblock %}
 
+
+{% block script%}
+  function addNewShelf(shelfName)
+  {
+    shelfNameList = [];
+    $('#shelf-items dd > a').each(function(b){ shelfNameList.push($(this).text())});
+  
+    if ( ($.inArray(shelfName.toLowerCase(), $.map(shelfNameList, function(n,i){return n.toLowerCase()}))) < 0 )
+    {
+      shelfNameId = shelfName.split(" ").join("_");
+
+      $( "#shelf-items dd:nth-child(1)" )
+      .after( "<dd><a href='#panel_"+shelfNameId+"'>"+shelfName+"</a><div id='panel_"+shelfNameId+"' class='content'><a href='#' class='button expand'> Add this to shelf </a></div></dd>" );
+    }
+    else
+    {
+      alert("Shelf with this name already exist !\n\n Create shelf with different name.");
+    }
+
+  }
+{% endblock %}
