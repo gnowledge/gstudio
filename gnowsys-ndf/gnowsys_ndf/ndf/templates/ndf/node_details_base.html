@@ -44,7 +44,6 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% block related_content %}
 
 
-
 {% endblock %}
 
 
@@ -68,6 +67,9 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 </dl>
 
 {% endblock %}
+
+
+{% get_group_type request.path request.user as group_type %}
 
 {% block body_content %}
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
