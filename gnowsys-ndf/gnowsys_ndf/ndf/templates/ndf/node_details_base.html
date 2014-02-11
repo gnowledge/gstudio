@@ -97,19 +97,6 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     </div>
   </dd>
 
-  <dd>
-    <a href="#panel2">Shelf - 1</a>
-    <div id="panel2" class="content">
-      <a href="" class="button expand"> Add to this shelf </a>
-    </div>
-  </dd>
-  
-  <dd>
-    <a href="#panel3">Shelf - 2</a>
-    <div id="panel3" class="content">
-      <a href="" class="button expand"> Add to this shelf </a>
-    </div>
-  </dd>
 </dl>
 
 {% endblock %}
@@ -201,6 +188,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
 {% block script%}
+
   function addNewShelf(shelfName)
   {
     shelfNameList = [];
@@ -219,4 +207,5 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     }
 
   }
+
 {% endblock %}
