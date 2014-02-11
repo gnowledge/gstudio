@@ -101,8 +101,4 @@ def edit_group(request,group_name,group_id):
                                       context_instance=RequestContext(request)
                                       )
 
-def redi():
-	
-	return render_to_response("ndf/redirect.html", RequestContext(request))
-  
 
