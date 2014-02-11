@@ -1,7 +1,13 @@
 {% extends "ndf/base.html" %}
 {% block title %} {{title}} {% endblock %}
 
-{% block meta_content %}
+{% block help_topics %}
+<li><a href="#">Pages Introduction</a></li>
+<li><a href="#">Working with Pages</a></li>
+<li><a href="#">Page types</a></li>
+{% endblock %}
+
+{% block help_content %}
 <p>Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.</p>
 
 <h5>Who can make a page?</h5>
@@ -90,24 +96,30 @@
     {% for node in page_nodes %}
     <li class="card">
       <a class="page" href="{% url 'page_details' group_name node %}">
-        <header>
 
-          <div class="label-list">
-            {% for tag in node.tags %}
-            <span class="label">{{tag}}</span>
-            {% endfor %}
-          </div>
+        <header>
+        
+<div class="label-list">
+          {% for tag in node.tags %}
+          <span class="label">{{tag}}</span>
+          {% endfor %}
+        </div>
 
           <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-          <h4>{{ node.name }}</h4>
-
-          <small>{{ node.member_of|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-          </small>
+          <h4>{{ node.name }}
+            <div>
+              <small class="subheader">{{ node.member_of|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+              </small>
+            </div>
+          </h4>
         </header>
 
         <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
 
-        <div class="button expand">View Page</div> 
+
+
+        <div class="small button">View Page</div> 
+
         <footer class="row">
          <div class="small-6 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
          <div class="small-6 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 

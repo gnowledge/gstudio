@@ -29,6 +29,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   Contributed by: {{ node.user_details_dict.modified_by|join:', ' }}
 </p>
 <p>
+
   Last update: {{ node.last_update|date:"j F Y" }}
 </p>
 <p>
@@ -42,125 +43,161 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 {% block related_content %}
 
-{% if node.collection_dict|length > 0 %}
-<h3>Collection</h3>
 
-{% for index_key, each_node in node.collection_dict.items %}
-{% get_grid_fs_object each_node as grid_fs_obj %}
-{% if each_node.mime_type %}
-{% if each_node.collection_set %}
-<li class="list" style="list-style-type:none;">
-  <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-  <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
-</li>
-{% else %}
-<li class="list" style="list-style-type:none;">
-  <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-
-  <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
-</li>
-{% endif %}
-{% else %}
-{% if each_node.collection_set %}
-<li class="list" style="list-style-type:none;">
-  <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-  <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
-</li>
-{% else %}
-<li class="list" style="list-style-type:none;">
-  <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-  <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
-</li>
-{% endif %}
-{% endif %}
-{% endfor %}
-
-{% endif %}
 
 {% endblock %}
 
 {% block body_content %}
+<a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
 
 <header class="row page">
 
 
+  <section class="medium-2 columns">
 
-  <h2 class="medium-12 columns">
     <div class="label-list"> 
       {% for tag in node.tags %}
       <span class="radius label">{{tag}}</span> 
       {% endfor %}
-      <a class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
     </div>
-    <span class='node'>{{node.name}}</span> <a href="{% block url %}{% endblock %}" class="button edit"><i class="fi-pencil"></i> <span>Edit</span></a>
-  </h2>
-  <h3 class="medium-12 columns subheader">
-    <small>Edited {{ node.last_update|timesince }} ago by <a class="user">User</a></small>
-  </h3>
-  <nav class="medium-12 columns">
-    <dl class="tabs" data-tab>
-      <dd class="medium-2 columns"><h3>View:</h3></dd>
-      <dd class="active"><a href="#view-page"><i class="fi-page-filled"></i> Content</a></dd>
-      <dd><a href="#view-graph"><i class="fi-share"></i> Graph</a></dd>
-      <dd><a href="#view-comments"><i class="fi-comment"></i> Comments</a></dd>
-      <dd><a href="#view-revisions"><i class="fi-clock"></i> Revisions</a></dd>
-    </dl>
+  </section>
 
-  </nav>
-</header>
+  <section class="medium-10 columns" >
+    <ul class="breadcrumbs">
+    <li><a href="/{{group_name}}">{{group_name}}</a></li>
+      <li><a href="#">Collection Name</a></li>
+    </ul>
 
-<div class="tabs-content">
-  <!-- Tab content -->
-  <div class="content active" id="view-page">
+    <h2>
+      <span class='node'>{{node.name}}</span>
+    </h2>
 
-    <!-- Outer Main Row -->
-    <ul class="inline-list">
+    <h3 class="subheader">
+      <small>
 
-     {% if user.is_authenticated %}
-     {% block add_list %}{% endblock %}
-     {% endif %}
-   </ul>
+        Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a></small>
+      </h3>
 
+    </section>
 
-   {% if node.prior_node|length > 0 %}
-   <fieldset>
-     <legend><h5><strong>Things to know before going ahead</strong></h5></legend>
-     {% for index_key, each_node in node.prior_node_dict.items %}
-     {% get_grid_fs_object each_node as grid_fs_obj %}
-     {% if each_node.mime_type %}
-     <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-     {% else %}
-     <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-     {% endif %}
-     {% endfor %}
-   </fieldset>
-   {% endif %}
+  </header>
 
-   {% block add_fields %} {% endblock %}
-
-
-   {% with node.html_content|safe as description %}
-
-   <div class="card">
-    {% if description != "None" %}
-    {{ description }}
-    {% endif %}
-  </div>
-
-  {% endwith %}
-</div>
-
-<!-- Tab View Graph -->
-<div class="content" id="view-graph">    
   <div class="row">
-    <div class="small-12 columns" id="graph-div">
-      {% include "ndf/relational_graph.html" with graphData=graphData %}        
-    </div>
+
+    <nav class="medium-2 columns">
+      <ul class="side-nav">
+        {% if node.collection_dict|length > 0 %}
+        <h3>Contents</h3>
+        {% for index_key, each_node in node.collection_dict.items %}
+        {% get_grid_fs_object each_node as grid_fs_obj %}
+
+        {% if each_node.mime_type %}
+        {% if each_node.collection_set %}
+        <li class="list" style="list-style-type:none;">
+          <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+          <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
+        </li>
+
+        {% else %}
+        <li class="list" style="list-style-type:none;">
+          <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+
+          <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
+        </li>
+        {% endif %}
+
+        {% else %}
+        {% if each_node.collection_set %}
+        <li class="list" style="list-style-type:none;">
+          <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+          <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+        </li>
+
+        {% else %}
+        <li class="list" style="list-style-type:none;">
+          <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+          <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+        </li>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        {% endif %}
+      </ul>
+
+    </nav>
+
+    <section class="medium-7 columns">
+      <div class="tabs-content">
+
+        <!-- Tab content -->
+        <div class="content active" id="view-page">
+
+         {% if node.prior_node|length > 0 %}
+         <div class="panel">
+           <h6>You may want to read these first:</h5>
+            {% for index_key, each_node in node.prior_node_dict.items %}
+            {% get_grid_fs_object each_node as grid_fs_obj %}
+            {% if each_node.mime_type %}
+            <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+            {% else %}
+            <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% block add_fields %} {% endblock %}
+
+          <ul class="inline-list">
+           {% if user.is_authenticated %}
+           {% block add_list %}{% endblock %}
+           {% endif %}
+         </ul>
+
+         {% with node.html_content|safe as description %}
+
+         {% if description != "None" %}
+         {{ description }}
+         {% endif %}
+
+         {% endwith %}
+       </div>
+
+       <!-- Tab View Graph -->
+       <div class="content" id="view-graph">    
+        <div class="row">
+          <div class="small-12 columns" id="graph-div">
+            {% include "ndf/relational_graph.html" with graphData=graphData %}        
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="medium-3 columns">
+      <div class="panel">
+        <h6>Page Options</h6>
+
+        <dl class="row tabs" data-tab>
+          <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+          <dd><a href="#view-graph"><i class="fi-share"></i> Explore</a></dd>
+          <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+        </dl>
+      </div>
+
+      <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+      <ul id="edit-options" class="f-dropdown">
+        <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
+      </ul>
+
+    </section>
+
+
   </div>
-</div>
-</div>
-<!--  ###### Graph ###### -->
 
+  <footer class="row">
+    <h5>Contriubted by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
+  </footer>
 
-{% endblock %}
+  {% endblock %}
 
