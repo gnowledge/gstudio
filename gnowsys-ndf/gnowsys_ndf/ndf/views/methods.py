@@ -52,7 +52,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     
     if checked:     
       if checked == "Page":
-        gst_page_id = collection.Node.one({'_type': "GSystemType", name: "Page"})._id
+        gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [group_name]}})
         
       elif checked == "File":         
@@ -70,23 +70,23 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
 
       elif checked == "QuizObj":
         # For collection-list
-        gst_quiz_id = collection.Node.one({'_type': "GSystemType", name: "Quiz"})._id
-        gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", name: "QuizItem"})._id
+        gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
+        gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "OnlyQuiz":
-        gst_quiz_id = collection.Node.one({'_type': "GSystemType", name: "Quiz"})._id
+        gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_id]}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "QuizItem":
-        gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", name: "QuizItem"})._id
+        gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "Group":
         drawer = collection.Node.find({'_type': u"Group"})
 
       elif checked == "Forum":
-        gst_forum_id = collection.Node.one({'_type': "GSystemType", name: "Forum"})._id
+        gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [group_name]}})
 
     else:
