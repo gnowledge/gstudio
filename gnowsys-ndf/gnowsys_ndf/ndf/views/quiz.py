@@ -51,12 +51,12 @@ def quiz(request, group_name, app_id):
     if gst_quiz._id == ObjectId(app_id):
         title = gst_quiz.name
 
-        quiz_nodes = collection.Node.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
+        quiz_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
         quiz_nodes.sort('last_update', -1)
         quiz_nodes_count = quiz_nodes.count()
 
-        gst_quiz_item_id = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})._id
-        quiz_item_nodes = collection.Node.find({'gsystem_type': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
+        gst_quiz_item_id = collection.Node.one({'_type': 'GSystemType', 'name': u'QuizItem'})._id
+        quiz_item_nodes = collection.Node.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
         quiz_item_nodes.sort('last_update', -1)
         quiz_item_nodes_count = quiz_item_nodes.count()
 
@@ -79,7 +79,7 @@ def quiz(request, group_name, app_id):
                               'group_name': group_name
                           }
         
-        if gst_quiz._id in node.gsystem_type:
+        if gst_quiz._id in node.member_of:
             template_name = "ndf/quiz_details.html"
 
         else:
@@ -110,7 +110,7 @@ def create_edit_quiz_item(request, group_name, node_id=None):
     if node_id:
         node = collection.Node.one({'_id': ObjectId(node_id)})
 
-        if "Quiz" in node.member_of:
+        if gst_quiz._id in node.member_of:
             # Add question from a given Quiz category's context
             quiz_node = node
             quiz_item_node = collection.GSystem()
@@ -128,8 +128,7 @@ def create_edit_quiz_item(request, group_name, node_id=None):
 
         if not quiz_item_node.has_key('_id'):
             quiz_item_node.created_by = usrid
-            quiz_item_node.member_of.append(gst_quiz_item.name)
-            quiz_item_node.gsystem_type.append(gst_quiz_item._id)
+            quiz_item_node.member_of.append(gst_quiz_item._id)
 
         if usrid not in quiz_item_node.modified_by:
             quiz_item_node.modified_by.append(usrid)

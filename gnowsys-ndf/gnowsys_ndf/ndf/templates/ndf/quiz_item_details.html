@@ -56,7 +56,7 @@
 	{% endif %}
       </ul>
       <p>
-	{{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
+	{{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
       </p>
       <p>
 	Contributors: {{ node.user_details_dict.modified_by|join:', ' }}
