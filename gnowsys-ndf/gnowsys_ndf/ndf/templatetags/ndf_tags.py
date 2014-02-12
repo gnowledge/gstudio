@@ -80,8 +80,8 @@ def get_gapps_menubar(group_name, selectedGapp):
   """Get Gapps menu-bar
   """
 
-  gst_collection = db[GSystemType.collection_name]
-  gst_cur = gst_collection.GSystemType.find({'$and':[{'_type':'GSystemType'},{'member_of':'GAPP'}]})
+  collection = db[Node.collection_name]
+  gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
 
   gapps = {}
   i = 0;
