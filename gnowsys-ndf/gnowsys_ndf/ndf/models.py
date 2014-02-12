@@ -490,8 +490,7 @@ class GSystem(Node):
     """
     use_schemaless = True
 
-    structure = {
-        'gsystem_type': [ObjectId],
+    structure = {        
         'attribute_set': [dict],		# Dict that holds AT name & its values
         'relation_set': [dict],			# Dict that holds RT name & its related_object value
         'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class [(ObjectId, version_no)]
