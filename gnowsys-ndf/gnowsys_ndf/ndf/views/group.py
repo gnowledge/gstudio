@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-
+from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 
 try:
@@ -85,8 +85,10 @@ def group_dashboard(request,group_name):
         pass
     return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'node':groupobj,'user':request.user},context_instance=RequestContext(request))
 
+@login_required
 def edit_group(request,group_name,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+    
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_name, gst_group)
             page_node.save()
@@ -98,6 +100,5 @@ def edit_group(request,group_name,group_id):
                                         },
                                       context_instance=RequestContext(request)
                                       )
-
 
 

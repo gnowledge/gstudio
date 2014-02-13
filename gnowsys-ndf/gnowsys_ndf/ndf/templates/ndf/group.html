@@ -70,7 +70,13 @@
     </li>
 
     <!-- Existing card list-->
-    {% for node in groups %}
+    {% get_group_type request.path request.user as group_type %}	
+
+	{% if groups == "None" %}
+		<p><em>Currently NO nodes in the gnowledge base!!!</em></p>		
+		{% else %}
+   {% for node in groups %}
+      
     <li class="card">
       <a class="group" href="/{{node.name}}">
 
@@ -104,6 +110,8 @@
 {% empty %}
 <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
 {% endfor %}
+
+{% endif %}
 
 </ul>
 {% endblock %}
