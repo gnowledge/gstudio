@@ -6,11 +6,14 @@ from django.template import Library
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
-
+import re
 from django.contrib.auth.models import User
-
+from django.shortcuts import render_to_response, render
 from gnowsys_ndf.ndf.views.methods import get_drawers
-
+from django.template import RequestContext,loader
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.http import Http404
 register = Library()
 db = get_database()
 
@@ -195,7 +198,7 @@ def get_existing_groups_excluded(grname):
     if items.name != grname:
       group.append(items)
   if not group:
-    group.append("None")
+    return "None"
   return group
 
 @register.assignment_tag
@@ -221,11 +224,51 @@ def get_user_group(user):
                                 '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}] 
                               })
 
-  for g in colg:
-    group.append(g)
-    
+
+  
+  for items in colg:
+
+      group.append(items)
+  if not group:
+    return "None"
   return group
 
+@register.assignment_tag
+def get_group_type(grname,user):
+  col_Group = db[Group.collection_name]
+  
+  #get all the strings after and before the /
+  split_result = re.split(r'[/=]', grname)
+  
+  # check wheather Group exist in the database
+  colg=col_Group.Group.one({'_type': 'Group','name':split_result[1]})
+  #Query for implemting the same senario with ObjectId instead of Group name
+  #  colg=col_Group.Group.one({'_type': 'Group','_id':split_result[1]})
+
+  #check if Group exist in the database
+  if colg is not None:
+	# Check is user is logged in
+	if  user.id:
+		# condition for group accesseble to logged user
+	  	if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
+			return "allowed"
+		else:
+			raise Http404	
+	else:
+		#condition for groups,accesseble to not logged users
+		if colg.group_type=="PUBLIC":
+			
+			return "allowed"
+                else:
+			print "redirection"
+			raise Http404
+  else:
+	
+	return "pass"
+		
+			
+	
+  
 
 
 '''this template function is used to get the user object from template''' 
@@ -238,6 +281,9 @@ def get_user_object(user_id):
     print "User Not found in User Table",e
   return user_obj
   
+
+
+	
 
 '''this template function is used to get the user object from template''' 
 @register.assignment_tag 

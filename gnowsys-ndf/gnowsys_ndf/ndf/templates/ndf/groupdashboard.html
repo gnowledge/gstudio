@@ -1,16 +1,28 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
-
+from django.contrib.auth.decorators import login_required
 {% block title %} Group Dashboard {% endblock %}
 
 {% block head %}
 
+
+<script type="text/javascript" ></script>
+ 
+<script>
+var chk_login = "{{ user }}";
+</script>
+	
+
+
 <script type="text/javascript">
 //function to toggle the lable Join and Unsubscribe
-
 function change_label(label)
 {   
-    if(label == "Join")
+	if(chk_login=="AnonymousUser")
+		{document.location.href = '/accounts/login/';
+		}
+	
+     else if(label == "Join")
     { $("#notify").val("Unsubscribe");}
     else
     { $("#notify").val("Join");}
@@ -56,13 +68,13 @@ $(document).ready(function()
       notify(groupn,"remove");
       change_label("remove");
       label="Join"
+	
     }
   }); //end notify_click()
 }); //end document_ready()
 
 </script>
 {% endblock %}
-
 
 {% block url %}
 {% url 'edit_group' groupobj.name groupobj %}
