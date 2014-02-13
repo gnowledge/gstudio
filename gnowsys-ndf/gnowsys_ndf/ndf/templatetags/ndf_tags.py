@@ -236,18 +236,21 @@ def get_user_group(user):
 @register.assignment_tag
 def get_group_type(grname,user):
   col_Group = db[Group.collection_name]
-  grname1 = re.sub('/', '', grname)
+  
   #get all the strings after and before the /
   split_result = re.split(r'[/=]', grname)
   
   # check wheather Group exist in the database
   colg=col_Group.Group.one({'_type': 'Group','name':split_result[1]})
+  #Query for implemting the same senario with ObjectId instead of Group name
+  #  colg=col_Group.Group.one({'_type': 'Group','_id':split_result[1]})
+
   #check if Group exist in the database
   if colg is not None:
 	# Check is user is logged in
 	if  user.id:
 		# condition for group accesseble to logged user
-	  	if colg.group_type=="PUBLIC" or colg.created_by==user.id or colg.author_set==user.id:
+	  	if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
 			return "allowed"
 		else:
 			raise Http404	
