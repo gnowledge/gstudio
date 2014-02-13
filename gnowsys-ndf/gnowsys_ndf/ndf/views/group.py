@@ -61,7 +61,7 @@ def create_group(request,group_name):
         cname=request.POST.get('groupname', "")
         colg.altnames=cname
         colg.name = unicode(cname)
-        colg.member_of.append(u"Group")
+        colg.member_of.append(gst_group._id)
         usrid = int(request.user.id)
         colg.created_by=usrid
         colg.group_type = request.POST.get('group_type', "")

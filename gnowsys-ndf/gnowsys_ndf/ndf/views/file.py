@@ -54,7 +54,7 @@ def file(request, group_name, file_id):
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
         collection = db[File.collection_name]
-        files = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
+        files = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
         already_uploaded = request.GET.getlist('var', "")
         return render_to_response("ndf/file.html", {'title': title, 'files':files, 'already_uploaded':already_uploaded}, context_instance = RequestContext(request))
     else:
@@ -88,7 +88,7 @@ def submitDoc(request, group_name):
         content_org = request.POST.get('content_org', '')
         print "content:", content_org
         tags = request.POST.get('tags')
-        #memberOf = request.POST.get("memberOf", "")
+
         i = 1
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
@@ -136,7 +136,7 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, usrnam
             fileobj.created_by = int(userid)
             fileobj.file_size = size
             fileobj.group_set.append(unicode(group_name))        #group name stored in group_set field
-            fileobj.gsystem_type.append(GST_FILE._id)
+            fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
             if content_org:
                 fileobj.content_org = unicode(content_org)
@@ -155,7 +155,7 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, usrnam
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
             	fileobj.mime_type = "video"
-                fileobj.gsystem_type.append(GST_VIDEO._id)
+                fileobj.member_of.append(GST_VIDEO._id)
        	        fileobj.save()
             	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id)
 	       
@@ -170,7 +170,7 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, usrnam
 
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
-                fileobj.gsystem_type.append(GST_IMAGE._id)
+                fileobj.member_of.append(GST_IMAGE._id)
                 thumbnailimg = convert_image_thumbnail(files)
                 tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
                 fileobj.fs_file_ids.append(tobjectid)

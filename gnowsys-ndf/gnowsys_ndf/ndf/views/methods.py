@@ -23,15 +23,13 @@ def get_forum_repl_type(forrep_id):
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
   if obj:
-    if obj.member_of in forum_st.name:
-          if obj.member_of in "Forum":
-             return "Forum"
-          else:    
-             return "Reply"
-    else:
-          return "None"
+    if forum_st._id in obj.member_of:
+      return "Forum"
+    else:    
+      return "Reply"
   else:
-          return "None"
+    return "None"
+
 def check_existing_group(groupname):
   col_Group = db[Group.collection_name]
   gpn=groupname
@@ -41,7 +39,6 @@ def check_existing_group(groupname):
   else:
     return False
 
-
 def get_drawers(group_name, nid=None, nlist=[], checked=None):
     """Get both drawers-list.
     """
@@ -49,45 +46,51 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     dict1 = {}
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
-    gst_collection = db[GSystemType.collection_name]
-    gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
-    gs_collection = db[GSystem.collection_name]
+    collection = db[Node.collection_name]
     
     drawer = None    
     
     if checked:     
       if checked == "Page":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Page']}, 'group_set': {'$all': [group_name]}})
+        gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [group_name]}})
         
       elif checked == "File":         
-        drawer = gs_collection.GSystem.find({'_type': u"File", 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'group_set': {'$all': [group_name]}})
         
       elif checked == "Image":         
-        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "Video":         
-        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [group_name]}})
 
       elif checked == "Quiz":
-        drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})
+        # For prior-node-list
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "QuizObj":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$in':[u'Quiz',u'QuizItem']}, 'group_set': {'$all': [group_name]}})
+        # For collection-list
+        gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
+        gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "OnlyQuiz":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Quiz']}, 'group_set': {'$all': [group_name]}})
+        gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_id]}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "QuizItem":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'QuizItem']}, 'group_set': {'$all': [group_name]}})
+        gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
 
       elif checked == "Group":
-        drawer = gs_collection.GSystem.find({'_type': u"Group"})
+        drawer = collection.Node.find({'_type': u"Group"})
 
       elif checked == "Forum":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Forum']}, 'group_set': {'$all': [group_name]}})
+        gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [group_name]}})
 
     else:
-      drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
+      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
            
     
     if (nid is None) and (not nlist):
@@ -100,7 +103,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
           dict1[each._id] = each
 
       for oid in nlist: 
-        obj = gs_collection.GSystem.one({'_id': oid})
+        obj = collection.Node.one({'_id': oid})
         dict2.append(obj)        
 
       dict_drawer['1'] = dict1
@@ -114,7 +117,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
             dict1[each._id] = each
           
       for oid in nlist: 
-        obj = gs_collection.GSystem.one({'_id': oid})
+        obj = collection.Node.one({'_id': oid})
         dict2.append(obj)
       
       dict_drawer['1'] = dict1
@@ -144,8 +147,7 @@ def get_node_common_fields(request, node, group_name, node_type):
   if not node.has_key('_id'):
     
     node.created_by = usrid
-    node.member_of.append(node_type.name)
-    node.gsystem_type.append(node_type._id)
+    node.member_of.append(node_type._id)
   
     if private:
       private = True

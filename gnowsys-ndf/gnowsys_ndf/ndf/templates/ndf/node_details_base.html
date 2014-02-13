@@ -1,6 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
-{% block title %} {{ node.member_of|join:", " }} - {{ node.name }}  {% endblock %}
+{% block title %} {{ node.member_of_names_list|join:", " }} - {{ node.name }}  {% endblock %}
 {% block head %}
 
 <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
@@ -23,7 +23,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% block meta_content %}
 <!--This content possibly comes from page_details.html-->
 <p>
-  {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
+  {{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
 </p>
 <p>
   Contributed by: {{ node.user_details_dict.modified_by|join:', ' }}

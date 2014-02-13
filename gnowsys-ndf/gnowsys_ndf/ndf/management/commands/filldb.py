@@ -36,12 +36,12 @@ class Command(BaseCommand):
                 gst_node=collection.GSystemType()
                 gst_node.name = unicode(each)
                 gst_node.created_by = user_id
-                gst_node.member_of.append(u'GAPP')
+                # gst_node.member_of.append(u'GAPP')
                 gst_node.modified_by.append(user_id)
                 gst_node.save()
-            elif('GAPP' not in node_doc.member_of):
-                node_doc.member_of.append(u'GAPP')
-                node_doc.save()
+            # elif('GAPP' not in node_doc.member_of):
+            #     node_doc.member_of.append(u'GAPP')
+            #     node_doc.save()
                    
         #Create default group 'home'
         node_doc =collection.GSystemType.one({'$and':[{'_type': u'Group'},{'name': u'home'}]})
@@ -49,7 +49,7 @@ class Command(BaseCommand):
             gs_node = collection.Group()
             gs_node.name = u'home'
             gs_node.created_by = user_id
-            gs_node.member_of.append(u"Group")
+            gs_node.member_of.append(collection.Node.one({'name': "Group"})._id)
             gs_node.disclosure_policy=u'DISCLOSED_TO_MEM'
             gs_node.subscription_policy=u'OPEN'
             gs_node.visibility_policy=u'ANNOUNCED'
@@ -65,7 +65,7 @@ class Command(BaseCommand):
             gs_node = collection.GSystemType()
             gs_node.name = u'Twist'
             gs_node.created_by = user_id
-            gs_node.member_of.append(u"ST")
+            # gs_node.member_of.append(u"ST")
             # gs_node.meta_type_set.append(forum_type._id)
             # gs_node.meta_type_set.append(forum_type)
             gs_node.save()
@@ -75,7 +75,7 @@ class Command(BaseCommand):
             gs_node = collection.GSystemType()
             gs_node.name = u'Reply'
             gs_node.created_by = user_id
-            gs_node.member_of.append(u"ST")
+            # gs_node.member_of.append(u"ST")
             # gs_node.meta_type_set.append(forum_type._id)
             gs_node.save()
 
@@ -85,7 +85,7 @@ class Command(BaseCommand):
             auth = collection.GSystemType()
             auth.name = u"Author"
             auth.created_by = user_id
-            auth.member_of.append(u"ST")
+            # auth.member_of.append(u"ST")
             auth.save()
 
         auth = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'}) 
@@ -96,7 +96,7 @@ class Command(BaseCommand):
             gst_node = collection.GSystemType()
             gst_node.name = u"Shelf"
             gst_node.created_by = user_id
-            gst_node.member_of.append(u"ST")
+            # gst_node.member_of.append(u"ST")
             gst_node.save()
 
         shelf = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Shelf'})    
@@ -110,7 +110,7 @@ class Command(BaseCommand):
             rt_node.subject_type.append(auth._id)
             rt_node.object_type.append(shelf._id)
             rt_node.created_by = user_id
-            rt_node.member_of.append(u"RT")
+            # rt_node.member_of.append(u"RT")
             rt_node.save()            
 
         # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
@@ -119,47 +119,47 @@ class Command(BaseCommand):
         # Create 'QuizItem' GSystemType, if didn't exists 
         quiz_item_type = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})
         if quiz_item_type is None:
-            gs_node = collection.GSystemType()
-            gs_node.name = u'QuizItem'
-            gs_node.created_by = user_id
-            gs_node.member_of.append(u"ST")
-            # gs_node.meta_type_set.append(quiz_type._id)
-            gs_node.save()
+            gst_node = collection.GSystemType()
+            gst_node.name = u'QuizItem'
+            gst_node.created_by = user_id
+            # gst_node.member_of.append(u"ST")
+            # gst_node.meta_type_set.append(quiz_type._id)
+            gst_node.save()
 
         quiz_item_type = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})
 
         # Create 'quiz_type' AttributeType, if didn't exists 
         node_doc = collection.Node.one({'_type': u'AttributeType', 'name': u'quiz_type'})
         if node_doc is None:
-            gs_node = collection.AttributeType()
-            gs_node.name = u'quiz_type'
-            gs_node.created_by = user_id
-            gs_node.member_of.append(u"AT")
-            gs_node.data_type = str(QUIZ_TYPE_CHOICES_TU)  # One of them from the given values
-            gs_node.subject_type.append(quiz_item_type._id)
-            gs_node.save()
+            at_node = collection.AttributeType()
+            at_node.name = u'quiz_type'
+            at_node.created_by = user_id
+            # at_node.member_of.append(u"AT")
+            at_node.data_type = str(QUIZ_TYPE_CHOICES_TU)  # One of them from the given values
+            at_node.subject_type.append(quiz_item_type._id)
+            at_node.save()
 
         # Create 'options' AttributeType, if didn't exists 
         node_doc = collection.Node.one({'_type': u'AttributeType', 'name': u'options'})
         if node_doc is None:
-            gs_node = collection.AttributeType()
-            gs_node.name = u'options'
-            gs_node.created_by = user_id
-            gs_node.member_of.append(u"AT")
-            gs_node.data_type = "[" + DATA_TYPE_CHOICES[6] + "]"  # list of unicodes
-            gs_node.subject_type.append(quiz_item_type._id)
-            gs_node.save()
+            at_node = collection.AttributeType()
+            at_node.name = u'options'
+            at_node.created_by = user_id
+            # at_node.member_of.append(u"AT")
+            at_node.data_type = "[" + DATA_TYPE_CHOICES[6] + "]"  # list of unicodes
+            at_node.subject_type.append(quiz_item_type._id)
+            at_node.save()
 
         # Create 'correct_answer' AttributeType, if didn't exists 
         node_doc = collection.Node.one({'_type': u'AttributeType', 'name': u'correct_answer'})
         if node_doc is None:
-            gs_node = collection.AttributeType()
-            gs_node.name = u'correct_answer'
-            gs_node.created_by = user_id
-            gs_node.member_of.append(u"AT")
-            gs_node.data_type = "[" + DATA_TYPE_CHOICES[6] + "]"  # list of unicodes
-            gs_node.subject_type.append(quiz_item_type._id)
-            gs_node.save()
+            at_node = collection.AttributeType()
+            at_node.name = u'correct_answer'
+            at_node.created_by = user_id
+            # at_node.member_of.append(u"AT")
+            at_node.data_type = "[" + DATA_TYPE_CHOICES[6] + "]"  # list of unicodes
+            at_node.subject_type.append(quiz_item_type._id)
+            at_node.save()
 
         # Append quiz_type, options & correct_answer to attribute_type_set of 'QuizItem'
         if not quiz_item_type.attribute_type_set:
@@ -170,29 +170,29 @@ class Command(BaseCommand):
 
         node_doc = collection.GSystemType.one({'$and':[{'_type': u'AttributeType'},{'name': u'start_time'}]})
         if node_doc is None:
-            gs_node = collection.AttributeType()
-            gs_node.name = u'start_time'
-            gs_node.created_by = user_id
-            gs_node.member_of.append(u"AT")
-            # gs_node.data_type="DateTime"
-            # gs_node.data_type = "datetime.datetime"
-            gs_node.data_type = DATA_TYPE_CHOICES[9]   # datetime.datetime
-            gs_node.subject_type.append(forum_type._id)
-            gs_node.subject_type.append(quiz_type._id)
-            gs_node.save()
+            at_node = collection.AttributeType()
+            at_node.name = u'start_time'
+            at_node.created_by = user_id
+            # at_node.member_of.append(u"AT")
+            # at_node.data_type="DateTime"
+            # at_node.data_type = "datetime.datetime"
+            at_node.data_type = DATA_TYPE_CHOICES[9]   # datetime.datetime
+            at_node.subject_type.append(forum_type._id)
+            at_node.subject_type.append(quiz_type._id)
+            at_node.save()
 
         node_doc = collection.GSystemType.one({'$and':[{'_type': u'AttributeType'},{'name': u'end_time'}]})
         if node_doc is None:
-            gs_node = collection.AttributeType()
-            gs_node.name = u'end_time'
-            gs_node.created_by = user_id
-            gs_node.member_of.append(u"AT")
-            # gs_node.data_type="DateTime"
-            # gs_node.data_type = "datetime.datetime"
-            gs_node.data_type = DATA_TYPE_CHOICES[9]   # datetime.datetime
-            gs_node.subject_type.append(forum_type._id)
-            gs_node.subject_type.append(quiz_type._id)
-            gs_node.save()
+            at_node = collection.AttributeType()
+            at_node.name = u'end_time'
+            at_node.created_by = user_id
+            # at_node.member_of.append(u"AT")
+            # at_node.data_type="DateTime"
+            # at_node.data_type = "datetime.datetime"
+            at_node.data_type = DATA_TYPE_CHOICES[9]   # datetime.datetime
+            at_node.subject_type.append(forum_type._id)
+            at_node.subject_type.append(quiz_type._id)
+            at_node.save()
 
         # Append start_time & end_time to attribute_type_set of 'Quiz'
         if not quiz_type.attribute_type_set:
