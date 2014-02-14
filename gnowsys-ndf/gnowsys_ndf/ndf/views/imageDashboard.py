@@ -25,7 +25,7 @@ def imageDashboard(request, group_name, image_id):
     '''
     fetching image acording to group name
     '''
-    img_col= collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(image_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
+    img_col= collection.GSystem.find({'member_of': {'$all': [ObjectId(image_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
     variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded })

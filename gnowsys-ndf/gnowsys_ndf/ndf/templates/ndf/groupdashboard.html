@@ -1,18 +1,33 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
-
+from django.contrib.auth.decorators import login_required
 {% block title %} Group Dashboard {% endblock %}
 
 {% block head %}
+
+
+<script type="text/javascript" ></script>
+ 
+<script>
+var chk_login = "{{ user }}";
+</script>
+	
+
+
 <script type="text/javascript">
 //function to toggle the lable Join and Unsubscribe
 function change_label(label)
-{
-    if(label == "Join")
+{   
+	if(chk_login=="AnonymousUser")
+		{document.location.href = '/accounts/login/';
+		}
+	
+     else if(label == "Join")
     { $("#notify").val("Unsubscribe");}
     else
     { $("#notify").val("Join");}
 }
+
 //function for sending notifications for Join and Unsubscribe
 function notify(group,activity)
 {
@@ -37,6 +52,7 @@ function notify(group,activity)
 
 }
 
+
 $(document).ready(function()
 {
   var groupn = $("#groupname").val();
@@ -52,13 +68,13 @@ $(document).ready(function()
       notify(groupn,"remove");
       change_label("remove");
       label="Join"
+	
     }
   }); //end notify_click()
 }); //end document_ready()
 
 </script>
 {% endblock %}
-
 
 {% block url %}
 {% url 'edit_group' groupobj.name groupobj %}
@@ -73,7 +89,8 @@ $(document).ready(function()
 <input type="hidden" id="groupname" value="{{group}}">
 {% if user_is_joined == "joined" %}
      <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible" >
-{% elif user_is_joined == "not"  %}
+{% elif user_is_joined == "not" or not user.is_authenticated  %}
+
      <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
 {% endif %}
 {% get_user_object node.created_by as user_obj %}
@@ -86,7 +103,12 @@ $(document).ready(function()
 {% endblock %}
 
 {% block body_content %}
+<!-- Place for group splash page design
+<a class="button" data-reveal-id="group-splash">Intro</a>
+<div id="group-splash" class="reveal-modal" data-reveal>
 
+<img src="http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg">
+</div-->
 {{ block.super }}
 {% endblock %}
 

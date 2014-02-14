@@ -14,9 +14,6 @@ nav.top-bar .has-dropdown .button{ /* Needs testing */
 	top:0;
 }
 
-p{
-	margin-bottom: 1.25rem;
-}
 
 input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
@@ -24,7 +21,8 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 
 
 /* Top bar */
-header{
+body>header{
+border-bottom: 1px solid black;
 }
 .top-bar,.top-bar-section ul,body>header{
 	background-color: #222;
@@ -81,23 +79,35 @@ main>aside a:hover{
 }
 
 h2:not(.subheader){
-	color: black;
-	font-size: 2rem;
-	margin-bottom: 0;
+	color: #222;
+	font-family: "Georgia Serif", Serif;
+	font-size: :1.2rem;
+	font-weight: bold;
+	margin: 0;
+}
+h3{
+	font-size: 1.4rem;
 }
 
-
+p{
+	font-size: 0.9rem;
+	line-height: 1.5;
+}
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
 	background-color: #222;
 }
-a.right-off-canvas-toggle{
+a#toggle-shelf{
+	position: absolute;
+	top:1rem;
+	right: 1rem;
 	color: black;
+	z-index: 10;
 }
-a.right-off-canvas-toggle:hover{
-	color: white;
+a#toggle-shelf:hover{
+	color: #aaa;
 }
-a.right-off-canvas-toggle i{
+a#toggle-shelf i{
 	font-size: 30px;
 }
 
@@ -127,9 +137,6 @@ a.right-off-canvas-toggle i{
 }
 
 /* Card block */
-li.card{
-	min-height: 26rem;
-}
 .card>*{
 	position: relative;
 	background-color: white;
@@ -172,43 +179,46 @@ li.card{
 	color:inherit;
 }
 /* Content Tabs */
-header .tabs{
+article nav{
+	padding-top: 2rem;
 }
-header .tabs i{
+article .tabs{
+
+}
+article .tabs i{
 	margin-right: 5px;
 	font-size: 1.3rem;
 }
-header .tabs h3{
-	font-size: 1rem;
-	font-weight: bold;
-	padding: 0.7rem 3rem 0 0.5rem;
-	color: #777;
-	display: none;
-}
-header .tabs dd a{
-	color: white;
-	padding-top: 0.5rem;
-	padding-bottom: 0.8rem;
-	background-color: #aaa;
-}
-header .tabs dd a:hover{
-	background-color: #999 ;
-}
-header .tabs dd.active a{
-	background-color: #888;
-	font-weight: bold;
-}
-.tabs-content>.content{/* Overrides tab content floating lef */
+article .tabs dd{
+	width: 100%;
 	float: none;
 }
+article .tabs dd a{
+	color:#aaa;
+	background-color: inherit;
+	padding: 0.5rem;
+	padding-left: 1rem;
+}
+article .tabs dd a:hover{
+	background-color: inherit;
+	color:#999;
+}
+article .tabs dd.active a{
+	color:#222;
+	background-color: inherit;
+}
+
+.tabs-content>.content{
+	padding-top: 0;
+}
+
 /* Default card */
 .card header{
-	text-align: center;
+	margin-bottom: 0;
 }
 .card h4{
 	font-weight: bold;
 	font-size: 1rem;
-	margin: 0;
 }
 .card p{
 	font-size: 0.9rem;
@@ -218,7 +228,7 @@ header .tabs dd.active a{
 	width:80px;
 	height: 80px;
 	overflow: hidden;
-	display: block;
+	display: none;
 
 }
 .card .th:hover{
@@ -255,16 +265,18 @@ header .tabs dd.active a{
 }
 /* Inline label list */
 .label{
+	color: white;
 	background-color: #aaa;
-	border-left:1px solid #999;
+	border-left:1px solid ye;
 	display: inline-block;
 }
 .label:hover{
-	background-color: #999;
+	background-color: orange;
 }
 
 .label-list{
 	text-align: left;
+	padding: 0.5rem 0;
 }
 
 .card .label{
@@ -308,17 +320,19 @@ main .button:hover{
 
 /* Content area */
 article{
-	margin-top: 1.5rem;
+	margin-top: 0.5rem;
 	background-color: #f5f5f5;
 	border:solid 1px #ddd;
-	padding:2rem!important;
-	padding-bottom: 20px; 
+	padding-bottom: 4rem; 
 }
 
-article>header{
+article header{
+}
+article .breadcrumbs{
+	background-color: #eee;
 }
 article nav{
-	margin-top: 1rem;
+	
 }
 
 pre{
@@ -331,8 +345,11 @@ pre{
 	background: url('/static/ndf/images/pre.png');
 	background-size:1px 4rem;
 	padding-left:0.5rem;
+	font-family: monospace;
 }
+article p{
 
+}
 textarea{
 	min-height: 6rem;
 }
@@ -343,7 +360,11 @@ textarea{
 	min-height: 10rem;
 
 }
-
+#content>p:first-of-type{
+	font-size: 120%;
+	line-height: 1.4;
+	color: #222;
+}
 /*************************** 3. Custom CSS Below ***********************/
 
 .user{
@@ -376,12 +397,8 @@ a.app i{
 	margin-right:8px;
 }
 .button.edit{
-	margin-left:1rem;
 	margin-bottom: 0;
-	vertical-align: middle;
 }
-.button.edit span{display: none;}
-.button.edit:hover span{display: inline;}
 
 /* Sidebar Search Results */
 main .search{
