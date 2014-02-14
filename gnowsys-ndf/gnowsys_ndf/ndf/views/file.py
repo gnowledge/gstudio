@@ -54,9 +54,18 @@ def file(request, group_name, file_id):
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
         collection = db[File.collection_name]
-        files = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
+        files = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [group_name]}})
+        imageCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [group_name]}})
+        videoCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [group_name]}})
         already_uploaded = request.GET.getlist('var', "")
-        return render_to_response("ndf/file.html", {'title': title, 'files':files, 'already_uploaded':already_uploaded}, context_instance = RequestContext(request))
+        return render_to_response("ndf/file.html", 
+                                  {'title': title, 
+                                   'files': files,
+                                   'imageCollection': imageCollection,
+                                   'videoCollection': videoCollection,
+                                   'already_uploaded': already_uploaded
+                                  }, 
+                                  context_instance = RequestContext(request))
     else:
         return HttpResponseRedirect(reverse('homepage'))
         
@@ -171,6 +180,7 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, usrnam
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
                 fileobj.member_of.append(GST_IMAGE._id)
+                fileobj.save()
                 thumbnailimg = convert_image_thumbnail(files)
                 tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
                 fileobj.fs_file_ids.append(tobjectid)

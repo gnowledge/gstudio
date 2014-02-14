@@ -89,8 +89,9 @@ def get_gapps_menubar(group_name, selectedGapp):
   gapps = {}
   i = 0;
   for app in gst_cur:
-    i = i+1;
-    gapps[i] = {'id': app._id, 'name': app.name.lower()}
+    if app.name not in ["Image", "Video"]:
+      i = i+1;
+      gapps[i] = {'id': app._id, 'name': app.name.lower()}
 
   selectedGapp = selectedGapp.split("/")[2]
   
