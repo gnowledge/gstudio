@@ -85,6 +85,10 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
 
       elif checked == "Forum":
         drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Forum']}, 'group_set': {'$all': [group_name]}})
+       
+      #code for adding module
+      elif checked == "Module":
+        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Module']}, 'group_set': {'$all': [group_name]}})
 
     else:
       drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   

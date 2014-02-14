@@ -1,5 +1,6 @@
 #from django.http import HttpResponseRedirect
 #from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response #render  uncomment when to use
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -31,3 +32,33 @@ def course(request, group_name, course_id):
         template = "ndf/course.html"
         variable = RequestContext(request, {'course_coll': course_coll })
         return render_to_response(template, variable)
+
+@login_required
+def create_edit(request, group_name, node_id = None):
+    """Creates/Modifies details about the given quiz-item.
+    """
+
+    context_variables = { 'title': GST_COURSE.name,
+                          'group_name': group_name
+                      }
+
+    if node_id:
+        course_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
+    else:
+        course_node = collection.GSystem()
+
+    if request.method == "POST":
+        get_node_common_fields(request, course_node, group_name, gst_course)
+        course_node.save()
+        
+        return HttpResponseRedirect(reverse('course', kwargs={'group_name': group_name, 'course_id': course_node._id}))
+        
+    else:
+        if node_id:
+            context_variables['node'] = course_node
+            
+        return render_to_response("ndf/course_create_edit.html",
+                                  context_variables,
+                                  context_instance=RequestContext(request)
+                              )
+

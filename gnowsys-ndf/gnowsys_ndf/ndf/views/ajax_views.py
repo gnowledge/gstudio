@@ -23,7 +23,9 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
-from gnowsys_ndf.settings import GAPPS 
+from gnowsys_ndf.settings import GAPPS
+import json
+ 
 db = get_database()
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
@@ -129,7 +131,8 @@ def get_module_set_list(node):
     for each in node.collection_set:
         each = collection.Node.one({'_id':each})
         dict = {}
-        dict[unicode(each._id)] = hm_obj.get_current_version(each)
+        dict['id'] = unicode(each._id)
+        dict['version_no'] = hm_obj.get_current_version(each)
         if each._id not in list_of_collection:
             list_of_collection.append(each._id)
             if each.collection_set :                                   #checking that same collection can'not be called again
@@ -137,31 +140,61 @@ def get_module_set_list(node):
         list.append(dict)
     return list
 
-#@login_required
+
 list_of_collection = []
 hm_obj = HistoryManager()
 GST_MODULE = gs_collection.GSystemType.one({'name': GAPPS[8]})
-def make_module_set(_id):
+
+@login_required
+def make_module_set(request, group_name):
     '''
     This methode will create module of collection and stores objectid's with version number's
     '''
-    #if request.is_ajax() and _id:
-    node = collection.Node.one({'_id':ObjectId(_id)})
-    list_of_collection.append(node._id)
-    dict = {}
-    dict[unicode(node._id)] =hm_obj.get_current_version(node)
-    if node.collection_set:
-        dict['collection'] = get_module_set_list(node)          #gives the list of collection with proper hierarchy as they are
-    #return dict
-    #creating new Gsystem object and assining data of collection object
-    gsystem_obj = collection.GSystem()
-    gsystem_obj.name = unicode(node.name)
-    gsystem_obj.content = unicode(node.content)
-    gsystem_obj.gsystem_type.append(GST_MODULE._id)
-    gsystem_obj.member_of.append(unicode(GST_MODULE._id))
-    gsystem_obj.created_by = 1
-    gsystem_obj.module_set.append(dict)
-    gsystem_obj.save()
-    return "success"
+    if request.is_ajax():
+        try:
+            _id = request.GET.get("_id","")
+            print "id:",_id
+            if _id:
+                node = collection.Node.one({'_id':ObjectId(_id)})
+                list_of_collection.append(node._id)
+                dict = {}
+                dict['id'] = unicode(node._id)
+                dict['version_no'] = hm_obj.get_current_version(node)
+                if node.collection_set:
+                    dict['collection'] = get_module_set_list(node)          #gives the list of collection with proper hierarchy as they are
+           
+                #creating new Gsystem object and assining data of collection object
+                gsystem_obj = collection.GSystem()
+                gsystem_obj.name = unicode(node.name)
+                gsystem_obj.content = unicode(node.content)
+                gsystem_obj.gsystem_type.append(GST_MODULE._id)
+                gsystem_obj.member_of.append(unicode(GST_MODULE._id))
+                gsystem_obj.group_set.append(unicode(group_name))
+                gsystem_obj.created_by = int(request.user.id)
+                gsystem_obj.module_set.append(dict)
+                gsystem_obj.save()
+                return HttpResponse("module succesfull created")
+            else:
+                return HttpResponse("Not a valid id passed")
+        except Exception as e:
+              return HttpResponse(e)
 
-    
+
+def walk(node):
+    list = []
+    for each in node:
+       dict = {}
+       n = collection.Node.one({'_id':ObjectId(each['id'])})
+       dict['label'] = n.name
+       dict['id'] = each['id']
+       dict['version_no'] = each['version_no']
+       if "collection" in each.keys():
+             dict['children'] = walk(each['collection'])
+       list.append(dict)
+    return list
+
+def get_module_json(request, group_name):
+    _id = request.GET.get("_id","")
+    node = collection.Node.one({'_id':ObjectId(_id)})
+    data = walk(node.module_set)
+    return HttpResponse(json.dumps(data))

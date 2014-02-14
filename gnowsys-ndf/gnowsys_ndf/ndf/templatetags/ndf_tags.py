@@ -46,7 +46,7 @@ def edit_drawer_widget(field, group_name, node, checked=None):
   drawers = None
   drawer1 = None
   drawer2 = None
-
+ 
   if node :
     if field == "collection":
       if checked == "Quiz":
@@ -57,19 +57,29 @@ def edit_drawer_widget(field, group_name, node, checked=None):
       drawers = get_drawers(group_name, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
+      print field,"check"
       checked = None
       drawers = get_drawers(group_name, node._id, node.prior_node, checked)
     
+    #code for Adding module to course
+    elif field == "add_module":
+      checked = "Module"
+      drawers = get_drawers(group_name, node._id, node.collection_set, checked)
+      
     drawer1 = drawers['1']
     drawer2 = drawers['2']
 
   else:
     if field == "collection" and checked == "Quiz":
       checked = "QuizItem"
+    
+    elif field == "add_module":
+      checked = "Module"
+    
     else:
       # To make the collection work as Heterogenous one, by default
       checked = None
-
+    print checked
     drawer1 = get_drawers(group_name, None, [], checked)
 
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
