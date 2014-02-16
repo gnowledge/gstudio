@@ -88,7 +88,7 @@
 
           {% if user.is_authenticated %}
           <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
-            Upload File
+            <span class="fi-upload">  Upload File</span>
           </a>
           {% endif %}
 	</div>
@@ -145,6 +145,39 @@
   <div class="content" id="view-image">
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 
+      <!-- Node create card-->
+      <li class="create card">
+        <div class="file">
+          <h4><i class="fi-plus"></i> New Upload</h4>
+
+          <div class="row">
+
+            <div class="large-12 columns">
+              <input type="text" placeholder="Name of the File" />
+              <textarea placeholder="Describe the File"></textarea>
+	      
+              <div class="login-mode switch round">
+                <input id="PUBLIC" name="login-mode" type="radio" checked>
+                <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+		
+                <input id="PRIVATE" name="login-mode" type="radio">
+                <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+		
+                <span></span>
+              </div>
+
+            </div>
+
+          </div>
+
+          {% if user.is_authenticated %}
+          <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+            <span class="fi-upload"> File</span>
+          </a>
+          {% endif %}
+	</div>
+      </li>
+
       {% if imageCollection.count != 0 %}
 
       <!-- Existing card list-->
@@ -197,6 +230,39 @@
   <!-- View 3 -->
   <div class="content" id="view-video">
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Node create card-->
+      <li class="create card">
+        <div class="file">
+          <h4><i class="fi-plus"></i> New Upload</h4>
+
+          <div class="row">
+
+            <div class="large-12 columns">
+              <input type="text" placeholder="Name of the File" />
+              <textarea placeholder="Describe the File"></textarea>
+	      
+              <div class="login-mode switch round">
+                <input id="PUBLIC" name="login-mode" type="radio" checked>
+                <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+		
+                <input id="PRIVATE" name="login-mode" type="radio">
+                <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+		
+                <span></span>
+              </div>
+
+            </div>
+
+          </div>
+
+          {% if user.is_authenticated %}
+          <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+            <span class="fi-upload"> File</span>
+          </a>
+          {% endif %}
+	</div>
+      </li>
 
       {% if videoCollection.count != 0 %}
 
