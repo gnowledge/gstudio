@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns:xlink="http://www.w3.org/1999/xlink">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	
+	<script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+	<script type="text/javascript" src="/static/ndf/js/jquery.js"></script>	
+	<script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>		
+	<style type="text/css">
+
+		.link {
+			stroke: #ccc;
+		}
+
+		.nodetext {
+			#pointer-events: none;
+			font: 10px Serif;
+			font-style:italic;
+		}
+
+		.mainnode{
+
+			font: 15px sans-serif;
+			/*fill:"black";*/
+			border-width: 1px;
+			font-weight:bold;
+			border-color: gray;
+		}
+
+		.relnode {
+			font: 10px sans-serif;			
+			fill:#404040;
+		}
+
+
+		.node {
+			border-width: 1px;
+			border-color: gray;
+			fill:#25587E;
+			font: 12px sans-serif;
+		}
+
+		body {
+			background-color: white;
+			display:block;
+		}
+
+		#chart {
+			/*height: 90%;
+			margin: 0 auto;
+			width: 90%*/;
+			display: block;
+		}
+
+		svg {
+			/*margin-left: 10%;
+			margin-right: 10%;*/
+			display: block;
+			position: absolute;
+		}
+
+
+	</style>
+
+</head>
+
+<body>
+
+	<div id="chart" data-graph="{{graphData}}" data-loc="{{request.META.PATH_INFO}}">
+	</div>
+
+	<script type="text/javascript">
+	
+	var loc = ($('#chart').attr("data-loc")).split("/")[3];
+
+	if( loc != "details") { $("#graphArea").hide();	}
+
+	var jsonData = $.parseJSON($("#chart").attr("data-graph"));
+
+	function init(a,b)
+	{
+
+		nodes_by_id = _.reduce(a, function(acc, n) 
+		{
+			acc[n._id] = n;
+				return acc;
+		}, {});
+
+		all_edges=new Array();
+	
+	    //this contains all the links between the nodes
+	    all_edges =_(b).chain().map(function(e) 
+	    {
+	     	e.source = nodes_by_id[e.from];
+	     	e.target = nodes_by_id[e.to];
+			//e.type = nodes_by_id[e.type]
+			return e;
+		}).filter(function(e)
+			{
+				return nodes_by_id[e.from] && nodes_by_id[e.to]&& e.type!="title" && e.type!="content" && e.type!="authors"
+			}).value();  
+	}
+		
+		$(function fgraph() 
+		{	
+
+			// d3.json(jsonData, function (json1){ 
+				json1 = jsonData;
+				metadata=json1.node_metadata;
+				relations=json1.relations;
+
+				init(metadata,relations);
+				load(jsonData.node_metadata[0]._id) 
+			// });
+
+			function load(key)
+			{
+				var w = 550,
+				h = 300,
+				fill = d3.scale.category20();
+
+				var vis = d3.select("#chart")
+				.append("svg:svg")
+				.attr("width", w)
+				.attr("height", h);       
+				vis.append("svg:g").attr("class", "edges");        
+				vis.append("svg:g").attr("class", "nodes");
+
+
+
+				nodes_by_id[key].x = w/2.0;
+				nodes_by_id[key].y = h/2.0;       
+
+				var force = d3.layout.force()
+				.linkStrength(0.3)
+				.charge(-3000)
+				.friction(0.7)
+				.gravity(0.8)
+				.linkDistance(10)
+				.nodes([])
+				.links([])
+				.size([w, h])
+				.start();
+
+				function update(edges)
+				{
+			        // for each func
+			        _.each(nodes_by_id, function(n){n.added = false});
+			        
+			        // reduce the nodes list to have only those nodes for a given rel.
+			        nodes = _.reduce(edges, function(acc, e) 
+			        {
+			        	if(nodes_by_id[e.from] && !nodes_by_id[e.from].added){
+			        		nodes_by_id[e.from].added = true;
+			        		acc.push(nodes_by_id[e.from]);
+			        	}
+			        	if(nodes_by_id[e.to] && !nodes_by_id[e.to].added){
+			        		nodes_by_id[e.to].added = true;
+			        		acc.push(nodes_by_id[e.to]);
+			        	}
+			        	return acc;
+			        }, []);
+	        
+		        force.nodes(nodes);
+		        force.links(edges);
+		        force.start();
+
+		        link = d3.select("#chart g.edges").selectAll("line.link").select(this.arrowhead)
+		        .data(edges, function(e){return e.from + "-" + e.to + "-" + e.type});
+
+
+		        link.enter().append("svg:line")
+		        .attr("class", "link")
+                .style("stroke-width", 2 /* function(d) {
+                  return Math.sqrt(d.value);
+              	} */ )
+                .attr("x1", function(d) {
+                	return d.source.x;
+                })
+                .attr("y1", function(d) {
+                	return d.source.y;
+                })
+                .attr("x2", function(d) {
+                	return d.target.x;
+                })
+                .attr("y2", function(d) {
+                	return d.target.y;
+                })
+                .attr("text", function(d) {
+                	return d.type;
+                })
+                .attr("marker-end", "url(#arrowhead)");
+
+
+
+
+                var node = d3.select("#chart g.nodes").selectAll("g.node").data(nodes);
+
+
+
+                var new_g = node.enter().append("svg:a")
+                .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })   	      
+
+                .call(force.drag);
+
+                new_g.append("svg:marker")
+                .attr("id", "arrowhead")
+                .attr("viewBox","0 0 10 10")
+                .attr("refX","20")
+                .attr("refY","5")
+                .attr("markerUnits","strokeWidth")
+                .attr("markerWidth","9")
+                .attr("markerHeight","5")
+                .attr("orient","auto")
+                .append("svg:path")
+                .attr("d","M 0 0 L 10 5 L 0 10 z")
+                .attr("fill", "#6D6666"); 
+
+
+
+                text1 = new_g.append("svg:text")
+                .attr("class",function(d) {var e=(d._id).charAt(0);  if (d._id==key) return "mainnode";else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode";  else return "node"; })
+                .attr("y", 20)
+                .attr("x", 25) 
+                .attr("dy", ".35em")
+                .attr("text-anchor","middle") 	  
+
+
+                .text(function(d) {
+                	return d.screen_name;
+                });
+
+                // bbox = text1.node().getBBox();
+
+                // console.log(bbox);
+
+
+                // new_g.filter(function(d) { return (d._id).charAt(0)=="-"; }).append("svg:rect")
+                // .attr("x",bbox.x-22)
+                // .attr("y", bbox.y)	
+                // .attr("width", function(d) {var ttx=d.screen_name ; return (ttx.length+bbox.width+40)})
+                // .attr("height", bbox.height)
+                // .call(force.drag)
+                // .style("fill-opacity", ".1")
+                // .style("stroke", "#000")
+                // .style("stroke-width","1px"  );
+
+                new_g.filter(function(d) { if(d.refType=="Gbobject") return (d._id)>0 ;}).append("svg:ellipse")
+                .attr("cx", 25)                
+                // .attr("cx", function(d){ return JSON.stringify(d.x / 4);})
+                .attr("cy", 20)
+                .call(force.drag)
+                .attr("rx",function(d) {var ttx=d.screen_name; return(ttx.length/3 +"em"
+                	)})
+                .attr("ry",20)
+                .style("fill-opacity", ".2")
+                // .style("stroke", "#666")
+                // .style("stroke-width", "1.5px")
+                .style("fill", function(d) {if (d.refType=="Objecttype") return "blue"; else if(d.refType=="Gbobject") return "#0000ff"; else return "none"});
+
+                node.exit().remove();							
+
+                force.on("tick", function() {
+
+                	var x_center = $("#chart").width() / 2;
+                	var y_center = $("#chart").height() / 2;
+
+                	link.attr("x1", function(d) { return d.source.x; })
+                	.attr("y1", function(d) { return d.source.y; })
+                	.attr("x2", function(d) { return d.target.x; })
+                	.attr("y2", function(d) { return d.target.y; });
+
+                	node.attr("transform", function(d) { return "translate(" + (d.x-16) + "," + (d.y-16) + ")"; });
+
+                });
+            	}
+		
+            update(all_edges);
+            vis.style("opacity", 1e-6)
+            .transition()
+            .duration(1000)
+            .style("opacity", 1);
+        }
+        });
+    
+
+</script>
+
+</body>
+</html>

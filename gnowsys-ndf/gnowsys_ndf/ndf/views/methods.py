@@ -213,7 +213,7 @@ def get_node_common_fields(request, node, group_name, node_type):
 
   
 
-# ------ Some work for graph ------
+# ------ Some work for relational graph - (II) ------
 def neighbourhood_nodes(page_node):
 
   collection = db[Node.collection_name]
@@ -266,4 +266,100 @@ def neighbourhood_nodes(page_node):
     graphData += ']}' 
 
   return graphData
+# ------ End of processing for graph ------
+
+
+
+# ------ Some work for node graph - (II) ------
+def graph_nodes(page_node):
+  
+  collection = db[Node.collection_name]
+        
+  def _get_node_info(node_id):
+    node = collection.Node.one( {'$or':[{'_type':'GSystem'},{'_type':'File'}], '_id':node_id}  )
+    return node.name
+
+  def _get_username(id_int):
+    return User.objects.get(id=id_int).username
+
+  page_node_id = str(id(page_node._id))
+  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"Gbobject"}, '
+  node_relations = ''
+  exception_items = [
+                      "name", "content", "_id", "login_required", "attribute_set",
+                      "member_of", "status", "comment_enabled", "start_publication"
+                    ]
+
+  username = User.objects.get(id=page_node.created_by).username
+
+  i = 1
+  for key, value in page_node.items():
+    
+    if key in exception_items:
+      pass
+
+    elif isinstance(value, list) and len(value):
+
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
+      key_id = str(i)
+      # i += 1
+      
+      if key in ("modified_by", "author_set"):
+        for each in value:
+          node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
+          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+          i += 1
+
+      else:
+        for each in value:
+          if isinstance(each, ObjectId):
+            node_name = _get_node_info(each)          
+            node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'_n"},'
+          
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            i += 1
+          else:
+            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            i += 1
+    
+    else:
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
+      key_id = str(i)      
+
+      if isinstance( value, list):
+        for each in value:
+          node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(i) +'_n"},'
+          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+          i += 1 
+      
+      elif key == "created_by":
+        node_metadata += '{"screen_name":"' + _get_username(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
+        i += 1
+
+      elif key == "content_org":
+        if len(str(value)) > 25:
+          node_metadata += '{"screen_name":"' + value[:25] + '...", "_id":"'+ str(i) +'_n"},'
+        else:
+          node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
+        i += 1 
+      
+      else:
+        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
+        i += 1 
+    # End of if - else
+  # End of for loop
+
+  node_metadata = node_metadata[:-1]
+  node_relations = node_relations[:-1]
+
+  node_graph_data = '{ "node_metadata": [' + node_metadata + '], "relations": [' + node_relations + '] }'
+
+  return node_graph_data
+
 # ------ End of processing for graph ------
