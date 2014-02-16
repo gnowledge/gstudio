@@ -189,13 +189,22 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
        </div>
 
        <!-- Tab View Graph -->
+
        <div class="content" id="view-graph">    
         <div class="row">
           <div class="small-12 columns" id="graph-div">
-            {% include "ndf/relational_graph.html" with graphData=graphData %}        
+            {% include "ndf/node_graph.html" with graphData=graphData %}        
           </div>
         </div>
       </div>
+       <!-- 
+       <div class="content" id="view-graph">    
+        <div class="row">
+          <div class="small-12 columns" id="graph-div">
+            {#% #include "ndf/relational_graph.html" with graphData=graphData %}        
+          </div>
+        </div>
+      </div> -->
     </section>
 
     <section class="medium-3 columns">
