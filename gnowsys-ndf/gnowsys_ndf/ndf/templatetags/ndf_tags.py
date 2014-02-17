@@ -6,11 +6,14 @@ from django.template import Library
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
-
+import re
 from django.contrib.auth.models import User
-
+from django.shortcuts import render_to_response, render
 from gnowsys_ndf.ndf.views.methods import get_drawers
-
+from django.template import RequestContext,loader
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.http import Http404
 register = Library()
 db = get_database()
 
@@ -41,7 +44,7 @@ def get_all_replies(parent):
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_name, node, checked=None):
+def edit_drawer_widget(field, group_id, node, checked=None):
 
   drawers = None
   drawer1 = None
@@ -54,11 +57,11 @@ def edit_drawer_widget(field, group_name, node, checked=None):
       else:
         checked = None
 
-      drawers = get_drawers(group_name, node._id, node.collection_set, checked)
+      drawers = get_drawers(group_id, node._id, node.collection_set, checked)
 
     elif field == "prior_node":
       checked = None
-      drawers = get_drawers(group_name, node._id, node.prior_node, checked)
+      drawers = get_drawers(group_id, node._id, node.prior_node, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
@@ -70,24 +73,23 @@ def edit_drawer_widget(field, group_name, node, checked=None):
       # To make the collection work as Heterogenous one, by default
       checked = None
 
-    drawer1 = get_drawers(group_name, None, [], checked)
+    drawer1 = get_drawers(group_id, None, [], checked)
 
-  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
+  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_id}
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(group_id, selectedGapp):
   """Get Gapps menu-bar
   """
-  print "insmenu",group_id
-  gst_collection = db[GSystemType.collection_name]
-  gst_cur = gst_collection.GSystemType.find({'$and':[{'_type':'GSystemType'},{'member_of':'GAPP'}]})
-
+  collection = db[Node.collection_name]
+  gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
   gapps = {}
   i = 0;
   for app in gst_cur:
-    i = i+1;
-    gapps[i] = {'id': app._id, 'name': app.name.lower()}
+    if app.name not in ["Image", "Video"]:
+      i = i+1;
+      gapps[i] = {'id': app._id, 'name': app.name.lower()}
 
   selectedGapp = selectedGapp.split("/")[2]
   return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'newgroup':group_id}
@@ -126,7 +128,7 @@ def get_twist_replies(twist):
 
 
 @register.assignment_tag
-def check_user_join(request,groupname):
+def check_user_join(request,group_id):
   if not request.user:
     return "null"
   user=request.user
@@ -137,7 +139,7 @@ def check_user_join(request,groupname):
   else:
     return "null"
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.one({'$and':[{'_type':'Group'},{'name':groupname}]})
+  colg = col_Group.Group.one({'_id':ObjectId(group_id)})
   if colg:
     if colg.created_by == user_id:
       return "author"
@@ -152,8 +154,8 @@ def check_user_join(request,groupname):
     return "nullobj"
   
 @register.assignment_tag
-def check_group(groupname):
-  fl = check_existing_group(groupname)
+def check_group(group_id):
+  fl = check_existing_group(group_id)
   return fl
 
 @register.assignment_tag
@@ -171,10 +173,9 @@ def get_group_name(groupurl):
   else:
       grp = "home"
   if grp == "home":
-    grpobj=col_Group.Group.one({'$and':[{'_type': u'Group'},{'name':grp}]})
+    grpobj=col_Group.Group.one({'_id':ObjectId(group_id)})
   else:
     grpobj=col_Group.Group.one({'_id':ObjectId(grp)})
-  print "get_gpname",grpobj.name
   return grpobj
 
 @register.assignment_tag
@@ -201,15 +202,15 @@ def get_existing_groups_excluded(grname):
     if items.name != grname:
       group.append(items)
   if not group:
-    group.append("None")
+    return "None"
   return group
 
 @register.assignment_tag
-def get_group_policy(group_name,user):
+def get_group_policy(group_id,user):
   try:
     policy = ""
     col_Group = db[Group.collection_name]
-    colg = col_Group.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
+    colg = col_Group.Group.one({'_id':ObjectId(group_id)})
     if colg:
       policy = str(colg.subscription_policy)
   except:
@@ -226,12 +227,41 @@ def get_user_group(user):
                                 'name': {'$nin': ['home']},
                                 '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}] 
                               })
+  for items in colg:
 
-  for g in colg:
-    group.append(g)
-    
+      group.append(items)
+  if not group:
+    return "None"
   return group
 
+@register.assignment_tag
+def get_group_type(group_id,user):
+  col_Group = db[Group.collection_name]
+  colg=col_Group.Group.one({'_id': ObjectId(group_id)})
+  #check if Group exist in the database
+  if colg is not None:
+	# Check is user is logged in
+	if  user.id:
+		# condition for group accesseble to logged user
+	  	if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
+			return "allowed"
+		else:
+			raise Http404	
+	else:
+		#condition for groups,accesseble to not logged users
+		if colg.group_type=="PUBLIC":
+			
+			return "allowed"
+                else:
+			print "redirection"
+			raise Http404
+  else:
+	
+	return "pass"
+		
+			
+	
+  
 
 
 '''this template function is used to get the user object from template''' 
@@ -244,6 +274,9 @@ def get_user_object(user_id):
     print "User Not found in User Table",e
   return user_obj
   
+
+
+	
 
 '''this template function is used to get the user object from template''' 
 @register.assignment_tag 

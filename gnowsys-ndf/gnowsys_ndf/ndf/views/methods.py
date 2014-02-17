@@ -23,71 +23,74 @@ def get_forum_repl_type(forrep_id):
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
   if obj:
-    if obj.member_of in forum_st.name:
-          if obj.member_of in "Forum":
-             return "Forum"
-          else:    
-             return "Reply"
-    else:
-          return "None"
+    if forum_st._id in obj.member_of:
+      return "Forum"
+    else:    
+      return "Reply"
   else:
-          return "None"
-def check_existing_group(groupname):
+    return "None"
+
+def check_existing_group(group_id):
   col_Group = db[Group.collection_name]
-  gpn=groupname
+  gpn=group_id
   colg = col_Group.Group.find({'_type': u'Group', "name":gpn})
   if colg.count() >= 1:
     return True
   else:
     return False
 
-
-def get_drawers(group_name, nid=None, nlist=[], checked=None):
+def get_drawers(group_id, nid=None, nlist=[], checked=None):
     """Get both drawers-list.
     """
     dict_drawer = {}
     dict1 = {}
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
-    gst_collection = db[GSystemType.collection_name]
-    gst_page = gst_collection.GSystemType.one({'name': GAPPS[0]})
-    gs_collection = db[GSystem.collection_name]
+    collection = db[Node.collection_name]
     
     drawer = None    
     
     if checked:     
       if checked == "Page":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Page']}, 'group_set': {'$all': [group_name]}})
+        gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [group_id]}})
         
       elif checked == "File":         
-        drawer = gs_collection.GSystem.find({'_type': u"File", 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'group_set': {'$all': [group_id]}})
         
       elif checked == "Image":         
-        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [group_id]}})
 
       elif checked == "Video":         
-        drawer = gs_collection.GSystem.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [group_id]}})
 
       elif checked == "Quiz":
-        drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})
+        # For prior-node-list
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_id]}})
 
       elif checked == "QuizObj":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$in':[u'Quiz',u'QuizItem']}, 'group_set': {'$all': [group_name]}})
+        # For collection-list
+        gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
+        gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [group_id]}})
 
       elif checked == "OnlyQuiz":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Quiz']}, 'group_set': {'$all': [group_name]}})
+        gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_id]}, 'group_set': {'$all': [group_id]}})
 
       elif checked == "QuizItem":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'QuizItem']}, 'group_set': {'$all': [group_name]}})
+        gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_item_id]}, 'group_set': {'$all': [group_id]}})
 
       elif checked == "Group":
-        drawer = gs_collection.GSystem.find({'_type': u"Group"})
+        drawer = collection.Node.find({'_type': u"Group"})
 
       elif checked == "Forum":
-        drawer = gs_collection.GSystem.find({'_type': u"GSystem", 'member_of': {'$all':[u'Forum']}, 'group_set': {'$all': [group_name]}})
+        gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [group_id]}})
 
     else:
-      drawer = gs_collection.GSystem.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
+      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_id]}})   
            
     
     if (nid is None) and (not nlist):
@@ -100,7 +103,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
           dict1[each._id] = each
 
       for oid in nlist: 
-        obj = gs_collection.GSystem.one({'_id': oid})
+        obj = collection.Node.one({'_id': oid})
         dict2.append(obj)        
 
       dict_drawer['1'] = dict1
@@ -114,7 +117,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
             dict1[each._id] = each
           
       for oid in nlist: 
-        obj = gs_collection.GSystem.one({'_id': oid})
+        obj = collection.Node.one({'_id': oid})
         dict2.append(obj)
       
       dict_drawer['1'] = dict1
@@ -144,8 +147,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   if not node.has_key('_id'):
     
     node.created_by = usrid
-    node.member_of.append(node_type.name)
-    node.gsystem_type.append(node_type._id)
+    node.member_of.append(node_type._id)
   
     if private:
       private = True
@@ -165,8 +167,8 @@ def get_node_common_fields(request, node, group_id, node_type):
     node.modified_by.remove(usrid)
     node.modified_by.insert(0,usrid)
 
-  if group_name not in node.group_set:
-    node.group_set.append(group_name)
+  if group_id not in node.group_set:
+    node.group_set.append(group_id)
 
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
@@ -211,7 +213,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   
 
-# ------ Some work for graph ------
+# ------ Some work for relational graph - (II) ------
 def neighbourhood_nodes(page_node):
 
   collection = db[Node.collection_name]
@@ -264,4 +266,100 @@ def neighbourhood_nodes(page_node):
     graphData += ']}' 
 
   return graphData
+# ------ End of processing for graph ------
+
+
+
+# ------ Some work for node graph - (II) ------
+def graph_nodes(page_node):
+  
+  collection = db[Node.collection_name]
+        
+  def _get_node_info(node_id):
+    node = collection.Node.one( {'$or':[{'_type':'GSystem'},{'_type':'File'}], '_id':node_id}  )
+    return node.name
+
+  def _get_username(id_int):
+    return User.objects.get(id=id_int).username
+
+  page_node_id = str(id(page_node._id))
+  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"Gbobject"}, '
+  node_relations = ''
+  exception_items = [
+                      "name", "content", "_id", "login_required", "attribute_set",
+                      "member_of", "status", "comment_enabled", "start_publication"
+                    ]
+
+  username = User.objects.get(id=page_node.created_by).username
+
+  i = 1
+  for key, value in page_node.items():
+    
+    if key in exception_items:
+      pass
+
+    elif isinstance(value, list) and len(value):
+
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
+      key_id = str(i)
+      # i += 1
+      
+      if key in ("modified_by", "author_set"):
+        for each in value:
+          node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
+          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+          i += 1
+
+      else:
+        for each in value:
+          if isinstance(each, ObjectId):
+            node_name = _get_node_info(each)          
+            node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'_n"},'
+          
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            i += 1
+          else:
+            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            i += 1
+    
+    else:
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
+      key_id = str(i)      
+
+      if isinstance( value, list):
+        for each in value:
+          node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(i) +'_n"},'
+          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+          i += 1 
+      
+      elif key == "created_by":
+        node_metadata += '{"screen_name":"' + _get_username(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
+        i += 1
+
+      elif key == "content_org":
+        if len(str(value)) > 25:
+          node_metadata += '{"screen_name":"' + value[:25] + '...", "_id":"'+ str(i) +'_n"},'
+        else:
+          node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
+        i += 1 
+      
+      else:
+        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
+        i += 1 
+    # End of if - else
+  # End of for loop
+
+  node_metadata = node_metadata[:-1]
+  node_relations = node_relations[:-1]
+
+  node_graph_data = '{ "node_metadata": [' + node_metadata + '], "relations": [' + node_relations + '] }'
+
+  return node_graph_data
+
 # ------ End of processing for graph ------

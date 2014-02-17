@@ -50,20 +50,19 @@ def quiz(request, group_id, app_id):
     """
     if gst_quiz._id == ObjectId(app_id):
         title = gst_quiz.name
-
-        quiz_nodes = collection.Node.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_id]}})
+        quiz_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_id]}})
         quiz_nodes.sort('last_update', -1)
         quiz_nodes_count = quiz_nodes.count()
-
-        gst_quiz_item_id = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})._id
-        quiz_item_nodes = collection.Node.find({'gsystem_type': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [group_id]}})
+        gst_quiz_item_id = collection.Node.one({'_type': 'GSystemType', 'name': u'QuizItem'})._id
+        quiz_item_nodes = collection.Node.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [group_id]}})
         quiz_item_nodes.sort('last_update', -1)
         quiz_item_nodes_count = quiz_item_nodes.count()
 
         return render_to_response("ndf/quiz_list.html",
                                   {'title': title, 
                                    'quiz_nodes': quiz_nodes, 'quiz_nodes_count': quiz_nodes_count,
-                                   'quiz_item_nodes': quiz_item_nodes, 'quiz_item_nodes_count': quiz_item_nodes_count
+                                   'quiz_item_nodes': quiz_item_nodes, 'quiz_item_nodes_count': quiz_item_nodes_count,
+                                   'newgroup':group_id
                                   }, 
                                   context_instance=RequestContext(request)
         )
@@ -76,10 +75,11 @@ def quiz(request, group_id, app_id):
         template_name = ""
         context_variables = { 'node': node,
                               'title': title,
-                              'group_id': group_id
+                              'group_id': group_id,
+                              'newgroup':group_id
                           }
         
-        if gst_quiz._id in node.gsystem_type:
+        if gst_quiz._id in node.member_of:
             template_name = "ndf/quiz_details.html"
 
         else:
@@ -100,7 +100,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
 
     context_variables = { 'title': gst_quiz_item.name,
                           'quiz_type_choices': QUIZ_TYPE_CHOICES,
-                          'group_id': group_id
+                          'group_id': group_id,
+                          'newgroup': group_id
                       }
 
     node = None
@@ -110,7 +111,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     if node_id:
         node = collection.Node.one({'_id': ObjectId(node_id)})
 
-        if "Quiz" in node.member_of:
+        if gst_quiz._id in node.member_of:
             # Add question from a given Quiz category's context
             quiz_node = node
             quiz_item_node = collection.GSystem()
@@ -128,8 +129,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
 
         if not quiz_item_node.has_key('_id'):
             quiz_item_node.created_by = usrid
-            quiz_item_node.member_of.append(gst_quiz_item.name)
-            quiz_item_node.gsystem_type.append(gst_quiz_item._id)
+            quiz_item_node.member_of.append(gst_quiz_item._id)
 
         if usrid not in quiz_item_node.modified_by:
             quiz_item_node.modified_by.append(usrid)
@@ -189,6 +189,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
     else:
         if node_id:
             context_variables['node'] = quiz_item_node
+            context_variables['newgroup'] = group_id
             
         return render_to_response("ndf/quiz_item_create_edit.html",
                                   context_variables,
@@ -200,7 +201,8 @@ def create_edit_quiz(request, group_id, node_id=None):
     """Creates/Edits quiz category.
     """
     context_variables = { 'title': gst_quiz.name,
-                          'group_id': group_id
+                          'group_id': group_id,
+                          'newgroup': group_id
                       }
 
     if node_id:
@@ -217,6 +219,7 @@ def create_edit_quiz(request, group_id, node_id=None):
     else:
         if node_id:
             context_variables['node'] = quiz_node
+            context_variables['newgroup'] = group_id
             
         return render_to_response("ndf/quiz_create_edit.html",
                                   context_variables,

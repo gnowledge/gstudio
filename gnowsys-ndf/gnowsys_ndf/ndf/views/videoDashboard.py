@@ -23,10 +23,10 @@ collection = db[File.collection_name]
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4]})
 
 def videoDashboard(request, group_id, video_id):
-    vid_col = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(video_id)]},'_type':'File', 'group_set': {'$all': [group_id]}})
+    vid_col = collection.GSystem.find({'member_of': {'$all': [ObjectId(video_id)]},'_type':'File', 'group_set': {'$all': [group_id]}})
     template = "ndf/videoDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'videoCollection':vid_col, 'already_uploaded':already_uploaded})
+    variable = RequestContext(request, {'videoCollection':vid_col, 'already_uploaded':already_uploaded, 'newgroup':group_id})
     return render_to_response(template, variable)
 
 def getvideoThumbnail(request, group_id, _id):
@@ -54,7 +54,7 @@ def video_search(request,group_id):
         keyword=request.GET.get("search","")
         vid_search=collection.File.find({'$and':[{'mime_type':{'$regex': 'video'}},{'$or':[{'name':{'$regex':keyword}},{'tags':{'$regex':keyword}}]}]})
         template="ndf/file_search.html"
-        variable=RequestContext(request,{'file_collection':vid_search,'view_name':'video_search'})
+        variable=RequestContext(request,{'file_collection':vid_search,'view_name':'video_search','newgroup':group_id})
         return render_to_response(template,variable)        
 
 
@@ -62,7 +62,8 @@ def video_detail(request, group_id, _id):
     vid_node = collection.File.one({"_id": ObjectId(_id)})
     return render_to_response("ndf/video_detail.html",
                                   { 'node': vid_node,
-                                    'group_id': group_id
+                                    'group_id': group_id,
+                                    'newgroup':group_id
                                   },
                                   context_instance = RequestContext(request)
         )
@@ -77,7 +78,8 @@ def video_edit(request,group_id,_id):
     else:
         return render_to_response("ndf/video_edit.html",
                                   { 'node': vid_node,
-                                    'group_id': group_id
+                                    'group_id': group_id,
+                                    'newgroup':group_id
                                 },
                                   context_instance=RequestContext(request)
                               )

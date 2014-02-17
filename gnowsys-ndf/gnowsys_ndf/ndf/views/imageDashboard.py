@@ -25,10 +25,10 @@ def imageDashboard(request, group_id, image_id):
     '''
     fetching image acording to group name
     '''
-    img_col= collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(image_id)]},'_type':'File', 'group_set': {'$all': [group_id]}})
+    img_col= collection.GSystem.find({'member_of': {'$all': [ObjectId(image_id)]},'_type':'File', 'group_set': {'$all': [group_id]}})
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
-    variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded })
+    variable = RequestContext(request, {'imageCollection': img_col,'already_uploaded':already_uploaded,'newgroup':group_id })
     return render_to_response(template, variable)
 def getImageThumbnail(request, group_id, _id):
     '''
@@ -70,14 +70,15 @@ def image_search(request,group_id):
         keyword=request.GET.get("search","")
         img_search=collection.File.find({'$and':[{'mime_type':{'$regex': 'image'}},{'$or':[{'name':{'$regex':keyword}},{'tags':{'$regex':keyword}}]}]})
         template="ndf/file_search.html"
-        variable=RequestContext(request,{'file_collection':img_search,'view_name':'image_search'})
+        variable=RequestContext(request,{'file_collection':img_search,'view_name':'image_search','newgroup':group_id})
         return render_to_response(template,variable)
 
 def image_detail(request, group_id, _id):
     img_node = collection.File.one({"_id": ObjectId(_id)})
     return render_to_response("ndf/image_detail.html",
                                   { 'node': img_node,
-                                    'group_id': group_id
+                                    'group_id': group_id,
+                                    'newgroup':group_id
                                   },
                                   context_instance = RequestContext(request)
         )
@@ -86,12 +87,13 @@ def image_edit(request,group_id,_id):
     if request.method == "POST":
         get_node_common_fields(request, img_node, group_id, GST_IMAGE)
         img_node.save()
-        return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))
+        return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id,'newgroup':group_id}))
         
     else:
         return render_to_response("ndf/image_edit.html",
                                   { 'node': img_node,
-                                    'group_id': group_id
+                                    'group_id': group_id,
+                                    'newgroup':group_id
                                 },
                                   context_instance=RequestContext(request)
                               )

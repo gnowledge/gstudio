@@ -39,7 +39,7 @@ twist_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':
 
 
 def forum(request,group_id,node_id):
-    existing_forums = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [group_id]}})
+    existing_forums = gs_collection.GSystem.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [group_id]}})
     existing_forums.sort('name')
     variables=RequestContext(request,{'existing_forums':existing_forums,'newgroup':group_id})
     return render_to_response("ndf/forum.html",variables)
@@ -59,8 +59,7 @@ def create_forum(request,group_id):
         usrid=int(request.user.id)
         colf.created_by=usrid
         colf.group_set.append(unicode(group_id))
-        colf.member_of.append(forum_st.name)
-        colf.gsystem_type.append(forum_st._id)
+        colf.member_of.append(forum_st._id)
         sdate=request.POST.get('sdate',"")
         shrs= request.POST.get('shrs',"") 
         smts= request.POST.get('smts',"")
@@ -104,7 +103,7 @@ def display_thread(request,group_id,thread_id):
         thread = gs_collection.GSystemType.one({'_id': ObjectId(thread_id)})
         forum=""
         for each in thread.prior_node:
-            forum=gs_collection.GSystem.one({'$and':[{'member_of':'Forum'},{'_id':ObjectId(each)}]})
+            forum=gs_collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
             if forum:
                 variables=RequestContext(request,{'forum':forum,'thread':thread,'newgroup':group_id,'eachrep':thread,'user':request.user})
                 return render_to_response("ndf/thread_details.html",variables)
@@ -130,14 +129,12 @@ def add_node(request,group_id):
         if node == "Twist":
             name=tw_name
             colrep.name=unicode(name)
-            colrep.member_of.append(twist_st.name)
-            colrep.gsystem_type.append(twist_st._id)
+            colrep.member_of.append(twist_st._id)
         elif node == "Reply":
             print "ins reply"
             name="Reply of:"+str(sup._id)
             colrep.name=unicode(name)
-            colrep.member_of.append(reply_st.name)
-            colrep.gsystem_type.append(reply_st._id)
+            colrep.member_of.append(reply_st._id)
 #        if node=="Reply":
 #            exstng_reply=gs_collection.GSystem.one({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(sup._id)}]})
         colrep.prior_node.append(sup._id)
