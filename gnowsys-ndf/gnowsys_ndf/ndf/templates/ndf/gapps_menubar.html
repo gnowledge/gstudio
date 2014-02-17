@@ -1,5 +1,6 @@
-<!-- GApps Menubar -->
 
+<!-- GApps Menubar -->
+<input type="hidden" value="{{newgroup}}">
 {% for index_key, app_dict in gapps.items %}
 
 <li>
@@ -15,8 +16,7 @@
 	active-menu
 	
 	{% endif %}
-
-	app" href="{% url app_dict.name group_name app_dict.id %}">
+	app" href="{% url app_dict.name newgroup app_dict.id %}">
 
 	{% comment %} Includes an app icon if found{% endcomment %}
 	{% if app_dict.name|lower == "page" %}

@@ -22,6 +22,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 {% block meta_content %}
 <!--This content possibly comes from page_details.html-->
+
 <p>
   {{ node.member_of|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
 </p>

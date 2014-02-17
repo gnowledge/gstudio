@@ -76,10 +76,10 @@ def edit_drawer_widget(field, group_name, node, checked=None):
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(group_name, selectedGapp):
+def get_gapps_menubar(group_id, selectedGapp):
   """Get Gapps menu-bar
   """
-
+  print "insmenu",group_id
   gst_collection = db[GSystemType.collection_name]
   gst_cur = gst_collection.GSystemType.find({'$and':[{'_type':'GSystemType'},{'member_of':'GAPP'}]})
 
@@ -90,8 +90,7 @@ def get_gapps_menubar(group_name, selectedGapp):
     gapps[i] = {'id': app._id, 'name': app.name.lower()}
 
   selectedGapp = selectedGapp.split("/")[2]
-  
-  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp, 'group_name': group_name}
+  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'newgroup':group_id}
 
 
 @register.assignment_tag
@@ -159,17 +158,24 @@ def check_group(groupname):
 
 @register.assignment_tag
 def get_group_name(groupurl):
+  col_Group = db[Group.collection_name]
   sp=groupurl.split("/",2)
   if len(sp)<=1:
-    return "home"
+    grp = "home"
   if sp[1]:
     chsp = check_existing_group(sp[1])
     if chsp:
-      return sp[1]
+      grp = sp[1]
     else:
-      return "home"
+      grp = "home"
   else:
-      return "home"
+      grp = "home"
+  if grp == "home":
+    grpobj=col_Group.Group.one({'$and':[{'_type': u'Group'},{'name':grp}]})
+  else:
+    grpobj=col_Group.Group.one({'_id':ObjectId(grp)})
+  print "get_gpname",grpobj.name
+  return grpobj
 
 @register.assignment_tag
 def get_existing_groups():

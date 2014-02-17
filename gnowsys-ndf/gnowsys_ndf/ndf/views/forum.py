@@ -38,13 +38,13 @@ twist_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':
 
 
 
-def forum(request,group_name,node_id):
-    existing_forums = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [group_name]}})
+def forum(request,group_id,node_id):
+    existing_forums = gs_collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [group_id]}})
     existing_forums.sort('name')
-    variables=RequestContext(request,{'existing_forums':existing_forums})
+    variables=RequestContext(request,{'existing_forums':existing_forums,'newgroup':group_id})
     return render_to_response("ndf/forum.html",variables)
 
-def create_forum(request,group_name):
+def create_forum(request,group_id):
     if request.method == "POST":
         colf=gs_collection.GSystem()
         name=unicode(request.POST.get('forum_name',""))
@@ -58,7 +58,7 @@ def create_forum(request,group_name):
         colf.content=unicode(fixstr[0])
         usrid=int(request.user.id)
         colf.created_by=usrid
-        colf.group_set.append(unicode(group_name))
+        colf.group_set.append(unicode(group_id))
         colf.member_of.append(forum_st.name)
         colf.gsystem_type.append(forum_st._id)
         sdate=request.POST.get('sdate',"")
@@ -89,29 +89,29 @@ def create_forum(request,group_name):
         colf.attribute_set.append(start_dt)
         colf.attribute_set.append(end_dt)
         colf.save()
-        return HttpResponseRedirect(reverse('show', kwargs={'group_name': group_name, 'forum_id': colf._id}))
+        return HttpResponseRedirect(reverse('show', kwargs={'group_id': group_id, 'newgroup':group_id,'forum_id': colf._id}))
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
     return render_to_response("ndf/create_forum.html",RequestContext(request))
 
-def display_forum(request,group_name,forum_id):
+def display_forum(request,group_id,forum_id):
     forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
-    variables=RequestContext(request,{'forum':forum})
+    variables=RequestContext(request,{'forum':forum,'newgroup':group_id})
     return render_to_response("ndf/forumdetails.html",variables)
 
-def display_thread(request,group_name,thread_id):
+def display_thread(request,group_id,thread_id):
     try:
         thread = gs_collection.GSystemType.one({'_id': ObjectId(thread_id)})
         forum=""
         for each in thread.prior_node:
             forum=gs_collection.GSystem.one({'$and':[{'member_of':'Forum'},{'_id':ObjectId(each)}]})
             if forum:
-                variables=RequestContext(request,{'forum':forum,'thread':thread,'eachrep':thread,'user':request.user})
+                variables=RequestContext(request,{'forum':forum,'thread':thread,'newgroup':group_id,'eachrep':thread,'user':request.user})
                 return render_to_response("ndf/thread_details.html",variables)
     except:
         pass
 
-def add_node(request,group_name):
+def add_node(request,group_id):
     try:
         content_org="\n"+request.POST.get("reply","")
         node=request.POST.get("node","")
@@ -148,7 +148,7 @@ def add_node(request,group_name):
         colrep.content_org = unicode(content_org.encode('utf8'))
         usrid=int(request.user.id)
         colrep.created_by=usrid
-        colrep.group_set.append(unicode(group_name))
+        colrep.group_set.append(unicode(group_id))
         colrep.save()
         if node == "Reply":
             # if exstng_reply:
@@ -156,11 +156,11 @@ def add_node(request,group_name):
             #     exstng_reply.prior_node.append(colrep._id)
             #     exstng_reply.save()
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
-            variables=RequestContext(request,{'thread':threadobj,'user':request.user})
+            variables=RequestContext(request,{'thread':threadobj,'user':request.user,'newgroup':group_id})
             return render_to_response("ndf/refreshtwist.html",variables)
         else:
             templ=get_template('ndf/refreshthread.html')
-            html = templ.render(Context({'forum':forumobj,'user':request.user}))
+            html = templ.render(Context({'forum':forumobj,'user':request.user,'newgroup':group_id}))
             return HttpResponse(html)
 
 

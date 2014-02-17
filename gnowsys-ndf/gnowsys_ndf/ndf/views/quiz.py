@@ -45,18 +45,18 @@ rcs = RCS()
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
 #######################################################################################################################################
 
-def quiz(request, group_name, app_id):
+def quiz(request, group_id, app_id):
     """Renders a list of all 'Quiz-type-GSystems' available within the database.
     """
     if gst_quiz._id == ObjectId(app_id):
         title = gst_quiz.name
 
-        quiz_nodes = collection.Node.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
+        quiz_nodes = collection.Node.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_id]}})
         quiz_nodes.sort('last_update', -1)
         quiz_nodes_count = quiz_nodes.count()
 
         gst_quiz_item_id = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})._id
-        quiz_item_nodes = collection.Node.find({'gsystem_type': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
+        quiz_item_nodes = collection.Node.find({'gsystem_type': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [group_id]}})
         quiz_item_nodes.sort('last_update', -1)
         quiz_item_nodes_count = quiz_item_nodes.count()
 
@@ -76,7 +76,7 @@ def quiz(request, group_name, app_id):
         template_name = ""
         context_variables = { 'node': node,
                               'title': title,
-                              'group_name': group_name
+                              'group_id': group_id
                           }
         
         if gst_quiz._id in node.gsystem_type:
@@ -92,7 +92,7 @@ def quiz(request, group_name, app_id):
 
 
 @login_required
-def create_edit_quiz_item(request, group_name, node_id=None):
+def create_edit_quiz_item(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
 
@@ -100,7 +100,7 @@ def create_edit_quiz_item(request, group_name, node_id=None):
 
     context_variables = { 'title': gst_quiz_item.name,
                           'quiz_type_choices': QUIZ_TYPE_CHOICES,
-                          'group_name': group_name
+                          'group_id': group_id
                       }
 
     node = None
@@ -134,8 +134,8 @@ def create_edit_quiz_item(request, group_name, node_id=None):
         if usrid not in quiz_item_node.modified_by:
             quiz_item_node.modified_by.append(usrid)
 
-        if group_name not in quiz_item_node.group_set:
-            quiz_item_node.group_set.append(group_name)
+        if group_id not in quiz_item_node.group_set:
+            quiz_item_node.group_set.append(group_id)
 
         quiz_type = request.POST.get('quiz_type_val')
         quiz_item_node['quiz_type'] = unicode(quiz_type)
@@ -184,7 +184,7 @@ def create_edit_quiz_item(request, group_name, node_id=None):
             quiz_node.collection_set.append(quiz_item_node._id)
             quiz_node.save()
         
-        return HttpResponseRedirect(reverse('quiz', kwargs={'group_name': group_name, 'app_id': quiz_item_node._id}))
+        return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id, 'app_id': quiz_item_node._id}))
         
     else:
         if node_id:
@@ -196,11 +196,11 @@ def create_edit_quiz_item(request, group_name, node_id=None):
                               )
 
 @login_required
-def create_edit_quiz(request, group_name, node_id=None):
+def create_edit_quiz(request, group_id, node_id=None):
     """Creates/Edits quiz category.
     """
     context_variables = { 'title': gst_quiz.name,
-                          'group_name': group_name
+                          'group_id': group_id
                       }
 
     if node_id:
@@ -209,10 +209,10 @@ def create_edit_quiz(request, group_name, node_id=None):
         quiz_node = collection.GSystem()
 
     if request.method == "POST":
-        get_node_common_fields(request, quiz_node, group_name, gst_quiz)
+        get_node_common_fields(request, quiz_node, group_id, gst_quiz)
         quiz_node.save()
         
-        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_name': group_name, 'app_id': quiz_node._id}))
+        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'app_id': quiz_node._id}))
 
     else:
         if node_id:

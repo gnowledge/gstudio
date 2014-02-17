@@ -123,7 +123,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     return dict_drawer
 
 
-def get_node_common_fields(request, node, group_name, node_type):
+def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node.
   """
   

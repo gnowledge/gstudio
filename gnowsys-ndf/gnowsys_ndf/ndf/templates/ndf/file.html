@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block search_content %}
-<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' newgroup %}">
 
   <div class="row collapse">
     <div class="small-10 columns">
@@ -86,7 +86,7 @@
             </div>
           </div>
           {% if user.is_authenticated %}
-          <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+          <a class="button expand" href="{% url 'uploadDoc' newgroup %}?next={{request.path}}">
             Upload File
           </a>
           {% endif %}
@@ -116,7 +116,7 @@
 
             <p>This file is a..</p>
 
-            <a class="button expand" href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">File details</a>
+            <a class="button expand" href ="{% url 'read_file' newgroup file grid_fs_obj.filename %}">File details</a>
             {% get_user_object file.created_by as user_obj %}
             {% ifequal  user_obj.username  user.username  %}
             <a  class="button alert tiny" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
@@ -142,8 +142,8 @@
    <div class="content" id="view-image">
      {% for image in imageCollection %}
      <li  class="clearing-featured-img">
-      <a href="{% url 'get_mid_size_img' group_name image %}">
-        <img  src="{% url 'getImageThumbnail' group_name image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' group_name image %}'>{{image.name}}</a> <script type='text/javascript'>
+      <a href="{% url 'get_mid_size_img' newgroup image %}">
+        <img  src="{% url 'getImageThumbnail' newgroup image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' newgroup image %}'>{{image.name}}</a> <script type='text/javascript'>
         var angle = 0;
         $('.img_rotate').on('click', function() {
         angle += 90;
@@ -161,7 +161,7 @@
  {% for video in videoCollection %}
  <li>
   <a class="video" id="{{video}}" href="#">
-    <img src="{% url 'getvideoThumbnail' group_name video %}" style="border-radius:10px;"></img>
+    <img src="{% url 'getvideoThumbnail' newgroup video %}" style="border-radius:10px;"></img>
     <span align="left">{{video.name}}</span>
   </a>
   {% get_user_object video.created_by as user_obj %}
@@ -207,9 +207,9 @@
  var video_total = $('.video').length;
  var pre = $(".video_pre");
  var next = $(".video_next");
- var url = "/{{group_name}}/video/fullvideo/"+video_id
+ var url = "/{{newgroup}}/video/fullvideo/"+video_id
  $("#play_video").attr("src",url);
- $(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_id)
+ $(".video_details_link").attr("href","/{{newgroup}}/video/video_detail/"+video_id)
  if(video_index >= 1 && video_index < video_total-1)
  {
  pre.attr("id",video_index-1);
@@ -247,9 +247,9 @@ var next = $(".video_next");
 pre.show();
 next.show();
 var video_url = $(".video")[this.id].id
-var url = "/{{group_name}}/video/fullvideo/"+video_url
+var url = "/{{newgroup}}/video/fullvideo/"+video_url
 $("#play_video").attr("src",url);
-$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_url)
+$(".video_details_link").attr("href","/{{newgroup}}/video/video_detail/"+video_url)
 if(video_index >= 1 && video_index < video_total-1)
 {
   pre.attr("id",video_index-1);
@@ -279,9 +279,9 @@ var next = $(".video_next");
 pre.show();
 next.show();
 var video_url = $(".video")[this.id].id
-var url = "/{{group_name}}/video/fullvideo/"+video_url
+var url = "/{{newgroup}}/video/fullvideo/"+video_url
 $("#play_video").attr("src",url);
-$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_url)
+$(".video_details_link").attr("href","/{{newgroup}}/video/video_detail/"+video_url)
 if(video_index >= 1 && video_index < video_total-1)
 {
   pre.attr("id",video_index-1);

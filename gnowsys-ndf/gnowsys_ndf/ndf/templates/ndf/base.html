@@ -33,7 +33,8 @@
 	<!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
 
-	{% block head %}  {% endblock %}
+	{% block head %}  
+        {% endblock %}
 
 	<style>
 
@@ -100,7 +101,7 @@
 <body>
 	<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
 
-	{% get_group_name request.path as group_name %}
+
 
 	<header class="row drop-shadow">
 
@@ -132,7 +133,7 @@
 					{% if user.is_authenticated %}
 
 					<li class="has-dropdown">
-						<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_name user.username %}">{{ user.username }}</a>
+						<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' groupobj user.username %}">{{ user.username }}</a>
 						<ul class="dropdown">
 							<li><a href="{% url 'auth_password_change' %}">Change password</a></li>
 							<li class="has-form"><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
@@ -151,19 +152,19 @@
 				<!-- Left Nav Section -->
 				<ul class="left">
 					<li class="has-dropdown group">
-						<a class="active-menu" href="#"><i class="fi-home"></i> {{group_name}}</a>
+						<a class="active-menu" href="#"><i class="fi-home"></i> {{groupobj.name}}</a>
 
 						<!-- If logged in show user groups -->
 						
 						{% if user.is_authenticated %}
 						  	{% get_user_group  request.user as groups %}
 						  {% else %}	
-							 {% get_existing_groups_excluded group_name as groups %}
+							 {% get_existing_groups_excluded groupobj.name as groups %}
 					         {% endif %} 
 						<ul class="dropdown">
 							<!-- Create dropdown item for each group -->
 							{% for gp_id in groups %}
-							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id.name %}">{{gp_id.name}}</a></li>
+							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id.name}}</a></li>
 							{% endfor %}
 
 						</ul>
@@ -172,7 +173,8 @@
 
 					</li>
 
-					{% get_gapps_menubar group_name request.META.PATH_INFO %}
+					{% get_gapps_menubar newgroup request.META.PATH_INFO %}
+
 				</ul>
 			</section>
 		</nav>
@@ -253,6 +255,7 @@
 							{% block extra_content %}  {% endblock %}
 
 
+							<input type="hidden" value="{{newgroup}}"> 
 
 						</article>
 						<!-- End of content section -->	

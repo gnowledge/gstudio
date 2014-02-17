@@ -22,21 +22,21 @@ db = get_database()
 collection = db[File.collection_name]
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4]})
 
-def videoDashboard(request, group_name, video_id):
-    vid_col = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(video_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
+def videoDashboard(request, group_id, video_id):
+    vid_col = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(video_id)]},'_type':'File', 'group_set': {'$all': [group_id]}})
     template = "ndf/videoDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
     variable = RequestContext(request, {'videoCollection':vid_col, 'already_uploaded':already_uploaded})
     return render_to_response(template, variable)
 
-def getvideoThumbnail(request, group_name, _id):
+def getvideoThumbnail(request, group_id, _id):
     videoobj = collection.File.one({"_id": ObjectId(_id)})
     if (videoobj.fs.files.exists(videoobj.fs_file_ids[1])):
         f = videoobj.fs.files.get(ObjectId(videoobj.fs_file_ids[1]))
         return HttpResponse(f.read())
         
     
-def getFullvideo(request, group_name, _id):
+def getFullvideo(request, group_id, _id):
     videoobj = collection.File.one({"_id": ObjectId(_id)})
     if len(videoobj.fs_file_ids) > 2:
     	if (videoobj.fs.files.exists(videoobj.fs_file_ids[2])):
@@ -48,7 +48,7 @@ def getFullvideo(request, group_name, _id):
             return HttpResponse(f.read(), content_type=f.content_type)
        
         
-def video_search(request,group_name):
+def video_search(request,group_id):
     vidcol=collection.File.find({'mime_type':{'$regex': 'video'}})
     if request.method=="GET":
         keyword=request.GET.get("search","")
@@ -58,26 +58,26 @@ def video_search(request,group_name):
         return render_to_response(template,variable)        
 
 
-def video_detail(request, group_name, _id):
+def video_detail(request, group_id, _id):
     vid_node = collection.File.one({"_id": ObjectId(_id)})
     return render_to_response("ndf/video_detail.html",
                                   { 'node': vid_node,
-                                    'group_name': group_name
+                                    'group_id': group_id
                                   },
                                   context_instance = RequestContext(request)
         )
 
-def video_edit(request,group_name,_id):
+def video_edit(request,group_id,_id):
     vid_node = collection.File.one({"_id": ObjectId(_id)})
     if request.method == "POST":
-        get_node_common_fields(request, vid_node, group_name, GST_VIDEO)
+        get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save()
-        return HttpResponseRedirect(reverse('video_detail', kwargs={'group_name': group_name, '_id': vid_node._id}))
+        return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
         
     else:
         return render_to_response("ndf/video_edit.html",
                                   { 'node': vid_node,
-                                    'group_name': group_name
+                                    'group_id': group_id
                                 },
                                   context_instance=RequestContext(request)
                               )

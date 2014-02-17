@@ -21,13 +21,13 @@ collection = db[Node.collection_name]
 GST_COLLECTION = db[GSystemType.collection_name]
 GST_COURSE = GST_COLLECTION.GSystemType.one({'name': GAPPS[7]})
 
-def course(request, group_name, course_id):
+def course(request, group_id, course_id):
     """
    * Renders a list of all 'courses' available within the database.
     """
     if GST_COURSE._id == ObjectId(course_id):
         title = GST_COURSE.name
-        course_coll = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [group_name]}})
+        course_coll = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [group_id]}})
         template = "ndf/course.html"
         variable = RequestContext(request, {'course_coll': course_coll })
         return render_to_response(template, variable)

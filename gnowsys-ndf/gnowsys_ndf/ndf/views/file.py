@@ -47,34 +47,34 @@ GST_VIDEO = GST_COLLECTION.GSystemType.one({'name': GAPPS[4]})
 ####################################################################################################################################                                             V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
 ###################################################################################################################################
 
-def file(request, group_name, file_id):
+def file(request, group_id, file_id):
     """
    * Renders a list of all 'Files' available within the database.
     """
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
         collection = db[File.collection_name]
-        files = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]},'_type':'File', 'group_set': {'$all': [group_name]}})
+        files = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(file_id)]},'_type':'File', 'group_set': {'$all': [group_id]}})
         already_uploaded = request.GET.getlist('var', "")
-        return render_to_response("ndf/file.html", {'title': title, 'files':files, 'already_uploaded':already_uploaded}, context_instance = RequestContext(request))
+        return render_to_response("ndf/file.html", {'title': title, 'newgroup':group_id, 'files':files, 'already_uploaded':already_uploaded}, context_instance = RequestContext(request))
     else:
-        return HttpResponseRedirect(reverse('homepage'))
+        return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'newgroup':group_id}))
         
 @login_required    
-def uploadDoc(request, group_name):
+def uploadDoc(request, group_id):
     if request.method == "GET":
         page_url = request.GET.get("next", "")
         template = "ndf/UploadDoc.html"
     if  page_url:
-        variable = RequestContext(request, {'page_url': page_url})
+        variable = RequestContext(request, {'page_url': page_url,'newgroup':group_id})
     else:
-        variable = RequestContext(request, {})
+        variable = RequestContext(request, {'newgroup':group_id})
     return render_to_response(template, variable)
       
     
 
 @login_required
-def submitDoc(request, group_name):
+def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
     """
@@ -93,14 +93,14 @@ def submitDoc(request, group_name):
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
+                    f = save_file(each, mtitle, userid, group_id, GST_FILE._id.__str__(), content_org, tags, usrname)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
+                    f = save_file(each, title, userid, group_id, GST_FILE._id.__str__(), content_org, tags, usrname)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
+                f = save_file(each, title, userid, group_id, GST_FILE._id.__str__(), content_org, tags, usrname)
             if f:
                 alreadyUploadedFiles.append(f)
                 title = mtitle
@@ -108,9 +108,9 @@ def submitDoc(request, group_name):
             str1 = str1 + 'var=' + each + '&'
         return HttpResponseRedirect(page_url+'?'+str1)
     else:
-        return HttpResponseRedirect(reverse('homepage'))
+        return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'newgroup':group_id}))
             
-def save_file(files, title, userid, group_name, st_id, content_org, tags, usrname):
+def save_file(files, title, userid, group_id, st_id, content_org, tags, usrname):
     """
     this will create file object and save files in gridfs collection
     """
@@ -135,7 +135,7 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, usrnam
             fileobj.name = unicode(title)
             fileobj.created_by = int(userid)
             fileobj.file_size = size
-            fileobj.group_set.append(unicode(group_name))        #group name stored in group_set field
+            fileobj.group_set.append(group_id)        #group name stored in group_set field
             fileobj.gsystem_type.append(GST_FILE._id)
             fileobj.mime_type = filetype
             if content_org:
@@ -282,31 +282,31 @@ def convertVideo(files, userid, objid):
     return files, filetype, thumbnailvideo
 
 	
-def GetDoc(request, group_name):
+def GetDoc(request, group_id):
     filecollection = get_database()[File.collection_name]
     files = filecollection.File.find({'_type': u'File'})
     #return files
     template = "ndf/DocumentList.html"
-    variable = RequestContext(request, {'filecollection':files})
+    variable = RequestContext(request, {'filecollection':files,'newgroup':group_id})
     return render_to_response(template, variable)
 
-def readDoc(request, _id, group_name, file_name = ""):
+def readDoc(request, _id, group_id, file_name = ""):
     filecollection = get_database()[File.collection_name]
     fileobj = filecollection.File.one({"_id": ObjectId(_id)})  
     grid_fs_obj = fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))
     return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
 
-def file_search(request, group_name):
+def file_search(request, group_id):
     if request.method == "GET":
         keyword = request.GET.get("search", "")
         files = db[File.collection_name]
         file_search = files.File.find({'$or':[{'name':{'$regex': keyword}}, {'tags':{'$regex':keyword}}]}) #search result from file
         template = "ndf/file_search.html"
-        variable = RequestContext(request, {'file_collection':file_search, 'view_name':'file_search'})
+        variable = RequestContext(request, {'file_collection':file_search, 'view_name':'file_search','newgroup':group_id})
         return render_to_response(template, variable)
 
 @login_required    
-def delete_file(request, group_name, _id):
+def delete_file(request, group_id, _id):
   """Delete file and its data
   """
   file_collection = db[File.collection_name]
