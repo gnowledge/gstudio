@@ -34,10 +34,13 @@ def adminDashboardClass(request, class_name):
     objects_details = []
     nodes = collection.Node.find({'_type':class_name})
     for each in nodes:
+        member = []
+        for members in each.member_of:
+            member.append(collection.Node.one({ '_id': members}).name+" - "+str(members))
 	if class_name in ("GSystem","File"):
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(each.member_of),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
 	else :
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(each.member_of),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at})
     groups = []
     group = collection.Node.find({'_type':"Group"})
     for each in group:
@@ -57,17 +60,24 @@ def adminDashboardEdit(request):
     '''
     edit class's objects
     '''
-    if request.is_ajax() and request.method =="POST":
-       objectjson = json.loads(request.POST['objectjson'])
-    node = collection.Node.one({ '_id': ObjectId(objectjson['id'])})
-    node.name =  objectjson['fields']['title']
-    for key,value in objectjson['fields'].items():
-         if key == "group":
-            node['group_set'] = value.split(",")
-         if key == "type":
-            node['member_of'] = value.split(",")
-    node.save()     
-    return StreamingHttpResponse(node.name+" edited successfully")
+    try:
+        if request.is_ajax() and request.method =="POST":
+            objectjson = json.loads(request.POST['objectjson'])
+        node = collection.Node.one({ '_id': ObjectId(objectjson['id'])})
+        node.name =  objectjson['fields']['title']
+        for key,value in objectjson['fields'].items():
+            if key == "group":
+                node['group_set'] = value.split(",")
+            if key == "type":
+                typelist = []
+                for eachvalue in  value.split(","):
+                    typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                node['member_of'] = typelist
+        node.save()     
+        return StreamingHttpResponse(node.name+" edited successfully")
+    except Exception as e:
+          return StreamingHttpResponse(e)
+
 
 
 

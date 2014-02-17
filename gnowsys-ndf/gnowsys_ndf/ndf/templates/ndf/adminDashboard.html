@@ -22,7 +22,7 @@
      <h2>Select Types</h2>
      <select id="id_Systemtypes" name="Systemtypes" multiple="multiple" style="max-width:500px;height:180px;">
        {% for systemtype in systemtypes %}
-       <option value="{{systemtype.id}}" name="{{systemtype.title}}">{{systemtype.title}}</option>
+       <option value="{{systemtype.id}}" name="{{systemtype.title}} - {{systemtype.id}}">{{systemtype.title}} - {{systemtype.id}}</option>
        {% endfor %}
      </select>
      <font style="font-size:12px;font-weight:bold;" id="viewsystemtypelist"></font>
@@ -138,11 +138,12 @@ var objectid = $(this).attr("name");
         $(".button.editobject").show();
 });
 
-$(document).on('click',".group input",function(){
+$(document).on('focus',".group input",function(){
         baseobject = $(this);
         var baseobjectval = baseobject.val()
         var arr = baseobjectval.split(',')
         $('#viewgrouplist').text(baseobjectval);
+        $('#id_groups option').removeAttr("selected");
         for(var each in arr){ $('#id_groups option[name="'+arr[each]+'"]').attr('selected','selected');  }
         $('#myGroup').foundation('reveal', 'open');
         $('#id_groups').change(function() {
@@ -158,13 +159,14 @@ $(document).on('click',".group input",function(){
                   $('#viewgrouplist').text(str);
                   });
 });
-$(document).on('click',".type input",function(){
-        $('#mySystemtype').foundation('reveal', 'open');
+$(document).on('focus',".type input",function(){
         baseobject = $(this);
         var baseobjectval = baseobject.val()
         $('#viewsystemtypelist').text(baseobjectval);
         var arr = baseobjectval.split(',')
+        $('#mySystemtype option').removeAttr("selected");
         for(var each in arr){ $('#mySystemtype option[name="'+arr[each]+'"]').attr('selected','selected');  }
+        $('#mySystemtype').foundation('reveal', 'open');
         $('#id_Systemtypes').change(function() {
                  option = $(this).find('option:selected');
                  var i = 0;
