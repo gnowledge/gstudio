@@ -13,5 +13,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.page',
                        url(r'^search$', 'page', name='page_search'),
 
                        url(r'^(?P<node_id>[\w-]+)/version/(?P<version_no>\d+\.\d+)$', 'version_node', name='node_version'),
+                       
+                       url(r'^delete/(?P<node_id>[\w-]+)$', 'delete_page', name='page_delete'),
 )
 
