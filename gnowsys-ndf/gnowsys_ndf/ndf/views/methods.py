@@ -279,18 +279,20 @@ def graph_nodes(page_node):
     node = collection.Node.one( {'$or':[{'_type':'GSystem'},{'_type':'File'}], '_id':node_id}  )
     return node.name
 
-  def _get_username(id_int):
-    return User.objects.get(id=id_int).username
+  # def _get_username(id_int):
+    # return User.objects.get(id=id_int).username
 
   page_node_id = str(id(page_node._id))
-  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"Gbobject"}, '
+  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"GSystem"}, '
   node_relations = ''
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set",
-                      "member_of", "status", "comment_enabled", "start_publication"
+                      "member_of", "status", "comment_enabled", "start_publication",
+                      "_type", "modified_by", "created_by", "last_update", "url", "featured",
+                      "created_at", "group_set", "type_of", "content_org", "author_set"
                     ]
 
-  username = User.objects.get(id=page_node.created_by).username
+  # username = User.objects.get(id=page_node.created_by).username
 
   i = 1
   for key, value in page_node.items():
@@ -305,14 +307,14 @@ def graph_nodes(page_node):
       key_id = str(i)
       # i += 1
       
-      if key in ("modified_by", "author_set"):
-        for each in value:
-          node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
-          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
-          i += 1
+      # if key in ("modified_by", "author_set"):
+      #   for each in value:
+      #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
+      #     node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+      #     i += 1
 
-      else:
-        for each in value:
+      # else:
+      for each in value:
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)          
             node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'_n"},'
@@ -325,7 +327,7 @@ def graph_nodes(page_node):
             i += 1
     
     else:
-      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"},'
       node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
       key_id = str(i)      
 
@@ -334,19 +336,6 @@ def graph_nodes(page_node):
           node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(i) +'_n"},'
           node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
           i += 1 
-      
-      elif key == "created_by":
-        node_metadata += '{"screen_name":"' + _get_username(value) + '", "_id":"'+ str(i) +'_n"},'
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
-        i += 1
-
-      elif key == "content_org":
-        if len(str(value)) > 25:
-          node_metadata += '{"screen_name":"' + value[:25] + '...", "_id":"'+ str(i) +'_n"},'
-        else:
-          node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
-        i += 1 
       
       else:
         node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
