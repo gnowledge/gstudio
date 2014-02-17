@@ -127,7 +127,6 @@
 				vis.append("svg:g").attr("class", "nodes");
 
 
-
 				nodes_by_id[key].x = w/2.0;
 				nodes_by_id[key].y = h/2.0;       
 
@@ -192,10 +191,7 @@
                 .attr("marker-end", "url(#arrowhead)");
 
 
-
-
                 var node = d3.select("#chart g.nodes").selectAll("g.node").data(nodes);
-
 
 
                 var new_g = node.enter().append("svg:a")
@@ -245,9 +241,8 @@
                 // .style("stroke", "#000")
                 // .style("stroke-width","1px"  );
 
-                new_g.filter(function(d) { if(d.refType=="Gbobject") return (d._id)>0 ;}).append("svg:ellipse")
+                new_g.filter(function(d) { if(d.refType=="GSystem") return (d._id)>0 ;}).append("svg:ellipse")
                 .attr("cx", 25)                
-                // .attr("cx", function(d){ return JSON.stringify(d.x / 4);})
                 .attr("cy", 20)
                 .call(force.drag)
                 .attr("rx",function(d) {var ttx=d.screen_name; return(ttx.length/3 +"em"
@@ -256,7 +251,7 @@
                 .style("fill-opacity", ".2")
                 // .style("stroke", "#666")
                 // .style("stroke-width", "1.5px")
-                .style("fill", function(d) {if (d.refType=="Objecttype") return "blue"; else if(d.refType=="Gbobject") return "#0000ff"; else return "none"});
+                .style("fill", function(d) {if (d.refType=="Objecttype") return "blue"; else if(d.refType=="GSystem") return "#0000ff"; else return "none"});
 
                 node.exit().remove();							
 
@@ -281,7 +276,7 @@
             .duration(1000)
             .style("opacity", 1);
         }
-        });
+    });
     
 
 </script>
