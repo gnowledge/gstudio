@@ -71,41 +71,44 @@ background-repeat:no-repeat; background-size: 48px 48px
 	<div id="node-details-edit-div" class="tabs-content" > 
 
 		<div class="active content row" id="panel-name-description">
-
 			<div class="medium-6 columns">
 
 				<div class="row">
-					<div class="medium-12 columns">
+					<div class="medium-8 columns">
 						<label>{{title}} Name</label>
 						<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-						<small class="error">Value missing: Name is required!!!</small>
-
-						{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
-
+						<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 					</div>
-				</div>
-
-				<div class="row">
-					<div class="medium-12 columns">
-						<label>Privacy</label>
-						<input type="checkbox" id="private_cb" name="private_cb" /> Make it private?
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="medium-12 columns">
-
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="small-2 columns text-right">
-						<h5>Tag{{node.tags|pluralize|default_if_none:"s"}} : </h5>
-					</div>
-					<div class="small-4 small-offset-6 small-pull-6 columns">
+					<div class="medium-4 columns">
+						<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label></span>
 						<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
 					</div>
 				</div>
+
+				<div class="row">
+					<div class="medium-12 columns">
+						{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="medium-4 columns">
+					<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+						<div class="privacy-mode switch round">
+
+							<input id="PUBLIC" name="login-mode" type="radio" checked>
+							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+							<input id="private_cb" name="login-mode" type="radio">
+							<label for="private_cb" onclick="">Private <i class="fi-lock"></i></label>
+
+							<span></span>
+
+						</div>
+					</div>		
+				</div>
+
+				
 			</div>
 		</div>
 
@@ -181,7 +184,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	{% block add_fields %} {% endblock %}
 
 	<div class="row" >
-		<input type="submit" id="save-node" value="Save" class="button small-10 small-push-1 column"/>
+		<input type="submit" id="save-node" value="Save" class="button medium-6 columns"/>
 	</div>
 
 </form>
@@ -199,7 +202,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 		});
 
 		var cn_list = cn_arr.join(',');
-
 
 		$.ajax({
 			type: "POST",

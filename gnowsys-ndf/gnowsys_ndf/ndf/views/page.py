@@ -28,14 +28,14 @@ from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, graph_nodes
 
 
 #######################################################################################################################################
 
 db = get_database()
 collection = db[Node.collection_name]
-gst_page = collection.Node.one({'_type': u'GSystemType', 'name': GAPPS[0]})
+gst_page = collection.Node.one({'_type': 'GSystemType', 'name': GAPPS[0]})
 history_manager = HistoryManager()
 rcs = RCS()
 
@@ -47,13 +47,15 @@ def page(request, group_name, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     if request.method == "POST":
+        # Written for implementing search-functionality
         title = gst_page.name
         
         search_field = request.POST['search_field']
 
-        page_nodes = collection.Node.find({'member_of': {'$all':[title]},
+        page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
                                            '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                   {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                                   {'tags': {'$regex':search_field, '$options': 'i'}}
+                                                  ], 
                                            'group_set': {'$all': [group_name]}
                                        })
         page_nodes.sort('last_update', -1)
@@ -70,7 +72,7 @@ def page(request, group_name, app_id=None):
     elif gst_page._id == ObjectId(app_id):
         title = gst_page.name
         
-        page_nodes = collection.Node.find({'gsystem_type': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
+        page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
         page_nodes.sort('last_update', -1)
         page_nodes_count = page_nodes.count()
 
@@ -85,7 +87,8 @@ def page(request, group_name, app_id=None):
         page_node = collection.Node.one({"_id": ObjectId(app_id)})
 
         # ------ Some work for graph ------
-        graphData = neighbourhood_nodes(page_node)
+        # graphData = neighbourhood_nodes(page_node)
+        graphData = graph_nodes(page_node)
         
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,

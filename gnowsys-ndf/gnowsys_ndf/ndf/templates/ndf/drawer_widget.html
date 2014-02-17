@@ -44,7 +44,7 @@
                   <b> {{value.name}} </b>
                 </div>                
                 <div class="small-12 columns text-left" style="padding-top:3px">
-                  <i class="posted-by" >{{ value.member_of|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                  <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
                 </div>     
               </div>
 
@@ -114,7 +114,7 @@
               </div>                
               <!-- <div class="small-7 columns text-right"> -->
               <div class="small-12 columns text-left" style="padding-top:3px">
-                <i class="posted-by">{{ value.member_of|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
               </div>     
             </div>
 
@@ -147,13 +147,34 @@
     liHeight = $("#{{widget_for}}_drawer1 > li").outerHeight();
     $(".resource-drawer").height(liHeight * 15);
 
-    //For clicked or selected resource item
-    $("#{{widget_for}}_drawer1 li.bullet-item").click(function(){
-      $(this).toggleClass("selected-resource") ;
-    });
+    // To select the single as well as multiple items from list 
+    $("#{{widget_for}}_drawer1 li.bullet-item").click(function(e) {
 
-    $("#{{widget_for}}_drawer2 li.bullet-item").click(function(){
-      $(this).toggleClass("selected-resource") ;
+      if (e.ctrlKey)
+      {        
+        $(this).toggleClass('selected-resource');
+      } 
+      else
+      {
+        $('.bullet-item').removeClass('selected-resource');           
+        $(this).addClass('selected-resource');        
+      }                   
+        
+    }); 
+
+
+    $("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
+      
+      if (e.ctrlKey)
+      {        
+        $(this).toggleClass('selected-resource');
+      } 
+      else
+      {
+        $('.bullet-item').removeClass('selected-resource');           
+        $(this).addClass('selected-resource');        
+      }     
+      
     });
     
     
