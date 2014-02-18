@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from django.http import Http404
 register = Library()
 db = get_database()
+collection = db['Nodes']
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -62,6 +63,10 @@ def edit_drawer_widget(field, group_name, node, checked=None):
     elif field == "prior_node":
       checked = None
       drawers = get_drawers(group_name, node._id, node.prior_node, checked)
+      
+    elif field == "module":
+      checked = "Module"
+      drawers = get_drawers(group_name, node._id, node.collection_set, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
@@ -69,6 +74,10 @@ def edit_drawer_widget(field, group_name, node, checked=None):
   else:
     if field == "collection" and checked == "Quiz":
       checked = "QuizItem"
+      
+    elif field == "module":
+      checked = "Module"
+      
     else:
       # To make the collection work as Heterogenous one, by default
       checked = None
@@ -317,4 +326,19 @@ def get_grid_fs_object(f):
   except Exception as e:
     print "Object does not exist", e
   return grid_fs_obj
+
+@register.inclusion_tag('ndf/admin_class.html')
+def get_class_list(class_name):
+  """Get list of class 
+  """
+  class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType"]
+  return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name}
+
+@register.assignment_tag
+def get_Object_count(key):
+    try:
+        return collection.Node.find({'_type':key}).count()
+    except:
+        return 'null'
   
+

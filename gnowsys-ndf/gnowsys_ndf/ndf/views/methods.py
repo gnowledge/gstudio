@@ -88,7 +88,12 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       elif checked == "Forum":
         gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [group_name]}})
-
+      
+      elif checked == "Module":
+        gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [group_name]}})
+    
+        
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
            
@@ -139,10 +144,11 @@ def get_node_common_fields(request, node, group_name, node_type):
   access_policy = request.POST.get("login-mode", '') 
 
   tags = request.POST.get('tags')
-  prior_node_list = request.POST['prior_node_list']
-  collection_list = request.POST['collection_list']
+  prior_node_list = request.POST.get('prior_node_list','')
+  collection_list = request.POST.get('collection_list','')
+  module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
-
+  print module_list,"test"
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
@@ -209,7 +215,23 @@ def get_node_common_fields(request, node, group_name, node_type):
       node.collection_set.append(node_id)
     
     i = i+1  
-      
+ 
+  # -------------------------------------------------------------------------------- Module
+
+  node.collection_set = []
+  if module_list != '':
+      collection_list = module_list.split(",")
+
+  i = 0                    
+  while (i < len(collection_list)):
+    node_id = ObjectId(collection_list[i])
+    
+    if gcollection.Node.one({"_id": node_id}):
+      node.collection_set.append(node_id)
+    
+    i = i+1  
+ 
+    
   # ------------------------------------------------------------------------------- org-content
   if content_org:
     node.content_org = unicode(content_org)

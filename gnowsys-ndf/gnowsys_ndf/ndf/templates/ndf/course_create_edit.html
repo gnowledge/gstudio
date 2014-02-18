@@ -1,0 +1,21 @@
+{% extends "ndf/node_edit_base.html" %}
+{% load ndf_tags %}
+
+{% block page_tab %} Basic {% endblock %}
+{% block collection_tab %}Add Module {% endblock %}
+
+{% block collection %}
+<div class="content" id="panel-collection" style="width:95%;">
+  <div class="row">
+    <div class="small-12 columns">
+      <h5>Add or Remove Module : </h5>
+    </div>
+    <div class="small-12 columns">
+      <div id="module_drawer" >
+	{% edit_drawer_widget "module" group_name node %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
