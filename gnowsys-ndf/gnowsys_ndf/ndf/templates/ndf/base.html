@@ -28,7 +28,7 @@
 
 	<!-- External default stylesheet-->
 	<link href="/static/ndf/css/default.css" rel="stylesheet">
-
+        <link href="/static/ndf/css/jqtree.css" rel="stylesheet">
 	<!-- Enable HTML5 on old browsers -->
 	<!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
@@ -100,7 +100,7 @@
 <body>
 	<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
 
-	{% get_group_name request.path as group_name %}
+	{% get_group_name request.path as group_name %}	
 
 	<header class="drop-shadow">
 
@@ -166,14 +166,17 @@
 						<ul class="dropdown">
 						  <!-- Create dropdown item for each group -->
 						      	
-					    	  {% if groups == "None" %}
+					    {% if groups == "None" %}
 								
-						  <li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' 'None' %}">{{gp_id}}</a></li>					     {% else %}
-						  {% for gp_id in groups %}
-						  
-						  <li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id.name %}">{{gp_id.name}}</a></li>				     {% endfor %}	
+						  <li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' 'None' %}">{{gp_id}}</a></li>
+						{% else %}
+						  	{% for gp_id in groups %}						  		
+						  	
+						  		<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id.name %}">{{gp_id.name}}</a></li>		
+
+						  	{% endfor %}	
 							
-						  {% endif %}	
+						{% endif %}	
 
 						</ul>
 
@@ -270,16 +273,7 @@
 										    {% block extra_content %}  {% endblock %}  
 										
  										{% endif %}
-									
-											
-									
-										
-																									  
-		
-									
-							
-									
-									
+
 																				
 
 						
@@ -333,6 +327,8 @@
 			<script src="/static/ndf/foundation/js/foundation/foundation.topbar.js"></script>
 
 			<script type="text/javascript">
+
+			
 
 		// Initialize Foundation CSS
 		$(document).foundation();

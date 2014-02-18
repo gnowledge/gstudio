@@ -88,7 +88,12 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       elif checked == "Forum":
         gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [group_name]}})
-
+      
+      elif checked == "Module":
+        gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [group_name]}})
+    
+        
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
            
@@ -132,32 +137,41 @@ def get_node_common_fields(request, node, group_name, node_type):
   
   gcollection = db[Node.collection_name]
 
-  collection = None
-  private = None
+  collection = None  
 
   name = request.POST.get('name')
   usrid = int(request.user.id)
-  private = request.POST.get("private_cb", '')
-  tags = request.POST.get('tags')
-  prior_node_list = request.POST['prior_node_list']
-  collection_list = request.POST['collection_list']
-  content_org = request.POST.get('content_org')
+  access_policy = request.POST.get("login-mode", '') 
 
+  tags = request.POST.get('tags')
+  prior_node_list = request.POST.get('prior_node_list','')
+  collection_list = request.POST.get('collection_list','')
+  module_list = request.POST.get('module_list','')
+  content_org = request.POST.get('content_org')
+  print module_list,"test"
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
     node.created_by = usrid
     node.member_of.append(node_type._id)
   
-    if private:
-      private = True
+    if access_policy == "PUBLIC":
+      node.access_policy = unicode(access_policy)      
     else:
-      private = False
-
+      node.access_policy = unicode(access_policy)    
+          
     # End of if
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+
+  if access_policy == "PUBLIC":
+      node.access_policy = u"PUBLIC"      
+  else:
+      node.access_policy = u"PRIVATE"    
+
+  print node.access_policy
+  print node.access_policy
 
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
@@ -201,7 +215,23 @@ def get_node_common_fields(request, node, group_name, node_type):
       node.collection_set.append(node_id)
     
     i = i+1  
-      
+ 
+  # -------------------------------------------------------------------------------- Module
+
+  node.collection_set = []
+  if module_list != '':
+      collection_list = module_list.split(",")
+
+  i = 0                    
+  while (i < len(collection_list)):
+    node_id = ObjectId(collection_list[i])
+    
+    if gcollection.Node.one({"_id": node_id}):
+      node.collection_set.append(node_id)
+    
+    i = i+1  
+ 
+    
   # ------------------------------------------------------------------------------- org-content
   if content_org:
     node.content_org = unicode(content_org)
@@ -210,6 +240,7 @@ def get_node_common_fields(request, node, group_name, node_type):
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
+
 
   
 

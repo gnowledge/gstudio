@@ -1,0 +1,197 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %} Admin {% endblock %}
+{% block meta_content %}
+	{% get_class_list class_name %}
+{% endblock %}
+{% block body_content %} 
+<div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
+     <p>Hold down "Control", to select more than one.</p>
+     <h2>Select Groups</h2>
+     <select id="id_groups" name="groups" multiple="multiple" style="max-width:500px;height:180px;">
+       {% for group in Groups%}
+       <option value="{{group.id}}" name="{{group.title}}">{{group.title}}</option>
+       {% endfor %}
+     </select>
+     <font style="font-size:12px;font-weight:bold;" id="viewgrouplist"></font>
+     <a class="close-reveal-modal">&#215;</a>
+</div>
+
+<div id="mySystemtype" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
+     <p>Hold down "Control", to select more than one.</p>
+     <h2>Select Types</h2>
+     <select id="id_Systemtypes" name="Systemtypes" multiple="multiple" style="max-width:500px;height:180px;">
+       {% for systemtype in systemtypes %}
+       <option value="{{systemtype.id}}" name="{{systemtype.title}} - {{systemtype.id}}">{{systemtype.title}} - {{systemtype.id}}</option>
+       {% endfor %}
+     </select>
+     <font style="font-size:12px;font-weight:bold;" id="viewsystemtypelist"></font>
+     <a class="close-reveal-modal">&#215;</a>
+</div>
+
+ <input class="button deleteObjects" type="button" value="Delete">
+<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+{% csrf_token %}
+<input name="search" type="textbox" value="" style="width:300px;">
+<input type="hidden" name="class" value="{{class_name}}">
+<input type="submit" value="search" style="width:100px;">
+</form>
+
+<table >
+  <thead>
+    <tr>
+      <th width="20"> <input class="checkedAll" type="checkbox"></th>
+      <th width="150">Id</th>
+      <th width="150">Title</th>
+    {% if class_name == "File" or class_name ==  "GSystem"  %}
+      <th width="150">Group(s)</th>
+    {% endif %}
+      <th width="150">Type(s)</th>
+      <th width="150">Author</th>
+      <th width="150">Creation date</th>
+      	
+    </tr>
+  </thead>
+  <tbody>
+	{% for each in nodes %}
+    <tr>	
+            <td  id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+	    <td class="id" style="font-size:11px;">{{each.Id}}</td>
+	    <td class="title" style="font-size:95%"><font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}"></td>
+	{% if class_name == "File" or class_name ==  "GSystem"  %}
+	    <td class="group" style="font-size:11px;"><font class="viewinput{{each.Id}}">{{each.Group}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}"></td>
+	{% endif %}
+	    <td class="type" style="font-size:11px;"><font class="viewinput{{each.Id}}">{{each.Type}}</font><input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" ></td>
+	    <td class="author" style="font-size:11px;">{{each.Author}}</td>
+	   <td class="creation" style="font-size:11px;">{{each.Creation}}</td>
+	   <td style="font-size:11px;"> <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 	<input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none"></td>
+    </tr>
+ 
+	{% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
+
+{% block script %}
+var option,baseobject;
+$(document).on('click',".checkedAll",function(){
+	if($(this).is(":checked")==true){
+		$('.objectsCheckbox input').prop( "checked", true );
+	}
+	else{
+		$('.objectsCheckbox input').prop( "checked", false );
+	}
+});
+$(document).on('click',".button.editobject",function(){
+	var objectid = this.id;
+        $(".viewinput"+objectid).hide();
+	$(".editinput"+objectid).show();
+        $(this).hide();
+        $("#save"+objectid).show();
+});
+$(document).on('click',".button.deleteObjects",function(){
+        var selectedobject = $(".objectsCheckbox input:checked")
+        if(selectedobject.length > 0){
+             var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+             if(confirmed == true){
+             var i = 0;
+             var str = "";  
+             $.map(selectedobject,function(each){
+                  if(i == 0){str = str.concat(each.parentElement.id)}
+                  else {str = str.concat(","+each.parentElement.id)}
+                  i= i+1
+             })
+
+             $.ajax({
+             url: '/admin/class/delete',
+             type: 'POST',
+             data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
+             beforeSend: function() {     },
+             success: function(result){
+             alert(result)},
+             complete: function(){   }
+             });
+             
+             $.map(selectedobject,function(each){
+                  each.parentElement.parentElement.remove()
+             })
+             
+             }
+        }
+        else{
+        alert("select object to delete")
+        }
+     
+});
+
+$(document).on('click',".button.saveobject",function(){
+var objectid = $(this).attr("name");
+        $(this).hide();
+        var json = {};
+        var fields = {};
+        json['id']=objectid
+        $.map($(".editinput"+objectid),function(each){
+                  fields[each.parentElement.className] = each.value 
+                  $("."+each.parentElement.className+" font.viewinput"+objectid).html(each.value) });
+        json['fields']=fields
+        $.ajax({
+        url: '/admin/class/edit',
+        type: 'POST',
+        data: {objectjson:JSON.stringify(json),csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {     },
+        success: function(result){
+        alert(result);},
+        complete: function(){   } 
+        });
+	$(".editinput"+objectid).hide();
+        $(".viewinput"+objectid).show();
+        $(this).hide();
+        $(".button.editobject").show();
+});
+
+$(document).on('focus',".group input",function(){
+        baseobject = $(this);
+        var baseobjectval = baseobject.val()
+        var arr = baseobjectval.split(',')
+        $('#viewgrouplist').text(baseobjectval);
+        $('#id_groups option').removeAttr("selected");
+        for(var each in arr){ $('#id_groups option[name="'+arr[each]+'"]').attr('selected','selected');  }
+        $('#myGroup').foundation('reveal', 'open');
+        $('#id_groups').change(function() {
+                 option = $(this).find('option:selected');
+                 var i = 0;
+                 var str = "";
+                 $.map(option, function(op){
+                          if(i == 0){str = str.concat(op.label)}
+                          else {str = str.concat(","+op.label)}
+                          i= i+1
+                          return console.log(op.value);});
+                  baseobject.val(str);
+                  $('#viewgrouplist').text(str);
+                  });
+});
+$(document).on('focus',".type input",function(){
+        baseobject = $(this);
+        var baseobjectval = baseobject.val()
+        $('#viewsystemtypelist').text(baseobjectval);
+        var arr = baseobjectval.split(',')
+        $('#mySystemtype option').removeAttr("selected");
+        for(var each in arr){ $('#mySystemtype option[name="'+arr[each]+'"]').attr('selected','selected');  }
+        $('#mySystemtype').foundation('reveal', 'open');
+        $('#id_Systemtypes').change(function() {
+                 option = $(this).find('option:selected');
+                 var i = 0;
+                 var str = "";
+                 $.map(option, function(op){
+                          if(i == 0){str = str.concat(op.label)}
+                          else {str = str.concat(","+op.label)}
+                          i= i+1
+                          return console.log(op.value);});
+                  baseobject.val(str);
+                  $('#viewsystemtypelist').text(str);
+                  });
+
+});
+
+{% endblock %}	

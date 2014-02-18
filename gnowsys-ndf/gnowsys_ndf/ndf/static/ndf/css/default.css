@@ -229,7 +229,9 @@ article .tabs dd.active a{
 	height: 80px;
 	overflow: hidden;
 	display: none;
-
+}
+.gallery .card .th{
+	display: block;
 }
 .card .th:hover{
 	width: 150px;

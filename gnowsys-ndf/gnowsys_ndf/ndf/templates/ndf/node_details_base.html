@@ -18,6 +18,30 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   });
 </script>
 
+<!-- script to call ajax function for converting collection into module -->
+<script>
+  $(document).ready(function()
+   {
+      $("#module").one("click", function()
+       {
+         $.ajax({
+                url:"/{{group_name}}/ajax/make_module",
+                type:"GET",
+                data:{_id:"{{node.pk}}"},
+                beforeSend:function(){
+                          $("#ajax_search").show();
+                          },
+                success: function(result){
+                         $("#ajax_search").hide();
+                         $("#module").attr("disabled", "disabled");
+                         alert(result);
+  
+                         }
+                });
+        });
+    });
+</script>
+
 {% endblock %}
 
 {% block meta_content %}
@@ -84,6 +108,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
       <span class="radius label">{{tag}}</span> 
       {% endfor %}
     </div>
+
   </section>
 
   <section class="medium-10 columns" >
@@ -94,6 +119,10 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
     <h2>
       <span class='node'>{{node.name}}</span>
+      <!-- added button to convert collection into module-->
+    {% if node.collection_set and user.is_authenticated%}
+     <a href="#" class="button" id="module"></i> <span>Make Module</a>
+    {% endif %}
     </h2>
 
     <h3 class="subheader">
