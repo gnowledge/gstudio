@@ -1,7 +1,5 @@
 {% extends "ndf/base.html" %}
-
 {% load ndf_tags %}
-
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
 
 {% block style %}
@@ -35,7 +33,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% endblock %}
 
 {% block body_content %}
-
 <form data-abide id="form-edit-node" method="POST" action="">
   <header class="row">
     <h2 class="medium-12 columns">
@@ -51,9 +48,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
 	  <a href="#panel-name-description">{% block page_tab %} Page {% endblock %}</a>
-
-	  <a href="#panel-name-description">Page</a>
-
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
 	  <a href="#panel-prior-node">Prior Node</a>
@@ -66,12 +60,9 @@ background-repeat:no-repeat; background-size: 48px 48px
      </dl>
     </nav>
   </header>
-
-
   {% csrf_token %}
 
  <div id="node-details-edit-div" class="tabs-content" > 
-
     <div class="active content row" id="panel-name-description">
       <div class="medium-6 columns">
 	<div class="row">
@@ -110,6 +101,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
       </div>
     </div>
+    {% block prior_node %}<!-- overide this block if you want to change prior node block -->
    <div class="content" id="panel-prior-node"  style="width:95%;">
       <div class="row">
 	<div class="small-12 columns">
@@ -124,6 +116,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
       </div>
     </div>
+   {% endblock %}
+   {% block collection %}<!-- overide this block if you want to change prior node block -->
    <div class="content" id="panel-collection" style="width:95%;">
       <div class="row">
 	<div class="small-12 columns">
@@ -175,9 +169,7 @@ background-repeat:no-repeat; background-size: 48px 48px
       </div>
     </div>
    {% endblock %}
-
   </div>
-
   {% block add_fields %} {% endblock %}
 
   <div class="row" >
