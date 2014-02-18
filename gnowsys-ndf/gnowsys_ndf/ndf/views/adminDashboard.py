@@ -31,8 +31,14 @@ def adminDashboardClass(request, class_name):
     '''
     fetching class's objects
     '''
+    if request.method=="POST":
+        search = request.POST.get("search","")
+        classtype = request.POST.get("class","")
+        nodes = collection.Node.find({'name':{'$regex':search},'_type':classtype})
+    else :
+        nodes = collection.Node.find({'_type':class_name})
     objects_details = []
-    nodes = collection.Node.find({'_type':class_name})
+    print nodes
     for each in nodes:
         member = []
         for members in each.member_of:

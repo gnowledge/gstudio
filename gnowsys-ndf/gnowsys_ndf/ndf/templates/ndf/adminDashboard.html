@@ -30,6 +30,13 @@
 </div>
 
  <input class="button deleteObjects" type="button" value="Delete">
+<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+{% csrf_token %}
+<input name="search" type="textbox" value="" style="width:300px;">
+<input type="hidden" name="class" value="{{class_name}}">
+<input type="submit" value="search" style="width:100px;">
+</form>
+
 <table >
   <thead>
     <tr>
