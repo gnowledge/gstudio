@@ -353,6 +353,7 @@ article p{
 textarea{
 	min-height: 6rem;
 }
+/*
 .orgitdown textarea{
 	min-height: 15rem!important;
 }
@@ -360,6 +361,7 @@ textarea{
 	min-height: 10rem;
 
 }
+*/
 #content>p:first-of-type{
 	font-size: 120%;
 	line-height: 1.4;

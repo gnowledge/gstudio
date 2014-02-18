@@ -23,8 +23,8 @@ def get_all_users_to_invite():
     inv_users={}
     users=User.objects.all()
     for each in users:
-      inv_users[each.username.__str__()+"<"+each.email.__str__()+">"]=each.id
-    return inv_users
+      inv_users[each.username.__str__()]=each.id.__str__()
+    return str(inv_users)
   except Exception as e:
     print str(e)
  

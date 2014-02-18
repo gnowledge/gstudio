@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.template.loader import get_template
+from django.contrib.auth.models import User
 
 
 
@@ -16,7 +17,7 @@ from gnowsys_ndf.ndf.views.methods import get_forum_repl_type
 from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
-
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 import datetime
 from gnowsys_ndf.ndf.org2any import org2html
 try:
@@ -116,9 +117,9 @@ def add_node(request,group_name):
         node=request.POST.get("node","")
         thread=request.POST.get("thread","")
         forumid=request.POST.get("forumid","")
+        print "reply",forumid
         sup_id=request.POST.get("supnode","")
         tw_name=request.POST.get("twistname","")
-        print "supid",sup_id
         if forumid:
             forumobj=gs_collection.GSystem.one({"_id": ObjectId(forumid)})
         sup=gs_collection.GSystem.one({"_id": ObjectId(sup_id)})
@@ -147,12 +148,38 @@ def add_node(request,group_name):
         colrep.created_by=usrid
         colrep.group_set.append(unicode(group_name))
         colrep.save()
+        colg = gs_collection.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
+        
+
+       
+        if node == "Twist" :  
+            url="/"+group_name+"/forum/thread"+str(colrep._id)
+            activity="Added a thread "
+            prefix=" on the forum "+str(forumobj.name)
+            nodename=colrep.name
+        if node == "Reply":
+            threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
+            url="/"+group_name+"/forum/thread"+str(threadobj._id)
+            activity="Added a reply "
+            prefix=" on the thread "+str(threadobj.name)+" on the forum "+str(forumobj.name)
+            nodename=""
+        name=colrep.name
+        for each in colg.author_set:
+            bx=User.objects.get(id=each)
+            msg=activity+"-"+str(nodename)+" in the group "+str(group_name)
+            ret = set_notif_val(request,group_name,msg,activity,bx)
+            print "send not"
+        bx=User.objects.get(id=colg.created_by)
+        msg=activity+"-"+str(nodename)+prefix+" in the group "+str(group_name)+" crated by you"
+        ret = set_notif_val(request,group_name,msg,activity,bx)
+
+        print "send not"
+
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]
             #     exstng_reply.prior_node.append(colrep._id)
             #     exstng_reply.save()
-            threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
             variables=RequestContext(request,{'thread':threadobj,'user':request.user})
             return render_to_response("ndf/refreshtwist.html",variables)
         else:

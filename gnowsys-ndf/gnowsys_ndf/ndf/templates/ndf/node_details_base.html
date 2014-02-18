@@ -193,7 +193,9 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
        <div class="content" id="view-graph">    
         <div class="row">
           <div class="small-12 columns" id="graph-div">
-            {% include "ndf/node_graph.html" with graphData=graphData %}        
+<!--
+            {% include "ndf/node_graph.html" with graphData=graphData %}  
+-->      
           </div>
         </div>
       </div>
@@ -229,7 +231,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   </div>
 
   <footer class="row">
-    <h5>Contriubted by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
+    <h5>Contributed by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
   </footer>
 
   {% endblock %}
