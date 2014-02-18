@@ -108,10 +108,15 @@ $(document).on('click',".button.deleteObjects",function(){
              type: 'POST',
              data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
              beforeSend: function() {     },
-             success: function(result){ 
+             success: function(result){
              alert(result)},
-             complete: function(){   } 
+             complete: function(){   }
              });
+             
+             $.map(selectedobject,function(each){
+                  each.parentElement.parentElement.remove()
+             })
+             
              }
         }
         else{

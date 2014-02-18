@@ -38,7 +38,6 @@ def adminDashboardClass(request, class_name):
     else :
         nodes = collection.Node.find({'_type':class_name})
     objects_details = []
-    print nodes
     for each in nodes:
         member = []
         for members in each.member_of:
@@ -98,4 +97,4 @@ def adminDashboardDelete(request):
         node = collection.Node.one({ '_id': ObjectId(each)})
         node.delete()
 
-    return StreamingHttpResponse(len(deleteobjects.split(","))+" objects deleted")
+    return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")
