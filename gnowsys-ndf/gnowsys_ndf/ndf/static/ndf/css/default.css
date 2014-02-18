@@ -1,7 +1,6 @@
 /*************************** 1. Foundation CSS overrides ***********************/
 
 /* Foundation hacks */
-
 .row{
 	max-width:inherit;/* Expand to full browser width instead of 960px */
 }
@@ -65,6 +64,9 @@ border-bottom: 1px solid black;
 }
 
 /* Sections */
+body{
+	font-family: FreeSans;
+}
 main>aside{
 	margin-bottom: 0.5rem;
 }
