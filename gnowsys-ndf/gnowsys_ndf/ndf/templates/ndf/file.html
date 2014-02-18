@@ -97,6 +97,8 @@
       {% if files.count != 0 %}
       <!-- Existing card list-->
       {% for file in files %}
+      {% if file.created_by == request.user.pk %}
+
       {% get_user_object file.created_by as user_obj %}
       {% get_grid_fs_object file as grid_fs_obj %}
       <li class="card">
@@ -132,6 +134,46 @@
 	  
         </div>
       </li>
+
+      {% else %}
+        {% if file.access_policy == "PUBLIC" %}          
+          {% get_user_object file.created_by as user_obj %}
+          {% get_grid_fs_object file as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+    
+          <header>
+
+              <div class="label-list">
+                {% for tag in file.tags %}
+                <span class="label">{{tag}}</span>
+                {% endfor %}
+              </div>
+        
+              <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+              <h4>{{file.name}}</h4>
+              <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
+        
+          </header>
+
+          <p>This file is a..</p>
+
+          <a class="button expand" href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">File details</a>
+
+          {% get_user_object file.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+          <a class="button alert tiny" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+    
+          <footer class="row">
+            <div class="small-6 columns">{{file.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
+          </footer>
+    
+        </div>
+      </li>
+        {% endif %}
+      {% endif %}
       
       {% endfor %}
       

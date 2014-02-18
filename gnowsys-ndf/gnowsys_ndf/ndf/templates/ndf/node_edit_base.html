@@ -37,6 +37,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">
+
   
   <header class="row">
     <h2 class="medium-12 columns">
@@ -76,19 +77,38 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 	  </div>
-	  <div class="medium-4 columns">
-	    <span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label>
-	    </span>
 
-	    <div class="privacy-mode switch round">
-	      <input id="PUBLIC" name="login-mode" type="radio" checked>
-	      <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-	      
-	      <input id="private_cb" name="login-mode" type="radio">
-	      <label for="private_cb" onclick="">Private <i class="fi-lock"></i></label>
-	      
-	      <span></span>
-	    </div>
+	  <div class="medium-4 columns">
+	    {% if node.created_by == request.user.pk %}	
+			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+				<div class="privacy-mode switch round">
+						
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+						
+							<span></span>
+				</div>
+
+		{% else %}
+						
+			{% if not node %}
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+						<div class="privacy-mode switch round">
+						
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+						
+							<span></span>
+						</div>
+
+			{% endif %}
+		{% endif %}	    
 	  </div>
 	</div>
 
