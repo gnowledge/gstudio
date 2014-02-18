@@ -11,6 +11,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
 
 from django_mongokit import get_database
 
@@ -93,6 +95,39 @@ def select_drawer(request, group_name):
                                       }, 
                                       context_instance=RequestContext(request)
             )
+
+
+
+def user_group(request, group_name):
+
+  if request.is_ajax() and request.method == "POST":
+
+    
+    name = request.POST.get('username')    
+    password = request.POST.get('password')
+
+    name = User.objects.get(username=name)    
+    usrid = int(name.id)    
+    
+    collection = db[Node.collection_name]
+    
+    group_exist = collection.Node.one({'$and':[{'_type': u'Group'},{'name': unicode(name)}]})
+    auth_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})._id 
+
+    if usrid:
+      if group_exist is None:
+        auth = collection.Author()
+
+        auth._type = u"Group"
+        auth.name = unicode(name)      
+        auth.password = auth.password_crypt(password)
+        auth.member_of.append(auth_type)      
+        auth.created_by = usrid
+
+        auth.save()  
+
+
+  return HttpResponse("success")
 
 
 @login_required

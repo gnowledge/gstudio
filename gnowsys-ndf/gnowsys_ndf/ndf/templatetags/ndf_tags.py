@@ -173,6 +173,7 @@ def check_group(groupname):
 @register.assignment_tag
 def get_group_name(groupurl):
   sp=groupurl.split("/",2)
+
   if len(sp)<=1:
     return "home"
   if sp[1]:
@@ -183,6 +184,14 @@ def get_group_name(groupurl):
       return "home"
   else:
       return "home"
+
+#@register.assignment_tag
+#def get_user_group_name(groupname):
+#  col_Group = db[Group.collection_name]
+#  colg = col_Group.Group.one({'_type': u'Group', "name":unicode(groupname)})
+
+#  return colg.name
+
 
 @register.assignment_tag
 def get_existing_groups():
@@ -226,19 +235,31 @@ def get_group_policy(group_name,user):
 @register.assignment_tag
 def get_user_group(user):
 
-  group = []
+  group = []  
   col_Group = db[Group.collection_name]
+  collection = db[Node.collection_name]
+  auth_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})._id 
 
   colg = col_Group.Group.find({ '_type': u'Group', 
                                 'name': {'$nin': ['home']},
-                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}] 
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
                               })
 
 
+  auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
   
   for items in colg:
+    if items.name == auth.name:
+      #group.append(items)
+      author = items
 
-      group.append(items)
+    else:
+      if items.group_type == "PUBLIC":
+        group.append(items)
+
+  if author: 
+    group.append(author)
+
   if not group:
     return "None"
   return group
@@ -274,9 +295,7 @@ def get_group_type(grname,user):
 			raise Http404
   else:
 	
-	return "pass"
-		
-			
+	return "pass"		
 	
   
 
