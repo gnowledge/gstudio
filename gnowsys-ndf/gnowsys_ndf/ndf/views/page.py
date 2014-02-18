@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, graph_nodes
 
 
 #######################################################################################################################################
@@ -71,8 +71,12 @@ def page(request, group_name, app_id=None):
 
     elif gst_page._id == ObjectId(app_id):
         title = gst_page.name
-        
-        page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_name]}})
+
+        # collection.Node.reload()
+        page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
+                                           'group_set': {'$all': [group_name]}, 
+                                           'status': {'$nin': ['HIDDEN']}
+                                       })
         page_nodes.sort('last_update', -1)
         page_nodes_count = page_nodes.count()
 
@@ -87,7 +91,8 @@ def page(request, group_name, app_id=None):
         page_node = collection.Node.one({"_id": ObjectId(app_id)})
 
         # ------ Some work for graph ------
-        graphData = neighbourhood_nodes(page_node)
+        # graphData = neighbourhood_nodes(page_node)
+        graphData = graph_nodes(page_node)
         
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
@@ -127,6 +132,19 @@ def create_edit_page(request, group_name, node_id=None):
                                   context_variables,
                                   context_instance=RequestContext(request)
                               )
+
+@login_required    
+def delete_page(request, group_name, node_id):
+    """Change the status to Hidden.
+    
+    Just hide the page from users!
+    """
+
+    print "\n node: ", type(node_id), "\n"
+    op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    print " op: ", op, "\n"
+    
+    return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
 
 
 def version_node(request, group_name, node_id, version_no):

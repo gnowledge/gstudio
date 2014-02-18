@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from django.http import Http404
 register = Library()
 db = get_database()
+collection = db['Nodes']
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -97,8 +98,9 @@ def get_gapps_menubar(group_name, selectedGapp):
   gapps = {}
   i = 0;
   for app in gst_cur:
-    i = i+1;
-    gapps[i] = {'id': app._id, 'name': app.name.lower()}
+    if app.name not in ["Image", "Video"]:
+      i = i+1;
+      gapps[i] = {'id': app._id, 'name': app.name.lower()}
 
   selectedGapp = selectedGapp.split("/")[2]
   
@@ -305,5 +307,19 @@ def get_grid_fs_object(f):
   except Exception as e:
     print "Object does not exist", e
   return grid_fs_obj
+
+@register.inclusion_tag('ndf/admin_class.html')
+def get_class_list(class_name):
+  """Get list of class 
+  """
+  class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType"]
+  return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name}
+
+@register.assignment_tag
+def get_Object_count(key):
+    try:
+        return collection.Node.find({'_type':key}).count()
+    except:
+        return 'null'
   
 

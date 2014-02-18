@@ -37,9 +37,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">
-
   <header class="row">
-    
     <h2 class="medium-12 columns">
       {% if node %}
       Editing {{title}}: {{node.name}}
@@ -53,6 +51,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
 	  <a href="#panel-name-description">{% block page_tab %} Page {% endblock %}</a>
+
+	  <a href="#panel-name-description">Page</a>
+
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
 	  <a href="#panel-prior-node">Prior Node</a>
@@ -62,18 +63,17 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  <a href="#panel-collection">{% block collection_tab %}Collection {% endblock %}</a> 
 	</dd>  
 	
-      </dl>
+     </dl>
     </nav>
   </header>
 
 
   {% csrf_token %}
 
-  <div id="node-details-edit-div" class="tabs-content" > 
+ <div id="node-details-edit-div" class="tabs-content" > 
 
     <div class="active content row" id="panel-name-description">
       <div class="medium-6 columns">
-
 	<div class="row">
 	  <div class="medium-8 columns">
 	    <label>{{title}} Name</label>
@@ -108,13 +108,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    </div>
 	  </div>		
 	</div>
-
-	
       </div>
     </div>
-    <!-- change code of this block  overide block in your code -->
-    {% block prior_node %}
-    <div class="content" id="panel-prior-node"  style="width:95%;">
+   <div class="content" id="panel-prior-node"  style="width:95%;">
       <div class="row">
 	<div class="small-12 columns">
 	  <h5>Add or edit Prior Node : </h5>
@@ -128,10 +124,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
       </div>
     </div>
-    {% endblock %}
-    <!-- change code of this block  overide block in your code -->
-    {% block collection %}
-    <div class="content" id="panel-collection" style="width:95%;">
+   <div class="content" id="panel-collection" style="width:95%;">
       <div class="row">
 	<div class="small-12 columns">
 	  <h5>Add or edit Collection : </h5>
@@ -181,7 +174,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
       </div>
     </div>
-    {% endblock %}
+   {% endblock %}
 
   </div>
 
@@ -190,6 +183,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   <div class="row" >
     <input type="submit" id="save-node" value="Save" class="button medium-6 columns"/>
   </div>
+
 
 </form>
 
