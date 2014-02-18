@@ -40,12 +40,6 @@ from gnowsys_ndf.ndf.rcslib import RCS
 
 #######################################################################################################################################
 
-STATUS_CHOICES = (
-    ('DRAFT'),
-    ('HIDDEN'),
-    ('PUBLISHED')
-)
-
 NODE_TYPE_CHOICES = (
     ('Nodes'),
     ('Attribute Types'),
@@ -117,7 +111,10 @@ DATA_TYPE_CHOICES = (
     'CustomType'
 )
 
-QUIZ_TYPE_CHOICES_TU = IS(u"Short-Response", u"Single-Choice", u"Multiple-Choice")
+STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED')
+STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
+
+QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 
 #######################################################################################################################################
@@ -177,11 +174,11 @@ class Node(DjangoDocument):
       	'login_required': bool,
       	#'password': basestring,
 
-        'status': STATUS_CHOICES
+        'status': STATUS_CHOICES_TU
     }
     
     required_fields = ['name']
-    default_values = {'created_at': datetime.datetime.utcnow}
+    default_values = {'created_at': datetime.datetime.utcnow, 'status': u'DRAFT'}
     use_dot_notation = True
 
     ########## Setter(@x.setter) & Getter(@property) ##########
