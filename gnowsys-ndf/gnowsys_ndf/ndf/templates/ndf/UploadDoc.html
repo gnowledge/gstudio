@@ -30,7 +30,7 @@
 -->
 <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
 	<div class ="row">
-		<fieldset small-6 large-12 coloumns>
+		<fieldset small-6 large-12 columns>
 			<legend>Upload File</legend>
 			<div class="fallback">
 				<label>Choose File</label>
@@ -47,6 +47,40 @@
 			<legend>Add Tag</legend>
 			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Example: abc, XYZ" \
 			/>
+		</fieldset>
+		<fieldset class="medium-4 columns">
+			<legend>Privacy</legend>
+			<div class="row">
+					<div class="medium-6 columns">
+						{% if node.created_by == request.user.pk %}	
+			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"></span>
+						<div class="privacy-mode switch round">
+						
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+						
+							<span></span>
+						</div>
+						{% else %}
+						{% if not node %}
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"></span>
+						<div class="privacy-mode switch round">
+						
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+						
+							<span></span>
+						</div>
+						{% endif %}
+						{% endif %}
+					</div>
+				</div>
 		</fieldset>
 		<input type="hidden" name="user" value="{{user.id}}">
 		<input type="hidden" name="page_url" value="{{page_url}}">

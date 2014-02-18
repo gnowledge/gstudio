@@ -23,6 +23,10 @@ from gnowsys_ndf.ndf.models import GSystemType
 #######################################################################################################################################
 
 
-def homepage(request):
+def homepage(request):	
 
-    return render_to_response("ndf/base.html", context_instance=RequestContext(request))
+	return render_to_response("ndf/base.html",context_instance=RequestContext(request))
+
+		
+
+    

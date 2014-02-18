@@ -137,12 +137,12 @@ def get_node_common_fields(request, node, group_name, node_type):
   
   gcollection = db[Node.collection_name]
 
-  collection = None
-  private = None
+  collection = None  
 
   name = request.POST.get('name')
   usrid = int(request.user.id)
-  private = request.POST.get("private_cb", '')
+  access_policy = request.POST.get("login-mode", '') 
+
   tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
   collection_list = request.POST.get('collection_list','')
@@ -155,15 +155,23 @@ def get_node_common_fields(request, node, group_name, node_type):
     node.created_by = usrid
     node.member_of.append(node_type._id)
   
-    if private:
-      private = True
+    if access_policy == "PUBLIC":
+      node.access_policy = unicode(access_policy)      
     else:
-      private = False
-
+      node.access_policy = unicode(access_policy)    
+          
     # End of if
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+
+  if access_policy == "PUBLIC":
+      node.access_policy = u"PUBLIC"      
+  else:
+      node.access_policy = u"PRIVATE"    
+
+  print node.access_policy
+  print node.access_policy
 
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
@@ -232,6 +240,7 @@ def get_node_common_fields(request, node, group_name, node_type):
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
+
 
   
 

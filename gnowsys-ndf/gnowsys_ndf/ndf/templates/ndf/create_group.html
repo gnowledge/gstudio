@@ -22,8 +22,8 @@
   Existing Groups:
 
   {% get_existing_groups as groups%}
-  {% for items in groups %}
-  {{items}} {% if not forloop.last %} ,{% endif %}
+  {% for items in groups %}  
+  {{items.name}} {% if not forloop.last %} ,{% endif %}  
   {% endfor %}
   {% endif %}
 

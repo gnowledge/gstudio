@@ -93,17 +93,22 @@
     </div>
   </li>
 
-  <!-- Existing card list-->
-  {% for node in page_nodes %}
-  <li class="card">
-    <div class="page">
-      <header>
+
+    <!-- Existing card list-->
+    {% for node in page_nodes %}
+      {% if node.created_by == request.user.pk %}
+    <li class="card">
+      <!--<a class="page" href="{#% url 'page_details' group_name node %#}">-->
+
+        <header>
+
         
 	<div class="label-list">
           {% for tag in node.tags %}
           <span class="label">{{tag}}</span>
           {% endfor %}
         </div>
+
 
         <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
         <h4>{{ node.name }}
@@ -129,10 +134,53 @@
     </div>
   </li>
   
+  {% else %}
+    {% if node.access_policy == "PUBLIC" %}
+      <li class="card">
+      <!--<a class="page" href="{#% url 'page_details' group_name node %#}">-->
+
+        <header>
+
+        
+  <div class="label-list">
+          {% for tag in node.tags %}
+          <span class="label">{{tag}}</span>
+          {% endfor %}
+        </div>
+
+
+        <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+        <h4>{{ node.name }}
+          <div>
+            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            </small>
+          </div>
+        </h4>
+      </header>
+      
+      <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+      
+      <a class="small button expand" href="{% url 'page_details' group_name node %}">Page Details</a>
+      
+      {% if node.created_by == request.user.id %}
+      <a class="button alert tiny" href="{% url 'page_delete' group_name node %}">Delete</a>
+      {% endif %}
+      
+      <footer class="row">
+        <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
+        <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
+      </footer>
+    </div>
+  </li>
+    {% endif %}
+
+  {% endif %}
+
   {% empty %}
   
   {% if not searching %}
   <li class="bullet-item text-left">
+
     <div class="row">
       <div class="small-12 columns">
 	<p>Currently <b>NO Pages</b>!!!</p>
@@ -143,11 +191,6 @@
   
   {% endfor %}
 </ul>
-
-
-
-
-
 
 {% endblock %}
 
