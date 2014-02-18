@@ -1,0 +1,11 @@
+{% load ndf_tags %}
+<ul class="side-nav"> 
+	{% for each in class_list %}
+		{% get_Object_count each as count %}
+		{% ifequal class_name each %}
+		<li class="active"> <a href="/admin/class/{{each}}">{{each}} ({{count}})</a> <li>
+		{% else %}
+		<li > <a href="/admin/class/{{each}}">{{each}} ({{count}})</a> <li>
+		{% endifequal %}
+	{% endfor %}	
+</ul>
