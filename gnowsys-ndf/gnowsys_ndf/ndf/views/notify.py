@@ -6,10 +6,11 @@ from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.notification import models as notification
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
+from django.contrib.sites.models import Site
 
 db = get_database()
 col_Group = db[Group.collection_name]
-
+sitename=Site.objects.all()[0]
 def get_user(username):
     bx=User.objects.filter(username=username)
     if bx:
@@ -24,8 +25,8 @@ def set_notif_val(request,group_name,msg,activ,bx):
     try:
         username=request.user
         obj=group_name
-        site="sample"
-        objurl="sample"
+        site=sitename
+        objurl=""
         render = render_to_string("notification/label.html",{'sender':username,'activity':activ,'conjunction':'-','object':obj,'site':site,'oburl':objurl})
         notification.create_notice_type(render, msg, "notification")
         notification.send([bx], render, {"from_user": request.user})
@@ -33,6 +34,7 @@ def set_notif_val(request,group_name,msg,activ,bx):
     except:
         return False
 
+# Send invitation to any user
 def send_invitation(request,group_name):
     try:
         list_of_invities=request.POST.get("users","") 
@@ -63,6 +65,7 @@ def notifyuser(request,group_name):
     bx=get_user(request.user)
     ret = set_notif_val(request,group_name,msg,activ,bx)
     colg = col_Group.Group.one({'name':group_name})
+    print "memberof",colg.member_of
     colg.author_set.append(bx.id)
     colg.save()
     if ret :
