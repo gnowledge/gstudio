@@ -27,7 +27,7 @@ def module(request, group_name, module_id):
     """
     if GST_MODULE._id == ObjectId(module_id):
         title = GST_MODULE.name
-        module_coll = collection.GSystem.find({'gsystem_type': {'$all': [ObjectId(module_id)]}, 'group_set': {'$all': [group_name]}})
+        module_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(module_id)]}, 'group_set': {'$all': [group_name]}})
         template = "ndf/module.html"
         variable = RequestContext(request, {'module_coll': module_coll })
         return render_to_response(template, variable)

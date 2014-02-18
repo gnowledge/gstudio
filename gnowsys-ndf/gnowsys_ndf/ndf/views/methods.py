@@ -144,10 +144,11 @@ def get_node_common_fields(request, node, group_name, node_type):
   usrid = int(request.user.id)
   private = request.POST.get("private_cb", '')
   tags = request.POST.get('tags')
-  prior_node_list = request.POST['prior_node_list']
-  collection_list = request.POST['collection_list']
+  prior_node_list = request.POST.get('prior_node_list','')
+  collection_list = request.POST.get('collection_list','')
+  module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
-
+  print module_list,"test"
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
@@ -206,7 +207,23 @@ def get_node_common_fields(request, node, group_name, node_type):
       node.collection_set.append(node_id)
     
     i = i+1  
-      
+ 
+  # -------------------------------------------------------------------------------- Module
+
+  node.collection_set = []
+  if module_list != '':
+      collection_list = module_list.split(",")
+
+  i = 0                    
+  while (i < len(collection_list)):
+    node_id = ObjectId(collection_list[i])
+    
+    if gcollection.Node.one({"_id": node_id}):
+      node.collection_set.append(node_id)
+    
+    i = i+1  
+ 
+    
   # ------------------------------------------------------------------------------- org-content
   if content_org:
     node.content_org = unicode(content_org)
