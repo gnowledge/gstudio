@@ -22,7 +22,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <script>
   $(document).ready(function()
    {
-      $("#module").click(function()
+      $("#module").one("click", function()
        {
          $.ajax({
                 url:"/{{group_name}}/ajax/make_module",
@@ -33,7 +33,9 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
                           },
                 success: function(result){
                          $("#ajax_search").hide();
+                         $("#module").attr("disabled", "disabled");
                          alert(result);
+  
                          }
                 });
         });
