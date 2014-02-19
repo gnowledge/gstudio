@@ -8,17 +8,17 @@
 	<script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>		
 	<style type="text/css">
 
-		.link {
+		#chart .link {
 			stroke: #ccc;
 		}
 
-		.nodetext {
+		#chart .nodetext {
 			#pointer-events: none;
 			font: 10px Serif;
 			font-style:italic;
 		}
 
-		.mainnode{
+		#chart .mainnode{
 
 			font: 15px sans-serif;
 			/*fill:"black";*/
@@ -27,13 +27,13 @@
 			border-color: gray;
 		}
 
-		.relnode {
+		#chart .relnode {
 			font: 10px sans-serif;			
 			fill:#404040;
 		}
 
 
-		.node {
+		#chart .node {
 			border-width: 1px;
 			border-color: gray;
 			fill:#25587E;
@@ -73,9 +73,10 @@
 	
 	var loc = ($('#chart').attr("data-loc")).split("/")[3];
 
-	if( loc != "details") { $("#graphArea").hide();	}
-
 	var jsonData = $.parseJSON($("#chart").attr("data-graph"));
+
+	// graphArea = $("#view-graph").height();
+	// alert(graphArea);
 
 	function init(a,b)
 	{
@@ -195,7 +196,8 @@
 
 
                 var new_g = node.enter().append("svg:a")
-                .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })   	      
+                .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })
+                // .attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
 
                 .call(force.drag);
 
