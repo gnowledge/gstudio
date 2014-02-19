@@ -250,6 +250,17 @@ def get_user_group(user):
 
   auth = ""
   auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+  if auth is None:
+    auth = collection.Author()
+
+    auth._type = u"Group"
+    auth.name = unicode(user.username)      
+    auth.password = u""
+    auth.member_of.append(auth_type)      
+    auth.created_by = int(user.pk)
+
+    auth.save()
+
   
   for items in colg:    
     if auth:
