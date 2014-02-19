@@ -136,17 +136,16 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     </ul>
 
     <h2>
-      <span class='node'>{{node.name}}</span>
-      <div class="label-list"> 
+      <span class='node'>{{node.name}}</span>      <small class="label-list"> 
         {% for tag in node.tags %}
         <span class="radius label">{{tag}}</span> 
         {% endfor %}
-      </div>      
+      </small>      
     </h2>
 
     <dl class="row tabs" data-tab>
       <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
-      <dd><a href="#view-graph" data-reveal-id="view-graph"><i class="fi-share"></i> Explore</a></dd>
+      <dd><a href="#view-graph" data-reveal-id="view-graph"><i class="fi-trees"></i> Explore</a></dd>
       <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
     </dl>
 
@@ -199,8 +198,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
        <div class="content reveal-modal x-large graph-height" id="view-graph" data-reveal>    
-        <!-- <div class="row"> -->
-          <!-- <div class="small-12 columns" id="graph-div"> -->
+        <h3>Exlore Object</h3>
             {% if '/details/' in request.path %}
               {% include "ndf/node_graph.html" with graphData=graphData %}
             {% endif %}

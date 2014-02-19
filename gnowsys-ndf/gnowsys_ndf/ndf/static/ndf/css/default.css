@@ -262,19 +262,19 @@ article .tabs dd.active a{
 }
 /* Inline label list */
 .label{
-	color: red;
-	background-color: inherit;
+	font-weight: bold;
+	color: orange;
+	background-color: inherit;border: 1px dotted orange;
 	display: inline-block;
 }
 .label:hover{
 	background-color: orange;
+	color:white;
 }
 
 .label-list{
 	display: inline-block;
 	text-align: left;
-	border-top: 1px red dotted;
-	border-bottom: 1px red dotted;
 }
 
 .card .label{
