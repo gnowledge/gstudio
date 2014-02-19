@@ -25,8 +25,7 @@ class Command(BaseCommand):
 
   		# As considering default access_policy of all documents is PUBLIC 
 
-  		collection.update({'_type': {'$in':[u"Node", u"GSystem", u"GSystemType", u"RelationType", u"ProcessType", u"AttributeType", u"MetaType"]} },
-  			{'$set': {'access_policy': u"PUBLIC"}}, multi=True)
+  		collection.update({}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
 
   		# As _type field values is a list of those who all are inherited Node collection, as access_policy field is placed in Node collection
   		

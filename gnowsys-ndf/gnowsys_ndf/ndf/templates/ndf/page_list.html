@@ -96,9 +96,10 @@
 
     <!-- Existing card list-->
     {% for node in page_nodes %}
+
       {% if node.created_by == request.user.pk %}
     <li class="card">
-      <!--<a class="page" href="{#% url 'page_details' group_name node %#}">-->
+      <div class="page">
 
         <header>
 
@@ -137,7 +138,7 @@
   {% else %}
     {% if node.access_policy == "PUBLIC" %}
       <li class="card">
-      <!--<a class="page" href="{#% url 'page_details' group_name node %#}">-->
+        <div class="page">
 
         <header>
 

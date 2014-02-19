@@ -93,14 +93,15 @@ def get_gapps_menubar(group_name, selectedGapp):
   """
 
   collection = db[Node.collection_name]
-  gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
-
+  
   gapps = {}
   i = 0;
-  for app in gst_cur:
-    if app.name not in ["Image", "Video"]:
-      i = i+1;
-      gapps[i] = {'id': app._id, 'name': app.name.lower()}
+  for app in GAPPS:
+    node = collection.Node.one({'_type': 'GSystemType', 'name': app})
+    if node:
+      if node.name not in ["Image", "Video"]:
+        i = i+1;
+        gapps[i] = {'id': node._id, 'name': node.name.lower()}
 
   selectedGapp = selectedGapp.split("/")[2]
   
@@ -235,7 +236,9 @@ def get_group_policy(group_name,user):
 @register.assignment_tag
 def get_user_group(user):
 
-  group = []  
+  group = [] 
+  author = None
+
   col_Group = db[Group.collection_name]
   collection = db[Node.collection_name]
   auth_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})._id 
