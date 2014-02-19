@@ -31,8 +31,8 @@ def get_all_users_to_invite():
  
 
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(thread,parent,ind,token,user):
-  return {'thread':thread,'reply': parent,'user':user,'indent':ind+10,'csrf_token':token,'eachrep':parent}
+def get_reply(thread,parent,forum,token,user):
+  return {'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent}
 
 @register.assignment_tag
 def get_all_replies(parent):

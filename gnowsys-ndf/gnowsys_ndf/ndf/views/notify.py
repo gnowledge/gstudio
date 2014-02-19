@@ -65,9 +65,9 @@ def notifyuser(request,group_name):
     bx=get_user(request.user)
     ret = set_notif_val(request,group_name,msg,activ,bx)
     colg = col_Group.Group.one({'name':group_name})
-    print "memberof",colg.member_of
-    colg.author_set.append(bx.id)
-    colg.save()
+    if not ((bx.id in colg.author_set) or (bx.id==colg.created_by)):
+        colg.author_set.append(bx.id)
+        colg.save()
     if ret :
         return HttpResponse("success")
     else:
