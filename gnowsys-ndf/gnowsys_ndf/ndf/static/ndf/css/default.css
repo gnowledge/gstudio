@@ -84,7 +84,6 @@ h2:not(.subheader){
 	color: #222;
 	font-family: "Georgia Serif", Serif;
 	font-size: :1.2rem;
-	font-weight: bold;
 	margin: 0;
 }
 h3{
@@ -263,9 +262,8 @@ article .tabs dd.active a{
 }
 /* Inline label list */
 .label{
-	color: white;
-	background-color: #aaa;
-	border-left:1px solid ye;
+	color: red;
+	background-color: inherit;
 	display: inline-block;
 }
 .label:hover{
@@ -273,8 +271,10 @@ article .tabs dd.active a{
 }
 
 .label-list{
+	display: inline-block;
 	text-align: left;
-	padding: 0.5rem 0;
+	border-top: 1px red dotted;
+	border-bottom: 1px red dotted;
 }
 
 .card .label{

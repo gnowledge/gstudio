@@ -45,67 +45,55 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% endblock %}
 
 {% block meta_content %}
-<!--This content possibly comes from page_details.html-->
-<p>
-  {{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
-</p>
-<p>
-  Contributed by: {{ node.user_details_dict.modified_by|join:', ' }}
-</p>
-<p>
-
-  Last update: {{ node.last_update|date:"j F Y" }}
-</p>
-<p>
-  Version{{ node.version_dict|length|pluralize }}: 
-  {% for seq_no, version_no in node.version_dict.items reversed %}
-  <abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
-  {% endfor %}
-</p>
 
 {% endblock %}
 
 {% block related_content %}
 
-    <ul class="side-nav">
-      {% if node.collection_dict|length > 0 %}
-      <h3>Contents</h3>
-      {% for index_key, each_node in node.collection_dict.items %}
-      {% get_grid_fs_object each_node as grid_fs_obj %}
+<ul class="side-nav">
+  {% if node.collection_dict|length > 0 %}
+  <h3>Contents</h3>
+  {% for index_key, each_node in node.collection_dict.items %}
+  {% get_grid_fs_object each_node as grid_fs_obj %}
 
-      {% if each_node.mime_type %}
-      {% if each_node.collection_set %}
-      <li>
-        <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-        <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
-      </li>
+  {% if each_node.mime_type %}
 
-      {% else %}
-      <li>
-        <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+  {% if each_node.collection_set %}
 
-        <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
-      </li>
-      {% endif %}
+  <li>
 
-      {% else %}
-      {% if each_node.collection_set %}
-      <li>
-        <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-        <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
-      </li>
+    <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
 
-      {% else %}
-      <li>
-        <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-        <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
-      </li>
-      {% endif %}
-      {% endif %}
-      {% endfor %}
 
-      {% endif %}
-    </ul>
+    <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
+  </li>
+
+  {% else %}
+  <li>
+    <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+
+    <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
+  </li>
+  {% endif %}
+
+  {% else %}
+  {% if each_node.collection_set %}
+  <li>
+    <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+    <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+  </li>
+
+  {% else %}
+  <li>
+    <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+    <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+  </li>
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+
+  {% endif %}
+</ul>
 
 
 {% endblock %}
@@ -141,17 +129,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <header class="row page">
 
 
-  <section class="medium-2 columns">
-
-    <div class="label-list"> 
-      {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span> 
-      {% endfor %}
-    </div>
-
-  </section>
-
-  <section class="medium-10 columns" >
+  <section class="medium-12 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{group_name}}">{{group_name}}</a></li>
       <li><a href="#">Collection Name</a></li>
@@ -159,10 +137,11 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
     <h2>
       <span class='node'>{{node.name}}</span>
-      <!-- added button to convert collection into module-->
-      {% if node.collection_set and user.is_authenticated%}
-      <a href="#" class="button" id="module"></i> <span>Make Module</a>
-      {% endif %}
+      <div class="label-list"> 
+        {% for tag in node.tags %}
+        <span class="radius label">{{tag}}</span> 
+        {% endfor %}
+      </div>      
     </h2>
 
     <dl class="row tabs" data-tab>
@@ -179,7 +158,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
 
-<section class="medium-9 columns">
+  <section class="medium-9 columns">
     <div class="tabs-content">
 
       <!-- Tab content -->
@@ -239,37 +218,49 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
     <section class="medium-3 columns">
       <div class="panel">
-       <h3 class="subheader">
-        <small>
+       <h5 class="subheader">
+       Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View changes</a>
+         <small>
+          <div>
+            {{ node.member_of_names_list|join:', ' }} created on {{ node.created_at|date:"j F Y" }} by <span class="user">{{ node.user_details_dict.created_by }}</span>
 
-          Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a></small>
-        </h3>
-        
-        <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
-        <ul id="edit-options" class="f-dropdown">
-          <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
-        </ul>
+            {% for seq_no, version_no in node.version_dict.items reversed %}
+            <abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+            {% endfor %}
+          </div>
+        </small>
+      </h5>
 
-      </div>
+      <!-- added button to convert collection into module-->
+      {% if node.collection_set and user.is_authenticated%}
+      <a href="#" class="button" id="module"></i> <span>Make Module</a>
+      {% endif %}
 
-      
+      <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+      <ul id="edit-options" class="f-dropdown">
+        <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
+      </ul>
 
-    </section>
-
-
-  </div>
-
-  <footer class="row">
-    <h5>Contributed by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
-  </footer>
-
-  {% endblock %}
+    </div>
 
 
-  {% block script%}
 
-  function addNewShelf(shelfName)
-  {
+  </section>
+
+
+</div>
+
+<footer class="row">
+  <h5>Contributed by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
+</footer>
+
+{% endblock %}
+
+
+{% block script%}
+
+function addNewShelf(shelfName)
+{
   shelfNameList = [];
   $('#shelf-items dd > a').each(function(b){ shelfNameList.push($(this).text())});
   
