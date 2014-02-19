@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
   		db = get_database()
-  		collection = db[Node.collection_name]
+  		collection = db[Node.collection_name] 
 
   		# As considering default access_policy of all documents is PUBLIC 
 

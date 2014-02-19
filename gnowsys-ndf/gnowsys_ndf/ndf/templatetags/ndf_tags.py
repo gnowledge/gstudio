@@ -245,17 +245,18 @@ def get_user_group(user):
                                 '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
                               })
 
-
+  auth = ""
   auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
   
-  for items in colg:
-    if items.name == auth.name:
-      #group.append(items)
-      author = items
+  for items in colg:    
+    if auth:
+      if items.name == auth.name:        
+        author = items
 
-    else:
-      if items.group_type == "PUBLIC":
-        group.append(items)
+      else:
+        if items.group_type == "PUBLIC":
+          group.append(items)
+    
 
   if author: 
     group.append(author)
