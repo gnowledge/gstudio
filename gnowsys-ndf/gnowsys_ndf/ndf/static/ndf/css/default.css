@@ -433,3 +433,8 @@ input.node-title{
 	display: inline-block;
 	width: 
 }
+
+/* view-graph in node_details_base.html */
+.graph-height{
+	height:70%;
+}
