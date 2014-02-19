@@ -229,7 +229,9 @@ article .tabs dd.active a{
 	height: 80px;
 	overflow: hidden;
 	display: none;
-
+}
+.gallery .card .th{
+	display: block;
 }
 .card .th:hover{
 	width: 150px;
@@ -353,6 +355,7 @@ article p{
 textarea{
 	min-height: 6rem;
 }
+/*
 .orgitdown textarea{
 	min-height: 15rem!important;
 }
@@ -360,6 +363,7 @@ textarea{
 	min-height: 10rem;
 
 }
+*/
 #content>p:first-of-type{
 	font-size: 120%;
 	line-height: 1.4;

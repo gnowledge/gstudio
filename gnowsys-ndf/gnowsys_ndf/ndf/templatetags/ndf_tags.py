@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from django.http import Http404
 register = Library()
 db = get_database()
+collection = db['Nodes']
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -23,8 +24,8 @@ def get_all_users_to_invite():
     inv_users={}
     users=User.objects.all()
     for each in users:
-      inv_users[each.username.__str__()+"<"+each.email.__str__()+">"]=each.id
-    return inv_users
+      inv_users[each.username.__str__()]=each.id.__str__()
+    return str(inv_users)
   except Exception as e:
     print str(e)
  
@@ -62,6 +63,10 @@ def edit_drawer_widget(field, group_name, node, checked=None):
     elif field == "prior_node":
       checked = None
       drawers = get_drawers(group_name, node._id, node.prior_node, checked)
+      
+    elif field == "module":
+      checked = "Module"
+      drawers = get_drawers(group_name, node._id, node.collection_set, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
@@ -69,6 +74,10 @@ def edit_drawer_widget(field, group_name, node, checked=None):
   else:
     if field == "collection" and checked == "Quiz":
       checked = "QuizItem"
+      
+    elif field == "module":
+      checked = "Module"
+      
     else:
       # To make the collection work as Heterogenous one, by default
       checked = None
@@ -164,6 +173,7 @@ def check_group(groupname):
 @register.assignment_tag
 def get_group_name(groupurl):
   sp=groupurl.split("/",2)
+
   if len(sp)<=1:
     return "home"
   if sp[1]:
@@ -174,6 +184,14 @@ def get_group_name(groupurl):
       return "home"
   else:
       return "home"
+
+#@register.assignment_tag
+#def get_user_group_name(groupname):
+#  col_Group = db[Group.collection_name]
+#  colg = col_Group.Group.one({'_type': u'Group', "name":unicode(groupname)})
+
+#  return colg.name
+
 
 @register.assignment_tag
 def get_existing_groups():
@@ -217,19 +235,31 @@ def get_group_policy(group_name,user):
 @register.assignment_tag
 def get_user_group(user):
 
-  group = []
+  group = []  
   col_Group = db[Group.collection_name]
+  collection = db[Node.collection_name]
+  auth_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})._id 
 
   colg = col_Group.Group.find({ '_type': u'Group', 
                                 'name': {'$nin': ['home']},
-                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}] 
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
                               })
 
 
+  auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
   
   for items in colg:
+    if items.name == auth.name:
+      #group.append(items)
+      author = items
 
-      group.append(items)
+    else:
+      if items.group_type == "PUBLIC":
+        group.append(items)
+
+  if author: 
+    group.append(author)
+
   if not group:
     return "None"
   return group
@@ -265,9 +295,7 @@ def get_group_type(grname,user):
 			raise Http404
   else:
 	
-	return "pass"
-		
-			
+	return "pass"		
 	
   
 
@@ -298,4 +326,19 @@ def get_grid_fs_object(f):
   except Exception as e:
     print "Object does not exist", e
   return grid_fs_obj
+
+@register.inclusion_tag('ndf/admin_class.html')
+def get_class_list(class_name):
+  """Get list of class 
+  """
+  class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType"]
+  return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name}
+
+@register.assignment_tag
+def get_Object_count(key):
+    try:
+        return collection.Node.find({'_type':key}).count()
+    except:
+        return 'null'
   
+

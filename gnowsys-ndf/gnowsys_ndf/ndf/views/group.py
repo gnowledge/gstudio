@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
+from django.contrib.auth.models import User
 
 try:
     from bson import ObjectId
@@ -55,6 +56,7 @@ def group(request, group_name,app_id):
 
 
 def create_group(request,group_name):
+
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
@@ -71,7 +73,7 @@ def create_group(request,group_name):
         colg.visibility_policy = request.POST.get('existance', "")
         colg.disclosure_policy = request.POST.get('member', "")
         colg.encryption_policy = request.POST.get('encryption', "")
-        print "sub Pol",colg.subscription_policy
+        print "sub Pol",colg.subscription_policy        
         colg.save()
         #A Private Sub-Document For Moderations 
         if colg.edit_policy == "EDITABLE_MODERATED":
@@ -90,7 +92,7 @@ def create_group(request,group_name):
 def group_dashboard(request,group_name):
     try:
         gp=unicode(group_name)
-        groupobj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':gp}]})
+        groupobj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':gp}]})        
     except:
         groupobj=""
         pass
@@ -98,7 +100,7 @@ def group_dashboard(request,group_name):
 
 @login_required
 def edit_group(request,group_name,group_id):
-    page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+    page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})    
     
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_name, gst_group)

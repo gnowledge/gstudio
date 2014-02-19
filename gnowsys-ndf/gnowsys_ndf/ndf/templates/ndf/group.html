@@ -76,6 +76,8 @@
 		<p><em>Currently NO nodes in the gnowledge base!!!</em></p>		
 		{% else %}
    {% for node in groups %}
+    {% if node.created_by == request.user.pk %}  
+      {% if node.name != request.user.username %}
       
     <li class="card">
       <a class="group" href="/{{node.name}}">
@@ -106,6 +108,40 @@
     <a href="{#% url 'delete_node' node %#}">delete</a>
   -->
 </li>
+{% endif %}
+{% else %}
+    {% if node.access_policy == "PUBLIC" %}
+      <li class="card">
+      <a class="group" href="/{{node.name}}">
+
+        <header>
+          <div class="label-list">
+            {% for tag in node.tags %}
+            <span class="label">{{tag}}</span>
+            {% endfor %}
+          </div>
+          <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+          <h4>{{ node.name }}</h4>
+          <small>Created <em>? days ago</em> by <span class="user">{{ node.user_details_dict.created_by }}</span></small>
+        </header>
+
+        <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
+        <div class="button expand">View Group</div> 
+
+        <footer class="row">
+         <div class="small-6 columns"><strong>{{node.author_set|length}}</strong> Members</div>
+         <div class="small-6 columns"><strong>56</strong> Objects</div> 
+       </footer>
+
+     </a>
+    <!--
+    Member Of   : {{ node.member_of }}<br>
+    Tags       : {{ node.tags|join:", " }}<br>
+    <a href="{#% url 'delete_node' node %#}">delete</a>
+  -->
+</li>
+    {% endif %}
+{% endif %}
 
 {% empty %}
 <p><em>Currently NO nodes in the gnowledge base!!!</em></p>

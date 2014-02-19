@@ -18,7 +18,7 @@
 <p>{% blocktrans %}Your username and password didn't match. Please try again.{% endblocktrans %}</p>
 {% endif %}
 
-<form method="post" action="{% url 'auth_login' %}">{% csrf_token %}
+<form method="post" id="loginSubmit" action="{% url 'auth_login' %}">{% csrf_token %}
 <table>
 	<tr>
 		<td>{% trans form.username.label_tag %}</td>
@@ -38,7 +38,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan="3"><input type="submit" class="button expand" value="{% trans "Login" %}" /></td>
+		<td colspan="3"><input type="submit" id="Login" class="button expand" value="{% trans "Login" %}" /></td>
 	</tr>
 	<tr>
 		<td colspan="3"> 
@@ -52,5 +52,29 @@
 <input type="hidden" name="next" value="{{ next }}" />
 		
 </form>
+
+<script type="text/javascript">
+    $(document).ready(function() {     
+
+    	$("#Login").click(function(e) {     		
+
+    		e.preventDefault();
+
+        	$.ajax({
+          		type: "POST",
+          		url: "{% url 'user_group' group_name %}",
+          		datatype: "html",
+          		data: $("#loginSubmit").serialize(),          		
+          		complete: function(data){          			          			
+          			$("#loginSubmit").submit();           			
+          			
+          		}
+        	});   
+
+      	});
+
+    });
+
+</script>
 
 {% endblock %}

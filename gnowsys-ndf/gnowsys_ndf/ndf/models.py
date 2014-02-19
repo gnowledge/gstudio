@@ -40,12 +40,6 @@ from gnowsys_ndf.ndf.rcslib import RCS
 
 #######################################################################################################################################
 
-STATUS_CHOICES = (
-    ('DRAFT'),
-    ('HIDDEN'),
-    ('PUBLISHED')
-)
-
 NODE_TYPE_CHOICES = (
     ('Nodes'),
     ('Attribute Types'),
@@ -117,7 +111,10 @@ DATA_TYPE_CHOICES = (
     'CustomType'
 )
 
-QUIZ_TYPE_CHOICES_TU = IS(u"Short-Response", u"Single-Choice", u"Multiple-Choice")
+STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED')
+STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
+
+QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 
 #######################################################################################################################################
@@ -158,6 +155,7 @@ class Node(DjangoDocument):
         
         'type_of': unicode,
         'member_of': [ObjectId],
+        'access_policy': unicode,   # To Create Public or Private node
 
       	'created_at': datetime.datetime,
         'last_update': datetime.datetime,
@@ -177,11 +175,11 @@ class Node(DjangoDocument):
       	'login_required': bool,
       	#'password': basestring,
 
-        'status': STATUS_CHOICES
+        'status': STATUS_CHOICES_TU
     }
     
     required_fields = ['name']
-    default_values = {'created_at': datetime.datetime.utcnow}
+    default_values = {'created_at': datetime.datetime.utcnow, 'status': u'DRAFT'}
     use_dot_notation = True
 
     ########## Setter(@x.setter) & Getter(@property) ##########
@@ -347,7 +345,7 @@ class Node(DjangoDocument):
             # Create history-version-file
             if history_manager.create_or_replace_json_file(self):
                 fp = history_manager.get_file_path(self)
-                user = User.objects.get(pk=self.created_by).username
+                user = User.objects.get(pk=self.created_by).username                
                 message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
                 rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
         else:
@@ -554,12 +552,59 @@ class Group(GSystem):
 class Author(Group):
     """Author class to store django user instances
     """
-    structure = {
-        'username': unicode,
-        'email': unicode        
+    structure = {                
+        'email': unicode,       
+        'password': unicode 
     }
 
     use_dot_notation = True
+
+    required_fields = ['name', 'password']
+    
+
+    def __init__(self, *args, **kwargs):
+        super(Author, self).__init__(*args, **kwargs)
+        
+
+    def __eq__(self, other_user):
+        # found that otherwise millisecond differences in created_at is compared
+        try:
+            other_id = other_user['_id']
+        except (AttributeError, TypeError):
+            return False
+
+        return self['_id'] == other_id
+
+
+    @property
+
+    def id(self):
+
+        return self.name
+
+    
+
+    def password_crypt(self, password):
+
+        password_salt = str(len(password))
+
+        crypt = hashlib.sha1(password[::-1].upper() + password_salt).hexdigest()
+
+        PASSWORD = unicode(crypt, 'utf-8')
+
+        return PASSWORD  
+
+    
+
+    def is_anonymous(self):
+
+        return False
+
+    
+
+    def is_authenticated(self):
+
+        return True
 
 
 
