@@ -98,6 +98,7 @@ p{
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
 	background-color: #222;
+	color:white;
 }
 a#toggle-shelf{
 	position: absolute;
@@ -107,7 +108,7 @@ a#toggle-shelf{
 	z-index: 10;
 }
 a#toggle-shelf:hover{
-	color: #aaa;
+	color: black;
 }
 a#toggle-shelf i{
 	font-size: 30px;
@@ -190,10 +191,6 @@ article .tabs{
 article .tabs i{
 	margin-right: 5px;
 	font-size: 1.3rem;
-}
-article .tabs dd{
-	width: 100%;
-	float: none;
 }
 article .tabs dd a{
 	color:#aaa;
@@ -325,9 +322,12 @@ main .button:hover{
 article{
 	margin-top: 0.5rem;
 	padding-bottom: 4rem; 
+	background-color: white;
 }
 
 article header{
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 1rem!important;
 }
 article .breadcrumbs{
 	display: none;

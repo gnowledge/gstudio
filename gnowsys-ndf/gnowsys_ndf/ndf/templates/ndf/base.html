@@ -60,6 +60,7 @@
 			-webkit-box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
+			background-color: #fafafa;
 		}
 
 		.workspace:after{
@@ -199,6 +200,9 @@
 					<h4><i class='fi-info'></i> Help</h4>
 					<ul class="off-canvas-list">
 						{% block help_topics %}  {% endblock %}
+						<div>
+						{% block help_content %}  {% endblock %}
+						</div>
 						<li><a href="#">About metaStudio</a></li>
 					</ul>
 				</aside>
@@ -213,12 +217,9 @@
 							<!-- Meta content in the (main aside header)-->
 							<header class="medium-6 large-12 columns">
 
-								<a class="left-off-canvas-toggle meta" ><h3>Help</h3></a> 
-
-								
-								{% block help_content %}  {% endblock %}
-
+								<a class="left-off-canvas-toggle meta" >
 								{% block meta_content %}  {% endblock %}
+								</a> 
 
 								
 							</header>
