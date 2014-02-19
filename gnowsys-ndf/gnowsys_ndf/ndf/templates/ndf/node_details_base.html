@@ -21,25 +21,25 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <!-- script to call ajax function for converting collection into module -->
 <script>
   $(document).ready(function()
-   {
-      $("#module").one("click", function()
-       {
-         $.ajax({
-                url:"/{{group_name}}/ajax/make_module",
-                type:"GET",
-                data:{_id:"{{node.pk}}"},
-                beforeSend:function(){
-                          $("#ajax_search").show();
-                          },
-                success: function(result){
-                         $("#ajax_search").hide();
-                         $("#module").attr("disabled", "disabled");
-                         alert(result);
-  
-                         }
-                });
-        });
-    });
+  {
+    $("#module").one("click", function()
+    {
+     $.ajax({
+      url:"/{{group_name}}/ajax/make_module",
+      type:"GET",
+      data:{_id:"{{node.pk}}"},
+      beforeSend:function(){
+        $("#ajax_search").show();
+      },
+      success: function(result){
+       $("#ajax_search").hide();
+       $("#module").attr("disabled", "disabled");
+       alert(result);
+
+     }
+   });
+   });
+  });
 </script>
 
 {% endblock %}
@@ -66,6 +66,46 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% endblock %}
 
 {% block related_content %}
+
+    <ul class="side-nav">
+      {% if node.collection_dict|length > 0 %}
+      <h3>Contents</h3>
+      {% for index_key, each_node in node.collection_dict.items %}
+      {% get_grid_fs_object each_node as grid_fs_obj %}
+
+      {% if each_node.mime_type %}
+      {% if each_node.collection_set %}
+      <li>
+        <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+        <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
+      </li>
+
+      {% else %}
+      <li>
+        <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+
+        <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
+      </li>
+      {% endif %}
+
+      {% else %}
+      {% if each_node.collection_set %}
+      <li>
+        <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+        <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+      </li>
+
+      {% else %}
+      <li>
+        <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+        <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+      </li>
+      {% endif %}
+      {% endif %}
+      {% endfor %}
+
+      {% endif %}
+    </ul>
 
 
 {% endblock %}
@@ -113,121 +153,80 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
   <section class="medium-10 columns" >
     <ul class="breadcrumbs">
-    <li><a href="/{{group_name}}">{{group_name}}</a></li>
+      <li><a href="/{{group_name}}">{{group_name}}</a></li>
       <li><a href="#">Collection Name</a></li>
     </ul>
 
     <h2>
       <span class='node'>{{node.name}}</span>
       <!-- added button to convert collection into module-->
-    {% if node.collection_set and user.is_authenticated%}
-     <a href="#" class="button" id="module"></i> <span>Make Module</a>
-    {% endif %}
+      {% if node.collection_set and user.is_authenticated%}
+      <a href="#" class="button" id="module"></i> <span>Make Module</a>
+      {% endif %}
     </h2>
 
-    <h3 class="subheader">
-      <small>
+    <dl class="row tabs" data-tab>
+      <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+      <dd><a href="#view-graph"><i class="fi-share"></i> Explore</a></dd>
+      <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+    </dl>
 
-        Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a></small>
-      </h3>
+  </section>
 
-    </section>
+</header>
 
-  </header>
+<div class="row">
 
-  <div class="row">
 
-    <nav class="medium-2 columns">
-      <ul class="side-nav">
-        {% if node.collection_dict|length > 0 %}
-        <h3>Contents</h3>
-        {% for index_key, each_node in node.collection_dict.items %}
-        {% get_grid_fs_object each_node as grid_fs_obj %}
 
-        {% if each_node.mime_type %}
-        {% if each_node.collection_set %}
-        <li class="list" style="list-style-type:none;">
-          <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-          <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
-        </li>
+<section class="medium-9 columns">
+    <div class="tabs-content">
 
-        {% else %}
-        <li class="list" style="list-style-type:none;">
-          <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
+      <!-- Tab content -->
+      <div class="content active" id="view-page">
 
-          <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
-        </li>
-        {% endif %}
-
-        {% else %}
-        {% if each_node.collection_set %}
-        <li class="list" style="list-style-type:none;">
-          <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-          <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
-        </li>
-
-        {% else %}
-        <li class="list" style="list-style-type:none;">
-          <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-          <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
-        </li>
-        {% endif %}
-        {% endif %}
-        {% endfor %}
-
-        {% endif %}
-      </ul>
-
-    </nav>
-
-    <section class="medium-7 columns">
-      <div class="tabs-content">
-
-        <!-- Tab content -->
-        <div class="content active" id="view-page">
-
-         {% if node.prior_node|length > 0 %}
-         <div class="panel">
-           <h6>You may want to read these first:</h5>
-            {% for index_key, each_node in node.prior_node_dict.items %}
-            {% get_grid_fs_object each_node as grid_fs_obj %}
-            {% if each_node.mime_type %}
-            <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-            {% else %}
-            <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-            {% endif %}
-            {% endfor %}
-          </div>
+       {% if node.prior_node|length > 0 %}
+       <div class="panel">
+         <h6>You may want to read these first:</h5>
+          {% for index_key, each_node in node.prior_node_dict.items %}
+          {% get_grid_fs_object each_node as grid_fs_obj %}
+          {% if each_node.mime_type %}
+          <a href="{% url 'read_file' group_name each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          {% else %}
+          <a href="{% url 'page_details' group_name each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
           {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
 
-          {% block add_fields %} {% endblock %}
+        {% block add_fields %} {% endblock %}
 
-          <ul class="inline-list">
-           {% if user.is_authenticated %}
-           {% block add_list %}{% endblock %}
-           {% endif %}
-         </ul>
-
-         {% with node.html_content|safe as description %}
-
-         {% if description != "None" %}
-         {{ description }}
+        <ul class="inline-list">
+         {% if user.is_authenticated %}
+         {% block add_list %}{% endblock %}
          {% endif %}
+       </ul>
 
-         {% endwith %}
-       </div>
+       {% with node.html_content|safe as description %}
 
-       <!-- Tab View Graph -->
+       {% if description != "None" %}
+       {{ description }}
+       {% endif %}
 
-       <div class="content" id="view-graph">    
-        <div class="row">
-          <div class="small-12 columns" id="graph-div">
+       {% endwith %}
+     </div>
+
+     <!-- Tab View Graph -->
+
+     <div class="content" id="view-graph">    
+      <div class="row">
+        <div class="small-12 columns" id="graph-div">
 <!--
             {% include "ndf/node_graph.html" with graphData=graphData %}  
--->      
-          </div>
+          -->      
         </div>
       </div>
+    </div>
        <!-- 
        <div class="content" id="view-graph">    
         <div class="row">
@@ -240,19 +239,20 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
     <section class="medium-3 columns">
       <div class="panel">
-        <h6>Page Options</h6>
+       <h3 class="subheader">
+        <small>
 
-        <dl class="row tabs" data-tab>
-          <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
-          <dd><a href="#view-graph"><i class="fi-share"></i> Explore</a></dd>
-          <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-        </dl>
+          Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a></small>
+        </h3>
+        
+        <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+        <ul id="edit-options" class="f-dropdown">
+          <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
+        </ul>
+
       </div>
 
-      <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
-      <ul id="edit-options" class="f-dropdown">
-        <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
-      </ul>
+      
 
     </section>
 
@@ -266,25 +266,25 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   {% endblock %}
 
 
-{% block script%}
+  {% block script%}
 
   function addNewShelf(shelfName)
   {
-    shelfNameList = [];
-    $('#shelf-items dd > a').each(function(b){ shelfNameList.push($(this).text())});
+  shelfNameList = [];
+  $('#shelf-items dd > a').each(function(b){ shelfNameList.push($(this).text())});
   
-    if ( ($.inArray(shelfName.toLowerCase(), $.map(shelfNameList, function(n,i){return n.toLowerCase()}))) < 0 )
-    {
-      shelfNameId = shelfName.split(" ").join("_");
+  if ( ($.inArray(shelfName.toLowerCase(), $.map(shelfNameList, function(n,i){return n.toLowerCase()}))) < 0 )
+  {
+  shelfNameId = shelfName.split(" ").join("_");
 
-      $( "#shelf-items dd:nth-child(1)" )
-      .after( "<dd><a href='#panel_"+shelfNameId+"'>"+shelfName+"</a><div id='panel_"+shelfNameId+"' class='content'><a href='#' class='button expand'> Add this to shelf </a></div></dd>" );
-    }
-    else
-    {
-      alert("Shelf with this name already exist !\n\n Create shelf with different name.");
-    }
+  $( "#shelf-items dd:nth-child(1)" )
+  .after( "<dd><a href='#panel_"+shelfNameId+"'>"+shelfName+"</a><div id='panel_"+shelfNameId+"' class='content'><a href='#' class='button expand'> Add this to shelf </a></div></dd>" );
+}
+else
+{
+  alert("Shelf with this name already exist !\n\n Create shelf with different name.");
+}
 
-  }
+}
 
 {% endblock %}
