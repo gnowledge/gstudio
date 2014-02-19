@@ -2,8 +2,11 @@
 {% load ndf_tags %}
 {% block title %} Group {% endblock %}
 
-
 {% block meta_content %}
+<h2>Groups</h2>
+{% endblock %}
+
+{% block help_content %}
 
 <p>Groups are an easy way to share content and conversation, either privately or with the world. Many times, a group already exist for a specific interest or topic. If you can't find one you like, feel free to start your own.</p>
 
@@ -13,17 +16,13 @@
 {% endblock %}
 
 {% get_user_group  request.user as groups %}
+
 {% block body_content %} 
 <header class="row">
-  <h2 class="medium-12 columns">Groups</h2>
-  <nav class="medium-12 columns">
    <dl class="tabs" data-tab>
-     <dd><h3>View:</h3></dd>
      <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
      <dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>
    </dl>
-
- </nav>
 </header>
 
 
