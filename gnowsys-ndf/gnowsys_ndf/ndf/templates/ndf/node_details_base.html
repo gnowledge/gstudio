@@ -222,9 +222,10 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
        <div class="content" id="view-graph">    
         <div class="row">
           <div class="small-12 columns" id="graph-div">
-<!--
-            {% include "ndf/node_graph.html" with graphData=graphData %}  
--->      
+            {% if 'details' in request.path %}
+              {{ request.path }}
+              {% include "ndf/node_graph.html" with graphData=graphData %}
+            {% endif %}
           </div>
         </div>
       </div>
