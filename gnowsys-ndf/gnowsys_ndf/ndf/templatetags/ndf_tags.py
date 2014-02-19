@@ -93,14 +93,15 @@ def get_gapps_menubar(group_name, selectedGapp):
   """
 
   collection = db[Node.collection_name]
-  gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
-
+  
   gapps = {}
   i = 0;
-  for app in gst_cur:
-    if app.name not in ["Image", "Video"]:
-      i = i+1;
-      gapps[i] = {'id': app._id, 'name': app.name.lower()}
+  for app in GAPPS:
+    node = collection.Node.one({'_type': 'GSystemType', 'name': app})
+    if node:
+      if node.name not in ["Image", "Video"]:
+        i = i+1;
+        gapps[i] = {'id': node._id, 'name': node.name.lower()}
 
   selectedGapp = selectedGapp.split("/")[2]
   
@@ -235,7 +236,9 @@ def get_group_policy(group_name,user):
 @register.assignment_tag
 def get_user_group(user):
 
-  group = []  
+  group = [] 
+  author = None
+
   col_Group = db[Group.collection_name]
   collection = db[Node.collection_name]
   auth_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})._id 
@@ -245,17 +248,29 @@ def get_user_group(user):
                                 '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
                               })
 
-
+  auth = ""
   auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
-  
-  for items in colg:
-    if items.name == auth.name:
-      #group.append(items)
-      author = items
+  if auth is None:
+    auth = collection.Author()
 
-    else:
-      if items.group_type == "PUBLIC":
-        group.append(items)
+    auth._type = u"Group"
+    auth.name = unicode(user.username)      
+    auth.password = u""
+    auth.member_of.append(auth_type)      
+    auth.created_by = int(user.pk)
+
+    auth.save()
+
+  
+  for items in colg:    
+    if auth:
+      if items.name == auth.name:        
+        author = items
+
+      else:
+        if items.group_type == "PUBLIC":
+          group.append(items)
+    
 
   if author: 
     group.append(author)
