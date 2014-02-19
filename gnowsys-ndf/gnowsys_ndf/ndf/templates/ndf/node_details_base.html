@@ -219,24 +219,15 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
        <!-- Tab View Graph -->
 
-       <div class="content" id="view-graph">    
-        <div class="row">
-          <div class="small-12 columns" id="graph-div">
-            {% if 'details' in request.path %}
-              {{ request.path }}
+       <div class="content reveal-modal x-large graph-height" id="view-graph" data-reveal>    
+        <!-- <div class="row"> -->
+          <!-- <div class="small-12 columns" id="graph-div"> -->
+            {% if '/details/' in request.path %}
               {% include "ndf/node_graph.html" with graphData=graphData %}
             {% endif %}
-          </div>
-        </div>
+          <!-- </div> -->
+        <!-- </div> -->
       </div>
-       <!-- 
-       <div class="content" id="view-graph">    
-        <div class="row">
-          <div class="small-12 columns" id="graph-div">
-            {#% #include "ndf/relational_graph.html" with graphData=graphData %}        
-          </div>
-        </div>
-      </div> -->
     </section>
 
     <section class="medium-3 columns">
@@ -245,7 +236,8 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
         <dl class="row tabs" data-tab>
           <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
-          <dd><a href="#view-graph"><i class="fi-share"></i> Explore</a></dd>
+          <!-- <dd><a href="#view-graph"><i class="fi-share"></i> Explore</a></dd> -->
+          <dd><a href="#" data-reveal-id="view-graph" ><i class="fi-share"></i> Explore</a></dd>
           <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
         </dl>
       </div>

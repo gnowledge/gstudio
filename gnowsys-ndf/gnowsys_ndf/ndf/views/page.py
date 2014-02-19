@@ -92,9 +92,10 @@ def page(request, group_name, app_id=None):
 
         # ------ Some work for graph ------
         # graphData = neighbourhood_nodes(page_node)
-        graph_pages = ['details', 'image_detail']
-
-        graphData = graph_nodes(page_node, group_name)
+        if "details" in (request.path): 
+          graphData = graph_nodes(page_node, group_name)
+        else:
+          graphData = ''
 
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,

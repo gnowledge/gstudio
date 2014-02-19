@@ -73,9 +73,10 @@
 	
 	var loc = ($('#chart').attr("data-loc")).split("/")[3];
 
-	// if( loc != "details") { $("#graphArea").hide();	}
-
 	var jsonData = $.parseJSON($("#chart").attr("data-graph"));
+
+	// graphArea = $("#view-graph").height();
+	// alert(graphArea);
 
 	function init(a,b)
 	{
@@ -196,9 +197,7 @@
 
                 var new_g = node.enter().append("svg:a")
                 .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })
-                // .attr("xlink:href", function(d){ if(d.refType == 'relation') return "http://google.co.in"})
-                .attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
-                // {#%# url 'page_details' group_name each_node.pk %}
+                // .attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
 
                 .call(force.drag);
 
