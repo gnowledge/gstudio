@@ -130,6 +130,8 @@ background-repeat:no-repeat; background-size: 48px 48px
       </div>
     </div>
     
+    {% block prior_node %}
+
     <div class="content" id="panel-prior-node"  style="width:95%;">
       <div class="row">
 	<div class="small-12 columns">
@@ -145,6 +147,10 @@ background-repeat:no-repeat; background-size: 48px 48px
       </div>
     </div>
     
+    {% endblock %}
+
+    {% block collection %}
+
     <div class="content" id="panel-collection" style="width:95%;">
       <div class="row">
 	<div class="small-12 columns">
@@ -195,8 +201,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
       </div>
     </div>
+
+    {% endblock %}
     
-  </div>
+  </div>  
   
   {% block add_fields %} {% endblock %}
   
@@ -242,6 +250,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 		pn_arr = []
 		cn_arr = []
+		md_arr = [] //for adding module
 
 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
@@ -251,10 +260,15 @@ background-repeat:no-repeat; background-size: 48px 48px
 			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
 				cn_arr.push($(this).val());
 			}
+
+			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
+  				md_arr.push($(this).val());
+  			}
 		});
 
 		$("#prior_node_list").val(pn_arr)
-		$("#collection_list").val(cn_arr)    
+		$("#collection_list").val(cn_arr) 
+		$("#module_list").val(md_arr)   
 
 		{% block base_save_on_click %}{% endblock %}
 	});
