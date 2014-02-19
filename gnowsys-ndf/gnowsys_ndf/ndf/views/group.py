@@ -60,6 +60,7 @@ def create_group(request,group_name):
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
+        Mod_colg=col_Group.Group()
         cname=request.POST.get('groupname', "")
         colg.altnames=cname
         colg.name = unicode(cname)
@@ -74,6 +75,16 @@ def create_group(request,group_name):
         colg.encryption_policy = request.POST.get('encryption', "")
         print "sub Pol",colg.subscription_policy        
         colg.save()
+        #A Private Sub-Document For Moderations 
+        if colg.edit_policy == "EDITABLE_MODERATED":
+    
+            Mod_colg.altnames=cname + "Mod" 
+            Mod_colg.name=cname + "Mod"     
+            Mod_colg.group_type = "PRIVATE"
+            Mod_colg.created_by=usrid
+            Mod_colg.save() 
+  
+            
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", RequestContext(request))
     
@@ -102,5 +113,4 @@ def edit_group(request,group_name,group_id):
                                         },
                                       context_instance=RequestContext(request)
                                       )
-
 
