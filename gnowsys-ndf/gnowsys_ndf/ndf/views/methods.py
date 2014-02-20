@@ -9,7 +9,7 @@ from django.template.defaultfilters import slugify
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
-
+import re
 ######################################################################################################################################
 
 db = get_database()
@@ -153,6 +153,15 @@ def get_node_common_fields(request, node, group_name, node_type):
   if not node.has_key('_id'):
     
     node.created_by = usrid
+    #Adding the page for moderation
+    col_Group = db[Group.collection_name]
+    grname = re.split(r'[/=]', request.path)
+    colg = col_Group.Group.one({'_type':u'Group','name':grname[1]+"Mod"})
+    print "above block executed"
+    if grname[1] in colg.group_set:
+       print "if block executed"
+       node.group_set.append(unicode(grname[1]+"Mod"))
+    
     node.member_of.append(node_type._id)
   
     if access_policy == "PUBLIC":

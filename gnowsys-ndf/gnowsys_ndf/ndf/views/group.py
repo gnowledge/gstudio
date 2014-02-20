@@ -82,6 +82,7 @@ def create_group(request,group_name):
             Mod_colg.name=cname + "Mod"     
             Mod_colg.group_type = "PRIVATE"
             Mod_colg.created_by=usrid
+            Mod_colg.group_set.append(cname)
             Mod_colg.save() 
   
             
