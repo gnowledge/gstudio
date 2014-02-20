@@ -80,16 +80,24 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  </div>
 
 	  <div class="medium-4 columns">
-	    {% if node.created_by == request.user.pk %}	
+	    {% if node.created_by == request.user.pk %}		    	
 			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
 				<div class="privacy-mode switch round">
-						
+						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
 							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
 							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-						
+						{% else %}
+							{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
+								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
+								<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
+								<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+							{% endif %}
+						{% endif %}
 							<span></span>
 				</div>
 
