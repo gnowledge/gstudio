@@ -109,7 +109,7 @@
 </li>
 {% endif %}
 {% else %}
-    {% if node.access_policy == "PUBLIC" %}
+    {% if node.group_type == "PUBLIC" %}
       <li class="card">
       <a class="group" href="/{{node.name}}">
 

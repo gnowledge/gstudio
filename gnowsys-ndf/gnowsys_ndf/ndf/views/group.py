@@ -93,6 +93,11 @@ def edit_group(request,group_name,group_id):
     
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_name, gst_group)
+            if page_node.access_policy == "PUBLIC":
+                page_node.group_type = "PUBLIC"
+            if page_node.access_policy == "PRIVATE":
+                page_node.group_type = "PRIVATE"
+
             page_node.save()
             group_name=page_node.name
             return HttpResponseRedirect(reverse('groupchange', kwargs={'group_name': group_name}))
