@@ -249,8 +249,7 @@ def get_user_group(user):
     auth._type = u"Group"
     auth.name = unicode(user.username)      
     auth.password = u""
-    auth.member_of.append(auth_type)  
-    auth.group_type = "PUBLIC"    
+    auth.member_of.append(auth_type)      
     auth.created_by = int(user.pk)
 
     auth.save()
