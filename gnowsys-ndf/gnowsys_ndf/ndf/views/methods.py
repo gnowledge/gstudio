@@ -168,10 +168,8 @@ def get_node_common_fields(request, node, group_name, node_type):
   if access_policy == "PUBLIC":
       node.access_policy = u"PUBLIC"      
   else:
-      node.access_policy = u"PRIVATE"    
-
-  print node.access_policy
-  print node.access_policy
+      node.access_policy = u"PRIVATE"  
+  
 
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
