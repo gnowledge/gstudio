@@ -23,11 +23,10 @@ def get_user(username):
 
 def set_notif_val(request,group_name,msg,activ,bx):
     try:
-        username=request.user
         obj=group_name
-        site=sitename
-        objurl=""
-        render = render_to_string("notification/label.html",{'sender':username,'activity':activ,'conjunction':'-','object':obj,'site':site,'oburl':objurl})
+        site=sitename.name.__str__()
+        objurl="http://test"
+        render = render_to_string("notification/label.html",{'sender':username,'activity':activ,'conjunction':'-','object':obj,'site':site,'link':objurl})
         notification.create_notice_type(render, msg, "notification")
         notification.send([bx], render, {"from_user": request.user})
         return True
