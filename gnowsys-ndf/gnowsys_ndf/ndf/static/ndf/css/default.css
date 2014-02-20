@@ -326,6 +326,9 @@ article header{
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 1rem!important;
 }
+article footer{
+	border-top: 1px dotted #ddd;
+}
 article .breadcrumbs{
 	display: none;
 	background-color: #eee;
