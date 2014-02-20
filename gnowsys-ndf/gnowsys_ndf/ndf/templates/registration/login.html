@@ -38,7 +38,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan="3"><input type="submit" id="Login" class="button expand" value="{% trans "Login" %}" /></td>
+		<td colspan="3"><input type="submit" class="button expand" value="{% trans "Login" %}" /></td>
 	</tr>
 	<tr>
 		<td colspan="3"> 
@@ -52,29 +52,5 @@
 <input type="hidden" name="next" value="{{ next }}" />
 		
 </form>
-
-<script type="text/javascript">
-    $(document).ready(function() {     
-
-    	$("#Login").click(function(e) {     		
-
-    		e.preventDefault();
-
-        	$.ajax({
-          		type: "POST",
-          		url: "{% url 'user_group' group_name %}",
-          		datatype: "html",
-          		data: $("#loginSubmit").serialize(),          		
-          		complete: function(data){          			          			
-          			$("#loginSubmit").submit();           			
-          			
-          		}
-        	});   
-
-      	});
-
-    });
-
-</script>
 
 {% endblock %}
