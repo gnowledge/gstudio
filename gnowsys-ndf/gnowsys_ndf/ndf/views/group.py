@@ -66,7 +66,7 @@ def create_group(request,group_name):
         colg.member_of.append(gst_group._id)
         usrid = int(request.user.id)
         colg.created_by=usrid
-        colg.group_type = request.POST.get('group_type', "")
+        colg.group_type = request.POST.get('group_type', "")        
         colg.edit_policy = request.POST.get('edit_policy', "")
         colg.subscription_policy = request.POST.get('subscription', "")
         colg.visibility_policy = request.POST.get('existance', "")
