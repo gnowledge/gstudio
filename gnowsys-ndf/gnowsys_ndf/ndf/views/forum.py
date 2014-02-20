@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 
 
@@ -111,6 +112,7 @@ def display_thread(request,group_name,thread_id):
 
 def add_node(request,group_name):
     try:
+        sitename=Site.objects.all()[0].name.__str__()
         content_org=request.POST.get("reply","")
         node=request.POST.get("node","")
         thread=request.POST.get("thread","")
@@ -143,22 +145,23 @@ def add_node(request,group_name):
         colrep.save()
         colg = gs_collection.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
         if node == "Twist" :  
-            url="/"+group_name+"/forum/thread"+str(colrep._id)
-            activity="Added a thread "
-            prefix=" on the forum "+forumobj.name
+            url="http://"+sitename+"/"+group_name+"/forum/thread"+str(colrep._id)
+            activity=str(request.user.username)+" -added a thread "
+            prefix=" on the forum '"+forumobj.name+"'"
             nodename=name
         if node == "Reply":
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
-            url="/"+group_name+"/forum/thread"+str(threadobj._id)
-            activity="Added a reply "
-            prefix=" on the thread "+threadobj.name+" on the forum "+forumobj.name
+            url="http://"+sitename+"/"+group_name+"/forum/thread"+str(threadobj._id)
+            activity=str(request.user.username)+" -added a reply "
+            prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
             nodename=""
+        link=url
         for each in colg.author_set:
             bx=User.objects.get(id=each)
-            msg=activity+"-"+nodename+" in the group "+group_name
+            msg=activity+"-"+nodename+" in the group '"+group_name+"'\n"+"Please visit "+link+" to see the updated page"
             ret = set_notif_val(request,group_name,msg,activity,bx)
         bx=User.objects.get(id=colg.created_by)
-        msg=activity+"-"+nodename+prefix+" in the group "+group_name+" crated by you"
+        msg=activity+"-"+nodename+prefix+" in the group '"+group_name+"' created by you"+"\n"+"Please visit "+link+" to see the updated page" 
         ret = set_notif_val(request,group_name,msg,activity,bx)
         if node == "Reply":
             # if exstng_reply:
