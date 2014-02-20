@@ -84,7 +84,6 @@ h2:not(.subheader){
 	color: #222;
 	font-family: "Georgia Serif", Serif;
 	font-size: :1.2rem;
-	font-weight: bold;
 	margin: 0;
 }
 h3{
@@ -182,9 +181,6 @@ a#toggle-shelf i{
 	color:inherit;
 }
 /* Content Tabs */
-article nav{
-	padding-top: 2rem;
-}
 article .tabs{
 
 }
@@ -266,18 +262,19 @@ article .tabs dd.active a{
 }
 /* Inline label list */
 .label{
-	color: white;
-	background-color: #aaa;
-	border-left:1px solid ye;
+	font-weight: bold;
+	color: orange;
+	background-color: inherit;border: 1px dotted orange;
 	display: inline-block;
 }
 .label:hover{
 	background-color: orange;
+	color:white;
 }
 
 .label-list{
+	display: inline-block;
 	text-align: left;
-	padding: 0.5rem 0;
 }
 
 .card .label{
@@ -293,7 +290,7 @@ main aside{
 }
 
 main aside.fade{
-	opacity:0.5;
+	opacity:0.8;
 }
 aside>section{
 	margin:inherit!important;
@@ -435,4 +432,9 @@ input.node-title{
 	height:  4rem;
 	display: inline-block;
 	width: 
+}
+
+/* view-graph in node_details_base.html */
+.graph-height{
+	height:70%;
 }
