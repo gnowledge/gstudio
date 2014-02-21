@@ -114,29 +114,28 @@ main > aside a:hover {
 h2:not(.subheader) {
   color: #222;
   font-family: "Georgia Serif", Serif;
-  font-size: 1.2rem;
   margin: 0;
 }
 
-/* line 90, ../scss/default.scss */
+/* line 89, ../scss/default.scss */
 h3 {
   font-size: 1.4rem;
 }
 
-/* line 94, ../scss/default.scss */
+/* line 93, ../scss/default.scss */
 p {
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
 /* Off canvas navigation */
-/* line 99, ../scss/default.scss */
+/* line 98, ../scss/default.scss */
 aside.left-off-canvas-menu {
   background-color: #222;
   color: white;
 }
 
-/* line 103, ../scss/default.scss */
+/* line 102, ../scss/default.scss */
 a#toggle-shelf {
   position: absolute;
   top: 1rem;
@@ -145,17 +144,17 @@ a#toggle-shelf {
   z-index: 10;
 }
 
-/* line 110, ../scss/default.scss */
+/* line 109, ../scss/default.scss */
 a#toggle-shelf:hover {
   color: black;
 }
 
-/* line 113, ../scss/default.scss */
+/* line 112, ../scss/default.scss */
 a#toggle-shelf i {
   font-size: 30px;
 }
 
-/* line 117, ../scss/default.scss */
+/* line 116, ../scss/default.scss */
 .inner-wrap > aside h4 {
   color: white;
   padding: 10px;
@@ -163,19 +162,19 @@ a#toggle-shelf i {
 
 /* Should be in Foundation */
 /* Effects */
-/* line 127, ../scss/default.scss */
+/* line 126, ../scss/default.scss */
 .drop-shadow {
   -webkit-box-shadow: 2px 2px 4px 1px #333;
   box-shadow: 2px 2px 4px 1px #333;
 }
 
-/* line 131, ../scss/default.scss */
+/* line 130, ../scss/default.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 135, ../scss/default.scss */
+/* line 134, ../scss/default.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -184,7 +183,7 @@ a#toggle-shelf i {
 }
 
 /* Card block */
-/* line 143, ../scss/default.scss */
+/* line 142, ../scss/default.scss */
 .card > * {
   position: relative;
   background-color: white;
@@ -202,52 +201,52 @@ a#toggle-shelf i {
   -o-transition: opacity .5s ease-in;
 }
 
-/* line 160, ../scss/default.scss */
+/* line 159, ../scss/default.scss */
 .card > *:hover {
   border: 1px solid #ddd;
   opacity: 1;
 }
 
 /* Create card */
-/* line 165, ../scss/default.scss */
+/* line 164, ../scss/default.scss */
 .create.card > * {
   background-color: #999;
   opacity: 1;
 }
 
-/* line 169, ../scss/default.scss */
+/* line 168, ../scss/default.scss */
 .create.card > *:hover {
   background-color: #008759;
 }
 
-/* line 172, ../scss/default.scss */
+/* line 171, ../scss/default.scss */
 .create.card h4 {
   color: white;
 }
 
-/* line 175, ../scss/default.scss */
+/* line 174, ../scss/default.scss */
 .create.card .button {
   border: 1px solid #00ba7b;
 }
 
-/* line 178, ../scss/default.scss */
+/* line 177, ../scss/default.scss */
 .create.card label {
   color: white;
 }
 
-/* line 181, ../scss/default.scss */
+/* line 180, ../scss/default.scss */
 .create.card .switch label {
   color: inherit;
 }
 
 /* Content Tabs */
-/* line 188, ../scss/default.scss */
+/* line 187, ../scss/default.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
 
-/* line 192, ../scss/default.scss */
+/* line 191, ../scss/default.scss */
 article .tabs dd a {
   color: #aaa;
   background-color: inherit;
@@ -255,41 +254,41 @@ article .tabs dd a {
   padding-left: 1rem;
 }
 
-/* line 198, ../scss/default.scss */
+/* line 197, ../scss/default.scss */
 article .tabs dd a:hover {
   background-color: inherit;
   color: #999;
 }
 
-/* line 202, ../scss/default.scss */
+/* line 201, ../scss/default.scss */
 article .tabs dd.active a {
   color: #222;
   background-color: inherit;
 }
 
-/* line 207, ../scss/default.scss */
+/* line 206, ../scss/default.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
 /* Default card */
-/* line 212, ../scss/default.scss */
+/* line 211, ../scss/default.scss */
 .card header {
   margin-bottom: 0;
 }
 
-/* line 215, ../scss/default.scss */
+/* line 214, ../scss/default.scss */
 .card h4 {
   font-weight: bold;
   font-size: 1rem;
 }
 
-/* line 219, ../scss/default.scss */
+/* line 218, ../scss/default.scss */
 .card p {
   font-size: 0.9rem;
 }
 
-/* line 222, ../scss/default.scss */
+/* line 221, ../scss/default.scss */
 .card .th {
   margin: 20px auto;
   width: 80px;
@@ -298,38 +297,38 @@ article .tabs dd.active a {
   display: none;
 }
 
-/* line 229, ../scss/default.scss */
+/* line 228, ../scss/default.scss */
 .gallery .card .th {
   display: block;
 }
 
-/* line 232, ../scss/default.scss */
+/* line 231, ../scss/default.scss */
 .card .th:hover {
   width: 150px;
   height: 150px;
 }
 
-/* line 236, ../scss/default.scss */
+/* line 235, ../scss/default.scss */
 .card .th img {
   width: 100%;
 }
 
-/* line 239, ../scss/default.scss */
+/* line 238, ../scss/default.scss */
 .card section {
   background-color: #ddd;
 }
 
-/* line 242, ../scss/default.scss */
+/* line 241, ../scss/default.scss */
 .card .button {
   opacity: 0.1;
 }
 
-/* line 245, ../scss/default.scss */
+/* line 244, ../scss/default.scss */
 .card.create .button {
   opacity: 0.5;
 }
 
-/* line 248, ../scss/default.scss */
+/* line 247, ../scss/default.scss */
 .card > *:hover .button {
   opacity: 1;
   transition: opacity .5s ease-in ease-in;
@@ -339,7 +338,7 @@ article .tabs dd.active a {
 }
 
 /* Card icons */
-/* line 256, ../scss/default.scss */
+/* line 255, ../scss/default.scss */
 .card > * > i {
   position: absolute;
   top: -12px;
@@ -350,7 +349,7 @@ article .tabs dd.active a {
 }
 
 /* Inline label list */
-/* line 265, ../scss/default.scss */
+/* line 264, ../scss/default.scss */
 .label {
   font-weight: bold;
   color: orange;
@@ -359,97 +358,97 @@ article .tabs dd.active a {
   display: inline-block;
 }
 
-/* line 271, ../scss/default.scss */
+/* line 270, ../scss/default.scss */
 .label:hover {
   background-color: orange;
   color: white;
 }
 
-/* line 276, ../scss/default.scss */
+/* line 275, ../scss/default.scss */
 .label-list {
   display: inline-block;
   text-align: left;
 }
 
-/* line 281, ../scss/default.scss */
+/* line 280, ../scss/default.scss */
 .card .label {
   opacity: 0.5;
 }
 
-/* line 284, ../scss/default.scss */
+/* line 283, ../scss/default.scss */
 .card > :hover .label {
   opacity: 1;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 289, ../scss/default.scss */
+/* line 288, ../scss/default.scss */
 main aside {
   padding-top: 1rem;
 }
 
-/* line 293, ../scss/default.scss */
+/* line 292, ../scss/default.scss */
 main aside.fade {
   opacity: 0.8;
 }
 
-/* line 296, ../scss/default.scss */
+/* line 295, ../scss/default.scss */
 aside > section {
   margin: inherit !important;
   margin-bottom: 5px;
   padding-bottom: 3rem;
 }
 
-/* line 302, ../scss/default.scss */
+/* line 301, ../scss/default.scss */
 aside > section > div {
   padding: 15px;
 }
 
-/* line 309, ../scss/default.scss */
+/* line 308, ../scss/default.scss */
 aside .meta i {
   color: #ccc;
 }
 
-/* line 310, ../scss/default.scss */
+/* line 309, ../scss/default.scss */
 aside:hover .meta i {
   color: black;
 }
 
-/* line 312, ../scss/default.scss */
+/* line 311, ../scss/default.scss */
 main .button {
   background-color: #008759;
 }
 
-/* line 315, ../scss/default.scss */
+/* line 314, ../scss/default.scss */
 main .button:hover {
   background-color: #00ba7b;
 }
 
 /* Content area */
-/* line 320, ../scss/default.scss */
+/* line 319, ../scss/default.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
   background-color: white;
 }
 
-/* line 326, ../scss/default.scss */
+/* line 325, ../scss/default.scss */
 article header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
 
-/* line 330, ../scss/default.scss */
+/* line 329, ../scss/default.scss */
 article footer {
   border-top: 1px dotted #ddd;
 }
 
-/* line 333, ../scss/default.scss */
+/* line 332, ../scss/default.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 341, ../scss/default.scss */
+/* line 340, ../scss/default.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -463,7 +462,7 @@ pre {
   font-family: monospace;
 }
 
-/* line 356, ../scss/default.scss */
+/* line 355, ../scss/default.scss */
 textarea {
   min-height: 6rem;
 }
@@ -477,7 +476,7 @@ textarea {
 
 }
 */
-/* line 368, ../scss/default.scss */
+/* line 367, ../scss/default.scss */
 #content > p:first-of-type {
   font-size: 120%;
   line-height: 1.4;
@@ -485,17 +484,17 @@ textarea {
 }
 
 /*************************** 3. Custom CSS Below ***********************/
-/* line 375, ../scss/default.scss */
+/* line 374, ../scss/default.scss */
 .user {
   color: inherit;
 }
 
-/* line 378, ../scss/default.scss */
+/* line 377, ../scss/default.scss */
 .user {
   color: inherit;
 }
 
-/* line 381, ../scss/default.scss */
+/* line 380, ../scss/default.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -504,65 +503,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 388, ../scss/default.scss */
+/* line 387, ../scss/default.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 392, ../scss/default.scss */
+/* line 391, ../scss/default.scss */
 a.node {
   display: block;
 }
 
-/* line 396, ../scss/default.scss */
+/* line 395, ../scss/default.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 399, ../scss/default.scss */
+/* line 398, ../scss/default.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 404, ../scss/default.scss */
+/* line 403, ../scss/default.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 409, ../scss/default.scss */
+/* line 408, ../scss/default.scss */
 main .search {
   margin: 0;
 }
 
-/* line 412, ../scss/default.scss */
+/* line 411, ../scss/default.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 415, ../scss/default.scss */
+/* line 414, ../scss/default.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 422, ../scss/default.scss */
+/* line 421, ../scss/default.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 427, ../scss/default.scss */
+/* line 426, ../scss/default.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 434, ../scss/default.scss */
+/* line 433, ../scss/default.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -570,18 +569,18 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 441, ../scss/default.scss */
+/* line 440, ../scss/default.scss */
 .graph-height {
   height: 70%;
 }
 
 /* Splash Page */
-/* line 446, ../scss/default.scss */
+/* line 445, ../scss/default.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 449, ../scss/default.scss */
+/* line 448, ../scss/default.scss */
 #splash > img {
   position: absolute;
 }
