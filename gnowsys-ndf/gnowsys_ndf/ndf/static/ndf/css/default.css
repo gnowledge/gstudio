@@ -21,7 +21,7 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 
 /* Top bar */
 body>header{
-border-bottom: 1px solid black;
+	border-bottom: 1px solid black;
 }
 .top-bar,.top-bar-section ul,body>header{
 	background-color: #222;
@@ -440,4 +440,12 @@ input.node-title{
 /* view-graph in node_details_base.html */
 .graph-height{
 	height:70%;
+}
+
+/* Splash Page */
+#splash{
+	background-image: url('http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg');
+}
+#splash>img{
+	position: absolute;
 }
