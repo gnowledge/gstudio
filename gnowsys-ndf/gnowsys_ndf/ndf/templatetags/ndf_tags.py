@@ -139,7 +139,10 @@ def check_user_join(request,group_id):
   else:
     return "null"
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.one({'_id':ObjectId(group_id)})
+  if group_id == '/home/'or group_id == "":
+    colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+  else:
+    colg = col_Group.Group.one({'_id':ObjectId(group_id)})
   if colg:
     if colg.created_by == user_id:
       return "author"
@@ -236,8 +239,12 @@ def get_user_group(user):
 
 @register.assignment_tag
 def get_group_type(group_id,user):
+  print "gropid=temptag",group_id
   col_Group = db[Group.collection_name]
-  colg=col_Group.Group.one({'_id': ObjectId(group_id)})
+  if group_id == '/home/':
+    colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+  else:  
+    colg=col_Group.Group.one({'_id': ObjectId(group_id)})
   #check if Group exist in the database
   if colg is not None:
 	# Check is user is logged in
