@@ -58,8 +58,12 @@ def create_forum(request,group_name):
             filename = slugify(name) + "-" + usrname + "-"
             colf.content = org2html(content_org, file_prefix=filename)
         usrid=int(request.user.id)
+        usrname = unicode(request.user.username)
         colf.created_by=usrid
         colf.group_set.append(unicode(group_name))
+        if usrname not in colf.group_set:
+            colf.group_set.append(usrname)     
+
         colf.member_of.append(forum_st._id)
         sdate=request.POST.get('sdate',"")
         shrs= request.POST.get('shrs',"") 
