@@ -211,11 +211,9 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   <section class="medium-3 columns">
     <div class="panel">
      <h5 class="subheader">
-       Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <div><a href="#view-changes"><i class="fi-clock"></i> View changes</a></div>
+     Edited {{ node.last_update|timesince }} ago by <a class="user">?</a> 
        <small>
-        <div>
-          {{ node.member_of_names_list|join:', ' }} created on {{ node.created_at|date:"j F Y" }} by <span class="user">{{ node.user_details_dict.created_by }}</span>
-
+         <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
           {% for seq_no, version_no in node.version_dict.items reversed %}
           <abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
           {% endfor %}
@@ -244,17 +242,18 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 </div>
 
-<footer class="row">
-  <h5>Contributed by {{ node.user_details_dict.modified_by|join:', ' }}</h5>
-</footer>
+<footer>
+  <p><small>
+    <em>Written by {{ node.user_details_dict.modified_by|join:', ' }}</em></small></p>
+  </footer>
 
-{% endblock %}
+  {% endblock %}
 
 
-{% block script%}
+  {% block script%}
 
-function addNewShelf(shelfName)
-{
+  function addNewShelf(shelfName)
+  {
   shelfNameList = [];
   $('#shelf-items dd > a').each(function(b){ shelfNameList.push($(this).text())});
   
