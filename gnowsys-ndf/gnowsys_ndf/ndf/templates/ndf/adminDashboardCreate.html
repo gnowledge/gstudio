@@ -1,0 +1,41 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %} Admin {% endblock %}
+{% block meta_content %}
+     {% ifequal url 'data' %}
+	{% get_class_list class_name %}
+     {% else %}
+        {% get_class_type_list class_name %}
+     {% endifequal %}
+{% endblock %}
+{% block body_content %} 
+<div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
+  {% for list in fieldlist %}
+  <div style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list %}
+  </div>
+{% endfor %}
+
+  {% for key,value in class_structure.items %}
+  {% if not key in fieldlist %}
+  <div style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{key}}</font> 
+    </div>
+    {% get_input_fields value key %}
+    
+  </div>
+  {% endif %}
+  {% endfor%}
+</div>
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}	
+
+
+<select id="id_auto_now_add" name="auto_now_add"><option selected="selected" value="1">Unknown</option><option value="2">Yes</option><option value="3">No</option></select>
