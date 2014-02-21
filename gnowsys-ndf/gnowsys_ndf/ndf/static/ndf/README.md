@@ -11,7 +11,12 @@
 
 ## Package management using bower
 
-Third party frontend packages can like jquery can be managed using [bower](http://www.bower.io)
+Third party frontend packages can like jquery can be managed and updated using [bower](http://www.bower.io). This allows for clean installation and dependency management. Bower managed packages are in the components/ folder and currently contain the following components:
+
+* Foundation - Responsive CSS framework
+* jQuery
+* d3 - Visualization library
+* 
 
 ## Editing styles
 
