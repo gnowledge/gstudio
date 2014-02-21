@@ -6,7 +6,8 @@ from gnowsys_ndf.ndf.views import *
 
 
 urlpatterns = patterns('gnowsys_ndf.ndf.views.userDashboard',                       
-                       url(r'^(?P<user>[\w-]+)/userDashboard', 'dashboard', name='userDashboard')
+                       url(r'^(?P<user>[^/]+)/userDashboard', 'dashboard', name='userDashboard')                      
+                       
                        
 )
 
