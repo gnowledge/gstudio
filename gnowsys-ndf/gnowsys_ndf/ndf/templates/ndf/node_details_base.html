@@ -145,9 +145,15 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
   <dl class="row tabs" data-tab>
     <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+
     {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+
+    <dd><a href="#view-graph"><i class="fi-share"></i> Graph</a></dd>
+
     {% endif %}
-    
+
+    <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+
   </section>
 
 </header>
