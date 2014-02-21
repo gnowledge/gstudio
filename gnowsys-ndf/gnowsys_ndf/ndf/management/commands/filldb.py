@@ -54,7 +54,7 @@ class Command(BaseCommand):
             gs_node.subscription_policy=u'OPEN'
             gs_node.visibility_policy=u'ANNOUNCED'
             gs_node.encryption_policy=u'NOT_ENCRYPTED'
-            gs_node.group_type=u'PUBLIC'
+            gs_node.group_type= u'PUBLIC'
             gs_node.edit_policy =u'NON_EDITABLE'
             gs_node.save()
 
