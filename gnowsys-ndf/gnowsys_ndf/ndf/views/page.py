@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, graph_nodes
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 
 #######################################################################################################################################
@@ -90,17 +90,9 @@ def page(request, group_name, app_id=None):
     else:
         page_node = collection.Node.one({"_id": ObjectId(app_id)})
 
-        # ------ Some work for graph ------
-        # graphData = neighbourhood_nodes(page_node)
-        if "details" in (request.path): 
-          graphData = graph_nodes(page_node, group_name)
-        else:
-          graphData = ''
-
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
-                                    'group_name': group_name,
-                                    'graphData': graphData
+                                    'group_name': group_name
                                   },
                                   context_instance = RequestContext(request)
         )        

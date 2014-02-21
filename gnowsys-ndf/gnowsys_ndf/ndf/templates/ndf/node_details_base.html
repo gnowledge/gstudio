@@ -145,11 +145,10 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
   <dl class="row tabs" data-tab>
     <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
-    <dd><a href="#view-graph" data-reveal-id="view-graph"><i class="fi-share"></i> Graph</a></dd>
-    <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-  </dl>
-
-</section>
+    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+    {% endif %}
+    
+  </section>
 
 </header>
 
@@ -194,16 +193,14 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
        {% endwith %}
      </div>
 
+
      <!-- Tab View Graph -->
-
-
      <div class="content reveal-modal x-large graph-height" id="view-graph" data-reveal>    
-      <h3>Exlore Object</h3>
-      {% if '/details/' in request.path %}
-      {% include "ndf/node_graph.html" with graphData=graphData %}
+      <h3>{{node.name}}</h3>
+      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+      <a class="close-reveal-modal">&#215;</a>
+      {% include "ndf/node_graph.html" %}
       {% endif %}
-      <!-- </div> -->
-      <!-- </div> -->
     </div>
 
   </section>
@@ -211,7 +208,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   <section class="medium-3 columns">
     <div class="panel">
      <h5 class="subheader">
-     Edited {{ node.last_update|timesince }} ago by <a class="user">?</a> 
+       Edited {{ node.last_update|timesince }} ago by <a class="user">?</a> 
        <small>
          <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
           {% for seq_no, version_no in node.version_dict.items reversed %}
