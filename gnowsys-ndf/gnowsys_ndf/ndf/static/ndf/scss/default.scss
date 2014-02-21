@@ -1,0 +1,451 @@
+
+/*************************** 1. Foundation CSS overrides ***********************/
+
+/* Foundation hacks */
+.row{
+	max-width:inherit;/* Expand to full browser width instead of 960px */
+}
+.top-bar input{	/* Issue filed at github */
+	height:auto;
+	padding-top:.35rem;
+	padding-bottom:.35rem;
+}
+nav.top-bar .has-dropdown .button{ /* Needs testing */
+	top:0;
+}
+
+
+input[type="checkbox"] + label, input[type="radio"] + label{
+	margin: inherit!important;
+}
+
+
+/* Top bar */
+body>header{
+	border-bottom: 1px solid black;
+}
+.top-bar,.top-bar-section ul,body>header{
+	background-color: #222;
+}
+.top-bar-section li:not(.has-form) a{
+	background-color: #222!important;
+}
+.top-bar-section .has-form{
+	background-color: #222;
+}
+
+
+.top-bar-section a.app.active-menu{
+	/* Active App */
+	background-color: #008759!important;
+	font-weight: bold;
+	color:white;
+	opacity:1;
+	border-bottom: 1px solid black;
+	margin-bottom: -1px;
+}
+.top-bar-section a.app:hover{
+	color:white;
+	opacity:1;
+}
+.top-bar-section a.app{ 
+	/* Apps */
+	opacity:0.7;
+	background-color: inherit;
+	top:0;
+}
+.top-bar-section li.group a.active-menu{ 
+	/* Active group */
+	background-color: #154534!important;
+	font-weight: bold!important;
+}
+.top-bar-section li:not(.has-form) a:hover{
+	/* Top bar hover */
+	background-color: #008759!important;
+}
+
+/* Sections */
+body{
+	font-family: FreeSans;
+}
+main>aside{
+	margin-bottom: 0.5rem;
+}
+main>aside header{
+	margin-top: 1rem;
+}
+main>aside a{
+	color: #008759;
+}
+main>aside a:hover{
+	color: inherit;
+}
+
+h2:not(.subheader){
+	color: #222;
+	font-family: "Georgia Serif", Serif;
+	font-size:1.2rem;
+	margin: 0;
+}
+h3{
+	font-size: 1.4rem;
+}
+
+p{
+	font-size: 0.9rem;
+	line-height: 1.5;
+}
+/* Off canvas navigation */
+aside.left-off-canvas-menu{
+	background-color: #222;
+	color:white;
+}
+a#toggle-shelf{
+	position: absolute;
+	top:1rem;
+	right: 1rem;
+	color: black;
+	z-index: 10;
+}
+a#toggle-shelf:hover{
+	color: black;
+}
+a#toggle-shelf i{
+	font-size: 30px;
+}
+
+.inner-wrap>aside h4{
+	color: white;
+	padding:10px;
+}
+
+
+
+/* Should be in Foundation */
+
+/* Effects */
+.drop-shadow{
+	-webkit-box-shadow: 2px 2px 4px 1px #333;
+	box-shadow: 2px 2px 4px 1px #333;
+}
+.rounded{
+	border-radius: 2px;
+	-webkit-border-radius:2px;
+}
+.transition-opacity{
+	transition: opacity .3s ease;
+	-moz-transition: opacity .3s ease;
+	-webkit-transition: opacity .3s ease;
+	-o-transition: opacity .3s ease;
+}
+
+/* Card block */
+.card>*{
+	position: relative;
+	background-color: white;
+	margin:2px;
+	padding:10px;
+	border: 1px solid #eaeaea;
+	display: block;
+	color:inherit!important;
+	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
+	box-shadow: 2px 2px 4px 1px #ddd;
+	opacity:0.8;
+	transition: opacity .5s ease-in ease-in;
+	-moz-transition: opacity .5s ease-in;
+	-webkit-transition: opacity .5s ease-in;
+	-o-transition: opacity .5s ease-in;
+
+}
+.card>*:hover{
+	border: 1px solid #ddd;
+	opacity:1;
+}
+/* Create card */
+.create.card>*{
+	background-color: #999;
+	opacity:1;
+}
+.create.card>*:hover{
+	background-color: #008759;
+}
+.create.card h4{
+	color:white;
+}
+.create.card .button{
+	border:1px solid #00ba7b;
+}
+.create.card label{
+	color:white;
+}
+.create.card .switch label{
+	color:inherit;
+}
+/* Content Tabs */
+article .tabs{
+
+}
+article .tabs i{
+	margin-right: 5px;
+	font-size: 1.3rem;
+}
+article .tabs dd a{
+	color:#aaa;
+	background-color: inherit;
+	padding: 0.5rem;
+	padding-left: 1rem;
+}
+article .tabs dd a:hover{
+	background-color: inherit;
+	color:#999;
+}
+article .tabs dd.active a{
+	color:#222;
+	background-color: inherit;
+}
+
+.tabs-content>.content{
+	padding-top: 0;
+}
+
+/* Default card */
+.card header{
+	margin-bottom: 0;
+}
+.card h4{
+	font-weight: bold;
+	font-size: 1rem;
+}
+.card p{
+	font-size: 0.9rem;
+}
+.card .th{
+	margin:20px auto;
+	width:80px;
+	height: 80px;
+	overflow: hidden;
+	display: none;
+}
+.gallery .card .th{
+	display: block;
+}
+.card .th:hover{
+	width: 150px;
+	height: 150px;
+}
+.card .th img{
+	width: 100%;
+}
+.card section{
+	background-color: #ddd;
+}
+.card .button{
+	opacity:0.1;
+}
+.card.create .button{
+	opacity:0.5;
+}
+.card>*:hover .button{
+	opacity:1;
+	transition: opacity .5s ease-in ease-in;
+	-moz-transition: opacity .5s ease-in;
+	-webkit-transition: opacity .5s ease-in;
+	-o-transition: opacity .5s ease-in;
+}
+/* Card icons */
+.card>*>i{
+	position: absolute;
+	top: -12px;
+	right: 20px;
+	font-size: 4rem;
+	color:#eee;
+	opacity: 0.4;
+}
+/* Inline label list */
+.label{
+	font-weight: bold;
+	color: orange;
+	background-color: inherit;border: 1px dotted orange;
+	display: inline-block;
+}
+.label:hover{
+	background-color: orange;
+	color:white;
+}
+
+.label-list{
+	display: inline-block;
+	text-align: left;
+}
+
+.card .label{
+	opacity:0.5;
+}
+.card>:hover .label{
+	opacity:1;
+}
+
+/*************************** 2. Custom CSS overrides ***********************/
+main aside{
+	padding-top: 1rem;
+}
+
+main aside.fade{
+	opacity:0.8;
+}
+aside>section{
+	margin:inherit!important;
+	margin-bottom:5px;
+	padding-bottom: 3rem;
+}
+
+aside>section>div{
+	padding: 15px;
+}
+
+aside>section h3,aside>section h4,aside>section h5 {
+
+}
+aside .meta i{color: #ccc;}
+aside:hover .meta i{color: black;}
+
+main .button{
+	background-color:#008759 ;
+}
+main .button:hover{
+	background-color:#00ba7b ;
+}
+
+/* Content area */
+article{
+	margin-top: 0.5rem;
+	padding-bottom: 4rem; 
+	background-color: white;
+}
+
+article header{
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 1rem!important;
+}
+article footer{
+	border-top: 1px dotted #ddd;
+}
+article .breadcrumbs{
+	display: none;
+	background-color: #eee;
+}
+article nav{
+	
+}
+
+pre{
+	width:92%;
+	overflow: auto;
+	margin: 2rem 0;
+	border: 1px solid #eee;
+	border-left: 1rem solid #eee;
+	font: lighter 1.2rem/2rem Monaco;
+	background: url('/static/ndf/images/pre.png');
+	background-size:1px 4rem;
+	padding-left:0.5rem;
+	font-family: monospace;
+}
+article p{
+
+}
+textarea{
+	min-height: 6rem;
+}
+/*
+.orgitdown textarea{
+	min-height: 15rem!important;
+}
+#content{
+	min-height: 10rem;
+
+}
+*/
+#content>p:first-of-type{
+	font-size: 120%;
+	line-height: 1.4;
+	color: #222;
+}
+/*************************** 3. Custom CSS Below ***********************/
+
+.user{
+	color: inherit;
+}
+.user{
+	color: inherit;
+}
+.user i{
+	padding: 0.2em 0.5em;
+	margin-right:0.4em;
+	color:white;
+	background-color:#ddd;
+	opacity:0.8;
+}
+.user:hover i{
+	opacity:1;
+}
+
+a.node{
+	display:block;
+}
+
+a.app{
+	overflow: hidden;
+}
+a.app i{
+	font-size:15px;
+	color:white;
+	margin-right:8px;
+}
+.button.edit{
+	margin-bottom: 0;
+}
+
+/* Sidebar Search Results */
+main .search{
+	margin:0;
+}
+main .search div>*{
+	margin: 0;
+}
+#search-results{
+	list-style: none;
+	margin:0;
+}
+#search-results li{
+
+}
+#search-results a{
+	background-color: black;
+	padding: 0.5rem;
+	display: block;
+}
+#search-results a:hover{
+	background-color: #444;
+}
+
+/************ Forms **************/
+
+/* Node edit */
+input.node-title{
+	font-size: 3rem;
+	height:  4rem;
+	display: inline-block;
+}
+
+/* view-graph in node_details_base.html */
+.graph-height{
+	height:70%;
+}
+
+/* Splash Page */
+#splash{
+	background-image: url('http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg');
+}
+#splash>img{
+	position: absolute;
+}

@@ -12,23 +12,24 @@
 	<link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png">
 
 	<!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
-	<link rel="stylesheet" href="/static/ndf/foundation/css/normalize.css">
-	<link rel="stylesheet" href="/static/ndf/foundation/css/foundation.css">
+	<link rel="stylesheet" href="/static/ndf/components/foundation/css/normalize.css">
+	<link rel="stylesheet" href="/static/ndf/components/foundation/css/foundation.css">
 
 	<!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
 	<link rel="stylesheet" href="/static/ndf/foundation-icons/foundation-icons.css">
 
 	<!-- Modernizr - Browser detection JS http://modernizr.com/ -->
-	<script src="/static/ndf/foundation/js/vendor/modernizr.js"></script>
+	<script src="/static/ndf/components/modernizr/modernizr.js"></script>
 
 	<!-- jQuery -->
-	<script src="/static/ndf/js/jquery.js"></script> 
+	<script src="/static/ndf/components/jquery/dist/jquery.min.js"></script> 
 	<!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
 	<script src="/static/ndf/js/jquery-migrate-1.0.0.js"></script>
 
 	<!-- External default stylesheet-->
 	<link href="/static/ndf/css/default.css" rel="stylesheet">
 	<link href="/static/ndf/css/jqtree.css" rel="stylesheet">
+
 	<!-- Enable HTML5 on old browsers -->
 	<!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
@@ -244,8 +245,8 @@
 
 								<section class="medium-6 large-12 columns">
 
-										{% block related_content %}  {% endblock %}
-								
+									{% block related_content %}  {% endblock %}
+
 								</section>
 
 
