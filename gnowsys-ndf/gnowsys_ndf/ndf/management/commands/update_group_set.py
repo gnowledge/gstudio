@@ -22,13 +22,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-      collection = db[Node.collection_name]
+      collection = get_database()[Node.collection_name]
       cur = collection.Node.find({'_type': {'$in': ['GSystem', 'File', 'Group']}})
         
       for n in cur:
         usrname = User.objects.get(pk=n.created_by).username
           
-        u = collection.Node.one({'_type': 'Author', 'name': unicode(usrname)})
+        u = collection.Node.one({'_type': 'Group', 'name': usrname})
           
         if u:
           n.group_set.append(u.name)
