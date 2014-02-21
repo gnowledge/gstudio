@@ -160,6 +160,8 @@ def make_module_set(request, group_name):
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
                 list_of_collection.append(node._id)
+                usrname = unicode(request.user.username)
+                
                 dict = {}
                 dict['id'] = unicode(node._id)
                 dict['version_no'] = hm_obj.get_current_version(node)
@@ -173,6 +175,9 @@ def make_module_set(request, group_name):
                 #gsystem_obj.gsystem_type.append(GST_MODULE._id)
                 gsystem_obj.member_of.append(GST_MODULE._id)
                 gsystem_obj.group_set.append(unicode(group_name))
+                if usrname not in gsystem_obj.group_set:        
+                    gsystem_obj.group_set.append(usrname)
+
                 gsystem_obj.created_by = int(request.user.id)
                 gsystem_obj.module_set.append(dict)
                 gsystem_obj.save()

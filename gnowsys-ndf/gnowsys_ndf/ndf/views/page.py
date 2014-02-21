@@ -74,11 +74,12 @@ def page(request, group_name, app_id=None):
 
         # collection.Node.reload()
         page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
-                                           'group_set': {'$all': [group_name]}, 
+                                           'group_set': {'$all': [group_name]},                                           
                                            'status': {'$nin': ['HIDDEN']}
-                                       })
+                                       })        
+
         page_nodes.sort('last_update', -1)
-        page_nodes_count = page_nodes.count()
+        page_nodes_count = page_nodes.count()        
 
         return render_to_response("ndf/page_list.html",
                                   {'title': title, 
