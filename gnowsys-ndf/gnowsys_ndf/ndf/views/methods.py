@@ -168,9 +168,12 @@ def get_node_common_fields(request, node, group_name, node_type):
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
 
-  if access_policy == "PUBLIC":
+  if access_policy:
+    # Policy will be changed only by the creator of the resource 
+    # via access_policy(public/private) option on the template which is visible only to the creator
+    if access_policy == "PUBLIC":
       node.access_policy = u"PUBLIC"      
-  else:
+    else:
       node.access_policy = u"PRIVATE"  
   
 
