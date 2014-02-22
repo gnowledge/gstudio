@@ -52,6 +52,10 @@ def adminDesignerDashboardClassCreate(request,class_name):
     '''
     delete class's objects
     '''
+    definitionlist = []
+    contentlist = []
+    dependencylist = []
+    options = []
     class_structure = eval(class_name).structure
     # if class_name == 'GSystemType':
     #     class_structure = collection.GSystemType.structure
@@ -74,10 +78,30 @@ def adminDesignerDashboardClassCreate(request,class_name):
             newdict[key] = "datetime"
         else: 
             newdict[key] = value
-            print value, key
+    #        print value, key
     class_structure = newdict    
-    fieldlist = ['name', 'altnames', 'status', 'content', 'content_org']
+    if class_name == "AttributeType":
+        definitionlist = ['name','altnames','subject_type','applicable_node_type','data_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        contentlist = ['content','content_org']
+        dependencylist = ['prior_node']
+        options = ['featured','created_by','created_at','start_publication','tags','url','last_update','login_required']
+    elif class_name == "GSystemType":
+        definitionlist = ['name','altnames','status','meta_type_set','attribute_type_set','relation_type_set','process_type_set']
+        contentlist = ['content','content_org']
+        dependencylist = ['prior_node']
+        options = ['featured','created_by','created_at','start_publication','tags','url','last_update','login_required']
+    elif class_name == "RelationType":
+        definitionlist = ['name','altnames','subject_type','applicable_node_type','data_type','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        contentlist = ['content','content_org']
+        dependencylist = ['prior_node']
+        options = ['featured','created_by','created_at','start_publication','tags','url','last_update','login_required']
+    else :
+        definitionlist = []
+        contentlist = []
+        dependencylist = []
+        options = []
+
     template = "ndf/adminDashboardCreate.html"
-    variable = RequestContext(request, {'class_name':class_name,"url":"designer","class_structure":class_structure,'fieldlist':fieldlist})
+    variable = RequestContext(request, {'class_name':class_name,"url":"designer","class_structure":class_structure,'definitionlist':definitionlist,'contentlist':contentlist,'dependencylist':dependencylist,'options':options})
     return render_to_response(template, variable)
 

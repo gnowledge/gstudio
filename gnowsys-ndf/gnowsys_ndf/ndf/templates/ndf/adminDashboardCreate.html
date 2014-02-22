@@ -10,7 +10,57 @@
 {% endblock %}
 {% block body_content %} 
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
-  {% for list in fieldlist %}
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#definitionlist">Definition</a>
+  <div id="definitionlist" class="active">
+
+  {% for list in definitionlist %}
+  <div style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list %}
+  </div>
+{% endfor %}
+</div>
+</dd>
+</dl>
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#contentlist">Content</a>
+  <div id="contentlist" class="content">
+  {% for list in contentlist %}
+  <div  style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list %}
+  </div>
+{% endfor %}
+  </div>
+  </dd>
+</dl>
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#dependencylist">Dependency</a>
+ <div id="dependencylist" class="content">
+  {% for list in dependencylist %}
+  <div style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list %}
+  </div>
+{% endfor %}
+</div>
+  </dd>
+</dl>
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#options">Options</a>
+    <div id="options" class="content">
+  {% for list in options %}
   <div style="display:table-row;">
     <div style="display:table-cell;"> 
       <font size="3"> {{list}}</font> 
@@ -19,23 +69,13 @@
   </div>
 {% endfor %}
 
-  {% for key,value in class_structure.items %}
-  {% if not key in fieldlist %}
-  <div style="display:table-row;">
-    <div style="display:table-cell;"> 
-      <font size="3"> {{key}}</font> 
-    </div>
-    {% get_input_fields value key %}
-    
-  </div>
-  {% endif %}
-  {% endfor%}
+</div>
+  </dd>
+</dl>
+
 </div>
 {% endblock %}
 
 {% block script %}
 
 {% endblock %}	
-
-
-<select id="id_auto_now_add" name="auto_now_add"><option selected="selected" value="1">Unknown</option><option value="2">Yes</option><option value="3">No</option></select>
