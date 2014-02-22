@@ -141,6 +141,7 @@ def get_node_common_fields(request, node, group_name, node_type):
 
   name = request.POST.get('name')
   usrid = int(request.user.id)
+  usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
 
   tags = request.POST.get('tags')
@@ -154,6 +155,8 @@ def get_node_common_fields(request, node, group_name, node_type):
     
     node.created_by = usrid
     node.member_of.append(node_type._id)
+    if group_name not in node.group_set:
+      node.group_set.append(group_name)    
   
     if access_policy == "PUBLIC":
       node.access_policy = unicode(access_policy)      
@@ -179,8 +182,11 @@ def get_node_common_fields(request, node, group_name, node_type):
     node.modified_by.remove(usrid)
     node.modified_by.insert(0,usrid)
 
-  if group_name not in node.group_set:
-    node.group_set.append(group_name)
+  # For displaying nodes in home group as well as in creator group.
+  if group_name not in node.group_set: 
+    node.group_set.append(group_name)  
+  elif usrname not in node.group_set:   
+    node.group_set.append(usrname)  
 
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
