@@ -31,8 +31,8 @@ def get_all_users_to_invite():
  
 
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(thread,parent,ind,token,user):
-  return {'thread':thread,'reply': parent,'user':user,'indent':ind+10,'csrf_token':token,'eachrep':parent}
+def get_reply(thread,parent,forum,token,user):
+  return {'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent}
 
 @register.assignment_tag
 def get_all_replies(parent):
@@ -186,13 +186,6 @@ def get_group_name(groupurl):
   else:
       return "home"
 
-#@register.assignment_tag
-#def get_user_group_name(groupname):
-#  col_Group = db[Group.collection_name]
-#  colg = col_Group.Group.one({'_type': u'Group', "name":unicode(groupname)})
-
-#  return colg.name
-
 
 @register.assignment_tag
 def get_existing_groups():
@@ -211,7 +204,7 @@ def get_existing_groups():
 def get_existing_groups_excluded(grname):
   group = []
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find({'_type':u'Group','group_type':"PUBLIC"})
+  colg = col_Group.Group.find({'_type':u'Group', 'group_type': "PUBLIC"})  
   colg.sort('name')
   gr=list(colg)
   for items in gr:
@@ -241,7 +234,12 @@ def get_user_group(user):
 
   col_Group = db[Group.collection_name]
   collection = db[Node.collection_name]
-  auth_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})._id 
+
+  group_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Group'})
+  auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
+
+  if auth_obj:
+    auth_type = auth_obj._id
 
   colg = col_Group.Group.find({ '_type': u'Group', 
                                 'name': {'$nin': ['home']},
@@ -250,6 +248,7 @@ def get_user_group(user):
 
   auth = ""
   auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+
   if auth is None:
     auth = collection.Author()
 
@@ -260,23 +259,24 @@ def get_user_group(user):
     auth.created_by = int(user.pk)
 
     auth.save()
-
   
-  for items in colg:    
-    if auth:
-      if items.name == auth.name:        
+  for items in colg:  
+    if items.created_by == user.pk:
+      if items.name == auth.name:
         author = items
-
       else:
-        if items.group_type == "PUBLIC":
-          group.append(items)
+        group.append(items)
     
+    else:
+      if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
+        group.append(items)
 
   if author: 
     group.append(author)
 
   if not group:
     return "None"
+
   return group
 
 @register.assignment_tag
@@ -347,7 +347,14 @@ def get_class_list(class_name):
   """Get list of class 
   """
   class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType"]
-  return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name}
+  return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data"}
+
+@register.inclusion_tag('ndf/admin_class.html')
+def get_class_type_list(class_name):
+  """Get list of class 
+  """
+  class_list = ["GSystemType", "RelationType", "AttributeType"]
+  return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"designer"}
 
 @register.assignment_tag
 def get_Object_count(key):
@@ -396,4 +403,14 @@ def set_page_moderation(grname,page_name):
  
  print "something"
   
+@register.filter
+def get_dict_item(dictionary, key):
+    return dictionary.get(key)
 
+
+@register.inclusion_tag('ndf/admin_fields.html')
+def get_input_fields(fields_value,type_value):
+  """Get html tags 
+  """
+  
+  return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value}

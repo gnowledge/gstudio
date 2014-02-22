@@ -98,38 +98,6 @@ def select_drawer(request, group_name):
 
 
 
-def user_group(request, group_name):
-
-  if request.is_ajax() and request.method == "POST":
-
-    
-    name = request.POST.get('username')    
-    password = request.POST.get('password')
-
-    name = User.objects.get(username=name)    
-    usrid = int(name.id)    
-    
-    collection = db[Node.collection_name]
-    
-    group_exist = collection.Node.one({'$and':[{'_type': u'Group'},{'name': unicode(name)}]})
-    auth_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})._id 
-
-    if usrid:
-      if group_exist is None:
-        auth = collection.Author()
-
-        auth._type = u"Group"
-        auth.name = unicode(name)      
-        auth.password = auth.password_crypt(password)
-        auth.member_of.append(auth_type)      
-        auth.created_by = usrid
-
-        auth.save()  
-
-
-  return HttpResponse("success")
-
-
 @login_required
 def change_group_settings(request, group_name):
     '''
@@ -192,6 +160,8 @@ def make_module_set(request, group_name):
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
                 list_of_collection.append(node._id)
+                usrname = unicode(request.user.username)
+                
                 dict = {}
                 dict['id'] = unicode(node._id)
                 dict['version_no'] = hm_obj.get_current_version(node)
@@ -205,6 +175,9 @@ def make_module_set(request, group_name):
                 #gsystem_obj.gsystem_type.append(GST_MODULE._id)
                 gsystem_obj.member_of.append(GST_MODULE._id)
                 gsystem_obj.group_set.append(unicode(group_name))
+                if usrname not in gsystem_obj.group_set:        
+                    gsystem_obj.group_set.append(usrname)
+
                 gsystem_obj.created_by = int(request.user.id)
                 gsystem_obj.module_set.append(dict)
                 gsystem_obj.save()
@@ -233,3 +206,123 @@ def get_module_json(request, group_name):
     node = collection.Node.one({'_id':ObjectId(_id)})
     data = walk(node.module_set)
     return HttpResponse(json.dumps(data))
+
+
+# ------------- For generating graph json data ------------
+def graph_nodes(request, group_name):
+
+  collection = db[Node.collection_name]
+  page_node = collection.Node.one({'_id':ObjectId(request.GET.get("id"))}) 
+
+  def _get_node_info(node_id):
+    node = collection.Node.one( {'_id':node_id}  )
+    node
+    # mime_type = "true"  if node.structure.has_key('mime_type') else 'false'
+
+    return node.name
+
+  # def _get_username(id_int):
+    # return User.objects.get(id=id_int).username
+
+  def _get_node_url(node_id):
+
+    node_url = '/' + group_name
+    node = collection.Node.one({'_id':node_id})
+
+    if len(node.member_of) > 1:
+      if node.mime_type == 'image/jpeg':
+        node_url += '/image/image_detail/' + str(node_id)
+      elif node.mime_type == 'video':
+        node_url += '/video/video_detail/' + str(node_id)
+
+    elif len(node.member_of) == 1:
+      gapp_name = (collection.Node.one({'_id':node.member_of[0]}).name).lower()
+
+      if gapp_name == 'forum':
+        node_url += '/forum/show/' + str(node_id)
+
+      elif gapp_name == 'file':
+        node_url += '/image/image_detail/' + str(node_id)
+
+      elif gapp_name == 'page':
+        node_url += '/page/details/' + str(node_id)
+
+      elif gapp_name == 'quiz' or 'quizitem':
+        node_url += '/quiz/details/' + str(node_id)
+      
+    return node_url
+
+  page_node_id = str(id(page_node._id))
+  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"GSystem"}, '
+  node_relations = ''
+  exception_items = [
+                      "name", "content", "_id", "login_required", "attribute_set",
+                      "member_of", "status", "comment_enabled", "start_publication",
+                      "_type", "modified_by", "created_by", "last_update", "url", "featured",
+                      "created_at", "group_set", "type_of", "content_org", "author_set",
+                      "fs_file_ids", "file_size", "mime_type"
+                    ]
+
+  # username = User.objects.get(id=page_node.created_by).username
+
+  i = 1
+  for key, value in page_node.items():
+    
+    if key in exception_items:
+      pass
+
+    elif isinstance(value, list):
+
+      if len(value):
+
+        node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
+        key_id = str(i)
+        # i += 1
+        
+        # if key in ("modified_by", "author_set"):
+        #   for each in value:
+        #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
+        #     node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+        #     i += 1
+
+        # else:
+        for each in value:
+          if isinstance(each, ObjectId):
+            node_name = _get_node_info(each)          
+
+            node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "url":"'+ _get_node_url(each) +'", "refType":"relation"},'
+            # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
+            i += 1
+          else:
+            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
+            i += 1
+    
+    else:
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"},'
+      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
+      key_id = str(i)      
+
+      if isinstance( value, list):
+        for each in value:
+          node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(i) +'_n"},'
+          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+          i += 1 
+      
+      else:
+        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
+        i += 1 
+    # End of if - else
+  # End of for loop
+
+  node_metadata = node_metadata[:-1]
+  node_relations = node_relations[:-1]
+
+  node_graph_data = '{ "node_metadata": [' + node_metadata + '], "relations": [' + node_relations + '] }'
+
+  return HttpResponse(node_graph_data)
+
+# ------ End of processing for graph ------

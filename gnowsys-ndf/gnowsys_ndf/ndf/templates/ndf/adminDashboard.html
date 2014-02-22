@@ -2,7 +2,11 @@
 {% load ndf_tags %}
 {% block title %} Admin {% endblock %}
 {% block meta_content %}
+     {% ifequal url 'data' %}
 	{% get_class_list class_name %}
+     {% else %}
+        {% get_class_type_list class_name %}
+     {% endifequal %}
 {% endblock %}
 {% block body_content %} 
 <div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
@@ -41,12 +45,12 @@
   <thead>
     <tr>
       <th width="20"> <input class="checkedAll" type="checkbox"></th>
-      <th width="150">Id</th>
+      <th width="150" style="display:none">Id</th>
       <th width="150">Title</th>
     {% if class_name == "File" or class_name ==  "GSystem"  %}
       <th width="150">Group(s)</th>
     {% endif %}
-      <th width="150">Type(s)</th>
+      <th width="150" style="display:none">Type(s)</th>
       <th width="150">Author</th>
       <th width="150">Creation date</th>
       	
@@ -56,12 +60,12 @@
 	{% for each in nodes %}
     <tr>	
             <td  id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-	    <td class="id" style="font-size:11px;">{{each.Id}}</td>
+	    <td  style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
 	    <td class="title" style="font-size:95%"><font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}"></td>
 	{% if class_name == "File" or class_name ==  "GSystem"  %}
 	    <td class="group" style="font-size:11px;"><font class="viewinput{{each.Id}}">{{each.Group}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}"></td>
 	{% endif %}
-	    <td class="type" style="font-size:11px;"><font class="viewinput{{each.Id}}">{{each.Type}}</font><input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" ></td>
+	    <td style="display:none" class="type" style="font-size:11px;"><font class="viewinput{{each.Id}}">{{each.Type}}</font><input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" ></td>
 	    <td class="author" style="font-size:11px;">{{each.Author}}</td>
 	   <td class="creation" style="font-size:11px;">{{each.Creation}}</td>
 	   <td style="font-size:11px;"> <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 	<input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none"></td>
@@ -104,7 +108,7 @@ $(document).on('click',".button.deleteObjects",function(){
              })
 
              $.ajax({
-             url: '/admin/class/delete',
+             url: '/admin/data/delete',
              type: 'POST',
              data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
              beforeSend: function() {     },
@@ -136,7 +140,7 @@ var objectid = $(this).attr("name");
                   $("."+each.parentElement.className+" font.viewinput"+objectid).html(each.value) });
         json['fields']=fields
         $.ajax({
-        url: '/admin/class/edit',
+        url: '/admin/data/edit',
         type: 'POST',
         data: {objectjson:JSON.stringify(json),csrfmiddlewaretoken: '{{ csrf_token }}'},
         beforeSend: function() {     },

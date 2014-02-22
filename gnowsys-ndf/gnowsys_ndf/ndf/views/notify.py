@@ -23,11 +23,10 @@ def get_user(username):
 
 def set_notif_val(request,group_name,msg,activ,bx):
     try:
-        username=request.user
         obj=group_name
-        site=sitename
-        objurl=""
-        render = render_to_string("notification/label.html",{'sender':username,'activity':activ,'conjunction':'-','object':obj,'site':site,'oburl':objurl})
+        site=sitename.name.__str__()
+        objurl="http://test"
+        render = render_to_string("notification/label.html",{'sender':username,'activity':activ,'conjunction':'-','object':obj,'site':site,'link':objurl})
         notification.create_notice_type(render, msg, "notification")
         notification.send([bx], render, {"from_user": request.user})
         return True
@@ -65,9 +64,9 @@ def notifyuser(request,group_name):
     bx=get_user(request.user)
     ret = set_notif_val(request,group_name,msg,activ,bx)
     colg = col_Group.Group.one({'name':group_name})
-    print "memberof",colg.member_of
-    colg.author_set.append(bx.id)
-    colg.save()
+    if not ((bx.id in colg.author_set) or (bx.id==colg.created_by)):
+        colg.author_set.append(bx.id)
+        colg.save()
     if ret :
         return HttpResponse("success")
     else:
