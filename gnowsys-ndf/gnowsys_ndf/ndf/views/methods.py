@@ -153,15 +153,28 @@ def get_node_common_fields(request, node, group_name, node_type):
   if not node.has_key('_id'):
     
     node.created_by = usrid
-    #Adding the page for moderation
+    #Adding Moderated Group info in group_set field
     col_Group = db[Group.collection_name]
     grname = re.split(r'[/=]', request.path)
-    colg = col_Group.Group.one({'_type':u'Group','name':grname[1]+"Mod"})
-    print "above block executed"
-    if grname[1] in colg.group_set:
-       print "if block executed"
-       node.group_set.append(unicode(grname[1]+"Mod"))
+    # take the group_name from url
+    colg = col_Group.Group.one({'_type':u'Group','name':grname[1]})
     
+   
+    if colg is not  None:
+       #first check the post node id and take the id
+       Post_nodeid=colg.post_node
+       #once you have the id check search for the sub node
+       sub_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
+       if sub_colg is not None:
+          sub_group_name=sub_colg.name
+          #append the name in the page group_Set
+          node.group_set.append(sub_group_name)
+          node.group_set.append(unicode(request.user))    
+          print "elseif"
+    else:
+       if group_name not in node.group_set:
+          node.group_set.append(group_name)
+
     node.member_of.append(node_type._id)
   
     if access_policy == "PUBLIC":
@@ -190,8 +203,8 @@ def get_node_common_fields(request, node, group_name, node_type):
     node.modified_by.remove(usrid)
     node.modified_by.insert(0,usrid)
 
-  if group_name not in node.group_set:
-    node.group_set.append(group_name)
+  #if group_name not in node.group_set:
+  #  node.group_set.append(group_name)
 
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 

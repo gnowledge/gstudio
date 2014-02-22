@@ -75,6 +75,8 @@ def create_group(request,group_name):
         colg.encryption_policy = request.POST.get('encryption', "")
         print "sub Pol",colg.subscription_policy        
         colg.save()
+        #colg = col_Group.Group.one({"_type":"Group","name":cname})
+        
         #A Private Sub-Document For Moderations 
         if colg.edit_policy == "EDITABLE_MODERATED":
     
@@ -82,8 +84,11 @@ def create_group(request,group_name):
             Mod_colg.name=cname + "Mod"     
             Mod_colg.group_type = "PRIVATE"
             Mod_colg.created_by=usrid
-            Mod_colg.group_set.append(cname)
+            Mod_colg.prior_node.append(colg._id)
             Mod_colg.save() 
+            colg.post_node.append(Mod_colg._id)
+            colg.save()
+            
   
             
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user},context_instance=RequestContext(request))

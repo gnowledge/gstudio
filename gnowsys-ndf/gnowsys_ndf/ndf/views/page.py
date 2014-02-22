@@ -255,3 +255,10 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         print "\n Please pass a valid rcs-version-file!!!\n"
         #TODO: Throw an error indicating the above message!
         return ""
+       
+       
+
+    
+    
+
+
