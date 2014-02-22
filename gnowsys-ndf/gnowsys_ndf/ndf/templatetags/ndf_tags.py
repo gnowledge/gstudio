@@ -7,6 +7,7 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 import re
+import datetime
 from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, render
 from gnowsys_ndf.ndf.views.methods import get_drawers
@@ -418,10 +419,9 @@ def set_page_moderation(grname,page_name):
 def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
-
 @register.inclusion_tag('ndf/admin_fields.html')
 def get_input_fields(fields_value,type_value):
   """Get html tags 
   """
   
-  return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value}
+  return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value,"datetime":datetime.datetime.now().ctime()}
