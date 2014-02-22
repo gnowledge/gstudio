@@ -229,12 +229,18 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     {% if node.collection_set and user.is_authenticated%}
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
-
+    {% get_group request.path as groupname %}
+    
+    {% if  user.id in groupname.author_set or groupname.created_by == user.id or user.is_authenticated %}
 
     <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
     <ul id="edit-options" class="f-dropdown">
       <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
     </ul>
+    {% else %}
+    
+    {% endif %}
+    
 
   </div>
 

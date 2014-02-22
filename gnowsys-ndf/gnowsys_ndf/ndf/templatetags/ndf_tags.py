@@ -213,7 +213,18 @@ def get_existing_groups_excluded(grname):
   if not group:
     return "None"
   return group
-
+  
+@register.assignment_tag
+def get_group(group_name):
+  col_Group = db[Group.collection_name]
+  grname = re.split(r'[/=]', group_name)
+  
+  colg=col_Group.Group.one({'_type': 'Group','name':grname[1]})
+  if colg is not None:
+     return colg
+  else:
+     return "None"   
+     
 @register.assignment_tag
 def get_group_policy(group_name,user):
   try:
