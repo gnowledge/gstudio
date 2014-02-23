@@ -84,18 +84,34 @@ def select_drawer(request, group_name):
                                       context_instance=RequestContext(request)
             )
           
-        else:
+        else:          
             
-            drawer = get_drawers(group_name, node_id, [], checked)   
-       
+          # For creating a resource collection   
+          if node_id is None:                             
+            drawer = get_drawers(group_name, node_id, [], checked)  
+
             return render_to_response("ndf/drawer_widget.html", 
-                                      {"widget_for": "collection", 
-                                       "drawer1": drawer, 
-                                       "group_name": group_name
-                                      }, 
-                                      context_instance=RequestContext(request)
+                                       {"widget_for": "collection", 
+                                        "drawer1": drawer, 
+                                        "group_name": group_name
+                                       }, 
+                                       context_instance=RequestContext(request)
             )
 
+          # For editing a resource collection   
+          else:
+
+            drawer = get_drawers(group_name, node_id, [], checked)  
+       
+            return render_to_response("ndf/drawer_widget.html", 
+                                       {"widget_for": "collection", 
+                                        "drawer1": drawer['1'], 
+                                        "group_name": group_name
+                                       }, 
+                                       context_instance=RequestContext(request)
+            )
+
+            
 
 
 @login_required
