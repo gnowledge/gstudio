@@ -230,8 +230,8 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
     {% get_group request.path as groupname %}
-    
-    {% if  user.id in groupname.author_set or groupname.created_by == user.id or user.is_authenticated %}
+    <!--  Code for not showing the button to non subscribed users -->
+    {% if  user.id in groupname.author_set or groupname.created_by == user.id or groupname.name == "home" %}
 
     <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
     <ul id="edit-options" class="f-dropdown">

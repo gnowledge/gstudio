@@ -12,9 +12,9 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-
+from gnowsys_ndf.ndf.templatetags.ndf_tags import set_page_moderation
 from django_mongokit import get_database
-
+import re
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -251,7 +251,19 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
        
        
 
-    
-    
 
+def publish_page(request,group_name,node_name):
+
+ set_page_moderation(group_name,node_name)
+ if node_name:
+        page_node = collection.Node.one({'_type': u'GSystem', 'name':node_name})
+ else:
+        page_node = collection.GSystem()
+        
+ return render_to_response('ndf/page_list.html', 
+                                  { 'node': page_node,
+                                    'group_name': group_name
+                                  },
+                                  context_instance = RequestContext(request)
+        )      
 

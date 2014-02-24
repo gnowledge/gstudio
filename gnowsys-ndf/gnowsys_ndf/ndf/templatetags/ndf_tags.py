@@ -378,8 +378,9 @@ def get_Object_count(key):
 @register.assignment_tag
 def get_prior_node(path):
   grname = re.split(r'[/=]', path)
+  print "got group name",grname
   col_Group = db[Group.collection_name]
-  prior_node=col_Group.Group.one({'_type': 'Group',"name":grname[1]})
+  prior_node=col_Group.Group.one({'_type': 'Group',"name":{'$in':grname}})
          
   if prior_node is not  None:
        print "first"
@@ -412,7 +413,7 @@ def set_page_moderation(grname,page_name):
  page_info.save()   
     
  
- print "something"
+ 
   
 @register.filter
 def get_dict_item(dictionary, key):

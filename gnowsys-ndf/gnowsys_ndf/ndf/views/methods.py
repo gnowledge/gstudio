@@ -177,8 +177,10 @@ def get_node_common_fields(request, node, group_name, node_type):
           node.group_set.append(group_name)
 
     node.member_of.append(node_type._id)
-    if group_name not in node.group_set:
-      node.group_set.append(group_name)    
+    #commeting this part because this could would clash with the funcationality of puting page in medration
+    #if group_name not in node.group_set:
+      #node.group_set.append(group_name)    
+      
   
     if access_policy == "PUBLIC":
       node.access_policy = unicode(access_policy)      
@@ -209,7 +211,8 @@ def get_node_common_fields(request, node, group_name, node_type):
 
   # For displaying nodes in home group as well as in creator group.
   if group_name not in node.group_set: 
-    node.group_set.append(group_name)  
+    #node.group_set.append(group_name)  
+    print "did something"
   elif usrname not in node.group_set:   
     node.group_set.append(usrname)  
 

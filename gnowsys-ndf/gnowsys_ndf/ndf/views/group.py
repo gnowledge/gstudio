@@ -12,7 +12,7 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from django.contrib.auth.models import User
-
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_prior_node
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -124,4 +124,23 @@ def edit_group(request,group_name,group_id):
                                         },
                                       context_instance=RequestContext(request)
                                       )
+                                      
+
+def publish_page(group_name):
+
+ base_group_name=get_prior_node(group_name)   
+ Mod_group_name=re.split(r'[/=]', group_name)
+ col_Group = db[Group.collection_name]
+ page_info=col_Group.Group.one({'_type': 'GSystem',"name":page_name})   
+ try: 
+  page_info.group_set=[]
+ except:
+    print "work done"
+ page_info.group_set.append(unicode(base_group_name))
+ page_info.save()   
+     
+ print "something"
+
+
+                                      
 
