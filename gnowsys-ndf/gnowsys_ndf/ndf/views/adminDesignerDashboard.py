@@ -1,6 +1,6 @@
 ''' -- imports from installed packages -- '''
 
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.contrib.auth.models import User
@@ -56,30 +56,6 @@ def adminDesignerDashboardClassCreate(request,class_name):
     contentlist = []
     dependencylist = []
     options = []
-    class_structure = eval(class_name).structure
-    # if class_name == 'GSystemType':
-    #     class_structure = collection.GSystemType.structure
-    # if class_name == 'RelationType':
-    #     class_structure = collection.RelationType.structure
-    # if class_name == 'AttributeType':
-    #     class_structure = collection.AttributeType.structure
-
-    newdict = {}
-    for key,value in class_structure.items():
-        if value == bool:
-            newdict[key] = "bool"
-        elif value == unicode:
-            newdict[key] = "unicode"
-        elif value == list:
-            newdict[key] = "list"
-        elif type(value) == list:
-            newdict[key] = "list"
-        elif value == datetime.datetime:
-            newdict[key] = "datetime"
-        else: 
-            newdict[key] = value
-    #        print value, key
-    class_structure = newdict    
     if class_name == "AttributeType":
         definitionlist = ['name','altnames','subject_type','applicable_node_type','data_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content','content_org']
@@ -101,7 +77,65 @@ def adminDesignerDashboardClassCreate(request,class_name):
         dependencylist = []
         options = []
 
+    class_structure = eval(class_name).structure
+    required_fields = eval(class_name).required_fields
+    newdict = {}
+    new_instance_type = eval("collection"+"."+class_name)()
+#    new_instance_type = collection.Node
+    print new_instance_type
+    if request.method=="POST":
+        for key,value in class_structure.items():
+            if value == bool:
+                print key , "bool"
+                if request.POST.get(key,""):
+                    if request.POST.get(key,"") in (1,2):
+                        if request.POST.get(key,"") == 1:
+                            new_instance_type[key] = True
+                        else :
+                            new_instance_type[key] = False  
+                            
+                    print request.POST.get(key,"")
+              #  newdict[key] = "bool"
+            elif value == unicode:
+                print key , unicode
+                if request.POST.get(key,""):
+                    new_instance_type[key] = unicode(request.POST.get(key,"")) 
+            elif value == list:
+                print key,"list"
+                if request.POST.get(key,""):
+                    new_instance_type[key] = list(request.POST.get(key,""))
+            elif type(value) == list:
+                if request.POST.get(key,""):
+                    new_instance_type[key] = list(request.POST.get(key,""))
+            elif value == datetime.datetime:
+                pass
+            elif key == "status":
+                if request.POST.get(key,""):
+                    new_instance_type[key] = unicode(request.POST.get(key,""))
+            else: 
+                if request.POST.get(key,""):
+                    new_instance_type[key] = request.POST.get(key,"")
+        new_instance_type.save()
+        return HttpResponseRedirect("/admin/designer/"+class_name)
+    for key,value in class_structure.items():
+        if value == bool:
+            newdict[key] = "bool"
+        elif value == unicode:
+            newdict[key] = "unicode"
+        elif value == list:
+            newdict[key] = "list"
+        elif type(value) == list:
+            newdict[key] = "list"
+        elif value == datetime.datetime:
+            newdict[key] = "datetime"
+        elif key == "status":
+            newdict[key] = "status"
+        else: 
+            newdict[key] = value
+    #        print value, key
+    class_structure = newdict    
+ 
     template = "ndf/adminDashboardCreate.html"
-    variable = RequestContext(request, {'class_name':class_name,"url":"designer","class_structure":class_structure,'definitionlist':definitionlist,'contentlist':contentlist,'dependencylist':dependencylist,'options':options})
+    variable = RequestContext(request, {'class_name':class_name,"url":"designer","class_structure":class_structure,'definitionlist':definitionlist,'contentlist':contentlist,'dependencylist':dependencylist,'options':options,"required_fields":required_fields})
     return render_to_response(template, variable)
 
