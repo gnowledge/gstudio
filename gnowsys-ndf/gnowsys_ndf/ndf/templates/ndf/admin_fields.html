@@ -4,14 +4,19 @@
       <font size="3"> <input type="textbox" name="{{type_value}}"></font>
     </div>
     {% elif fields_value == "bool" %}
-    <select id="id_auto_now_add" name="{{type_value}}" style="width:30%">
-      <option selected="selected" value="1">Unknown</option>
-      <option value="2">Yes</option>
-      <option value="3">No</option>
+    <select id="id_auto_now_add" name="{{type_value}}" style="width:50%">
+      <option selected="selected" value="0">Unknown</option>
+      <option value="1">Yes</option>
+      <option value="2">No</option>
     </select>
     {% elif fields_value == "datetime" %}
-    <label name="{{type_value}}">{{datetime}}
-    
+    <label>{% now "jS F Y H:i" %}</label>
+    {% elif fields_value == "status" %}
+      <select id="id_auto_now_add" name="{{type_value}}" style="width:60%">
+	<option selected="selected" value="PUBLISHED">PUBLISHED</option>
+	<option value="DRAFT">DRAFT</option>
+	<option value="HIDDEN">HIDDEN</option>
+      </select>
     {% else %}
     <div style="display:table-cell;">
       <font size="3"> {{ fields_value }}</font>

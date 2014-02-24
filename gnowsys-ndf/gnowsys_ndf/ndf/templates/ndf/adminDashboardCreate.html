@@ -9,11 +9,13 @@
      {% endifequal %}
 {% endblock %}
 {% block body_content %} 
+<form method="post" action="." name="{{class_name}}">
+{% csrf_token %}
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
 <dl class="accordion" data-accordion>
   <dd>
     <a href="#definitionlist">Definition</a>
-  <div id="definitionlist" class="active">
+  <div id="definitionlist" class="content active">
 
   {% for list in definitionlist %}
   <div style="display:table-row;">
@@ -74,8 +76,12 @@
 </dl>
 
 </div>
+<input type="submit" name="submit" class="button">
+</form>
 {% endblock %}
 
 {% block script %}
-
+{% autoescape off %}
+var required_fields = {{ required_fields }}
+{% endautoescape %}
 {% endblock %}	
