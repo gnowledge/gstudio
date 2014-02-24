@@ -165,7 +165,7 @@ def add_node(request,group_name):
             msg=activity+"-"+nodename+" in the group '"+group_name+"'\n"+"Please visit "+link+" to see the updated page"
             ret = set_notif_val(request,group_name,msg,activity,bx)
         bx=User.objects.get(id=colg.created_by)
-        msg=activity+"-"+nodename+prefix+" in the group '"+group_name+"' created by you"+"\n"+"Please visit "+link+" to see the updated page" 
+        msg=activity+"-"+nodename+prefix+" in the group '"+group_name+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"     
         ret = set_notif_val(request,group_name,msg,activity,bx)
         if node == "Reply":
             # if exstng_reply:
