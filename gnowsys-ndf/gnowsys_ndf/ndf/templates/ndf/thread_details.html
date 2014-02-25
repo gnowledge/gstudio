@@ -29,6 +29,15 @@ border-radius: 5px;
 	  {% with thread.content|safe as thread_content %}
 	  <font size ="2" >{{thread_content}} </font>
 	  {% endwith %}
+
+	  {% get_user_object thread.created_by as user_obj %}
+	      <small>
+		by:<a class="user" href="#" data-gnow="#337700">{{user_obj.username}}</a>
+	      </small>
+      <small>
+      on:<strong>{{thread.created_at}}</strong>
+    </small>
+
 	</div>
        <div id="smalldiv" class="large-6 columns">
 	 {% if user.is_authenticated %}
@@ -43,7 +52,7 @@ border-radius: 5px;
 
 <div class="response_change" id="refreshthread" class="large-12 columns">
   <div style="margin-left:40px;margin-bottom:1px">  
-    {% get_reply thread thread 15 csrf_token request.user %}
+    {% get_reply thread thread forum csrf_token request.user %}
   </div>
 </div>
 </div>

@@ -1,6 +1,7 @@
 
 
 {% load ndf_tags %}
+
 <script src="/static/ndf/js/jquery-ui.js"></script>
 <link href="/static/ndf/css/jquery-ui.css" rel="stylesheet">
 
@@ -18,6 +19,7 @@ function handle(){
 
 function UserInvitation()
 {
+
 $.extend(items,{% get_all_users_to_invite %});
 i=0;
 for (var key in items)
@@ -25,13 +27,13 @@ for (var key in items)
 user_list[i]=key;
 i=i+1;
 }
+
 $( "#userInvite" ).autocomplete({
    source: user_list
 });
 $(".invitation").show();
 
 }
-
 
 
 $(document).on('click',".removeList",function() {

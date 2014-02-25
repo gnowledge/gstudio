@@ -8,17 +8,17 @@
 	<script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>		
 	<style type="text/css">
 
-		.link {
+		#chart .link {
 			stroke: #ccc;
 		}
 
-		.nodetext {
+		#chart .nodetext {
 			#pointer-events: none;
 			font: 10px Serif;
 			font-style:italic;
 		}
 
-		.mainnode{
+		#chart .mainnode{
 
 			font: 15px sans-serif;
 			/*fill:"black";*/
@@ -27,13 +27,13 @@
 			border-color: gray;
 		}
 
-		.relnode {
+		#chart .relnode {
 			font: 10px sans-serif;			
 			fill:#404040;
 		}
 
 
-		.node {
+		#chart .node {
 			border-width: 1px;
 			border-color: gray;
 			fill:#25587E;
@@ -73,9 +73,10 @@
 	
 	var loc = ($('#chart').attr("data-loc")).split("/")[3];
 
-	if( loc != "details") { $("#graphArea").hide();	}
-
 	var jsonData = $.parseJSON($("#chart").attr("data-graph"));
+
+	// graphArea = $("#view-graph").height();
+	// alert(graphArea);
 
 	function init(a,b)
 	{
@@ -125,7 +126,6 @@
 				.attr("height", h);       
 				vis.append("svg:g").attr("class", "edges");        
 				vis.append("svg:g").attr("class", "nodes");
-
 
 
 				nodes_by_id[key].x = w/2.0;
@@ -192,14 +192,12 @@
                 .attr("marker-end", "url(#arrowhead)");
 
 
-
-
                 var node = d3.select("#chart g.nodes").selectAll("g.node").data(nodes);
 
 
-
                 var new_g = node.enter().append("svg:a")
-                .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })   	      
+                .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })
+                // .attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
 
                 .call(force.drag);
 
@@ -245,9 +243,8 @@
                 // .style("stroke", "#000")
                 // .style("stroke-width","1px"  );
 
-                new_g.filter(function(d) { if(d.refType=="Gbobject") return (d._id)>0 ;}).append("svg:ellipse")
+                new_g.filter(function(d) { if(d.refType=="GSystem") return (d._id)>0 ;}).append("svg:ellipse")
                 .attr("cx", 25)                
-                // .attr("cx", function(d){ return JSON.stringify(d.x / 4);})
                 .attr("cy", 20)
                 .call(force.drag)
                 .attr("rx",function(d) {var ttx=d.screen_name; return(ttx.length/3 +"em"
@@ -256,7 +253,7 @@
                 .style("fill-opacity", ".2")
                 // .style("stroke", "#666")
                 // .style("stroke-width", "1.5px")
-                .style("fill", function(d) {if (d.refType=="Objecttype") return "blue"; else if(d.refType=="Gbobject") return "#0000ff"; else return "none"});
+                .style("fill", function(d) {if (d.refType=="Objecttype") return "blue"; else if(d.refType=="GSystem") return "#0000ff"; else return "none"});
 
                 node.exit().remove();							
 
@@ -281,7 +278,7 @@
             .duration(1000)
             .style("opacity", 1);
         }
-        });
+    });
     
 
 </script>

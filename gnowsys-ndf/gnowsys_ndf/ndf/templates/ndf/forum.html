@@ -4,7 +4,12 @@
 
 {% block meta_content %}
 
-<h3>About</h3>
+<h2>Forums</h2>
+
+{% endblock %}
+
+{% block help_content %}
+
 <p>The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others.</p>
 
 {% endblock %}
@@ -12,7 +17,6 @@
 {% block body_content %}
 
 <header class="row">
-	<h2 class="medium-12 columns">Forums</h2>
 
 	<div class="medium-12 columns">
 		{% if user.is_authenticated %}

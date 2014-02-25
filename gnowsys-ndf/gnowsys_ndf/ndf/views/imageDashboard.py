@@ -82,6 +82,7 @@ def image_detail(request, group_id, _id):
                                   },
                                   context_instance = RequestContext(request)
         )
+
 def image_edit(request,group_id,_id):
     img_node = collection.File.one({"_id": ObjectId(_id)})
     if request.method == "POST":

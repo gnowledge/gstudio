@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from django.http import Http404
 register = Library()
 db = get_database()
+collection = db['Nodes']
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -23,15 +24,15 @@ def get_all_users_to_invite():
     inv_users={}
     users=User.objects.all()
     for each in users:
-      inv_users[each.username.__str__()+"<"+each.email.__str__()+">"]=each.id
-    return inv_users
+      inv_users[each.username.__str__()]=each.id.__str__()
+    return str(inv_users)
   except Exception as e:
     print str(e)
  
 
 @register.inclusion_tag('ndf/twist_replies.html')
-def get_reply(thread,parent,ind,token,user):
-  return {'thread':thread,'reply': parent,'user':user,'indent':ind+10,'csrf_token':token,'eachrep':parent}
+def get_reply(thread,parent,forum,token,user):
+  return {'thread':thread,'reply': parent,'user':user,'forum':forum,'csrf_token':token,'eachrep':parent}
 
 @register.assignment_tag
 def get_all_replies(parent):
@@ -56,12 +57,13 @@ def edit_drawer_widget(field, group_id, node, checked=None):
         checked = "QuizItem"
       else:
         checked = None
-
       drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-
     elif field == "prior_node":
       checked = None
       drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+    elif field == "module":
+      checked = "Module"
+      drawers = get_drawers(group_id, node._id, node.collection_set, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
@@ -69,6 +71,10 @@ def edit_drawer_widget(field, group_id, node, checked=None):
   else:
     if field == "collection" and checked == "Quiz":
       checked = "QuizItem"
+      
+    elif field == "module":
+      checked = "Module"
+      
     else:
       # To make the collection work as Heterogenous one, by default
       checked = None
@@ -86,10 +92,12 @@ def get_gapps_menubar(group_id, selectedGapp):
   gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
   gapps = {}
   i = 0;
-  for app in gst_cur:
-    if app.name not in ["Image", "Video"]:
-      i = i+1;
-      gapps[i] = {'id': app._id, 'name': app.name.lower()}
+  for app in GAPPS:
+    node = collection.Node.one({'_type': 'GSystemType', 'name': app})
+    if node:
+      if node.name not in ["Image", "Video"]:
+        i = i+1;
+        gapps[i] = {'id': node._id, 'name': node.name.lower()}
 
   selectedGapp = selectedGapp.split("/")[2]
   return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'newgroup':group_id}
@@ -165,6 +173,7 @@ def check_group(group_id):
 def get_group_name(groupurl):
   col_Group = db[Group.collection_name]
   sp=groupurl.split("/",2)
+
   if len(sp)<=1:
     grp = "home"
   if sp[1]:
@@ -180,6 +189,7 @@ def get_group_name(groupurl):
   else:
     grpobj=col_Group.Group.one({'_id':ObjectId(grp)})
   return grpobj
+
 
 @register.assignment_tag
 def get_existing_groups():
@@ -198,7 +208,7 @@ def get_existing_groups():
 def get_existing_groups_excluded(grname):
   group = []
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.find({'_type':u'Group','group_type':"PUBLIC"})
+  colg = col_Group.Group.find({'_type':u'Group', 'group_type': "PUBLIC"})  
   colg.sort('name')
   gr=list(colg)
   for items in gr:
@@ -223,16 +233,32 @@ def get_group_policy(group_id,user):
 @register.assignment_tag
 def get_user_group(user):
 
-  group = []
+  group = [] 
+  author = None
+
   col_Group = db[Group.collection_name]
+  collection = db[Node.collection_name]
+  auth_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})._id 
 
   colg = col_Group.Group.find({ '_type': u'Group', 
                                 'name': {'$nin': ['home']},
-                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}] 
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
                               })
-  for items in colg:
 
-      group.append(items)
+  auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+  
+  for items in colg:
+    if items.name == auth.name:
+      #group.append(items)                                                                                                                   
+      author = items
+
+    else:
+      if items.group_type == "PUBLIC":
+        group.append(items)
+
+  if author:
+    group.append(author)
+
   if not group:
     return "None"
   return group
@@ -264,9 +290,7 @@ def get_group_type(group_id,user):
 			raise Http404
   else:
 	
-	return "pass"
-		
-			
+	return "pass"		
 	
   
 
@@ -297,4 +321,19 @@ def get_grid_fs_object(f):
   except Exception as e:
     print "Object does not exist", e
   return grid_fs_obj
+
+@register.inclusion_tag('ndf/admin_class.html')
+def get_class_list(class_name):
+  """Get list of class 
+  """
+  class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType"]
+  return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name}
+
+@register.assignment_tag
+def get_Object_count(key):
+    try:
+        return collection.Node.find({'_type':key}).count()
+    except:
+        return 'null'
   
+

@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
+from django.contrib.auth.models import User
 
 try:
     from bson import ObjectId
@@ -54,6 +55,7 @@ def group(request, group_id,app_id):
     
 
 
+
 def create_group(request,group_id):
     if request.method == "POST":
         col_Group = db[Group.collection_name]
@@ -64,13 +66,13 @@ def create_group(request,group_id):
         colg.member_of.append(gst_group._id)
         usrid = int(request.user.id)
         colg.created_by=usrid
-        colg.group_type = request.POST.get('group_type', "")
+        colg.group_type = request.POST.get('group_type', "")        
         colg.edit_policy = request.POST.get('edit_policy', "")
         colg.subscription_policy = request.POST.get('subscription', "")
         colg.visibility_policy = request.POST.get('existance', "")
         colg.disclosure_policy = request.POST.get('member', "")
         colg.encryption_policy = request.POST.get('encryption', "")
-        print "sub Pol",colg.subscription_policy
+        print "sub Pol",colg.subscription_policy        
         colg.save()
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'newgroup':group_id},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", RequestContext(request))
@@ -88,7 +90,6 @@ def create_group(request,group_id):
 
 def group_dashboard(request,group_id=None):
     try:
-        print "insidegrpdash",group_id
         if group_id == None:
             print "home"
             groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -96,17 +97,18 @@ def group_dashboard(request,group_id=None):
             print "other grps"    
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
     except Exception as e:
-        groupobj=""
         pass
-    print "grpdash-",groupobj
     return render_to_response("ndf/groupdashboard.html",{'newgroup':groupobj,'curgroup':groupobj,'user':request.user},context_instance=RequestContext(request))
 
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
-    
     if request.method == "POST":
-            get_node_common_fields(request, page_node, group_id, gst_group)
+            get_node_common_fields(request, page_node, group_name, gst_group)
+            if page_node.access_policy == "PUBLIC":
+                page_node.group_type = "PUBLIC"
+            if page_node.access_policy == "PRIVATE":
+                page_node.group_type = "PRIVATE"
             page_node.save()
             group_name=page_node.name
             return HttpResponseRedirect(reverse('groupchange', kwargs={'newgroup':group_id}))

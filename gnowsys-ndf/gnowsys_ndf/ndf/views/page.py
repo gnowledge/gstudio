@@ -70,7 +70,11 @@ def page(request, group_id, app_id=None):
 
     elif gst_page._id == ObjectId(app_id):
         title = gst_page.name
-        page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [group_id]}})
+        # collection.Node.reload()
+        page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
+                                           'group_set': {'$all': [group_name]}, 
+                                           'status': {'$nin': ['HIDDEN']}
+                                       })
         page_nodes.sort('last_update', -1)
         page_nodes_count = page_nodes.count()
 
@@ -86,8 +90,11 @@ def page(request, group_id, app_id=None):
 
         # ------ Some work for graph ------
         # graphData = neighbourhood_nodes(page_node)
-        graphData = graph_nodes(page_node)
-        
+        if "details" in (request.path): 
+          graphData = graph_nodes(page_node, group_name)
+        else:
+          graphData = ''
+
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
@@ -128,6 +135,19 @@ def create_edit_page(request, group_id, node_id=None):
                                   context_variables,
                                   context_instance=RequestContext(request)
                               )
+
+@login_required    
+def delete_page(request, group_name, node_id):
+    """Change the status to Hidden.
+    
+    Just hide the page from users!
+    """
+
+    print "\n node: ", type(node_id), "\n"
+    op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    print " op: ", op, "\n"
+    
+    return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
 
 
 def version_node(request, group_id, node_id, version_no):

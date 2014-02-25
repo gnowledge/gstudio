@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block help_content %}
+
 <p>Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.</p>
 
 <h5>Who can make a page?</h5>
@@ -15,28 +16,24 @@
 
 {% endblock %}
 
+{% block meta_content %}
+<h2>Pages</h2>
+{% endblock %}
 
 {% block body_content %} 
 
 <header class="row">
-  <h2 class="medium-12 columns">Pages
 
-  </h2>
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages ({{ page_nodes_count }})</a></dd>
+    <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
+  </dl>
 
-  <nav class="medium-12 columns">
-
-    <dl class="tabs" data-tab>
-      <dd><h3>View:</h3></dd>
-      <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages ({{ page_nodes_count }})</a></dd>
-      <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
-    </dl>
-
-  </nav>
 </header>
 
-<ul class="pricing-table">
 
-  {% if searching and page_nodes_count > 0 %}
+{% if searching and page_nodes_count > 0 %}
+<ul class="pricing-table">
   <li class="bullet-item text-left">
     <div class="row">
       <div class="small-12 columns end">
@@ -53,10 +50,9 @@
    </div>  
  </div>  
 </li>
-
+</ul>
 {% endif %}
 
-</ul>
 
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -90,63 +86,111 @@
         Create {{title}}
       </a>
       {% endif %}
-    </li>
+    </div>
+  </li>
+
 
     <!-- Existing card list-->
     {% for node in page_nodes %}
+
+      {% if node.created_by == request.user.pk %}
     <li class="card">
-      <a class="page" href="{% url 'page_details' group_name node %}">
+      <div class="page">
 
-        <header>
-        
-<div class="label-list">
-          {% for tag in node.tags %}
-          <span class="label">{{tag}}</span>
-          {% endfor %}
+
+      <header>
+
+       <div class="label-list">
+        {% for tag in node.tags %}
+        <span class="label">{{tag}}</span>
+        {% endfor %}
+      </div>
+
+
+        <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+        <h4>{{ node.name }}
+          <div>
+            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            </small>
+          </div>
+        </h4>
+      </header>
+      
+      <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+      
+      <a class="small button expand" href="{% url 'page_details' group_name node %}">Page Details</a>
+      
+      {% if node.created_by == request.user.id %}
+      <a class="button alert tiny" href="{% url 'page_delete' group_name node %}">Delete</a>
+      {% endif %}
+      
+      <footer class="row">
+        <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
+        <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
+      </footer>
+
+    </div>
+  </li>  
+  
+{% else %}
+{% if node.access_policy == "PUBLIC" %}
+<li class="card">
+  <div class="page">
+
+    <header>
+
+      <div class="label-list">
+        {% for tag in node.tags %}
+        <span class="label">{{tag}}</span>
+        {% endfor %}
+      </div>
+
+      <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+
+      <h4>{{ node.name }}
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
         </div>
+      </h4>
 
-          <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-          <h4>{{ node.name }}
-            <div>
-              <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-              </small>
-            </div>
-          </h4>
-        </header>
+    </header>
 
-        <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
+    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
 
+    <a class="small button expand" href="{% url 'page_details' group_name node %}">Page Details</a>
 
+    {% if node.created_by == request.user.id %}
+    <a class="button alert tiny" href="{% url 'page_delete' group_name node %}">Delete</a>
+    {% endif %}
 
-        <div class="small button">View Page</div> 
+    <footer class="row">
+      <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
+      <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
+    </footer>
 
-        <footer class="row">
-         <div class="small-6 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
-         <div class="small-6 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
-       </footer>
+  </div>
+</li>
 
-     </a>
-   </li>
+{% endif %}
 
-   {% empty %}
+{% endif %}
 
-   {% if not searching %}
-   <li class="bullet-item text-left">
-    <div class="row">
-      <div class="small-12 columns">
-       <p>Currently <b>NO Pages</b>!!!</p>
-     </div>
+{% empty %}
+
+{% if not searching %}
+<li class="bullet-item text-left">
+
+  <div class="row">
+    <div class="small-12 columns">
+     <p>Currently <b>NO Pages</b>!!!</p>
    </div>
- </li>
- {% endif %}
+ </div>
+</li>
+{% endif %}
 
- {% endfor %}
+{% endfor %}
 </ul>
-
-
-
-
-
 
 {% endblock %}
 

@@ -88,7 +88,9 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Forum":
         gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [group_id]}})
-
+      elif checked == "Module":
+        gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [group_name]}})
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_id]}})   
            
@@ -132,32 +134,39 @@ def get_node_common_fields(request, node, group_id, node_type):
   
   gcollection = db[Node.collection_name]
 
-  collection = None
-  private = None
+  collection = None  
 
   name = request.POST.get('name')
   usrid = int(request.user.id)
-  private = request.POST.get("private_cb", '')
-  tags = request.POST.get('tags')
-  prior_node_list = request.POST['prior_node_list']
-  collection_list = request.POST['collection_list']
-  content_org = request.POST.get('content_org')
+  access_policy = request.POST.get("login-mode", '') 
 
+  tags = request.POST.get('tags')
+  prior_node_list = request.POST.get('prior_node_list','')
+  collection_list = request.POST.get('collection_list','')
+  module_list = request.POST.get('module_list','')
+  content_org = request.POST.get('content_org')
+  print module_list,"test"
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
     node.created_by = usrid
     node.member_of.append(node_type._id)
   
-    if private:
-      private = True
+    if access_policy == "PUBLIC":
+      node.access_policy = unicode(access_policy)      
     else:
-      private = False
-
+      node.access_policy = unicode(access_policy)    
+          
     # End of if
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+
+  if access_policy == "PUBLIC":
+      node.access_policy = u"PUBLIC"      
+  else:
+      node.access_policy = u"PRIVATE"  
+  
 
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
@@ -201,7 +210,23 @@ def get_node_common_fields(request, node, group_id, node_type):
       node.collection_set.append(node_id)
     
     i = i+1  
-      
+ 
+  # -------------------------------------------------------------------------------- Module
+
+  node.collection_set = []
+  if module_list != '':
+      collection_list = module_list.split(",")
+
+  i = 0                    
+  while (i < len(collection_list)):
+    node_id = ObjectId(collection_list[i])
+    
+    if gcollection.Node.one({"_id": node_id}):
+      node.collection_set.append(node_id)
+    
+    i = i+1  
+ 
+    
   # ------------------------------------------------------------------------------- org-content
   if content_org:
     node.content_org = unicode(content_org)
@@ -210,6 +235,7 @@ def get_node_common_fields(request, node, group_id, node_type):
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
+
 
   
 
@@ -271,26 +297,59 @@ def neighbourhood_nodes(page_node):
 
 
 # ------ Some work for node graph - (II) ------
-def graph_nodes(page_node):
+def graph_nodes(page_node, group_name):
   
   collection = db[Node.collection_name]
         
   def _get_node_info(node_id):
     node = collection.Node.one( {'$or':[{'_type':'GSystem'},{'_type':'File'}], '_id':node_id}  )
+
+    mime_type = "true"  if node.structure.has_key('mime_type') else 'false'
+
     return node.name
 
-  def _get_username(id_int):
-    return User.objects.get(id=id_int).username
+  # def _get_username(id_int):
+    # return User.objects.get(id=id_int).username
+
+  # def _get_node_url(node_id):
+
+  #   node_url = '/' + group_name
+  #   node = collection.Node.one({'_id':node_id})
+
+  #   if len(node.member_of) > 1:
+  #     if node.mime_type == 'image/jpeg':
+  #       node_url += '/image/image_detail/' + str(node_id)
+  #     elif node.mime_type == 'video':
+  #       node_url += '/video/video_detail/' + str(node_id)
+
+  #   elif len(node.member_of) == 1:
+  #     gapp_name = (collection.Node.one({'_id':node.member_of[0]}).name).lower()
+
+  #     if gapp_name == 'forum':
+  #       node_url += '/forum/show/' + str(node_id)
+
+  #     elif gapp_name == 'file':
+  #       node_url += '/image/image_detail/' + str(node_id)
+
+  #     elif gapp_name == 'page':
+  #       node_url += '/page/details/' + str(node_id)
+
+  #     elif gapp_name == 'quiz' or 'quizitem':
+  #       node_url += '/quiz/details/' + str(node_id)
+      
+  #   return node_url
 
   page_node_id = str(id(page_node._id))
-  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"Gbobject"}, '
+  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"GSystem"}, '
   node_relations = ''
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set",
-                      "member_of", "status", "comment_enabled", "start_publication"
+                      "member_of", "status", "comment_enabled", "start_publication",
+                      "_type", "modified_by", "created_by", "last_update", "url", "featured",
+                      "created_at", "group_set", "type_of", "content_org", "author_set"
                     ]
 
-  username = User.objects.get(id=page_node.created_by).username
+  # username = User.objects.get(id=page_node.created_by).username
 
   i = 1
   for key, value in page_node.items():
@@ -298,34 +357,37 @@ def graph_nodes(page_node):
     if key in exception_items:
       pass
 
-    elif isinstance(value, list) and len(value):
+    elif isinstance(value, list):
 
-      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
-      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
-      key_id = str(i)
-      # i += 1
-      
-      if key in ("modified_by", "author_set"):
-        for each in value:
-          node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
-          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
-          i += 1
+      if len(value):
 
-      else:
+        node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
+        key_id = str(i)
+        # i += 1
+        
+        # if key in ("modified_by", "author_set"):
+        #   for each in value:
+        #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
+        #     node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
+        #     i += 1
+
+        # else:
         for each in value:
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)          
-            node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'_n"},'
-          
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+
+            # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "url":"'+ _get_node_url(each) +'", "refType":"relation"},'
+            node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'_n"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
     
     else:
-      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"},'
       node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
       key_id = str(i)      
 
@@ -334,19 +396,6 @@ def graph_nodes(page_node):
           node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(i) +'_n"},'
           node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
           i += 1 
-      
-      elif key == "created_by":
-        node_metadata += '{"screen_name":"' + _get_username(value) + '", "_id":"'+ str(i) +'_n"},'
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
-        i += 1
-
-      elif key == "content_org":
-        if len(str(value)) > 25:
-          node_metadata += '{"screen_name":"' + value[:25] + '...", "_id":"'+ str(i) +'_n"},'
-        else:
-          node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
-        i += 1 
       
       else:
         node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
