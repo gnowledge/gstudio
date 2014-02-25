@@ -153,8 +153,8 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, access
             if content_org:
                 fileobj.content_org = unicode(content_org)
                 # Required to link temporary files with the current user who is modifying this document
-                filename = slugify(title) + "-" + usrname + "-"
-                fileobj.content = org2html(content_org, file_prefix=filename)
+                filename_content = slugify(title) + "-" + usrname + "-"
+                fileobj.content = org2html(content_org, file_prefix = filename_content)
             fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
             
             # For giving privacy to file objects
