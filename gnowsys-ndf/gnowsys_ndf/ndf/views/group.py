@@ -12,7 +12,7 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from django.contrib.auth.models import User
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_prior_node
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
