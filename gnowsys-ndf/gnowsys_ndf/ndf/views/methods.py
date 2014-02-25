@@ -9,6 +9,7 @@ from django.template.defaultfilters import slugify
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
+
 import re
 ######################################################################################################################################
 
@@ -151,33 +152,37 @@ def get_node_common_fields(request, node, group_name, node_type):
   content_org = request.POST.get('content_org')
   print module_list,"test"
   # --------------------------------------------------------------------------- For create only
+  
+ 
   if not node.has_key('_id'):
     
+    grname = re.split(r'[/=]', request.path)
     node.created_by = usrid
     #Adding Moderated Group info in group_set field
     col_Group = db[Group.collection_name]
-    grname = re.split(r'[/=]', request.path)
+    
     # take the group_name from url
     colg = col_Group.Group.one({'_type':u'Group','name':grname[1]})
     
-   
+    
     if colg is not  None:
        #first check the post node id and take the id
        Post_nodeid=colg.post_node
        #once you have the id check search for the sub node
        sub_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
        if sub_colg is not None:
+          
           sub_group_name=sub_colg.name
           #append the name in the page group_Set
           node.group_set.append(sub_group_name)
-          node.group_set.append(unicode(request.user))    
-          print "elseif"
+          node.group_set.append(unicode(request.user)) 
     else:
+       
        if group_name not in node.group_set:
           node.group_set.append(group_name)
 
     node.member_of.append(node_type._id)
-    #commeting this part because this could would clash with the funcationality of puting page in medration
+    #commeting this part because this could would clash with the funcationality of puting page in moderation
     #if group_name not in node.group_set:
       #node.group_set.append(group_name)    
       
@@ -191,7 +196,6 @@ def get_node_common_fields(request, node, group_name, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
-
   if access_policy:
     # Policy will be changed only by the creator of the resource 
     # via access_policy(public/private) option on the template which is visible only to the creator
@@ -199,7 +203,7 @@ def get_node_common_fields(request, node, group_name, node_type):
       node.access_policy = u"PUBLIC"      
     else:
       node.access_policy = u"PRIVATE"  
-  
+ 
 
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
@@ -210,13 +214,16 @@ def get_node_common_fields(request, node, group_name, node_type):
     node.modified_by.insert(0,usrid)
 
   # For displaying nodes in home group as well as in creator group.
-  if group_name not in node.group_set: 
-    #node.group_set.append(group_name)  
-    print "did something"
-  elif usrname not in node.group_set:   
-    node.group_set.append(usrname)  
+  
+#  if group_name not in node.group_set: 
+ #   node.group_set.append(group_name)  
+ # elif usrname not in node.group_set:   
+ #   node.group_set.append(usrname)  
 
-
+  
+  
+ 
+  
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
   # -------------------------------------------------------------------------------- prior_node
@@ -273,7 +280,13 @@ def get_node_common_fields(request, node, group_name, node_type):
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
-
+  col_Group = db[Group.collection_name]  
+  colg = col_Group.Group.one({'_type':u'Group','name':group_name})
+  print "asfasfasd",colg.prior_node
+  if node.has_key('_id'): 
+    if not colg.prior_node : 
+      
+      set_page_moderation(request,request.path, node)
 
   
 
@@ -331,3 +344,49 @@ def neighbourhood_nodes(page_node):
 
   return graphData
 # ------ End of processing for graph ------
+
+
+
+def get_prior_post_node(path):
+  try:
+    group_name = re.split(r'[/=]', path)
+    grname=group_name[1]
+  except:
+   grname=path
+  
+  col_Group = db[Group.collection_name]
+  prior_post_node=col_Group.Group.one({'_type': 'Group',"name":grname})
+  #check wheather we got the Group name       
+  if prior_post_node is not  None:
+       #first check the prior node id  and take the id
+       Prior_nodeid=prior_post_node.prior_node
+       #once you have the id check search for the base node
+       base_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Prior_nodeid}})
+       
+       if base_colg is None:
+          #check for the Post Node id
+           Post_nodeid=prior_post_node.post_node
+           Mod_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
+           if Mod_colg is not None:
+            #return the name of the post_group
+            post_group_name=Mod_colg.name
+            return post_group_name
+       else:
+          #return the name of the base group
+          base_group_name=base_colg.name
+          return base_group_name
+
+  
+
+def set_page_moderation(request,grname, node):
+ group_name=get_prior_post_node(grname)
+ 
+ node.group_set=[]
+ node.group_set.append(unicode(group_name))
+ node.group_set.append(unicode(request.user)) 
+ node.save()
+    
+
+
+
+

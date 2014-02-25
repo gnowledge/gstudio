@@ -122,12 +122,15 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
 {% get_group_type request.path request.user as group_type %}
-
+  
 {% block body_content %}
+{% if published == "published" %}
+  {{"The Page is Published"}}
+{% else %}
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
 
 <header class="row page">
-
+{{published}}
 
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
@@ -255,10 +258,10 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   <p><small>
     <em>Written by {{ node.user_details_dict.modified_by|join:', ' }}</em></small></p>
   </footer>
-
+{% endif %}
   {% endblock %}
 
-
+  
   {% block script%}
 
   function addNewShelf(shelfName)

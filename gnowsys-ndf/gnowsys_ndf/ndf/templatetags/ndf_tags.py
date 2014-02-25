@@ -322,8 +322,16 @@ def get_group_type(grname,user):
   else:
 	
 	return "pass"		
-	
+@register.assignment_tag 	
+def get_res_type(group_name):
+  col_Group = db[Group.collection_name]
+  grname = re.split(r'[/=]', group_name)
   
+  colg=col_Group.Group.one({'_type': 'Group','name':grname[1]})
+  if colg is not None:
+     return colg._type
+  else:
+     return "None"     
 
 
 '''this template function is used to get the user object from template''' 
@@ -375,44 +383,7 @@ def get_Object_count(key):
         return 'null'
         
 #This Function is written to set the visibilty of published pages in the group    
-@register.assignment_tag
-def get_prior_node(path):
-  grname = re.split(r'[/=]', path)
-  print "got group name",grname
-  col_Group = db[Group.collection_name]
-  prior_node=col_Group.Group.one({'_type': 'Group',"name":{'$in':grname}})
-         
-  if prior_node is not  None:
-       print "first"
-       #first check the post node id and take the id
-       Prior_nodeid=prior_node.prior_node
-       print "prior node",Prior_nodeid
-       #once you have the id check search for the sub node
-       base_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Prior_nodeid}})
-       if base_colg is not None:
-        
-          base_group_name=base_colg.name
-          
-          return base_group_name
-  
-   
-@register.assignment_tag        
-def set_page_moderation(grname,page_name):
- 
- base_group_name=get_prior_node(grname)   
- Mod_group_name=re.split(r'[/=]', grname)
- col_Group = db[Group.collection_name]
- page_info=col_Group.Group.one({'_type': 'GSystem',"name":page_name})   
- try: 
-  page_info.group_set=[]
- except:
-    print "work done"
-  
-  
- page_info.group_set.append(unicode(base_group_name))
- page_info.save()   
-    
- 
+
  
   
 @register.filter

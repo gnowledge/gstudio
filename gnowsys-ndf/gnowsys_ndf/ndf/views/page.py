@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-from gnowsys_ndf.ndf.templatetags.ndf_tags import set_page_moderation
+from gnowsys_ndf.ndf.views.methods import set_page_moderation
 from django_mongokit import get_database
 import re
 try:
@@ -115,7 +115,9 @@ def create_edit_page(request, group_name, node_id=None):
         page_node = collection.GSystem()
 
     if request.method == "POST":
+        print "count"
         get_node_common_fields(request, page_node, group_name, gst_page)
+        print "\n amn-grooup_set: ", page_node.group_set, "\n"
         page_node.save()
         
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_name': group_name, 'app_id': page_node._id}))
@@ -252,17 +254,15 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
        
 
 
-def publish_page(request,group_name,node_name):
+def publish_page(request,group_name,node):
+ node_name = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node)})
 
- set_page_moderation(group_name,node_name)
- if node_name:
-        page_node = collection.Node.one({'_type': u'GSystem', 'name':node_name})
- else:
-        page_node = collection.GSystem()
-        
- return render_to_response('ndf/page_list.html', 
-                                  { 'node': page_node,
-                                    'group_name': group_name
+ set_page_moderation(request,group_name,node_name)
+
+ published='published'      
+ return render_to_response('ndf/node_details_base.html', 
+                                  { 'published':published
+                                    
                                   },
                                   context_instance = RequestContext(request)
         )      
