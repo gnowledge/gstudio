@@ -58,8 +58,11 @@ def create_forum(request,group_id):
             filename = slugify(name) + "-" + usrname + "-"
             colf.content = org2html(content_org, file_prefix=filename)
         usrid=int(request.user.id)
+        usrname = unicode(request.user.username)
         colf.created_by=usrid
         colf.group_set.append(unicode(group_id))
+        if usrname not in colf.group_set:
+            colf.group_set.append(usrname)     
         colf.member_of.append(forum_st._id)
         sdate=request.POST.get('sdate',"")
         shrs= request.POST.get('shrs',"") 
@@ -161,7 +164,7 @@ def add_node(request,group_id):
             msg=activity+"-"+nodename+" in the group '"+group_name+"'\n"+"Please visit "+link+" to see the updated page"
             ret = set_notif_val(request,group_name,msg,activity,bx)
         bx=User.objects.get(id=colg.created_by)
-        msg=activity+"-"+nodename+prefix+" in the group '"+group_name+"' created by you"+"\n"+"Please visit "+link+" to see the updated page" 
+        msg=activity+"-"+nodename+prefix+" in the group '"+group_name+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"     
         ret = set_notif_val(request,group_name,msg,activity,bx)
         if node == "Reply":
             # if exstng_reply:

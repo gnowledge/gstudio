@@ -148,6 +148,8 @@ def save_file(files, title, userid, group_id, st_id, content_org, tags, access_p
             fileobj.created_by = int(userid)
             fileobj.file_size = size
             fileobj.group_set.append(group_id)        #group name stored in group_set field
+            if usrname not in fileobj.group_set:                 # File creator stored in group_set field
+                fileobj.group_set.append(usrname)
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
             if content_org:

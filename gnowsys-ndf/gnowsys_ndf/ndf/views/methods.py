@@ -138,6 +138,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   name = request.POST.get('name')
   usrid = int(request.user.id)
+  usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
 
   tags = request.POST.get('tags')
@@ -151,6 +152,8 @@ def get_node_common_fields(request, node, group_id, node_type):
     
     node.created_by = usrid
     node.member_of.append(node_type._id)
+    if group_name not in node.group_set:
+      node.group_set.append(group_name)    
   
     if access_policy == "PUBLIC":
       node.access_policy = unicode(access_policy)      
@@ -162,9 +165,12 @@ def get_node_common_fields(request, node, group_id, node_type):
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
 
-  if access_policy == "PUBLIC":
+  if access_policy:
+    # Policy will be changed only by the creator of the resource 
+    # via access_policy(public/private) option on the template which is visible only to the creator
+    if access_policy == "PUBLIC":
       node.access_policy = u"PUBLIC"      
-  else:
+    else:
       node.access_policy = u"PRIVATE"  
   
 
@@ -175,9 +181,11 @@ def get_node_common_fields(request, node, group_id, node_type):
   else:
     node.modified_by.remove(usrid)
     node.modified_by.insert(0,usrid)
-
-  if group_id not in node.group_set:
-    node.group_set.append(group_id)
+  # For displaying nodes in home group as well as in creator group.
+  if group_id not in node.group_set: 
+    node.group_set.append(group_id)  
+  elif usrname not in node.group_set:   
+    node.group_set.append(usrname)  
 
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
@@ -292,123 +300,4 @@ def neighbourhood_nodes(page_node):
     graphData += ']}' 
 
   return graphData
-# ------ End of processing for graph ------
-
-
-
-# ------ Some work for node graph - (II) ------
-def graph_nodes(page_node, group_name):
-  
-  collection = db[Node.collection_name]
-        
-  def _get_node_info(node_id):
-    node = collection.Node.one( {'$or':[{'_type':'GSystem'},{'_type':'File'}], '_id':node_id}  )
-
-    mime_type = "true"  if node.structure.has_key('mime_type') else 'false'
-
-    return node.name
-
-  # def _get_username(id_int):
-    # return User.objects.get(id=id_int).username
-
-  # def _get_node_url(node_id):
-
-  #   node_url = '/' + group_name
-  #   node = collection.Node.one({'_id':node_id})
-
-  #   if len(node.member_of) > 1:
-  #     if node.mime_type == 'image/jpeg':
-  #       node_url += '/image/image_detail/' + str(node_id)
-  #     elif node.mime_type == 'video':
-  #       node_url += '/video/video_detail/' + str(node_id)
-
-  #   elif len(node.member_of) == 1:
-  #     gapp_name = (collection.Node.one({'_id':node.member_of[0]}).name).lower()
-
-  #     if gapp_name == 'forum':
-  #       node_url += '/forum/show/' + str(node_id)
-
-  #     elif gapp_name == 'file':
-  #       node_url += '/image/image_detail/' + str(node_id)
-
-  #     elif gapp_name == 'page':
-  #       node_url += '/page/details/' + str(node_id)
-
-  #     elif gapp_name == 'quiz' or 'quizitem':
-  #       node_url += '/quiz/details/' + str(node_id)
-      
-  #   return node_url
-
-  page_node_id = str(id(page_node._id))
-  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"GSystem"}, '
-  node_relations = ''
-  exception_items = [
-                      "name", "content", "_id", "login_required", "attribute_set",
-                      "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "modified_by", "created_by", "last_update", "url", "featured",
-                      "created_at", "group_set", "type_of", "content_org", "author_set"
-                    ]
-
-  # username = User.objects.get(id=page_node.created_by).username
-
-  i = 1
-  for key, value in page_node.items():
-    
-    if key in exception_items:
-      pass
-
-    elif isinstance(value, list):
-
-      if len(value):
-
-        node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
-        key_id = str(i)
-        # i += 1
-        
-        # if key in ("modified_by", "author_set"):
-        #   for each in value:
-        #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
-        #     node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
-        #     i += 1
-
-        # else:
-        for each in value:
-          if isinstance(each, ObjectId):
-            node_name = _get_node_info(each)          
-
-            # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "url":"'+ _get_node_url(each) +'", "refType":"relation"},'
-            node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
-            i += 1
-          else:
-            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
-            i += 1
-    
-    else:
-      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"},'
-      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
-      key_id = str(i)      
-
-      if isinstance( value, list):
-        for each in value:
-          node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(i) +'_n"},'
-          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
-          i += 1 
-      
-      else:
-        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
-        i += 1 
-    # End of if - else
-  # End of for loop
-
-  node_metadata = node_metadata[:-1]
-  node_relations = node_relations[:-1]
-
-  node_graph_data = '{ "node_metadata": [' + node_metadata + '], "relations": [' + node_relations + '] }'
-
-  return node_graph_data
-
 # ------ End of processing for graph ------

@@ -1,0 +1,87 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %} Admin {% endblock %}
+{% block meta_content %}
+     {% ifequal url 'data' %}
+	{% get_class_list class_name %}
+     {% else %}
+        {% get_class_type_list class_name %}
+     {% endifequal %}
+{% endblock %}
+{% block body_content %} 
+<form method="post" action="." name="{{class_name}}">
+{% csrf_token %}
+<div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#definitionlist">Definition</a>
+  <div id="definitionlist" class="content active">
+
+  {% for list in definitionlist %}
+  <div style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list %}
+  </div>
+{% endfor %}
+</div>
+</dd>
+</dl>
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#contentlist">Content</a>
+  <div id="contentlist" class="content">
+  {% for list in contentlist %}
+  <div  style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list %}
+  </div>
+{% endfor %}
+  </div>
+  </dd>
+</dl>
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#dependencylist">Dependency</a>
+ <div id="dependencylist" class="content">
+  {% for list in dependencylist %}
+  <div style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list %}
+  </div>
+{% endfor %}
+</div>
+  </dd>
+</dl>
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#options">Options</a>
+    <div id="options" class="content">
+  {% for list in options %}
+  <div style="display:table-row;">
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list %}
+  </div>
+{% endfor %}
+
+</div>
+  </dd>
+</dl>
+
+</div>
+<input type="submit" name="submit" class="button">
+</form>
+{% endblock %}
+
+{% block script %}
+{% autoescape off %}
+var required_fields = {{ required_fields }}
+{% endautoescape %}
+{% endblock %}	

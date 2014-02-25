@@ -10,7 +10,8 @@ from gnowsys_ndf.ndf.forms import *
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^admin/class/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
+    (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
+    (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
     (r'^admin/', include(admin.site.urls)),
     (r'^$', RedirectView.as_view(url= '/home/')),
     (r'^home/','gnowsys_ndf.ndf.views.group.group_dashboard'),

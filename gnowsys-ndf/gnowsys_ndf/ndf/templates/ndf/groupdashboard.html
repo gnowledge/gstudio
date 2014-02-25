@@ -7,11 +7,11 @@ from django.contrib.auth.decorators import login_required
 
 
 <script type="text/javascript" ></script>
- 
+
 <script>
-var chk_login = "{{ user }}";
+  var chk_login = "{{ user }}";
 </script>
-	
+
 
 
 
@@ -21,12 +21,12 @@ function change_label(label)
 {   
 	if(chk_login=="AnonymousUser")
 		{document.location.href = '/accounts/login/';
-		}
-	
-     else if(label == "Join")
-    { $("#notify").val("Unsubscribe");}
-    else
-    { $("#notify").val("Join");}
+}
+
+else if(label == "Join")
+  { $("#notify").val("Unsubscribe");}
+else
+  { $("#notify").val("Join");}
 }
 
 //function for sending notifications for Join and Unsubscribe
@@ -60,17 +60,17 @@ $(document).ready(function()
   var label = $("#notify").val();
   $("#notify").click(function(){
    if (label == "Join")
-    {
+   {
      notify(groupn,"join");
-    change_label("Join");
-    label="Unsubscribed"
-    }
-    else {
-      notify(groupn,"remove");
-      change_label("remove");
-      label="Join"
-	
-    }
+     change_label("Join");
+     label="Unsubscribed"
+   }
+   else {
+    notify(groupn,"remove");
+    change_label("remove");
+    label="Join"
+
+  }
   }); //end notify_click()
 }); //end document_ready()
 
@@ -92,27 +92,39 @@ $(document).ready(function()
 {% check_user_join request node as user_is_joined %}
 <input type="hidden" id="groupname" value="{{node}}">
 {% if user_is_joined == "joined" %}
-     <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible" >
+<input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible" >
 {% elif user_is_joined == "not" or not user.is_authenticated  %}
 
-     <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
+<input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
 {% endif %}
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
-     <h3>Manage</h3>
-     <p>You can invite other members to be a part of this group</p>
-     {% include "ndf/invite_users.html" %}   
+<h3>Manage</h3>
+<p>You can invite other members to be a part of this group</p>
+{% include "ndf/invite_users.html" %}   
 {% endifequal %} 
-   
+
 {% endblock %}
 
-{% block body_content %}
-<!-- Place for group splash page design
-<a class="button" data-reveal-id="group-splash">Intro</a>
-<div id="group-splash" class="reveal-modal" data-reveal>
 
-<img src="http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg">
+{% block body_content %}
+
+<!--Place for group splash page design-->
+<!--a class="button" data-reveal-id="splash">Intro</a>
+
+<div id="splash" class="reveal-modal medium" data-reveal>
+
+  <div class="large-4 small-centered columns">
+    <h2>Do things:</h2>
+    <ul id="some" class="button-group">
+      <li><a class="button rounded" href="">NUSSD</a></li>
+      <li><a class="button rounded" href="">CUBE</a></li>
+      <li><a class="button rounded" href="">Something Else..</a></li>
+    </ul>
+  </div>
+
 </div-->
+
 {{ block.super }}
 {% endblock %}
 

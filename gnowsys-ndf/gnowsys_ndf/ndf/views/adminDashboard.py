@@ -56,7 +56,7 @@ def adminDashboardClass(request, class_name):
         systemtypes.append({'id':each._id,"title":each.name})
 
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes})
+    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"data"})
     return render_to_response(template, variable)
 
 

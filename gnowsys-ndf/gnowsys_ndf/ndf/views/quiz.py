@@ -126,6 +126,7 @@ def create_edit_quiz_item(request, group_id, node_id=None):
 
     if request.method == "POST":
         usrid = int(request.user.id)
+        usrname = unicode(request.user.username)
 
         if not quiz_item_node.has_key('_id'):
             quiz_item_node.created_by = usrid
@@ -134,8 +135,11 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         if usrid not in quiz_item_node.modified_by:
             quiz_item_node.modified_by.append(usrid)
 
+
         if group_id not in quiz_item_node.group_set:
             quiz_item_node.group_set.append(group_id)
+        if usrname not in quiz_item_node.group_set:
+            quiz_item_node.group_set.append(usrname)
 
         quiz_type = request.POST.get('quiz_type_val')
         quiz_item_node['quiz_type'] = unicode(quiz_type)
