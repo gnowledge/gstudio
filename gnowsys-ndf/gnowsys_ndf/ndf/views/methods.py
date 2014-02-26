@@ -282,11 +282,11 @@ def get_node_common_fields(request, node, group_name, node_type):
     node.content = org2html(content_org, file_prefix=filename)
   col_Group = db[Group.collection_name]  
   colg = col_Group.Group.one({'_type':u'Group','name':group_name})
-  print "asfasfasd",colg.prior_node
+  
   if node.has_key('_id'): 
     if not colg.prior_node : 
       
-      set_page_moderation(request,request.path, node)
+      set_page_moderation(request,group_name, node)
 
   
 
@@ -381,10 +381,10 @@ def get_prior_post_node(path):
 def set_page_moderation(request,grname, node):
  group_name=get_prior_post_node(grname)
  
- node.group_set=[]
+ node.group_set.remove(grname)
  node.group_set.append(unicode(group_name))
- node.group_set.append(unicode(request.user)) 
- node.save()
+ 
+
     
 
 

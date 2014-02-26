@@ -258,7 +258,7 @@ def publish_page(request,group_name,node):
  node_name = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node)})
 
  set_page_moderation(request,group_name,node_name)
-
+ node_name.save()  
  published='published'      
  return render_to_response('ndf/node_details_base.html', 
                                   { 'published':published
