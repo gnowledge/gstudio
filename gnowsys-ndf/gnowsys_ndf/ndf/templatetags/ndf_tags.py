@@ -4,6 +4,7 @@ from django.template import Library
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 import re
@@ -96,8 +97,11 @@ def get_gapps_menubar(group_name, selectedGapp):
   
   gapps = {}
   i = 0;
-  for app in GAPPS:
-    node = collection.Node.one({'_type': 'GSystemType', 'name': app})
+  meta = META_TYPE[0]
+  meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name':meta}]})
+  GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]})
+  for node in GAPPS:
+    #node = collection.Node.one({'_type': 'GSystemType', '': app})
     if node:
       if node.name not in ["Image", "Video"]:
         i = i+1;
