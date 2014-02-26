@@ -1,6 +1,6 @@
 {% extends "ndf/base.html" %}
 {% block title %} {{title}} {% endblock %}
-
+{% load ndf_tags %}
 {% block help_topics %}
 <li><a href="#">Pages Introduction</a></li>
 <li><a href="#">Working with Pages</a></li>
@@ -124,7 +124,11 @@
       {% if node.created_by == request.user.id %}
       <a class="button alert tiny" href="{% url 'page_delete' group_name node %}">Delete</a>
       {% endif %}
-      
+      {% get_group request.path as groupname %}
+      {% if  not groupname.post_node %}
+    <a class="button alert tiny" >Under Moderation</a>
+ 
+    {% endif %} 
       <footer class="row">
         <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
         <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 

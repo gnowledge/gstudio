@@ -213,7 +213,18 @@ def get_existing_groups_excluded(grname):
   if not group:
     return "None"
   return group
-
+  
+@register.assignment_tag
+def get_group(group_name):
+  col_Group = db[Group.collection_name]
+  grname = re.split(r'[/=]', group_name)
+  
+  colg=col_Group.Group.one({'_type': 'Group','name':grname[1]})
+  if colg is not None:
+     return colg
+  else:
+     return "None"   
+     
 @register.assignment_tag
 def get_group_policy(group_name,user):
   try:
@@ -312,8 +323,16 @@ def get_group_type(grname,user):
   else:
 	
 	return "pass"		
-	
+@register.assignment_tag 	
+def get_res_type(group_name):
+  col_Group = db[Group.collection_name]
+  grname = re.split(r'[/=]', group_name)
   
+  colg=col_Group.Group.one({'_type': 'Group','name':grname[1]})
+  if colg is not None:
+     return colg._type
+  else:
+     return "None"     
 
 
 '''this template function is used to get the user object from template''' 
@@ -363,6 +382,10 @@ def get_Object_count(key):
         return collection.Node.find({'_type':key}).count()
     except:
         return 'null'
+        
+#This Function is written to set the visibilty of published pages in the group    
+
+ 
   
 @register.filter
 def get_dict_item(dictionary, key):

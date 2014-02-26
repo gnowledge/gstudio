@@ -12,9 +12,9 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-
+from gnowsys_ndf.ndf.views.methods import set_page_moderation
 from django_mongokit import get_database
-
+import re
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -115,7 +115,9 @@ def create_edit_page(request, group_name, node_id=None):
         page_node = collection.GSystem()
 
     if request.method == "POST":
+        print "count"
         get_node_common_fields(request, page_node, group_name, gst_page)
+        print "\n amn-grooup_set: ", page_node.group_set, "\n"
         page_node.save()
         
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_name': group_name, 'app_id': page_node._id}))
@@ -248,3 +250,20 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         print "\n Please pass a valid rcs-version-file!!!\n"
         #TODO: Throw an error indicating the above message!
         return ""
+       
+       
+
+
+def publish_page(request,group_name,node):
+ node_name = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node)})
+
+ set_page_moderation(request,group_name,node_name)
+ node_name.save()  
+ published='published'      
+ return render_to_response('ndf/node_details_base.html', 
+                                  { 'published':published
+                                    
+                                  },
+                                  context_instance = RequestContext(request)
+        )      
+
