@@ -7,13 +7,14 @@ from django.views.generic import TemplateView
 from registration.backends.default.views import RegistrationView
 
 from gnowsys_ndf.ndf.forms import *
+from gnowsys_ndf.ndf.views.home import HomeRedirectView
 admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
     (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
-    (r'^admin/', include(admin.site.urls)),
-    (r'^$', RedirectView.as_view(url= '/home/')),        
+    (r'^admin/', include(admin.site.urls)),    
+    (r'^$', HomeRedirectView.as_view()), # For redirecting to user group after login       
     (r'^(?P<group_name>[^/]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_name>[^/]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_name>[^/]+)/video/', include('gnowsys_ndf.ndf.urls.video')),
