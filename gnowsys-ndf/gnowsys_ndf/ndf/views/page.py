@@ -72,7 +72,7 @@ def page(request, group_id, app_id=None):
         title = gst_page.name
         # collection.Node.reload()
         page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
-                                           'group_set': {'$all': [group_name]},                                           
+                                           'group_set': {'$all': [group_id]},                                           
                                            'status': {'$nin': ['HIDDEN']}
                                        })        
 

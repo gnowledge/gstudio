@@ -88,6 +88,7 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 def get_gapps_menubar(group_id, selectedGapp):
   """Get Gapps menu-bar
   """
+  print "groupcheck in gmenubar",group_id
   collection = db[Node.collection_name]
   gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
   gapps = {}
@@ -287,7 +288,9 @@ def get_group_type(group_id,user):
   if group_id == '/home/':
     colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
   else:  
-    colg=col_Group.Group.one({'_id': ObjectId(group_id)})
+    gpid=str(group_id).split("/")
+    print gpid
+    colg=col_Group.Group.one({'_id': ObjectId(gpid[1])})
   #check if Group exist in the database
   if colg is not None:
 	# Check is user is logged in

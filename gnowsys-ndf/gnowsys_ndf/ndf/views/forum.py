@@ -122,6 +122,8 @@ def add_node(request,group_id):
         forumid=request.POST.get("forumid","")
         sup_id=request.POST.get("supnode","")
         tw_name=request.POST.get("twistname","")
+        forumobj=""
+        groupobj=""
         if forumid:
             forumobj=gs_collection.GSystem.one({"_id": ObjectId(forumid)})
         sup=gs_collection.GSystem.one({"_id": ObjectId(sup_id)})

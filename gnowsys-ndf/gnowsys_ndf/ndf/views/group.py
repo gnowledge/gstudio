@@ -90,13 +90,16 @@ def create_group(request,group_id):
 
 def group_dashboard(request,group_id=None):
     try:
+        print "ingrpdashview",group_id
+        groupobj=""
         if group_id == None:
             print "home"
             groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         else:
-            print "other grps"    
+            print "other grps",group_id,type(group_id)    
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
     except Exception as e:
+        print "Error in groupdash board-"+str(e)
         pass
     return render_to_response("ndf/groupdashboard.html",{'newgroup':groupobj,'curgroup':groupobj,'user':request.user},context_instance=RequestContext(request))
 

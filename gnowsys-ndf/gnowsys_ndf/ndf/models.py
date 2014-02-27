@@ -494,7 +494,7 @@ class GSystem(Node):
         'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class [(ObjectId, version_no)]
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
-        'group_set': [unicode],                 # List of ObjectId's of Groups to which this document belongs
+        'group_set': [ObjectId],                # List of ObjectId's of Groups to which this document belongs
         'author_set': [int]                     # List of Authors
     }
     
