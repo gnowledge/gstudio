@@ -60,6 +60,7 @@ def create_group(request,group_name):
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
+        Mod_colg=col_Group.Group()
         cname=request.POST.get('groupname', "")
         colg.altnames=cname
         colg.name = unicode(cname)
@@ -74,6 +75,22 @@ def create_group(request,group_name):
         colg.encryption_policy = request.POST.get('encryption', "")
         print "sub Pol",colg.subscription_policy        
         colg.save()
+        #colg = col_Group.Group.one({"_type":"Group","name":cname})
+        
+        #A Private Sub-Document For Moderations 
+        if colg.edit_policy == "EDITABLE_MODERATED":
+    
+            Mod_colg.altnames=cname + "Mod" 
+            Mod_colg.name=cname + "Mod"     
+            Mod_colg.group_type = "PRIVATE"
+            Mod_colg.created_by=usrid
+            Mod_colg.prior_node.append(colg._id)
+            Mod_colg.save() 
+            colg.post_node.append(Mod_colg._id)
+            colg.save()
+            
+  
+            
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", RequestContext(request))
     
@@ -107,5 +124,23 @@ def edit_group(request,group_name,group_id):
                                         },
                                       context_instance=RequestContext(request)
                                       )
+                                      
 
+def publish_page(group_name):
+
+ base_group_name=get_prior_node(group_name)   
+ Mod_group_name=re.split(r'[/=]', group_name)
+ col_Group = db[Group.collection_name]
+ page_info=col_Group.Group.one({'_type': 'GSystem',"name":page_name})   
+ try: 
+  page_info.group_set=[]
+ except:
+    print "work done"
+ page_info.group_set.append(unicode(base_group_name))
+ page_info.save()   
+     
+ print "something"
+
+
+                                      
 

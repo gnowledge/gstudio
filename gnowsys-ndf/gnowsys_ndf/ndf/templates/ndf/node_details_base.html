@@ -122,12 +122,15 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
 {% get_group_type request.path request.user as group_type %}
-
+  
 {% block body_content %}
+{% if published == "published" %}
+  {{"The Page is Published"}}
+{% else %}
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
 
 <header class="row page">
-
+{{published}}
 
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
@@ -229,12 +232,18 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     {% if node.collection_set and user.is_authenticated%}
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
-
+    {% get_group request.path as groupname %}
+    <!--  Code for not showing the button to non subscribed users -->
+    {% if  user.id in groupname.author_set or groupname.created_by == user.id or groupname.name == "home" %}
 
     <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
     <ul id="edit-options" class="f-dropdown">
       <li><a href="{% url 'page_create_edit' group_name %}">Create a new page</a></li>
     </ul>
+    {% else %}
+    
+    {% endif %}
+    
 
   </div>
 
@@ -249,10 +258,10 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   <p><small>
     <em>Written by {{ node.user_details_dict.modified_by|join:', ' }}</em></small></p>
   </footer>
-
+{% endif %}
   {% endblock %}
 
-
+  
   {% block script%}
 
   function addNewShelf(shelfName)

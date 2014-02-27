@@ -44,8 +44,14 @@ background-repeat:no-repeat; background-size: 48px 48px
       {% else %}
       Create a New {{title}}
       {% endif %}
+      {% get_group request.path as groupname %}
+      {% get_res_type request.path as group_type %}
     </h2>
     
+    {% if  not groupname.post_node %}
+       
+    <a href="{% url 'publish_page' group_name node %}"> Publish </a></abbr> 
+   {% endif %} 
     <nav class="medium-12 columns">
       <dl class="tabs" data-tab>
 	<dd><h3>View:</h3></dd>
