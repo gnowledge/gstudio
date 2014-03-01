@@ -57,7 +57,7 @@ def adminDesignerDashboardClassCreate(request,class_name):
     dependencylist = []
     options = []
     if class_name == "AttributeType":
-        definitionlist = ['name','altnames','subject_type','applicable_node_type','data_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        definitionlist = ['name','altnames','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']

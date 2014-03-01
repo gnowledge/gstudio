@@ -26,7 +26,7 @@
       {% get_input_fields class_structure|get_dict_item:list list %}
       {% if list in  required_fields %}
       <div style="display:table-cell;">
-	<font size="3" color="red"> * </font>
+	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
       </div>
       {% endif %}
     </div>
@@ -103,10 +103,26 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 {% block script %}
 {% autoescape off %}
 var required_fields = {{ required_fields }}
+var flag = 0;
 {% endautoescape %}
-$("#save-node-type").click(function() {
+$("form").submit(function(event) {
+flag = 0;
 for(each in type_list){
 eval(type_list[each] + "()");
+}
+for(reqfields in required_fields){
+if($("[name = "+required_fields[reqfields]+" ]").val()){
+$("#"+required_fields[reqfields]+"_required").hide();
+}
+else{
+flag = 1;
+$("#"+required_fields[reqfields]+"_required").show();
+}
+}
+if(flag == 1)
+{
+alert("* mandatory fields required");
+event.preventDefault();
 }
 });
 
