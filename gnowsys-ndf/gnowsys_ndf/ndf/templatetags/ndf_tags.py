@@ -281,20 +281,8 @@ def get_user_group(user):
                                 'name': {'$nin': ['home']},
                                 '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
                               })
-
-  auth = ""
+  
   auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
-
-  if auth is None:
-    auth = collection.Author()
-
-    auth._type = u"Group"
-    auth.name = unicode(user.username)      
-    auth.password = u""
-    auth.member_of.append(auth_type)      
-    auth.created_by = int(user.pk)
-
-    auth.save()
   
   for items in colg:  
     if items.created_by == user.pk:
