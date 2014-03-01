@@ -24,6 +24,11 @@
 	<font size="3"> {{list}}</font> 
       </div>
       {% get_input_fields class_structure|get_dict_item:list list %}
+      {% if list in  required_fields %}
+      <div style="display:table-cell;">
+	<font size="3" color="red"> * </font>
+      </div>
+      {% endif %}
     </div>
     {% endfor %}
   </div>
