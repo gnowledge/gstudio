@@ -57,7 +57,7 @@ def adminDesignerDashboardClassCreate(request,class_name):
     dependencylist = []
     options = []
     if class_name == "AttributeType":
-        definitionlist = ['name','altnames','subject_type','applicable_node_type','data_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        definitionlist = ['name','altnames','subject_type','applicable_node_type','data_type','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -67,7 +67,7 @@ def adminDesignerDashboardClassCreate(request,class_name):
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     elif class_name == "RelationType":
-        definitionlist = ['name','inverse_name','altnames','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','slug','is_symmetric','is_reflexive','is_transitive','status']
+        definitionlist = ['name','inverse_name','altnames','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -85,8 +85,8 @@ def adminDesignerDashboardClassCreate(request,class_name):
         for key,value in class_structure.items():
             if value == bool:
                 if request.POST.get(key,""):
-                    if request.POST.get(key,"") in (1,2):
-                        if request.POST.get(key,"") == 1:
+                    if request.POST.get(key,"") in ('1','2'):
+                        if request.POST.get(key,"") == '1':
                             new_instance_type[key] = True
                         else :
                             new_instance_type[key] = False  
@@ -102,19 +102,33 @@ def adminDesignerDashboardClassCreate(request,class_name):
                     else :
                         new_instance_type[key] = unicode(request.POST.get(key,""))
             elif value == list:
-                print key,"list"
                 if request.POST.get(key,""):
-                    new_instance_type[key] = list(request.POST.get(key,""))
+                    new_instance_type[key] = request.POST.get(key,"").split(",")
             elif type(value) == list:
                 if request.POST.get(key,""):
-                    new_instance_type[key] = list(request.POST.get(key,""))
+                    if key in ("tags","applicable_node_type"):
+                        new_instance_type[key] = request.POST.get(key,"").split(",")
+                    elif key in ["meta_type_set","attribute_type_set","relation_type_set"]:
+                        listoflist = []
+                        for each in request.POST.get(key,"").split(","):
+                            listoflist.append(collection.Node.one({"_id":ObjectId(each)}))
+                        new_instance_type[key] = listoflist
+                    else :
+                        listoflist = []
+                        for each in request.POST.get(key,"").split(","):
+                            listoflist.append(ObjectId(each))
+                        new_instance_type[key] = listoflist
             elif value == datetime.datetime:
-                pass
+                new_instance_type[key] = datetime.datetime.now()
+#                pass
             elif key == "status":
                 if request.POST.get(key,""):
                     new_instance_type[key] = unicode(request.POST.get(key,""))
             elif key == "created_by":
                 new_instance_type[key] = request.user.id
+            elif value == int:
+                if request.POST.get(key,""):
+                    new_instance_type[key] = int(request.POST.get(key,""))
             else: 
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"")
@@ -131,6 +145,8 @@ def adminDesignerDashboardClassCreate(request,class_name):
             newdict[key] = "list"
         elif value == datetime.datetime:
             newdict[key] = "datetime"
+        elif value == int:
+            newdict[key] = "int"
         elif key == "status":
             newdict[key] = "status"
         else: 

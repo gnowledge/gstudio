@@ -91,7 +91,7 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 </dl>
 
 </div>
-<input type="submit" name="submit" class="button">
+<input type="submit" name="submit" class="button" id="save-node-type">
 </form>
 {% endblock %}
 
@@ -99,4 +99,16 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 {% autoescape off %}
 var required_fields = {{ required_fields }}
 {% endautoescape %}
+$("#save-node-type").click(function() {
+for(each in type_list){
+eval(type_list[each] + "()");
+}
+});
+
 {% endblock %}	
+
+{% block head %} 
+<script type="text/javascript">
+var type_list = []
+</script>
+{% endblock %}
