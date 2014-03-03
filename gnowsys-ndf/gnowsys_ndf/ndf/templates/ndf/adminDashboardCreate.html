@@ -9,6 +9,7 @@
      {% endifequal %}
 {% endblock %}
 {% block body_content %} 
+<link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 <form method="post" action="." name="{{class_name}}">
 {% csrf_token %}
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
@@ -16,46 +17,65 @@
   <dd>
     <a href="#definitionlist">Definition</a>
   <div id="definitionlist" class="content active">
-
-  {% for list in definitionlist %}
-  <div style="display:table-row;">
-    <div style="display:table-cell;"> 
-      <font size="3"> {{list}}</font> 
+    
+    {% for list in definitionlist %}
+    <div style="display:table-row;">
+      <div style="display:table-cell;"> 
+	<font size="3"> {{list}}</font> 
+      </div>
+      {% get_input_fields class_structure|get_dict_item:list list %}
+      {% if list in  required_fields %}
+      <div style="display:table-cell;">
+	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
+      </div>
+      {% endif %}
     </div>
-    {% get_input_fields class_structure|get_dict_item:list list %}
-  </div>
-{% endfor %}
-</div>
-</dd>
-</dl>
-<dl class="accordion" data-accordion>
-  <dd>
-    <a href="#contentlist">Content</a>
-  <div id="contentlist" class="content">
-  {% for list in contentlist %}
-  <div  style="display:table-row;">
-    <div style="display:table-cell;"> 
-      <font size="3"> {{list}}</font> 
-    </div>
-    {% get_input_fields class_structure|get_dict_item:list list %}
-  </div>
-{% endfor %}
+    {% endfor %}
   </div>
   </dd>
 </dl>
 <dl class="accordion" data-accordion>
   <dd>
-    <a href="#dependencylist">Dependency</a>
- <div id="dependencylist" class="content">
-  {% for list in dependencylist %}
-  <div style="display:table-row;">
-    <div style="display:table-cell;"> 
-      <font size="3"> {{list}}</font> 
+    <a href="#contentlist">Content</a>
+    <div id="contentlist" class="content">
+
+      {% for list in contentlist %}
+      <div class="medium-12 columns">
+	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+      </div>
+      {% endfor %}
+<script type="text/javascript">
+
+$(".orgitdown .orgitdownButton1 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/bold.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+$(".orgitdown .orgitdownButton2 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/italic.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+$(".orgitdown .orgitdownButton3 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/stroke.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+$(".orgitdown .orgitdownButton4 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/list-bullet.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+$(".orgitdown .orgitdownButton5 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/list-numeric.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+$(".orgitdown .orgitdownButton6 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/picture.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+$(".orgitdown .orgitdownButton7 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/link.png")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+$(".orgitdown .orgitdownButton8 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/html.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+$(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/close.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
+
+
+</script>
+
     </div>
-    {% get_input_fields class_structure|get_dict_item:list list %}
-  </div>
+  </dd>
+</dl>
+<dl class="accordion" data-accordion>
+  <dd>
+    <a href="#dependencylist">Dependency</a>
+    <div id="dependencylist" class="content">
+
+      {% for list in dependencylist %}
+      <div style="display:table-row;">
+	<div style="display:table-cell;"> 
+	  <font size="3"> {{list}}</font> 
+	</div>
+	{% get_input_fields class_structure|get_dict_item:list list %}
+      </div>
 {% endfor %}
-</div>
+    </div>
   </dd>
 </dl>
 <dl class="accordion" data-accordion>
@@ -69,19 +89,47 @@
     </div>
     {% get_input_fields class_structure|get_dict_item:list list %}
   </div>
-{% endfor %}
-
-</div>
+  {% endfor %}
+  
+    </div>
   </dd>
 </dl>
 
 </div>
-<input type="submit" name="submit" class="button">
+<input type="submit" name="submit" class="button" id="save-node-type">
 </form>
 {% endblock %}
 
 {% block script %}
 {% autoescape off %}
 var required_fields = {{ required_fields }}
+var flag = 0;
 {% endautoescape %}
+$("form").submit(function(event) {
+flag = 0;
+for(each in type_list){
+eval(type_list[each] + "()");
+}
+for(reqfields in required_fields){
+if($("[name = "+required_fields[reqfields]+" ]").val()){
+$("#"+required_fields[reqfields]+"_required").hide();
+}
+else{
+flag = 1;
+$("#"+required_fields[reqfields]+"_required").show();
+}
+}
+if(flag == 1)
+{
+alert("* mandatory fields required");
+event.preventDefault();
+}
+});
+
 {% endblock %}	
+
+{% block head %} 
+<script type="text/javascript">
+var type_list = []
+</script>
+{% endblock %}

@@ -89,6 +89,41 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
+@register.inclusion_tag('tags/dummy.html')
+def list_widget(type_value, fields_value,template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+  drawer1 = {}
+  drawer2 = None
+  group_name = ""
+  alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
+  fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+  fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
+  fields = {"subject_type":"GSystemType","object_type":"GSystemType","meta_type_set":"MetaType","attribute_type_set":"AttributeType","relation_type_set":"RelationType","member_of":"all_types","prior_node":"all_types","applicable_node_type":"NODE_TYPE_CHOICES","subject_applicable_nodetype":"NODE_TYPE_CHOICES","object_applicable_nodetype":"NODE_TYPE_CHOICES","data_type": "DATA_TYPE_CHOICES"}
+  types = fields[type_value]
+
+  if type_value in fields_selection1:
+    print type_value,"tagss"
+    if type_value in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
+      for each in NODE_TYPE_CHOICES:
+        drawer1[each] = each
+    elif type_value in ("data_type"):
+      for each in DATA_TYPE_CHOICES:
+        drawer1[each] = each
+    else:
+      drawer = collection.Node.find({"_type":types})
+      for each in drawer:
+        drawer1[str(each._id)]=each.name
+    return {'template': template1, 'widget_for': type_value, 'drawer1': drawer1}
+  
+  if type_value in fields_selection2:
+    if types in alltypes:
+      for each in collection.Node.find({"_type":types}):
+        drawer1[each._id] = each
+    if types in ["all_types"]:
+      for each in alltypes:
+        for eachnode in collection.Node.find({"_type":each}):
+          drawer1[eachnode._id] = eachnode
+    return {'template': template2, 'widget_for': type_value, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': "home"}
+
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(group_id, selectedGapp):
@@ -365,5 +400,5 @@ def get_dict_item(dictionary, key):
 def get_input_fields(fields_value,type_value):
   """Get html tags 
   """
-  
-  return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value}
+  field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
+  return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value,"field_type_list":field_type_list}
