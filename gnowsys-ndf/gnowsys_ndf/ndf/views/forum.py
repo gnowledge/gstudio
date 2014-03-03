@@ -23,7 +23,7 @@ import datetime
 from gnowsys_ndf.ndf.org2any import org2html
 try:
     from bson import ObjectId
-except ImportError:  # old pymongo                                                                                                           
+except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 
@@ -43,11 +43,12 @@ twist_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':
 def forum(request,group_id,node_id):
     existing_forums = gs_collection.GSystem.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [group_id]}})
     existing_forums.sort('name')
-    variables=RequestContext(request,{'existing_forums':existing_forums,'newgroup':group_id})
+    variables=RequestContext(request,{'existing_forums':existing_forums,'groupid':group_id,'group_id':group_id})
     return render_to_response("ndf/forum.html",variables)
 
 def create_forum(request,group_id):
     if request.method == "POST":
+        colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
         colf=gs_collection.GSystem()
         name=unicode(request.POST.get('forum_name',""))
         colf.name=name
@@ -60,9 +61,11 @@ def create_forum(request,group_id):
         usrid=int(request.user.id)
         usrname = unicode(request.user.username)
         colf.created_by=usrid
-        colf.group_set.append(unicode(group_id))
-        if usrname not in colf.group_set:
-            colf.group_set.append(usrname)     
+        colf.group_set.append(colg._id)
+        user_group_obj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+        if user_group_obj:
+            if user_group_obj._id not in colf.group_set:
+                colf.group_set.append(user_group_obj._id)     
         colf.member_of.append(forum_st._id)
         sdate=request.POST.get('sdate',"")
         shrs= request.POST.get('shrs',"") 
@@ -91,14 +94,14 @@ def create_forum(request,group_id):
         colf.attribute_set.append(start_dt)
         colf.attribute_set.append(end_dt)
         colf.save()
-        return HttpResponseRedirect(reverse('show', kwargs={'group_id': group_id, 'newgroup':group_id,'forum_id': colf._id}))
+        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id}))
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
-    return render_to_response("ndf/create_forum.html",RequestContext(request))
+    return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id},RequestContext(request))
 
 def display_forum(request,group_id,forum_id):
     forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
-    variables=RequestContext(request,{'forum':forum,'newgroup':group_id})
+    variables=RequestContext(request,{'forum':forum,'groupid':group_id,'group_id':group_id})
     return render_to_response("ndf/forumdetails.html",variables)
 
 def display_thread(request,group_id,thread_id):
@@ -108,7 +111,7 @@ def display_thread(request,group_id,thread_id):
         for each in thread.prior_node:
             forum=gs_collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
             if forum:
-                variables=RequestContext(request,{'forum':forum,'thread':thread,'newgroup':group_id,'eachrep':thread,'user':request.user})
+                variables=RequestContext(request,{'forum':forum,'thread':thread,'groupid':group_id,'group_id':group_id,'eachrep':thread,'user':request.user})
                 return render_to_response("ndf/thread_details.html",variables)
     except:
         pass
@@ -124,6 +127,7 @@ def add_node(request,group_id):
         tw_name=request.POST.get("twistname","")
         forumobj=""
         groupobj=""
+        colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
         if forumid:
             forumobj=gs_collection.GSystem.one({"_id": ObjectId(forumid)})
         sup=gs_collection.GSystem.one({"_id": ObjectId(sup_id)})
@@ -146,28 +150,35 @@ def add_node(request,group_id):
             colrep.content = org2html(content_org, file_prefix=filename)
         usrid=int(request.user.id)
         colrep.created_by=usrid
-        colrep.group_set.append(group_id)
+        print "in forum add",group_id,type(group_id)
+        colrep.group_set.append(colg._id)
         colrep.save()
-        colg = gs_collection.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
+        groupname=colg.name
         if node == "Twist" :  
-            url="http://"+sitename+"/"+group_name+"/forum/thread"+str(colrep._id)
+            url="http://"+sitename+"/"+str(group_id)+"/forum/thread"+str(colrep._id)
             activity=str(request.user.username)+" -added a thread "
             prefix=" on the forum '"+forumobj.name+"'"
             nodename=name
         if node == "Reply":
+            print "in threadobj_object"
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
-            url="http://"+sitename+"/"+group_name+"/forum/thread"+str(threadobj._id)
+            url="http://"+sitename+"/"+str(group_id)+"/forum/thread"+str(threadobj._id)
             activity=str(request.user.username)+" -added a reply "
             prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
             nodename=""
         link=url
+        print "till now",colg.author_set
         for each in colg.author_set:
+            print each
             bx=User.objects.get(id=each)
-            msg=activity+"-"+nodename+" in the group '"+group_name+"'\n"+"Please visit "+link+" to see the updated page"
-            ret = set_notif_val(request,group_name,msg,activity,bx)
+            msg=activity+"-"+nodename+" in the group '"+str(groupname)+"'\n"+"Please visit "+link+" to see the updated page"
+            if bx:
+                ret = set_notif_val(request,group_id,msg,activity,bx)
         bx=User.objects.get(id=colg.created_by)
-        msg=activity+"-"+nodename+prefix+" in the group '"+group_name+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"     
-        ret = set_notif_val(request,group_name,msg,activity,bx)
+        msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"   
+        if bx:
+            ret = set_notif_val(request,group_id,msg,activity,bx)
+        print "reached here"
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]
@@ -175,11 +186,11 @@ def add_node(request,group_id):
             #     exstng_reply.save()
 
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
-            variables=RequestContext(request,{'thread':threadobj,'user':request.user,'forum':forumobj,'newgroup':group_id})
+            variables=RequestContext(request,{'thread':threadobj,'user':request.user,'forum':forumobj,'groupid':group_id,'group_id':group_id})
             return render_to_response("ndf/refreshtwist.html",variables)
         else:
             templ=get_template('ndf/refreshthread.html')
-            html = templ.render(Context({'forum':forumobj,'user':request.user,'newgroup':group_id}))
+            html = templ.render(Context({'forum':forumobj,'user':request.user,'groupid':group_id,'group_id':group_id}))
             return HttpResponse(html)
 
 

@@ -54,9 +54,9 @@ def file(request, group_id, file_id):
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
         collection = db[File.collection_name]
-        files = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [group_id]}})
-        imageCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [group_id]}})
-        videoCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [group_id]}})
+        files = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
+        imageCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
+        videoCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
         already_uploaded = request.GET.getlist('var', "")
         return render_to_response("ndf/file.html", 
                                   {'title': title, 
@@ -64,11 +64,12 @@ def file(request, group_id, file_id):
                                    'imageCollection': imageCollection,
                                    'videoCollection': videoCollection,
                                    'already_uploaded': already_uploaded,
-                                   'newgroup': group_id
+                                   'groupid': group_id,
+                                   'group_id':group_id
                                   }, 
                                   context_instance = RequestContext(request))
     else:
-        return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'newgroup':group_id}))
+        return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
         
 @login_required    
 def uploadDoc(request, group_id):
@@ -76,9 +77,9 @@ def uploadDoc(request, group_id):
         page_url = request.GET.get("next", "")
         template = "ndf/UploadDoc.html"
     if  page_url:
-        variable = RequestContext(request, {'page_url': page_url,'newgroup':group_id})
+        variable = RequestContext(request, {'page_url': page_url,'groupid':group_id,'group_id':group_id})
     else:
-        variable = RequestContext(request, {'newgroup':group_id})
+        variable = RequestContext(request, {'groupid':group_id,'group_id':group_id})
     return render_to_response(template, variable)
       
     
@@ -119,7 +120,7 @@ def submitDoc(request, group_id):
             str1 = str1 + 'var=' + each + '&'
         return HttpResponseRedirect(page_url+'?'+str1)
     else:
-        return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'newgroup':group_id}))
+        return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
             
 
 def save_file(files, title, userid, group_id, st_id, content_org, tags, access_policy, usrname):
@@ -147,16 +148,20 @@ def save_file(files, title, userid, group_id, st_id, content_org, tags, access_p
             fileobj.name = unicode(title)
             fileobj.created_by = int(userid)
             fileobj.file_size = size
-            fileobj.group_set.append(group_id)        #group name stored in group_set field
-            if usrname not in fileobj.group_set:                 # File creator stored in group_set field
-                fileobj.group_set.append(usrname)
+            group_object=fcol.Group.one({'_id':ObjectId(group_id)})
+            if group_object._id not in fileobj.group_set:
+                fileobj.group_set.append(group_object._id)        #group id stored in group_set field
+            user_group_object=fcol.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+            if user_group_object:
+                if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
+                    fileobj.group_set.append(user_group_object._id)
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
             if content_org:
                 fileobj.content_org = unicode(content_org)
                 # Required to link temporary files with the current user who is modifying this document
-                filename = slugify(title) + "-" + usrname + "-"
-                fileobj.content = org2html(content_org, file_prefix=filename)
+                filename_content = slugify(title) + "-" + usrname + "-"
+                fileobj.content = org2html(content_org, file_prefix = filename_content)
             fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
             
             # For giving privacy to file objects
@@ -309,7 +314,7 @@ def GetDoc(request, group_id):
     files = filecollection.File.find({'_type': u'File'})
     #return files
     template = "ndf/DocumentList.html"
-    variable = RequestContext(request, {'filecollection':files,'newgroup':group_id})
+    variable = RequestContext(request, {'filecollection':files,'groupid':group_id,'group_id':group_id})
     return render_to_response(template, variable)
 
 def readDoc(request, _id, group_id, file_name = ""):
@@ -324,7 +329,7 @@ def file_search(request, group_id):
         files = db[File.collection_name]
         file_search = files.File.find({'$or':[{'name':{'$regex': keyword}}, {'tags':{'$regex':keyword}}]}) #search result from file
         template = "ndf/file_search.html"
-        variable = RequestContext(request, {'file_collection':file_search, 'view_name':'file_search','newgroup':group_id})
+        variable = RequestContext(request, {'file_collection':file_search, 'view_name':'file_search','groupid':group_id,'group_id':group_id})
         return render_to_response(template, variable)
 
 @login_required    

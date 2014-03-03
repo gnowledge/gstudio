@@ -35,7 +35,7 @@ collection = db[Node.collection_name]
 #######################################################################################################################################
 
 def dashboard(request, group_id, user):	
-    
+    print "inside userdash board view"    
     ID = User.objects.get(username=user).pk
     
     date_of_join = User.objects.get(username=user).date_joined
@@ -48,7 +48,7 @@ def dashboard(request, group_id, user):
     group_drawer = get_drawers(None,None,None,"Group")
     forum_drawer = get_drawers(group_id,None,None,"Forum")
     
-    obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'created_by': int(ID) ,'group_set': {'$all': [group_name]}})
+    obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'created_by': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
     collab_drawer = []	
     
     for each in obj.sort('last_update', -1):  	# To populate collaborators according to their latest modification of particular resource
@@ -63,7 +63,7 @@ def dashboard(request, group_id, user):
                                'video_drawer':video_drawer,'file_drawer': file_drawer,
                                'quiz_drawer':quiz_drawer,'group_drawer': group_drawer,
                                'forum_drawer':forum_drawer,'collab_drawer': collab_drawer,
-                               'newgroup':group_id
+                               'groupid':group_id,'group_id':group_id
                               },
                               context_instance=RequestContext(request)
     )

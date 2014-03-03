@@ -25,11 +25,13 @@ def course(request, group_id, course_id):
     """
    * Renders a list of all 'courses' available within the database.
     """
+    print "incourse view"
     if GST_COURSE._id == ObjectId(course_id):
         title = GST_COURSE.name
-        course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [group_id]}})
+        print "in course",course_id,group_id
+        course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         template = "ndf/course.html"
-        variable = RequestContext(request, {'course_coll': course_coll })
+        variable = RequestContext(request, {'course_coll': course_coll,'groupid':group_id,'group_id':group_id })
         return render_to_response(template, variable)
 
 @login_required
@@ -38,7 +40,8 @@ def create_edit(request, group_id, node_id = None):
     """
 
     context_variables = { 'title': GST_COURSE.name,
-                          'group_id': group_id
+                          'group_id': group_id,
+                          'groupid':group_id
                       }
 
     if node_id:
@@ -54,7 +57,8 @@ def create_edit(request, group_id, node_id = None):
     else:
         if node_id:
             context_variables['node'] = course_node
-            
+            context_variables['groupid']=group_id
+            context_variables['group_id']=group_id
         return render_to_response("ndf/course_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -64,7 +68,8 @@ def course_detail(request, group_id, _id):
     course_node = collection.Node.one({"_id": ObjectId(_id)})
     return render_to_response("ndf/course_detail.html",
                                   { 'node': course_node,
-                                    'group_id': group_id
+                                    'groupid': group_id,
+                                    'group_id':group_id
                                   },
                                   context_instance = RequestContext(request)
         )

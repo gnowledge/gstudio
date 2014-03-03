@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from registration.backends.default.views import RegistrationView
 
 from gnowsys_ndf.ndf.forms import *
+from gnowsys_ndf.ndf.views.home import HomeRedirectView
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -21,10 +22,10 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/page/', include('gnowsys_ndf.ndf.urls.page')),
     (r'^(?P<group_id>[^/]+)/group/', include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_id>[^/]+)/forum/', include('gnowsys_ndf.ndf.urls.forum')),
-    (r'^(?P<group_name>[^/]+)/quiz/', include('gnowsys_ndf.ndf.urls.quiz')),
-    (r'^(?P<group_name>[^/]+)/course/', include('gnowsys_ndf.ndf.urls.course')),
-    (r'^(?P<group_name>[^/]+)/module/', include('gnowsys_ndf.ndf.urls.module')),
-    (r'^(?P<group_name>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
+    (r'^(?P<group_id>[^/]+)/quiz/', include('gnowsys_ndf.ndf.urls.quiz')),
+    (r'^(?P<group_id>[^/]+)/course/', include('gnowsys_ndf.ndf.urls.course')),
+    (r'^(?P<group_id>[^/]+)/module/', include('gnowsys_ndf.ndf.urls.module')),
+    (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
    # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
@@ -44,6 +45,6 @@ urlpatterns = patterns('',
         name='password_reset'
     ),
     url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
-     (r'^accounts/', include('registration.backends.default.urls')),
+    (r'^accounts/', include('registration.backends.default.urls')),
     url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )

@@ -25,7 +25,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     $("#module").one("click", function()
     {
      $.ajax({
-      url:"/{{group_name}}/ajax/make_module",
+      url:"/{{groupid}}/ajax/make_module",
       type:"GET",
       data:{_id:"{{node.pk}}"},
       beforeSend:function(){
@@ -61,7 +61,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <p>
   Version{{ node.version_dict|length|pluralize }}: 
   {% for seq_no, version_no in node.version_dict.items reversed %}
-  <abbr title={{version_no}}><a href="{% url 'node_version' group_id node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+  <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
   {% endfor %}
 </p>
 
@@ -84,14 +84,14 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
 
 
-    <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
+    <a href="{% url 'read_file' groupid each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
   </li>
 
   {% else %}
   <li>
     <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
 
-    <a href="{% url 'read_file' group_name each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
+    <a href="{% url 'read_file' groupid each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
   </li>
   {% endif %}
 
@@ -99,13 +99,13 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   {% if each_node.collection_set %}
   <li>
     <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-    <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+    <a href="{% url 'page_details' groupid each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
   </li>
 
   {% else %}
   <li>
     <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-    <a href="{% url 'page_details' group_name each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+    <a href="{% url 'page_details' groupid each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
   </li>
   {% endif %}
   {% endif %}
@@ -139,8 +139,8 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 {% endblock %}
 
-
 {% get_group_type request.path request.user as group_type %}
+
 
 {% block body_content %}
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
@@ -150,7 +150,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
-      <li><a href="/{{group_name}}">{{group_name}}</a></li>
+      <li><a href="/{{groupid}}">{{groupid}}</a></li>
       <li><a href="#">Collection Name</a></li>
     </ul>
 
@@ -193,9 +193,9 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
           {% if each_node.mime_type %}
-          <a href="{% url 'read_file' group_id each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'read_file' groupid each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
           {% else %}
-          <a href="{% url 'page_details' group_id each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'page_details' groupid each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
           {% endif %}
           {% endfor %}
         </div>
@@ -237,7 +237,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
        <small>
          <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
           {% for seq_no, version_no in node.version_dict.items reversed %}
-          <abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+          <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
           {% endfor %}
         </div>
       </small>
@@ -252,7 +252,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
     <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
     <ul id="edit-options" class="f-dropdown">
-      <li><a href="{% url 'page_create_edit' newgroup %}">Create a new page</a></li>
+      <li><a href="{% url 'page_create_edit' groupid %}">Create a new page</a></li>
     </ul>
 
   </div>

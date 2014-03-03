@@ -39,7 +39,7 @@
     </ul>
   </div>
 </div>
-{% get_group_name request.path as group_name %}
+
 <div class="row" style="padding-top:10px" id="thread">
 {% get_forum_twists forum as thread %}
 {% for each in thread %}
@@ -51,7 +51,7 @@
 </div>
 <div class= "small-10 large-10 columns">
   <h4>
-    <a href="/{{group_name}}/forum/thread/{{each}}">
+    <a href="/{{groupid}}/forum/thread/{{each}}">
       {{each.name}}
     </a><br/>
     <small>

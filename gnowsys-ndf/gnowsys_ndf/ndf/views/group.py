@@ -43,6 +43,7 @@ gs_collection = db[GSystem.collection_name]
 def group(request, group_id,app_id):
     """Renders a list of all 'Group-type-GSystems' available within the database.
     """
+    print "in group view",group_id
     group_nodes = []
     col_Group = db[Group.collection_name]
     colg = col_Group.Group.find({'_type': u'Group'})
@@ -51,7 +52,7 @@ def group(request, group_id,app_id):
     for items in gr:
             group_nodes.append(items)
     group_nodes_count = len(group_nodes)
-    return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_count': group_nodes_count,'newgroup':group_id}, context_instance=RequestContext(request))
+    return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_count': group_nodes_count,'groupid': group_id,'group_id': group_id}, context_instance=RequestContext(request))
     
 
 
@@ -74,8 +75,8 @@ def create_group(request,group_id):
         colg.encryption_policy = request.POST.get('encryption', "")
         print "sub Pol",colg.subscription_policy        
         colg.save()
-        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'newgroup':group_id},context_instance=RequestContext(request))
-    return render_to_response("ndf/create_group.html", RequestContext(request))
+        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id},context_instance=RequestContext(request))
+    return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
     
 # def home_dashboard(request):
 #     try:
@@ -98,26 +99,29 @@ def group_dashboard(request,group_id=None):
         else:
             print "other grps",group_id,type(group_id)    
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
+            print groupobj,"TEST"
     except Exception as e:
         print "Error in groupdash board-"+str(e)
+        groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         pass
-    return render_to_response("ndf/groupdashboard.html",{'newgroup':groupobj,'curgroup':groupobj,'user':request.user},context_instance=RequestContext(request))
+    return render_to_response("ndf/groupdashboard.html",{'groupid':groupobj['_id'],'group_id':groupobj['_id'],'user':request.user},context_instance=RequestContext(request))
 
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
     if request.method == "POST":
-            get_node_common_fields(request, page_node, group_name, gst_group)
+            get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
                 page_node.group_type = "PUBLIC"
             if page_node.access_policy == "PRIVATE":
                 page_node.group_type = "PRIVATE"
             page_node.save()
-            group_name=page_node.name
-            return HttpResponseRedirect(reverse('groupchange', kwargs={'newgroup':group_id}))
+            group_id=page_node._id
+            return HttpResponseRedirect(reverse('groupchange', kwargs={'groupid':group_id,'group_id':group_id}))
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
-                                        'newgroup':group_id
+                                        'groupid':group_id,
+                                        'group_id':group_id
                                         },
                                       context_instance=RequestContext(request)
                                       )

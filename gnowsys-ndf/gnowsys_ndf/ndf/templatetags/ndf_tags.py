@@ -14,9 +14,15 @@ from django.template import RequestContext,loader
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from pymongo.errors import InvalidId as invalid_id
 register = Library()
 db = get_database()
 collection = db['Nodes']
+
+
+@register.assignment_tag
+def get_groupid():
+  return "ttt"
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -81,28 +87,42 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 
     drawer1 = get_drawers(group_id, None, [], checked)
 
-  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_id}
+  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(group_id, selectedGapp):
   """Get Gapps menu-bar
   """
-  print "groupcheck in gmenubar",group_id
-  collection = db[Node.collection_name]
-  gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
-  gapps = {}
-  i = 0;
-  for app in GAPPS:
-    node = collection.Node.one({'_type': 'GSystemType', 'name': app})
-    if node:
-      if node.name not in ["Image", "Video"]:
-        i = i+1;
-        gapps[i] = {'id': node._id, 'name': node.name.lower()}
+  try:
+    print "groupcheck in gmenubar test",group_id,type(group_id)
+    collection = db[Node.collection_name]
+    gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
+    gapps = {}
+    i = 0;
+    for app in GAPPS:
+      node = collection.Node.one({'_type': 'GSystemType', 'name': app})
+      if node:
+        if node.name not in ["Image", "Video"]:
+          i = i+1;
+          gapps[i] = {'id': node._id, 'name': node.name.lower()}
+    selectedGapp = selectedGapp.split("/")[2]
+    print "gapps=",gapps
+    if group_id == None:
+      print "groupid none"
+      group_id=gpid._id
+    group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+    if not group_obj:
+      group_id=gpid._id
 
-  selectedGapp = selectedGapp.split("/")[2]
-  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'newgroup':group_id}
-
+    print "group_id=",group_id
+    return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+  except invalid_id:
+    gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    group_id=gpid._id
+    print "in exception"
+    return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 @register.assignment_tag
 def get_forum_twists(forum):
@@ -138,6 +158,7 @@ def get_twist_replies(twist):
 
 @register.assignment_tag
 def check_user_join(request,group_id):
+  print "checkuser join",group_id,type(group_id)
   if not request.user:
     return "null"
   user=request.user
@@ -167,29 +188,9 @@ def check_user_join(request,group_id):
   
 @register.assignment_tag
 def check_group(group_id):
+  print "in  exgrp",group_id,type(group_id)
   fl = check_existing_group(group_id)
   return fl
-
-@register.assignment_tag
-def get_group_name(groupurl):
-  col_Group = db[Group.collection_name]
-  sp=groupurl.split("/",2)
-
-  if len(sp)<=1:
-    grp = "home"
-  if sp[1]:
-    chsp = check_existing_group(sp[1])
-    if chsp:
-      grp = sp[1]
-    else:
-      grp = "home"
-  else:
-      grp = "home"
-  if grp == "home":
-    grpobj=col_Group.Group.one({'_id':ObjectId(group_id)})
-  else:
-    grpobj=col_Group.Group.one({'_id':ObjectId(grp)})
-  return grpobj
 
 
 @register.assignment_tag
@@ -222,6 +223,7 @@ def get_existing_groups_excluded(grname):
 @register.assignment_tag
 def get_group_policy(group_id,user):
   try:
+    print "insideget_grp_policy"
     policy = ""
     col_Group = db[Group.collection_name]
     colg = col_Group.Group.one({'_id':ObjectId(group_id)})
@@ -236,6 +238,7 @@ def get_user_group(user):
 
   group = [] 
   author = None
+  auth_type = ""
 
   col_Group = db[Group.collection_name]
   collection = db[Node.collection_name]
@@ -252,17 +255,6 @@ def get_user_group(user):
                               })
 
   auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
-
-  if auth is None:
-    auth = collection.Author()
-
-    auth._type = u"Group"
-    auth.name = unicode(user.username)      
-    auth.password = u""
-    auth.member_of.append(auth_type)      
-    auth.created_by = int(user.pk)
-
-    auth.save()
   
   for items in colg:
     if items.name == auth.name:
@@ -283,36 +275,38 @@ def get_user_group(user):
 
 @register.assignment_tag
 def get_group_type(group_id,user):
-  print "gropid=temptag",group_id
-  col_Group = db[Group.collection_name]
-  if group_id == '/home/':
-    colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-  else:  
-    gpid=str(group_id).split("/")
-    print gpid
-    colg=col_Group.Group.one({'_id': ObjectId(gpid[1])})
-  #check if Group exist in the database
-  if colg is not None:
-	# Check is user is logged in
-	if  user.id:
-		# condition for group accesseble to logged user
-	  	if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
-			return "allowed"
-		else:
-			raise Http404	
-	else:
-		#condition for groups,accesseble to not logged users
-		if colg.group_type=="PUBLIC":
-			
-			return "allowed"
-                else:
-			print "redirection"
-			raise Http404
-  else:
-	
+  try:
+    print "gropid=temptag",group_id
+    col_Group = db[Group.collection_name]
+    if group_id == '/home/':
+      colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    else:  
+      #gpid=str(group_id).split("/")
+      colg=col_Group.Group.one({'_id': ObjectId(group_id)})
+    #check if Group exist in the database
+    if colg is not None:
+      # Check is user is logged in
+      if  user.id:
+        # condition for group accesseble to logged user
+        if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
+          return "allowed"
+        else:
+          raise Http404	
+      else:
+        #condition for groups,accesseble to not logged users
+        if colg.group_type=="PUBLIC":
+          return "allowed"
+        else:
+          print "redirection"
+          raise Http404
+    else:
 	return "pass"		
-	
-  
+  except Exception as e:
+    print "Error in group_type_view_in_ndf_tags"+str(e)
+    colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    return "pass"
+    
+
 
 
 '''this template function is used to get the user object from template''' 

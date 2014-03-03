@@ -111,7 +111,7 @@
 		<nav class="top-bar row" data-topbar>
 			<ul class="title-area">
 				<li class="name">
-					<h1><a href="/" accesskey="q"><img src="/static/ndf/images/icon/meta.svg"> meta<b>Studio</b></a></h1>
+					<h1><a href="/home" accesskey="q"><img src="/static/ndf/images/icon/meta.svg"> meta<b>Studio</b></a></h1>
 				</li>
 				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
 			</ul>
@@ -135,7 +135,7 @@
 					{% if user.is_authenticated %}
 
 					<li class="has-dropdown">
-						<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' newgroup user.username %}">{{ user.username }}</a>
+						<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' groupid user.username %}">{{ user.username }}</a>
 						<ul class="dropdown">
 							<li><a href="{% url 'auth_password_change' %}">Change password</a></li>
 							<li class="has-form"><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
@@ -174,7 +174,7 @@
 							{% else %}
 							{% for gp_id in groups %}						  		
 
-							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id.name %}">{{gp_id.name}}</a></li>		
+							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id.name}}</a></li>		
 
 							{% endfor %}	
 							
@@ -187,7 +187,7 @@
 
 					</li>
 
-					{% get_gapps_menubar newgroup request.META.PATH_INFO %}
+					{% get_gapps_menubar groupid request.META.PATH_INFO %}
 
 				</ul>
 			</section>
@@ -267,7 +267,9 @@
 
 							<!-- The actual body content -->
 							<!-- Url redirection -->
+
 							{% get_group_type  request.path request.user  as group_type %}
+
 
 							<!-- "pass" is used for the url which does not contains Group_name and "allowed" is used for those urls which Consist of Group names which user or public is allowed to acccess"-->
 							{% if group_type == "pass" or group_type == "allowed"%}
@@ -280,7 +282,7 @@
 							{% endif %}
 
 							<input type="hidden" value="{{newgroup}}"> 
-
+							<input type="hidden" value="{{groupid}}"> 
 						
 						</article>
 						<!-- End of content section -->	

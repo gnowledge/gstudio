@@ -6,9 +6,7 @@ from django.contrib.auth.decorators import login_required
 {% block head %}
 
 
-<script type="text/javascript" ></script>
-
-<script>
+<script type="text/javascript" >
   var chk_login = "{{ user }}";
 </script>
 
@@ -89,7 +87,7 @@ $(document).ready(function()
 <p> Members in this group :{{node.author_set|length}} </p>
 
 {% get_group_policy node request.user as policy %}
-{% check_user_join request node as user_is_joined %}
+{% check_user_join request groupid as user_is_joined %}
 <input type="hidden" id="groupname" value="{{node}}">
 {% if user_is_joined == "joined" %}
 <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible" >

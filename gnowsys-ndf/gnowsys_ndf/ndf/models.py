@@ -155,13 +155,14 @@ class Node(DjangoDocument):
         
         'type_of': unicode,
         'member_of': [ObjectId],
-        'access_policy': unicode,   # To Create Public or Private node
+        'access_policy': unicode,               # To Create Public or Private node
 
       	'created_at': datetime.datetime,
         'last_update': datetime.datetime,
         #'rating': RatingField(),
         'created_by': int,			# Primary Key of User(django's) Class
-        'modified_by': [int],		# list of Primary Keys of User(django's) Class
+        'modified_by': [int],		        # List of Primary Keys of User(django's) Class
+        'location': dict,
 
         'start_publication': datetime.datetime,
 

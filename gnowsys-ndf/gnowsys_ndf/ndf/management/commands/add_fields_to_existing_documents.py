@@ -1,8 +1,6 @@
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
 
-from mongokit import IS
-
 from django_mongokit import get_database
 
 try:
@@ -17,21 +15,29 @@ from gnowsys_ndf.ndf.models import Node
 
 class Command(BaseCommand):
 
-    help = " This script will add the access_policy field to all created documents in your database."
+    help = " This script will add the new field(s) into already existing documents (only if they doesn't exists) in your database."
 
     def handle(self, *args, **options):
-        db = get_database()
-        collection = db[Node.collection_name] 
+        collection = get_database()[Node.collection_name]
+        # Keep latest fields to be added at top
+
+        # -------------------------------------------------------------------------------------------------------------
+        # Adding "location" field with no default value
+        # -------------------------------------------------------------------------------------------------------------
+        collection.update({'location': {'$exists': False}}, {'$set': {'location': {}}}, upsert=False, multi=True)
         
-        # As considering default access_policy of all documents is PUBLIC 
-        
+        # -------------------------------------------------------------------------------------------------------------
+        # Adding "access_policy" field
+        # -------------------------------------------------------------------------------------------------------------
+        # For Group documents, access_policy value is set depending upon their 
+        # group_type values, i.e. either PRIVATE/PUBLIC whichever is there
         collection.update({'_type': 'Group', 'group_type': 'PRIVATE'}, {'$set': {'access_policy': u"PRIVATE"}}, upsert=False, multi=True)
         collection.update({'_type': 'Group', 'group_type': 'PUBLIC'}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
         
+        # For Non-Group documents which doesn't consits of access_policy field, add it with PUBLIC as it's default value
         collection.update({'_type': {'$nin': ['Group']}, 'access_policy': {'$exists': False}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
         
         collection.update({'_type': {'$nin': ['Group']}, 'access_policy': {'$in': [None, "PUBLIC"]}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
         collection.update({'_type': {'$nin': ['Group']}, 'access_policy': "PRIVATE"}, {'$set': {'access_policy': u"PRIVATE"}}, upsert=False, multi=True)
 
-        # As _type field values is a list of those who all are inherited Node collection, as access_policy field is placed in Node collection
   		

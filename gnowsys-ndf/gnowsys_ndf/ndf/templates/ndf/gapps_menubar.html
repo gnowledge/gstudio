@@ -16,7 +16,7 @@
 	active-menu
 	
 	{% endif %}
-	app" href="{% url app_dict.name newgroup app_dict.id %}">
+	app" href="{% url app_dict.name groupid app_dict.id %}">
 
 	{% comment %} Includes an app icon if found{% endcomment %}
 	{% if app_dict.name|lower == "page" %}
