@@ -142,6 +142,7 @@ def delete_page(request, group_name, node_id):
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
 
+
 def version_node(request, group_name, node_id, version_no):
     """Renders either a single or compared version-view based on request.
 
