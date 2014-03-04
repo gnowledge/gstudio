@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, graph_nodes,get_translate_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, get_translate_common_fields
 
 
 #######################################################################################################################################
