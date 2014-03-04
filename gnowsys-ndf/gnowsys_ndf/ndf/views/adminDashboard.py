@@ -35,7 +35,7 @@ def adminDashboardClass(request, class_name):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = collection.Node.find({'name':{'$regex':search},'_type':classtype})
+        nodes = collection.Node.find({'name':{'$regex':search, '$options': 'i' },'_type':classtype})
     else :
         nodes = collection.Node.find({'_type':class_name})
     objects_details = []
@@ -72,15 +72,17 @@ def adminDashboardEdit(request):
         if request.is_ajax() and request.method =="POST":
             objectjson = json.loads(request.POST['objectjson'])
         node = collection.Node.one({ '_id': ObjectId(objectjson['id'])})
+	print objectjson['id'],node
         node.name =  objectjson['fields']['title']
         for key,value in objectjson['fields'].items():
             if key == "group":
                 node['group_set'] = value.split(",")
             if key == "type":
                 typelist = []
-                for eachvalue in  value.split(","):
-                    typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                node['member_of'] = typelist
+		if value :
+                	for eachvalue in  value.split(","):
+                    		typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                	node['member_of'] = typelist
         node.save()     
         return StreamingHttpResponse(node.name+" edited successfully")
     except Exception as e:

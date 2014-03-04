@@ -1,9 +1,5 @@
 from django.conf.urls import patterns, url
 
-from django.views.generic import TemplateView
-
-from gnowsys_ndf.ndf.views import *
-
 urlpatterns = patterns('gnowsys_ndf.ndf.views.forum',
                        url(r'^(?P<node_id>[\w-]+)$', 'forum', name='forum'),
                        url(r'^create/$', 'create_forum', name='create_forum'),

@@ -57,20 +57,20 @@ def adminDesignerDashboardClassCreate(request,class_name):
     dependencylist = []
     options = []
     if class_name == "AttributeType":
-        definitionlist = ['name','altnames','subject_type','applicable_node_type','data_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
-        contentlist = ['content','content_org']
+        definitionlist = ['name','altnames','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        contentlist = ['content_org']
         dependencylist = ['prior_node']
-        options = ['featured','created_by','created_at','start_publication','tags','url','last_update','login_required']
+        options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     elif class_name == "GSystemType":
-        definitionlist = ['name','altnames','status','meta_type_set','attribute_type_set','relation_type_set']
-        contentlist = ['content','content_org']
+        definitionlist = ['name','altnames','status','meta_type_set','attribute_type_set','relation_type_set','member_of']
+        contentlist = ['content_org']
         dependencylist = ['prior_node']
-        options = ['featured','created_by','created_at','start_publication','tags','url','last_update','login_required']
+        options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     elif class_name == "RelationType":
-        definitionlist = ['name','inverse_name','altnames','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','slug','is_symmetric','is_reflexive','is_transitive','status']
-        contentlist = ['content','content_org']
+        definitionlist = ['name','inverse_name','altnames','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status','member_of']
+        contentlist = ['content_org']
         dependencylist = ['prior_node']
-        options = ['featured','created_by','created_at','start_publication','tags','url','last_update','login_required']
+        options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     else :
         definitionlist = []
         contentlist = []
@@ -81,37 +81,54 @@ def adminDesignerDashboardClassCreate(request,class_name):
     required_fields = eval(class_name).required_fields
     newdict = {}
     new_instance_type = eval("collection"+"."+class_name)()
-#    new_instance_type = collection.Node
-    print new_instance_type
     if request.method=="POST":
         for key,value in class_structure.items():
             if value == bool:
-                print key , "bool"
                 if request.POST.get(key,""):
-                    if request.POST.get(key,"") in (1,2):
-                        if request.POST.get(key,"") == 1:
+                    if request.POST.get(key,"") in ('1','2'):
+                        if request.POST.get(key,"") == '1':
                             new_instance_type[key] = True
                         else :
                             new_instance_type[key] = False  
                             
-                    print request.POST.get(key,"")
-              #  newdict[key] = "bool"
             elif value == unicode:
-                print key , unicode
                 if request.POST.get(key,""):
-                    new_instance_type[key] = unicode(request.POST.get(key,"")) 
+                    if key == "content_org":
+                        new_instance_type[key] = unicode(request.POST.get(key,""))
+                        # Required to link temporary files with the current user who is modifying this document
+                        usrname = request.user.username
+                        filename = slugify(new_instance_type['name']) + "-" + usrname + "-"
+                        new_instance_type['content'] = org2html(new_instance_type[key], file_prefix=filename)
+                    else :
+                        new_instance_type[key] = unicode(request.POST.get(key,""))
             elif value == list:
-                print key,"list"
                 if request.POST.get(key,""):
-                    new_instance_type[key] = list(request.POST.get(key,""))
+                    new_instance_type[key] = request.POST.get(key,"").split(",")
             elif type(value) == list:
                 if request.POST.get(key,""):
-                    new_instance_type[key] = list(request.POST.get(key,""))
+                    if key in ("tags","applicable_node_type"):
+                        new_instance_type[key] = request.POST.get(key,"").split(",")
+                    elif key in ["meta_type_set","attribute_type_set","relation_type_set"]:
+                        listoflist = []
+                        for each in request.POST.get(key,"").split(","):
+                            listoflist.append(collection.Node.one({"_id":ObjectId(each)}))
+                        new_instance_type[key] = listoflist
+                    else :
+                        listoflist = []
+                        for each in request.POST.get(key,"").split(","):
+                            listoflist.append(ObjectId(each))
+                        new_instance_type[key] = listoflist
             elif value == datetime.datetime:
-                pass
+                new_instance_type[key] = datetime.datetime.now()
+#                pass
             elif key == "status":
                 if request.POST.get(key,""):
                     new_instance_type[key] = unicode(request.POST.get(key,""))
+            elif key == "created_by":
+                new_instance_type[key] = request.user.id
+            elif value == int:
+                if request.POST.get(key,""):
+                    new_instance_type[key] = int(request.POST.get(key,""))
             else: 
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"")
@@ -128,11 +145,12 @@ def adminDesignerDashboardClassCreate(request,class_name):
             newdict[key] = "list"
         elif value == datetime.datetime:
             newdict[key] = "datetime"
+        elif value == int:
+            newdict[key] = "int"
         elif key == "status":
             newdict[key] = "status"
         else: 
             newdict[key] = value
-    #        print value, key
     class_structure = newdict    
  
     template = "ndf/adminDashboardCreate.html"

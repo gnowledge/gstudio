@@ -1,12 +1,10 @@
 from django.conf.urls import patterns, url
 from django.views.generic.base import RedirectView
-from gnowsys_ndf.ndf.views import *
 
-
-urlpatterns = patterns('',
+urlpatterns = patterns('gnowsys_ndf.ndf.views.adminDashboard',
         url(r'^$', RedirectView.as_view(url='GSystem'), name='adminClass'),
-        url(r'^edit','gnowsys_ndf.ndf.views.adminDashboard.adminDashboardEdit',name='adminDashboardEdit' ),
-        url(r'^delete','gnowsys_ndf.ndf.views.adminDashboard.adminDashboardDelete',name='adminDashboardDelete' ),
-	url(r'^(?P<class_name>[^/]+)','gnowsys_ndf.ndf.views.adminDashboard.adminDashboardClass',name='adminDashboardClass' ),
+        url(r'^edit', 'adminDashboardEdit', name='adminDashboardEdit'),
+        url(r'^delete', 'adminDashboardDelete', name='adminDashboardDelete'),
+	url(r'^(?P<class_name>[^/]+)', 'adminDashboardClass', name='adminDashboardClass'),
 
 )

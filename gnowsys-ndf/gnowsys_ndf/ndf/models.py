@@ -152,7 +152,10 @@ class Node(DjangoDocument):
         'altnames': unicode,
         'plural': unicode,
         'prior_node': [ObjectId],
+        'post_node': [ObjectId],
         
+        'language': unicode,
+
         'type_of': unicode,
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
@@ -168,6 +171,8 @@ class Node(DjangoDocument):
 
         'content': unicode,
         'content_org': unicode,
+
+        'collection_set': [ObjectId],		# List of ObjectId's of different Types/GSystems
 
         'tags': [unicode],
         'featured': bool,
@@ -492,7 +497,6 @@ class GSystem(Node):
     structure = {        
         'attribute_set': [dict],		# Dict that holds AT name & its values
         'relation_set': [dict],			# Dict that holds RT name & its related_object value
-        'collection_set': [ObjectId],		# List of ObjectId's of GSystem Class [(ObjectId, version_no)]
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
         'group_set': [unicode],                 # List of ObjectId's of Groups to which this document belongs
