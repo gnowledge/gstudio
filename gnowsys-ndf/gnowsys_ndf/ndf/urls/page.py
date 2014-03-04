@@ -6,7 +6,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.page',
                        url(r'^details/(?P<app_id>[\w-]+)$', 'page', name='page_details'),
                        url(r'^edit/(?P<node_id>[\w-]+)$', 'create_edit_page', name='page_create_edit'),
                        url(r'^search$', 'page', name='page_search'),
-
+                       url(r'^(?P<node_id>[\w-]+)/translate/$', 'translate_node', name='node_translation'),
                        url(r'^(?P<node_id>[\w-]+)/version/(?P<version_no>\d+\.\d+)$', 'version_node', name='node_version'),
                        
                        url(r'^delete/(?P<node_id>[\w-]+)$', 'delete_page', name='page_delete'),

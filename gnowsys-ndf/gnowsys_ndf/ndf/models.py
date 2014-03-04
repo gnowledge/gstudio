@@ -154,6 +154,8 @@ class Node(DjangoDocument):
         'prior_node': [ObjectId],
         'post_node': [ObjectId],
         
+        'language': unicode,
+
         'type_of': unicode,
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
