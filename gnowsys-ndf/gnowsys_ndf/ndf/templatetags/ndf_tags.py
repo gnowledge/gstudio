@@ -270,43 +270,46 @@ def get_group_policy(group_id,user):
 
 @register.assignment_tag
 def get_user_group(user):
+  try:
+    group = [] 
+    author = None
+    auth_type = ""
+  
+    col_Group = db[Group.collection_name]
+    collection = db[Node.collection_name]
+    
+    group_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Group'})
+    auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
 
-  group = [] 
-  author = None
-  auth_type = ""
+    if auth_obj:
+      auth_type = auth_obj._id
 
-  col_Group = db[Group.collection_name]
-  collection = db[Node.collection_name]
-
-  group_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Group'})
-  auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
-
-  if auth_obj:
-    auth_type = auth_obj._id
-
-  colg = col_Group.Group.find({ '_type': u'Group', 
+    colg = col_Group.Group.find({ '_type': u'Group', 
                                 'name': {'$nin': ['home']},
                                 '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
                               })
 
-  auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
-  
-  for items in colg:
-    if items.name == auth.name:
-      #group.append(items)                                                                                                                   
-      author = items
+    auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+    print "colg=",colg
+    for items in colg:
+      if items.created_by == user.pk:
+        if items.name == auth.name:
+          author = items
+        else:
+          group.append(items)
+      else:
+        if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
+          group.append(items)
 
-    else:
-      if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
-        group.append(items)
+    if author:
+      group.append(author)
 
-  if author:
-    group.append(author)
+    if not group:
+      return "None"
 
-  if not group:
-    return "None"
-
-  return group
+    return group
+  except:
+    return group
 
 @register.assignment_tag
 def get_group_type(group_id,user):
