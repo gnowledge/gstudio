@@ -92,19 +92,23 @@ def create_group(request,group_id):
 def group_dashboard(request,group_id=None):
     try:
         print "ingrpdashview",group_id
-        groupobj=""
+        groupobj="" 
+        grpid=""
         if group_id == None:
             print "home"
             groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+            grpid=groupobj['_id']
+            print grpid,"grpid"
         else:
             print "other grps",group_id,type(group_id)    
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
-            print groupobj,"TEST"
+            grpid=groupobj['_id']
     except Exception as e:
         print "Error in groupdash board-"+str(e)
         groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+        grpid=groupobj['_id']
         pass
-    return render_to_response("ndf/groupdashboard.html",{'groupid':groupobj['_id'],'group_id':groupobj['_id'],'user':request.user},context_instance=RequestContext(request))
+    return render_to_response("ndf/groupdashboard.html",{'groupid':grpid,'group_id':grpid,'user':request.user},context_instance=RequestContext(request))
 
 @login_required
 def edit_group(request,group_id):

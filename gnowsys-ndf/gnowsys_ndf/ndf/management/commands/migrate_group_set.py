@@ -12,16 +12,31 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import Node,GSystem
 
 ####################################################################################################################
 
 class Command(BaseCommand):
 
-    help = " This script will change the group_set of documents in your database."
+    help = " This script will replace the [unicode] (i.e. group_name) of 'group_set' field of GSystem with [ObjectId] (i.e. group_id)."
 
     def handle(self, *args, **options):
-        get_documents=
+        db=get_database()
+        collection = db[Node.collection_name]
+        systems = collection.Node.find({'_type':u'GSystem'})
+        for each in systems:
+            gps = collection.Node.find({'_type':u'Group'})
+            for eachgps in gps:
+                grpname = unicode(eachgps.name)
+                if grpname.strip() in each.group_set:
+                    each.group_set.remove(grpname)
+                    each.group_set.append(eachgps._id)
+            for each_group_set_item in each.group_set:
+                if type(each_group_set_item)==type(unicode()):
+                    each.group_set.remove(each_group_set_item)
+            each.save()
+
+            
             
        
           
