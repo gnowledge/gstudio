@@ -15,6 +15,7 @@ from django.template import RequestContext,loader
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+
 register = Library()
 db = get_database()
 collection = db['Nodes']
@@ -132,11 +133,12 @@ def get_gapps_menubar(group_name, selectedGapp):
   
   gapps = {}
   i = 0;
-  meta = META_TYPE[0]
-  meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name':meta}]})
-  GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]})
-  for node in GAPPS:
-    #node = collection.Node.one({'_type': 'GSystemType', '': app})
+
+  meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+  # GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]})
+
+  for app in GAPPS:
+    node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
     if node:
       if node.name not in ["Image", "Video"]:
         i = i+1;
