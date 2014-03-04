@@ -43,6 +43,7 @@
 
     <h5>Quiz</h5>
     {% for node in quiz_nodes %}
+      {% if node.created_by == request.user.pk %}  
     <div class="row">
 
       <div class="small-8 columns">
@@ -58,7 +59,25 @@
      {% endif %}
 
    </div>
+   {% else %}
+    {% if node.access_policy == "PUBLIC" %}
+      <div class="row">
 
+      <div class="small-8 columns">
+       <label class="inline"><strong><a href="{% url 'quiz_details' group_name node %}">{{ node.name }}</a></strong></label>
+     </div>
+
+     {% if user.is_authenticated %}
+     <div class="small-4 columns">
+       <a href="{% url 'quiz_item_create_edit' group_name node %}">
+         <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
+       </a>
+     </div>
+     {% endif %}
+
+   </div>
+    {% endif %}
+    {% endif %}
    {% empty %}
    <div class="row">
 

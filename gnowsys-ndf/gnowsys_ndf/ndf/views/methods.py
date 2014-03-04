@@ -88,7 +88,12 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
       elif checked == "Forum":
         gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [group_name]}})
-
+      
+      elif checked == "Module":
+        gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [group_name]}})
+    
+        
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
            
@@ -169,32 +174,45 @@ def get_node_common_fields(request, node, group_name, node_type):
   
   gcollection = db[Node.collection_name]
 
-  collection = None
-  private = None
+  collection = None  
 
   name = request.POST.get('name')
   usrid = int(request.user.id)
-  private = request.POST.get("private_cb", '')
-  tags = request.POST.get('tags')
-  prior_node_list = request.POST['prior_node_list']
-  collection_list = request.POST['collection_list']
-  content_org = request.POST.get('content_org')
+  usrname = unicode(request.user.username)
+  access_policy = request.POST.get("login-mode", '') 
 
+  tags = request.POST.get('tags')
+  prior_node_list = request.POST.get('prior_node_list','')
+  collection_list = request.POST.get('collection_list','')
+  module_list = request.POST.get('module_list','')
+  content_org = request.POST.get('content_org')
+  print module_list,"test"
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
     node.created_by = usrid
     node.member_of.append(node_type._id)
+    if group_name not in node.group_set:
+      node.group_set.append(group_name)    
   
-    if private:
-      private = True
+    if access_policy == "PUBLIC":
+      node.access_policy = unicode(access_policy)      
     else:
-      private = False
-
+      node.access_policy = unicode(access_policy)    
+          
     # End of if
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+
+  if access_policy:
+    # Policy will be changed only by the creator of the resource 
+    # via access_policy(public/private) option on the template which is visible only to the creator
+    if access_policy == "PUBLIC":
+      node.access_policy = u"PUBLIC"      
+    else:
+      node.access_policy = u"PRIVATE"  
+  
 
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
@@ -204,8 +222,11 @@ def get_node_common_fields(request, node, group_name, node_type):
     node.modified_by.remove(usrid)
     node.modified_by.insert(0,usrid)
 
-  if group_name not in node.group_set:
-    node.group_set.append(group_name)
+  # For displaying nodes in home group as well as in creator group.
+  if group_name not in node.group_set: 
+    node.group_set.append(group_name)  
+  elif usrname not in node.group_set:   
+    node.group_set.append(usrname)  
 
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
@@ -238,7 +259,23 @@ def get_node_common_fields(request, node, group_name, node_type):
       node.collection_set.append(node_id)
     
     i = i+1  
-      
+ 
+  # -------------------------------------------------------------------------------- Module
+
+  node.collection_set = []
+  if module_list != '':
+      collection_list = module_list.split(",")
+
+  i = 0                    
+  while (i < len(collection_list)):
+    node_id = ObjectId(collection_list[i])
+    
+    if gcollection.Node.one({"_id": node_id}):
+      node.collection_set.append(node_id)
+    
+    i = i+1  
+ 
+    
   # ------------------------------------------------------------------------------- org-content
   if content_org:
     node.content_org = unicode(content_org)
@@ -247,6 +284,7 @@ def get_node_common_fields(request, node, group_name, node_type):
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
+
 
   
 
@@ -306,86 +344,3 @@ def neighbourhood_nodes(page_node):
 # ------ End of processing for graph ------
 
 
-
-# ------ Some work for node graph - (II) ------
-def graph_nodes(page_node):
-  
-  collection = db[Node.collection_name]
-        
-  def _get_node_info(node_id):
-    node = collection.Node.one( {'$or':[{'_type':'GSystem'},{'_type':'File'}], '_id':node_id}  )
-    return node.name
-
-  # def _get_username(id_int):
-    # return User.objects.get(id=id_int).username
-
-  page_node_id = str(id(page_node._id))
-  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"GSystem"}, '
-  node_relations = ''
-  exception_items = [
-                      "name", "content", "_id", "login_required", "attribute_set",
-                      "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "modified_by", "created_by", "last_update", "url", "featured",
-                      "created_at", "group_set", "type_of", "content_org", "author_set"
-                    ]
-
-  # username = User.objects.get(id=page_node.created_by).username
-
-  i = 1
-  for key, value in page_node.items():
-    
-    if key in exception_items:
-      pass
-
-    elif isinstance(value, list) and len(value):
-
-      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
-      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
-      key_id = str(i)
-      # i += 1
-      
-      # if key in ("modified_by", "author_set"):
-      #   for each in value:
-      #     node_metadata += '{"screen_name":"' + _get_username(each) + '", "_id":"'+ str(i) +'_n"},'
-      #     node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
-      #     i += 1
-
-      # else:
-      for each in value:
-          if isinstance(each, ObjectId):
-            node_name = _get_node_info(each)          
-            node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'_n"},'
-          
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
-            i += 1
-          else:
-            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
-            i += 1
-    
-    else:
-      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"},'
-      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
-      key_id = str(i)      
-
-      if isinstance( value, list):
-        for each in value:
-          node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(i) +'_n"},'
-          node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(i) +'_n"},'
-          i += 1 
-      
-      else:
-        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
-        i += 1 
-    # End of if - else
-  # End of for loop
-
-  node_metadata = node_metadata[:-1]
-  node_relations = node_relations[:-1]
-
-  node_graph_data = '{ "node_metadata": [' + node_metadata + '], "relations": [' + node_relations + '] }'
-
-  return node_graph_data
-
-# ------ End of processing for graph ------

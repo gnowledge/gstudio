@@ -28,7 +28,7 @@ border-radius: 5px;
 {% get_all_replies reply as replies %}
 
 {% for eachrep in replies %}
-{% get_user_object eachrep.created_by as userobj %}
+{% get_user_object eachrep.created_by as user_obj %}
 
 <div class="row">
 <div id="insidediv" class="large-6 columns">
@@ -36,12 +36,14 @@ border-radius: 5px;
           {% with eachrep.content|safe as rep_content %}
               {{rep_content}}
           {% endwith %}
-       <font size="0.5">
-      by:<strong>{{userobj.username}}</strong>
-      <br/>
-      on:<strong>{{eachrep.created_at}}</strong>
-    </font>
 </font>
+       <small>
+		by:<a class="user" href="#" data-gnow="#337700">{{user_obj.username}}</a>
+	      </small>
+      <small>
+      on:<strong>{{eachrep.created_at}}</strong>
+    </small>
+
 </div>
         <div class="large-6 columns">
 
@@ -53,7 +55,7 @@ border-radius: 5px;
 
 <div class="response_change" id="refreshthread" class="large-12 columns">
 
-{% get_reply thread eachrep indent csrf_token user %}
+{% get_reply thread eachrep forum csrf_token user %}
 
 </div>
 {% endfor %}

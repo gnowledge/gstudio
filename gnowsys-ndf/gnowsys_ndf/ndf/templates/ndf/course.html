@@ -3,7 +3,7 @@
 {% block body_content %}
 <div class="row">
   <div class="small-3 large-3 columns">
-    <a href="#" class="button">create</a>
+    <a href="{% url 'create_edit' group_name %}" class="button">create</a>
   </div>
 </div>
 <div class="row">
@@ -13,7 +13,7 @@
       <li class="bullet-item text-left">
 	<div class="row">
           <div class="small-5 columns ">
-            <a href="{% url 'page_details' group_name course %}">
+            <a href="{% url 'course_detail' group_name course %}">
 	      <b>{{course.name}}</b>
 	    </a>
           </div>                
@@ -25,8 +25,6 @@
           </div>
 	</div>
       </li>
-      { % empty %}
-      <p> <em> No Course available in this group !!</em></P>
       {% endfor %}
     </ul>
   </div>

@@ -8,6 +8,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.template.loader import get_template
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 
 
@@ -16,7 +18,7 @@ from gnowsys_ndf.ndf.views.methods import get_forum_repl_type
 from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
-
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 import datetime
 from gnowsys_ndf.ndf.org2any import org2html
 try:
@@ -49,16 +51,19 @@ def create_forum(request,group_name):
         colf=gs_collection.GSystem()
         name=unicode(request.POST.get('forum_name',""))
         colf.name=name
-        content_org = "\n"+request.POST.get('content_org')
-        strng='<div id="postamble">\n<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>\n</div>\n'
-        filename = slugify(name) + "-" + request.user.username + "-"
-        colfcont = unicode(org2html(content_org, file_prefix=filename))
-        fixstr=colfcont.split(strng)
-        colf.content_org = unicode(colfcont.encode('utf8'))
-        colf.content=unicode(fixstr[0])
+        content_org = request.POST.get('content_org',"")
+        if content_org:
+            colf.content_org = unicode(content_org)
+            usrname = request.user.username
+            filename = slugify(name) + "-" + usrname + "-"
+            colf.content = org2html(content_org, file_prefix=filename)
         usrid=int(request.user.id)
+        usrname = unicode(request.user.username)
         colf.created_by=usrid
         colf.group_set.append(unicode(group_name))
+        if usrname not in colf.group_set:
+            colf.group_set.append(usrname)     
+
         colf.member_of.append(forum_st._id)
         sdate=request.POST.get('sdate',"")
         shrs= request.POST.get('shrs',"") 
@@ -74,7 +79,6 @@ def create_forum(request,group_name):
             smts=0
         if sdate:
             sdate1=sdate.split("/") 
-            print sdate1[2],sdate1[0],sdate1[1]
             st_date = datetime.datetime(int(sdate1[2]),int(sdate1[0]),int(sdate1[1]),int(shrs),int(smts))
             start_dt[start_time.name]=st_date
         if not ehrs:
@@ -112,48 +116,63 @@ def display_thread(request,group_name,thread_id):
 
 def add_node(request,group_name):
     try:
-        content_org="\n"+request.POST.get("reply","")
+        sitename=Site.objects.all()[0].name.__str__()
+        content_org=request.POST.get("reply","")
         node=request.POST.get("node","")
         thread=request.POST.get("thread","")
         forumid=request.POST.get("forumid","")
         sup_id=request.POST.get("supnode","")
         tw_name=request.POST.get("twistname","")
-        print "supid",sup_id
         if forumid:
             forumobj=gs_collection.GSystem.one({"_id": ObjectId(forumid)})
         sup=gs_collection.GSystem.one({"_id": ObjectId(sup_id)})
-        strng='<div id="postamble">\n<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>\n</div>\n'
         if not sup :        
             return HttpResponse("failure")
         colrep=gs_collection.GSystem()
         if node == "Twist":
             name=tw_name
-            colrep.name=unicode(name)
             colrep.member_of.append(twist_st._id)
         elif node == "Reply":
-            print "ins reply"
-            name="Reply of:"+str(sup._id)
-            colrep.name=unicode(name)
+            name=unicode("Reply of:"+str(sup._id))
             colrep.member_of.append(reply_st._id)
-#        if node=="Reply":
-#            exstng_reply=gs_collection.GSystem.one({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(sup._id)}]})
         colrep.prior_node.append(sup._id)
-        filename = slugify(name) + "-" + request.user.username + "-"
-        colrepcont = unicode(org2html(content_org, file_prefix=filename))
-        fixstr=colrepcont.split(strng)
-        colrep.content=unicode(fixstr[0])
-        colrep.content_org = unicode(content_org.encode('utf8'))
+        colrep.name=name
+        if content_org:
+            colrep.content_org = unicode(content_org)
+            # Required to link temporary files with the current user who is modifying this document
+            usrname = request.user.username
+            filename = slugify(name) + "-" + usrname + "-"
+            colrep.content = org2html(content_org, file_prefix=filename)
         usrid=int(request.user.id)
         colrep.created_by=usrid
-        colrep.group_set.append(unicode(group_name))
+        colrep.group_set.append(group_name)
         colrep.save()
+        colg = gs_collection.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
+        if node == "Twist" :  
+            url="http://"+sitename+"/"+group_name+"/forum/thread"+str(colrep._id)
+            activity=str(request.user.username)+" -added a thread "
+            prefix=" on the forum '"+forumobj.name+"'"
+            nodename=name
+        if node == "Reply":
+            threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
+            url="http://"+sitename+"/"+group_name+"/forum/thread"+str(threadobj._id)
+            activity=str(request.user.username)+" -added a reply "
+            prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
+            nodename=""
+        link=url
+        for each in colg.author_set:
+            bx=User.objects.get(id=each)
+            msg=activity+"-"+nodename+" in the group '"+group_name+"'\n"+"Please visit "+link+" to see the updated page"
+            ret = set_notif_val(request,group_name,msg,activity,bx)
+        bx=User.objects.get(id=colg.created_by)
+        msg=activity+"-"+nodename+prefix+" in the group '"+group_name+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"     
+        ret = set_notif_val(request,group_name,msg,activity,bx)
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]
             #     exstng_reply.prior_node.append(colrep._id)
             #     exstng_reply.save()
-            threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
-            variables=RequestContext(request,{'thread':threadobj,'user':request.user})
+            variables=RequestContext(request,{'thread':threadobj,'forum':forumobj,'user':request.user})
             return render_to_response("ndf/refreshtwist.html",variables)
         else:
             templ=get_template('ndf/refreshthread.html')

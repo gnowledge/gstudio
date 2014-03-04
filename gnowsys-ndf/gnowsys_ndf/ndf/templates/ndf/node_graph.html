@@ -4,21 +4,21 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	
 	<script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
-	<script type="text/javascript" src="/static/ndf/js/jquery.js"></script>	
+
 	<script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>		
 	<style type="text/css">
 
-		.link {
+		#chart .link {
 			stroke: #ccc;
 		}
 
-		.nodetext {
+		#chart .nodetext {
 			#pointer-events: none;
 			font: 10px Serif;
 			font-style:italic;
 		}
 
-		.mainnode{
+		#chart .mainnode{
 
 			font: 15px sans-serif;
 			/*fill:"black";*/
@@ -27,13 +27,13 @@
 			border-color: gray;
 		}
 
-		.relnode {
+		#chart .relnode {
 			font: 10px sans-serif;			
 			fill:#404040;
 		}
 
 
-		.node {
+		#chart .node {
 			border-width: 1px;
 			border-color: gray;
 			fill:#25587E;
@@ -66,16 +66,13 @@
 
 <body>
 
-	<div id="chart" data-graph="{{graphData}}" data-loc="{{request.META.PATH_INFO}}">
+	<div id="chart">
 	</div>
 
 	<script type="text/javascript">
 	
-	var loc = ($('#chart').attr("data-loc")).split("/")[3];
-
-	if( loc != "details") { $("#graphArea").hide();	}
-
-	var jsonData = $.parseJSON($("#chart").attr("data-graph"));
+	var graphHeight = ($(window).height())*0.55,
+		graphWidth  = ($(window).width())*0.75;
 
 	function init(a,b)
 	{
@@ -104,19 +101,19 @@
 		$(function fgraph() 
 		{	
 
-			// d3.json(jsonData, function (json1){ 
-				json1 = jsonData;
+			d3.json("{% url 'get_graph_json' group_name %}?id={{node.pk}}", function (json1){ 
+				// json1 = jsonData;
 				metadata=json1.node_metadata;
 				relations=json1.relations;
 
 				init(metadata,relations);
-				load(jsonData.node_metadata[0]._id) 
-			// });
+				load(json1.node_metadata[0]._id) 
+			});
 
 			function load(key)
 			{
-				var w = 550,
-				h = 300,
+				var w = graphWidth,
+				h = graphHeight,
 				fill = d3.scale.category20();
 
 				var vis = d3.select("#chart")
@@ -159,7 +156,7 @@
 			        	}
 			        	return acc;
 			        }, []);
-	        
+	        		
 		        force.nodes(nodes);
 		        force.links(edges);
 		        force.start();
@@ -195,7 +192,8 @@
 
 
                 var new_g = node.enter().append("svg:a")
-                .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })   	      
+                .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })
+                .attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
 
                 .call(force.drag);
 
@@ -211,7 +209,6 @@
                 .append("svg:path")
                 .attr("d","M 0 0 L 10 5 L 0 10 z")
                 .attr("fill", "#6D6666"); 
-
 
 
                 text1 = new_g.append("svg:text")
@@ -251,7 +248,7 @@
                 .style("fill-opacity", ".2")
                 // .style("stroke", "#666")
                 // .style("stroke-width", "1.5px")
-                .style("fill", function(d) {if (d.refType=="Objecttype") return "blue"; else if(d.refType=="GSystem") return "#0000ff"; else return "none"});
+                .style("fill", function(d) {if (d.refType=="Objecttype") return "blue"; else if(d.refType=="GSystem") return "#008759"; else return "none"});
 
                 node.exit().remove();							
 

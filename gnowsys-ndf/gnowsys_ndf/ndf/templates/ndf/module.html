@@ -1,0 +1,44 @@
+{% extends "ndf/base.html" %}
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+<!--External  css for tree -- >
+
+<!-- javascript file for tree -->
+<script src="/static/ndf/js/tree.jquery.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function()
+    {
+    $(function() {
+    $('.tree').tree();
+    });
+    });
+  </script>
+{% endblock %}
+  
+{% block body_content %}
+  <div class="row">
+    <div class="small-6 large-12 columns">
+      <ul class="pricing-table">
+	{% for module in module_coll %}
+	<li class="bullet-item text-left">
+	  <div class="row">
+            <div class="small-5 columns ">	  
+	      <!-- bellow div for making tree from json data -->
+	      <div class="tree" data-url="{% url 'get_module_json' group_name %}?_id={{module.pk}}"></div>
+            </div>                
+            <div class="small-7 columns text-right">
+              <i class="label secondary" >Created by {{module.user_details_dict.created_by}} on {{module.created_at|date:"j F Y"}} </i>
+            </div>    
+            <div class="small-12 columns" style="padding-top:5px;">
+	      <p>{{ node.html_content|safe|striptags|truncatechars:150 }}</p>
+            </div>
+	  </div>
+	</li>
+	{% empty %}
+	<p> <em> No Module available in this group !!</em></P>
+	{% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock %}

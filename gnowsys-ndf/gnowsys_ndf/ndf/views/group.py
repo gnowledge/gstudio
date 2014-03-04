@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
+from django.contrib.auth.models import User
 
 try:
     from bson import ObjectId
@@ -55,6 +56,7 @@ def group(request, group_name,app_id):
 
 
 def create_group(request,group_name):
+
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
@@ -64,13 +66,13 @@ def create_group(request,group_name):
         colg.member_of.append(gst_group._id)
         usrid = int(request.user.id)
         colg.created_by=usrid
-        colg.group_type = request.POST.get('group_type', "")
+        colg.group_type = request.POST.get('group_type', "")        
         colg.edit_policy = request.POST.get('edit_policy', "")
         colg.subscription_policy = request.POST.get('subscription', "")
         colg.visibility_policy = request.POST.get('existance', "")
         colg.disclosure_policy = request.POST.get('member', "")
         colg.encryption_policy = request.POST.get('encryption', "")
-        print "sub Pol",colg.subscription_policy
+        print "sub Pol",colg.subscription_policy        
         colg.save()
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", RequestContext(request))
@@ -79,7 +81,7 @@ def create_group(request,group_name):
 def group_dashboard(request,group_name):
     try:
         gp=unicode(group_name)
-        groupobj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':gp}]})
+        groupobj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':gp}]})        
     except:
         groupobj=""
         pass
@@ -87,10 +89,15 @@ def group_dashboard(request,group_name):
 
 @login_required
 def edit_group(request,group_name,group_id):
-    page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+    page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})    
     
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_name, gst_group)
+            if page_node.access_policy == "PUBLIC":
+                page_node.group_type = "PUBLIC"
+            if page_node.access_policy == "PRIVATE":
+                page_node.group_type = "PRIVATE"
+
             page_node.save()
             group_name=page_node.name
             return HttpResponseRedirect(reverse('groupchange', kwargs={'group_name': group_name}))

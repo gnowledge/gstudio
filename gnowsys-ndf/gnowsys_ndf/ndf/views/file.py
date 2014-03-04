@@ -95,6 +95,7 @@ def submitDoc(request, group_name):
         usrname = request.user.username
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
+        access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
         print "content:", content_org
         tags = request.POST.get('tags')
 
@@ -102,14 +103,14 @@ def submitDoc(request, group_name):
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
+                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
+                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, usrname)
+                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
             if f:
                 alreadyUploadedFiles.append(f)
                 title = mtitle
@@ -119,7 +120,7 @@ def submitDoc(request, group_name):
     else:
         return HttpResponseRedirect(reverse('homepage'))
             
-def save_file(files, title, userid, group_name, st_id, content_org, tags, usrname):
+def save_file(files, title, userid, group_name, st_id, content_org, tags, access_policy, usrname):
     """
     this will create file object and save files in gridfs collection
     """
@@ -145,14 +146,23 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, usrnam
             fileobj.created_by = int(userid)
             fileobj.file_size = size
             fileobj.group_set.append(unicode(group_name))        #group name stored in group_set field
+            if usrname not in fileobj.group_set:                 # File creator stored in group_set field
+                fileobj.group_set.append(usrname)
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
             if content_org:
                 fileobj.content_org = unicode(content_org)
                 # Required to link temporary files with the current user who is modifying this document
-                filename = slugify(title) + "-" + usrname + "-"
-                fileobj.content = org2html(content_org, file_prefix=filename)
+                filename_content = slugify(title) + "-" + usrname + "-"
+                fileobj.content = org2html(content_org, file_prefix = filename_content)
             fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+            
+            # For giving privacy to file objects
+            if access_policy == "PUBLIC":
+                fileobj.access_policy = unicode(access_policy)      
+            else:
+                fileobj.access_policy = unicode(access_policy)
+
             fileobj.save()
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs

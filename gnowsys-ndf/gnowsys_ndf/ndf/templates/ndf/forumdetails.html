@@ -24,7 +24,10 @@
       <a title="{{forum.name}}" href="#">
 	<h2>{{forum.name}}</h2>
       </a>
-    
+     	  {% with forum.content|safe as forum_content %}
+	  <font size ="2" >{{forum_content}} </font>
+	  {% endwith %}
+
   </div>
   <div class="small-6 large-6 columns" style="height:40px">
     <ul class="sub-nav">
