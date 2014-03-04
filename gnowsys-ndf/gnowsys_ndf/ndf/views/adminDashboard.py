@@ -6,12 +6,13 @@ from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from django_mongokit import get_database
-
 from gnowsys_ndf.ndf.views.methods import *
+
 import json
 
 db = get_database()
-collection = db[File.collection_name]
+collection = db[Node.collection_name]
+GAPP = collection.Node.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
 
 @user_passes_test(lambda u: u.is_superuser)
 def adminDashboard(request):
@@ -23,7 +24,7 @@ def adminDashboard(request):
     for each in nodes:
 	objects_details.append({"Id":each._id,"Title":each.name,"Type":each.type_of,"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set)})
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':"GSystem","nodes":objects_details})
+    variable = RequestContext(request, {'class_name':"GSystem", "nodes":objects_details })
     return render_to_response(template, variable)
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -41,7 +42,9 @@ def adminDashboardClass(request, class_name):
     for each in nodes:
         member = []
         for members in each.member_of:
-            member.append(collection.Node.one({ '_id': members}).name+" - "+str(members))
+            obj = collection.Node.one({ '_id': members})
+            if obj:
+                member.append(obj.name+" - "+str(members))
 	if class_name in ("GSystem","File"):
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
 	else :
