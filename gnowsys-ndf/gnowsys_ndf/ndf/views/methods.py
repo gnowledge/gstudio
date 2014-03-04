@@ -125,6 +125,43 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
 
     return dict_drawer
 
+def get_translate_common_fields(request, node, group_name, node_type):
+  """ retrive & update the common fields required for translation of the node """
+
+  gcollection = db[Node.collection_name]
+  usrid = int(request.user.id)
+  content_org = request.POST.get('content_org')
+  name = request.POST.get('name')
+  usrid = int(request.user.id)
+  language= request.POST.get('lan')
+  if not node.has_key('_id'):
+    
+    node.created_by = usrid
+    node.member_of.append(node_type._id)
+
+  node.name = unicode(name)
+
+  #node.modified_by.append(usrid)
+  if usrid not in node.modified_by:
+  #if usrid in node.modified_by:
+    node.modified_by.insert(0,usrid)
+  else:
+    node.modified_by.remove(usrid)
+    node.modified_by.insert(0,usrid)
+
+  if group_name not in node.group_set:
+    node.group_set.append(group_name)
+
+  if content_org:
+    node.content_org = unicode(content_org)
+    node.name=unicode(name)
+    node.language=unicode(language) 
+    # Required to link temporary files with the current user who is modifying this document
+    usrname = request.user.username
+    filename = slugify(name) + "-" + usrname + "-"
+    node.content = org2html(content_org, file_prefix=filename)
+
+  
 
 def get_node_common_fields(request, node, group_name, node_type):
   """Updates the retrieved values of common fields from request into the given node.
@@ -322,7 +359,7 @@ def graph_nodes(page_node):
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
             i += 1
     

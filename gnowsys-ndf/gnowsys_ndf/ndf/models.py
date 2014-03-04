@@ -155,7 +155,7 @@ class Node(DjangoDocument):
         'altnames': unicode,
         'plural': unicode,
         'prior_node': [ObjectId],
-        
+        'language': unicode,
         'type_of': unicode,
         'member_of': [ObjectId],
 
@@ -169,7 +169,7 @@ class Node(DjangoDocument):
 
         'content': unicode,
         'content_org': unicode,
-
+         
         'tags': [unicode],
         'featured': bool,
         'url':unicode,
