@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, graph_nodes,get_translate_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, get_translate_common_fields
 
 
 #######################################################################################################################################
@@ -134,7 +134,6 @@ def create_edit_page(request, group_id, node_id=None):
                                   context_instance=RequestContext(request)
                               )
 
-
 @login_required    
 def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
@@ -147,6 +146,7 @@ def delete_page(request, group_id, node_id):
     print " op: ", op, "\n"
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
+
 
 
 
