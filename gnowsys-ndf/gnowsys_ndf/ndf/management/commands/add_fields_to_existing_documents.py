@@ -25,7 +25,7 @@ class Command(BaseCommand):
         # Adding "location" field with no default value
         # -------------------------------------------------------------------------------------------------------------
         collection.update({'location': {'$exists': False}}, {'$set': {'location': {}}}, upsert=False, multi=True)
-        collection.update({'language': {'$exists': False}}, {'$set': {'language': {}}}, upsert=False, multi=True)
+        collection.update({'language': {'$exists': False}}, {'$set': {'language': u''}}, upsert=False, multi=True)
         
         # -------------------------------------------------------------------------------------------------------------
         # Adding "access_policy" field
