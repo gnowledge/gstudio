@@ -200,6 +200,9 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+META_TYPE = [u"GAPP"]
+
+#Default APPs inculde in beloow GAPPS list
 GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module"]
 
 EMACS_INIT_FILE_PATH = "~/.emacs"
