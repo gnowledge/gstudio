@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import Node
 
-####################################################################################################################
+###################################################################################################################################################################################
 
 class Command(BaseCommand):
 
@@ -20,6 +20,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         collection = get_database()[Node.collection_name]
         # Keep latest fields to be added at top
+
+        # -------------------------------------------------------------------------------------------------------------
+        # Adding "post_node" field with empty list as it's default value
+        # -------------------------------------------------------------------------------------------------------------
+        collection.update({'post_node': {'$exists': False}}, {'$set': {'post_node': []}}, upsert=False, multi=True)
+
+        # -------------------------------------------------------------------------------------------------------------
+        # Adding "collection_set" field with empty list as it's default value
+        # -------------------------------------------------------------------------------------------------------------
+        collection.update({'collection_set': {'$exists': False}}, {'$set': {'collection_set': []}}, upsert=False, multi=True)
 
         # -------------------------------------------------------------------------------------------------------------
         # Adding "location" field with no default value
