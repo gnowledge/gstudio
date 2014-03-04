@@ -28,7 +28,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, graph_nodes,get_translate_common_fields
 
 
 #######################################################################################################################################
@@ -134,6 +134,7 @@ def create_edit_page(request, group_id, node_id=None):
                                   context_instance=RequestContext(request)
                               )
 
+
 @login_required    
 def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
@@ -146,6 +147,7 @@ def delete_page(request, group_id, node_id):
     print " op: ", op, "\n"
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
+
 
 
 def version_node(request, group_id, node_id, version_no):
@@ -203,6 +205,52 @@ def version_node(request, group_id, node_id, version_no):
                                'selected_versions': selected_versions,
                                'content': content
                               },
+                              context_instance = RequestContext(request)
+    )        
+
+def translate_node(request,group_id,node_id=None):
+    """ translate the node content"""
+
+    context_variables = { 'title': gst_page.name,
+                          'group_id': group_id,
+                          'groupid': group_id
+                      }
+
+    page_node = collection.GSystem()
+
+    if request.method == "POST":
+        get_translate_common_fields(request, page_node, group_id, gst_page)
+        page_node.save()
+        
+        return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
+        
+
+
+    node = collection.Node.one({"_id": ObjectId(node_id)})
+    fp = history_manager.get_file_path(node)
+    # Retrieve rcs-file for a given version-number
+    rcs.checkout(fp)
+   
+    # Copy content from rcs-version-file
+    data = None
+    with open(fp, 'r') as sf:
+        data = sf.read()
+       
+        # Used json.loads(x) -- to covert string to dictionary object
+        # If want to use key from this converted dictionay, use array notation because dot notation doesn't works!
+        data = json.loads(data)
+
+        # Remove retrieved rcs-file belonging to the given version-number
+        rcs.checkin(fp)
+
+        content = data
+        return render_to_response("ndf/translation_page.html",
+                               {'content': content,
+                                'node':node,
+                                'groupid':group_id,
+                                'group_id':group_id
+                               },
+                             
                               context_instance = RequestContext(request)
     )        
 

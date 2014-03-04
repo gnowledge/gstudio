@@ -152,7 +152,7 @@ class Node(DjangoDocument):
         'altnames': unicode,
         'plural': unicode,
         'prior_node': [ObjectId],
-        
+        'language': unicode,
         'type_of': unicode,
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
@@ -168,7 +168,7 @@ class Node(DjangoDocument):
 
         'content': unicode,
         'content_org': unicode,
-
+         
         'tags': [unicode],
         'featured': bool,
         'url':unicode,
