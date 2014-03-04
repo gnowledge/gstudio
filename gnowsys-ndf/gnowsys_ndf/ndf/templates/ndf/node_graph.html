@@ -251,7 +251,7 @@
 	                        { 
 	                			$.getJSON("{% url 'get_graph_json' group_name %}?id=" + d._id , function (json2) {
 	                				new_metadata = json2.node_metadata;
-		                		});	
+
 
 	                			// _.filter(new_metadata, function(e){if(e._id>0){
                            		_.filter(new_metadata, function(e){if(e._id){
@@ -269,6 +269,9 @@
             	                neighbour_node= neighbour_node.concat(prev_node);
             	                // alert(neighbour_node);
                 	            neighbour_node = _.uniq(neighbour_node);
+		                		
+		                		});	
+								
 
                     	        metadata=[]
                         	    relations=[]
@@ -292,10 +295,11 @@
                                       	metadata=_.union(new_metadata,metadata);
 
                                       	relations=_.union(new_relations,relations);
-                                      	relations= check_Relationtype(metadata,relations);
+                                      	//relations= check_Relationtype(metadata,relations);
                                       	}
                                     });     
                           		}
+                          		alert(metadata);
                           		
                           		_.each(metadata, function(m){
                           			for(i=0;i<neighbour_node.length;i++)
@@ -306,11 +310,38 @@
                                     		{m.expanded="false";}
                             		}
                         		});
-                        		alert(metadata);
 
                           		init(metadata,relations);
                           		load(objectid) ;                        
 	                		} // --END if
+	                		else if(d._id>0 && d._id!= objectid)
+               		        {
+                        
+                    	    neighbour_node =neighbour_node.concat(d._id);
+                        	d3.select("#amazingViz").remove();  
+	                        $.ajax({
+	                          async:false,
+	                          url:'/nodetypes/graphs/graph_json/' + d._id , 
+	                          datatype:'json',
+	                          success:function (json2) {
+	                            new_metadata=json2.node_metadata;
+	                            new_relations=json2.relations;
+	                            metadata=_.union(new_metadata,metadata);
+	                            relations=_.union(new_relations,relations);
+	                            relations= check_Relationtype(metadata,relations);
+	                            _.each(metadata, function(m){
+
+	                              for(i=0;i<neighbour_node.length;i++)
+	                              {
+	                                if(m._id==neighbour_node[i])
+	                                  m.expanded="true";
+	                              }
+	                            });
+	                          }});
+                				//console.log(metadata);
+                				init(metadata,relations);
+                				load(objectid);
+              				}
                 		});
                 	}
                 });
