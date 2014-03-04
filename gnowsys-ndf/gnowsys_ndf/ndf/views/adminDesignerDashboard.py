@@ -27,23 +27,36 @@ def adminDesignerDashboardClass(request, class_name):
     objects_details = []
     for each in nodes:
         member = []
+        member_of = ""
+        member_of = each.member_of
+        if member_of:
+            member_of = member_of[0]
+            member_of = collection.Node.one({'_id':member_of})
+            member_of = member_of.name
+            
         for members in each.member_of:
             member.append(collection.Node.one({ '_id': members}).name+" - "+str(members))
 	if class_name in ("GSystem","File"):
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
 	else :
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':member_of})
     groups = []
     group = collection.Node.find({'_type':"Group"})
     for each in group:
         groups.append({'id':each._id,"title":each.name})
+    
     systemtypes = []
     systemtype = collection.Node.find({'_type':"GSystemType"})
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
 
+    meta_types = []
+    meta_type = collection.Node.find({'_type':"MetaType"})
+    for each in meta_type:
+        meta_types.append({'id':each._id,"title":each.name})
+
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer"})
+    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer",'meta_types':meta_types})
     return render_to_response(template, variable)
 
 
