@@ -212,9 +212,8 @@ def create_meta_type(user_id):
     '''
     creating meta_type in database
     '''
-    meta_type = MetaType[0]
     meta = collection.MetaType()
-    meta.name = meta_type
+    meta.name = META_TYPE[0]
     meta.created_by = user_id # default hardcode
     meta.save()
     return meta
