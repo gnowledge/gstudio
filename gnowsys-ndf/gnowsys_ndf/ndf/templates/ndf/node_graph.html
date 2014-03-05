@@ -109,7 +109,7 @@
 		    neighbour_node= neighbour_node.concat(objectid);  
     
 
-			// $.getJSON("{% url 'get_graph_json' group_name %}?id={{node.pk}}", function (json1){ 
+			// $.getJSON("{% url 'get_graph_json' groupid %}?id={{node.pk}}", function (json1){ 
 			$.getJSON("{% url 'get_graph_json' groupid %}?id=" + objectid, function (json1){ 
 
 				metadata=json1.node_metadata;
@@ -250,7 +250,7 @@
                 			// alert(JSON.stringify(d))
 	                        if( d.expanded=="true" && d._id!= objectid )
 	                        { 
-	                			$.getJSON("{% url 'get_graph_json' group_name %}?id=" + d._id , function (json2) {
+	                			$.getJSON("{% url 'get_graph_json' groupid %}?id=" + d._id , function (json2) {
 	                				new_metadata = json2.node_metadata;
 
 
@@ -287,7 +287,7 @@
                               		$.ajax({
 
                                   		async:false,
-                                  		url:"{% url 'get_graph_json' group_name %}?id=" + g , 
+                                  		url:"{% url 'get_graph_json' groupid %}?id=" + g , 
                                   		datatype:'json',
                                   		success:function (json2) {
                                   			json2 = JSON.parse(json2);
@@ -325,7 +325,7 @@
                         	d3.select("#amazingViz").remove();  
 	                        $.ajax({
 	                          async:false,
-	                          url:"{% url 'get_graph_json' group_name %}?id=" + d._id , 
+	                          url:"{% url 'get_graph_json' groupid %}?id=" + d._id , 
 	                          datatype:'json',
 	                          success:function (json2) {
 	                          	json2 = JSON.parse(json2);
