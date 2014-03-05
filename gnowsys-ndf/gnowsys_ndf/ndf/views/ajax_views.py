@@ -233,7 +233,11 @@ def get_module_json(request, group_id):
 def graph_nodes(request, group_id):
 
   collection = db[Node.collection_name]
-  page_node = collection.Node.one({'_id':ObjectId(request.GET.get("id"))}) 
+  page_node = collection.Node.one({'_id':ObjectId(request.GET.get("id"))})
+  
+  coll_relation = { 'relation_name':'has_collection', 'inverse_name':'member_of_collection' }
+
+  prior_relation = { 'relation_name':'prerequisite', 'inverse_name':'is_required_for' }
 
   def _get_node_info(node_id):
     node = collection.Node.one( {'_id':node_id}  )
@@ -273,15 +277,16 @@ def graph_nodes(request, group_id):
       
     return node_url
 
-  page_node_id = str(id(page_node._id))
-  node_metadata ='{"screen_name":"' + page_node.name + '", "_id":"'+ page_node_id +'", "refType":"GSystem"}, '
+
+  # page_node_id = str(id(page_node._id))
+  node_metadata ='{"screen_name":"' + page_node.name + '",  "title":"' + page_node.name + '",  "_id":"'+ str(page_node._id) +'", "refType":"GSystem"}, '
   node_relations = ''
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set",
                       "member_of", "status", "comment_enabled", "start_publication",
                       "_type", "modified_by", "created_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
-                      "fs_file_ids", "file_size", "mime_type"
+                      "fs_file_ids", "file_size", "mime_type", "location", "language"
                     ]
 
   # username = User.objects.get(id=page_node.created_by).username
@@ -296,9 +301,11 @@ def graph_nodes(request, group_id):
 
       if len(value):
 
-        node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
-        key_id = str(i)
+        # node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
+        node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(abs(hash(key+str(page_node._id)))) +'_r"}, '
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
+        # key_id = str(i)
+        key_id = str(abs(hash(key+str(page_node._id))))
         # i += 1
         
         # if key in ("modified_by", "author_set"):
@@ -310,9 +317,15 @@ def graph_nodes(request, group_id):
         # else:
         for each in value:
           if isinstance(each, ObjectId):
-            node_name = _get_node_info(each)          
+            node_name = _get_node_info(each)
+            if key == "collection_set":
+              inverse = coll_relation['inverse_name'] 
+            elif key == "prior_node":
+              inverse = prior_relation['inverse_name'] 
+            else:
+              inverse = ""
 
-            node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "url":"'+ _get_node_url(each) +'", "refType":"relation"},'
+            node_metadata += '{"screen_name":"' + node_name + '", "title":"' + page_node.name + '", "_id":"'+ str(each) +'", "url":"'+ _get_node_url(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1"},'
             # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
@@ -322,9 +335,10 @@ def graph_nodes(request, group_id):
             i += 1
     
     else:
-      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"},'
-      node_relations += '{"type":"'+ key +'", "from":"'+ str(id(page_node._id)) +'", "to": "'+ str(i) +'_r"},'
-      key_id = str(i)      
+      node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
+      node_relations += '{"type":"'+ key +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
+      # key_id = str(i)     
+      key_id = str(abs(hash(key+str(page_node._id))))
 
       if isinstance( value, list):
         for each in value:
@@ -334,7 +348,7 @@ def graph_nodes(request, group_id):
       
       else:
         node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
-        node_relations += '{"type":"'+ key +'", "from":"'+ str(i) +'_r", "to": "'+ str(i) +'_n"},'
+        node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
         i += 1 
     # End of if - else
   # End of for loop
@@ -343,6 +357,8 @@ def graph_nodes(request, group_id):
   node_relations = node_relations[:-1]
 
   node_graph_data = '{ "node_metadata": [' + node_metadata + '], "relations": [' + node_relations + '] }'
+
+  # print node_graph_data
 
   return HttpResponse(node_graph_data)
 

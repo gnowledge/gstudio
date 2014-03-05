@@ -148,6 +148,7 @@ def delete_page(request, group_id, node_id):
 
 
 
+
 def version_node(request, group_id, node_id, version_no):
     """Renders either a single or compared version-view based on request.
 

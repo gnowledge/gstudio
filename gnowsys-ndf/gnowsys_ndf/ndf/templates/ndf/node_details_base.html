@@ -167,7 +167,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
     {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
 
-    <dd><a href="#" data-reveal-id="view-graph"><i class="fi-share"></i> Graph</a></dd>
+    <dd><a href="#view-graph" data-reveal-id="view-graph"><i class="fi-share"></i> Graph</a></dd>
 
     {% endif %}
 
@@ -220,7 +220,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 
      <!-- Tab View Graph -->
-     <div class="content reveal-modal x-large graph-height" id="view-graph" data-reveal>    
+     <div class="content reveal-modal graph-div" id="view-graph" data-reveal>    
       <h3>{{node.name}}</h3>
       {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
       <a class="close-reveal-modal">&#215;</a>
