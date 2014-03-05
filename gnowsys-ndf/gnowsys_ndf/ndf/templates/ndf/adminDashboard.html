@@ -38,7 +38,7 @@
      <h2>Select MetaType</h2>
      <select id="id_meta_type" name="meta_types" multiple="multiple" style="max-width:500px;height:180px;">
        {% for meta_type in meta_types %}
-       <option value="{{meta_type.id}}" name="{{meta_type.title}}">{{meta_type.title}}</option>
+       <option value="{{meta_type.id}}" name="{{meta_type.title}} - {{meta_type.id}}">{{meta_type.title}} - {{meta_type.id}}</option>
        {% endfor %}
      </select>
      <font style="font-size:12px;font-weight:bold;" id="view_meta_type_list"></font>
@@ -96,9 +96,9 @@
 	      <font class="viewinput{{each.Id}}">{{each.member_of}}</font>
 	      <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.member_of}}">
 	    </td> 
-	    <td class="type" style="font-size:11px;">
-	      <font class="viewinput{{each.Id}}">{{each.Type}}</font>
-	      <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.Type}}" >
+	    <td class="collection_set" style="font-size:11px;">
+	      <font class="viewinput{{each.Id}}">{{each.collection_list}}</font>
+	      <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.collection_list}}" >
 	    </td>
 	    {% endif %}
 	    <td style="fo3nt-size:11px;"> 
@@ -213,7 +213,7 @@ $(document).on('focus',".group input",function(){
                   });
 });
 
-$(document).on('focus',".type input",function(){
+$(document).on('focus',".collection_set input",function(){
         baseobject = $(this);
         var baseobjectval = baseobject.val()
         $('#viewsystemtypelist').text(baseobjectval);

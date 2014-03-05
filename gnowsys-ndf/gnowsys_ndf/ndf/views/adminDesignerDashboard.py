@@ -27,19 +27,21 @@ def adminDesignerDashboardClass(request, class_name):
     objects_details = []
     for each in nodes:
         member = []
-        member_of = ""
-        member_of = each.member_of
-        if member_of:
-            member_of = member_of[0]
-            member_of = collection.Node.one({'_id':member_of})
-            member_of = member_of.name
-            
+        member_of_list = []
+        collection_list = []
+        for e in each.member_of:
+            member_of_list.append(collection.Node.one({'_id':e}).name+" - "+str(e))
+        
         for members in each.member_of:
             member.append(collection.Node.one({ '_id': members}).name+" - "+str(members))
-	if class_name in ("GSystem","File"):
+        
+        for coll in each.collection_set:
+            collection_list.append(collection.Node.one({ '_id': coll}).name+" - "+str(coll))
+	
+        if class_name in ("GSystem","File"):
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
 	else :
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':member_of})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list)})
     groups = []
     group = collection.Node.find({'_type':"Group"})
     for each in group:
