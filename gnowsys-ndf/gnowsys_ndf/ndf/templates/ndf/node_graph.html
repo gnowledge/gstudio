@@ -110,7 +110,8 @@
     
 
 			// $.getJSON("{% url 'get_graph_json' group_name %}?id={{node.pk}}", function (json1){ 
-			$.getJSON("{% url 'get_graph_json' group_name %}?id=" + objectid, function (json1){ 
+			$.getJSON("{% url 'get_graph_json' groupid %}?id=" + objectid, function (json1){ 
+
 				metadata=json1.node_metadata;
 				relations=json1.relations;
 

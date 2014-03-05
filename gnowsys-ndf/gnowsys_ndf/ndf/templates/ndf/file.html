@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block search_content %}
-<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' groupid %}">
 
   <div class="row collapse">
     <div class="small-10 columns">
@@ -89,7 +89,7 @@
           </div>
 
           {% if user.is_authenticated %}
-          <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+          <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
             <span class="fi-upload">  Upload File</span>
           </a>
           {% endif %}
@@ -122,11 +122,11 @@
 
           <p>File description?</p>
 
-          <a class="button expand" href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">File details</a>
+          <a class="button expand" href ="{% url 'read_file' groupid file grid_fs_obj.filename %}">File details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' groupid file %}?next={{request.path}}">Delete </a>
           {% endifequal %}
 	  
           <footer class="row">
@@ -160,11 +160,11 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'read_file' group_name file grid_fs_obj.filename %}">File details</a>
+          <a class="button expand" href ="{% url 'read_file' groupid file grid_fs_obj.filename %}">File details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' 'group' file %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' groupid file %}?next={{request.path}}">Delete </a>
           {% endifequal %}
     
           <footer class="row">
@@ -215,7 +215,7 @@
           </div>
 
           {% if user.is_authenticated %}
-          <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+          <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
             <span class="fi-upload"> Upload File</span>
           </a>
           {% endif %}
@@ -248,11 +248,11 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'read_file' group_name image grid_fs_obj.filename %}">File details</a>
+          <a class="button expand" href ="{% url 'read_file' groupid image grid_fs_obj.filename %}">File details</a>
 
           {% get_user_object image.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' 'group' image %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' groupid image %}?next={{request.path}}">Delete </a>
           {% endifequal %}
 	  
           <footer class="row">
@@ -269,12 +269,49 @@
       <p><em>Currently NO image uploaded!!!</em></p>
       {% endif %}
 
+     </ul>
+   </div>
+
+   <!-- View 2 -->
+   <div class="content" id="view-image">
+     {% for image in imageCollection %}
+     <li  class="clearing-featured-img">
+      <a href="{% url 'get_mid_size_img' groupid image %}">
+        <img  src="{% url 'getImageThumbnail' groupid image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' groupid image %}'>{{image.name}}</a> <script type='text/javascript'>
+        var angle = 0;
+        $('.img_rotate').on('click', function() {
+        angle += 90;
+        $('.visible-img img').rotate(angle);
+      });
+    </script>" >
+  </img>
+</a>
+</li>
+{% endfor %}
+</div>
+
+<!-- View 3 -->
+<div class="content" id="view-video">
+ {% for video in videoCollection %}
+ <li>
+  <a class="video" id="{{video}}" href="#">
+    <img src="{% url 'getvideoThumbnail' groupid video %}" style="border-radius:10px;"></img>
+    <span align="left">{{video.name}}</span>
+  </a>
+  {% get_user_object video.created_by as user_obj %}
+  {% ifequal  user_obj.username  user.username  %}
+  <a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' groupid video %}?next={{request.path}}">Delete </a>
+  {% endifequal %}
+</li>
+{% endfor %}
+
     </ul>
   </div>
 
   <!-- View 3 -->
   <div class="content" id="view-video">
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
 
       <!-- Node create card-->
       <li class="create card">
@@ -302,7 +339,7 @@
           </div>
 
           {% if user.is_authenticated %}
-          <a class="button expand" href="{% url 'uploadDoc' group_name %}?next={{request.path}}">
+          <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
             <span class="fi-upload"> Upload File</span>
           </a>
           {% endif %}
@@ -334,11 +371,11 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'read_file' group_name video grid_fs_obj.filename %}">File details</a>
+          <a class="button expand" href ="{% url 'read_file' groupid video grid_fs_obj.filename %}">File details</a>
 
           {% get_user_object video.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' 'group' video %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' groupid video %}?next={{request.path}}">Delete </a>
           {% endifequal %}
 	  
           <footer class="row">
@@ -379,9 +416,9 @@
  var video_total = $('.video').length;
  var pre = $(".video_pre");
  var next = $(".video_next");
- var url = "/{{group_name}}/video/fullvideo/"+video_id
+ var url = "/{{groupid}}/video/fullvideo/"+video_id
  $("#play_video").attr("src",url);
- $(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_id)
+ $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_id)
  if(video_index >= 1 && video_index < video_total-1)
  {
  pre.attr("id",video_index-1);
@@ -419,9 +456,9 @@ var next = $(".video_next");
 pre.show();
 next.show();
 var video_url = $(".video")[this.id].id
-var url = "/{{group_name}}/video/fullvideo/"+video_url
+var url = "/{{groupid}}/video/fullvideo/"+video_url
 $("#play_video").attr("src",url);
-$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_url)
+$(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
 if(video_index >= 1 && video_index < video_total-1)
 {
   pre.attr("id",video_index-1);
@@ -451,9 +488,9 @@ var next = $(".video_next");
 pre.show();
 next.show();
 var video_url = $(".video")[this.id].id
-var url = "/{{group_name}}/video/fullvideo/"+video_url
+var url = "/{{groupid}}/video/fullvideo/"+video_url
 $("#play_video").attr("src",url);
-$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_url)
+$(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
 if(video_index >= 1 && video_index < video_total-1)
 {
   pre.attr("id",video_index-1);

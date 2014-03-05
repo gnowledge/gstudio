@@ -17,7 +17,7 @@
 
 {% get_user_group request.user as groups %}
 
-{% block body_content %} 
+{% block body_content %}
 <header class="row">
   <dl class="tabs" data-tab>
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
@@ -43,34 +43,34 @@
           <div class="login-mode switch round">
             <input id="PUBLIC" name="login-mode" type="radio" checked>
             <label for="PUBLIC" onclick="">Public Group <i class="fi-torsos-all"></i></label>
-	    
+
             <input id="PRIVATE" name="login-mode" type="radio">
             <label for="PRIVATE" onclick="">Private Group <i class="fi-lock"></i></label>
 
             <span></span>
           </div>
 
-          <script>
+          <script type="text/javascript">
             $("#ANONYMOUS").change(function(){
               /* Hide type group type options if anonymous*/
-              $(".login-mode").slideToggle();     
+              $(".login-mode").slideToggle();
             });
           </script>
         </div>
       </div>
 
       {% if user.is_authenticated %}
-      <a class="button expand" href="{% url 'create_group' 'group' %}">
+      <a class="button expand" href="{% url 'create_group' groupid %}">
         Create Group
       </a>
       {% endif %}
   </li>
   
   <!-- Existing card list-->
-  {% get_group_type request.path request.user as group_type %}	
+  {% get_group_type request.path request.user as group_type %}
   
   {% if groups == "None" %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>		
+  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
   {% else %}
 
   {% for node in groups %}
@@ -86,17 +86,17 @@
           {% endfor %}
         </div>
         
-	<div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+<div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
         <h4>{{ node.name }}</h4>
         <small>Created <em>? days ago</em> by <span class="user">{{ node.user_details_dict.created_by }}</span></small>
       </header>
       
       <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
-      <div class="button expand">View Group</div> 
+      <div class="button expand">View Group</div>
       
       <footer class="row">
         <div class="small-6 columns"><strong>{{node.author_set|length}}</strong> Members</div>
-        <div class="small-6 columns"><strong>56</strong> Objects</div> 
+        <div class="small-6 columns"><strong>56</strong> Objects</div>
       </footer>
       
     </a>

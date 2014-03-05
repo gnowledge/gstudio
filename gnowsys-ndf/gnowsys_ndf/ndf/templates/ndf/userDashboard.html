@@ -82,8 +82,10 @@
 				{% for key, value in page_drawer.items %}
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 												
+
 							<a href="{% url 'page_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]							
+			{% comment %}				[Group : {{value.group_set|join:", "}} ]	{% endcomment %}			
+
 						</li>
 					{% endif %}
 				{% endfor %}	
@@ -102,8 +104,10 @@
 				{% for key, value in image_drawer.items %}
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
+
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
-							[Group : {{value.group_set|join:", "}} ]
+				{% comment %}		[Group : {{value.group_set|join:", "}} ] {% endcomment %}
+
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -123,7 +127,7 @@
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
-							[Group : {{value.group_set|join:", "}} ]				
+				{% comment %} 		[Group : {{value.group_set|join:", "}} ]	{% endcomment %}		
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -143,7 +147,7 @@
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
-							[Group : {{value.group_set|join:", "}} ]			
+				{% comment %}		[Group : {{value.group_set|join:", "}} ] {% endcomment %}			
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -166,7 +170,7 @@
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 												
 							<a href="{% url 'quiz_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]							
+				{% comment %}	[Group : {{value.group_set|join:", "}} ]	{% endcomment %}						
 						</li>
 					{% endif %}
 				{% endfor %}	
@@ -235,7 +239,7 @@
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'page_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]				
+				{% comment %}	[Group : {{value.group_set|join:", "}} ] {% endcomment %}				
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -255,7 +259,7 @@
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]				
+				{% comment %}		[Group : {{value.group_set|join:", "}} ]	{% endcomment %}		
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -275,7 +279,7 @@
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]			
+					{% comment %}	[Group : {{value.group_set|join:", "}} ] {% endcomment %}			
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -295,7 +299,7 @@
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]				
+				{% comment %}	[Group : {{value.group_set|join:", "}} ] {% endcomment %}			
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -318,7 +322,7 @@
 					{% if user_id in value.modified_by %}        
 						<li class="bullet-item" value={{key}}> 												
 							<a href="{% url 'quiz_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]							
+				{% comment %}	[Group : {{value.group_set|join:", "}} ] {% endcomment %}				
 						</li>
 					{% endif %}
 				{% endfor %}	

@@ -19,11 +19,11 @@ padding-right:2px;
 border-radius: 5px;
 } 
 </style>
-{% get_group_name request.path as group_name %}
+
 <div class="row">
       <div class="large-12 columns">
 	<div id="maindiv" class="large-6 columns">
-	  <font size ="6"  >Forum :     <a href="/{{group_name}}/forum/show/{{forum}}">
+	  <font size ="6"  >Forum :     <a href="/{{groupid}}/forum/show/{{forum}}">
 {{forum.name}}</a></font> </p>
 	  <font size="5" color="green">{{thread.name}}</font>
 	  {% with thread.content|safe as thread_content %}

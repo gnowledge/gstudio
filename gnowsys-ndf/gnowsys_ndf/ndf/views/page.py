@@ -43,9 +43,10 @@ rcs = RCS()
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
 #######################################################################################################################################
 
-def page(request, group_name, app_id=None):
+def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
+    group_object=collection.Group.one({'_id':ObjectId(group_id)})
     if request.method == "POST":
         # Written for implementing search-functionality
         title = gst_page.name
@@ -54,9 +55,8 @@ def page(request, group_name, app_id=None):
 
         page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
                                            '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                   {'tags': {'$regex':search_field, '$options': 'i'}}
-                                                  ], 
-                                           'group_set': {'$all': [group_name]}
+                                                   {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                           'group_set': {'$all': [ObjectId(group_id)]}
                                        })
         page_nodes.sort('last_update', -1)
         page_nodes_count = page_nodes.count()
@@ -64,17 +64,16 @@ def page(request, group_name, app_id=None):
         return render_to_response("ndf/page_list.html",
                                   {'title': title, 
                                    'searching': True, 'query': search_field,
-                                   'page_nodes': page_nodes, 'page_nodes_count': page_nodes_count
+                                   'page_nodes': page_nodes, 'groupid':group_id,'page_nodes_count': page_nodes_count,'group_id':group_id
                                   }, 
                                   context_instance=RequestContext(request)
         )
 
     elif gst_page._id == ObjectId(app_id):
         title = gst_page.name
-
         # collection.Node.reload()
         page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
-                                           'group_set': {'$all': [group_name]},                                           
+                                           'group_set': {'$all': [ObjectId(group_id)]},                                           
                                            'status': {'$nin': ['HIDDEN']}
                                        })        
 
@@ -83,7 +82,7 @@ def page(request, group_name, app_id=None):
 
         return render_to_response("ndf/page_list.html",
                                   {'title': title, 
-                                   'page_nodes': page_nodes, 'page_nodes_count': page_nodes_count
+                                   'page_nodes': page_nodes,'groupid':group_id,'page_nodes_count': page_nodes_count,'group_id':group_id
                                   }, 
                                   context_instance=RequestContext(request)
         )
@@ -93,7 +92,8 @@ def page(request, group_name, app_id=None):
 
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
-                                    'group_name': group_name
+                                    'group_id': group_id,
+                                    'groupid':group_id
                                   },
                                   context_instance = RequestContext(request)
         )        
@@ -101,12 +101,12 @@ def page(request, group_name, app_id=None):
 
 
 @login_required
-def create_edit_page(request, group_name, node_id=None):
+def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-
     context_variables = { 'title': gst_page.name,
-                          'group_name': group_name
+                          'group_id': group_id,
+                          'groupid': group_id
                       }
 
     if node_id:
@@ -115,22 +115,25 @@ def create_edit_page(request, group_name, node_id=None):
         page_node = collection.GSystem()
 
     if request.method == "POST":
-        get_node_common_fields(request, page_node, group_name, gst_page)
+        get_node_common_fields(request, page_node, group_id, gst_page)
+        print "in page save"
         page_node.save()
         
-        return HttpResponseRedirect(reverse('page_details', kwargs={'group_name': group_name, 'app_id': page_node._id}))
+        return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
         
     else:
         if node_id:
             context_variables['node'] = page_node
-            
+            context_variables['groupid']=group_id
+            context_variables['group_id']=group_id
+
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
                               )
 
 @login_required    
-def delete_page(request, group_name, node_id):
+def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
     
     Just hide the page from users!
@@ -140,10 +143,13 @@ def delete_page(request, group_name, node_id):
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     print " op: ", op, "\n"
     
-    return HttpResponseRedirect(reverse('page', kwargs={'group_name': group_name, 'app_id': gst_page._id}))
+    return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
 
 
-def version_node(request, group_name, node_id, version_no):
+
+
+
+def version_node(request, group_id, node_id, version_no):
     """Renders either a single or compared version-view based on request.
 
     In single version-view, all information of the node for the given version-number 
@@ -193,26 +199,29 @@ def version_node(request, group_name, node_id, version_no):
     return render_to_response("ndf/version_page.html",
                               {'view': view,
                                'node': node,
+                               'group_id':group_id,
+                               'groupid':group_id,
                                'selected_versions': selected_versions,
                                'content': content
                               },
                               context_instance = RequestContext(request)
     )        
 
-def translate_node(request,group_name,node_id=None):
+def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
 
     context_variables = { 'title': gst_page.name,
-                          'group_name': group_name
+                          'group_id': group_id,
+                          'groupid': group_id
                       }
 
     page_node = collection.GSystem()
 
     if request.method == "POST":
-        get_translate_common_fields(request, page_node, group_name, gst_page)
+        get_translate_common_fields(request, page_node, group_id, gst_page)
         page_node.save()
         
-        return HttpResponseRedirect(reverse('page_details', kwargs={'group_name': group_name, 'app_id': page_node._id}))
+        return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
         
 
 
@@ -236,7 +245,9 @@ def translate_node(request,group_name,node_id=None):
         content = data
         return render_to_response("ndf/translation_page.html",
                                {'content': content,
-                                'node':node
+                                'node':node,
+                                'groupid':group_id,
+                                'group_id':group_id
                                },
                              
                               context_instance = RequestContext(request)

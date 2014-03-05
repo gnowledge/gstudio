@@ -21,24 +21,25 @@ collection = db[Node.collection_name]
 GST_COLLECTION = db[GSystemType.collection_name]
 GST_COURSE = GST_COLLECTION.GSystemType.one({'name': GAPPS[7]})
 
-def course(request, group_name, course_id):
+def course(request, group_id, course_id):
     """
    * Renders a list of all 'courses' available within the database.
     """
     if GST_COURSE._id == ObjectId(course_id):
         title = GST_COURSE.name
-        course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [group_name]}})
+        course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         template = "ndf/course.html"
-        variable = RequestContext(request, {'course_coll': course_coll })
+        variable = RequestContext(request, {'course_coll': course_coll,'groupid':group_id,'group_id':group_id })
         return render_to_response(template, variable)
 
 @login_required
-def create_edit(request, group_name, node_id = None):
+def create_edit(request, group_id, node_id = None):
     """Creates/Modifies details about the given quiz-item.
     """
 
     context_variables = { 'title': GST_COURSE.name,
-                          'group_name': group_name
+                          'group_id': group_id,
+                          'groupid':group_id
                       }
 
     if node_id:
@@ -47,25 +48,26 @@ def create_edit(request, group_name, node_id = None):
         course_node = collection.GSystem()
 
     if request.method == "POST":
-        get_node_common_fields(request, course_node, group_name, GST_COURSE)
+        get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save()
-        #return HttpResponseRedirect(reverse('ndf.views.course.course',kwargs={'group_name': group_name, 'course_id': course_node._id}))
-        return HttpResponseRedirect(reverse('course', kwargs={'group_name': group_name, 'course_id': GST_COURSE._id}))
+        return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id, 'course_id': GST_COURSE._id}))
         
     else:
         if node_id:
             context_variables['node'] = course_node
-            
+            context_variables['groupid']=group_id
+            context_variables['group_id']=group_id
         return render_to_response("ndf/course_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
                               )
 
-def course_detail(request, group_name, _id):
+def course_detail(request, group_id, _id):
     course_node = collection.Node.one({"_id": ObjectId(_id)})
     return render_to_response("ndf/course_detail.html",
                                   { 'node': course_node,
-                                    'group_name': group_name
+                                    'groupid': group_id,
+                                    'group_id':group_id
                                   },
                                   context_instance = RequestContext(request)
         )
