@@ -3,9 +3,10 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	
+	<!-- Scripts required for D3 graph -->
 	<script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
-
 	<script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>		
+
 	<style type="text/css">
 
 		#chart .link {
@@ -18,6 +19,7 @@
 			font-style:italic;
 		}
 
+		/*Central node shown in ellipse*/
 		#chart .mainnode{
 
 			font: 15px sans-serif;
@@ -27,38 +29,35 @@
 			border-color: gray;
 		}
 
+		/*Connector element that connects two nodes*/
 		#chart .relnode {
 			font: 10px sans-serif;			
 			fill:#404040;
 		}
 
-
+		/*Peripheral nodes to main node*/
 		#chart .node {
 			border-width: 1px;
 			border-color: gray;
-			fill:#25587E;
+			fill:#154534;
 			font: 12px sans-serif;
 		}
 
-		body {
+		/*body {
 			background-color: white;
 			display:block;
 		}
+		*/
 
+		/* Div containing SVG area*/
 		#chart {
-			/*height: 90%;
-			margin: 0 auto;
-			width: 90%*/;
 			display: block;
 		}
 
 		svg {
-			/*margin-left: 10%;
-			margin-right: 10%;*/
 			display: block;
 			position: absolute;
 		}
-
 
 	</style>
 
@@ -66,137 +65,164 @@
 
 <body>
 
-	<div id="chart">
-	</div>
+
+	<!-- Div containing svg area -->
+	<div id="chart"></div>
 
 	<script type="text/javascript">
-	
-	var graphHeight = ($(window).height())*0.55,
-		graphWidth  = ($(window).width())*0.75;
 
-	function init(a,b)
-	{
+		var graphHeight = ($(window).height())*0.60,
+			graphWidth  = ($(window).width())*0.75;
 
-		nodes_by_id = _.reduce(a, function(acc, n) 
+		var objectid = "{{node.pk}}";	// _id of current vieving page
+
+
+		function init(a,b)
 		{
-			acc[n._id] = n;
-				return acc;
-		}, {});
-
-		all_edges=new Array();
-	
-	    //this contains all the links between the nodes
-	    all_edges =_(b).chain().map(function(e) 
-	    {
-	     	e.source = nodes_by_id[e.from];
-	     	e.target = nodes_by_id[e.to];
-			//e.type = nodes_by_id[e.type]
-			return e;
-		}).filter(function(e)
+			nodes_by_id = _.reduce(a, function(acc, n) 
 			{
+				acc[n._id] = n;
+				return acc;
+			}, {});
+
+			all_edges=new Array();
+
+		    //this contains all the links between the nodes
+		    all_edges =_(b).chain().map(function(e){
+
+		    	e.source = nodes_by_id[e.from];
+		    	e.target = nodes_by_id[e.to];
+				//e.type = nodes_by_id[e.type]
+				return e;
+			}).filter(function(e){
 				return nodes_by_id[e.from] && nodes_by_id[e.to]&& e.type!="title" && e.type!="content" && e.type!="authors"
 			}).value();  
-	}
-		
-		$(function fgraph() 
-		{	
+		} // ====== END of init() ======
 
-			d3.json("{% url 'get_graph_json' group_name %}?id={{node.pk}}", function (json1){ 
-				// json1 = jsonData;
+
+		// -------------------fgraph()--------------------
+		function fgraph() 
+		{	
+			neighbour_node= new Array();
+    		clicked_node=new Array();
+		    prev_node=new Array();
+		    neighbour_node= neighbour_node.concat(objectid);  
+    
+
+			// $.getJSON("{% url 'get_graph_json' group_name %}?id={{node.pk}}", function (json1){ 
+			$.getJSON("{% url 'get_graph_json' group_name %}?id=" + objectid, function (json1){ 
 				metadata=json1.node_metadata;
 				relations=json1.relations;
 
 				init(metadata,relations);
-				load(json1.node_metadata[0]._id) 
-			});
+				load(objectid); 
+			}); // --END of getJSON()
+			
+		} // ====== END of fgraph ======
 
-			function load(key)
-			{
-				var w = graphWidth,
+
+
+		// -------------------load()--------------------
+		function load(key)
+		{
+			var w = graphWidth,
 				h = graphHeight,
+				p = 140 + "%",
+	  			q = 110 + "%",
 				fill = d3.scale.category20();
 
-				var vis = d3.select("#chart")
-				.append("svg:svg")
-				.attr("width", w)
-				.attr("height", h);       
-				vis.append("svg:g").attr("class", "edges");        
-				vis.append("svg:g").attr("class", "nodes");
+			var vis = d3.select("#chart")
+						.append("svg:svg")
+						.attr("id", "amazingViz") 
+						.attr("width", w)
+						.attr("height", h);
+
+			vis.append("svg:g").attr("class", "edges");        
+			vis.append("svg:g").attr("class", "nodes");
 
 
-				nodes_by_id[key].x = w/2.0;
-				nodes_by_id[key].y = h/2.0;       
+			nodes_by_id[key].x = w/2.0;
+			nodes_by_id[key].y = h/2.0;       
 
-				var force = d3.layout.force()
-				.linkStrength(0.3)
-				.charge(-3000)
-				.friction(0.7)
-				.gravity(0.8)
-				.linkDistance(10)
-				.nodes([])
-				.links([])
-				.size([w, h])
-				.start();
+			var force = d3.layout.force()
+						.linkStrength(1)
+						.charge(-4000)
+						.friction(0.7)
+						.gravity(0.5)
+						.linkDistance(10)
+						.nodes([])
+						.links([])
+						.size([w, h])
+						.start();
 
-				function update(edges)
-				{
-			        // for each func
-			        _.each(nodes_by_id, function(n){n.added = false});
+			function update(edges)
+			{
+			    // for each func
+			    _.each(nodes_by_id, function(n){n.added = false});
 			        
-			        // reduce the nodes list to have only those nodes for a given rel.
-			        nodes = _.reduce(edges, function(acc, e) 
+			    // reduce the nodes list to have only those nodes for a given rel.
+			    nodes = _.reduce(edges, function(acc, e) 
+			    {
+			    	if(nodes_by_id[e.from] && !nodes_by_id[e.from].added)
+			    	{
+			        	nodes_by_id[e.from].added = true;
+			        	acc.push(nodes_by_id[e.from]);
+			        }
+			        if(nodes_by_id[e.to] && !nodes_by_id[e.to].added)
 			        {
-			        	if(nodes_by_id[e.from] && !nodes_by_id[e.from].added){
-			        		nodes_by_id[e.from].added = true;
-			        		acc.push(nodes_by_id[e.from]);
-			        	}
-			        	if(nodes_by_id[e.to] && !nodes_by_id[e.to].added){
-			        		nodes_by_id[e.to].added = true;
-			        		acc.push(nodes_by_id[e.to]);
-			        	}
-			        	return acc;
-			        }, []);
-	        		
-		        force.nodes(nodes);
-		        force.links(edges);
-		        force.start();
+			        	nodes_by_id[e.to].added = true;
+			        	acc.push(nodes_by_id[e.to]);
+			        }
+			        return acc;
+			    }, []);
 
-		        link = d3.select("#chart g.edges").selectAll("line.link").select(this.arrowhead)
-		        .data(edges, function(e){return e.from + "-" + e.to + "-" + e.type});
+			    force.nodes(nodes);
+			    force.links(edges);
+			    force.start();
+
+			    link = d3.select("#chart g.edges").selectAll("line.link").select(this.arrowhead)
+			    	     .data(edges, function(e){return e.from + "-" + e.to + "-" + e.type});
 
 
-		        link.enter().append("svg:line")
-		        .attr("class", "link")
-                .style("stroke-width", 2 /* function(d) {
-                  return Math.sqrt(d.value);
-              	} */ )
-                .attr("x1", function(d) {
-                	return d.source.x;
-                })
-                .attr("y1", function(d) {
-                	return d.source.y;
-                })
-                .attr("x2", function(d) {
-                	return d.target.x;
-                })
-                .attr("y2", function(d) {
-                	return d.target.y;
-                })
-                .attr("text", function(d) {
-                	return d.type;
-                })
-                .attr("marker-end", "url(#arrowhead)");
+			    link.enter().append("svg:line")
+			        .attr("class", "link")
+                	.style("stroke-width", 2 )
+	                .attr("x1", function(d) {
+	                	return d.source.x;
+	                })
+	                .attr("y1", function(d) {
+	                	return d.source.y;
+	                })
+	                .attr("x2", function(d) {
+	                	return d.target.x;
+	                })
+	                .attr("y2", function(d) {
+	                	return d.target.y;
+	                })
+	                .attr("text", function(d) {
+	                	return d.type;
+	                })
+	                .attr("marker-end", "url(#arrowhead)");
 
 
                 var node = d3.select("#chart g.nodes").selectAll("g.node").data(nodes);
 
 
                 var new_g = node.enter().append("svg:a")
-                .attr("class", function(d) { var e=(d._id).charAt(0); if (d._id==key) return "mainnode"; else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode"  ; else return "node"; })
-                .attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
+                				.attr("class", function(d) {
 
-                .call(force.drag);
+                					var e=(d._id).charAt(0);
 
+                					if (d._id==key) return "mainnode";
+                					else if (e=="-") return "nodetext";
+                					else if (isNaN(d._id)) return "relnode"; //logic to give class to relation node (pending)
+                					else return "node"; 
+                				})
+                				//.attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
+                				.call(force.drag);
+
+
+                // Definition of marker
                 new_g.append("svg:marker")
                 .attr("id", "arrowhead")
                 .attr("viewBox","0 0 10 10")
@@ -211,8 +237,128 @@
                 .attr("fill", "#6D6666"); 
 
 
+                // $("#chart").bind('click',function(event) {
+                	// if(event.ctrlKey==1){
+
+                $(window).bind('keydown',function(event) {
+                	if(event.keyCode==17)
+                	{      	
+
+                		new_g.on("click",function(d){                 
+
+                			// alert(JSON.stringify(d))
+	                        if( d.expanded=="true" && d._id!= objectid )
+	                        { 
+	                			$.getJSON("{% url 'get_graph_json' group_name %}?id=" + d._id , function (json2) {
+	                				new_metadata = json2.node_metadata;
+
+
+	                			// _.filter(new_metadata, function(e){if(e._id>0){
+                           		_.filter(new_metadata, function(e){if(e._id){
+                           			// alert(JSON.stringify(e));
+                                	clicked_node=clicked_node.concat(e._id) ;
+                                }});
+                                // alert(d._id + "====" + neighbour_node);
+
+                                index = _.indexOf(neighbour_node , d._id);
+                                // alert(index);
+    	                       	prev_node=neighbour_node.slice(0,index);
+        	                    // alert("prev_node" + prev_node);
+        	                    neighbour_node = _.difference(neighbour_node,clicked_node) ;
+        	                    // alert("diff" + neighbour_node);
+            	                neighbour_node= neighbour_node.concat(prev_node);
+            	                // alert(neighbour_node);
+                	            neighbour_node = _.uniq(neighbour_node);
+		                		
+		                		});	
+								
+
+                    	        metadata=[]
+                        	    relations=[]
+                           		metadata1=[]
+                           		relations1=[]            			
+	                           	
+
+                           		for(i=0;i<(neighbour_node.length);i++)
+                           		{
+                              		d3.select("#amazingViz").remove();  
+                              		g=neighbour_node[i]
+                              		$.ajax({
+
+                                  		async:false,
+                                  		url:"{% url 'get_graph_json' group_name %}?id=" + g , 
+                                  		datatype:'json',
+                                  		success:function (json2) {
+                                  			json2 = JSON.parse(json2);
+                                      	new_metadata=json2.node_metadata;
+                                      	new_relations=json2.relations;
+                                      	// alert(JSON.stringify(json2));
+                                      	metadata=_.union(new_metadata,metadata);
+
+                                      	relations=_.union(new_relations,relations);
+                                      	relations= check_Relationtype(metadata,relations);
+                                      	}
+                                    });     
+                          		}
+                          		// alert(metadata);
+                          		
+                          		_.each(metadata, function(m){
+                          			for(i=0;i<neighbour_node.length;i++)
+                            		{
+                                		if(m._id==neighbour_node[i])
+                                    		{m.expanded="true";}
+                                		else 
+                                    		{m.expanded="false";}
+                            		}
+                        		});
+
+                          		init(metadata,relations);
+                          		load(objectid) ;                        
+	                		} // --END if
+	                		// else if(d._id>0 && d._id!= objectid)
+	                		else if(d._id!= objectid)
+               		        {
+                        
+                    	    neighbour_node =neighbour_node.concat(d._id);
+                    	    // alert(neighbour_node);
+                        	d3.select("#amazingViz").remove();  
+	                        $.ajax({
+	                          async:false,
+	                          url:"{% url 'get_graph_json' group_name %}?id=" + d._id , 
+	                          datatype:'json',
+	                          success:function (json2) {
+	                          	json2 = JSON.parse(json2);
+	                            new_metadata=json2.node_metadata;
+	                            new_relations=json2.relations;
+				
+	                            metadata=_.union(new_metadata,metadata);
+	                            relations=_.union(new_relations,relations);
+	                            relations= check_Relationtype(metadata,relations);
+	                            _.each(metadata, function(m){
+
+	                              for(i=0;i<neighbour_node.length;i++)
+	                              {
+	                                if(m._id==neighbour_node[i])
+	                                  m.expanded="true";
+	                              }
+	                            });
+	                          }});
+                				//console.log(metadata);
+                				init(metadata,relations);
+                				load(objectid);
+              				}
+                		});
+                	}
+                });
+
+
                 text1 = new_g.append("svg:text")
-                .attr("class",function(d) {var e=(d._id).charAt(0);  if (d._id==key) return "mainnode";else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode";  else return "node"; })
+                .attr("class",function(d) {  
+                	if (d._id==key) return "mainnode"; 
+                	// else if (e=="-") return "nodetext"; 
+                	else if ( d._id.search("_r") > 0) return "relnode";
+                	else return "node"; 
+                })
                 .attr("y", 20)
                 .attr("x", 25) 
                 .attr("dy", ".35em")
@@ -238,7 +384,7 @@
                 // .style("stroke", "#000")
                 // .style("stroke-width","1px"  );
 
-                new_g.filter(function(d) { if(d.refType=="GSystem") return (d._id)>0 ;}).append("svg:ellipse")
+                new_g.filter(function(d) { if(d.refType=="GSystem") return true ;}).append("svg:ellipse")
                 .attr("cx", 25)                
                 .attr("cy", 20)
                 .call(force.drag)
@@ -265,16 +411,47 @@
                 	node.attr("transform", function(d) { return "translate(" + (d.x-16) + "," + (d.y-16) + ")"; });
 
                 });
-            	}
-		
+            }
+
             update(all_edges);
             vis.style("opacity", 1e-6)
             .transition()
             .duration(1000)
             .style("opacity", 1);
         }
-    });
-    
+
+
+    function check_Relationtype(metadata,relations)
+    {
+
+
+                _.each(metadata,function(d){
+                    if (d.refType=="Relationtype")
+                    { 
+                     a=d.inverse;
+                     if (d.flag==1)
+                     {
+                         relations= _.reject(relations,function(e)
+                         {
+                            return e.type==a
+                        });
+                     }
+                     else if (d.flag==0)
+                     {
+                         relations= _.reject(relations,function(e)
+                         {
+                            return e.type==d.screen_name
+                        });
+                     }
+                 }
+
+             }); 
+                return relations;
+
+    }
+
+    $(fgraph());
+
 
 </script>
 

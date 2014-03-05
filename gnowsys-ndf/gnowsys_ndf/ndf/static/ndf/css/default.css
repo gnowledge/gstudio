@@ -570,8 +570,9 @@ input.node-title {
 
 /* view-graph in node_details_base.html */
 /* line 440, ../scss/default.scss */
-.graph-height {
-  height: 70%;
+.graph-div {
+  height: 75%;
+  
 }
 
 /* Splash Page */
