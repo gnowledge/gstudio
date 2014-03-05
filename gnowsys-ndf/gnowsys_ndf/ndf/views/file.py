@@ -92,6 +92,7 @@ def submitDoc(request, group_name):
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
+        img_type = request.POST.get("type", "")
         usrname = request.user.username
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
@@ -103,24 +104,29 @@ def submitDoc(request, group_name):
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                    f = save_file(each, img_type, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                    f = save_file(each, img_type, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                f = save_file(each, img_type, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
             if f:
                 alreadyUploadedFiles.append(f)
                 title = mtitle
         for each in alreadyUploadedFiles:
             str1 = str1 + 'var=' + each + '&'
-        return HttpResponseRedirect(page_url+'?'+str1)
+
+        if img_type != "":
+            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_name': group_name, 'user': usrname}))
+        else:
+            return HttpResponseRedirect(page_url+'?'+str1)
+
     else:
         return HttpResponseRedirect(reverse('homepage'))
             
-def save_file(files, title, userid, group_name, st_id, content_org, tags, access_policy, usrname):
+def save_file(files, img_type, title, userid, group_name, st_id, content_org, tags, access_policy, usrname):
     """
     this will create file object and save files in gridfs collection
     """
@@ -144,18 +150,20 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, access
             filename = files.name
             fileobj.name = unicode(title)
             fileobj.created_by = int(userid)
+            fileobj.type_of = unicode(img_type)                 # To define type if image is profile_pic      
             fileobj.file_size = size
             fileobj.group_set.append(unicode(group_name))        #group name stored in group_set field
             if usrname not in fileobj.group_set:                 # File creator stored in group_set field
                 fileobj.group_set.append(usrname)
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
-            if content_org:
-                fileobj.content_org = unicode(content_org)
-                # Required to link temporary files with the current user who is modifying this document
-                filename_content = slugify(title) + "-" + usrname + "-"
-                fileobj.content = org2html(content_org, file_prefix = filename_content)
-            fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+            if img_type == None:
+                if content_org:
+                    fileobj.content_org = unicode(content_org)
+                    # Required to link temporary files with the current user who is modifying this document
+                    filename_content = slugify(title) + "-" + usrname + "-"
+                    fileobj.content = org2html(content_org, file_prefix = filename_content)
+                fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
             
             # For giving privacy to file objects
             if access_policy == "PUBLIC":
