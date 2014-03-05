@@ -34,21 +34,21 @@ collection = db[Node.collection_name]
 #                                                                     V I E W S   D E F I N E D   F O R   U S E R   D A S H B O A R D
 #######################################################################################################################################
 
-def dashboard(request, group_name, user):	
-    
+def dashboard(request, group_id, user):	
+
     ID = User.objects.get(username=user).pk
     
     date_of_join = User.objects.get(username=user).date_joined
     
-    page_drawer = get_drawers(group_name,None,None,"Page")
-    image_drawer = get_drawers(group_name,None,None,"Image")
-    video_drawer = get_drawers(group_name,None,None,"Video")
-    file_drawer = get_drawers(group_name,None,None,"File")
-    quiz_drawer = get_drawers(group_name,None,None,"OnlyQuiz")
+    page_drawer = get_drawers(group_id,None,None,"Page")
+    image_drawer = get_drawers(group_id,None,None,"Image")
+    video_drawer = get_drawers(group_id,None,None,"Video")
+    file_drawer = get_drawers(group_id,None,None,"File")
+    quiz_drawer = get_drawers(group_id,None,None,"OnlyQuiz")
     group_drawer = get_drawers(None,None,None,"Group")
-    forum_drawer = get_drawers(group_name,None,None,"Forum")
+    forum_drawer = get_drawers(group_id,None,None,"Forum")
     
-    obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'created_by': int(ID) ,'group_set': {'$all': [group_name]}})
+    obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'created_by': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
     collab_drawer = []	
     
     for each in obj.sort('last_update', -1):  	# To populate collaborators according to their latest modification of particular resource
@@ -62,7 +62,9 @@ def dashboard(request, group_name, user):
                                'page_drawer':page_drawer,'image_drawer': image_drawer,
                                'video_drawer':video_drawer,'file_drawer': file_drawer,
                                'quiz_drawer':quiz_drawer,'group_drawer': group_drawer,
-                               'forum_drawer':forum_drawer,'collab_drawer': collab_drawer
+                               'forum_drawer':forum_drawer,'collab_drawer': collab_drawer,
+                               'groupid':group_id,'group_id':group_id
                               },
                               context_instance=RequestContext(request)
     )
+

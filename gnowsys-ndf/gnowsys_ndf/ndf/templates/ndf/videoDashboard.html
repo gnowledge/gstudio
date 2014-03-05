@@ -13,10 +13,10 @@
   </ul>
 </div>
 {% endif %}
-{% get_group_name request.path as group_name %}
 
 
-<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name %}">
+
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' groupid %}">
   <div class="row"  style="padding-top:20px">
     <div class="large-7 columns">
       <div class="row collapse">
@@ -29,7 +29,7 @@
 	    </a>
 	  </div>
 	  <div class="small-2 columns">
-            <a href="{% url 'uploadDoc' group_name %}?next={{request.path}}" class="button postfix secondary">
+            <a href="{% url 'uploadDoc' groupid %}?next={{request.path}}" class="button postfix secondary">
 	      <i class="fi-paperclip">upload</i>
 	    </a>
 	  </div>
@@ -42,7 +42,7 @@
   {% for video in videoCollection %}
   <li>
     <a class="video" id="{{video}}" href="#">
-      <img src="{% url 'getvideoThumbnail' group_name video %}" style="border-radius:10px;"></img>
+      <img src="{% url 'getvideoThumbnail' groupid video %}" style="border-radius:10px;"></img>
       <span align="left">{{video.name}}</span>
     </a>
     {% get_user_object video.created_by as user_obj %}
@@ -78,9 +78,9 @@ var eventhandler = function(e) { e.preventDefault();}
 	var video_total = $('.video').length;
 	var pre = $(".video_pre");
 	var next = $(".video_next");
-	var url = "/{{group_name}}/video/fullvideo/"+video_id
+	var url = "/{{groupid}}/video/fullvideo/"+video_id
 	$("#play_video").attr("src",url);
-	$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_id)
+	$(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_id)
 	if(video_index >= 1 && video_index < video_total-1)
 	{
 	pre.attr("id",video_index-1);
@@ -118,9 +118,9 @@ var eventhandler = function(e) { e.preventDefault();}
 	pre.show();
 	next.show();
 	var video_url = $(".video")[this.id].id
-	var url = "/{{group_name}}/video/fullvideo/"+video_url
+	var url = "/{{groupid}}/video/fullvideo/"+video_url
 	$("#play_video").attr("src",url);
-	$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_url)
+	$(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
 	if(video_index >= 1 && video_index < video_total-1)
 	{
 	pre.attr("id",video_index-1);
@@ -150,9 +150,9 @@ var eventhandler = function(e) { e.preventDefault();}
 	pre.show();
 	next.show();
 	var video_url = $(".video")[this.id].id
-	var url = "/{{group_name}}/video/fullvideo/"+video_url
+	var url = "/{{groupid}}/video/fullvideo/"+video_url
 	$("#play_video").attr("src",url);
-	$(".video_details_link").attr("href","/{{group_name}}/video/video_detail/"+video_url)
+	$(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
 	if(video_index >= 1 && video_index < video_total-1)
 	{
 	pre.attr("id",video_index-1);

@@ -16,11 +16,12 @@ $('#orgitdown').val("");
 var tw_name=$("#thread_name").val();
 if (tw_name != "")
 {
-var grp=$("#grptxt").val();
+
 var forum=$("#forum").val();
 var thd = "";
 $("#thread_name").val("");
-var ajurl="/"+grp+"/forum/add_node/"
+var gpid="{{groupid}}"
+var ajurl="/"+gpid+"/forum/add_node/"
 
 $.ajax({
         url: ajurl,
@@ -83,7 +84,7 @@ height:100px;
 }
 </style>
 
-{% get_group_name request.path as group %}
+
 <a href="#" id="reply_forum" class="button" data-reveal-id="reply">Add a Thread</a>
 </p>
 <div id="reply" class="reveal-modal medium" data-reveal="">
@@ -97,7 +98,7 @@ Add a thread to the Forum:<br/>
 </div>
 </div>
   <textarea id="orgitdown" name="content_org" placeholder="Please enter description..."></textarea>
-<input id="grptxt" type="hidden" value="{{group}}">
+
 <input id="twist_save_reply" type="button" value="Save">
 <input id="forum" type="hidden" value="{{forum}}">
 <a  class="close-reveal-modal">×</a>

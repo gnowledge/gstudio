@@ -101,7 +101,7 @@
 		$(function fgraph() 
 		{	
 
-			d3.json("{% url 'get_graph_json' group_name %}?id={{node.pk}}", function (json1){ 
+			d3.json("{% url 'get_graph_json' groupid %}?id={{node.pk}}", function (json1){ 
 				// json1 = jsonData;
 				metadata=json1.node_metadata;
 				relations=json1.relations;

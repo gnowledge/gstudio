@@ -42,7 +42,7 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
-        'NAME': 'studio-dev',
+        'NAME': 'sandbox-studio',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -254,10 +254,10 @@ RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/static/rcs-repo")
 # collection-directory; in order to store json-files in an effective manner
 RCS_REPO_DIR_HASH_LEVEL = 3
 
-try:
-    from local_settings import *
-    #print "Local settings applied"
-except:
-    #print "Default settings applied"
-    pass
+# try:
+#     from local_settings import *
+#     #print "Local settings applied"
+# except:
+#     #print "Default settings applied"
+#     pass
 

@@ -25,7 +25,7 @@
 	  <div class="row">
             <div class="small-5 columns ">	  
 	      <!-- bellow div for making tree from json data -->
-	      <div class="tree" data-url="{% url 'get_module_json' group_name %}?_id={{module.pk}}"></div>
+	      <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{module.pk}}"></div>
             </div>                
             <div class="small-7 columns text-right">
               <i class="label secondary" >Created by {{module.user_details_dict.created_by}} on {{module.created_at|date:"j F Y"}} </i>

@@ -82,7 +82,7 @@
         </div>
       </div>
       {% if user.is_authenticated %}
-      <a class="button expand" href="{% url 'page_create_edit' group_name %}">
+      <a class="button expand" href="{% url 'page_create_edit' groupid %}">
         Create {{title}}
       </a>
       {% endif %}
@@ -119,10 +119,10 @@
       
       <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
       
-      <a class="small button expand" href="{% url 'page_details' group_name node %}">Page Details</a>
+      <a class="small button expand" href="{% url 'page_details' groupid node %}">Page Details</a>
       
       {% if node.created_by == request.user.id %}
-      <a class="button alert tiny" href="{% url 'page_delete' group_name node %}">Delete</a>
+      <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
       {% endif %}
       
       <footer class="row">
@@ -159,10 +159,10 @@
 
     <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
 
-    <a class="small button expand" href="{% url 'page_details' group_name node %}">Page Details</a>
+    <a class="small button expand" href="{% url 'page_details' groupid node %}">Page Details</a>
 
     {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url 'page_delete' group_name node %}">Delete</a>
+    <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
     {% endif %}
 
     <footer class="row">

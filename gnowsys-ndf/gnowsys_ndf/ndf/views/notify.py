@@ -20,35 +20,36 @@ def get_user(username):
         return 0
 
 
-
-def set_notif_val(request,group_name,msg,activ,bx):
+# A general function used to send all kind of notifications
+def set_notif_val(request,group_id,msg,activ,bx):
     try:
-        obj=group_name
+        group_obj=col_Group.Group.one({'_id':ObjectId(group_id)})
         site=sitename.name.__str__()
         objurl="http://test"
-        render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':obj,'site':site,'link':objurl})
+        render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':group_obj,'site':site,'link':objurl})
         notification.create_notice_type(render, msg, "notification")
         notification.send([bx], render, {"from_user": request.user})
         return True
     except Exception as e:
-        print "Error-",e
+        print "Error in sending notification-",e
         return False
 
-# Send invitation to any user
-def send_invitation(request,group_name):
+# Send invitation to any user to join or unsubscribe
+def send_invitation(request,group_id):
     try:
+        colg=col_Group.Group.one({'_id':ObjectId(group_id)})
+        groupname=colg.name
         list_of_invities=request.POST.get("users","") 
         sender=request.user
         sending_user=User.objects.get(id=sender.id)
         list_of_users=list_of_invities.split(",")
         activ="invitation to join in group"
-        msg="'This is to inform you that " +str(sending_user.username)+ " has subscribed you to the group " +str(group_name)+"'"
+        msg="'This is to inform you that " +str(sending_user.username)+ " has subscribed you to the group " +str(groupname)+"'"
 
-        colg = col_Group.Group.one({'name':group_name})
         ret=""
         for each in list_of_users:
             bx=User.objects.get(id=each)
-            ret = set_notif_val(request,group_name,msg,activ,bx)
+            ret = set_notif_val(request,group_id,msg,activ,bx)
             colg.author_set.append(bx.id)
             colg.save()
         if ret :
@@ -58,13 +59,14 @@ def send_invitation(request,group_name):
     except Exception as e:
         return HttpResponse(str(e))
 
-def notifyuser(request,group_name):
+def notifyuser(request,group_id):
 #    usobj=User.objects.filter(username=usern)
+    colg=col_Group.Group.one({'_id':ObjectId(group_id)})
+    groupname=colg.name
     activ="joined in group"
-    msg="You have successfully joined in the group '"+str(group_name)+"'"
+    msg="You have successfully joined in the group '"+str(groupname)+"'"
     bx=get_user(request.user)
-    ret = set_notif_val(request,group_name,msg,activ,bx)
-    colg = col_Group.Group.one({'name':group_name})
+    ret = set_notif_val(request,group_id,msg,activ,bx)
     if not ((bx.id in colg.author_set) or (bx.id==colg.created_by)):
         colg.author_set.append(bx.id)
         colg.save()
@@ -74,13 +76,14 @@ def notifyuser(request,group_name):
         return HttpResponse("failure")
 
 
-def notify_remove_user(request,group_name):
-    msg="You have been removed from the group '"+str(group_name)+"'"
+def notify_remove_user(request,group_id):
+    colg=col_Group.Group.one({'_id':ObjectId(group_id)})
+    groupname=colg.name
+    msg="You have been removed from the group '"+str(groupname)+"'"
     activ="removed from group"
     bx=get_user(request.user)
-    ret = set_notif_val(request,group_name,msg,activ,bx)
+    ret = set_notif_val(request,group_id,msg,activ,bx)
     col_Group = db[Group.collection_name]
-    colg = col_Group.Group.one({'name':group_name})
     colg.author_set.remove(bx.id)
     colg.save()
     if ret:
