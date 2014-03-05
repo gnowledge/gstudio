@@ -42,7 +42,7 @@ def checkgroup(request,group_name):
     
 
 
-def select_drawer(request, group_name):
+def select_drawer(request, group_id):
     
     if request.is_ajax() and request.method == "POST":
         
@@ -70,7 +70,7 @@ def select_drawer(request, group_name):
 
                 i = i+1
 
-            drawer = get_drawers(group_name, node_id, collection_list_ids, checked)
+            drawer = get_drawers(group_id, node_id, collection_list_ids, checked)
         
             drawer1 = drawer['1']
             drawer2 = drawer['2']
@@ -79,7 +79,8 @@ def select_drawer(request, group_name):
                                       {"widget_for": "collection",
                                        "drawer1": drawer1, 
                                        "drawer2": drawer2,
-                                       "group_name": group_name
+                                       "group_id": group_id,
+                                       "groupid": group_id
                                       },
                                       context_instance=RequestContext(request)
             )
@@ -88,12 +89,13 @@ def select_drawer(request, group_name):
             
           # For creating a resource collection   
           if node_id is None:                             
-            drawer = get_drawers(group_name, node_id, [], checked)  
+            drawer = get_drawers(group_id, node_id, [], checked)  
 
             return render_to_response("ndf/drawer_widget.html", 
                                        {"widget_for": "collection", 
                                         "drawer1": drawer, 
-                                        "group_name": group_name
+                                        "group_id": group_id,
+                                        "groupid": group_id
                                        }, 
                                        context_instance=RequestContext(request)
             )
@@ -101,12 +103,13 @@ def select_drawer(request, group_name):
           # For editing a resource collection   
           else:
 
-            drawer = get_drawers(group_name, node_id, [], checked)  
+            drawer = get_drawers(group_id, node_id, [], checked)  
        
             return render_to_response("ndf/drawer_widget.html", 
                                        {"widget_for": "collection", 
                                         "drawer1": drawer['1'], 
-                                        "group_name": group_name
+                                        "group_id": group_id,
+                                        "groupid": group_id
                                        }, 
                                        context_instance=RequestContext(request)
             )
@@ -115,7 +118,7 @@ def select_drawer(request, group_name):
 
 
 @login_required
-def change_group_settings(request, group_name):
+def change_group_settings(request, group_id):
     '''
 	changing group's object data
     '''
@@ -165,14 +168,13 @@ hm_obj = HistoryManager()
 GST_MODULE = gs_collection.GSystemType.one({'name': GAPPS[8]})
 
 @login_required
-def make_module_set(request, group_name):
+def make_module_set(request, group_id):
     '''
     This methode will create module of collection and stores objectid's with version number's
     '''
     if request.is_ajax():
         try:
             _id = request.GET.get("_id","")
-            print "id:",_id
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
                 list_of_collection.append(node._id)
@@ -190,10 +192,13 @@ def make_module_set(request, group_name):
                 gsystem_obj.content = unicode(node.content)
                 #gsystem_obj.gsystem_type.append(GST_MODULE._id)
                 gsystem_obj.member_of.append(GST_MODULE._id)
-                gsystem_obj.group_set.append(unicode(group_name))
-                if usrname not in gsystem_obj.group_set:        
-                    gsystem_obj.group_set.append(usrname)
-
+                group_object=gs_collection.Group.one({'_id':ObjectId(group_id)})
+                if group_object._id not in gsystem_obj.group_set:
+                    gsystem_obj.group_set.append(group_object._id)
+                user_group_object=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+                if user_group_object:
+                    if user_group_object._id not in gsystem_obj.group_set:        
+                        gsystem_obj.group_set.append(user_group_object._id)
                 gsystem_obj.created_by = int(request.user.id)
                 gsystem_obj.module_set.append(dict)
                 gsystem_obj.save()
@@ -217,7 +222,7 @@ def walk(node):
        list.append(dict)
     return list
 
-def get_module_json(request, group_name):
+def get_module_json(request, group_id):
     _id = request.GET.get("_id","")
     node = collection.Node.one({'_id':ObjectId(_id)})
     data = walk(node.module_set)
@@ -225,7 +230,7 @@ def get_module_json(request, group_name):
 
 
 # ------------- For generating graph json data ------------
-def graph_nodes(request, group_name):
+def graph_nodes(request, group_id):
 
   collection = db[Node.collection_name]
   page_node = collection.Node.one({'_id':ObjectId(request.GET.get("id"))}) 
@@ -242,7 +247,7 @@ def graph_nodes(request, group_name):
 
   def _get_node_url(node_id):
 
-    node_url = '/' + group_name
+    node_url = '/' + str(group_id)
     node = collection.Node.one({'_id':node_id})
 
     if len(node.member_of) > 1:

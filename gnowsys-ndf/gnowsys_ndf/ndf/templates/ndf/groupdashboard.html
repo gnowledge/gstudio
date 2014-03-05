@@ -6,11 +6,10 @@ from django.contrib.auth.decorators import login_required
 {% block head %}
 
 
-<script type="text/javascript" ></script>
-
-<script>
+<script type="text/javascript" >
   var chk_login = "{{ user }}";
 </script>
+
 
 
 
@@ -29,10 +28,10 @@ else
 }
 
 //function for sending notifications for Join and Unsubscribe
-function notify(group,activity)
+function notify(node,activity)
 {
 
-  var surl="/"+group+"/group/notify/"+activity+"/"
+  var surl="/"+node+"/group/notify/"+activity+"/"
   $.ajax({
     url: surl,
     beforeSend: function() {
@@ -77,16 +76,19 @@ $(document).ready(function()
 {% endblock %}
 
 {% block url %}
-{% url 'edit_group' groupobj.name groupobj %}
+{% url 'edit_group' 'home' %}
 {% endblock %}
 
 
 {% block meta_content %}
+
+
+
 <p> Members in this group :{{node.author_set|length}} </p>
-{% get_group_name request.path as group %}
-{% get_group_policy group request.user as policy %}
-{% check_user_join request group as user_is_joined %}
-<input type="hidden" id="groupname" value="{{group}}">
+
+{% get_group_policy node request.user as policy %}
+{% check_user_join request groupid as user_is_joined %}
+<input type="hidden" id="groupname" value="{{node}}">
 {% if user_is_joined == "joined" %}
 <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible" >
 {% elif user_is_joined == "not" or not user.is_authenticated  %}

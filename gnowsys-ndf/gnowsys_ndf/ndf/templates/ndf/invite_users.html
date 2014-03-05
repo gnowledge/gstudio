@@ -71,7 +71,7 @@ $(document).on('click',"#submitUserInvite",function(){
                     }
        var join_list_users= list_users.join(',');
        data = $("#userInvite").val();//attr('value');
-       var surl="/{{group}}/group/notify/send_invitation/"
+       var surl="/{{node}}/group/notify/send_invitation/"
 
 $.ajax({
 
@@ -115,7 +115,7 @@ height:150px;
 }
 </style>
 
-{% get_group_name request.path as group %}
+
 
 <input type="button" class="button tiny" id="UserInvitation" value="Subscribe Registered Members" onclick="UserInvitation()">
 <br/>

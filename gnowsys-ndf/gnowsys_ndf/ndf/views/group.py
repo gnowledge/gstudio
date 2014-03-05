@@ -40,7 +40,7 @@ gs_collection = db[GSystem.collection_name]
 #######################################################################################################################################
 
 
-def group(request, group_name,app_id):
+def group(request, group_id,app_id):
     """Renders a list of all 'Group-type-GSystems' available within the database.
     """
     group_nodes = []
@@ -51,12 +51,12 @@ def group(request, group_name,app_id):
     for items in gr:
             group_nodes.append(items)
     group_nodes_count = len(group_nodes)
-    return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_count': group_nodes_count}, context_instance=RequestContext(request))
+    return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_count': group_nodes_count,'groupid': group_id,'group_id': group_id}, context_instance=RequestContext(request))
     
 
 
-def create_group(request,group_name):
 
+def create_group(request,group_id):
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
@@ -72,38 +72,53 @@ def create_group(request,group_name):
         colg.visibility_policy = request.POST.get('existance', "")
         colg.disclosure_policy = request.POST.get('member', "")
         colg.encryption_policy = request.POST.get('encryption', "")
-        print "sub Pol",colg.subscription_policy        
         colg.save()
-        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user},context_instance=RequestContext(request))
-    return render_to_response("ndf/create_group.html", RequestContext(request))
+        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id},context_instance=RequestContext(request))
+    return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
     
+# def home_dashboard(request):
+#     try:
+#         groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+#     except Exception as e:
+#         groupobj=""
+#         pass
+#     print "frhome--",groupobj
+#     return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'user':request.user,'curgroup':groupobj},context_instance=RequestContext(request))
 
-def group_dashboard(request,group_name):
+
+
+def group_dashboard(request,group_id=None):
     try:
-        gp=unicode(group_name)
-        groupobj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':gp}]})        
-    except:
-        groupobj=""
+        groupobj="" 
+        grpid=""
+        if group_id == None:
+            groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+            grpid=groupobj['_id']
+        else:
+            groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
+            grpid=groupobj['_id']
+    except Exception as e:
+        groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+        grpid=groupobj['_id']
         pass
-    return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'node':groupobj,'user':request.user},context_instance=RequestContext(request))
+    return render_to_response("ndf/groupdashboard.html",{'groupid':grpid,'group_id':grpid,'user':request.user},context_instance=RequestContext(request))
 
 @login_required
-def edit_group(request,group_name,group_id):
-    page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})    
-    
+def edit_group(request,group_id):
+    page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
     if request.method == "POST":
-            get_node_common_fields(request, page_node, group_name, gst_group)
+            get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
                 page_node.group_type = "PUBLIC"
             if page_node.access_policy == "PRIVATE":
                 page_node.group_type = "PRIVATE"
-
             page_node.save()
-            group_name=page_node.name
-            return HttpResponseRedirect(reverse('groupchange', kwargs={'group_name': group_name}))
+            group_id=page_node._id
+            return HttpResponseRedirect(reverse('groupchange', kwargs={'groupid':group_id,'group_id':group_id}))
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
-                                        'group_name': group_name
+                                        'groupid':group_id,
+                                        'group_id':group_id
                                         },
                                       context_instance=RequestContext(request)
                                       )

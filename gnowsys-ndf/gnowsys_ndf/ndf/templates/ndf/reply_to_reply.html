@@ -6,9 +6,9 @@ $(document).ready(function(){
 $("#savereply{{each}}").click(function(){
 var content=$('#orgitdown{{each}}').val()
 alert(content);
-var grp=$("#grptxt{{each}}").val();
+
 var repl=$("#rep{{each}}").val();
-var ajurl="/"+grp+"/forum/add_node/"
+var ajurl="/"+groupid+"/forum/add_node/"
 
 $.ajax({
         url: ajurl,
@@ -75,12 +75,11 @@ div.overlay a.close {
 }
 </style>
 
-{% get_group_name request.path as group %}
+
 <button rel="#reply_frm{{each}}" id="reply_forum{{each}}" type="button" >Reply</button>
 <div class="overlay" id="reply_frm{{each}}">
 Reply to Reply:
   <textarea id="orgitdown{{each}}" name="content_org" placeholder="Please enter description..."></textarea>
-<input type="text" id="grptxt{{each}}" style="visibility:hidden" value="{{group}}">
 <input id="savereply{{each}}" type="button" value="Save">
 <input type="text" id="rep{{each}}" style="visibility:hidden" value="{{each}}">
 </div>
