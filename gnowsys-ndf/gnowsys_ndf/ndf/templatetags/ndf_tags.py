@@ -1,24 +1,25 @@
-''' -- imports from installed packages -- '''
-from django.template import Library
-
-
-''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
-from gnowsys_ndf.settings import META_TYPE
-from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group
+''' -- imports from python libraries -- '''
 import re
+
+''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
-from django.shortcuts import render_to_response, render
-from gnowsys_ndf.ndf.views.methods import get_drawers
-from django.template import RequestContext,loader
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from django.template import Library
+from django.template import RequestContext,loader
+from django.shortcuts import render_to_response, render
+
+''' -- imports from application folders/files -- '''
+from gnowsys_ndf.settings import GAPPS, META_TYPE
+from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import check_existing_group
+from gnowsys_ndf.ndf.views.methods import get_drawers
+
 
 register = Library()
 db = get_database()
-collection = db['Nodes']
+collection = db[Node.collection_name]
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -135,10 +136,9 @@ def get_gapps_menubar(group_name, selectedGapp):
   i = 0;
 
   meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-  # GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]})
+  GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
 
-  for app in GAPPS:
-    node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+  for node in GAPPS:
     if node:
       if node.name not in ["Image", "Video"]:
         i = i+1;
@@ -308,6 +308,18 @@ def get_user_group(user):
     return "None"
 
   return group
+
+
+@register.assignment_tag
+def get_profile_pic(user):
+
+  ID = User.objects.get(username=user).pk
+  GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+
+  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+
+  return prof_pic
+
 
 @register.assignment_tag
 def get_group_type(grname,user):
