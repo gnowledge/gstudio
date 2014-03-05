@@ -98,7 +98,6 @@ def submitDoc(request, group_id):
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
         access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
-        print "content:", content_org
         tags = request.POST.get('tags')
 
         i = 1

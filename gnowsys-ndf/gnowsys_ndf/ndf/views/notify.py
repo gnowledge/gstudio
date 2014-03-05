@@ -23,17 +23,15 @@ def get_user(username):
 # A general function used to send all kind of notifications
 def set_notif_val(request,group_id,msg,activ,bx):
     try:
-        print "in set notif val"
         group_obj=col_Group.Group.one({'_id':ObjectId(group_id)})
         site=sitename.name.__str__()
         objurl="http://test"
         render = render_to_string("notification/label.html",{'sender':request.user.username,'activity':activ,'conjunction':'-','object':group_obj,'site':site,'link':objurl})
         notification.create_notice_type(render, msg, "notification")
         notification.send([bx], render, {"from_user": request.user})
-        print "sent notification"
         return True
     except Exception as e:
-        print "Error-",e
+        print "Error in sending notification-",e
         return False
 
 # Send invitation to any user to join or unsubscribe

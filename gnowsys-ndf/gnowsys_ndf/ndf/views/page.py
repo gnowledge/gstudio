@@ -46,7 +46,6 @@ rcs = RCS()
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
-    print "in pageview"
     group_object=collection.Group.one({'_id':ObjectId(group_id)})
     if request.method == "POST":
         # Written for implementing search-functionality
@@ -105,7 +104,6 @@ def page(request, group_id, app_id=None):
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    print "in create ciew"
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id

@@ -25,10 +25,8 @@ def course(request, group_id, course_id):
     """
    * Renders a list of all 'courses' available within the database.
     """
-    print "incourse view"
     if GST_COURSE._id == ObjectId(course_id):
         title = GST_COURSE.name
-        print "in course",course_id,group_id
         course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         template = "ndf/course.html"
         variable = RequestContext(request, {'course_coll': course_coll,'groupid':group_id,'group_id':group_id })

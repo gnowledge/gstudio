@@ -43,7 +43,6 @@ gs_collection = db[GSystem.collection_name]
 def group(request, group_id,app_id):
     """Renders a list of all 'Group-type-GSystems' available within the database.
     """
-    print "in group view",group_id
     group_nodes = []
     col_Group = db[Group.collection_name]
     colg = col_Group.Group.find({'_type': u'Group'})
@@ -73,7 +72,6 @@ def create_group(request,group_id):
         colg.visibility_policy = request.POST.get('existance', "")
         colg.disclosure_policy = request.POST.get('member', "")
         colg.encryption_policy = request.POST.get('encryption', "")
-        print "sub Pol",colg.subscription_policy        
         colg.save()
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
@@ -91,20 +89,15 @@ def create_group(request,group_id):
 
 def group_dashboard(request,group_id=None):
     try:
-        print "ingrpdashview",group_id
         groupobj="" 
         grpid=""
         if group_id == None:
-            print "home"
             groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
             grpid=groupobj['_id']
-            print grpid,"grpid"
         else:
-            print "other grps",group_id,type(group_id)    
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
             grpid=groupobj['_id']
     except Exception as e:
-        print "Error in groupdash board-"+str(e)
         groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         grpid=groupobj['_id']
         pass

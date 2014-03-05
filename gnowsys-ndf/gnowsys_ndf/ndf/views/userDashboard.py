@@ -35,7 +35,7 @@ collection = db[Node.collection_name]
 #######################################################################################################################################
 
 def dashboard(request, group_id, user):	
-    print "inside userdash board view"    
+
     ID = User.objects.get(username=user).pk
     
     date_of_join = User.objects.get(username=user).date_joined

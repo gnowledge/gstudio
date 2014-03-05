@@ -150,7 +150,6 @@ def add_node(request,group_id):
             colrep.content = org2html(content_org, file_prefix=filename)
         usrid=int(request.user.id)
         colrep.created_by=usrid
-        print "in forum add",group_id,type(group_id)
         colrep.group_set.append(colg._id)
         colrep.save()
         groupname=colg.name
@@ -160,16 +159,13 @@ def add_node(request,group_id):
             prefix=" on the forum '"+forumobj.name+"'"
             nodename=name
         if node == "Reply":
-            print "in threadobj_object"
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
             url="http://"+sitename+"/"+str(group_id)+"/forum/thread"+str(threadobj._id)
             activity=str(request.user.username)+" -added a reply "
             prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
             nodename=""
         link=url
-        print "till now",colg.author_set
         for each in colg.author_set:
-            print each
             bx=User.objects.get(id=each)
             msg=activity+"-"+nodename+" in the group '"+str(groupname)+"'\n"+"Please visit "+link+" to see the updated page"
             if bx:
@@ -178,7 +174,6 @@ def add_node(request,group_id):
         msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"   
         if bx:
             ret = set_notif_val(request,group_id,msg,activity,bx)
-        print "reached here"
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]

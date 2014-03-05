@@ -184,7 +184,6 @@ def get_node_common_fields(request, node, group_id, node_type):
   collection_list = request.POST.get('collection_list','')
   module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
-  print module_list,"test"
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
@@ -229,7 +228,6 @@ def get_node_common_fields(request, node, group_id, node_type):
     if user_group_obj:
       if user_group_obj._id not in node.group_set:   
         node.group_set.append(user_group_obj._id)  
-  print "after group_set user"
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
   # -------------------------------------------------------------------------------- prior_node
@@ -286,7 +284,6 @@ def get_node_common_fields(request, node, group_id, node_type):
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
-    print "last"
 
   
 

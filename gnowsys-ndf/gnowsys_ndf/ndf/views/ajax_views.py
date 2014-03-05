@@ -175,7 +175,6 @@ def make_module_set(request, group_id):
     if request.is_ajax():
         try:
             _id = request.GET.get("_id","")
-            print "id:",_id
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
                 list_of_collection.append(node._id)

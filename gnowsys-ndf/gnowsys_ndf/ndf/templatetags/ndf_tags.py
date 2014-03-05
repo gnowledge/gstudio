@@ -1,20 +1,20 @@
-''' -- imports from installed packages -- '''
-from django.template import Library
-
-
-''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
-from gnowsys_ndf.settings import META_TYPE
-from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group
+''' -- imports from python libraries -- '''
 import re
+
+''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
-from django.shortcuts import render_to_response, render
-from gnowsys_ndf.ndf.views.methods import get_drawers
-from django.template import RequestContext,loader
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+from django.template import Library
+from django.template import RequestContext,loader
+from django.shortcuts import render_to_response, render
+
+''' -- imports from application folders/files -- '''
+from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import check_existing_group
+from gnowsys_ndf.ndf.views.methods import get_drawers
 
 from pymongo.errors import InvalidId as invalid_id
 
@@ -22,7 +22,7 @@ from pymongo.errors import InvalidId as invalid_id
 
 register = Library()
 db = get_database()
-collection = db['Nodes']
+collection = db[Node.collection_name]
 
 
 @register.assignment_tag
@@ -149,7 +149,7 @@ def get_gapps_menubar(group_id, selectedGapp):
     gapps = {}
     i = 0;
     meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-    GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]})
+    GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
     
     for node in GAPPS:
       #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
@@ -170,6 +170,7 @@ def get_gapps_menubar(group_id, selectedGapp):
     gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=gpid._id
     return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+
 
 @register.assignment_tag
 def get_forum_twists(forum):
