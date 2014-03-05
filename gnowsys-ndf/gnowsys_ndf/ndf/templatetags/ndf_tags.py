@@ -11,14 +11,12 @@ from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.settings import GAPPS, META_TYPE
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
 
 from pymongo.errors import InvalidId as invalid_id
-
-
 
 register = Library()
 db = get_database()
@@ -158,7 +156,6 @@ def get_gapps_menubar(group_id, selectedGapp):
         if node.name not in ["Image", "Video"]:
           i = i+1;
           gapps[i] = {'id': node._id, 'name': node.name.lower()}
-    print "all apps=",gapps
     selectedGapp = selectedGapp.split("/")[2]
     if group_id == None:
       group_id=gpid._id
@@ -320,6 +317,18 @@ def get_user_group(user):
     return group
   except:
     return group
+
+
+@register.assignment_tag
+def get_profile_pic(user):
+
+  ID = User.objects.get(username=user).pk
+  GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+
+  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+
+  return prof_pic
+
 
 @register.assignment_tag
 def get_group_type(group_id,user):

@@ -21,7 +21,36 @@
 	<!-- Users General Information -->
 	<div class="row">
 		<div class="small-3 columns">
-			<a href="#"><img src="/static/ndf/images/user.png"></a>
+			
+			{% if user.is_authenticated %}
+				
+				{% if prof_pic %}
+					<a href="#"><img  src="{% url 'getImageThumbnail' group_name prof_pic %}" height="120" width="120"></img></a><br/>
+					<a href='#' id="pic">Change Profile Picture</a>
+				{% else %}
+					<a href="#"><img src="/static/ndf/images/user.png" height="120" width="120"></a><br/>
+					<a href='#' id="pic">Upload Profile Picture</a>
+				{% endif %}			
+			
+			
+			<div id="pic_div" style="display:none;">
+				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">
+					{% csrf_token %}
+					<input type="file" name="doc[]"  id="docFile" multiple/>
+
+					<input type="hidden" name="type" value="profile_pic">						
+					<input type="hidden" name="user" value="{{user_id}}">					
+					<input type="submit" id="submitpostid" value="Save">
+
+					<p id="message" style="display:none">
+						Please wait for uploading profile picture
+					</p>
+						
+				</form>
+			</div>
+			{% else %}
+				<p><em>You are Not Authorised user please login to upload profile picture </em></p>
+			{% endif %}
 		</div>
 		<div class="small-9 columns" style="padding-top:30px;">
 			<h4><a href="#">Welcome {{username}}</a></h4>
@@ -392,6 +421,26 @@
     		}).show();
   		});
     });
+
+    $("#pic").click(function() {
+		$("#pic_div").css("display", 'block');
+	});
+
+	$(document).ready(function($){
+		$(document).on('submit',"form",function(){
+			if($("#docFile").val() != "")
+			{	
+				$("#message").show();
+				$("#submitpostid").hide();
+				$("#submitpostid").submit();
+			}
+			else
+			{
+				alert("select a file");
+				return false;
+			}
+		});
+	});
 	
 </script>
 

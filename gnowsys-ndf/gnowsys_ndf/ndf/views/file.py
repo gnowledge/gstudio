@@ -94,6 +94,7 @@ def submitDoc(request, group_id):
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
+        img_type = request.POST.get("type", "")
         usrname = request.user.username
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
@@ -104,23 +105,30 @@ def submitDoc(request, group_id):
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f = save_file(each, mtitle, userid, group_id, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                    f = save_file(each, img_type, mtitle, userid, group_id, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, title, userid, group_id, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                    f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, title, userid, group_id, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+
             if f:
                 alreadyUploadedFiles.append(f)
                 title = mtitle
         for each in alreadyUploadedFiles:
             str1 = str1 + 'var=' + each + '&'
-        return HttpResponseRedirect(page_url+'?'+str1)
+
+        if img_type != "":
+            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id, 'user': usrname}))
+        else:
+            return HttpResponseRedirect(page_url+'?'+str1)
+
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
             
+
 
 def save_file(files, title, userid, group_id, st_id, content_org, tags, access_policy, usrname):
     """
@@ -146,6 +154,7 @@ def save_file(files, title, userid, group_id, st_id, content_org, tags, access_p
             filename = files.name
             fileobj.name = unicode(title)
             fileobj.created_by = int(userid)
+            fileobj.type_of = unicode(img_type)                 # To define type if image is profile_pic      
             fileobj.file_size = size
             group_object=fcol.Group.one({'_id':ObjectId(group_id)})
             if group_object._id not in fileobj.group_set:
@@ -156,12 +165,13 @@ def save_file(files, title, userid, group_id, st_id, content_org, tags, access_p
                     fileobj.group_set.append(user_group_object._id)
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
-            if content_org:
-                fileobj.content_org = unicode(content_org)
-                # Required to link temporary files with the current user who is modifying this document
-                filename_content = slugify(title) + "-" + usrname + "-"
-                fileobj.content = org2html(content_org, file_prefix = filename_content)
-            fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+            if img_type == None:
+                if content_org:
+                    fileobj.content_org = unicode(content_org)
+                    # Required to link temporary files with the current user who is modifying this document
+                    filename_content = slugify(title) + "-" + usrname + "-"
+                    fileobj.content = org2html(content_org, file_prefix = filename_content)
+                fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
             
             # For giving privacy to file objects
             if access_policy == "PUBLIC":

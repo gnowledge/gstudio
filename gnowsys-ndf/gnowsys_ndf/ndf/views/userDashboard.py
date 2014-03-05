@@ -22,12 +22,14 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers
+from gnowsys_ndf.settings import GAPPS
 
 
 #######################################################################################################################################
 
 db = get_database()
 collection = db[Node.collection_name]
+GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 
 
 #######################################################################################################################################
@@ -56,14 +58,31 @@ def dashboard(request, group_id, user):
             name = User.objects.get(pk=val).username 		
             collab_drawer.append(name)			
             
-            
+
+    img_cur = collection.GSystem.find({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })        
+    
+    if img_cur.count() > 1: 
+      cur = collection.GSystem.one({'_id':ObjectId(img_cur[0]._id)})
+      if cur.fs_file_ids:
+        for each in cur.fs_file_ids:
+            cur.fs.files.delete(each)
+      cur.delete()
+
+      img_obj = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })
+    
+    else:
+      img_obj = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+    
+
+
     return render_to_response("ndf/userDashboard.html",
                               {'username': user, 'user_id': ID, 'DOJ': date_of_join, 
+                               'prof_pic': img_obj,'group_id':group_id,                               
                                'page_drawer':page_drawer,'image_drawer': image_drawer,
                                'video_drawer':video_drawer,'file_drawer': file_drawer,
                                'quiz_drawer':quiz_drawer,'group_drawer': group_drawer,
                                'forum_drawer':forum_drawer,'collab_drawer': collab_drawer,
-                               'groupid':group_id,'group_id':group_id
+                               'groupid':group_id
                               },
                               context_instance=RequestContext(request)
     )
