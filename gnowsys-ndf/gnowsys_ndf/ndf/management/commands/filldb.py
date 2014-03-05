@@ -15,33 +15,38 @@ from gnowsys_ndf.ndf.models import Node, GSystemType
 from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import META_TYPE
+
 
 ####################################################################################################################
+#global variables
+db = get_database()
+collection = db[Node.collection_name]
 
 class Command(BaseCommand):
     help = "Based on GAPPS list, inserts few documents (consisting of dummy values) into the following collections:\n\n" \
            "\tGSystemType, AttributeType"
 
     def handle(self, *args, **options):
-        db = get_database()
-        #collection = db[GSystemType.collection_name]
-        collection = db[Node.collection_name]
-
         user_id = 1 
-
         node_doc = None
+        meta_type_name = META_TYPE[0]
+        meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]}) # getting MetaType Object
+        if meta_type == None:
+            meta_type = create_meta_type(user_id) #creating MetaType
+        
         for each in GAPPS:
             node_doc = collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':each}]})
             if (node_doc == None or each != node_doc['name']):
                 gst_node=collection.GSystemType()
                 gst_node.name = unicode(each)
                 gst_node.created_by = user_id
-                # gst_node.member_of.append(u'GAPP')
+                gst_node.member_of.append(meta_type._id) # appending metatype to the GSystemType
                 gst_node.modified_by.append(user_id)
                 gst_node.save()
-            # elif('GAPP' not in node_doc.member_of):
-            #     node_doc.member_of.append(u'GAPP')
-            #     node_doc.save()
+            elif(meta_type._id not in node_doc.member_of):
+                 node_doc.member_of.append(meta_type._id)
+                 node_doc.save()
                    
         #Create default group 'home'
         node_doc =collection.GSystemType.one({'$and':[{'_type': u'Group'},{'name': u'home'}]})
@@ -203,3 +208,12 @@ class Command(BaseCommand):
 
         # --- End of handle() ---
 
+def create_meta_type(user_id):
+    '''
+    creating meta_type in database
+    '''
+    meta = collection.MetaType()
+    meta.name = META_TYPE[0]
+    meta.created_by = user_id # default hardcode
+    meta.save()
+    return meta

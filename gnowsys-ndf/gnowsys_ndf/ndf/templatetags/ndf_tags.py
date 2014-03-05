@@ -4,6 +4,7 @@ from django.template import Library
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 import re
@@ -14,15 +15,28 @@ from django.template import RequestContext,loader
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import Http404
+
 from pymongo.errors import InvalidId as invalid_id
+
+
+
 register = Library()
 db = get_database()
 collection = db['Nodes']
 
 
 @register.assignment_tag
-def get_groupid():
-  return "ttt"
+def get_group_object(group_id = None):
+  try:
+    colln=db[Node.collection_name]
+    if group_id == None :
+      group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    else:
+      group_object=colln.Group.one({'_id':ObjectId(group_id)})
+    return group_object
+  except invalid_id:
+    group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    return group_object
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -101,7 +115,6 @@ def list_widget(type_value, fields_value,template1='ndf/option_widget.html',temp
   types = fields[type_value]
 
   if type_value in fields_selection1:
-    print type_value,"tagss"
     if type_value in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
       for each in NODE_TYPE_CHOICES:
         drawer1[each] = each
@@ -130,33 +143,32 @@ def get_gapps_menubar(group_id, selectedGapp):
   """Get Gapps menu-bar
   """
   try:
-    print "groupcheck in gmenubar test",group_id,type(group_id)
     collection = db[Node.collection_name]
     gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
+#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
     gapps = {}
     i = 0;
-    for app in GAPPS:
-      node = collection.Node.one({'_type': 'GSystemType', 'name': app})
+    meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+    GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]})
+    
+    for node in GAPPS:
+      #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
       if node:
         if node.name not in ["Image", "Video"]:
           i = i+1;
           gapps[i] = {'id': node._id, 'name': node.name.lower()}
+
     selectedGapp = selectedGapp.split("/")[2]
-    print "gapps=",gapps
     if group_id == None:
-      print "groupid none"
       group_id=gpid._id
     group_obj=collection.Group.one({'_id':ObjectId(group_id)})
     if not group_obj:
       group_id=gpid._id
 
-    print "group_id=",group_id
     return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
   except invalid_id:
     gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=gpid._id
-    print "in exception"
     return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 @register.assignment_tag
@@ -193,7 +205,6 @@ def get_twist_replies(twist):
 
 @register.assignment_tag
 def check_user_join(request,group_id):
-  print "checkuser join",group_id,type(group_id)
   if not request.user:
     return "null"
   user=request.user
@@ -223,7 +234,6 @@ def check_user_join(request,group_id):
   
 @register.assignment_tag
 def check_group(group_id):
-  print "in  exgrp",group_id,type(group_id)
   fl = check_existing_group(group_id)
   return fl
 
@@ -258,7 +268,6 @@ def get_existing_groups_excluded(grname):
 @register.assignment_tag
 def get_group_policy(group_id,user):
   try:
-    print "insideget_grp_policy"
     policy = ""
     col_Group = db[Group.collection_name]
     colg = col_Group.Group.one({'_id':ObjectId(group_id)})
@@ -290,7 +299,6 @@ def get_user_group(user):
                               })
 
     auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
-    print "colg=",colg
     for items in colg:
       if items.created_by == user.pk:
         if items.name == auth.name:
@@ -314,7 +322,6 @@ def get_user_group(user):
 @register.assignment_tag
 def get_group_type(group_id,user):
   try:
-    print "gropid=temptag",group_id
     col_Group = db[Group.collection_name]
     if group_id == '/home/':
       colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -335,12 +342,11 @@ def get_group_type(group_id,user):
         if colg.group_type=="PUBLIC":
           return "allowed"
         else:
-          print "redirection"
           raise Http404
     else:
 	return "pass"		
   except Exception as e:
-    print "Error in group_type_view_in_ndf_tags"+str(e)
+    print "Error in group_type_tag "+str(e)
     colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     return "pass"
     

@@ -154,8 +154,8 @@
 				<!-- Left Nav Section -->
 				<ul class="left">
 					<li class="has-dropdown group">
-
-						<a class="active-menu" href="/{{groupobj}}"><i class="fi-home"></i> {{groupobj.name}}</a>
+					  {% get_group_object groupid as group_object %}
+						<a class="active-menu" href="/{{groupobj}}"><i class="fi-home"></i> {{group_object.name}}</a>
 
 						<!-- If logged in show user groups -->
 						
