@@ -107,7 +107,8 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 def list_widget(type_value, fields_value,template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
   drawer1 = {}
   drawer2 = None
-  group_name = ""
+  group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+  groupid=group_obj._id
   alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
   fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
   fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
@@ -135,7 +136,7 @@ def list_widget(type_value, fields_value,template1='ndf/option_widget.html',temp
       for each in alltypes:
         for eachnode in collection.Node.find({"_type":each}):
           drawer1[eachnode._id] = eachnode
-    return {'template': template2, 'widget_for': type_value, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': "home"}
+    return {'template': template2, 'widget_for': type_value, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid}
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
@@ -157,7 +158,7 @@ def get_gapps_menubar(group_id, selectedGapp):
         if node.name not in ["Image", "Video"]:
           i = i+1;
           gapps[i] = {'id': node._id, 'name': node.name.lower()}
-
+    print "all apps=",gapps
     selectedGapp = selectedGapp.split("/")[2]
     if group_id == None:
       group_id=gpid._id
