@@ -281,7 +281,7 @@ def graph_nodes(request, group_name):
                       "member_of", "status", "comment_enabled", "start_publication",
                       "_type", "modified_by", "created_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
-                      "fs_file_ids", "file_size", "mime_type", "location"
+                      "fs_file_ids", "file_size", "mime_type", "location", "language"
                     ]
 
   # username = User.objects.get(id=page_node.created_by).username

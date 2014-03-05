@@ -3,9 +3,10 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	
+	<!-- Scripts required for D3 graph -->
 	<script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
-
 	<script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>		
+
 	<style type="text/css">
 
 		#chart .link {
@@ -18,6 +19,7 @@
 			font-style:italic;
 		}
 
+		/*Central node shown in ellipse*/
 		#chart .mainnode{
 
 			font: 15px sans-serif;
@@ -27,38 +29,35 @@
 			border-color: gray;
 		}
 
+		/*Connector element that connects two nodes*/
 		#chart .relnode {
 			font: 10px sans-serif;			
 			fill:#404040;
 		}
 
-
+		/*Peripheral nodes to main node*/
 		#chart .node {
 			border-width: 1px;
 			border-color: gray;
-			fill:#25587E;
+			fill:#154534;
 			font: 12px sans-serif;
 		}
 
-		body {
+		/*body {
 			background-color: white;
 			display:block;
 		}
+		*/
 
+		/* Div containing SVG area*/
 		#chart {
-			/*height: 90%;
-			margin: 0 auto;
-			width: 90%*/;
 			display: block;
 		}
 
 		svg {
-			/*margin-left: 10%;
-			margin-right: 10%;*/
 			display: block;
 			position: absolute;
 		}
-
 
 	</style>
 
@@ -66,19 +65,20 @@
 
 <body>
 
-	<div id="chart">
-	</div>
+
+	<!-- Div containing svg area -->
+	<div id="chart"></div>
 
 	<script type="text/javascript">
 
 		var graphHeight = ($(window).height())*0.60,
-		graphWidth  = ($(window).width())*0.75;
+			graphWidth  = ($(window).width())*0.75;
 
-		var objectid = "{{node.pk}}";
+		var objectid = "{{node.pk}}";	// _id of current vieving page
+
 
 		function init(a,b)
 		{
-
 			nodes_by_id = _.reduce(a, function(acc, n) 
 			{
 				acc[n._id] = n;
@@ -100,7 +100,6 @@
 		} // ====== END of init() ======
 
 
-
 		// -------------------fgraph()--------------------
 		function fgraph() 
 		{	
@@ -116,9 +115,9 @@
 				relations=json1.relations;
 
 				init(metadata,relations);
-				load(json1.node_metadata[0]._id) 
+				load(objectid); 
 			}); // --END of getJSON()
-
+			
 		} // ====== END of fgraph ======
 
 
@@ -244,10 +243,11 @@
                 $(window).bind('keydown',function(event) {
                 	if(event.keyCode==17)
                 	{      	
+
                 		new_g.on("click",function(d){                 
+
                 			// alert(JSON.stringify(d))
-	                        // if( d.expanded=="true" && d._id!= objectid )
-	                        if(d._id)
+	                        if( d.expanded=="true" && d._id!= objectid )
 	                        { 
 	                			$.getJSON("{% url 'get_graph_json' group_name %}?id=" + d._id , function (json2) {
 	                				new_metadata = json2.node_metadata;
@@ -289,17 +289,18 @@
                                   		url:"{% url 'get_graph_json' group_name %}?id=" + g , 
                                   		datatype:'json',
                                   		success:function (json2) {
+                                  			json2 = JSON.parse(json2);
                                       	new_metadata=json2.node_metadata;
                                       	new_relations=json2.relations;
                                       	// alert(JSON.stringify(json2));
                                       	metadata=_.union(new_metadata,metadata);
 
                                       	relations=_.union(new_relations,relations);
-                                      	//relations= check_Relationtype(metadata,relations);
+                                      	relations= check_Relationtype(metadata,relations);
                                       	}
                                     });     
                           		}
-                          		alert(metadata);
+                          		// alert(metadata);
                           		
                           		_.each(metadata, function(m){
                           			for(i=0;i<neighbour_node.length;i++)
@@ -314,18 +315,22 @@
                           		init(metadata,relations);
                           		load(objectid) ;                        
 	                		} // --END if
-	                		else if(d._id>0 && d._id!= objectid)
+	                		// else if(d._id>0 && d._id!= objectid)
+	                		else if(d._id!= objectid)
                		        {
                         
                     	    neighbour_node =neighbour_node.concat(d._id);
+                    	    // alert(neighbour_node);
                         	d3.select("#amazingViz").remove();  
 	                        $.ajax({
 	                          async:false,
-	                          url:'/nodetypes/graphs/graph_json/' + d._id , 
+	                          url:"{% url 'get_graph_json' group_name %}?id=" + d._id , 
 	                          datatype:'json',
 	                          success:function (json2) {
+	                          	json2 = JSON.parse(json2);
 	                            new_metadata=json2.node_metadata;
 	                            new_relations=json2.relations;
+				
 	                            metadata=_.union(new_metadata,metadata);
 	                            relations=_.union(new_relations,relations);
 	                            relations= check_Relationtype(metadata,relations);
@@ -348,7 +353,12 @@
 
 
                 text1 = new_g.append("svg:text")
-                .attr("class",function(d) {var e=(d._id).charAt(0);  if (d._id==key) return "mainnode";else if (e=="-") return "nodetext"; else if (isNaN(d._id)) return "relnode";  else return "node"; })
+                .attr("class",function(d) {  
+                	if (d._id==key) return "mainnode"; 
+                	// else if (e=="-") return "nodetext"; 
+                	else if ( d._id.search("_r") > 0) return "relnode";
+                	else return "node"; 
+                })
                 .attr("y", 20)
                 .attr("x", 25) 
                 .attr("dy", ".35em")
@@ -374,7 +384,7 @@
                 // .style("stroke", "#000")
                 // .style("stroke-width","1px"  );
 
-                new_g.filter(function(d) { if(d.refType=="GSystem") return (d._id)>0 ;}).append("svg:ellipse")
+                new_g.filter(function(d) { if(d.refType=="GSystem") return true ;}).append("svg:ellipse")
                 .attr("cx", 25)                
                 .attr("cy", 20)
                 .call(force.drag)
@@ -409,7 +419,6 @@
             .duration(1000)
             .style("opacity", 1);
         }
-    // }
 
 
     function check_Relationtype(metadata,relations)
