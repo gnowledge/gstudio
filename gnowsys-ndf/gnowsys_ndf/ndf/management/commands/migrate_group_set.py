@@ -23,6 +23,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         db=get_database()
         collection = db[Node.collection_name]
+        """
         systems = collection.Node.find({'_type':u'GSystem'})
         for each in systems:
             gps = collection.Node.find({'_type':u'Group'})
@@ -35,6 +36,18 @@ class Command(BaseCommand):
                 if type(each_group_set_item)==type(unicode()):
                     each.group_set.remove(each_group_set_item)
             each.save()
+        """
+
+        for n in cur:
+            gs = n.group_set
+            n.group_set = []
+            for group in gs:
+                if type(group) == unicode:
+                    n.group_set.append(collection.Node.one({'name': group})._id)
+                else:
+                    n.group_set.append(group)
+            n.save()
+
 
             
             
