@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 from registration.backends.default.views import RegistrationView
 
 from gnowsys_ndf.ndf.forms import *
-from gnowsys_ndf.ndf.views.home import HomeRedirectView
+from gnowsys_ndf.ndf.views.home import HomeRedirectView, homepage
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -28,6 +28,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
+    url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', homepage, name='GAPPS'),       
    # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
