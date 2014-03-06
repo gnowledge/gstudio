@@ -101,7 +101,8 @@ def group_dashboard(request,group_id=None):
         groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         grpid=groupobj['_id']
         pass
-    return render_to_response("ndf/groupdashboard.html",{'groupid':grpid,'group_id':grpid,'user':request.user},context_instance=RequestContext(request))
+    return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 'group_id':grpid, 'user':request.user},context_instance=RequestContext(request))
+
 
 @login_required
 def edit_group(request,group_id):
