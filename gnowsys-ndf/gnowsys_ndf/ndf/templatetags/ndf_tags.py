@@ -278,10 +278,11 @@ def get_group_policy(group_id,user):
 
 @register.assignment_tag
 def get_user_group(user):
-  try:
+  
     group = [] 
     author = None
     auth_type = ""
+    print "user", user.username
   
     col_Group = db[Group.collection_name]
     collection = db[Node.collection_name]
@@ -315,8 +316,7 @@ def get_user_group(user):
       return "None"
 
     return group
-  except:
-    return group
+  
 
 
 @register.assignment_tag
