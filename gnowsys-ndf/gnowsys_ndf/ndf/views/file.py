@@ -130,7 +130,7 @@ def submitDoc(request, group_id):
             
 
 
-def save_file(files, title, userid, group_id, st_id, content_org, tags, access_policy, usrname):
+def save_file(files, img_type, title, userid, group_id, st_id, content_org, tags, access_policy, usrname):
     """
     this will create file object and save files in gridfs collection
     """
