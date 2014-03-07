@@ -23,7 +23,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         db=get_database()
         collection = db[Node.collection_name]
-"""
+        """
         cur=collection.Node.find({'group_set':{'$exists':True}})
         for each in cur:
             gps = collection.Node.find({'_type':u'Group'})
@@ -36,7 +36,8 @@ class Command(BaseCommand):
                 if type(each_group_set_item)==unicode:
                     each.group_set.remove(each_group_set_item)
             each.save()
-"""
+        """
+
         cur=collection.Node.find({'group_set':{'$exists':True}})
         for n in cur:
             gs = n.group_set
