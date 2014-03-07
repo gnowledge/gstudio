@@ -1,5 +1,4 @@
 <br/><br/>
-
 <div>
 
   <!-- Title only row -->
@@ -148,7 +147,8 @@
     $(".resource-drawer").height(liHeight * 15);
 
     // To select the single as well as multiple items from list 
-    $("#{{widget_for}}_drawer1 li.bullet-item").click(function(e) {
+    $(document).on('click','#{{widget_for}}_drawer1 li.bullet-item',function(e){
+    //$("#{{widget_for}}_drawer1 li.bullet-item").on("click", function(e) {
 
       if (e.ctrlKey)
       {        
@@ -162,8 +162,8 @@
         
     }); 
 
-
-    $("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
+     $(document).on('click','#{{widget_for}}_drawer2 li.bullet-item',function(e){
+    //$("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
       
       if (e.ctrlKey)
       {        
@@ -277,9 +277,10 @@
 
 
   // Search-Box for LHS drawer of resources
-  $('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
+    $(document).on('keydown keypress keyup change', '#{{widget_for}}_search' ,function(){
+    //$('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
     var search = (this.value).toLowerCase();
-    var $li = $("#{{widget_for}}_drawer1 li.bullet-item").hide();
+    var $li = $("#{{widget_for}}_drawer1 li.bullet-item").hide()
     $li.filter(function() {
       return $(this).text().toLowerCase().indexOf(search) >= 0;
     }).show();

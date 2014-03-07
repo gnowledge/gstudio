@@ -342,3 +342,33 @@ def graph_nodes(request, group_name):
   return HttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
+
+def get_data_for_drawer(request, group_name):
+    data_list = []
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    node_id = request.GET.get("id","")
+    coll_obj_list = []
+    st = collection.Node.find({"_type":"GSystemType"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.collection_set:
+        coll_obj_list.append(collection.Node.one({'_id':each}))
+    drawer1 = list(set(st) - set(coll_obj_list))
+    drawer2 = coll_obj_list
+    for each in drawer1:
+       dic = {}
+       dic['id'] = str(each._id)
+       dic['name'] = str(each.name)
+       d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
+    for each in drawer2:
+       dic = {}
+       dic['id'] = str(each._id)
+       dic['name'] = str(each.name)
+       d2.append(dic)
+    draw2['drawer2'] = d2
+    data_list.append(draw2)
+    return HttpResponse(json.dumps(data_list))

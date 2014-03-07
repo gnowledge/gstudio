@@ -85,13 +85,11 @@ def adminDashboardEdit(request):
                 typelist = []
                 for eachvalue in  value.split(","):
                     typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                print typelist
                 node['member_of'] = typelist
             if key == "collection_set":
                 typelist = []
                 for eachvalue in  value.split(","):
                     typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                print typelist
                 node['collection_set'] = typelist
 
         node.save()     
