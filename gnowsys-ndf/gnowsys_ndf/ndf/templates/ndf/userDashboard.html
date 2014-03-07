@@ -15,13 +15,49 @@
 {% endblock %}
 
 {% block body_content %}
-
+{% load ndf_tags %}
 <div class="row">
 
 	<!-- Users General Information -->
 	<div class="row">
 		<div class="small-3 columns">
-			<a href="#"><img src="/static/ndf/images/user.png"></a>
+			
+			{% if user.is_authenticated %}
+				
+
+				{% if prof_pic %}
+
+					<a href="#"><img  src="{% url 'getImageThumbnail' group_id prof_pic %}" height="120" width="120"></img></a><br/>
+					<a href='#' id="pic">Change Profile Picture</a>
+				{% else %}
+					<a href="#"><img src="/static/ndf/images/user.png" height="120" width="120"></a><br/>
+					<a href='#' id="pic">Upload Profile Picture</a>
+
+				{% endif %}		
+
+			
+				{% if already_uploaded != "None" %}
+					<br/><br/><span style="color:red"> {{already_uploaded}} image is already uploaded please choose different image</span>
+				{% endif %}
+
+			<div id="pic_div" style="display:none;">
+				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_id %}">
+					{% csrf_token %}
+					<input type="file" name="doc[]"  id="docFile" multiple/>
+
+					<input type="hidden" name="type" value="profile_pic">						
+					<input type="hidden" name="user" value="{{user_id}}">					
+					<input type="submit" id="submitpostid" value="Save">
+
+					<p id="message" style="display:none">
+						Please wait for uploading profile picture
+					</p>
+						
+				</form>
+			</div>
+			{% else %}
+				<p><em>You are Not Authorised user please login to upload profile picture </em></p>
+			{% endif %}
 		</div>
 		<div class="small-9 columns" style="padding-top:30px;">
 			<h4><a href="#">Welcome {{username}}</a></h4>
@@ -53,8 +89,10 @@
 				{% for key, value in page_drawer.items %}
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 												
+
 							<a href="{% url 'page_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]							
+			{% comment %}				[Group : {{value.group_set|join:", "}} ]	{% endcomment %}			
+
 						</li>
 					{% endif %}
 				{% endfor %}	
@@ -73,8 +111,10 @@
 				{% for key, value in image_drawer.items %}
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
+
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
-							[Group : {{value.group_set|join:", "}} ]
+				{% comment %}		[Group : {{value.group_set|join:", "}} ] {% endcomment %}
+
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -94,7 +134,7 @@
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
-							[Group : {{value.group_set|join:", "}} ]				
+				{% comment %} 		[Group : {{value.group_set|join:", "}} ]	{% endcomment %}		
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -114,7 +154,7 @@
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a><br/> 
-							[Group : {{value.group_set|join:", "}} ]			
+				{% comment %}		[Group : {{value.group_set|join:", "}} ] {% endcomment %}			
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -137,7 +177,7 @@
 					{% if user_id == value.created_by %}        
 						<li class="bullet-item" value={{key}}> 												
 							<a href="{% url 'quiz_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]							
+				{% comment %}	[Group : {{value.group_set|join:", "}} ]	{% endcomment %}						
 						</li>
 					{% endif %}
 				{% endfor %}	
@@ -206,7 +246,7 @@
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'page_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]				
+				{% comment %}	[Group : {{value.group_set|join:", "}} ] {% endcomment %}				
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -226,7 +266,7 @@
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]				
+				{% comment %}		[Group : {{value.group_set|join:", "}} ]	{% endcomment %}		
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -246,7 +286,7 @@
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]			
+					{% comment %}	[Group : {{value.group_set|join:", "}} ] {% endcomment %}			
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -266,7 +306,7 @@
 					{% if user_id in value.modified_by %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]				
+				{% comment %}	[Group : {{value.group_set|join:", "}} ] {% endcomment %}			
 						</li>
 					{% endif %}
 				{% endfor %}
@@ -289,7 +329,7 @@
 					{% if user_id in value.modified_by %}        
 						<li class="bullet-item" value={{key}}> 												
 							<a href="{% url 'quiz_details' value.group_set|join:', ' key %}">{{value.name}} </a>  <br/>
-							[Group : {{value.group_set|join:", "}} ]							
+				{% comment %}	[Group : {{value.group_set|join:", "}} ] {% endcomment %}				
 						</li>
 					{% endif %}
 				{% endfor %}	
@@ -388,6 +428,26 @@
     		}).show();
   		});
     });
+
+    $("#pic").click(function() {
+		$("#pic_div").css("display", 'block');
+	});
+
+	$(document).ready(function($){
+		$(document).on('submit',"form",function(){
+			if($("#docFile").val() != "")
+			{	
+				$("#message").show();
+				$("#submitpostid").hide();
+				$("#submitpostid").submit();
+			}
+			else
+			{
+				alert("select a file");
+				return false;
+			}
+		});
+	});
 	
 </script>
 

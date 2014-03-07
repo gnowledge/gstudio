@@ -11,14 +11,30 @@ from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import META_TYPE
+from gnowsys_ndf.settings import GAPPS, META_TYPE
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
 
+from pymongo.errors import InvalidId as invalid_id
+
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
+
+
+@register.assignment_tag
+def get_group_object(group_id = None):
+  try:
+    colln=db[Node.collection_name]
+    if group_id == None :
+      group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    else:
+      group_object=colln.Group.one({'_id':ObjectId(group_id)})
+    return group_object
+  except invalid_id:
+    group_object=colln.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    return group_object
 
 @register.simple_tag
 def get_all_users_to_invite():
@@ -47,7 +63,7 @@ def get_all_replies(parent):
 
 
 @register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_name, node, checked=None):
+def edit_drawer_widget(field, group_id, node, checked=None):
 
   drawers = None
   drawer1 = None
@@ -59,16 +75,13 @@ def edit_drawer_widget(field, group_name, node, checked=None):
         checked = "QuizItem"
       else:
         checked = None
-
-      drawers = get_drawers(group_name, node._id, node.collection_set, checked)
-
+      drawers = get_drawers(group_id, node._id, node.collection_set, checked)
     elif field == "prior_node":
       checked = None
-      drawers = get_drawers(group_name, node._id, node.prior_node, checked)
-      
+      drawers = get_drawers(group_id, node._id, node.prior_node, checked)
     elif field == "module":
       checked = "Module"
-      drawers = get_drawers(group_name, node._id, node.collection_set, checked)
+      drawers = get_drawers(group_id, node._id, node.collection_set, checked)
     
     drawer1 = drawers['1']
     drawer2 = drawers['2']
@@ -84,15 +97,16 @@ def edit_drawer_widget(field, group_name, node, checked=None):
       # To make the collection work as Heterogenous one, by default
       checked = None
 
-    drawer1 = get_drawers(group_name, None, [], checked)
+    drawer1 = get_drawers(group_id, None, [], checked)
 
-  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': group_name}
+  return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(type_value, fields_value,template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
   drawer1 = {}
   drawer2 = None
-  group_name = ""
+  group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+  groupid=group_obj._id
   alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
   fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
   fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
@@ -100,7 +114,6 @@ def list_widget(type_value, fields_value,template1='ndf/option_widget.html',temp
   types = fields[type_value]
 
   if type_value in fields_selection1:
-    print type_value,"tagss"
     if type_value in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
       for each in NODE_TYPE_CHOICES:
         drawer1[each] = each
@@ -121,31 +134,40 @@ def list_widget(type_value, fields_value,template1='ndf/option_widget.html',temp
       for each in alltypes:
         for eachnode in collection.Node.find({"_type":each}):
           drawer1[eachnode._id] = eachnode
-    return {'template': template2, 'widget_for': type_value, 'drawer1': drawer1, 'drawer2': drawer2, 'group_name': "home"}
+    return {'template': template2, 'widget_for': type_value, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid}
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(group_name, selectedGapp):
+def get_gapps_menubar(group_id, selectedGapp):
   """Get Gapps menu-bar
   """
+  try:
+    collection = db[Node.collection_name]
+    gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
+    gapps = {}
+    i = 0;
+    meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+    GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+    
+    for node in GAPPS:
+      #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+      if node:
+        if node.name not in ["Image", "Video"]:
+          i = i+1;
+          gapps[i] = {'id': node._id, 'name': node.name.lower()}
+    selectedGapp = selectedGapp.split("/")[2]
+    if group_id == None:
+      group_id=gpid._id
+    group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+    if not group_obj:
+      group_id=gpid._id
 
-  collection = db[Node.collection_name]
-  
-  gapps = {}
-  i = 0;
-
-  meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-  GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
-
-  for node in GAPPS:
-    if node:
-      if node.name not in ["Image", "Video"]:
-        i = i+1;
-        gapps[i] = {'id': node._id, 'name': node.name.lower()}
-
-  selectedGapp = selectedGapp.split("/")[2]
-  
-  return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp, 'group_name': group_name}
+    return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+  except invalid_id:
+    gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    group_id=gpid._id
+    return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
 @register.assignment_tag
@@ -181,7 +203,7 @@ def get_twist_replies(twist):
 
 
 @register.assignment_tag
-def check_user_join(request,groupname):
+def check_user_join(request,group_id):
   if not request.user:
     return "null"
   user=request.user
@@ -192,7 +214,10 @@ def check_user_join(request,groupname):
   else:
     return "null"
   col_Group = db[Group.collection_name]
-  colg = col_Group.Group.one({'$and':[{'_type':'Group'},{'name':groupname}]})
+  if group_id == '/home/'or group_id == "":
+    colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+  else:
+    colg = col_Group.Group.one({'_id':ObjectId(group_id)})
   if colg:
     if colg.created_by == user_id:
       return "author"
@@ -207,24 +232,9 @@ def check_user_join(request,groupname):
     return "nullobj"
   
 @register.assignment_tag
-def check_group(groupname):
-  fl = check_existing_group(groupname)
+def check_group(group_id):
+  fl = check_existing_group(group_id)
   return fl
-
-@register.assignment_tag
-def get_group_name(groupurl):
-  sp=groupurl.split("/",2)
-
-  if len(sp)<=1:
-    return "home"
-  if sp[1]:
-    chsp = check_existing_group(sp[1])
-    if chsp:
-      return sp[1]
-    else:
-      return "home"
-  else:
-      return "home"
 
 
 @register.assignment_tag
@@ -255,11 +265,11 @@ def get_existing_groups_excluded(grname):
   return group
 
 @register.assignment_tag
-def get_group_policy(group_name,user):
+def get_group_policy(group_id,user):
   try:
     policy = ""
     col_Group = db[Group.collection_name]
-    colg = col_Group.Group.one({'$and':[{'_type':'Group'},{'name':group_name}]})
+    colg = col_Group.Group.one({'_id':ObjectId(group_id)})
     if colg:
       policy = str(colg.subscription_policy)
   except:
@@ -268,80 +278,103 @@ def get_group_policy(group_name,user):
 
 @register.assignment_tag
 def get_user_group(user):
+  
+    group = [] 
+    author = None
+    auth_type = ""    
+  
+    col_Group = db[Group.collection_name]
+    collection = db[Node.collection_name]
+    
+    group_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Group'})
+    auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
 
-  group = [] 
-  author = None
-  auth_type = ""
+    if auth_obj:
+      auth_type = auth_obj._id
 
-  col_Group = db[Group.collection_name]
-  collection = db[Node.collection_name]
-
-  group_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Group'})
-  auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
-
-  if auth_obj:
-    auth_type = auth_obj._id
-
-  colg = col_Group.Group.find({ '_type': u'Group', 
+    colg = col_Group.Group.find({ '_type': u'Group', 
                                 'name': {'$nin': ['home']},
                                 '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
                               })
-  
-  auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
-  
-  for items in colg:  
-    if items.created_by == user.pk:
-      if items.name == auth.name:
-        author = items
+
+    auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+    for items in colg:
+      if items.created_by == user.pk:
+        if items.name == auth.name:
+          author = items
+        else:
+          group.append(items)
       else:
-        group.append(items)
-    
-    else:
-      if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
-        group.append(items)
+        if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
+          group.append(items)
 
-  if author: 
-    group.append(author)
+    if author:
+      group.append(author)
 
-  if not group:
-    return "None"
+    if not group:
+      return "None"
 
-  return group
+    return group
+  
+
 
 @register.assignment_tag
-def get_group_type(grname,user):
-  col_Group = db[Group.collection_name]
-  
-  #get all the strings after and before the /
-  split_result = re.split(r'[/=]', grname)
-  
-  # check wheather Group exist in the database
-  colg=col_Group.Group.one({'_type': 'Group','name':split_result[1]})
-  #Query for implemting the same senario with ObjectId instead of Group name
-  #  colg=col_Group.Group.one({'_type': 'Group','_id':split_result[1]})
+def get_profile_pic(user):
 
-  #check if Group exist in the database
-  if colg is not None:
-	# Check is user is logged in
-	if  user.id:
-		# condition for group accesseble to logged user
-	  	if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
-			return "allowed"
-		else:
-			raise Http404	
-	else:
-		#condition for groups,accesseble to not logged users
-		if colg.group_type=="PUBLIC":
-			
-			return "allowed"
-                else:
-			print "redirection"
-			raise Http404
-  else:
-	
-	return "pass"		
-	
-  
+  ID = User.objects.get(username=user).pk
+  GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+
+  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+
+  return prof_pic
+
+
+@register.assignment_tag
+def get_group_type(group_id, user):
+
+  try:
+    col_Group = db[Group.collection_name]
+
+    if group_id == '/home/':
+      colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    else:  
+      gid = group_id.replace("/", "")
+      if ObjectId.is_valid(gid):
+        colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
+      else:
+        colg = None
+    
+    #check if Group exist in the database
+    if colg is not None:
+
+      # Check is user is logged in
+      if  user.id:
+        # condition for group accesseble to logged user
+        if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
+          return "allowed"
+        else:
+          raise Http404	
+
+      else:
+        #condition for groups, accessible to not logged users
+        print "\n colg.group_type: ", colg.group_type
+        if colg.group_type == "PUBLIC":
+          return "allowed"
+        else:
+          print "\n going inn..."
+          raise Http404
+    else:
+	return "pass"
+
+  except Http404:
+    raise Http404
+    
+  except Exception as e:
+    print "Error in group_type_tag "+str(e)
+    colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+    return "pass"
+    
+
 
 
 '''this template function is used to get the user object from template''' 

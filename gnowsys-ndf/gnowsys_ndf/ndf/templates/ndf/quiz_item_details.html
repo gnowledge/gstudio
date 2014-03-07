@@ -37,8 +37,8 @@
     <!-- Add button -->
     {% if user.is_authenticated %}
     <p>
-    <a href="{% url 'quiz_create_edit' group_name %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create_edit' group_name %}" class="button small right">+ Add {{title}} Item</a>
+    <a href="{% url 'quiz_create_edit' groupid %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create_edit' groupid %}" class="button small right">+ Add {{title}} Item</a>
     </p>
     {% endif %}
     
@@ -52,7 +52,7 @@
       <ul class="inline-list">
 	<li><h3>Question</h3></li>
 	{% if user.is_authenticated %}
-	<li><a href="{% url 'quiz_item_create_edit' group_name node %}" class="button small">Edit this Question</a></li>
+	<li><a href="{% url 'quiz_item_create_edit' groupid node %}" class="button small">Edit this Question</a></li>
 	{% endif %}
       </ul>
       <p>
@@ -67,7 +67,7 @@
       <p>
 	Version{{ node.version_dict|length|pluralize }}: 
 	{% for seq_no, version_no in node.version_dict.items reversed %}
-	<abbr title={{version_no}}><a href="{% url 'node_version' group_name node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+	<abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
 	{% endfor %}
       </p>
       {% if node.tags|length > 0 %}

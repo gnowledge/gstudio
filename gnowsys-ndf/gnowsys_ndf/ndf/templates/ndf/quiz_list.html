@@ -30,8 +30,8 @@
   <div class="medium-12 columns">
    <!-- Add button -->
    {% if user.is_authenticated %}
-    <a href="{% url 'quiz_create_edit' group_name %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create_edit' group_name %}" class="button small">+ Add {{title}} Item</a>
+    <a href="{% url 'quiz_create_edit' groupid %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create_edit' groupid %}" class="button small">+ Add {{title}} Item</a>
   {% endif %}
 </div>
 </header>
@@ -47,12 +47,12 @@
     <div class="row">
 
       <div class="small-8 columns">
-       <label class="inline"><strong><a href="{% url 'quiz_details' group_name node %}">{{ node.name }}</a></strong></label>
+       <label class="inline"><strong><a href="{% url 'quiz_details' groupid node %}">{{ node.name }}</a></strong></label>
      </div>
 
      {% if user.is_authenticated %}
      <div class="small-4 columns">
-       <a href="{% url 'quiz_item_create_edit' group_name node %}">
+       <a href="{% url 'quiz_item_create_edit' groupid node %}">
          <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
        </a>
      </div>
@@ -64,12 +64,12 @@
       <div class="row">
 
       <div class="small-8 columns">
-       <label class="inline"><strong><a href="{% url 'quiz_details' group_name node %}">{{ node.name }}</a></strong></label>
+       <label class="inline"><strong><a href="{% url 'quiz_details' groupid node %}">{{ node.name }}</a></strong></label>
      </div>
 
      {% if user.is_authenticated %}
      <div class="small-4 columns">
-       <a href="{% url 'quiz_item_create_edit' group_name node %}">
+       <a href="{% url 'quiz_item_create_edit' groupid node %}">
          <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
        </a>
      </div>
@@ -98,7 +98,7 @@
   <div class="row" style="padding-left:8px;">
 
     <div class="small-12 columns">
-     <label><strong><a href="{% url 'quiz_details' group_name node %}">{{ node.html_content|safe|truncatewords:30 }}</a></strong></label>
+     <label><strong><a href="{% url 'quiz_details' groupid node %}">{{ node.html_content|safe|truncatewords:30 }}</a></strong></label>
    </div>
 
  </div>

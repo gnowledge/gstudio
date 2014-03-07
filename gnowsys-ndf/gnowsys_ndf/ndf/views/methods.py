@@ -30,16 +30,16 @@ def get_forum_repl_type(forrep_id):
   else:
     return "None"
 
-def check_existing_group(groupname):
+def check_existing_group(group_name):
   col_Group = db[Group.collection_name]
-  gpn=groupname
+  gpn=str(group_name).strip()
   colg = col_Group.Group.find({'_type': u'Group', "name":gpn})
   if colg.count() >= 1:
     return True
   else:
     return False
 
-def get_drawers(group_name, nid=None, nlist=[], checked=None):
+def get_drawers(group_id, nid=None, nlist=[], checked=None):
     """Get both drawers-list.
     """
     dict_drawer = {}
@@ -53,49 +53,47 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
     if checked:     
       if checked == "Page":
         gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
       elif checked == "File":         
-        drawer = collection.Node.find({'_type': u"File", 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'type_of': {'$in': [u"", None]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
       elif checked == "Image":         
-        drawer = collection.Node.find({'_type': u"File", 'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'type_of': {'$in': [u"", None]},'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Video":         
-        drawer = collection.Node.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Quiz":
         # For prior-node-list
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "QuizObj":
         # For collection-list
         gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
         gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[gst_quiz_id, gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "OnlyQuiz":
         gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_id]}, 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "QuizItem":
         gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_item_id]}, 'group_set': {'$all': [group_name]}})
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Group":
         drawer = collection.Node.find({'_type': u"Group"})
 
       elif checked == "Forum":
         gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [group_name]}})
-      
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [group_name]}})
-    
-        
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     else:
-      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [group_name]}})   
+      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'type_of': {'$in': [u"", None]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+
            
     
     if (nid is None) and (not nlist):
@@ -130,7 +128,7 @@ def get_drawers(group_name, nid=None, nlist=[], checked=None):
 
     return dict_drawer
 
-def get_translate_common_fields(request, node, group_name, node_type):
+def get_translate_common_fields(request, node, group_id, node_type):
   """ retrive & update the common fields required for translation of the node """
 
   gcollection = db[Node.collection_name]
@@ -154,8 +152,9 @@ def get_translate_common_fields(request, node, group_name, node_type):
     node.modified_by.remove(usrid)
     node.modified_by.insert(0,usrid)
 
-  if group_name not in node.group_set:
-    node.group_set.append(group_name)
+  group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
+  if group_obj._id not in node.group_set:
+    node.group_set.append(group_obj._id)
 
   if content_org:
     node.content_org = unicode(content_org)
@@ -168,12 +167,12 @@ def get_translate_common_fields(request, node, group_name, node_type):
 
   
 
-def get_node_common_fields(request, node, group_name, node_type):
+def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node.
   """
   
   gcollection = db[Node.collection_name]
-
+  group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None  
 
   name = request.POST.get('name')
@@ -186,15 +185,15 @@ def get_node_common_fields(request, node, group_name, node_type):
   collection_list = request.POST.get('collection_list','')
   module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
-  print module_list,"test"
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
     node.created_by = usrid
     node.member_of.append(node_type._id)
-    if group_name not in node.group_set:
-      node.group_set.append(group_name)    
-  
+
+    if group_obj._id not in node.group_set:
+      node.group_set.append(group_obj._id)    
+
     if access_policy == "PUBLIC":
       node.access_policy = unicode(access_policy)      
     else:
@@ -221,13 +220,15 @@ def get_node_common_fields(request, node, group_name, node_type):
   else:
     node.modified_by.remove(usrid)
     node.modified_by.insert(0,usrid)
-
   # For displaying nodes in home group as well as in creator group.
-  if group_name not in node.group_set: 
-    node.group_set.append(group_name)  
-  elif usrname not in node.group_set:   
-    node.group_set.append(usrname)  
+  user_group_obj=gcollection.Node.one({'$and':[{'_type':ObjectId(group_id)},{'name':usrname}]})
 
+  if group_obj._id not in node.group_set: 
+    node.group_set.append(group_obj._id)  
+  else:
+    if user_group_obj:
+      if user_group_obj._id not in node.group_set:   
+        node.group_set.append(user_group_obj._id)  
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
   # -------------------------------------------------------------------------------- prior_node
@@ -284,7 +285,6 @@ def get_node_common_fields(request, node, group_name, node_type):
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
-
 
   
 

@@ -32,11 +32,6 @@ class Command(BaseCommand):
         collection.update({'collection_set': {'$exists': False}}, {'$set': {'collection_set': []}}, upsert=False, multi=True)
 
         # -------------------------------------------------------------------------------------------------------------
-        # Adding "language" field with no default value
-        # -------------------------------------------------------------------------------------------------------------
-        collection.update({'language': {'$exists': False}}, {'$set': {'language': u''}}, upsert=False, multi=True)
-
-        # -------------------------------------------------------------------------------------------------------------
         # Adding "location" field with no default value
         # -------------------------------------------------------------------------------------------------------------
 

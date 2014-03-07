@@ -1,6 +1,6 @@
 {% extends "ndf/node_details_base.html" %}
 {% block title %} {{title}} {% endblock %}
-{% block url %}{% url 'create_edit' group_name node %}{% endblock %}
+{% block url %}{% url 'create_edit' groupid node %}{% endblock %}
 
 <!-- overide head block from base.html -->
 {% block head %}
@@ -24,7 +24,7 @@
   <div class ="row">
     {% for each in node.collection_set %}
     <!-- bellow div for making tree from json data -->
-    <div class="tree" data-url="{% url 'get_module_json' group_name %}?_id={{each}}"></div>
+    <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{each}}"></div>
     {% endfor %}
   </div>
 </section>
@@ -44,7 +44,7 @@
   <section class="medium-10 columns" >
     <h2>
       <span class='node'>{{node.name}}</span>
-      <span><a class="button" href="{% url 'create_edit' group_name node.pk %}">Edit</a></span>
+      <span><a class="button" href="{% url 'create_edit' groupid node.pk %}">Edit</a></span>
     </h2>
     <h3 class="subheader">
       <small> 

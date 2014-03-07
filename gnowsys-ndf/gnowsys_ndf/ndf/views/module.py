@@ -21,15 +21,15 @@ collection = db[Node.collection_name]
 GST_COLLECTION = db[GSystemType.collection_name]
 GST_MODULE = GST_COLLECTION.GSystemType.one({'name': GAPPS[8]})
 
-def module(request, group_name, module_id):
+def module(request, group_id, module_id):
     """
    * Renders a list of all 'modules' available within the database.
     """
     if GST_MODULE._id == ObjectId(module_id):
         title = GST_MODULE.name
-        module_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(module_id)]}, 'group_set': {'$all': [group_name]}})
+        module_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(module_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         template = "ndf/module.html"
-        variable = RequestContext(request, {'module_coll': module_coll })
+        variable = RequestContext(request, {'module_coll': module_coll,'group_id':group_id,'groupid':group_id })
         return render_to_response(template, variable)
 
     

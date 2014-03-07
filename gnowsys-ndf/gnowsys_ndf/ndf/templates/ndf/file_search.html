@@ -3,7 +3,7 @@
 {% block title %} {{title}} {% endblock %}
 {% block body_content %} 
 
-<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url view_name  group_name %}">
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url view_name  groupid %}">
   <div class="row"  style="padding-top:20px">
     <div class="large-6 columns">
       <div class="row collapse">
@@ -27,7 +27,7 @@
     <div style='display:table-row;'>
       <div style='display:table-cell;'>
 	{% if "image" in  file.mime_type %}
-	<img src="{% url 'getImageThumbnail' group_name file %}" vertical-align="top"></img>
+	<img src="{% url 'getImageThumbnail' groupid file %}" vertical-align="top"></img>
 	{% endif %}
 	<!-- {% if "pdf" in  file.mime_type %} -->
 	<!-- <img src="/home/file/readDoc/52aacbfd1606ea57ec7c40f6" vertical-align="top"></img> -->

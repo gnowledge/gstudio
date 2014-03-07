@@ -111,15 +111,15 @@ DATA_TYPE_CHOICES = (
     'CustomType'
 )
 
+#######################################################################################################################################
+# CUSTOM DATA-TYPE DEFINITIONS
+#######################################################################################################################################
+
 STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED')
 STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
-
-#######################################################################################################################################
-#                                                                            C U S T O M    D A T A    T Y P E    D E F I N I T I O N S
-#######################################################################################################################################
 
 class RatingField(CustomType):
     mongo_type = unicode
@@ -135,10 +135,10 @@ class RatingField(CustomType):
         # else:
         #     return "value must be between 0 and 5"
 
-#######################################################################################################################################
-#                                                                                                    C L A S S    D E F I N I T I O N S
-#######################################################################################################################################
 
+#######################################################################################################################################
+# FRAME CLASS DEFINITIONS
+#######################################################################################################################################
 
 @connection.register
 class Node(DjangoDocument):
@@ -162,7 +162,7 @@ class Node(DjangoDocument):
 
       	'created_at': datetime.datetime,
         'last_update': datetime.datetime,
-        #'rating': RatingField(),
+        # 'rating': RatingField(),
         'created_by': int,			# Primary Key of User(django's) Class
         'modified_by': [int],		        # List of Primary Keys of User(django's) Class
         'location': dict,
@@ -172,14 +172,14 @@ class Node(DjangoDocument):
         'content': unicode,
         'content_org': unicode,
 
-        'collection_set': [ObjectId],		# List of ObjectId's of different Types/GSystems
+        'collection_set': [ObjectId],		# List of ObjectId's of different GTypes/GSystems
 
         'tags': [unicode],
         'featured': bool,
-        'url':unicode,
+        'url': unicode,
         'comment_enabled': bool,
       	'login_required': bool,
-      	#'password': basestring,
+      	# 'password': basestring,
 
         'status': STATUS_CHOICES_TU
     }
@@ -408,20 +408,6 @@ class AttributeType(Node):
     use_dot_notation = True
 
 
-'''
-# **********************************************************************
-#  This is an Aggregation class, hence we are not keeping history of it.
-# **********************************************************************
-@connection.register
-class Attribute(Node):
-    collection_name = 'Attributes'
-    structure = {
-        'attribute_type': ObjectId,		# ObjectId's of AttributeType Class
-        'attribute_value': None                 # To store values of created attribute type		
-    }
-    
-    use_dot_notation = True 
-'''
  
 @connection.register
 class RelationType(Node):
@@ -443,23 +429,6 @@ class RelationType(Node):
     required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
 	
-'''
-# **********************************************************************
-#  This is an Aggregation class, hence we are not keeping history of it.
-# **********************************************************************
-
-@connection.register
-class Relation(Node):
-
-    structure = {
-        'subject_type_value': ObjectId,		# ObjectId's of GSystemType Class
-        'relation_type_value': ObjectId,	# ObjectId's of RelationType Class
-        'object_type_value': ObjectId,		# ObjectId's of GSystemType Class
-	}
-
-    use_dot_notation = True
-'''
-
 class ProcessType(Node):
     """A kind of nodetype for defining processes or events or temporal
     objects involving change.
@@ -495,11 +464,11 @@ class GSystem(Node):
     use_schemaless = True
 
     structure = {        
-        'attribute_set': [dict],		# Dict that holds AT name & its values
-        'relation_set': [dict],			# Dict that holds RT name & its related_object value
+        # 'attribute_set': [ObjectId],		# ObjectIds of GAttributes
+        'relation_set': [ObjectId],		# ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
-        'group_set': [unicode],                 # List of ObjectId's of Groups to which this document belongs
+        'group_set': [ObjectId],                # List of ObjectId's of Groups to which this document belongs
         'author_set': [int]                     # List of Authors
     }
     
@@ -614,7 +583,7 @@ class Author(Group):
 
 
 #######################################################################################################################################
-#                                                                                  H E L P E R  --   C L A S S    D E F I N I T I O N S
+#  HELPER -- CLASS DEFINITIONS
 #######################################################################################################################################
 
 class HistoryManager():
@@ -842,3 +811,50 @@ class HistoryManager():
         rcs.checkin(fp)
 
         return doc_obj 
+
+#######################################################################################################################################
+#  TRIPLE CLASS DEFINITIONS
+#######################################################################################################################################
+
+@connection.register
+class Triple(DjangoDocument):
+
+    objects = models.Manager()
+
+    collection_name = 'Triples'
+    structure = {
+        'name': unicode,
+        'subject_value': ObjectId,	  # ObjectId's of GSystemType Class
+        'lang': basestring,               # Put validation for standard language codes
+        'status': STATUS_CHOICES_TU
+    }
+    
+    use_dot_notation = True
+
+
+@connection.register
+class GAttribute(Triple):
+
+    objects = models.Manager()
+
+    collection_name = 'GAttributes'
+    structure = {
+        'attribute_type': ObjectId,	  # ObjectId's of AttributeType Class
+        'object_value': None		  # value data-type determined by attribute-type field
+    }
+    
+    use_dot_notation = True
+
+
+@connection.register
+class GRelation(Triple):
+
+    objects = models.Manager()
+
+    collection_name = 'GRelations'
+    structure = {
+        'relation_type_value': ObjectId,  # ObjectId's of RelationType Class
+        'object_value': ObjectId,	  # ObjectId's of GType/GSystems Class
+    }
+    
+    use_dot_notation = True
