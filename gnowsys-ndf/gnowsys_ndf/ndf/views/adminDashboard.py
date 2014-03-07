@@ -21,10 +21,15 @@ def adminDashboard(request):
     '''
     objects_details = []
     nodes = collection.Node.find({'_type':"GSystem"})
+    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    groupid = ""
+    if group_obj:
+	groupid = str(group_obj[0]._id)
     for each in nodes:
 	objects_details.append({"Id":each._id,"Title":each.name,"Type":each.type_of,"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set)})
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':"GSystem", "nodes":objects_details })
+
+    variable = RequestContext(request, {'class_name':"GSystem","nodes":objects_details,"groupid":groupid})
     return render_to_response(template, variable)
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -57,9 +62,12 @@ def adminDashboardClass(request, class_name):
     systemtype = collection.Node.find({'_type':"GSystemType"})
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
-
+    groupid = ""
+    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    if group_obj:
+	groupid = str(group_obj[0]._id)
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"data"})
+    variable = RequestContext(request, {'class_name':class_name, "nodes":objects_details, "Groups":groups, "systemtypes":systemtypes, "url":"data", "groupid":groupid})
     return render_to_response(template, variable)
 
 
