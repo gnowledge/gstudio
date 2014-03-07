@@ -41,9 +41,12 @@ def adminDesignerDashboardClass(request, class_name):
     systemtype = collection.Node.find({'_type':"GSystemType"})
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
-
+    groupid = ""
+    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    if group_obj:
+	groupid = str(group_obj[0]._id)
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer"})
+    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"designer","groupid":groupid})
     return render_to_response(template, variable)
 
 
@@ -152,8 +155,12 @@ def adminDesignerDashboardClassCreate(request,class_name):
         else: 
             newdict[key] = value
     class_structure = newdict    
- 
+    groupid = ""
+    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    if group_obj:
+	groupid = str(group_obj[0]._id)
+
     template = "ndf/adminDashboardCreate.html"
-    variable = RequestContext(request, {'class_name':class_name,"url":"designer","class_structure":class_structure,'definitionlist':definitionlist,'contentlist':contentlist,'dependencylist':dependencylist,'options':options,"required_fields":required_fields})
+    variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid})
     return render_to_response(template, variable)
 
