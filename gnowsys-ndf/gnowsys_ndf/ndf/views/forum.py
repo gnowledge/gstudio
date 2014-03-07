@@ -41,7 +41,7 @@ twist_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':
 
 
 def forum(request,group_id,node_id):
-    existing_forums = gs_collection.GSystem.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [group_id]}})
+    existing_forums = gs_collection.GSystem.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     existing_forums.sort('name')
     variables=RequestContext(request,{'existing_forums':existing_forums,'groupid':group_id,'group_id':group_id})
     return render_to_response("ndf/forum.html",variables)
