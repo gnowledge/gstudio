@@ -56,7 +56,7 @@ class HomeRedirectView(RedirectView):
     			auth.save()
 
     		# This will return a string in url as username and allows us to redirect into user group as soon as user logsin.
-        	return "/{}/".format(auth.pk)
+        	return "/{0}/".format(auth.pk)
             
         else:
         	# If user is not loggedin it will redirect to home as our base group.
