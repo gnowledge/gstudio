@@ -37,7 +37,7 @@ class Command(BaseCommand):
                     each.group_set.remove(each_group_set_item)
             each.save()
         """
-
+        cur=collection.Node.find({'group_set':{'$exists':True}})
         for n in cur:
             gs = n.group_set
             n.group_set = []
