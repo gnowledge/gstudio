@@ -284,7 +284,7 @@ def get_user_group(user):
     group = [] 
     author = None
     auth_type = ""    
-    print "user=",user
+    
     col_Group = db[Group.collection_name]
     collection = db[Node.collection_name]
     
