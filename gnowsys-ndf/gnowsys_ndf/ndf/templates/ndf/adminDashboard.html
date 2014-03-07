@@ -8,6 +8,37 @@
         {% get_class_type_list class_name %}
      {% endifequal %}
 {% endblock %}
+{% block style %}
+
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer {
+border-color: #D3D3D3; border-style: solid;
+padding: 0 !important;
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px;
+background-repeat:no-repeat; background-size: 48px 48px
+}
+
+{% endblock %}
+
+
 {% block body_content %} 
 <div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
      <p>Hold down "Control", to select more than one.</p>
@@ -21,17 +52,26 @@
      <a class="close-reveal-modal">&#215;</a>
 </div>
 
-<div id="mySystemtype" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
-     <p>Hold down "Control", to select more than one.</p>
-     <h2>Select Types</h2>
-     <select id="id_Systemtypes" name="Systemtypes" multiple="multiple" style="max-width:500px;height:180px;">
-       {% for systemtype in systemtypes %}
-       <option value="{{systemtype.id}}" name="{{systemtype.title}} - {{systemtype.id}}">{{systemtype.title}} - {{systemtype.id}}</option>
-       {% endfor %}
-     </select>
-     <font style="font-size:12px;font-weight:bold;" id="viewsystemtypelist"></font>
+<div id="mySystemtype" class="reveal-modal" data-reveal >
+     <h2>Select Collections</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" %}
+      </div>
      <a class="close-reveal-modal">&#215;</a>
 </div>
+
+<div id="my_meta_type" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
+     <p>Hold down "Control", to select more than one.</p>
+     <h2>Select MetaType</h2>
+     <select id="id_meta_type" name="meta_types" multiple="multiple" style="max-width:500px;height:180px;">
+       {% for meta_type in meta_types %}
+       <option value="{{meta_type.id}}" name="{{meta_type.title}} - {{meta_type.id}}">{{meta_type.title}} - {{meta_type.id}}</option>
+       {% endfor %}
+     </select>
+     <font style="font-size:12px;font-weight:bold;" id="view_meta_type_list"></font>
+     <a class="close-reveal-modal">&#215;</a>
+</div>
+
 
  <input class="button deleteObjects" type="button" value="Delete">
 <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
@@ -53,6 +93,10 @@
       <th width="150" style="display:none">Type(s)</th>
       <th width="150">Author</th>
       <th width="150">Creation date</th>
+      {% if class_name == "GSystemType"  %}
+      <th width="150">Member OF</th>
+      <th width="150">Collection</th>
+      {% endif %}
       	
     </tr>
   </thead>
@@ -63,12 +107,32 @@
 	    <td  style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
 	    <td class="title" style="font-size:95%"><font class="viewinput{{each.Id}}">{{each.Title}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Title}}"></td>
 	{% if class_name == "File" or class_name ==  "GSystem"  %}
-	    <td class="group" style="font-size:11px;"><font class="viewinput{{each.Id}}">{{each.Group}}</font><input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}"></td>
+	    <td class="group" style="font-size:11px;">
+	      <font class="viewinput{{each.Id}}">{{each.Group}}</font>
+	      <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.Group}}">
+	    </td>
 	{% endif %}
-	    <td style="display:none" class="type" style="font-size:11px;"><font class="viewinput{{each.Id}}">{{each.Type}}</font><input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" ></td>
+	    <td style="display:none" class="type" style="font-size:11px;">
+	      <font class="viewinput{{each.Id}}">{{each.Type}}</font>
+	      <input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" >
+	    </td>
 	    <td class="author" style="font-size:11px;">{{each.Author}}</td>
-	   <td class="creation" style="font-size:11px;">{{each.Creation}}</td>
-	   <td style="font-size:11px;"> <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 	<input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none"></td>
+	    <td class="creation" style="font-size:11px;">{{each.Creation}}</td>
+	    {% if class_name == "GSystemType"  %}
+	    <td class="member_of" style="font-size:11px;">
+	      <font class="viewinput{{each.Id}}">{{each.member_of}}</font>
+	      <input style="display:none" class="editinput{{each.Id}}" type="text" value= "{{each.member_of}}">
+	    </td> 
+	    <td class="collection_set" style="font-size:11px;">
+	      <font class="viewinput{{each.Id}}">{{each.collection_list}}</font>
+	      <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.collection_list}}" >
+	    </td>
+	    {% endif %}
+	    <td style="fo3nt-size:11px;"> 
+	      <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 
+	      <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none">
+	   </td>
+	    
     </tr>
  
 	{% endfor %}
@@ -78,6 +142,30 @@
 {% endblock %}
 
 {% block script %}
+function set_drawer_value(node_id)
+{
+ $('#_drawer1').html("");
+ $('#_drawer2').html("");
+ $('#_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
+  var url = '/home/ajax/get_data_for_drawer/?id='+node_id ;
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
+}
+
 var option,baseobject;
 $(document).on('click',".checkedAll",function(){
 	if($(this).is(":checked")==true){
@@ -89,6 +177,7 @@ $(document).on('click',".checkedAll",function(){
 });
 $(document).on('click',".button.editobject",function(){
 	var objectid = this.id;
+        set_drawer_value(objectid);
         $(".viewinput"+objectid).hide();
 	$(".editinput"+objectid).show();
         $(this).hide();
@@ -175,15 +264,31 @@ $(document).on('focus',".group input",function(){
                   $('#viewgrouplist').text(str);
                   });
 });
-$(document).on('focus',".type input",function(){
+
+$(document).on('focus',".collection_set input",function(){
+      var data_list = []
+      var obj = $(this);
+      $('#mySystemtype').foundation('reveal', 'open');
+       $('.close-reveal-modal').click(function(){
+        $.each($('#_drawer2 li'),function(index,item){
+         data_list.push(item.innerHTML+" -  "+item.id); 
+         });
+      console.log(data_list);
+      obj.val(data_list);
+   });
+});
+$(document).on('focus',".member_of input",function(){
         baseobject = $(this);
         var baseobjectval = baseobject.val()
-        $('#viewsystemtypelist').text(baseobjectval);
+        $('#view_meta_type_list').text(baseobjectval);
         var arr = baseobjectval.split(',')
-        $('#mySystemtype option').removeAttr("selected");
-        for(var each in arr){ $('#mySystemtype option[name="'+arr[each]+'"]').attr('selected','selected');  }
-        $('#mySystemtype').foundation('reveal', 'open');
-        $('#id_Systemtypes').change(function() {
+        $('#id_meta_type option').removeAttr("selected");
+        for(var each in arr)
+        {
+          $('#id_meta_type option[name="'+arr[each]+'"]').attr('selected','selected');
+        }
+        $('#my_meta_type').foundation('reveal', 'open');
+        $('#id_meta_type').change(function() {
                  option = $(this).find('option:selected');
                  var i = 0;
                  var str = "";
@@ -193,7 +298,7 @@ $(document).on('focus',".type input",function(){
                           i= i+1
                           return console.log(op.value);});
                   baseobject.val(str);
-                  $('#viewsystemtypelist').text(str);
+                  $('#view_meta_type_list').text(str);
                   });
 
 });
