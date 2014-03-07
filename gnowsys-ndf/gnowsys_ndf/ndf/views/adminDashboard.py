@@ -83,7 +83,8 @@ def adminDashboardEdit(request):
         node.name =  objectjson['fields']['title']
         for key,value in objectjson['fields'].items():
             if key == "group":
-                node['group_set'] = value.split(",")
+                if value:
+                    node['group_set'] = value.split(",")
             # if key == "type":
             #     typelist = []
             #     for eachvalue in  value.split(","):
@@ -91,14 +92,16 @@ def adminDashboardEdit(request):
             #     node['member_of'] = typelist
             if key == "member_of":
                 typelist = []
-                for eachvalue in  value.split(","):
-                    typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                node['member_of'] = typelist
+                if value:
+                    for eachvalue in  value.split(","):
+                        typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                    node['member_of'] = typelist
             if key == "collection_set":
                 typelist = []
-                for eachvalue in  value.split(","):
-                    typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                node['collection_set'] = typelist
+                if value:
+                    for eachvalue in  value.split(","):
+                        typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                    node['collection_set'] = typelist
 
         node.save()     
         return StreamingHttpResponse(node.name+" edited successfully")
