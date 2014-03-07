@@ -2,7 +2,7 @@
 
 {% extends "ndf/node_details_base.html" %}
 
-{% block url %}{% url 'quiz_create_edit' group_name node %}{% endblock %}
+{% block url %}{% url 'quiz_create_edit' groupid node %}{% endblock %}
 
 {% block meta_content %}
 
@@ -20,8 +20,8 @@
     <!-- Add button -->
     {% if user.is_authenticated %}
     <p>
-    <a href="{% url 'quiz_create_edit' group_name %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create_edit' group_name %}" class="button small right">+ Add {{title}} Item</a>
+    <a href="{% url 'quiz_create_edit' groupid %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create_edit' groupid %}" class="button small right">+ Add {{title}} Item</a>
     </p>
     {% endif %}
     

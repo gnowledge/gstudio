@@ -6,12 +6,13 @@ from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from django_mongokit import get_database
-
 from gnowsys_ndf.ndf.views.methods import *
+
 import json
 
 db = get_database()
-collection = db[File.collection_name]
+collection = db[Node.collection_name]
+GAPP = collection.Node.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fetching MetaType name GAPP
 
 @user_passes_test(lambda u: u.is_superuser)
 def adminDashboard(request):
@@ -20,10 +21,15 @@ def adminDashboard(request):
     '''
     objects_details = []
     nodes = collection.Node.find({'_type':"GSystem"})
+    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    groupid = ""
+    if group_obj:
+	groupid = str(group_obj[0]._id)
     for each in nodes:
 	objects_details.append({"Id":each._id,"Title":each.name,"Type":each.type_of,"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set)})
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':"GSystem","nodes":objects_details})
+
+    variable = RequestContext(request, {'class_name':"GSystem","nodes":objects_details,"groupid":groupid})
     return render_to_response(template, variable)
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -34,14 +40,16 @@ def adminDashboardClass(request, class_name):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = collection.Node.find({'name':{'$regex':search, '$options': 'i' },'_type':classtype})
+        nodes = collection.Node.find({'name':{'$regex':search},'_type':classtype})
     else :
         nodes = collection.Node.find({'_type':class_name})
     objects_details = []
     for each in nodes:
         member = []
         for members in each.member_of:
-            member.append(collection.Node.one({ '_id': members}).name+" - "+str(members))
+            obj = collection.Node.one({ '_id': members})
+            if obj:
+                member.append(obj.name+" - "+str(members))
 	if class_name in ("GSystem","File"):
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
 	else :
@@ -54,9 +62,12 @@ def adminDashboardClass(request, class_name):
     systemtype = collection.Node.find({'_type':"GSystemType"})
     for each in systemtype:
         systemtypes.append({'id':each._id,"title":each.name})
-
+    groupid = ""
+    group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+    if group_obj:
+	groupid = str(group_obj[0]._id)
     template = "ndf/adminDashboard.html"
-    variable = RequestContext(request, {'class_name':class_name,"nodes":objects_details,"Groups":groups,"systemtypes":systemtypes,"url":"data"})
+    variable = RequestContext(request, {'class_name':class_name, "nodes":objects_details, "Groups":groups, "systemtypes":systemtypes, "url":"data", "groupid":groupid})
     return render_to_response(template, variable)
 
 
@@ -69,17 +80,29 @@ def adminDashboardEdit(request):
         if request.is_ajax() and request.method =="POST":
             objectjson = json.loads(request.POST['objectjson'])
         node = collection.Node.one({ '_id': ObjectId(objectjson['id'])})
-	print objectjson['id'],node
         node.name =  objectjson['fields']['title']
         for key,value in objectjson['fields'].items():
             if key == "group":
-                node['group_set'] = value.split(",")
-            if key == "type":
+                if value:
+                    node['group_set'] = value.split(",")
+            # if key == "type":
+            #     typelist = []
+            #     for eachvalue in  value.split(","):
+            #         typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+            #     node['member_of'] = typelist
+            if key == "member_of":
                 typelist = []
-		if value :
-                	for eachvalue in  value.split(","):
-                    		typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                	node['member_of'] = typelist
+                if value:
+                    for eachvalue in  value.split(","):
+                        typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                    node['member_of'] = typelist
+            if key == "collection_set":
+                typelist = []
+                if value:
+                    for eachvalue in  value.split(","):
+                        typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                    node['collection_set'] = typelist
+
         node.save()     
         return StreamingHttpResponse(node.name+" edited successfully")
     except Exception as e:

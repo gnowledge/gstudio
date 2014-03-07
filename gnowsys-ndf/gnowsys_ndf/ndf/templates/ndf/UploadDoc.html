@@ -20,7 +20,7 @@
 {% if user.is_authenticated %}
 
 <!--
-<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_id %}">{% csrf_token %}
   <div class="fallback">
     <input type="file" name="doc[]"  id="docFile" multiple/>
     <input type="hidden" name="user" value="{{user.id}}">
@@ -28,7 +28,7 @@
   </div>
 </form>
 -->
-<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name %}">{% csrf_token %}
+<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' groupid %}">{% csrf_token %}
 	<div class ="row">
 		<fieldset small-6 large-12 columns>
 			<legend>Upload File</legend>

@@ -7,26 +7,29 @@ from django.views.generic import TemplateView
 from registration.backends.default.views import RegistrationView
 
 from gnowsys_ndf.ndf.forms import *
-from gnowsys_ndf.ndf.views.home import HomeRedirectView
+from gnowsys_ndf.ndf.views.home import HomeRedirectView, homepage
 admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
     (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
-    (r'^admin/', include(admin.site.urls)),    
-    (r'^$', HomeRedirectView.as_view()), # For redirecting to user group after login       
-    (r'^(?P<group_name>[^/]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
-    (r'^(?P<group_name>[^/]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
-    (r'^(?P<group_name>[^/]+)/video/', include('gnowsys_ndf.ndf.urls.video')),
-    (r'^(?P<group_name>[^/]+)/page/', include('gnowsys_ndf.ndf.urls.page')),
-    (r'^(?P<group_name>[^/]+)/group/', include('gnowsys_ndf.ndf.urls.group')),
-    (r'^(?P<group_name>[^/]+)/forum/', include('gnowsys_ndf.ndf.urls.forum')),
-    (r'^(?P<group_name>[^/]+)/quiz/', include('gnowsys_ndf.ndf.urls.quiz')),
-    (r'^(?P<group_name>[^/]+)/course/', include('gnowsys_ndf.ndf.urls.course')),
-    (r'^(?P<group_name>[^/]+)/module/', include('gnowsys_ndf.ndf.urls.module')),
-    (r'^(?P<group_name>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
-    (r'^(?P<group_name>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
-    (r'^(?P<group_name>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
+    (r'^admin/', include(admin.site.urls)),
+#    (r'^$', HomeRedirectView.as_view()),    
+    (r'^$', RedirectView.as_view(url="/home/")),    
+    (r'^home/','gnowsys_ndf.ndf.views.group.group_dashboard'),
+    (r'^(?P<group_id>[^/]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
+    (r'^(?P<group_id>[^/]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
+    (r'^(?P<group_id>[^/]+)/video/', include('gnowsys_ndf.ndf.urls.video')),
+    (r'^(?P<group_id>[^/]+)/page/', include('gnowsys_ndf.ndf.urls.page')),
+    (r'^(?P<group_id>[^/]+)/group/', include('gnowsys_ndf.ndf.urls.group')),
+    (r'^(?P<group_id>[^/]+)/forum/', include('gnowsys_ndf.ndf.urls.forum')),
+    (r'^(?P<group_id>[^/]+)/quiz/', include('gnowsys_ndf.ndf.urls.quiz')),
+    (r'^(?P<group_id>[^/]+)/course/', include('gnowsys_ndf.ndf.urls.course')),
+    (r'^(?P<group_id>[^/]+)/module/', include('gnowsys_ndf.ndf.urls.module')),
+    (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
+    (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
+    (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
+    url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', homepage, name='GAPPS'),       
    # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
@@ -44,6 +47,6 @@ urlpatterns = patterns('',
         name='password_reset'
     ),
     url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
-     (r'^accounts/', include('registration.backends.default.urls')),
+    (r'^accounts/', include('registration.backends.default.urls')),
     url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )

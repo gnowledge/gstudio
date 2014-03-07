@@ -25,12 +25,13 @@ $("#org{{eachrep}}").css("display","block");
   $('#orgitdownreps{{eachrep}}').val("");
   if (contento != "")
   {
-  var grp=$("#grptxt{{eachrep}}").val();
+
   var repl=$("#rep{{eachrep}}").val();
   var thd=$("#thd{{eachrep}}").val();
   var twname=""
   var fid="{{forum}}"
-  var ajurl="/"+grp+"/forum/add_node/"
+  var gpid="{{groupid}}"
+  var ajurl="/"+gpid+"/forum/add_node/"
   $.ajax({
   url: ajurl,
   type: 'POST',
@@ -81,14 +82,13 @@ height:60px;
 }
 </style>
 {% endblock %}
-{% get_group_name request.path as group %}
+
 
 <input type="button" id="reply_forum{{eachrep}}" value="Reply" >
 <div id="org{{eachrep}}" style="display:none">
 <div id="showorgeditor{{eachrep}}" class="orgcont" data-reveal="">
 Reply :
   <textarea id="orgitdownreps{{eachrep}}" name="content_org" placeholder="Please enter description..."></textarea>
-<input type="hidden" id="grptxt{{eachrep}}" style="visibility:hidden" value="{{group}}">
 <input id="savereply{{eachrep}}" type="button" value="Save">
 <input type="hidden" id="rep{{eachrep}}" style="visibility:hidden" value="{{eachrep}}">
 <input type="hidden" id="thd{{eachrep}}" style="visibility:hidden" value="{{thread}}">

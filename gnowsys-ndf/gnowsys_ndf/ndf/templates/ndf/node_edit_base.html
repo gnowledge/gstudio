@@ -159,7 +159,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	<div class="small-12 columns">
 	  <div id="prior_node_drawer">
-	    {% edit_drawer_widget "prior_node" group_name node title %}
+	    {% edit_drawer_widget "prior_node" groupid node title %}
 	  </div>
 	</div>
       </div>
@@ -214,7 +214,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	<div class="small-12 columns">
 	  <div id="collection_drawer" >
-	    {% edit_drawer_widget "collection" group_name node title %}
+	    {% edit_drawer_widget "collection" groupid node title %}
 	  </div>
 	</div>
       </div>
@@ -248,7 +248,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 		$.ajax({
 			type: "POST",
-			url: "{% url 'select_drawer' group_name %}",
+			url: "{% url 'select_drawer' groupid %}",
 			datatype: "html",
 			data:{
 				homo_collection: this.value,

@@ -48,7 +48,7 @@
 </select>
 {% elif fields_value == "list" %}
 <div id="list_drawer" >
-  {#% edit_drawer_widget type_value group_name node %#}
+  {#% edit_drawer_widget type_value groupid node %#}
   {% list_widget type_value fields_value %}
   {% if type_value in field_type_list %}
   <input id="{{type_value}}_type" type="hidden" name="{{type_value}}" value="" />
@@ -67,6 +67,7 @@
   </script>
   {% endif %}
 
+
 </div>
 {% elif fields_value == "int" %}
 <div style="display:table-cell;">
@@ -74,7 +75,7 @@
 </div>
 {% elif type_value == "subject_applicable_nodetype" or type_value == "object_applicable_nodetype" or type_value == "data_type" %}
 <div id="list_drawer" >
-  {#% edit_drawer_widget type_value group_name node %#}
+  {#% edit_drawer_widget type_value groupid node %#}
   {% list_widget type_value fields_value %}
 </div>
 {% else %}
