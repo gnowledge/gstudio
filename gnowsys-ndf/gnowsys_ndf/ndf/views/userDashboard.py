@@ -36,8 +36,9 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 #                                                                     V I E W S   D E F I N E D   F O R   U S E R   D A S H B O A R D
 #######################################################################################################################################
 
-def dashboard(request, group_id, user):	
 
+def dashboard(request, group_id, user, uploaded=None):	
+    
     ID = User.objects.get(username=user).pk
     
     date_of_join = User.objects.get(username=user).date_joined
@@ -73,11 +74,12 @@ def dashboard(request, group_id, user):
     else:
       img_obj = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
     
-
+        
 
     return render_to_response("ndf/userDashboard.html",
                               {'username': user, 'user_id': ID, 'DOJ': date_of_join, 
-                               'prof_pic': img_obj,'group_id':group_id,                               
+                               'prof_pic': img_obj,'group_id':group_id,              
+                               'already_uploaded': uploaded,
                                'page_drawer':page_drawer,'image_drawer': image_drawer,
                                'video_drawer':video_drawer,'file_drawer': file_drawer,
                                'quiz_drawer':quiz_drawer,'group_drawer': group_drawer,

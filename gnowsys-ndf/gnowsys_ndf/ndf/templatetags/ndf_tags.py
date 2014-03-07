@@ -280,10 +280,10 @@ def get_group_policy(group_id,user):
 
 @register.assignment_tag
 def get_user_group(user):
-  try:
+  
     group = [] 
     author = None
-    auth_type = ""
+    auth_type = ""    
   
     col_Group = db[Group.collection_name]
     collection = db[Node.collection_name]
@@ -317,8 +317,7 @@ def get_user_group(user):
       return "None"
 
     return group
-  except:
-    return group
+  
 
 
 @register.assignment_tag
@@ -333,16 +332,23 @@ def get_profile_pic(user):
 
 
 @register.assignment_tag
-def get_group_type(group_id,user):
+def get_group_type(group_id, user):
+
   try:
     col_Group = db[Group.collection_name]
+
     if group_id == '/home/':
       colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     else:  
-      #gpid=str(group_id).split("/")
-      colg=col_Group.Group.one({'_id': ObjectId(group_id)})
+      gid = group_id.replace("/", "")
+      if ObjectId.is_valid(gid):
+        colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
+      else:
+        colg = None
+    
     #check if Group exist in the database
     if colg is not None:
+
       # Check is user is logged in
       if  user.id:
         # condition for group accesseble to logged user
@@ -350,14 +356,21 @@ def get_group_type(group_id,user):
           return "allowed"
         else:
           raise Http404	
+
       else:
-        #condition for groups,accesseble to not logged users
-        if colg.group_type=="PUBLIC":
+        #condition for groups, accessible to not logged users
+        print "\n colg.group_type: ", colg.group_type
+        if colg.group_type == "PUBLIC":
           return "allowed"
         else:
+          print "\n going inn..."
           raise Http404
     else:
-	return "pass"		
+	return "pass"
+
+  except Http404:
+    raise Http404
+    
   except Exception as e:
     print "Error in group_type_tag "+str(e)
     colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})

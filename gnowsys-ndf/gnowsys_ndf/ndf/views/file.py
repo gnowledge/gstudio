@@ -108,6 +108,7 @@ def submitDoc(request, group_id):
                     f = save_file(each, img_type, mtitle, userid, group_id, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
+
                     f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
                     i = i + 1
             else:
@@ -120,8 +121,10 @@ def submitDoc(request, group_id):
         for each in alreadyUploadedFiles:
             str1 = str1 + 'var=' + each + '&'
 
-        if img_type != "":
-            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id, 'user': usrname}))
+        if img_type != "": 
+            
+            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id, 'user': usrname, 'uploaded': f}))
+
         else:
             return HttpResponseRedirect(page_url+'?'+str1)
 
@@ -130,7 +133,7 @@ def submitDoc(request, group_id):
             
 
 
-def save_file(files, title, userid, group_id, st_id, content_org, tags, access_policy, usrname):
+def save_file(files, img_type, title, userid, group_id, st_id, content_org, tags, access_policy, usrname):
     """
     this will create file object and save files in gridfs collection
     """

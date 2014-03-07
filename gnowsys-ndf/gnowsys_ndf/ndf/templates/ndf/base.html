@@ -139,12 +139,13 @@
 
 					{% get_profile_pic  request.user as prof_pic %}
 						{% if prof_pic %}
-						<a href="{% url 'userDashboard' groupid user.username %}">
+
+						<a href="{% url 'userDashboard' groupid user.username None %}">
 						<img  src="{% url 'getImageThumbnail' groupid prof_pic %}" height="30" width="30"></img>
 						{{ user.username }}</a>
 
 						{% else %}
-						<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' groupid user.username %}">
+						<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' groupid user.username None %}">
 						{{ user.username }}</a>
 						{% endif %}
 
