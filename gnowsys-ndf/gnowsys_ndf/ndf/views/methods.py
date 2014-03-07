@@ -180,7 +180,7 @@ def get_node_common_fields(request, node, group_name, node_type):
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
-
+  language= request.POST.get('lan')
   tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
   collection_list = request.POST.get('collection_list','')
@@ -204,7 +204,8 @@ def get_node_common_fields(request, node, group_name, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
-
+  node.language=unicode(language) 
+    
   if access_policy:
     # Policy will be changed only by the creator of the resource 
     # via access_policy(public/private) option on the template which is visible only to the creator

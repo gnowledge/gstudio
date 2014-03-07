@@ -92,6 +92,7 @@ def submitDoc(request, group_name):
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
+        language = request.POST.get("lan", "")
         usrname = request.user.username
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
@@ -103,14 +104,14 @@ def submitDoc(request, group_name):
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
-                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, tags, access_policy, usrname)
+                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
             if f:
                 alreadyUploadedFiles.append(f)
                 title = mtitle
@@ -120,7 +121,7 @@ def submitDoc(request, group_name):
     else:
         return HttpResponseRedirect(reverse('homepage'))
             
-def save_file(files, title, userid, group_name, st_id, content_org, tags, access_policy, usrname):
+def save_file(files, title, userid, group_name, st_id, content_org, language, tags, access_policy, usrname):
     """
     this will create file object and save files in gridfs collection
     """
@@ -143,6 +144,7 @@ def save_file(files, title, userid, group_name, st_id, content_org, tags, access
                 filetype1 = ""
             filename = files.name
             fileobj.name = unicode(title)
+            fileobj.language= unicode(language)
             fileobj.created_by = int(userid)
             fileobj.file_size = size
             fileobj.group_set.append(unicode(group_name))        #group name stored in group_set field
