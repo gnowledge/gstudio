@@ -364,7 +364,7 @@ def graph_nodes(request, group_id):
 
 # ------ End of processing for graph ------
 
-def get_data_for_drawer(request, group_name):
+def get_data_for_drawer(request, group_id):
     data_list = []
     d1 = []
     d2 = []

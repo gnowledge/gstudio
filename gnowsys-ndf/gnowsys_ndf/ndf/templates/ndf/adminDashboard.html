@@ -147,7 +147,7 @@ function set_drawer_value(node_id)
  $('#_drawer1').html("");
  $('#_drawer2').html("");
  $('#_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
-  var url = '/home/ajax/get_data_for_drawer/?id='+node_id ;
+  var url = '/{{groupid}}/ajax/get_data_for_drawer/?id='+node_id ;
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
    if(index == 0)
