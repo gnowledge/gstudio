@@ -37,6 +37,7 @@ def adminDashboardClass(request, class_name):
     '''
     fetching class's objects
     '''
+    group_set = ""
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
@@ -50,8 +51,9 @@ def adminDashboardClass(request, class_name):
             obj = collection.Node.one({ '_id': members})
             if obj:
                 member.append(obj.name+" - "+str(members))
+		group_set = [collection.Node.find_one({"_id":eachgroup}).name for eachgroup in each.group_set ]
 	if class_name in ("GSystem","File"):
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(group_set),"Creation":each.created_at})
 	else :
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at})
     groups = []
@@ -83,7 +85,8 @@ def adminDashboardEdit(request):
         node.name =  objectjson['fields']['title']
         for key,value in objectjson['fields'].items():
             if key == "group":
-                node['group_set'] = value.split(",")
+                if value:
+                    node['group_set'] = value.split(",")
             # if key == "type":
             #     typelist = []
             #     for eachvalue in  value.split(","):
@@ -91,14 +94,16 @@ def adminDashboardEdit(request):
             #     node['member_of'] = typelist
             if key == "member_of":
                 typelist = []
-                for eachvalue in  value.split(","):
-                    typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                node['member_of'] = typelist
+                if value:
+                    for eachvalue in  value.split(","):
+                        typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                    node['member_of'] = typelist
             if key == "collection_set":
                 typelist = []
-                for eachvalue in  value.split(","):
-                    typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                node['collection_set'] = typelist
+                if value:
+                    for eachvalue in  value.split(","):
+                        typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                    node['collection_set'] = typelist
 
         node.save()     
         return StreamingHttpResponse(node.name+" edited successfully")
