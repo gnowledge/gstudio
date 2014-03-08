@@ -42,7 +42,7 @@ def checkgroup(request,group_name):
     
 
 
-def select_drawer(request, group_name):
+def select_drawer(request, group_id):
     
     if request.is_ajax() and request.method == "POST":
         
@@ -70,7 +70,7 @@ def select_drawer(request, group_name):
 
                 i = i+1
 
-            drawer = get_drawers(group_name, node_id, collection_list_ids, checked)
+            drawer = get_drawers(group_id, node_id, collection_list_ids, checked)
         
             drawer1 = drawer['1']
             drawer2 = drawer['2']
@@ -79,7 +79,7 @@ def select_drawer(request, group_name):
                                       {"widget_for": "collection",
                                        "drawer1": drawer1, 
                                        "drawer2": drawer2,
-                                       "group_name": group_name
+                                       "groupid": group_id
                                       },
                                       context_instance=RequestContext(request)
             )
@@ -88,12 +88,12 @@ def select_drawer(request, group_name):
             
           # For creating a resource collection   
           if node_id is None:                             
-            drawer = get_drawers(group_name, node_id, [], checked)  
+            drawer = get_drawers(group_id, node_id, [], checked)  
 
             return render_to_response("ndf/drawer_widget.html", 
                                        {"widget_for": "collection", 
                                         "drawer1": drawer, 
-                                        "group_name": group_name
+                                        "groupid": group_id
                                        }, 
                                        context_instance=RequestContext(request)
             )
@@ -101,12 +101,12 @@ def select_drawer(request, group_name):
           # For editing a resource collection   
           else:
 
-            drawer = get_drawers(group_name, node_id, [], checked)  
+            drawer = get_drawers(group_id, node_id, [], checked)  
        
             return render_to_response("ndf/drawer_widget.html", 
                                        {"widget_for": "collection", 
                                         "drawer1": drawer['1'], 
-                                        "group_name": group_name
+                                        "groupid": group_id
                                        }, 
                                        context_instance=RequestContext(request)
             )
