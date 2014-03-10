@@ -91,6 +91,7 @@ def submitDoc(request, group_id):
     """
     alreadyUploadedFiles = []
     str1 = ''
+    img_type=""
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
@@ -107,14 +108,14 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f = save_file(each, mtitle, userid, group_name, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
+                    f = save_file(each, img_type, mtitle, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
+                    f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, title, userid, group_name, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
+                f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
             if f:
                 alreadyUploadedFiles.append(f)
                 title = mtitle
@@ -131,7 +132,7 @@ def submitDoc(request, group_id):
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
             
-def save_file(files, title, userid, group_name, st_id, content_org, language, tags, access_policy, usrname):
+def save_file(files, img_type, title, userid, group_id, st_id, content_org, language, tags, access_policy, usrname):
     """
     this will create file object and save files in gridfs collection
     """
@@ -156,7 +157,8 @@ def save_file(files, title, userid, group_name, st_id, content_org, language, ta
             fileobj.name = unicode(title)
             fileobj.language= unicode(language)
             fileobj.created_by = int(userid)
-            fileobj.type_of = unicode(img_type)                 # To define type if image is profile_pic      
+            if img_type:
+                fileobj.type_of = unicode(img_type)                 # To define type if image is profile_pic      
             fileobj.file_size = size
             group_object=fcol.Group.one({'_id':ObjectId(group_id)})
             if group_object._id not in fileobj.group_set:

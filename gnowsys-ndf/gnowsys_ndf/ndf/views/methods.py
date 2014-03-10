@@ -128,7 +128,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     return dict_drawer
 
-def get_translate_common_fields(request, node, group_id, node_type):
+def get_translate_common_fields(request, node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
   gcollection = db[Node.collection_name]
@@ -143,7 +143,6 @@ def get_translate_common_fields(request, node, group_id, node_type):
     node.member_of.append(node_type._id)
 
   node.name = unicode(name)
-
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
   #if usrid in node.modified_by:
