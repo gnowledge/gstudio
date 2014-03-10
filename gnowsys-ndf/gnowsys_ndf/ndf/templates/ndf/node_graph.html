@@ -74,7 +74,7 @@
 				graphWidth  = ($(window).width());
 
 			var objectid = "{{node.pk}}";	// _id of current viewing page
-
+			var flag=false;
 
 			function init(a,b)
 			{
@@ -327,13 +327,11 @@
                 				}
                 			});
 						}
-					//press shift key + drag to fix the position of node according to customer like
+					//press shift key + drag to fix the position of node according to customer choice.
 						else if(event.keyCode==16)
 						{
-							new_g.on("click",function(d)
-							{
-     			       			d3.select(this).classed("fixed",d.fixed=true);
-     			       		});
+							flag = true;
+							new_g.on("click",ondrag);
 						}
 					});
 
@@ -402,11 +400,26 @@
                 }
                 function dblclick(d)
                 {
+                	//double click to remove the fix posiotion of node.
                 	d3.select(this).classed("fixed", d.fixed = false);
                 }
-                function dragstart(d)
+                function ondrag(d)
                 {
-                	d3.select(this).classed("fixed",d.fixed = false);
+                	//Check if flag is true then it will fix the position for node.
+                	//But without shift + click node will not fix.
+                	if (flag)
+                	{
+                		d3.select(this).classed("fixed",d.fixed=true);
+                	}
+                	else
+                	{
+                		d3.select(this).classed("fixed",d.fixed=false);
+                	}
+
+                	if (flag)
+                	{
+                		flag = false;	
+                	}
                 }
 
                 function check_Relationtype(metadata,relations)
