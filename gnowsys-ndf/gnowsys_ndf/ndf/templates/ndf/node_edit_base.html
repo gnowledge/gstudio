@@ -219,8 +219,20 @@ background-repeat:no-repeat; background-size: 48px 48px
   <div class="row" >
     <input type="submit" id="save-node" value="Save" class="button medium-6 columns"/>
   </div>
+  <!---- code only for edit  --->
+  {% get_Node_object node request.user as status %}
+  {% if status == "DRAFT" %}
+  {{group_id}}
+  <div class= "row">
   
+   <a class="button medium-6 columns" href="{% url 'publish_page'  group_id node %}">
+    Publish
+   </a>
+
+</div>
+ {% endif %}
 </form>
+
 
 <script type="text/javascript">
 

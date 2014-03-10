@@ -10,10 +10,13 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 
+from gnowsys_ndf.ndf.models import HistoryManager
+
+import re
 ######################################################################################################################################
 
 db = get_database()
-
+history_manager = HistoryManager()
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
@@ -190,10 +193,27 @@ def get_node_common_fields(request, node, group_id, node_type):
     
     node.created_by = usrid
     node.member_of.append(node_type._id)
+    # Section for group
+    col_Group = db[Group.collection_name]
+    colg = col_Group.Group.one({'_id':ObjectId(group_id)})
+    
+    if colg is not  None:
+       Post_nodeid=colg.post_node
+       sub_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
+       if sub_colg is not None:
+          node.group_set.append(sub_colg._id)
+    
+    else:
+       
+       if group_obj._id not in node.group_set:
+          node.group_set.append(group_obj._id)    
+       else:
+          if user_group_obj:
+              if user_group_obj._id not in node.group_set:   
+                node.group_set.append(user_group_obj._id)  
 
-    if group_obj._id not in node.group_set:
-      node.group_set.append(group_obj._id)    
 
+    
     if access_policy == "PUBLIC":
       node.access_policy = unicode(access_policy)      
     else:
@@ -203,7 +223,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
-
+  node.status=unicode("DRAFT")
   if access_policy:
     # Policy will be changed only by the creator of the resource 
     # via access_policy(public/private) option on the template which is visible only to the creator
@@ -223,13 +243,23 @@ def get_node_common_fields(request, node, group_id, node_type):
   # For displaying nodes in home group as well as in creator group.
   user_group_obj=gcollection.Node.one({'$and':[{'_type':ObjectId(group_id)},{'name':usrname}]})
 
-  if group_obj._id not in node.group_set: 
-    node.group_set.append(group_obj._id)  
-  else:
-    if user_group_obj:
-      if user_group_obj._id not in node.group_set:   
-        node.group_set.append(user_group_obj._id)  
+  #if group_obj._id not in node.group_set: 
+   # node.group_set.append(group_obj._id)  
+  #else:
+   # if user_group_obj:
+    #  if user_group_obj._id not in node.group_set:   
+     #   node.group_set.append(user_group_obj._id)  
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+  
+  
+  
+  col_Group = db[Group.collection_name]  
+  colg = col_Group.Group.one({'_type':u'Group','_id':ObjectId(group_id)})
+  
+  #if node.has_key('_id'): 
+  #  if not colg.prior_node : 
+      
+  #    set_page_moderation(request,group_id, node)
 
   # -------------------------------------------------------------------------------- prior_node
 
@@ -342,5 +372,79 @@ def neighbourhood_nodes(page_node):
 
   return graphData
 # ------ End of processing for graph ------
+
+def get_prior_post_node(group_id):
+  
+  col_Group = db[Group.collection_name]
+  prior_post_node=col_Group.Group.one({'_type': 'Group',"_id":ObjectId(group_id)})
+  #check wheather we got the Group name       
+  if prior_post_node is not  None:
+       #first check the prior node id  and take the id
+       Prior_nodeid=prior_post_node.prior_node
+       #once you have the id check search for the base node
+       base_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Prior_nodeid}})
+       
+       if base_colg is None:
+          #check for the Post Node id
+           Post_nodeid=prior_post_node.post_node
+           Mod_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
+           if Mod_colg is not None:
+            #return the name of the post_group
+            print "got  post Node",Mod_colg.name
+            post_group_name=Mod_colg._id
+            return post_group_name
+       else:
+          #return the name of the base group
+          print "got prior Node",base_colg.name
+          base_group_name=base_colg._id
+          return base_group_name
+
+
+def set_page_moderation(request,group_id, node):
+ 
+ col_Group = db[Group.collection_name]
+ group_name=col_Group.Group.one({'_type': 'Group',"_id":ObjectId(group_id)})
+ 
+ prior_post_group_id=get_prior_post_node(group_id)
+ 
+ if ObjectId(group_id) in node.group_set:
+  node.group_set.remove(ObjectId(group_id))
+
+ if ObjectId(prior_post_group_id) not in node.group_set:
+  node.group_set.append(ObjectId(prior_post_group_id))
+  
+  
+  
+def get_versioned_page(node):
+            content=[] 
+       
+            #check if same happens for multiple nodes
+            i=node.current_version
+          
+            #get the particular document Document
+                   
+            doc=history_manager.get_version_document(node,i)
+
+          
+            #check for the published status for the particular version
+          
+            while (doc.status != "PUBLISHED"):
+              currentRev = i
+
+              splitVersion = currentRev.split('.')
+              previousSubNumber = int(splitVersion[1]) - 1 
+
+              if previousSubNumber <= 0:
+               previousSubNumber = 1
+
+              prev_ver=splitVersion[0] +"."+ str(previousSubNumber)
+              i=prev_ver 
+
+              doc=history_manager.get_version_document(node,i)
+              print "cotent name",doc.name
+              if (doc.status == '1.1'):
+                  return doc
+            return doc
+
 
 

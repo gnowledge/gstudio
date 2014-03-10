@@ -92,9 +92,9 @@
 
     <!-- Existing card list-->
     {% for node in page_nodes %}
-
-      {% if node.created_by == request.user.pk %}
-
+        
+       {% if node.created_by == request.user.pk %}
+        
     <li class="card">
       <div class="page">
 
@@ -124,7 +124,9 @@
       {% if node.created_by == request.user.id %}
       <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
       {% endif %}
-      
+      {% if node.status == "DRAFT" %}
+      <a class="button alert tiny" >Under Moderation</a>
+      {% endif %}
       <footer class="row">
         <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
         <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
@@ -164,6 +166,8 @@
     {% if node.created_by == request.user.id %}
     <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
     {% endif %}
+          
+    
 
     <footer class="row">
       <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
@@ -189,6 +193,7 @@
  </div>
 </li>
 {% endif %}
+        
 
 {% endfor %}
 </ul>

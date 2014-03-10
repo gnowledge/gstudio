@@ -12,6 +12,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
+from gnowsys_ndf.ndf.views.methods import set_page_moderation
+from gnowsys_ndf.ndf.views.methods import get_versioned_page
 
 from django_mongokit import get_database
 
@@ -46,6 +48,9 @@ rcs = RCS()
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
+    content=[]
+    version=[]
+    con=[]
     group_object=collection.Group.one({'_id':ObjectId(group_id)})
     if request.method == "POST":
         # Written for implementing search-functionality
@@ -70,30 +75,90 @@ def page(request, group_id, app_id=None):
         )
 
     elif gst_page._id == ObjectId(app_id):
-        title = gst_page.name
+        #code for moderated Groups
         # collection.Node.reload()
-        page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
+        group_type = collection.Node.one({'_id':ObjectId(group_id)})
+        if  group_type.prior_node:
+          
+          title = gst_page.name
+          node=group_type.prior_node[0]
+          page_nodes = collection.Node.find({'member_of':ObjectId(app_id),
+                                            'group_set':ObjectId(node),    
+                                             'status':'DRAFT' 
+                                       })        
+                                       
+          
+          page_nodes.sort('last_update', -1)
+          page_nodes_count = page_nodes.count()        
+          
+          return render_to_response("ndf/page_list.html",
+                                  {'title': title, 
+                                   'page_nodes': page_nodes,'groupid':group_id,'page_nodes_count':page_nodes_count,             
+                                    'group_id':group_id
+
+                                  }, 
+                                  context_instance=RequestContext(request))
+        
+        else:
+          #code for parent Groups
+          node = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
                                            'group_set': {'$all': [ObjectId(group_id)]},                                           
                                            'status': {'$nin': ['HIDDEN']}
-                                       })        
+                                      })  
+          if node is None:
+            node = collection.Node.find({'member_of':ObjectId(app_id)})
+          for nodes in node:
+            print "Nodes",nodes.name
+            content.append(get_versioned_page(nodes))  
+                    
+         # rcs content ends here
+        
+          
+          
+          return render_to_response("ndf/page_list.html",
+                                  {
+                                    'page_nodes':content,
+                                    'groupid':group_id,
+                                    'group_id':group_id
 
-        page_nodes.sort('last_update', -1)
-        page_nodes_count = page_nodes.count()        
-
-        return render_to_response("ndf/page_list.html",
-                                  {'title': title, 
-                                   'page_nodes': page_nodes,'groupid':group_id,'page_nodes_count': page_nodes_count,'group_id':group_id
+      
+                                   
                                   }, 
                                   context_instance=RequestContext(request)
-        )
+            )
+
+        
+        
 
     else:
-        page_node = collection.Node.one({"_id": ObjectId(app_id)})
+        Group_node = collection.Node.one({"_id": ObjectId(group_id)})
+                
+       
+        if  Group_node.prior_node: 
+            Group_Status = "Moderated" 
+            page_node = collection.Node.one({"_id": ObjectId(app_id)})
+            return render_to_response('ndf/page_details.html', 
+                                  { 'node': page_node,
+                                    'group_id': group_id,
+                                    'groupid':group_id,
+                                    'Group_Status':Group_Status                
+                                  },
+                                  context_instance = RequestContext(request)
+                        )        
 
+            
+            
+        else:
+          node = collection.Node.one({"_id":ObjectId(app_id)})
+          page_node=get_versioned_page(node)
+        
+        
+        Group_Status = "NonModerated" 
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid':group_id,
+                                    'Group_Status':Group_Status                
                                   },
                                   context_instance = RequestContext(request)
         )        
@@ -116,7 +181,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         get_node_common_fields(request, page_node, group_id, gst_page)
-        print "in page save"
+        
         page_node.save()
         
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
@@ -302,3 +367,25 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         print "\n Please pass a valid rcs-version-file!!!\n"
         #TODO: Throw an error indicating the above message!
         return ""
+        
+def publish_page(request,group_id,node):
+ #col_Group = db[Group.collection_name]
+ #collection = db[Node.collection_name]
+    
+     
+ node_id=collection.Node.one({'_id':ObjectId(node)})
+ node_id.status=unicode("PUBLISHED")
+ node_id.save() 
+
+ Group_Status="Moderated"
+ return render_to_response("ndf/node_details_base.html",
+                                 { 'group_id':group_id,
+                                   'node':node_id,
+                                   'groupid':group_id,
+                                   'Group_Status':Group_Status
+                                
+                                 
+                                 
+                                 },
+                                  context_instance=RequestContext(request)
+                              )

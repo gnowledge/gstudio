@@ -172,7 +172,14 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     {% endif %}
 
     <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+  
+          
 
+   
+
+
+ 
+ 
   </section>
 
 </header>
@@ -200,7 +207,8 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
           {% endfor %}
         </div>
         {% endif %}
-
+          
+          
         {% block add_fields %} {% endblock %}
 
         <ul class="inline-list">
@@ -249,13 +257,14 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
 
-
+     {% get_edit_status node request.user Group_Status as edit_pas %}
+    {% if edit_pas == "pass"  %}
     <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
     <ul id="edit-options" class="f-dropdown">
       <li><a href="{% url 'page_create_edit' groupid %}">Create a new page</a></li>
     </ul>
-
-  </div>
+  {% endif  %}
+    </div>
 
 
 

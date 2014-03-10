@@ -437,3 +437,52 @@ def get_input_fields(fields_value,type_value):
   """
   field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
   return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value,"field_type_list":field_type_list}
+  
+  
+
+@register.assignment_tag
+def get_edit_status(node,user,Group_Status):
+   print "asdfasdf",node
+	 
+   if user.id is not None:
+    auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
+
+    if auth_obj:
+      auth_type = auth_obj._id
+      group_gst = collection.Node.one({'_id':node._id,
+				
+                                '$or':[{'created_by':user.id},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ]}) 
+      print "Group name",group_gst                          
+    if group_gst is not None:
+        if (Group_Status == "NonModerated" and group_gst.status == "PUBLISHED") or (Group_Status == "Moderated" and group_gst.status == "DRAFT"):
+            return "pass"
+            
+    if Group_Status == "":
+         return "pass"
+
+			
+	  
+@register.assignment_tag
+def get_Node_object(node,user):
+
+  
+   if user.id is not None:
+    
+      group_gst = collection.Node.one({'_id':node._id})
+      if group_gst.status == "DRAFT":
+        return "DRAFT"
+				
+                                
+    
+		    
+		      
+		      
+		
+   
+
+
+  
+  
+
+
+  
