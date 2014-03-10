@@ -8,14 +8,14 @@ from registration.backends.default.views import RegistrationView
 
 from gnowsys_ndf.ndf.forms import *
 from gnowsys_ndf.ndf.views.home import HomeRedirectView, homepage
+from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view
 admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
     (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
     (r'^admin/', include(admin.site.urls)),
-#    (r'^$', HomeRedirectView.as_view()),    
-    (r'^$', RedirectView.as_view(url="/home/")),    
+    (r'^$', HomeRedirectView.as_view()),        
     (r'^home/','gnowsys_ndf.ndf.views.group.group_dashboard'),
     (r'^(?P<group_id>[^/]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
@@ -29,7 +29,8 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
-    url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', homepage, name='GAPPS'),       
+    url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', custom_app_view, name='GAPPS'),       
+    url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', custom_app_view, name='GAPPS_set'),
    # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),

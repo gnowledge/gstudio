@@ -37,6 +37,7 @@ def adminDashboardClass(request, class_name):
     '''
     fetching class's objects
     '''
+    group_set = ""
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
@@ -50,8 +51,9 @@ def adminDashboardClass(request, class_name):
             obj = collection.Node.one({ '_id': members})
             if obj:
                 member.append(obj.name+" - "+str(members))
+		group_set = [collection.Node.find_one({"_id":eachgroup}).name for eachgroup in each.group_set ]
 	if class_name in ("GSystem","File"):
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(group_set),"Creation":each.created_at})
 	else :
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at})
     groups = []
