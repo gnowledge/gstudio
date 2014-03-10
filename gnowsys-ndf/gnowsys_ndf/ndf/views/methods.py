@@ -143,6 +143,7 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
     node.member_of.append(node_type._id)
 
   node.name = unicode(name)
+  node.language=unicode(language)
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
   #if usrid in node.modified_by:
@@ -158,7 +159,6 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
   if content_org:
     node.content_org = unicode(content_org)
     node.name=unicode(name)
-    node.language=unicode(language) 
     # Required to link temporary files with the current user who is modifying this document
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
