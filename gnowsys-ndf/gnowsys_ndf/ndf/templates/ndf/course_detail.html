@@ -53,7 +53,9 @@
     </h3>
   </section>
 </header>
-
+<!-- overiding block_related content -->
+{% block related_content %}
+{% endblock %}
 <div class="row">
   {% with node.html_content|safe as description %}
   {% if description != "None" %}
