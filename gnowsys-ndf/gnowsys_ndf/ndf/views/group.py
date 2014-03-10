@@ -105,13 +105,13 @@ def group_dashboard(request,group_id=None):
         groupobj="" 
         grpid=""
         if group_id == None:
-            groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+            groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
             grpid=groupobj['_id']
         else:
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
             grpid=groupobj['_id']
     except Exception as e:
-        groupobj=gs_collection.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+        groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         grpid=groupobj['_id']
         pass
     return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 'group_id':grpid, 'user':request.user},context_instance=RequestContext(request))
@@ -129,7 +129,7 @@ def edit_group(request,group_id):
                 page_node.group_type = "PRIVATE"
             page_node.save()
             group_id=page_node._id
-            return HttpResponseRedirect(reverse('groupchange', kwargs={'groupid':group_id,'group_id':group_id}))
+            return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
                                         'groupid':group_id,

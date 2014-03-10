@@ -15,9 +15,9 @@
 	{% for each in class_list %}
 		{% get_Object_count each as count %}
 		{% ifequal class_name each %}
-		<li class="active"> <a href="/admin/designer/{{each}}" style="float:left">{{each}} ({{count}})</a><a href="/admin/designer/{{each}}/create">&nbsp;+</a><li>
+		<li class="active"> <a href="/admin/designer/{{each}}" style="float:left">{{each}} ({{count}})</a><a href="/admin/designer/{{each}}/create/">&nbsp;+</a><li>
 		{% else %}
-		<li > <a href="/admin/designer/{{each}}" style="float:left">{{each}} ({{count}})</a><a href="/admin/designer/{{each}}/create">&nbsp;+</a><li>
+		<li > <a href="/admin/designer/{{each}}" style="float:left">{{each}} ({{count}})</a><a href="/admin/designer/{{each}}/create/">&nbsp;+</a><li>
 		{% endifequal %}
 	{% endfor %}	
 </ul>
