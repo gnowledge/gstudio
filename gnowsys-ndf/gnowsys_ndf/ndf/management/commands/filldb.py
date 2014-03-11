@@ -118,6 +118,20 @@ class Command(BaseCommand):
             # rt_node.member_of.append(u"RT")
             rt_node.save()            
 
+        page = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Page'})    
+
+        # Create 'translation_of' RelationType, if it didn't exists    
+        translation_of_RT = collection.RelationType.one({'_type': u'RelationType', 'name': u'translation_of'}) 
+        if translation_of_RT is None:
+            rt = collection.RelationType()
+            rt.name = u"translation_of"
+            rt.inverse_name = u"translation_of"
+            rt.subject_type.append(page._id)
+            rt.object_type.append(page._id)
+            rt.created_by = user_id
+            rt.save()            
+
+
         # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
         quiz_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Quiz'})
 
