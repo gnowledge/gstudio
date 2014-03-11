@@ -47,7 +47,7 @@
   <option value="HIDDEN">HIDDEN</option>
 </select>
 {% elif fields_value == "list" %}
-<div id="list_drawer" >
+<div id="list_drawer" style="border-spacing:0px;">
   {#% edit_drawer_widget type_value groupid node %#}
   {% list_widget type_value fields_value %}
   {% if type_value in field_type_list %}
