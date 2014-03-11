@@ -107,22 +107,24 @@
         <div class="file">
 	  
           <header>
-
               <div class="label-list">
                 {% for tag in file.tags %}
                 <span class="label">{{tag}}</span>
                 {% endfor %}
               </div>
 	      
-              <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+              <div class="th">
+		<a href="{% url 'read_file' groupid file grid_fs_obj.filename %}">
+		  <img src="/static/ndf/images/icon/meta.svg" />
+		</a>
+	      </div>
               <h4>{{file.name}}</h4>
               <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
-	      
           </header>
 
           <p>File description?</p>
 
-          <a class="button expand" href ="{% url 'read_file' groupid file grid_fs_obj.filename %}">File details</a>
+          <a class="button expand" href ="{% url 'read_file' groupid file grid_fs_obj.filename %}">View details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
@@ -145,22 +147,24 @@
         <div class="file">
     
           <header>
-
-              <div class="label-list">
-                {% for tag in file.tags %}
-                <span class="label">{{tag}}</span>
-                {% endfor %}
-              </div>
+            <div class="label-list">
+              {% for tag in file.tags %}
+              <span class="label">{{tag}}</span>
+              {% endfor %}
+            </div>
         
-              <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
-              <h4>{{file.name}}</h4>
-              <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
-        
+            <div class="th">
+	      <a href="{% url 'read_file' groupid file grid_fs_obj.filename %}">
+		<img src="/static/ndf/images/icon/meta.svg" />
+	      </a>
+	    </div>
+            <h4>{{file.name}}</h4>
+            <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
           </header>
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'read_file' groupid file grid_fs_obj.filename %}">File details</a>
+          <a class="button expand" href ="{% url 'read_file' groupid file grid_fs_obj.filename %}">View details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
@@ -240,7 +244,11 @@
                 {% endfor %}
               </div>
 	      
-              <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+              <div class="th">
+		<a href="{% url 'read_file' groupid image grid_fs_obj.filename %}">
+		  <img src="{% url 'getImageThumbnail' groupid image %}" />
+		</a>
+	      </div>
               <h4>{{image.name}}</h4>
               <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
 	      
@@ -248,7 +256,7 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'read_file' groupid image grid_fs_obj.filename %}">File details</a>
+          <a class="button expand" href ="{% url 'image_detail' groupid image %}">View details</a>
 
           {% get_user_object image.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
@@ -272,46 +280,9 @@
      </ul>
    </div>
 
-   <!-- View 2 -->
-   <div class="content" id="view-image">
-     {% for image in imageCollection %}
-     <li  class="clearing-featured-img">
-      <a href="{% url 'get_mid_size_img' groupid image %}">
-        <img  src="{% url 'getImageThumbnail' groupid image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' groupid image %}'>{{image.name}}</a> <script type='text/javascript'>
-        var angle = 0;
-        $('.img_rotate').on('click', function() {
-        angle += 90;
-        $('.visible-img img').rotate(angle);
-      });
-    </script>" >
-  </img>
-</a>
-</li>
-{% endfor %}
-</div>
-
-<!-- View 3 -->
-<div class="content" id="view-video">
- {% for video in videoCollection %}
- <li>
-  <a class="video" id="{{video}}" href="#">
-    <img src="{% url 'getvideoThumbnail' groupid video %}" style="border-radius:10px;"></img>
-    <span align="left">{{video.name}}</span>
-  </a>
-  {% get_user_object video.created_by as user_obj %}
-  {% ifequal  user_obj.username  user.username  %}
-  <a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' groupid video %}?next={{request.path}}">Delete </a>
-  {% endifequal %}
-</li>
-{% endfor %}
-
-    </ul>
-  </div>
-
   <!-- View 3 -->
   <div class="content" id="view-video">
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
-
 
       <!-- Node create card-->
       <li class="create card">
@@ -363,7 +334,12 @@
                 {% endfor %}
               </div>
 	      
-              <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+              <div class="th">
+		<a href="{% url 'read_file' groupid video grid_fs_obj.filename %}">
+		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
+		  <img src="{% url 'getvideoThumbnail' groupid video %}">
+		</a>
+	      </div>
               <h4>{{video.name}}</h4>
               <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
 	      
@@ -371,7 +347,7 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'read_file' groupid video grid_fs_obj.filename %}">File details</a>
+          <a class="button expand" href ="{% url 'video_detail' groupid video %}">View details</a>
 
           {% get_user_object video.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}

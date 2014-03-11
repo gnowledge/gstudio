@@ -76,7 +76,7 @@ $(document).ready(function()
 {% endblock %}
 
 {% block url %}
-{% url 'edit_group' 'home' %}
+{% url 'edit_group' node %}
 {% endblock %}
 
 
@@ -124,5 +124,6 @@ $(document).ready(function()
 </div-->
 
 {{ block.super }}
+
 {% endblock %}
 

@@ -63,7 +63,7 @@ def video_detail(request, group_id, _id):
     return render_to_response("ndf/video_detail.html",
                                   { 'node': vid_node,
                                     'group_id': group_id,
-                                    'newgroup':group_id
+                                    'groupid':group_id
                                   },
                                   context_instance = RequestContext(request)
         )
@@ -79,7 +79,7 @@ def video_edit(request,group_id,_id):
         return render_to_response("ndf/video_edit.html",
                                   { 'node': vid_node,
                                     'group_id': group_id,
-                                    'newgroup':group_id
+                                    'groupid':group_id
                                 },
                                   context_instance=RequestContext(request)
                               )
