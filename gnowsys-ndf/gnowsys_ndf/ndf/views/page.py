@@ -230,12 +230,12 @@ def translate_node(request,group_id,node_id=None):
         grelation.subject_value=ObjectId(node_id)
         grelation.object_value=ObjectId(page_node._id)
         grelation.save()
-        subject_node=collection.Node.one({'_id':ObjectId(node_id)})
-        object_node=collection.Node.one({'_id':ObjectId(page_node._id)})
-        subject_node.relation_set.append(grelation._id)
-        object_node.relation_set.append(grelation._id)
-        subject_node.save()
-        object_node.save()
+        # subject_node=collection.Node.one({'_id':ObjectId(node_id)})
+        # object_node=collection.Node.one({'_id':ObjectId(page_node._id)})
+        # subject_node.relation_set.append(grelation._id)
+        # object_node.relation_set.append(grelation._id)
+        # subject_node.save()
+        # object_node.save()
                
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
         
