@@ -76,7 +76,8 @@ $(document).ready(function()
 {% endblock %}
 
 {% block url %}
-{% url 'edit_group' groupid %}
+{% url 'edit_group' node %}
+
 {% endblock %}
 
 
@@ -124,5 +125,6 @@ $(document).ready(function()
 </div-->
 
 {{ block.super }}
+
 {% endblock %}
 
