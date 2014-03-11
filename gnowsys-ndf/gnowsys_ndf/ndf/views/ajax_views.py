@@ -165,7 +165,7 @@ hm_obj = HistoryManager()
 GST_MODULE = gs_collection.GSystemType.one({'name': GAPPS[8]})
 
 @login_required
-def make_module_set(request, group_name):
+def make_module_set(request, group_id):
     '''
     This methode will create module of collection and stores objectid's with version number's
     '''
@@ -173,11 +173,12 @@ def make_module_set(request, group_name):
         try:
             _id = request.GET.get("_id","")
             print "id:",_id
+            print group_id
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
                 list_of_collection.append(node._id)
-                usrname = unicode(request.user.username)
-                
+                # usrname = request.user.id
+                # print usrname,"test"
                 dict = {}
                 dict['id'] = unicode(node._id)
                 dict['version_no'] = hm_obj.get_current_version(node)
@@ -190,10 +191,10 @@ def make_module_set(request, group_name):
                 gsystem_obj.content = unicode(node.content)
                 #gsystem_obj.gsystem_type.append(GST_MODULE._id)
                 gsystem_obj.member_of.append(GST_MODULE._id)
-                gsystem_obj.group_set.append(unicode(group_name))
-                if usrname not in gsystem_obj.group_set:        
-                    gsystem_obj.group_set.append(usrname)
-
+                gsystem_obj.group_set.append(ObjectId(group_id))
+                # if usrname not in gsystem_obj.group_set:        
+                #     gsystem_obj.group_set.append(int(usrname))
+ 
                 gsystem_obj.created_by = int(request.user.id)
                 gsystem_obj.module_set.append(dict)
                 gsystem_obj.save()
@@ -217,7 +218,7 @@ def walk(node):
        list.append(dict)
     return list
 
-def get_module_json(request, group_name):
+def get_module_json(request, group_id):
     _id = request.GET.get("_id","")
     node = collection.Node.one({'_id':ObjectId(_id)})
     data = walk(node.module_set)
