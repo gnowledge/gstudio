@@ -1,19 +1,98 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+
 {% block title %} Admin {% endblock %}
+
 {% block meta_content %}
 <ul class="side-nav"> 
   {% for each in app_collection_set %}
   {% get_Object_count each.name as count %}
   {% ifequal each.id app_set_id %}
-  <li class="active"> <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}">{{each.name}} ({{count}})</a> <li>
+  <li class="active"> 
+    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
+    <a href="{% url "GAPPS_set_instance" groupid app_name app_id each.id %}">&nbsp;+</a>
+  </li>
     {% else %}
-    <li > <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}">{{each.name}} ({{count}})</a> <li>
+    <li> 
+      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
+      <a href="{% url "GAPPS_set_instance" groupid app_name app_id each.id %}">&nbsp;+</a>
+    </li>
     {% endifequal %}
     {% endfor %}
 </ul>
 {% endblock %}
+
 {% block body_content %} 
+{% if app_set_template %}
+{% if nodes %}
+<input class="button deleteObjects" type="button" value="Delete">
+<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+  {% csrf_token %}
+  <input name="search" type="textbox" value="" style="width:300px;">
+  <input type="hidden" name="class" value="{{class_name}}">
+  <input type="submit" value="search" style="width:100px;">
+</form>
+{% endif %}
+<table >
+  <thead>
+    <tr>
+      {% if nodes %}
+      <th width="20"> <input class="checkedAll" type="checkbox"></th>
+      <th width="150" style="display:none">Id</th>
+      <th width="150">Title</th>
+      <th width="150">Created by</th>
+      <th width="150">Creation date</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for each in nodes %}
+    <tr>
+      <td  id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+      <td  style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
+    </tr>
+    {% empty %}
+    <h3>No data to display</h3>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if create_new %}
+<form method="POST" action=".">
+  <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> {{app_set_name}}'s name</font> 
+       </div>
+       <div style="display:table-cell;">
+	 <font size="3"> <input type="textbox" name="name"></font>
+       </div>
+     </div>
+     {% if systemtype_attributetype_set %}
+     {% for at in systemtype_attributetype_set %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> {{at.type}} </font> 
+       </div>
+       <div style="display:table-cell;">
+	 {% if at.value == "bool" %}
+	 <select id="id_auto_now_add" name="{{at.type_id}}" style="width:50%">
+	   <option selected="selected" value="">Unknown</option>
+	   <option value="Yes">Yes</option>
+	   <option value="No">No</option>
+	 </select>
+	 {% else %}
+	 <font size="3"> <input type="textbox" name="{{at.type_id}}"></font>
+	 {% endif %}
+       </div>
+     </div>
+       {% endfor %}
+     {% endif %}
+     <input type="submit" name="submit" class="button" id="save-system">
+  </div>
+</form>
+{% endif %}
 
 {% endblock %}
 
