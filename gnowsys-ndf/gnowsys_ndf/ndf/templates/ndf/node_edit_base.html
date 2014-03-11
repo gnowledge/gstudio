@@ -37,7 +37,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">
+
   <header class="row">
+
     <h2 class="medium-12 columns">
       {% if node %}
       Editing {{title}}: {{node.name}}
@@ -82,6 +84,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  <div class="medium-4 columns">
 	    {% if node.created_by == request.user.pk %}		    	
 			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+
+			
 				<div class="privacy-mode switch round">
 						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
@@ -116,10 +120,16 @@ background-repeat:no-repeat; background-size: 48px 48px
 							<span></span>
 						</div>
 
+
 			{% endif %}
 		{% endif %}	    
 	  </div>
 	</div>
+	<div class="row">
+	  
+	  <div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+	     </div></div>
+
 
 	<div class="row">
 	  <div class="medium-12 columns">
