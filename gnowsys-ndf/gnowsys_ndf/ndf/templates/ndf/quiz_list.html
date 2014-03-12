@@ -30,8 +30,8 @@
   <div class="medium-12 columns">
    <!-- Add button -->
    {% if user.is_authenticated %}
-    <a href="{% url 'quiz_create_edit' groupid %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create_edit' groupid %}" class="button small">+ Add {{title}} Item</a>
+    <a href="{% url 'quiz_create' groupid %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create' groupid %}" class="button small">+ Add {{title}} Item</a>
   {% endif %}
 </div>
 </header>
@@ -52,7 +52,7 @@
 
      {% if user.is_authenticated %}
      <div class="small-4 columns">
-       <a href="{% url 'quiz_item_create_edit' groupid node %}">
+       <a href="{% url 'quiz_item_create' groupid %}">
          <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
        </a>
      </div>
@@ -69,7 +69,7 @@
 
      {% if user.is_authenticated %}
      <div class="small-4 columns">
-       <a href="{% url 'quiz_item_create_edit' groupid node %}">
+       <a href="{% url 'quiz_item_create' groupid %}">
          <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
        </a>
      </div>
