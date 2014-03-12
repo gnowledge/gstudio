@@ -113,6 +113,24 @@ def select_drawer(request, group_id):
 
             
 
+def collection_nav(request, group_id):
+    
+    if request.is_ajax() and request.method == "POST":    
+      node_id = request.POST.get("node_id", '')
+
+      collection = db[Node.collection_name]
+
+      node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+
+      
+      return render_to_response('ndf/node_ajax_view.html', 
+                                  { 'node': node_obj,
+                                    'group_id': group_id,
+                                    'groupid':group_id
+                                  },
+                                  context_instance = RequestContext(request)
+      )
+
 
 @login_required
 def change_group_settings(request, group_name):
