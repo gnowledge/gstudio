@@ -180,6 +180,17 @@ class Command(BaseCommand):
             at_node.subject_type.append(quiz_item_type._id)
             at_node.save()
 
+        # Create 'module_set_md5' AttributeType, if didn't exists 
+        node = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
+        GST_MODULE = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Module'}]})
+        if node is None:
+            at = collection.AttributeType()
+            at.name = u'module_set_md5'
+            at.created_by = user_id
+            at.data_type = u''                #unicode data type
+            at.subject_type.append(GST_MODULE._id)
+            at.save()
+
         # Append quiz_type, options & correct_answer to attribute_type_set of 'QuizItem'
         if not quiz_item_type.attribute_type_set:
             quiz_item_type.attribute_type_set.append(collection.Node.one({'_type': u'AttributeType', 'name': u'quiz_type'}))

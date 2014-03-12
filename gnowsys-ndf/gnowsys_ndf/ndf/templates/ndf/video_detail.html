@@ -1,6 +1,5 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
-{% block url %}{% url 'video_edit' groupid node %}{% endblock %}
 
 {% block add_list %}
 {% get_grid_fs_object node as grid_fs_obj %}

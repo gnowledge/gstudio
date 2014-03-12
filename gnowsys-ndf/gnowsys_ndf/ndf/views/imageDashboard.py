@@ -75,6 +75,7 @@ def image_search(request,group_id):
 
 def image_detail(request, group_id, _id):
     img_node = collection.File.one({"_id": ObjectId(_id)})
+    print img_node.name
     return render_to_response("ndf/image_detail.html",
                                   { 'node': img_node,
                                     'group_id': group_id,
