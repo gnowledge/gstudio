@@ -116,7 +116,6 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         get_node_common_fields(request, page_node, group_id, gst_page)
-        print "in page save"
         page_node.save()
         
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
@@ -216,16 +215,34 @@ def translate_node(request,group_id,node_id=None):
                       }
 
     page_node = collection.GSystem()
+    
 
     if request.method == "POST":
-        get_translate_common_fields(request, page_node, group_id, gst_page)
+        get_translate_common_fields(request, page_node, group_id, gst_page, node_id)
         page_node.save()
+       
+        # add triple to the GRelation 
+        # then append this ObjectId of GRelation instance in respective subject and object Nodes' relation_set field.
+        relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
         
+        grelation=collection.GRelation()
+        grelation.relation_type_value=ObjectId(relation_type._id)
+        grelation.subject_value=ObjectId(node_id)
+        grelation.object_value=ObjectId(page_node._id)
+        grelation.save()
+        # subject_node=collection.Node.one({'_id':ObjectId(node_id)})
+        # object_node=collection.Node.one({'_id':ObjectId(page_node._id)})
+        # subject_node.relation_set.append(grelation._id)
+        # object_node.relation_set.append(grelation._id)
+        # subject_node.save()
+        # object_node.save()
+               
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
         
 
 
     node = collection.Node.one({"_id": ObjectId(node_id)})
+        
     fp = history_manager.get_file_path(node)
     # Retrieve rcs-file for a given version-number
     rcs.checkout(fp)

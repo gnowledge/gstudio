@@ -16,8 +16,8 @@
     <!-- Add button -->
     {% if user.is_authenticated %}
     <p>
-    <a href="{% url 'quiz_create_edit' groupid %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create_edit' groupid %}" class="button small right">+ Add {{title}} Item</a>
+    <a href="{% url 'quiz_create' groupid %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create' groupid %}" class="button small right">+ Add {{title}} Item</a>
     </p>
     {% endif %}
     

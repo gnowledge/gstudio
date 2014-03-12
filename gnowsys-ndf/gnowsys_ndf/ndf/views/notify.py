@@ -7,6 +7,11 @@ from gnowsys_ndf.notification import models as notification
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
+
 
 db = get_database()
 col_Group = db[Group.collection_name]
@@ -57,6 +62,7 @@ def send_invitation(request,group_id):
         else:
             return HttpResponse("failure")
     except Exception as e:
+        print str(e)
         return HttpResponse(str(e))
 
 def notifyuser(request,group_id):

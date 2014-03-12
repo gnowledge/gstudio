@@ -91,8 +91,8 @@ def create_forum(request,group_id):
             edate1=edate.split("/")
             en_date= datetime.datetime(int(edate1[2]),int(edate1[0]),int(edate1[1]),int(ehrs),int(emts))
             end_dt[end_time.name]=en_date
-        colf.attribute_set.append(start_dt)
-        colf.attribute_set.append(end_dt)
+       # colf.attribute_set.append(start_dt)
+       # colf.attribute_set.append(end_dt)
         colf.save()
         return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id}))
         # variables=RequestContext(request,{'forum':colf})

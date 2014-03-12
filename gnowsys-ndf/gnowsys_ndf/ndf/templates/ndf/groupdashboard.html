@@ -5,13 +5,9 @@ from django.contrib.auth.decorators import login_required
 
 {% block head %}
 
-
 <script type="text/javascript" >
   var chk_login = "{{ user }}";
 </script>
-
-
-
 
 <script type="text/javascript">
 //function to toggle the lable Join and Unsubscribe
@@ -75,14 +71,7 @@ $(document).ready(function()
 </script>
 {% endblock %}
 
-{% block url %}
-{% url 'edit_group' node %}
-{% endblock %}
-
-
 {% block meta_content %}
-
-
 
 <p> Members in this group :{{node.author_set|length}} </p>
 

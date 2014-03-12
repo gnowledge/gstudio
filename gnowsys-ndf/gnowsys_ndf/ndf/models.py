@@ -465,7 +465,7 @@ class GSystem(Node):
 
     structure = {        
         # 'attribute_set': [ObjectId],		# ObjectIds of GAttributes
-        'relation_set': [ObjectId],		# ObjectIds of GRelations
+        #'relation_set': [ObjectId],		# ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
         'group_set': [ObjectId],                # List of ObjectId's of Groups to which this document belongs

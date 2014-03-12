@@ -52,7 +52,7 @@ border-radius: 5px;
 
 <div class="response_change" id="refreshthread" class="large-12 columns">
   <div style="margin-left:40px;margin-bottom:1px">  
-    {% get_reply thread thread forum csrf_token request.user %}
+    {% get_reply thread thread forum csrf_token request.user groupid %}
   </div>
 </div>
 </div>
