@@ -169,6 +169,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% endblock %}
 
 {% block script %}
+var global_object_id;
 function set_drawer_value(node_id)
 {
  $('#mySystemtype #collection_set_drawer1').html("");
@@ -253,6 +254,7 @@ $(document).on('click',".checkedAll",function(){
 });
 $(document).on('click',".button.editobject",function(){
 	var objectid = this.id;
+        global_object_id = objectid;
         set_drawer_value(objectid);
 	attributetype_set_drawer_value(objectid);
 	relationtype_set_drawer_value(objectid);
@@ -304,7 +306,7 @@ var objectid = $(this).attr("name");
         json['id']=objectid
         $.map($(".editinput"+objectid),function(each){
                   fields[each.parentElement.className] = each.value 
-                  $("."+each.parentElement.className+" font.viewinput"+objectid).html(each.value) });
+              });
         json['fields']=fields
         $.ajax({
         url: '/admin/data/edit',
@@ -323,8 +325,9 @@ var objectid = $(this).attr("name");
 
 $(document).on('focus',".group input",function(){
         baseobject = $(this);
-        var baseobjectval = baseobject.val()
-        var arr = baseobjectval.split(',')
+        fontelement = $(".group font.viewinput"+global_object_id);
+        var baseobjectval = baseobject.val();
+        var arr = baseobjectval.split(',');
         $('#viewgrouplist').text(baseobjectval);
         $('#id_groups option').removeAttr("selected");
         for(var each in arr){ $('#id_groups option[name="'+arr[each]+'"]').attr('selected','selected');  }
@@ -333,13 +336,21 @@ $(document).on('focus',".group input",function(){
                  option = $(this).find('option:selected');
                  var i = 0;
                  var str = "";
+                 var str1 = "";
                  $.map(option, function(op){
-                          if(i == 0){str = str.concat(op.label)}
-                          else {str = str.concat(","+op.label)}
+                          if(i == 0){
+                          str = str.concat(op.value)
+                          str1 = str1.concat(op.label)
+                              }
+                          else {
+                          str = str.concat(","+op.value)
+                          str1 = str1.concat(", "+op.label)}
                           i= i+1
-                          return console.log(op.value);});
+                          return});
                   baseobject.val(str);
-                  $('#viewgrouplist').text(str);
+                  console.log(fontelement);
+                  fontelement.html(str1);
+                  $('#viewgrouplist').text(str1);
                   });
 });
 

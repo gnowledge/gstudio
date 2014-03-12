@@ -85,10 +85,11 @@ def adminDashboardEdit(request):
         node.name =  objectjson['fields']['title']
         for key,value in objectjson['fields'].items():
             if key == "group":
-                if value:
-                    node['group_set'] = value.split(",")
-		else :
-	            node['group_set'] = []
+                typelist = []
+                for eachvalue in  value.split(","):
+		    if eachvalue:
+                    	typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                node['group_set'] = typelist
             # if key == "type":
             #     typelist = []
             #     for eachvalue in  value.split(","):
