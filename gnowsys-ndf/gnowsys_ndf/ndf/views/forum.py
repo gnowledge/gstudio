@@ -154,20 +154,20 @@ def add_node(request,group_id):
         colrep.save()
         groupname=colg.name
         if node == "Twist" :  
-            url="http://"+sitename+"/"+str(group_id)+"/forum/thread"+str(colrep._id)
-            activity=str(request.user.username)+" -added a thread "
-            prefix=" on the forum '"+forumobj.name+"'"
+            url="http://"+sitename+"/"+str(group_id)+"/forum/thread/"+str(colrep._id)
+            activity=str(request.user.username)+" -added a thread '"
+            prefix="' on the forum '"+forumobj.name+"'"
             nodename=name
         if node == "Reply":
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
-            url="http://"+sitename+"/"+str(group_id)+"/forum/thread"+str(threadobj._id)
+            url="http://"+sitename+"/"+str(group_id)+"/forum/thread/"+str(threadobj._id)
             activity=str(request.user.username)+" -added a reply "
             prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
             nodename=""
         link=url
         for each in colg.author_set:
             bx=User.objects.get(id=each)
-            msg=activity+"-"+nodename+" in the group '"+str(groupname)+"'\n"+"Please visit "+link+" to see the updated page"
+            msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"'\n"+"Please visit "+link+" to see the updated page"
             if bx:
                 ret = set_notif_val(request,group_id,msg,activity,bx)
         bx=User.objects.get(id=colg.created_by)
