@@ -427,6 +427,14 @@ def get_Object_count(key):
         return collection.Node.find({'_type':key}).count()
     except:
         return 'null'
+
+@register.assignment_tag
+def get_memberof_objects_count(key):
+    #try:
+  print key
+  return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'_type':'GSystem'}).count()
+    #except:
+    #    return 'null'
   
 @register.filter
 def get_dict_item(dictionary, key):
