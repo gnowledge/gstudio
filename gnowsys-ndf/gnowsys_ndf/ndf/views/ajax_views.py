@@ -359,21 +359,44 @@ def graph_nodes(request, group_id):
   return HttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
+
+def get_data_for_switch_groups(request,group_id):
+    coll_obj_list = []
+    node_id = request.GET.get("object_id","")
+    print "nodeid",node_id
+    st = collection.Node.find({"_type":"Group"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.group_set:
+        coll_obj_list.append(collection.Node.one({'_id':each}))
+    data_list=set_drawer_widget(st,coll_obj_list)
+    return HttpResponse(json.dumps(data_list))
+
+
+'''
+designer module's drawer widget function
+'''
 def get_data_for_drawer(request, group_id):
+    coll_obj_list = []
+    node_id = request.GET.get("id","")
+    st = collection.Node.find({"_type":"GSystemType"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.collection_set:
+        coll_obj_list.append(collection.Node.one({'_id':each}))
+    data_list=set_drawer_widget(st,coll_obj_list)
+    return HttpResponse(json.dumps(data_list))
+
+    
+def set_drawer_widget(st,coll_obj_list):
     '''
-    this method will fetch data for designer module's drawer widget
+    this method will set data for drawer widget
     '''
+    print "st=",st,"coln",coll_obj_list
     data_list = []
     d1 = []
     d2 = []
     draw1 = {}
     draw2 = {}
-    node_id = request.GET.get("id","")
-    coll_obj_list = []
-    st = collection.Node.find({"_type":"GSystemType"})
-    node = collection.Node.one({"_id":ObjectId(node_id)})
-    for each in node.collection_set:
-        coll_obj_list.append(collection.Node.one({'_id':each}))
+    
     drawer1 = list(set(st) - set(coll_obj_list))
     drawer2 = coll_obj_list
     for each in drawer1:
@@ -390,4 +413,4 @@ def get_data_for_drawer(request, group_id):
        d2.append(dic)
     draw2['drawer2'] = d2
     data_list.append(draw2)
-    return HttpResponse(json.dumps(data_list))
+    return data_list 
