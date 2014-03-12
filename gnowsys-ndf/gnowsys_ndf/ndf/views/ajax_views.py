@@ -172,13 +172,9 @@ def make_module_set(request, group_id):
     if request.is_ajax():
         try:
             _id = request.GET.get("_id","")
-            print "id:",_id
-            print group_id
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
                 list_of_collection.append(node._id)
-                # usrname = request.user.id
-                # print usrname,"test"
                 dict = {}
                 dict['id'] = unicode(node._id)
                 dict['version_no'] = hm_obj.get_current_version(node)
@@ -195,9 +191,8 @@ def make_module_set(request, group_id):
                 #     gsystem_obj.group_set.append(int(usrname))
                 gsystem_obj.created_by = int(request.user.id)
                 gsystem_obj.module_set.append(dict)
-                print gsystem_obj.module_set,"module_set"
                 module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
-                print module_set_md5,"test"
+
                 check =check_module_exits(module_set_md5)          #checking module already exits or not
                 if(check == 'True'):
                     return HttpResponse("This module already Exists")
@@ -226,7 +221,6 @@ def sotore_md5_module_set(object_id,module_set_md5):
             attr_obj.subject = object_id
             attr_obj.object_value = unicode(module_set_md5)
             attr_obj.save()
-            print attr_obj.object_value,"object_value"
         except Exception as e:
             return 'False'
         return 'True'
