@@ -16,12 +16,12 @@
 
   {% endblock %}
 
-  {%block related_content %}
+  {% block related_content %}
 
   {% if groups %}
   Existing Groups:
 
-  {% get_existing_groups as groups%}
+  {% get_existing_groups_excluding_username as groups%}
   {% for items in groups %}  
   {{items.name}} {% if not forloop.last %} ,{% endif %}  
   {% endfor %}
