@@ -333,6 +333,35 @@ def get_profile_pic(user):
 
 
 @register.assignment_tag
+def get_edit_url(groupid):
+
+  node = collection.Node.one({'_id': ObjectId(groupid) }) 
+
+  if node._type == 'GSystem':
+
+    type_name = collection.Node.one({'_id': node.member_of[0]}).name
+
+    if type_name == 'Quiz':
+      return 'quiz_edit'    
+    elif type_name == 'Page':
+      return 'page_create_edit' 
+    elif type_name == 'QuizItem':
+      return 'quiz_item_edit'
+
+  elif node._type == 'Group':
+    return 'edit_group'
+
+  elif node._type == 'File':
+
+    if node.mime_type == 'video':      
+      return 'video_edit'       
+    elif 'image' in node.mime_type:
+      return 'image_edit'
+
+  
+
+
+@register.assignment_tag
 def get_group_type(group_id, user):
 
   try:
@@ -389,9 +418,6 @@ def get_user_object(user_id):
   except Exception as e:
     print "User Not found in User Table",e
   return user_obj
-  
-
-
 	
 
 '''this template function is used to get the user object from template''' 
