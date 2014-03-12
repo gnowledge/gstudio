@@ -57,7 +57,7 @@ def adminDashboardClass(request, class_name):
         collection_list = []
         attribute_type_set = []
         relation_type_set = []
-        if class_name in ("GSystemType"):
+        if class_name == "GSystemType":
             for e in each.member_of:
                 member_of_list.append(collection.Node.one({'_id':e}).name+" - "+str(e))
                 
