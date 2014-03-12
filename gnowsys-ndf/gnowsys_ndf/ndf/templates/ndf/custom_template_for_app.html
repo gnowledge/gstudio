@@ -1,12 +1,12 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 
-{% block title %} Admin {% endblock %}
+{% block title %} {{ title }} {% endblock %}
 
 {% block meta_content %}
 <ul class="side-nav"> 
   {% for each in app_collection_set %}
-  {% get_Object_count each.name as count %}
+  {% get_memberof_objects_count each.id as count %}
   {% ifequal each.id app_set_id %}
   <li class="active"> 
     <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
@@ -38,7 +38,6 @@
     <tr>
       {% if nodes %}
       <th width="20"> <input class="checkedAll" type="checkbox"></th>
-      <th width="150" style="display:none">Id</th>
       <th width="150">Title</th>
       <th width="150">Created by</th>
       <th width="150">Creation date</th>
@@ -48,8 +47,10 @@
   <tbody>
     {% for each in nodes %}
     <tr>
-      <td  id="{{each.Id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-      <td  style="display:none" class="id" style="font-size:11px;">{{each.Id}}</td>
+      <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+      <td  class="name" style="font-size:11px;">{{each.name}}</td>
+      <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
+      <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
     </tr>
     {% empty %}
     <h3>No data to display</h3>
@@ -60,6 +61,7 @@
 
 {% if create_new %}
 <form method="POST" action=".">
+  {% csrf_token %}
   <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
      <div style="display:table-row;">
        <div style="display:table-cell;"> 
