@@ -131,6 +131,24 @@ class Command(BaseCommand):
             rt.created_by = user_id
             rt.save()            
 
+        # Create 'Pandora_video' GsystemType, if it didn't exists    
+        pandora_video = collection.GSystemType.one({'$and':[{'_type': u'GSystemType'},{'name': u'Pandora_video'}]})
+        if pandora_video is None:
+            st = collection.GSystemType()
+            st.name = u'Pandora_video'
+            st.created_by = user_id
+            st.save()
+
+        # Create 'source_id' AttributeType, if didn't exists 
+        source_id = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'source_id'}]})
+        if source_id is None:
+            at = collection.AttributeType()
+            at.name = u'source_id'
+            at.created_by = user_id
+            at.data_type = u''                #unicode data type
+            at.subject_type.append(pandora_video._id)
+            at.save()
+
 
         # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
         quiz_type = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Quiz'})
