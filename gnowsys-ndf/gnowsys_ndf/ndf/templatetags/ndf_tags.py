@@ -442,24 +442,27 @@ def get_input_fields(fields_value,type_value):
   
 
 @register.assignment_tag
-def get_edit_status(node,user,Group_Status):
-   print "asdfasdf",node
-	 
-   if user.id is not None:
-    auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
-
-    if auth_obj:
-      auth_type = auth_obj._id
-      group_gst = collection.Node.one({'_id':node._id,
+def get_group_type(node,user):
+   
+     if user.id is not None: 
+      print "node name",node
+      col_Group =db[Group.collection_name]
+      try:
+        group_gst = col_Group.Group.one({'_id':ObjectId(node._id)})
+      except:
+        grname = re.split(r'[/=]', node)
+        group_gst = col_Group.Group.one({'_id':ObjectId(grname[1])})  
 				
-                                '$or':[{'created_by':user.id},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ]}) 
-      print "Group name",group_gst                          
-    if group_gst is not None:
-        if (Group_Status == "NonModerated" and group_gst.status == "PUBLISHED") or (Group_Status == "Moderated" and group_gst.status == "DRAFT"):
-            return "pass"
-            
-    if Group_Status == "":
-         return "pass"
+                               
+      if group_gst.post_node:
+         return "Moderated"
+      else:
+          return  group_gst._type                             
+      
+              
+              
+              
+      
 
 			
 	  
@@ -468,8 +471,13 @@ def get_Node_object(node,user):
 
   
    if user.id is not None:
-    
-      group_gst = collection.Node.one({'_id':node._id})
+      print "node name",node    
+      try:
+        group_gst = collection.Node.one({'_id':node._id})
+      except:
+        grname = re.split(r'[/=]', node)
+        group_gst = col_Group.Group.one({'_id':ObjectId(grname[1])})  
+
       if group_gst.status == "DRAFT":
         return "DRAFT"
 				

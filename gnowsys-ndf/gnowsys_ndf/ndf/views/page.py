@@ -78,10 +78,12 @@ def page(request, group_id, app_id=None):
         #code for moderated Groups
         # collection.Node.reload()
         group_type = collection.Node.one({'_id':ObjectId(group_id)})
+        
         if  group_type.prior_node:
           
           title = gst_page.name
           node=group_type.prior_node[0]
+          print "get the prior node",node  
           page_nodes = collection.Node.find({'member_of':ObjectId(app_id),
                                             'group_set':ObjectId(node),    
                                              'status':'DRAFT' 
