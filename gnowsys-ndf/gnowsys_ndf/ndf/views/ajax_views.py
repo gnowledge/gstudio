@@ -113,6 +113,24 @@ def select_drawer(request, group_id):
 
             
 
+def collection_nav(request, group_id):
+    
+    if request.is_ajax() and request.method == "POST":    
+      node_id = request.POST.get("node_id", '')
+
+      collection = db[Node.collection_name]
+
+      node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+
+      
+      return render_to_response('ndf/node_ajax_view.html', 
+                                  { 'node': node_obj,
+                                    'group_id': group_id,
+                                    'groupid':group_id
+                                  },
+                                  context_instance = RequestContext(request)
+      )
+
 
 @login_required
 def change_group_settings(request, group_name):
@@ -165,19 +183,16 @@ hm_obj = HistoryManager()
 GST_MODULE = gs_collection.GSystemType.one({'name': GAPPS[8]})
 
 @login_required
-def make_module_set(request, group_name):
+def make_module_set(request, group_id):
     '''
     This methode will create module of collection and stores objectid's with version number's
     '''
     if request.is_ajax():
         try:
             _id = request.GET.get("_id","")
-            print "id:",_id
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
                 list_of_collection.append(node._id)
-                usrname = unicode(request.user.username)
-                
                 dict = {}
                 dict['id'] = unicode(node._id)
                 dict['version_no'] = hm_obj.get_current_version(node)
@@ -188,20 +203,61 @@ def make_module_set(request, group_name):
                 gsystem_obj = collection.GSystem()
                 gsystem_obj.name = unicode(node.name)
                 gsystem_obj.content = unicode(node.content)
-                #gsystem_obj.gsystem_type.append(GST_MODULE._id)
                 gsystem_obj.member_of.append(GST_MODULE._id)
-                gsystem_obj.group_set.append(unicode(group_name))
-                if usrname not in gsystem_obj.group_set:        
-                    gsystem_obj.group_set.append(usrname)
-
+                gsystem_obj.group_set.append(ObjectId(group_id))
+                # if usrname not in gsystem_obj.group_set:        
+                #     gsystem_obj.group_set.append(int(usrname))
                 gsystem_obj.created_by = int(request.user.id)
                 gsystem_obj.module_set.append(dict)
-                gsystem_obj.save()
-                return HttpResponse("module succesfull created")
+                module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
+
+                check =check_module_exits(module_set_md5)          #checking module already exits or not
+                if(check == 'True'):
+                    return HttpResponse("This module already Exists")
+                else:
+                    gsystem_obj.save()
+                    check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
+                    if (check1 == 'True'):
+                        return HttpResponse("module succesfull created")
+                    else:
+                        gsystem_obj.delete()
+                        return HttpResponse("Attribute type 'module_set_md5' yet not created Run 'python manage.py filldb on terminal to create'")
             else:
                 return HttpResponse("Not a valid id passed")
         except Exception as e:
               return HttpResponse(e)
+
+def sotore_md5_module_set(object_id,module_set_md5):
+    '''
+    This method will store md5 of module_set of perticular GSystem into an Attribute
+    '''
+    node_at = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]}) #retrving attribute type
+    if node_at is not None:
+        try:
+            attr_obj =  collection.GAttribute()                #created instance of attribute class
+            attr_obj.attribute_type = node_at._id
+            attr_obj.subject = object_id
+            attr_obj.object_value = unicode(module_set_md5)
+            attr_obj.save()
+        except Exception as e:
+            return 'False'
+        return 'True'
+    else:
+        print "Run 'python manage.py filldb' commanad to create AttributeType 'module_set_md5' "
+        return 'False'
+    
+
+def check_module_exits(module_set_md5):
+    '''
+    This method will check is module already exits ?
+    '''
+    node_at = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
+    attribute = collection.Triple.one({'_type':'GAttribute', 'attribute_type':node_at._id, 'object_value':module_set_md5}) 
+    if attribute is not None:
+        return 'True'
+    else:
+        return 'False'
+        
 
 
 def walk(node):
@@ -217,12 +273,11 @@ def walk(node):
        list.append(dict)
     return list
 
-def get_module_json(request, group_name):
+def get_module_json(request, group_id):
     _id = request.GET.get("_id","")
     node = collection.Node.one({'_id':ObjectId(_id)})
     data = walk(node.module_set)
     return HttpResponse(json.dumps(data))
-
 
 # ------------- For generating graph json data ------------
 def graph_nodes(request, group_id):
@@ -358,21 +413,44 @@ def graph_nodes(request, group_id):
   return HttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
+
+def get_data_for_switch_groups(request,group_id):
+    coll_obj_list = []
+    node_id = request.GET.get("object_id","")
+    print "nodeid",node_id
+    st = collection.Node.find({"_type":"Group"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.group_set:
+        coll_obj_list.append(collection.Node.one({'_id':each}))
+    data_list=set_drawer_widget(st,coll_obj_list)
+    return HttpResponse(json.dumps(data_list))
+
+
+'''
+designer module's drawer widget function
+'''
 def get_data_for_drawer(request, group_id):
+    coll_obj_list = []
+    node_id = request.GET.get("id","")
+    st = collection.Node.find({"_type":"GSystemType"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.collection_set:
+        coll_obj_list.append(collection.Node.one({'_id':each}))
+    data_list=set_drawer_widget(st,coll_obj_list)
+    return HttpResponse(json.dumps(data_list))
+
+    
+def set_drawer_widget(st,coll_obj_list):
     '''
-    this method will fetch data for designer module's drawer widget
+    this method will set data for drawer widget
     '''
+    print "st=",st,"coln",coll_obj_list
     data_list = []
     d1 = []
     d2 = []
     draw1 = {}
     draw2 = {}
-    node_id = request.GET.get("id","")
-    coll_obj_list = []
-    st = collection.Node.find({"_type":"GSystemType"})
-    node = collection.Node.one({"_id":ObjectId(node_id)})
-    for each in node.collection_set:
-        coll_obj_list.append(collection.Node.one({'_id':each}))
+    
     drawer1 = list(set(st) - set(coll_obj_list))
     drawer2 = coll_obj_list
     for each in drawer1:
@@ -389,4 +467,4 @@ def get_data_for_drawer(request, group_id):
        d2.append(dic)
     draw2['drawer2'] = d2
     data_list.append(draw2)
-    return HttpResponse(json.dumps(data_list))
+    return data_list 

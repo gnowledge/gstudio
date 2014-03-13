@@ -25,7 +25,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
     $("#module").one("click", function()
     {
      $.ajax({
-      url:"/{{groupid}}/ajax/make_module",
+      url:"/{{groupid}}/ajax/make_module/",
       type:"GET",
       data:{_id:"{{node.pk}}"},
       beforeSend:function(){
@@ -71,7 +71,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 <ul class="side-nav">
   {% if node.collection_dict|length > 0 %}
-  <h3>Contents</h3>
+  <h3><a href="{% url 'page_details' groupid node %}">{{node.name}}</a> Contents</h3>
   {% for index_key, each_node in node.collection_dict.items %}
   {% get_grid_fs_object each_node as grid_fs_obj %}
 
@@ -80,18 +80,14 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   {% if each_node.collection_set %}
 
   <li>
-
     <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-
-
-    <a href="{% url 'read_file' groupid each_node.pk grid_fs_obj.filename %}" style="padding-left:10px;">{{ each_node.name }}</a>
+    <a class="select" name="{{each_node.pk}}" style="padding-left:10px;">{{ each_node.name }}</a>
   </li>
 
   {% else %}
   <li>
     <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-
-    <a href="{% url 'read_file' groupid each_node.pk grid_fs_obj.filename %}" style="padding-left:12px;">{{ each_node.name }}</a> 
+    <a class="select" name="{{each_node.pk}}" style="padding-left:12px;">{{ each_node.name }}</a> 
   </li>
   {% endif %}
 
@@ -99,13 +95,13 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   {% if each_node.collection_set %}
   <li>
     <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-    <a href="{% url 'page_details' groupid each_node.pk %}" style="padding-left:10px;">{{ each_node.name }}</a>
+    <a class="select" name="{{each_node.pk}}" style="padding-left:10px;">{{ each_node.name }}</a>
   </li>
 
   {% else %}
   <li>
     <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-    <a href="{% url 'page_details' groupid each_node.pk %}" style="padding-left:12px;">{{ each_node.name }}</a>
+    <a class="select" name="{{each_node.pk}}" style="padding-left:12px;">{{ each_node.name }}</a>
   </li>
   {% endif %}
   {% endif %}
@@ -114,9 +110,26 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   {% endif %}
 </ul>
 
+<script>
+  $(".select").click(function() {
+    
+    $.ajax({
+      type: "POST",
+      url: "{% url 'collection_nav' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: this.name,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#view_page").html(data);
+      }
+    });
+
+  });
+</script>
 
 {% endblock %}
-
 
 {% block shelf_content %}
 <h4 class="text-center">Shelf</h4>
@@ -141,144 +154,13 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 
 {% get_group_type request.path request.user as group_type %}
 
-
 {% block body_content %}
-<a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
 
-<header class="row page">
-
-
-  <section class="medium-12 columns" >
-    <ul class="breadcrumbs">
-      <li><a href="/{{groupid}}">{{groupid}}</a></li>
-      <li><a href="#">Collection Name</a></li>
-    </ul>
-
-    <h2>
-      <span class='node'>{{node.name}}</span>      <small class="label-list"> 
-      {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span> 
-      {% endfor %}
-    </small>      
-  </h2>
-
-  <dl class="row tabs" data-tab>
-    <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
-
-    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-
-    <dd><a href="#view-graph" data-reveal-id="view-graph"><i class="fi-share"></i> Graph</a></dd>
-
-    {% endif %}
-
-    <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-  
-          
-
-   
-
-
- 
- 
-  </section>
-
-</header>
-
-<div class="row">
-
-
-
-  <section class="medium-9 columns">
-    <div class="tabs-content">
-
-      <!-- Tab content -->
-      <div class="content active" id="view-page">
-
-       {% if node.prior_node|length > 0 %}
-       <div class="panel">
-         <h6>You may want to read these first:</h6>
-          {% for index_key, each_node in node.prior_node_dict.items %}
-          {% get_grid_fs_object each_node as grid_fs_obj %}
-          {% if each_node.mime_type %}
-          <a href="{% url 'read_file' groupid each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-          {% else %}
-          <a href="{% url 'page_details' groupid each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-          {% endif %}
-          {% endfor %}
-        </div>
-        {% endif %}
-          
-          
-        {% block add_fields %} {% endblock %}
-
-        <ul class="inline-list">
-         {% if user.is_authenticated %}
-         {% block add_list %}{% endblock %}
-         {% endif %}
-       </ul>
-
-       {% with node.html_content|safe as description %}
-
-       {% if description != "None" %}
-       {{ description }}
-       {% endif %}
-
-       {% endwith %}
-     </div>
-
-
-     <!-- Tab View Graph -->
-     <div class="content reveal-modal graph-div" id="view-graph" data-reveal>    
-      <h3 style="position:absolute;">{{node.name}}</h3>
-      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-      <a class="close-reveal-modal">&#215;</a>
-      {% include "ndf/node_graph.html" %}
-      {% endif %}
-    </div>
-
-  </section>
-
-  <section class="medium-3 columns">
-    <div class="panel">
-     <h5 class="subheader">
-       Edited {{ node.last_update|timesince }} ago by <a class="user">?</a> 
-       <small>
-         <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
-          {% for seq_no, version_no in node.version_dict.items reversed %}
-          <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
-          {% endfor %}
-        </div>
-      </small>
-    </h5>
-
-
-    <!-- added button to convert collection into module-->
-    {% if node.collection_set and user.is_authenticated%}
-    <a href="#" class="button" id="module"></i> <span>Make Module</a>
-    {% endif %}
-
-     {% get_edit_status node request.user Group_Status as edit_pas %}
-    {% if edit_pas == "pass"  %}
-    <a href="{% block url %}{% endblock %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
-    <ul id="edit-options" class="f-dropdown">
-      <li><a href="{% url 'page_create_edit' groupid %}">Create a new page</a></li>
-    </ul>
-  {% endif  %}
-    </div>
-
-
-
-</section>
-
-
+<div id="view_page">
+  {% include "ndf/node_ajax_view.html" %}  
 </div>
 
-<footer>
-  <p><small>
-    <em>Written by {{ node.user_details_dict.modified_by|join:', ' }}</em></small></p>
-  </footer>
-
-  {% endblock %}
+{% endblock %}
 
 
   {% block script%}

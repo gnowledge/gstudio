@@ -10,23 +10,30 @@
 
 <form data-abide id="form-edit-node" method="POST" action="">
 {% csrf_token %}
+<script type="text/javascript">
 
+$(document).ready(function(){
+$("#lan option[value={{node.language}}]").remove();
+});
 
-      <div class="large-12 columns">
+</script>
+
+       <div class="large-12 columns">
       
-	<table class="large-6 columns">
-	<div class="row">
-	  <div class="large-6 columns text-center">{{node.language}}</div>
-	  <div class="large-6 columns"><select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select>
+	 <table class="large-6 columns">
+	   <div class="row">
+	     <div class="large-6 columns text-center"> {{node.language}}</div>
+	     <div class="large-6 columns"><select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select>
 	     </div>
-  <hr style="height:5px;background-color: #0B6580;" />
+	     <hr style="height:5px;background-color: #0B6580;" />
+
 
       	{% for k, v in content.items %}
     
 	</div>
   	
          <tr>
-	  {% if k == 'name' or k == 'tags' or k == 'relation_set' or k == 'prior_node' or k == 'content_org' %}
+	  {% if k == 'name' or k == 'tags' or k == 'prior_node' or k == 'content_org' %}
 	     <td>{{k}}</td>
              <td>{{v}}</td>
 	  {% endif %}
@@ -39,7 +46,7 @@
       	{% for k, v in content.items %}
 	
          <tr>
-	  {% if k == 'tags' or k == 'relation_set' or k == 'prior_node'%}
+	  {% if k == 'tags' or k == 'prior_node'%}
 	     <td>{{k}}</td>
              <td>{{v}}</td>
 	   {% endif %}

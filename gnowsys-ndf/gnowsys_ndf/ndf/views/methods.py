@@ -131,7 +131,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     return dict_drawer
 
-def get_translate_common_fields(request, node, group_id, node_type):
+def get_translate_common_fields(request, node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
   gcollection = db[Node.collection_name]
@@ -146,7 +146,7 @@ def get_translate_common_fields(request, node, group_id, node_type):
     node.member_of.append(node_type._id)
 
   node.name = unicode(name)
-
+  node.language=unicode(language)
   #node.modified_by.append(usrid)
   if usrid not in node.modified_by:
   #if usrid in node.modified_by:
@@ -162,7 +162,6 @@ def get_translate_common_fields(request, node, group_id, node_type):
   if content_org:
     node.content_org = unicode(content_org)
     node.name=unicode(name)
-    node.language=unicode(language) 
     # Required to link temporary files with the current user who is modifying this document
     usrname = request.user.username
     filename = slugify(name) + "-" + usrname + "-"
@@ -180,7 +179,6 @@ def get_node_common_fields(request, node, group_id, node_type):
   name = request.POST.get('name')
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
-  access_policy = request.POST.get("login-mode", '')
 
   tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
@@ -205,7 +203,12 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+
   node.status=unicode("DRAFT")
+
+  node.language=unicode(language) 
+    
+
   if access_policy:
     # Policy will be changed only by the creator of the resource
     # via access_policy(public/private) option on the template which is visible only to the creator

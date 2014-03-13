@@ -471,7 +471,7 @@ class GSystem(Node):
 
     structure = {        
         # 'attribute_set': [ObjectId],		# ObjectIds of GAttributes
-        'relation_set': [ObjectId],		# ObjectIds of GRelations
+        #'relation_set': [ObjectId],		# ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
         'group_set': [ObjectId],                # List of ObjectId's of Groups to which this document belongs
@@ -827,10 +827,11 @@ class Triple(DjangoDocument):
 
     objects = models.Manager()
 
-    collection_name = 'Triples'
+    collection_name = 'Nodes'
     structure = {
+        '_type': unicode,
         'name': unicode,
-        'subject_value': ObjectId,	  # ObjectId's of GSystemType Class
+        'subject': ObjectId,	          # ObjectId's of GSystem Class
         'lang': basestring,               # Put validation for standard language codes
         'status': STATUS_CHOICES_TU
     }
@@ -843,9 +844,9 @@ class GAttribute(Triple):
 
     objects = models.Manager()
 
-    collection_name = 'GAttributes'
+    collection_name = 'Nodes'
     structure = {
-        'attribute_type': ObjectId,	  # ObjectId's of AttributeType Class
+        'attribute_type': ObjectId,  # holding dbref's  of AttributeType Class
         'object_value': None		  # value data-type determined by attribute-type field
     }
     
@@ -857,7 +858,7 @@ class GRelation(Triple):
 
     objects = models.Manager()
 
-    collection_name = 'GRelations'
+    collection_name = 'Nodes'
     structure = {
         'relation_type_value': ObjectId,  # ObjectId's of RelationType Class
         'object_value': ObjectId,	  # ObjectId's of GType/GSystems Class

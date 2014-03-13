@@ -41,7 +41,7 @@ class Command(BaseCommand):
         # Adding "language" field with no default value
         # -------------------------------------------------------------------------------------------------------------
 
-        collection.update({'language': {'$exists': False}}, {'$set': {'language': unicode('')}}, upsert=False, multi=True)
+        collection.update({'language': {'$exists': True}}, {'$set': {'language':unicode('')}}, upsert=False, multi=True)
         
         # -------------------------------------------------------------------------------------------------------------
         # Adding "access_policy" field

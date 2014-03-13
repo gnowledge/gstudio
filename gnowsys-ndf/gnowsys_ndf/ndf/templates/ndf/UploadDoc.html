@@ -40,6 +40,12 @@
 			</div>
 		</fieldset>
 		<fieldset>
+			<legend>Select Language</legend>
+			<div class="large-4 columns"><select name="lan" id="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select>
+	     </div>
+		</fieldset>
+
+		<fieldset>
 			<legend>Add Description</legend>
 			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Please enter question" %}
 		</fieldset>
