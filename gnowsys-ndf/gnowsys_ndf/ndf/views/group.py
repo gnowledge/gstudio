@@ -30,6 +30,7 @@ from gnowsys_ndf.ndf.views.methods import *
 
 #######################################################################################################################################
 
+from django.contrib.auth.models import User
 db = get_database()
 gst_collection = db[GSystemType.collection_name]
 gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
@@ -44,14 +45,24 @@ def group(request, group_id,app_id):
     """Renders a list of all 'Group-type-GSystems' available within the database.
     """
     group_nodes = []
+    excl_gr_nodes=[]
     col_Group = db[Group.collection_name]
+    user_list=[]
+    users=User.objects.all()
+    for each in users:
+        user_list.append(each.username)
     colg = col_Group.Group.find({'_type': u'Group'})
     colg.sort('name')
     gr = list(colg)
     for items in gr:
             group_nodes.append(items)
     group_nodes_count = len(group_nodes)
-    return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_count': group_nodes_count,'groupid': group_id,'group_id': group_id}, context_instance=RequestContext(request))
+    colg = col_Group.Group.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
+    colg.sort('name')
+    gr = list(colg)
+    for items in gr:
+            excl_gr_nodes.append(items)
+    return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_excluding_users':excl_gr_nodes,'group_nodes_count': group_nodes_count,'groupid': group_id,'group_id': group_id}, context_instance=RequestContext(request))
     
 
 
