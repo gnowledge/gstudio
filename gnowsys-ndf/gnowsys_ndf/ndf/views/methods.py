@@ -179,7 +179,8 @@ def get_node_common_fields(request, node, group_id, node_type):
   name = request.POST.get('name')
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
-
+  access_policy = request.POST.get("login-mode", '') 
+  language= request.POST.get('lan')
   tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
   collection_list = request.POST.get('collection_list','')

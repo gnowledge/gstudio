@@ -14,6 +14,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from gnowsys_ndf.ndf.views.methods import set_page_moderation
 from gnowsys_ndf.ndf.views.methods import get_versioned_page
+from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
 from django_mongokit import get_database
 
@@ -78,8 +79,9 @@ def page(request, group_id, app_id=None):
         #code for moderated Groups
         # collection.Node.reload()
         group_type = collection.Node.one({'_id':ObjectId(group_id)})
-        
-        if  group_type.prior_node:
+        group_info=group_type_info(group_id)
+
+        if  group_info == "Moderated":
           
           title = gst_page.name
           node=group_type.prior_node[0]
@@ -101,7 +103,7 @@ def page(request, group_id, app_id=None):
                                   }, 
                                   context_instance=RequestContext(request))
         
-        else:
+        elif group_info == "BaseModerated":
           #code for parent Groups
           node = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
                                            'group_set': {'$all': [ObjectId(group_id)]},                                           
@@ -128,7 +130,20 @@ def page(request, group_id, app_id=None):
                                   }, 
                                   context_instance=RequestContext(request)
             )
+        elif group_info == "PUBLIC" or group_info == "PRIVATE":
+              page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
+                                           'group_set': {'$all': [ObjectId(group_id)]},
+                                           'status': {'$nin': ['HIDDEN']}
+                                       })
 
+              page_nodes.sort('last_update', -1)
+              page_nodes_count = page_nodes.count()
+
+              return render_to_response("ndf/page_list.html",
+                                  {
+                                   'page_nodes': page_nodes,'groupid':group_id,'page_nodes_count':  page_nodes_count,'group_id':group_id
+                                  },
+                                  context_instance=RequestContext(request))
         
         
 

@@ -484,50 +484,81 @@ def get_input_fields(fields_value,type_value):
   
 
 @register.assignment_tag
-def get_group_type(node,user):
+def group_type_info(groupid,user=0):
    
-     if user.id is not None: 
-      print "node name",node
+ 
+      
       col_Group =db[Group.collection_name]
-      try:
-        group_gst = col_Group.Group.one({'_id':ObjectId(node._id)})
-      except:
-        grname = re.split(r'[/=]', node)
-        group_gst = col_Group.Group.one({'_id':ObjectId(grname[1])})  
-				
+      
+      group_gst = col_Group.Group.one({'_id':ObjectId(groupid)})
+      	
                                
       if group_gst.post_node:
-         return "Moderated"
+         return "BaseModerated"
+      elif group_gst.prior_node:
+         return "Moderated"   
       else:
-          return  group_gst._type                             
+          return  group_gst.group_type                        
       
               
               
               
       
-
+@register.assignment_tag
+def user_access_policy(node,user):
 			
+	  col_Group=db[Group.collection_name]
+	  
+	  group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+	    
+	    
+	  if user.id in group_gst.group_set or group_gst.created_by == user.id:
+	    return 'allow'
+	    
+	    
+	      
+	    
 	  
 @register.assignment_tag
-def get_Node_object(node,user):
-
-  
-   if user.id is not None:
-      print "node name",node    
-      try:
-        group_gst = collection.Node.one({'_id':node._id})
-      except:
-        grname = re.split(r'[/=]', node)
-        group_gst = col_Group.Group.one({'_id':ObjectId(grname[1])})  
-
-      if group_gst.status == "DRAFT":
-        return "DRAFT"
-				
+def resource_info(node):
+    col_Group=db[Group.collection_name]
+    try:
+      group_gst=col_Group.Group.one({'_id':ObjectId(node._id)})
+    except:
+      grname=re.split(r'[/=]',node)
+      group_gst=col_Group.Group.one({'_id':ObjectId(grname[1])})
+    return group_gst
+	  		
                                 
     
-		    
-		      
-		      
+@register.assignment_tag
+def edit_policy(groupid,node,user):
+
+  group_access= group_type_info(groupid,user)
+  
+  
+  #code for public Groups and its Resources
+  
+  if group_access == "PUBLIC":
+      user_access=user_access_policy(groupid,user)
+      if user_access == "allow":
+        return "allow"
+            
+  elif group_access == "PRIVATE":
+      return "allow"
+  elif group_access == "BaseModerated":
+       user_access=user_access_policy(groupid,user)
+       if user_access == "allow":
+          resource_infor=resource_info(node)
+          #code for exception 
+          if resource_infor._type == "Group":
+              return "allow"
+          elif resource_infor.status == "PUBLISHED":    
+              return "allow"
+  elif group_access == "Moderated": 
+       return "allow"
+      
+     	      
 		
    
 

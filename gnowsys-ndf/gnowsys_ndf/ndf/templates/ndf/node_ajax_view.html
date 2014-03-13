@@ -128,19 +128,23 @@
         </div>
       </small>
     </h5>
-
-
+    
+      
+  
     <!-- added button to convert collection into module-->
     {% if node.collection_set and user.is_authenticated%}
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
 
+     {% edit_policy groupid node request.user as status %}
+     {{status}}
+     {% if status == "allow" %}
     {% get_edit_url node.pk as edit_url %}
 
     {% check_group node.name as is_group %}
 
     {% if is_group %}    
-
+       
       <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
     {% else %}
@@ -148,7 +152,7 @@
       <a href="{% url edit_url groupid node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
     {% endif %}    
-
+    {% endif %}
     <ul id="edit-options" class="f-dropdown">
       <li><a href="{% url 'page_create_edit' groupid %}">Create a new page</a></li>
     </ul>

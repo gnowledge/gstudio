@@ -231,8 +231,9 @@ background-repeat:no-repeat; background-size: 48px 48px
   </div>
 
   {% if node %}
-  {% get_Node_object node request.user as status %}
-  {% if status == "DRAFT" %}
+  {% resource_info node as status %}
+
+  {% if status.status == "DRAFT" %}
 
   <div class= "row">
   
