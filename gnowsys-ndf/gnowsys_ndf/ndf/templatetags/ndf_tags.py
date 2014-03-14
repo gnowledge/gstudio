@@ -453,7 +453,7 @@ def get_grid_fs_object(f):
 def get_class_list(class_name):
   """Get list of class 
   """
-  class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType"]
+  class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]
   return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data"}
 
 @register.inclusion_tag('ndf/admin_class.html')
@@ -469,6 +469,13 @@ def get_Object_count(key):
         return collection.Node.find({'_type':key}).count()
     except:
         return 'null'
+
+@register.assignment_tag
+def get_memberof_objects_count(key):
+  try:
+  	return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'_type':'GSystem'}).count()
+  except:
+  	return 'null'
   
 @register.filter
 def get_dict_item(dictionary, key):
