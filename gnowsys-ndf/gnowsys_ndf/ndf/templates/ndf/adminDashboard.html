@@ -40,6 +40,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 
 {% block body_content %} 
+ {% if class_name == "GSystemType"  %}
 <div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
      <p>Hold down "Control", to select more than one.</p>
      <h2>Select Groups</h2>
@@ -55,9 +56,25 @@ background-repeat:no-repeat; background-size: 48px 48px
 <div id="mySystemtype" class="reveal-modal" data-reveal >
      <h2>Select Collections</h2>
       <div id="module_drawer" >
-        {% include "ndf/drawer_widget.html" %}
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       </div>
-     <a class="close-reveal-modal">&#215;</a>
+     <a class="close-reveal-modal st">&#215;</a>
+</div>
+
+<div id="myAttributetype" class="reveal-modal" data-reveal >
+     <h2>Select Attributetype set</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="attributetype_set"  %}
+      </div>
+     <a class="close-reveal-modal at">&#215;</a>
+</div>
+
+<div id="myRelationtype" class="reveal-modal" data-reveal >
+     <h2>Select Relationtype set</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="relationtype_set"  %}
+      </div>
+     <a class="close-reveal-modal rt">&#215;</a>
 </div>
 
 <div id="my_meta_type" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
@@ -71,7 +88,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <font style="font-size:12px;font-weight:bold;" id="view_meta_type_list"></font>
      <a class="close-reveal-modal">&#215;</a>
 </div>
-
+{% endif %}
 
  <input class="button deleteObjects" type="button" value="Delete">
 <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
@@ -85,17 +102,20 @@ background-repeat:no-repeat; background-size: 48px 48px
   <thead>
     <tr>
       <th width="20"> <input class="checkedAll" type="checkbox"></th>
-      <th width="150" style="display:none">Id</th>
-      <th width="150">Title</th>
+      <th width="140" style="display:none">Id</th>
+      <th width="140">Title</th>
     {% if class_name == "File" or class_name ==  "GSystem"  %}
-      <th width="150">Group(s)</th>
+      <th width="140">Group(s)</th>
     {% endif %}
-      <th width="150" style="display:none">Type(s)</th>
-      <th width="150">Author</th>
-      <th width="150">Creation date</th>
+      <th width="140" style="display:none">Type(s)</th>
+      <th width="140" style="display:none">Author</th>
+      <th width="140" style="display:none">Creation date</th>
       {% if class_name == "GSystemType"  %}
-      <th width="150">Member OF</th>
-      <th width="150">Collection</th>
+      <th width="140">Member OF</th>
+      <th width="140">Collection</th>
+      <th width="140">AttributeType_set</th>
+      <th width="140">RelationType_set</th>
+      <th width="140"></th>
       {% endif %}
       	
     </tr>
@@ -116,8 +136,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      <font class="viewinput{{each.Id}}">{{each.Type}}</font>
 	      <input style="display:none" class="editinput{{each.Id}} type" type="text" value= "{{each.Type}}" >
 	    </td>
-	    <td class="author" style="font-size:11px;">{{each.Author}}</td>
-	    <td class="creation" style="font-size:11px;">{{each.Creation}}</td>
+	    <td style="display:none" class="author" style="font-size:11px;">{{each.Author}}</td>
+	    <td style="display:none" class="creation" style="font-size:11px;">{{each.Creation}}</td>
 	    {% if class_name == "GSystemType"  %}
 	    <td class="member_of" style="font-size:11px;">
 	      <font class="viewinput{{each.Id}}">{{each.member_of}}</font>
@@ -127,8 +147,16 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      <font class="viewinput{{each.Id}}">{{each.collection_list}}</font>
 	      <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.collection_list}}" >
 	    </td>
+	    <td class="attribute_type_set" style="font-size:11px;">
+              <font class="viewinput{{each.Id}}">{{each.attribute_type_set}}</font>
+              <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.attribute_type_set}}" >
+            </td>
+	    <td class="relation_type_set" style="font-size:11px;">
+              <font class="viewinput{{each.Id}}">{{each.relation_type_set}}</font>
+              <input class="editinput{{each.Id}} type" style="display:none" type="text" value= "{{each.relation_type_set}}" >
+            </td>
 	    {% endif %}
-	    <td style="fo3nt-size:11px;"> 
+	    <td style="font-size:11px;"> 
 	      <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 
 	      <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none">
 	   </td>
@@ -142,29 +170,80 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% endblock %}
 
 {% block script %}
+var global_object_id;
+{% if class_name == "GSystemType"  %}
 function set_drawer_value(node_id)
 {
- $('#_drawer1').html("");
- $('#_drawer2').html("");
- $('#_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
+ $('#mySystemtype #collection_set_drawer1').html("");
+ $('#mySystemtype #collection_set_drawer2').html("");
+ $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
   var url = '/{{groupid}}/ajax/get_data_for_drawer/?id='+node_id ;
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
    if(index == 0)
     {
      $.each(drawer_elements.drawer1, function(index, element) {
-        $('#_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#mySystemtype #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
    }
    if(index == 1)
     {
     $.each(drawer_elements.drawer2, function(index, element) {
-        $('#_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#mySystemtype #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
     }
   });
    });
 }
+
+function attributetype_set_drawer_value(node_id)
+{
+ $('#myAttributetype #attributetype_set_drawer1').html("");
+ $('#myAttributetype #attributetype_set_drawer2').html("");
+ $('#myAttributetype #attributetype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
+  var url = '/{{groupid}}/ajax/get_data_for_drawer_of_attributetype_set/?id='+node_id ;
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#myAttributetype #attributetype_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#myAttributetype #attributetype_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
+}
+
+function relationtype_set_drawer_value(node_id)
+{
+ $('#myRelationtype #relationtype_set_drawer1').html("");
+ $('#myRelationtype #relationtype_set_drawer2').html("");
+ $('#myRelationtype #relationtype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
+  var url = '/{{groupid}}/ajax/get_data_for_drawer_of_relationtype_set/?id='+node_id ;
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#myRelationtype #relationtype_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+$.each(drawer_elements.drawer2, function(index, element) {
+        $('#myRelationtype #relationtype_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
+}
+{% endif %}
 
 var option,baseobject;
 $(document).on('click',".checkedAll",function(){
@@ -177,7 +256,12 @@ $(document).on('click',".checkedAll",function(){
 });
 $(document).on('click',".button.editobject",function(){
 	var objectid = this.id;
+        global_object_id = objectid;
+ {% if class_name == "GSystemType"  %}
         set_drawer_value(objectid);
+	attributetype_set_drawer_value(objectid);
+	relationtype_set_drawer_value(objectid);
+ {% endif %}
         $(".viewinput"+objectid).hide();
 	$(".editinput"+objectid).show();
         $(this).hide();
@@ -226,7 +310,7 @@ var objectid = $(this).attr("name");
         json['id']=objectid
         $.map($(".editinput"+objectid),function(each){
                   fields[each.parentElement.className] = each.value 
-                  $("."+each.parentElement.className+" font.viewinput"+objectid).html(each.value) });
+              });
         json['fields']=fields
         $.ajax({
         url: '/admin/data/edit',
@@ -239,14 +323,17 @@ var objectid = $(this).attr("name");
         });
 	$(".editinput"+objectid).hide();
         $(".viewinput"+objectid).show();
+        $(".title font.viewinput"+objectid).html(json['fields']['title']);
         $(this).hide();
         $(".button.editobject").show();
 });
 
+ {% if class_name == "GSystemType"  %}
 $(document).on('focus',".group input",function(){
         baseobject = $(this);
-        var baseobjectval = baseobject.val()
-        var arr = baseobjectval.split(',')
+        fontelement = $(".group font.viewinput"+global_object_id);
+        var baseobjectval = baseobject.val();
+        var arr = baseobjectval.split(',');
         $('#viewgrouplist').text(baseobjectval);
         $('#id_groups option').removeAttr("selected");
         for(var each in arr){ $('#id_groups option[name="'+arr[each]+'"]').attr('selected','selected');  }
@@ -255,13 +342,20 @@ $(document).on('focus',".group input",function(){
                  option = $(this).find('option:selected');
                  var i = 0;
                  var str = "";
+                 var str1 = "";
                  $.map(option, function(op){
-                          if(i == 0){str = str.concat(op.label)}
-                          else {str = str.concat(","+op.label)}
+                          if(i == 0){
+                          str = str.concat(op.value)
+                          str1 = str1.concat(op.label)
+                              }
+                          else {
+                          str = str.concat(","+op.value)
+                          str1 = str1.concat(", "+op.label)}
                           i= i+1
-                          return console.log(op.value);});
+                          return});
                   baseobject.val(str);
-                  $('#viewgrouplist').text(str);
+                  fontelement.html(str1);
+                  $('#viewgrouplist').text(str1);
                   });
 });
 
@@ -269,14 +363,41 @@ $(document).on('focus',".collection_set input",function(){
       var data_list = []
       var obj = $(this);
       $('#mySystemtype').foundation('reveal', 'open');
-       $('.close-reveal-modal').click(function(){
-        $.each($('#_drawer2 li'),function(index,item){
+       $('.close-reveal-modal.st').click(function(){
+        $.each($('#mySystemtype #collection_set_drawer2 li'),function(index,item){
          data_list.push(item.innerHTML+" -  "+item.id); 
          });
-      console.log(data_list);
       obj.val(data_list);
    });
 });
+
+$(document).on('focus',".attribute_type_set input",function(){
+      var data_list = []
+      var obj_at = ""
+      obj_at = $(this);
+      $('#myAttributetype').foundation('reveal', 'open');
+       $('.close-reveal-modal.at').click(function(){
+        $.each($('#myAttributetype #attributetype_set_drawer2 li'),function(index,item){
+         data_list.push(item.innerHTML+" -  "+item.id); 
+         });
+      obj_at.val(data_list);
+   });
+});
+
+$(document).on('focus',".relation_type_set input",function(){
+      var data_list = []
+      var obj_rt = ""
+      obj_rt = $(this);
+      $('#myRelationtype').foundation('reveal', 'open');
+       $('.close-reveal-modal.rt').click(function(){
+        $.each($('#myRelationtype #relationtype_set_drawer2 li'),function(index,item){
+         data_list.push(item.innerHTML+" -  "+item.id); 
+         });
+      obj_rt.val(data_list);
+   });
+});
+
+
 $(document).on('focus',".member_of input",function(){
         baseobject = $(this);
         var baseobjectval = baseobject.val()
@@ -302,5 +423,5 @@ $(document).on('focus',".member_of input",function(){
                   });
 
 });
-
+ {% endif %}
 {% endblock %}	

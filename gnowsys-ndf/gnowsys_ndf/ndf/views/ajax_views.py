@@ -468,3 +468,70 @@ def set_drawer_widget(st,coll_obj_list):
     draw2['drawer2'] = d2
     data_list.append(draw2)
     return data_list 
+
+def get_data_for_drawer_of_attributetype_set(request, group_id):
+    '''
+    this method will fetch data for designer module's drawer widget
+    '''
+    data_list = []
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    node_id = request.GET.get("id","")
+    coll_obj_list = []
+    st = collection.Node.find({"_type":"AttributeType"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.attribute_type_set:
+        coll_obj_list.append(each)
+    drawer1 = list(set(st) - set(coll_obj_list))
+    drawer2 = coll_obj_list
+    for each in drawer1:
+       dic = {}
+       dic['id'] = str(each._id)
+       dic['name'] = str(each.name)
+       d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
+    for each in drawer2:
+       dic = {}
+       dic['id'] = str(each._id)
+       dic['name'] = str(each.name)
+       d2.append(dic)
+    draw2['drawer2'] = d2
+    data_list.append(draw2)
+    return HttpResponse(json.dumps(data_list))
+
+def get_data_for_drawer_of_relationtype_set(request, group_id):
+    '''
+    this method will fetch data for designer module's drawer widget
+    '''
+    data_list = []
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    node_id = request.GET.get("id","")
+    coll_obj_list = []
+    st = collection.Node.find({"_type":"RelationType"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.relation_type_set:
+        coll_obj_list.append(each)
+    drawer1 = list(set(st) - set(coll_obj_list))
+    drawer2 = coll_obj_list
+    for each in drawer1:
+       dic = {}
+       dic['id'] = str(each._id)
+       dic['name'] = str(each.name)
+       d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
+    for each in drawer2:
+       dic = {}
+       dic['id'] = str(each._id)
+       dic['name'] = str(each.name)
+       d2.append(dic)
+    draw2['drawer2'] = d2
+    data_list.append(draw2)
+    return HttpResponse(json.dumps(data_list))
+

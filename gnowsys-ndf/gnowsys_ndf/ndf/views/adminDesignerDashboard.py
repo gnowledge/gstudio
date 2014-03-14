@@ -21,7 +21,7 @@ def adminDesignerDashboardClass(request, class_name):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = collection.Node.find({'name':{'$regex':search},'_type':classtype})
+        nodes = collection.Node.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype})
     else :
         nodes = collection.Node.find({'_type':class_name})
     objects_details = []
@@ -29,6 +29,8 @@ def adminDesignerDashboardClass(request, class_name):
         member = []
         member_of_list = []
         collection_list = []
+        attribute_type_set = []
+        relation_type_set = [] 
         for e in each.member_of:
             member_of_list.append(collection.Node.one({'_id':e}).name+" - "+str(e))
         
@@ -37,10 +39,14 @@ def adminDesignerDashboardClass(request, class_name):
         
         for coll in each.collection_set:
             collection_list.append(collection.Node.one({ '_id': coll}).name+" - "+str(coll))
-	
-        if class_name in ("GSystem","File"):
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(each.group_set),"Creation":each.created_at})
-	else :
+        
+        if class_name in ("GSystemType"):
+            for at_set in each.attribute_type_set:
+                attribute_type_set.append(at_set.name+" - "+str(at_set._id))
+            for rt_set in each.relation_type_set:
+                relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
+            objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list), "attribute_type_set":",".join(attribute_type_set), "relation_type_set":",".join(relation_type_set)})
+        else :
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list)})
     groups = []
     group = collection.Node.find({'_type':"Group"})

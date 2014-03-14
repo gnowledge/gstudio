@@ -888,6 +888,7 @@ class Triple(DjangoDocument):
         'status': STATUS_CHOICES_TU
     }
     
+    required_fields = ['name', 'subject']
     use_dot_notation = True
 
     ########## Built-in Functions (Overridden) ##########
@@ -933,6 +934,7 @@ class GAttribute(Triple):
         'object_value': None		  # value data-type determined by attribute-type field
     }
     
+    required_fields = ['attribute_value', 'object_value']
     use_dot_notation = True
 
 
@@ -944,6 +946,7 @@ class GRelation(Triple):
         'right_subject': ObjectId,	  # ObjectId's of GSystems Class
     }
     
+    required_fields = ['relation_type', 'right_subject']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
 
