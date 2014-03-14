@@ -11,6 +11,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.page',
                        
                        url(r'^delete/(?P<node_id>[\w-]+)$', 'delete_page', name='page_delete'),
                        url(r'^page_publish/(?P<node>[\w-]+)$','publish_page',name='publish_page'),
+                       
  
                       
 )

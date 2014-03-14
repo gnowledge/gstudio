@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-from gnowsys_ndf.ndf.views.methods import set_page_moderation
+
 from gnowsys_ndf.ndf.views.methods import get_versioned_page
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 

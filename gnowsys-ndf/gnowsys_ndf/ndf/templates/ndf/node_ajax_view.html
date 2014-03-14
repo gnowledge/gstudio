@@ -137,7 +137,7 @@
     {% endif %}
 
      {% edit_policy groupid node request.user as status %}
-     {{status}}
+     
      {% if status == "allow" %}
     {% get_edit_url node.pk as edit_url %}
 

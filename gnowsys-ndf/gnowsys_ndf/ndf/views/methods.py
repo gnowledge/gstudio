@@ -350,46 +350,8 @@ def neighbourhood_nodes(page_node):
   return graphData
 # ------ End of processing for graph ------
 
-def get_prior_post_node(group_id):
-  
-  col_Group = db[Group.collection_name]
-  prior_post_node=col_Group.Group.one({'_type': 'Group',"_id":ObjectId(group_id)})
-  #check wheather we got the Group name       
-  if prior_post_node is not  None:
-       #first check the prior node id  and take the id
-       Prior_nodeid=prior_post_node.prior_node
-       #once you have the id check search for the base node
-       base_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Prior_nodeid}})
-       
-       if base_colg is None:
-          #check for the Post Node id
-           Post_nodeid=prior_post_node.post_node
-           Mod_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
-           if Mod_colg is not None:
-            #return the name of the post_group
-            print "got  post Node",Mod_colg.name
-            post_group_name=Mod_colg._id
-            return post_group_name
-       else:
-          #return the name of the base group
-          print "got prior Node",base_colg.name
-          base_group_name=base_colg._id
-          return base_group_name
 
 
-def set_page_moderation(request,group_id, node):
- 
- col_Group = db[Group.collection_name]
- group_name=col_Group.Group.one({'_type': 'Group',"_id":ObjectId(group_id)})
- 
- prior_post_group_id=get_prior_post_node(group_id)
- 
- if ObjectId(group_id) in node.group_set:
-  node.group_set.remove(ObjectId(group_id))
-
- if ObjectId(prior_post_group_id) not in node.group_set:
-  node.group_set.append(ObjectId(prior_post_group_id))
-  
   
   
 def get_versioned_page(node):

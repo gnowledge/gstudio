@@ -76,6 +76,8 @@ $(document).ready(function()
 <p> Members in this group :{{node.author_set|length}} </p>
 
 {% get_group_policy node request.user as policy %}
+{% get_prior_post_node  group_id as groupname     %}
+
 {% check_user_join request groupid as user_is_joined %}
 <input type="hidden" id="groupname" value="{{node}}">
 {% if user_is_joined == "joined" %}
@@ -86,10 +88,17 @@ $(document).ready(function()
 {% endif %}
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
+
 <h3>Manage</h3>
 <p>You can invite other members to be a part of this group</p>
+
 {% include "ndf/invite_users.html" %}   
+
+<a>{{ groupname.name }}</a>
 {% endifequal %} 
+
+
+
 
 {% endblock %}
 

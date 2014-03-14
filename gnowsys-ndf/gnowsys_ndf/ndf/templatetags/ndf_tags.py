@@ -525,6 +525,7 @@ def resource_info(node):
     try:
       group_gst=col_Group.Group.one({'_id':ObjectId(node._id)})
     except:
+      print "something",node
       grname=re.split(r'[/=]',node)
       group_gst=col_Group.Group.one({'_id':ObjectId(grname[1])})
     return group_gst
@@ -535,7 +536,7 @@ def resource_info(node):
 def edit_policy(groupid,node,user):
 
   group_access= group_type_info(groupid,user)
-  
+  resource_infor=resource_info(node)
   
   #code for public Groups and its Resources
   
@@ -553,16 +554,40 @@ def edit_policy(groupid,node,user):
           #code for exception 
           if resource_infor._type == "Group":
               return "allow"
+          elif resource_infor.created_by == user.id:
+              return "allow"    
           elif resource_infor.status == "PUBLISHED":    
               return "allow"
   elif group_access == "Moderated": 
        return "allow"
-      
+  elif resource_infor.created_by == user.id:
+              return "allow"    
      	      
 		
    
 
-
+@register.assignment_tag
+def get_prior_post_node(group_id):
+  
+  col_Group = db[Group.collection_name]
+  prior_post_node=col_Group.Group.one({'_type': 'Group',"_id":ObjectId(group_id)})
+  #check wheather we got the Group name       
+  if prior_post_node is not  None:
+       #first check the prior node id  and take the id
+       Prior_nodeid=prior_post_node.prior_node
+       #once you have the id check search for the base node
+       base_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Prior_nodeid}})
+       
+       if base_colg is None:
+          #check for the Post Node id
+           Post_nodeid=prior_post_node.post_node
+           Mod_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
+           if Mod_colg is not None:
+            #return node of the Moderated group            
+            return Mod_colg
+       else:
+          #return node of the base group
+          return base_colg
   
   
 
