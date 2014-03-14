@@ -928,7 +928,7 @@ class GAttribute(Triple):
         'object_value': None		  # value data-type determined by attribute-type field
     }
     
-    required_fields = ['attribute_value', 'object_value']
+    required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
 
 
