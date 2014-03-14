@@ -251,6 +251,22 @@ def get_existing_groups():
       group.append(items)
   return group
 
+@register.assignment_tag
+def get_existing_groups_excluding_username():
+  group = []
+  col_Group = db[Group.collection_name]
+  user_list=[]
+  users=User.objects.all()
+  for each in users:
+    user_list.append(each.username)
+  colg = col_Group.Group.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
+  colg.sort('name')
+  gr = list(colg)
+  for items in gr:
+    if items.name:
+      group.append(items)
+  return group
+
 
 @register.assignment_tag
 def get_existing_groups_excluded(grname):
