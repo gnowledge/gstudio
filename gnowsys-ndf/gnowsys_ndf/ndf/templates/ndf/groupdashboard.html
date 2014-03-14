@@ -94,7 +94,7 @@ $(document).ready(function()
 
 {% include "ndf/invite_users.html" %}   
 
-<a>{{ groupname.name }}</a>
+<a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
 {% endifequal %} 
 
 

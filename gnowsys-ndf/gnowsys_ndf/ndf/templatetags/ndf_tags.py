@@ -316,13 +316,15 @@ def get_user_group(user):
                               })
 
     auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+    
     if auth:
       for items in colg:
         if items.created_by == user.pk:
           if items.name == auth.name:
             author = items
           else:
-            group.append(items)
+            if not items.prior_node:
+              group.append(items)
         else:
           if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
             group.append(items)
