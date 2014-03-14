@@ -226,9 +226,10 @@ def translate_node(request,group_id,node_id=None):
         relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
         
         grelation=collection.GRelation()
-        grelation.relation_type_value=ObjectId(relation_type._id)
+        grelation.relation_type=relation_type
         grelation.subject_value=ObjectId(node_id)
-        grelation.object_value=ObjectId(page_node._id)
+        grelation.right_subject=page_node._id
+        grelation.name=u""
         grelation.save()
         # subject_node=collection.Node.one({'_id':ObjectId(node_id)})
         # object_node=collection.Node.one({'_id':ObjectId(page_node._id)})
