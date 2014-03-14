@@ -117,6 +117,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
             newattribute.subject = newgsystem._id
             newattribute.attribute_type = attributetype_key._id
             newattribute.object_value = value
+            newattribute.name = unicode(newgsystem.name+"- "+attributetype_key.name+"-"+value)
             newattribute.save()
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
           
