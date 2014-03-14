@@ -224,32 +224,28 @@
 	                	{
 	                		new_g.on("click",function(d)
 	                		{
-	                			// alert(JSON.stringify(d))
-	                			if( d.expanded=="true" && d._id!= objectid )
+	                			if( d.expanded=="true" && d._id!=objectid )
 	                			{
-	                				$.getJSON("{% url 'get_graph_json' groupid %}?id=" + d._id , 
-	                					function (json2)
-	                					{
+	                				$.ajax({async:false,
+											url:"{% url 'get_graph_json' groupid %}?id=" + d._id,
+											datatype:'json',
+											success:function (json2)
+											{
+												json2 = JSON.parse(json2);
 	                						new_metadata = json2.node_metadata;
 	                						// _.filter(new_metadata, function(e){if(e._id>0){
 	                						_.filter(new_metadata, function(e){if(e._id)
 	                						{
-	                							// alert(JSON.stringify(e));
 	                							clicked_node=clicked_node.concat(e._id) ;
 	                						}});
-	                					// alert(d._id + "====" + neighbour_node);
 
 	                						index = _.indexOf(neighbour_node , d._id);
-	                					// alert(index);
 
 	                						prev_node=neighbour_node.slice(0,index);
-	                					// alert("prev_node" + prev_node);
 	                						neighbour_node = _.difference(neighbour_node,clicked_node) ;
-	                					// alert("diff" + neighbour_node);
 	                						neighbour_node= neighbour_node.concat(prev_node);
-	                					// alert(neighbour_node);
 	                						neighbour_node = _.uniq(neighbour_node);
-	                					});
+	                					}});
 
 									metadata=[]
 									relations=[]
@@ -269,14 +265,12 @@
 												json2 = JSON.parse(json2);
 												new_metadata=json2.node_metadata;
 												new_relations=json2.relations;
-											// alert(JSON.stringify(json2));
 												metadata=_.union(new_metadata,metadata);
 												relations=_.union(new_relations,relations);
 												relations= check_Relationtype(metadata,relations);
 											}
 										});
 									}
-                          		// alert(metadata);
 
                           			_.each(metadata, function(m)
                           			{
@@ -296,7 +290,7 @@
                           			else if(d._id!= objectid)
                           			{
                           				neighbour_node =neighbour_node.concat(d._id);
-                          			// alert(neighbour_node);
+
                           			d3.select("#amazingViz").remove();
 
                           			$.ajax({
@@ -321,13 +315,13 @@
                           					});
                           				}
                           			});
-                				//console.log(metadata);
                 					init(metadata,relations);
                 					load(objectid);
                 				}
                 			});
 						}
-					//press shift key + drag to fix the position of node according to customer choice.
+
+					//press shift key + drag to fix the position of node according to user choice.
 						else if(event.keyCode==16)
 						{
 							flag = true;

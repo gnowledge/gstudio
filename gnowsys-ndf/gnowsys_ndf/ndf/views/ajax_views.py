@@ -5,6 +5,7 @@
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.http import StreamingHttpResponse
 from django.core.urlresolvers import reverse
 
 from django.shortcuts import render_to_response
@@ -410,9 +411,10 @@ def graph_nodes(request, group_id):
 
   # print node_graph_data
 
-  return HttpResponse(node_graph_data)
+  return StreamingHttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
+
 
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []
