@@ -298,7 +298,8 @@ class Node(DjangoDocument):
         history_manager = HistoryManager()
         return history_manager.get_version_dict(self)
 
-    ########## Built-in Functions (Defined/Overridden) ##########
+
+    ########## Built-in Functions (Overridden) ##########
     
     def __unicode__(self):
         return self._id
@@ -321,7 +322,7 @@ class Node(DjangoDocument):
         # whether do they exists in their GSystemType's "attribute_type_set";
         #    If exists, add them to the document
         #    Otherwise, throw an error -- " Illegal access: Invalid field found!!! "
-        nc = get_database()[Node.collection_name]
+        collection = get_database()[Node.collection_name]
         for key, value in self.iteritems():
             if key == '_id':
                 continue
@@ -329,7 +330,7 @@ class Node(DjangoDocument):
             if not self.structure.has_key(key):
                 field_found = False
                 for gst_id in self.member_of:
-                    attribute_set_list = nc.Node.one({'_id': gst_id}).attribute_type_set
+                    attribute_set_list = collection.Node.one({'_id': gst_id}).attribute_type_set
                     
                     for attribute in attribute_set_list:
                         if key == attribute['name']:
@@ -434,7 +435,58 @@ class RelationType(Node):
 
     required_fields = ['inverse_name', 'subject_type', 'object_type']
     use_dot_notation = True
-	
+
+    ##########  User-Defined Functions ##########
+
+    @staticmethod
+    def get_possible_relations(gtype_id_or_list):
+        """Finds possible relations and inverse-relations of a given node (or list of nodes).
+        
+        Keyword arguments:
+        gtype_id_or_list -- ObjectId or List of ObjectIds whose relationships need to be find out
+        
+        Returns: tuple consisting of two dictionaries, each consisting of key as ObjectId of relation-type-node and 
+        value as relation-type-node itself
+        
+        Dictionary #1: Possible relations
+        Dictionary #2: Possible inverse-relations
+        """
+
+        possible_relations = {}
+        possible_inverse_relations = {}
+
+        collection = get_database()[Node.collection_name]
+        
+        # Converts to list, if only single ObjectId is passed
+        if not isinstance(gtype_id_or_list, list):
+            gtype_id_or_list = list([gtype_id_or_list])
+            
+        # Code for finding out relationships associated with each gtype_id in the list
+        for gtype_id in gtype_id_or_list:
+
+            # Converts string representaion of ObjectId to it's corresponding ObjectId type, if found
+            if not isinstance(gtype_id, ObjectId):
+                if ObjectId.is_valid(gtype_id):
+                    gtype_id = ObjectId(gtype_id)
+                else:
+                    print "\n Invalid ObjectId: ", gtype_id, " is not a valid ObjectId!!!\n"
+
+            possible_relation_cur = collection.Node.find({'_type': 'RelationType', 'subject_type': {'$in': [gtype_id]}})
+            possible_inverse_relation_cur = collection.Node.find({'_type': 'RelationType', 'object_type': {'$in': [gtype_id]}})
+
+            if possible_relation_cur.count():
+                for relation in possible_relation_cur:
+                    if not possible_relations.has_key(relation._id):
+                        possible_relations[relation._id] = relation
+            
+            if possible_inverse_relation_cur.count():
+                for inverse_relation in possible_inverse_relation_cur:
+                    if not possible_inverse_relations.has_key(inverse_relation._id):
+                        possible_inverse_relations[inverse_relation._id] = inverse_relation
+            
+        return possible_relations, possible_inverse_relations
+
+
 class ProcessType(Node):
     """A kind of nodetype for defining processes or events or temporal
     objects involving change.
@@ -730,7 +782,7 @@ class HistoryManager():
         (b) False - Otherwise
         """
 
-        collection_tuple = (AttributeType, RelationType, GSystemType, GSystem)
+        collection_tuple = (GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
@@ -806,10 +858,10 @@ class HistoryManager():
         with open(fp, 'r') as version_file:
             json_data = version_file.read()
 
-        nc = get_database()[Node.collection_name]
+        collection = get_database()[Node.collection_name]
 
         # Converts the json-formatted data into python-specific format
-        doc_obj = nc.Node.from_json(json_data)
+        doc_obj = collection.Node.from_json(json_data)
 
         # print "\n type of : ", type(doc_obj)
         # print "\n document object (", version_no, ") \n", doc_obj
@@ -838,15 +890,46 @@ class Triple(DjangoDocument):
     
     use_dot_notation = True
 
+    ########## Built-in Functions (Overridden) ##########
+    
+    def __unicode__(self):
+        return self._id
+    
+    def identity(self):
+        return self.__unicode__()
+    
+    def save(self, *args, **kwargs):
+        is_new = False
+
+        if not self.has_key('_id'):
+            is_new = True               # It's a new document, hence yet no ID!"
+        
+        super(Triple, self).save(*args, **kwargs)
+        
+        history_manager = HistoryManager()
+        rcs_obj = RCS()
+
+        if is_new:
+            # Create history-version-file
+            if history_manager.create_or_replace_json_file(self):
+                fp = history_manager.get_file_path(self)
+                message = "This document (" + self.name + ") is created on " + datetime.datetime.now().strftime("%d %B %Y")
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+        else:
+            # Update history-version-file
+            fp = history_manager.get_file_path(self)
+            rcs_obj.checkout(fp)
+
+            if history_manager.create_or_replace_json_file(self):
+                message = "This document (" + self.name + ") is lastly updated on " + datetime.datetime.now().strftime("%d %B %Y")
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+
 
 @connection.register
 class GAttribute(Triple):
 
-    objects = models.Manager()
-
-    collection_name = 'Nodes'
     structure = {
-        'attribute_type': ObjectId,  # holding dbref's  of AttributeType Class
+        'attribute_type': ObjectId,       # ObjectId of AttributeType Class
         'object_value': None		  # value data-type determined by attribute-type field
     }
     
@@ -856,12 +939,11 @@ class GAttribute(Triple):
 @connection.register
 class GRelation(Triple):
 
-    objects = models.Manager()
-
-    collection_name = 'Nodes'
     structure = {
-        'relation_type_value': ObjectId,  # ObjectId's of RelationType Class
-        'object_value': ObjectId,	  # ObjectId's of GType/GSystems Class
+        'relation_type': RelationType,    # DBRef of RelationType Class
+        'right_subject': ObjectId,	  # ObjectId's of GSystems Class
     }
     
     use_dot_notation = True
+    use_autorefs = True                   # To support Embedding of Documents
+
