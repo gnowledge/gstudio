@@ -382,6 +382,7 @@ class AttributeType(Node):
 
     structure = {
 	'data_type': basestring,
+        'complex_data_type': [unicode],
         'subject_type': [ObjectId],
 	'applicable_node_type': [basestring],	# NODE_TYPE_CHOICES
 		
@@ -408,8 +409,73 @@ class AttributeType(Node):
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
 
+    ##########  User-Defined Functions ##########
 
- 
+    @staticmethod
+    def append_attribute(attr_id_or_node, attr_dict):
+        collection = get_database()[Node.collection_name]
+
+        if isinstance(attr_id_or_node, unicode):
+            # Convert unicode representation of ObjectId into it's corresponding ObjectId type
+            # Then fetch attribute-type-node from AttributeType collection of respective ObjectId
+            if ObjectId.is_valid(attr_id_or_node):
+                attr_id_or_node = collection.Node.one({'_type': 'AttributeType', '_id': ObjectId(attr_id_or_node)})
+            else:
+                print "\n Invalid ObjectId: ", attr_id_or_node, " is not a valid ObjectId!!!\n"
+                # Throw indicating the same
+        
+        if not attr_id_or_node.complex_data_type:
+            # Code for simple data-type 
+            # Simple data-types: int, float, ObjectId, list, dict, basestring, unicode
+            if not attr_dict.has_key(attr_id_or_node.name):
+                # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
+                attr_dict[attr_id_or_node.name] = eval(attr_id_or_node.data_type)
+
+        else:
+            # Code for complex data-type 
+            # Complex data-types: [...], {...}
+            if attr_id_or_node.data_type == "dict":
+                for c_attr_id in attr_id_or_node.complex_data_type:
+                    # NOTE: Here c_attr_id is in unicode format
+                    # Hence, this function first converts attr_id 
+                    # to ObjectId format if unicode found
+                    AttributeType.append_attribute(c_attr_id, attr_dict)
+
+            elif attr_id_or_node.data_type == "list":
+                if len(attr_id_or_node.complex_data_type) == 1:
+                    # Represents list of simple data-types
+                    # Ex: [int], [ObjectId], etc.
+                    dt = unicode("[" + attr_id_or_node.complex_data_type[0] + "]")
+                    if not attr_dict.has_key(attr_id_or_node.name):
+                        # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
+                        attr_dict[attr_id_or_node.name] = eval(dt)
+                    
+                else:
+                    # Represents list of complex data-types
+                    # Ex: [{...}]
+                    for c_attr_id in attr_id_or_node.complex_data_type:
+                        if not ObjectId.is_valid(c_attr_id):
+                            # If basic data-type values are found, pass the iteration
+                            pass
+           
+                        # If unicode representation of ObjectId is found
+                        AttributeType.append_attribute(c_attr_id, attr_dict)
+
+            elif attr_id_or_node.data_type == "IS()":
+                # Below code does little formatting, for example:
+                # data_type: "IS()"
+                # complex_value: [u"ab", u"cd"]
+                # dt: "IS(u'ab', u'cd')"
+                dt = "IS("
+                for v in attr_id_or_node.complex_data_type:
+                    dt = dt + "u'" + v + "'" + ", " 
+                dt = dt[:(dt.rfind(", "))] + ")"
+
+                if not attr_dict.has_key(attr_id_or_node.name):
+                    # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
+                    attr_dict[attr_id_or_node.name] = eval(dt)
+
+
 @connection.register
 class RelationType(Node):
 
@@ -517,7 +583,7 @@ class GSystem(Node):
 
     structure = {        
         # 'attribute_set': [ObjectId],		# ObjectIds of GAttributes
-        #'relation_set': [ObjectId],		# ObjectIds of GRelations
+        # 'relation_set': [ObjectId],		# ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
         'group_set': [ObjectId],                # List of ObjectId's of Groups to which this document belongs
@@ -525,6 +591,27 @@ class GSystem(Node):
     }
     
     use_dot_notation = True
+
+    ##########  User-Defined Functions ##########
+
+    def get_possible_attributes(self, gsystem_type_id):
+        if not isinstance(gsystem_type_id, ObjectId):
+            if ObjectId.is_valid(gsystem_type_id):
+                gsystem_type_id = ObjectId(gsystem_type_id)
+            else:
+                print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
+                # Throw error indicating the same
+
+        collection = get_database()[Node.collection_name]
+        attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
+        
+        possible_attributes = {}
+
+        for attr in attributes:
+            AttributeType.append_attribute(attr, possible_attributes)
+
+        return possible_attributes
+        
 
 
 @connection.register
