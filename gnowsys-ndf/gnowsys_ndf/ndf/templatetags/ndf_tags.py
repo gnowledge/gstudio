@@ -349,6 +349,18 @@ def get_profile_pic(user):
 
 
 @register.assignment_tag
+def get_group_name(val):
+
+  GroupName = []
+
+  for each in val.group_set: 
+
+    grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
+    GroupName.append(grpName)
+  
+  return GroupName
+
+@register.assignment_tag
 def get_edit_url(groupid):
 
   node = collection.Node.one({'_id': ObjectId(groupid) }) 
