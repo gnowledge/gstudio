@@ -157,8 +157,8 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
             fileobj.name = unicode(title)
             fileobj.language= unicode(language)
             fileobj.created_by = int(userid)
-            if img_type:
-                fileobj.type_of = unicode(img_type)                 # To define type if image is profile_pic      
+            if img_type:                
+                fileobj.type_of = ObjectId(img_type)                 # To define type if image is profile_pic      
             fileobj.file_size = size
             group_object=fcol.Group.one({'_id':ObjectId(group_id)})
             if group_object._id not in fileobj.group_set:

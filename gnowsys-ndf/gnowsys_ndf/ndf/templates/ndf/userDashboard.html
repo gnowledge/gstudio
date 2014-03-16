@@ -25,9 +25,9 @@
 			{% if user.is_authenticated %}
 				
 
-				{% if prof_pic %}
+				{% if prof_pic_obj %}
 
-					<a href="#"><img  src="{% url 'getImageThumbnail' group_id prof_pic %}" height="120" width="120"></img></a><br/>
+					<a href="#"><img  src="{% url 'getImageThumbnail' group_id prof_pic_obj %}" height="120" width="120"></img></a><br/>
 					<a href='#' id="pic">Change Profile Picture</a>
 				{% else %}
 					<a href="#"><img src="/static/ndf/images/user.png" height="120" width="120"></a><br/>
@@ -45,7 +45,7 @@
 					{% csrf_token %}
 					<input type="file" name="doc[]"  id="docFile" multiple/>
 
-					<input type="hidden" name="type" value="profile_pic">						
+					<input type="hidden" name="type" value="{{prof_pic_id}}">						
 					<input type="hidden" name="user" value="{{user_id}}">					
 					<input type="submit" id="submitpostid" value="Save">
 
