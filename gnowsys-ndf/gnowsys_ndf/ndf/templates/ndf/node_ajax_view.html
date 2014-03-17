@@ -107,7 +107,7 @@
 
      <!-- Tab View Graph -->
      <div class="content reveal-modal graph-div" id="view-graph" data-reveal>    
-      <h3 style="position:absolute;">{{node.name}}</h3>
+      
       {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
       <a class="close-reveal-modal">&#215;</a>
       {% include "ndf/node_graph.html" %}
