@@ -79,7 +79,7 @@
 		}
 
 		#view-graph .button {	background-color: #008759;	}
-		#view-graph .button:hover {	background-color: #00ba7b;	}
+		#view-graph .button:hover {	background-color: #00ba7b	;	}
 
 	</style>
 </head>
@@ -89,7 +89,7 @@
 			<div>
 				<h3 class="text-center">{{node.name}}</h3>				
 			</div>
-			<input type="button" class="button expand" value="Save as SVG" onclick='download();' />
+			<input type="button" class="button expand" value="Save as SVG" onclick='download("{{node.name}}");' />
 		</div>
 
 		<!-- Div containing svg area -->
@@ -484,7 +484,7 @@
 
                 $(fgraph());
 
-                function download() 
+                function download(filename) 
                 {
 				    // var el = document.createElement('a');
 				    // el.setAttribute('href', 'data:image/svg+xml;,' + encodeURIComponent(svgdata));
@@ -492,7 +492,9 @@
 				    // el.click();
 
 				    var blob = new Blob([$("#chart").html()], {type: "image/svg+xml"});
-					saveAs(blob, "Graph.svg");
+				    filename = filename.replace(/\ /g, '_');
+				    filename += "_graph.svg";
+					saveAs(blob, filename);
 				}
 
 		</script>
