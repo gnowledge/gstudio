@@ -432,7 +432,10 @@ class AttributeType(Node):
                 # It means node should ne added to this inner_attr_dict and not to attr_dict
                 if not inner_attr_dict.has_key(attr_id_or_node.name):
                     # If inner_attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                    inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value[attr_id_or_node.name]]
+                    if attr_value is None:
+                        inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value]
+                    else:
+                        inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value[attr_id_or_node.name]]
                 
                 if attr_dict.has_key(attr_id_or_node.name):
                     # If this attribute-node exists in outer attr_dict, then remove it
@@ -611,44 +614,83 @@ class GSystem(Node):
 
     ##########  User-Defined Functions ##########
 
-    def get_possible_attributes(self, gsystem_type_id):
-        if not isinstance(gsystem_type_id, ObjectId):
-            if ObjectId.is_valid(gsystem_type_id):
-                gsystem_type_id = ObjectId(gsystem_type_id)
-            else:
-                print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
-                # Throw error indicating the same
+    def get_possible_attributes(self, gsystem_type_id_or_list):
+        """Returns a dictionary consisting key as attribute-name and value as list of attribute-data-type and attribute-value, i.e. the 
+        structure required to dynamically build forms for creating GSystems (as 'data-type' determines the html-widget to be selected)
 
-        # collection = get_database()[Node.collection_name]
-        # attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
+        Keyword arguments:
+        gsystem_type_id_or_list -- List of ObjectIds of GSystemTypes' to which the given node (self) belongs
+  
+        If node (self) has '_id' -- Node is created; indicating possible attributes needs to be searched under GAttribute collection & return 
+        value of those attributes (previously existing) as part of the list along with attribute-type-data_type
+
+        Else -- Node needs to be created; indicating possible attributes needs to be searched under AttributeType collection & return default 
+        value 'None' of those attributes as part of the list along with attribute-type-data_type
+  
+        Returns: a dictionary which consists of key as attribute-name and value as list of attribute-data-type and attribute-value
+  
+        Example:
         
-        # possible_attributes = {}
+        (1) For attributes with basic data-type:
+        - first_name: basestring
+        - last_name: basetsring
+        
+        {
+          u'first_name': [basestring, <<None/actual-object-value>>]
+          u'last_name': [basestring, <<None/actual-object-value>>]
+        }
+      
+        (2) For attributes with complex data-type:
+        - person_name: {
+                         first_name: basestring,
+                         last_name: basestring
+                       }
+        - documents: [ObjectId]
+      
+        {
+          u'person_name': {
+                            u'first_name': [basestring, <<None/actual-object-value>>]
+                            u'last_name': [basestring, <<None/actual-object-value>>]
+                          }
+          u'documents': [[ObjectId], <<None/actual-object-value>>],
+        }
+        """
 
-        # for attr in attributes:
-        #     AttributeType.append_attribute(attr, possible_attributes)
-
+        gsystem_type_list = []
         possible_attributes = {}
 
-        if not self.has_key("_id"):
-            # If - node doesn't has key _id
-            print "\n node doesn't exists... using AttributeType\n"
-            collection = get_database()[Node.collection_name]
-            attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
-            
-            for attr in attributes:
-                # Here attr is of type -- AttributeType
-                AttributeType.append_attribute(attr, possible_attributes)
+        # Converts to list, if only single ObjectId is passed
+        if not isinstance(gsystem_type_id_or_list, list):
+            gsystem_type_list = [gsystem_type_id_or_list]
 
-        else:
-            # Else - node has key _id
-            print "\n node exists... using GAttribute\n"
-            collection = get_database()[Triple.collection_name]
-            attributes = collection.Triple.find({'subject': self._id})
+        # Code for finding out attributes associated with each gsystem_type_id in the list
+        for gsystem_type_id in gsystem_type_list:
+
+            # Converts string representaion of ObjectId to it's corresponding ObjectId type, if found
+            if not isinstance(gsystem_type_id, ObjectId):
+                if ObjectId.is_valid(gsystem_type_id):
+                    gsystem_type_id = ObjectId(gsystem_type_id)
+                else:
+                    print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
             
-            for attr_obj in attributes:
-                # Here attr is of type -- GAttribute [ subject (node._id), attribute_type (AttributeType), object_value (value of attribute) ]
-                # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [returns document-object]
-                AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
+            if not self.has_key("_id"):
+                # If - node doesn't has key _id
+                collection = get_database()[Node.collection_name]
+                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
+                
+                for attr in attributes:
+                    # Here attr is of type -- AttributeType
+                    AttributeType.append_attribute(attr, possible_attributes)
+
+            else:
+                # Else - node has key _id
+                collection = get_database()[Triple.collection_name]
+                attributes = collection.Triple.find({'subject': self._id})
+            
+                for attr_obj in attributes:
+                    # attr_obj is of type - GAttribute [subject (node._id), attribute_type (AttributeType), object_value (value of attribute)]
+                    # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [document-object]
+                    AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
 
         return possible_attributes
         
