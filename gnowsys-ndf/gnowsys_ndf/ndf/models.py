@@ -619,13 +619,36 @@ class GSystem(Node):
                 print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
                 # Throw error indicating the same
 
-        collection = get_database()[Node.collection_name]
-        attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
+        # collection = get_database()[Node.collection_name]
+        # attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
         
+        # possible_attributes = {}
+
+        # for attr in attributes:
+        #     AttributeType.append_attribute(attr, possible_attributes)
+
         possible_attributes = {}
 
-        for attr in attributes:
-            AttributeType.append_attribute(attr, possible_attributes)
+        if not self.has_key("_id"):
+            # If - node doesn't has key _id
+            print "\n node doesn't exists... using AttributeType\n"
+            collection = get_database()[Node.collection_name]
+            attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
+            
+            for attr in attributes:
+                # Here attr is of type -- AttributeType
+                AttributeType.append_attribute(attr, possible_attributes)
+
+        else:
+            # Else - node has key _id
+            print "\n node exists... using GAttribute\n"
+            collection = get_database()[Triple.collection_name]
+            attributes = collection.Triple.find({'subject': self._id})
+            
+            for attr_obj in attributes:
+                # Here attr is of type -- GAttribute [ subject (node._id), attribute_type (AttributeType), object_value (value of attribute) ]
+                # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [returns document-object]
+                AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes)
 
         return possible_attributes
         
@@ -1002,7 +1025,17 @@ class Triple(DjangoDocument):
 
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
+
+        collection = get_database()[Node.collection_name]
+        subject_name = collection.Node.one({'_id': self.subject}).name
         
+        if self._type == "GAttribute":
+            self.name = subject_name + " -- " + self.attribute_type['name'] + " -- " + unicode(self.object_value)
+
+        elif self._type == "GRelation":
+            right_subject_name = collection.Node.one({'_id': self.right_subject}).name
+            self.name = subject_name + " -- " + self.relation_type['name'] + " -- " + right_subject_name
+
         super(Triple, self).save(*args, **kwargs)
         
         history_manager = HistoryManager()
@@ -1028,8 +1061,9 @@ class Triple(DjangoDocument):
 class GAttribute(Triple):
 
     structure = {
-        'attribute_type': ObjectId,       # ObjectId of AttributeType Class
-        'object_value': None		  # value data-type determined by attribute-type field
+        # 'attribute_type': ObjectId,       # ObjectId of AttributeType Class
+        'attribute_type': AttributeType,  # DBRef of AttributeType Class
+        'object_value': None		  # value -- it's data-type, is determined by attribute_type field
     }
     
     required_fields = ['attribute_type', 'object_value']
