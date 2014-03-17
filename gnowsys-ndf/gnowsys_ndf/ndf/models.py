@@ -412,7 +412,7 @@ class AttributeType(Node):
     ##########  User-Defined Functions ##########
 
     @staticmethod
-    def append_attribute(attr_id_or_node, attr_dict, inner_attr_dict=None):
+    def append_attribute(attr_id_or_node, attr_dict, attr_value=None, inner_attr_dict=None):
         collection = get_database()[Node.collection_name]
 
         if isinstance(attr_id_or_node, unicode):
@@ -432,7 +432,7 @@ class AttributeType(Node):
                 # It means node should ne added to this inner_attr_dict and not to attr_dict
                 if not inner_attr_dict.has_key(attr_id_or_node.name):
                     # If inner_attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                    inner_attr_dict[attr_id_or_node.name] = eval(attr_id_or_node.data_type)
+                    inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value[attr_id_or_node.name]]
                 
                 if attr_dict.has_key(attr_id_or_node.name):
                     # If this attribute-node exists in outer attr_dict, then remove it
@@ -442,7 +442,7 @@ class AttributeType(Node):
                 # If inner_attr_dict is None
                 if not attr_dict.has_key(attr_id_or_node.name):
                     # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                    attr_dict[attr_id_or_node.name] = eval(attr_id_or_node.data_type)
+                    attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value]
 
         else:
             # Code for complex data-type 
@@ -454,7 +454,7 @@ class AttributeType(Node):
                     # NOTE: Here c_attr_id is in unicode format
                     # Hence, this function first converts attr_id 
                     # to ObjectId format if unicode found
-                    AttributeType.append_attribute(c_attr_id, attr_dict, inner_attr_dict)
+                    AttributeType.append_attribute(c_attr_id, attr_dict, attr_value, inner_attr_dict)
 
                 attr_dict[attr_id_or_node.name] = inner_attr_dict
 
@@ -465,7 +465,7 @@ class AttributeType(Node):
                     dt = unicode("[" + attr_id_or_node.complex_data_type[0] + "]")
                     if not attr_dict.has_key(attr_id_or_node.name):
                         # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                        attr_dict[attr_id_or_node.name] = eval(dt)
+                        attr_dict[attr_id_or_node.name] = [eval(dt), attr_value]
                     
                 else:
                     # Represents list of complex data-types
@@ -476,7 +476,7 @@ class AttributeType(Node):
                             pass
            
                         # If unicode representation of ObjectId is found
-                        AttributeType.append_attribute(c_attr_id, attr_dict)
+                        AttributeType.append_attribute(c_attr_id, attr_dict, attr_value)
 
             elif attr_id_or_node.data_type == "IS()":
                 # Below code does little formatting, for example:
@@ -490,7 +490,7 @@ class AttributeType(Node):
 
                 if not attr_dict.has_key(attr_id_or_node.name):
                     # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                    attr_dict[attr_id_or_node.name] = eval(dt)
+                    attr_dict[attr_id_or_node.name] = [eval(dt), attr_value]
 
 
 @connection.register
@@ -648,7 +648,7 @@ class GSystem(Node):
             for attr_obj in attributes:
                 # Here attr is of type -- GAttribute [ subject (node._id), attribute_type (AttributeType), object_value (value of attribute) ]
                 # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [returns document-object]
-                AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes)
+                AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
 
         return possible_attributes
         
