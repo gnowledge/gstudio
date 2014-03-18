@@ -276,6 +276,12 @@ class Node(DjangoDocument):
         elif MARKUP_LANGUAGE == 'restructuredtext':
             return restructuredtext(self.content)
         return self.content
+        
+    @property
+    def current_version(self):
+
+     history_manager= HistoryManager()
+     return history_manager.get_current_version(self)    
 
     @property
     def version_dict(self):
