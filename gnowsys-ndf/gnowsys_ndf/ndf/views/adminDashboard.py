@@ -41,7 +41,7 @@ def adminDashboardClass(request, class_name):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = collection.Node.find({'name':{'$regex':search},'_type':classtype})
+        nodes = collection.Node.find({'name':{'$regex':search, '$options': 'i' },'_type':classtype})
     else :
         nodes = collection.Node.find({'_type':class_name})
     objects_details = []
@@ -51,11 +51,32 @@ def adminDashboardClass(request, class_name):
             obj = collection.Node.one({ '_id': members})
             if obj:
                 member.append(obj.name+" - "+str(members))
-		group_set = [collection.Node.find_one({"_id":eachgroup}).name for eachgroup in each.group_set ]
+
+        member = []
+        member_of_list = []
+        collection_list = []
+        attribute_type_set = []
+        relation_type_set = []
+        if class_name == "GSystemType":
+            for e in each.member_of:
+                member_of_list.append(collection.Node.one({'_id':e}).name+" - "+str(e))
+                
+            for members in each.member_of:
+                member.append(collection.Node.one({ '_id': members}).name+" - "+str(members))
+
+            for coll in each.collection_set:
+                collection_list.append(collection.Node.one({ '_id': coll}).name+" - "+str(coll))
+
+            for at_set in each.attribute_type_set:
+                attribute_type_set.append(at_set.name+" - "+str(at_set._id))
+            for rt_set in each.relation_type_set:
+                relation_type_set.append(rt_set.name+" - "+str(rt_set._id))
+
 	if class_name in ("GSystem","File"):
+      		group_set = [collection.Node.find_one({"_id":eachgroup}).name for eachgroup in each.group_set ]
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(group_set),"Creation":each.created_at})
 	else :
-		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at})
+		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list), "attribute_type_set":",".join(attribute_type_set), "relation_type_set":",".join(relation_type_set)})
     groups = []
     group = collection.Node.find({'_type':"Group"})
     for each in group:
@@ -85,8 +106,11 @@ def adminDashboardEdit(request):
         node.name =  objectjson['fields']['title']
         for key,value in objectjson['fields'].items():
             if key == "group":
-                if value:
-                    node['group_set'] = value.split(",")
+                typelist = []
+                for eachvalue in  value.split(","):
+		    if eachvalue:
+                    	typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                node['group_set'] = typelist
             # if key == "type":
             #     typelist = []
             #     for eachvalue in  value.split(","):
@@ -94,16 +118,29 @@ def adminDashboardEdit(request):
             #     node['member_of'] = typelist
             if key == "member_of":
                 typelist = []
-                if value:
-                    for eachvalue in  value.split(","):
-                        typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                    node['member_of'] = typelist
+                for eachvalue in  value.split(","):
+		    if eachvalue:
+                    	typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                node['member_of'] = typelist
             if key == "collection_set":
                 typelist = []
-                if value:
-                    for eachvalue in  value.split(","):
-                        typelist.append(ObjectId(eachvalue.split(" ")[-1]))
-                    node['collection_set'] = typelist
+	        for eachvalue in  value.split(","):
+		    if eachvalue:
+                    	typelist.append(ObjectId(eachvalue.split(" ")[-1]))
+                node['collection_set'] = typelist
+            if key == "attribute_type_set":
+                typelist = []
+	        for eachvalue in  value.split(","):
+		    if eachvalue:
+                    	typelist.append(collection.Node.find_one(ObjectId(eachvalue.split(" ")[-1])))
+                node['attribute_type_set'] = typelist
+            if key == "relation_type_set":
+                typelist = []
+	        for eachvalue in  value.split(","):
+		    if eachvalue:
+                    	typelist.append(collection.Node.find_one(ObjectId(eachvalue.split(" ")[-1])))
+                node['relation_type_set'] = typelist
+
 
         node.save()     
         return StreamingHttpResponse(node.name+" edited successfully")

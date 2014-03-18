@@ -60,7 +60,8 @@ def dashboard(request, group_id, user, uploaded=None):
             collab_drawer.append(name)			
             
 
-    img_cur = collection.GSystem.find({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })        
+    prof_pic = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'profile_pic'})._id 
+    img_cur = collection.GSystem.find({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })        
     
     if img_cur.count() > 1: 
       cur = collection.GSystem.one({'_id':ObjectId(img_cur[0]._id)})
@@ -69,17 +70,17 @@ def dashboard(request, group_id, user, uploaded=None):
             cur.fs.files.delete(each)
       cur.delete()
 
-      img_obj = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })
+      img_obj = collection.GSystem.one({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })
     
+      print img_obj.name
     else:
-      img_obj = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
-    
-        
+      img_obj = collection.GSystem.one({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+              
 
     return render_to_response("ndf/userDashboard.html",
                               {'username': user, 'user_id': ID, 'DOJ': date_of_join, 
-                               'prof_pic': img_obj,'group_id':group_id,              
-                               'already_uploaded': uploaded,
+                               'prof_pic_obj': img_obj,'group_id':group_id,              
+                               'prof_pic_id': prof_pic,'already_uploaded': uploaded,
                                'page_drawer':page_drawer,'image_drawer': image_drawer,
                                'video_drawer':video_drawer,'file_drawer': file_drawer,
                                'quiz_drawer':quiz_drawer,'group_drawer': group_drawer,

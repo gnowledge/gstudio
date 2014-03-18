@@ -89,7 +89,6 @@ def notify_remove_user(request,group_id):
     activ="removed from group"
     bx=get_user(request.user)
     ret = set_notif_val(request,group_id,msg,activ,bx)
-    col_Group = db[Group.collection_name]
     colg.author_set.remove(bx.id)
     colg.save()
     if ret:

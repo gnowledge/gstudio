@@ -251,6 +251,22 @@ def get_existing_groups():
       group.append(items)
   return group
 
+@register.assignment_tag
+def get_existing_groups_excluding_username():
+  group = []
+  col_Group = db[Group.collection_name]
+  user_list=[]
+  users=User.objects.all()
+  for each in users:
+    user_list.append(each.username)
+  colg = col_Group.Group.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
+  colg.sort('name')
+  gr = list(colg)
+  for items in gr:
+    if items.name:
+      group.append(items)
+  return group
+
 
 @register.assignment_tag
 def get_existing_groups_excluded(grname):
@@ -326,11 +342,24 @@ def get_profile_pic(user):
 
   ID = User.objects.get(username=user).pk
   GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+  prof_pic = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'profile_pic'})._id 
 
-  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
 
   return prof_pic
 
+
+@register.assignment_tag
+def get_group_name(val):
+
+  GroupName = []
+
+  for each in val.group_set: 
+
+    grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
+    GroupName.append(grpName)
+  
+  return GroupName
 
 @register.assignment_tag
 def get_edit_url(groupid):
@@ -437,7 +466,7 @@ def get_grid_fs_object(f):
 def get_class_list(class_name):
   """Get list of class 
   """
-  class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType"]
+  class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]
   return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data"}
 
 @register.inclusion_tag('ndf/admin_class.html')
@@ -453,6 +482,13 @@ def get_Object_count(key):
         return collection.Node.find({'_type':key}).count()
     except:
         return 'null'
+
+@register.assignment_tag
+def get_memberof_objects_count(key):
+  try:
+  	return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'_type':'GSystem'}).count()
+  except:
+  	return 'null'
   
 @register.filter
 def get_dict_item(dictionary, key):
