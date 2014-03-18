@@ -10,10 +10,13 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 
+from gnowsys_ndf.ndf.models import HistoryManager
+
+import re
 ######################################################################################################################################
 
 db = get_database()
-
+history_manager = HistoryManager()
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
@@ -167,12 +170,11 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
   
 
 def get_node_common_fields(request, node, group_id, node_type):
-  """Updates the retrieved values of common fields from request into the given node.
-  """
+  """Updates the retrieved values of common fields from request into the given node."""
   
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
-  collection = None  
+  collection = None
 
   name = request.POST.get('name')
   usrid = int(request.user.id)
@@ -191,26 +193,30 @@ def get_node_common_fields(request, node, group_id, node_type):
     node.member_of.append(node_type._id)
 
     if group_obj._id not in node.group_set:
-      node.group_set.append(group_obj._id)    
+      node.group_set.append(group_obj._id)
 
     if access_policy == "PUBLIC":
-      node.access_policy = unicode(access_policy)      
+      node.access_policy = unicode(access_policy)
     else:
-      node.access_policy = unicode(access_policy)    
+      node.access_policy = unicode(access_policy)
           
     # End of if
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+
+  node.status=unicode("DRAFT")
+
   node.language=unicode(language) 
     
+
   if access_policy:
-    # Policy will be changed only by the creator of the resource 
+    # Policy will be changed only by the creator of the resource
     # via access_policy(public/private) option on the template which is visible only to the creator
     if access_policy == "PUBLIC":
-      node.access_policy = u"PUBLIC"      
+      node.access_policy = u"PUBLIC"
     else:
-      node.access_policy = u"PRIVATE"  
+      node.access_policy = u"PRIVATE"
   
 
   #node.modified_by.append(usrid)
@@ -223,12 +229,12 @@ def get_node_common_fields(request, node, group_id, node_type):
   # For displaying nodes in home group as well as in creator group.
   user_group_obj=gcollection.Node.one({'$and':[{'_type':ObjectId(group_id)},{'name':usrname}]})
 
-  if group_obj._id not in node.group_set: 
-    node.group_set.append(group_obj._id)  
+  if group_obj._id not in node.group_set:
+    node.group_set.append(group_obj._id)
   else:
     if user_group_obj:
-      if user_group_obj._id not in node.group_set:   
-        node.group_set.append(user_group_obj._id)  
+      if user_group_obj._id not in node.group_set:
+        node.group_set.append(user_group_obj._id)
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
   # -------------------------------------------------------------------------------- prior_node
@@ -252,14 +258,14 @@ def get_node_common_fields(request, node, group_id, node_type):
   if collection_list != '':
       collection_list = collection_list.split(",")
 
-  i = 0                    
+  i = 0
   while (i < len(collection_list)):
     node_id = ObjectId(collection_list[i])
     
     if gcollection.Node.one({"_id": node_id}):
       node.collection_set.append(node_id)
     
-    i = i+1  
+    i = i+1
  
   # -------------------------------------------------------------------------------- Module
 
@@ -267,14 +273,14 @@ def get_node_common_fields(request, node, group_id, node_type):
   if module_list != '':
       collection_list = module_list.split(",")
 
-  i = 0                    
+  i = 0
   while (i < len(collection_list)):
     node_id = ObjectId(collection_list[i])
     
     if gcollection.Node.one({"_id": node_id}):
       node.collection_set.append(node_id)
     
-    i = i+1  
+    i = i+1
  
     
   # ------------------------------------------------------------------------------- org-content
@@ -289,6 +295,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   
 
 # ------ Some work for relational graph - (II) ------
+  
 def neighbourhood_nodes(page_node):
 
   collection = db[Node.collection_name]
@@ -342,5 +349,41 @@ def neighbourhood_nodes(page_node):
 
   return graphData
 # ------ End of processing for graph ------
+
+
+
+  
+  
+def get_versioned_page(node):
+            content=[] 
+       
+            #check if same happens for multiple nodes
+            i=node.current_version
+          
+            #get the particular document Document
+                   
+            doc=history_manager.get_version_document(node,i)
+
+          
+            #check for the published status for the particular version
+          
+            while (doc.status != "PUBLISHED"):
+              currentRev = i
+
+              splitVersion = currentRev.split('.')
+              previousSubNumber = int(splitVersion[1]) - 1 
+
+              if previousSubNumber <= 0:
+               previousSubNumber = 1
+
+              prev_ver=splitVersion[0] +"."+ str(previousSubNumber)
+              i=prev_ver 
+
+              doc=history_manager.get_version_document(node,i)
+              print "cotent name",doc.name
+              if (i == '1.1'):
+                  return doc
+            return doc
+
 
 
