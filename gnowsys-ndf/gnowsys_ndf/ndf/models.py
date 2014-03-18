@@ -425,25 +425,6 @@ class Node(DjangoDocument):
                 else:
                     print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
             
-            # if not self.has_key("_id"):
-            #     # If - node doesn't has key _id
-            #     collection = get_database()[Node.collection_name]
-            #     attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
-                
-            #     for attr in attributes:
-            #         # Here attr is of type -- AttributeType
-            #         AttributeType.append_attribute(attr, possible_attributes)
-
-            # else:
-            #     # Else - node has key _id
-            #     collection = get_database()[Triple.collection_name]
-            #     attributes = collection.Triple.find({'subject': self._id})
-            
-            #     for attr_obj in attributes:
-            #         # attr_obj is of type - GAttribute [subject (node._id), attribute_type (AttributeType), object_value (value of attribute)]
-            #         # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [document-object]
-            #         AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
-
             if self.has_key("_id"):
                 # If - node has key _id
                 collection = get_database()[Triple.collection_name]
@@ -1129,13 +1110,13 @@ class Triple(DjangoDocument):
 class GAttribute(Triple):
 
     structure = {
-        # 'attribute_type': ObjectId,       # ObjectId of AttributeType Class
         'attribute_type': AttributeType,  # DBRef of AttributeType Class
         'object_value': None		  # value -- it's data-type, is determined by attribute_type field
     }
     
     required_fields = ['attribute_type', 'object_value']
     use_dot_notation = True
+    use_autorefs = True                   # To support Embedding of Documents
 
 
 @connection.register
