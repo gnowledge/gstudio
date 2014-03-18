@@ -80,7 +80,7 @@ def page(request, group_id, app_id=None):
         # collection.Node.reload()
         group_type = collection.Node.one({'_id':ObjectId(group_id)})
         group_info=group_type_info(group_id)
-
+        print "group_info",group_info
         if  group_info == "Moderated":
           
           title = gst_page.name
@@ -130,7 +130,7 @@ def page(request, group_id, app_id=None):
                                   }, 
                                   context_instance=RequestContext(request)
             )
-        elif group_info == "PUBLIC" or group_info == "PRIVATE":
+        elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:
               page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
                                            'group_set': {'$all': [ObjectId(group_id)]},
                                            'status': {'$nin': ['HIDDEN']}
