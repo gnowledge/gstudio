@@ -5,25 +5,26 @@
 	
 	<!-- Scripts required for D3 graph -->
 	<script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
-	<script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>		
-
+	<script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+	<script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+	 
 	<style type="text/css">
 
 		#chart .link {
-			stroke: #ccc;
+			/*stroke: #ccc;*/
 		}
 
 		#chart .nodetext {
-			#pointer-events: none;
-			font: 10px Serif;
-			font-style:italic;
+			/*#pointer-events: none;*/
+			/*font: 10px Serif;*/
+			/*font-style:italic;*/
 		}
 
 		/*Central node shown in ellipse*/
 		#chart .mainnode{
 
 			font: 15px sans-serif;
-			/*fill:"black";*/
+			fill:"black";
 			border-width: 1px;
 			font-weight:bold;
 			border-color: gray;
@@ -31,16 +32,16 @@
 
 		/*Connector element that connects two nodes*/
 		#chart .relnode {
-			font: 10px sans-serif;			
-			fill:#404040;
+			/*font: 10px sans-serif;			*/
+			/*fill:#404040;*/
 		}
 
 		/*Peripheral nodes to main node*/
 		#chart .node {
-			border-width: 1px;
-			border-color: gray;
-			fill:#154534;
-			font: 12px sans-serif;
+			/*border-width: 1px;*/
+			/*border-color: gray;*/
+			/*fill:#154534;*/
+			/*font: 12px sans-serif;*/
 		}
 
 		/*body {
@@ -52,26 +53,50 @@
 		/* Div containing SVG area*/
 		#chart {
 			display: block;
+			padding-top: 1%;
+			/*padding-left:1%;*/
+			/*padding-right: 1% */
+			height: 87%;
+			float: left;
+			width: -webkit-calc(75%); width:-o-calc(75%); width: -moz-calc(75%); width: calc(77%);
+			display: block;
+			/*position: absolute;*/
+			
 		}
 
 		#view-graph svg {
-			top: 2.5%;
-			height: 95%;
-			width: -webkit-calc(98%); width:-o-calc(98%); width: -moz-calc(98%); width: calc(98%);
-			left: 1%;
-			display: block;
-			position: absolute;
+			margin-left: 1%;
 		}
+
+		#view-graph .graph-info-panel {
+			background-color:#F2F2F2; 
+			width:20%; height:100%; 
+			display:inline-block; float:left;
+		}
+
+		#view-graph .graph-info-panel div:first-child {
+			height:90%;
+		}
+
+		#view-graph .button {	background-color: #008759;	}
+		#view-graph .button:hover {	background-color: #00ba7b	;	}
 
 	</style>
 </head>
 	<body>
+		
+		<div class="graph-info-panel">
+			<div>
+				<h3 class="text-center">{{node.name}}</h3>				
+			</div>
+			<input type="button" class="button expand" value="Save as SVG" onclick='download("{{node.name}}");' />
+		</div>
+
 		<!-- Div containing svg area -->
 		<div id="chart"></div>
-
-		<script type="text/javascript">
-			var graphHeight = ($(window).height()),
-				graphWidth  = ($(window).width());
+			<script type="text/javascript">
+			var graphHeight = ($(window).height()*0.87),
+				graphWidth  = ($(window).width()*0.77);
 
 			var objectid = "{{node.pk}}";	// _id of current viewing page
 			var flag=false;
@@ -125,19 +150,25 @@
 
 				var vis = d3.select("#chart")
 							.append("svg:svg")
-							.attr("id", "amazingViz") ;
-						// .attr("width", w)
-						// .attr("height", h);
+							.attr("id", "amazingViz")
+							.attr("height", h)
+							.attr("width", w);
 
-				vis.append("svg:g").attr("class", "edges");        
-				vis.append("svg:g").attr("class", "nodes");
+					vis.append("rect")
+						.attr("height", "100%")
+						.attr("width", "100%")
+						.style("fill", "white");
 
-				nodes_by_id[key].x = w/2.0;
-				nodes_by_id[key].y = h/2.0;       
+					vis.append("svg:g").attr("class", "edges");
 
-				var force = d3.layout.force()
+					vis.append("svg:g").attr("class", "nodes");
+
+					nodes_by_id[key].x = w/2.0;
+					nodes_by_id[key].y = h/2.0;       
+
+					var force = d3.layout.force()
 							.linkStrength(1)
-							.charge(-4000)
+							.charge(-5000)
 							.friction(0.7)
 							.gravity(0.5)
 							.linkDistance(10)
@@ -146,7 +177,7 @@
 							.size([w, h])
 							.start();
 
-				var drag = force.drag();
+					var drag = force.drag();
 
 				function update(edges)
 				{
@@ -177,8 +208,9 @@
 				    	     .data(edges, function(e){return e.from + "-" + e.to + "-" + e.type});
 
 				    link.enter().append("svg:line")
-				        .attr("class", "link")
+				        // .attr("class", "link")
     	            	.style("stroke-width", 2 )
+    	            	.style("stroke", "#ccc")
 		                .attr("x1", function(d) {	return d.source.x; })
 	                	.attr("y1", function(d) {	return d.source.y; })
 	                	.attr("x2", function(d) {	return d.target.x; })
@@ -188,9 +220,11 @@
 
 	                var node = d3.select("#chart g.nodes").selectAll("g.node").data(nodes);
 
+
+
 	                var new_g = node.enter().append("svg:a")
-	                				.attr("class", function(d)
-	                				{
+	                				.attr("class", function(d){
+
                 						var e=(d._id).charAt(0);
 
 	                					if (d._id==key) return "mainnode";
@@ -198,6 +232,7 @@
         	        					else if (isNaN(d._id)) return "relnode"; //logic to give class to relation node (pending)
             	    					else return "node"; 
             	    				})
+            	    				
                 					//.attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
                 					.call(drag);
 
@@ -330,18 +365,29 @@
 					});
 
 					text1 = new_g.append("svg:text")
-                				 .attr("class",function(d) {
-                				 	if (d._id==key) return "mainnode";
-                				 	// else if (e=="-") return "nodetext";
-                				 	else if ( d._id.search("_r") > 0) return "relnode";
-                				 	else return "node";
-                				 })
+                				 // .attr("class",function(d) {
+                				 // 	if (d._id==key) return "mainnode";
+                				 // 	// else if (e=="-") return "nodetext";
+                				 // 	else if ( d._id.search("_r") > 0) return "relnode";
+                				 // 	else return "node";
+                				 // })
                 				 .attr("y", 20)
                 				 .attr("x", 25)
                 				 .attr("dy", ".35em")
                 				 .attr("text-anchor","middle")
                 				 .on("drag",drag)
                 				 .text(function(d){ return d.screen_name; })
+                				 .style("font", function(d){
+
+            	    					nodeFont = d._id==key?"bold 15px sans-serif":(d.refType=="Relation"||(d._id).slice(-2)=="_n")?"normal 12px serif":"normal 10px sans-serif";
+            	    					return nodeFont;
+            	    				})
+                				 .style("fill", function(d){
+                				 	if(d.refType=="GSystem"){ return "black" }
+                				 	if(d.refType=="Relation" || (d._id).slice(-2)=="_n"){ return "#154534" }
+                				 	else if((d._id).slice(-2)=="_r")
+                				 		{ return "#404040"}
+                				 })
                 				 .on("dblclick", dblclick);
 
                 		// bbox = text1.node().getBBox();
@@ -381,7 +427,7 @@
                 				.attr("x2", function(d) { return d.target.x; })
                 				.attr("y2", function(d) { return d.target.y; });
 
-                				node.attr("transform", function(d) { return "translate(" + (d.x-16) + "," + (d.y-16) + ")"; });
+                				node.attr("transform", function(d) { return "translate(" + (d.x-20) + "," + (d.y-20) + ")"; });
                 		});
                 	}
 
@@ -437,6 +483,22 @@
                 }
 
                 $(fgraph());
+
+                function download(filename) 
+                {
+				    // var el = document.createElement('a');
+				    // el.setAttribute('href', 'data:image/svg+xml;,' + encodeURIComponent(svgdata));
+				    // el.setAttribute('download', filename);
+				    // el.click();
+
+				    var blob = new Blob([$("#chart").html()], {type: "image/svg+xml"});
+				    filename = filename.replace(/\ /g, '_');
+				    filename += "_graph.svg";
+					saveAs(blob, filename);
+				}
+
 		</script>
+		
+
 	</body>
 </html>
