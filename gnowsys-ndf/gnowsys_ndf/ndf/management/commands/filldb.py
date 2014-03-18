@@ -84,6 +84,16 @@ class Command(BaseCommand):
             # gs_node.meta_type_set.append(forum_type._id)
             gs_node.save()
 
+      	# Create 'profile_pic' GSystemType, if it didn't exists
+        prof_pic = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'profile_pic'}) 
+        if prof_pic is None:
+            prof_pic = collection.GSystemType()
+            prof_pic.name = u"profile_pic"
+            prof_pic.created_by = user_id            
+            prof_pic.save()
+
+        prof_pic = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'profile_pic'}) 
+
         # Create 'Author' GSystemType, if it didn't exists
         auth = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'}) 
         if auth is None:
@@ -139,8 +149,10 @@ class Command(BaseCommand):
             st.created_by = user_id
             st.save()
 
+      	pandora_video = collection.GSystemType.one({'$and':[{'_type': u'GSystemType'},{'name': u'Pandora_video'}]})
+
         # Create 'source_id' AttributeType, if didn't exists 
-        source_id = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'source_id'}]})
+        source_id = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': u'source_id'}]})
         if source_id is None:
             at = collection.AttributeType()
             at.name = u'source_id'

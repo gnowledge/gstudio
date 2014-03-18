@@ -344,11 +344,24 @@ def get_profile_pic(user):
 
   ID = User.objects.get(username=user).pk
   GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+  prof_pic = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'profile_pic'})._id 
 
-  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': 'profile_pic', 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
 
   return prof_pic
 
+
+@register.assignment_tag
+def get_group_name(val):
+
+  GroupName = []
+
+  for each in val.group_set: 
+
+    grpName = collection.Node.one({'_id': ObjectId(each) }).name.__str__()
+    GroupName.append(grpName)
+  
+  return GroupName
 
 @register.assignment_tag
 def get_edit_url(groupid):

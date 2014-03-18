@@ -156,7 +156,7 @@ class Node(DjangoDocument):
         
         'language': unicode,
 
-        'type_of': unicode,
+        'type_of': ObjectId,        # To define type_of GSystemType for particular node              
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
 
