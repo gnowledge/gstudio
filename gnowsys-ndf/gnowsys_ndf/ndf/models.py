@@ -561,6 +561,13 @@ class AttributeType(Node):
 
                     attr_dict[attr_id_or_node.name] = inner_attr_dict
 
+                else:
+                    for remove_attr_name in attr_dict[attr_id_or_node.name].iterkeys():
+                        if attr_dict.has_key(remove_attr_name):
+                            # If this attribute-node exists in outer attr_dict, then remove it
+                            del attr_dict[remove_attr_name]
+                    
+
             elif attr_id_or_node.data_type == "list":
                 if len(attr_id_or_node.complex_data_type) == 1:
                     # Represents list of simple data-types
