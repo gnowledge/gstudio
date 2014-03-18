@@ -364,6 +364,105 @@ class Node(DjangoDocument):
                 message = "This document (" + self.name + ") is lastly updated on " + self.last_update.strftime("%d %B %Y")
                 rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
+    ##########  User-Defined Functions ##########
+
+    def get_possible_attributes(self, gsystem_type_id_or_list):
+        """Returns a dictionary consisting key as attribute-name and value as list of attribute-data-type and attribute-value, i.e. the 
+        structure required to dynamically build forms for creating GSystems (as 'data-type' determines the html-widget to be selected)
+
+        Keyword arguments:
+        gsystem_type_id_or_list -- List of ObjectIds of GSystemTypes' to which the given node (self) belongs
+  
+        If node (self) has '_id' -- Node is created; indicating possible attributes needs to be searched under GAttribute collection & return 
+        value of those attributes (previously existing) as part of the list along with attribute-type-data_type
+
+        Else -- Node needs to be created; indicating possible attributes needs to be searched under AttributeType collection & return default 
+        value 'None' of those attributes as part of the list along with attribute-type-data_type
+  
+        Returns: a dictionary which consists of key as attribute-name and value as list of attribute-data-type and attribute-value
+  
+        Example:
+        
+        (1) For attributes with basic data-type:
+        - first_name: basestring
+        - last_name: basetsring
+        
+        {
+          u'first_name': [basestring, <<None/actual-object-value>>]
+          u'last_name': [basestring, <<None/actual-object-value>>]
+        }
+      
+        (2) For attributes with complex data-type:
+        - person_name: {
+                         first_name: basestring,
+                         last_name: basestring
+                       }
+        - documents: [ObjectId]
+      
+        {
+          u'person_name': {
+                            u'first_name': [basestring, <<None/actual-object-value>>]
+                            u'last_name': [basestring, <<None/actual-object-value>>]
+                          }
+          u'documents': [[ObjectId], <<None/actual-object-value>>],
+        }
+        """
+
+        gsystem_type_list = []
+        possible_attributes = {}
+
+        # Converts to list, if only single ObjectId is passed
+        if not isinstance(gsystem_type_id_or_list, list):
+            gsystem_type_list = [gsystem_type_id_or_list]
+
+        # Code for finding out attributes associated with each gsystem_type_id in the list
+        for gsystem_type_id in gsystem_type_list:
+
+            # Converts string representaion of ObjectId to it's corresponding ObjectId type, if found
+            if not isinstance(gsystem_type_id, ObjectId):
+                if ObjectId.is_valid(gsystem_type_id):
+                    gsystem_type_id = ObjectId(gsystem_type_id)
+                else:
+                    print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
+            
+            # if not self.has_key("_id"):
+            #     # If - node doesn't has key _id
+            #     collection = get_database()[Node.collection_name]
+            #     attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
+                
+            #     for attr in attributes:
+            #         # Here attr is of type -- AttributeType
+            #         AttributeType.append_attribute(attr, possible_attributes)
+
+            # else:
+            #     # Else - node has key _id
+            #     collection = get_database()[Triple.collection_name]
+            #     attributes = collection.Triple.find({'subject': self._id})
+            
+            #     for attr_obj in attributes:
+            #         # attr_obj is of type - GAttribute [subject (node._id), attribute_type (AttributeType), object_value (value of attribute)]
+            #         # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [document-object]
+            #         AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
+
+            if self.has_key("_id"):
+                # If - node has key _id
+                collection = get_database()[Triple.collection_name]
+                attributes = collection.Triple.find({'subject': self._id})
+            
+                for attr_obj in attributes:
+                    # attr_obj is of type - GAttribute [subject (node._id), attribute_type (AttributeType), object_value (value of attribute)]
+                    # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [document-object]
+                    AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
+
+            collection = get_database()[Node.collection_name]
+            attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
+                
+            for attr in attributes:
+                # Here attr is of type -- AttributeType
+                AttributeType.append_attribute(attr, possible_attributes)
+
+        return possible_attributes
+
 
 @connection.register
 class MetaType(Node):
@@ -382,6 +481,7 @@ class AttributeType(Node):
 
     structure = {
 	'data_type': basestring,
+        'complex_data_type': [unicode],
         'subject_type': [ObjectId],
 	'applicable_node_type': [basestring],	# NODE_TYPE_CHOICES
 		
@@ -408,8 +508,94 @@ class AttributeType(Node):
     required_fields = ['data_type', 'subject_type']
     use_dot_notation = True
 
+    ##########  User-Defined Functions ##########
 
- 
+    @staticmethod
+    def append_attribute(attr_id_or_node, attr_dict, attr_value=None, inner_attr_dict=None):
+        collection = get_database()[Node.collection_name]
+
+        if isinstance(attr_id_or_node, unicode):
+            # Convert unicode representation of ObjectId into it's corresponding ObjectId type
+            # Then fetch attribute-type-node from AttributeType collection of respective ObjectId
+            if ObjectId.is_valid(attr_id_or_node):
+                attr_id_or_node = collection.Node.one({'_type': 'AttributeType', '_id': ObjectId(attr_id_or_node)})
+            else:
+                print "\n Invalid ObjectId: ", attr_id_or_node, " is not a valid ObjectId!!!\n"
+                # Throw indicating the same
+        
+        if not attr_id_or_node.complex_data_type:
+            # Code for simple data-type 
+            # Simple data-types: int, float, ObjectId, list, dict, basestring, unicode
+            if inner_attr_dict is not None:
+                # If inner_attr_dict exists
+                # It means node should ne added to this inner_attr_dict and not to attr_dict
+                if not inner_attr_dict.has_key(attr_id_or_node.name):
+                    # If inner_attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
+                    if attr_value is None:
+                        inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value]
+                    else:
+                        inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value[attr_id_or_node.name]]
+                
+                if attr_dict.has_key(attr_id_or_node.name):
+                    # If this attribute-node exists in outer attr_dict, then remove it
+                    del attr_dict[attr_id_or_node.name]
+
+            else:
+                # If inner_attr_dict is None
+                if not attr_dict.has_key(attr_id_or_node.name):
+                    # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
+                    attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value]
+
+        else:
+            # Code for complex data-type 
+            # Complex data-types: [...], {...}
+            if attr_id_or_node.data_type == "dict":
+                if not attr_dict.has_key(attr_id_or_node.name):
+                    inner_attr_dict = {}
+
+                    for c_attr_id in attr_id_or_node.complex_data_type:
+                        # NOTE: Here c_attr_id is in unicode format
+                        # Hence, this function first converts attr_id 
+                        # to ObjectId format if unicode found
+                        AttributeType.append_attribute(c_attr_id, attr_dict, attr_value, inner_attr_dict)
+
+                    attr_dict[attr_id_or_node.name] = inner_attr_dict
+
+            elif attr_id_or_node.data_type == "list":
+                if len(attr_id_or_node.complex_data_type) == 1:
+                    # Represents list of simple data-types
+                    # Ex: [int], [ObjectId], etc.
+                    dt = unicode("[" + attr_id_or_node.complex_data_type[0] + "]")
+                    if not attr_dict.has_key(attr_id_or_node.name):
+                        # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
+                        attr_dict[attr_id_or_node.name] = [eval(dt), attr_value]
+                    
+                else:
+                    # Represents list of complex data-types
+                    # Ex: [{...}]
+                    for c_attr_id in attr_id_or_node.complex_data_type:
+                        if not ObjectId.is_valid(c_attr_id):
+                            # If basic data-type values are found, pass the iteration
+                            pass
+           
+                        # If unicode representation of ObjectId is found
+                        AttributeType.append_attribute(c_attr_id, attr_dict, attr_value)
+
+            elif attr_id_or_node.data_type == "IS()":
+                # Below code does little formatting, for example:
+                # data_type: "IS()"
+                # complex_value: [u"ab", u"cd"]
+                # dt: "IS(u'ab', u'cd')"
+                dt = "IS("
+                for v in attr_id_or_node.complex_data_type:
+                    dt = dt + "u'" + v + "'" + ", " 
+                dt = dt[:(dt.rfind(", "))] + ")"
+
+                if not attr_dict.has_key(attr_id_or_node.name):
+                    # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
+                    attr_dict[attr_id_or_node.name] = [eval(dt), attr_value]
+
+
 @connection.register
 class RelationType(Node):
 
@@ -517,7 +703,7 @@ class GSystem(Node):
 
     structure = {        
         # 'attribute_set': [ObjectId],		# ObjectIds of GAttributes
-        #'relation_set': [ObjectId],		# ObjectIds of GRelations
+        # 'relation_set': [ObjectId],		# ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
         'group_set': [ObjectId],                # List of ObjectId's of Groups to which this document belongs
@@ -525,6 +711,8 @@ class GSystem(Node):
     }
     
     use_dot_notation = True
+
+        
 
 
 @connection.register
@@ -898,7 +1086,17 @@ class Triple(DjangoDocument):
 
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
+
+        collection = get_database()[Node.collection_name]
+        subject_name = collection.Node.one({'_id': self.subject}).name
         
+        if self._type == "GAttribute":
+            self.name = subject_name + " -- " + self.attribute_type['name'] + " -- " + unicode(self.object_value)
+
+        elif self._type == "GRelation":
+            right_subject_name = collection.Node.one({'_id': self.right_subject}).name
+            self.name = subject_name + " -- " + self.relation_type['name'] + " -- " + right_subject_name
+
         super(Triple, self).save(*args, **kwargs)
         
         history_manager = HistoryManager()
@@ -924,8 +1122,9 @@ class Triple(DjangoDocument):
 class GAttribute(Triple):
 
     structure = {
-        'attribute_type': ObjectId,       # ObjectId of AttributeType Class
-        'object_value': None		  # value data-type determined by attribute-type field
+        # 'attribute_type': ObjectId,       # ObjectId of AttributeType Class
+        'attribute_type': AttributeType,  # DBRef of AttributeType Class
+        'object_value': None		  # value -- it's data-type, is determined by attribute_type field
     }
     
     required_fields = ['attribute_type', 'object_value']
