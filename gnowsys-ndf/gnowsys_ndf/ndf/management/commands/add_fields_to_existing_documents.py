@@ -22,26 +22,31 @@ class Command(BaseCommand):
         # Keep latest fields to be added at top
 
         # -------------------------------------------------------------------------------------------------------------
+        # Adding "complex_data_type" field with empty list as it's default value
+        # -------------------------------------------------------------------------------------------------------------
+        collection.update( {'_type': 'AttributeType', 'complex_data_type': {'$exists': False}}, {'$set': {'complex_data_type': []}}, upsert=False, multi=True )
+
+        # -------------------------------------------------------------------------------------------------------------
         # Adding "post_node" field with empty list as it's default value
         # -------------------------------------------------------------------------------------------------------------
-        collection.update({'post_node': {'$exists': False}}, {'$set': {'post_node': []}}, upsert=False, multi=True)
+        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'post_node': {'$exists': False}}, {'$set': {'post_node': []}}, upsert=False, multi=True)
 
         # -------------------------------------------------------------------------------------------------------------
         # Adding "collection_set" field with empty list as it's default value
         # -------------------------------------------------------------------------------------------------------------
-        collection.update({'collection_set': {'$exists': False}}, {'$set': {'collection_set': []}}, upsert=False, multi=True)
+        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'collection_set': {'$exists': False}}, {'$set': {'collection_set': []}}, upsert=False, multi=True)
 
         # -------------------------------------------------------------------------------------------------------------
         # Adding "location" field with no default value
         # -------------------------------------------------------------------------------------------------------------
 
-        collection.update({'location': {'$exists': False}}, {'$set': {'location': {}}}, upsert=False, multi=True)
+        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'location': {'$exists': False}}, {'$set': {'location': {}}}, upsert=False, multi=True)
 
         # -------------------------------------------------------------------------------------------------------------
         # Adding "language" field with no default value
         # -------------------------------------------------------------------------------------------------------------
 
-        collection.update({'language': {'$exists': True}}, {'$set': {'language':unicode('')}}, upsert=False, multi=True)
+        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'language': {'$exists': False}}, {'$set': {'language':unicode('')}}, upsert=False, multi=True)
         
         # -------------------------------------------------------------------------------------------------------------
         # Adding "access_policy" field
@@ -52,9 +57,9 @@ class Command(BaseCommand):
         collection.update({'_type': 'Group', 'group_type': 'PUBLIC'}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
         
         # For Non-Group documents which doesn't consits of access_policy field, add it with PUBLIC as it's default value
-        collection.update({'_type': {'$nin': ['Group']}, 'access_policy': {'$exists': False}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
+        collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation']}, 'access_policy': {'$exists': False}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
         
-        collection.update({'_type': {'$nin': ['Group']}, 'access_policy': {'$in': [None, "PUBLIC"]}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
-        collection.update({'_type': {'$nin': ['Group']}, 'access_policy': "PRIVATE"}, {'$set': {'access_policy': u"PRIVATE"}}, upsert=False, multi=True)
+        collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation']}, 'access_policy': {'$in': [None, "PUBLIC"]}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
+        collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation']}, 'access_policy': "PRIVATE"}, {'$set': {'access_policy': u"PRIVATE"}}, upsert=False, multi=True)
 
   		
