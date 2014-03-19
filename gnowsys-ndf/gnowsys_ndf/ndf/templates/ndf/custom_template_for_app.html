@@ -83,6 +83,19 @@
      </div>
   {% endfor %}
   {% endif %}
+  {% if app_set_instance_rtlist %}
+  {% for rt in app_set_instance_rtlist %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> {{rt.type}} </font> 
+       </div>
+       <div style="display:table-cell;">
+	 <font size="3"> {{rt.value}} </font>
+       </div>
+     </div>
+  {% endfor %}
+  {% endif %}
+
   </div>    
 {% endif %}
 
@@ -117,8 +130,26 @@
 	 {% endif %}
        </div>
      </div>
-       {% endfor %}
+     {% endfor %}
      {% endif %}
+     {% if systemtype_relationtype_set %}
+     {% for rt in systemtype_relationtype_set %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> {{rt.rt_name}} </font> 
+       </div>
+       <div style="display:table-cell;">
+	 <select id="relation_selection" name="{{rt.type_id}}" style="width:50%">
+	   <option selected="selected" value="">Unknown</option>
+	   {% for each_gsystem in rt.object_type %}
+	   <option value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
+	   {% endfor %}
+	 </select>
+       </div>
+     </div>
+     {% endfor %}
+     {% endif %}
+
      <input type="submit" name="submit" class="button" id="save-system">
   </div>
 </form>
