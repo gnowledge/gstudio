@@ -262,10 +262,12 @@ def check_module_exits(module_set_md5):
 
 
 def walk(node):
+    hm = HistoryManager()
     list = []
     for each in node:
        dict = {}
-       n = collection.Node.one({'_id':ObjectId(each['id'])})
+       node = collection.Node.one({'_id':ObjectId(each['id'])})
+       n =  hm.get_version_document(node,each['version_no'])
        dict['label'] = n.name
        dict['id'] = each['id']
        dict['version_no'] = each['version_no']
