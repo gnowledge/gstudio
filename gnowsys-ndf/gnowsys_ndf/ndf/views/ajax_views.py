@@ -351,7 +351,6 @@ def graph_nodes(request, group_id):
     elif isinstance(value, list):
 
       if len(value):
-
         # node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
         node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(abs(hash(key+str(page_node._id)))) +'_r"}, '
         node_relations += '{"type":"'+ key +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
@@ -381,8 +380,8 @@ def graph_nodes(request, group_id):
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
+            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
             i += 1
     
     else:

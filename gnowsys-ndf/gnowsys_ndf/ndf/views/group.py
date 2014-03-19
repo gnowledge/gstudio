@@ -71,6 +71,7 @@ def create_group(request,group_id):
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
+        Mod_colg=col_Group.Group()
         cname=request.POST.get('groupname', "")
         colg.altnames=cname
         colg.name = unicode(cname)
@@ -84,6 +85,18 @@ def create_group(request,group_id):
         colg.disclosure_policy = request.POST.get('member', "")
         colg.encryption_policy = request.POST.get('encryption', "")
         colg.save()
+        
+        
+        if colg.edit_policy == "EDITABLE_MODERATED":
+    
+            Mod_colg.altnames=cname + "Mod" 
+            Mod_colg.name=cname + "Mod"     
+            Mod_colg.group_type = "PRIVATE"
+            Mod_colg.created_by=usrid
+            Mod_colg.prior_node.append(colg._id)
+            Mod_colg.save() 
+            colg.post_node.append(Mod_colg._id)
+            colg.save()
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id},context_instance=RequestContext(request))
     return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
     
@@ -118,6 +131,7 @@ def group_dashboard(request,group_id=None):
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+    
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
