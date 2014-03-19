@@ -63,11 +63,12 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
             systemtype_relationtype_set.append({"rt_name":each.name,"type_id":str(each._id)})
 
         for eachatset in systemtype_attributetype_set :
-            for eachattribute in collection.Node.find({"_type":"GAttribute", "subject":system._id, "attribute_type":ObjectId(eachatset["type_id"])}):
+            for eachattribute in collection.Node.find({"_type":"GAttribute", "subject":system._id, "attribute_type.$id":ObjectId(eachatset["type_id"])}):
                 atlist.append({"type":eachatset["type"],"type_id":eachatset["type_id"],"value":eachattribute.object_value})
         for eachrtset in systemtype_relationtype_set :
             for eachrelation in collection.Node.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
-                rtlist.append({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value": collection.Node.find_one({"_id":ObjectId(eachrelation.right_subject)}).name})
+                right_subject = collection.Node.find_one({"_id":ObjectId(eachrelation.right_subject)})
+                rtlist.append({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
 
                               
         app_set_name = systemtype.name
@@ -102,7 +103,6 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
         for each in systemtype.attribute_type_set:
             systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type})
         for eachrt in systemtype.relation_type_set:
-            print collection.Node.find_one({'_id':ObjectId(eachrt.object_type[0])}).name
             object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in collection.Node.find({'member_of': {'$all': [ collection.Node.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
             systemtype_relationtype_set.append({"rt_name":eachrt.name,"type_id":str(eachrt._id),"object_type":object_type})
     
@@ -124,9 +124,9 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
             attributetype_key = collection.Node.find_one({"_id":ObjectId(key)})
             newattribute = collection.GAttribute()
             newattribute.subject = newgsystem._id
-            newattribute.attribute_type = attributetype_key._id
+            newattribute.attribute_type = attributetype_key
             newattribute.object_value = value
-            newattribute.name = unicode(newgsystem.name+"- "+attributetype_key.name+"-"+value)
+ #           newattribute.name = unicode(newgsystem.name+"- "+attributetype_key.name+"-"+value)
             newattribute.save()
         for key,value in request_rt_dict.items():
             relationtype_key = collection.Node.find_one({"_id":ObjectId(key)})
@@ -134,8 +134,8 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
             newrelation = collection.GRelation()
             newrelation.subject = newgsystem._id
             newrelation.relation_type = relationtype_key
-            newrelation.right_subject = right_subject
-            newrelation.name = unicode(newgsystem.name+"- "+relationtype_key.name+"-"+right_subject.name)
+            newrelation.right_subject = right_subject._id
+#            newrelation.name = unicode(newgsystem.name+"- "+relationtype_key.name+"-"+right_subject.name)
             newrelation.save()
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
           
