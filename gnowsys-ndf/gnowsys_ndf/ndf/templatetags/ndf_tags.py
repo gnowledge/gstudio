@@ -316,13 +316,15 @@ def get_user_group(user):
                               })
 
     auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+    
     if auth:
       for items in colg:
         if items.created_by == user.pk:
           if items.name == auth.name:
             author = items
           else:
-            group.append(items)
+            if not items.prior_node:
+              group.append(items)
         else:
           if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
             group.append(items)
@@ -500,3 +502,116 @@ def get_input_fields(fields_value,type_value):
   """
   field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
   return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value,"field_type_list":field_type_list}
+  
+  
+
+@register.assignment_tag
+def group_type_info(groupid,user=0):
+   
+ 
+      
+      col_Group =db[Group.collection_name]
+      
+      group_gst = col_Group.Group.one({'_id':ObjectId(groupid)})
+      	
+                               
+      if group_gst.post_node:
+         return "BaseModerated"
+      elif group_gst.prior_node:
+         return "Moderated"   
+      else:
+          return  group_gst.group_type                        
+      
+              
+              
+              
+      
+@register.assignment_tag
+def user_access_policy(node,user):
+			
+	  col_Group=db[Group.collection_name]
+	  
+	  group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+	    
+	    
+	  if user.id in group_gst.group_set or group_gst.created_by == user.id:
+	    return 'allow'
+	    
+	    
+	      
+	    
+	  
+@register.assignment_tag
+def resource_info(node):
+    col_Group=db[Group.collection_name]
+    try:
+      group_gst=col_Group.Group.one({'_id':ObjectId(node._id)})
+    except:
+      print "something",node
+      grname=re.split(r'[/=]',node)
+      group_gst=col_Group.Group.one({'_id':ObjectId(grname[1])})
+    return group_gst
+	  		
+                                
+    
+@register.assignment_tag
+def edit_policy(groupid,node,user):
+
+  group_access= group_type_info(groupid,user)
+  resource_infor=resource_info(node)
+  
+  #code for public Groups and its Resources
+  
+  if group_access == "PUBLIC":
+      user_access=user_access_policy(groupid,user)
+      if user_access == "allow":
+        return "allow"
+            
+  elif group_access == "PRIVATE":
+      return "allow"
+  elif group_access == "BaseModerated":
+       user_access=user_access_policy(groupid,user)
+       if user_access == "allow":
+          resource_infor=resource_info(node)
+          #code for exception 
+          if resource_infor._type == "Group":
+              return "allow"
+          elif resource_infor.created_by == user.id:
+              return "allow"    
+          elif resource_infor.status == "PUBLISHED":    
+              return "allow"
+  elif group_access == "Moderated": 
+       return "allow"
+  elif resource_infor.created_by == user.id:
+              return "allow"    
+     	      
+		
+   
+
+@register.assignment_tag
+def get_prior_post_node(group_id):
+  
+  col_Group = db[Group.collection_name]
+  prior_post_node=col_Group.Group.one({'_type': 'Group',"_id":ObjectId(group_id)})
+  #check wheather we got the Group name       
+  if prior_post_node is not  None:
+       #first check the prior node id  and take the id
+       Prior_nodeid=prior_post_node.prior_node
+       #once you have the id check search for the base node
+       base_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Prior_nodeid}})
+       
+       if base_colg is None:
+          #check for the Post Node id
+           Post_nodeid=prior_post_node.post_node
+           Mod_colg=col_Group.Group.one({'_type':u'Group','_id':{'$in':Post_nodeid}})
+           if Mod_colg is not None:
+            #return node of the Moderated group            
+            return Mod_colg
+       else:
+          #return node of the base group
+          return base_colg
+  
+  
+
+
+  
