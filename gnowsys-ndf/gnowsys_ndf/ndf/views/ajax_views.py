@@ -222,7 +222,7 @@ def make_module_set(request, group_id):
                         return HttpResponse("module succesfull created")
                     else:
                         gsystem_obj.delete()
-                        return HttpResponse("Attribute type 'module_set_md5' yet not created Run 'python manage.py filldb on terminal to create'")
+                        return HttpResponse("Error Occured while checking modules existance'")
             else:
                 return HttpResponse("Not a valid id passed")
         except Exception as e:
@@ -246,6 +246,8 @@ def sotore_md5_module_set(object_id,module_set_md5):
     else:
         print "Run 'python manage.py filldb' commanad to create AttributeType 'module_set_md5' "
         return 'False'
+#-- under construction    
+#def create_relation_module(object_id):
     
 
 def check_module_exits(module_set_md5):
