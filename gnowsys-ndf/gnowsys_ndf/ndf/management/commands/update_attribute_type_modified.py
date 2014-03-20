@@ -31,8 +31,11 @@ class Command(BaseCommand):
         for n in cur:
             if type(n['attribute_type']) == ObjectId:
                 attr_type = collection.Node.one( {'_id': n['attribute_type']} )
-                print attr_type.name
-                collection.update({'_id':n['_id']},{'$set':{'attribute_type':{"$ref" : attr_type.collection_name, "$id" : attr_type._id,"$db" :attr_type.db.name}}})
+                if attr_type:
+                    collection.update({'_id':n['_id']},{'$set':{'attribute_type':{"$ref" : attr_type.collection_name, "$id" : attr_type._id,"$db" :attr_type.db.name}}})
+                else:
+                    collection.remove({'_id':n['_id']})
+                
 
                 # # Retrieving attribute-type document(or object) from it's ObjectId stored in GAttribute's attribute_type field 
                 # attr_type = collection.Node.one( {'_id': n.attribute_type} )
