@@ -240,7 +240,7 @@ def sotore_md5_module_set(object_id,module_set_md5):
     if node_at is not None:
         try:
             attr_obj =  collection.GAttribute()                #created instance of attribute class
-            attr_obj.attribute_type = node_at._id
+            attr_obj.attribute_type = node_at
             attr_obj.subject = object_id
             attr_obj.object_value = unicode(module_set_md5)
             attr_obj.save()
@@ -254,11 +254,12 @@ def sotore_md5_module_set(object_id,module_set_md5):
 #-- under construction    
 def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
-    relation = collection.GRelation()                         #instance of GRelation class
-    relation.relation_type = rt_has_module
-    relation.right_subject = right_subject_id
-    relaton.subject = subject_id
-    relation.save()
+    if rt_has_module and subject_id and right_subject_id:
+        relation = collection.GRelation()                         #instance of GRelation class
+        relation.relation_type = rt_has_module
+        relation.right_subject = right_subject_id
+        relation.subject = subject_id
+        relation.save()
     
 
 def check_module_exits(module_set_md5):
@@ -266,7 +267,7 @@ def check_module_exits(module_set_md5):
     This method will check is module already exits ?
     '''
     node_at = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
-    attribute = collection.Triple.one({'_type':'GAttribute', 'attribute_type':node_at._id, 'object_value':module_set_md5}) 
+    attribute = collection.Triple.one({'_type':'GAttribute', 'attribute_type.$id':node_at._id, 'object_value':module_set_md5}) 
     if attribute is not None:
         return 'True'
     else:
