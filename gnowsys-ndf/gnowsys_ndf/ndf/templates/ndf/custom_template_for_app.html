@@ -9,13 +9,17 @@
   {% get_memberof_objects_count each.id as count %}
   {% ifequal each.id app_set_id %}
   <li class="active"> 
-    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
-    <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}">&nbsp;+</a>
+    <div>
+    <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+    </div>
   </li>
     {% else %}
     <li> 
-      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
-      <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}">&nbsp;+</a>
+      <div>
+      <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+      </div>
     </li>
     {% endifequal %}
     {% endfor %}
