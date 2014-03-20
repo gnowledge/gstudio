@@ -11,18 +11,17 @@
 	<style type="text/css">
 
 		#chart .link {
-			/*stroke: #ccc;*/
+			stroke: #ccc;
 		}
 
 		#chart .nodetext {
-			/*#pointer-events: none;*/
-			/*font: 10px Serif;*/
-			/*font-style:italic;*/
+			#pointer-events: none;
+			font: 10px Serif;
+			font-style:italic;
 		}
 
 		/*Central node shown in ellipse*/
 		#chart .mainnode{
-
 			font: 15px sans-serif;
 			fill:"black";
 			border-width: 1px;
@@ -32,16 +31,16 @@
 
 		/*Connector element that connects two nodes*/
 		#chart .relnode {
-			/*font: 10px sans-serif;			*/
-			/*fill:#404040;*/
+			font: 10px sans-serif;			
+			fill:#404040;
 		}
 
 		/*Peripheral nodes to main node*/
 		#chart .node {
-			/*border-width: 1px;*/
-			/*border-color: gray;*/
-			/*fill:#154534;*/
-			/*font: 12px sans-serif;*/
+			border-width: 1px;
+			border-color: gray;
+			fill:#154534;
+			font: 12px sans-serif;
 		}
 
 		/*body {
@@ -54,14 +53,10 @@
 		#chart {
 			display: block;
 			padding-top: 1%;
-			/*padding-left:1%;*/
-			/*padding-right: 1% */
 			height: 87%;
 			float: left;
 			width: -webkit-calc(75%); width:-o-calc(75%); width: -moz-calc(75%); width: calc(77%);
 			display: block;
-			/*position: absolute;*/
-			
 		}
 
 		#view-graph svg {
@@ -85,21 +80,26 @@
 </head>
 	<body>
 		
+		<!-- This is panel on LHS of graph -->
 		<div class="graph-info-panel">
 			<div>
+				<!-- Title of current page -->
 				<h3 class="text-center">{{node.name}}</h3>				
 			</div>
+			<!-- Download Button -->
 			<input type="button" class="button expand" value="Save as SVG" onclick='download("{{node.name}}");' />
 		</div>
 
 		<!-- Div containing svg area -->
 		<div id="chart"></div>
 			<script type="text/javascript">
-			var graphHeight = ($(window).height()*0.87),
-				graphWidth  = ($(window).width()*0.77);
 
-			var objectid = "{{node.pk}}";	// _id of current viewing page
-			var flag=false;
+			var graphHeight = ($(window).height()*0.87), // Getting 87% of window height 
+				graphWidth  = ($(window).width()*0.77);	 // Getting 77% of window width 
+
+			var objectid = "{{node.pk}}";				// _id of current viewing page
+			var flag=false;								// flag used for shift+click (Fixing position of node)
+
 
 			function init(a,b)
 			{
@@ -110,7 +110,7 @@
 				}, {});
 				all_edges=new Array();
 
-		    //this contains all the links between the nodes
+		    	//all_edges contains all the links between the nodes
 		   		all_edges =_(b).chain().map(function(e)
 		    	{
 		    		e.source = nodes_by_id[e.from];
@@ -123,7 +123,8 @@
 				}).value();  
 			} // ====== END of init() ======
 
-// -------------------fgraph()--------------------
+
+			// -------------------fgraph()--------------------
 			function fgraph() 
 			{	
 				neighbour_node= new Array();
@@ -141,7 +142,8 @@
 				}); // --END of getJSON()
 			} // ====== END of fgraph ======
 
-// -------------------load()--------------------
+			
+			// -------------------load()--------------------
 			function load(key)
 			{
 				var w = graphWidth,
@@ -152,21 +154,41 @@
 							.append("svg:svg")
 							.attr("id", "amazingViz")
 							.attr("height", h)
-							.attr("width", w);
+							.attr("width", w)
+							.attr("xmlns", "http://www.w3.org/2000/svg")
+							.attr("version", "1.1");
 
-					vis.append("rect")
-						.attr("height", "100%")
-						.attr("width", "100%")
-						.style("fill", "white");
+				// Definition of marker
+                vis.append("svg:marker")
+    		             .attr("id", "arrowhead")
+                		 .attr("viewBox","0 0 10 10")
+                		 .attr("refX","20")
+                		 .attr("refY","5")
+                		 .attr("markerUnits","strokeWidth")
+                		 .attr("markerWidth","9")
+                		 .attr("markerHeight","5")
+                		 .attr("orient","auto")
+                		 .append("svg:path")
+                		 .attr("d","M 0 0 L 10 5 L 0 10 z")
+                		 .attr("fill", "#6D6666"); 
 
-					vis.append("svg:g").attr("class", "edges");
 
-					vis.append("svg:g").attr("class", "nodes");
 
-					nodes_by_id[key].x = w/2.0;
-					nodes_by_id[key].y = h/2.0;       
+				// Adding white color rectangle to background of graph 
+				vis.append("rect")
+					.attr("height", "100%")
+					.attr("width", "100%")
+					.style("fill", "white");
 
-					var force = d3.layout.force()
+				vis.append("svg:g").attr("class", "edges");
+
+				vis.append("svg:g").attr("class", "nodes");
+
+				nodes_by_id[key].x = w/2.0;
+				nodes_by_id[key].y = h/2.0;       
+
+				// Defining properties of graph
+				var force = d3.layout.force()
 							.linkStrength(1)
 							.charge(-5000)
 							.friction(0.7)
@@ -177,14 +199,14 @@
 							.size([w, h])
 							.start();
 
-					var drag = force.drag();
+				var drag = force.drag();
 
 				function update(edges)
 				{
-			    // for each func
+			    	// for each func
 				    _.each(nodes_by_id, function(n){n.added = false});
 			        
-			    // reduce the nodes list to have only those nodes for a given rel.
+			    	// reduce the nodes list to have only those nodes for a given rel.
 				    nodes = _.reduce(edges, function(acc, e) 
 				    {
 				    	if(nodes_by_id[e.from] && !nodes_by_id[e.from].added)
@@ -220,36 +242,21 @@
 
 	                var node = d3.select("#chart g.nodes").selectAll("g.node").data(nodes);
 
-
-
 	                var new_g = node.enter().append("svg:a")
 	                				.attr("class", function(d){
 
-                						var e=(d._id).charAt(0);
+                						// var e=(d._id).charAt(0);
 
 	                					if (d._id==key) return "mainnode";
-    	            					else if (e=="-") return "nodetext";
-        	        					else if (isNaN(d._id)) return "relnode"; //logic to give class to relation node (pending)
-            	    					else return "node"; 
+    	            					// else if (e=="-") return "nodetext";
+        	        					else if ((d._id).slice(-2) == "_r") return "relnode"; //logic to give class to relation node (pending)
+            	    					else if (d.refType == "Relation")return "node"; 
             	    				})
             	    				
                 					//.attr("xlink:href", function(d){ if(d.refType == 'relation') return d.url})
                 					.call(drag);
 
-                // Definition of marker
-	                new_g.append("svg:marker")
-    		             .attr("id", "arrowhead")
-                		 .attr("viewBox","0 0 10 10")
-                		 .attr("refX","20")
-                		 .attr("refY","5")
-                		 .attr("markerUnits","strokeWidth")
-                		 .attr("markerWidth","9")
-                		 .attr("markerHeight","5")
-                		 .attr("orient","auto")
-                		 .append("svg:path")
-                		 .attr("d","M 0 0 L 10 5 L 0 10 z")
-                		 .attr("fill", "#6D6666"); 
-
+                	
                 // $("#chart").bind('click',function(event) {
                 	// if(event.ctrlKey==1){
 
@@ -364,19 +371,44 @@
 						}
 					});
 
-					text1 = new_g.append("svg:text")
-                				 // .attr("class",function(d) {
-                				 // 	if (d._id==key) return "mainnode";
-                				 // 	// else if (e=="-") return "nodetext";
-                				 // 	else if ( d._id.search("_r") > 0) return "relnode";
-                				 // 	else return "node";
-                				 // })
+					
+					new_g.filter(function(d){ return (d._id).slice(-2) =="_n"; })
+						.append("svg:rect")
+                		.attr("x", function(d) {var ttx=d.screen_name ;  return (-ttx.length*2/1.75)} )
+                		.attr("y", 10)	
+                		.attr("width", function(d) {var ttx=d.screen_name ;  return (ttx.length+22+40)})
+                		.attr("height", 20)
+                		.call(drag)
+                		.style("fill-opacity", ".1")
+                		.style("stroke", "lightgray")
+                		.style("stroke-width","1px");
+
+                	new_g.filter(function(d) { if(d.refType=="GSystem" || d.refType=="Relation") return true ;}).append("svg:ellipse")
+                		.attr("cx", 25)                
+                		.attr("cy", 20)
+                		.call(drag)
+                		.attr("rx",function(d) {var ttx=d.screen_name; return(ttx.length/2 +"em")})
+                		.attr("ry",15)
+                		.style("fill-opacity", function(d) {if (d.refType=="Relation") return 0.2; else if(d.refType=="GSystem") return 0.7;})
+                	// .style("stroke", "#666")
+                	// .style("stroke-width", "1.5px")
+                		.style("fill", function(d) {if (d.refType=="Relation") return "#008759"; else if(d.refType=="GSystem") return "#008759"; else return "none"})
+                		.on("dblclick",dblclick);
+
+
+                	text1 = new_g.append("svg:text")
+                				 .attr("class",function(d) {
+                				 	if (d._id==key) return "mainnode";
+                				 	// else if (e=="-") return "nodetext";
+                				 	else if ( d._id.search("_r") > 0) return "relnode";
+                				 	else if ( d.refType == "Relation" ) return "node";
+                				 })
                 				 .attr("y", 20)
                 				 .attr("x", 25)
                 				 .attr("dy", ".35em")
                 				 .attr("text-anchor","middle")
                 				 .on("drag",drag)
-                				 .text(function(d){ return d.screen_name; })
+                				 .text(function(d){  return d.screen_name; })
                 				 .style("font", function(d){
 
             	    					nodeFont = d._id==key?"bold 15px sans-serif":(d.refType=="Relation"||(d._id).slice(-2)=="_n")?"normal 12px serif":"normal 10px sans-serif";
@@ -384,7 +416,7 @@
             	    				})
                 				 .style("fill", function(d){
                 				 	if(d.refType=="GSystem"){ return "black" }
-                				 	if(d.refType=="Relation" || (d._id).slice(-2)=="_n"){ return "#154534" }
+                				 	if(d.refType=="Relation" || (d._id).slice(-2)=="_n"){ return "#00432c" }
                 				 	else if((d._id).slice(-2)=="_r")
                 				 		{ return "#404040"}
                 				 })
@@ -403,17 +435,6 @@
                 		// .style("stroke", "#000")
                 		// .style("stroke-width","1px"  );
 
-                	new_g.filter(function(d) { if(d.refType=="GSystem") return true ;}).append("svg:ellipse")
-                		.attr("cx", 25)                
-                		.attr("cy", 20)
-                		.call(drag)
-                		.attr("rx",function(d) {var ttx=d.screen_name; return(ttx.length/3 +"em")})
-                		.attr("ry",20)
-                		.style("fill-opacity", ".2")
-                	// .style("stroke", "#666")
-                	// .style("stroke-width", "1.5px")
-                		.style("fill", function(d) {if (d.refType=="Objecttype") return "blue"; else if(d.refType=="GSystem") return "#008759"; else return "none"})
-                		.on("dblclick",dblclick);
 
                 		node.exit().remove();
 
@@ -490,7 +511,7 @@
 				    // el.setAttribute('href', 'data:image/svg+xml;,' + encodeURIComponent(svgdata));
 				    // el.setAttribute('download', filename);
 				    // el.click();
-
+				    
 				    var blob = new Blob([$("#chart").html()], {type: "image/svg+xml"});
 				    filename = filename.replace(/\ /g, '_');
 				    filename += "_graph.svg";
