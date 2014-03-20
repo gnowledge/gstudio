@@ -24,7 +24,7 @@ from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import Group
-
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 
@@ -35,6 +35,7 @@ db = get_database()
 gst_collection = db[GSystemType.collection_name]
 gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
 gs_collection = db[GSystem.collection_name]
+collection = db[Node.collection_name]
 
 #######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
@@ -150,3 +151,16 @@ def edit_group(request,group_id):
                                       )
 
 
+def switch_group(request,group_id,node_id):
+    print "inside switch_group"
+    coll_obj_list = []
+    print "nodeid",node_id
+    st = collection.Node.find({"_type":"Group"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.group_set:
+        coll_obj_list.append(collection.Node.one({'_id':each}))
+    data_list=set_drawer_widget(st,coll_obj_list)
+    print "dl=",data_list[0]
+    print "dl1=",data_list[1]
+    return HttpResponse(json.dumps(data_list))
+    return 

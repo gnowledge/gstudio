@@ -415,9 +415,8 @@ def graph_nodes(request, group_id):
 # ------ End of processing for graph ------
 
 
-def get_data_for_switch_groups(request,group_id):
+def get_data_for_switch_groups(request,group_id,node_id):
     coll_obj_list = []
-    node_id = request.GET.get("object_id","")
     print "nodeid",node_id
     st = collection.Node.find({"_type":"Group"})
     node = collection.Node.one({"_id":ObjectId(node_id)})
