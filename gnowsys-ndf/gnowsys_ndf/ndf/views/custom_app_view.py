@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import *
 
 db = get_database()
 collection = db['Nodes']
@@ -29,6 +30,8 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
     app_set_instance_name = ""
     app_set_name = ""
     title = ""
+    tags = ""
+    content = ""
     for eachset in app.collection_set:
 	 app_set = collection.Node.find_one({"_id":eachset})
 	 app_collection_set.append({"id":str(app_set._id),"name":app_set.name}) 	
@@ -70,12 +73,13 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
                 right_subject = collection.Node.find_one({"_id":ObjectId(eachrelation.right_subject)})
                 rtlist.append({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
 
-                              
+        tags = ",".join(system.tags)
+        content = system.content
         app_set_name = systemtype.name
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
     template = "ndf/custom_template_for_app.html"
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist})
+    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, "content":content})
     return render_to_response(template, variable)
       
 
@@ -109,6 +113,8 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
     request_at_dict = {}
     request_rt_dict = {}
     if request.method=="POST":
+        tags = request.POST.get("tags","")
+        content_org = unicode(request.POST.get("content_org",""))
         name = request.POST.get("name","")
         for each in systemtype_attributetype_set:
             request_at_dict[each["type_id"]] = request.POST.get(each["type_id"],"")
@@ -119,6 +125,12 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
         newgsystem.name = name
         newgsystem.member_of=[ObjectId(app_set_id)]
         newgsystem.created_by = request.user.id
+        if tags:
+             newgsystem.tags = tags.split(",")
+        if content_org:
+            usrname = request.user.username
+            filename = slugify(newgsystem.name) + "-" + usrname
+            newgsystem.content = org2html(content_org, file_prefix=filename)
         newgsystem.save()
         for key,value in request_at_dict.items():
             attributetype_key = collection.Node.find_one({"_id":ObjectId(key)})

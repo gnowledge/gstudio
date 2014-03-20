@@ -95,7 +95,28 @@
      </div>
   {% endfor %}
   {% endif %}
-
+     {% if tags %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> tags </font> 
+       </div>
+       <div style="display:table-cell;">
+	 <font size="3"> {{tags}} </font>
+       </div>
+     </div>
+     {% endif %}
+     {% if content %}
+    <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> content: </font> 
+       </div>
+    </div>
+    <div style="display:block">
+    {% with content|safe as description %}
+    {{ description }}
+    {% endwith %}
+    </div>
+    {% endif %}
   </div>    
 {% endif %}
 
@@ -149,9 +170,32 @@
      </div>
      {% endfor %}
      {% endif %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> Tags</font> 
+       </div>
+       <div style="display:table-cell;">
+         <input id="tags_id" name="tags" type="textbox" value="" placeholder="Separate tags with commas...">
+       </div>
+     </div>
+    <div style="display:table-row;">
+      <div style="display:table-cell;"> 
+	<font size="3"> Content</font> 
+      </div>
+      <div style="display:table-cell">
+	<div id="contentlist" class="content">
+	  <div class="">
+	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+	  </div>
+	</div>
+      </div>
+    </div>
 
-     <input type="submit" name="submit" class="button" id="save-system">
+
+
   </div>
+  <input type="submit" name="submit" class="button" id="save-system">
+
 </form>
 {% endif %}
 
