@@ -82,7 +82,7 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, "content":content})
     return render_to_response(template, variable)
       
-
+@login_required
 def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
     """
     create new instance of app_set of apps view for custom GAPPS
