@@ -115,16 +115,17 @@
 	      
               <div class="th">
 		<a href="{% url 'read_file' groupid file grid_fs_obj.filename %}">
-		  <img src="/static/ndf/images/icon/meta.svg" />
+		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
+		  <img src="{% url 'getFileThumbnail' groupid file %}">
 		</a>
 	      </div>
               <h4>{{file.name}}</h4>
               <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
           </header>
 
-          <p>File description?</p>
+          <p>File description</p>
 
-          <a class="button expand" href ="{% url 'read_file' groupid file grid_fs_obj.filename %}">View details</a>
+          <a class="button expand" href ="{% url 'file_detail' groupid file %}">View details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
@@ -155,7 +156,8 @@
         
             <div class="th">
 	      <a href="{% url 'read_file' groupid file grid_fs_obj.filename %}">
-		<img src="/static/ndf/images/icon/meta.svg" />
+		<!--<img src="/static/ndf/images/icon/meta.svg">-->
+		<img src="{% url 'getFileThumbnail' groupid file %}">
 	      </a>
 	    </div>
             <h4>{{file.name}}</h4>
@@ -164,7 +166,7 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'read_file' groupid file grid_fs_obj.filename %}">View details</a>
+          <a class="button expand" href ="{% url 'file_detail' groupid file %}">View details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
