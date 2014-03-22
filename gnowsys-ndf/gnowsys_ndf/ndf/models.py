@@ -417,9 +417,11 @@ class Node(DjangoDocument):
         gsystem_type_list = []
         possible_attributes = {}
 
-        # Converts to list, if only single ObjectId is passed
+        # Converts to list, if passed parameter is only single ObjectId
         if not isinstance(gsystem_type_id_or_list, list):
             gsystem_type_list = [gsystem_type_id_or_list]
+        else:
+            gsystem_type_list = gsystem_type_id_or_list
 
         # Code for finding out attributes associated with each gsystem_type_id in the list
         for gsystem_type_id in gsystem_type_list:
@@ -431,8 +433,10 @@ class Node(DjangoDocument):
                 else:
                     print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
             
+            # Case - While editing GSystem
+            # Checking in Gattribute collection - to collect user-defined attributes' values, if already set!
             if self.has_key("_id"):
-                # If - node has key _id
+                # If - node has key '_id'
                 collection = get_database()[Triple.collection_name]
                 attributes = collection.Triple.find({'subject': self._id})
             
@@ -441,12 +445,24 @@ class Node(DjangoDocument):
                     # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [document-object]
                     AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
 
+            # Case - While creating GSystem / if new attributes get added
+            # Again checking in AttributeType collection - because to collect newly added user-defined attributes, if any!
             collection = get_database()[Node.collection_name]
             attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
                 
             for attr in attributes:
                 # Here attr is of type -- AttributeType
                 AttributeType.append_attribute(attr, possible_attributes)
+
+            # type_of check for current GSystemType to which the node belongs to
+            gsystem_type_node = collection.Node.one({'_id': gsystem_type_id}, {'name': 1, 'type_of': 1})
+
+            if gsystem_type_node.type_of:
+                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_node.type_of]}})
+                
+                for attr in attributes:
+                    # Here attr is of type -- AttributeType
+                    AttributeType.append_attribute(attr, possible_attributes)
 
         return possible_attributes
 
