@@ -10,8 +10,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.file',
                         url(r'^documentList/', 'GetDoc', name='documentList'),
                         url(r'^readDoc/(?P<_id>[\w-]+)/(?P<file_name>[^/]+)$', 'readDoc', name='read_file'),
                         url(r'^search/$', 'file_search', name='file_search'),
-                        url(r'^file_detail/(?P<_id>[\w-]+)$', 'file_detail', name='file_detail'),
-                        url(r'^fileThumbnail/(?P<_id>[\w-]+)$', 'getFileThumbnail', name='getFileThumbnail'),
+                        url(r'^details/(?P<_id>[\w-]+)$', 'file_detail', name='file_detail'),
+                        url(r'^thumbnail/(?P<_id>[\w-]+)$', 'getFileThumbnail', name='getFileThumbnail'),
                         url(r'^delete_file/(?P<_id>[\w-]+)$', 'delete_file', name='delete_file'),
                        
 )
