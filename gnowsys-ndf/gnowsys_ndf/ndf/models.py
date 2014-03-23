@@ -215,7 +215,7 @@ class Node(DjangoDocument):
         collection = get_database()[Node.collection_name]
 
         for each_member_id in self.member_of:
-            member_of_names.append(collection.Node.one({'_id': each_member_id}).name)
+            member_of_names.append(collection.Node.one({'_id': ObjectId(each_member_id)}).name)
 
         return member_of_names
 

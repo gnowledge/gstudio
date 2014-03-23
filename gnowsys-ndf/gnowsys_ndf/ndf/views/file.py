@@ -54,14 +54,15 @@ def file(request, group_id, file_id):
     """
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
-        collection = db[File.collection_name]
-        files = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
-        imageCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
-        videoCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
+        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
         already_uploaded = request.GET.getlist('var', "")
         return render_to_response("ndf/file.html", 
                                   {'title': title, 
                                    'files': files,
+                                   'docCollection': docCollection,
                                    'imageCollection': imageCollection,
                                    'videoCollection': videoCollection,
                                    'already_uploaded': already_uploaded,
