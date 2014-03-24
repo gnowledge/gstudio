@@ -251,6 +251,13 @@ def sotore_md5_module_set(object_id,module_set_md5):
         print "Run 'python manage.py filldb' commanad to create AttributeType 'module_set_md5' "
         return 'False'
 
+#-- under construction
+def create_version_of_module():
+    '''
+    This method will create attribute version_no of module with at type version
+    '''
+    at_version = collection.Node.one({'_type':'AttributeType', 'name':'version'})
+
 #-- under construction    
 def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
