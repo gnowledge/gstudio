@@ -71,8 +71,13 @@ $(document).ready(function()
 </script>
 {% endblock %}
 
+<!-- overide meta_content block from base.html -->
 {% block meta_content %}
 
+{% endblock %}
+
+<!-- overide related_content block from base.html -->
+{% block related_content %}
 <p> Members in this group :{{node.author_set|length}} </p>
 
 {% get_group_policy node request.user as policy %}
@@ -86,6 +91,7 @@ $(document).ready(function()
 
 <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
 {% endif %}
+
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
 
@@ -97,11 +103,7 @@ $(document).ready(function()
 <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
 {% endifequal %} 
 
-
-
-
 {% endblock %}
-
 
 {% block body_content %}
 
