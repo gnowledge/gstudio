@@ -1,0 +1,13 @@
+{% extends "ndf/node_details_base.html" %}
+{% load ndf_tags %}
+
+{% block add_list %}
+{% get_grid_fs_object node as grid_fs_obj %}
+
+<li>
+<a href="{% url 'read_file' groupid node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
+  <i class="fi-download large"> download  </i>
+</a>
+</li>
+{% endblock %}
+

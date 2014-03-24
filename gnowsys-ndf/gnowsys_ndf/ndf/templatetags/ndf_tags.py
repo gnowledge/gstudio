@@ -388,6 +388,8 @@ def get_edit_url(groupid):
       return 'video_edit'       
     elif 'image' in node.mime_type:
       return 'image_edit'
+    else:
+      return 'file_edit'
 
   
 

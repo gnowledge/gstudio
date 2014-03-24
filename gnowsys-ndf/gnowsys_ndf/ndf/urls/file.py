@@ -13,5 +13,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.file',
                         url(r'^details/(?P<_id>[\w-]+)$', 'file_detail', name='file_detail'),
                         url(r'^thumbnail/(?P<_id>[\w-]+)$', 'getFileThumbnail', name='getFileThumbnail'),
                         url(r'^delete_file/(?P<_id>[\w-]+)$', 'delete_file', name='delete_file'),
+                        url(r'^edit_file/(?P<_id>[\w-]+)$', 'file_edit', name='file_edit')
                        
 )
