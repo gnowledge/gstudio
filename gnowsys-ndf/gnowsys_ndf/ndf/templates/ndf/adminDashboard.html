@@ -176,7 +176,7 @@ function set_drawer_value(node_id)
 {
  $('#mySystemtype #collection_set_drawer1').html("");
  $('#mySystemtype #collection_set_drawer2').html("");
- $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
+ $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
   var url = '/{{groupid}}/ajax/get_data_for_drawer/?id='+node_id ;
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
@@ -200,7 +200,7 @@ function attributetype_set_drawer_value(node_id)
 {
  $('#myAttributetype #attributetype_set_drawer1').html("");
  $('#myAttributetype #attributetype_set_drawer2').html("");
- $('#myAttributetype #attributetype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
+ $('#myAttributetype #attributetype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="attributetype_set_search" class="margin-0"></li>');
   var url = '/{{groupid}}/ajax/get_data_for_drawer_of_attributetype_set/?id='+node_id ;
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
@@ -224,7 +224,7 @@ function relationtype_set_drawer_value(node_id)
 {
  $('#myRelationtype #relationtype_set_drawer1').html("");
  $('#myRelationtype #relationtype_set_drawer2').html("");
- $('#myRelationtype #relationtype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="_search" class="margin-0"></li>');
+ $('#myRelationtype #relationtype_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="relationtype_set_search" class="margin-0"></li>');
   var url = '/{{groupid}}/ajax/get_data_for_drawer_of_relationtype_set/?id='+node_id ;
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
