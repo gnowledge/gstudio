@@ -213,9 +213,16 @@ class Node(DjangoDocument):
         member_of_names = []
 
         collection = get_database()[Node.collection_name]
-
-        for each_member_id in self.member_of:
-            member_of_names.append(collection.Node.one({'_id': each_member_id}).name)
+        if self.member_of:
+            for each_member_id in self.member_of:
+                mem=collection.Node.one({'_id': ObjectId(each_member_id)})
+                if mem:
+                    member_of_names.append(mem.name)
+        else:
+            for each_member_id in self.gsystem_type:
+                mem=collection.Node.one({'_id': ObjectId(each_member_id)})
+                if mem:
+                    member_of_names.append(mem.name)
 
         return member_of_names
 
@@ -1066,7 +1073,7 @@ class Triple(DjangoDocument):
     
     required_fields = ['name', 'subject']
     use_dot_notation = True
-
+    use_autorefs = True
     ########## Built-in Functions (Overridden) ##########
     
     def __unicode__(self):
