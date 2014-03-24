@@ -66,9 +66,9 @@
       <!-- Node create card-->
       <li class="create card">
         <div class="file">
-          <h4><i class="fi-plus"></i> New Upload</h4>
+         <h4><i class="fi-plus"></i> New Upload</h4>
 
-          <div class="row">
+         <!-- <div class="row">
 
             <div class="large-12 columns">
               <input type="text" placeholder="Name of the File" />
@@ -86,8 +86,7 @@
 
             </div>
 
-          </div>
-
+          </div>-->
           {% if user.is_authenticated %}
           <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
             <span class="fi-upload">  Upload File</span>
@@ -119,7 +118,10 @@
 		</a>
 	      </div>
               <h4>{{file.name}}</h4>
-              <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
+	      <div>
+		<small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+		</small>
+	      </div>
           </header>
 
           <p>File description?</p>
@@ -159,7 +161,10 @@
 	      </a>
 	    </div>
             <h4>{{file.name}}</h4>
-            <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
+	    <div>
+		<small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+		</small>
+	      </div>
           </header>
 
           <p>This file is a..</p>
@@ -250,7 +255,10 @@
 		</a>
 	      </div>
               <h4>{{image.name}}</h4>
-              <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
+	      <div>
+		<small class="subheader">{{ image.member_of_names_list|join:', ' }} created {{image.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{image.user_details_dict.created_by}}</span> 
+		</small>
+	      </div>
 	      
           </header>
 
@@ -341,7 +349,10 @@
 		</a>
 	      </div>
               <h4>{{video.name}}</h4>
-              <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
+	      <div>
+		<small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{video.user_details_dict.created_by}}</span> 
+		</small>
+	      </div>
 	      
           </header>
 
