@@ -248,10 +248,9 @@
                                                          
 							
 								<!--Content search -->
+								{% block search_content %}
 								{% include "ndf/node_search_base.html" %}
-
-
-								{% block search_content %}  {% endblock %}
+								{% endblock %}
 								<!--ul id="search-results">
 									{% block search_results %}  {% endblock %}
 									<li>
