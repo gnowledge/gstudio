@@ -32,16 +32,17 @@ import ox
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 
+from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 
 #######################################################################################################################################
 
 db = get_database()
-GST_COLLECTION = db[GSystemType.collection_name]
-GST_FILE = GST_COLLECTION.GSystemType.one({'name': GAPPS[1]})
-GST_IMAGE = GST_COLLECTION.GSystemType.one({'name': GAPPS[3]})
-GST_VIDEO = GST_COLLECTION.GSystemType.one({'name': GAPPS[4]})
+collection = db[Node.collection_name]
+GST_FILE = collection.GSystemType.one({'name': GAPPS[1]})
+GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4]})
 
 
 ####################################################################################################################################                                             V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
@@ -53,14 +54,15 @@ def file(request, group_id, file_id):
     """
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
-        collection = db[File.collection_name]
-        files = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
-        imageCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
-        videoCollection = collection.GSystem.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
+        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
         already_uploaded = request.GET.getlist('var', "")
         return render_to_response("ndf/file.html", 
                                   {'title': title, 
                                    'files': files,
+                                   'docCollection': docCollection,
                                    'imageCollection': imageCollection,
                                    'videoCollection': videoCollection,
                                    'already_uploaded': already_uploaded,
@@ -360,3 +362,41 @@ def delete_file(request, group_id, _id):
   except Exception as e:
     print "Exception:", e
   return HttpResponseRedirect(pageurl) 
+
+
+def file_detail(request, group_id, _id):
+    """Depending upon mime-type of the node, this view returns respective display-view.
+    """
+    file_node = collection.File.one({"_id": ObjectId(_id)})
+
+    file_template = ""
+
+    if file_node.mime_type == 'video':      
+        file_template = "ndf/video_detail.html"
+    elif 'image' in file_node.mime_type:
+        file_template = "ndf/image_detail.html"
+    else:
+        grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
+        return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
+
+    return render_to_response(file_template,
+                              { 'node': file_node,
+                                'group_id': group_id,
+                                'groupid':group_id
+                              },
+                              context_instance = RequestContext(request)
+                             )
+
+def getFileThumbnail(request, group_id, _id):
+    """Returns thumbnail of respective file
+    """
+    file_node = collection.File.one({"_id": ObjectId(_id)})
+
+    if file_node is not None:
+        if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
+            f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
+            return HttpResponse(f.read(), content_type=f.content_type)
+    else:
+        return HttpResponse("")
+
+
