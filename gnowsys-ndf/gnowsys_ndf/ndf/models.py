@@ -714,7 +714,9 @@ class GSystemType(Node):
         'meta_type_set': [MetaType],            # List of Metatypes
         'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
         'relation_type_set': [RelationType],    # Holds list of Relation Types
-        'process_type_set': [ProcessType]       # List of Process Types 
+        'process_type_set': [ProcessType],      # List of Process Types
+
+        'property_order': []                    # List of user-defined attributes in template-view order
     }
     
     use_dot_notation = True
