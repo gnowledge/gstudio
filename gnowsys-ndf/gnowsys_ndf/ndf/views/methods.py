@@ -62,7 +62,11 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         drawer = collection.Node.find({'_type': u"File", 'type_of': {'$in': [u"", None]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
       elif checked == "Image":         
-        drawer = collection.Node.find({'_type': u"File", 'type_of': {'$in': [u"", None]},'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawers = collection.Node.find({'_type': u"File", 'type_of': {'$in': [u"", None]},'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = []
+        for each in drawers:
+          if 'image' in each.mime_type:
+            drawer.append(each)
 
       elif checked == "Video":         
         drawer = collection.Node.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [ObjectId(group_id)]}})
