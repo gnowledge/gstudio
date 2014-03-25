@@ -1,5 +1,6 @@
 {% load ndf_tags %}
 
+
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
 
 <header class="row page">
@@ -32,7 +33,6 @@
   </section>
 
 </header>
-
 <div class="row">
 
   <section class="medium-9 columns">
@@ -59,19 +59,20 @@
         <!-- Code for showing media details -->
         {% if node.mime_type == 'video' %}
         <div>
-  			<video width="640px" controls buffered>
-  			<source src="{% url 'getFullvideo' groupid node  %}" type="video/webm">
-  			<source src="{% url 'getFullvideo' groupid node  %}" type="video/ogg">    
-			Your browser does not support the video tag.
+  	
+			  <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+    			    <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
+                            
+
+
+  			Your browser does not support the video tag.
 			</video>
 			<br/>
-			<a href="{% url 'getFullvideo' groupid node %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
-  				<i class="fi-download large"> download  </i>
-			</a>
-			
+	
+			<!-- <a target="_blank" download="http://wetube.gnowledge.org/{{video_obj}}/480p.webm">Right click and choose "Save Link as.." to Download </a> -->
 		</div>
 
-		{% else %}		
+		{% else %}
 		
 		{% get_grid_fs_object node as grid_fs_obj %}
 		<div>
@@ -149,7 +150,7 @@
 
     {% else %}
 
-      <a href="{% url edit_url groupid node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+      <a href="{% url edit_url groupid node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
     {% endif %}    
     {% endif %}

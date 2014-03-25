@@ -95,7 +95,7 @@
           {% endif %}
 	</div>
       </li>
-
+ 
       {% if files.count != 0 %}
       <!-- Existing card list-->
       {% for file in files %}      
@@ -283,7 +283,6 @@
   <!-- View 3 -->
   <div class="content" id="view-video">
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
-
       <!-- Node create card-->
       <li class="create card">
         <div class="file">
@@ -316,6 +315,30 @@
           {% endif %}
 	</div>
       </li>
+{% for each in sourceid %}
+ {% get_user_object each.object.created_by as user_obj %}      
+      <li class="card">
+	<div class="file">
+	  <header>
+            <div class="th">
+	      <a href="http://wetube.gnowledge.org/{{each.id}}/480p.webm">
+		<img src="http://wetube.gnowledge.org/{{each.id}}/icon128.jpg">
+	      </a>
+	    </div>
+
+	    <h4>{{each.object.name}}</h4>
+	    
+	    <small>Created by <span class="user">{{user_obj.username}}</span> <em>{{each.object.created_at}}</em></small>
+	    
+          </header>
+	  <p>This file is a..</p>
+         
+	  <a class="button expand" href ="{% url 'video_detail' groupid each.object %}?vid_id={{each.id}}">View details</a>
+          </div>
+      </li>
+
+{% endfor %}
+
 
       {% if videoCollection.count != 0 %}
 
@@ -346,8 +369,7 @@
           </header>
 
           <p>This file is a..</p>
-
-          <a class="button expand" href ="{% url 'video_detail' groupid video %}">View details</a>
+          <a class="button expand" href ="">View details</a>
 
           {% get_user_object video.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
