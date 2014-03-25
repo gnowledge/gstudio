@@ -9,13 +9,17 @@
   {% get_memberof_objects_count each.id as count %}
   {% ifequal each.id app_set_id %}
   <li class="active"> 
-    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
-    <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}">&nbsp;+</a>
+    <div>
+    <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+    </div>
   </li>
     {% else %}
     <li> 
-      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
-      <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}">&nbsp;+</a>
+      <div>
+      <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+      </div>
     </li>
     {% endifequal %}
     {% endfor %}
@@ -83,6 +87,40 @@
      </div>
   {% endfor %}
   {% endif %}
+  {% if app_set_instance_rtlist %}
+  {% for rt in app_set_instance_rtlist %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> {{rt.type}} </font> 
+       </div>
+       <div style="display:table-cell;">
+	 <font size="3"> {{rt.value_name}} </font>
+       </div>
+     </div>
+  {% endfor %}
+  {% endif %}
+     {% if tags %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> tags </font> 
+       </div>
+       <div style="display:table-cell;">
+	 <font size="3"> {{tags}} </font>
+       </div>
+     </div>
+     {% endif %}
+     {% if content %}
+    <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> content: </font> 
+       </div>
+    </div>
+    <div style="display:block">
+    {% with content|safe as description %}
+    {{ description }}
+    {% endwith %}
+    </div>
+    {% endif %}
   </div>    
 {% endif %}
 
@@ -117,10 +155,51 @@
 	 {% endif %}
        </div>
      </div>
-       {% endfor %}
+     {% endfor %}
      {% endif %}
-     <input type="submit" name="submit" class="button" id="save-system">
+     {% if systemtype_relationtype_set %}
+     {% for rt in systemtype_relationtype_set %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> {{rt.rt_name}} </font> 
+       </div>
+       <div style="display:table-cell;">
+	 <select id="relation_selection" name="{{rt.type_id}}" style="width:50%">
+	   <option selected="selected" value="">Unknown</option>
+	   {% for each_gsystem in rt.object_type %}
+	   <option value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
+	   {% endfor %}
+	 </select>
+       </div>
+     </div>
+     {% endfor %}
+     {% endif %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> Tags</font> 
+       </div>
+       <div style="display:table-cell;">
+         <input id="tags_id" name="tags" type="textbox" value="" placeholder="Separate tags with commas...">
+       </div>
+     </div>
+    <div style="display:table-row;">
+      <div style="display:table-cell;"> 
+	<font size="3"> Content</font> 
+      </div>
+      <div style="display:table-cell">
+	<div id="contentlist" class="content">
+	  <div class="">
+	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+	  </div>
+	</div>
+      </div>
+    </div>
+
+
+
   </div>
+  <input type="submit" name="submit" class="button" id="save-system">
+
 </form>
 {% endif %}
 

@@ -47,10 +47,10 @@ def adminDashboardClass(request, class_name):
     objects_details = []
     for each in nodes:
         member = []
-        for members in each.member_of:
-            obj = collection.Node.one({ '_id': members})
-            if obj:
-                member.append(obj.name+" - "+str(members))
+        # for members in each.member_of:
+        #     obj = collection.Node.one({ '_id': members})
+        #     if obj:
+        #         member.append(obj.name+" - "+str(members))
 
         member = []
         member_of_list = []
@@ -75,6 +75,8 @@ def adminDashboardClass(request, class_name):
 	if class_name in ("GSystem","File"):
       		group_set = [collection.Node.find_one({"_id":eachgroup}).name for eachgroup in each.group_set ]
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Group":",".join(group_set),"Creation":each.created_at})
+        elif class_name in ("GAttribute","GRelation"):
+            objects_details.append({"Id":each._id,"Title":each.name,"Type":"","Author":"","Creation":""})
 	else :
 		objects_details.append({"Id":each._id,"Title":each.name,"Type":",".join(member),"Author":User.objects.get(id=each.created_by).username,"Creation":each.created_at,'member_of':",".join(member_of_list), "collection_list":",".join(collection_list), "attribute_type_set":",".join(attribute_type_set), "relation_type_set":",".join(relation_type_set)})
     groups = []

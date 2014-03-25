@@ -27,25 +27,23 @@ class Command(BaseCommand):
 
         collection = get_database()[Triple.collection_name]
         cur = collection.Triple.find( {'_type': 'GAttribute'} )
-        
+
         for n in cur:
-            if type(n.attribute_type) == ObjectId:
-                # Retrieving attribute-type document(or object) from it's ObjectId stored in GAttribute's attribute_type field 
-                attr_type = collection.Node.one( {'_id': n.attribute_type} )
+            if type(n['attribute_type']) == ObjectId:
+                attr_type = collection.Node.one( {'_id': n['attribute_type']} )
+                if attr_type:
+                    collection.update({'_id':n['_id']},{'$set':{'attribute_type':{"$ref" : attr_type.collection_name, "$id" : attr_type._id,"$db" :attr_type.db.name}}})
+                else:
+                    collection.remove({'_id':n['_id']})
 
-                # Replacing GAttribute's attribute_type field value from ObjectId to DBRef
-                n.attribute_type = attr_type
+            subject_doc = collection.Node.one({'_id': n.subject})
+            n.name = subject_doc.name + " -- " + n.attribute_type['name'] + " -- " + n.object_value
 
-                subject_doc = collection.Node.one({'_id': n.subject})
-
-                n.name = subject_doc.name + " -- " + n.attribute_type['name'] + " -- " + n.object_value
-
-                if history_manager.create_or_replace_json_file(n):
-                    fp = history_manager.get_file_path(n)
-                    message = "This document (" + n.name + ") is created on " + subject_doc.created_at.strftime("%d %B %Y")
-                    rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
-
-                n.save()
+            # Creates a history (version-file) for GAttribute documents
+            if history_manager.create_or_replace_json_file(n):
+                fp = history_manager.get_file_path(n)
+                message = "This document (" + n.name + ") is created on " + subject_doc.created_at.strftime("%d %B %Y")
+                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
 
         # --- End of handle() ---
 

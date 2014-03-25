@@ -59,9 +59,9 @@
 
   <!-- Node create card-->
   <li class="create card">
-    <div class="page">
+  <div class="page">
       <h4><i class="fi-plus"></i> New</h4>
-      <div class="row">
+      <!--<div class="row">
         <div class="large-12 columns">
 
           <input type="text" placeholder="Name of the {{title}}" />
@@ -80,7 +80,7 @@
           </div>
 
         </div>
-      </div>
+      </div>-->
       {% if user.is_authenticated %}
       <a class="button expand" href="{% url 'page_create_edit' groupid %}">
         Create {{title}}

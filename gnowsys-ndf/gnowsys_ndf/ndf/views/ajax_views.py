@@ -193,36 +193,40 @@ def make_module_set(request, group_id):
             _id = request.GET.get("_id","")
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
-                list_of_collection.append(node._id)
-                dict = {}
-                dict['id'] = unicode(node._id)
-                dict['version_no'] = hm_obj.get_current_version(node)
-                if node.collection_set:
-                    dict['collection'] = get_module_set_list(node)          #gives the list of collection with proper hierarchy as they are
+                if node:
+                    list_of_collection.append(node._id)
+                    dict = {}
+                    dict['id'] = unicode(node._id)
+                    dict['version_no'] = hm_obj.get_current_version(node)
+                    if node.collection_set:
+                        dict['collection'] = get_module_set_list(node)  #gives the list of collection with proper hierarchy as they are
            
-                #creating new Gsystem object and assining data of collection object
-                gsystem_obj = collection.GSystem()
-                gsystem_obj.name = unicode(node.name)
-                gsystem_obj.content = unicode(node.content)
-                gsystem_obj.member_of.append(GST_MODULE._id)
-                gsystem_obj.group_set.append(ObjectId(group_id))
-                # if usrname not in gsystem_obj.group_set:        
-                #     gsystem_obj.group_set.append(int(usrname))
-                gsystem_obj.created_by = int(request.user.id)
-                gsystem_obj.module_set.append(dict)
-                module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
-
-                check =check_module_exits(module_set_md5)          #checking module already exits or not
-                if(check == 'True'):
-                    return HttpResponse("This module already Exists")
-                else:
-                    gsystem_obj.save()
-                    check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
-                    if (check1 == 'True'):
-                        return HttpResponse("module succesfull created")
+                    #creating new Gsystem object and assining data of collection object
+                    gsystem_obj = collection.GSystem()
+                    gsystem_obj.name = unicode(node.name)
+                    gsystem_obj.content = unicode(node.content)
+                    gsystem_obj.member_of.append(GST_MODULE._id)
+                    gsystem_obj.group_set.append(ObjectId(group_id))
+                    # if usrname not in gsystem_obj.group_set:        
+                    #     gsystem_obj.group_set.append(int(usrname))
+                    gsystem_obj.created_by = int(request.user.id)
+                    gsystem_obj.module_set.append(dict)
+                    module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
+                    
+                    check =check_module_exits(module_set_md5)          #checking module already exits or not
+                    if(check == 'True'):
+                        return HttpResponse("This module already Exists")
                     else:
-                        gsystem_obj.delete()
-                        return HttpResponse("Attribute type 'module_set_md5' yet not created Run 'python manage.py filldb on terminal to create'")
+                        gsystem_obj.save()
+                        create_relation_of_module(node._id, gsystem_obj._id)
+                        check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
+                        if (check1 == 'True'):
+                            return HttpResponse("module succesfull created")
+                        else:
+                            gsystem_obj.delete()
+                            return HttpResponse("Error Occured while storing md5 of object in attribute'")
+                else:
+                    return HttpResponse("Object not present corresponds to this id")
             else:
                 return HttpResponse("Not a valid id passed")
         except Exception as e:
@@ -236,7 +240,7 @@ def sotore_md5_module_set(object_id,module_set_md5):
     if node_at is not None:
         try:
             attr_obj =  collection.GAttribute()                #created instance of attribute class
-            attr_obj.attribute_type = node_at._id
+            attr_obj.attribute_type = node_at
             attr_obj.subject = object_id
             attr_obj.object_value = unicode(module_set_md5)
             attr_obj.save()
@@ -246,6 +250,23 @@ def sotore_md5_module_set(object_id,module_set_md5):
     else:
         print "Run 'python manage.py filldb' commanad to create AttributeType 'module_set_md5' "
         return 'False'
+
+#-- under construction
+def create_version_of_module():
+    '''
+    This method will create attribute version_no of module with at type version
+    '''
+    at_version = collection.Node.one({'_type':'AttributeType', 'name':'version'})
+
+#-- under construction    
+def create_relation_of_module(subject_id, right_subject_id):
+    rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
+    if rt_has_module and subject_id and right_subject_id:
+        relation = collection.GRelation()                         #instance of GRelation class
+        relation.relation_type = rt_has_module
+        relation.right_subject = right_subject_id
+        relation.subject = subject_id
+        relation.save()
     
 
 def check_module_exits(module_set_md5):
@@ -253,7 +274,7 @@ def check_module_exits(module_set_md5):
     This method will check is module already exits ?
     '''
     node_at = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
-    attribute = collection.Triple.one({'_type':'GAttribute', 'attribute_type':node_at._id, 'object_value':module_set_md5}) 
+    attribute = collection.Triple.one({'_type':'GAttribute', 'attribute_type.$id':node_at._id, 'object_value':module_set_md5}) 
     if attribute is not None:
         return 'True'
     else:
@@ -262,10 +283,12 @@ def check_module_exits(module_set_md5):
 
 
 def walk(node):
+    hm = HistoryManager()
     list = []
     for each in node:
        dict = {}
-       n = collection.Node.one({'_id':ObjectId(each['id'])})
+       node = collection.Node.one({'_id':ObjectId(each['id'])})
+       n =  hm.get_version_document(node,each['version_no'])
        dict['label'] = n.name
        dict['id'] = each['id']
        dict['version_no'] = each['version_no']
