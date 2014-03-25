@@ -35,6 +35,7 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import Node
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 #######################################################################################################################################
 
@@ -376,8 +377,9 @@ def file_detail(request, group_id, _id):
     elif 'image' in file_node.mime_type:
         file_template = "ndf/image_detail.html"
     else:
-        grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
-        return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
+        file_template = "ndf/document_detail.html"
+        #grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
+        #return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
 
     return render_to_response(file_template,
                               { 'node': file_node,
@@ -400,3 +402,18 @@ def getFileThumbnail(request, group_id, _id):
         return HttpResponse("")
 
 
+def file_edit(request,group_id,_id):
+    file_node = collection.File.one({"_id": ObjectId(_id)})
+    if request.method == "POST":
+        get_node_common_fields(request, file_node, group_id, GST_FILE)
+        file_node.save()
+        return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
+        
+    else:
+        return render_to_response("ndf/document_edit.html",
+                                  { 'node': file_node,
+                                    'group_id': group_id,
+                                    'groupid':group_id
+                                },
+                                  context_instance=RequestContext(request)
+                              )
