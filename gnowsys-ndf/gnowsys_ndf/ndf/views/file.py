@@ -77,7 +77,7 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
                 source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]}) 
                 pandora_video_id=[] 
                 source_id_set=[]
-                for each in allVideosData: 
+                for each in allVideosData[:50]: 
                     gattribute=collection.Node.one({'$and':[{'object_value':each['id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]}) 
                     if gattribute is None: 
                         
@@ -86,24 +86,27 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
                         gs.mime_type="video"
                         gs.member_of=[pandora_video_st._id] 
                         gs.name=each['title'].lower() 
-                        gs.created_by=request.user.id 
+                        gs.created_by=1
+                        
                         gs.save() 
                         at=collection.GAttribute() 
                         at.attribute_type=source_id_at 
                         at.object_value=each['id'] 
                         at.subject=gs._id 
                         at.save() 
-
-                get_member_set=collection.Node.find({'$and':[{'member_of':pandora_video_st._id},{'_type':'File'}]})
+                get_member_set=collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'Fil\
+e'}]})
+      
                 for each in get_member_set:
                     pandora_video_id.append(each['_id'])
                 for each in pandora_video_id:
                     att_set=collection.Node.one({'$and':[{'subject':each},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
-                    object1=collection.Node.one({'_id':each})
-                    obj_set={}
-                    obj_set['id']=att_set.object_value
-                    obj_set['object']=object1
-                    source_id_set.append(obj_set)
+                    if att_set:
+                        object1=collection.Node.one({'_id':each})
+                        obj_set={}
+                        obj_set['id']=att_set.object_value
+                        obj_set['object']=object1
+                        source_id_set.append(obj_set)
 
                 # for each in pandora_video_id:
                 #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
