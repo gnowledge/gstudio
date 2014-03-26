@@ -23,6 +23,10 @@ class Command(BaseCommand):
         
         collection = get_database()[Node.collection_name]
 
+        # Renames field: 'modified_by' to 'contributors'
+        collection.update({'modified_by': {'$exists': True}}, {'$rename': {'modified_by': "contributors"}}, upsert=False, multi=True)
+
+        # Updates location fields' values from '{}' (empty dictionary) to '[]' (empty list)
         collection.update({'location': {}}, {'$set': {'location': []}}, upsert=False, multi=True)
         
 
