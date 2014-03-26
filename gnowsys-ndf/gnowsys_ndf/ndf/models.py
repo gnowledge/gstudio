@@ -156,15 +156,17 @@ class Node(DjangoDocument):
         
         'language': unicode,
 
-        'type_of': ObjectId,        # To define type_of GSystemType for particular node              
+        'type_of': ObjectId,                    # To define type_of GSystemType for particular node              
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
 
       	'created_at': datetime.datetime,
-        'created_by': int,			# Primary Key of User(django's) Class
+        'created_by': int,			# Primary Key of User(django's) Class who created the document
 
         'last_update': datetime.datetime,
-        'modified_by': [int],		        # List of Primary Keys of User(django's) Class
+        'modified_by': int,		        # Primary Key of User(django's) Class who lastly modified the document
+
+        'contributors': [int],		        # List of Primary Keys of User(django's) Class
 
         # 'rating': RatingField(),
 
