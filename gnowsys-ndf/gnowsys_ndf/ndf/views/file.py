@@ -77,7 +77,7 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
                 source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]}) 
                 pandora_video_id=[] 
                 source_id_set=[]
-                for each in allVideosData[:300]: 
+                for each in allVideosData: 
                     gattribute=collection.Node.one({'$and':[{'object_value':each['id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]}) 
                     if gattribute is None: 
                         
