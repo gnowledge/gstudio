@@ -27,6 +27,8 @@
 
     {% endif %}
 
+    <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+
     <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
 
   </section>
@@ -40,9 +42,10 @@
 
       <!-- Tab content -->
       <div class="content active" id="view-page">
-
+        
        {% if node.prior_node|length > 0 %}
        <div class="panel">
+       
          <h6>You may want to read these first:</h6>
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
@@ -113,8 +116,18 @@
      <div class="content reveal-modal graph-div" id="view-graph" data-reveal>    
       
       {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-      <a class="close-reveal-modal">&#215;</a>
+        <a class="close-reveal-modal">&#215;</a>
       {% include "ndf/node_graph.html" %}
+      {% endif %}
+    </div>
+
+     <!-- Tab View Map Widget -->
+     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
+      
+      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+        <a class="close-reveal-modal" >&#215;</a>
+        <!-- {#% #include "ndf/map_widget.html" %} -->
+        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
       {% endif %}
     </div>
 
