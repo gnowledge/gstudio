@@ -22,6 +22,11 @@ class Command(BaseCommand):
         # Keep latest fields to be added at top
 
         # -------------------------------------------------------------------------------------------------------------
+        # Adding "property_order" field with empty list as it's default value
+        # -------------------------------------------------------------------------------------------------------------
+        collection.update( {'_type': 'GSystemType', 'property_order': {'$exists': False}}, {'$set': {'property_order': []}}, upsert=False, multi=True )
+
+        # -------------------------------------------------------------------------------------------------------------
         # Adding "complex_data_type" field with empty list as it's default value
         # -------------------------------------------------------------------------------------------------------------
         collection.update( {'_type': 'AttributeType', 'complex_data_type': {'$exists': False}}, {'$set': {'complex_data_type': []}}, upsert=False, multi=True )
