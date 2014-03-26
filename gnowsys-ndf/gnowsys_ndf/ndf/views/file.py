@@ -77,8 +77,7 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
                 source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]}) 
                 pandora_video_id=[] 
                 source_id_set=[]
-                
-                for each in allVideosData: 
+                for each in allVideosData[:300]: 
                     gattribute=collection.Node.one({'$and':[{'object_value':each['id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]}) 
                     if gattribute is None: 
                         
@@ -96,7 +95,6 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
                         at.save() 
 
                 get_member_set=collection.Node.find({'$and':[{'member_of':pandora_video_st._id},{'_type':'File'}]})
-                
                 for each in get_member_set:
                     pandora_video_id.append(each['_id'])
                 for each in pandora_video_id:

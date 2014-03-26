@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
   {% load ndf_tags %}
+{% load pagination_tags %}
 
 {% block title %} {{title}} {% endblock %}
 
@@ -13,6 +14,7 @@
 {% endblock %}
 
 {% block search_content %}
+
 <form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' groupid %}">
 
   <div class="row collapse">
@@ -390,6 +392,7 @@
    </div>
 
   <!-- Tab View #4 - Videos -->
+  {% autopaginate sourceid 23 %}
   <div class="content" id="view-video">
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
       <!-- Node create card-->
@@ -424,7 +427,9 @@
           {% endif %}
 	</div>
       </li>
+ 
 {% for each in sourceid %}
+      
  {% get_user_object each.object.created_by as user_obj %}      
       <li class="card">
 	<div class="file">
@@ -449,6 +454,7 @@
 {% endfor %}
 
 
+      {% comment %}
       {% if videoCollection.count != 0 %}
 
       <!-- Existing card list-->
@@ -499,12 +505,14 @@
       {% endfor %}
       
       {% else %}
+     
       <p><em>Currently NO video uploaded!!!</em></p>
       {% endif %}
+{% endcomment%} 
 
     </ul>
   </div>
-
+{% paginate %}
 </div>
 
 
