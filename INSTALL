@@ -97,6 +97,10 @@ within it; and also perform following steps:
   	NOTE:
   		(1) For more information visit - "https://github.com/dcramer/django-ratings"
 
+  Install django-pagination (1.0.7) : pip install django-pagination 
+  	NOTE:
+  		(1) For more information visit - "https://pypi.python.org/pypi/django-pagination"
+
   Install django-notification(1.1.1)  : pip install django-notification
         NOTE
 	        (1) For more information visit - "https://pypi.python.org/pypi/django-notification/1.1.1" 
