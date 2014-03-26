@@ -203,7 +203,7 @@ class Node(DjangoDocument):
         user_details['created_by'] = User.objects.get(pk=self.created_by).username
 
         modified_by_usernames = []
-        for each_pk in self.modified_by:
+        for each_pk in self.contributors:
             modified_by_usernames.append(User.objects.get(pk=each_pk).username)
         user_details['modified_by'] = modified_by_usernames
 
@@ -378,7 +378,7 @@ class Node(DjangoDocument):
             # Create history-version-file
             if history_manager.create_or_replace_json_file(self):
                 fp = history_manager.get_file_path(self)
-                user = User.objects.get(pk=self.created_by).username                
+                user = User.objects.get(pk=self.created_by).username
                 message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
                 rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
         else:
@@ -387,7 +387,8 @@ class Node(DjangoDocument):
             rcs_obj.checkout(fp)
 
             if history_manager.create_or_replace_json_file(self):
-                message = "This document (" + self.name + ") is lastly updated on " + self.last_update.strftime("%d %B %Y")
+                user = User.objects.get(pk=self.modified_by).username
+                message = "This document (" + self.name + ") is lastly updated by " + user + " on " + self.last_update.strftime("%d %B %Y")
                 rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
     ##########  User-Defined Functions ##########
