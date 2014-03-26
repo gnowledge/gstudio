@@ -161,19 +161,21 @@ class Node(DjangoDocument):
         'access_policy': unicode,               # To Create Public or Private node
 
       	'created_at': datetime.datetime,
-        'last_update': datetime.datetime,
-        # 'rating': RatingField(),
         'created_by': int,			# Primary Key of User(django's) Class
-        'modified_by': [int],		        # List of Primary Keys of User(django's) Class
-        'location': dict,
 
-        'start_publication': datetime.datetime,
+        'last_update': datetime.datetime,
+        'modified_by': [int],		        # List of Primary Keys of User(django's) Class
+
+        # 'rating': RatingField(),
+
+        'location': [dict],
 
         'content': unicode,
         'content_org': unicode,
 
         'collection_set': [ObjectId],		# List of ObjectId's of different GTypes/GSystems
 
+        'start_publication': datetime.datetime,
         'tags': [unicode],
         'featured': bool,
         'url': unicode,
