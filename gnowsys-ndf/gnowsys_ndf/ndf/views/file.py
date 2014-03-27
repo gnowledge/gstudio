@@ -49,6 +49,7 @@ GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4]})
 ####################################################################################################################################                                             V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
 ###################################################################################################################################
 lock=threading.Lock()
+count = 0    
 def file(request, group_id, file_id):
     """
    * Renders a list of all 'Files' available within the database.
@@ -190,11 +191,15 @@ def submitDoc(request, group_id):
 
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
-            
+
+
+    
+first_object = ''
 def save_file(files, img_type, title, userid, group_id, st_id, content_org, language, tags, access_policy, usrname):
     """
     this will create file object and save files in gridfs collection
     """
+    global count,first_object
     fcol = db[File.collection_name]
     fileobj = fcol.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
@@ -216,16 +221,23 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
             fileobj.name = unicode(title)
             fileobj.language= unicode(language)
             fileobj.created_by = int(userid)
+            
+            if access_policy:
+                fileobj.access_policy = unicode(access_policy) # For giving privacy to file objects   
             if img_type:                
                 fileobj.type_of = ObjectId(img_type)                 # To define type if image is profile_pic      
+            
             fileobj.file_size = size
             group_object=fcol.Group.one({'_id':ObjectId(group_id)})
+            
             if group_object._id not in fileobj.group_set:
                 fileobj.group_set.append(group_object._id)        #group id stored in group_set field
+            
             user_group_object=fcol.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
             if user_group_object:
                 if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
                     fileobj.group_set.append(user_group_object._id)
+
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
             if img_type == None:
@@ -236,51 +248,49 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
                     fileobj.content = org2html(content_org, file_prefix = filename_content)
                 fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
             
-            # For giving privacy to file objects
-            if access_policy == "PUBLIC":
-                fileobj.access_policy = unicode(access_policy)      
-            else:
-                fileobj.access_policy = unicode(access_policy)
-
             fileobj.save()
             files.seek(0)                                                                  #moving files cursor to start
             objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
-            fileobj.fs_file_ids.append(objectid)
-            fileobj.save()
-
+            collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
+            
+            # For making collection if uploaded file more than one
+            if count == 0:
+                first_object = fileobj
+            else:
+                collection.File.find_and_modify({'_id':first_object._id},{'$push':{'collection_set':fileobj._id}})
+                
+                
             """ 
             code for converting video into webm and converted video assigning to varible files
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
             	fileobj.mime_type = "video"
-                fileobj.member_of.append(GST_VIDEO._id)
-       	        fileobj.save()
+                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
             	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id)
 	       
                 '''storing thumbnail of video with duration in saved object'''
                 tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
-       	        fileobj.fs_file_ids.append(tobjectid)                                      #saving thumbnail's id into file object
-       	        fileobj.save()
+       	        
+                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+                
        	        if filename.endswith('.webm') == False:
                     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
-                    fileobj.fs_file_ids.append(tobjectid) # saving webm video id into file object
-                    fileobj.save()
+                    # saving webm video id into file object
+                    collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
-                fileobj.member_of.append(GST_IMAGE._id)
-                fileobj.save()
+                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
                 thumbnailimg = convert_image_thumbnail(files)
                 tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
-                fileobj.fs_file_ids.append(tobjectid)
-                fileobj.save()
+                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+                
                 files.seek(0)
                 mid_size_img = convert_mid_size_image(files)
                 if mid_size_img:
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-                    fileobj.fs_file_ids.append(mid_img_id)
-                    fileobj.save()
-
+                    collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
+            count = count + 1
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
 
