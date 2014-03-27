@@ -403,7 +403,7 @@ def graph_nodes(request, group_id):
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
             i += 1
     
