@@ -6,7 +6,7 @@
 {% block meta_content %}
 <ul class="side-nav"> 
   {% for each in app_collection_set %}
-  {% get_memberof_objects_count each.id as count %}
+  {% get_memberof_objects_count each.id groupid as count %}
   {% ifequal each.id app_set_id %}
   <li class="active"> 
     <div>

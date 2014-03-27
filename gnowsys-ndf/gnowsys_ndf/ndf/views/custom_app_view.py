@@ -46,7 +46,7 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
             classtype = request.POST.get("class","")
             nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]},'_type':'GSystem'}))
         else :
-            nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'_type':'GSystem'}))
+            nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'_type':'GSystem','group_set':{'$all': [ObjectId(group_id)]}}))
         nodes_dict = []
         for each in nodes:
             nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
@@ -125,6 +125,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
         newgsystem.name = name
         newgsystem.member_of=[ObjectId(app_set_id)]
         newgsystem.created_by = request.user.id
+        newgsystem.group_set.append(ObjectId(group_id))
         if tags:
              newgsystem.tags = tags.split(",")
         if content_org:
