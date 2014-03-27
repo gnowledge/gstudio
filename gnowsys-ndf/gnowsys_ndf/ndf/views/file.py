@@ -67,10 +67,10 @@ def file(request, group_id, file_id):
         lock.acquire()
         try:
                 api=ox.api.API("http://wetube.gnowledge.org/api")
-                countVideo = api.find({"query":{"operator":"&","conditions":[{"operator":"==","key":"project","value":"NROER"}]}})
-                totalVideoNo=countVideo['data']['items']
+                #countVideo = api.find({"query":{"operator":"&","conditions":[{"operator":"==","key":"project","value":"NROER"}]}})
+                #totalVideoNo=countVideo['data']['items']
                 allVideo = api.find({"keys":["id","title","director","id","posterRatio","year","user"],"query":{"conditions":[{"oper\
-ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVideoNo],"sort":[{"operator":"+","key":"title"}]})
+ator":"==","key":"project","value":"NROER"}],"operator":"&"},"sort":[{"operator":"+","key":"title"}]})
 
                 allVideosData=allVideo['data']['items']
 
