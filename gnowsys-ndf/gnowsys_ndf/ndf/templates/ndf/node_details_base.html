@@ -68,73 +68,19 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% endblock %}
 
 {% block related_content %}
+<br/>
 
-<ul class="side-nav">
-  {% if node.collection_dict|length > 0 %}
-  <h3><a href="{% url 'page_details' groupid node %}">{{node.name}}</a> Contents</h3>
-  {% for index_key, each_node in node.collection_dict.items %}
-  {% get_grid_fs_object each_node as grid_fs_obj %}
+<div id="view_collection">
+  {% include "ndf/collection_ajax_view.html" %}  
+</div>
 
-  {% if each_node.mime_type %}
-
-  {% if each_node.collection_set %}
-
-  <li>
-    <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-    <a class="select" name="{{each_node.pk}}" style="padding-left:10px;">{{ each_node.name }}</a>
-  </li>
-
-  {% else %}
-  <li>
-    <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-    <a class="select" name="{{each_node.pk}}" style="padding-left:12px;">{{ each_node.name }}</a> 
-  </li>
-  {% endif %}
-
-  {% else %}
-  {% if each_node.collection_set %}
-  <li>
-    <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
-    <a class="select" name="{{each_node.pk}}" style="padding-left:10px;">{{ each_node.name }}</a>
-  </li>
-
-  {% else %}
-  <li>
-    <abbr title="Page"><img src="/static/ndf/images/doc.png"></abbr>
-    <a class="select" name="{{each_node.pk}}" style="padding-left:12px;">{{ each_node.name }}</a>
-  </li>
-  {% endif %}
-  {% endif %}
-  {% endfor %}
-
-  {% endif %}
-</ul>
-
-<script>
-  $(".select").click(function() {
-    
-    $.ajax({
-      type: "POST",
-      url: "{% url 'collection_nav' groupid %}",
-      datatype: "html",
-      data:{
-        node_id: this.name,
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function(data) {
-        $("#view_page").html(data);
-      }
-    });
-
-  });
-</script>
 
 {% endblock %}
-<!--
+
 {% block shelf_content %}
 <h4 class="text-center">Shelf</h4>
 <dl id="shelf-items" class="accordion" data-accordion>
- Adding new shelf text input and add button -->
+<!-- Adding new shelf text input and add button -->
   <dd>  
     <div class="row">
       <div class="row collapse">

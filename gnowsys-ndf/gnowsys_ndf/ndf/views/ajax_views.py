@@ -13,6 +13,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import ast
 
 
 from django_mongokit import get_database
@@ -131,6 +132,37 @@ def collection_nav(request, group_id):
                                   },
                                   context_instance = RequestContext(request)
       )
+
+
+def collection_view(request, group_id):
+
+  if request.is_ajax() and request.method == "POST":    
+    node_id = request.POST.get("node_id", '')
+    breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
+    #print "\n breadcrumbs_list:", breadcrumbs_list
+    #print "\n type of: ", type(breadcrumbs_list)
+
+    collection = db[Node.collection_name]
+    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+
+    breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
+    #breadcrumbs_list = [str(x) for x in breadcrumbs_list.split(',')]
+    breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
+
+    #print "\n breadcrumbs_list: ", breadcrumbs_list
+
+    breadcrumbs_list.append(( str(node_obj._id), str(node_obj.name) ))
+    #print "\n breadcrumbs_list: ", breadcrumbs_list
+
+    return render_to_response('ndf/collection_ajax_view.html', 
+                                 { 'node': node_obj,
+                                   'group_id': group_id,
+                                   'groupid':group_id,
+                                   'breadcrumbs_list':breadcrumbs_list
+                                 },
+                                 context_instance = RequestContext(request)
+    )
+
 
 
 @login_required
