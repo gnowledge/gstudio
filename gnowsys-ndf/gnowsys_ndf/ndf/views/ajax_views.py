@@ -13,6 +13,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import ast
 
 
 from django_mongokit import get_database
@@ -131,6 +132,37 @@ def collection_nav(request, group_id):
                                   },
                                   context_instance = RequestContext(request)
       )
+
+
+def collection_view(request, group_id):
+
+  if request.is_ajax() and request.method == "POST":    
+    node_id = request.POST.get("node_id", '')
+    breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
+    #print "\n breadcrumbs_list:", breadcrumbs_list
+    #print "\n type of: ", type(breadcrumbs_list)
+
+    collection = db[Node.collection_name]
+    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+
+    breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
+    #breadcrumbs_list = [str(x) for x in breadcrumbs_list.split(',')]
+    breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
+
+    #print "\n breadcrumbs_list: ", breadcrumbs_list
+
+    breadcrumbs_list.append(( str(node_obj._id), str(node_obj.name) ))
+    #print "\n breadcrumbs_list: ", breadcrumbs_list
+
+    return render_to_response('ndf/collection_ajax_view.html', 
+                                 { 'node': node_obj,
+                                   'group_id': group_id,
+                                   'groupid':group_id,
+                                   'breadcrumbs_list':breadcrumbs_list
+                                 },
+                                 context_instance = RequestContext(request)
+    )
+
 
 
 @login_required
@@ -358,7 +390,7 @@ def graph_nodes(request, group_id):
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set",
                       "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "modified_by", "created_by", "last_update", "url", "featured",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language"
                     ]
@@ -403,7 +435,7 @@ def graph_nodes(request, group_id):
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
             i += 1
     

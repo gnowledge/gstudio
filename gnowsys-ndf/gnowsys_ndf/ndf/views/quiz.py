@@ -133,8 +133,10 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             quiz_item_node.created_by = usrid
             quiz_item_node.member_of.append(gst_quiz_item._id)
 
-        if usrid not in quiz_item_node.modified_by:
-            quiz_item_node.modified_by.append(usrid)
+        quiz_item_node.modified_by = usrid
+
+        if usrid not in quiz_item_node.contributors:
+            quiz_item_node.contributors.append(usrid)
 
         group_object=collection.Group.one({'_id':ObjectId(group_id)})
         if group_object._id not in quiz_item_node.group_set:
