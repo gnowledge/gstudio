@@ -358,7 +358,7 @@ def graph_nodes(request, group_id):
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set",
                       "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "modified_by", "created_by", "last_update", "url", "featured",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language"
                     ]

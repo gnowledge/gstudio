@@ -55,7 +55,7 @@ def dashboard(request, group_id, user, uploaded=None):
     collab_drawer = []	
     
     for each in obj.sort('last_update', -1):  	# To populate collaborators according to their latest modification of particular resource
-        for val in each.modified_by:
+        for val in each.contributors:
             name = User.objects.get(pk=val).username 		
             collab_drawer.append(name)			
             

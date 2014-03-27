@@ -151,13 +151,11 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
 
   node.name = unicode(name)
   node.language=unicode(language)
-  #node.modified_by.append(usrid)
-  if usrid not in node.modified_by:
-  #if usrid in node.modified_by:
-    node.modified_by.insert(0,usrid)
-  else:
-    node.modified_by.remove(usrid)
-    node.modified_by.insert(0,usrid)
+
+  node.modified_by = usrid
+
+  if usrid not in node.contributors:
+    node.contributors.append(usrid)
 
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   if group_obj._id not in node.group_set:
