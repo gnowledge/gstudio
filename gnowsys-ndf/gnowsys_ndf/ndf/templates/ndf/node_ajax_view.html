@@ -126,7 +126,7 @@
   <section class="medium-3 columns">
     <div class="panel">
      <h5 class="subheader">
-       Edited {{ node.last_update|timesince }} ago by <a class="user">?</a> 
+       Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
        <small>
          <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
           {% for seq_no, version_no in node.version_dict.items reversed %}
@@ -175,6 +175,6 @@
 
 <footer>
   <p><small>
-    <em>Written by {{ node.user_details_dict.modified_by|join:', ' }}</em></small></p>
+    <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
   </footer>
 

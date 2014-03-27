@@ -247,7 +247,7 @@
           			<input type="text" class="margin-0" name="pg_contrib" placeholder="Search Page"/>
         		</li>
 				{% for key, value in page_drawer.items %} 
-					{% if user_id in value.modified_by %}       
+					{% if user_id in value.contributors %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'page_details' value.group_set|join:', ' key %}"><b>{{value.name}} </b></a>  <br/>
 								{% get_group_name value as GroupName %}
@@ -268,7 +268,7 @@
           			<input type="text" class="margin-0" name="img_contrib" placeholder="Search Image"/>
         		</li>    
 				{% for key, value in image_drawer.items %} 
-					{% if user_id in value.modified_by %}       
+					{% if user_id in value.contributors %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}"><b>{{value.name}} </b></a>  <br/>
 								{% get_group_name value as GroupName %}
@@ -289,7 +289,7 @@
           			<input type="text" class="margin-0" name="vid_contrib" placeholder="Search Video"/>
         		</li>        
 				{% for key, value in video_drawer.items %} 
-					{% if user_id in value.modified_by %}       
+					{% if user_id in value.contributors %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}"><b>{{value.name}} </b></a>  <br/>
 								{% get_group_name value as GroupName %}
@@ -310,7 +310,7 @@
           			<input type="text" class="margin-0" name="file_contrib" placeholder="Search File"/>
         		</li>       
 				{% for key, value in file_drawer.items %} 
-					{% if user_id in value.modified_by %}       
+					{% if user_id in value.contributors %}       
 						<li class="bullet-item" value={{key}}> 					
 							<a href="{% url 'read_file' value.group_set|join:', ' key value.name %}"><b>{{value.name}}</b> </a>  <br/>
 								{% get_group_name value as GroupName %}
@@ -334,7 +334,7 @@
           			<input type="text" class="margin-0" name="quiz_contrib" placeholder="Search Quiz"/>
         		</li>
 				{% for key, value in quiz_drawer.items %}
-					{% if user_id in value.modified_by %}        
+					{% if user_id in value.contributors %}        
 						<li class="bullet-item" value={{key}}> 												
 							<a href="{% url 'quiz_details' value.group_set|join:', ' key %}"><b>{{value.name}}</b> </a>  <br/>
 								{% get_group_name value as GroupName %}
@@ -355,7 +355,7 @@
           			<input type="text" class="margin-0" name="group_contrib" placeholder="Search Group"/>
         		</li>
 				{% for key, value in group_drawer.items %}
-					{% if user_id in value.modified_by %}        
+					{% if user_id in value.contributors %}        
 						<li class="bullet-item" value={{key}}> 												
 							<a href="{% url 'groupchange' value.name %}"><b>{{value.name}} </b></a>  							
 						</li>
@@ -374,7 +374,7 @@
           			<input type="text" class="margin-0" name="forum_contrib" placeholder="Search Forum"/>
         		</li>
 				{% for key, value in forum_drawer.items %}
-					{% if user_id in value.modified_by %}        
+					{% if user_id in value.contributors %}        
 						<li class="bullet-item" value={{key}}> 												
 							<a href="{% url 'show' value.group_set|join:', ' value %}"><b>{{value.name}}</b> </a>  					{% get_group_name value as GroupName %}
 								[Group: {{GroupName|join:", "}} ]

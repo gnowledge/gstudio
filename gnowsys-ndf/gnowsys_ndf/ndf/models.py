@@ -200,12 +200,17 @@ class Node(DjangoDocument):
         and appends those to 'user_details' dict-variable
         """
         user_details = {}
-        user_details['created_by'] = User.objects.get(pk=self.created_by).username
+        if self.created_by:
+            user_details['created_by'] = User.objects.get(pk=self.created_by).username
 
-        modified_by_usernames = []
+        contributor_names = []
         for each_pk in self.contributors:
-            modified_by_usernames.append(User.objects.get(pk=each_pk).username)
-        user_details['modified_by'] = modified_by_usernames
+            contributor_names.append(User.objects.get(pk=each_pk).username)
+        # user_details['modified_by'] = contributor_names
+        user_details['contributors'] = contributor_names
+
+        if self.modified_by:
+            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
 
         return user_details
 
