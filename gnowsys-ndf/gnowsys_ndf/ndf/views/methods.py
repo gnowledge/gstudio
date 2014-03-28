@@ -189,10 +189,14 @@ def get_node_common_fields(request, node, group_id, node_type):
   collection_list = request.POST.get('collection_list','')
   module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
-  map_geojson_data = request.POST.get('map-geojson-data') + ","
-  print map_geojson_data, "==============", type(map_geojson_data)
-  map_geojson_data = list(ast.literal_eval(map_geojson_data))# if(map_geojson_data) else [{}]
-  print "--------------", map_geojson_data
+  map_geojson_data = request.POST.get('map-geojson-data')
+  
+  if map_geojson_data:
+    map_geojson_data = map_geojson_data + ","
+    map_geojson_data = list(ast.literal_eval(map_geojson_data))
+  else:
+    map_geojson_data = []
+  
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
