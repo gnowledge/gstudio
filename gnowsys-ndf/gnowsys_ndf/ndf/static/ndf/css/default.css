@@ -584,6 +584,14 @@ input.node-title {
   padding: 0.25em 0;
 }
 
+#view-map-widget .close-reveal-modal{
+  z-index:1; background-color: #D3D3D3; padding: 0 10px 5px;
+}
+
+#view-map-widget .close-reveal-modal:hover{
+background-color: white; border-radius: 10px; padding: 0 10px 5px;	
+}
+
 /* Splash Page */
 /* line 445, ../scss/default.scss */
 #splash {
