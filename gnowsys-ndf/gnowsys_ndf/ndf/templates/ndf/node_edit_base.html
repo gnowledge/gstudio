@@ -128,8 +128,14 @@ background-repeat:no-repeat; background-size: 48px 48px
 	<div class="row">
 	  
 	  <div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
-	     </div></div>
+	     </div>
 
+	  <div class="large-6 columns" style="padding: 1.8em;">
+	  	<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+	  		<i class="fi-marker"></i> &nbsp; Add Location
+	  	</a>
+	  </div>
+	</div>
 
 	<div class="row">
 	  <div class="medium-12 columns">
@@ -239,6 +245,18 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
     {% endif %}
  {% endif %}
+
+ <!-- Overlay : Map Widget -->
+     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+      
+      <!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+        <a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="edit" %}
+        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+      <!-- #{#%# endif %} -->
+    </div>
+
+
 </form>
 
 

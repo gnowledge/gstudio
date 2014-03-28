@@ -26,13 +26,14 @@
 		.popup-add-content-button { background-color: #199369; color: #FFFFFF; display: block; float: left; padding: 1px 2px;	}
 
 		.popup-delete-content-button { background-color: #F04124; color: #FFFFFF; display: inline-block; float: right; padding: 1px 2px;	}		
+
 	</style>
 
 </head>
 
 <body>
 
-	<div id="map"></div>
+	<div id="map" data-mode="{{mode}}"><input type="hidden" data-map-markers="{{ node.location }}" value="" name="map-geojson-data"/></div>
 	
 	<script type="text/javascript">
 
@@ -45,24 +46,82 @@
 	 	// initialize the map on the "map" div with a given center and zoom
 	 	var map = L.map('map').setView([25.92,79.84], 5).addLayer(osm);
 
-
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
+	 	mapdata = $("input:hidden[name=map-geojson-data]").attr("data-map-markers");
+	 	mapdata = mapdata.replace(/'/gm, '"');
+	 	mapdata = mapdata.replace(/u"/gm, '"');
+	 	mapdata = JSON.parse(mapdata);
+
 	 	markerGeoJSON = [];
+
+	 	if( mapdata.length > 0 )
+	 	{
+	 		// Adding mapdata on map
+		 	// L.geoJson(mapdata, {onEachFeature: function (feature, layer) {
+		 	// 	// layer.bindPopup("feature.properties.description");
+		 	// }}).addTo(map);
+
+			tempArr = []	// to catch newly created markers
+			
+			L.geoJson(mapdata, {
+			    
+			    pointToLayer: function (feature, latlng) {
+
+			        var marker = L.marker(latlng);
+
+					tempArr.push(marker);
+			
+					return marker;
+					
+			    }
+			}).addTo(map);
+
+
+	        // Adding mapdata values in markerGeoJSON.
+	        $.each(tempArr, function(i, val){ 
+
+	        	var addLeafletID = tempArr[i].toGeoJSON();
+	        	
+	        	$(addLeafletID).attr("properties", {"id": tempArr[i]._leaflet_id});
+	        	markerGeoJSON.push(JSON.stringify(addLeafletID));
+
+	        })
+
+	 		
+	 		// $.each(mapdata, function(i, val){
+
+	 		// 	var co_ord = val.geometry.coordinates;
+	 		// 	markerGeoJSON[i] = JSON.stringify(val)
+
+	 		// })
+	 	}
+
+	 	
+
+		{% if mode == "edit" %}
+			map.on('click', onMapClick );
 
 		// Script for adding marker on map click
 		function onMapClick(e) {
 
 			var marker = L.marker(e.latlng, {
-				// draggable:true,
+				draggable:true,
 				title:"Resource location",
 				alt:"Resource Location",
 				riseOnHover:true
 			}).addTo(map)
 				// .bindPopup(e.latlng.toString()).openPopup();
 				// .bindPopup($(".popup-html").html()).openPopup();
-				
-			markerGeoJSON.push(JSON.stringify(marker.toGeoJSON()));
+			
+			var addLeafletID = marker.toGeoJSON();
+			$(addLeafletID).attr("properties", {"id": marker._leaflet_id});
+			
+			markerGeoJSON.push(JSON.stringify(addLeafletID));
+
+			$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
+			$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
+			
 			// marker.on("popupopen", function(){
 
 				// alert("kljhkj");
@@ -75,23 +134,36 @@
 			// });
 
 			// Update marker on changing it's position
-			// marker.on("dragend",function(ev){
+			marker.on("dragend",function(ev){
 
-			// 	var changedPos = ev.target.getLatLng();
+				var changedPos = ev.target.getLatLng();
 				
+            	this.setLatLng(changedPos).update();	// Update the marker position
+            	// map.removeLayer(this);
 
-   //          	this.setLatLng(changedPos).update();	// Update the marker position
-   //          	// map.removeLayer(this);
+            	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
+            
+            	var addLeafletID = this.toGeoJSON();
+				$(addLeafletID).attr("properties", {"id": lID});
 
-   //          	this.setPopupContent(changedPos.toString()).openPopup();	// Updating popup Msg
-   //          	// abc = this.toGeoJSON();
-   //          	// alert(this._leaflet_id);
-   //          });
+            	updatedGeoJSON = JSON.stringify(addLeafletID);
 
+            	$.each(markerGeoJSON, function(i, val) {
+            	
+            		var getID = $.parseJSON(val).properties.id; 
+            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+            	})
 
+            	// this.setPopupContent(changedPos.toString()).openPopup();	// Updating popup Msg
+            	// $('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON);
+            	$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
+            	$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
+            });
 
-			// marker.on("contextmenu", function(){(alert("hii"))});
+			// marker.on("contextmenu", function(){(alert("aaa"))});
 		}
+
+		{% endif %}
 
 		// function removeMarker(markerEl){
 		// 	alert($(markerEl).html());
@@ -104,7 +176,7 @@
 		// 	})[0]);
 		// }
 
-		map.on('click', onMapClick);
+		// map.on('click', onMapClick );
 
 	</script>
 
@@ -124,6 +196,7 @@
 
 
 <!-- 
+[{'geometry': {'type': 'Point', 'coordinates': [86.5283203125, 23.82555130688476]}, 'type': 'Feature', 'properties': {'id': 27}}, {'geometry': {'type': 'Point', 'coordinates': [85.20996093749999, 23.301901124188877]}, 'type': 'Feature', 'properties': {'id': 34}}]
 
 =======================================================
 
@@ -145,9 +218,6 @@ var geojsonFeature = {
     }
 };
 
-GeoJSON objects are added to the map through a GeoJSON layer. To create it and add it to a map, we can use the following code:
-
-L.geoJson(geojsonFeature).addTo(map);
 
 Alternatively, we could create an empty GeoJSON layer and assign it to a variable so that we can add more features to it later.
 
