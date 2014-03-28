@@ -200,12 +200,14 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
 
 # ===============================================================================================
 
+# Removes n attribute if created accidently in existsing documents
+collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False, multi=True)
+
 # Updates wherever modified_by field is None with default value as either first contributor or 1
 modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': None})
-
 if modified_by_cur.count > 0:
     for n in modified_by_cur:
         if n.contributors:
             collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
         else:
-            collection.update({'_id': n._id}, {'$set': {'modified_by': 1, 'n.contributors': [1]}}, upsert=False, multi=False)
+            collection.update({'_id': n._id}, {'$set': {'modified_by': 1, 'contributors': [1]}}, upsert=False, multi=False)
