@@ -72,12 +72,18 @@ def create_group(request,group_id):
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
         Mod_colg=col_Group.Group()
+
         cname=request.POST.get('groupname', "")
         colg.altnames=cname
         colg.name = unicode(cname)
         colg.member_of.append(gst_group._id)
         usrid = int(request.user.id)
-        colg.created_by=usrid
+        colg.created_by = usrid
+        colg.modified_by = usrid
+        
+        if usrid not in colg.contributors:
+            colg.contributors.append(usrid)
+
         colg.group_type = request.POST.get('group_type', "")        
         colg.edit_policy = request.POST.get('edit_policy', "")
         colg.subscription_policy = request.POST.get('subscription', "")
@@ -86,18 +92,21 @@ def create_group(request,group_id):
         colg.encryption_policy = request.POST.get('encryption', "")
         colg.save()
         
-        
         if colg.edit_policy == "EDITABLE_MODERATED":
-    
-            Mod_colg.altnames=cname + "Mod" 
-            Mod_colg.name=cname + "Mod"     
+            Mod_colg.altnames = cname + "Mod" 
+            Mod_colg.name = cname + "Mod"     
             Mod_colg.group_type = "PRIVATE"
-            Mod_colg.created_by=usrid
+            Mod_colg.created_by = usrid
+            Mod_colg.modified_by = usrid
+            if usrid not in Mod_colg.contributors:
+                Mod_colg.contributors.append(usrid)
             Mod_colg.prior_node.append(colg._id)
             Mod_colg.save() 
             colg.post_node.append(Mod_colg._id)
             colg.save()
+
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id},context_instance=RequestContext(request))
+
     return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
     
 # def home_dashboard(request):

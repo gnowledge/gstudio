@@ -52,7 +52,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
   {{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
 </p>
 <p>
-  Contributed by: {{ node.user_details_dict.modified_by|join:', ' }}
+  Contributed by: {{ node.user_details_dict.contributors|join:', ' }}
 </p>
 <p>
 

@@ -151,13 +151,11 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
 
   node.name = unicode(name)
   node.language=unicode(language)
-  #node.modified_by.append(usrid)
-  if usrid not in node.modified_by:
-  #if usrid in node.modified_by:
-    node.modified_by.insert(0,usrid)
-  else:
-    node.modified_by.remove(usrid)
-    node.modified_by.insert(0,usrid)
+
+  node.modified_by = usrid
+
+  if usrid not in node.contributors:
+    node.contributors.append(usrid)
 
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   if group_obj._id not in node.group_set:
@@ -212,7 +210,6 @@ def get_node_common_fields(request, node, group_id, node_type):
   node.status=unicode("DRAFT")
 
   node.language=unicode(language) 
-    
 
   if access_policy:
     # Policy will be changed only by the creator of the resource
@@ -221,15 +218,12 @@ def get_node_common_fields(request, node, group_id, node_type):
       node.access_policy = u"PUBLIC"
     else:
       node.access_policy = u"PRIVATE"
-  
 
-  #node.modified_by.append(usrid)
-  if usrid not in node.modified_by:
-  #if usrid in node.modified_by:
-    node.modified_by.insert(0,usrid)
-  else:
-    node.modified_by.remove(usrid)
-    node.modified_by.insert(0,usrid)
+  node.modified_by = usrid
+
+  if usrid not in node.contributors:
+    node.contributors.append(usrid)
+
   # For displaying nodes in home group as well as in creator group.
   user_group_obj=gcollection.Node.one({'$and':[{'_type':ObjectId(group_id)},{'name':usrname}]})
 
@@ -239,6 +233,7 @@ def get_node_common_fields(request, node, group_id, node_type):
     if user_group_obj:
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
+
   node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
   # -------------------------------------------------------------------------------- prior_node

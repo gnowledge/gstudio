@@ -156,24 +156,28 @@ class Node(DjangoDocument):
         
         'language': unicode,
 
-        'type_of': ObjectId,        # To define type_of GSystemType for particular node              
+        'type_of': ObjectId,                    # To define type_of GSystemType for particular node              
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
 
       	'created_at': datetime.datetime,
-        'last_update': datetime.datetime,
-        # 'rating': RatingField(),
-        'created_by': int,			# Primary Key of User(django's) Class
-        'modified_by': [int],		        # List of Primary Keys of User(django's) Class
-        'location': dict,
+        'created_by': int,			# Primary Key of User(django's) Class who created the document
 
-        'start_publication': datetime.datetime,
+        'last_update': datetime.datetime,
+        'modified_by': int,		        # Primary Key of User(django's) Class who lastly modified the document
+
+        'contributors': [int],		        # List of Primary Keys of User(django's) Class
+
+        # 'rating': RatingField(),
+
+        'location': [dict],
 
         'content': unicode,
         'content_org': unicode,
 
         'collection_set': [ObjectId],		# List of ObjectId's of different GTypes/GSystems
 
+        'start_publication': datetime.datetime,
         'tags': [unicode],
         'featured': bool,
         'url': unicode,
@@ -196,12 +200,17 @@ class Node(DjangoDocument):
         and appends those to 'user_details' dict-variable
         """
         user_details = {}
-        user_details['created_by'] = User.objects.get(pk=self.created_by).username
+        if self.created_by:
+            user_details['created_by'] = User.objects.get(pk=self.created_by).username
 
-        modified_by_usernames = []
-        for each_pk in self.modified_by:
-            modified_by_usernames.append(User.objects.get(pk=each_pk).username)
-        user_details['modified_by'] = modified_by_usernames
+        contributor_names = []
+        for each_pk in self.contributors:
+            contributor_names.append(User.objects.get(pk=each_pk).username)
+        # user_details['modified_by'] = contributor_names
+        user_details['contributors'] = contributor_names
+
+        if self.modified_by:
+            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
 
         return user_details
 
@@ -374,7 +383,7 @@ class Node(DjangoDocument):
             # Create history-version-file
             if history_manager.create_or_replace_json_file(self):
                 fp = history_manager.get_file_path(self)
-                user = User.objects.get(pk=self.created_by).username                
+                user = User.objects.get(pk=self.created_by).username
                 message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
                 rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
         else:
@@ -383,7 +392,8 @@ class Node(DjangoDocument):
             rcs_obj.checkout(fp)
 
             if history_manager.create_or_replace_json_file(self):
-                message = "This document (" + self.name + ") is lastly updated on " + self.last_update.strftime("%d %B %Y")
+                user = User.objects.get(pk=self.modified_by).username
+                message = "This document (" + self.name + ") is lastly updated by " + user + " on " + self.last_update.strftime("%d %B %Y")
                 rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
     ##########  User-Defined Functions ##########

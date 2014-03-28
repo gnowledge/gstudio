@@ -131,8 +131,8 @@
       {% endif %}
        {% endif %} 
       <footer class="row">
-        <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
-        <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
+        <div class="small-7 columns"><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</div>
+        <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div> 
       </footer>
 
     </div>
