@@ -57,42 +57,41 @@
         {% endif %}
 
         {% if node.mime_type %}
-        <!-- Code for showing media details -->
-        {% if node.mime_type == 'video' %}
+        
+ {% if node.mime_type == 'video' %}
         <div>
-  	
-			  <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
-    			    <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
-                            
+   <video width="640px" controls buffered>
+   <source src="{% url 'getFullvideo' groupid node %}" type="video/webm">
+   <source src="{% url 'getFullvideo' groupid node %}" type="video/ogg">
+Your browser does not support the video tag.
+</video>
+<br/>
+<a href="{% url 'getFullvideo' groupid node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
+   <i class="fi-download large"> download </i>
+</a>
 
+</div>
 
-  			Your browser does not support the video tag.
-			</video>
-			<br/>
-	
-			<!-- <a target="_blank" download="http://wetube.gnowledge.org/{{video_obj}}/480p.webm">Right click and choose "Save Link as.." to Download </a> -->
-		</div>
-	
+{% else %}
 
-		{% else %}
-		
-		{% get_grid_fs_object node as grid_fs_obj %}
-		<div>
-      {% if 'image' in node.mime_type %}
-  			<a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}">
-    			<img src="{% url 'getFullImage' groupid node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
-  			</a> 
-      {% else %}
+{% get_grid_fs_object node as grid_fs_obj %}
+<div>        <!-- Code for showing media details -->
+
+	  {% if 'image' in node.mime_type %}
+  	  <a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}">
+    	    <img src="{% url 'getFullImage' groupid node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
+  	  </a> 
+	  {% else %}
          <a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}"> {{ grid_fs_obj.filename }} </a><br/>     
       {% endif %}
-  			<br/>
-  			<a href="{% url 'read_file' groupid node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
-  				<i class="fi-download large"> download  </i>
-			</a>
-		</div>
-
-		{% endif %}
-		{% endif %}
+  	 <br/>
+  	 <a href="{% url 'read_file' groupid node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
+  	   <i class="fi-download large"> download  </i>
+	 </a>
+	</div>
+	
+	{% endif %}
+	{% endif %}
 
         {% block add_fields %} {% endblock %}
 

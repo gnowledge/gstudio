@@ -51,7 +51,7 @@ class Command(BaseCommand):
                 gst_node.name = unicode(each)
                 gst_node.created_by = user_id
                 gst_node.member_of.append(meta_type._id) # appending metatype to the GSystemType
-                gst_node.modified_by.append(user_id)
+                gst_node.contributors.append(user_id)
                 gst_node.save()
             elif(meta_type._id not in node_doc.member_of):
                  node_doc.member_of.append(meta_type._id)

@@ -265,7 +265,7 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
             	fileobj.mime_type = "video"
-                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
+                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_VIDEO._id}})
             	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id)
 	       
                 '''storing thumbnail of video with duration in saved object'''
