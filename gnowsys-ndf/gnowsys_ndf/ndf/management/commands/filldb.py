@@ -62,10 +62,10 @@ class Command(BaseCommand):
                 gst_node=collection.GSystemType()
                 gst_node.name = unicode(each)
                 gst_node.created_by = user_id
-                gst_node.member_of.append(meta_type._id) # appending metatype to the GSystemType
                 gst_node.modified_by = user_id
-                if usrid not in gst_node.contributors:
-                    gst_node.contributors.append(usrid)
+                if user_id not in gst_node.contributors:
+                    gst_node.contributors.append(user_id)
+                gst_node.member_of.append(meta_type._id) # appending metatype to the GSystemType
                 gst_node.save()
             elif(meta_type._id not in node_doc.member_of):
                  node_doc.member_of.append(meta_type._id)
@@ -77,6 +77,9 @@ class Command(BaseCommand):
             gs_node = collection.Group()
             gs_node.name = u'home'
             gs_node.created_by = user_id
+            gs_node.modified_by = user_id
+            if user_id not in gs_node.contributors:
+                gs_node.contributors.append(user_id)
             gs_node.member_of.append(collection.Node.one({'name': "Group"})._id)
             gs_node.disclosure_policy=u'DISCLOSED_TO_MEM'
             gs_node.subscription_policy=u'OPEN'
@@ -143,6 +146,9 @@ def create_meta_type(user_id):
     meta = collection.MetaType()
     meta.name = META_TYPE[0]
     meta.created_by = user_id # default hardcode
+    meta.modified_by = user_id
+    if user_id not in meta.contributors:
+        meta.contributors.append(user_id)
     meta.save()
     return meta
 
@@ -156,6 +162,9 @@ def create_gsystem_type(st_name, user_id):
             gs_node = collection.GSystemType()
             gs_node.name = unicode(st_name)
             gs_node.created_by = user_id
+            gs_node.modified_by = user_id
+            if user_id not in gs_node.contributors:
+                gs_node.contributors.append(user_id)
             gs_node.save()
             print 'created', st_name, 'as', 'GSystemType'
         except Exception as e:
@@ -173,6 +182,9 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list):
             at = collection.AttributeType()
             at.name = unicode(at_name)
             at.created_by = user_id
+            at.modified_by = user_id
+            if user_id not in at.contributors:
+                at.contributors.append(user_id)
             at.data_type = data_type              
             for each in system_type_id_list:
                 at.subject_type.append(each)
@@ -199,6 +211,9 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
             for ot_id in object_type_id_list:
                 rt_node.object_type.append(ot_id)
             rt_node.created_by = user_id
+            rt_node.modified_by = user_id
+            if user_id not in rt_node.contributors:
+                rt_node.contributors.append(user_id)
             rt_node.save()
             print 'created', rt_name, 'as', 'RelationType'
         except Exception as e:
