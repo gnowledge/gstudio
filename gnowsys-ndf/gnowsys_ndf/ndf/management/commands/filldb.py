@@ -51,7 +51,9 @@ class Command(BaseCommand):
                 gst_node.name = unicode(each)
                 gst_node.created_by = user_id
                 gst_node.member_of.append(meta_type._id) # appending metatype to the GSystemType
-                gst_node.contributors.append(user_id)
+                gst_node.modified_by = user_id
+                if usrid not in gst_node.contributors:
+                    gst_node.contributors.append(usrid)
                 gst_node.save()
             elif(meta_type._id not in node_doc.member_of):
                  node_doc.member_of.append(meta_type._id)
@@ -194,3 +196,27 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
             print 'RelationType',rt_name,'fails to create because:',e
     else:
         print 'RelationType',rt_node.name,'already created'
+
+# Update type_of field to list
+type_of_cursor=collection.find({'type_of':{'$exists':True}})
+for object_cur in type_of_cursor:
+    if type(object_cur['type_of']) == ObjectId or object_cur['type_of'] == None:
+	if type(object_cur['type_of']) == ObjectId :
+		collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[object_cur['type_of']]}})
+	else :
+		collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[]}})
+
+# ===============================================================================================
+
+# Removes n attribute if created accidently in existsing documents
+collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False, multi=True)
+
+# Updates wherever modified_by field is None with default value as either first contributor or 1
+modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': None})
+if modified_by_cur.count > 0:
+    for n in modified_by_cur:
+        if n.contributors:
+            collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
+        else:
+            collection.update({'_id': n._id}, {'$set': {'modified_by': 1, 'contributors': [1]}}, upsert=False, multi=False)
+
