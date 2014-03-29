@@ -59,13 +59,14 @@ def video_search(request,group_id):
 
 
 def video_detail(request, group_id, _id):
-    
-    video_obj=request.GET.get("vid_id","")
     vid_node = collection.File.one({"_id": ObjectId(_id)})
-    template = "ndf/video_detail.html"
-    variable = RequestContext(request, {'node': vid_node, 'video_obj':video_obj,'group_id': group_id,'groupid':group_id})
-    return render_to_response(template, variable)
-
+    return render_to_response("ndf/video_detail.html",
+                                  { 'node': vid_node,
+                                    'group_id': group_id,
+                                    'groupid':group_id
+                                  },
+                                  context_instance = RequestContext(request)
+        )
 def video_edit(request,group_id,_id):
     vid_node = collection.File.one({"_id": ObjectId(_id)})
     if request.method == "POST":

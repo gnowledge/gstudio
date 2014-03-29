@@ -1,7 +1,6 @@
 {% extends "ndf/base.html" %}
   {% load ndf_tags %}
 {% load pagination_tags %}
-
 {% block title %} {{title}} {% endblock %}
 
 {% block help_content %}
@@ -41,6 +40,8 @@
      <dd><a href="#view-doc"><i class="fi-page-filled"></i> Documents</a></dd>
      <dd><a href="#view-image"><i class="fi-camera"></i>Images</a></dd>
      <dd><a href="#view-video"><i class="fi-video"></i> Videos</a></dd>
+     <dd><a href="#view-pandora-video"><i class="fi-pandoravideo"></i> Pandora Videos</a></dd>
+
      <!-- <dd><a href="#panel2-4"><i class="fi-list-thumbnails"></i> File list</a></dd> -->
    </dl>
 
@@ -305,7 +306,7 @@
       <li class="create card">
         <div class="file">
           <h4><i class="fi-plus"></i> New Upload</h4>
-
+	  <!--
           <div class="row">
 
             <div class="large-12 columns">
@@ -324,7 +325,7 @@
 
             </div>
 
-          </div>
+          </div>-->
 
           {% if user.is_authenticated %}
           <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
@@ -390,43 +391,136 @@
 
      </ul>
    </div>
-
-  <!-- Tab View #4 - Videos -->
-  {% autopaginate sourceid 23 %}
+<!-- Tab View #4 - Videos -->
   <div class="content" id="view-video">
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
       <!-- Node create card-->
       <li class="create card">
         <div class="file">
           <h4><i class="fi-plus"></i> New Upload</h4>
-
+	  <!--
           <div class="row">
 
             <div class="large-12 columns">
               <input type="text" placeholder="Name of the File" />
               <textarea placeholder="Describe the File"></textarea>
-	      
+
               <div class="login-mode switch round">
                 <input id="PUBLIC" name="login-mode" type="radio" checked>
                 <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-		
+
                 <input id="PRIVATE" name="login-mode" type="radio">
                 <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-		
+
                 <span></span>
               </div>
+</div>
 
-            </div>
-
-          </div>
+          </div>-->
 
           {% if user.is_authenticated %}
           <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
             <span class="fi-upload"> Upload File</span>
           </a>
           {% endif %}
-	</div>
+</div>
       </li>
+
+      {% if videoCollection.count != 0 %}
+
+      <!-- Existing card list-->
+      {% for video in videoCollection %}
+      {% get_user_object video.created_by as user_obj %}
+      {% get_grid_fs_object video as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+
+          <header>
+
+              <div class="label-list">
+                {% for tag in video.tags %}
+                <span class="label">{{tag}}</span>
+                {% endfor %}
+              </div>
+
+              <div class="th">
+		<a href="{% url 'read_file' groupid video grid_fs_obj.filename %}">
+		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
+		  <img src="{% url 'getvideoThumbnail' groupid video %}">
+		</a>
+	      </div>
+              <h4>{{video.name}}</h4>
+	      <div>
+		<small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{video.user_details_dict.created_by}}</span>
+		</small>
+	      </div>
+	      
+          </header>
+
+          <p>This file is a..</p>
+
+          <a class="button expand" href ="{% url 'video_detail' groupid video %}">View details</a>
+
+          {% get_user_object video.created_by as user_obj %}
+          {% ifequal user_obj.username user.username %}
+          <a class="button alert tiny" href="{% url 'delete_file' groupid video %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+
+          <footer class="row">
+            <div class="small-6 columns">{{video.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{video.file_size.size}}</strong> {{video.file_size.unit}}</div>
+          </footer>
+
+        </div>
+      </li>
+      
+      {% endfor %}
+      
+      {% else %}
+      <p><em>Currently NO video uploaded!!!</em></p>
+      {% endif %}
+
+    </ul>
+  </div>
+
+  <!-- Tab View #5 - pandora Videos -->
+  <div class="content" id="view-pandora-video">
+{% autopaginate sourceid 23 %}
+  
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+      <!-- Node create card-->
+      <!-- <li class="create card"> -->
+      <!--   <div class="file"> -->
+      <!--     <h4><i class="fi-plus"></i> New Upload</h4> -->
+
+      <!--     <div class="row"> -->
+
+      <!--       <div class="large-12 columns"> -->
+      <!--         <input type="text" placeholder="Name of the File" /> -->
+      <!--         <textarea placeholder="Describe the File"></textarea> -->
+	      
+      <!--         <div class="login-mode switch round"> -->
+      <!--           <input id="PUBLIC" name="login-mode" type="radio" checked> -->
+      <!--           <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label> -->
+		
+      <!--           <input id="PRIVATE" name="login-mode" type="radio"> -->
+      <!--           <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label> -->
+		
+      <!--           <span></span> -->
+      <!--         </div> -->
+
+      <!--       </div> -->
+
+      <!--     </div> -->
+
+      <!--     {% if user.is_authenticated %} -->
+      <!--     <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}"> -->
+      <!--       <span class="fi-upload"> Upload File</span> -->
+      <!--     </a> -->
+      <!--     {% endif %} -->
+      <!-- 	</div> -->
+      <!-- </li> -->
  
 {% for each in sourceid %}
       
@@ -454,65 +548,11 @@
 {% endfor %}
 
 
-      {% comment %}
-      {% if videoCollection.count != 0 %}
-
-      <!-- Existing card list-->
-      {% for video in videoCollection %}
-      {% get_user_object video.created_by as user_obj %}
-      {% get_grid_fs_object video as grid_fs_obj %}
-      <li class="card">
-        <div class="file">
-	  
-          <header>
-
-              <div class="label-list">
-                {% for tag in video.tags %}
-                <span class="label">{{tag}}</span>
-                {% endfor %}
-              </div>
-	      
-              <div class="th">
-		<a href="{% url 'read_file' groupid video grid_fs_obj.filename %}">
-		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
-		  <img src="{% url 'getvideoThumbnail' groupid video %}">
-		</a>
-	      </div>
-              <h4>{{video.name}}</h4>
-	      <div>
-		<small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{video.user_details_dict.created_by}}</span> 
-		</small>
-	      </div>
-	      
-          </header>
-
-          <p>This file is a..</p>
-          <a class="button expand" href ="">View details</a>
-
-          {% get_user_object video.created_by as user_obj %}
-          {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' groupid video %}?next={{request.path}}">Delete </a>
-          {% endifequal %}
-	  
-          <footer class="row">
-            <div class="small-6 columns">{{video.mime_type}}</div>
-            <div class="small-6 columns"><strong>{{video.file_size.size}}</strong> {{video.file_size.unit}}</div> 
-          </footer>
-	  
-        </div>
-      </li>
       
-      {% endfor %}
-      
-      {% else %}
-     
-      <p><em>Currently NO video uploaded!!!</em></p>
-      {% endif %}
-{% endcomment%} 
-
     </ul>
-  </div>
 {% paginate %}
+
+  </div>
 </div>
 
 
