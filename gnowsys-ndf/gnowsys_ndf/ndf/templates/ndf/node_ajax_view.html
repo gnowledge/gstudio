@@ -21,7 +21,7 @@
   </h2>
 
   <dl class="row tabs" data-tab>
-    <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+    <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read video</a></dd>
 
     {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
 
@@ -37,7 +37,6 @@
 
 </header>
 <div class="row">
-
   <section class="medium-9 columns">
     <div class="tabs-content">
 
@@ -60,19 +59,21 @@
         {% endif %}
 
         {% if node.mime_type %}
-        
- {% if node.mime_type == 'video' %}
-        <div>
-   <video width="640px" controls buffered>
-   <source src="{% url 'getFullvideo' groupid node %}" type="video/webm">
-   <source src="{% url 'getFullvideo' groupid node %}" type="video/ogg">
-Your browser does not support the video tag.
-</video>
-<br/>
-<a href="{% url 'getFullvideo' groupid node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
-   <i class="fi-download large"> download </i>
-</a>
-
+{% if 'Pandora_video' in node.member_of %}
+       testthecode
+{% endif %}
+       {% if 'video' in node.mime_type %}
+       <div>
+	 <video width="640px" controls buffered>
+	   <source src="{% url 'getFullvideo' groupid node %}" type="video/webm">
+	     <source src="{% url 'getFullvideo' groupid node %}" type="video/ogg">
+	       Your browser does not support the video tag.
+	 </video>
+	 <br/>
+	 <a href="{% url 'getFullvideo' groupid node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
+	   <i class="fi-download large"> download </i>
+	 </a>
+	 
 </div>
 
 {% else %}
@@ -89,7 +90,7 @@ Your browser does not support the video tag.
       {% endif %}
   	 <br/>
   	 <a href="{% url 'read_file' groupid node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
-  	   <i class="fi-download large"> download  </i>
+  	   <i class="fi-download large"> download </i>
 	 </a>
 	</div>
 	

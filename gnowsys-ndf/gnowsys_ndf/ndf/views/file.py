@@ -264,8 +264,8 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
             code for converting video into webm and converted video assigning to varible files
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
-            	fileobj.mime_type = "video"
                 collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_VIDEO._id}})
+                collection.File.find_and_modify({'_id':fileobj._id},{'$set':{'mime':'video'}})
             	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id)
 	       
                 '''storing thumbnail of video with duration in saved object'''
@@ -379,7 +379,7 @@ def convertVideo(files, userid, objid):
 	videoDuration = "00:00:30"
     else :
     	videoDuration = "00:00:00"    	
-    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # creating thumbnail of video using ffmpeg
+    proc = subprocess.Popen(['ffmpeg', '-i', str("/tmp/"+userid+"/"+fileVideoName+"/"+fileVideoName), '-ss', videoDuration, "-s", "170*128", "-vframes", "1", str("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")]) # GScreating thumbnail of video using ffmpeg
     proc.wait()
     background = Image.open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+".png")
     fore = Image.open(MEDIA_ROOT+"ndf/images/poster.jpg")

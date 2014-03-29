@@ -1,2 +1,26 @@
 {% extends "ndf/node_details_base.html" %}
+{% load ndf_tags %}
 
+{% block add_list %}
+{% get_grid_fs_object node as grid_fs_obj %}
+sandflkadsfdsaf
+sad
+fdsa
+f
+sad
+<li>
+<a href="{% url 'getFullvideo' groupid node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
+  <i class="fi-download large"> download </i>
+</a>
+</li>
+{% endblock %}
+
+{% block add_fields %}
+<div>
+  <video width="640px" controls buffered>
+  <source src="{% url 'getFullvideo' groupid node %}" type="video/webm">
+  <source src="{% url 'getFullvideo' groupid node %}" type="video/ogg">
+Your browser does not support the video tag.
+</video>
+</div>
+{% endblock %}
