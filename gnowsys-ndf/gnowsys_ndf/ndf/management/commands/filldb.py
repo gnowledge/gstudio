@@ -197,6 +197,14 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
     else:
         print 'RelationType',rt_node.name,'already created'
 
+# Update type_of field to list
+type_of_cursor=collection.find({'type_of':{'$exists':True}})
+for object_cur in type_of_cursor:
+    if type(object_cur['type_of']) == ObjectId or object_cur['type_of'] == None:
+	if type(object_cur['type_of']) == ObjectId :
+		collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[object_cur['type_of']]}})
+	else :
+		collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[]}})
 
 # ===============================================================================================
 
@@ -211,3 +219,4 @@ if modified_by_cur.count > 0:
             collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
         else:
             collection.update({'_id': n._id}, {'$set': {'modified_by': 1, 'contributors': [1]}}, upsert=False, multi=False)
+

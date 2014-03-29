@@ -111,7 +111,7 @@ def list_widget(type_value, fields_value,template1='ndf/option_widget.html',temp
 	groupid = str(group_obj[0]._id)
   alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
   fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
-  fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
+  fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
   fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType"}
   types = fields[type_value]
 
@@ -502,7 +502,7 @@ def get_dict_item(dictionary, key):
 def get_input_fields(fields_value,type_value):
   """Get html tags 
   """
-  field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
+  field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
   return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value,"field_type_list":field_type_list}
   
   
