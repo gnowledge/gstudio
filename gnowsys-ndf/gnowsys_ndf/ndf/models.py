@@ -156,7 +156,7 @@ class Node(DjangoDocument):
         
         'language': unicode,
 
-        'type_of': ObjectId,                    # To define type_of GSystemType for particular node              
+        'type_of': [ObjectId],                    # To define type_of GSystemType for particular node              
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
 
@@ -392,7 +392,7 @@ class Node(DjangoDocument):
             rcs_obj.checkout(fp)
 
             if history_manager.create_or_replace_json_file(self):
-                user = User.objects.get(pk=self.modified_by).username
+                user = User.objects.get(pk=self.created_by).username
                 message = "This document (" + self.name + ") is lastly updated by " + user + " on " + self.last_update.strftime("%d %B %Y")
                 rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
