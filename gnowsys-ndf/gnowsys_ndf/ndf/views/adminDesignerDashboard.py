@@ -89,7 +89,7 @@ def adminDesignerDashboardClassCreate(request,class_name):
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     elif class_name == "GSystemType":
-        definitionlist = ['name','altnames','status','meta_type_set','attribute_type_set','relation_type_set','member_of']
+        definitionlist = ['name','altnames','status','member_of','meta_type_set','attribute_type_set','relation_type_set','type_of']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
