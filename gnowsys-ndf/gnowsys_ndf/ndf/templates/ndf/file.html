@@ -306,7 +306,7 @@
       <li class="create card">
         <div class="file">
           <h4><i class="fi-plus"></i> New Upload</h4>
-
+	  <!--
           <div class="row">
 
             <div class="large-12 columns">
@@ -325,7 +325,7 @@
 
             </div>
 
-          </div>
+          </div>-->
 
           {% if user.is_authenticated %}
           <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
@@ -399,7 +399,7 @@
       <li class="create card">
         <div class="file">
           <h4><i class="fi-plus"></i> New Upload</h4>
-
+	  <!--
           <div class="row">
 
             <div class="large-12 columns">
@@ -417,7 +417,7 @@
               </div>
 </div>
 
-          </div>
+          </div>-->
 
           {% if user.is_authenticated %}
           <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
