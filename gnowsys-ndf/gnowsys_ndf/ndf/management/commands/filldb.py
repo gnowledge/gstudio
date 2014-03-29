@@ -39,7 +39,7 @@ import sys
 filename = sys.argv[-1]
 print filename,"test"
 f = filename.split("/")
-if f[-1] == "ATs.json" or f[-1] == "RTs.json":
+if f[-1] == "ATs.json" or f[-1] == "RTs.json" or f[-1] == "STs.json":
     json_file = open(filename)
 else:
     json_file = ""
@@ -87,9 +87,7 @@ class Command(BaseCommand):
             gs_node.save()
         
         #creating factory GSystemType's 
-        for each in factory_gsystem_types:
-            create_gsystem_type(each, user_id)
-
+        create_sts(factory_gsystem_types,user_id)
         #creating factory RelationType's 
         create_rts(factory_relation_types,user_id)
 
@@ -97,7 +95,7 @@ class Command(BaseCommand):
         create_ats(factory_attribute_types,user_id)
         
 
-        #creating  AttributeType's and RelationType's by json file as input
+        #creating  AttributeType's, RelationType's and SystemType's by json file as input
         if json_file:
             a = json_file.name.split('/')
             if a[-1] == 'ATs.json':
@@ -105,10 +103,14 @@ class Command(BaseCommand):
                 create_ats(json_data,user_id)
             elif a[-1] == 'RTs.json':
                 json_data = json.loads(json_file.read())
-                print json_data,"Test_RTS json"
+                #print json_data,"Test_RTS json"
                 create_rts(json_data,user_id)
+            elif a[-1] == "STs.json":
+                json_data = json.loads(json_file.read())
+                #print json_data,"Test_STs json"
+                create_sts(json_data,user_id)
             else:
-                print 'file name should be ATs.json or RTs.json to load Ats or RTs of json'
+                print 'file name should be ATs.json,STs.json or RTs.json to load Ats,STs or RTs of json'
             
         
         # # Retrieve 'Quiz' GSystemType's id -- in order to append it to 'meta_type_set' for 'QuizItem' GSystemType
@@ -233,6 +235,10 @@ def create_rts(factory_relation_types,user_id):
                 node_rs = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': rs}]})
                 object_type_id_list.append(node_rs._id)
         create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list)
+
+def create_sts(factory_gsystem_types,user_id):
+    for each in factory_gsystem_types:
+        create_gsystem_type(each, user_id)
 
 # Update type_of field to list
 type_of_cursor=collection.find({'type_of':{'$exists':True}})
