@@ -96,7 +96,10 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
     systemtype_attributetype_set = []
     systemtype_relationtype_set = []
     title = ""
-
+    file_st_ids = []
+    app_type_of_id = ""
+    File = 'False'
+    print app_set_id,"test-app-id"
     for eachset in app.collection_set:
 	 app_set = collection.Node.find_one({"_id":eachset})
 	 app_collection_set.append({"id":str(app_set._id),"name":app_set.name}) 	
@@ -112,6 +115,16 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
     
     request_at_dict = {}
     request_rt_dict = {}
+
+    files_sts = ['File','Image','Video']
+    if app_set_id:
+        app = collection.Node.one({'_id':ObjectId(app_set_id)})
+        for each in files_sts:
+            node_id = collection.Node.one({'name':each})._id
+            if node_id in app.type_of:
+                File = 'True'
+        
+    print app.type_of,"test",file_st_ids
     if request.method=="POST":
         tags = request.POST.get("tags","")
         content_org = unicode(request.POST.get("content_org",""))
@@ -121,7 +134,12 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
         for eachrtset in systemtype_relationtype_set:
             request_rt_dict[eachrtset["type_id"]] = request.POST.get(eachrtset["type_id"],"")
 
-        newgsystem = collection.GSystem()
+        
+        if app.type_of in file_st_ids:
+            newgsystem = collection.File() #creating File object ot store files
+        else:
+            newgsystem = collection.GSystem()
+
         newgsystem.name = name
         newgsystem.member_of=[ObjectId(app_set_id)]
         newgsystem.created_by = request.user.id
@@ -153,7 +171,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
           
     template = "ndf/custom_template_for_app.html"
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title})
+    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File})
     return render_to_response(template, variable)
       
  
