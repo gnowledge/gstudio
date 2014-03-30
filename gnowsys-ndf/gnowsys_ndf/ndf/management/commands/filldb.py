@@ -269,13 +269,29 @@ for object_cur in type_of_cursor:
 # Removes n attribute if created accidently in existsing documents
 collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False, multi=True)
 
-# Updates wherever modified_by field is None with default value as either first contributor or 1
+# Updates wherever modified_by field is None with default value as either first contributor or the creator of the resource
 modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': None})
 if modified_by_cur.count > 0:
     for n in modified_by_cur:
         if n.contributors:
             collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
         else:
-            collection.update({'_id': n._id}, {'$set': {'modified_by': 1, 'contributors': [1]}}, upsert=False, multi=False)
+            if n.created_by:
+                collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]}}, upsert=False, multi=False)
+            else:
+                print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")\n"
+
+# Updating faulty modified_by and contributors values (in case of user-group and file documents)
+cur = collection.Node.find({'modified_by': {'$exists': True}})
+for n in cur:
+    # By faulty, it means modified_by and contributors has 1 as their values
+    # 1 stands for superuser
+    # Instead of this value should be the creator of that resource 
+    # (even this is applicable only if created_by field of that resource holds some value)
+    if not n.created_by:
+        print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")"
+    else:
+        if n.created_by not in n.contributors:
+            collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]} }, upsert=False, multi=False)
 
 
