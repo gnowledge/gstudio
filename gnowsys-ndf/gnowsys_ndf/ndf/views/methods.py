@@ -215,11 +215,8 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
-
-  node.status=unicode("DRAFT")
-
-  node.language=unicode(language) 
-    
+  node.status = unicode("DRAFT")
+  node.language = unicode(language) 
   node.location = map_geojson_data # Storing location data
 
   if access_policy:
@@ -245,7 +242,8 @@ def get_node_common_fields(request, node, group_id, node_type):
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
 
-  node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+  if tags:
+    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
   # -------------------------------------------------------------------------------- prior_node
 

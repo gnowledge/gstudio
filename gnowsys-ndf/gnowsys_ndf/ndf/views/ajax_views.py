@@ -187,6 +187,7 @@ def change_group_settings(request, group_name):
                 group_node.visibility_policy = visibility_policy
                 group_node.disclosure_policy = disclosure_policy
                 group_node.encryption_policy = encryption_policy
+                group_node.modified_by = int(request.user.id)
                 group_node.save()
                 return HttpResponse("changed successfully")
         except:
@@ -241,7 +242,11 @@ def make_module_set(request, group_id):
                     gsystem_obj.group_set.append(ObjectId(group_id))
                     # if usrname not in gsystem_obj.group_set:        
                     #     gsystem_obj.group_set.append(int(usrname))
-                    gsystem_obj.created_by = int(request.user.id)
+                    user_id = int(request.user.id)
+                    gsystem_obj.created_by = user_id
+                    gsystem_obj.modified_by = user_id
+                    if user_id not in gsystem_obj.contributors:
+                        gsystem_obj.contributors.append(user_id)
                     gsystem_obj.module_set.append(dict)
                     module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
                     
