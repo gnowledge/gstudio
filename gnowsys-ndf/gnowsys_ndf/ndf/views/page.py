@@ -425,6 +425,7 @@ def publish_page(request,group_id,node):
      
   node=collection.Node.one({'_id':ObjectId(node)})
   node.status=unicode("PUBLISHED")
+  node.modified_by = int(request.user.id)
   node.save() 
 
   return render_to_response("ndf/page_details.html",

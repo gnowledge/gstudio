@@ -50,9 +50,12 @@ class HomeRedirectView(RedirectView):
     			auth._type = u"Group"
     			auth.name = unicode(self.request.user)      
     			auth.password = u""
-    			auth.member_of.append(auth_type)      
-    			auth.created_by = int(self.request.user.pk)
-
+    			auth.member_of.append(auth_type)
+                        user_id = int(self.request.user.pk)
+    			auth.created_by = user_id
+                        auth.modified_by = user_id
+                        if user_id not in auth.contributors:
+                            auth.contributors.append(user_id)
     			auth.save()
 
     		# This will return a string in url as username and allows us to redirect into user group as soon as user logsin.

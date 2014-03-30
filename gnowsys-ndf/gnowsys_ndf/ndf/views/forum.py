@@ -61,6 +61,9 @@ def create_forum(request,group_id):
         usrid=int(request.user.id)
         usrname = unicode(request.user.username)
         colf.created_by=usrid
+        colf.modified_by = usrid
+        if usrid not in colf.contributors:
+            colf.contributors.append(usrid)
         colf.group_set.append(colg._id)
         user_group_obj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
         if user_group_obj:
@@ -150,6 +153,9 @@ def add_node(request,group_id):
             colrep.content = org2html(content_org, file_prefix=filename)
         usrid=int(request.user.id)
         colrep.created_by=usrid
+        colrep.modified_by = usrid
+        if usrid not in colrep.contributors:
+            colrep.contributors.append(usrid)
         colrep.group_set.append(colg._id)
         colrep.save()
         groupname=colg.name

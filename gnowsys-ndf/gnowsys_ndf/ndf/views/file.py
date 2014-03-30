@@ -81,15 +81,17 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"sort":[{"operator"
                 for each in allVideosData[:50]: 
                     gattribute=collection.Node.one({'$and':[{'object_value':each['id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]}) 
                     if gattribute is None: 
-                        
                         #gs=collection.GSystem() 
                         gs=collection.File()
                         gs.mime_type="video"
                         gs.member_of=[pandora_video_st._id] 
-                        gs.name=each['title'].lower() 
+                        gs.name=each['title'].lower()
                         gs.created_by=1
-                        
+                        gs.modified_by = 1
+                        if 1 not in gs.contributors:
+                            auth.contributors.append(1)
                         gs.save() 
+
                         at=collection.GAttribute() 
                         at.attribute_type=source_id_at 
                         at.object_value=each['id'] 
@@ -221,6 +223,9 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
             fileobj.name = unicode(title)
             fileobj.language= unicode(language)
             fileobj.created_by = int(userid)
+            fileobj.modified_by = int(userid)
+            if int(userid) not in fileobj.contributors:
+                fileobj.contributors.append(int(userid))
             
             if access_policy:
                 fileobj.access_policy = unicode(access_policy) # For giving privacy to file objects   

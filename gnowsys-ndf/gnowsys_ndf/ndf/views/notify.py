@@ -75,6 +75,7 @@ def notifyuser(request,group_id):
     ret = set_notif_val(request,group_id,msg,activ,bx)
     if not ((bx.id in colg.author_set) or (bx.id==colg.created_by)):
         colg.author_set.append(bx.id)
+        colg.modified_by = int(request.user.id)
         colg.save()
     if ret :
         return HttpResponse("success")
@@ -90,6 +91,7 @@ def notify_remove_user(request,group_id):
     bx=get_user(request.user)
     ret = set_notif_val(request,group_id,msg,activ,bx)
     colg.author_set.remove(bx.id)
+    colg.modified_by = int(request.user.id)
     colg.save()
     if ret:
         return HttpResponse("success")
