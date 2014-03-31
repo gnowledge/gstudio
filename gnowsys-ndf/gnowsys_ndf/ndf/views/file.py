@@ -89,7 +89,7 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"sort":[{"operator"
                         gs.created_by=1
                         gs.modified_by = 1
                         if 1 not in gs.contributors:
-                            auth.contributors.append(1)
+                            gs.contributors.append(1)
                         gs.save() 
 
                         at=collection.GAttribute() 
