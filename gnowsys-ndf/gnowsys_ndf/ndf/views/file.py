@@ -89,7 +89,7 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"sort":[{"operator"
                         gs.created_by=1
                         gs.modified_by = 1
                         if 1 not in gs.contributors:
-                            auth.contributors.append(1)
+                            gs.contributors.append(1)
                         gs.save() 
 
                         at=collection.GAttribute() 
@@ -270,7 +270,7 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
                 collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_VIDEO._id}})
-                collection.File.find_and_modify({'_id':fileobj._id},{'$set':{'mime':'video'}})
+                collection.File.find_and_modify({'_id':fileobj._id},{'$set':{'mime_type':'video'}})
             	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id)
 	       
                 '''storing thumbnail of video with duration in saved object'''

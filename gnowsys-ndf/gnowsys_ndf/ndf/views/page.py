@@ -162,13 +162,18 @@ def page(request, group_id, app_id=None):
         
         breadcrumbs_list = []
         breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))
-        print "page === "
-        print page_node
+
+        location = []
+        for each in page_node.location:
+          location.append(json.dumps(each))
+
+
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'groupid':group_id,
-                                    'breadcrumbs_list': breadcrumbs_list
+                                    'breadcrumbs_list': breadcrumbs_list,
+                                    'location': location
                                   },
                                   context_instance = RequestContext(request)
         )        
@@ -198,23 +203,22 @@ def create_edit_page(request, group_id, node_id=None):
         
         #breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))  
         #print "list ", breadcrumbs_list      
-        #return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
+        return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
 
-        location = []
-        for each in page_node.location:
-          location.append(json.dumps(each))
+        #location = []
+        #for each in page_node.location:
+        #  location.append(json.dumps(each))
 
-        print "create_edit_page === POST"
 
-        return render_to_response('ndf/page_details.html', 
-                                  { 'node': page_node,
-                                    'group_id': group_id,
-                                    'groupid':group_id,
-                                    'location': location
-                                   # 'breadcrumbs_list': breadcrumbs_list
-                                  },
-                                  context_instance = RequestContext(request)
-        )
+        #return render_to_response('ndf/page_details.html', 
+        #                          { 'node': page_node,
+        #                            'group_id': group_id,
+        #                            'groupid':group_id,
+        #                            'location': location
+        #                           # 'breadcrumbs_list': breadcrumbs_list
+        #                          },
+        #                          context_instance = RequestContext(request)
+        #)
         
     else:
         if node_id:
