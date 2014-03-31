@@ -10,8 +10,11 @@
 {% endblock %}
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
-<form method="post" action="." name="{{class_name}}">
+<form method="post" action="" name="{{class_name}}">
 {% csrf_token %}
+
+<h2>{{node.name}}</h2>
+
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
 <dl class="accordion" data-accordion>
   <dd>

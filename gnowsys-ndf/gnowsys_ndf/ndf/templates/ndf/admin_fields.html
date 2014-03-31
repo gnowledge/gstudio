@@ -28,58 +28,68 @@
   }
 </style>
 
-{% if fields_value == "unicode" or type_value == "tags" %}
+{% if fields_type == "unicode" or fields_name == "tags" %}
 <div style="display:table-cell;">
-  <font size="3"> <input type="textbox" name="{{type_value}}"></font>
+  {% if fields_name == "tags" %}
+  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|join:', '|default_if_none:''}}"></font>
+  {% else %}
+  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
+  {% endif %}  
 </div>
-{% elif fields_value == "bool" %}
-<select id="id_auto_now_add" name="{{type_value}}" style="width:50%">
-  <option selected="selected" value="0">Unknown</option>
-  <option value="1">Yes</option>
-  <option value="2">No</option>
+
+{% elif fields_type == "bool" %}
+<select id="id_auto_now_add" name="{{fields_name}}" style="width:50%">
+  <option value="0">Unknown</option>
+  <option value="1" {% if fields_value == 1 %}selected{% endif %} >Yes</option>
+  <option value="2" {% if fields_value == 2 %}selected{% endif %} >No</option>
 </select>
-{% elif fields_value == "datetime" %}
+
+{% elif fields_type == "datetime" %}
 <label>{% now "jS F Y H:i" %}</label>
-{% elif fields_value == "status" %}
-<select id="id_auto_now_add" name="{{type_value}}" style="width:60%">
-  <option selected="selected" value="PUBLISHED">PUBLISHED</option>
-  <option value="DRAFT">DRAFT</option>
-  <option value="HIDDEN">HIDDEN</option>
+
+{% elif fields_type == "status" %}
+<select id="id_auto_now_add" name="{{fields_name}}" style="width:60%">
+  <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >PUBLISHED</option>
+  <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >DRAFT</option>
+  <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >HIDDEN</option>
 </select>
-{% elif fields_value == "list" %}
+
+{% elif fields_type == "list" %}
 <div id="list_drawer" style="border-spacing:0px;">
-  {#% edit_drawer_widget type_value groupid node %#}
-  {% list_widget type_value fields_value %}
-  {% if type_value in field_type_list %}
-  <input id="{{type_value}}_type" type="hidden" name="{{type_value}}" value="" />
+  {#% edit_drawer_widget fields_name groupid node %#}
+  {% list_widget fields_name fields_type fields_value %}
+  {% if fields_name in field_type_list %}
+  <input id="{{fields_name}}_type" type="hidden" name="{{fields_name}}" value="" />
   <script type="text/javascript">
     
-    function {{type_value}}() {
+    function {{fields_name}}() {
     type_arr = []
     $(".node_id").each(function (){
-    if ($(this).parent(".bullet-item").parent("#{{type_value}}_drawer2").attr("id") == "{{type_value}}_drawer2") {
+    if ($(this).parent(".bullet-item").parent("#{{fields_name}}_drawer2").attr("id") == "{{fields_name}}_drawer2") {
     type_arr.push($(this).val());
     }
     });
-    $("#{{type_value}}_type").val(type_arr)
+    $("#{{fields_name}}_type").val(type_arr)
     }
-    type_list.push("{{type_value}}");
+    type_list.push("{{fields_name}}");
   </script>
   {% endif %}
-
-
 </div>
-{% elif fields_value == "int" %}
+
+{% elif fields_type == "int" %}
 <div style="display:table-cell;">
-  <font size="3"> <input type="number" name="{{type_value}}"></font>
+  <font size="3"> <input type="number" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
 </div>
-{% elif type_value == "subject_applicable_nodetype" or type_value == "object_applicable_nodetype" or type_value == "data_type" %}
+
+{% elif fields_name == "subject_applicable_nodetype" or fields_name == "object_applicable_nodetype" or fields_name == "data_type" %}
 <div id="list_drawer" >
-  {#% edit_drawer_widget type_value groupid node %#}
-  {% list_widget type_value fields_value %}
+  {#% edit_drawer_widget fields_name groupid node %#}
+  {% list_widget fields_name fields_type fields_value %}
 </div>
+
 {% else %}
 <div style="display:table-cell;">
-  <font size="3"> <input type="textbox" name="{{type_value}}"></font>
+  <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
 </div>
+
 {% endif %}
