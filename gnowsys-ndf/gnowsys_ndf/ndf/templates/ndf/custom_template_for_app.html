@@ -182,6 +182,17 @@
          <input id="tags_id" name="tags" type="textbox" value="" placeholder="Separate tags with commas...">
        </div>
      </div>
+     
+     {% if File == "True" %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3">Upload File</font> 
+       </div>
+       <div style="display:table-cell;">
+         <input id="file_id" name="file" type="file">
+       </div>
+     </div>
+     {% endif %}
     <div style="display:table-row;">
       <div style="display:table-cell;"> 
 	<font size="3"> Content</font> 
