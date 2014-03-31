@@ -49,10 +49,8 @@
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
 	 	mapdata = $("input:hidden[name=map-geojson-data]").attr("data-map-markers");
-	 	mapdata = mapdata.replace(/'/gm, '"');
-	 	mapdata = mapdata.replace(/u"/gm, '"');
-	 	mapdata = JSON.parse(mapdata);
-
+	 	console.log(mapdata);
+	 	
 	 	markerGeoJSON = [];
 
 	 	if( mapdata.length > 0 )
@@ -62,13 +60,26 @@
 		 	// 	// layer.bindPopup("feature.properties.description");
 		 	// }}).addTo(map);
 
+			mapdata = mapdata.replace(/'/gm, '"');
+	 		mapdata = mapdata.replace(/u"/gm, '"');
+	 		mapdata = JSON.parse(mapdata);
+
 			tempArr = []	// to catch newly created markers
 			
 			L.geoJson(mapdata, {
 			    
 			    pointToLayer: function (feature, latlng) {
 
-			        var marker = L.marker(latlng);
+			    {% if mode == "edit" %}
+					var marker = L.marker(latlng, {
+									draggable:true,
+									title:"Resource location",
+									alt:"Resource Location",
+									riseOnHover:true
+								});			    	
+			    {% else %}
+			    	var marker = L.marker(latlng);
+			    {% endif %}			        
 
 					tempArr.push(marker);
 			

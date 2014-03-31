@@ -199,6 +199,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         get_node_common_fields(request, page_node, group_id, gst_page)
+        print "\n::::::::::page.py", page_node.location 
         page_node.save()
         
         #breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))  
