@@ -160,14 +160,16 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
  #           newattribute.name = unicode(newgsystem.name+"- "+attributetype_key.name+"-"+value)
             newattribute.save()
         for key,value in request_rt_dict.items():
-            relationtype_key = collection.Node.find_one({"_id":ObjectId(key)})
-            right_subject = collection.Node.find_one({"_id":ObjectId(value)})
-            newrelation = collection.GRelation()
-            newrelation.subject = newgsystem._id
-            newrelation.relation_type = relationtype_key
-            newrelation.right_subject = right_subject._id
+            if key:
+                relationtype_key = collection.Node.find_one({"_id":ObjectId(key)})
+            if value:
+                right_subject = collection.Node.find_one({"_id":ObjectId(value)})
+                newrelation = collection.GRelation()
+                newrelation.subject = newgsystem._id
+                newrelation.relation_type = relationtype_key
+                newrelation.right_subject = right_subject._id
 #            newrelation.name = unicode(newgsystem.name+"- "+relationtype_key.name+"-"+right_subject.name)
-            newrelation.save()
+                newrelation.save()
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
           
     template = "ndf/custom_template_for_app.html"
