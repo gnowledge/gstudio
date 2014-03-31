@@ -1,12 +1,14 @@
 {% load ndf_tags %}
 
 <ul class="side-nav">
-  {% if node.collection_dict|length > 0 %}
   <nav class="breadcrumbs">
     {% for key,value in breadcrumbs_list %}
-    	 <a href="{% url 'page_details' groupid key %}">{{value}}</a> 
+       <a href="{% url 'page_details' groupid key %}">{{value}}</a> 
+       <!--<a href="{% url 'collection_view' groupid %}">{{value}}</a>-->
     {% endfor %}
   </nav>
+
+  {% if node.collection_dict|length > 0 %}
 
   {% for index_key, each_node in node.collection_dict.items %}
   {% get_grid_fs_object each_node as grid_fs_obj %}
