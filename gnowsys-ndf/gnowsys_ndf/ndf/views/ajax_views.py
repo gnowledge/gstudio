@@ -32,7 +32,8 @@ import json
 db = get_database()
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
-
+#This function is used to check (while creating a new group) group exists or not
+#This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 def checkgroup(request,group_name):
     titl=request.GET.get("gname","")
     retfl=check_existing_group(titl)
@@ -193,40 +194,36 @@ def make_module_set(request, group_id):
             _id = request.GET.get("_id","")
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
-                if node:
-                    list_of_collection.append(node._id)
-                    dict = {}
-                    dict['id'] = unicode(node._id)
-                    dict['version_no'] = hm_obj.get_current_version(node)
-                    if node.collection_set:
-                        dict['collection'] = get_module_set_list(node)  #gives the list of collection with proper hierarchy as they are
+                list_of_collection.append(node._id)
+                dict = {}
+                dict['id'] = unicode(node._id)
+                dict['version_no'] = hm_obj.get_current_version(node)
+                if node.collection_set:
+                    dict['collection'] = get_module_set_list(node)          #gives the list of collection with proper hierarchy as they are
            
-                    #creating new Gsystem object and assining data of collection object
-                    gsystem_obj = collection.GSystem()
-                    gsystem_obj.name = unicode(node.name)
-                    gsystem_obj.content = unicode(node.content)
-                    gsystem_obj.member_of.append(GST_MODULE._id)
-                    gsystem_obj.group_set.append(ObjectId(group_id))
-                    # if usrname not in gsystem_obj.group_set:        
-                    #     gsystem_obj.group_set.append(int(usrname))
-                    gsystem_obj.created_by = int(request.user.id)
-                    gsystem_obj.module_set.append(dict)
-                    module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
-                    
-                    check =check_module_exits(module_set_md5)          #checking module already exits or not
-                    if(check == 'True'):
-                        return HttpResponse("This module already Exists")
-                    else:
-                        gsystem_obj.save()
-                        create_relation_of_module(node._id, gsystem_obj._id)
-                        check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
-                        if (check1 == 'True'):
-                            return HttpResponse("module succesfull created")
-                        else:
-                            gsystem_obj.delete()
-                            return HttpResponse("Error Occured while storing md5 of object in attribute'")
+                #creating new Gsystem object and assining data of collection object
+                gsystem_obj = collection.GSystem()
+                gsystem_obj.name = unicode(node.name)
+                gsystem_obj.content = unicode(node.content)
+                gsystem_obj.member_of.append(GST_MODULE._id)
+                gsystem_obj.group_set.append(ObjectId(group_id))
+                # if usrname not in gsystem_obj.group_set:        
+                #     gsystem_obj.group_set.append(int(usrname))
+                gsystem_obj.created_by = int(request.user.id)
+                gsystem_obj.module_set.append(dict)
+                module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
+
+                check =check_module_exits(module_set_md5)          #checking module already exits or not
+                if(check == 'True'):
+                    return HttpResponse("This module already Exists")
                 else:
-                    return HttpResponse("Object not present corresponds to this id")
+                    gsystem_obj.save()
+                    check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
+                    if (check1 == 'True'):
+                        return HttpResponse("module succesfull created")
+                    else:
+                        gsystem_obj.delete()
+                        return HttpResponse("Attribute type 'module_set_md5' yet not created Run 'python manage.py filldb on terminal to create'")
             else:
                 return HttpResponse("Not a valid id passed")
         except Exception as e:
@@ -250,15 +247,6 @@ def sotore_md5_module_set(object_id,module_set_md5):
     else:
         print "Run 'python manage.py filldb' commanad to create AttributeType 'module_set_md5' "
         return 'False'
-
-#-- under construction    
-def create_relation_of_module(subject_id, right_subject_id):
-    rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
-    relation = collection.GRelation()                         #instance of GRelation class
-    relation.relation_type = rt_has_module
-    relation.right_subject = right_subject_id
-    relaton.subject = subject_id
-    relation.save()
     
 
 def check_module_exits(module_set_md5):
@@ -275,12 +263,10 @@ def check_module_exits(module_set_md5):
 
 
 def walk(node):
-    hm = HistoryManager()
     list = []
     for each in node:
        dict = {}
-       node = collection.Node.one({'_id':ObjectId(each['id'])})
-       n =  hm.get_version_document(node,each['version_no'])
+       n = collection.Node.one({'_id':ObjectId(each['id'])})
        dict['label'] = n.name
        dict['id'] = each['id']
        dict['version_no'] = each['version_no']
@@ -428,17 +414,6 @@ def graph_nodes(request, group_id):
   return StreamingHttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
-
-
-def get_data_for_switch_groups(request,group_id,node_id):
-    coll_obj_list = []
-    print "nodeid",node_id
-    st = collection.Node.find({"_type":"Group"})
-    node = collection.Node.one({"_id":ObjectId(node_id)})
-    for each in node.group_set:
-        coll_obj_list.append(collection.Node.one({'_id':each}))
-    data_list=set_drawer_widget(st,coll_obj_list)
-    return HttpResponse(json.dumps(data_list))
 
 
 '''
