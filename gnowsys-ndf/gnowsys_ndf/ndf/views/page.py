@@ -161,7 +161,7 @@ def page(request, group_id, app_id=None):
             page_node = node
         
         breadcrumbs_list = []
-        breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))
+        breadcrumbs_list.append( (str(page_node._id), page_node.name) )
 
         location = []
         for each in page_node.location:

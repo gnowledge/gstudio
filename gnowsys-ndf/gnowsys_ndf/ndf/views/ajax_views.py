@@ -151,7 +151,7 @@ def collection_view(request, group_id):
 
     #print "\n breadcrumbs_list: ", breadcrumbs_list
 
-    breadcrumbs_list.append(( str(node_obj._id), str(node_obj.name) ))
+    breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
     #print "\n breadcrumbs_list: ", breadcrumbs_list
 
     return render_to_response('ndf/collection_ajax_view.html', 
