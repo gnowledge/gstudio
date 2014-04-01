@@ -21,9 +21,10 @@ def adminDesignerDashboardClass(request, class_name):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = collection.Node.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype})
+        nodes = collection.Node.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
     else :
-        nodes = collection.Node.find({'_type':class_name})
+        nodes = collection.Node.find({'_type':class_name}).sort('last_update', -1)
+
     objects_details = []
     for each in nodes:
         member = []
@@ -79,7 +80,6 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     '''
     delete class's objects
     '''
-    instance_type_node = None
     new_instance_type = None
 
     definitionlist = []
@@ -88,7 +88,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     options = []
 
     if class_name == "AttributeType":
-        definitionlist = ['name','altnames','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        definitionlist = ['name','altnames','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -113,8 +113,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     newdict = {}
 
     if node_id:
-        instance_type_node = collection.Node.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
-        # print "\n instance_type_node: \n", instance_type_node
+        new_instance_type = collection.Node.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
 
     else:
         new_instance_type = eval("collection"+"."+class_name)()
@@ -175,21 +174,29 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
 
     for key,value in class_structure.items():
         if value == bool:
-            newdict[key] = "bool"
+            # newdict[key] = "bool"
+            newdict[key] = ["bool", new_instance_type[key]]
         elif value == unicode:
-            newdict[key] = "unicode"
+            # newdict[key] = "unicode"
+            newdict[key] = ["unicode", new_instance_type[key]]
         elif value == list:
-            newdict[key] = "list"
+            # newdict[key] = "list"
+            newdict[key] = ["list", new_instance_type[key]]
         elif type(value) == list:
-            newdict[key] = "list"
+            # newdict[key] = "list"
+            newdict[key] = ["list", new_instance_type[key]]
         elif value == datetime.datetime:
-            newdict[key] = "datetime"
+            # newdict[key] = "datetime"
+            newdict[key] = ["datetime", new_instance_type[key]]
         elif value == int:
-            newdict[key] = "int"
+            # newdict[key] = "int"
+            newdict[key] = ["int", new_instance_type[key]]
         elif key == "status":
-            newdict[key] = "status"
+            # newdict[key] = "status"
+            newdict[key] = ["status", new_instance_type[key]]
         else: 
-            newdict[key] = value
+            # newdict[key] = value
+            newdict[key] = [value, new_instance_type[key]]
 
     class_structure = newdict
 
@@ -204,11 +211,10 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     class_structure_with_values = {}
     if node_id:
         for key, value in class_structure.items():
-            print "\t", key, " -- ", instance_type_node[key], " -- ", class_structure[key]
-            class_structure_with_values[key] = []
+            class_structure_with_values[key] = [class_structure[key][0], new_instance_type[key]]
 
-        variable = RequestContext(request, {'node': instance_type_node,
-                                            'class_name': class_name, 'class_structure': class_structure, 'url': "designer", 
+        variable = RequestContext(request, {'node': new_instance_type,
+                                            'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
                                             'options': options, 'required_fields': required_fields,
                                             'groupid': groupid
