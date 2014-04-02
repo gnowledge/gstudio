@@ -160,8 +160,9 @@ def page(request, group_id, app_id=None):
           elif node.status == u"PUBLISHED":
             page_node = node
         
-        
+        # First time breadcrumbs_list created on click of page details
         breadcrumbs_list = []
+        # Appends the elements in breadcrumbs_list first time the resource which is clicked
         breadcrumbs_list.append( (str(page_node._id), page_node.name) )
 
         location = []
@@ -411,7 +412,7 @@ def publish_page(request,group_id,node):
   node.modified_by = int(request.user.id)
   node.save() 
 
-
+  # This shows the newly created breadcrumbs_list when page is published
   breadcrumbs_list = []
   breadcrumbs_list.append(( str(node._id), str(node.name) ))
 

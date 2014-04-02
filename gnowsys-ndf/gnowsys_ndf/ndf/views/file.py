@@ -452,10 +452,14 @@ def file_detail(request, group_id, _id):
         #grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
         #return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
 
+    breadcrumbs_list = []
+    breadcrumbs_list.append(( str(file_node._id), file_node.name ))
+
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
-                                'groupid':group_id
+                                'groupid':group_id,
+                                'breadcrumbs_list': breadcrumbs_list
                               },
                               context_instance = RequestContext(request)
                              )
