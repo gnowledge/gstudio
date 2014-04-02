@@ -159,9 +159,9 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
                         new_instance_type[key] = listoflist
 
             elif value == datetime.datetime:
-                new_instance_type[key] = datetime.datetime.now()
-#                pass
-
+                if key == "last_update":
+                    new_instance_type[key] = datetime.datetime.now()
+                
             elif key == "status":
                 if request.POST.get(key,""):
                     new_instance_type[key] = unicode(request.POST.get(key,""))
