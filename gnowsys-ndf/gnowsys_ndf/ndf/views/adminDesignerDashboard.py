@@ -138,9 +138,11 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
                         new_instance_type['content'] = org2html(new_instance_type[key], file_prefix=filename)
                     else :
                         new_instance_type[key] = unicode(request.POST.get(key,""))
+
             elif value == list:
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"").split(",")
+
             elif type(value) == list:
                 if request.POST.get(key,""):
                     if key in ("tags","applicable_node_type"):
@@ -155,22 +157,42 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
                         for each in request.POST.get(key,"").split(","):
                             listoflist.append(ObjectId(each))
                         new_instance_type[key] = listoflist
+
             elif value == datetime.datetime:
                 new_instance_type[key] = datetime.datetime.now()
 #                pass
+
             elif key == "status":
                 if request.POST.get(key,""):
                     new_instance_type[key] = unicode(request.POST.get(key,""))
-            elif key == "created_by":
-                new_instance_type[key] = request.user.id
+
+            # elif key == "created_by":
+            #     new_instance_type[key] = request.user.id
+
             elif value == int:
                 if request.POST.get(key,""):
                     new_instance_type[key] = int(request.POST.get(key,""))
+
             else: 
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"")
+
+        user_id = request.user.id
+
+        if not new_instance_type.has_key('_id'):
+            new_instance_type.created_by = user_id
+
+        new_instance_type.modified_by = user_id
+
+        if user_id not in new_instance_type.contributors:
+            new_instance_type.contributors.append(user_id)
+
         new_instance_type.save()
+
         return HttpResponseRedirect("/admin/designer/"+class_name)
+
+
+    # If GET request ---------------------------------------------------------------------------------------
 
     for key,value in class_structure.items():
         if value == bool:
