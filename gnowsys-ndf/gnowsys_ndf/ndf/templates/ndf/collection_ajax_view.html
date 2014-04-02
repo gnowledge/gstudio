@@ -1,12 +1,14 @@
 {% load ndf_tags %}
 
 <ul class="side-nav">
-  {% if node.collection_dict|length > 0 %}
+  <!-- Breadcrumbs List on top of collections on resource page   -->
   <nav class="breadcrumbs">
     {% for key,value in breadcrumbs_list %}
-    	 <a href="{% url 'page_details' groupid key %}">{{value}}</a> 
+       <a class="bc" name="{{key}}">{{ value }}</a>
     {% endfor %}
   </nav>
+
+  {% if node.collection_dict|length > 0 %}
 
   {% for index_key, each_node in node.collection_dict.items %}
   {% get_grid_fs_object each_node as grid_fs_obj %}
@@ -71,4 +73,38 @@
     });
 
   });
+
+  $(".bc").click(function() {
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'collection_nav' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: this.name,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#view_page").html(data);
+      }
+    });
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'collection_view' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: this.name,
+        modify_option: 'delete',
+        breadcrumbs_list: '{{ breadcrumbs_list }}',
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#view_collection").html(data);
+      }
+    });
+
+
+  });
+
 </script>

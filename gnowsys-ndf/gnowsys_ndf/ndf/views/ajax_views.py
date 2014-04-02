@@ -1,7 +1,6 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 
-
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -114,7 +113,7 @@ def select_drawer(request, group_id):
             )
 
             
-
+# This ajax view renders the output as "node view" by clicking on collections
 def collection_nav(request, group_id):
     
     if request.is_ajax() and request.method == "POST":    
@@ -124,7 +123,6 @@ def collection_nav(request, group_id):
 
       node_obj = collection.Node.one({'_id': ObjectId(node_id)})
 
-      
       return render_to_response('ndf/node_ajax_view.html', 
                                   { 'node': node_obj,
                                     'group_id': group_id,
@@ -134,35 +132,41 @@ def collection_nav(request, group_id):
       )
 
 
+# This view handles the collection list of resource and its breadcrumbs
 def collection_view(request, group_id):
 
   if request.is_ajax() and request.method == "POST":    
     node_id = request.POST.get("node_id", '')
+    modify_option = request.POST.get("modify_option", '')
     breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
-    #print "\n breadcrumbs_list:", breadcrumbs_list
-    #print "\n type of: ", type(breadcrumbs_list)
 
     collection = db[Node.collection_name]
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
 
     breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
-    #breadcrumbs_list = [str(x) for x in breadcrumbs_list.split(',')]
     breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
 
-    #print "\n breadcrumbs_list: ", breadcrumbs_list
+    # This is for breadcrumbs on collection which manipulates the breadcrumbs list (By clicking on breadcrumbs_list elements)
+    if modify_option:
+      tupl = ( str(node_obj._id), node_obj.name )
+      Index = breadcrumbs_list.index(tupl) + 1
+      # Arranges the breadcrumbs according to the breadcrumbs_list indexes
+      breadcrumbs_list = [i for i in breadcrumbs_list if breadcrumbs_list.index(i) in range(Index)]  
+      # Removes the adjacent duplicate elements in breadcrumbs_list
+      breadcrumbs_list = [ breadcrumbs_list[i] for i in range(len(breadcrumbs_list)) if i == 0 or breadcrumbs_list[i-1] != breadcrumbs_list[i] ]
 
-    breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
-    #print "\n breadcrumbs_list: ", breadcrumbs_list
+    else:
+      # This is for adding the collection elements in breadcrumbs_list from navigation through collection of resource.
+      breadcrumbs_list.append( (str(node_obj._id), node_obj.name) )
 
     return render_to_response('ndf/collection_ajax_view.html', 
-                                 { 'node': node_obj,
-                                   'group_id': group_id,
-                                   'groupid':group_id,
-                                   'breadcrumbs_list':breadcrumbs_list
-                                 },
+                                  { 'node': node_obj,
+                                    'group_id': group_id,
+                                    'groupid':group_id,
+                                    'breadcrumbs_list':breadcrumbs_list
+                                  },
                                  context_instance = RequestContext(request)
     )
-
 
 
 @login_required
