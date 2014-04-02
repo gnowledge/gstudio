@@ -159,8 +159,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    <td style="font-size:11px;"> 
 	      <input class="button editobject" id="{{each.Id}}" type="button" value="Edit"> 
 	      <input class="button saveobject" id="save{{each.Id}}" name="{{each.Id}}" type="button" value="Save" style="display:none">
+	    </td>
+	    <td> 
+	      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}">
+		Edit&nbsp;&nbsp;<i class="fi-plus"></i>
+	      </a>
 	   </td>
-	    
     </tr>
  
 	{% endfor %}

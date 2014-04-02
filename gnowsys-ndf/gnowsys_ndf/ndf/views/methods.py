@@ -387,7 +387,6 @@ def get_versioned_page(node):
               i=prev_ver 
 
               doc=history_manager.get_version_document(node,i)
-              print "cotent name",doc.name
               if (i == '1.1'):
                   return doc
             return doc
