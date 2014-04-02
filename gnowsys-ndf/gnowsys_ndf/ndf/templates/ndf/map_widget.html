@@ -69,7 +69,15 @@
 			L.geoJson(mapdata, {
 			    
 			    pointToLayer: function (feature, latlng) {
+			    	{% if mode == "edit" %}
+			        	var marker = L.marker(latlng, {
+							draggable:true,
+							title:"Resource location",
+							alt:"Resource Location",
+							riseOnHover:true
+						})
 
+<<<<<<< HEAD
 			    {% if mode == "edit" %}
 					var marker = L.marker(latlng, {
 									draggable:true,
@@ -80,9 +88,17 @@
 			    {% else %}
 			    	var marker = L.marker(latlng);
 			    {% endif %}			        
+=======
+						marker.on("dragend", dragend);
+>>>>>>> mongokit
 
-					tempArr.push(marker);
-			
+			        {% else %}
+			        	var marker = L.marker(latlng);
+
+			       	{% endif %}
+
+						tempArr.push(marker);
+						
 					return marker;
 					
 			    }
@@ -121,10 +137,12 @@
 				title:"Resource location",
 				alt:"Resource Location",
 				riseOnHover:true
-			}).addTo(map)
+			}).addTo(map);
 				// .bindPopup(e.latlng.toString()).openPopup();
 				// .bindPopup($(".popup-html").html()).openPopup();
 			
+			marker.on("dragend", dragend);
+
 			var addLeafletID = marker.toGeoJSON();
 			$(addLeafletID).attr("properties", {"id": marker._leaflet_id});
 			
@@ -144,8 +162,12 @@
 			// 	aaa = this.toGeoJSON();//.latlng.toString();
 			// });
 
-			// Update marker on changing it's position
-			marker.on("dragend",function(ev){
+			// marker.on("contextmenu", function(){(alert("aaa"))});
+		}
+
+		// Update marker on changing it's position
+			// marker.on("dragend",function(ev){
+				function dragend(ev){
 
 				var changedPos = ev.target.getLatLng();
 				
@@ -169,10 +191,7 @@
             	// $('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON);
             	$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
             	$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
-            });
-
-			// marker.on("contextmenu", function(){(alert("aaa"))});
-		}
+            }//);
 
 		{% endif %}
 
