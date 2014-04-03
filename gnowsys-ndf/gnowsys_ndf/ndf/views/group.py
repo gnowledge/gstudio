@@ -137,11 +137,7 @@ def group_dashboard(request,group_id=None):
         pass
 
     if groupobj.status == u"DRAFT":
-        for i in groupobj.contributors:
-            if i == request.user.pk :
-                groupobj = groupobj
-            else:
-                groupobj=get_versioned_page(groupobj)
+        groupobj=get_versioned_page(groupobj)
 
     elif groupobj.status == u"PUBLISHED":
         groupobj = groupobj
