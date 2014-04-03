@@ -6,16 +6,20 @@
 {% block meta_content %}
 <ul class="side-nav"> 
   {% for each in app_collection_set %}
-  {% get_memberof_objects_count each.id as count %}
+  {% get_memberof_objects_count each.id groupid as count %}
   {% ifequal each.id app_set_id %}
   <li class="active"> 
-    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
-    <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}">&nbsp;+</a>
+    <div>
+    <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+    </div>
   </li>
     {% else %}
     <li> 
-      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" style="float:left">{{each.name}} ({{count}})</a> 
-      <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}">&nbsp;+</a>
+      <div>
+      <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+      </div>
     </li>
     {% endifequal %}
     {% endfor %}
@@ -178,6 +182,17 @@
          <input id="tags_id" name="tags" type="textbox" value="" placeholder="Separate tags with commas...">
        </div>
      </div>
+     
+     {% if File == "True" %}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3">Upload File</font> 
+       </div>
+       <div style="display:table-cell;">
+         <input id="file_id" name="file" type="file">
+       </div>
+     </div>
+     {% endif %}
     <div style="display:table-row;">
       <div style="display:table-cell;"> 
 	<font size="3"> Content</font> 

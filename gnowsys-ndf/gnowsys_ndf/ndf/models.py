@@ -156,24 +156,28 @@ class Node(DjangoDocument):
         
         'language': unicode,
 
-        'type_of': ObjectId,        # To define type_of GSystemType for particular node              
+        'type_of': [ObjectId],                    # To define type_of GSystemType for particular node              
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
 
       	'created_at': datetime.datetime,
-        'last_update': datetime.datetime,
-        # 'rating': RatingField(),
-        'created_by': int,			# Primary Key of User(django's) Class
-        'modified_by': [int],		        # List of Primary Keys of User(django's) Class
-        'location': dict,
+        'created_by': int,			# Primary Key of User(django's) Class who created the document
 
-        'start_publication': datetime.datetime,
+        'last_update': datetime.datetime,
+        'modified_by': int,		        # Primary Key of User(django's) Class who lastly modified the document
+
+        'contributors': [int],		        # List of Primary Keys of User(django's) Class
+
+        # 'rating': RatingField(),
+
+        'location': [dict],
 
         'content': unicode,
         'content_org': unicode,
 
         'collection_set': [ObjectId],		# List of ObjectId's of different GTypes/GSystems
 
+        'start_publication': datetime.datetime,
         'tags': [unicode],
         'featured': bool,
         'url': unicode,
@@ -196,12 +200,17 @@ class Node(DjangoDocument):
         and appends those to 'user_details' dict-variable
         """
         user_details = {}
-        user_details['created_by'] = User.objects.get(pk=self.created_by).username
+        if self.created_by:
+            user_details['created_by'] = User.objects.get(pk=self.created_by).username
 
-        modified_by_usernames = []
-        for each_pk in self.modified_by:
-            modified_by_usernames.append(User.objects.get(pk=each_pk).username)
-        user_details['modified_by'] = modified_by_usernames
+        contributor_names = []
+        for each_pk in self.contributors:
+            contributor_names.append(User.objects.get(pk=each_pk).username)
+        # user_details['modified_by'] = contributor_names
+        user_details['contributors'] = contributor_names
+
+        if self.modified_by:
+            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
 
         return user_details
 
@@ -213,10 +222,26 @@ class Node(DjangoDocument):
         member_of_names = []
 
         collection = get_database()[Node.collection_name]
-
-        for each_member_id in self.member_of:
-            member_of_names.append(collection.Node.one({'_id': each_member_id}).name)
-
+        if self.member_of:
+            for each_member_id in self.member_of:
+                if type(each_member_id) == ObjectId:
+                    _id = each_member_id
+                else:
+                    _id = each_member_id['$oid']
+                if _id:
+                    mem=collection.Node.one({'_id': ObjectId(_id)})
+                    if mem:
+                        member_of_names.append(mem.name)
+        else:
+            for each_member_id in self.gsystem_type:
+                if type(each_member_id) == ObjectId:
+                    _id = each_member_id
+                else:
+                    _id = each_member_id['$oid']
+                if _id:
+                    mem=collection.Node.one({'_id': ObjectId(_id)})
+                    if mem:
+                        member_of_names.append(mem.name)
         return member_of_names
 
     @property        
@@ -279,9 +304,8 @@ class Node(DjangoDocument):
         
     @property
     def current_version(self):
-
-     history_manager= HistoryManager()
-     return history_manager.get_current_version(self)    
+        history_manager= HistoryManager()
+        return history_manager.get_current_version(self)    
 
     @property
     def version_dict(self):
@@ -337,7 +361,6 @@ class Node(DjangoDocument):
                             field_found = True
 
                             # TODO: Check whether type of "value" matches with that of "attribute['data_type']"
-
                             # Don't continue searching from list of remaining attributes 
                             break
 
@@ -356,19 +379,31 @@ class Node(DjangoDocument):
 
         if is_new:
             # Create history-version-file
-            if history_manager.create_or_replace_json_file(self):
-                fp = history_manager.get_file_path(self)
-                user = User.objects.get(pk=self.created_by).username                
-                message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+            try:
+                if history_manager.create_or_replace_json_file(self):
+                    fp = history_manager.get_file_path(self)
+                    user = User.objects.get(pk=self.created_by).username
+                    message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+            except Exception as err:
+                print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be created!!!\n"
+                collection.remove({'_id': self._id})
+                raise RuntimeError(err)
+
         else:
             # Update history-version-file
             fp = history_manager.get_file_path(self)
             rcs_obj.checkout(fp)
 
-            if history_manager.create_or_replace_json_file(self):
-                message = "This document (" + self.name + ") is lastly updated on " + self.last_update.strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+            try:
+                if history_manager.create_or_replace_json_file(self):
+                    user = User.objects.get(pk=self.modified_by).username
+                    message = "This document (" + self.name + ") is lastly updated by " + user + " on " + self.last_update.strftime("%d %B %Y")
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+            except Exception as err:
+                print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
+                raise RuntimeError(err)
+                
 
     ##########  User-Defined Functions ##########
 
@@ -417,9 +452,11 @@ class Node(DjangoDocument):
         gsystem_type_list = []
         possible_attributes = {}
 
-        # Converts to list, if only single ObjectId is passed
+        # Converts to list, if passed parameter is only single ObjectId
         if not isinstance(gsystem_type_id_or_list, list):
             gsystem_type_list = [gsystem_type_id_or_list]
+        else:
+            gsystem_type_list = gsystem_type_id_or_list
 
         # Code for finding out attributes associated with each gsystem_type_id in the list
         for gsystem_type_id in gsystem_type_list:
@@ -431,8 +468,10 @@ class Node(DjangoDocument):
                 else:
                     print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
             
+            # Case - While editing GSystem
+            # Checking in Gattribute collection - to collect user-defined attributes' values, if already set!
             if self.has_key("_id"):
-                # If - node has key _id
+                # If - node has key '_id'
                 collection = get_database()[Triple.collection_name]
                 attributes = collection.Triple.find({'subject': self._id})
             
@@ -441,12 +480,24 @@ class Node(DjangoDocument):
                     # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [document-object]
                     AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
 
+            # Case - While creating GSystem / if new attributes get added
+            # Again checking in AttributeType collection - because to collect newly added user-defined attributes, if any!
             collection = get_database()[Node.collection_name]
             attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
                 
             for attr in attributes:
                 # Here attr is of type -- AttributeType
                 AttributeType.append_attribute(attr, possible_attributes)
+
+            # type_of check for current GSystemType to which the node belongs to
+            gsystem_type_node = collection.Node.one({'_id': gsystem_type_id}, {'name': 1, 'type_of': 1})
+
+            if gsystem_type_node.type_of:
+                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_node.type_of]}})
+                
+                for attr in attributes:
+                    # Here attr is of type -- AttributeType
+                    AttributeType.append_attribute(attr, possible_attributes)
 
         return possible_attributes
 
@@ -682,7 +733,9 @@ class GSystemType(Node):
         'meta_type_set': [MetaType],            # List of Metatypes
         'attribute_type_set': [AttributeType],	# Embed list of Attribute Type Class as Documents
         'relation_type_set': [RelationType],    # Holds list of Relation Types
-        'process_type_set': [ProcessType]       # List of Process Types 
+        'process_type_set': [ProcessType],      # List of Process Types
+
+        'property_order': []                    # List of user-defined attributes in template-view order
     }
     
     use_dot_notation = True
@@ -958,7 +1011,7 @@ class HistoryManager():
         (b) False - Otherwise
         """
 
-        collection_tuple = (GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation)
+        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
@@ -1015,8 +1068,13 @@ class HistoryManager():
             # if document_object is None or
             # !isinstance(document_object, collection_tuple)
 
-            print("\n Error: Either invalid instance or "\
-                      "not matching given instances list!!!")
+            msg = " Following instance is either invalid or " \
+            + "not matching given instances-type list " + str(collection_tuple) + ":-" \
+            + "\n\tObjectId: " + document_object._id.__str__() \
+            + "\n\t    Type: " + document_object._type \
+            + "\n\t    Name: " + document_object.name
+
+            raise RuntimeError(msg)
 
         return file_res
       
@@ -1066,7 +1124,7 @@ class Triple(DjangoDocument):
     
     required_fields = ['name', 'subject']
     use_dot_notation = True
-
+    use_autorefs = True
     ########## Built-in Functions (Overridden) ##########
     
     def __unicode__(self):

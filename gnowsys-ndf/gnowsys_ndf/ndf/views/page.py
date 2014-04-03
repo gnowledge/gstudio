@@ -148,34 +148,32 @@ def page(request, group_id, app_id=None):
         
 
     else:
-        Group_node = collection.Node.one({"_id": ObjectId(group_id)})
-                
+        Group_node = collection.Node.one({"_id": ObjectId(group_id)})                
        
         if  Group_node.prior_node: 
-            Group_Status = "Moderated" 
-            page_node = collection.Node.one({"_id": ObjectId(app_id)})
-            return render_to_response('ndf/page_details.html', 
-                                  { 'node': page_node,
-                                    'group_id': group_id,
-                                    'groupid':group_id,
-                                    'Group_Status':Group_Status                
-                                  },
-                                  context_instance = RequestContext(request)
-                        )        
-
-            
+            page_node = collection.Node.one({"_id": ObjectId(app_id)})            
             
         else:
           node = collection.Node.one({"_id":ObjectId(app_id)})
-          page_node=get_versioned_page(node)
+          if node.status == u"DRAFT":
+            page_node=get_versioned_page(node)
+          elif node.status == u"PUBLISHED":
+            page_node = node
         
-        
-        Group_Status = "NonModerated" 
+        breadcrumbs_list = []
+        breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))
+
+        location = []
+        for each in page_node.location:
+          location.append(json.dumps(each))
+
+
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'groupid':group_id,
-                                    'Group_Status':Group_Status                
+                                    'breadcrumbs_list': breadcrumbs_list,
+                                    'location': location
                                   },
                                   context_instance = RequestContext(request)
         )        
@@ -196,17 +194,41 @@ def create_edit_page(request, group_id, node_id=None):
     else:
         page_node = collection.GSystem()
 
+    #breadcrumbs_list = []
+    #breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))
+
     if request.method == "POST":
         get_node_common_fields(request, page_node, group_id, gst_page)
         page_node.save()
         
+        #breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))  
+        #print "list ", breadcrumbs_list      
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
+
+        #location = []
+        #for each in page_node.location:
+        #  location.append(json.dumps(each))
+
+
+        #return render_to_response('ndf/page_details.html', 
+        #                          { 'node': page_node,
+        #                            'group_id': group_id,
+        #                            'groupid':group_id,
+        #                            'location': location
+        #                           # 'breadcrumbs_list': breadcrumbs_list
+        #                          },
+        #                          context_instance = RequestContext(request)
+        #)
         
     else:
         if node_id:
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
+
+            # location = []
+            # for each in page_node.location:
+            #   location.append(json.dumps(each))
 
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
@@ -404,23 +426,18 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         return ""
         
 def publish_page(request,group_id,node):
- #col_Group = db[Group.collection_name]
- #collection = db[Node.collection_name]
-    
      
- node_id=collection.Node.one({'_id':ObjectId(node)})
- node_id.status=unicode("PUBLISHED")
- node_id.save() 
+  node=collection.Node.one({'_id':ObjectId(node)})
+  node.status=unicode("PUBLISHED")
+  node.modified_by = int(request.user.id)
+  node.save() 
 
- Group_Status="Moderated"
- return render_to_response("ndf/node_details_base.html",
-                                 { 'group_id':group_id,
-                                   'node':node_id,
-                                   'groupid':group_id,
-                                   'Group_Status':Group_Status
-                                
-                                 
-                                 
-                                 },
-                                  context_instance=RequestContext(request)
-                              )
+  return render_to_response("ndf/page_details.html",
+                                { 'group_id':group_id,
+                                  'node':node,
+                                  'groupid':group_id,
+                                },
+                                 context_instance=RequestContext(request)
+                             )
+
+ 

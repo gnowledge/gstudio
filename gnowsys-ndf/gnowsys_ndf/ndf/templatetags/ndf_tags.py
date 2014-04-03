@@ -102,41 +102,80 @@ def edit_drawer_widget(field, group_id, node, checked=None):
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
-def list_widget(type_value, fields_value,template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+
   drawer1 = {}
   drawer2 = None
   groupid = ""
   group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+
   if group_obj:
 	groupid = str(group_obj[0]._id)
-  alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
-  fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
-  fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
-  fields = {"subject_type":"GSystemType","object_type":"GSystemType","meta_type_set":"MetaType","attribute_type_set":"AttributeType","relation_type_set":"RelationType","member_of":"all_types","prior_node":"all_types","applicable_node_type":"NODE_TYPE_CHOICES","subject_applicable_nodetype":"NODE_TYPE_CHOICES","object_applicable_nodetype":"NODE_TYPE_CHOICES","data_type": "DATA_TYPE_CHOICES"}
-  types = fields[type_value]
 
-  if type_value in fields_selection1:
-    if type_value in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
+  alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
+
+  fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+
+  fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
+
+  fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType"}
+  types = fields[fields_name]
+
+  if fields_name in fields_selection1:
+    if fields_value:
+      dummy_fields_value = fields_value
+      fields_value = []
+      for v in dummy_fields_value:
+        fields_value.append(v.__str__())
+
+    if fields_name in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
       for each in NODE_TYPE_CHOICES:
         drawer1[each] = each
-    elif type_value in ("data_type"):
+    elif fields_name in ("data_type"):
       for each in DATA_TYPE_CHOICES:
         drawer1[each] = each
     else:
       drawer = collection.Node.find({"_type":types})
       for each in drawer:
         drawer1[str(each._id)]=each.name
-    return {'template': template1, 'widget_for': type_value, 'drawer1': drawer1}
+    return {'template': template1, 'widget_for': fields_name, 'drawer1': drawer1, 'selected_value': fields_value}
+
   
-  if type_value in fields_selection2:
+  if fields_name in fields_selection2:
+    fields_value_id_list = []
+
+    if fields_value:
+      for each in fields_value:
+        if type(each) == ObjectId:
+          fields_value_id_list.append(each)
+        else:
+          fields_value_id_list.append(each._id)
+
     if types in alltypes:
-      for each in collection.Node.find({"_type":types}):
-        drawer1[each._id] = each
+      for each in collection.Node.find({"_type": types}):
+        if fields_value_id_list:
+          if each._id not in fields_value_id_list:
+            drawer1[each._id] = each
+        else:
+          drawer1[each._id] = each
+
     if types in ["all_types"]:
       for each in alltypes:
-        for eachnode in collection.Node.find({"_type":each}):
-          drawer1[eachnode._id] = eachnode
-    return {'template': template2, 'widget_for': type_value, 'drawer1': drawer1, 'drawer2': drawer2, 'groupid': groupid}
+        for eachnode in collection.Node.find({"_type": each}):
+          if fields_value_id_list:
+            if eachnode._id not in fields_value_id_list:
+              drawer1[eachnode._id] = eachnode
+          else:
+            drawer1[eachnode._id] = eachnode
+
+    if fields_value_id_list:
+      drawer2 = []
+      for each_id in fields_value_id_list:
+        each_node = collection.Node.one({'_id': each_id})
+        if each_node:
+          drawer2.append(each_node)
+
+    return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid, 'groupid': groupid}
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
@@ -388,6 +427,8 @@ def get_edit_url(groupid):
       return 'video_edit'       
     elif 'image' in node.mime_type:
       return 'image_edit'
+    else:
+      return 'file_edit'
 
   
 
@@ -420,11 +461,9 @@ def get_group_type(group_id, user):
 
       else:
         #condition for groups, accessible to not logged users
-        print "\n colg.group_type: ", colg.group_type
         if colg.group_type == "PUBLIC":
           return "allowed"
         else:
-          print "\n going inn..."
           raise Http404
     else:
 	return "pass"
@@ -486,9 +525,9 @@ def get_Object_count(key):
         return 'null'
 
 @register.assignment_tag
-def get_memberof_objects_count(key):
+def get_memberof_objects_count(key,group_id):
   try:
-  	return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'_type':'GSystem'}).count()
+  	return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'_type':'GSystem','group_set': {'$all': [ObjectId(group_id)]},'_type':'GSystem'}).count()
   except:
   	return 'null'
   
@@ -497,11 +536,13 @@ def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
 @register.inclusion_tag('ndf/admin_fields.html')
-def get_input_fields(fields_value,type_value):
+def get_input_fields(fields_type,fields_name):
   """Get html tags 
   """
-  field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of"]
-  return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value,"field_type_list":field_type_list}
+  field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
+  return {'template': 'ndf/admin_fields.html', 
+          "fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
+          "field_type_list":field_type_list}
   
   
 
@@ -547,7 +588,6 @@ def resource_info(node):
     try:
       group_gst=col_Group.Group.one({'_id':ObjectId(node._id)})
     except:
-      print "something",node
       grname=re.split(r'[/=]',node)
       group_gst=col_Group.Group.one({'_id':ObjectId(grname[1])})
     return group_gst

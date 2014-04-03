@@ -1,5 +1,6 @@
 {% load ndf_tags %}
 
+
 <!-- css for drawer widget -->
 <style type = "text/css">
 
@@ -32,6 +33,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 </style>
 
 
+
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
 
 <header class="row page">
@@ -51,7 +53,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   </h2>
 
   <dl class="row tabs" data-tab>
-    <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+    <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read video</a></dd>
 
     {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
 
@@ -59,22 +61,23 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     {% endif %}
 
+    <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+
     <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
 
   </section>
 
 </header>
-
 <div class="row">
-
   <section class="medium-9 columns">
     <div class="tabs-content">
 
       <!-- Tab content -->
       <div class="content active" id="view-page">
-
+        
        {% if node.prior_node|length > 0 %}
        <div class="panel">
+       
          <h6>You may want to read these first:</h6>
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
@@ -88,36 +91,43 @@ background-repeat:no-repeat; background-size: 48px 48px
         {% endif %}
 
         {% if node.mime_type %}
-        <!-- Code for showing media details -->
-        {% if node.mime_type == 'video' %}
-        <div>
-  			<video width="640px" controls buffered>
-  			<source src="{% url 'getFullvideo' groupid node  %}" type="video/webm">
-  			<source src="{% url 'getFullvideo' groupid node  %}" type="video/ogg">    
-			Your browser does not support the video tag.
-			</video>
-			<br/>
-			<a href="{% url 'getFullvideo' groupid node %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
-  				<i class="fi-download large"> download  </i>
-			</a>
-			
-		</div>
+{% if 'Pandora_video' in node.member_of %}
+       testthecode
+{% endif %}
+       {% if 'video' in node.mime_type %}
+       <div>
+	 <video width="640px" controls buffered>
+	   <source src="{% url 'getFullvideo' groupid node %}" type="video/webm">
+	     <source src="{% url 'getFullvideo' groupid node %}" type="video/ogg">
+	       Your browser does not support the video tag.
+	 </video>
+	 <br/>
+	 <a href="{% url 'getFullvideo' groupid node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
+	   <i class="fi-download large"> download </i>
+	 </a>
+	 
+</div>
 
-		{% else %}		
-		
-		{% get_grid_fs_object node as grid_fs_obj %}
-		<div>
-  			<a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}">
-    			<img src="{% url 'getFullImage' groupid node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
-  			</a>
-  			<br/>
-  			<a href="{% url 'read_file' groupid node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
-  				<i class="fi-download large"> download  </i>
-			</a>
-		</div>
+{% else %}
 
-		{% endif %}
-		{% endif %}
+{% get_grid_fs_object node as grid_fs_obj %}
+<div>        <!-- Code for showing media details -->
+
+	  {% if 'image' in node.mime_type %}
+  	  <a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}">
+    	    <img src="{% url 'getFullImage' groupid node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
+  	  </a> 
+	  {% else %}
+         <a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}"> {{ grid_fs_obj.filename }} </a><br/>     
+      {% endif %}
+  	 <br/>
+  	 <a href="{% url 'read_file' groupid node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
+  	   <i class="fi-download large"> download </i>
+	 </a>
+	</div>
+	
+	{% endif %}
+	{% endif %}
 
         {% block add_fields %} {% endblock %}
 
@@ -141,9 +151,19 @@ background-repeat:no-repeat; background-size: 48px 48px
      <div class="content reveal-modal graph-div" id="view-graph" data-reveal>    
       
       {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-      <a class="close-reveal-modal">&#215;</a>
+        <a class="close-reveal-modal">&#215;</a>
       {% include "ndf/node_graph.html" %}
       {% endif %}
+    </div>
+
+     <!-- Tab View Map Widget -->
+     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
+      
+      <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+        <a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="read" %}
+        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+      <!-- #{#%# endif %} -->
     </div>
 
   </section>
@@ -151,7 +171,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   <section class="medium-3 columns">
     <div class="panel">
      <h5 class="subheader">
-       Edited {{ node.last_update|timesince }} ago by <a class="user">?</a> 
+       Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
        <small>
          <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
           {% for seq_no, version_no in node.version_dict.items reversed %}
@@ -190,7 +210,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     {% else %}
 
-      <a href="{% url edit_url groupid node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+      <a href="{% url edit_url groupid node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
     {% endif %}    
     {% endif %}
@@ -211,7 +231,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 <footer>
   <p><small>
-    <em>Written by {{ node.user_details_dict.modified_by|join:', ' }}</em></small></p>
+    <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
   </footer>
 
 <script type="text/javascript">

@@ -102,7 +102,7 @@
 
 <body>
 	<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
-
+	
 
 	<header class="drop-shadow">
 
@@ -249,10 +249,9 @@
 						
 
 								<!--Content search -->
+								{% block search_content %}
 								{% include "ndf/node_search_base.html" %}
-
-
-								{% block search_content %}  {% endblock %}
+								{% endblock %}
 								<!--ul id="search-results">
 									{% block search_results %}  {% endblock %}
 									<li>

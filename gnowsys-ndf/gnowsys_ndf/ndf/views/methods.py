@@ -13,6 +13,7 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.models import HistoryManager
 
 import re
+import ast
 ######################################################################################################################################
 
 db = get_database()
@@ -59,13 +60,16 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
       elif checked == "File":         
-        drawer = collection.Node.find({'_type': u"File", 'type_of': {'$in': [u"", None]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"File", 'group_set': {'$all': [ObjectId(group_id)]}})
         
       elif checked == "Image":         
-        drawer = collection.Node.find({'_type': u"File", 'type_of': {'$in': [u"", None]},'mime_type': {'$exists': True, '$nin': [u'video']}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        gst_image_id = collection.Node.one({'_type': "GSystemType", 'name': "Image"})._id
+        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$in':[gst_image_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        
 
       elif checked == "Video":         
-        drawer = collection.Node.find({'_type': u"File", 'mime_type': u"video", 'group_set': {'$all': [ObjectId(group_id)]}})
+        gst_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Video"})._id
+        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$in':[gst_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
       elif checked == "Quiz":
         # For prior-node-list
@@ -95,7 +99,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     else:
-      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'type_of': {'$in': [u"", None]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
 
            
     
@@ -147,13 +151,11 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
 
   node.name = unicode(name)
   node.language=unicode(language)
-  #node.modified_by.append(usrid)
-  if usrid not in node.modified_by:
-  #if usrid in node.modified_by:
-    node.modified_by.insert(0,usrid)
-  else:
-    node.modified_by.remove(usrid)
-    node.modified_by.insert(0,usrid)
+
+  node.modified_by = usrid
+
+  if usrid not in node.contributors:
+    node.contributors.append(usrid)
 
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   if group_obj._id not in node.group_set:
@@ -186,6 +188,14 @@ def get_node_common_fields(request, node, group_id, node_type):
   collection_list = request.POST.get('collection_list','')
   module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
+  map_geojson_data = request.POST.get('map-geojson-data')
+  
+  if map_geojson_data:
+    map_geojson_data = map_geojson_data + ","
+    map_geojson_data = list(ast.literal_eval(map_geojson_data))
+  else:
+    map_geojson_data = []
+  
   # --------------------------------------------------------------------------- For create only
   if not node.has_key('_id'):
     
@@ -204,11 +214,9 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
-
-  node.status=unicode("DRAFT")
-
-  node.language=unicode(language) 
-    
+  node.status = unicode("DRAFT")
+  node.language = unicode(language) 
+  node.location = map_geojson_data # Storing location data
 
   if access_policy:
     # Policy will be changed only by the creator of the resource
@@ -217,15 +225,12 @@ def get_node_common_fields(request, node, group_id, node_type):
       node.access_policy = u"PUBLIC"
     else:
       node.access_policy = u"PRIVATE"
-  
 
-  #node.modified_by.append(usrid)
-  if usrid not in node.modified_by:
-  #if usrid in node.modified_by:
-    node.modified_by.insert(0,usrid)
-  else:
-    node.modified_by.remove(usrid)
-    node.modified_by.insert(0,usrid)
+  node.modified_by = usrid
+
+  if usrid not in node.contributors:
+    node.contributors.append(usrid)
+
   # For displaying nodes in home group as well as in creator group.
   user_group_obj=gcollection.Node.one({'$and':[{'_type':ObjectId(group_id)},{'name':usrname}]})
 
@@ -235,7 +240,9 @@ def get_node_common_fields(request, node, group_id, node_type):
     if user_group_obj:
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
-  node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+
+  if tags:
+    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 
   # -------------------------------------------------------------------------------- prior_node
 

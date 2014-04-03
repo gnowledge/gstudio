@@ -13,6 +13,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import ast
 
 
 from django_mongokit import get_database
@@ -134,6 +135,37 @@ def collection_nav(request, group_id):
       )
 
 
+def collection_view(request, group_id):
+
+  if request.is_ajax() and request.method == "POST":    
+    node_id = request.POST.get("node_id", '')
+    breadcrumbs_list = request.POST.get("breadcrumbs_list", '')
+    #print "\n breadcrumbs_list:", breadcrumbs_list
+    #print "\n type of: ", type(breadcrumbs_list)
+
+    collection = db[Node.collection_name]
+    node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+
+    breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
+    #breadcrumbs_list = [str(x) for x in breadcrumbs_list.split(',')]
+    breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
+
+    #print "\n breadcrumbs_list: ", breadcrumbs_list
+
+    breadcrumbs_list.append(( str(node_obj._id), str(node_obj.name) ))
+    #print "\n breadcrumbs_list: ", breadcrumbs_list
+
+    return render_to_response('ndf/collection_ajax_view.html', 
+                                 { 'node': node_obj,
+                                   'group_id': group_id,
+                                   'groupid':group_id,
+                                   'breadcrumbs_list':breadcrumbs_list
+                                 },
+                                 context_instance = RequestContext(request)
+    )
+
+
+
 @login_required
 def change_group_settings(request, group_name):
     '''
@@ -156,6 +188,7 @@ def change_group_settings(request, group_name):
                 group_node.visibility_policy = visibility_policy
                 group_node.disclosure_policy = disclosure_policy
                 group_node.encryption_policy = encryption_policy
+                group_node.modified_by = int(request.user.id)
                 group_node.save()
                 return HttpResponse("changed successfully")
         except:
@@ -200,30 +233,35 @@ def make_module_set(request, group_id):
                 dict['version_no'] = hm_obj.get_current_version(node)
                 if node.collection_set:
                     dict['collection'] = get_module_set_list(node)          #gives the list of collection with proper hierarchy as they are
-           
-                #creating new Gsystem object and assining data of collection object
-                gsystem_obj = collection.GSystem()
-                gsystem_obj.name = unicode(node.name)
-                gsystem_obj.content = unicode(node.content)
-                gsystem_obj.member_of.append(GST_MODULE._id)
-                gsystem_obj.group_set.append(ObjectId(group_id))
-                # if usrname not in gsystem_obj.group_set:        
-                #     gsystem_obj.group_set.append(int(usrname))
-                gsystem_obj.created_by = int(request.user.id)
-                gsystem_obj.module_set.append(dict)
-                module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
-
-                check =check_module_exits(module_set_md5)          #checking module already exits or not
-                if(check == 'True'):
-                    return HttpResponse("This module already Exists")
-                else:
-                    gsystem_obj.save()
-                    check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
-                    if (check1 == 'True'):
-                        return HttpResponse("module succesfull created")
+                    #creating new Gsystem object and assining data of collection object
+                    gsystem_obj = collection.GSystem()
+                    gsystem_obj.name = unicode(node.name)
+                    gsystem_obj.content = unicode(node.content)
+                    gsystem_obj.member_of.append(GST_MODULE._id)
+                    gsystem_obj.group_set.append(ObjectId(group_id))
+                    # if usrname not in gsystem_obj.group_set:        
+                    #     gsystem_obj.group_set.append(int(usrname))
+                    user_id = int(request.user.id)
+                    gsystem_obj.created_by = user_id
+                    gsystem_obj.modified_by = user_id
+                    if user_id not in gsystem_obj.contributors:
+                        gsystem_obj.contributors.append(user_id)
+                    gsystem_obj.module_set.append(dict)
+                    module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
+                    
+                    check =check_module_exits(module_set_md5)          #checking module already exits or not
+                    if(check == 'True'):
+                        return HttpResponse("This module already Exists")
                     else:
-                        gsystem_obj.delete()
-                        return HttpResponse("Attribute type 'module_set_md5' yet not created Run 'python manage.py filldb on terminal to create'")
+                        gsystem_obj.save()
+                        create_relation_of_module(node._id, gsystem_obj._id)
+                        check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
+                        if (check1 == 'True'):
+                            return HttpResponse("module succesfull created")
+                        else:
+                            gsystem_obj.delete()
+                            return HttpResponse("Error Occured while storing md5 of object in attribute'")
+
             else:
                 return HttpResponse("Not a valid id passed")
         except Exception as e:
@@ -237,7 +275,7 @@ def sotore_md5_module_set(object_id,module_set_md5):
     if node_at is not None:
         try:
             attr_obj =  collection.GAttribute()                #created instance of attribute class
-            attr_obj.attribute_type = node_at._id
+            attr_obj.attribute_type = node_at
             attr_obj.subject = object_id
             attr_obj.object_value = unicode(module_set_md5)
             attr_obj.save()
@@ -247,6 +285,24 @@ def sotore_md5_module_set(object_id,module_set_md5):
     else:
         print "Run 'python manage.py filldb' commanad to create AttributeType 'module_set_md5' "
         return 'False'
+
+#-- under construction
+def create_version_of_module():
+    '''
+    This method will create attribute version_no of module with at type version
+    '''
+    at_version = collection.Node.one({'_type':'AttributeType', 'name':'version'})
+
+#-- under construction    
+def create_relation_of_module(subject_id, right_subject_id):
+    rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
+    if rt_has_module and subject_id and right_subject_id:
+        relation = collection.GRelation()                         #instance of GRelation class
+        relation.relation_type = rt_has_module
+        relation.right_subject = right_subject_id
+        relation.subject = subject_id
+        relation.save()
+
     
 
 def check_module_exits(module_set_md5):
@@ -254,7 +310,7 @@ def check_module_exits(module_set_md5):
     This method will check is module already exits ?
     '''
     node_at = collection.Node.one({'$and':[{'_type': 'AttributeType'},{'name': 'module_set_md5'}]})
-    attribute = collection.Triple.one({'_type':'GAttribute', 'attribute_type':node_at._id, 'object_value':module_set_md5}) 
+    attribute = collection.Triple.one({'_type':'GAttribute', 'attribute_type.$id':node_at._id, 'object_value':module_set_md5}) 
     if attribute is not None:
         return 'True'
     else:
@@ -336,7 +392,7 @@ def graph_nodes(request, group_id):
   exception_items = [
                       "name", "content", "_id", "login_required", "attribute_set",
                       "member_of", "status", "comment_enabled", "start_publication",
-                      "_type", "modified_by", "created_by", "last_update", "url", "featured",
+                      "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language"
                     ]
@@ -381,7 +437,7 @@ def graph_nodes(request, group_id):
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
             i += 1
     
