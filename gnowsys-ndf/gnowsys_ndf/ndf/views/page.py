@@ -402,18 +402,8 @@ def publish_page(request,group_id,node):
   node.status=unicode("PUBLISHED")
   node.modified_by = int(request.user.id)
   node.save() 
-
-  # This shows the newly created breadcrumbs_list when page is published
-  breadcrumbs_list = []
-  breadcrumbs_list.append(( str(node._id), str(node.name) ))
-
-  return render_to_response("ndf/page_details.html",
-                                { 'group_id':group_id,
-                                  'node':node,
-                                  'groupid':group_id,
-                                  'breadcrumbs_list': breadcrumbs_list
-                                },
-                                 context_instance=RequestContext(request)
-                             )
-
  
+  if node._type == 'Group':
+    return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
+
+  return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))

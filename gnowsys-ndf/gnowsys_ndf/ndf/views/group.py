@@ -130,11 +130,32 @@ def group_dashboard(request,group_id=None):
         else:
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
             grpid=groupobj['_id']
+
     except Exception as e:
         groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         grpid=groupobj['_id']
         pass
-    return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 'group_id':grpid, 'user':request.user},context_instance=RequestContext(request))
+
+    if groupobj.status == u"DRAFT":
+        for i in groupobj.contributors:
+            if i == request.user.pk :
+                groupobj = groupobj
+            else:
+                groupobj=get_versioned_page(groupobj)
+
+    elif groupobj.status == u"PUBLISHED":
+        groupobj = groupobj
+        
+    # First time breadcrumbs_list created on click of page details
+    breadcrumbs_list = []
+    # Appends the elements in breadcrumbs_list first time the resource which is clicked
+    breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
+
+    return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
+                                                         'group_id':grpid, 'user':request.user, 
+                                                         'breadcrumbs_list': breadcrumbs_list
+                                                        },context_instance=RequestContext(request)
+                            )
 
 
 @login_required
