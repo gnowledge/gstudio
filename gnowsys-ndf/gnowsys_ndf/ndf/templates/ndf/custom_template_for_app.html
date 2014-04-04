@@ -109,12 +109,40 @@
        </div>
      </div>
      {% endif %}
+     {% if system_type == "File"%}
+     <div style="display:table-row;">
+       <div style="display:table-cell;"> 
+	 <font size="3"> Uploaded File </font> 
+       </div>
+       {% if "image" in mime_type %}
+       <a href = "{% url 'file_detail' groupid system_id %}">
+       <div style="display:table-cell;">
+	  <img  src="{% url 'getImageThumbnail' groupid system_id %}" />
+       </div>
+       </a>
+       {% elif "video" in mime_type %}
+       <a href = "{% url 'file_detail' groupid system_id %}">
+       <div style="display:table-cell;">
+	  <img  src="{% url 'getImageThumbnail' groupid system_id %}" />
+       </div>
+       </a>
+       {% else %}
+       <a href ="{% url 'file_detail' groupid system_id %}">
+       <div style="display:table-cell;">
+	  <font size="3">{{app_set_instance_name}}</font>
+       </div>
+       </a>
+       {% endif %}
+     </div>
+     {% endif %}
+
      {% if content %}
     <div style="display:table-row;">
        <div style="display:table-cell;"> 
-	 <font size="3"> content: </font> 
+	 <font size="3"> content: </font>
        </div>
     </div>
+    
     <div style="display:block">
     {% with content|safe as description %}
     {{ description }}
@@ -126,7 +154,7 @@
 
 {# template for showing apt_set_instance new form #}
 {% if create_new %}
-<form method="POST" action=".">
+<form method="POST" action="."  enctype="multipart/form-data">
   {% csrf_token %}
   <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
      <div style="display:table-row;">
