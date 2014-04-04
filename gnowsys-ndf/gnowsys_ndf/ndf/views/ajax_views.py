@@ -323,10 +323,12 @@ def check_module_exits(module_set_md5):
 
 
 def walk(node):
+    hm = HistoryManager()
     list = []
     for each in node:
        dict = {}
-       n = collection.Node.one({'_id':ObjectId(each['id'])})
+       node = collection.Node.one({'_id':ObjectId(each['id'])})
+       n = hm.get_version_document(node,each['version_no'])
        dict['label'] = n.name
        dict['id'] = each['id']
        dict['version_no'] = each['version_no']
@@ -474,6 +476,17 @@ def graph_nodes(request, group_id):
   return StreamingHttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
+
+def get_data_for_switch_groups(request,group_id):
+    coll_obj_list = []
+    node_id = request.GET.get("object_id","")
+    print "nodeid",node_id
+    st = collection.Node.find({"_type":"Group"})
+    node = collection.Node.one({"_id":ObjectId(node_id)})
+    for each in node.group_set:
+        coll_obj_list.append(collection.Node.one({'_id':each}))
+    data_list=set_drawer_widget(st,coll_obj_list)
+    return HttpResponse(json.dumps(data_list))
 
 
 '''
