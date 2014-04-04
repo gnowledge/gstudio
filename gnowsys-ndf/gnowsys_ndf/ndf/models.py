@@ -3,7 +3,6 @@ import os
 import hashlib
 import datetime
 import json
-import ast
 
 from random import random
 from random import choice
@@ -194,30 +193,6 @@ class Node(DjangoDocument):
     use_dot_notation = True
 
     ########## Setter(@x.setter) & Getter(@property) ##########
-
-    @property
-    def location(self):
-        loc = []
-        for each in self["location"]:
-            loc.append(json.dumps(each))
-
-        # print "\n=======GETTER=========", loc, "-----------------"
-
-        return self["location"]
-
-    @location.setter
-    def location(self, value):
-
-        if value:
-            value = value + ","
-            value = list(ast.literal_eval(value))
-        else:
-            value = []
-
-        # print "\n========SETTER========", value, "-----------------"
-
-        self["location"] = value
-    
 
     @property
     def user_details_dict(self):

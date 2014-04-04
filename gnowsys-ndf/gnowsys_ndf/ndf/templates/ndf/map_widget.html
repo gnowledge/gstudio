@@ -97,7 +97,7 @@
 
 					if(description)
 					{
-						tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>',description);
+						tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+description+'</div>');
 					}
 					else
 					{
@@ -116,7 +116,11 @@
 						marker.on("dragend", dragend);
 
 			        {% else %}
-			        	var marker = L.marker(latlng);
+			        	var marker = L.marker(latlng, {
+							title:"Resource location",
+							alt:"Resource Location",
+							riseOnHover:true
+						}).bindPopup(feature.properties.description);
 
 			       	{% endif %}
 
@@ -132,11 +136,22 @@
 
 	        	var addLeafletID = tempArr[i].toGeoJSON();
 	        	
-	        	$(addLeafletID).attr("properties", {"id": tempArr[i]._leaflet_id});
+	        	// console.log(tempArr[i].feature.properties.description);
+	        	
+	        	$(addLeafletID).attr("properties", {"id": tempArr[i]._leaflet_id, "description":tempArr[i].feature.properties.description});
 	        	markerGeoJSON.push(JSON.stringify(addLeafletID));
 
 	        })
+	        updateHiddenTagContent();
 
+	 	}
+
+	 	
+
+	 	function updateHiddenTagContent()
+	 	{
+	 		$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
+			$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
 	 	}
 	 	
 
@@ -172,34 +187,69 @@
 
 		// Update marker on changing it's position
 		function dragend(ev){
-			aaaa = this;
+			
 			var changedPos = ev.target.getLatLng();
 			
            	this.setLatLng(changedPos).update();	// Update the marker position
 
            	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
-            
-           	var addLeafletID = this.toGeoJSON();
-			$(addLeafletID).attr("properties", {"id": lID});
 
-           	updatedGeoJSON = JSON.stringify(addLeafletID);
+           	var tempMarkerGeoJSON = this.toGeoJSON();
 
-           	$.each(markerGeoJSON, function(i, val) {
+			var description = tempMarkerGeoJSON.properties.description;
+
+			if(! description)
+			{
+				$.each(markerGeoJSON, function(i, val) {
+				            	
+					            		var getID = $.parseJSON(val).properties.id,
+					            			getDescription = $.parseJSON(val).properties.description; 
+				
+					            		if(getID == lID) { description = getDescription?getDescription:"";  }  
+					           		})
+			}
+
+			if(description)
+			{					
+				$(".popup-content:visible").text(description);
+			}
+
+			// tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();					
+
+			tempMarkerGeoJSON.properties.id = lID;	
+			
+					
+					var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
+			
+            		$.each(markerGeoJSON, function(i, val) {
             	
-           		var getID = $.parseJSON(val).properties.id; 
-           		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
-           	})
+	            		var getID = $.parseJSON(val).properties.id; 
+	            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+            		})
+
+            		updateHiddenTagContent();
+
+   //         	var addLeafletID = this.toGeoJSON();
+			// $(addLeafletID).attr("properties", {"id": lID});
+
+   //         	updatedGeoJSON = JSON.stringify(addLeafletID);
+
+   //         	$.each(markerGeoJSON, function(i, val) {
+            	
+   //         		var getID = $.parseJSON(val).properties.id; 
+   //         		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+   //         	})
 
            	// this.setPopupContent(changedPos.toString()).openPopup();	// Updating popup Msg
            	// $('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON);
-           	$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
-           	$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
+           	// $('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
+           	// $('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
         }//);
 
 
 		function activateMarker(){
 
-			tempMarker = this;
+			var tempMarker = this;
 			// tempMarker._popup._content			
 			var tempMarkerGeoJSON = this.toGeoJSON();
 			// console.log(JSON.stringify(tempMarkerGeoJSON));
@@ -219,16 +269,26 @@
 			}
 			 			
 			if(description)
-			{	
-				// tempMarker._popup._content = (tempMarker._popup._content).replace('<div class="popup-content" contenteditable="true"></div>', '<div class="popup-content" contenteditable="true">'+ description +'</div>');
+			{					
 				$(".popup-content:visible").text(description);
 			}
 			
 			// To remove marker on click of delete
-			$(".popup-delete-content-button").click(function(){map.removeLayer(tempMarker)});
+			$(".popup-delete-content-button:visible").click(function(){
 
-			// saveEditBtn="";
+				$.each(markerGeoJSON, function(i, val) {
 
+	            		getID = JSON.parse(val).properties.id; 
+
+	            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
+            		})
+
+				map.removeLayer(tempMarker);
+
+				updateHiddenTagContent();
+			});
+
+			
 			$(".popup-content").on("blur", function(){
 			
 				if($(this).html() != initialPopContent )
@@ -239,10 +299,10 @@
 			});
 			
 			// To add content on click of add content
-			$(".popup-add-content-button").click(function(){
+			$(".popup-add-content-button:visible").click(function(){
 
 				if($(this).children("i").hasClass("fi-page-edit"))
-				{					
+				{						
 					$(this).parent().parent().find(".popup-content").focus();	
 				}
 				else if($(this).children("i").hasClass("fi-save"))
@@ -257,14 +317,17 @@
 					}
 					
 					var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
-					console.log(updatedGeoJSON);
+					// console.log(updatedGeoJSON);
             		$.each(markerGeoJSON, function(i, val) {
             	
 	            		var getID = $.parseJSON(val).properties.id; 
 	            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
             		})
+
+            		updateHiddenTagContent();
 				}
 			});			
+
 		}
 
 

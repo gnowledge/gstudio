@@ -319,6 +319,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% block base_save_on_click %}{% endblock %}
 	});
 
+	$(document).on('opened', '[data-reveal]', function () {  map.invalidateSize();  });
+
 </script>
 
 {% endblock %}

@@ -160,7 +160,7 @@ def page(request, group_id, app_id=None):
         # location = []
         # for each in page_node.location:
         #   location.append(json.dumps(each))
-
+        
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
