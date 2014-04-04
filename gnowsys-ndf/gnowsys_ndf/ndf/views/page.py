@@ -160,7 +160,7 @@ def page(request, group_id, app_id=None):
         # location = []
         # for each in page_node.location:
         #   location.append(json.dumps(each))
-
+        
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
@@ -190,6 +190,7 @@ def create_edit_page(request, group_id, node_id=None):
     
     if request.method == "POST":
         get_node_common_fields(request, page_node, group_id, gst_page)
+
         page_node.save()
         
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
