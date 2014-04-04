@@ -203,7 +203,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      {% if status == "allow" %}
     {% get_edit_url node.pk as edit_url %}
 
-    {% check_group node.name as is_group %}
+    {% check_group node as is_group %}
 
     {% if is_group %}    
        
