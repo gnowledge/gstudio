@@ -21,11 +21,21 @@
 		
 		#map { height: 100%; width: 100%; }
 
-		.leaflet-popup-content {	min-width:100px;	}
+		.leaflet-popup-content {	min-width:145px; max-width: auto;	}
 
 		.popup-add-content-button { background-color: #199369; color: #FFFFFF; display: block; float: left; padding: 1px 2px;	}
 
-		.popup-delete-content-button { background-color: #F04124; color: #FFFFFF; display: inline-block; float: right; padding: 1px 2px;	}		
+		.popup-delete-content-button { background-color: #F04124; color: #FFFFFF; display: inline-block; float: right; padding: 1px 2px;	}
+
+		.popup-content {	padding: 0.25;	margin-bottom: 0.5em; }
+		
+		.popup-content:focus {	
+								background-color: #FFFFE0;
+							    border-color: buttonface;
+							    border-style: dashed;
+							    margin-bottom: 0.5em;
+							    padding: 0.25em;
+							}		
 
 	</style>
 
@@ -34,6 +44,16 @@
 <body>
 
 	<div id="map" data-mode="{{mode}}"><input type="hidden" data-map-markers="{{ node.location }}" value="" name="map-geojson-data"/></div>
+
+	<div style="display:none;">
+		<div class="popup-html">
+			<div class="popup-content" contenteditable="true"></div>
+			<div class="row">
+				<div class="small-5 popup-add-content-button text-center"><i class="fi-page-edit">&nbsp; edit</i></div>			
+				<div class="small-5 popup-delete-content-button text-center"><i class="fi-trash">&nbsp; marker</i></div>			
+			</div>
+		</div>
+	</div>
 	
 	<script type="text/javascript">
 
@@ -46,12 +66,14 @@
 	 	// initialize the map on the "map" div with a given center and zoom
 	 	var map = L.map('map').setView([25.92,79.84], 5).addLayer(osm);
 
+	 	var initialPopContent = "Add description.. <i>(optional)</i>";
+
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
 	 	mapdata = $("input:hidden[name=map-geojson-data]").attr("data-map-markers");
-	 	console.log(mapdata);
 	 	
 	 	markerGeoJSON = [];
+	 	popupBasicHtml = $(".popup-html").html()
 
 	 	if( mapdata.length > 0 )
 	 	{
@@ -69,28 +91,29 @@
 			L.geoJson(mapdata, {
 			    
 			    pointToLayer: function (feature, latlng) {
+
+					var description = feature.properties.description,
+						tempPopupContent;
+
+					if(description)
+					{
+						tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>',description);
+					}
+					else
+					{
+						tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+ initialPopContent +'</div>');
+					}
+
 			    	{% if mode == "edit" %}
 			        	var marker = L.marker(latlng, {
 							draggable:true,
 							title:"Resource location",
 							alt:"Resource Location",
 							riseOnHover:true
-						})
+						}).bindPopup(tempPopupContent);
 
-<<<<<<< HEAD
-			    {% if mode == "edit" %}
-					var marker = L.marker(latlng, {
-									draggable:true,
-									title:"Resource location",
-									alt:"Resource Location",
-									riseOnHover:true
-								});			    	
-			    {% else %}
-			    	var marker = L.marker(latlng);
-			    {% endif %}			        
-=======
+			        	marker.on("popupopen", activateMarker );
 						marker.on("dragend", dragend);
->>>>>>> mongokit
 
 			        {% else %}
 			        	var marker = L.marker(latlng);
@@ -103,8 +126,7 @@
 					
 			    }
 			}).addTo(map);
-
-
+			
 	        // Adding mapdata values in markerGeoJSON.
 	        $.each(tempArr, function(i, val){ 
 
@@ -115,15 +137,7 @@
 
 	        })
 
-	 		
-	 		// $.each(mapdata, function(i, val){
-
-	 		// 	var co_ord = val.geometry.coordinates;
-	 		// 	markerGeoJSON[i] = JSON.stringify(val)
-
-	 		// })
 	 	}
-
 	 	
 
 		{% if mode == "edit" %}
@@ -132,15 +146,18 @@
 		// Script for adding marker on map click
 		function onMapClick(e) {
 
+			var tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+ initialPopContent +'</div>');
+
 			var marker = L.marker(e.latlng, {
 				draggable:true,
 				title:"Resource location",
 				alt:"Resource Location",
 				riseOnHover:true
-			}).addTo(map);
-				// .bindPopup(e.latlng.toString()).openPopup();
-				// .bindPopup($(".popup-html").html()).openPopup();
+			}).addTo(map)
+				.bindPopup(tempPopupContent);
+				// .openPopup();
 			
+			marker.on("popupopen", activateMarker );
 			marker.on("dragend", dragend);
 
 			var addLeafletID = marker.toGeoJSON();
@@ -151,47 +168,106 @@
 			$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
 			$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
 			
-			// marker.on("popupopen", function(){
-
-				// alert("kljhkj");
-				// $(".popup-delete-content-button").click(function(){map.removeLayer(this)});
-			// })
-
-
-			// marker.on("dragstart",function(ev){
-			// 	aaa = this.toGeoJSON();//.latlng.toString();
-			// });
-
-			// marker.on("contextmenu", function(){(alert("aaa"))});
 		}
 
 		// Update marker on changing it's position
-			// marker.on("dragend",function(ev){
-				function dragend(ev){
+		function dragend(ev){
+			aaaa = this;
+			var changedPos = ev.target.getLatLng();
+			
+           	this.setLatLng(changedPos).update();	// Update the marker position
 
-				var changedPos = ev.target.getLatLng();
-				
-            	this.setLatLng(changedPos).update();	// Update the marker position
-            	// map.removeLayer(this);
-
-            	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
+           	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
             
-            	var addLeafletID = this.toGeoJSON();
-				$(addLeafletID).attr("properties", {"id": lID});
+           	var addLeafletID = this.toGeoJSON();
+			$(addLeafletID).attr("properties", {"id": lID});
 
-            	updatedGeoJSON = JSON.stringify(addLeafletID);
+           	updatedGeoJSON = JSON.stringify(addLeafletID);
 
-            	$.each(markerGeoJSON, function(i, val) {
+           	$.each(markerGeoJSON, function(i, val) {
             	
-            		var getID = $.parseJSON(val).properties.id; 
-            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
-            	})
+           		var getID = $.parseJSON(val).properties.id; 
+           		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+           	})
 
-            	// this.setPopupContent(changedPos.toString()).openPopup();	// Updating popup Msg
-            	// $('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON);
-            	$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
-            	$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
-            }//);
+           	// this.setPopupContent(changedPos.toString()).openPopup();	// Updating popup Msg
+           	// $('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON);
+           	$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
+           	$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
+        }//);
+
+
+		function activateMarker(){
+
+			tempMarker = this;
+			// tempMarker._popup._content			
+			var tempMarkerGeoJSON = this.toGeoJSON();
+			// console.log(JSON.stringify(tempMarkerGeoJSON));
+			var lID = tempMarker._leaflet_id;		// Getting Leaflet ID of this marker
+
+			var description = tempMarkerGeoJSON.properties.description;
+
+			if(! description)
+			{
+				$.each(markerGeoJSON, function(i, val) {
+				            	
+					            		var getID = $.parseJSON(val).properties.id,
+					            			getDescription = $.parseJSON(val).properties.description; 
+				
+					            		if(getID == lID) { description = getDescription?getDescription:"";  }  
+					           		})
+			}
+			 			
+			if(description)
+			{	
+				// tempMarker._popup._content = (tempMarker._popup._content).replace('<div class="popup-content" contenteditable="true"></div>', '<div class="popup-content" contenteditable="true">'+ description +'</div>');
+				$(".popup-content:visible").text(description);
+			}
+			
+			// To remove marker on click of delete
+			$(".popup-delete-content-button").click(function(){map.removeLayer(tempMarker)});
+
+			// saveEditBtn="";
+
+			$(".popup-content").on("blur", function(){
+			
+				if($(this).html() != initialPopContent )
+				{
+					$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
+					// saveEditBtn = $(this).siblings().find("div.popup-add-content-button");
+				}
+			});
+			
+			// To add content on click of add content
+			$(".popup-add-content-button").click(function(){
+
+				if($(this).children("i").hasClass("fi-page-edit"))
+				{					
+					$(this).parent().parent().find(".popup-content").focus();	
+				}
+				else if($(this).children("i").hasClass("fi-save"))
+				{
+					$(this).find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
+
+					tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();					
+
+					if(! tempMarkerGeoJSON.properties.id)
+					{
+						tempMarkerGeoJSON.properties.id = lID;	
+					}
+					
+					var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
+					console.log(updatedGeoJSON);
+            		$.each(markerGeoJSON, function(i, val) {
+            	
+	            		var getID = $.parseJSON(val).properties.id; 
+	            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+            		})
+				}
+			});			
+		}
+
+
 
 		{% endif %}
 
@@ -207,19 +283,9 @@
 		// }
 
 		// map.on('click', onMapClick );
-
+		// map.invalidateSize();
 	</script>
-
-<!-- 	<div style="display:none;">
-		<div class="popup-html">
-			<div class="popup-content"></div>
-			<div class="row">
-				<div class="popup-add-content-button" > + Content </div>			
-				<div class="popup-delete-content-button"> Delete </div>			
-			</div>
-		</div>
-	</div>
- -->
+	
 </body>
 </html>
 
