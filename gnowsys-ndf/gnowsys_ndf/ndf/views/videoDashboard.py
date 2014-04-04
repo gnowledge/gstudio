@@ -60,10 +60,12 @@ def video_search(request,group_id):
 
 def video_detail(request, group_id, _id):
     vid_node = collection.File.one({"_id": ObjectId(_id)})
+    video_obj=request.GET.get("vid_id","")
     return render_to_response("ndf/video_detail.html",
                                   { 'node': vid_node,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid':group_id,
+                                    'video_obj':video_obj
                                   },
                                   context_instance = RequestContext(request)
         )
