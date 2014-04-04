@@ -227,12 +227,14 @@ def make_module_set(request, group_id):
             _id = request.GET.get("_id","")
             if _id:
                 node = collection.Node.one({'_id':ObjectId(_id)})
-                list_of_collection.append(node._id)
-                dict = {}
-                dict['id'] = unicode(node._id)
-                dict['version_no'] = hm_obj.get_current_version(node)
-                if node.collection_set:
-                    dict['collection'] = get_module_set_list(node)          #gives the list of collection with proper hierarchy as they are
+                if node:
+                    list_of_collection.append(node._id)
+                    dict = {}
+                    dict['id'] = unicode(node._id)
+                    dict['version_no'] = hm_obj.get_current_version(node)
+                    if node.collection_set:
+                        dict['collection'] = get_module_set_list(node)     #gives the list of collection with proper hierarchy as they are
+
                     #creating new Gsystem object and assining data of collection object
                     gsystem_obj = collection.GSystem()
                     gsystem_obj.name = unicode(node.name)
@@ -261,6 +263,8 @@ def make_module_set(request, group_id):
                         else:
                             gsystem_obj.delete()
                             return HttpResponse("Error Occured while storing md5 of object in attribute'")
+                else:
+                    return HttpResponse("Object not present corresponds to this id")
 
             else:
                 return HttpResponse("Not a valid id passed")
