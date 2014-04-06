@@ -419,9 +419,11 @@ def get_user_page(request,node):
           if line.find(str(request.user))!=-1:
                rev_no=rev_no.strip(' ')
                node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
                return (node,rev_no)    
        if rev_no == '1.1':
            node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
            return(node,'1.1')
                    
 def get_page(request,node):
@@ -484,8 +486,9 @@ def check_page_first_creation(request,node):
           if line.find(str(request.user))!=-1:
                count =count+1
                if count ==2:
+                proc1.kill()
                	return (count)
-    proc1.close()
+    proc1.kill()
     if count == 1:
 	return(count)     
       
