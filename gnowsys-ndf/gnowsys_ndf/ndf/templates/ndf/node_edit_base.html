@@ -235,10 +235,10 @@ background-repeat:no-repeat; background-size: 48px 48px
   <div class="row" >
     <input type="submit" id="save-node" value="Save" class="button medium-6 columns"/>
   </div>
-  {% check_group node as is_group %}
+  
   {% if node %}
   	{% get_publish_policy groupid node as group_policy %}
-
+        {% check_group node as is_group %} 
   	{% if group_policy == "allow" %}
   	{% if is_group %} 
   
