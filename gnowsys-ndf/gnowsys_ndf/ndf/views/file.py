@@ -42,9 +42,9 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 db = get_database()
 collection = db[Node.collection_name]
-GST_FILE = collection.GSystemType.one({'name': GAPPS[1]})
-GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
-GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4]})
+GST_FILE = collection.GSystemType.one({'name': GAPPS[1], '_type':'GSystemType'})
+GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
+GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 
 ####################################################################################################################################                                             V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
 ###################################################################################################################################
@@ -154,6 +154,7 @@ def submitDoc(request, group_id):
     alreadyUploadedFiles = []
     str1 = ''
     img_type=""
+    obj_id_instance = ObjectId()
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
@@ -170,15 +171,15 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f = save_file(each, img_type, mtitle, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
+                    f = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
+                    f = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
-            if f:
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
+            if not obj_id_instance.is_valid(f):
                 alreadyUploadedFiles.append(f)
                 title = mtitle
         for each in alreadyUploadedFiles:
@@ -197,7 +198,7 @@ def submitDoc(request, group_id):
 
     
 first_object = ''
-def save_file(files, img_type, title, userid, group_id, st_id, content_org, language, tags, access_policy, usrname):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None):
     """
     this will create file object and save files in gridfs collection
     """
@@ -221,7 +222,8 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
                 filetype1 = ""
             filename = files.name
             fileobj.name = unicode(title)
-            fileobj.language= unicode(language)
+            if language:
+                fileobj.language= unicode(language)
             fileobj.created_by = int(userid)
             fileobj.modified_by = int(userid)
             if int(userid) not in fileobj.contributors:
@@ -237,11 +239,11 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
             
             if group_object._id not in fileobj.group_set:
                 fileobj.group_set.append(group_object._id)        #group id stored in group_set field
-            
-            user_group_object=fcol.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
-            if user_group_object:
-                if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
-                    fileobj.group_set.append(user_group_object._id)
+            if usrname:
+                user_group_object=fcol.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+                if user_group_object:
+                    if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
+                        fileobj.group_set.append(user_group_object._id)
 
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
@@ -296,6 +298,7 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
             count = count + 1
+            return fileobj._id
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
 
