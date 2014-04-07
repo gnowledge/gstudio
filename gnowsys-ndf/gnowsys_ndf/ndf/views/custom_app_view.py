@@ -140,7 +140,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
         tags = request.POST.get("tags","")
         content_org = unicode(request.POST.get("content_org",""))
         name = request.POST.get("name","")
-        file1 = request.FILES['file']
+        file1 = request.FILES.get('file', '')
         for each in systemtype_attributetype_set:
             request_at_dict[each["type_id"]] = request.POST.get(each["type_id"],"")
         for eachrtset in systemtype_relationtype_set:
