@@ -437,9 +437,9 @@ and if he has published his contents then he would be shown the current publishe
      username =request.user
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
-          
+     print "entered here for roming"     
      if  ver2 != '1.1':                
-           
+            print "again here"
 	    if node2 is not None:
 		
                 if node2.status == 'PUBLISHED':
@@ -450,24 +450,29 @@ and if he has published his contents then he would be shown the current publishe
 			elif float(ver2) == float(ver1):
 				return(node1,ver1)
 		elif node2.status == 'DRAFT':
-                        
-                        if  node1.status == 'DRAFT':
+                       #========== conditions for Group===============#
+
+                        if  node1.status == 'DRAFT' and node._type == "Group":
 			    #check to perform if the person has recently joined the group
 			    count=check_page_first_creation(request,node2)
-                            print"the basic count",count
                             if count == 1:
-                                print"the count2",count
-				return (node1,ver1)
+                                return (node1,ver1)
                             elif count == 2:
- 				print"the count",count
 				return (node2,ver2)
 
                             
                         return (node2,ver2)  
 	    else:
-		return(node1,ver1)		
+                        
+			return(node1,ver1)		
 	    
      else:
+         
+         if node._type == "GSystem" and node1.status == "DRAFT":
+              if node1.created_by ==request.user.id:
+                   return (node2,ver2)
+              else:
+		   return ('None','None')
          return (node1,ver1)
 	 
 def check_page_first_creation(request,node):
@@ -481,7 +486,6 @@ def check_page_first_creation(request,node):
     proc1=subprocess.Popen(cmd,shell=True,
 				stdout=subprocess.PIPE)
     for line in iter(proc1.stdout.readline,b''):
-         print line
          if line.find('updated')!=-1 or line.find('created')!=-1:
           if line.find(str(request.user))!=-1:
                count =count+1
