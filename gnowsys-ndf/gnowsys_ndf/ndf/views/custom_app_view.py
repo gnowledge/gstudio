@@ -152,6 +152,12 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
                 f = save_file(file1, name, request.user.id, group_id, content_org, tags)
                 if obj_id_ins.is_valid(f):
                     newgsystem = collection.Node.one({'_id':f})
+                else:
+                    template = "ndf/custom_template_for_app.html"
+                    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
+                    return render_to_response(template, variable)
+            else:
+                newgsystem = collection.File()
         else:
             newgsystem = collection.GSystem()
 

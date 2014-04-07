@@ -527,7 +527,7 @@ def get_Object_count(key):
 @register.assignment_tag
 def get_memberof_objects_count(key,group_id):
   try:
-  	return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'_type':'GSystem','group_set': {'$all': [ObjectId(group_id)]},'_type':'GSystem'}).count()
+  	return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
   except:
   	return 'null'
   
