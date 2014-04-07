@@ -245,5 +245,47 @@
 {% endblock %}
 
 {% block script %}
+$(document).on('click',".checkedAll",function(){
+	if($(this).is(":checked")==true){
+		$('.objectsCheckbox input').prop( "checked", true );
+	}
+	else{
+		$('.objectsCheckbox input').prop( "checked", false );
+	}
+});
+$(document).on('click',".button.deleteObjects",function(){
+        var selectedobject = $(".objectsCheckbox input:checked")
+        if(selectedobject.length > 0){
+             var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+             if(confirmed == true){
+             var i = 0;
+             var str = "";  
+             $.map(selectedobject,function(each){
+                  if(i == 0){str = str.concat(each.parentElement.id)}
+                  else {str = str.concat(","+each.parentElement.id)}
+                  i= i+1
+             })
+
+             $.ajax({
+             url: '/admin/data/delete',
+             type: 'POST',
+             data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
+             beforeSend: function() {     },
+             success: function(result){
+             alert(result)},
+             complete: function(){   }
+             });
+             
+             $.map(selectedobject,function(each){
+                  each.parentElement.parentElement.remove()
+             })
+             
+             }
+        }
+        else{
+        alert("select object to delete")
+        }
+     
+});
 
 {% endblock %}	
