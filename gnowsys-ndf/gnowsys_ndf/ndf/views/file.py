@@ -27,6 +27,7 @@ import os
 import subprocess
 import ox
 import threading
+from django.http import Http404
 #from string import maketrans 
 
 
@@ -56,10 +57,11 @@ def file(request, group_id, file_id):
     """
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
-        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+       
+        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'fs_file_ids':{'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
         already_uploaded = request.GET.getlist('var', "")
     
         '''                                                                                                                                 saving wetube.gnowledge.org videos data in GSystem, with locking                                                            
@@ -407,11 +409,6 @@ def GetDoc(request, group_id):
     variable = RequestContext(request, {'filecollection':files,'groupid':group_id,'group_id':group_id})
     return render_to_response(template, variable)
 
-def readDoc(request, _id, group_id, file_name = ""):
-    filecollection = get_database()[File.collection_name]
-    fileobj = filecollection.File.one({"_id": ObjectId(_id)})  
-    grid_fs_obj = fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))
-    return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
 
 def file_search(request, group_id):
     if request.method == "GET":
@@ -445,16 +442,17 @@ def file_detail(request, group_id, _id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     file_template = ""
-
-    if file_node.mime_type == 'video':      
-        file_template = "ndf/video_detail.html"
-    elif 'image' in file_node.mime_type:
-        file_template = "ndf/image_detail.html"
-    else:
-        file_template = "ndf/document_detail.html"
+    if file_node.mime_type:
+        if file_node.mime_type == 'video':      
+            file_template = "ndf/video_detail.html"
+        elif 'image' in file_node.mime_type:
+            file_template = "ndf/image_detail.html"
+        else:
+            file_template = "ndf/document_detail.html"
         #grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
         #return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
-
+    else:
+         raise Http404 
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
@@ -475,6 +473,23 @@ def getFileThumbnail(request, group_id, _id):
     else:
         return HttpResponse("")
 
+def readDoc(request, _id, group_id, file_name = ""):
+    '''Return Files 
+    '''
+    print "inside read doc",group_id,file_name,_id
+    file_node = collection.File.one({"_id": ObjectId(_id)})
+    if file_node is not None:
+        if file_node.fs_file_ids:
+            if (file_node.fs.files.exists(file_node.fs_file_ids[0])):
+                grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
+                return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
+            else:
+                return HttpResponse("")
+        else:
+            print "else in fs_file_ids"
+            return HttpResponse("")
+    else:
+        return HttpResponse("")
 
 def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
