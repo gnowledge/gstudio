@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-	<!-- <title>Maps Widget</title> -->
-
-	<meta charset="utf-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 	<!-- JS Links -->
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
-	<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script> -->
 	<!-- <script src="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.js" type="text/javascript" ></script> -->
 
 	<!-- CSS Links -->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
-	<!-- <link rel="stylesheet" type="text/css" href="foundation.css" /> -->
+
+	<!-- <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" /> -->
+	<!-- <link rel="stylesheet" href="https://raw.githubusercontent.com/lvoogdt/Leaflet.awesome-markers/2.0/develop/dist/leaflet.awesome-markers.css"> -->
+	<!-- <script src="https://raw.githubusercontent.com/lvoogdt/Leaflet.awesome-markers/2.0/develop/dist/leaflet.awesome-markers.js"></script> -->
+	
 	<!-- <link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.css"> -->
 
 	<style type="text/css">
@@ -23,9 +19,11 @@
 
 		.leaflet-popup-content {	min-width:145px; max-width: auto;	}
 
-		.popup-add-content-button { background-color: #199369; color: #FFFFFF; display: block; float: left; padding: 1px 2px;	}
+		.popup-add-content-button { background-color: #199369; color: #FFFFFF; display: block; float: left; padding: 1px 2px; cursor: pointer;	}
+		.popup-add-content-button:hover { background-color: #00BA7B; }
 
-		.popup-delete-content-button { background-color: #F04124; color: #FFFFFF; display: inline-block; float: right; padding: 1px 2px;	}
+		.popup-delete-content-button { background-color: #d84b33; color: #FFFFFF; display: inline-block; float: right; padding: 1px 2px; cursor: pointer;	}
+		.popup-delete-content-button:hover { background-color: #f15439; }
 
 		.popup-content {	padding: 0.25;	margin-bottom: 0.5em; }
 		
@@ -39,7 +37,6 @@
 
 	</style>
 
-</head>
 
 <body>
 
@@ -57,6 +54,7 @@
 	
 	<script type="text/javascript">
 
+		 
 	 	// We’ll add a tile layer to add to our map, in this case it’s a OSM tile layer.
 	 	// Creating a tile layer usually involves setting the URL template for the tile images
 	 	var osmUrl 	  = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
@@ -107,24 +105,25 @@
 			    	{% if mode == "edit" %}
 			        	var marker = L.marker(latlng, {
 							draggable:true,
-							title:"Resource location",
-							alt:"Resource Location",
+							title: (description)?description:"Resource Location",
+							alt: (description)?description:"Resource Location",
 							riseOnHover:true
 						}).bindPopup(tempPopupContent);
 
 			        	marker.on("popupopen", activateMarker );
 						marker.on("dragend", dragend);
 
-			        {% else %}
+			        {% elif mode == "read" %}
 			        	var marker = L.marker(latlng, {
-							title:"Resource location",
-							alt:"Resource Location",
+							title: (description)?description:"Resource Location",
+							alt: (description)?description:"Resource Location",
 							riseOnHover:true
-						}).bindPopup(feature.properties.description);
+						});
+						if(description){ marker.bindPopup(feature.properties.description); }
 
 			       	{% endif %}
 
-						tempArr.push(marker);
+					tempArr.push(marker);
 						
 					return marker;
 					
@@ -229,22 +228,10 @@
 
             		updateHiddenTagContent();
 
-   //         	var addLeafletID = this.toGeoJSON();
-			// $(addLeafletID).attr("properties", {"id": lID});
+		    //	var addLeafletID = this.toGeoJSON();
+			// 	$(addLeafletID).attr("properties", {"id": lID});
+        }
 
-   //         	updatedGeoJSON = JSON.stringify(addLeafletID);
-
-   //         	$.each(markerGeoJSON, function(i, val) {
-            	
-   //         		var getID = $.parseJSON(val).properties.id; 
-   //         		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
-   //         	})
-
-           	// this.setPopupContent(changedPos.toString()).openPopup();	// Updating popup Msg
-           	// $('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON);
-           	// $('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
-           	// $('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
-        }//);
 
 
 		function activateMarker(){
@@ -288,8 +275,7 @@
 				updateHiddenTagContent();
 			});
 
-			
-			$(".popup-content").on("blur", function(){
+			$(".popup-content:visible").bind("keypress mouseup change blur", function(){
 			
 				if($(this).html() != initialPopContent )
 				{
@@ -330,30 +316,10 @@
 
 		}
 
-
-
 		{% endif %}
 
-		// function removeMarker(markerEl){
-		// 	alert($(markerEl).html());
-		// 	map.removeLayer(markerEl);
-		// }
-
-		// function addPump(){
-		// 	var pump = L.marker(cords,{icon: truckPump}).addTo(map).bindPopup($('<a href="#" class="speciallink">Remove ME</a>').click(function() {
-		// 		map.removeLayer(pump);
-		// 	})[0]);
-		// }
-
-		// map.on('click', onMapClick );
-		// map.invalidateSize();
 	</script>
 	
-</body>
-</html>
-
-
-
 <!-- 
 [{'geometry': {'type': 'Point', 'coordinates': [86.5283203125, 23.82555130688476]}, 'type': 'Feature', 'properties': {'id': 27}}, {'geometry': {'type': 'Point', 'coordinates': [85.20996093749999, 23.301901124188877]}, 'type': 'Feature', 'properties': {'id': 34}}]
 
