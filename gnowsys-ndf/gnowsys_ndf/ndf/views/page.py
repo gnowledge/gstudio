@@ -115,21 +115,15 @@ def page(request, group_id, app_id=None):
             print "Nodes",nodes.name
             content.append(get_versioned_page(nodes))  
                     
-         # rcs content ends here
-        
-          
-          
+          # rcs content ends here
           return render_to_response("ndf/page_list.html",
-                                  {
-                                    'page_nodes':content,
+                                  { 'page_nodes':content,
                                     'groupid':group_id,
                                     'group_id':group_id
-
-      
-                                   
                                   }, 
                                   context_instance=RequestContext(request)
             )
+
         elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:
               page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
                                            'group_set': {'$all': [ObjectId(group_id)]},
@@ -145,8 +139,6 @@ def page(request, group_id, app_id=None):
                                   },
                                   context_instance=RequestContext(request))
         
-        
-
     else:
         Group_node = collection.Node.one({"_id": ObjectId(group_id)})                
        
@@ -160,20 +152,21 @@ def page(request, group_id, app_id=None):
           elif node.status == u"PUBLISHED":
             page_node = node
         
+        # First time breadcrumbs_list created on click of page details
         breadcrumbs_list = []
-        breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))
+        # Appends the elements in breadcrumbs_list first time the resource which is clicked
+        breadcrumbs_list.append( (str(page_node._id), page_node.name) )
 
-        location = []
-        for each in page_node.location:
-          location.append(json.dumps(each))
-
-
+        # location = []
+        # for each in page_node.location:
+        #   location.append(json.dumps(each))
+        
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'groupid':group_id,
                                     'breadcrumbs_list': breadcrumbs_list,
-                                    'location': location
+                                    # 'location': location
                                   },
                                   context_instance = RequestContext(request)
         )        
@@ -194,42 +187,21 @@ def create_edit_page(request, group_id, node_id=None):
     else:
         page_node = collection.GSystem()
 
-    #breadcrumbs_list = []
-    #breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))
-
+    
     if request.method == "POST":
         get_node_common_fields(request, page_node, group_id, gst_page)
+
         page_node.save()
         
-        #breadcrumbs_list.append(( str(page_node._id), str(page_node.name) ))  
-        #print "list ", breadcrumbs_list      
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
 
-        #location = []
-        #for each in page_node.location:
-        #  location.append(json.dumps(each))
-
-
-        #return render_to_response('ndf/page_details.html', 
-        #                          { 'node': page_node,
-        #                            'group_id': group_id,
-        #                            'groupid':group_id,
-        #                            'location': location
-        #                           # 'breadcrumbs_list': breadcrumbs_list
-        #                          },
-        #                          context_instance = RequestContext(request)
-        #)
-        
     else:
         if node_id:
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
 
-            # location = []
-            # for each in page_node.location:
-            #   location.append(json.dumps(each))
-
+           
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -431,13 +403,8 @@ def publish_page(request,group_id,node):
   node.status=unicode("PUBLISHED")
   node.modified_by = int(request.user.id)
   node.save() 
-
-  return render_to_response("ndf/page_details.html",
-                                { 'group_id':group_id,
-                                  'node':node,
-                                  'groupid':group_id,
-                                },
-                                 context_instance=RequestContext(request)
-                             )
-
  
+  if node._type == 'Group':
+    return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
+
+  return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))

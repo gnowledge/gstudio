@@ -35,9 +35,13 @@ def get_forum_repl_type(forrep_id):
     return "None"
 
 def check_existing_group(group_name):
-  col_Group = db[Group.collection_name]
-  gpn=group_name
-  colg = col_Group.Group.find({'_type': u'Group', "name":gpn})
+  collection = db[Node.collection_name]
+
+  if type(group_name) == 'unicode':
+    colg = collection.Node.find({'_type': u'Group', "name": group_name})
+  else:
+    colg = collection.Node.find({'_type': u'Group', "_id": group_name._id})
+
   if colg.count() >= 1:
     return True
   else:
@@ -387,7 +391,6 @@ def get_versioned_page(node):
               i=prev_ver 
 
               doc=history_manager.get_version_document(node,i)
-              print "cotent name",doc.name
               if (i == '1.1'):
                   return doc
             return doc

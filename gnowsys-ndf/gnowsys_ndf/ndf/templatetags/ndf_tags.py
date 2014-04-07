@@ -544,42 +544,28 @@ def get_input_fields(fields_type,fields_name):
           "fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
           "field_type_list":field_type_list}
   
-  
 
 @register.assignment_tag
 def group_type_info(groupid,user=0):
-   
- 
-      
-      col_Group =db[Group.collection_name]
-      
-      group_gst = col_Group.Group.one({'_id':ObjectId(groupid)})
-      	
-                               
-      if group_gst.post_node:
-         return "BaseModerated"
-      elif group_gst.prior_node:
-         return "Moderated"   
-      else:
-          return  group_gst.group_type                        
-      
-              
-              
-              
+  col_Group =db[Group.collection_name]
+  group_gst = col_Group.Group.one({'_id':ObjectId(groupid)})
+  
+  if group_gst.post_node:
+    return "BaseModerated"
+  elif group_gst.prior_node:
+    return "Moderated"   
+  else:
+    return  group_gst.group_type                        
+
       
 @register.assignment_tag
 def user_access_policy(node,user):
-			
-	  col_Group=db[Group.collection_name]
-	  
-	  group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+  col_Group=db[Group.collection_name]
+  group_gst = col_Group.Group.one({'_id':ObjectId(node)})
 	    
-	    
-	  if user.id in group_gst.group_set or group_gst.created_by == user.id:
-	    return 'allow'
-	    
-	    
-	      
+  # if user.id in group_gst.group_set or group_gst.created_by == user.id:
+  if user.id in group_gst.author_set or group_gst.created_by == user.id:
+    return 'allow'
 	    
 	  
 @register.assignment_tag
@@ -591,12 +577,10 @@ def resource_info(node):
       grname=re.split(r'[/=]',node)
       group_gst=col_Group.Group.one({'_id':ObjectId(grname[1])})
     return group_gst
-	  		
                                 
     
 @register.assignment_tag
 def edit_policy(groupid,node,user):
-
   group_access= group_type_info(groupid,user)
   resource_infor=resource_info(node)
   
