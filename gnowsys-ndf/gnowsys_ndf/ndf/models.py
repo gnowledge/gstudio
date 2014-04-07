@@ -92,23 +92,18 @@ ENCRYPTION_POLICY=(
 )
 
 DATA_TYPE_CHOICES = (
-    'None',
-    'bool',
-    'int',
-    'float',
-    'long',
-    'basestring',
-    'unicode',
-    'list',
-    'dict',
-    'datetime.datetime',
-    'bson.binary.Binary',
-    'pymongo.objectid.ObjectId',
-    'bson.dbref.DBRef',
-    'bson.code.Code',
-    'type(re.compile(""))',
-    'uuid.UUID',
-    'CustomType'
+    "None",
+    "bool",
+    "basestring",
+    "unicode",
+    "int",
+    "float",
+    "long",
+    "datetime.datetime",
+    "list",
+    "dict",
+    "ObjectId",
+    "IS()"
 )
 
 #######################################################################################################################################
@@ -484,7 +479,7 @@ class Node(DjangoDocument):
             # Again checking in AttributeType collection - because to collect newly added user-defined attributes, if any!
             collection = get_database()[Node.collection_name]
             attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
-                
+
             for attr in attributes:
                 # Here attr is of type -- AttributeType
                 AttributeType.append_attribute(attr, possible_attributes)
@@ -493,8 +488,7 @@ class Node(DjangoDocument):
             gsystem_type_node = collection.Node.one({'_id': gsystem_type_id}, {'name': 1, 'type_of': 1})
 
             if gsystem_type_node.type_of:
-                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_node.type_of]}})
-                
+                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': gsystem_type_node.type_of}})
                 for attr in attributes:
                     # Here attr is of type -- AttributeType
                     AttributeType.append_attribute(attr, possible_attributes)
@@ -621,7 +615,7 @@ class AttributeType(Node):
                     for c_attr_id in attr_id_or_node.complex_data_type:
                         if not ObjectId.is_valid(c_attr_id):
                             # If basic data-type values are found, pass the iteration
-                            pass
+                            continue
            
                         # If unicode representation of ObjectId is found
                         AttributeType.append_attribute(c_attr_id, attr_dict, attr_value)
