@@ -635,7 +635,44 @@ def get_prior_post_node(group_id):
           #return node of the base group
           return base_colg
   
+@register.assignment_tag
+def Group_Editing_policy(groupid,node,user):
+  col_Group = db[Group.collection_name]
+  node=col_Group.Group.one({"_id":ObjectId(groupid)})
+
+  if node.edit_policy == "EDITABLE_MODERATED":
+     status=edit_policy(groupid,node,user)
+     if status is not None:
+        return "allow"
+  elif node.edit_policy == "NON_EDITABLE":
+    status=non_editable_policy(groupid,user.id)
+    if status is not None:
+        return "allow"
+  elif node.edit_policy == "EDITABLE_NON_MODERATED":  
+     status=edit_policy(groupid,node,user)
+     if status is not None:
+        return "allow"
+  elif node.edit_policy is None:
+    return "allow"      
   
 
 
+@register.assignment_tag
+def get_publish_policy(groupid,resnode):
+  col_Group = db[Group.collection_name]
+  node=col_Group.Group.one({"_id":ObjectId(groupid)})
+  group_type=group_type_info(groupid)
+  if group_type == "Moderated":
+     base_group=get_prior_post_node(groupid)
+
+     if base_group is not None:
+       if base_group.status == "DRAFT" or node.status == "DRAFT":
+           return "allow"
+           
+  elif node.edit_policy == "NON_EDITABLE":
+       return "allow"    
+  elif node.edit_policy == "EDITABLE_NON_MODERATED":
+      if resnode.status == "DRAFT": 
+         print "working section",resnode.status  
+         return "allow"
   

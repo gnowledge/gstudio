@@ -398,7 +398,7 @@ class Node(DjangoDocument):
             try:
                 if history_manager.create_or_replace_json_file(self):
                     user = User.objects.get(pk=self.modified_by).username
-                    message = "This document (" + self.name + ") is lastly updated by " + user + " on " + self.last_update.strftime("%d %B %Y")
+                    message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
                     rcs_obj.checkin(fp, 1, message.encode('utf-8'))
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
