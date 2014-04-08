@@ -85,7 +85,8 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         app_set_name = systemtype.name
         system_id = system._id
         system_type = system._type
-        system_mime_type = system.mime_type
+        if system_type == 'File':
+            system_mime_type = system.mime_type
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
     template = "ndf/custom_template_for_app.html"
