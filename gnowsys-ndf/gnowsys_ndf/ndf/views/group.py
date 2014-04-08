@@ -137,17 +137,19 @@ def group_dashboard(request,group_id=None):
         grpid=groupobj['_id']
         pass
 
-    if groupobj.status == u"DRAFT":
-        groupobj=get_versioned_page(groupobj)
+    #if groupobj.status == u"DRAFT":
+    #    groupobj,ver=get_versioned_page(groupobj)
 
-    elif groupobj.status == u"PUBLISHED":
-        groupobj = groupobj
-        
+    #elif groupobj.status == u"PUBLISHED":
+    #    groupobj = groupobj
+    #the below method would give u the drafted or published contents depending on the user 
+    #upper code is not required
+    groupobj,ver=get_page(request,groupobj)    
     # First time breadcrumbs_list created on click of page details
     breadcrumbs_list = []
     # Appends the elements in breadcrumbs_list first time the resource which is clicked
     breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
-
+    
     return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
                                                          'group_id':grpid, 'user':request.user, 
                                                          'breadcrumbs_list': breadcrumbs_list
@@ -158,15 +160,18 @@ def group_dashboard(request,group_id=None):
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
     
+    print"going throught this section"  
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
                 page_node.group_type = "PUBLIC"
             if page_node.access_policy == "PRIVATE":
+                
                 page_node.group_type = "PRIVATE"
             page_node.save()
             group_id=page_node._id
             return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
+    page_node,ver=get_page(request,page_node)
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
                                         'groupid':group_id,
@@ -201,3 +206,26 @@ def switch_group(request,group_id,node_id):
     except Exception as e:
         print "Exception in switch_group"+str(e)
         return HttpResponse("Failure")
+def publish_group(request,group_id,node):
+  node=collection.Node.one({'_id':ObjectId(node)})
+   
+  page_node,v=get_page(request,node)
+  
+  node.content = page_node.content
+  node.content_org=page_node.content_org
+  node.status=unicode("PUBLISHED")
+  node.modified_by = int(request.user.id)
+  node.save() 
+ 
+  return render_to_response("ndf/groupdashboard.html",
+                                 { 'group_id':group_id,
+                                   'node':node,
+                                   'groupid':group_id
+                                   
+                                
+                                 
+                                 
+                                 },
+                                  context_instance=RequestContext(request)
+                              )
+
