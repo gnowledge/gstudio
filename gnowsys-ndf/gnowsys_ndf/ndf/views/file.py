@@ -34,7 +34,7 @@ from django.http import Http404
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 
-from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import Node, GRelation
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
@@ -189,7 +189,7 @@ def submitDoc(request, group_id):
 
         if img_type != "": 
             
-            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id, 'user': usrname, 'uploaded': f}))
+            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id }))
 
         else:
             return HttpResponseRedirect(page_url+'?'+str1)
@@ -233,8 +233,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             
             if access_policy:
                 fileobj.access_policy = unicode(access_policy) # For giving privacy to file objects   
-            if img_type:                
-                fileobj.type_of = ObjectId(img_type)                 # To define type if image is profile_pic      
             
             fileobj.file_size = size
             group_object=fcol.Group.one({'_id':ObjectId(group_id)})
@@ -424,9 +422,13 @@ def delete_file(request, group_id, _id):
   """Delete file and its data
   """
   file_collection = db[File.collection_name]
+  auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
   pageurl = request.GET.get("next", "")
   try:
     cur = file_collection.File.one({'_id':ObjectId(_id)})
+    rel_obj = collection.GRelation.one({'subject': ObjectId(auth._id), 'right_subject': ObjectId(_id) })
+    if rel_obj :
+        rel_obj.delete()
     if cur.fs_file_ids:
         for each in cur.fs_file_ids:
             cur.fs.files.delete(each)
