@@ -85,7 +85,8 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         app_set_name = systemtype.name
         system_id = system._id
         system_type = system._type
-        system_mime_type = system.mime_type
+        if system_type == 'File':
+            system_mime_type = system.mime_type
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
     template = "ndf/custom_template_for_app.html"
@@ -152,6 +153,12 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None):
                 f = save_file(file1, name, request.user.id, group_id, content_org, tags)
                 if obj_id_ins.is_valid(f):
                     newgsystem = collection.Node.one({'_id':f})
+                else:
+                    template = "ndf/custom_template_for_app.html"
+                    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
+                    return render_to_response(template, variable)
+            else:
+                newgsystem = collection.File()
         else:
             newgsystem = collection.GSystem()
 
