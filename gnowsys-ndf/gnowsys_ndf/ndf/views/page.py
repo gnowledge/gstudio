@@ -140,7 +140,7 @@ def page(request, group_id, app_id=None):
         else:
           node = collection.Node.one({"_id":ObjectId(app_id)})
           if node.status == u"DRAFT":
-            (page_node,ver)=get_versioned_page(node)
+            page_node,ver = get_versioned_page(node)
           elif node.status == u"PUBLISHED":
             page_node = node
         
