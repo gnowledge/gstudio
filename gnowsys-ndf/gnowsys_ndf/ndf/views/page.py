@@ -302,7 +302,7 @@ def translate_node(request,group_id,node_id=None):
         
         grelation=collection.GRelation()
         grelation.relation_type=relation_type
-        grelation.subject_value=ObjectId(node_id)
+        grelation.subject=ObjectId(node_id)
         grelation.right_subject=page_node._id
         grelation.name=u""
         grelation.save()
@@ -336,9 +336,17 @@ def translate_node(request,group_id,node_id=None):
         rcs.checkin(fp)
 
         content = data
+        node_details=[]
+        for k,v in content.items():
+            
+            node_name=content['name']
+            node_content_org=content['content_org']
+            node_tags=content['tags']
+            
         return render_to_response("ndf/translation_page.html",
                                {'content': content,
                                 'node':node,
+                                'node_name':node_name,
                                 'groupid':group_id,
                                 'group_id':group_id
                                },
