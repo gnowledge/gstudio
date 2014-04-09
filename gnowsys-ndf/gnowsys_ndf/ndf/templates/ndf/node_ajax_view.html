@@ -236,7 +236,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   </footer>
 
 <script type="text/javascript">
-var data_list = []
+var data_list = ""
 var saveflag = 0
 function setdrawer(){
       $('#mySystemtype').foundation('reveal', 'open');
@@ -248,7 +248,7 @@ function setdrawer(){
 }
 function get_new_groups(){
  $.each($('#mySystemtype #collection_set_drawer2 li'),function(index,item){
-         data_list.push(""+item.id);
+         data_list=data_list+String(item.id)+",";
          });
 }
 
