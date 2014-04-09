@@ -187,7 +187,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     {% if node.collection_set and user.is_authenticated%}
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
-{% comment %}
+
 	<input type="button" id="switch_group" class="button small" value="Switch Group">
 <div id="mySystemtype" class="reveal-modal" data-reveal >
      <h2>Select Groups</h2>
@@ -197,7 +197,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <a class="close-reveal-modal st">&#215;</a>
 <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
 </div>
-{% endcomment %}
+
      {% edit_policy groupid node request.user as status %}
      
      {% if status == "allow" %}
@@ -236,7 +236,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   </footer>
 
 <script type="text/javascript">
-var data_list = []
+var data_list = ""
 var saveflag = 0
 function setdrawer(){
       $('#mySystemtype').foundation('reveal', 'open');
@@ -248,7 +248,7 @@ function setdrawer(){
 }
 function get_new_groups(){
  $.each($('#mySystemtype #collection_set_drawer2 li'),function(index,item){
-         data_list.push(""+item.id);
+         data_list=data_list+String(item.id)+",";
          });
 }
 

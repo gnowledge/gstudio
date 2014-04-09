@@ -57,7 +57,6 @@ def page(request, group_id, app_id=None):
         title = gst_page.name
         
         search_field = request.POST['search_field']
-
         page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
                                            '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
                                                    {'tags': {'$regex':search_field, '$options': 'i'}}], 
@@ -79,21 +78,16 @@ def page(request, group_id, app_id=None):
         # collection.Node.reload()
         group_type = collection.Node.one({'_id':ObjectId(group_id)})
         group_info=group_type_info(group_id)
-        print "group_info",group_info
         if  group_info == "Moderated":
           
           title = gst_page.name
           node=group_type.prior_node[0]
-          print "get the prior node",node  
-          page_nodes = collection.Node.find({'member_of':ObjectId(app_id),
-                                            'group_set':ObjectId(node),    
-                                             'status':'DRAFT' 
-                                       })        
-                                       
+          page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
+                                             'group_set': {'$all': [ObjectId(node)]},
+                                       })
           
           page_nodes.sort('last_update', -1)
           page_nodes_count = page_nodes.count()        
-          
           return render_to_response("ndf/page_list.html",
                                   {'title': title, 
                                    'page_nodes': page_nodes,'groupid':group_id,'page_nodes_count':page_nodes_count,             
@@ -111,7 +105,6 @@ def page(request, group_id, app_id=None):
           if node is None:
             node = collection.Node.find({'member_of':ObjectId(app_id)})
           for nodes in node:
-            print "Nodes",nodes.name
             content.append(get_versioned_page(nodes))  
                     
           # rcs content ends here
@@ -147,7 +140,7 @@ def page(request, group_id, app_id=None):
         else:
           node = collection.Node.one({"_id":ObjectId(app_id)})
           if node.status == u"DRAFT":
-            page_node=get_versioned_page(node)
+            (page_node,ver)=get_versioned_page(node)
           elif node.status == u"PUBLISHED":
             page_node = node
         

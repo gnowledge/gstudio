@@ -159,8 +159,6 @@ def group_dashboard(request,group_id=None):
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
-    
-    print"going throught this section"  
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
@@ -184,16 +182,14 @@ def edit_group(request,group_id):
 def switch_group(request,group_id,node_id):
     try:
         node=collection.Node.one({"_id":ObjectId(node_id)})
-        print "method=",request.method
         if request.method == "POST":
-            print "aaa",request.POST
-            new_grps = request.POST['new_grps[]']
-            print "newgrps"
-            if new_grps:
-                for each in new_grps:
-                    print "each id",each
-                    if ObjectId(each) not in node.group_set:
-                        node.group_set.append(ObjectId(each));
+            new_grps = request.POST['new_grps']
+            new_grps_list=new_grps.split(",")
+            if new_grps_list:
+                for each in new_grps_list:
+                    if each:
+                        if ObjectId(each) not in node.group_set:
+                            node.group_set.append(ObjectId(each));
                 node.save()
             return HttpResponse("Success")
         else:
