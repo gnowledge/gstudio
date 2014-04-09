@@ -100,7 +100,7 @@
       {% if files.count != 0 %}
       <!-- Existing card list-->
       {% for file in files %}      
-      {% if file.created_by == request.user.pk and not file.type_of %}
+      {% if file.created_by == request.user.pk %}
 
       {% get_user_object file.created_by as user_obj %}
       {% get_grid_fs_object file as grid_fs_obj %}
@@ -206,7 +206,7 @@
       {% if docCollection.count != 0 %}
       <!-- Existing card list-->
       {% for doc in docCollection %}      
-      {% if doc.created_by == request.user.pk and not doc.type_of %}
+      {% if doc.created_by == request.user.pk %}
 
       {% get_user_object doc.created_by as user_obj %}
       {% get_grid_fs_object doc as grid_fs_obj %}
@@ -339,7 +339,6 @@
 
       <!-- Existing card list-->
       {% for image in imageCollection %}
-      {% if not image.type_of %}
       {% get_user_object image.created_by as user_obj %}
       {% get_grid_fs_object image as grid_fs_obj %}
       <li class="card">
@@ -382,7 +381,6 @@
 	  
         </div>
       </li>
-      {% endif %}
       {% endfor %}
       
       {% else %}
