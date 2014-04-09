@@ -11,9 +11,10 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 
 from gnowsys_ndf.ndf.models import HistoryManager
-
+import subprocess
 import re
 import ast
+import string
 ######################################################################################################################################
 
 db = get_database()
@@ -35,9 +36,13 @@ def get_forum_repl_type(forrep_id):
     return "None"
 
 def check_existing_group(group_name):
-  col_Group = db[Group.collection_name]
-  gpn=group_name
-  colg = col_Group.Group.find({'_type': u'Group', "name":gpn})
+  collection = db[Node.collection_name]
+
+  if type(group_name) == 'unicode':
+    colg = collection.Node.find({'_type': u'Group', "name": group_name})
+  else:
+    colg = collection.Node.find({'_type': u'Group', "_id": group_name._id})
+
   if colg.count() >= 1:
     return True
   else:
@@ -173,7 +178,7 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
 
 def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node."""
-  
+  print"has come here"
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
@@ -388,8 +393,102 @@ def get_versioned_page(node):
 
               doc=history_manager.get_version_document(node,i)
               if (i == '1.1'):
-                  return doc
-            return doc
+                  return (doc,i)
+            return (doc,i)
 
 
+def get_user_page(request,node):
+    ''' function gives the last docment submited by the currently logged in user either it
+	can be drafted or published
+'''
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+	(fp)
+    rev_no =""
+    proc1=subprocess.Popen(cmd,shell=True,
+				stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+       
+       if line.find('revision')!=-1 and line.find('selected') == -1:
 
+          rev_no=string.split(line,'revision')
+          rev_no=rev_no[1].strip( '\t\n\r')
+          rev_no=rev_no.strip(' ')
+       if line.find('updated')!=-1:
+          if line.find(str(request.user))!=-1:
+               rev_no=rev_no.strip(' ')
+               node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
+               return (node,rev_no)    
+       if rev_no == '1.1':
+           node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
+           return(node,'1.1')
+                   
+def get_page(request,node):
+     ''' function to filter between the page to be displyed to user 
+           i.e which page to be shown to the user drafted or the published page
+	if a user have some drafted content then he wouldbe shown his own drafted contents 
+and if he has published his contents then he would be shown the current published contents
+
+
+'''
+     username =request.user
+     node1,ver1=get_versioned_page(node)
+     node2,ver2=get_user_page(request,node)     
+          
+     if  ver2 != '1.1':                
+           
+	    if node2 is not None:
+		
+                if node2.status == 'PUBLISHED':
+			if float(ver2) > float(ver1):			
+				return (node2,ver2)
+			elif float(ver2) < float(ver1):
+				return (node1,ver1)
+			elif float(ver2) == float(ver1):
+				return(node1,ver1)
+		elif node2.status == 'DRAFT':
+                        
+                        if  node1.status == 'DRAFT':
+			    #check to perform if the person has recently joined the group
+			    count=check_page_first_creation(request,node2)
+                            print"the basic count",count
+                            if count == 1:
+                                print"the count2",count
+				return (node1,ver1)
+                            elif count == 2:
+ 				print"the count",count
+				return (node2,ver2)
+
+                            
+                        return (node2,ver2)  
+	    else:
+		return(node1,ver1)		
+	    
+     else:
+         return (node1,ver1)
+	 
+def check_page_first_creation(request,node):
+    ''' function to check wheather the editing is performed by the user very first time '''
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+	(fp)
+    rev_no =""
+    count=0
+    proc1=subprocess.Popen(cmd,shell=True,
+				stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+         print line
+         if line.find('updated')!=-1 or line.find('created')!=-1:
+          if line.find(str(request.user))!=-1:
+               count =count+1
+               if count ==2:
+                proc1.kill()
+               	return (count)
+    proc1.kill()
+    if count == 1:
+	return(count)     
+      

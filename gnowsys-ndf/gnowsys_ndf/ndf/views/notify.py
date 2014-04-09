@@ -49,7 +49,7 @@ def send_invitation(request,group_id):
         sending_user=User.objects.get(id=sender.id)
         list_of_users=list_of_invities.split(",")
         activ="invitation to join in group"
-        msg="'This is to inform you that " +str(sending_user.username)+ " has subscribed you to the group " +str(groupname)+"'"
+        msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+"'"
 
         ret=""
         for each in list_of_users:
@@ -70,7 +70,7 @@ def notifyuser(request,group_id):
     colg=col_Group.Group.one({'_id':ObjectId(group_id)})
     groupname=colg.name
     activ="joined in group"
-    msg="You have successfully joined in the group '"+str(groupname)+"'"
+    msg="You have successfully joined in the group '"+ groupname +"'"
     bx=get_user(request.user)
     ret = set_notif_val(request,group_id,msg,activ,bx)
     if not ((bx.id in colg.author_set) or (bx.id==colg.created_by)):
@@ -86,7 +86,7 @@ def notifyuser(request,group_id):
 def notify_remove_user(request,group_id):
     colg=col_Group.Group.one({'_id':ObjectId(group_id)})
     groupname=colg.name
-    msg="You have been removed from the group '"+str(groupname)+"'"
+    msg="You have been removed from the group '"+ groupname +"'"
     activ="removed from group"
     bx=get_user(request.user)
     ret = set_notif_val(request,group_id,msg,activ,bx)

@@ -27,6 +27,7 @@ import os
 import subprocess
 import ox
 import threading
+from django.http import Http404
 #from string import maketrans 
 
 
@@ -42,9 +43,9 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 db = get_database()
 collection = db[Node.collection_name]
-GST_FILE = collection.GSystemType.one({'name': GAPPS[1]})
-GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
-GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4]})
+GST_FILE = collection.GSystemType.one({'name': GAPPS[1], '_type':'GSystemType'})
+GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
+GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 
 ####################################################################################################################################                                             V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
 ###################################################################################################################################
@@ -56,10 +57,11 @@ def file(request, group_id, file_id):
     """
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
-        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+       
+        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'fs_file_ids':{'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+        videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
         already_uploaded = request.GET.getlist('var', "")
     
         '''                                                                                                                                 saving wetube.gnowledge.org videos data in GSystem, with locking                                                            
@@ -154,6 +156,7 @@ def submitDoc(request, group_id):
     alreadyUploadedFiles = []
     str1 = ''
     img_type=""
+    obj_id_instance = ObjectId()
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
@@ -170,15 +173,15 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f = save_file(each, img_type, mtitle, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
+                    f = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
+                    f = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each, img_type, title, userid, group_id, GST_FILE._id.__str__(), content_org, language, tags, access_policy, usrname)
-            if f:
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
+            if not obj_id_instance.is_valid(f):
                 alreadyUploadedFiles.append(f)
                 title = mtitle
         for each in alreadyUploadedFiles:
@@ -197,7 +200,7 @@ def submitDoc(request, group_id):
 
     
 first_object = ''
-def save_file(files, img_type, title, userid, group_id, st_id, content_org, language, tags, access_policy, usrname):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None):
     """
     this will create file object and save files in gridfs collection
     """
@@ -221,7 +224,8 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
                 filetype1 = ""
             filename = files.name
             fileobj.name = unicode(title)
-            fileobj.language= unicode(language)
+            if language:
+                fileobj.language= unicode(language)
             fileobj.created_by = int(userid)
             fileobj.modified_by = int(userid)
             if int(userid) not in fileobj.contributors:
@@ -237,11 +241,11 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
             
             if group_object._id not in fileobj.group_set:
                 fileobj.group_set.append(group_object._id)        #group id stored in group_set field
-            
-            user_group_object=fcol.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
-            if user_group_object:
-                if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
-                    fileobj.group_set.append(user_group_object._id)
+            if usrname:
+                user_group_object=fcol.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+                if user_group_object:
+                    if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
+                        fileobj.group_set.append(user_group_object._id)
 
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
@@ -296,6 +300,7 @@ def save_file(files, img_type, title, userid, group_id, st_id, content_org, lang
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
             count = count + 1
+            return fileobj._id
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
 
@@ -404,11 +409,6 @@ def GetDoc(request, group_id):
     variable = RequestContext(request, {'filecollection':files,'groupid':group_id,'group_id':group_id})
     return render_to_response(template, variable)
 
-def readDoc(request, _id, group_id, file_name = ""):
-    filecollection = get_database()[File.collection_name]
-    fileobj = filecollection.File.one({"_id": ObjectId(_id)})  
-    grid_fs_obj = fileobj.fs.files.get(ObjectId(fileobj.fs_file_ids[0]))
-    return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
 
 def file_search(request, group_id):
     if request.method == "GET":
@@ -442,19 +442,20 @@ def file_detail(request, group_id, _id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     file_template = ""
-
-    if file_node.mime_type == 'video':      
-        file_template = "ndf/video_detail.html"
-    elif 'image' in file_node.mime_type:
-        file_template = "ndf/image_detail.html"
-    else:
-        file_template = "ndf/document_detail.html"
+    if file_node.mime_type:
+        if file_node.mime_type == 'video':      
+            file_template = "ndf/video_detail.html"
+        elif 'image' in file_node.mime_type:
+            file_template = "ndf/image_detail.html"
+        else:
+            file_template = "ndf/document_detail.html"
         #grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
         #return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
+    else:
+         raise Http404 
 
     breadcrumbs_list = []
     breadcrumbs_list.append(( str(file_node._id), file_node.name ))
-
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
@@ -476,6 +477,23 @@ def getFileThumbnail(request, group_id, _id):
     else:
         return HttpResponse("")
 
+def readDoc(request, _id, group_id, file_name = ""):
+    '''Return Files 
+    '''
+    print "inside read doc",group_id,file_name,_id
+    file_node = collection.File.one({"_id": ObjectId(_id)})
+    if file_node is not None:
+        if file_node.fs_file_ids:
+            if (file_node.fs.files.exists(file_node.fs_file_ids[0])):
+                grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
+                return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
+            else:
+                return HttpResponse("")
+        else:
+            print "else in fs_file_ids"
+            return HttpResponse("")
+    else:
+        return HttpResponse("")
 
 def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})

@@ -31,8 +31,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, get_translate_common_fields
-
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, get_translate_common_fields,get_page
 
 #######################################################################################################################################
 
@@ -160,7 +159,7 @@ def page(request, group_id, app_id=None):
         # location = []
         # for each in page_node.location:
         #   location.append(json.dumps(each))
-
+        
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
@@ -190,6 +189,7 @@ def create_edit_page(request, group_id, node_id=None):
     
     if request.method == "POST":
         get_node_common_fields(request, page_node, group_id, gst_page)
+
         page_node.save()
         
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
@@ -402,8 +402,8 @@ def publish_page(request,group_id,node):
   node.status=unicode("PUBLISHED")
   node.modified_by = int(request.user.id)
   node.save() 
- 
-  if node._type == 'Group':
-    return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
+  #no need to use this section as seprate view is created for group publish
+  #if node._type == 'Group':
+   # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
 
   return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))

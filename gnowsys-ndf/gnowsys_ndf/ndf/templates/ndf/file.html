@@ -115,7 +115,7 @@
               </div>
 	      
               <div class="th">
-		<a href="{% url 'read_file' groupid file grid_fs_obj.filename %}">
+		<a href="{% url 'read_file' groupid file.pk grid_fs_obj.filename %}">
 		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
 		  <img src="{% url 'getFileThumbnail' groupid file %}">
 		</a>
@@ -159,7 +159,7 @@
             </div>
         
             <div class="th">
-	      <a href="{% url 'read_file' groupid file grid_fs_obj.filename %}">
+	      <a href="{% url 'read_file' groupid file.pk grid_fs_obj.filename %}">
 		<!--<img src="/static/ndf/images/icon/meta.svg">-->
 		<img src="{% url 'getFileThumbnail' groupid file %}">
 	      </a>
@@ -221,7 +221,7 @@
               </div>
 	      
               <div class="th">
-		<a href="{% url 'read_file' groupid doc grid_fs_obj.filename %}">
+		<a href="{% url 'read_file' groupid doc.pk grid_fs_obj.filename %}">
 		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
 		  <img src="{% url 'getFileThumbnail' groupid doc %}">
 		</a>
@@ -262,7 +262,7 @@
             </div>
         
             <div class="th">
-	      <a href="{% url 'read_file' groupid doc grid_fs_obj.filename %}">
+	      <a href="{% url 'read_file' groupid doc.pk grid_fs_obj.filename %}">
 		<!--<img src="/static/ndf/images/icon/meta.svg">-->
 		<img src="{% url 'getFileThumbnail' groupid doc %}">
 	      </a>
@@ -354,7 +354,7 @@
               </div>
 	      
               <div class="th">
-		<a href="{% url 'read_file' groupid image grid_fs_obj.filename %}">
+		<a href="{% url 'read_file' groupid image.pk grid_fs_obj.filename %}">
 		  <img src="{% url 'getImageThumbnail' groupid image %}" />
 		</a>
 	      </div>
@@ -445,7 +445,7 @@
               </div>
 
               <div class="th">
-		<a href="{% url 'read_file' groupid video grid_fs_obj.filename %}">
+		<a href="{% url 'read_file' groupid video.pk grid_fs_obj.filename %}">
 		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
 		  <img src="{% url 'getvideoThumbnail' groupid video %}">
 		</a>

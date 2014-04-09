@@ -4,8 +4,9 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.group',
                        url(r'^$','group_dashboard', name='groupchange'),
                        url(r'^(?P<app_id>[\w-]+)$', 'group', name='group'),
                        url(r'^create_group/', 'create_group', name='create_group'),
-
+                       url(r'^group_publish/(?P<node>[\w-]+)$','publish_group',name='publish_group'),
 		       url(r'^edit_group/', 'edit_group', name='edit_group'),
+		       url(r'^switch_group/(?P<node_id>[\w-]+)$', 'switch_group', name='switch_group'),
 
 )
 

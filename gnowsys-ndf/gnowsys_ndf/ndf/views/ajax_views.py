@@ -32,7 +32,8 @@ import json
 db = get_database()
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
-
+#This function is used to check (while creating a new group) group exists or not
+#This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 def checkgroup(request,group_name):
     titl=request.GET.get("gname","")
     retfl=check_existing_group(titl)
@@ -236,8 +237,8 @@ def make_module_set(request, group_id):
                     dict['id'] = unicode(node._id)
                     dict['version_no'] = hm_obj.get_current_version(node)
                     if node.collection_set:
-                        dict['collection'] = get_module_set_list(node)  #gives the list of collection with proper hierarchy as they are
-           
+                        dict['collection'] = get_module_set_list(node)     #gives the list of collection with proper hierarchy as they are
+
                     #creating new Gsystem object and assining data of collection object
                     gsystem_obj = collection.GSystem()
                     gsystem_obj.name = unicode(node.name)
@@ -268,6 +269,7 @@ def make_module_set(request, group_id):
                             return HttpResponse("Error Occured while storing md5 of object in attribute'")
                 else:
                     return HttpResponse("Object not present corresponds to this id")
+
             else:
                 return HttpResponse("Not a valid id passed")
         except Exception as e:
@@ -308,6 +310,7 @@ def create_relation_of_module(subject_id, right_subject_id):
         relation.right_subject = right_subject_id
         relation.subject = subject_id
         relation.save()
+
     
 
 def check_module_exits(module_set_md5):
@@ -329,7 +332,7 @@ def walk(node):
     for each in node:
        dict = {}
        node = collection.Node.one({'_id':ObjectId(each['id'])})
-       n =  hm.get_version_document(node,each['version_no'])
+       n = hm.get_version_document(node,each['version_no'])
        dict['label'] = n.name
        dict['id'] = each['id']
        dict['version_no'] = each['version_no']
@@ -477,7 +480,6 @@ def graph_nodes(request, group_id):
   return StreamingHttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
-
 
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []
