@@ -112,7 +112,8 @@ def page(request, group_id, app_id=None):
             node = collection.Node.find({'member_of':ObjectId(app_id)})
           for nodes in node:
             print "Nodes",nodes.name
-            content.append(get_versioned_page(nodes))  
+            node,ver=get_versioned_page(nodes) 
+            content.append(node)  
                     
           # rcs content ends here
           return render_to_response("ndf/page_list.html",
@@ -155,7 +156,7 @@ def page(request, group_id, app_id=None):
           else:
              #else part is kept for time being until all the groups are implemented
              if node.status == u"DRAFT":
-            	page_node=get_versioned_page(node)
+            	page_node,ver=get_versioned_page(node)
              elif node.status == u"PUBLISHED":
                 page_node = node
         
