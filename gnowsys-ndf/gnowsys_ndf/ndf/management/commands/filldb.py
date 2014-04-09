@@ -24,13 +24,13 @@ db = get_database()
 collection = db[Node.collection_name]
 
 #append gsystem_type name to create factory GSystemType
-factory_gsystem_types = ['Twist', 'Reply', 'Author', 'Shelf', 'QuizItem', 'Pandora_video', 'profile_pic']
+factory_gsystem_types = ['Twist', 'Reply', 'Author', 'Shelf', 'QuizItem', 'Pandora_video']
 
 #fill attribute name,data_type,gsystem_type name in bellow dict to create factory Attribute Type
 factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'], 'data_type':'str(QUIZ_TYPE_CHOICES_TU)'}},{'options':{'gsystem_names_list':['QuizItem'], 'data_type':'"[" + DATA_TYPE_CHOICES[6] + "]"'}}, {'correct_answer':{'gsystem_names_list':['QuizItem'], 'data_type':'"[" + DATA_TYPE_CHOICES[6] + "]"'}}, {'start_time':{'gsystem_names_list':['QuizItem','Forum'], 'data_type':'DATA_TYPE_CHOICES[9]'}}, {'end_time':{'gsystem_names_list':['QuizItem','Forum'], 'data_type':'DATA_TYPE_CHOICES[9]'}}, {'module_set_md5':{'gsystem_names_list':['Module'], 'data_type':'u""'}},{'source_id':{'gsystem_names_list':['Pandora_video'], 'data_type':'u""'}} ]
 
 #fill relation_type_name,inverse_name,subject_type,object_type in bellow dict to create factory Relation Type
-factory_relation_types = [{'has_shelf':{'subject_type':['Author'],'object_type':['Shelf'], 'inverse_name':'shelf_of'}}, {'translation_of':{'subject_type':['Page'],'object_type':['Page'], 'inverse_name':'translation_of'}}, {'has_module':{'subject_type':['Page'],'object_type':['Module'], 'inverse_name':'generated_from'}}]
+factory_relation_types = [{'has_shelf':{'subject_type':['Author'],'object_type':['Shelf'], 'inverse_name':'shelf_of'}}, {'translation_of':{'subject_type':['Page'],'object_type':['Page'], 'inverse_name':'translation_of'}}, {'has_module':{'subject_type':['Page'],'object_type':['Module'], 'inverse_name':'generated_from'}}, {'has_profile_pic':{'subject_type':['Author'],'object_type':['Image'], 'inverse_name':'profile_pic_of'}}]
 
 #for taking input json file
 import json
@@ -294,4 +294,8 @@ for n in cur:
         if n.created_by not in n.contributors:
             collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]} }, upsert=False, multi=False)
 
-
+# For delete the profile_pic as GST 
+profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_pic'})
+if profile_pic_obj:
+	profile_pic_obj.delete()
+	print "Deleted GST document of profile_pic"
