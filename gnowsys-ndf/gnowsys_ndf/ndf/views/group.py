@@ -186,18 +186,19 @@ def switch_group(request,group_id,node_id):
         node=collection.Node.one({"_id":ObjectId(node_id)})
         print "method=",request.method
         if request.method == "POST":
-            new_groups=request.POST.get('new_grps',"")
-            print "newgrps",new_groups
-            for each in new_groups:
-                print "each id",each
-                if ObjectId(each) not in node.group_set:
-                    node.group_set.append(ObjectId(each));
-            node.save()
+            print "aaa",request.POST
+            new_grps = request.POST['new_grps[]']
+            print "newgrps"
+            if new_grps:
+                for each in new_grps:
+                    print "each id",each
+                    if ObjectId(each) not in node.group_set:
+                        node.group_set.append(ObjectId(each));
+                node.save()
             return HttpResponse("Success")
         else:
             coll_obj_list = []
             st = collection.Node.find({"_type":"Group"})
-
             for each in node.group_set:
                 coll_obj_list.append(collection.Node.one({'_id':each}))
             data_list=set_drawer_widget(st,coll_obj_list)
