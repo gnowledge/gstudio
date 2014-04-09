@@ -41,11 +41,11 @@
 				{% endif %}
 
 			<div id="pic_div" style="display:none;">
-				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_id %}">
+				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'userDashboard' groupid %}">
 					{% csrf_token %}
 					<input type="file" name="doc[]"  id="docFile" multiple/>
 
-					<input type="hidden" name="type" value="{{prof_pic_id}}">						
+					<input type="hidden" name="type" value="profile_pic">						
 					<input type="hidden" name="user" value="{{user_id}}">					
 					<input type="submit" id="submitpostid" value="Save">
 
@@ -443,21 +443,20 @@
 		$("#pic_div").css("display", 'block');
 	});
 
-	$(document).ready(function($){
-		$(document).on('submit',"form",function(){
-			if($("#docFile").val() != "")
+	$("#submitpostid").click(function() {
+		if($("#docFile").val() != "")
 			{	
 				$("#message").show();
 				$("#submitpostid").hide();
-				$("#submitpostid").submit();
 			}
 			else
 			{
 				alert("select a file");
 				return false;
 			}
-		});
 	});
+
+	
 	
 </script>
 

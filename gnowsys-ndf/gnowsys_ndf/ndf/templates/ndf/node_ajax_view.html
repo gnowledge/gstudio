@@ -300,6 +300,17 @@ $.ajax({
 
 });  //end of document click
 
-$(document).on('opened', '[data-reveal]', function () {  map.invalidateSize();  });
+
+  $(document).on('opened', '[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+    if( tempArr.length )
+    {
+      var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+    }
+  });
+
 
 </script>

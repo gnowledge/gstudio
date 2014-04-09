@@ -22,6 +22,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers
+from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.settings import GAPPS
 
 
@@ -37,11 +38,49 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 #######################################################################################################################################
 
 
-def dashboard(request, group_id, user, uploaded=None):	
+def dashboard(request, group_id):	
     
-    ID = User.objects.get(username=user).pk
-    
-    date_of_join = User.objects.get(username=user).date_joined
+    auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
+    prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
+    uploaded = "None"
+
+    if request.method == "POST" :
+      """
+      This will take the image uploaded by user and it searches if its already available in gridfs 
+      using its md5 
+      """ 	
+      for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+      	fcol = db[File.collection_name]
+    	fileobj = fcol.File()
+    	filemd5 = hashlib.md5(each.read()).hexdigest()
+    	if fileobj.fs.files.exists({"md5":filemd5}):
+    	  coll = get_database()['fs.files']
+    	  a = coll.find_one({"md5":filemd5})
+    	  # prof_image takes the already available document of uploaded image from its md5 
+    	  prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+
+    	else:
+    	  # If uploaded image is not found in gridfs stores this new image 
+      	  submitDoc(request, group_id)
+      	  # prof_image takes the already available document of uploaded image from its name
+      	  prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+
+      # prof_img takes already available relation of user with its profile image
+      prof_img = collection.GRelation.one({'subject': ObjectId(auth._id), 'right_subject': ObjectId(prof_image._id) })
+      # If prof_img not found then it creates the relation of new uploaded image with its user
+      if not prof_img:
+        prof_img = collection.GRelation()
+        prof_img.subject = ObjectId(auth._id) 
+        prof_img.relation_type = prof_pic
+        prof_img.right_subject = ObjectId(prof_image._id)
+        prof_img.save()
+      else:
+        obj_img = collection.Node.one({'_id': ObjectId(prof_img.right_subject) })
+        uploaded = obj_img.name
+
+
+    ID = request.user.pk
+    date_of_join = request.user.date_joined
     
     page_drawer = get_drawers(group_id,None,None,"Page")
     image_drawer = get_drawers(group_id,None,None,"Image")
@@ -59,28 +98,19 @@ def dashboard(request, group_id, user, uploaded=None):
             name = User.objects.get(pk=val).username 		
             collab_drawer.append(name)			
             
-
-    prof_pic = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'profile_pic'})._id 
-    img_cur = collection.GSystem.find({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })        
-    
-    if img_cur.count() > 1: 
-      cur = collection.GSystem.one({'_id':ObjectId(img_cur[0]._id)})
-      if cur.fs_file_ids:
-        for each in cur.fs_file_ids:
-            cur.fs.files.delete(each)
-      cur.delete()
-
-      img_obj = collection.GSystem.one({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })
-    
-      print img_obj.name
+    # prof_pic_rel will get the cursor object of relation of user with its profile picture 
+    prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+    if prof_pic_rel.count() > 0 :
+      index = prof_pic_rel.count() - 1
+      img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
     else:
-      img_obj = collection.GSystem.one({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
-              
+      img_obj = "" 
 
     return render_to_response("ndf/userDashboard.html",
-                              {'username': user, 'user_id': ID, 'DOJ': date_of_join, 
-                               'prof_pic_obj': img_obj,'group_id':group_id,              
-                               'prof_pic_id': prof_pic,'already_uploaded': uploaded,
+                              {'username': request.user.username, 'user_id': ID, 'DOJ': date_of_join, 
+                               'prof_pic_obj': img_obj,
+                               'group_id':group_id,              
+                               'already_uploaded': uploaded,
                                'page_drawer':page_drawer,'image_drawer': image_drawer,
                                'video_drawer':video_drawer,'file_drawer': file_drawer,
                                'quiz_drawer':quiz_drawer,'group_drawer': group_drawer,
