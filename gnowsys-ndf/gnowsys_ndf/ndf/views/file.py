@@ -473,9 +473,14 @@ def getFileThumbnail(request, group_id, _id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if file_node is not None:
-        if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
-            f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
-            return HttpResponse(f.read(), content_type=f.content_type)
+        if file_node.fs_file_ids:
+            if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
+                f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
+                return HttpResponse(f.read(), content_type=f.content_type)
+            else:
+                return HttpResponse("")
+        else:
+            return HttpResponse("")
     else:
         return HttpResponse("")
 
