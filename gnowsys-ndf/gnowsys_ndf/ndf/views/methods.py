@@ -437,9 +437,9 @@ and if he has published his contents then he would be shown the current publishe
      username =request.user
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
-     print "entered here for roming"     
+     
      if  ver2 != '1.1':                
-            print "again here"
+         
 	    if node2 is not None:
 		
                 if node2.status == 'PUBLISHED':
