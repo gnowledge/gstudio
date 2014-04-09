@@ -1,3 +1,5 @@
+{% block head %}
+
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 	<!-- JS Links -->
@@ -6,12 +8,13 @@
 
 	<!-- CSS Links -->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
-
-	<!-- <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" /> -->
-	<!-- <link rel="stylesheet" href="https://raw.githubusercontent.com/lvoogdt/Leaflet.awesome-markers/2.0/develop/dist/leaflet.awesome-markers.css"> -->
-	<!-- <script src="https://raw.githubusercontent.com/lvoogdt/Leaflet.awesome-markers/2.0/develop/dist/leaflet.awesome-markers.js"></script> -->
+	
+	<link rel="stylesheet" href="/static/ndf/leaflet/leaflet.awesome-markers.css">
+	<script src="/static/ndf/leaflet/leaflet.awesome-markers.js"></script>
 	
 	<!-- <link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.css"> -->
+
+{% endblock %}
 
 	<style type="text/css">
 		
@@ -27,13 +30,7 @@
 
 		.popup-content {	padding: 0.25;	margin-bottom: 0.5em; }
 		
-		.popup-content:focus {	
-								background-color: #FFFFE0;
-							    border-color: buttonface;
-							    border-style: dashed;
-							    margin-bottom: 0.5em;
-							    padding: 0.25em;
-							}		
+		.popup-content:focus {	background-color: #FFFFE0; border-color: buttonface; border-style: dashed; margin-bottom: 0.5em; padding: 0.25em; }		
 
 	</style>
 
@@ -53,18 +50,25 @@
 	</div>
 	
 	<script type="text/javascript">
-
 		 
-	 	// We’ll add a tile layer to add to our map, in this case it’s a OSM tile layer.
-	 	// Creating a tile layer usually involves setting the URL template for the tile images
+
+	 	// We’ll add a OSM tile layer to our map
 	 	var osmUrl 	  = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
 	 	osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 	 	osm 	  = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
 	 	
+
 	 	// initialize the map on the "map" div with a given center and zoom
 	 	var map = L.map('map').setView([25.92,79.84], 5).addLayer(osm);
+	 	
+	 	var nonInfoMarker = L.AwesomeMarkers.icon({ markerColor: 'blue', iconColor: 'white', spin:false });
+	 	var infoMarker = L.AwesomeMarkers.icon({ icon: 'info', prefix: 'fi', markerColor: 'blue', iconColor: 'white', spin:false });
 
-	 	var initialPopContent = "Add description.. <i>(optional)</i>";
+  		// L.marker([25.92,79.84], { icon: infoMarker }).addTo(map);
+
+	 	var initialPopContent = "Add description.. <i>(optional)</i>",
+	 		initialPopContentText = "Add description.. (optional)";
+
 
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
@@ -72,6 +76,8 @@
 	 	
 	 	markerGeoJSON = [];
 	 	popupBasicHtml = $(".popup-html").html()
+
+	 	tempArr = []	// to catch newly created markers
 
 	 	if( mapdata.length > 0 )
 	 	{
@@ -83,8 +89,6 @@
 			mapdata = mapdata.replace(/'/gm, '"');
 	 		mapdata = mapdata.replace(/u"/gm, '"');
 	 		mapdata = JSON.parse(mapdata);
-
-			tempArr = []	// to catch newly created markers
 			
 			L.geoJson(mapdata, {
 			    
@@ -102,23 +106,22 @@
 						tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+ initialPopContent +'</div>');
 					}
 
-			    	{% if mode == "edit" %}
-			        	var marker = L.marker(latlng, {
-							draggable:true,
-							title: (description)?description:"Resource Location",
-							alt: (description)?description:"Resource Location",
-							riseOnHover:true
+					var marker = L.marker(latlng, {
+						icon: (description)?infoMarker:nonInfoMarker,
+						title: (description)?description:"Resource Location",
+						alt: (description)?description:"Resource Location",
+						riseOnHover:true
+
+			    	{% if mode == "edit" %}	        	
+							,draggable:true,
 						}).bindPopup(tempPopupContent);
 
 			        	marker.on("popupopen", activateMarker );
 						marker.on("dragend", dragend);
 
 			        {% elif mode == "read" %}
-			        	var marker = L.marker(latlng, {
-							title: (description)?description:"Resource Location",
-							alt: (description)?description:"Resource Location",
-							riseOnHover:true
-						});
+
+						}); // End of marker for read
 						if(description){ marker.bindPopup(feature.properties.description); }
 
 			       	{% endif %}
@@ -129,6 +132,8 @@
 					
 			    }
 			}).addTo(map);
+
+			
 			
 	        // Adding mapdata values in markerGeoJSON.
 	        $.each(tempArr, function(i, val){ 
@@ -141,21 +146,22 @@
 	        	markerGeoJSON.push(JSON.stringify(addLeafletID));
 
 	        })
-	        updateHiddenTagContent();
 
+			{% if mode == "edit" %}	        
+	        	updateHiddenTagContent();
+	        {% endif %}
 	 	}
+	 		 	 	
 
-	 	
+	{% if mode == "edit" %}
 
-	 	function updateHiddenTagContent()
+		function updateHiddenTagContent()
 	 	{
 	 		$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
 			$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
 	 	}
-	 	
-
-		{% if mode == "edit" %}
-			map.on('click', onMapClick );
+		
+		map.on('click', onMapClick );
 
 		// Script for adding marker on map click
 		function onMapClick(e) {
@@ -163,6 +169,7 @@
 			var tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+ initialPopContent +'</div>');
 
 			var marker = L.marker(e.latlng, {
+				icon: nonInfoMarker,
 				draggable:true,
 				title:"Resource location",
 				alt:"Resource Location",
@@ -257,7 +264,7 @@
 			 			
 			if(description)
 			{					
-				$(".popup-content:visible").text(description);
+				$(".popup-content:visible").text(description);				
 			}
 			
 			// To remove marker on click of delete
@@ -275,13 +282,18 @@
 				updateHiddenTagContent();
 			});
 
-			$(".popup-content:visible").bind("keypress mouseup change blur", function(){
+			$(".popup-content:visible").bind("keyup keypress onmouseup change blur", function(){
 			
-				if($(this).html() != initialPopContent )
+				var tempContentText = ($(this).text()).trim();
+
+				if( tempContentText != initialPopContentText )
 				{
 					$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
-					// saveEditBtn = $(this).siblings().find("div.popup-add-content-button");
 				}
+				else
+				{
+					$(this).siblings().find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
+				}				
 			});
 			
 			// To add content on click of add content
@@ -295,15 +307,26 @@
 				{
 					$(this).find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
 
-					tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();					
+					getMarkerTextNote = $(this).parent().parent().find(".popup-content:visible").text().trim();	
 
+					if(getMarkerTextNote.length && getMarkerTextNote != initialPopContentText )
+					{
+						tempMarker.setIcon(infoMarker);
+					}
+					else
+					{
+						tempMarker.setIcon(nonInfoMarker);	
+					}
+					
+					tempMarkerGeoJSON.properties.description = getMarkerTextNote.replace(/'/gm, "");	// temp fix.
+									
 					if(! tempMarkerGeoJSON.properties.id)
 					{
 						tempMarkerGeoJSON.properties.id = lID;	
 					}
 					
 					var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
-					// console.log(updatedGeoJSON);
+					
             		$.each(markerGeoJSON, function(i, val) {
             	
 	            		var getID = $.parseJSON(val).properties.id; 
@@ -316,53 +339,6 @@
 
 		}
 
-		{% endif %}
+	{% endif %}
 
 	</script>
-	
-<!-- 
-[{'geometry': {'type': 'Point', 'coordinates': [86.5283203125, 23.82555130688476]}, 'type': 'Feature', 'properties': {'id': 27}}, {'geometry': {'type': 'Point', 'coordinates': [85.20996093749999, 23.301901124188877]}, 'type': 'Feature', 'properties': {'id': 34}}]
-
-=======================================================
-
-http://leafletjs.com/reference.html#geojson
-http://leafletjs.com/examples/geojson.html
-https://paulcrickard.wordpress.com/tag/geojson/
-https://www.mapbox.com/blog/open-web-geojson/
-
-var geojsonFeature = {
-    "type": "Feature",
-    "properties": {
-        "name": "Coors Field",
-        "amenity": "Baseball Stadium",
-        "popupContent": "This is where the Rockies play!"
-    },
-    "geometry": {
-        "type": "Point",
-        "coordinates": [-104.99404, 39.75621]
-    }
-};
-
-
-Alternatively, we could create an empty GeoJSON layer and assign it to a variable so that we can add more features to it later.
-
-var myLayer = L.geoJson().addTo(map);
-myLayer.addData(geojsonFeature);
-
-
-map.eachLayer(function(e){ console.log(e._leaflet_id); })
-
-map.eachLayer(function(layer){
-  if(layer.toGeoJSON){
-    console.log(layer.toGeoJSON())
-  }
-});
-
-// to modify geoJSON object aaa
-$(aaa).attr("properties", '{"id":23}')
-
-
-for search in OSM : https://github.com/twain47/Nominatim
-
-=======================================================
- -->
