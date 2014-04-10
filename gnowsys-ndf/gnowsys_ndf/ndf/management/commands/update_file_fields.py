@@ -34,7 +34,7 @@ class Command(BaseCommand):
                         grid_fs_obj = node.fs.files.get(ObjectId(node.fs_file_ids[0]))
                         thumbnail_pdf = convert_pdf_thumbnail(grid_fs_obj,node._id)
                         tobjectid = node.fs.files.put(thumbnail_pdf.read(), filename=thumbnail_pdf.name)
-                        if not  node.fs_file_ids[1]:
+                        if len(node.fs_file_ids) ==1:
                             collection.File.find_and_modify({'_id':node._id},{'$push':{'fs_file_ids':tobjectid}})
                             print "this file",str(node._id),"succesfully updated"
                         else:
