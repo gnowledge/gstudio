@@ -185,7 +185,8 @@ def create_edit_quiz_item(request, group_id, node_id=None):
             quiz_item_node['correct_answer'].append(correct_answer)
 
         tags = request.POST.get('tags')
-        quiz_item_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+        if tags:
+            quiz_item_node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
         
         quiz_item_node.save()
 

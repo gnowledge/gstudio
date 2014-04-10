@@ -304,9 +304,8 @@ class Node(DjangoDocument):
         
     @property
     def current_version(self):
-
-     history_manager= HistoryManager()
-     return history_manager.get_current_version(self)    
+        history_manager= HistoryManager()
+        return history_manager.get_current_version(self)    
 
     @property
     def version_dict(self):
@@ -362,7 +361,6 @@ class Node(DjangoDocument):
                             field_found = True
 
                             # TODO: Check whether type of "value" matches with that of "attribute['data_type']"
-
                             # Don't continue searching from list of remaining attributes 
                             break
 
@@ -381,20 +379,31 @@ class Node(DjangoDocument):
 
         if is_new:
             # Create history-version-file
-            if history_manager.create_or_replace_json_file(self):
-                fp = history_manager.get_file_path(self)
-                user = User.objects.get(pk=self.created_by).username
-                message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+            try:
+                if history_manager.create_or_replace_json_file(self):
+                    fp = history_manager.get_file_path(self)
+                    user = User.objects.get(pk=self.created_by).username
+                    message = "This document (" + self.name + ") is created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+            except Exception as err:
+                print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be created!!!\n"
+                collection.remove({'_id': self._id})
+                raise RuntimeError(err)
+
         else:
             # Update history-version-file
             fp = history_manager.get_file_path(self)
             rcs_obj.checkout(fp)
 
-            if history_manager.create_or_replace_json_file(self):
-                user = User.objects.get(pk=self.created_by).username
-                message = "This document (" + self.name + ") is lastly updated by " + user + " on " + self.last_update.strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+            try:
+                if history_manager.create_or_replace_json_file(self):
+                    user = User.objects.get(pk=self.modified_by).username
+                    message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
+                    rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+            except Exception as err:
+                print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
+                raise RuntimeError(err)
+                
 
     ##########  User-Defined Functions ##########
 
@@ -1002,7 +1011,7 @@ class HistoryManager():
         (b) False - Otherwise
         """
 
-        collection_tuple = (GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation)
+        collection_tuple = (MetaType, GSystemType, GSystem, AttributeType, GAttribute, RelationType, GRelation)
         file_res = False    # True, if no error/exception occurred
 
         if document_object is not None and \
@@ -1059,8 +1068,13 @@ class HistoryManager():
             # if document_object is None or
             # !isinstance(document_object, collection_tuple)
 
-            print("\n Error: Either invalid instance or "\
-                      "not matching given instances list!!!")
+            msg = " Following instance is either invalid or " \
+            + "not matching given instances-type list " + str(collection_tuple) + ":-" \
+            + "\n\tObjectId: " + document_object._id.__str__() \
+            + "\n\t    Type: " + document_object._type \
+            + "\n\t    Name: " + document_object.name
+
+            raise RuntimeError(msg)
 
         return file_res
       

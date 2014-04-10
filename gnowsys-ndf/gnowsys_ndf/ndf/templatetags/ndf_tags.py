@@ -102,41 +102,80 @@ def edit_drawer_widget(field, group_id, node, checked=None):
   return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
-def list_widget(type_value, fields_value,template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
+
   drawer1 = {}
   drawer2 = None
   groupid = ""
   group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
+
   if group_obj:
 	groupid = str(group_obj[0]._id)
-  alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
-  fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
-  fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
-  fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType"}
-  types = fields[type_value]
 
-  if type_value in fields_selection1:
-    if type_value in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
+  alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
+
+  fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+
+  fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
+
+  fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType"}
+  types = fields[fields_name]
+
+  if fields_name in fields_selection1:
+    if fields_value:
+      dummy_fields_value = fields_value
+      fields_value = []
+      for v in dummy_fields_value:
+        fields_value.append(v.__str__())
+
+    if fields_name in ("applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype"):
       for each in NODE_TYPE_CHOICES:
         drawer1[each] = each
-    elif type_value in ("data_type"):
+    elif fields_name in ("data_type"):
       for each in DATA_TYPE_CHOICES:
         drawer1[each] = each
     else:
       drawer = collection.Node.find({"_type":types})
       for each in drawer:
         drawer1[str(each._id)]=each.name
-    return {'template': template1, 'widget_for': type_value, 'drawer1': drawer1}
+    return {'template': template1, 'widget_for': fields_name, 'drawer1': drawer1, 'selected_value': fields_value}
+
   
-  if type_value in fields_selection2:
+  if fields_name in fields_selection2:
+    fields_value_id_list = []
+
+    if fields_value:
+      for each in fields_value:
+        if type(each) == ObjectId:
+          fields_value_id_list.append(each)
+        else:
+          fields_value_id_list.append(each._id)
+
     if types in alltypes:
-      for each in collection.Node.find({"_type":types}):
-        drawer1[each._id] = each
+      for each in collection.Node.find({"_type": types}):
+        if fields_value_id_list:
+          if each._id not in fields_value_id_list:
+            drawer1[each._id] = each
+        else:
+          drawer1[each._id] = each
+
     if types in ["all_types"]:
       for each in alltypes:
-        for eachnode in collection.Node.find({"_type":each}):
-          drawer1[eachnode._id] = eachnode
-    return {'template': template2, 'widget_for': type_value, 'drawer1': drawer1, 'drawer2': drawer2, 'groupid': groupid}
+        for eachnode in collection.Node.find({"_type": each}):
+          if fields_value_id_list:
+            if eachnode._id not in fields_value_id_list:
+              drawer1[eachnode._id] = eachnode
+          else:
+            drawer1[eachnode._id] = eachnode
+
+    if fields_value_id_list:
+      drawer2 = []
+      for each_id in fields_value_id_list:
+        each_node = collection.Node.one({'_id': each_id})
+        if each_node:
+          drawer2.append(each_node)
+
+    return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid, 'groupid': groupid}
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
@@ -343,10 +382,15 @@ def get_user_group(user):
 def get_profile_pic(user):
 
   ID = User.objects.get(username=user).pk
-  GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
-  prof_pic = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'profile_pic'})._id 
+  auth = collection.Node.one({'_type': u'Group', 'name': unicode(user) })
 
-  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+  prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+
+  if prof_pic_rel.count() > 0 :
+    index = prof_pic_rel.count() - 1
+    prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+  else:
+    prof_pic = "" 
 
   return prof_pic
 
@@ -422,11 +466,9 @@ def get_group_type(group_id, user):
 
       else:
         #condition for groups, accessible to not logged users
-        print "\n colg.group_type: ", colg.group_type
         if colg.group_type == "PUBLIC":
           return "allowed"
         else:
-          print "\n going inn..."
           raise Http404
     else:
 	return "pass"
@@ -490,7 +532,7 @@ def get_Object_count(key):
 @register.assignment_tag
 def get_memberof_objects_count(key,group_id):
   try:
-  	return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'_type':'GSystem','group_set': {'$all': [ObjectId(group_id)]},'_type':'GSystem'}).count()
+  	return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
   except:
   	return 'null'
   
@@ -499,48 +541,36 @@ def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
 @register.inclusion_tag('ndf/admin_fields.html')
-def get_input_fields(fields_value,type_value):
+def get_input_fields(fields_type,fields_name):
   """Get html tags 
   """
   field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
-  return {'template': 'ndf/admin_fields.html', "fields_value": fields_value, "type_value":type_value,"field_type_list":field_type_list}
-  
+  return {'template': 'ndf/admin_fields.html', 
+          "fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
+          "field_type_list":field_type_list}
   
 
 @register.assignment_tag
 def group_type_info(groupid,user=0):
-   
- 
-      
-      col_Group =db[Group.collection_name]
-      
-      group_gst = col_Group.Group.one({'_id':ObjectId(groupid)})
-      	
-                               
-      if group_gst.post_node:
-         return "BaseModerated"
-      elif group_gst.prior_node:
-         return "Moderated"   
-      else:
-          return  group_gst.group_type                        
-      
-              
-              
-              
+  col_Group =db[Group.collection_name]
+  group_gst = col_Group.Group.one({'_id':ObjectId(groupid)})
+  
+  if group_gst.post_node:
+    return "BaseModerated"
+  elif group_gst.prior_node:
+    return "Moderated"   
+  else:
+    return  group_gst.group_type                        
+
       
 @register.assignment_tag
 def user_access_policy(node,user):
-			
-	  col_Group=db[Group.collection_name]
-	  
-	  group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+  col_Group=db[Group.collection_name]
+  group_gst = col_Group.Group.one({'_id':ObjectId(node)})
 	    
-	    
-	  if user.id in group_gst.group_set or group_gst.created_by == user.id:
-	    return 'allow'
-	    
-	    
-	      
+  # if user.id in group_gst.group_set or group_gst.created_by == user.id:
+  if user.id in group_gst.author_set or group_gst.created_by == user.id:
+    return 'allow'
 	    
 	  
 @register.assignment_tag
@@ -549,16 +579,13 @@ def resource_info(node):
     try:
       group_gst=col_Group.Group.one({'_id':ObjectId(node._id)})
     except:
-      print "something",node
       grname=re.split(r'[/=]',node)
       group_gst=col_Group.Group.one({'_id':ObjectId(grname[1])})
     return group_gst
-	  		
                                 
     
 @register.assignment_tag
 def edit_policy(groupid,node,user):
-
   group_access= group_type_info(groupid,user)
   resource_infor=resource_info(node)
   
@@ -613,7 +640,44 @@ def get_prior_post_node(group_id):
           #return node of the base group
           return base_colg
   
+@register.assignment_tag
+def Group_Editing_policy(groupid,node,user):
+  col_Group = db[Group.collection_name]
+  node=col_Group.Group.one({"_id":ObjectId(groupid)})
+
+  if node.edit_policy == "EDITABLE_MODERATED":
+     status=edit_policy(groupid,node,user)
+     if status is not None:
+        return "allow"
+  elif node.edit_policy == "NON_EDITABLE":
+    status=non_editable_policy(groupid,user.id)
+    if status is not None:
+        return "allow"
+  elif node.edit_policy == "EDITABLE_NON_MODERATED":  
+     status=edit_policy(groupid,node,user)
+     if status is not None:
+        return "allow"
+  elif node.edit_policy is None:
+    return "allow"      
   
 
 
+@register.assignment_tag
+def get_publish_policy(groupid,resnode):
+  col_Group = db[Group.collection_name]
+  node=col_Group.Group.one({"_id":ObjectId(groupid)})
+  group_type=group_type_info(groupid)
+  if group_type == "Moderated":
+     base_group=get_prior_post_node(groupid)
+
+     if base_group is not None:
+       if base_group.status == "DRAFT" or node.status == "DRAFT":
+           return "allow"
+           
+  elif node.edit_policy == "NON_EDITABLE":
+       return "allow"    
+  elif node.edit_policy == "EDITABLE_NON_MODERATED":
+      if resnode.status == "DRAFT": 
+         print "working section",resnode.status  
+         return "allow"
   

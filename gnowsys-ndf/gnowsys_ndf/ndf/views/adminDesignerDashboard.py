@@ -21,9 +21,10 @@ def adminDesignerDashboardClass(request, class_name):
     if request.method=="POST":
         search = request.POST.get("search","")
         classtype = request.POST.get("class","")
-        nodes = collection.Node.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype})
+        nodes = collection.Node.find({'name':{'$regex':search,'$options': 'i' },'_type':classtype}).sort('last_update', -1)
     else :
-        nodes = collection.Node.find({'_type':class_name})
+        nodes = collection.Node.find({'_type':class_name}).sort('last_update', -1)
+
     objects_details = []
     for each in nodes:
         member = []
@@ -75,16 +76,19 @@ def adminDesignerDashboardClass(request, class_name):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def adminDesignerDashboardClassCreate(request,class_name):
+def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     '''
     delete class's objects
     '''
+    new_instance_type = None
+
     definitionlist = []
     contentlist = []
     dependencylist = []
     options = []
+
     if class_name == "AttributeType":
-        definitionlist = ['name','altnames','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digit','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        definitionlist = ['name','altnames','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -107,7 +111,13 @@ def adminDesignerDashboardClassCreate(request,class_name):
     class_structure = eval(class_name).structure
     required_fields = eval(class_name).required_fields
     newdict = {}
-    new_instance_type = eval("collection"+"."+class_name)()
+
+    if node_id:
+        new_instance_type = collection.Node.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
+
+    else:
+        new_instance_type = eval("collection"+"."+class_name)()
+
     if request.method=="POST":
         for key,value in class_structure.items():
             if value == bool:
@@ -128,9 +138,11 @@ def adminDesignerDashboardClassCreate(request,class_name):
                         new_instance_type['content'] = org2html(new_instance_type[key], file_prefix=filename)
                     else :
                         new_instance_type[key] = unicode(request.POST.get(key,""))
+
             elif value == list:
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"").split(",")
+
             elif type(value) == list:
                 if request.POST.get(key,""):
                     if key in ("tags","applicable_node_type"):
@@ -145,46 +157,92 @@ def adminDesignerDashboardClassCreate(request,class_name):
                         for each in request.POST.get(key,"").split(","):
                             listoflist.append(ObjectId(each))
                         new_instance_type[key] = listoflist
+
             elif value == datetime.datetime:
-                new_instance_type[key] = datetime.datetime.now()
-#                pass
+                if key == "last_update":
+                    new_instance_type[key] = datetime.datetime.now()
+                
             elif key == "status":
                 if request.POST.get(key,""):
                     new_instance_type[key] = unicode(request.POST.get(key,""))
-            elif key == "created_by":
-                new_instance_type[key] = request.user.id
+
+            # elif key == "created_by":
+            #     new_instance_type[key] = request.user.id
+
             elif value == int:
                 if request.POST.get(key,""):
                     new_instance_type[key] = int(request.POST.get(key,""))
+
             else: 
                 if request.POST.get(key,""):
                     new_instance_type[key] = request.POST.get(key,"")
+
+        user_id = request.user.id
+
+        if not new_instance_type.has_key('_id'):
+            new_instance_type.created_by = user_id
+
+        new_instance_type.modified_by = user_id
+
+        if user_id not in new_instance_type.contributors:
+            new_instance_type.contributors.append(user_id)
+
         new_instance_type.save()
+
         return HttpResponseRedirect("/admin/designer/"+class_name)
+
+
+    # If GET request ---------------------------------------------------------------------------------------
+
     for key,value in class_structure.items():
         if value == bool:
-            newdict[key] = "bool"
+            # newdict[key] = "bool"
+            newdict[key] = ["bool", new_instance_type[key]]
         elif value == unicode:
-            newdict[key] = "unicode"
+            # newdict[key] = "unicode"
+            newdict[key] = ["unicode", new_instance_type[key]]
         elif value == list:
-            newdict[key] = "list"
+            # newdict[key] = "list"
+            newdict[key] = ["list", new_instance_type[key]]
         elif type(value) == list:
-            newdict[key] = "list"
+            # newdict[key] = "list"
+            newdict[key] = ["list", new_instance_type[key]]
         elif value == datetime.datetime:
-            newdict[key] = "datetime"
+            # newdict[key] = "datetime"
+            newdict[key] = ["datetime", new_instance_type[key]]
         elif value == int:
-            newdict[key] = "int"
+            # newdict[key] = "int"
+            newdict[key] = ["int", new_instance_type[key]]
         elif key == "status":
-            newdict[key] = "status"
+            # newdict[key] = "status"
+            newdict[key] = ["status", new_instance_type[key]]
         else: 
-            newdict[key] = value
-    class_structure = newdict    
+            # newdict[key] = value
+            newdict[key] = [value, new_instance_type[key]]
+
+    class_structure = newdict
+
     groupid = ""
     group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
 	groupid = str(group_obj[0]._id)
 
     template = "ndf/adminDashboardCreate.html"
-    variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid})
+
+    variable = None
+    class_structure_with_values = {}
+    if node_id:
+        for key, value in class_structure.items():
+            class_structure_with_values[key] = [class_structure[key][0], new_instance_type[key]]
+
+        variable = RequestContext(request, {'node': new_instance_type,
+                                            'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
+                                            'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
+                                            'options': options, 'required_fields': required_fields,
+                                            'groupid': groupid
+                                        })
+    else:
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid})
+
     return render_to_response(template, variable)
 

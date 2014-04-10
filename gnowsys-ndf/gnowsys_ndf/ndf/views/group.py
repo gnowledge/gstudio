@@ -24,7 +24,7 @@ from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import Group
-
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups
 from gnowsys_ndf.ndf.views.methods import *
 
@@ -35,6 +35,7 @@ db = get_database()
 gst_collection = db[GSystemType.collection_name]
 gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
 gs_collection = db[GSystem.collection_name]
+collection = db[Node.collection_name]
 
 #######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
@@ -130,26 +131,47 @@ def group_dashboard(request,group_id=None):
         else:
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
             grpid=groupobj['_id']
+
     except Exception as e:
         groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         grpid=groupobj['_id']
         pass
-    return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 'group_id':grpid, 'user':request.user},context_instance=RequestContext(request))
 
+    #if groupobj.status == u"DRAFT":
+    #    groupobj,ver=get_versioned_page(groupobj)
+
+    #elif groupobj.status == u"PUBLISHED":
+    #    groupobj = groupobj
+    #the below method would give u the drafted or published contents depending on the user 
+    #upper code is not required
+    groupobj,ver=get_page(request,groupobj)    
+    # First time breadcrumbs_list created on click of page details
+    breadcrumbs_list = []
+    # Appends the elements in breadcrumbs_list first time the resource which is clicked
+    breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
+    
+    return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
+                                                         'group_id':grpid, 'user':request.user, 
+                                                         'breadcrumbs_list': breadcrumbs_list
+                                                        },context_instance=RequestContext(request)
+                            )
 
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
     
+    print"going throught this section"  
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
                 page_node.group_type = "PUBLIC"
             if page_node.access_policy == "PRIVATE":
+                
                 page_node.group_type = "PRIVATE"
             page_node.save()
             group_id=page_node._id
             return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
+    page_node,ver=get_page(request,page_node)
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
                                         'groupid':group_id,
@@ -158,4 +180,52 @@ def edit_group(request,group_id):
                                       context_instance=RequestContext(request)
                                       )
 
+
+def switch_group(request,group_id,node_id):
+    try:
+        node=collection.Node.one({"_id":ObjectId(node_id)})
+        print "method=",request.method
+        if request.method == "POST":
+            new_groups=request.POST.get('new_grps',"")
+            print "newgrps",new_groups
+            for each in new_groups:
+                print "each id",each
+                if ObjectId(each) not in node.group_set:
+                    node.group_set.append(ObjectId(each));
+            node.save()
+            return HttpResponse("Success")
+        else:
+            coll_obj_list = []
+            st = collection.Node.find({"_type":"Group"})
+
+            for each in node.group_set:
+                coll_obj_list.append(collection.Node.one({'_id':each}))
+            data_list=set_drawer_widget(st,coll_obj_list)
+            return HttpResponse(json.dumps(data_list))
+     
+    except Exception as e:
+        print "Exception in switch_group"+str(e)
+        return HttpResponse("Failure")
+def publish_group(request,group_id,node):
+  node=collection.Node.one({'_id':ObjectId(node)})
+   
+  page_node,v=get_page(request,node)
+  
+  node.content = page_node.content
+  node.content_org=page_node.content_org
+  node.status=unicode("PUBLISHED")
+  node.modified_by = int(request.user.id)
+  node.save() 
+ 
+  return render_to_response("ndf/groupdashboard.html",
+                                 { 'group_id':group_id,
+                                   'node':node,
+                                   'groupid':group_id
+                                   
+                                
+                                 
+                                 
+                                 },
+                                  context_instance=RequestContext(request)
+                              )
 
