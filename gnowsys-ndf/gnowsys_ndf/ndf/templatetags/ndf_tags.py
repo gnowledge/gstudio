@@ -667,6 +667,7 @@ def get_publish_policy(groupid,resnode):
   col_Group = db[Group.collection_name]
   node=col_Group.Group.one({"_id":ObjectId(groupid)})
   group_type=group_type_info(groupid)
+  print 
   if group_type == "Moderated":
      base_group=get_prior_post_node(groupid)
 
@@ -678,6 +679,10 @@ def get_publish_policy(groupid,resnode):
        return "allow"    
   elif node.edit_policy == "EDITABLE_NON_MODERATED":
       if resnode.status == "DRAFT": 
-         print "working section",resnode.status  
          return "allow"
-  
+  elif group_type is  None:
+     print  "node status",resnode.status
+     if resnode.status == "DRAFT":
+        print " as;ldfkjdas;flj;slajf"
+        return "allow"
+      
