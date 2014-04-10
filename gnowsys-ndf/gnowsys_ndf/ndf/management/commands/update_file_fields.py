@@ -25,28 +25,29 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         
         #fetch all nodes whoes mime_type contain pdf or svg
-        nodes = collection.Node.find({'$or':[{ 'mime_type': { '$regex': 'pdf', '$options': 'i' }},{ 'mime_type': { '$regex': 'svg', '$options': 'i' }}]})
-        for each in nodes:
-            node = collection.Node.one({'_id':ObjectId(each['_id'])})
-            if node is not None:
-                if node.fs_file_ids:
-                    if (node.fs.files.exists(node.fs_file_ids[0])):
-                        grid_fs_obj = node.fs.files.get(ObjectId(node.fs_file_ids[0]))
-                        thumbnail_pdf = convert_pdf_thumbnail(grid_fs_obj,node._id)
-                        tobjectid = node.fs.files.put(thumbnail_pdf.read(), filename=thumbnail_pdf.name)
-                        if len(node.fs_file_ids) ==1:
-                            collection.File.find_and_modify({'_id':node._id},{'$push':{'fs_file_ids':tobjectid}})
-                            print "this file",str(node._id),"succesfully updated"
+        try:
+            nodes = collection.Node.find({'$or':[{ 'mime_type': { '$regex': 'pdf', '$options': 'i' }},{ 'mime_type': { '$regex': 'svg', '$options': 'i' }}]})
+            for each in nodes:
+                node = collection.Node.one({'_id':ObjectId(each['_id'])})
+                if node is not None:
+                    if node.fs_file_ids:
+                        if (node.fs.files.exists(node.fs_file_ids[0])):
+                            if len(node.fs_file_ids) == 1:
+                                grid_fs_obj = node.fs.files.get(ObjectId(node.fs_file_ids[0]))
+                                thumbnail_pdf = convert_pdf_thumbnail(grid_fs_obj,node._id)
+                                tobjectid = node.fs.files.put(thumbnail_pdf.read(), filename=thumbnail_pdf.name)
+                                collection.File.find_and_modify({'_id':node._id},{'$push':{'fs_file_ids':tobjectid}})
+                                print "this file",str(node._id),"succesfully updated"
+                            else:
+                                print "This file's:",str(node._id),"thumbnail already created"
                         else:
-                            print "This file's:",str(node._id),"thumbnail already created"
+                            print "1.this file dont have fs_file_ids[0]"
                     else:
-                        print "1.this file dont have fs_file_ids[0]"
+                        print "2.this file dont have fs_file_ids[0]"
                 else:
-                    print "2.this file dont have fs_file_ids[0]"
-            else:
-                print "incorrect node"
-                
-
+                    print "incorrect node"
+        except Exception as e:
+            print "Error Occured",e
         # --- End of handle() ---
 
 def convert_pdf_thumbnail(files,_id):
