@@ -105,7 +105,9 @@ def page(request, group_id, app_id=None):
           if node is None:
             node = collection.Node.find({'member_of':ObjectId(app_id)})
           for nodes in node:
-            content.append(get_versioned_page(nodes))  
+            node,ver=get_versioned_page(nodes) 
+            content.append(node)  
+
                     
           # rcs content ends here
           return render_to_response("ndf/page_list.html",
@@ -117,17 +119,21 @@ def page(request, group_id, app_id=None):
             )
 
         elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:
+              content =[]
               page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
                                            'group_set': {'$all': [ObjectId(group_id)]},
                                            'status': {'$nin': ['HIDDEN']}
                                        })
-
-              page_nodes.sort('last_update', -1)
+	      for nodes in page_nodes:
+		node,ver=get_page(request,nodes)
+                if node != 'None':
+                	content.append(node)	
+              #page_nodes.sort('last_update', -1)
               page_nodes_count = page_nodes.count()
 
               return render_to_response("ndf/page_list.html",
                                   {
-                                   'page_nodes': page_nodes,'groupid':group_id,'page_nodes_count':  page_nodes_count,'group_id':group_id
+                                   'page_nodes':content,'groupid':group_id,'page_nodes_count':  page_nodes_count,'group_id':group_id
                                   },
                                   context_instance=RequestContext(request))
         
@@ -139,10 +145,15 @@ def page(request, group_id, app_id=None):
             
         else:
           node = collection.Node.one({"_id":ObjectId(app_id)})
-          if node.status == u"DRAFT":
-            page_node,ver = get_versioned_page(node)
-          elif node.status == u"PUBLISHED":
-            page_node = node
+          if Group_node.edit_policy == "EDITABLE_NON_MODERATED":
+            page_node,ver=get_page(request,node)
+          else:
+             #else part is kept for time being until all the groups are implemented
+             if node.status == u"DRAFT":
+            	page_node,ver=get_versioned_page(node)
+             elif node.status == u"PUBLISHED":
+                page_node = node
+
         
         # First time breadcrumbs_list created on click of page details
         breadcrumbs_list = []
@@ -173,7 +184,7 @@ def create_edit_page(request, group_id, node_id=None):
                           'group_id': group_id,
                           'groupid': group_id
                       }
-
+    
     if node_id:
         page_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
@@ -181,6 +192,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     
     if request.method == "POST":
+        
         get_node_common_fields(request, page_node, group_id, gst_page)
 
         page_node.save()
@@ -188,12 +200,14 @@ def create_edit_page(request, group_id, node_id=None):
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
 
     else:
+        
         if node_id:
+            page_node,ver=get_page(request,page_node)
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
 
-           
+        print "would get out of the page  "
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -392,6 +406,9 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
 def publish_page(request,group_id,node):
      
   node=collection.Node.one({'_id':ObjectId(node)})
+  page_node,v=get_page(request,node)
+  node.content = page_node.content
+  node.content_org=page_node.content_org
   node.status=unicode("PUBLISHED")
   node.modified_by = int(request.user.id)
   node.save() 

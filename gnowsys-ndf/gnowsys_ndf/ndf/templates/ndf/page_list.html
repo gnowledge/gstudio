@@ -125,7 +125,7 @@
       <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
       {% endif %}
      {% group_type_info groupid request.user as grouptype %}
-     {% if grouptype == "PUBLIC" or grouptype == "PRIVATE" or grouptype == "Moderated" %}
+     {% if  grouptype == "Moderated" %}
       {% if node.status == "DRAFT" %}
       <a class="button alert tiny" >Under Moderation</a>
       {% endif %}
