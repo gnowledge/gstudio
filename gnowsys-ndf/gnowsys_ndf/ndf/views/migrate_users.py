@@ -31,13 +31,11 @@ def migrate():
             b['id']=max(userids)+1
          a.__dict__=b
          a.save()
-      else:
          bx=User.objects.get(username=each['username'])
          msg=msg1+bx.username+msg2+msg3
-         render = render_to_string("notification/label.html",{'sender':name,'activity':activ,'conjunction':'-','object':'','site':site,'link\
-':''})
+         render = render_to_string("notification/label.html",{'sender':name,'activity':activ,'conjunction':'-','object':'','site':site,'lin#k':''})
          notification.create_notice_type(render, msg, "notification")
-         notification.send([bx], render, {"from_user": sender})
+#         notification.send([bx], render, {"from_user": sender})
    fp.close()
 
 

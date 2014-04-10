@@ -523,14 +523,14 @@ def set_drawer_widget(st,coll_obj_list):
     for each in drawer1:
        dic = {}
        dic['id'] = str(each._id)
-       dic['name'] = str(each.name)
+       dic['name'] = each.name
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
     for each in drawer2:
        dic = {}
        dic['id'] = str(each._id)
-       dic['name'] = str(each.name)
+       dic['name'] = each.name
        d2.append(dic)
     draw2['drawer2'] = d2
     data_list.append(draw2)

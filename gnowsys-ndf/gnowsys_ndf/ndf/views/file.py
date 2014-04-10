@@ -20,6 +20,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 import magic  #for this install python-magic example:pip install python-magic
+import subprocess
 import mimetypes
 from PIL import Image, ImageDraw, ImageFile #install PIL example:pip install PIL
 from StringIO import StringIO
@@ -34,7 +35,7 @@ from django.http import Http404
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 
-from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import Node, GRelation
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
@@ -189,7 +190,7 @@ def submitDoc(request, group_id):
 
         if img_type != "": 
             
-            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id, 'user': usrname, 'uploaded': f}))
+            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id }))
 
         else:
             return HttpResponseRedirect(page_url+'?'+str1)
@@ -233,8 +234,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             
             if access_policy:
                 fileobj.access_policy = unicode(access_policy) # For giving privacy to file objects   
-            if img_type:                
-                fileobj.type_of = ObjectId(img_type)                 # To define type if image is profile_pic      
             
             fileobj.file_size = size
             group_object=fcol.Group.one({'_id':ObjectId(group_id)})
@@ -286,7 +285,14 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
                     # saving webm video id into file object
                     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-
+            
+            '''storing thumbnail of pdf and svg files  in saved object'''        
+            if 'pdf' in filetype or 'svg' in filetype:
+                thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
+                tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
+                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+             
+            
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
                 collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
@@ -331,6 +337,21 @@ def convert_image_thumbnail(files):
     img.save(thumb_io, "JPEG")
     thumb_io.seek(0)
     return thumb_io
+
+def convert_pdf_thumbnail(files,_id):
+    '''
+    convert pdf file's thumnail
+    '''
+    filename = str(_id)
+    os.system("mkdir -p "+ "/tmp"+"/"+filename+"/")
+    fd = open('%s/%s/%s' % (str("/tmp"),str(filename),str(filename)), 'wb')
+    files.seek(0)
+    fd.write(files.read())
+    fd.close()
+    subprocess.check_call(['convert', '-thumbnail', '128x128',str("/tmp/"+filename+"/"+filename+"[0]"),str("/tmp/"+filename+"/"+filename+"-thumbnail.png")])
+    thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
+    return thumb_pdf
+    
 
 def convert_mid_size_image(files):
     '''
@@ -424,9 +445,13 @@ def delete_file(request, group_id, _id):
   """Delete file and its data
   """
   file_collection = db[File.collection_name]
+  auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
   pageurl = request.GET.get("next", "")
   try:
     cur = file_collection.File.one({'_id':ObjectId(_id)})
+    rel_obj = collection.GRelation.one({'subject': ObjectId(auth._id), 'right_subject': ObjectId(_id) })
+    if rel_obj :
+        rel_obj.delete()
     if cur.fs_file_ids:
         for each in cur.fs_file_ids:
             cur.fs.files.delete(each)
@@ -471,9 +496,14 @@ def getFileThumbnail(request, group_id, _id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if file_node is not None:
-        if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
-            f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
-            return HttpResponse(f.read(), content_type=f.content_type)
+        if file_node.fs_file_ids:
+            if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
+                f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
+                return HttpResponse(f.read(), content_type=f.content_type)
+            else:
+                return HttpResponse("")
+        else:
+            return HttpResponse("")
     else:
         return HttpResponse("")
 

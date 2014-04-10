@@ -233,12 +233,14 @@ background-repeat:no-repeat; background-size: 48px 48px
   {% block add_fields %} {% endblock %}
   
   <div class="row" >
-    <input type="submit" id="save-node" value="Save" class="button medium-6 columns"/>
+    <input type="submit" id="save-node" value="Save As Draft" class="button medium-6 columns"/>
   </div>
   
   {% if node %}
   	{% get_publish_policy groupid node as group_policy %}
+
 	{% check_group node as is_group %}
+
   	{% if group_policy == "allow" %}
   	{% if is_group %} 
   
@@ -325,7 +327,23 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% block base_save_on_click %}{% endblock %}
 	});
 
-	$(document).on('opened', '[data-reveal]', function () {  map.invalidateSize();  });
+	$(document).on('opened', '[data-reveal]', function () {  
+	
+		map.invalidateSize();  
+
+		if( tempArr.length )
+    	{
+			var group = new L.featureGroup(tempArr)
+ 				map.fitBounds(group.getBounds());
+ 		}
+	});
+
+	// $(document).on('close', '[data-reveal]', function () {  
+	// 	var mapLng = map.getCenter().lng,
+	// 		mapLat = map.getCenter().lat,
+	// 		mapZoom = map.getZoom();
+	// 	// console.log(mapLng + " lat :" + mapLat + " zoom : " + mapZoom);
+	// });
 
 </script>
 

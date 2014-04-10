@@ -382,10 +382,15 @@ def get_user_group(user):
 def get_profile_pic(user):
 
   ID = User.objects.get(username=user).pk
-  GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
-  prof_pic = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'profile_pic'})._id 
+  auth = collection.Node.one({'_type': u'Group', 'name': unicode(user) })
 
-  prof_pic = collection.GSystem.one({'_type': 'File', 'type_of': ObjectId(prof_pic), 'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 'created_by': int(ID) })  
+  prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+
+  if prof_pic_rel.count() > 0 :
+    index = prof_pic_rel.count() - 1
+    prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+  else:
+    prof_pic = "" 
 
   return prof_pic
 
