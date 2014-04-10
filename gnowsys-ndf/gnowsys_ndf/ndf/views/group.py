@@ -194,7 +194,9 @@ def switch_group(request,group_id,node_id):
             return HttpResponse("Success")
         else:
             coll_obj_list = []
-            st = collection.Node.find({"_type":"Group"})
+            data_list=[]
+            user_id=request.user.id
+            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}}]})
             for each in node.group_set:
                 coll_obj_list.append(collection.Node.one({'_id':each}))
             data_list=set_drawer_widget(st,coll_obj_list)
