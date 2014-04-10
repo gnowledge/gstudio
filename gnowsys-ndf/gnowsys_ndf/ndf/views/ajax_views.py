@@ -602,3 +602,42 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
 
+def deletion_instances(request, group_id):
+    '''                                                                                                                                           delete class's objects                                                                                                                        '''
+    send_dict = []
+    if request.is_ajax() and request.method =="POST":
+       deleteobjects = request.POST['deleteobjects']
+       confirm = request.POST.get("confirm","")
+    for each in  deleteobjects.split(","):
+        delete_list = []
+        node = collection.Node.one({ '_id': ObjectId(each)})
+        left_relations = collection.Node.find({"_type":"GRelation", "subject":node._id})
+        right_relations = collection.Node.find({"_type":"GRelation", "right_subject":node._id})
+        attributes = collection.Node.find({"_type":"GAttribute", "subject":node._id})
+        if confirm:
+            all_associates = list(left_relations)+list(right_relations)+list(attributes)
+            for eachobject in all_associates:
+                eachobject.delete()
+            node.delete()
+        else:
+            if left_relations :
+                list_rel = []
+                for each in left_relations:
+                    rname = collection.Node.find_one({"_id":each.right_subject}).name
+                    list_rel.append(each.relation_type.name+" : "+rname)
+                delete_list.append({'left_relations':list_rel})
+            if right_relations :
+                list_rel = []
+                for each in right_relations:
+                    lname = collection.Node.find_one({"_id":each.subject}).name
+                    list_rel.append(each.relation_type.name+" : "+lname)
+                delete_list.append({'right_relations':list_rel})
+            if attributes :
+                list_att = []
+                for each in attributes:
+                    list_att.append(each.attribute_type.name+" : "+each.object_value)
+                delete_list.append({'attributes':list_att})
+            send_dict.append({"title":node.name,"content":delete_list})
+    if confirm:
+        return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")         
+    return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
