@@ -20,6 +20,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 import magic  #for this install python-magic example:pip install python-magic
+import subprocess
 import mimetypes
 from PIL import Image, ImageDraw, ImageFile #install PIL example:pip install PIL
 from StringIO import StringIO
@@ -284,7 +285,14 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
                     # saving webm video id into file object
                     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-
+            
+            '''storing thumbnail of pdf and svg files  in saved object'''        
+            if 'pdf' in filetype or 'svg' in filetype:
+                thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
+                tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
+                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+             
+            
             '''storing thumbnail of image in saved object'''
             if 'image' in filetype:
                 collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
@@ -329,6 +337,21 @@ def convert_image_thumbnail(files):
     img.save(thumb_io, "JPEG")
     thumb_io.seek(0)
     return thumb_io
+
+def convert_pdf_thumbnail(files,_id):
+    '''
+    convert pdf file's thumnail
+    '''
+    filename = str(_id)
+    os.system("mkdir -p "+ "/tmp"+"/"+filename+"/")
+    fd = open('%s/%s/%s' % (str("/tmp"),str(filename),str(filename)), 'wb')
+    files.seek(0)
+    fd.write(files.read())
+    fd.close()
+    subprocess.check_call(['convert', '-thumbnail', '128x128',str("/tmp/"+filename+"/"+filename+"[0]"),str("/tmp/"+filename+"/"+filename+"-thumbnail.png")])
+    thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
+    return thumb_pdf
+    
 
 def convert_mid_size_image(files):
     '''
