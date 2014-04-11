@@ -809,7 +809,8 @@ class Author(Group):
     """
     structure = {                
         'email': unicode,       
-        'password': unicode 
+        'password': unicode,
+        'visited_location': []
     }
 
     use_dot_notation = True
