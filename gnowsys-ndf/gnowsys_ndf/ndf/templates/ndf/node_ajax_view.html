@@ -91,9 +91,19 @@ background-repeat:no-repeat; background-size: 48px 48px
         {% endif %}
 
         {% if node.mime_type %}
-{% if 'Pandora_video' in node.member_of %}
-       testthecode
-{% endif %}
+       {% if 'Pandora_video' in node.member_of_names_list %}
+       <div>
+       <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+	 <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
+	   Your browser does not support the video tag.
+       </video>
+       </br>
+       <a download="480.webm" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" class="button tiny secondary"> 
+	 <i class="fi-download large"> download </i>
+      </a>
+	
+      </div>
+       {% else %}
        {% if 'video' in node.mime_type %}
        <div>
 	 <video width="640px" controls buffered>
@@ -128,7 +138,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	{% endif %}
 	{% endif %}
-
+       {% endif %}
         {% block add_fields %} {% endblock %}
 
         <ul class="inline-list">
