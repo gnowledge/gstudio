@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load pagination_tags %}
 {% block title %} Admin {% endblock %}
 {% block meta_content %}
      {% ifequal url 'data' %}
@@ -97,7 +98,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 <input type="hidden" name="class" value="{{class_name}}">
 <input type="submit" value="search" style="width:100px;">
 </form>
-
+{% autopaginate nodes 25 %}
 <table >
   <thead>
     <tr>
@@ -170,7 +171,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	{% endfor %}
   </tbody>
 </table>
-
+{% paginate %}
 {% endblock %}
 
 {% block script %}
