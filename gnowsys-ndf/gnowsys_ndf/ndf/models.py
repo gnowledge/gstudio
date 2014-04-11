@@ -92,23 +92,18 @@ ENCRYPTION_POLICY=(
 )
 
 DATA_TYPE_CHOICES = (
-    'None',
-    'bool',
-    'int',
-    'float',
-    'long',
-    'basestring',
-    'unicode',
-    'list',
-    'dict',
-    'datetime.datetime',
-    'bson.binary.Binary',
-    'pymongo.objectid.ObjectId',
-    'bson.dbref.DBRef',
-    'bson.code.Code',
-    'type(re.compile(""))',
-    'uuid.UUID',
-    'CustomType'
+    "None",
+    "bool",
+    "basestring",
+    "unicode",
+    "int",
+    "float",
+    "long",
+    "datetime.datetime",
+    "list",
+    "dict",
+    "ObjectId",
+    "IS()"
 )
 
 #######################################################################################################################################
@@ -484,7 +479,7 @@ class Node(DjangoDocument):
             # Again checking in AttributeType collection - because to collect newly added user-defined attributes, if any!
             collection = get_database()[Node.collection_name]
             attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
-                
+
             for attr in attributes:
                 # Here attr is of type -- AttributeType
                 AttributeType.append_attribute(attr, possible_attributes)
@@ -493,8 +488,7 @@ class Node(DjangoDocument):
             gsystem_type_node = collection.Node.one({'_id': gsystem_type_id}, {'name': 1, 'type_of': 1})
 
             if gsystem_type_node.type_of:
-                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_node.type_of]}})
-                
+                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': gsystem_type_node.type_of}})
                 for attr in attributes:
                     # Here attr is of type -- AttributeType
                     AttributeType.append_attribute(attr, possible_attributes)
@@ -621,7 +615,7 @@ class AttributeType(Node):
                     for c_attr_id in attr_id_or_node.complex_data_type:
                         if not ObjectId.is_valid(c_attr_id):
                             # If basic data-type values are found, pass the iteration
-                            pass
+                            continue
            
                         # If unicode representation of ObjectId is found
                         AttributeType.append_attribute(c_attr_id, attr_dict, attr_value)
@@ -1097,12 +1091,34 @@ class HistoryManager():
         # Converts the json-formatted data into python-specific format
         doc_obj = collection.Node.from_json(json_data)
 
-        # print "\n type of : ", type(doc_obj)
-        # print "\n document object (", version_no, ") \n", doc_obj
-
         rcs.checkin(fp)
+        
+        # Below Code temporary resolves the problem of '$oid'
+        # This problem occurs when we convert mongodb's document into json-format using mongokit's to_json_type() function
+        # - It converts ObjectId() type into corresponding format "{u'$oid': u'24-digit-hexstring'}"
+        # But actual problem comes into picture when we have a field whose data-type is "list of ObjectIds"
+        # In case of '_id' field (automatically created by mongodb), mongokit handles this conversion and does so
+        # But not in case of "list of ObjectIds", it still remains in above given format and causes problem
 
-        return doc_obj 
+        for k, v in doc_obj.iteritems():
+            oid_list_str = ""
+            oid_ObjectId_list = []
+            if v and type(v) == list:
+                oid_list_str = v.__str__()
+                try:
+                    if '$oid' in oid_list_str: #v.__str__():
+
+                        for oid_dict in v:
+                            oid_ObjectId = ObjectId(oid_dict['$oid'])
+                            oid_ObjectId_list.append(oid_ObjectId)
+
+                        doc_obj[k] = oid_ObjectId_list
+
+                except Exception as e:
+                    print "\n Exception for document's ("+doc_obj.name+") key ("+k+") -- ", str(e), "\n"
+
+        return doc_obj
+
 
 #######################################################################################################################################
 #  TRIPLE CLASS DEFINITIONS

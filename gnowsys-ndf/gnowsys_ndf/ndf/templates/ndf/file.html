@@ -99,6 +99,7 @@
  
       {% if files.count != 0 %}
       <!-- Existing card list-->
+      {% autopaginate files 23 %}
       {% for file in files %}      
       {% if file.created_by == request.user.pk %}
 
@@ -196,6 +197,7 @@
       <p><em>Currently NO file uploaded!!!</em></p>
       {% endif %}
     </ul>
+{% paginate %}
   </div>
 
   <!-- Tab View 2 - Documents -->
@@ -205,6 +207,7 @@
 
       {% if docCollection.count != 0 %}
       <!-- Existing card list-->
+      {% autopaginate docCollection 23 %}
       {% for doc in docCollection %}      
       {% if doc.created_by == request.user.pk %}
 
@@ -296,6 +299,7 @@
       <p><em>Currently NO file uploaded!!!</em></p>
       {% endif %}
     </ul>
+{% paginate %}
   </div>
   
   <!-- Tab View #3 - Images -->
@@ -336,7 +340,7 @@
       </li>
 
       {% if imageCollection.count != 0 %}
-
+      {% autopaginate imageCollection 23 %}
       <!-- Existing card list-->
       {% for image in imageCollection %}
       {% get_user_object image.created_by as user_obj %}
@@ -388,6 +392,7 @@
       {% endif %}
 
      </ul>
+{% paginate %}
    </div>
 <!-- Tab View #4 - Videos -->
   <div class="content" id="view-video">
@@ -426,7 +431,7 @@
       </li>
 
       {% if videoCollection.count != 0 %}
-
+      {% autopaginate videoCollection 23 %}
       <!-- Existing card list-->
       {% for video in videoCollection %}
       {% get_user_object video.created_by as user_obj %}
@@ -480,12 +485,14 @@
       {% endif %}
 
     </ul>
+{% paginate %}
   </div>
 
   <!-- Tab View #5 - pandora Videos -->
   <div class="content" id="view-pandora-video">
 {% autopaginate sourceid 23 %}
   
+
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
       <!-- Node create card-->
       <!-- <li class="create card"> -->
