@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load pagination_tags %}
 
 {% block title %} {{ title }} {% endblock %}
 
@@ -30,6 +31,7 @@
 {# template for showing apt_set_instance list #}
 {% if app_set_template %}
 {% if nodes %}
+{% autopaginate nodes 25 %}
 <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
 <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
 <input class="button confirmDeleteObjects" type="button" value="Confirm">
@@ -69,6 +71,7 @@
     {% endfor %}
   </tbody>
 </table>
+{% paginate %}
 {% endif %}
 
 {# template for showing apt_set_instance details #}
