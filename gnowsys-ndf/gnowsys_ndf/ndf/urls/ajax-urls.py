@@ -15,6 +15,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^get_graph_json/', 'graph_nodes', name='get_graph_json'),
                        url(r'^get_data_for_drawer/', 'get_data_for_drawer', name='get_data_for_drawer'),
                        url(r'^get_data_for_drawer_of_attributetype_set/', 'get_data_for_drawer_of_attributetype_set', name='get_data_for_drawer_of_attributetype_set'),
-                       url(r'^get_data_for_drawer_of_relationtype_set/', 'get_data_for_drawer_of_relationtype_set', name='get_data_for_drawer_of_relationtype_set')                       
+                       url(r'^get_data_for_drawer_of_relationtype_set/', 'get_data_for_drawer_of_relationtype_set', name='get_data_for_drawer_of_relationtype_set'),                
+                       url(r'^deletionInstances/', 'deletion_instances', name='deletion_instances')
 
 )

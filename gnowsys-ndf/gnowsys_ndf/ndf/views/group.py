@@ -159,8 +159,6 @@ def group_dashboard(request,group_id=None):
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
-    
-    print"going throught this section"  
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
@@ -184,20 +182,21 @@ def edit_group(request,group_id):
 def switch_group(request,group_id,node_id):
     try:
         node=collection.Node.one({"_id":ObjectId(node_id)})
-        print "method=",request.method
         if request.method == "POST":
-            new_groups=request.POST.get('new_grps',"")
-            print "newgrps",new_groups
-            for each in new_groups:
-                print "each id",each
-                if ObjectId(each) not in node.group_set:
-                    node.group_set.append(ObjectId(each));
-            node.save()
+            new_grps = request.POST['new_grps']
+            new_grps_list=new_grps.split(",")
+            if new_grps_list:
+                for each in new_grps_list:
+                    if each:
+                        if ObjectId(each) not in node.group_set:
+                            node.group_set.append(ObjectId(each));
+                node.save()
             return HttpResponse("Success")
         else:
             coll_obj_list = []
-            st = collection.Node.find({"_type":"Group"})
-
+            data_list=[]
+            user_id=request.user.id
+            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}}]})
             for each in node.group_set:
                 coll_obj_list.append(collection.Node.one({'_id':each}))
             data_list=set_drawer_widget(st,coll_obj_list)
