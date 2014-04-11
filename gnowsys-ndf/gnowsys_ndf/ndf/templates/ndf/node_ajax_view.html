@@ -293,6 +293,7 @@ $.ajax({
                               },
         success: function(data){
                        alert("Successfully switched groups");
+                       $('.close-reveal-modal.st').trigger('click');
            },
        complete: function(){
                     $("#ajax_load_image").hide();
