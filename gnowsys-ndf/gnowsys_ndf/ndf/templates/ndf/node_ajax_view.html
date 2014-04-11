@@ -234,9 +234,14 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     {% check_group node as is_group %}
 
-    {% if is_group %}    
+    {% if is_group %}
+
+             {% get_user_object node.created_by as created_user %}
+
+             {% ifequal created_user request.user %}     
        
-      <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+      <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
+         {% endifequal %}
 
     {% else %}
 
@@ -322,6 +327,7 @@ $.ajax({
                               },
         success: function(data){
                        alert("Successfully switched groups");
+                       $('.close-reveal-modal.st').trigger('click');
            },
        complete: function(){
                     $("#ajax_load_image").hide();
