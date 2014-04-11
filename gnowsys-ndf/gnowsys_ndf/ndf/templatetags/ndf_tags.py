@@ -541,13 +541,13 @@ def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
 @register.inclusion_tag('ndf/admin_fields.html')
-def get_input_fields(fields_type,fields_name):
+def get_input_fields(fields_type,fields_name,translate=None):
   """Get html tags 
   """
   field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
   return {'template': 'ndf/admin_fields.html', 
           "fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
-          "field_type_list":field_type_list}
+          "field_type_list":field_type_list,"translate":translate}
   
 
 @register.assignment_tag

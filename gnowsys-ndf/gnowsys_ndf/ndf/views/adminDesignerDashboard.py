@@ -86,7 +86,8 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     contentlist = []
     dependencylist = []
     options = []
-
+    translate=request.GET.get('translate','')
+    print translate,"trans"
     if class_name == "AttributeType":
         definitionlist = ['name','altnames','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
@@ -232,17 +233,18 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     variable = None
     class_structure_with_values = {}
     if node_id:
+        
         for key, value in class_structure.items():
             class_structure_with_values[key] = [class_structure[key][0], new_instance_type[key]]
 
         variable = RequestContext(request, {'node': new_instance_type,
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
-                                            'options': options, 'required_fields': required_fields,
+                                            'options': options, 'required_fields': required_fields,"translate":translate,
                                             'groupid': groupid
                                         })
     else:
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid})
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate})
 
     return render_to_response(template, variable)
 
