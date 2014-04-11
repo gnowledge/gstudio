@@ -327,22 +327,46 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% block base_save_on_click %}{% endblock %}
 	});
 
-	$(document).on('opened', '[data-reveal]', function () {  
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
 	
 		map.invalidateSize();  
 
-		if( tempArr.length )
-    	{
-			var group = new L.featureGroup(tempArr)
- 				map.fitBounds(group.getBounds());
- 		}
+	    var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	    	    
+	    if(lastVisitedLocationVal){
+
+	    	if( !lastVisitedLocationVal[0]=="["){ "["+(lastVisitedLocationVal)+"]"}
+	    	lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal.toString());
+	    	console.log(lastVisitedLocationVal);
+	    	var zoom = lastVisitedLocationVal.pop(),
+	    		lng = lastVisitedLocationVal.pop(),
+	    		lat = lastVisitedLocationVal.pop();
+	    	map.setView([lat, lng], zoom);
+    	}
+
+		// if(lastVisitedLocationVal){
+
+		// 	var zoom = lastVisitedLocationVal.pop();
+
+		// 	map.setView(lastVisitedLocationVal, zoom);
+		// }
+
+		// if( tempArr.length )
+  		//   	{
+		// 	var group = new L.featureGroup(tempArr)
+ 		// 			map.fitBounds(group.getBounds());
+ 		// 	}
+
+ 		// map.setView([lat, lng], zoom); 		
 	});
 
-	// $(document).on('close', '[data-reveal]', function () {  
-	// 	var mapLng = map.getCenter().lng,
-	// 		mapLat = map.getCenter().lat,
-	// 		mapZoom = map.getZoom();
-	// 	// console.log(mapLng + " lat :" + mapLat + " zoom : " + mapZoom);
+	// $(document).on('close', '#view-map-edit-widget[data-reveal]', function () {  
+	// 	var mapZoom = map.getZoom();
+	// 	var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	// 	lastVisitedLocationVal = JSON.parse("["+lastVisitedLocationVal+"]");
+	// 	lastVisitedLocationVal.pop();
+	// 	lastVisitedLocationVal.push(mapZoom)
+	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
 
 </script>

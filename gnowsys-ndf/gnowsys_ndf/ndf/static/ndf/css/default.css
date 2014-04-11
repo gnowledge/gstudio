@@ -584,12 +584,12 @@ input.node-title {
   padding: 0.25em 0;
 }
 
-#view-map-widget .close-reveal-modal{
-  z-index:1; background-color: #D3D3D3; padding: 0 10px 5px;
+#view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal{
+  z-index:1; background-color: captiontext; padding: 5px 15px 10px; color:white !important; opacity:0.8; font-size: 2rem; box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-#view-map-widget .close-reveal-modal:hover{
-background-color: white; border-radius: 10px; padding: 0 10px 5px;	
+#view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover{
+background-color: white; border-radius: 30px; padding: 5px 15px 10px; transition:2s; opacity:1; color:black !important; font-size: 2rem;
 }
 
 /* Splash Page */

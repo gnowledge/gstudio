@@ -320,15 +320,30 @@ $.ajax({
 });  //end of document click
 
 
-  $(document).on('opened', '[data-reveal]', function () {  
+  $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
       
     map.invalidateSize();  
 
-    if( tempArr.length )
-    {
-      var group = new L.featureGroup(tempArr)
-          map.fitBounds(group.getBounds());
+    var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+
+    if(lastVisitedLocationVal){
+
+      lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+      var zoom = lastVisitedLocationVal.pop(),
+          lng = lastVisitedLocationVal.pop(),
+          lat = lastVisitedLocationVal.pop();
+        map.setView([lat, lng], zoom);
     }
+
+
+    // if( tempArr.length )
+    // {
+    //   var group = new L.featureGroup(tempArr)
+    //       map.fitBounds(group.getBounds());
+    // }
+
+    // map.setView([lat, lng], zoom);
+
   });
 
 
