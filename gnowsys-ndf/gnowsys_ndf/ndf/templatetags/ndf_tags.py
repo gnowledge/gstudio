@@ -565,11 +565,12 @@ def group_type_info(groupid,user=0):
       
 @register.assignment_tag
 def user_access_policy(node,user):
+  
   col_Group=db[Group.collection_name]
   group_gst = col_Group.Group.one({'_id':ObjectId(node)})
-	    
   # if user.id in group_gst.group_set or group_gst.created_by == user.id:
   if user.id in group_gst.author_set or group_gst.created_by == user.id:
+    
     return 'allow'
 	    
 	  
@@ -663,11 +664,12 @@ def Group_Editing_policy(groupid,node,user):
 
 
 @register.assignment_tag
-def get_publish_policy(groupid,resnode):
-  col_Group = db[Group.collection_name]
-  node=col_Group.Group.one({"_id":ObjectId(groupid)})
-  group_type=group_type_info(groupid)
-  print 
+def get_publish_policy(request,groupid,resnode):
+ col_Group = db[Group.collection_name]
+ node=col_Group.Group.one({"_id":ObjectId(groupid)})
+ group_type=group_type_info(groupid)
+ if request.user.id:
+   
   if group_type == "Moderated":
      base_group=get_prior_post_node(groupid)
 
@@ -676,13 +678,20 @@ def get_publish_policy(groupid,resnode):
            return "allow"
            
   elif node.edit_policy == "NON_EDITABLE":
-       return "allow"    
-  elif node.edit_policy == "EDITABLE_NON_MODERATED":
       if resnode.status == "DRAFT": 
-         return "allow"
-  elif group_type is  None:
-     print  "node status",resnode.status
-     if resnode.status == "DRAFT":
-        print " as;ldfkjdas;flj;slajf"
-        return "allow"
+         return "allow"    
+  elif node.edit_policy == "EDITABLE_NON_MODERATED":
+      group=user_access_policy(groupid,request.user)
+      #condition for groups
+      ver=node.current_version
+      if node._type == "Group" and ver == "1.1":
+        return "stop"
+      if group == "allow":
+        if resnode.status == "DRAFT": 
+          return "allow"
+  #elif group_type is  None:
+  #  group=user_access_policy(groupid,request.user)
+  #  if group == "allow":
+  #   if resnode.status == "DRAFT":
+  #      return "allow"
       

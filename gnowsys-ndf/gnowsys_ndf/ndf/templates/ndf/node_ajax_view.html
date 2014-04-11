@@ -199,14 +199,13 @@ background-repeat:no-repeat; background-size: 48px 48px
     {% endif %}
    
     {% if node %}
-     {% get_publish_policy groupid node as group_policy %}
-
-      	{% check_group node as is_group %}
+     {% get_publish_policy request groupid node as group_policy %}
+        {% check_group node as is_group %}
 
   	{% if group_policy == "allow" %}
   	{% if is_group %} 
    <div>
-   <a class="button small" href="{% url 'publish_page'  group_id node %}"> Publish </a>
+   <a class="button small" href="{% url 'publish_group'  group_id node %}"> Publish </a>
     </a>
    </div>
   	{% else %}
