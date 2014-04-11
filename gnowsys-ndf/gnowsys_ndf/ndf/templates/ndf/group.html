@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load pagination_tags %}
 {% block title %} Group {% endblock %}
 
 {% block meta_content %}
@@ -71,7 +72,7 @@
   {% if groups == "None" %}
   <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
   {% else %}
-
+{% autopaginate groups 	23 %}
   {% for node in groups %}
   {% if node.name != request.user.username %}
   
@@ -112,4 +113,5 @@
   {% endif %}
   
 </ul>
+{% paginate %}
 {% endblock %}

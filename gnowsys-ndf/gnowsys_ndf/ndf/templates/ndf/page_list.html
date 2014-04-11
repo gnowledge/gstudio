@@ -1,6 +1,7 @@
 {% extends "ndf/base.html" %}
 {% block title %} {{title}} {% endblock %}
 {% load ndf_tags %}
+{% load pagination_tags %}
 {% block help_topics %}
 <li><a href="#">Pages Introduction</a></li>
 <li><a href="#">Working with Pages</a></li>
@@ -89,7 +90,7 @@
     </div>
   </li>
 
-
+{% autopaginate page_nodes 23 %}
     <!-- Existing card list-->
     {% for node in page_nodes %}
         
@@ -200,6 +201,6 @@
 
 {% endfor %}
 </ul>
-
+{% paginate %}
 {% endblock %}
 
