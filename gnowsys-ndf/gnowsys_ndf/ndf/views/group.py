@@ -182,14 +182,15 @@ def edit_group(request,group_id):
 def switch_group(request,group_id,node_id):
     try:
         node=collection.Node.one({"_id":ObjectId(node_id)})
+        exstng_grps=node.group_set
         if request.method == "POST":
+            node.group_set=[]
             new_grps = request.POST['new_grps']
             new_grps_list=new_grps.split(",")
             if new_grps_list:
                 for each in new_grps_list:
                     if each:
-                        if ObjectId(each) not in node.group_set:
-                            node.group_set.append(ObjectId(each));
+                        node.group_set.append(ObjectId(each));
                 node.save()
             return HttpResponse("Success")
         else:
