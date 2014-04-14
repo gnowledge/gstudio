@@ -162,7 +162,7 @@ INSTALLED_APPS = (
     'notification',
     'pagination',
     'gnowsys_ndf.mobwrite',	#textb
-    'south',			#textb
+#    'south',			#textb
     'django_extensions',	#textb
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
