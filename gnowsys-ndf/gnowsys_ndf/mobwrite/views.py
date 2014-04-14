@@ -38,7 +38,7 @@ def mobwrite(request):
     if not settings.DEBUG:
         models.mobwrite_core.LOG.setLevel(models.mobwrite_core.logging.ERROR)
     mobwrite = models.DjangoMobWrite()
-    q = urllib.unquote(request.raw_post_data)
+    q = urllib.unquote(request.body)
     mode = None
     if q.find("p=") == 0:
         mode = "script"
