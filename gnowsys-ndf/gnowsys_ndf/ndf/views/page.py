@@ -164,18 +164,24 @@ def page(request, group_id, app_id=None):
         # for each in page_node.location:
         #   location.append(json.dumps(each))
 
-        usrid = int(request.user.id)
-        usrname = unicode(request.user.username)
+        usrid = request.user.id
+        visited_location = ""
+
+        if(usrid):
+
+          usrid = int(request.user.id)
+          usrname = unicode(request.user.username)
         
-        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+          author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+          user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+          visited_location = user_group_location.visited_location
 
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'groupid':group_id,
                                     'breadcrumbs_list': breadcrumbs_list,
-                                    'visited_location': user_group_location.visited_location,
+                                    'visited_location': visited_location,
                                     # 'location': location
                                   },
                                   context_instance = RequestContext(request)

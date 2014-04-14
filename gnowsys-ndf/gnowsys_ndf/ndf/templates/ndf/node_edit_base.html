@@ -327,22 +327,73 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% block base_save_on_click %}{% endblock %}
 	});
 
+
+  $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+    
+    $.ajax({
+  url: "{% url 'get_visited_location' groupid %}",
+  success: function(data){ 
+   {% if visited_location %}
+
+    data = {{visited_location}};
+
+     var lastVisitedLocationVal = data;
+    if(lastVisitedLocationVal){
+
+      if(lastVisitedLocationVal == "[]"){
+        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+      }
+
+      if(lastVisitedLocationVal.length > 0){
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+              map.setView([lat, lng], zoom);
+            }
+    }
+
+    {% else %}
+
+    if( tempArr.length )
+    {
+      var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+    }
+
+    {% endif %}
+  }
+});
+
+  });
+
 	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
 	
 		map.invalidateSize();  
 
-	    var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
-	    	    
-	    if(lastVisitedLocationVal){
+	    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
+	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.startsWith("["))){
+	    	
+	    // 	lastVisitedLocationVal = "[" + lastVisitedLocationVal;
+	    // }
+	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.endsWith("]"))){
+	    	
+	    // 	lastVisitedLocationVal += "]";
+	    // }
+	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
+	    // if(lastVisitedLocationVal){
 
-	    	if( !lastVisitedLocationVal[0]=="["){ "["+(lastVisitedLocationVal)+"]"}
-	    	lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal.toString());
-	    	console.log(lastVisitedLocationVal);
-	    	var zoom = lastVisitedLocationVal.pop(),
-	    		lng = lastVisitedLocationVal.pop(),
-	    		lat = lastVisitedLocationVal.pop();
-	    	map.setView([lat, lng], zoom);
-    	}
+	    // 	if(lastVisitedLocationVal == "[]"){
+     //    lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+     //  }
+     //  if(lastVisitedLocationVal.length > 0){
+     //        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+     //        var zoom = lastVisitedLocationVal.pop(),
+     //            lng = lastVisitedLocationVal[1],
+     //            lat = lastVisitedLocationVal[0];
+     //          map.setView([lat, lng], zoom);}
+    	// }
 
 		// if(lastVisitedLocationVal){
 
