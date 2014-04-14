@@ -145,7 +145,7 @@ def page(request, group_id, app_id=None):
             
         else:
           node = collection.Node.one({"_id":ObjectId(app_id)})
-          if Group_node.edit_policy == "EDITABLE_NON_MODERATED":
+          if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None:
             page_node,ver=get_page(request,node)
           else:
              #else part is kept for time being until all the groups are implemented
@@ -412,7 +412,7 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         return ""
         
 def publish_page(request,group_id,node):
-     
+  print "getting in tite"   
   node=collection.Node.one({'_id':ObjectId(node)})
   page_node,v=get_page(request,node)
   node.content = page_node.content
@@ -425,3 +425,9 @@ def publish_page(request,group_id,node):
    # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
 
   return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
+
+  
+  
+  
+  
+  
