@@ -80,23 +80,10 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% endblock %}
 
 {% block shelf_content %}
-<h4 class="text-center">Shelf</h4>
-<dl id="shelf-items" class="accordion" data-accordion>
-<!-- Adding new shelf text input and add button -->
-  <dd>  
-    <div class="row">
-      <div class="row collapse">
-        <div class="small-10 columns">
-          <input type="text" id="new-shelf-text" onkeyup="(this.value).trim().length?$('#add-shelf-btn').removeClass('disabled'):$('#add-shelf-btn').addClass('disabled');" placeholder="Add new shelf">
-        </div>
-        <div class="small-2 columns">
-          <div onclick="$(this).hasClass('disabled')?'':addNewShelf($('#new-shelf-text').val().trim())" id="add-shelf-btn" class="button postfix disabled">Add</div>
-        </div>
-      </div>
-    </div>
-  </dd>
 
-</dl>
+<div id="shelf">
+    {% include "ndf/shelf.html" %}  
+</div>
 
 {% endblock %}
 

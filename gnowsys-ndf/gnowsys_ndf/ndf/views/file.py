@@ -35,7 +35,7 @@ from django.http import Http404
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 
-from gnowsys_ndf.ndf.models import Node, GRelation
+from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
@@ -44,6 +44,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 db = get_database()
 collection = db[Node.collection_name]
+collection_tr = db[Triple.collection_name]
 GST_FILE = collection.GSystemType.one({'name': GAPPS[1], '_type':'GSystemType'})
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
@@ -481,10 +482,35 @@ def file_detail(request, group_id, _id):
 
     breadcrumbs_list = []
     breadcrumbs_list.append(( str(file_node._id), file_node.name ))
+
+    auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) }) 
+
+    has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+    dbref_has_shelf = has_shelf_RT.get_dbref()
+
+    shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+    shelves = []
+    shelf_list = {}
+
+    if shelf:
+        for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+            shelves.append(shelf_name)
+
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+                shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                shelf_list[shelf_name.name].append(shelf_item.name)
+                
+    else:
+        shelves = []
+
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
                                 'groupid':group_id,
+                                'shelf_list': shelf_list,
+                                'shelves': shelves, 
                                 'breadcrumbs_list': breadcrumbs_list
                               },
                               context_instance = RequestContext(request)
