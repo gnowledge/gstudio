@@ -668,22 +668,24 @@ def get_publish_policy(request,groupid,resnode):
  col_Group = db[Group.collection_name]
  node=col_Group.Group.one({"_id":ObjectId(groupid)})
  group_type=group_type_info(groupid)
+ group=user_access_policy(groupid,request.user)
+ ver=node.current_version
  if request.user.id:
    
   if group_type == "Moderated":
      base_group=get_prior_post_node(groupid)
-
      if base_group is not None:
        if base_group.status == "DRAFT" or node.status == "DRAFT":
            return "allow"
            
   elif node.edit_policy == "NON_EDITABLE":
-      if resnode.status == "DRAFT": 
+    if node._type == "Group" and ver == "1.1":
+        return "stop"
+    if group == "allow":     
+     if resnode.status == "DRAFT": 
          return "allow"    
   elif node.edit_policy == "EDITABLE_NON_MODERATED":
-      group=user_access_policy(groupid,request.user)
       #condition for groups
-      ver=node.current_version
       if node._type == "Group" and ver == "1.1":
         return "stop"
       if group == "allow":
