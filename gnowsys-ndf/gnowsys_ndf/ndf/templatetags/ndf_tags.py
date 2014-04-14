@@ -690,5 +690,5 @@ def mongo_id(value):
             value = value['_id']
    
     # Return value
-    return unicode(str(value['_id']))
+    return unicode(str(value))
 #textb 

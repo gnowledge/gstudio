@@ -1,12 +1,35 @@
+{% load ndf_tags %}
+
 <!-- orgitdown! -->
 <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
 <!-- orgitdown! toolbar settings -->
 <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
 <!-- orgitdown! skin -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
-
+{% if node_id %}
+	<!-- start of mobwrite -->
+	<script src="/static/js/mobwrite/diff_match_patch.js"></script>
+	<script src="/static/js/mobwrite/core.js"></script>
+	<script src="/static/js/mobwrite/form.js"></script>
+	<script src="/static/js/mobwrite/iframe.js"></script>
+	<script>
+	mobwrite.syncGateway = '/mobwrite/';
+	$(function(){
+	        mobwrite.share('{{node_id|mongo_id}}');
+	});
+	</script>
+{% endif %}
+<!-- end of mobwrite -->
+{{node_id}}kh
+{% if node_id %}
+<textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}">{{var_value}}</textarea>
+{% else %}
 <textarea id="orgitdown_{{var_name}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}">{{var_value}}</textarea>
-
+{% endif %}
 <script>
+{% if node_id %}
+  $("#{{node_id|mongo_id}}").orgitdown(mySettings);
+{% else %}
   $("#orgitdown_{{var_name}}").orgitdown(mySettings);
+{% endif %}
 </script>

@@ -160,7 +160,7 @@ INSTALLED_APPS = (
     'registration',
     'djangoratings',
     'notification',
-    'pagination'
+    'pagination',
     'gnowsys_ndf.mobwrite',	#textb
     'south',			#textb
     'django_extensions',	#textb
