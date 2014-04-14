@@ -403,10 +403,10 @@ class Node(DjangoDocument):
     ##########  User-Defined Functions ##########
 
     def get_possible_attributes(self, gsystem_type_id_or_list):
-        """Returns user-defined attribute(s) of given node which belongs to either given list of / single GType(s).
+        """Returns user-defined attribute(s) of given node which belongs to either given single/list of GType(s).
 
         Keyword arguments:
-        gsystem_type_id_or_list -- List of / Single ObjectId(s) of GSystemTypes' to which the given node (self) belongs
+        gsystem_type_id_or_list -- Single/List of ObjectId(s) of GSystemTypes' to which the given node (self) belongs
   
         If node (self) has '_id' -- Node is created; indicating possible attributes needs to be searched under GAttribute collection & return 
         value of those attributes (previously existing) as part of the list along with attribute-data_type
@@ -414,33 +414,18 @@ class Node(DjangoDocument):
         Else -- Node needs to be created; indicating possible attributes needs to be searched under AttributeType collection & return default 
         value 'None' of those attributes as part of the list along with attribute-data_type
   
-        Returns: a dictionary which consists of key as attribute-name and value as list of attribute-data-type and attribute-value
-  
-        Example:
-        
-        (1) For attributes with basic data-type:
-        - first_name: basestring
-        - last_name: basetsring
-        
+        Returns: 
+        Dictionary that holds follwoing details:-
+        Key -- Name of the attribute
+        Value -- It's again a dictionary that holds key and values as shown below:
         {
-          u'first_name': [basestring, <<None/actual-object-value>>]
-          u'last_name': [basestring, <<None/actual-object-value>>]
+          'attribute-type-name': {
+              'altnames': Value of AttributeType node's altnames field,
+              'data_type': Value of AttributeType node's data_type field,
+              'object_value': Value of GAttribute node's object_value field
+          }
         }
-      
-        (2) For attributes with complex data-type:
-        - person_name: {
-                         first_name: basestring,
-                         last_name: basestring
-                       }
-        - documents: [ObjectId]
-      
-        {
-          u'person_name': {
-                            u'first_name': [basestring, <<None/actual-object-value>>]
-                            u'last_name': [basestring, <<None/actual-object-value>>]
-                          }
-          u'documents': [[ObjectId], <<None/actual-object-value>>],
-        }
+        
         """
 
         gsystem_type_list = []
@@ -493,10 +478,10 @@ class Node(DjangoDocument):
 
 
     def get_possible_relations(self, gsystem_type_id_or_list):
-        """Returns relation(s) of given node which belongs to either given list of GTypes or given single GType.
+        """Returns relation(s) of given node which belongs to either given single/list of GType(s).
 
         Keyword arguments:
-        gsystem_type_id_or_list -- List of / Single ObjectId(s) of GTypes' to which the given node (self) belongs
+        gsystem_type_id_or_list -- Single/List of ObjectId(s) of GTypes' to which the given node (self) belongs
   
         If node (self) has '_id' -- Node is created; indicating possible relations need to be searched under GRelation collection & return 
         value of those relations (previously existing) as part of the dict along with relation-type details ('object_type' and 'inverse_name')
@@ -510,6 +495,7 @@ class Node(DjangoDocument):
         Value -- It's again a dictionary that holds key and values as shown below:
         {
           'relation-type-name': {
+              'altnames': Value of RelationType node's altnames field,
               'object_type': Value of RelationType node's object_type field,
               'inverse_name': Value of RelationType node's inverse_name field,
               'right_subject': Value of GRelation node's right_subject field
@@ -634,9 +620,15 @@ class AttributeType(Node):
                 if not inner_attr_dict.has_key(attr_id_or_node.name):
                     # If inner_attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
                     if attr_value is None:
-                        inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value]
+                        inner_attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                                 'data_type': eval(attr_id_or_node.data_type), 
+                                                                 'object_value': attr_value
+                                                                }
                     else:
-                        inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value[attr_id_or_node.name]]
+                        inner_attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                                 'data_type': eval(attr_id_or_node.data_type), 
+                                                                 'object_value': attr_value[attr_id_or_node.name]
+                                                                }
                 
                 if attr_dict.has_key(attr_id_or_node.name):
                     # If this attribute-node exists in outer attr_dict, then remove it
@@ -646,7 +638,10 @@ class AttributeType(Node):
                 # If inner_attr_dict is None
                 if not attr_dict.has_key(attr_id_or_node.name):
                     # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                    attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value]
+                    attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                       'data_type': eval(attr_id_or_node.data_type), 
+                                                       'object_value': attr_value
+                                                      }
 
         else:
             # Code for complex data-type 
@@ -677,7 +672,10 @@ class AttributeType(Node):
                     dt = unicode("[" + attr_id_or_node.complex_data_type[0] + "]")
                     if not attr_dict.has_key(attr_id_or_node.name):
                         # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                        attr_dict[attr_id_or_node.name] = [eval(dt), attr_value]
+                        attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                           'data_type': eval(dt), 
+                                                           'object_value': attr_value
+                                                          }
                     
                 else:
                     # Represents list of complex data-types
@@ -702,7 +700,10 @@ class AttributeType(Node):
 
                 if not attr_dict.has_key(attr_id_or_node.name):
                     # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                    attr_dict[attr_id_or_node.name] = [eval(dt), attr_value]
+                    attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                       'data_type': eval(dt), 
+                                                       'object_value': attr_value
+                                                      }
 
 
 @connection.register
@@ -741,6 +742,7 @@ class RelationType(Node):
         Value -- It's again a dictionary that holds key and values as shown below:
         {
           'relation-type-name': {
+              'altnames': Value of RelationType node's altnames field,
               'object_type': Value of RelationType node's object_type field,
               'inverse_name': Value of RelationType node's inverse_name field,
               'right_subject': Value of GRelation node's right_subject field
@@ -754,6 +756,7 @@ class RelationType(Node):
 
         if not rel_dict.has_key(rel_type_node.name):
             rel_dict[rel_type_node.name] = {
+                'altnames': rel_type_node.altnames,
                 'object_type': rel_type_node.object_type,
                 'inverse_name': rel_type_node.inverse_name,
                 'right_subject': right_subject_node
