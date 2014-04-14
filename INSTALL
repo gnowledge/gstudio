@@ -2,6 +2,17 @@
 	** INSTALLATIONS REQUIRED FOR GSTUDIO-MONGOKIT
 #############################################################################################################
 
+Need python, pip and virtualenv:
+    apt-get install python-setuptools git
+    east_install pip
+    pip install virtualenv
+
+Get:
+    git clone git@github.com:gnowledge/gstudio.git
+    cd gstudio
+    virtualenv --system-site-packages .
+    ./bin/pip install -r requirements.txt
+
 
 To start with, first install python development package, MongoDB, git (distributed version control system) and
 Revision Control System (RCS) using follwoing commands:

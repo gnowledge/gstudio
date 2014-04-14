@@ -1,0 +1,15 @@
+django
+django-mongokit
+django-registration
+django-ratings
+django-pagination
+django-notification
+python-magic
+PIL
+ox
+django-passwords
+South==0.8.4
+django-extensions==1.3.3
+django-reversion==1.8.0
+gunicorn
+markdown
