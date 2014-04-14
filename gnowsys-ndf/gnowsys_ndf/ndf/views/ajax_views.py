@@ -11,6 +11,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 import ast
 
@@ -602,6 +603,7 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
 
+@login_required
 def deletion_instances(request, group_id):
     '''                                                                                                                                           delete class's objects                                                                                                                        '''
     send_dict = []

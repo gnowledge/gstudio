@@ -41,7 +41,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 
 {% block body_content %} 
- {% if class_name == "GSystemType"  %}
 <div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
      <p>Hold down "Control", to select more than one.</p>
      <h2>Select Groups</h2>
@@ -53,6 +52,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <font style="font-size:12px;font-weight:bold;" id="viewgrouplist"></font>
      <a class="close-reveal-modal">&#215;</a>
 </div>
+ {% if class_name == "GSystemType"  %}
 
 <div id="mySystemtype" class="reveal-modal" data-reveal >
      <h2>Select Collections</h2>
@@ -333,7 +333,7 @@ var objectid = $(this).attr("name");
         $(".button.editobject").show();
 });
 
- {% if class_name == "GSystemType"  %}
+
 $(document).on('focus',".group input",function(){
         baseobject = $(this);
         fontelement = $(".group font.viewinput"+global_object_id);
@@ -363,7 +363,7 @@ $(document).on('focus',".group input",function(){
                   $('#viewgrouplist').text(str1);
                   });
 });
-
+ {% if class_name == "GSystemType"  %}
 $(document).on('focus',".collection_set input",function(){
       var data_list = []
       var obj = $(this);
