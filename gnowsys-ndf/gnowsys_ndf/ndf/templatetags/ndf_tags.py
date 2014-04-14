@@ -679,14 +679,14 @@ def get_publish_policy(request,groupid,resnode):
            return "allow"
            
   elif node.edit_policy == "NON_EDITABLE":
-    if node._type == "Group" and ver == "1.1":
+    if node._type == "Group" and ver == "1.1" and node.created_by != request.user.id :
         return "stop"
-    if group == "allow":     
+    if group == "allow":          
      if resnode.status == "DRAFT": 
          return "allow"    
   elif node.edit_policy == "EDITABLE_NON_MODERATED":
       #condition for groups
-      if node._type == "Group" and ver == "1.1":
+      if node._type == "Group" and ver == "1.1" or  node.created_by != request.user.id:
         return "stop"
       if group == "allow":
         if resnode.status == "DRAFT": 
