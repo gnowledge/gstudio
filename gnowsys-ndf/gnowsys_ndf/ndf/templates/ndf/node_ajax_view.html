@@ -47,7 +47,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     <h2>
       <span class='node'>{{node.name}}</span>      <small class="label-list"> 
       {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span> 
+      <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
       {% endfor %}
     </small>      
   </h2>
@@ -333,11 +333,10 @@ $.ajax({
   url: "{% url 'get_visited_location' groupid %}",
   success: function(data){ 
 
-    {% if visited_location %}
+    data = JSON.parse(data);
 
-    data = {{visited_location}};
-
-     var lastVisitedLocationVal = data;
+    var lastVisitedLocationVal = data;
+    
     if(lastVisitedLocationVal){
 
       if(lastVisitedLocationVal == "[]"){
@@ -352,16 +351,12 @@ $.ajax({
               map.setView([lat, lng], zoom);
             }
     }
-
-    {% else %}
-
-    if( tempArr.length )
+    else if( tempArr.length )
     {
       var group = new L.featureGroup(tempArr)
           map.fitBounds(group.getBounds());
     }
 
-    {% endif %}
   }
 });
 

@@ -111,7 +111,7 @@
           <header>
               <div class="label-list">
                 {% for tag in file.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
@@ -155,7 +155,7 @@
           <header>
             <div class="label-list">
               {% for tag in file.tags %}
-              <span class="label">{{tag}}</span>
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
               {% endfor %}
             </div>
         
@@ -219,7 +219,7 @@
           <header>
               <div class="label-list">
                 {% for tag in doc.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
@@ -260,7 +260,7 @@
           <header>
             <div class="label-list">
               {% for tag in doc.tags %}
-              <span class="label">{{tag}}</span>
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
               {% endfor %}
             </div>
         
@@ -352,7 +352,7 @@
 
               <div class="label-list">
                 {% for tag in image.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
@@ -443,7 +443,7 @@
 
               <div class="label-list">
                 {% for tag in video.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 
