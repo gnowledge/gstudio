@@ -11,6 +11,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 import ast
 
@@ -602,6 +603,7 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
 
+@login_required
 def deletion_instances(request, group_id):
     '''                                                                                                                                           delete class's objects                                                                                                                        '''
     send_dict = []
@@ -641,3 +643,19 @@ def deletion_instances(request, group_id):
     if confirm:
         return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")         
     return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
+
+def get_visited_location(request, group_id):
+
+  usrid = request.user.id
+  visited_location = ""
+
+  if(usrid):
+
+    usrid = int(request.user.id)
+    usrname = unicode(request.user.username)
+        
+    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    visited_location = user_group_location.visited_location
+  
+  return StreamingHttpResponse({'visited_location': visited_location})

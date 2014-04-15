@@ -70,6 +70,19 @@ def group(request, group_id,app_id):
 
 
 def create_group(request,group_id):
+
+    usrid = request.user.id
+    visited_location = ""
+
+    if(usrid):
+
+        usrid = int(request.user.id)
+        usrname = unicode(request.user.username)
+        
+        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+        visited_location = user_group_location.visited_location
+
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
@@ -107,7 +120,7 @@ def create_group(request,group_id):
             colg.post_node.append(Mod_colg._id)
             colg.save()
 
-        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id},context_instance=RequestContext(request))
+        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id, 'visited_location':visited_location},context_instance=RequestContext(request))
 
     return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
     
@@ -123,6 +136,20 @@ def create_group(request,group_id):
 
 
 def group_dashboard(request,group_id=None):
+
+    # for getting last accessed location of user    
+    usrid = request.user.id
+    visited_location = ""
+
+    if(usrid):
+
+        usrid = int(request.user.id)
+        usrname = unicode(request.user.username)
+        
+        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+        visited_location = user_group_location.visited_location
+
     try:
         groupobj="" 
         grpid=""
@@ -153,13 +180,28 @@ def group_dashboard(request,group_id=None):
     
     return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
                                                          'group_id':grpid, 'user':request.user, 
-                                                         'breadcrumbs_list': breadcrumbs_list
+                                                         'breadcrumbs_list': breadcrumbs_list,
+                                                         'visited_location':visited_location
                                                         },context_instance=RequestContext(request)
                             )
 
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+
+    # for getting user's last accessed location    
+    usrid = request.user.id
+    visited_location = ""
+
+    if(usrid):
+
+        usrid = int(request.user.id)
+        usrname = unicode(request.user.username)
+        
+        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+        visited_location = user_group_location.visited_location
+
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
@@ -174,7 +216,8 @@ def edit_group(request,group_id):
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
                                         'groupid':group_id,
-                                        'group_id':group_id
+                                        'group_id':group_id,
+                                        'visited_location': visited_location
                                         },
                                       context_instance=RequestContext(request)
                                       )
@@ -211,7 +254,23 @@ def switch_group(request,group_id,node_id):
     except Exception as e:
         print "Exception in switch_group"+str(e)
         return HttpResponse("Failure")
+
+
 def publish_group(request,group_id,node):
+
+  # for getting user's last accessed location    
+  usrid = request.user.id
+  visited_location = ""
+
+  if(usrid):
+
+    usrid = int(request.user.id)
+    usrname = unicode(request.user.username)
+        
+    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    visited_location = user_group_location.visited_location
+
   node=collection.Node.one({'_id':ObjectId(node)})
    
   page_node,v=get_page(request,node)
@@ -225,11 +284,8 @@ def publish_group(request,group_id,node):
   return render_to_response("ndf/groupdashboard.html",
                                  { 'group_id':group_id,
                                    'node':node,
-                                   'groupid':group_id
-                                   
-                                
-                                 
-                                 
+                                   'groupid':group_id,
+                                   'visited_location':visited_location
                                  },
                                   context_instance=RequestContext(request)
                               )

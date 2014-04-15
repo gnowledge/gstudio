@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{domain}} - share and write</title>
+<script>
+    document.location.href = '/new/';
+</script>
+<style>
+    input[type=text] {
+        background: #f3f3f3;
+        border: 0;
+        margin-right: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 id="title">{{domain}} - share and write</h1>
+<div id="canvas">
+<p>
+This is a collaborative text editor. you need javascript to use {{domain}}
+</p>
+</div>
+{% endblock %}
+

@@ -163,12 +163,25 @@ def page(request, group_id, app_id=None):
         # location = []
         # for each in page_node.location:
         #   location.append(json.dumps(each))
+
+        usrid = request.user.id
+        visited_location = ""
+
+        if(usrid):
+
+          usrid = int(request.user.id)
+          usrname = unicode(request.user.username)
         
+          author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+          user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+          visited_location = user_group_location.visited_location
+
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'groupid':group_id,
                                     'breadcrumbs_list': breadcrumbs_list,
+                                    'visited_location': visited_location,
                                     # 'location': location
                                   },
                                   context_instance = RequestContext(request)
@@ -190,14 +203,19 @@ def create_edit_page(request, group_id, node_id=None):
     else:
         page_node = collection.GSystem()
 
-    
+    usrid = int(request.user.id)
+    usrname = unicode(request.user.username)
+
+    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+
     if request.method == "POST":
         
         get_node_common_fields(request, page_node, group_id, gst_page)
 
         page_node.save()
-        
-        return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
+
+        return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:
         
@@ -206,6 +224,7 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
+        context_variables['visited_location']=user_group_location.visited_location
 
         print "would get out of the page  "
         return render_to_response("ndf/page_create_edit.html",

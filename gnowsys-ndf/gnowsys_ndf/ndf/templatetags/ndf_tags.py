@@ -696,3 +696,14 @@ def get_publish_policy(groupid,resnode):
          print "working section",resnode.status  
          return "allow"
   
+#textb
+@register.filter("mongo_id")
+def mongo_id(value):
+     # Retrieve _id value
+    if type(value) == type({}):
+        if value.has_key('_id'):
+            value = value['_id']
+   
+    # Return value
+    return unicode(str(value))
+#textb 
