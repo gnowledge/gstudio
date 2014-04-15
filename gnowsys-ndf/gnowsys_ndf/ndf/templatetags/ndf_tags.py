@@ -664,10 +664,10 @@ def Group_Editing_policy(groupid,node,user):
 
 
 @register.assignment_tag
-def get_publish_policy(request,groupid,resnode):
+def get_publish_policy(request,groupid,res_node):
  col_Group = db[Group.collection_name]
  node=col_Group.Group.one({"_id":ObjectId(groupid)})
- resnode=col_Group.Group.one({"_id":ObjectId(resnode._id)})
+ resnode=col_Group.Group.one({"_id":ObjectId(res_node._id)})
  group_type=group_type_info(groupid)
  group=user_access_policy(groupid,request.user)
  ver=node.current_version
@@ -678,19 +678,21 @@ def get_publish_policy(request,groupid,resnode):
         if base_group.status == "DRAFT" or node.status == "DRAFT":
             return "allow"
    elif node.edit_policy == "NON_EDITABLE":
-    if resnode._type == "Group" and ver == "1.1" or resnode.created_by != request.user.id :
+    if resnode._type == "Group":
+      if ver == "1.1" or resnode.created_by != request.user.id :
          return "stop"
     if group == "allow":          
-      if resnode.status == "DRAFT": 
+      if res_node.status == "DRAFT": 
           return "allow"    
    elif node.edit_policy == "EDITABLE_NON_MODERATED":
        #condition for groups
-       if resnode._type == "Group" and ver == "1.1" or  resnode.created_by != request.user.id:
-         return "stop"
+       if resnode._type == "Group":
+         if ver == "1.1" or  resnode.created_by != request.user.id:
+          return "stop"
        if group == "allow":
-         if resnode.status == "DRAFT": 
+         if res_node.status == "DRAFT": 
            return "allow"
-          
+  #code commented in case required for groups not assigned edit_policy        
   #elif group_type is  None:
   #  group=user_access_policy(groupid,request.user)
   #  if group == "allow":
