@@ -643,3 +643,19 @@ def deletion_instances(request, group_id):
     if confirm:
         return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")         
     return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
+
+def get_visited_location(request, group_id):
+
+  usrid = request.user.id
+  visited_location = ""
+
+  if(usrid):
+
+    usrid = int(request.user.id)
+    usrname = unicode(request.user.username)
+        
+    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    visited_location = user_group_location.visited_location
+  
+  return StreamingHttpResponse({'visited_location': visited_location})
