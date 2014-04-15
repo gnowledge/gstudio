@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+    <head>
+        {% block head %}
+        {% endblock %}
+        <link href="/static/css/base.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+    <div id="menu">
+        <a href="/new/">new</a> .:. <a href="/faq/">faq</a>
+    </div>
+    {% block content %}
+    {% endblock %}
+    </body>
+</html>

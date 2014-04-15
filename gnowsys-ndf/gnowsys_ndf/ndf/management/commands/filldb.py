@@ -299,3 +299,23 @@ profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_
 if profile_pic_obj:
 	profile_pic_obj.delete()
 	print "Deleted GST document of profile_pic"
+
+
+# For adding visited_location field (default value set as []) in User Groups.
+try:
+    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    if author:
+        cur = collection.Node.find({'_type': "Group", 'member_of': author._id, 'visited_location': {'$exists': False}})
+
+        if cur.count():
+            print "\n"
+            for each in cur:
+                collection.update({'_type': "Group", '_id': each._id}, {'$set': {'visited_location': []}}, upsert=False, multi=True)
+                print " 'visited_location' field added to Author group (" + each.name + ")\n"
+
+    else:
+        error_message = "\n Exception while creating 'visited_location' field in Author class.\n Author GSystemType doesn't exists!!!\n"
+        raise Exception(error_message)
+
+except Exception as e:
+    print str(e)

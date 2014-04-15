@@ -339,15 +339,75 @@ $.ajax({
 });  //end of document click
 
 
-  $(document).on('opened', '[data-reveal]', function () {  
-      
-    map.invalidateSize();  
+  $(document).on('open', '#view-map-widget[data-reveal]', function () {  
+    
+    $.ajax({
+  url: "{% url 'get_visited_location' groupid %}",
+  success: function(data){ 
+
+    {% if visited_location %}
+
+    data = {{visited_location}};
+
+     var lastVisitedLocationVal = data;
+    if(lastVisitedLocationVal){
+
+      if(lastVisitedLocationVal == "[]"){
+        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+      }
+
+      if(lastVisitedLocationVal.length > 0){
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+              map.setView([lat, lng], zoom);
+            }
+    }
+
+    {% else %}
 
     if( tempArr.length )
     {
       var group = new L.featureGroup(tempArr)
           map.fitBounds(group.getBounds());
     }
+
+    {% endif %}
+  }
+});
+
+  });
+
+  $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+    // if(lastVisitedLocationVal){
+
+    //   if(lastVisitedLocationVal == "[]"){
+    //     lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+    //   }
+
+    //   if(lastVisitedLocationVal.length > 0){
+    //         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+    //         var zoom = lastVisitedLocationVal.pop(),
+    //             lng = lastVisitedLocationVal[1],
+    //             lat = lastVisitedLocationVal[0];
+    //           map.setView([lat, lng], zoom);
+    //         }
+    // }
+
+
+    // if( tempArr.length )
+    // {
+    //   var group = new L.featureGroup(tempArr)
+    //       map.fitBounds(group.getBounds());
+    // }
+
+    // map.setView([lat, lng], zoom);
+
   });
 
 

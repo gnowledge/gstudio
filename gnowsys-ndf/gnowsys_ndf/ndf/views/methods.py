@@ -4,6 +4,8 @@
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from django.shortcuts import render_to_response, render
+from django.template import RequestContext
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
@@ -185,7 +187,7 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
 
 def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node."""
-  print"has come here"
+  
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
@@ -201,7 +203,8 @@ def get_node_common_fields(request, node, group_id, node_type):
   module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
   map_geojson_data = request.POST.get('map-geojson-data')
-  
+  user_last_visited_location = request.POST.get('last_visited_location')
+
   if map_geojson_data:
     map_geojson_data = map_geojson_data + ","
     map_geojson_data = list(ast.literal_eval(map_geojson_data))
@@ -311,7 +314,18 @@ def get_node_common_fields(request, node, group_id, node_type):
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
 
-  
+  # ----------------------------------------------------------------------------- visited_location in author class
+  if user_last_visited_location:
+    
+    user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
+
+    author = gcollection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = gcollection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    user_group_location['visited_location'] = user_last_visited_location
+    user_group_location.save()
+
+# ============= END of def get_node_common_fields() ==============
+
 
 # ------ Some work for relational graph - (II) ------
   
@@ -502,3 +516,12 @@ def check_page_first_creation(request,node):
     if count == 1:
 	return(count)     
       
+
+def tag_info(request, group_id, tagname):
+  '''
+  Function to get all the resources related to tag
+  '''
+
+  # print group_id
+
+  return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))

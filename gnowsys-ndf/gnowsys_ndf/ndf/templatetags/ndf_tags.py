@@ -678,11 +678,9 @@ def get_publish_policy(request,groupid,resnode):
         if base_group.status == "DRAFT" or node.status == "DRAFT":
             return "allow"
    elif node.edit_policy == "NON_EDITABLE":
-     print "in this section",resnode._type
-     if resnode._type == "Group" and ver == "1.1" or resnode.created_by != request.user.id :
+    if resnode._type == "Group" and ver == "1.1" or resnode.created_by != request.user.id :
          return "stop"
-    
-     if group == "allow":          
+    if group == "allow":          
       if resnode.status == "DRAFT": 
           return "allow"    
    elif node.edit_policy == "EDITABLE_NON_MODERATED":
@@ -699,3 +697,16 @@ def get_publish_policy(request,groupid,resnode):
   #   if resnode.status == "DRAFT":
   #      return "allow"
       
+  
+#textb
+@register.filter("mongo_id")
+def mongo_id(value):
+     # Retrieve _id value
+    if type(value) == type({}):
+        if value.has_key('_id'):
+            value = value['_id']
+   
+    # Return value
+    return unicode(str(value))
+#textb 
+
