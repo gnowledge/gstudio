@@ -172,7 +172,7 @@ def collection_view(request, group_id):
 
 
 @login_required
-def change_group_settings(request, group_name):
+def change_group_settings(request,group_id):
     '''
 	changing group's object data
     '''
@@ -184,7 +184,7 @@ def change_group_settings(request, group_name):
             visibility_policy = request.POST['visibility_policy']
             disclosure_policy = request.POST['disclosure_policy']
             encryption_policy = request.POST['encryption_policy']
-            group_id = request.POST['group_id']
+           # group_id = request.POST['group_id']
             group_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
             if group_node :
                 group_node.edit_policy = edit_policy

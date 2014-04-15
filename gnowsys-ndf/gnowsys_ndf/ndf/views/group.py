@@ -25,8 +25,9 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem
 from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups,get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import *
+
 
 #######################################################################################################################################
 
@@ -240,7 +241,11 @@ def switch_group(request,group_id,node_id):
             coll_obj_list = []
             data_list=[]
             user_id=request.user.id
-            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}}]})
+            all_user_groups=[]
+            for each in get_all_user_groups():
+                all_user_groups.append(each.name)
+            print "list usergrps",all_user_groups
+            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
             for each in node.group_set:
                 coll_obj_list.append(collection.Node.one({'_id':each}))
             data_list=set_drawer_widget(st,coll_obj_list)
