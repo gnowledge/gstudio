@@ -667,30 +667,32 @@ def Group_Editing_policy(groupid,node,user):
 def get_publish_policy(request,groupid,resnode):
  col_Group = db[Group.collection_name]
  node=col_Group.Group.one({"_id":ObjectId(groupid)})
+ resnode=col_Group.Group.one({"_id":ObjectId(resnode._id)})
  group_type=group_type_info(groupid)
  group=user_access_policy(groupid,request.user)
  ver=node.current_version
  if request.user.id:
-   
-  if group_type == "Moderated":
-     base_group=get_prior_post_node(groupid)
-     if base_group is not None:
-       if base_group.status == "DRAFT" or node.status == "DRAFT":
+   if group_type == "Moderated":
+      base_group=get_prior_post_node(groupid)
+      if base_group is not None:
+        if base_group.status == "DRAFT" or node.status == "DRAFT":
+            return "allow"
+   elif node.edit_policy == "NON_EDITABLE":
+     print "in this section",resnode._type
+     if resnode._type == "Group" and ver == "1.1" or resnode.created_by != request.user.id :
+         return "stop"
+    
+     if group == "allow":          
+      if resnode.status == "DRAFT": 
+          return "allow"    
+   elif node.edit_policy == "EDITABLE_NON_MODERATED":
+       #condition for groups
+       if resnode._type == "Group" and ver == "1.1" or  resnode.created_by != request.user.id:
+         return "stop"
+       if group == "allow":
+         if resnode.status == "DRAFT": 
            return "allow"
-           
-  elif node.edit_policy == "NON_EDITABLE":
-    if node._type == "Group" and ver == "1.1" and node.created_by != request.user.id :
-        return "stop"
-    if group == "allow":          
-     if resnode.status == "DRAFT": 
-         return "allow"    
-  elif node.edit_policy == "EDITABLE_NON_MODERATED":
-      #condition for groups
-      if node._type == "Group" and ver == "1.1" or  node.created_by != request.user.id:
-        return "stop"
-      if group == "allow":
-        if resnode.status == "DRAFT": 
-          return "allow"
+          
   #elif group_type is  None:
   #  group=user_access_policy(groupid,request.user)
   #  if group == "allow":
