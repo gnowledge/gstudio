@@ -144,7 +144,7 @@ encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_po
 $(document).on('click',"#changeButton",function(){
 
 $.ajax({
-url:'/{{node.altnames}}/ajax/change_group_settings/',
+url:'/{{node}}/ajax/change_group_settings/',
 type: 'POST',
 data: {edit_policy:edit_policy.value, group_type:group_type.value, subscription_policy:subscription_policy.value, visibility_policy:visibility_policy.value, disclosure_policy:disclosure_policy.value, encryption_policy:encryption_policy.value, csrfmiddlewaretoken: '{{ csrf_token }}', group_id:"{{node}}"},
 beforeSend: function() {
