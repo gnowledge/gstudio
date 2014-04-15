@@ -27,7 +27,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 
-from gnowsys_ndf.ndf.models import Node, GSystem
+from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
@@ -37,6 +37,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_
 
 db = get_database()
 collection = db[Node.collection_name]
+collection_tr = db[Triple.collection_name]
 gst_page = collection.Node.one({'_type': 'GSystemType', 'name': GAPPS[0]})
 history_manager = HistoryManager()
 rcs = RCS()
@@ -160,6 +161,28 @@ def page(request, group_id, app_id=None):
         # Appends the elements in breadcrumbs_list first time the resource which is clicked
         breadcrumbs_list.append( (str(page_node._id), page_node.name) )
 
+        shelves = []
+        auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) }) 
+        has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+        dbref_has_shelf = has_shelf_RT.get_dbref()
+
+        shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+        shelf_list = {}
+
+        if shelf:
+            for each in shelf:
+                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+                shelves.append(shelf_name)
+
+                shelf_list[shelf_name.name] = []         
+                for ID in shelf_name.collection_set:
+                	shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                	shelf_list[shelf_name.name].append(shelf_item.name)
+
+        else:
+            shelves = []
+
+
         # location = []
         # for each in page_node.location:
         #   location.append(json.dumps(each))
@@ -179,6 +202,8 @@ def page(request, group_id, app_id=None):
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
+                                    'shelf_list': shelf_list,
+                                    'shelves': shelves,
                                     'groupid':group_id,
                                     'breadcrumbs_list': breadcrumbs_list,
                                     'visited_location': visited_location,
