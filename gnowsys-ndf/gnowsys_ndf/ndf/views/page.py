@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, get_translate_common_fields,get_page
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page
 
 #######################################################################################################################################
 
@@ -205,9 +205,7 @@ def page(request, group_id, app_id=None):
                                     'shelf_list': shelf_list,
                                     'shelves': shelves,
                                     'groupid':group_id,
-                                    'breadcrumbs_list': breadcrumbs_list,
-                                    'visited_location': visited_location,
-                                    # 'location': location
+                                    'breadcrumbs_list': breadcrumbs_list
                                   },
                                   context_instance = RequestContext(request)
         )        
@@ -228,12 +226,6 @@ def create_edit_page(request, group_id, node_id=None):
     else:
         page_node = collection.GSystem()
 
-    usrid = int(request.user.id)
-    usrname = unicode(request.user.username)
-
-    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-
     if request.method == "POST":
         
         get_node_common_fields(request, page_node, group_id, gst_page)
@@ -249,7 +241,6 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
-        context_variables['visited_location']=user_group_location.visited_location
 
         print "would get out of the page  "
         return render_to_response("ndf/page_create_edit.html",
