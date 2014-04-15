@@ -53,7 +53,13 @@
       {% for list in contentlist %}
       <div class="medium-12 columns">
 	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+
+      {% if translate %}
+	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+      
+      {% endif %}
       </div>
+      
       {% endfor %}
 <script type="text/javascript">
 
@@ -84,8 +90,16 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 	  <font size="3"> {{list}}</font> 
 	</div>
 	{% get_input_fields class_structure|get_dict_item:list list translate %}
-      </div>
+     
+    {% if translate %}
+      <div style="display:table-cell;"> 
+	  <font size="3"> {{list}}</font> 
+	</div>
+	{% get_input_fields class_structure|get_dict_item:list list translate %}
+      {% endif %}
+ </div>
 {% endfor %}
+
     </div>
   </dd>
 </dl>
@@ -99,6 +113,15 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
       <font size="3"> {{list}}</font> 
     </div>
     {% get_input_fields class_structure|get_dict_item:list list translate %}
+    
+    {% if translate%}
+  
+    <div style="display:table-cell;"> 
+      <font size="3"> {{list}}</font> 
+    </div>
+    {% get_input_fields class_structure|get_dict_item:list list translate %}
+  
+  {% endif %}
   </div>
   {% endfor %}
   
