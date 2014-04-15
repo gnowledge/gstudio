@@ -1,4 +1,5 @@
-  
+<div id="shelf">
+
 <h4 class="text-center">Shelf</h4>
 <dl class="accordion" data-accordion>
 <!-- Adding new shelf text input and add button -->
@@ -55,7 +56,7 @@
             <div class="row">
               <div class="row collapse">
                 <div class="small-2 columns">
-                  <a id="add-shelf-item"  name="{{each.name}}"><i class='button postfix fi-arrow-right'></i></a>
+                  <a class="add-shelf-item"  name="{{each.name}}"><i class='button postfix fi-arrow-right'></i></a>
                 </div>
                 <div class="small-10 columns">
         	          Add {{node.name}}          
@@ -75,6 +76,7 @@
   {% endfor %}   
 
 </dl>
+</div>
 
 <script>
 
@@ -96,7 +98,7 @@
 
   });
 
-  $("#add-shelf-item").click(function() {
+  $(".add-shelf-item").click(function() {
 
     $.ajax({
       type: "POST",
