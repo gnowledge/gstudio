@@ -198,6 +198,30 @@ background-repeat:no-repeat; background-size: 48px 48px
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
 
+     {% edit_policy groupid node request.user as status %}
+     
+     {% if status == "allow" %}
+    {% get_edit_url node.pk as edit_url %}
+
+    {% check_group node as is_group %}
+
+    {% get_user_object node.created_by as created_user %}
+
+    {% if is_group %}
+
+
+             {% ifequal created_user request.user %}     
+
+
+
+       
+      <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
+         {% endifequal %}
+
+    {% else %}
+
+             {% ifequal created_user request.user %}     
+
 	<input type="button" id="switch_group" class="button small" value="Switch Group">
 <div id="mySystemtype" class="reveal-modal" data-reveal >
      <h2>Select Groups</h2>
@@ -207,24 +231,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <a class="close-reveal-modal st">&#215;</a>
 <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
 </div>
-
-     {% edit_policy groupid node request.user as status %}
-     
-     {% if status == "allow" %}
-    {% get_edit_url node.pk as edit_url %}
-
-    {% check_group node as is_group %}
-
-    {% if is_group %}
-
-             {% get_user_object node.created_by as created_user %}
-
-             {% ifequal created_user request.user %}     
-       
-      <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
-         {% endifequal %}
-
-    {% else %}
+{% endifequal %}
 
       <a href="{% url edit_url groupid node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
