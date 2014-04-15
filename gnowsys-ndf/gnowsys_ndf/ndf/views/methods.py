@@ -148,6 +148,7 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
   content_org = request.POST.get('content_org')
   tags = request.POST.get('tags')
   name = request.POST.get('name')
+  tags = request.POST.get('tags')
   usrid = int(request.user.id)
   language= request.POST.get('lan')
   if not node.has_key('_id'):
@@ -166,6 +167,9 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   if group_obj._id not in node.group_set:
     node.group_set.append(group_obj._id)
+  if tags:
+    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+
   if tags:
     node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
 

@@ -10,6 +10,7 @@
 {% endblock %}
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
 <form method="post" action="" name="{{class_name}}">
 {% csrf_token %}
 
@@ -31,6 +32,13 @@
       <div style="display:table-cell;">
 	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
       </div>
+      {% endif %}
+
+      {% if translate %}
+      <div style="display:table-cell;"> 
+	<font size="3"> {{list}}</font> 
+      </div>
+      {% get_input_fields class_structure|get_dict_item:list list translate %}
       {% endif %}
     </div>
     {% endfor %}
@@ -75,7 +83,7 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 	<div style="display:table-cell;"> 
 	  <font size="3"> {{list}}</font> 
 	</div>
-	{% get_input_fields class_structure|get_dict_item:list list %}
+	{% get_input_fields class_structure|get_dict_item:list list translate %}
       </div>
 {% endfor %}
     </div>
@@ -90,7 +98,7 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
     <div style="display:table-cell;"> 
       <font size="3"> {{list}}</font> 
     </div>
-    {% get_input_fields class_structure|get_dict_item:list list %}
+    {% get_input_fields class_structure|get_dict_item:list list translate %}
   </div>
   {% endfor %}
   
@@ -101,6 +109,9 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 </div>
 <input type="submit" name="submit" class="button" id="save-node-type">
 </form>
+
+
+
 {% endblock %}
 
 {% block script %}

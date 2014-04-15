@@ -1,3 +1,4 @@
+
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% block title %} Admin {% endblock %}
@@ -165,6 +166,11 @@ background-repeat:no-repeat; background-size: 48px 48px
 		Edit&nbsp;&nbsp;<i class="fi-plus"></i>
 	      </a>
 	   </td>
+	    <td>
+	      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}?translate=True">
+                Translate
+
+	    </td>
     </tr>
  
 	{% endfor %}
