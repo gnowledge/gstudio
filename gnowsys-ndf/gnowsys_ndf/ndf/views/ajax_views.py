@@ -496,7 +496,7 @@ def graph_nodes(request, group_id):
   i = 1
   for key, value in page_node.items():
     
-    if key in exception_items:
+    if (key in exception_items) or (not value):      
       pass
 
     elif isinstance(value, list):
@@ -688,7 +688,7 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
 
 @login_required
 def deletion_instances(request, group_id):
-    '''                                                                                                                                           delete class's objects                                                                                                                        '''
+    '''delete class's objects'''
     send_dict = []
     if request.is_ajax() and request.method =="POST":
        deleteobjects = request.POST['deleteobjects']
@@ -739,6 +739,8 @@ def get_visited_location(request, group_id):
         
     author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
     user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-    visited_location = user_group_location.visited_location
+    
+    if user_group_location:
+      visited_location = user_group_location.visited_location
   
-  return StreamingHttpResponse({'visited_location': visited_location})
+  return StreamingHttpResponse(json.dumps(visited_location))

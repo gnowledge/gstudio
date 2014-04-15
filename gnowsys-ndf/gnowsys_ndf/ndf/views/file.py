@@ -466,19 +466,6 @@ def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
 
-    # for getting user's last accessed location    
-    usrid = request.user.id
-    visited_location = ""
-
-    if(usrid):
-
-        usrid = int(request.user.id)
-        usrname = unicode(request.user.username)
-        
-        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-        visited_location = user_group_location.visited_location
-
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     file_template = ""
@@ -523,7 +510,6 @@ def file_detail(request, group_id, _id):
                               { 'node': file_node,
                                 'group_id': group_id,
                                 'groupid':group_id,
-                                'visited_location': visited_location,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
                                 'breadcrumbs_list': breadcrumbs_list
@@ -569,18 +555,6 @@ def readDoc(request, _id, group_id, file_name = ""):
 def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
-    usrid = request.user.id
-    visited_location = ""
-
-    if(usrid):
-
-        usrid = int(request.user.id)
-        usrname = unicode(request.user.username)
-        
-        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-        visited_location = user_group_location.visited_location
-
     if request.method == "POST":
         get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save()
@@ -590,8 +564,7 @@ def file_edit(request,group_id,_id):
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,
                                     'group_id': group_id,
-                                    'groupid':group_id,
-                                    'visited_location': visited_location
+                                    'groupid':group_id
                                 },
                                   context_instance=RequestContext(request)
                               )

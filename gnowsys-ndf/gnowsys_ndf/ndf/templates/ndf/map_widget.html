@@ -165,7 +165,11 @@
 			// To set user's latest accesed marker.
 			if(visitedMarker)
 			{
-				visitedMarker.push(map.getZoom());
+				if(!visitedMarker[2])
+				{
+					visitedMarker.push(map.getZoom());
+				}	
+				
 				$('input:hidden[name=last_visited_location]').attr("value", visitedMarker);
 			}
 	 	}
