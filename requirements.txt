@@ -5,7 +5,7 @@ django-ratings
 django-pagination
 django-notification
 python-magic
-PIL
+pillow
 ox
 django-passwords
 South==0.8.4
