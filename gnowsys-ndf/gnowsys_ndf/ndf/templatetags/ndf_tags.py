@@ -23,6 +23,19 @@ db = get_database()
 collection = db[Node.collection_name]
 
 @register.assignment_tag
+def switch_group_conditions(user,group_id):
+  try:
+    ret_policy=False
+    req_user_id=User.objects.get(username=user).id
+    print "id",req_user_id
+    group=collection.Node.one({'_id':ObjectId(group_id)})
+    if req_user_id in group.author_set and group.group_type == 'PUBLIC':
+      ret_policy=True
+    return ret_policy
+  except Exception as ex:
+    print "Exception in switch_group_conditions"+str(ex)
+ 
+@register.assignment_tag
 def get_all_user_groups():
   try:
     ret_groups=[]
@@ -252,8 +265,6 @@ def get_twist_replies(twist):
   exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(twist._id)}]})
   for each in exstng_reply:
     lst=get_rec_objs(each)
-        
-      
   return ret_replies
 
 
