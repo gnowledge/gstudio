@@ -321,70 +321,13 @@ def get_node_common_fields(request, node, group_id, node_type):
 
     author = gcollection.Node.one({'_type': "GSystemType", 'name': "Author"})
     user_group_location = gcollection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-    user_group_location['visited_location'] = user_last_visited_location
+
+    if user_group_location:
+      user_group_location['visited_location'] = user_last_visited_location
+      
     user_group_location.save()
 
 # ============= END of def get_node_common_fields() ==============
-
-
-# ------ Some work for relational graph - (II) ------
-  
-def neighbourhood_nodes(page_node):
-
-  collection = db[Node.collection_name]
-        
-  gs = collection.Node.find( {'$or':[{'_type':'GSystem'},{'_type':'File'}]}  )
-  gs_cur = []
-
-  for each in gs:
-      gs_cur.append(each)
-
-  gs.rewind()
-
-  flag = False
-
-  # Initiate and append this line compulsory for viewing node.
-  graphData = '{"name":"'+ page_node.name +'", "degree":1, "children":['
-
-  # Scan each document in cursor 'gs'
-  for val in gs:
-    
-    # If vieving page _id exist in collection set of current document
-    if page_node._id in val.collection_set:
-      
-      flag = True      
-      # Start adding children 
-      graphData += '{"name":"'+ val.name +'","degree" : 2'   #},'
-      
-      # If there is only one matching item in collection set
-      if len(val.collection_set) == 1:
-        graphData += '},'
-        
-      # If there is more than one _id in collection set, start adding children of children.
-      elif len(val.collection_set) > 1:
-        graphData += ', "children":['
-        
-        for each in val.collection_set:
-          node_name = (filter( lambda x: x['_id'] == each, gs_cur ))[0].name
-          
-          # Escape name matching current page node name
-          if(page_node._id == each):
-            pass
-          else:
-            graphData += '{"name":"'+ node_name + '"},'
-
-        graphData = graphData[:-1] + ']},'
-
-  if flag:
-    graphData = graphData[:-1] + ']}' 
-  else:
-    graphData += ']}' 
-
-  return graphData
-# ------ End of processing for graph ------
-
-
-
   
   
 def get_versioned_page(node):

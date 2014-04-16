@@ -82,7 +82,7 @@
       <header>
         <div class="label-list">
           {% for tag in node.tags %}
-          <span class="label">{{tag}}</span>
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
           {% endfor %}
         </div>
         

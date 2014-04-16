@@ -4,7 +4,7 @@
 
 Need python, pip and virtualenv:
     apt-get install python-setuptools git
-    east_install pip
+    easy_install pip
     pip install virtualenv
 
 Get:
