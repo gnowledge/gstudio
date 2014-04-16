@@ -170,9 +170,92 @@ def collection_view(request, group_id):
                                  context_instance = RequestContext(request)
     )
 
+@login_required
+def shelf(request, group_id):
+    
+    if request.is_ajax() and request.method == "POST":    
+      shelf = request.POST.get("shelf_name", '')
+      shelf_add = request.POST.get("shelf_add", '')
+      shelf_item_remove = request.POST.get("shelf_item_remove", '')
+
+      shelf_available = ""
+      shelf_item_available = ""
+      collection= db[Node.collection_name]
+      collection_tr = db[Triple.collection_name]
+
+      shelf_gst = collection.Node.one({'_type': u'GSystemType', 'name': u'Shelf'})
+
+      auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
+      has_shelf_RT = collection.Node.one({'_type': u'RelationType', 'name': u'has_shelf'}) 
+      dbref_has_shelf = has_shelf_RT.get_dbref()
+
+      if shelf:
+        shelf_gs = collection.Node.one({'name': unicode(shelf), 'member_of': [ObjectId(shelf_gst._id)] })
+        if shelf_gs is None:
+          shelf_gs = collection.GSystem()
+          shelf_gs.name = unicode(shelf)
+          shelf_gs.created_by = int(request.user.id)
+          shelf_gs.member_of.append(shelf_gst._id)
+          shelf_gs.save()
+
+          shelf_R = collection_tr.GRelation()        
+          shelf_R.subject = ObjectId(auth._id)
+          shelf_R.relation_type = has_shelf_RT
+          shelf_R.right_subject = ObjectId(shelf_gs._id)
+          shelf_R.save()
+        else:
+          if shelf_add:
+            shelf_item = ObjectId(shelf_add)  
+
+            if shelf_item in shelf_gs.collection_set:
+              shelf_Item = collection.Node.one({'_id': ObjectId(shelf_item)}).name       
+              shelf_item_available = shelf_Item
+            else:
+              collection.update({'_id': shelf_gs._id}, {'$push': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)
+              shelf_gs.reload()
+
+          elif shelf_item_remove:
+            shelf_item = collection.Node.one({'name': unicode(shelf_item_remove)})._id
+            collection.update({'_id': shelf_gs._id}, {'$pull': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)      
+            shelf_gs.reload()
+          
+          else:
+            shelf_available = shelf
+
+      else:
+        shelf_gs = None
+
+      shelf = collection_tr.Triple.find({'_type': 'GRelation','subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelves = []
+      shelf_list = {}
+
+      if shelf:
+        for each in shelf:
+          shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})  
+          shelves.append(shelf_name)
+
+          shelf_list[shelf_name.name] = []         
+          for ID in shelf_name.collection_set:
+            shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+            shelf_list[shelf_name.name].append(shelf_item.name)
+            
+      else:
+        shelves = []
+
+      return render_to_response('ndf/shelf.html', 
+                                  { 'shelf_obj': shelf_gs,
+                                    'shelf_list': shelf_list, 
+                                    'shelves': shelves,
+                                    'shelf_available': shelf_available,
+                                    'shelf_item_available': shelf_item_available,
+                                    'groupid':group_id
+                                  },
+                                  context_instance = RequestContext(request)
+      )
+
 
 @login_required
-def change_group_settings(request, group_name):
+def change_group_settings(request,group_id):
     '''
 	changing group's object data
     '''
@@ -184,7 +267,7 @@ def change_group_settings(request, group_name):
             visibility_policy = request.POST['visibility_policy']
             disclosure_policy = request.POST['disclosure_policy']
             encryption_policy = request.POST['encryption_policy']
-            group_id = request.POST['group_id']
+           # group_id = request.POST['group_id']
             group_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
             if group_node :
                 group_node.edit_policy = edit_policy
@@ -413,7 +496,7 @@ def graph_nodes(request, group_id):
   i = 1
   for key, value in page_node.items():
     
-    if key in exception_items:
+    if (key in exception_items) or (not value):      
       pass
 
     elif isinstance(value, list):
@@ -605,7 +688,7 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
 
 @login_required
 def deletion_instances(request, group_id):
-    '''                                                                                                                                           delete class's objects                                                                                                                        '''
+    '''delete class's objects'''
     send_dict = []
     if request.is_ajax() and request.method =="POST":
        deleteobjects = request.POST['deleteobjects']
@@ -643,3 +726,21 @@ def deletion_instances(request, group_id):
     if confirm:
         return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")         
     return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
+
+def get_visited_location(request, group_id):
+
+  usrid = request.user.id
+  visited_location = ""
+
+  if(usrid):
+
+    usrid = int(request.user.id)
+    usrname = unicode(request.user.username)
+        
+    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    
+    if user_group_location:
+      visited_location = user_group_location.visited_location
+  
+  return StreamingHttpResponse(json.dumps(visited_location))

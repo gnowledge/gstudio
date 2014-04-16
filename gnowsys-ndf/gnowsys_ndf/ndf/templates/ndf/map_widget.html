@@ -48,6 +48,8 @@
 			</div>
 		</div>
 	</div>
+
+	<input type="hidden" value="{{ visited_location }}" name="last_visited_location"/>
 	
 	<script type="text/javascript">
 		 
@@ -155,10 +157,21 @@
 
 	{% if mode == "edit" %}
 
-		function updateHiddenTagContent()
+		function updateHiddenTagContent(visitedMarker)
 	 	{
 	 		$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
 			$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
+
+			// To set user's latest accesed marker.
+			if(visitedMarker)
+			{
+				if(!visitedMarker[2])
+				{
+					visitedMarker.push(map.getZoom());
+				}	
+				
+				$('input:hidden[name=last_visited_location]').attr("value", visitedMarker);
+			}
 	 	}
 		
 		map.on('click', onMapClick );
@@ -186,15 +199,20 @@
 			
 			markerGeoJSON.push(JSON.stringify(addLeafletID));
 
-			$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
-			$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
-			
+
+            var changedMarkerLatLng = []
+            changedMarkerLatLng.push(e.latlng.lat);
+            changedMarkerLatLng.push(e.latlng.lng);
+
+            updateHiddenTagContent(changedMarkerLatLng);
 		}
 
 		// Update marker on changing it's position
 		function dragend(ev){
-			
-			var changedPos = ev.target.getLatLng();
+
+			var	changedPos = ev.target.getLatLng(),
+				zoom;
+
 			
            	this.setLatLng(changedPos).update();	// Update the marker position
 
@@ -225,15 +243,19 @@
 			tempMarkerGeoJSON.properties.id = lID;	
 			
 					
-					var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
+			var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
 			
-            		$.each(markerGeoJSON, function(i, val) {
+            $.each(markerGeoJSON, function(i, val) {
             	
-	            		var getID = $.parseJSON(val).properties.id; 
-	            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
-            		})
+	        	var getID = $.parseJSON(val).properties.id; 
+	        	if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+            })
 
-            		updateHiddenTagContent();
+            var changedMarkerLatLng = []
+            changedMarkerLatLng.push(changedPos.lat);
+            changedMarkerLatLng.push(changedPos.lng);
+
+            updateHiddenTagContent(changedMarkerLatLng);
 
 		    //	var addLeafletID = this.toGeoJSON();
 			// 	$(addLeafletID).attr("properties", {"id": lID});
@@ -243,13 +265,18 @@
 
 		function activateMarker(){
 
-			var tempMarker = this;
+			tempMarker = this;
 			// tempMarker._popup._content			
 			var tempMarkerGeoJSON = this.toGeoJSON();
 			// console.log(JSON.stringify(tempMarkerGeoJSON));
 			var lID = tempMarker._leaflet_id;		// Getting Leaflet ID of this marker
 
 			var description = tempMarkerGeoJSON.properties.description;
+
+            var changedMarkerLatLng = []
+            changedMarkerLatLng.push(tempMarker.getLatLng().lat);
+            changedMarkerLatLng.push(tempMarker.getLatLng().lng);
+            updateHiddenTagContent(changedMarkerLatLng);
 
 			if(! description)
 			{
@@ -312,6 +339,8 @@
 					if(getMarkerTextNote.length && getMarkerTextNote != initialPopContentText )
 					{
 						tempMarker.setIcon(infoMarker);
+
+						tempMarker.options.title = tempMarkerGeoJSON.properties.description;
 					}
 					else
 					{
@@ -333,7 +362,7 @@
 	            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
             		})
 
-            		updateHiddenTagContent();
+            		updateHiddenTagContent(changedMarkerLatLng);
 				}
 			});			
 
