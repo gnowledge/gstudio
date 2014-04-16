@@ -162,7 +162,7 @@ def page(request, group_id, app_id=None):
         breadcrumbs_list.append( (str(page_node._id), page_node.name) )
 
         shelves = []
-        auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) }) 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
         has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
         dbref_has_shelf = has_shelf_RT.get_dbref()
 
@@ -196,7 +196,7 @@ def page(request, group_id, app_id=None):
           usrname = unicode(request.user.username)
         
           author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-          user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+          user_group_location = collection.Node.one({'_type': "Author", 'created_by': usrid, 'name': usrname})
           visited_location = user_group_location.visited_location
 
         return render_to_response('ndf/page_details.html', 
