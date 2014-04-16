@@ -752,15 +752,31 @@ class RelationType(Node):
 
         collection = get_database()[Node.collection_name]
 
-        right_subject_node = collection.Node.one({'_id': right_subject_value})
+        right_subject_node = None
+
+        if right_subject_value:
+            right_subject_node = collection.Node.one({'_id': right_subject_value})
+
+            if not right_subject_node:
+                error_message = "\n AppendRelationError: Right subject with this ObjectId("+str(right_subject_value)+") doesn't exists !!!"
+                raise Exception(error_message)
 
         if not rel_dict.has_key(rel_type_node.name):
+            right_subject_list = [right_subject_node] if right_subject_node else []
+
             rel_dict[rel_type_node.name] = {
                 'altnames': rel_type_node.altnames,
                 'object_type': rel_type_node.object_type,
                 'inverse_name': rel_type_node.inverse_name,
-                'right_subject': right_subject_node
+                'right_subject_list': right_subject_list
             }
+        
+        else:
+            right_subject_list = rel_dict[rel_type_node.name]["right_subject_list"] if rel_dict[rel_type_node.name]["right_subject_list"] else []
+            if right_subject_node:
+                if not (right_subject_node in right_subject_list):
+                    right_subject_list.append(right_subject_node)
+                    rel_dict[rel_type_node.name]["right_subject_list"] = right_subject_list
 
         return rel_dict
 
