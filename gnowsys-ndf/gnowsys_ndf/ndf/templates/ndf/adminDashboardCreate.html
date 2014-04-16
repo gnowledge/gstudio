@@ -44,7 +44,7 @@
 
       {% for list in contentlist %}
       <div class="medium-12 columns">
-	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" node_id=node.pk %}
       </div>
       {% endfor %}
 <script type="text/javascript">
