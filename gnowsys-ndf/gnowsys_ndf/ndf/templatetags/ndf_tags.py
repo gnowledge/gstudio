@@ -364,12 +364,12 @@ def get_user_group(user):
     if auth_obj:
       auth_type = auth_obj._id
 
-    colg = col_Group.Group.find({ '_type': u'Group', 
+    colg = col_Group.Group.find({ '_type': {'$in': ['Group','Author']},  
                                 'name': {'$nin': ['home']},
-                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id} ] 
                               })
 
-    auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+    auth = col_Group.Group.one({'_type': u"Author", 'name': unicode(user.username)})
     
     if auth:
       for items in colg:
@@ -397,7 +397,7 @@ def get_user_group(user):
 def get_profile_pic(user):
 
   ID = User.objects.get(username=user).pk
-  auth = collection.Node.one({'_type': u'Group', 'name': unicode(user) })
+  auth = collection.Node.one({'_type': u'Author', 'name': unicode(user) })
 
   prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
 
@@ -438,7 +438,7 @@ def get_edit_url(groupid):
     elif type_name == 'QuizItem':
       return 'quiz_item_edit'
 
-  elif node._type == 'Group':
+  elif node._type == 'Group' or node._type == 'Author' :
     return 'edit_group'
 
   elif node._type == 'File':

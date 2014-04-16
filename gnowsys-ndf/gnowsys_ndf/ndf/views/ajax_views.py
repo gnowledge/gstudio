@@ -185,7 +185,7 @@ def shelf(request, group_id):
 
       shelf_gst = collection.Node.one({'_type': u'GSystemType', 'name': u'Shelf'})
 
-      auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
       has_shelf_RT = collection.Node.one({'_type': u'RelationType', 'name': u'has_shelf'}) 
       dbref_has_shelf = has_shelf_RT.get_dbref()
 
