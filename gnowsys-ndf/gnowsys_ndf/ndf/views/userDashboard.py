@@ -41,7 +41,7 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 
 def dashboard(request, group_id):	
     
-    auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
     uploaded = "None"
 
@@ -107,8 +107,6 @@ def dashboard(request, group_id):
     else:
       img_obj = "" 
 
-
-    auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) }) 
 
     has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
     dbref_has_shelf = has_shelf_RT.get_dbref()

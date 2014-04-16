@@ -42,13 +42,12 @@ class HomeRedirectView(RedirectView):
             if auth_obj:
                 auth_type = auth_obj._id
             auth = ""
-            auth = collection.Group.one({'_type': u"Group", 'name': unicode(self.request.user)})            
+            auth = collection.Group.one({'_type': u"Author", 'name': unicode(self.request.user)})            
             # This will create user document in Author collection to behave user as a group.
             
             if auth is None:
                 auth = collection.Author()
                 
-                auth._type = u"Group"
                 auth.name = unicode(self.request.user)      
                 auth.password = u""
                 auth.member_of.append(auth_type)
