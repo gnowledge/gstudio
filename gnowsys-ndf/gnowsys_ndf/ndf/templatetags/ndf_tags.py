@@ -681,3 +681,13 @@ def get_publish_policy(groupid,resnode):
          print "working section",resnode.status  
          return "allow"
   
+@register.assignment_tag
+def get_source_id(obj_id):
+  try:
+    source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+    return att_set.object_value
+  except Exception as e:
+    print str(e)
+    return 'null'
+ 

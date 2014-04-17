@@ -519,27 +519,28 @@
       <!--     {% endif %} -->
       <!-- 	</div> -->
       <!-- </li> -->
- 
-{% for each in sourceid %}
-      
- {% get_user_object each.object.created_by as user_obj %}      
+{% autopaginate wetube_videos 25 %}
+{% for each in wetube_videos %}
+ {% get_source_id each.pk as source_id %}     
+ {% get_user_object each.created_by as user_obj %}      
       <li class="card">
 	<div class="file">
 	  <header>
             <div class="th">
-	      <a href="http://wetube.gnowledge.org/{{each.id}}/480p.webm">
-		<img src="http://wetube.gnowledge.org/{{each.id}}/icon128.jpg">
+	      <a href="http://wetube.gnowledge.org/{{source_id}}/480p.webm">
+		<img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
 	      </a>
 	    </div>
 
-	    <h4>{{each.object.name}}</h4>
+	    <h4>{{each.name}}</h4>
 	    
-	    <small>Created by <span class="user">{{user_obj.username}}</span> <em>{{each.object.created_at}}</em></small>
+	    <small>Created by <span class="user">{{user_obj.username}}</span> <em>{{each.created_at}}</em></small>
 	    
           </header>
 	  <p>This file is a..</p>
          
-	  <a class="button expand" href ="{% url 'video_detail' groupid each.object %}?vid_id={{each.id}}">View details</a>
+	 
+	 
           </div>
       </li>
 {% endfor %}
