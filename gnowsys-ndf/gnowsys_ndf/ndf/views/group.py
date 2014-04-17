@@ -38,7 +38,7 @@ collection_tr = db[Triple.collection_name]
 gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
-
+get_all_usergroups=get_all_user_groups()
 #######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
 #######################################################################################################################################
@@ -52,6 +52,7 @@ def group(request, group_id,app_id):
     col_Group = db[Group.collection_name]
     user_list=[]
     users=User.objects.all()
+    user_groups_len=len(get_all_usergroups)
     for each in users:
         user_list.append(each.username)
     colg = col_Group.Group.find({'_type': u'Group'})
@@ -59,7 +60,7 @@ def group(request, group_id,app_id):
     gr = list(colg)
     for items in gr:
             group_nodes.append(items)
-    group_nodes_count = len(group_nodes)
+    group_nodes_count = len(group_nodes)-user_groups_len
     colg = col_Group.Group.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
     colg.sort('name')
     gr = list(colg)
