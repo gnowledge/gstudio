@@ -23,6 +23,20 @@ db = get_database()
 collection = db[Node.collection_name]
 
 @register.assignment_tag
+def check_is_user_group(group_id):
+  try:
+    lst_grps=[]
+    all_user_grps=get_all_user_groups()
+    grp=collection.Node.one({'_id':ObjectId(group_id)})
+    for each in all_user_grps:
+      lst_grps.append(each.name)
+    if grp.name in lst_grps:
+      return True
+    else:
+      return False
+  except Exception as exptn:
+    print "Exception in check_user_group "+str(exptn)
+@register.assignment_tag
 def switch_group_conditions(user,group_id):
   try:
     ret_policy=False
