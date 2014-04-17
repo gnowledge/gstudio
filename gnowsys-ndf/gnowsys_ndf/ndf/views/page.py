@@ -1,4 +1,4 @@
-''' -- imports from python libraries -- '''
+x''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
 from difflib import HtmlDiff
@@ -242,7 +242,6 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
 
-        print "would get out of the page  "
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -255,9 +254,7 @@ def delete_page(request, group_id, node_id):
     Just hide the page from users!
     """
 
-    print "\n node: ", type(node_id), "\n"
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
-    print " op: ", op, "\n"
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
 
