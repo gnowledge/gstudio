@@ -22,21 +22,23 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 
-from gnowsys_ndf.ndf.models import GSystemType, GSystem
+from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
 from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups,get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import *
+
 
 #######################################################################################################################################
 
 from django.contrib.auth.models import User
 db = get_database()
 gst_collection = db[GSystemType.collection_name]
+collection_tr = db[Triple.collection_name]
 gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
-
+get_all_usergroups=get_all_user_groups()
 #######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
 #######################################################################################################################################
@@ -50,6 +52,7 @@ def group(request, group_id,app_id):
     col_Group = db[Group.collection_name]
     user_list=[]
     users=User.objects.all()
+    user_groups_len=len(get_all_usergroups)
     for each in users:
         user_list.append(each.username)
     colg = col_Group.Group.find({'_type': u'Group'})
@@ -57,7 +60,7 @@ def group(request, group_id,app_id):
     gr = list(colg)
     for items in gr:
             group_nodes.append(items)
-    group_nodes_count = len(group_nodes)
+    group_nodes_count = len(group_nodes)-user_groups_len
     colg = col_Group.Group.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
     colg.sort('name')
     gr = list(colg)
@@ -69,18 +72,6 @@ def group(request, group_id,app_id):
 
 
 def create_group(request,group_id):
-
-    usrid = request.user.id
-    visited_location = ""
-
-    if(usrid):
-
-        usrid = int(request.user.id)
-        usrname = unicode(request.user.username)
-        
-        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-        visited_location = user_group_location.visited_location
 
     if request.method == "POST":
         col_Group = db[Group.collection_name]
@@ -119,7 +110,32 @@ def create_group(request,group_id):
             colg.post_node.append(Mod_colg._id)
             colg.save()
 
-        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id, 'visited_location':visited_location},context_instance=RequestContext(request))
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+
+        has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+        dbref_has_shelf = has_shelf_RT.get_dbref()
+
+        shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+        shelves = []
+        shelf_list = {}
+
+        if shelf:
+            for each in shelf:
+                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                shelves.append(shelf_name)
+
+                shelf_list[shelf_name.name] = []         
+                for ID in shelf_name.collection_set:
+                    shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                    shelf_list[shelf_name.name].append(shelf_item.name)
+                    
+        else:
+            shelves = []
+
+        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,
+                                                             'groupid':group_id,'group_id':group_id,
+                                                             'shelf_list': shelf_list,'shelves': shelves
+                                                            },context_instance=RequestContext(request))
 
     return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
     
@@ -136,22 +152,12 @@ def create_group(request,group_id):
 
 def group_dashboard(request,group_id=None):
 
-    # for getting last accessed location of user    
-    usrid = request.user.id
-    visited_location = ""
-
-    if(usrid):
-
-        usrid = int(request.user.id)
-        usrname = unicode(request.user.username)
-        
-        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-        visited_location = user_group_location.visited_location
-
     try:
         groupobj="" 
         grpid=""
+        shelf_list = {}
+        shelves = []
+
         if group_id == None:
             groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
             grpid=groupobj['_id']
@@ -159,47 +165,52 @@ def group_dashboard(request,group_id=None):
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
             grpid=groupobj['_id']
 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+        print "user:", auth.name
+
+        has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+        dbref_has_shelf = has_shelf_RT.get_dbref()
+
+        shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+        shelf_list = {}
+
+        if shelf:
+            for each in shelf:
+                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                shelves.append(shelf_name)
+
+                shelf_list[shelf_name.name] = []         
+                for ID in shelf_name.collection_set:
+                    shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                    shelf_list[shelf_name.name].append(shelf_item.name)
+                    
+        else:
+            shelves = []
+
+
     except Exception as e:
         groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         grpid=groupobj['_id']
         pass
 
-    #if groupobj.status == u"DRAFT":
-    #    groupobj,ver=get_versioned_page(groupobj)
-
-    #elif groupobj.status == u"PUBLISHED":
-    #    groupobj = groupobj
-    #the below method would give u the drafted or published contents depending on the user 
-    #upper code is not required
+    
     groupobj,ver=get_page(request,groupobj)    
     # First time breadcrumbs_list created on click of page details
     breadcrumbs_list = []
     # Appends the elements in breadcrumbs_list first time the resource which is clicked
     breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
-    
+
     return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
                                                          'group_id':grpid, 'user':request.user, 
-                                                         'breadcrumbs_list': breadcrumbs_list,
-                                                         'visited_location':visited_location
+                                                         'shelf_list': shelf_list,
+                                                         'shelves': shelves, 
+                                                         'breadcrumbs_list': breadcrumbs_list
                                                         },context_instance=RequestContext(request)
                             )
 
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
-
-    # for getting user's last accessed location    
-    usrid = request.user.id
-    visited_location = ""
-
-    if(usrid):
-
-        usrid = int(request.user.id)
-        usrname = unicode(request.user.username)
-        
-        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-        visited_location = user_group_location.visited_location
 
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_id, gst_group)
@@ -215,8 +226,7 @@ def edit_group(request,group_id):
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
                                         'groupid':group_id,
-                                        'group_id':group_id,
-                                        'visited_location': visited_location
+                                        'group_id':group_id
                                         },
                                       context_instance=RequestContext(request)
                                       )
@@ -240,7 +250,11 @@ def switch_group(request,group_id,node_id):
             coll_obj_list = []
             data_list=[]
             user_id=request.user.id
-            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}}]})
+            all_user_groups=[]
+            for each in get_all_user_groups():
+                all_user_groups.append(each.name)
+            print "list usergrps",all_user_groups
+            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
             for each in node.group_set:
                 coll_obj_list.append(collection.Node.one({'_id':each}))
             data_list=set_drawer_widget(st,coll_obj_list)
@@ -252,19 +266,6 @@ def switch_group(request,group_id,node_id):
 
 
 def publish_group(request,group_id,node):
-
-  # for getting user's last accessed location    
-  usrid = request.user.id
-  visited_location = ""
-
-  if(usrid):
-
-    usrid = int(request.user.id)
-    usrname = unicode(request.user.username)
-        
-    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-    visited_location = user_group_location.visited_location
 
   node=collection.Node.one({'_id':ObjectId(node)})
    
@@ -279,8 +280,7 @@ def publish_group(request,group_id,node):
   return render_to_response("ndf/groupdashboard.html",
                                  { 'group_id':group_id,
                                    'node':node,
-                                   'groupid':group_id,
-                                   'visited_location':visited_location
+                                   'groupid':group_id
                                  },
                                   context_instance=RequestContext(request)
                               )

@@ -1,6 +1,12 @@
 {% load ndf_tags %}
 
-
+{% block head%}  
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+{% endblock%}
 <!-- css for drawer widget -->
 <style type = "text/css">
 
@@ -47,7 +53,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     <h2>
       <span class='node'>{{node.name}}</span>      <small class="label-list"> 
       {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span> 
+      <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
       {% endfor %}
     </small>      
   </h2>
@@ -57,7 +63,19 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
 
-    <dd><a href="#view-graph" data-reveal-id="view-graph"><i class="fi-share"></i> Graph</a></dd>
+    <dd><a href="#view-concept-graph" data-reveal-id="view-concept-graph"><i class="fi-share"></i> Concept Graph</a></dd>
+
+    {% endif %}
+
+    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+
+    <dd><a href="#view-collection-graph" data-reveal-id="view-collection-graph"><i class="fi-share"></i> Collection Graph</a></dd>
+
+    {% endif %}
+
+    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+
+    <dd><a href="#view-dependancy-graph" data-reveal-id="view-dependancy-graph"><i class="fi-share"></i> Dependancy Graph</a></dd>
 
     {% endif %}
 
@@ -157,12 +175,28 @@ background-repeat:no-repeat; background-size: 48px 48px
      </div>
 
 
-     <!-- Tab View Graph -->
-     <div class="content reveal-modal graph-div" id="view-graph" data-reveal>    
+<!-- Tab View Concept Graph -->
+     <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>    
       
       {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
         <a class="close-reveal-modal">&#215;</a>
-      {% include "ndf/node_graph.html" %}
+      {% include "ndf/graph_concept.html" %}
+      {% endif %}
+    </div>
+<!-- Tab View Collection Graph -->
+     <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+      
+      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+        <a class="close-reveal-modal">&#215;</a>
+      {% include "ndf/graph_collection.html" %}
+      {% endif %}
+    </div>
+<!-- Tab View Dependancy Graph -->
+     <div class="content reveal-modal graph-div" id="view-dependancy-graph" data-reveal>    
+      
+      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+        <a class="close-reveal-modal">&#215;</a>
+      {% include "ndf/graph_dependancy.html" %}
       {% endif %}
     </div>
 
@@ -197,7 +231,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     {% if node.collection_set and user.is_authenticated%}
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
-   
+
     {% if node %}
      {% get_publish_policy request groupid node as group_policy %}
         {% check_group node as is_group %}
@@ -227,23 +261,37 @@ background-repeat:no-repeat; background-size: 48px 48px
 <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
 </div>
 
+
      {% edit_policy groupid node request.user as status %}
      
      {% if status == "allow" %}
     {% get_edit_url node.pk as edit_url %}
-
+    {% switch_group_conditions request.user group_id as switch_conditions %}
     {% check_group node as is_group %}
+
+    {% get_user_object node.created_by as created_user %}
 
     {% if is_group %}
 
-             {% get_user_object node.created_by as created_user %}
-
              {% ifequal created_user request.user %}     
-       
+                   
       <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
-         {% endifequal %}
+             {% endifequal %}
 
     {% else %}
+
+             {% if switch_conditions %}     
+
+	<input type="button" id="switch_group" class="button small" value="Publish in group/s">
+<div id="mySystemtype" class="reveal-modal" data-reveal >
+     <h2>Select Groups</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+      </div>
+     <a class="close-reveal-modal st">&#215;</a>
+<input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
+</div>
+              {% endif %}
 
       <a href="{% url edit_url groupid node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
@@ -345,11 +393,10 @@ $.ajax({
   url: "{% url 'get_visited_location' groupid %}",
   success: function(data){ 
 
-    {% if visited_location %}
+    data = JSON.parse(data);
 
-    data = {{visited_location}};
-
-     var lastVisitedLocationVal = data;
+    var lastVisitedLocationVal = data;
+    
     if(lastVisitedLocationVal){
 
       if(lastVisitedLocationVal == "[]"){
@@ -364,16 +411,12 @@ $.ajax({
               map.setView([lat, lng], zoom);
             }
     }
-
-    {% else %}
-
-    if( tempArr.length )
+    else if( tempArr.length )
     {
       var group = new L.featureGroup(tempArr)
           map.fitBounds(group.getBounds());
     }
 
-    {% endif %}
   }
 });
 

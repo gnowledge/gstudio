@@ -6,8 +6,9 @@
 <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
 <!-- orgitdown! skin -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+<!-- start of mobwrite -->
 {% if node_id %}
-	<!-- start of mobwrite -->
 	<script src="/static/js/mobwrite/diff_match_patch.js"></script>
 	<script src="/static/js/mobwrite/core.js"></script>
 	<script src="/static/js/mobwrite/form.js"></script>
@@ -20,7 +21,9 @@
 	</script>
 {% endif %}
 <!-- end of mobwrite -->
+
 {% if node_id %}
+<input type="hidden" value="{% check_existence_textObj_mobwrite node_id %}">
 <textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}" value="{{var_value}}">{{var_value}}</textarea>
 {% else %}
 <textarea id="orgitdown_{{var_name}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}" value="{{var_value}}">{{var_value}}</textarea>

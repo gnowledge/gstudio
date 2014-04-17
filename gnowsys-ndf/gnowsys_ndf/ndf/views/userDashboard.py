@@ -30,6 +30,7 @@ from gnowsys_ndf.settings import GAPPS
 
 db = get_database()
 collection = db[Node.collection_name]
+collection_tr = db[Triple.collection_name]
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 
 
@@ -40,7 +41,7 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 
 def dashboard(request, group_id):	
     
-    auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
     uploaded = "None"
 
@@ -106,11 +107,33 @@ def dashboard(request, group_id):
     else:
       img_obj = "" 
 
+
+    has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+    dbref_has_shelf = has_shelf_RT.get_dbref()
+
+    shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+    shelves = []
+    shelf_list = {}
+
+    if shelf:
+      for each in shelf:
+        shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+        shelves.append(shelf_name)
+
+        shelf_list[shelf_name.name] = []         
+        for ID in shelf_name.collection_set:
+          shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+          shelf_list[shelf_name.name].append(shelf_item.name)
+
+    else:
+      shelves = []
+
     return render_to_response("ndf/userDashboard.html",
                               {'username': request.user.username, 'user_id': ID, 'DOJ': date_of_join, 
                                'prof_pic_obj': img_obj,
                                'group_id':group_id,              
                                'already_uploaded': uploaded,
+                               'shelf_list': shelf_list,'shelves': shelves,
                                'page_drawer':page_drawer,'image_drawer': image_drawer,
                                'video_drawer':video_drawer,'file_drawer': file_drawer,
                                'quiz_drawer':quiz_drawer,'group_drawer': group_drawer,

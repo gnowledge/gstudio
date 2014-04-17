@@ -1,0 +1,145 @@
+<div id="shelf">
+
+<h4 class="text-center">Shelf</h4>
+<dl class="accordion" data-accordion>
+<!-- Adding new shelf text input and add button -->
+  <dd>  
+    <div class="row">
+      <div class="row collapse">
+        <div class="small-10 columns">
+          <input type="text" id="new-shelf-text" onkeyup="(this.value).trim().length?$('#add-shelf-btn').removeClass('disabled'):$('#add-shelf-btn').addClass('disabled');" placeholder="Add new shelf">
+        </div>
+        <div class="small-2 columns">
+          <div id="add-shelf-btn" class="button postfix disabled">Add</div>
+        </div>
+      </div>
+    </div>
+    
+  </dd>
+  
+  {% if shelf_available %}
+      <span style="color:red"> Shelf name {{already_available}} is already exist, please choose different shelf name</span>
+  {% endif %}
+
+  {% for each in shelves %}   
+
+    {% for key,val in shelf_list.items %}          
+
+      {% if key == each.name %}
+ 
+        <dd>
+          <a class="shelfName" href="#shelf{{each}}"> {{ key }} </a>
+
+          <div id="shelf{{each}}" class="content">
+            {% if val %}
+              {% for name in val %}
+                <div class="row">
+                  <div class="row collapse">
+                    <div class="small-8 columns">
+                      {{name}}
+                    </div>
+                    <div class="small-4 columns">
+                      <a class="remove-shelf-item"  name="{{name}}" rel="{{key}}" ><i class='button postfix'>Remove</i></a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+
+            {% endif %}
+
+            {% if shelf_item_available %}
+              <span style="color:red"> Shelf Item name {{shelf_item_available}} is already exist </span>
+            {% endif %}
+
+            <br/>
+            {% if node.name not in val %}            
+            <div class="row">
+              <div class="row collapse">
+                <div class="small-2 columns">
+                  <a class="add-shelf-item"  name="{{each.name}}"><i class='button postfix fi-arrow-right'></i></a>
+                </div>
+                <div class="small-10 columns">
+        	          Add {{node.name}}          
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+          </div>
+      
+        </dd>
+
+      {% endif %}
+
+    {% endfor %}
+ 
+  {% endfor %}   
+
+</dl>
+</div>
+
+<script>
+
+  $("#add-shelf-btn").click(function() {
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'shelf' groupid %}",
+      datatype: "html",
+      data:{
+        shelf_name: $('#new-shelf-text').val(),
+        shelf_add: "{{ node.pk }}",
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#shelf").html(data);
+      }
+    });
+
+  });
+
+  $(".add-shelf-item").click(function() {
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'shelf' groupid %}",
+      datatype: "html",
+      data:{
+        shelf_name: this.name,
+        shelf_add: "{{ node.pk }}",
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#shelf").html(data);
+      }
+    });
+
+  });
+
+  $(".remove-shelf-item").click(function() {
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'shelf' groupid %}",
+      datatype: "html",
+      data:{
+        shelf_name: this.rel,
+        shelf_item_remove: this.name,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#shelf").html(data);
+      }
+    });
+
+  });
+  
+</script>
+
+
+
+
+
+  
+
+
