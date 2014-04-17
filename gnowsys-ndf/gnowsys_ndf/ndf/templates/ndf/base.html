@@ -184,7 +184,7 @@
 							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' 'None' %}">{{gp_id}}</a></li>
 							{% else %}
 							{% for gp_id in groups %}						  		
-
+								
 							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id.name}}</a></li>		
 
 							{% endfor %}	
