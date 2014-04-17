@@ -257,7 +257,12 @@ def get_node_common_fields(request, node, group_id, node_type):
         node.group_set.append(user_group_obj._id)
 
   if tags:
-    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+    for tag in tags.split(","):
+      tag = unicode(tag.strip())
+      if tag:
+        print "\n tags: ", node.tags, " -- ", tag, " -- ", (tag in node.tags)
+        if not (tag in node.tags):
+          node.tags.append(tag)
 
   # -------------------------------------------------------------------------------- prior_node
 

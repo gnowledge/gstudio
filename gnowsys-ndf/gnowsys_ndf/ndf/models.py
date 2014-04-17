@@ -403,45 +403,29 @@ class Node(DjangoDocument):
     ##########  User-Defined Functions ##########
 
     def get_possible_attributes(self, gsystem_type_id_or_list):
-        """Returns a dictionary consisting key as attribute-name and value as list of attribute-data-type and attribute-value, i.e. the 
-        structure required to dynamically build forms for creating GSystems (as 'data-type' determines the html-widget to be selected)
+        """Returns user-defined attribute(s) of given node which belongs to either given single/list of GType(s).
 
         Keyword arguments:
-        gsystem_type_id_or_list -- List of ObjectIds of GSystemTypes' to which the given node (self) belongs
+        gsystem_type_id_or_list -- Single/List of ObjectId(s) of GSystemTypes' to which the given node (self) belongs
   
         If node (self) has '_id' -- Node is created; indicating possible attributes needs to be searched under GAttribute collection & return 
-        value of those attributes (previously existing) as part of the list along with attribute-type-data_type
+        value of those attributes (previously existing) as part of the list along with attribute-data_type
 
         Else -- Node needs to be created; indicating possible attributes needs to be searched under AttributeType collection & return default 
-        value 'None' of those attributes as part of the list along with attribute-type-data_type
+        value 'None' of those attributes as part of the list along with attribute-data_type
   
-        Returns: a dictionary which consists of key as attribute-name and value as list of attribute-data-type and attribute-value
-  
-        Example:
-        
-        (1) For attributes with basic data-type:
-        - first_name: basestring
-        - last_name: basetsring
-        
+        Returns: 
+        Dictionary that holds follwoing details:-
+        Key -- Name of the attribute
+        Value -- It's again a dictionary that holds key and values as shown below:
         {
-          u'first_name': [basestring, <<None/actual-object-value>>]
-          u'last_name': [basestring, <<None/actual-object-value>>]
+          'attribute-type-name': {
+              'altnames': Value of AttributeType node's altnames field,
+              'data_type': Value of AttributeType node's data_type field,
+              'object_value': Value of GAttribute node's object_value field
+          }
         }
-      
-        (2) For attributes with complex data-type:
-        - person_name: {
-                         first_name: basestring,
-                         last_name: basestring
-                       }
-        - documents: [ObjectId]
-      
-        {
-          u'person_name': {
-                            u'first_name': [basestring, <<None/actual-object-value>>]
-                            u'last_name': [basestring, <<None/actual-object-value>>]
-                          }
-          u'documents': [[ObjectId], <<None/actual-object-value>>],
-        }
+        
         """
 
         gsystem_type_list = []
@@ -454,6 +438,7 @@ class Node(DjangoDocument):
             gsystem_type_list = gsystem_type_id_or_list
 
         # Code for finding out attributes associated with each gsystem_type_id in the list
+        collection = get_database()[Node.collection_name]
         for gsystem_type_id in gsystem_type_list:
 
             # Converts string representaion of ObjectId to it's corresponding ObjectId type, if found
@@ -461,39 +446,110 @@ class Node(DjangoDocument):
                 if ObjectId.is_valid(gsystem_type_id):
                     gsystem_type_id = ObjectId(gsystem_type_id)
                 else:
-                    print "\n Invalid ObjectId: ", gsystem_type_id, " is not a valid ObjectId!!!\n"
+                    error_message = "\n ObjectIdError: Invalid ObjectId (" + gsystem_type_id + ") found while finding attributes !!!\n"
+                    raise Exception(error_message)
             
-            # Case - While editing GSystem
+            # Case [A]: While editing GSystem
             # Checking in Gattribute collection - to collect user-defined attributes' values, if already set!
             if self.has_key("_id"):
                 # If - node has key '_id'
-                collection = get_database()[Triple.collection_name]
-                attributes = collection.Triple.find({'subject': self._id})
-            
+                attributes = collection.Triple.find({'_type': "GAttribute", 'subject': self._id})
                 for attr_obj in attributes:
                     # attr_obj is of type - GAttribute [subject (node._id), attribute_type (AttributeType), object_value (value of attribute)]
                     # Must convert attr_obj.attribute_type [dictionary] to collection.Node(attr_obj.attribute_type) [document-object]
-                    AttributeType.append_attribute(collection.Node(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
+                    AttributeType.append_attribute(collection.AttributeType(attr_obj.attribute_type), possible_attributes, attr_obj.object_value)
 
-            # Case - While creating GSystem / if new attributes get added
+            # Case [B]: While creating GSystem / if new attributes get added
             # Again checking in AttributeType collection - because to collect newly added user-defined attributes, if any!
-            collection = get_database()[Node.collection_name]
-            attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': [gsystem_type_id]}})
-
-            for attr in attributes:
-                # Here attr is of type -- AttributeType
-                AttributeType.append_attribute(attr, possible_attributes)
+            attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': gsystem_type_id})
+            for attr_type in attributes:
+                # Here attr_type is of type -- AttributeType
+                AttributeType.append_attribute(attr_type, possible_attributes)
 
             # type_of check for current GSystemType to which the node belongs to
             gsystem_type_node = collection.Node.one({'_id': gsystem_type_id}, {'name': 1, 'type_of': 1})
-
             if gsystem_type_node.type_of:
-                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$all': gsystem_type_node.type_of}})
-                for attr in attributes:
-                    # Here attr is of type -- AttributeType
-                    AttributeType.append_attribute(attr, possible_attributes)
+                attributes = collection.Node.find({'_type': 'AttributeType', 'subject_type': {'$in': gsystem_type_node.type_of}})
+                for attr_type in attributes:
+                    # Here attr_type is of type -- AttributeType
+                    AttributeType.append_attribute(attr_type, possible_attributes)
 
         return possible_attributes
+
+
+    def get_possible_relations(self, gsystem_type_id_or_list):
+        """Returns relation(s) of given node which belongs to either given single/list of GType(s).
+
+        Keyword arguments:
+        gsystem_type_id_or_list -- Single/List of ObjectId(s) of GTypes' to which the given node (self) belongs
+  
+        If node (self) has '_id' -- Node is created; indicating possible relations need to be searched under GRelation collection & return 
+        value of those relations (previously existing) as part of the dict along with relation-type details ('object_type' and 'inverse_name')
+
+        Else -- Node needs to be created; indicating possible relations need to be searched under RelationType collection & return default 
+        value 'None' for those relations as part of the dict along with relation-type details ('object_type' and 'inverse_name')
+  
+        Returns: 
+        Dictionary that holds details as follows:-
+        Key -- Name of the relation
+        Value -- It's again a dictionary that holds key and values as shown below:
+        {
+          'relation-type-name': {
+              'altnames': Value of RelationType node's altnames field,
+              'object_type': Value of RelationType node's object_type field,
+              'inverse_name': Value of RelationType node's inverse_name field,
+              'right_subject': Value of GRelation node's right_subject field
+          }
+        }
+        
+        """
+        gsystem_type_list = []
+        possible_relations = {}
+
+        # Converts to list, if passed parameter is only single ObjectId
+        if not isinstance(gsystem_type_id_or_list, list):
+            gsystem_type_list = [gsystem_type_id_or_list]
+        else:
+            gsystem_type_list = gsystem_type_id_or_list
+
+        # Code for finding out relations associated with each gsystem_type_id in the list
+        collection = get_database()[Node.collection_name]
+        for gsystem_type_id in gsystem_type_list:
+
+            # Converts string representaion of ObjectId to it's corresponding ObjectId type, if found
+            if not isinstance(gsystem_type_id, ObjectId):
+                if ObjectId.is_valid(gsystem_type_id):
+                    gsystem_type_id = ObjectId(gsystem_type_id)
+                else:
+                    error_message = "\n ObjectIdError: Invalid ObjectId (" + gsystem_type_id + ") found while finding relations !!!\n"
+                    raise Exception(error_message)
+            
+            # Case - While editing GSystem
+            # Checking in GRelation collection - to collect relations' values, if already set!
+            if self.has_key("_id"):
+                # If - node has key '_id'
+                relations = collection.Triple.find({'_type': "GRelation", 'subject': self._id})
+                for rel_obj in relations:
+                    # rel_obj is of type - GRelation [subject(node._id), relation_type(RelationType), right_subject(value of related object)]
+                    # Must convert rel_obj.relation_type [dictionary] to collection.Node(rel_obj.relation_type) [document-object]
+                    RelationType.append_relation(collection.RelationType(rel_obj.relation_type), possible_relations, rel_obj.right_subject)
+
+            # Case - While creating GSystem / if new relations get added
+            # Checking in RelationType collection - because to collect newly added user-defined relations, if any!
+            relations = collection.Node.find({'_type': 'RelationType', 'subject_type': gsystem_type_id})
+            for rel_type in relations:
+                # Here rel_type is of type -- RelationType
+                RelationType.append_relation(rel_type, possible_relations)
+
+            # type_of check for current GSystemType to which the node belongs to
+            gsystem_type_node = collection.Node.one({'_id': gsystem_type_id}, {'name': 1, 'type_of': 1})
+            if gsystem_type_node.type_of:
+                relations = collection.Node.find({'_type': 'RelationType', 'subject_type': {'$in': gsystem_type_node.type_of}})
+                for rel_type in relations:
+                    # Here rel_type is of type -- RelationType
+                    RelationType.append_relation(rel_type, possible_relations)
+
+        return possible_relations
 
 
 @connection.register
@@ -564,9 +620,15 @@ class AttributeType(Node):
                 if not inner_attr_dict.has_key(attr_id_or_node.name):
                     # If inner_attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
                     if attr_value is None:
-                        inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value]
+                        inner_attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                                 'data_type': eval(attr_id_or_node.data_type), 
+                                                                 'object_value': attr_value
+                                                                }
                     else:
-                        inner_attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value[attr_id_or_node.name]]
+                        inner_attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                                 'data_type': eval(attr_id_or_node.data_type), 
+                                                                 'object_value': attr_value[attr_id_or_node.name]
+                                                                }
                 
                 if attr_dict.has_key(attr_id_or_node.name):
                     # If this attribute-node exists in outer attr_dict, then remove it
@@ -576,7 +638,10 @@ class AttributeType(Node):
                 # If inner_attr_dict is None
                 if not attr_dict.has_key(attr_id_or_node.name):
                     # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                    attr_dict[attr_id_or_node.name] = [eval(attr_id_or_node.data_type), attr_value]
+                    attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                       'data_type': eval(attr_id_or_node.data_type), 
+                                                       'object_value': attr_value
+                                                      }
 
         else:
             # Code for complex data-type 
@@ -607,7 +672,10 @@ class AttributeType(Node):
                     dt = unicode("[" + attr_id_or_node.complex_data_type[0] + "]")
                     if not attr_dict.has_key(attr_id_or_node.name):
                         # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                        attr_dict[attr_id_or_node.name] = [eval(dt), attr_value]
+                        attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                           'data_type': eval(dt), 
+                                                           'object_value': attr_value
+                                                          }
                     
                 else:
                     # Represents list of complex data-types
@@ -632,7 +700,10 @@ class AttributeType(Node):
 
                 if not attr_dict.has_key(attr_id_or_node.name):
                     # If attr_dict[attr_id_or_node.name] key doesn't exists, then only add it!
-                    attr_dict[attr_id_or_node.name] = [eval(dt), attr_value]
+                    attr_dict[attr_id_or_node.name] = {'altnames': attr_id_or_node.altnames,
+                                                       'data_type': eval(dt), 
+                                                       'object_value': attr_value
+                                                      }
 
 
 @connection.register
@@ -658,52 +729,56 @@ class RelationType(Node):
     ##########  User-Defined Functions ##########
 
     @staticmethod
-    def get_possible_relations(gtype_id_or_list):
-        """Finds possible relations and inverse-relations of a given node (or list of nodes).
+    def append_relation(rel_type_node, rel_dict, right_subject_value=None):
+        """Appends details of a relation in format described below.
         
         Keyword arguments:
-        gtype_id_or_list -- ObjectId or List of ObjectIds whose relationships need to be find out
+        rel_type_node -- Document of RelationType node
+        rel_dict -- Dictionary to which relation-details are appended
+        right_subject_vale -- Actual value of related-subjects (only if provided, otherwise by default it's None)
         
-        Returns: tuple consisting of two dictionaries, each consisting of key as ObjectId of relation-type-node and 
-        value as relation-type-node itself
-        
-        Dictionary #1: Possible relations
-        Dictionary #2: Possible inverse-relations
+        Returns: Dictionary that holds details as follows:
+        Key -- Name of the relation
+        Value -- It's again a dictionary that holds key and values as shown below:
+        {
+          'relation-type-name': {
+              'altnames': Value of RelationType node's altnames field,
+              'object_type': Value of RelationType node's object_type field,
+              'inverse_name': Value of RelationType node's inverse_name field,
+              'right_subject': Value of GRelation node's right_subject field
+          }
+        }
         """
 
-        possible_relations = {}
-        possible_inverse_relations = {}
-
         collection = get_database()[Node.collection_name]
+
+        right_subject_node = None
+
+        if right_subject_value:
+            right_subject_node = collection.Node.one({'_id': right_subject_value})
+
+            if not right_subject_node:
+                error_message = "\n AppendRelationError: Right subject with this ObjectId("+str(right_subject_value)+") doesn't exists !!!"
+                raise Exception(error_message)
+
+        if not rel_dict.has_key(rel_type_node.name):
+            right_subject_list = [right_subject_node] if right_subject_node else []
+
+            rel_dict[rel_type_node.name] = {
+                'altnames': rel_type_node.altnames,
+                'object_type': rel_type_node.object_type,
+                'inverse_name': rel_type_node.inverse_name,
+                'right_subject_list': right_subject_list
+            }
         
-        # Converts to list, if only single ObjectId is passed
-        if not isinstance(gtype_id_or_list, list):
-            gtype_id_or_list = list([gtype_id_or_list])
-            
-        # Code for finding out relationships associated with each gtype_id in the list
-        for gtype_id in gtype_id_or_list:
+        else:
+            right_subject_list = rel_dict[rel_type_node.name]["right_subject_list"] if rel_dict[rel_type_node.name]["right_subject_list"] else []
+            if right_subject_node:
+                if not (right_subject_node in right_subject_list):
+                    right_subject_list.append(right_subject_node)
+                    rel_dict[rel_type_node.name]["right_subject_list"] = right_subject_list
 
-            # Converts string representaion of ObjectId to it's corresponding ObjectId type, if found
-            if not isinstance(gtype_id, ObjectId):
-                if ObjectId.is_valid(gtype_id):
-                    gtype_id = ObjectId(gtype_id)
-                else:
-                    print "\n Invalid ObjectId: ", gtype_id, " is not a valid ObjectId!!!\n"
-
-            possible_relation_cur = collection.Node.find({'_type': 'RelationType', 'subject_type': {'$in': [gtype_id]}})
-            possible_inverse_relation_cur = collection.Node.find({'_type': 'RelationType', 'object_type': {'$in': [gtype_id]}})
-
-            if possible_relation_cur.count():
-                for relation in possible_relation_cur:
-                    if not possible_relations.has_key(relation._id):
-                        possible_relations[relation._id] = relation
-            
-            if possible_inverse_relation_cur.count():
-                for inverse_relation in possible_inverse_relation_cur:
-                    if not possible_inverse_relations.has_key(inverse_relation._id):
-                        possible_inverse_relations[inverse_relation._id] = inverse_relation
-            
-        return possible_relations, possible_inverse_relations
+        return rel_dict
 
 
 class ProcessType(Node):
