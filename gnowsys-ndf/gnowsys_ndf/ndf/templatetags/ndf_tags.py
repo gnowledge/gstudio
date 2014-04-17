@@ -30,9 +30,7 @@ def check_is_user_group(group_id):
     grp=collection.Node.one({'_id':ObjectId(group_id)})
     for each in all_user_grps:
       lst_grps.append(each.name)
-    print grp.name,"all",all_user_grps
     if grp.name in lst_grps:
-      print "true"
       return True
     else:
       return False
