@@ -99,34 +99,36 @@ def dashboard(request, group_id):
             name = User.objects.get(pk=val).username 		
             collab_drawer.append(name)			
             
-    # prof_pic_rel will get the cursor object of relation of user with its profile picture 
-    prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
-    if prof_pic_rel.count() > 0 :
-      index = prof_pic_rel.count() - 1
-      img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
-    else:
-      img_obj = "" 
 
-
-    has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-    dbref_has_shelf = has_shelf_RT.get_dbref()
-
-    shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
     shelves = []
     shelf_list = {}
+    if auth:
+      # prof_pic_rel will get the cursor object of relation of user with its profile picture 
+      prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+      if prof_pic_rel.count() > 0 :
+        index = prof_pic_rel.count() - 1
+        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+      else:
+        img_obj = "" 
 
-    if shelf:
-      for each in shelf:
-        shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
-        shelves.append(shelf_name)
 
-        shelf_list[shelf_name.name] = []         
-        for ID in shelf_name.collection_set:
-          shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-          shelf_list[shelf_name.name].append(shelf_item.name)
+      has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+      dbref_has_shelf = has_shelf_RT.get_dbref()
 
-    else:
-      shelves = []
+      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+
+      if shelf:
+        for each in shelf:
+          shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+          shelves.append(shelf_name)
+
+          shelf_list[shelf_name.name] = []         
+          for ID in shelf_name.collection_set:
+            shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+            shelf_list[shelf_name.name].append(shelf_item.name)
+
+      else:
+        shelves = []
 
     return render_to_response("ndf/userDashboard.html",
                               {'username': request.user.username, 'user_id': ID, 'DOJ': date_of_join, 

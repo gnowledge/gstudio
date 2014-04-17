@@ -44,29 +44,46 @@ get_all_usergroups=get_all_user_groups()
 #######################################################################################################################################
 
 
-def group(request, group_id,app_id):
+def group(request, group_id, app_id):
     """Renders a list of all 'Group-type-GSystems' available within the database.
     """
     group_nodes = []
-    excl_gr_nodes=[]
-    col_Group = db[Group.collection_name]
-    user_list=[]
-    users=User.objects.all()
-    user_groups_len=len(get_all_usergroups)
-    for each in users:
-        user_list.append(each.username)
-    colg = col_Group.Group.find({'_type': u'Group'})
-    colg.sort('name')
-    gr = list(colg)
-    for items in gr:
-            group_nodes.append(items)
-    group_nodes_count = len(group_nodes)-user_groups_len
-    colg = col_Group.Group.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
-    colg.sort('name')
-    gr = list(colg)
-    for items in gr:
-            excl_gr_nodes.append(items)
-    return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_excluding_users':excl_gr_nodes,'group_nodes_count': group_nodes_count,'groupid': group_id,'group_id': group_id}, context_instance=RequestContext(request))
+    group_count = 0
+
+    auth = collection.Node.one({'_type': u"Author", 'name': unicode(request.user.username)})
+
+    if auth:
+        # Logged-In View
+        cur_groups_user = collection.Node.find({'_type': "Group", 
+                                                '_id': {'$nin': [ObjectId(group_id), auth._id]},
+                                                'name': {'$nin': ["home"]},
+                                                '$or': [{'created_by': request.user.id}, {'group_type': 'PUBLIC'}, {'author_set': request.user.id}]
+                                            })
+        if cur_groups_user.count():
+            for group in cur_groups_user:
+                group_nodes.append(group)
+
+        group_count = cur_groups_user.count()
+        
+    else:
+        # Without Log-In View
+        cur_public = collection.Node.find({'_type': "Group", 
+                                           '_id': {'$nin': [ObjectId(group_id)]},
+                                           'name': {'$nin': ["home"]},
+                                           'group_type': "PUBLIC"
+                                       })
+    
+        if cur_public.count():
+            for group in cur_public:
+                group_nodes.append(group)
+        
+        group_count = cur_public.count()
+
+    return render_to_response("ndf/group.html", 
+                              {'group_nodes': group_nodes, 
+                               'group_nodes_count': group_count, 
+                               'groupid': group_id, 'group_id': group_id
+                              }, context_instance=RequestContext(request))
     
 
 
@@ -115,9 +132,10 @@ def create_group(request,group_id):
         has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
         dbref_has_shelf = has_shelf_RT.get_dbref()
 
-        shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-        shelves = []
-        shelf_list = {}
+        if auth:
+            shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+            shelves = []
+            shelf_list = {}
 
         if shelf:
             for each in shelf:
@@ -166,26 +184,27 @@ def group_dashboard(request,group_id=None):
             grpid=groupobj['_id']
 
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-        print "user:", auth.name
 
-        has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-        dbref_has_shelf = has_shelf_RT.get_dbref()
+        if auth:
 
-        shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-        shelf_list = {}
+            has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+            dbref_has_shelf = has_shelf_RT.get_dbref()
 
-        if shelf:
-            for each in shelf:
-                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
-                shelves.append(shelf_name)
+            shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+            shelf_list = {}
 
-                shelf_list[shelf_name.name] = []         
-                for ID in shelf_name.collection_set:
-                    shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-                    shelf_list[shelf_name.name].append(shelf_item.name)
+            if shelf:
+                for each in shelf:
+                    shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                    shelves.append(shelf_name)
+
+                    shelf_list[shelf_name.name] = []         
+                    for ID in shelf_name.collection_set:
+                        shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                        shelf_list[shelf_name.name].append(shelf_item.name)
                     
-        else:
-            shelves = []
+            else:
+                shelves = []
 
 
     except Exception as e:

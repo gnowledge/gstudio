@@ -225,22 +225,24 @@ def shelf(request, group_id):
       else:
         shelf_gs = None
 
-      shelf = collection_tr.Triple.find({'_type': 'GRelation','subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
       shelves = []
       shelf_list = {}
 
-      if shelf:
-        for each in shelf:
-          shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})  
-          shelves.append(shelf_name)
+      if auth:
+        shelf = collection_tr.Triple.find({'_type': 'GRelation','subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+        
+        if shelf:
+          for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})  
+            shelves.append(shelf_name)
 
-          shelf_list[shelf_name.name] = []         
-          for ID in shelf_name.collection_set:
-            shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-            shelf_list[shelf_name.name].append(shelf_item.name)
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_list[shelf_name.name].append(shelf_item.name)
             
-      else:
-        shelves = []
+        else:
+          shelves = []
 
       return render_to_response('ndf/shelf.html', 
                                   { 'shelf_obj': shelf_gs,
