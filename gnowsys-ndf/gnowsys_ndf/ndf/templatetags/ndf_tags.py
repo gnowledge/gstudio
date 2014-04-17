@@ -15,7 +15,7 @@ from gnowsys_ndf.settings import GAPPS, META_TYPE
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
-
+from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 
 register = Library()
@@ -375,12 +375,12 @@ def get_user_group(user):
     if auth_obj:
       auth_type = auth_obj._id
 
-    colg = col_Group.Group.find({ '_type': u'Group', 
+    colg = col_Group.Group.find({ '_type': {'$in': ['Group','Author']},  
                                 'name': {'$nin': ['home']},
-                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id} ] 
                               })
 
-    auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+    auth = col_Group.Group.one({'_type': u"Author", 'name': unicode(user.username)})
     
     if auth:
       for items in colg:
@@ -408,7 +408,7 @@ def get_user_group(user):
 def get_profile_pic(user):
 
   ID = User.objects.get(username=user).pk
-  auth = collection.Node.one({'_type': u'Group', 'name': unicode(user) })
+  auth = collection.Node.one({'_type': u'Author', 'name': unicode(user) })
 
   prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
 
@@ -449,7 +449,7 @@ def get_edit_url(groupid):
     elif type_name == 'QuizItem':
       return 'quiz_item_edit'
 
-  elif node._type == 'Group':
+  elif node._type == 'Group' or node._type == 'Author' :
     return 'edit_group'
 
   elif node._type == 'File':
@@ -717,4 +717,28 @@ def mongo_id(value):
    
     # Return value
     return unicode(str(value))
+
+@register.simple_tag
+def check_existence_textObj_mobwrite(node_id):
+    '''
+	to check object already created or not, if not then create 
+	input nodeid 
+    '''		
+    check = ""
+    system = collection.Node.find_one({"_id":ObjectId(node_id)})
+    filename = TextObj.safe_name(str(system._id))
+    textobj = TextObj.objects.filter(filename=filename)
+    if textobj:
+       textobj = TextObj.objects.get(filename=filename)
+       pass
+    else:
+       if system.content_org == None:
+	   content_org = "None"
+       else :
+	   content_org = system.content_org
+       textobj = TextObj(filename=filename,text=content_org)
+       textobj.save()
+    check = textobj.filename
+    return check
 #textb 
+

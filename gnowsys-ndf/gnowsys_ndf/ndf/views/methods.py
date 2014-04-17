@@ -43,7 +43,7 @@ def check_existing_group(group_name):
   if type(group_name) == 'unicode':
     colg = collection.Node.find({'_type': u'Group', "name": group_name})
   else:
-    colg = collection.Node.find({'_type': u'Group', "_id": group_name._id})
+    colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
 
   if colg.count() >= 1:
     return True
