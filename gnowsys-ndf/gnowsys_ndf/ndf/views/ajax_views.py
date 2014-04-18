@@ -740,7 +740,7 @@ def get_visited_location(request, group_id):
     usrname = unicode(request.user.username)
         
     author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    user_group_location = collection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
     
     if user_group_location:
       visited_location = user_group_location.visited_location
