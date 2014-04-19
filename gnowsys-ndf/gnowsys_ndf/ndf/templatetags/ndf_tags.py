@@ -608,11 +608,12 @@ def group_type_info(groupid,user=0):
       
 @register.assignment_tag
 def user_access_policy(node,user):
+  
   col_Group=db[Group.collection_name]
   group_gst = col_Group.Group.one({'_id':ObjectId(node)})
-	    
   # if user.id in group_gst.group_set or group_gst.created_by == user.id:
   if user.id in group_gst.author_set or group_gst.created_by == user.id:
+    
     return 'allow'
 	    
 	  
@@ -706,23 +707,41 @@ def Group_Editing_policy(groupid,node,user):
 
 
 @register.assignment_tag
-def get_publish_policy(groupid,resnode):
-  col_Group = db[Group.collection_name]
-  node=col_Group.Group.one({"_id":ObjectId(groupid)})
-  group_type=group_type_info(groupid)
-  if group_type == "Moderated":
-     base_group=get_prior_post_node(groupid)
-
-     if base_group is not None:
-       if base_group.status == "DRAFT" or node.status == "DRAFT":
+def get_publish_policy(request,groupid,res_node):
+ col_Group = db[Group.collection_name]
+ node=col_Group.Group.one({"_id":ObjectId(groupid)})
+ resnode=col_Group.Group.one({"_id":ObjectId(res_node._id)})
+ group_type=group_type_info(groupid)
+ group=user_access_policy(groupid,request.user)
+ ver=node.current_version
+ if request.user.id:
+   if group_type == "Moderated":
+      base_group=get_prior_post_node(groupid)
+      if base_group is not None:
+        if base_group.status == "DRAFT" or node.status == "DRAFT":
+            return "allow"
+   elif node.edit_policy == "NON_EDITABLE":
+    if resnode._type == "Group":
+      if ver == "1.1" or resnode.created_by != request.user.id :
+         return "stop"
+    if group == "allow":          
+      if res_node.status == "DRAFT": 
+          return "allow"    
+   elif node.edit_policy == "EDITABLE_NON_MODERATED":
+       #condition for groups
+       if resnode._type == "Group":
+         if ver == "1.1" or  resnode.created_by != request.user.id:
+          return "stop"
+       if group == "allow":
+         if res_node.status == "DRAFT": 
            return "allow"
-           
-  elif node.edit_policy == "NON_EDITABLE":
-       return "allow"    
-  elif node.edit_policy == "EDITABLE_NON_MODERATED":
-      if resnode.status == "DRAFT": 
-         print "working section",resnode.status  
-         return "allow"
+  #code commented in case required for groups not assigned edit_policy        
+  #elif group_type is  None:
+  #  group=user_access_policy(groupid,request.user)
+  #  if group == "allow":
+  #   if resnode.status == "DRAFT":
+  #      return "allow"
+      
   
 #textb
 @register.filter("mongo_id")

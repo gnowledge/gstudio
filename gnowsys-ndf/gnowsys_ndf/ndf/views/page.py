@@ -1,4 +1,4 @@
-''' -- imports from python libraries -- '''
+x''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
 from difflib import HtmlDiff
@@ -146,7 +146,7 @@ def page(request, group_id, app_id=None):
             
         else:
           node = collection.Node.one({"_id":ObjectId(app_id)})
-          if Group_node.edit_policy == "EDITABLE_NON_MODERATED":
+          if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None or Group_node.edit_policy == "NON_EDITABLE":
             page_node,ver=get_page(request,node)
           else:
              #else part is kept for time being until all the groups are implemented
@@ -244,7 +244,6 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
 
-        print "would get out of the page  "
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -257,9 +256,7 @@ def delete_page(request, group_id, node_id):
     Just hide the page from users!
     """
 
-    print "\n node: ", type(node_id), "\n"
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
-    print " op: ", op, "\n"
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
 
@@ -449,7 +446,7 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         return ""
         
 def publish_page(request,group_id,node):
-     
+  print "getting in tite"   
   node=collection.Node.one({'_id':ObjectId(node)})
   page_node,v=get_page(request,node)
   node.content = page_node.content
@@ -462,3 +459,9 @@ def publish_page(request,group_id,node):
    # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
 
   return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
+
+  
+  
+  
+  
+  
