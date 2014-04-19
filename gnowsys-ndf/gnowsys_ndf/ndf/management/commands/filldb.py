@@ -314,6 +314,14 @@ try:
             
         cur = collection.Node.find({'_type': "Author", 'visited_location': {'$exists': False}})
 
+        author_cur = collection.Node.find({'_type': 'Author'})
+
+        if author_cur.count() > 0:
+            for each in author_cur:
+                if each.group_type == None:
+                    collection.update({'_id': each._id}, {'$set': {'group_type': u"PUBLIC", 'edit_policy': u"NON_EDITABLE", 'subscription_policy': u"OPEN"} }, upsert=False, multi=False)    
+                    print "Updated user group policies :", each.name
+
         if cur.count():
             print "\n"
             for each in cur:

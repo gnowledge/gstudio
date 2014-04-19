@@ -23,6 +23,33 @@ db = get_database()
 collection = db[Node.collection_name]
 
 @register.assignment_tag
+def check_is_user_group(group_id):
+  try:
+    lst_grps=[]
+    all_user_grps=get_all_user_groups()
+    grp=collection.Node.one({'_id':ObjectId(group_id)})
+    for each in all_user_grps:
+      lst_grps.append(each.name)
+    if grp.name in lst_grps:
+      return True
+    else:
+      return False
+  except Exception as exptn:
+    print "Exception in check_user_group "+str(exptn)
+@register.assignment_tag
+def switch_group_conditions(user,group_id):
+  try:
+    ret_policy=False
+    req_user_id=User.objects.get(username=user).id
+    print "id",req_user_id
+    group=collection.Node.one({'_id':ObjectId(group_id)})
+    if req_user_id in group.author_set and group.group_type == 'PUBLIC':
+      ret_policy=True
+    return ret_policy
+  except Exception as ex:
+    print "Exception in switch_group_conditions"+str(ex)
+ 
+@register.assignment_tag
 def get_all_user_groups():
   try:
     ret_groups=[]
@@ -252,8 +279,6 @@ def get_twist_replies(twist):
   exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(twist._id)}]})
   for each in exstng_reply:
     lst=get_rec_objs(each)
-        
-      
   return ret_replies
 
 
@@ -399,13 +424,16 @@ def get_profile_pic(user):
   ID = User.objects.get(username=user).pk
   auth = collection.Node.one({'_type': u'Author', 'name': unicode(user) })
 
-  prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+  if auth:
+    prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
 
-  if prof_pic_rel.count() > 0 :
-    index = prof_pic_rel.count() - 1
-    prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+    if prof_pic_rel.count() > 0 :
+      index = prof_pic_rel.count() - 1
+      prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+    else:
+      prof_pic = "" 
   else:
-    prof_pic = "" 
+    prof_pic = ""
 
   return prof_pic
 
