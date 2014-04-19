@@ -28,6 +28,8 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.mobwrite.models import ViewObj
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 import json
  
 db = get_database()
@@ -744,3 +746,31 @@ def get_visited_location(request, group_id):
       visited_location = user_group_location.visited_location
   
   return StreamingHttpResponse(json.dumps(visited_location))
+
+@login_required
+def get_online_editing_user(request, group_id):
+    '''
+    get user who online editing org editor
+    '''
+    if request.is_ajax() and request.method =="POST":
+        editorid = request.POST.get('editorid',"")
+    viewobj = ViewObj.objects.filter(filename=editorid)
+    userslist = []
+    if viewobj:
+        for each in viewobj:
+            if not each.username == request.user.username:
+                blankdict = {}
+                blankdict['username']=each.username
+                get_profile =  get_profile_pic(each.username)
+                if get_profile :
+                    blankdict['pro_img'] = "/"+str(group_id)+"/image/thumbnail/"+str(get_profile._id)
+                else :
+                    blankdict['pro_img'] = "no";
+                userslist.append(blankdict)
+        if len(userslist) == 0:
+            userslist.append("No users")
+    else :
+        userslist.append("No users")
+    return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+        
+
