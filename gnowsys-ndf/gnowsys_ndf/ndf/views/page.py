@@ -146,7 +146,7 @@ def page(request, group_id, app_id=None):
             
         else:
           node = collection.Node.one({"_id":ObjectId(app_id)})
-          if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None:
+          if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None or Group_node.edit_policy == "NON_EDITABLE":
             page_node,ver=get_page(request,node)
           else:
              #else part is kept for time being until all the groups are implemented
