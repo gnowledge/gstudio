@@ -51,11 +51,11 @@
       <span class='node'>{{node.name}}</span>
       <span><a class="button" href="{% url 'create_edit' groupid node.pk %}">Edit</a></span>
     </h2>
-    <h3 class="subheader">
+    <h3 class="subheader"></h3>
       <small> 
 	Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>
       </small>
-    </h3>
+
   </section>
 </header>
 

@@ -58,5 +58,6 @@ TAGS
 # others
 local/
 include/
-static/
+rcs-repo/
+mathjax/
 *.db
