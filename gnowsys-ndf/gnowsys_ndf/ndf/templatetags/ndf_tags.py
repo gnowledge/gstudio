@@ -55,16 +55,14 @@ def get_apps_for_groups(groupid):
     grp=collection.Node.one({'_id':ObjectId(groupid)})
     poss_atts=grp.get_possible_attributes(at_apps_list._id)
     if poss_atts:
-      list_apps=poss_atts['apps_list'][1]
+      list_apps=poss_atts['apps_list']['object_value']
       counter=1
-      print "list_apps -",list_apps
       for each in list_apps:
         obdict={}
         obdict['id']=each['_id']
         obdict['name']=each['name']
         ret_dict[counter]=obdict
         counter+=1 
-      print "return in apps",ret_dict  
       return ret_dict 
     else:
       gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -79,7 +77,7 @@ def get_apps_for_groups(groupid):
             gapps[i] = {'id': node._id, 'name': node.name.lower()}
       return gapps
   except Exception as exptn:
-    print "Exception in get_apps_for_home "+str(exptn)
+    print "Exception in get_apps_for_groups "+str(exptn)
 
 
 
