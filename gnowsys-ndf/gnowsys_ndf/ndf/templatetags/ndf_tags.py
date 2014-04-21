@@ -11,16 +11,77 @@ from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, META_TYPE
+from gnowsys_ndf.settings import GAPPS, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
+from django.contrib.sites.models import Site
 
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
+at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+  
+
+@register.assignment_tag
+def get_create_group_visibility():
+  if CREATE_GROUP_VISIBILITY:
+    return True
+  else:
+    return False
+
+@register.assignment_tag
+def get_site_info():
+  sitename=Site.objects.all()[0].name.__str__()
+  return sitename
+
+@register.assignment_tag
+def check_gapp_menus(groupid):
+  grp=collection.Node.one({'_id':ObjectId(groupid)})
+  if not at_apps_list:
+    return False
+  poss_atts=grp.get_possible_attributes(at_apps_list._id)
+  if not poss_atts:
+    return False
+  return True
+  
+ 
+@register.assignment_tag
+def get_apps_for_groups(groupid):
+  try:
+    ret_dict={}
+    grp=collection.Node.one({'_id':ObjectId(groupid)})
+    poss_atts=grp.get_possible_attributes(at_apps_list._id)
+    if poss_atts:
+      list_apps=poss_atts['apps_list'][1]
+      counter=1
+      print "list_apps -",list_apps
+      for each in list_apps:
+        obdict={}
+        obdict['id']=each['_id']
+        obdict['name']=each['name']
+        ret_dict[counter]=obdict
+        counter+=1 
+      print "return in apps",ret_dict  
+      return ret_dict 
+    else:
+      gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+      gapps = {}
+      i = 0;
+      meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+      GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+      for node in GAPPS:
+        if node:
+          if node.name not in ["Image", "Video"]:
+            i = i+1;
+            gapps[i] = {'id': node._id, 'name': node.name.lower()}
+      return gapps
+  except Exception as exptn:
+    print "Exception in get_apps_for_home "+str(exptn)
+
+
 
 @register.assignment_tag
 def check_is_user_group(group_id):
