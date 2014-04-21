@@ -1,17 +1,17 @@
 <style type="text/css">
-		#chart-dependancy .link
+		#chart-dependency .link
 		{
 			stroke: #ccc;
 		}
 
-		#chart-dependancy .nodetext {
+		#chart-dependency .nodetext {
 			#pointer-events: none;
 			font: 10px Serif;
 			font-style:italic;
 		}
 
 		/*Central node shown in ellipse*/
-		#chart-dependancy .mainnode{
+		#chart-dependency .mainnode{
 			font: 15px sans-serif;
 			fill:"black";
 			border-width: 1px;
@@ -20,13 +20,13 @@
 		}
 
 		/*Connector element that connects two nodes*/
-		#chart-dependancy .relnode {
+		#chart-dependency .relnode {
 			font: 10px sans-serif;			
 			fill:#404040;
 		}
 
 		/*Peripheral nodes to main node*/
-		#chart-dependancy .node {
+		#chart-dependency .node {
 			border-width: 1px;
 			border-color: gray;
 			fill:#154534;
@@ -40,7 +40,7 @@
 		*/
 
 		/* Div containing SVG area*/
-		#chart-dependancy {
+		#chart-dependency {
 			display: block;
 			padding-top: 1%;
 			height: 87%;
@@ -49,22 +49,22 @@
 			display: block;
 		}
 
-		#view-dependancy-graph svg {
+		#view-dependency-graph svg {
 			margin-left: 1%;
 		}
 
-		#view-dependancy-graph .graph-info-panel {
+		#view-dependency-graph .graph-info-panel {
 			background-color:#F2F2F2; 
 			width:20%; height:100%; 
 			display:inline-block; float:left;
 		}
 
-		#view-dependancy-graph .graph-info-panel div:first-child {
+		#view-dependency-graph .graph-info-panel div:first-child {
 			height:90%;
 		}
 
-		#view-dependancy-graph .button {	background-color: #008759;	}
-		#view-dependancy-graph .button:hover {	background-color: #00ba7b	;	}
+		#view-dependency-graph .button {	background-color: #008759;	}
+		#view-dependency-graph .button:hover {	background-color: #00ba7b	;	}
 
 		/* New CSS for Filter container 	*/
             .sidebar
@@ -136,83 +136,100 @@
                 </div>
 			</div>
 			<!-- Download Button -->
-			<input type="button" class="button expand" value="Save as SVG" onclick='dependancyg_download("{{node.name}}");' />
+			<input type="button" class="button expand" value="Save as SVG" onclick='dependencyg_download("{{node.name}}");' />
 		</div>
 
 		<!-- Div containing svg area -->
-		<div id="chart-dependancy"></div>
+		<div id="chart-dependency"></div>
 			<script type="text/javascript">
 
 			var graphHeight = ($(window).height()*0.87), // Getting 87% of window height 
 				graphWidth  = ($(window).width()*0.77);	 // Getting 77% of window width 
 
-			var dependancyg_objectid = "{{node.pk}}";				// _id of current viewing page
+			var dependencyg_objectid = "{{node.pk}}";				// _id of current viewing page
 			var flag=false;								// flag used for shift+click (Fixing position of node)
+			var tempd_mainnode
 
-
-			function dependancyg_init(a,b)
+// -------------------Start dependencyg_init()--------------------
+			function dependencyg_init(a,b)
 			{
-				dependancyg_nodes_by_id = _.reduce(a, function(acc, n) 
+				dependencyg_nodes_by_id = _.reduce(a, function(acc, n) 
 				{
 					acc[n._id] = n;
 					return acc;
 				}, {});
 
-				dependancyg_all_edges=new Array();
+				dependencyg_all_edges=new Array();
 
-		    	//dependancyg_all_edges contains all the links between the nodes
-		   		dependancyg_all_edges =_(b).chain().map(function(e)
+		    	//dependencyg_all_edges contains all the links between the nodes
+		   		dependencyg_all_edges =_(b).chain().map(function(e)
 		    	{
-		    		e.source = dependancyg_nodes_by_id[e.from];
-		    		e.target = dependancyg_nodes_by_id[e.to];
-					//e.type = dependancyg_nodes_by_id[e.type]
+		    		if ((e.from).slice(-2) != "_r")
+		    		{
+		    			e.source = dependencyg_nodes_by_id[e.from];
+		    			tempd_mainnode = e.source;
+		    		}
+		    		else
+		    		{
+		    			e.source = tempd_mainnode;
+		    		}
+
+		    		if ((e.to).slice(-2) != "_r")
+		    		{
+		    			e.target = dependencyg_nodes_by_id[e.to];
+		    		}
+		    		else
+		    		{
+		    			e.target = tempd_mainnode;
+		    		}
+					//e.type = dependencyg_nodes_by_id[e.type]
 					return e;
 				}).filter(function(e)
 				{
-					return dependancyg_nodes_by_id[e.from] && dependancyg_nodes_by_id[e.to]&& e.type!="title" && e.type!="content" && e.type!="authors" && e.type!="plural" && e.type!="altnames" && e.type!="access_policy" && e.type!="collection_set"
+					return dependencyg_nodes_by_id[e.from] && dependencyg_nodes_by_id[e.to]&& e.type!="title" && e.type!="content" && e.type!="authors" && e.type!="plural" && e.type!="altnames" && e.type!="access_policy" && e.type!="collection_set"
 				}).value();  
-			} // ====== END of init() ======
+			}
+// -------------------End Of dependencyg_init()---------------------
 
-
-			// -------------------fgraph()--------------------
-			function dependancyg_fgraph() 
+// -------------------Start dependencyg_fgraph()--------------------
+			function dependencyg_fgraph() 
 			{	
-				dependancyg_neighbour_node	= new Array();
-	    		dependancyg_clicked_node	= new Array();
-			    dependancyg_prev_node		= new Array();
+				dependencyg_neighbour_node	= new Array();
+	    		dependencyg_clicked_node	= new Array();
+			    dependencyg_prev_node		= new Array();
 
-			    dependancyg_neighbour_node	= dependancyg_neighbour_node.concat(dependancyg_objectid);  
+			    dependencyg_neighbour_node	= dependencyg_neighbour_node.concat(dependencyg_objectid);  
     
-				$.getJSON("{% url 'get_graph_json' groupid %}?id=" + dependancyg_objectid, function (json1)
+				$.getJSON("{% url 'get_graph_json' groupid %}?id=" + dependencyg_objectid, function (json1)
 				{
-					dependancyg_metadata  = json1.node_metadata;
-					dependancyg_relations = json1.relations;
+					dependencyg_metadata  = json1.node_metadata;
+					dependencyg_relations = json1.relations;
 
-					dependancyg_init(dependancyg_metadata,dependancyg_relations);
-					// createFilter(dependancyg_metadata,dependancyg_relations);
-					dependancyg_load(dependancyg_objectid);
+					dependencyg_init(dependencyg_metadata,dependencyg_relations);
+					// createFilter(dependencyg_metadata,dependencyg_relations);
+					dependencyg_load(dependencyg_objectid);
 				}); // --END of getJSON()
-			} // ====== END of fgraph ======
+			}
+// -------------------End of dependencyg_fgraph()--------------------
 
-
-			// -------------------dependancyg_load()--------------------
-			function dependancyg_load(key)
+// -------------------Start dependencyg_load()-----------------------
+			function dependencyg_load(key)
 			{
 				var w = graphWidth,
 					h = graphHeight,
 					fill = d3.scale.category20();
 
-				var vis = d3.select("#chart-dependancy")
+				var vis = d3.select("#chart-dependency")
 							.append("svg:svg")
-							.attr("id", "dependancyg_amazingViz")
+							.attr("id", "dependencyg_amazingViz")
 							.attr("height", h)
 							.attr("width", w)
 							.attr("xmlns", "http://www.w3.org/2000/svg")
 							.attr("version", "1.1");
 
-				// Definition of marker
+			// Definition of marker
                 vis.append("svg:marker")
-    		             .attr("id", "dependancyg_arrowhead")
+    		             .attr("id", "dependencyg_arrowhead")
                 		 .attr("viewBox","0 0 10 10")
                 		 .attr("refX","20")
                 		 .attr("refY","5")
@@ -224,7 +241,7 @@
                 		 .attr("d","M 0 0 L 10 5 L 0 10 z")
                 		 .attr("fill", "#6D6666"); 
 
-				// Adding white color rectangle to background of graph 
+			// Adding white color rectangle to background of graph 
 				vis.append("rect")
 					.attr("height", "100%")
 					.attr("width", "100%")
@@ -234,16 +251,16 @@
 
 				vis.append("svg:g").attr("class", "nodes");
 
-				dependancyg_nodes_by_id[key].x = w/2.0;
-				dependancyg_nodes_by_id[key].y = h/2.0;       
+				dependencyg_nodes_by_id[key].x = w/2.0;
+				dependencyg_nodes_by_id[key].y = h/2.0;       
 
-				// Defining properties of graph
+			// Defining properties of graph
 				var force = d3.layout.force()
 							.linkStrength(1)
 							.charge(-5000)
 							.friction(0.7)
 							.gravity(0.5)
-							.linkDistance(10)
+							.linkDistance(70)
 							.nodes([])
 							.links([])
 							.size([w, h])
@@ -251,23 +268,24 @@
 
 				var drag = force.drag();
 
+		// -------------------Start update()-----------------------
 				function update(edges)
 				{
-			    	// for each func
-				    _.each(dependancyg_nodes_by_id, function(n){n.added = false});
+			    // for each func
+				    _.each(dependencyg_nodes_by_id, function(n){n.added = false});
 
-			    	// reduce the nodes list to have only those nodes for a given rel.
+			    // reduce the nodes list to have only those nodes for a given rel.
 				    var nodes = _.reduce(edges, function(acc, e) 
 				    {
-				    	if(dependancyg_nodes_by_id[e.from] && !dependancyg_nodes_by_id[e.from].added)
+				    	if(dependencyg_nodes_by_id[e.from] && !dependencyg_nodes_by_id[e.from].added)
 				    	{
-				        	dependancyg_nodes_by_id[e.from].added = true;
-			    	    	acc.push(dependancyg_nodes_by_id[e.from]);
+				        	dependencyg_nodes_by_id[e.from].added = true;
+			    	    	acc.push(dependencyg_nodes_by_id[e.from]);
 			    	    }
-				        if(dependancyg_nodes_by_id[e.to] && !dependancyg_nodes_by_id[e.to].added)
+				        if(dependencyg_nodes_by_id[e.to] && !dependencyg_nodes_by_id[e.to].added)
 				        {
-				        	dependancyg_nodes_by_id[e.to].added = true;
-				        	acc.push(dependancyg_nodes_by_id[e.to]);
+				        	dependencyg_nodes_by_id[e.to].added = true;
+				        	acc.push(dependencyg_nodes_by_id[e.to]);
 				        }
 				        return acc;
 				    }, []);
@@ -276,9 +294,9 @@
 				    force.links(edges);
 				    force.start();
 
-				    var link = d3.select("#chart-dependancy g.edges")
+				    var link = d3.select("#chart-dependency g.edges")
 				    		 .selectAll("line.link")
-				    		 .select(this.dependancyg_arrowhead)
+				    		 .select(this.dependencyg_arrowhead)
 				    	     .data(edges, function(e){return e.from + "-" + e.to + "-" + e.type});
 
 				    link.enter().append("svg:line")
@@ -290,9 +308,9 @@
 	                	.attr("x2", function(d) {	return d.target.x; })
 	                	.attr("y2", function(d) {	return d.target.y; })
 		                .attr("text", function(d) {	return d.type; })
-		                .attr("marker-end", "url(#dependancyg_arrowhead)");
+		                .attr("marker-end", "url(#dependencyg_arrowhead)");
 
-	                var node = d3.select("#chart-dependancy g.nodes")
+	                var node = d3.select("#chart-dependency g.nodes")
 	                			 .selectAll("g.node")
 	                			 .data(nodes);
 
@@ -312,7 +330,7 @@
                 					.call(drag);
 
                 	
-                // $("#chart-dependancy").bind('click',function(event) {
+                // $("#chart-dependency").bind('click',function(event) {
                 	// if(event.ctrlKey==1){
 
 	                $(window).bind('keydown',function(event) 
@@ -321,7 +339,7 @@
 	                	{
 	                		new_g.on("click",function(d)
 	                		{
-	                			if( d.expanded=="true" && d._id!=dependancyg_objectid )
+	                			if( d.expanded=="true" && d._id!=dependencyg_objectid )
 	                			{
 	                				$.ajax(
 	                					{	
@@ -337,28 +355,28 @@
 	                								{
 	                									if(e._id)
 	                									{
-	                										dependancyg_clicked_node = dependancyg_clicked_node.concat(e._id) ;
+	                										dependencyg_clicked_node = dependencyg_clicked_node.concat(e._id) ;
 	                									}
 	                								});
 
-	                							index = _.indexOf(dependancyg_neighbour_node , d._id);
+	                							index = _.indexOf(dependencyg_neighbour_node , d._id);
 
-	                							dependancyg_prev_node = dependancyg_neighbour_node.slice(0,index);
-	                							dependancyg_neighbour_node = _.difference(dependancyg_neighbour_node,dependancyg_clicked_node) ;
-	                							dependancyg_neighbour_node= dependancyg_neighbour_node.concat(dependancyg_prev_node);
-	                							dependancyg_neighbour_node = _.uniq(dependancyg_neighbour_node);
+	                							dependencyg_prev_node = dependencyg_neighbour_node.slice(0,index);
+	                							dependencyg_neighbour_node = _.difference(dependencyg_neighbour_node,dependencyg_clicked_node) ;
+	                							dependencyg_neighbour_node= dependencyg_neighbour_node.concat(dependencyg_prev_node);
+	                							dependencyg_neighbour_node = _.uniq(dependencyg_neighbour_node);
 	                						}
 	                					});
 
-									dependancyg_metadata = []
-									dependancyg_relations = []
+									dependencyg_metadata = []
+									dependencyg_relations = []
 									metadata1 = []
 									relations1 = []
 
-									for(i=0;i<(dependancyg_neighbour_node.length);i++)
+									for(i=0;i<(dependencyg_neighbour_node.length);i++)
 									{
-										d3.select("#dependancyg_amazingViz").remove();
-										g = dependancyg_neighbour_node[i]
+										d3.select("#dependencyg_amazingViz").remove();
+										g = dependencyg_neighbour_node[i]
 
 										$.ajax(
 											{
@@ -372,33 +390,33 @@
 													new_metadata	= json2.node_metadata;
 													new_relations	= json2.relations;
 
-													dependancyg_metadata	= _.union(new_metadata,dependancyg_metadata);
-													dependancyg_relations	= _.union(new_relations,dependancyg_relations);
-													dependancyg_relations	= dependancyg_check_Relationtype(dependancyg_metadata,dependancyg_relations);
+													dependencyg_metadata	= _.union(new_metadata,dependencyg_metadata);
+													dependencyg_relations	= _.union(new_relations,dependencyg_relations);
+													dependencyg_relations	= dependencyg_check_Relationtype(dependencyg_metadata,dependencyg_relations);
 												}
 											});
 									}
 
-                          			_.each(dependancyg_metadata, function(m)
+                          			_.each(dependencyg_metadata, function(m)
                           			{
-                          				for(i=0;i<dependancyg_neighbour_node.length;i++)
+                          				for(i=0;i<dependencyg_neighbour_node.length;i++)
                           				{
-                          					if(m._id == dependancyg_neighbour_node[i])
+                          					if(m._id == dependencyg_neighbour_node[i])
                           					{	m.expanded	=	"true";		}
                           					else
                           					{	m.expanded	=	"false";	}
                           				}
                           			});
 
-                          			dependancyg_init(dependancyg_metadata,dependancyg_relations);
-                          			dependancyg_load(dependancyg_objectid) ;
+                          			dependencyg_init(dependencyg_metadata,dependencyg_relations);
+                          			dependencyg_load(dependencyg_objectid) ;
                           		} // --END if
-                          		// else if(d._id>0 && d._id!= dependancyg_objectid)
-                          		else if(d._id!= dependancyg_objectid)
+                          		// else if(d._id>0 && d._id!= dependencyg_objectid)
+                          		else if(d._id!= dependencyg_objectid)
                           		{
-                          			dependancyg_neighbour_node =dependancyg_neighbour_node.concat(d._id);
+                          			dependencyg_neighbour_node =dependencyg_neighbour_node.concat(d._id);
 
-                          			d3.select("#dependancyg_amazingViz").remove();
+                          			d3.select("#dependencyg_amazingViz").remove();
 
                           			$.ajax(
                           				{
@@ -412,23 +430,23 @@
 		                          				new_metadata	=	json2.node_metadata;
 		                          				new_relations	=	json2.relations;
 
-		                          				dependancyg_metadata	=	_.union(new_metadata,dependancyg_metadata);
-		                          				dependancyg_relations	=	_.union(new_relations,dependancyg_relations);
-		                          				dependancyg_relations	=	dependancyg_check_Relationtype(dependancyg_metadata,dependancyg_relations);
+		                          				dependencyg_metadata	=	_.union(new_metadata,dependencyg_metadata);
+		                          				dependencyg_relations	=	_.union(new_relations,dependencyg_relations);
+		                          				dependencyg_relations	=	dependencyg_check_Relationtype(dependencyg_metadata,dependencyg_relations);
 
-		                          				_.each(dependancyg_metadata, function(m)
+		                          				_.each(dependencyg_metadata, function(m)
 		                          				{
-		                          					for(i=0;i<dependancyg_neighbour_node.length;i++)
+		                          					for(i=0;i<dependencyg_neighbour_node.length;i++)
 		                          					{
-		                          						if(m._id == dependancyg_neighbour_node[i])
+		                          						if(m._id == dependencyg_neighbour_node[i])
 		                          							m.expanded = "true";
 		                          					}
 		                          				});
 		                          			}
                           				});
 
-                					dependancyg_init(dependancyg_metadata,dependancyg_relations);
-                					dependancyg_load(dependancyg_objectid);
+                					dependencyg_init(dependencyg_metadata,dependencyg_relations);
+                					dependencyg_load(dependencyg_objectid);
                 				}
                 			});
 						}
@@ -436,7 +454,7 @@
 						if(event.keyCode==16)
 						{
 							flag = true;
-							new_g.on("click",dependancyg_ondrag);
+							new_g.on("click",dependencyg_ondrag);
 						}
 					});
 
@@ -462,7 +480,7 @@
                 	// .style("stroke", "#666")
                 	// .style("stroke-width", "1.5px")
                 		.style("fill", function(d) {if (d.refType=="Relation") return "#008759"; else if(d.refType=="GSystem") return "#008759"; else return "none"})
-                		.on("dblclick",dependancyg_dblclick);
+                		.on("dblclick",dependencyg_dblclick);
 
 
                 	var text1 = new_g.append("svg:text")
@@ -477,7 +495,7 @@
                 				 .attr("dy", ".35em")
                 				 .attr("text-anchor","middle")
                 				 .on("drag",drag)
-                				 .text(function(d){  if(d.screen_name != "prior_node")
+                				 .text(function(d){  if((d._id).slice(-2) != "_r")
                 				 					 {	return d.screen_name; }
                 				 					}	)
                 				 .style("font", function(d){
@@ -491,7 +509,7 @@
                 				 	else if((d._id).slice(-2)=="_r")
                 				 		{ return "#404040"}
                 				 })
-                				 .on("dblclick", dependancyg_dblclick)
+                				 .on("dblclick", dependencyg_dblclick)
                 				 .attr("class","nodeText");
 
                 		// bbox = text1.node().getBBox();
@@ -512,8 +530,8 @@
 
                 	force.on("tick", function()
                 	{
-                		var x_center = $("#chart-dependancy").width() / 2;
-                		var y_center = $("#chart-dependancy").height() / 2;
+                		var x_center = $("#chart-dependency").width() / 2;
+                		var y_center = $("#chart-dependency").height() / 2;
 
                 		link.attr("x1", function(d) { return d.source.x; })
                 			.attr("y1", function(d) { return d.source.y; })
@@ -522,23 +540,25 @@
 
                 			node.attr("transform", function(d) { return "translate(" + (d.x-20) + "," + (d.y-20) + ")"; });
                 	});
-                } //---------------END of update()---------------
+                }
+       	//---------------END of update()---------------
 
-                update(dependancyg_all_edges);
+                update(dependencyg_all_edges);
 
                 vis.style("opacity", 1e-6)
                 	.transition()
                 	.duration(1000)
                 	.style("opacity", 1);
-            } //---------------END of dependancyg_load()---------------
+            }
+//---------------END of dependencyg_dblclickyg_load()---------------
 
 //--------------- Sticky Feature Code ---------------
-			function dependancyg_dblclick(d)
+			function dependencyg_dblclick(d)
             {
             	//double click to remove the fix posiotion of node.
             	d3.select(this).classed("fixed", d.fixed = false);
             }
-            function dependancyg_ondrag(d)
+            function dependencyg_ondrag(d)
             {
             	//Check if flag is true then it will fix the position for node.
                	//But without shift + click node will not fix.
@@ -558,8 +578,8 @@
             }
 //--------------- END of Sticky Feature Code ---------------
 
-// //--------------- Graph filter Feature Code ----------------
-// 			// createFilter() to create check box's
+//--------------- Graph filtration Code --------------------
+ 			// createFilter() to create check box's
 //                 function createFilter(node_meta,rel)
 //                 {
 //                 	var relations_a = new Array();
@@ -583,7 +603,7 @@
 //                 	  .append("label")
 //                 	  .each(function (d)
 //                 	  {
-//                 	  	if(d._id.slice(-2) == "_r" && d.screen_name!="prior_node" && d.screen_name!="dependancy_set")
+//                 	  	if(d._id.slice(-2) == "_r" && d.screen_name!="prior_node" && d.screen_name!="dependency_set")
 //                 	  	{
 //                 	  	// Create checkbox for each data
 // 	                	  	d3.select(this)
@@ -636,9 +656,9 @@
 //                 		$("a[id|='"+Id_rel[i]+"']").toggle();
 //                 	}
 // 				}
-// //--------------- END of Graph filter Feature Code ----------------
+//--------------- END of Graph filtration Code ----------------
 
-                function dependancyg_check_Relationtype(metadata,relations)
+                function dependencyg_check_Relationtype(metadata,relations)
                 {
                 	_.each(metadata,function(d)
                 	{
@@ -658,18 +678,19 @@
                 	return relations;
                 }
 
-                $(dependancyg_fgraph());
+                $(dependencyg_fgraph());
 
-                function dependancyg_download(filename) 
+//--------------- Save the Graph ----------------
+                function dependencyg_download(filename) 
                 {
 				    // var el = document.createElement('a');
 				    // el.setAttribute('href', 'data:image/svg+xml;,' + encodeURIComponent(svgdata));
-				    // el.setAttribute('dependancyg_download', filename);
+				    // el.setAttribute('dependencyg_download', filename);
 				    // el.click();
 
-				    var blob = new Blob([$("#chart-dependancy").html()], {type: "image/svg+xml"});
+				    var blob = new Blob([$("#chart-dependency").html()], {type: "image/svg+xml"});
 				    filename = filename.replace(/\ /g, '_');
-				    filename += "_graph.svg";
+				    filename += "_Dependency_Graph.svg";
 					saveAs(blob, filename);
 				}
 		</script>

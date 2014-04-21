@@ -64,23 +64,14 @@ background-repeat:no-repeat; background-size: 48px 48px
   <dl class="row tabs" data-tab>
     <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
-    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-
-    <dd><a href="#view-concept-graph" data-reveal-id="view-concept-graph"><i class="fi-share"></i> Concept Graph</a></dd>
-
-    {% endif %}
-
-    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-
-    <dd><a href="#view-collection-graph" data-reveal-id="view-collection-graph"><i class="fi-share"></i> Collection Graph</a></dd>
-
-    {% endif %}
-
-    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-
-    <dd><a href="#view-dependancy-graph" data-reveal-id="view-dependancy-graph"><i class="fi-share"></i> Dependancy Graph</a></dd>
-
-    {% endif %}
+    <dd>
+        <a href="#" data-dropdown="hover1" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+            <ul id="hover1" class="f-dropdown" data-dropdown-content>
+                <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+                <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+                <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+            </ul>
+    </dd>
 
     <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
@@ -177,30 +168,20 @@ background-repeat:no-repeat; background-size: 48px 48px
        {% endwith %}
      </div>
 
-
-<!-- Tab View Concept Graph -->
-     <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>    
-      
-      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+<!-- Content for Concept Graph -->
+    <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
         <a class="close-reveal-modal">&#215;</a>
-      {% include "ndf/graph_concept.html" %}
-      {% endif %}
+        {% include "ndf/graph_concept.html" %}
     </div>
-<!-- Tab View Collection Graph -->
+<!-- Content for Collection Graph -->
      <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-      
-      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-        <a class="close-reveal-modal">&#215;</a>
+      <a class="close-reveal-modal">&#215;</a>
       {% include "ndf/graph_collection.html" %}
-      {% endif %}
     </div>
-<!-- Tab View Dependancy Graph -->
-     <div class="content reveal-modal graph-div" id="view-dependancy-graph" data-reveal>    
-      
-      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-        <a class="close-reveal-modal">&#215;</a>
-      {% include "ndf/graph_dependancy.html" %}
-      {% endif %}
+<!-- Content for dependency Graph -->
+     <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+      <a class="close-reveal-modal">&#215;</a>
+      {% include "ndf/graph_dependency.html" %}
     </div>
 
      <!-- Tab View Map Widget -->

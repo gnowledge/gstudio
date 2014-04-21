@@ -135,11 +135,11 @@
     	            </div> -->
                 </div>
 			</div>
-			<!-- Download Button -->
+		<!-- Download Button -->
 			<input type="button" class="button expand" value="Save as SVG" onclick='collectiong_download("{{node.name}}");' />
 		</div>
 
-		<!-- Div containing svg area -->
+	<!-- Div containing svg area -->
 		<div id="chart-collection"></div>
 			<script type="text/javascript">
 
@@ -148,8 +148,9 @@
 
 			var collectiong_objectid = "{{node.pk}}";				// _id of current viewing page
 			var flag=false;								// flag used for shift+click (Fixing position of node)
+			var tempc_mainnode
 
-
+// -------------------Start collectiong_init()---------------------
 			function collectiong_init(a,b)
 			{
 				collectiong_nodes_by_id = _.reduce(a, function(acc, n) 
@@ -159,22 +160,37 @@
 				}, {});
 
 				collectiong_all_edges = new Array();
-
 		    	//collectiong_all_edges contains all the links between the nodes
 		   		collectiong_all_edges =_(b).chain().map(function(e)
 		    	{
-		    		e.source = collectiong_nodes_by_id[e.from];
-		    		e.target = collectiong_nodes_by_id[e.to];
+		    		if ((e.from).slice(-2) != "_r")
+		    		{
+		    			e.source = collectiong_nodes_by_id[e.from];
+		    			temp_mainnode = e.source;
+		    		}
+		    		else
+		    		{
+		    			e.source = temp_mainnode;
+		    		}
+
+		    		if ((e.to).slice(-2) != "_r")
+		    		{
+		    			e.target = collectiong_nodes_by_id[e.to];
+		    		}
+		    		else
+		    		{
+		    			e.target = temp_mainnode;
+		    		}
 					//e.type = collectiong_nodes_by_id[e.type]
 					return e;
 				}).filter(function(e)
 				{
 					return collectiong_nodes_by_id[e.from] && collectiong_nodes_by_id[e.to]&& e.type!="title" && e.type!="content" && e.type!="authors" && e.type!="plural" && e.type!="altnames" && e.type!="access_policy" && e.type!="prior_node"
 				}).value();  
-			} // ====== END of init() ======
+			}
+// -------------------End Of collectiong_init()---------------------
 
-
-			// -------------------fgraph()--------------------
+// -------------------Start collectiong_fgraph()--------------------
 			function collectiong_fgraph() 
 			{	
 				collectiong_neighbour_node	= new Array();
@@ -192,10 +208,10 @@
 					// createFilter(collectiong_metadata,collectiong_relations);
 					collectiong_load(collectiong_objectid);
 				}); // --END of getJSON()
-			} // ====== END of fgraph ======
+			}
+// -----------------End of collectiong_fgraph()-------------------
 
-
-			// -------------------collectiong_load()--------------------
+// -------------------Start collectiong_load()--------------------
 			function collectiong_load(key)
 			{
 				var w = graphWidth,
@@ -210,7 +226,7 @@
 							.attr("xmlns", "http://www.w3.org/2000/svg")
 							.attr("version", "1.1");
 
-				// Definition of marker
+			// Definition of marker
                 vis.append("svg:marker")
     		             .attr("id", "collectiong_arrowhead")
                 		 .attr("viewBox","0 0 10 10")
@@ -224,7 +240,7 @@
                 		 .attr("d","M 0 0 L 10 5 L 0 10 z")
                 		 .attr("fill", "#6D6666"); 
 
-				// Adding white color rectangle to background of graph 
+			// Adding white color rectangle to background of graph 
 				vis.append("rect")
 					.attr("height", "100%")
 					.attr("width", "100%")
@@ -237,13 +253,13 @@
 				collectiong_nodes_by_id[key].x = w/2.0;
 				collectiong_nodes_by_id[key].y = h/2.0;       
 
-				// Defining properties of graph
+			// Defining properties of graph
 				var force = d3.layout.force()
 							.linkStrength(1)
 							.charge(-5000)
 							.friction(0.7)
 							.gravity(0.5)
-							.linkDistance(20)
+							.linkDistance(70)
 							.nodes([])
 							.links([])
 							.size([w, h])
@@ -251,6 +267,7 @@
 
 				var drag = force.drag();
 
+		// -------------------Start update()-----------------------
 				function update(edges)
 				{
 			    	// for each func
@@ -477,7 +494,7 @@
                 				 .attr("dy", ".35em")
                 				 .attr("text-anchor","middle")
                 				 .on("drag",drag)
-                				 .text(function(d){  if(d.screen_name != "collection_set")
+                				 .text(function(d){  if((d._id).slice(-2) != "_r")
                 				 					 {	return d.screen_name; }
                 				 					}	)
                 				 .style("font", function(d){
@@ -522,7 +539,8 @@
 
                 			node.attr("transform", function(d) { return "translate(" + (d.x-20) + "," + (d.y-20) + ")"; });
                 	});
-                } //---------------END of update()---------------
+                }
+        //---------------END of update()---------------
 
                 update(collectiong_all_edges);
 
@@ -530,9 +548,10 @@
                 	.transition()
                 	.duration(1000)
                 	.style("opacity", 1);
-            } //---------------END of collectiong_load()---------------
+            }
+//---------------END of collectiong_load()---------------
 
-//--------------- Sticky Feature Code ---------------
+//----------------- Sticky Feature Code -----------------
 			function collectiong_dblclick(d)
             {
             	//double click to remove the fix posiotion of node.
@@ -558,7 +577,8 @@
             }
 //--------------- END of Sticky Feature Code ---------------
 
-// //--------------- Graph filter Feature Code ----------------
+//--------------- Graph filtration Code --------------------
+			// createFilter() to create check box's
 // 			// createFilter() to create check box's
 //                 function createFilter(node_meta,rel)
 //                 {
@@ -636,7 +656,7 @@
 //                 		$("a[id|='"+Id_rel[i]+"']").toggle();
 //                 	}
 // 				}
-// //--------------- END of Graph filter Feature Code ----------------
+//--------------- END of Graph filtration Code ----------------
 
                 function collectiong_check_Relationtype(metadata,relations)
                 {
@@ -660,6 +680,7 @@
 
                 $(collectiong_fgraph());
 
+//--------------- Save the Graph ----------------
                 function collectiong_download(filename) 
                 {
 				    // var el = document.createElement('a');
@@ -669,7 +690,7 @@
 
 				    var blob = new Blob([$("#chart-collection").html()], {type: "image/svg+xml"});
 				    filename = filename.replace(/\ /g, '_');
-				    filename += "_graph.svg";
+				    filename += "_Collection_Graph.svg";
 					saveAs(blob, filename);
 				}
 		</script>
