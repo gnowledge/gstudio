@@ -267,12 +267,18 @@ def parse_data_create_gsystem(json_file_path):
                             is_relation = False
 
                             if json_document[key]:
-                                if "," not in json_document[key]:
+                                # Here semi-colon(';') is used instead of comma(',')
+                                # Beacuse one of the value may contain comma(',') which causes problem in finding required value in database
+                                if ";" not in json_document[key]:
                                     # Necessary to inform perform_eval_type() that handle this value as list
-                                    json_document[key] = "\"" + json_document[key] + "\", "
+                                    json_document[key] = "\""+json_document[key]+"\", "
+                                else:
+                                    formatted_value = ""
+                                    for v in json_document[key].split(";"):
+                                        formatted_value += "\""+v.strip(" ")+"\", "
+                                    json_document[key] = formatted_value
 
                                 # print "\n For GRelation parsing content ", key," -- ", json_document[key], "\n"
-
                                 perform_eval_type(key, json_document, "GSystem", "GSystem")
 
                                 for right_subject_id in json_document[key]:
@@ -401,7 +407,7 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                 print "\n "+gsystem_type_name+" ("+node.name+") updated successfully.\n"
 
             else:
-                print "\n "+gsystem_type_name+" ("+node.name+") already exists (Nothing updated) !!!\n"
+                print "\n "+gsystem_type_name+" ("+node.name+") already exists (Nothing updated) !\n"
 
         except Exception as e:
             error_message = "\n "+gsystem_type_name+"Error: Failed to update ("+node.name+") as " + str(e) + "\n"
@@ -502,7 +508,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
                 print "\n GAttribute ("+ga_node.name+") updated successfully.\n"
 
             else:
-                print "\n GAttribute ("+ga_node.name+") already exists (Nothing updated) !!!\n"
+                print "\n GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
 
         except Exception as e:
             error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
@@ -542,6 +548,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id):
             raise Exception(error_message)
 
     else:
-        print "\n GRelation ("+gr_node.name+") already exists !!!\n"
+        print "\n GRelation ("+gr_node.name+") already exists !\n"
 
     return gr_node
