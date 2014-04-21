@@ -11,7 +11,7 @@ from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, META_TYPE
+from gnowsys_ndf.settings import GAPPS, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
@@ -24,6 +24,14 @@ db = get_database()
 collection = db[Node.collection_name]
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
   
+
+@register.assignment_tag
+def get_create_group_visibility():
+  if CREATE_GROUP_VISIBILITY:
+    return True
+  else:
+    return False
+
 @register.assignment_tag
 def get_site_info():
   sitename=Site.objects.all()[0].name.__str__()

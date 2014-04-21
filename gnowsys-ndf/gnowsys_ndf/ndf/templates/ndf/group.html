@@ -54,9 +54,12 @@
           </script>
        -->
       {% if user.is_authenticated %}
+      {% get_create_group_visibility as crate_group %}
+      {% if create_group %}
       <a class="button expand" href="{% url 'create_group' groupid %}">
         Create Group
       </a>
+      {% endif %}
       {% endif %}
       </div>
 
