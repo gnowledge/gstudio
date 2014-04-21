@@ -51,6 +51,9 @@ class HomeRedirectView(RedirectView):
                 auth.name = unicode(self.request.user)      
                 auth.password = u""
                 auth.member_of.append(auth_type)
+                auth.group_type = u"PUBLIC"
+                auth.edit_policy = u"NON_EDITABLE"
+                auth.subscription_policy = u"OPEN"
                 user_id = int(self.request.user.pk)
                 auth.created_by = user_id
                 auth.modified_by = user_id

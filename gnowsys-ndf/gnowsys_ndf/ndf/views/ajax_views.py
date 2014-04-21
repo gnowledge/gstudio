@@ -28,6 +28,8 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.mobwrite.models import ViewObj
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 import json
  
 db = get_database()
@@ -225,22 +227,24 @@ def shelf(request, group_id):
       else:
         shelf_gs = None
 
-      shelf = collection_tr.Triple.find({'_type': 'GRelation','subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
       shelves = []
       shelf_list = {}
 
-      if shelf:
-        for each in shelf:
-          shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})  
-          shelves.append(shelf_name)
+      if auth:
+        shelf = collection_tr.Triple.find({'_type': 'GRelation','subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+        
+        if shelf:
+          for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})  
+            shelves.append(shelf_name)
 
-          shelf_list[shelf_name.name] = []         
-          for ID in shelf_name.collection_set:
-            shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-            shelf_list[shelf_name.name].append(shelf_item.name)
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_list[shelf_name.name].append(shelf_item.name)
             
-      else:
-        shelves = []
+        else:
+          shelves = []
 
       return render_to_response('ndf/shelf.html', 
                                   { 'shelf_obj': shelf_gs,
@@ -738,9 +742,37 @@ def get_visited_location(request, group_id):
     usrname = unicode(request.user.username)
         
     author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-    user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    user_group_location = collection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
     
     if user_group_location:
       visited_location = user_group_location.visited_location
   
   return StreamingHttpResponse(json.dumps(visited_location))
+
+@login_required
+def get_online_editing_user(request, group_id):
+    '''
+    get user who online editing org editor
+    '''
+    if request.is_ajax() and request.method =="POST":
+        editorid = request.POST.get('editorid',"")
+    viewobj = ViewObj.objects.filter(filename=editorid)
+    userslist = []
+    if viewobj:
+        for each in viewobj:
+            if not each.username == request.user.username:
+                blankdict = {}
+                blankdict['username']=each.username
+                get_profile =  get_profile_pic(each.username)
+                if get_profile :
+                    blankdict['pro_img'] = "/"+str(group_id)+"/image/thumbnail/"+str(get_profile._id)
+                else :
+                    blankdict['pro_img'] = "no";
+                userslist.append(blankdict)
+        if len(userslist) == 0:
+            userslist.append("No users")
+    else :
+        userslist.append("No users")
+    return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+        
+

@@ -17,11 +17,76 @@ from gnowsys_ndf.ndf.views.methods import check_existing_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
+from django.contrib.sites.models import Site
 
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
+at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+  
+@register.assignment_tag
+def get_site_info():
+  sitename=Site.objects.all()[0].name.__str__()
+  return sitename
 
+@register.assignment_tag
+def check_gapp_menus(groupid):
+  grp=collection.Node.one({'_id':ObjectId(groupid)})
+  poss_atts=grp.get_possible_attributes(at_apps_list._id)
+  if not poss_atts:
+    return False
+  return True
+  
+ 
+@register.assignment_tag
+def get_apps_for_groups(groupid):
+  try:
+    ret_dict={}
+    grp=collection.Node.one({'_id':ObjectId(groupid)})
+    poss_atts=grp.get_possible_attributes(at_apps_list._id)
+    if poss_atts:
+      list_apps=poss_atts['apps_list'][1]
+      counter=1
+      print "list_apps -",list_apps
+      for each in list_apps:
+        obdict={}
+        obdict['id']=each['_id']
+        obdict['name']=each['name']
+        ret_dict[counter]=obdict
+        counter+=1 
+      print "return in apps",ret_dict  
+      return ret_dict 
+    else:
+      gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+      gapps = {}
+      i = 0;
+      meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+      GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+      for node in GAPPS:
+        if node:
+          if node.name not in ["Image", "Video"]:
+            i = i+1;
+            gapps[i] = {'id': node._id, 'name': node.name.lower()}
+      return gapps
+  except Exception as exptn:
+    print "Exception in get_apps_for_home "+str(exptn)
+
+
+
+@register.assignment_tag
+def check_is_user_group(group_id):
+  try:
+    lst_grps=[]
+    all_user_grps=get_all_user_groups()
+    grp=collection.Node.one({'_id':ObjectId(group_id)})
+    for each in all_user_grps:
+      lst_grps.append(each.name)
+    if grp.name in lst_grps:
+      return True
+    else:
+      return False
+  except Exception as exptn:
+    print "Exception in check_user_group "+str(exptn)
 @register.assignment_tag
 def switch_group_conditions(user,group_id):
   try:
@@ -410,13 +475,16 @@ def get_profile_pic(user):
   ID = User.objects.get(username=user).pk
   auth = collection.Node.one({'_type': u'Author', 'name': unicode(user) })
 
-  prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+  if auth:
+    prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
 
-  if prof_pic_rel.count() > 0 :
-    index = prof_pic_rel.count() - 1
-    prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+    if prof_pic_rel.count() > 0 :
+      index = prof_pic_rel.count() - 1
+      prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+    else:
+      prof_pic = "" 
   else:
-    prof_pic = "" 
+    prof_pic = ""
 
   return prof_pic
 

@@ -14,16 +14,16 @@
 
 {% block meta_content %}
 
-    <h3>About</h3>
+    <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
 
-    <p class="text-justify">By <b>Quiz Item</b>, you can create a miscellaneous quiz-question. This quiz-question can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
-
-    <p class="text-justify">By <b>Quiz</b>, you can build a quiz having list of quiz-items. Quiz-Items can be added to quiz in two ways:
+    <p class="text-justify">You can build a quiz in two ways:
       <ol  class="text-justify">
 	<li>By editing, Quiz node (via collection-list).</li>
-	<li>By using Quiz-Item button corresponding to the Quiz node (i.e. this will automatically add the quiz-item node to your quiz node).</li>
+	<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
       </ol>
     </p>
+
+
 
     <!-- Add button -->
     {% if user.is_authenticated %}

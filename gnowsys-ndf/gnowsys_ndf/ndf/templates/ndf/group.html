@@ -7,16 +7,14 @@
 <h2>Groups</h2>
 {% endblock %}
 
-{% block help_content %}
 
+{% block help_content %}
 <p>Groups are an easy way to share content and conversation, either privately or with the world. Many times, a group already exist for a specific interest or topic. If you can't find one you like, feel free to start your own.</p>
 
 <h5>How do groups work?</h5>
 <p>Groups can either be public, restricted (users may read a brief description or overview but not view content) or completely private. Every group has a wiki, a pool for resources, and a discussion board for talking.</p>
-
 {% endblock %}
 
-{% get_user_group request.user as groups %}
 
 {% block body_content %}
 <header class="row">
@@ -26,8 +24,6 @@
   </dl>
 </header>
 
-
-{% load url from future %}
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
   <!-- Node create card-->
@@ -67,14 +63,10 @@
   </li>
   
   <!-- Existing card list-->
-  {% get_group_type request.path request.user as group_type %}
-  
-  {% if groups == "None" %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
-  {% else %}
-{% autopaginate groups 	23 %}
-  {% for node in groups %}
-  {% if node.name != request.user.username %}
+
+  {% autopaginate groups 23 %}
+
+  {% for node in group_nodes %}
   
   <li class="card">
     <div class="group">
@@ -104,13 +96,11 @@
       
     </div>
   </li>
-  {% endif %}
   
   {% empty %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
+  <p><em>No groups found!</em></p>
   {% endfor %}
   
-  {% endif %}
   
 </ul>
 {% paginate %}
