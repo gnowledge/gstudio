@@ -135,11 +135,11 @@
     	            </div>
                 </div>
 			</div>
-			<!-- Download Button -->
+		<!-- Download Button -->
 			<input type="button" class="button expand" value="Save as SVG" onclick='conceptg_download("{{node.name}}");' />
 		</div>
 
-		<!-- Div containing svg area -->
+	<!-- Div containing svg area -->
 		<div id="chart-concept"></div>
 			<script type="text/javascript">
 
@@ -149,7 +149,7 @@
 			var conceptg_objectid = "{{node.pk}}";				// _id of current viewing page
 			var flag=false;								// flag used for shift+click (Fixing position of node)
 
-
+// -------------------Start conceptg_init()--------------------
 			function conceptg_init(a,b)
 			{
 				conceptg_nodes_by_id = _.reduce(a, function(acc, n) 
@@ -171,10 +171,10 @@
 				{
 					return conceptg_nodes_by_id[e.from] && conceptg_nodes_by_id[e.to]&& e.type!="title" && e.type!="content" && e.type!="authors" && e.type!="prior_node" && e.type!="collection_set"
 				}).value();  
-			} // ====== END of conceptg_init() ======
+			}
+// -------------------End Of conceptg_init()---------------------
 
-
-			// -------------------fgraph()--------------------
+// -------------------Start conceptg_fgraph()--------------------
 			function conceptg_fgraph() 
 			{	
 				conceptg_neighbour_node	= new Array();
@@ -192,10 +192,10 @@
 					createFilter(conceptg_metadata,conceptg_relations);
 					conceptg_load(conceptg_objectid);
 				}); // --END of getJSON()
-			} // ====== END of fgraph ======
+			}
+// -------------------End of conceptg_fgraph()--------------------
 
-
-			// -------------------conceptg_load()--------------------
+// -------------------Start conceptg_load()-----------------------
 			function conceptg_load(key)
 			{
 				var w = graphWidth,
@@ -210,7 +210,7 @@
 							.attr("xmlns", "http://www.w3.org/2000/svg")
 							.attr("version", "1.1");
 
-				// Definition of marker
+			// Definition of marker
                 vis.append("svg:marker")
     		             .attr("id", "conceptg_arrowhead")
                 		 .attr("viewBox","0 0 10 10")
@@ -224,7 +224,7 @@
                 		 .attr("d","M 0 0 L 10 5 L 0 10 z")
                 		 .attr("fill", "#6D6666"); 
 
-				// Adding white color rectangle to background of graph 
+			// Adding white color rectangle to background of graph 
 				vis.append("rect")
 					.attr("height", "100%")
 					.attr("width", "100%")
@@ -237,13 +237,13 @@
 				conceptg_nodes_by_id[key].x = w/2.0;
 				conceptg_nodes_by_id[key].y = h/2.0;       
 
-				// Defining properties of graph
+			// Defining properties of graph
 				var force = d3.layout.force()
 							.linkStrength(1)
 							.charge(-5000)
 							.friction(0.7)
 							.gravity(0.5)
-							.linkDistance(10)
+							.linkDistance(50)
 							.nodes([])
 							.links([])
 							.size([w, h])
@@ -251,12 +251,13 @@
 
 				var drag = force.drag();
 
+		// -------------------Start update()-----------------------
 				function update(edges)
 				{
-			    	// for each func
+			    // for each func
 				    _.each(conceptg_nodes_by_id, function(n){n.added = false});
 
-			    	// reduce the nodes list to have only those nodes for a given rel.
+			    // reduce the nodes list to have only those nodes for a given rel.
 				    var nodes = _.reduce(edges, function(acc, e) 
 				    {
 				    	if(conceptg_nodes_by_id[e.from] && !conceptg_nodes_by_id[e.from].added)
@@ -459,8 +460,8 @@
                 		.attr("rx",function(d) {var ttx=d.screen_name; return(ttx.length/2 +"em")})
                 		.attr("ry",15)
                 		.style("fill-opacity", function(d) {if (d.refType=="Relation") return 0.2; else if(d.refType=="GSystem") return 0.7;})
-                	// .style("stroke", "#666")
-                	// .style("stroke-width", "1.5px")
+                		// .style("stroke", "#666")
+                		// .style("stroke-width", "1.5px")
                 		.style("fill", function(d) {if (d.refType=="Relation") return "#008759"; else if(d.refType=="GSystem") return "#008759"; else return "none"})
                 		.on("dblclick",conceptg_dblclick);
 
@@ -505,7 +506,6 @@
                 		// .style("stroke", "#000")
                 		// .style("stroke-width","1px"  );
 
-
                 	node.exit().remove();
 
                 	force.on("tick", function()
@@ -520,7 +520,8 @@
 
                 			node.attr("transform", function(d) { return "translate(" + (d.x-20) + "," + (d.y-20) + ")"; });
                 	});
-                } //---------------END of update()---------------
+                }
+       	//---------------END of update()---------------
 
                 update(conceptg_all_edges);
 
@@ -528,9 +529,10 @@
                 	.transition()
                 	.duration(1000)
                 	.style("opacity", 1);
-            } //---------------END of conceptg_load()---------------
+            }
+//---------------END of conceptg_load()---------------
 
-//--------------- Sticky Feature Code ---------------
+//--------------- Sticky Feature Code ----------------
 			function conceptg_dblclick(d)
             {
             	//double click to remove the fix posiotion of node.
@@ -556,7 +558,7 @@
             }
 //--------------- END of Sticky Feature Code ---------------
 
-//--------------- Graph filter Feature Code ----------------
+//--------------- Graph filtration Code --------------------
 			// createFilter() to create check box's
                 function createFilter(node_meta,rel)
                 {
@@ -634,7 +636,7 @@
                 		$("a[id|='"+Id_rel[i]+"']").toggle();
                 	}
 				}
-//--------------- END of Graph filter Feature Code ----------------
+//--------------- END of Graph filtration Code ----------------
 
                 function conceptg_check_Relationtype(metadata,relations)
                 {
@@ -658,6 +660,7 @@
 
                 $(conceptg_fgraph());
 
+//--------------- Save the Graph ----------------
                 function conceptg_download(filename) 
                 {
 				    // var el = document.createElement('a');
@@ -667,7 +670,7 @@
 
 				    var blob = new Blob([$("#chart-concept").html()], {type: "image/svg+xml"});
 				    filename = filename.replace(/\ /g, '_');
-				    filename += "_graph.svg";
+				    filename += "_Concept_Graph.svg";
 					saveAs(blob, filename);
 				}
 		</script>
