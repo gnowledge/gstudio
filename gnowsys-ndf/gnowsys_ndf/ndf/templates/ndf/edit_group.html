@@ -12,7 +12,38 @@
 
   <dd>
     <a href="#change_settings">Click here to change {{node.name}}'s settings </a>
-    
+
+    {% if node.name == request.user.username %}
+      <div id="change_settings" class="content">
+
+        <div style='display:table-row;'>
+
+          <div style='display:table-cell;'> 
+            <font size="3" > Following policy</font>
+          </div>
+
+          <div style='display:table-cell;'> 
+            <select name="subscription_policy" id="subscription_policy">
+              <option id="OPEN">OPEN</option>
+              <option id="BY_REQUEST">BY_REQUEST</option>
+              <option id="BY_INVITATION">BY_INVITATION</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div style='display:table-row;'>
+ 
+          <div style='display:table-cell;' colspan='2' align="middle"> 
+            <input type="button" id="changeButton" value="Change"  class="button">
+            <img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
+            <font id="status"></font>
+          </div>
+        </div>
+        
+      </div>
+        
+    {% else %}
     <div id="change_settings" class="content">
 
      <div style='display:table;  border:1px;   border-spacing:10px; '>
@@ -102,7 +133,7 @@
     <font id="status"></font>
   </div>
 </div>
-
+{% endif %}
 </dd>
 </dl>
 
@@ -144,7 +175,7 @@ encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_po
 $(document).on('click',"#changeButton",function(){
 
 $.ajax({
-url:'/{{node.altnames}}/ajax/change_group_settings/',
+url:'/{{node}}/ajax/change_group_settings/',
 type: 'POST',
 data: {edit_policy:edit_policy.value, group_type:group_type.value, subscription_policy:subscription_policy.value, visibility_policy:visibility_policy.value, disclosure_policy:disclosure_policy.value, encryption_policy:encryption_policy.value, csrfmiddlewaretoken: '{{ csrf_token }}', group_id:"{{node}}"},
 beforeSend: function() {

@@ -305,12 +305,27 @@ if profile_pic_obj:
 try:
     author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
     if author:
-        cur = collection.Node.find({'_type': "Group", 'member_of': author._id, 'visited_location': {'$exists': False}})
+        auth_cur = collection.Node.find({'_type': 'Group', 'member_of': author._id })
+
+        if auth_cur.count() > 0:
+            for each in auth_cur:
+                collection.update({'_id': each._id}, {'$set': {'_type': "Author"} }, upsert=False, multi=False)    
+                print "Updated user group : ", each.name
+            
+        cur = collection.Node.find({'_type': "Author", 'visited_location': {'$exists': False}})
+
+        author_cur = collection.Node.find({'_type': 'Author'})
+
+        if author_cur.count() > 0:
+            for each in author_cur:
+                if each.group_type == None:
+                    collection.update({'_id': each._id}, {'$set': {'group_type': u"PUBLIC", 'edit_policy': u"NON_EDITABLE", 'subscription_policy': u"OPEN"} }, upsert=False, multi=False)    
+                    print "Updated user group policies :", each.name
 
         if cur.count():
             print "\n"
             for each in cur:
-                collection.update({'_type': "Group", '_id': each._id}, {'$set': {'visited_location': []}}, upsert=False, multi=True)
+                collection.update({'_type': "Author", '_id': each._id}, {'$set': {'visited_location': []}}, upsert=False, multi=True)
                 print " 'visited_location' field added to Author group (" + each.name + ")\n"
 
     else:
@@ -319,3 +334,5 @@ try:
 
 except Exception as e:
     print str(e)
+
+

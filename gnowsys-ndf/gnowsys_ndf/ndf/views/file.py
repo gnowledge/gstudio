@@ -35,7 +35,7 @@ from django.http import Http404
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 
-from gnowsys_ndf.ndf.models import Node, GRelation
+from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
@@ -44,6 +44,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 db = get_database()
 collection = db[Node.collection_name]
+collection_tr = db[Triple.collection_name]
 GST_FILE = collection.GSystemType.one({'name': GAPPS[1], '_type':'GSystemType'})
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
@@ -465,19 +466,6 @@ def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
 
-    # for getting user's last accessed location    
-    usrid = request.user.id
-    visited_location = ""
-
-    if(usrid):
-
-        usrid = int(request.user.id)
-        usrname = unicode(request.user.username)
-        
-        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-        visited_location = user_group_location.visited_location
-
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     file_template = ""
@@ -495,12 +483,36 @@ def file_detail(request, group_id, _id):
 
     breadcrumbs_list = []
     breadcrumbs_list.append(( str(file_node._id), file_node.name ))
+
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    shelves = []
+    shelf_list = {}
+
+    if auth:
+        has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+        dbref_has_shelf = has_shelf_RT.get_dbref()
+        shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+        
+        if shelf:
+            for each in shelf:
+                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                shelves.append(shelf_name)
+
+                shelf_list[shelf_name.name] = []         
+                for ID in shelf_name.collection_set:
+                    shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                    shelf_list[shelf_name.name].append(shelf_item.name)
+                
+        else:
+            shelves = []
+
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
                                 'groupid':group_id,
-                                'breadcrumbs_list': breadcrumbs_list,
-                                'visited_location': visited_location
+                                'shelf_list': shelf_list,
+                                'shelves': shelves, 
+                                'breadcrumbs_list': breadcrumbs_list
                               },
                               context_instance = RequestContext(request)
                              )
@@ -543,18 +555,6 @@ def readDoc(request, _id, group_id, file_name = ""):
 def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
-    usrid = request.user.id
-    visited_location = ""
-
-    if(usrid):
-
-        usrid = int(request.user.id)
-        usrname = unicode(request.user.username)
-        
-        author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-        user_group_location = collection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
-        visited_location = user_group_location.visited_location
-
     if request.method == "POST":
         get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save()
@@ -564,8 +564,7 @@ def file_edit(request,group_id,_id):
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,
                                     'group_id': group_id,
-                                    'groupid':group_id,
-                                    'visited_location': visited_location
+                                    'groupid':group_id
                                 },
                                   context_instance=RequestContext(request)
                               )

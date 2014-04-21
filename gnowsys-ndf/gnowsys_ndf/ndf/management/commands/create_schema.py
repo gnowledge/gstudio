@@ -37,75 +37,83 @@ class Command(BaseCommand):
         for file_name in args:
             file_path = os.path.join(SCHEMA_ROOT, file_name)
 
-            if os.path.exists(file_path):
-                file_extension = mimetypes.guess_type(file_name)[0]
+            try:
+                if os.path.exists(file_path):
+                    if not ("ST" in file_path or "AT" in file_path or "RT" in file_path):
+                        error_message = "\n InvalidSchemaFile ("+file_path+") : Please select a valid file for creating schema !!!\n"
+                        raise Exception(error_message)
 
-                if "csv" in file_extension:
-                    # Process csv file and convert it to json format at first
-                    print "\n CSVType: Follwoing file (", file_path, ") found!!!"
+                    file_extension = mimetypes.guess_type(file_name)[0]
+                
+                    if "csv" in file_extension:
+                        # Process csv file and convert it to json format at first
+                        print "\n CSVType: Follwoing file (", file_path, ") found!!!"
                     
-                    try:
-                        csv_file_path = file_path
-                        json_file_name = file_name.rstrip("csv") + "json"
-                        json_file_path = os.path.join(SCHEMA_ROOT, json_file_name)
-                        json_file_content = ""
+                        try:
+                            csv_file_path = file_path
+                            json_file_name = file_name.rstrip("csv") + "json"
+                            json_file_path = os.path.join(SCHEMA_ROOT, json_file_name)
+                            json_file_content = ""
                         
-                        with open(csv_file_path, 'rb') as csv_file:
-                            csv_file_content = csv.DictReader(csv_file, delimiter=",")
-                            json_file_content = []
-                            for row in csv_file_content:
-                                json_file_content.append(row)
+                            with open(csv_file_path, 'rb') as csv_file:
+                                csv_file_content = csv.DictReader(csv_file, delimiter=",")
+                                json_file_content = []
+                                for row in csv_file_content:
+                                    json_file_content.append(row)
 
-                        with open(json_file_path, 'w') as json_file:
-                            json.dump(json_file_content, 
-                                      json_file, 
-                                      indent=4, 
-                                      sort_keys=False)
+                            with open(json_file_path, 'w') as json_file:
+                                json.dump(json_file_content, 
+                                          json_file, 
+                                          indent=4, 
+                                          sort_keys=False)
 
-                        if os.path.exists(json_file_path):
-                            file_path = json_file_path
-                            is_json_file_exists = True
-                            print "\n JSONType: Following file (", json_file_path, ") created successfully."
+                            if os.path.exists(json_file_path):
+                                file_path = json_file_path
+                                is_json_file_exists = True
+                                print "\n JSONType: Following file (", json_file_path, ") created successfully."
 
-                    except Exception, e:
-                        print "\n CSV-JSONError: ", str(e)
+                        except Exception, e:
+                            print "\n CSV-JSONError: ", str(e)
                     
-                    # End of csv-json coversion
+                        # End of csv-json coversion
 
-                elif "json" in file_extension:
-                    is_json_file_exists = True
+                    elif "json" in file_extension:
+                        is_json_file_exists = True
+
+                    else:
+                        error_message = "\n FileTypeError: Please choose either 'csv' or 'json' format supported files!!!\n"
+                        raise Exception(error_message)
+
+                    if is_json_file_exists:
+                        # Process json file and create required SystemTypes, RelationTypes, and AttributeTypes
+                        print "\n Do processing json file task..."
+
+                        parse_data_create_gtype(file_path)
+                    
+                        # End of processing json file
+
+                    print "\n Done everything...\n"
+
+                    # End of creation of respective Types for Enrollment
 
                 else:
-                    print "\n FileTypeError: Please choose either 'csv' or 'json' format supported files!!!\n"
-                    return 
+                    error_message = "\n FileNotFound: Following path (" + file_path + ") doesn't exists!!!\n"
+                    raise Exception(error_message)
 
-                if is_json_file_exists:
-                    # Process json file and create required SystemTypes, RelationTypes, and AttributeTypes
-                    print "\n Do processing json file task..."
-
-                    create_type(file_path)
-                    
-                    # End of processing json file
-
-                print "\n Done everything...\n"
-
-                # End of creation of respective Types for Enrollment
-
-            else:
-                print "\n FileNotFound: Following path (", file_path, ") doesn't exists!!!\n"
-
+            except Exception as e:
+                print str(e)
+                return
+                            
         # --- End of handle() ---
 
 # -----------------------------------------------------------------------------------------------------------------
 # Function that process json data according to the structure field
 # -----------------------------------------------------------------------------------------------------------------
 
-def create_type(json_file_path):
-    """Depending upon file name, calls respective function
-    to create types and pass processed data to it
+def parse_data_create_gtype(json_file_path):
+    """Depending upon file name, processes data and passes it along
+    with necessary information to create respective GTypes
     """
-
-    types_not_created = []
 
     json_file_content = ""
 
@@ -199,16 +207,20 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
             error_message = "\n InvalidDataError: For " + type_to_create + " (" + json_document['name'] + ") invalid data found -- " + str(e) + "!!!"
             raise Exception(error_message)
 
+
     type_list = []
     for data in json_document[eval_field]:
-        if eval_field == "complex_data_type" and [(data in DATA_TYPE_CHOICES) or (json_document['data_type'] == "IS()")]:
+        if (eval_field == "complex_data_type") and ((data in DATA_TYPE_CHOICES) or (json_document['data_type'] == "IS()")):
             type_list.append(unicode(data))
 
         else:
             node = collection.Node.one({'_type': type_convert_objectid, 'name': data}, {'_id': 1})
         
             if node:
-                type_list.append(node._id)
+                if eval_field == "complex_data_type":
+                    type_list.append(unicode(node._id))
+                else:
+                    type_list.append(node._id)
             else:
                 if eval_field == "complex_data_type":
                     type_convert_objectid = "Sub-" + type_convert_objectid
@@ -281,121 +293,4 @@ def create_edit_type(type_name, json_document, user_id):
         else:
             print "\n "+type_name+" (", node.name, ") already exists (Nothing updated) !!!"
 
-
-'''
-def create_edit_gsystem_type(json_document, user_id):
-    """Creates factory GSystemTypes'
-    """
-
-    node = collection.Node.one({'_type': u"GSystemType", 'name': json_document['name']})
-    if node is None:
-        try:
-            node = collection.GSystemType()
-            
-            for key in json_document.iterkeys():
-                node[key] = json_document[key]
-
-            node.created_by = user_id
-            node.modified_by = user_id
-            if user_id not in node.contributors:
-                node.contributors.append(user_id)
-
-            node.status = u"PUBLISHED"
-
-            node.save()
-            print "\n GSystemType (", node.name, ") created successfully."
-
-        except Exception as e:
-            print "\n GSystemTypeError: Failed to create (", node.name, ") as ", e
-            
-    else:
-        is_node_changed = False
-
-        for key in json_document.iterkeys():
-            if type(node[key]) == list:
-                if set(node[key]) != set(json_document[key]):
-                    node[key] = json_document[key]
-                    is_node_changed = True
-
-            elif type(node[key]) == dict:
-                if cmp(node[key], json_document[key]) != 0:
-                    node[key] = json_document[key]
-                    is_node_changed = True
-
-            else:
-                if node[key] != json_document[key]:
-                    node[key] = json_document[key]
-                    is_node_changed = True
-
-        if is_node_updated:
-            node.modified_by = user_id
-            if user_id not in node.contributors:
-                node.contributors.append(user_id)
-
-            node.status = u"PUBLISHED"
-
-            node.save()
-            print "\n GSystemType (", node.name, ") updated successfully."
-
-        else:
-            print "\n GSystemType (", node.name, ") already exists (Nothing updated) !!!"
-
-
-def create_edit_attribute_type(json_document, user_id):
-    """Creates factory AttributeTypes'
-    """
-
-    node = collection.Node.one({'_type': u"AttributeType", 'name': json_document['name']})
-    if node is None:
-        try:
-            node = collection.AttributeType()
-            
-            for key in json_document.iterkeys():
-                node[key] = json_document[key]
-
-            node.created_by = user_id
-            node.modified_by = user_id
-            if user_id not in node.contributors:
-                node.contributors.append(user_id)
-
-            node.status = u"PUBLISHED"
-
-            node.save()
-            print "\n AttributeType (", node.name, ") created successfully."
-
-        except Exception as e:
-            print "\n AttributeTypeError: Failed to create (", node.name, ") as ", e
-
-    else:
-        print "\n AttributeType (", node.name, ") already exists!"
-
-
-def create_edit_relation_type(json_document, user_id):
-    """Creates factory RelationTypes'
-    """
-
-    node = collection.Node.one({'_type': u"RelationType", 'name': json_document['name']})
-    if node is None:
-        try:
-            node = collection.RelationType()
-
-            for key in json_document.iterkeys():
-                node[key] = json_document[key]
-
-            node.created_by = user_id
-            node.modified_by = user_id
-            if user_id not in node.contributors:
-                node.contributors.append(user_id)
-
-            node.status = u"PUBLISHED"
-
-            node.save()
-            print "\n RelationType (", node.name, ") created successfully."
-
-        except Exception as e:
-            print "\n RelationTypeError: Failed to create (", node.name, ") as ", e
-
-    else:
-        print "\n RelationType (", node.name, ") already exists!"
-'''
 

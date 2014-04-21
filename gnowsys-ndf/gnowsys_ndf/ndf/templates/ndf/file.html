@@ -111,7 +111,7 @@
           <header>
               <div class="label-list">
                 {% for tag in file.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
@@ -155,7 +155,7 @@
           <header>
             <div class="label-list">
               {% for tag in file.tags %}
-              <span class="label">{{tag}}</span>
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
               {% endfor %}
             </div>
         
@@ -194,7 +194,7 @@
       {% endfor %}
       
       {% else %}
-      <p><em>Currently NO file uploaded!!!</em></p>
+      <p><em>No resources found!</em></p>
       {% endif %}
     </ul>
 {% paginate %}
@@ -219,7 +219,7 @@
           <header>
               <div class="label-list">
                 {% for tag in doc.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
@@ -260,7 +260,7 @@
           <header>
             <div class="label-list">
               {% for tag in doc.tags %}
-              <span class="label">{{tag}}</span>
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
               {% endfor %}
             </div>
         
@@ -296,7 +296,7 @@
       {% endfor %}
       
       {% else %}
-      <p><em>Currently NO file uploaded!!!</em></p>
+      <p><em>No resources found!</em></p>
       {% endif %}
     </ul>
 {% paginate %}
@@ -352,7 +352,7 @@
 
               <div class="label-list">
                 {% for tag in image.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
@@ -388,7 +388,7 @@
       {% endfor %}
       
       {% else %}
-      <p><em>Currently NO image uploaded!!!</em></p>
+      <p><em>No images found!</em></p>
       {% endif %}
 
      </ul>
@@ -443,7 +443,7 @@
 
               <div class="label-list">
                 {% for tag in video.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 
@@ -481,7 +481,7 @@
       {% endfor %}
       
       {% else %}
-      <p><em>Currently NO video uploaded!!!</em></p>
+      <p><em>No videos found!</em></p>
       {% endif %}
 
     </ul>
