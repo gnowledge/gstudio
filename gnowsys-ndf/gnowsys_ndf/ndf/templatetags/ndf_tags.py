@@ -40,6 +40,8 @@ def get_site_info():
 @register.assignment_tag
 def check_gapp_menus(groupid):
   grp=collection.Node.one({'_id':ObjectId(groupid)})
+  if not at_apps_list:
+    return False
   poss_atts=grp.get_possible_attributes(at_apps_list._id)
   if not poss_atts:
     return False
