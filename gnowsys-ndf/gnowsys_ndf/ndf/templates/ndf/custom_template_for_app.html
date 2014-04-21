@@ -128,6 +128,17 @@
     </div>
   
   </div>
+
+
+    <!-- Overlay : Map VIEW Widget -->
+    <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
+      
+        <a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
+
+    </div>
+    <!-- END of Map Widget Overlay -->
+
   <!-- END of location/map widget -->
 
      {% if tags %}
@@ -272,10 +283,20 @@
         <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
           <i class="fi-marker"></i> &nbsp; Add Location
         </a>
-      </div>
+      </div>      
 
-    </div>     
-     <!-- END of location/map widget -->
+    </div>  
+
+    <!-- Overlay : Map EDIT Widget -->
+    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+
+        <a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
+
+    </div>
+    <!-- END of Map Widget Overlay -->
+
+    <!-- END of location/map widget -->
 
      <div style="display:table-row;">
        <div style="display:table-cell;"> 
@@ -310,28 +331,7 @@
     </div>
 
   </div>
-
-  <!-- Overlay : Map EDIT Widget -->
-    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
-      
-      <!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
-        <a class="close-reveal-modal" >&#215;</a>
-        {% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
-      <!-- #{#%# endif %} -->
-    </div>
-  <!-- END of Map Widget Overlay -->
-
-
-  
-  <!-- Overlay : Map VIEW Widget -->
-    <!-- <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>     -->
-      
-      <!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
-        <!-- <a class="close-reveal-modal" >&#215;</a> -->
-        <!-- {#%# include "ndf/map_widget.html" with mode="read" %} -->
-      <!-- #{#%# endif %} -->
-    <!-- </div> -->
-  <!-- END of Map Widget Overlay -->
+ 
 
   <input type="submit" name="submit" class="button" id="save-system" value="submit">
  
@@ -442,9 +442,8 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
              $('#myModal').foundation('reveal', 'close');
 });
 
-// <script type="text/javascript">
   
-  $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+  $(document).on('open', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
     
     $.ajax({
       
@@ -481,12 +480,10 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
 
   });
 
-  $(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
+  $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
   
     map.invalidateSize();  
   });
-
- // </script>
 
 
 {% endblock %}	

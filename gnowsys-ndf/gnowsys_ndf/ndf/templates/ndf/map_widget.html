@@ -38,7 +38,7 @@
 <body>
 
 	<div id="map" data-mode="{{mode}}">
-		<input type="hidden" data-map-markers="{{ node.location }}" value="{{system.location|safe}}" name="map-geojson-data"/>
+		<input type="hidden" data-map-markers="{{ node.location }}" value="{{location}}" name="map-geojson-data"/>
 	</div>
 
 	<div style="display:none;">
@@ -77,13 +77,17 @@
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
 		{% if source == "custom_template_edit" %}
+
 	 		mapdata = $("input:hidden[name=map-geojson-data]").val();
+
 	 		if(mapdata && typeof(mapdata) == "string")
 	 		{
-	 			mapdata = "[" + mapdata;
-	 			mapdata +="]";
+	 			mapdata = mapdata.trim();
+
+	 			mapdata = mapdata[0]!="["?"["+mapdata:mapdata ;
+	 			mapdata = mapdata[mapdata.length-1]!="]"? mapdata+"]":mapdata ;
 	 		}
-	 		console.log(mapdata)
+
 	 	{% else %}
 	 		mapdata = $("input:hidden[name=map-geojson-data]").attr("data-map-markers");
 	 	{% endif %}

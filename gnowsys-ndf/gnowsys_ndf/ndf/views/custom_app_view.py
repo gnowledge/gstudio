@@ -235,8 +235,10 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
             map_geojson_data = map_geojson_data + ","
             map_geojson_data = list(ast.literal_eval(map_geojson_data))
             newgsystem.location = map_geojson_data
+            location = map_geojson_data
         else:
             map_geojson_data = []
+            location = []
             newgsystem.location = map_geojson_data
 
         # check if user_group_location exist in proper format then add it into newgsystem
