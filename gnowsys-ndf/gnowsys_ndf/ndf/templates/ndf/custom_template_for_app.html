@@ -115,6 +115,21 @@
      </div>
   {% endfor %}
   {% endif %}
+
+  <!-- for location/map widget : VIEW -->
+  <div style="display:table-row;">
+  
+    <div style="display:table-cell;"> 
+      <font size="3"> Location </font> 
+    </div>
+  
+    <div style="display:table-cell;">
+      <a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a>
+    </div>
+  
+  </div>
+  <!-- END of location/map widget -->
+
      {% if tags %}
      <div style="display:table-row;">
        <div style="display:table-cell;"> 
@@ -245,6 +260,23 @@
      </div>
      {% endfor %}
      {% endif %}
+
+     <!-- map/location widget : EDIT -->
+    <div style="display:table-row;">
+      
+      <div style="display:table-cell;"> 
+        <font size="3"> Add Location </font> 
+      </div>
+      
+      <div style="display:table-cell;">
+        <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+          <i class="fi-marker"></i> &nbsp; Add Location
+        </a>
+      </div>
+
+    </div>     
+     <!-- END of location/map widget -->
+
      <div style="display:table-row;">
        <div style="display:table-cell;"> 
 	 <font size="3"> Tags</font> 
@@ -277,9 +309,30 @@
       </div>
     </div>
 
-
-
   </div>
+
+  <!-- Overlay : Map EDIT Widget -->
+    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+      
+      <!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+        <a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
+      <!-- #{#%# endif %} -->
+    </div>
+  <!-- END of Map Widget Overlay -->
+
+
+  
+  <!-- Overlay : Map VIEW Widget -->
+    <!-- <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>     -->
+      
+      <!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+        <!-- <a class="close-reveal-modal" >&#215;</a> -->
+        <!-- {#%# include "ndf/map_widget.html" with mode="read" %} -->
+      <!-- #{#%# endif %} -->
+    <!-- </div> -->
+  <!-- END of Map Widget Overlay -->
+
   <input type="submit" name="submit" class="button" id="save-system" value="submit">
  
 </form>
@@ -388,4 +441,52 @@ $(document).on('click',".button.deleteObjects",function(){
 $(document).on('click',".button.cancelDeleteObjects",function(){
              $('#myModal').foundation('reveal', 'close');
 });
+
+// <script type="text/javascript">
+  
+  $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+    
+    $.ajax({
+      
+      url: "{% url 'get_visited_location' groupid %}",
+
+      success: function(data){ 
+   
+        data = JSON.parse(data);
+
+        var lastVisitedLocationVal = data;
+        
+        if(lastVisitedLocationVal){
+
+          if(lastVisitedLocationVal == "[]"){
+            lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+          }
+
+          if(lastVisitedLocationVal.length > 0){
+                // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+                var zoom = lastVisitedLocationVal.pop(),
+                    lng = lastVisitedLocationVal[1],
+                    lat = lastVisitedLocationVal[0];
+                  map.setView([lat, lng], zoom);
+                }
+        }
+        else if( tempArr.length )
+        {
+          var group = new L.featureGroup(tempArr)
+              map.fitBounds(group.getBounds());
+        }
+       
+      }
+    });
+
+  });
+
+  $(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
+  
+    map.invalidateSize();  
+  });
+
+ // </script>
+
+
 {% endblock %}	

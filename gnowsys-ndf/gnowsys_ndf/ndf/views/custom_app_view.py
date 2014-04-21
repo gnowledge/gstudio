@@ -6,6 +6,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
+import ast
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import *
@@ -34,6 +35,7 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
     title = ""
     tags = ""
     content = ""
+    location = ""
     system_id = ""
     system_type = ""
     system_mime_type = ""
@@ -82,6 +84,7 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         
         tags = ",".join(system.tags)
         content = system.content
+        location = system.location
         app_set_name = systemtype.name
         system_id = system._id
         system_type = system._type
@@ -90,7 +93,7 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
     template = "ndf/custom_template_for_app.html"
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id})
+    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id})
     return render_to_response(template, variable)
       
 @login_required
@@ -106,6 +109,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
     systemtype = ""
     title = ""
     tags = ""
+    location=""
     content_org = ""
     system_id = ""
     system_type = ""
@@ -118,6 +122,10 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
     app_type_of_id = ""
     File = 'False'
     obj_id_ins = ObjectId()
+
+    user_id = int(request.user.id)  # getting django user id
+    user_name = unicode(request.user.username)  # getting django user name
+
     for eachset in app.collection_set:
 	 app_set = collection.Node.find_one({"_id":eachset})
 	 app_collection_set.append({"id":str(app_set._id),"name":app_set.name}) 	
@@ -166,6 +174,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
 
         tags = ",".join(system.tags)
         content_org = system.content_org
+        location = system.location
         system_id = system._id
         system_type = system._type
         if system_type == 'File':
@@ -178,7 +187,10 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
         tags = request.POST.get("tags","")
         content_org = unicode(request.POST.get("content_org",""))
         name = request.POST.get("name","")
+        map_geojson_data = request.POST.get('map-geojson-data') # getting markers
+        user_last_visited_location = request.POST.get('last_visited_location') # getting last visited location by user
         file1 = request.FILES.get('file', '')
+
         for each in systemtype_attributetype_set:
             if request.POST.get(each["type_id"],"") :
                 request_at_dict[each["type_id"]] = request.POST.get(each["type_id"],"")
@@ -208,14 +220,39 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
             newgsystem.created_by = request.user.id
             newgsystem.modified_by = request.user.id
         newgsystem.group_set.append(ObjectId(group_id))
+
         if tags:
              newgsystem.tags = tags.split(",")
+
         if content_org:
             usrname = request.user.username
             filename = slugify(newgsystem.name) + "-" + usrname
             newgsystem.content = org2html(content_org, file_prefix=filename)
             newgsystem.content_org = content_org
+
+        # check if map markers data exist in proper format then add it into newgsystem
+        if map_geojson_data:
+            map_geojson_data = map_geojson_data + ","
+            map_geojson_data = list(ast.literal_eval(map_geojson_data))
+            newgsystem.location = map_geojson_data
+        else:
+            map_geojson_data = []
+            newgsystem.location = map_geojson_data
+
+        # check if user_group_location exist in proper format then add it into newgsystem
+        if user_last_visited_location:
+    
+            user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
+
+            author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+            user_group_location = collection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': user_id, 'name': user_name})
+
+            if user_group_location:
+                user_group_location['visited_location'] = user_last_visited_location
+                user_group_location.save()
+
         newgsystem.save()
+
         if not app_set_instance_id :
             for key,value in request_at_dict.items():
                 attributetype_key = collection.Node.find_one({"_id":ObjectId(key)})
@@ -265,9 +302,9 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
         
 
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
-
+    
     template = "ndf/custom_template_for_app.html"
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id})
+    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
       
  
