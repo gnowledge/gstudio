@@ -126,8 +126,8 @@ $(document).ready(function()
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
 
-<h3>Manage</h3>
-<p>You can invite other members to be a part of this group</p>
+
+<p>You can subscribe registered members to this group</p>
 
 {% include "ndf/invite_users.html" %}   
 

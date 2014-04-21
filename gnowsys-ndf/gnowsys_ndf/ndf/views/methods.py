@@ -257,7 +257,12 @@ def get_node_common_fields(request, node, group_id, node_type):
         node.group_set.append(user_group_obj._id)
 
   if tags:
-    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+    for tag in tags.split(","):
+      tag = unicode(tag.strip())
+      if tag:
+        print "\n tags: ", node.tags, " -- ", tag, " -- ", (tag in node.tags)
+        if not (tag in node.tags):
+          node.tags.append(tag)
 
   # -------------------------------------------------------------------------------- prior_node
 
@@ -320,12 +325,12 @@ def get_node_common_fields(request, node, group_id, node_type):
     user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
     author = gcollection.Node.one({'_type': "GSystemType", 'name': "Author"})
-    user_group_location = gcollection.Node.one({'_type': "Group", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    user_group_location = gcollection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
 
     if user_group_location:
       user_group_location['visited_location'] = user_last_visited_location
       
-    user_group_location.save()
+      user_group_location.save()
 
 # ============= END of def get_node_common_fields() ==============
   
