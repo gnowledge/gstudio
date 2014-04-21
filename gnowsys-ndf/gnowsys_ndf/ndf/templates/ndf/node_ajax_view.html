@@ -217,16 +217,16 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   <section class="medium-3 columns">
     <div class="panel">
-     <h5 class="subheader">
+     <h3 class="subheader"></h3>
        Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
        <small>
-         <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
+         <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
           {% for seq_no, version_no in node.version_dict.items reversed %}
           <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
           {% endfor %}
         </div>
       </small>
-    </h5>
+
     
       
   
@@ -287,7 +287,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 <footer>
   <p><small>
-    <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
+    <em>Created by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
   </footer>
 
 <script type="text/javascript">
