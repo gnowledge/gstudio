@@ -411,11 +411,11 @@ and if he has published his contents then he would be shown the current publishe
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
-     if  ver2 != '1.1':                
-         
+     if  ver2 != '1.1':                           
 	    if node2 is not None:
-		
+		print "direct"
                 if node2.status == 'PUBLISHED':
+                  
 			if float(ver2) > float(ver1):			
 				return (node2,ver2)
 			elif float(ver2) < float(ver1):
@@ -425,15 +425,14 @@ and if he has published his contents then he would be shown the current publishe
 		elif node2.status == 'DRAFT':
                        #========== conditions for Group===============#
 
-                        if  node1.status == 'DRAFT' and node._type == "Group":
-			    #check to perform if the person has recently joined the group
+                        if   node._type == "Group":
+			    
 			    count=check_page_first_creation(request,node2)
                             if count == 1:
                                 return (node1,ver1)
                             elif count == 2:
-				return (node2,ver2)
-
-                            
+                               	return (node2,ver2)
+                        
                         return (node2,ver2)  
 	    else:
                         

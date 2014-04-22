@@ -216,6 +216,36 @@ background-repeat:no-repeat; background-size: 48px 48px
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
 
+    {% if node %}
+     {% get_publish_policy request groupid node as group_policy %}
+        {% check_group node as is_group %}
+
+  	{% if group_policy == "allow" %}
+  	{% if is_group %} 
+   <div>
+   <a class="button small" href="{% url 'publish_group'  group_id node %}"> Publish </a>
+    </a>
+   </div>
+  	{% else %}
+  	<div>
+   <a class="button small" href="{% url 'publish_page'  group_id node %}"> Publish
+   </a>  
+   </div>
+	{% endif %}
+    {% endif %}
+   {% endif %}
+ 
+	<input type="button" id="switch_group" class="button small" value="Switch Group">
+<div id="mySystemtype" class="reveal-modal" data-reveal >
+     <h2>Select Groups</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+      </div>
+     <a class="close-reveal-modal st">&#215;</a>
+<input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
+</div>
+
+
      {% edit_policy groupid node request.user as status %}
      
      {% if status == "allow" %}
