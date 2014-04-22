@@ -111,16 +111,8 @@ def switch_group_conditions(user,group_id):
 @register.assignment_tag
 def get_all_user_groups():
   try:
-    ret_groups=[]
-    all_groups=collection.Node.find({'_type':'Group'})
-    all_users=User.objects.all()
-    all_user_names=[]
-    for each in all_users:
-      all_user_names.append(each.username)
-    for each in all_groups:
-      if each.name in all_user_names:
-        ret_groups.append(each)
-    return ret_groups
+    all_groups=collection.Node.find({'_type':'Author'})
+    return list(all_groups)
   except:
     print "Exception in get_all_user_groups"
 
