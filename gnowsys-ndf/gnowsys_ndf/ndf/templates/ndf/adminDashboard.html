@@ -1,4 +1,3 @@
-
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load pagination_tags %}
@@ -167,11 +166,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 		Edit&nbsp;&nbsp;<i class="fi-plus"></i>
 	      </a>
 	   </td>
-	    <td>
-	      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}?translate=True">
-                Translate
-
-	    </td>
     </tr>
  
 	{% endfor %}
@@ -436,3 +430,4 @@ $(document).on('focus',".member_of input",function(){
 });
  {% endif %}
 {% endblock %}	
+

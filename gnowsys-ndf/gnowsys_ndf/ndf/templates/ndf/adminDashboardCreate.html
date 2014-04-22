@@ -10,7 +10,6 @@
 {% endblock %}
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
-
 <form method="post" action="" name="{{class_name}}">
 {% csrf_token %}
 
@@ -33,13 +32,6 @@
 	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
       </div>
       {% endif %}
-
-      {% if translate %}
-      <div style="display:table-cell;"> 
-	<font size="3"> {{list}}</font> 
-      </div>
-      {% get_input_fields class_structure|get_dict_item:list list translate %}
-      {% endif %}
     </div>
     {% endfor %}
   </div>
@@ -53,12 +45,7 @@
       {% for list in contentlist %}
       <div class="medium-12 columns">
 	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
-      {% if translate %}
-	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
-      
-      {% endif %}
       </div>
-      
       {% endfor %}
 <script type="text/javascript">
 
@@ -88,17 +75,9 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 	<div style="display:table-cell;"> 
 	  <font size="3"> {{list}}</font> 
 	</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate %}
-     
-    {% if translate %}
-      <div style="display:table-cell;"> 
-	  <font size="3"> {{list}}</font> 
-	</div>
-	{% get_input_fields class_structure|get_dict_item:list list translate %}
-      {% endif %}
- </div>
+	{% get_input_fields class_structure|get_dict_item:list list %}
+      </div>
 {% endfor %}
-
     </div>
   </dd>
 </dl>
@@ -111,16 +90,7 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
     <div style="display:table-cell;"> 
       <font size="3"> {{list}}</font> 
     </div>
-    {% get_input_fields class_structure|get_dict_item:list list translate %}
-    
-    {% if translate%}
-  
-    <div style="display:table-cell;"> 
-      <font size="3"> {{list}}</font> 
-    </div>
-    {% get_input_fields class_structure|get_dict_item:list list translate %}
-  
-  {% endif %}
+    {% get_input_fields class_structure|get_dict_item:list list %}
   </div>
   {% endfor %}
   
@@ -131,9 +101,6 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 </div>
 <input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
 </form>
-
-
-
 {% endblock %}
 
 {% block script %}
@@ -169,3 +136,4 @@ event.preventDefault();
 var type_list = []
 </script>
 {% endblock %}
+
