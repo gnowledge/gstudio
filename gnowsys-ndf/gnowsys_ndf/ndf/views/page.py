@@ -184,23 +184,6 @@ def page(request, group_id, app_id=None):
           else:
             shelves = []
 
-
-        # location = []
-        # for each in page_node.location:
-        #   location.append(json.dumps(each))
-
-        usrid = request.user.id
-        visited_location = ""
-
-        if(usrid):
-
-          usrid = int(request.user.id)
-          usrname = unicode(request.user.username)
-        
-          author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-          user_group_location = collection.Node.one({'_type': "Author", 'created_by': usrid, 'name': usrname})
-          visited_location = user_group_location.visited_location
-
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
@@ -223,10 +206,17 @@ def create_edit_page(request, group_id, node_id=None):
                           'groupid': group_id
                       }
     
+    available_nodes = collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(each.name)
+
     if node_id:
         page_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
         page_node = collection.GSystem()
+        
 
     if request.method == "POST":
         
@@ -243,6 +233,9 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
+            context_variables['nodes_list'] = json.dumps(nodes_list)
+        else:
+            context_variables['nodes_list'] = json.dumps(nodes_list)
 
         print "would get out of the page  "
         return render_to_response("ndf/page_create_edit.html",

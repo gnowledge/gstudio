@@ -328,9 +328,13 @@ def get_node_common_fields(request, node, group_id, node_type):
     user_group_location = gcollection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
 
     if user_group_location:
-      user_group_location['visited_location'] = user_last_visited_location
-      
-      user_group_location.save()
+
+      if node._type == "Author" and user_group_location._id == node._id:
+        node['visited_location'] = user_last_visited_location
+
+      else:
+        user_group_location['visited_location'] = user_last_visited_location
+        user_group_location.save()
 
 # ============= END of def get_node_common_fields() ==============
   

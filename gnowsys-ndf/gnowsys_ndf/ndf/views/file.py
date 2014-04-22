@@ -66,66 +66,34 @@ def file(request, group_id, file_id):
         videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
         already_uploaded = request.GET.getlist('var', "")
     
-        '''                                                                                                                                 saving wetube.gnowledge.org videos data in GSystem, with locking                                                            
-        '''
-        lock.acquire()
-        try:
-                api=ox.api.API("http://wetube.gnowledge.org/api")
-                #countVideo = api.find({"query":{"operator":"&","conditions":[{"operator":"==","key":"project","value":"NROER"}]}})
-                #totalVideoNo=countVideo['data']['items']
-                allVideo = api.find({"keys":["id","title","director","id","posterRatio","year","user"],"query":{"conditions":[{"oper\
-ator":"==","key":"project","value":"NROER"}],"operator":"&"},"sort":[{"operator":"+","key":"title"}]})
+        pandora_video_st=collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
+        source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
 
-                allVideosData=allVideo['data']['items']
-
-                pandora_video_st=collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]}) 
-                source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]}) 
-                pandora_video_id=[] 
-                source_id_set=[]
-                for each in allVideosData[:50]: 
-                    gattribute=collection.Node.one({'$and':[{'object_value':each['id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]}) 
-                    if gattribute is None: 
-                        #gs=collection.GSystem() 
-                        gs=collection.File()
-                        gs.mime_type="video"
-                        gs.member_of=[pandora_video_st._id] 
-                        gs.name=each['title'].lower()
-                        gs.created_by=1
-                        gs.modified_by = 1
-                        if 1 not in gs.contributors:
-                            gs.contributors.append(1)
-                        gs.save() 
-
-                        at=collection.GAttribute() 
-                        at.attribute_type=source_id_at 
-                        at.object_value=each['id'] 
-                        at.subject=gs._id 
-                        at.save() 
-                get_member_set=collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'Fil\
-e'}]})
-      
-                for each in get_member_set:
-                    pandora_video_id.append(each['_id'])
-                for each in pandora_video_id:
-                    att_set=collection.Node.one({'$and':[{'subject':each},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
-                    if att_set:
-                        object1=collection.Node.one({'_id':each})
-                        obj_set={}
-                        obj_set['id']=att_set.object_value
-                        obj_set['object']=object1
-                        source_id_set.append(obj_set)
-
+        pandora_video_id=[]
+        source_id_set=[]
+        get_member_set=collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'File'}]})
+        
+        #for each in get_member_set:
+    
+         #  pandora_video_id.append(each['_id'])
+        # for each in get_member_set:
+        #     att_set=collection.Node.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+        #     if att_set:
+        #         obj_set={}
+        #         obj_set['id']=att_set.object_value
+        #         obj_set['object']=each
+        #         source_id_set.append(obj_set)
+    
                 # for each in pandora_video_id:
                 #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
         
                 
-        finally:
-            lock.release()
-
+       
         return render_to_response("ndf/file.html", 
                                   {'title': title, 
                                    'files': files,
                                    'sourceid':source_id_set,
+                                   "wetube_videos":get_member_set,
                                    'docCollection': docCollection,
                                    'imageCollection': imageCollection,
                                    'videoCollection': videoCollection,

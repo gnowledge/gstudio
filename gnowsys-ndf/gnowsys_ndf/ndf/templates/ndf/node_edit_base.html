@@ -125,6 +125,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% endif %}	    
 	  </div>
 	</div>
+
+	<div id="message" style="display:none; color:red"></div>
+					
+
 	<div class="row">
 	  
 	  <div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
@@ -264,11 +268,32 @@ background-repeat:no-repeat; background-size: 48px 48px
       <!-- #{#%# endif %} -->
     </div>
 
-
+    <input type="hidden" id="nodes_list" name="title-of-node" value="{{nodes_list}}">						
 </form>
 
 
 <script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#name_id").change(function(){
+
+			var name = $("#name_id").val();
+			var nodes = $("#nodes_list").val();
+
+			if (nodes.indexOf(name) > 0)  
+			{
+				$("#message").css("display", "block");
+				$("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
+			}
+			else
+			{
+				$("#message").css("display", "none");
+			}
+
+		});
+	});
+
 
 	$("input:radio").click(function() {
 
