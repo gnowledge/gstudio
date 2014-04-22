@@ -132,23 +132,24 @@ def create_group(request,group_id):
         has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
         dbref_has_shelf = has_shelf_RT.get_dbref()
 
+        shelves = []
+        shelf_list = {}
+        
         if auth:
             shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-            shelves = []
-            shelf_list = {}
 
-        if shelf:
-            for each in shelf:
-                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
-                shelves.append(shelf_name)
+            if shelf:
+                for each in shelf:
+                    shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                    shelves.append(shelf_name)
 
-                shelf_list[shelf_name.name] = []         
-                for ID in shelf_name.collection_set:
-                    shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-                    shelf_list[shelf_name.name].append(shelf_item.name)
-                    
-        else:
-            shelves = []
+                    shelf_list[shelf_name.name] = []         
+                    for ID in shelf_name.collection_set:
+                        shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                        shelf_list[shelf_name.name].append(shelf_item.name)
+                        
+            else:
+                shelves = []
 
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,
                                                              'groupid':group_id,'group_id':group_id,
