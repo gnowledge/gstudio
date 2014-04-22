@@ -257,12 +257,15 @@ def get_node_common_fields(request, node, group_id, node_type):
         node.group_set.append(user_group_obj._id)
 
   if tags:
+    tags_list = []
+
     for tag in tags.split(","):
       tag = unicode(tag.strip())
+
       if tag:
-        print "\n tags: ", node.tags, " -- ", tag, " -- ", (tag in node.tags)
-        if not (tag in node.tags):
-          node.tags.append(tag)
+        tags_list.append(tag)
+
+    node.tags = tags_list
 
   # -------------------------------------------------------------------------------- prior_node
 
@@ -328,9 +331,13 @@ def get_node_common_fields(request, node, group_id, node_type):
     user_group_location = gcollection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
 
     if user_group_location:
-      user_group_location['visited_location'] = user_last_visited_location
-      
-      user_group_location.save()
+
+      if node._type == "Author" and user_group_location._id == node._id:
+        node['visited_location'] = user_last_visited_location
+
+      else:
+        user_group_location['visited_location'] = user_last_visited_location
+        user_group_location.save()
 
 # ============= END of def get_node_common_fields() ==============
   
@@ -407,11 +414,11 @@ and if he has published his contents then he would be shown the current publishe
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
-     if  ver2 != '1.1':                
-         
+     if  ver2 != '1.1':                           
 	    if node2 is not None:
-		
+		print "direct"
                 if node2.status == 'PUBLISHED':
+                  
 			if float(ver2) > float(ver1):			
 				return (node2,ver2)
 			elif float(ver2) < float(ver1):
@@ -421,15 +428,14 @@ and if he has published his contents then he would be shown the current publishe
 		elif node2.status == 'DRAFT':
                        #========== conditions for Group===============#
 
-                        if  node1.status == 'DRAFT' and node._type == "Group":
-			    #check to perform if the person has recently joined the group
+                        if   node._type == "Group":
+			    
 			    count=check_page_first_creation(request,node2)
                             if count == 1:
                                 return (node1,ver1)
                             elif count == 2:
-				return (node2,ver2)
-
-                            
+                               	return (node2,ver2)
+                        
                         return (node2,ver2)  
 	    else:
                         

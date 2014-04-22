@@ -132,30 +132,39 @@ def create_group(request,group_id):
         has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
         dbref_has_shelf = has_shelf_RT.get_dbref()
 
+        shelves = []
+        shelf_list = {}
+        
         if auth:
             shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-            shelves = []
-            shelf_list = {}
 
-        if shelf:
-            for each in shelf:
-                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
-                shelves.append(shelf_name)
+            if shelf:
+                for each in shelf:
+                    shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                    shelves.append(shelf_name)
 
-                shelf_list[shelf_name.name] = []         
-                for ID in shelf_name.collection_set:
-                    shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-                    shelf_list[shelf_name.name].append(shelf_item.name)
-                    
-        else:
-            shelves = []
+                    shelf_list[shelf_name.name] = []         
+                    for ID in shelf_name.collection_set:
+                        shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                        shelf_list[shelf_name.name].append(shelf_item.name)
+                        
+            else:
+                shelves = []
 
         return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,
                                                              'groupid':group_id,'group_id':group_id,
                                                              'shelf_list': shelf_list,'shelves': shelves
                                                             },context_instance=RequestContext(request))
 
-    return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
+
+    available_nodes = collection.Node.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(each.name)
+
+
+    return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
     
 # def home_dashboard(request):
 #     try:
@@ -242,6 +251,7 @@ def edit_group(request,group_id):
             group_id=page_node._id
             return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
     page_node,ver=get_page(request,page_node)
+
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
                                         'groupid':group_id,
