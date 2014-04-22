@@ -32,6 +32,7 @@ $('#enddate').fdatepicker();
     <div class="large-4 columns">
      <label>Name of the Forum</label>
       <input type="text" id="forum_name" name="forum_name">
+      <div id="message" style="display:none; color:red"></div>
     </div>
 
     <div class="large-4 small-2 columns">
@@ -85,7 +86,35 @@ $('#enddate').fdatepicker();
 </div>
    
 <input type="button" id="save_forum" class="btn btn-primary btn-large btn-block" value="Create Forum" onclick="saveforum()">
-       		 	<input type="submit" id="forum" value="Create Forum" class="btn btn-primary btn-large btn-block" style="display:none">
+
+<input type="submit" id="forum" value="Create Forum" class="btn btn-primary btn-large btn-block" style="display:none">
+
+<input type="hidden" id="nodes_list" value="{{nodes_list}}">            
+
 </form>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    $("#forum_name").change(function(){
+
+      var name = $("#forum_name").val();
+      var nodes = $("#nodes_list").val();
+
+      if (nodes.indexOf(name) > 0)  
+      {
+        $("#message").css("display", "block");
+        $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+        $("#forum_name").val("");
+      }
+      else
+      {
+        $("#message").css("display", "none");
+      }
+
+    });
+  });
+
+</script>
 
 {% endblock %}
