@@ -10,6 +10,7 @@ import datetime
 from django.core.management.base import BaseCommand, CommandError
 
 from django_mongokit import get_database
+from mongokit import IS
 
 try:
     from bson import ObjectId
@@ -125,8 +126,8 @@ def parse_data_create_gsystem(json_file_path):
         # print "\n gsystem_type_name: ", gsystem_type_name
 
         gsystem_type_node = collection.Node.one({'_type': "GSystemType", 
-                                                 '$or': [{'name': {'$regex': gsystem_type_name, '$options': 'i'}}, 
-                                                         {'altnames': {'$regex': gsystem_type_name, '$options': 'i'}}]
+                                                 '$or': [{'name': {'$regex': "^"+gsystem_type_name+"$", '$options': 'i'}}, 
+                                                         {'altnames': {'$regex': "^"+gsystem_type_name+"$", '$options': 'i'}}]
                                              })
         if gsystem_type_node:
             # print "\n ", gsystem_type_node.name, 
@@ -151,7 +152,7 @@ def parse_data_create_gsystem(json_file_path):
             json_document = {}
 
             for key_spaces, value_spaces in json_document_spaces.iteritems():
-                json_document[key_spaces.strip()] = value_spaces.strip()
+                json_document[key_spaces.strip().lower()] = value_spaces.strip()
 
             json_documents_list.append(json_document)
 
@@ -161,15 +162,27 @@ def parse_data_create_gsystem(json_file_path):
     except Exception as e:
         print "\n While parsing the file ("+json_file_path+") got following error...\n " + str(e)
 
+    '''
+    for json_document in json_documents_list:
+        if json_document.has_key("first name"):
+            n_name = json_document["first name"] + " "
+            if json_document["middle name"]:
+                n_name += json_document["middle name"] + " "
+            n_name += json_document["last name"]
+            json_document["name"] = n_name
+        print "\n json_document: ", json_document
+        print "\n name: ", json_document['name']
+    '''
+
     for json_document in json_documents_list:
         try:
             n_name = ""
-            if json_document.has_key("First Name"):
-                n_name = json_document["First Name"] + " "
-                if json_document["Middle Name"]:
-                    n_name += json_document["Middle Name"] + " "
-                n_name += json_document["Last Name"]
-                json_document["Name"] = n_name
+            if json_document.has_key("first name"):
+                n_name = json_document["first name"] + " "
+                if json_document["middle name"]:
+                    n_name += json_document["middle name"] + " "
+                n_name += json_document["last name"]
+                json_document["name"] = n_name
 
             parsed_json_document = {}
             attribute_relation_list = []
@@ -207,23 +220,28 @@ def parse_data_create_gsystem(json_file_path):
                     is_relation = True
 
                     for attr_key, attr_value in gst_possible_attributes_dict.iteritems():
-                        if key in attr_value['altnames']:
+                        # print "\n ", key, " -- (attr_key: "+attr_key+") -- (atlnm"+attr_value['altnames']+")" 
+                        if key == attr_value['altnames'].lower() or key == attr_key.lower():
                             is_relation = False
 
-                            # print "\n ", key, " == ", attr_value['altnames'], " -- ", type(attr_value['data_type']), "\n"
+                            #print "\n For GAttribute parsing content ", key," -- ", (type(attr_value['data_type']) == IS), " -- ", json_document[key], "\n"
                             if json_document[key]:
                                 if attr_value['data_type'] == unicode:
                                     json_document[key] = unicode(json_document[key])
 
+                                elif attr_value['data_type'] == bool:
+                                    if json_document[key].lower() == "yes":
+                                        json_document[key] = True
+                                    elif json_document[key].lower() == "no":
+                                        json_document[key] = False
+                                    else:
+                                        json_document[key] = None
+                                    
                                 elif attr_value['data_type'] == datetime.datetime:
-                                    json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
-
-                                elif (attr_value['data_type'] in [list, dict]) or (type(attr_value['data_type']) in [list, dict]):
-                                    if "," not in json_document[key]:
-                                        # Necessary to inform perform_eval_type() that handle this value as list
-                                        json_document[key] = "\"" + json_document[key] + "\", "
-
-                                        perform_eval_type(key, json_document, "GSystem")
+                                    if key == "dob":
+                                        json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
+                                    else:
+                                        json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")
 
                                 elif attr_value['data_type'] in [int, float, long]:
                                     if not json_document[key]:
@@ -236,14 +254,28 @@ def parse_data_create_gsystem(json_file_path):
                                         else:
                                             json_document[key] = long(json_document[key])
 
+                                elif type(attr_value['data_type']) == IS:
+                                    # print "\n ************** ", key, " -- ", json_document[key]
+                                    # print "\n attr_value['data_type']: ", attr_value['data_type']._operands
+                                    for op in attr_value['data_type']._operands:
+                                        if op.lower() == json_document[key].lower():
+                                            json_document[key] = op
+
+                                elif (attr_value['data_type'] in [list, dict]) or (type(attr_value['data_type']) in [list, dict]):
+                                    if "," not in json_document[key]:
+                                        # Necessary to inform perform_eval_type() that handle this value as list
+                                        json_document[key] = "\"" + json_document[key] + "\", "
+
+                                        perform_eval_type(key, json_document, "GSystem")
+
                                 subject_id = node._id
                                 attribute_type_node = collection.Node.one({'_type': "AttributeType", 
-                                                                           '$or': [{'name': {'$regex': attr_key, '$options': 'i'}}, 
-                                                                                   {'altnames': {'$regex': attr_key, '$options': 'i'}}]
+                                                                           '$or': [{'name': {'$regex': "^"+attr_key+"$", '$options': 'i'}}, 
+                                                                                   {'altnames': {'$regex': "^"+attr_key+"$", '$options': 'i'}}]
                                                                        })
                                 object_value = json_document[key]
                                 ga_node = None
-                                print "\n Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+json_document[key]+") ...\n"
+                                print "\n Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
                                 ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
 
                                 # To break outer for loop as key found
@@ -275,7 +307,8 @@ def parse_data_create_gsystem(json_file_path):
                         # print "\n ", key, " == ", rel_value['altnames'], " -- ", rel_key, "\n"
                         # print "\n check: ", key in rel_value['altnames'], "\n"
 
-                        if key in rel_value['altnames']:
+                        # if key in rel_value['altnames']:
+                        if key == rel_value['altnames'].lower() or key == rel_key.lower():
                             is_relation = False
 
                             if json_document[key]:
@@ -308,8 +341,8 @@ def parse_data_create_gsystem(json_file_path):
                                         rel_subject_type.extend(gsystem_type_node.type_of)
 
                                     relation_type_node = collection.Node.one({'_type': "RelationType", 
-                                                                              '$or': [{'name': {'$regex': rel_key, '$options': 'i'}}, 
-                                                                                      {'altnames': {'$regex': rel_key, '$options': 'i'}}],
+                                                                              '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
+                                                                                      {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
                                                                               'subject_type': {'$in': rel_subject_type}
                                                                       })
                                     # print "\n subject_id: ", subject_id, " -- ", node.name,"\n"
@@ -329,9 +362,8 @@ def parse_data_create_gsystem(json_file_path):
                                 break
 
         except Exception as e:
-            print "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['Name']+") got following error...\n " + str(e)
+            print "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
             
-
 
 def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_id):
     """Creates/Updates respective GSystem and it's related GAttribute(s)
@@ -350,8 +382,8 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
     #     node = collection.Node.one({'_type': "GSystem", 'name': unicode(json_document['name'])})
 
     node = collection.Node.one({'_type': "GSystem", 
-                                '$or': [{'name': {'$regex': json_document['name'], '$options': 'i'}}, 
-                                        {'altnames': {'$regex': json_document['name'], '$options': 'i'}}]
+                                '$or': [{'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}, 
+                                        {'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}]
                             })
 
     if node is None:
@@ -464,8 +496,8 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
 
         else:
             node = collection.Node.one({'_type': type_convert_objectid, 
-                                        '$or': [{'name': {'$regex': data, '$options': 'i'}}, 
-                                                {'altnames': {'$regex': data, '$options': 'i'}}]
+                                        '$or': [{'name': {'$regex': "^"+data+"$", '$options': 'i'}}, 
+                                                {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}]
                                        }, 
                                        {'_id': 1}
                                    )
