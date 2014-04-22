@@ -100,7 +100,15 @@ def create_forum(request,group_id):
         return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id}))
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
-    return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id},RequestContext(request))
+
+
+    available_nodes = gs_collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(each.name)
+
+    return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 def display_forum(request,group_id,forum_id):
     forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})

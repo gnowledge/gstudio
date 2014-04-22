@@ -55,16 +55,14 @@ def get_apps_for_groups(groupid):
     grp=collection.Node.one({'_id':ObjectId(groupid)})
     poss_atts=grp.get_possible_attributes(at_apps_list._id)
     if poss_atts:
-      list_apps=poss_atts['apps_list'][1]
+      list_apps=poss_atts['apps_list']['object_value']
       counter=1
-      print "list_apps -",list_apps
       for each in list_apps:
         obdict={}
         obdict['id']=each['_id']
         obdict['name']=each['name']
         ret_dict[counter]=obdict
         counter+=1 
-      print "return in apps",ret_dict  
       return ret_dict 
     else:
       gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -79,7 +77,7 @@ def get_apps_for_groups(groupid):
             gapps[i] = {'id': node._id, 'name': node.name.lower()}
       return gapps
   except Exception as exptn:
-    print "Exception in get_apps_for_home "+str(exptn)
+    print "Exception in get_apps_for_groups "+str(exptn)
 
 
 
@@ -645,13 +643,13 @@ def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
 @register.inclusion_tag('ndf/admin_fields.html')
-def get_input_fields(fields_type,fields_name):
+def get_input_fields(fields_type,fields_name,translate=None):
   """Get html tags 
   """
   field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
   return {'template': 'ndf/admin_fields.html', 
           "fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
-          "field_type_list":field_type_list}
+          "field_type_list":field_type_list,"translate":translate}
   
 
 @register.assignment_tag
@@ -784,7 +782,17 @@ def get_publish_policy(groupid,resnode):
       if resnode.status == "DRAFT": 
          print "working section",resnode.status  
          return "allow"
-  
+
+@register.assignment_tag
+def get_source_id(obj_id):
+  try:
+    source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+    return att_set.object_value
+  except Exception as e:
+    print str(e)
+    return 'null'
+ 
 #textb
 @register.filter("mongo_id")
 def mongo_id(value):

@@ -155,7 +155,15 @@ def create_group(request,group_id):
                                                              'shelf_list': shelf_list,'shelves': shelves
                                                             },context_instance=RequestContext(request))
 
-    return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
+
+    available_nodes = collection.Node.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(each.name)
+
+
+    return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
     
 # def home_dashboard(request):
 #     try:
@@ -242,6 +250,7 @@ def edit_group(request,group_id):
             group_id=page_node._id
             return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
     page_node,ver=get_page(request,page_node)
+
     return render_to_response("ndf/edit_group.html",
                                       { 'node': page_node,
                                         'groupid':group_id,
