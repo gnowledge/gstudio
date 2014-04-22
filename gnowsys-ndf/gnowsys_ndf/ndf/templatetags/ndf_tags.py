@@ -643,13 +643,13 @@ def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
 @register.inclusion_tag('ndf/admin_fields.html')
-def get_input_fields(fields_type,fields_name):
+def get_input_fields(fields_type,fields_name,translate=None):
   """Get html tags 
   """
   field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
   return {'template': 'ndf/admin_fields.html', 
           "fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
-          "field_type_list":field_type_list}
+          "field_type_list":field_type_list,"translate":translate}
   
 
 @register.assignment_tag
@@ -782,7 +782,17 @@ def get_publish_policy(groupid,resnode):
       if resnode.status == "DRAFT": 
          print "working section",resnode.status  
          return "allow"
-  
+
+@register.assignment_tag
+def get_source_id(obj_id):
+  try:
+    source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+    return att_set.object_value
+  except Exception as e:
+    print str(e)
+    return 'null'
+ 
 #textb
 @register.filter("mongo_id")
 def mongo_id(value):
@@ -818,3 +828,17 @@ def check_existence_textObj_mobwrite(node_id):
     return check
 #textb 
 
+@register.assignment_tag
+def get_version_of_module(module_id):
+  ''''
+  This method will return version number of module
+  '''
+  ver_at = collection.Node.one({'_type':'AttributeType','name':'version'})
+  if ver_at:
+    attr = collection.Triple.one({'_type':'GAttribute','attribute_type.$id':ver_at._id,'subject':ObjectId(module_id)})
+    if attr:
+      return attr.object_value
+    else:
+      return ""
+  else:
+    return ""

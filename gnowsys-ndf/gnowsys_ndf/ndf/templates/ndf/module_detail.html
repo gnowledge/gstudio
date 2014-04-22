@@ -27,10 +27,8 @@
 <section class="medium-6 large-12 columns">
   <h3>Modules</h3>
   <div class ="row">
-    {% for each in node.collection_set %}
     <!-- bellow div for making tree from json data -->
-    <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{each}}"></div>
-    {% endfor %}
+    <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{node.pk}}"></div>
   </div>
 </section>
 {% endblock %}

@@ -342,13 +342,13 @@ def make_module_set(request, group_id):
                         gsystem_obj.contributors.append(user_id)
                     gsystem_obj.module_set.append(dict)
                     module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
-                    
                     check =check_module_exits(module_set_md5)          #checking module already exits or not
                     if(check == 'True'):
                         return HttpResponse("This module already Exists")
                     else:
                         gsystem_obj.save()
                         create_relation_of_module(node._id, gsystem_obj._id)
+                        create_version_of_module(gsystem_obj._id,node._id)
                         check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
                         if (check1 == 'True'):
                             return HttpResponse("module succesfull created")
@@ -361,7 +361,8 @@ def make_module_set(request, group_id):
             else:
                 return HttpResponse("Not a valid id passed")
         except Exception as e:
-              return HttpResponse(e)
+            print "Error:",e
+            return HttpResponse(e)
 
 def sotore_md5_module_set(object_id,module_set_md5):
     '''
@@ -376,6 +377,7 @@ def sotore_md5_module_set(object_id,module_set_md5):
             attr_obj.object_value = unicode(module_set_md5)
             attr_obj.save()
         except Exception as e:
+            print "Exception:",e
             return 'False'
         return 'True'
     else:
@@ -383,12 +385,38 @@ def sotore_md5_module_set(object_id,module_set_md5):
         return 'False'
 
 #-- under construction
-def create_version_of_module():
+def create_version_of_module(subject_id,node_id):
     '''
     This method will create attribute version_no of module with at type version
     '''
+    rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
+    relation = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_module._id,'subject':node_id})
     at_version = collection.Node.one({'_type':'AttributeType', 'name':'version'})
-
+    attr_versions = []
+    if relation.count() > 0:
+        for each in relation:
+            module_id = collection.Triple.one({'_id':each['_id']})
+            if module_id:
+                attr = collection.Triple.one({'_type':'GAttribute','attribute_type.$id':at_version._id,'subject':ObjectId(module_id.right_subject)})
+            if attr:
+                attr_versions.append(attr.object_value)
+    print attr_versions,"Test version"
+    if attr_versions:
+        attr_versions.sort()
+        attr_ver = float(attr_versions[-1])
+        attr = collection.GAttribute()
+        attr.attribute_type = at_version
+        attr.subject = subject_id
+        attr.object_value = round((attr_ver+0.1),1)
+        attr.save()
+    else:
+        attr = collection.GAttribute()
+        attr.attribute_type = at_version
+        attr.subject = ObjectId(subject_id)
+        attr.object_value = 1
+        print "berfore save",attr
+        attr.save()
+            
 #-- under construction    
 def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
@@ -434,6 +462,8 @@ def get_module_json(request, group_id):
     node = collection.Node.one({'_id':ObjectId(_id)})
     data = walk(node.module_set)
     return HttpResponse(json.dumps(data))
+
+
 
 # ------------- For generating graph json data ------------
 def graph_nodes(request, group_id):
@@ -520,6 +550,7 @@ def graph_nodes(request, group_id):
         #     i += 1
 
         # else:
+
         for each in value:
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)
@@ -530,13 +561,13 @@ def graph_nodes(request, group_id):
             else:
               inverse = ""
 
-            node_metadata += '{"screen_name":"' + node_name + '", "title":"' + page_node.name + '", "_id":"'+ str(each) +'", "url":"'+ _get_node_url(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1"},'
+            node_metadata += '{"screen_name":"' + node_name + '", "title":"' + page_node.name + '", "_id":"'+ each +'", "url":"'+ _get_node_url(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1"},'
             # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ each +'"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + unicode(each) + '", "_id":"'+ unicode(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ unicode(each) +'_n"},'
             i += 1
     
     else:
@@ -552,7 +583,7 @@ def graph_nodes(request, group_id):
           i += 1 
       
       else:
-        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_metadata += '{"screen_name":"' + value + '", "_id":"'+ str(i) +'_n"},'
         node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
         i += 1 
     # End of if - else
@@ -568,6 +599,8 @@ def graph_nodes(request, group_id):
   return StreamingHttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
+
+
 
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []

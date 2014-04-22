@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load pagination_tags %}
+{% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
@@ -15,9 +16,46 @@
     });
     });
   </script>
-{% endblock %}
-  
+  {% endblock %}
+
 {% block body_content %}
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+{% for node in module_coll %}
+{% get_version_of_module node.pk as version %}
+<li class="card">
+  <div class="page">
+    <header>
+      <div class="label-list">
+        {% for tag in node.tags %}
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        {% endfor %}
+      </div>
+      <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+      <h4>{{ node.name }} <font color = "red"><b>Ver.</b>{{version}}</font>
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </h4>
+    </header>
+    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+    <a class="small button expand" href="{% url 'module_detail' groupid node %}">Detail</a> 
+    {% get_user_object node.created_by as user_obj %}
+    {% ifequal user_obj.username user.username %}
+    <a class="button alert tiny" href="{% url 'delete_module' groupid node %}?next={{request.path}}">Delete </a>
+    {% endifequal %}
+    
+    <footer class="row">
+    </footer>
+  </div>
+</li>  
+{% endfor %}
+</ul>
+
+
+
+
+{% comment %}
 {% autopaginate module_coll 23 %}
   <div class="row">
     <div class="small-6 large-12 columns">
@@ -44,4 +82,6 @@
     </div>
   </div>
 {% paginate %}
+{% endcomment %}
 {% endblock %}
+
