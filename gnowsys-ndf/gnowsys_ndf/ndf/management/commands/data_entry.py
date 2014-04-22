@@ -29,7 +29,13 @@ SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
 
 collection = get_database()[Node.collection_name]
 is_json_file_exists = False
-mis_group = collection.Node.one({'_type': "Group", 'name': "MIS_admin", 'group_type': "PRIVATE"}, {'created_by': 1})
+mis_group = collection.Node.one({'_type': "Group", 
+                                 '$or': [{'name': {'$regex': u"MIS_admin", '$options': 'i'}}, 
+                                         {'altnames': {'$regex': u"MIS_admin", '$options': 'i'}}],
+                                 'group_type': "PRIVATE"
+                                }, 
+                                {'created_by': 1}
+                            )
 group_id = mis_group._id
 user_id = mis_group.created_by  # User who created the above private group
 
@@ -118,7 +124,10 @@ def parse_data_create_gsystem(json_file_path):
         gsystem_type_name = gsystem_type_name.replace("_", " ")
         # print "\n gsystem_type_name: ", gsystem_type_name
 
-        gsystem_type_node = collection.Node.one({'_type': "GSystemType", 'name': gsystem_type_name})
+        gsystem_type_node = collection.Node.one({'_type': "GSystemType", 
+                                                 '$or': [{'name': {'$regex': gsystem_type_name, '$options': 'i'}}, 
+                                                         {'altnames': {'$regex': gsystem_type_name, '$options': 'i'}}]
+                                             })
         if gsystem_type_node:
             # print "\n ", gsystem_type_node.name, 
             gsystem_type_id = gsystem_type_node._id
@@ -228,7 +237,10 @@ def parse_data_create_gsystem(json_file_path):
                                             json_document[key] = long(json_document[key])
 
                                 subject_id = node._id
-                                attribute_type_node = collection.Node.one({'_type': "AttributeType", 'name': attr_key})
+                                attribute_type_node = collection.Node.one({'_type': "AttributeType", 
+                                                                           '$or': [{'name': {'$regex': attr_key, '$options': 'i'}}, 
+                                                                                   {'altnames': {'$regex': attr_key, '$options': 'i'}}]
+                                                                       })
                                 object_value = json_document[key]
                                 ga_node = None
                                 print "\n Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+json_document[key]+") ...\n"
@@ -296,7 +308,8 @@ def parse_data_create_gsystem(json_file_path):
                                         rel_subject_type.extend(gsystem_type_node.type_of)
 
                                     relation_type_node = collection.Node.one({'_type': "RelationType", 
-                                                                              'name': rel_key, 
+                                                                              '$or': [{'name': {'$regex': rel_key, '$options': 'i'}}, 
+                                                                                      {'altnames': {'$regex': rel_key, '$options': 'i'}}],
                                                                               'subject_type': {'$in': rel_subject_type}
                                                                       })
                                     # print "\n subject_id: ", subject_id, " -- ", node.name,"\n"
@@ -336,7 +349,10 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
     # else:
     #     node = collection.Node.one({'_type': "GSystem", 'name': unicode(json_document['name'])})
 
-    node = collection.Node.one({'_type': "GSystem", 'name': json_document['name']})
+    node = collection.Node.one({'_type': "GSystem", 
+                                '$or': [{'name': {'$regex': json_document['name'], '$options': 'i'}}, 
+                                        {'altnames': {'$regex': json_document['name'], '$options': 'i'}}]
+                            })
 
     if node is None:
         try:
@@ -447,7 +463,12 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
             type_list.append(data)
 
         else:
-            node = collection.Node.one({'_type': type_convert_objectid, '$or': [{'name': data}, {'altnames': data}]}, {'_id': 1})
+            node = collection.Node.one({'_type': type_convert_objectid, 
+                                        '$or': [{'name': {'$regex': data, '$options': 'i'}}, 
+                                                {'altnames': {'$regex': data, '$options': 'i'}}]
+                                       }, 
+                                       {'_id': 1}
+                                   )
         
             if node:
                 type_list.append(node._id)
@@ -521,10 +542,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id):
     gr_node = None
 
     gr_node = collection.Triple.one({'_type': "GRelation", 
-                                         'subject': subject_id, 
-                                         'relation_type': relation_type_node.get_dbref(),
-                                         'right_subject': right_subject_id
-                                      })
+                                     'subject': subject_id, 
+                                     'relation_type': relation_type_node.get_dbref(),
+                                     'right_subject': right_subject_id
+                                 })
 
     if gr_node is None:
         # Code for creation
