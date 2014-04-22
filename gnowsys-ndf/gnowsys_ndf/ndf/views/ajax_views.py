@@ -463,6 +463,8 @@ def get_module_json(request, group_id):
     data = walk(node.module_set)
     return HttpResponse(json.dumps(data))
 
+
+
 # ------------- For generating graph json data ------------
 def graph_nodes(request, group_id):
 
@@ -548,6 +550,7 @@ def graph_nodes(request, group_id):
         #     i += 1
 
         # else:
+
         for each in value:
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)
@@ -558,13 +561,13 @@ def graph_nodes(request, group_id):
             else:
               inverse = ""
 
-            node_metadata += '{"screen_name":"' + node_name + '", "title":"' + page_node.name + '", "_id":"'+ str(each) +'", "url":"'+ _get_node_url(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1"},'
+            node_metadata += '{"screen_name":"' + node_name + '", "title":"' + page_node.name + '", "_id":"'+ each +'", "url":"'+ _get_node_url(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1"},'
             # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ each +'"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + unicode(each) + '", "_id":"'+ unicode(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ unicode(each) +'_n"},'
             i += 1
     
     else:
@@ -580,7 +583,7 @@ def graph_nodes(request, group_id):
           i += 1 
       
       else:
-        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_metadata += '{"screen_name":"' + value + '", "_id":"'+ str(i) +'_n"},'
         node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
         i += 1 
     # End of if - else
@@ -596,6 +599,8 @@ def graph_nodes(request, group_id):
   return StreamingHttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
+
+
 
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []
