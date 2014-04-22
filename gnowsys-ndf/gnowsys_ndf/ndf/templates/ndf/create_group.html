@@ -45,7 +45,9 @@
         </div>
         <div style='display:table-cell;'> 
           <input type="text"  id="group_name" name="groupname" placeholder="Enter Group Name">
+          <div id="message" style="display:none; color:red"></div>
         </div>
+
         <div style='display:table-cell;'> 
           <font size="3" >Group Type</font>
         </div>
@@ -123,6 +125,8 @@
 </div>
 </div>
 
+<input type="hidden" id="nodes_list" value="{{nodes_list}}">           
+
 </form>
 
 {% endblock %}
@@ -164,6 +168,25 @@ function check_group_name()
 
 $(document).ready(function()
 {
+
+  $("#group_name").change(function(){
+
+    var name = $("#group_name").val();
+    var nodes = $("#nodes_list").val();
+
+    if (nodes.indexOf(name) > 0)  
+    {
+      $("#message").css("display", "block");
+      $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+      $("#group_name").val("");
+    }
+    else
+    {
+      $("#message").css("display", "none");
+    }
+
+  });
+
 
   /* New Form: Conditional Display */
 
