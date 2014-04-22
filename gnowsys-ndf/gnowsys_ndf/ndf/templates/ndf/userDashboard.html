@@ -6,7 +6,7 @@
 
     <h3>About</h3>
 
-    <p><b>Dashboard</b> shows users own activities in Metastudio also it explicitly shows what you have for creating a course</p>   
+    <p><b>Dashboard</b> shows users' own activities in the site.</p>   
 
 {% endblock %}
 
@@ -421,6 +421,35 @@
 			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
 		</div>
 	</div>
+	<br/>
+
+	
+	<div class="row">
+		{% for each in shelves %} 
+		{% for key,val in shelf_list.items %}
+		<div class="small-12 columns">
+
+			{% if key == each.name %}          
+
+				<h6 align="center"><b>{{key}}</b></h6>
+				<ul class="pricing-table resource-drawer" id="collaborators_drawer"> 
+				{% if val %}
+					{% for name in val %}
+
+						<li class="bullet-item" value="{{name}}"> 												
+							<a href="#"><b>{{name}} </b></a>  							
+						</li>							
+								
+					{% endfor %}
+				{% endif %}
+				</ul>
+			{% endif %}
+
+		</div>
+		{% endfor %}
+		{% endfor %}
+	</div>
+	
 	
 
 </div>

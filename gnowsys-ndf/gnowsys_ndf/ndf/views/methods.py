@@ -4,6 +4,8 @@
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from django.shortcuts import render_to_response, render
+from django.template import RequestContext
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
@@ -41,7 +43,7 @@ def check_existing_group(group_name):
   if type(group_name) == 'unicode':
     colg = collection.Node.find({'_type': u'Group', "name": group_name})
   else:
-    colg = collection.Node.find({'_type': u'Group', "_id": group_name._id})
+    colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
 
   if colg.count() >= 1:
     return True
@@ -185,7 +187,7 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
 
 def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node."""
-  print"has come here"
+  
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
@@ -201,7 +203,8 @@ def get_node_common_fields(request, node, group_id, node_type):
   module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
   map_geojson_data = request.POST.get('map-geojson-data')
-  
+  user_last_visited_location = request.POST.get('last_visited_location')
+
   if map_geojson_data:
     map_geojson_data = map_geojson_data + ","
     map_geojson_data = list(ast.literal_eval(map_geojson_data))
@@ -254,7 +257,12 @@ def get_node_common_fields(request, node, group_id, node_type):
         node.group_set.append(user_group_obj._id)
 
   if tags:
-    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+    for tag in tags.split(","):
+      tag = unicode(tag.strip())
+      if tag:
+        print "\n tags: ", node.tags, " -- ", tag, " -- ", (tag in node.tags)
+        if not (tag in node.tags):
+          node.tags.append(tag)
 
   # -------------------------------------------------------------------------------- prior_node
 
@@ -311,66 +319,24 @@ def get_node_common_fields(request, node, group_id, node_type):
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
 
-  
-
-# ------ Some work for relational graph - (II) ------
-  
-def neighbourhood_nodes(page_node):
-
-  collection = db[Node.collection_name]
-        
-  gs = collection.Node.find( {'$or':[{'_type':'GSystem'},{'_type':'File'}]}  )
-  gs_cur = []
-
-  for each in gs:
-      gs_cur.append(each)
-
-  gs.rewind()
-
-  flag = False
-
-  # Initiate and append this line compulsory for viewing node.
-  graphData = '{"name":"'+ page_node.name +'", "degree":1, "children":['
-
-  # Scan each document in cursor 'gs'
-  for val in gs:
+  # ----------------------------------------------------------------------------- visited_location in author class
+  if user_last_visited_location:
     
-    # If vieving page _id exist in collection set of current document
-    if page_node._id in val.collection_set:
-      
-      flag = True      
-      # Start adding children 
-      graphData += '{"name":"'+ val.name +'","degree" : 2'   #},'
-      
-      # If there is only one matching item in collection set
-      if len(val.collection_set) == 1:
-        graphData += '},'
-        
-      # If there is more than one _id in collection set, start adding children of children.
-      elif len(val.collection_set) > 1:
-        graphData += ', "children":['
-        
-        for each in val.collection_set:
-          node_name = (filter( lambda x: x['_id'] == each, gs_cur ))[0].name
-          
-          # Escape name matching current page node name
-          if(page_node._id == each):
-            pass
-          else:
-            graphData += '{"name":"'+ node_name + '"},'
+    user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
-        graphData = graphData[:-1] + ']},'
+    author = gcollection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = gcollection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
 
-  if flag:
-    graphData = graphData[:-1] + ']}' 
-  else:
-    graphData += ']}' 
+    if user_group_location:
 
-  return graphData
-# ------ End of processing for graph ------
+      if node._type == "Author" and user_group_location._id == node._id:
+        node['visited_location'] = user_last_visited_location
 
+      else:
+        user_group_location['visited_location'] = user_last_visited_location
+        user_group_location.save()
 
-
+# ============= END of def get_node_common_fields() ==============
   
   
 def get_versioned_page(node):
@@ -503,3 +469,12 @@ def check_page_first_creation(request,node):
     if count == 1:
 	return(count)     
       
+
+def tag_info(request, group_id, tagname):
+  '''
+  Function to get all the resources related to tag
+  '''
+
+  # print group_id
+
+  return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))

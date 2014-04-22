@@ -125,6 +125,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% endif %}	    
 	  </div>
 	</div>
+
+	<div id="message" style="display:none; color:red"></div>
+					
+
 	<div class="row">
 	  
 	  <div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
@@ -139,7 +143,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	<div class="row">
 	  <div class="medium-12 columns">
-	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
+	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
 	  </div>
 	</div>
 	
@@ -264,11 +268,32 @@ background-repeat:no-repeat; background-size: 48px 48px
       <!-- #{#%# endif %} -->
     </div>
 
-
+    <input type="hidden" id="nodes_list" name="title-of-node" value="{{nodes_list}}">						
 </form>
 
 
 <script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#name_id").change(function(){
+
+			var name = $("#name_id").val();
+			var nodes = $("#nodes_list").val();
+
+			if (nodes.indexOf(name) > 0)  
+			{
+				$("#message").css("display", "block");
+				$("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
+			}
+			else
+			{
+				$("#message").css("display", "none");
+			}
+
+		});
+	});
+
 
 	$("input:radio").click(function() {
 
@@ -327,22 +352,93 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% block base_save_on_click %}{% endblock %}
 	});
 
-	$(document).on('opened', '[data-reveal]', function () {  
+
+  $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+    
+    $.ajax({
+  url: "{% url 'get_visited_location' groupid %}",
+  success: function(data){ 
+   
+  	data = JSON.parse(data);
+
+    var lastVisitedLocationVal = data;
+    
+    if(lastVisitedLocationVal){
+
+      if(lastVisitedLocationVal == "[]"){
+        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+      }
+
+      if(lastVisitedLocationVal.length > 0){
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+              map.setView([lat, lng], zoom);
+            }
+    }
+    else if( tempArr.length )
+    {
+      var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+    }
+   
+  }
+});
+
+  });
+
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
 	
 		map.invalidateSize();  
 
-		if( tempArr.length )
-    	{
-			var group = new L.featureGroup(tempArr)
- 				map.fitBounds(group.getBounds());
- 		}
+	    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
+	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.startsWith("["))){
+	    	
+	    // 	lastVisitedLocationVal = "[" + lastVisitedLocationVal;
+	    // }
+	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.endsWith("]"))){
+	    	
+	    // 	lastVisitedLocationVal += "]";
+	    // }
+	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
+	    // if(lastVisitedLocationVal){
+
+	    // 	if(lastVisitedLocationVal == "[]"){
+     //    lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+     //  }
+     //  if(lastVisitedLocationVal.length > 0){
+     //        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+     //        var zoom = lastVisitedLocationVal.pop(),
+     //            lng = lastVisitedLocationVal[1],
+     //            lat = lastVisitedLocationVal[0];
+     //          map.setView([lat, lng], zoom);}
+    	// }
+
+		// if(lastVisitedLocationVal){
+
+		// 	var zoom = lastVisitedLocationVal.pop();
+
+		// 	map.setView(lastVisitedLocationVal, zoom);
+		// }
+
+		// if( tempArr.length )
+  		//   	{
+		// 	var group = new L.featureGroup(tempArr)
+ 		// 			map.fitBounds(group.getBounds());
+ 		// 	}
+
+ 		// map.setView([lat, lng], zoom); 		
 	});
 
-	// $(document).on('close', '[data-reveal]', function () {  
-	// 	var mapLng = map.getCenter().lng,
-	// 		mapLat = map.getCenter().lat,
-	// 		mapZoom = map.getZoom();
-	// 	// console.log(mapLng + " lat :" + mapLat + " zoom : " + mapZoom);
+	// $(document).on('close', '#view-map-edit-widget[data-reveal]', function () {  
+	// 	var mapZoom = map.getZoom();
+	// 	var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	// 	lastVisitedLocationVal = JSON.parse("["+lastVisitedLocationVal+"]");
+	// 	lastVisitedLocationVal.pop();
+	// 	lastVisitedLocationVal.push(mapZoom)
+	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
 
 </script>

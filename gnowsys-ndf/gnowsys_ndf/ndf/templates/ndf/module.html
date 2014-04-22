@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load pagination_tags %}
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
@@ -17,6 +18,7 @@
 {% endblock %}
   
 {% block body_content %}
+{% autopaginate module_coll 23 %}
   <div class="row">
     <div class="small-6 large-12 columns">
       <ul class="pricing-table">
@@ -36,9 +38,10 @@
 	  </div>
 	</li>
 	{% empty %}
-	<p> <em> No Module available in this group !!</em></P>
+	<p> <em>No module in this project group!</em></P>
 	{% endfor %}
       </ul>
     </div>
   </div>
+{% paginate %}
 {% endblock %}

@@ -11,17 +11,118 @@ from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, META_TYPE
+from gnowsys_ndf.settings import GAPPS, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
-
+from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
+from django.contrib.sites.models import Site
 
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
+at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+  
 
+@register.assignment_tag
+def get_create_group_visibility():
+  if CREATE_GROUP_VISIBILITY:
+    return True
+  else:
+    return False
+
+@register.assignment_tag
+def get_site_info():
+  sitename=Site.objects.all()[0].name.__str__()
+  return sitename
+
+@register.assignment_tag
+def check_gapp_menus(groupid):
+  grp=collection.Node.one({'_id':ObjectId(groupid)})
+  if not at_apps_list:
+    return False
+  poss_atts=grp.get_possible_attributes(at_apps_list._id)
+  if not poss_atts:
+    return False
+  return True
+  
+ 
+@register.assignment_tag
+def get_apps_for_groups(groupid):
+  try:
+    ret_dict={}
+    grp=collection.Node.one({'_id':ObjectId(groupid)})
+    poss_atts=grp.get_possible_attributes(at_apps_list._id)
+    if poss_atts:
+      list_apps=poss_atts['apps_list']['object_value']
+      counter=1
+      for each in list_apps:
+        obdict={}
+        obdict['id']=each['_id']
+        obdict['name']=each['name']
+        ret_dict[counter]=obdict
+        counter+=1 
+      return ret_dict 
+    else:
+      gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+      gapps = {}
+      i = 0;
+      meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+      GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+      for node in GAPPS:
+        if node:
+          if node.name not in ["Image", "Video"]:
+            i = i+1;
+            gapps[i] = {'id': node._id, 'name': node.name.lower()}
+      return gapps
+  except Exception as exptn:
+    print "Exception in get_apps_for_groups "+str(exptn)
+
+
+
+@register.assignment_tag
+def check_is_user_group(group_id):
+  try:
+    lst_grps=[]
+    all_user_grps=get_all_user_groups()
+    grp=collection.Node.one({'_id':ObjectId(group_id)})
+    for each in all_user_grps:
+      lst_grps.append(each.name)
+    if grp.name in lst_grps:
+      return True
+    else:
+      return False
+  except Exception as exptn:
+    print "Exception in check_user_group "+str(exptn)
+@register.assignment_tag
+def switch_group_conditions(user,group_id):
+  try:
+    ret_policy=False
+    req_user_id=User.objects.get(username=user).id
+    print "id",req_user_id
+    group=collection.Node.one({'_id':ObjectId(group_id)})
+    if req_user_id in group.author_set and group.group_type == 'PUBLIC':
+      ret_policy=True
+    return ret_policy
+  except Exception as ex:
+    print "Exception in switch_group_conditions"+str(ex)
+ 
+@register.assignment_tag
+def get_all_user_groups():
+  try:
+    ret_groups=[]
+    all_groups=collection.Node.find({'_type':'Group'})
+    all_users=User.objects.all()
+    all_user_names=[]
+    for each in all_users:
+      all_user_names.append(each.username)
+    for each in all_groups:
+      if each.name in all_user_names:
+        ret_groups.append(each)
+    return ret_groups
+  except:
+    print "Exception in get_all_user_groups"
 
 @register.assignment_tag
 def get_group_object(group_id = None):
@@ -237,8 +338,6 @@ def get_twist_replies(twist):
   exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(twist._id)}]})
   for each in exstng_reply:
     lst=get_rec_objs(each)
-        
-      
   return ret_replies
 
 
@@ -349,12 +448,12 @@ def get_user_group(user):
     if auth_obj:
       auth_type = auth_obj._id
 
-    colg = col_Group.Group.find({ '_type': u'Group', 
+    colg = col_Group.Group.find({ '_type': {'$in': ['Group','Author']},  
                                 'name': {'$nin': ['home']},
-                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id} ] 
                               })
 
-    auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+    auth = col_Group.Group.one({'_type': u"Author", 'name': unicode(user.username)})
     
     if auth:
       for items in colg:
@@ -382,15 +481,18 @@ def get_user_group(user):
 def get_profile_pic(user):
 
   ID = User.objects.get(username=user).pk
-  auth = collection.Node.one({'_type': u'Group', 'name': unicode(user) })
+  auth = collection.Node.one({'_type': u'Author', 'name': unicode(user) })
 
-  prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+  if auth:
+    prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
 
-  if prof_pic_rel.count() > 0 :
-    index = prof_pic_rel.count() - 1
-    prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+    if prof_pic_rel.count() > 0 :
+      index = prof_pic_rel.count() - 1
+      prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+    else:
+      prof_pic = "" 
   else:
-    prof_pic = "" 
+    prof_pic = ""
 
   return prof_pic
 
@@ -423,7 +525,7 @@ def get_edit_url(groupid):
     elif type_name == 'QuizItem':
       return 'quiz_item_edit'
 
-  elif node._type == 'Group':
+  elif node._type == 'Group' or node._type == 'Author' :
     return 'edit_group'
 
   elif node._type == 'File':
@@ -680,7 +782,7 @@ def get_publish_policy(groupid,resnode):
       if resnode.status == "DRAFT": 
          print "working section",resnode.status  
          return "allow"
-  
+
 @register.assignment_tag
 def get_source_id(obj_id):
   try:
@@ -691,3 +793,38 @@ def get_source_id(obj_id):
     print str(e)
     return 'null'
  
+#textb
+@register.filter("mongo_id")
+def mongo_id(value):
+     # Retrieve _id value
+    if type(value) == type({}):
+        if value.has_key('_id'):
+            value = value['_id']
+   
+    # Return value
+    return unicode(str(value))
+
+@register.simple_tag
+def check_existence_textObj_mobwrite(node_id):
+    '''
+	to check object already created or not, if not then create 
+	input nodeid 
+    '''		
+    check = ""
+    system = collection.Node.find_one({"_id":ObjectId(node_id)})
+    filename = TextObj.safe_name(str(system._id))
+    textobj = TextObj.objects.filter(filename=filename)
+    if textobj:
+       textobj = TextObj.objects.get(filename=filename)
+       pass
+    else:
+       if system.content_org == None:
+	   content_org = "None"
+       else :
+	   content_org = system.content_org
+       textobj = TextObj(filename=filename,text=content_org)
+       textobj.save()
+    check = textobj.filename
+    return check
+#textb 
+

@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load pagination_tags %}
 {% block title %}Forum{% endblock %}
 
 {% block meta_content %}
@@ -29,8 +30,8 @@
 	</div>
 </header>
 
-<h2>Join a Room</h2>
 
+{% autopaginate existing_forums 23 %}
 <div id="existing_forums">
 	<ul class="small-block-grid-1 medium-block-grid-2">
 		{% for each in existing_forums %}
@@ -39,5 +40,6 @@
 		{% endfor %}
 	</ul>
 </div>
+{% paginate %}
 {% endblock %}
 

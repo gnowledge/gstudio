@@ -1,5 +1,12 @@
 {% load ndf_tags %}
 
+{% block head%}  
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+{% endblock%}
 
 <!-- css for drawer widget -->
 <style type = "text/css">
@@ -33,8 +40,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 </style>
 
 
-
+{% if user.is_authenticated %}
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+{% endif %}
+
 
 <header class="row page">
 
@@ -47,7 +56,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     <h2>
       <span class='node'>{{node.name}}</span>      <small class="label-list"> 
       {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span> 
+      <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
       {% endfor %}
     </small>      
   </h2>
@@ -55,11 +64,14 @@ background-repeat:no-repeat; background-size: 48px 48px
   <dl class="row tabs" data-tab>
     <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
-    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-
-    <dd><a href="#view-graph" data-reveal-id="view-graph"><i class="fi-share"></i> Graph</a></dd>
-
-    {% endif %}
+    <dd>
+        <a href="#" data-dropdown="hover1" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+            <ul id="hover1" class="f-dropdown" data-dropdown-content>
+                <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+                <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+                <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+            </ul>
+    </dd>
 
     <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
@@ -156,14 +168,20 @@ background-repeat:no-repeat; background-size: 48px 48px
        {% endwith %}
      </div>
 
-
-     <!-- Tab View Graph -->
-     <div class="content reveal-modal graph-div" id="view-graph" data-reveal>    
-      
-      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+<!-- Content for Concept Graph -->
+    <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
         <a class="close-reveal-modal">&#215;</a>
-      {% include "ndf/node_graph.html" %}
-      {% endif %}
+        {% include "ndf/graph_concept.html" %}
+    </div>
+<!-- Content for Collection Graph -->
+     <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+      <a class="close-reveal-modal">&#215;</a>
+      {% include "ndf/graph_collection.html" %}
+    </div>
+<!-- Content for dependency Graph -->
+     <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+      <a class="close-reveal-modal">&#215;</a>
+      {% include "ndf/graph_dependency.html" %}
     </div>
 
      <!-- Tab View Map Widget -->
@@ -180,16 +198,16 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   <section class="medium-3 columns">
     <div class="panel">
-     <h5 class="subheader">
+     <h3 class="subheader"></h3>
        Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
        <small>
-         <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
+         <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
           {% for seq_no, version_no in node.version_dict.items reversed %}
           <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
           {% endfor %}
         </div>
       </small>
-    </h5>
+
     
       
   
@@ -198,7 +216,27 @@ background-repeat:no-repeat; background-size: 48px 48px
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
 
-	<input type="button" id="switch_group" class="button small" value="Switch Group">
+     {% edit_policy groupid node request.user as status %}
+     
+     {% if status == "allow" %}
+    {% get_edit_url node.pk as edit_url %}
+    {% switch_group_conditions request.user group_id as switch_conditions %}
+    {% check_group node as is_group %}
+
+    {% get_user_object node.created_by as created_user %}
+
+    {% if is_group %}
+
+             {% ifequal created_user request.user %}     
+                   
+      <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
+             {% endifequal %}
+
+    {% else %}
+
+             {% if switch_conditions %}     
+
+	<input type="button" id="switch_group" class="button small" value="Publish in group/s">
 <div id="mySystemtype" class="reveal-modal" data-reveal >
      <h2>Select Groups</h2>
       <div id="module_drawer" >
@@ -207,19 +245,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <a class="close-reveal-modal st">&#215;</a>
 <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
 </div>
-
-     {% edit_policy groupid node request.user as status %}
-     
-     {% if status == "allow" %}
-    {% get_edit_url node.pk as edit_url %}
-
-    {% check_group node as is_group %}
-
-    {% if is_group %}    
-       
-      <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
-
-    {% else %}
+              {% endif %}
 
       <a href="{% url edit_url groupid node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
@@ -242,7 +268,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 <footer>
   <p><small>
-    <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
+    <em>Created by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
   </footer>
 
 <script type="text/javascript">
@@ -303,6 +329,7 @@ $.ajax({
                               },
         success: function(data){
                        alert("Successfully switched groups");
+                       $('.close-reveal-modal.st').trigger('click');
            },
        complete: function(){
                     $("#ajax_load_image").hide();
@@ -314,15 +341,70 @@ $.ajax({
 });  //end of document click
 
 
-  $(document).on('opened', '[data-reveal]', function () {  
-      
-    map.invalidateSize();  
+  $(document).on('open', '#view-map-widget[data-reveal]', function () {  
+    
+    $.ajax({
+  url: "{% url 'get_visited_location' groupid %}",
+  success: function(data){ 
 
-    if( tempArr.length )
+    data = JSON.parse(data);
+
+    var lastVisitedLocationVal = data;
+    
+    if(lastVisitedLocationVal){
+
+      if(lastVisitedLocationVal == "[]"){
+        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+      }
+
+      if(lastVisitedLocationVal.length > 0){
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+              map.setView([lat, lng], zoom);
+            }
+    }
+    else if( tempArr.length )
     {
       var group = new L.featureGroup(tempArr)
           map.fitBounds(group.getBounds());
     }
+
+  }
+});
+
+  });
+
+  $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+    // if(lastVisitedLocationVal){
+
+    //   if(lastVisitedLocationVal == "[]"){
+    //     lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+    //   }
+
+    //   if(lastVisitedLocationVal.length > 0){
+    //         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+    //         var zoom = lastVisitedLocationVal.pop(),
+    //             lng = lastVisitedLocationVal[1],
+    //             lat = lastVisitedLocationVal[0];
+    //           map.setView([lat, lng], zoom);
+    //         }
+    // }
+
+
+    // if( tempArr.length )
+    // {
+    //   var group = new L.featureGroup(tempArr)
+    //       map.fitBounds(group.getBounds());
+    // }
+
+    // map.setView([lat, lng], zoom);
+
   });
 
 

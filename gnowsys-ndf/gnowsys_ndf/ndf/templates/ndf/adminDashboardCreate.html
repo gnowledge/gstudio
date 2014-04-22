@@ -52,8 +52,7 @@
 
       {% for list in contentlist %}
       <div class="medium-12 columns">
-	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
-
+	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
       {% if translate %}
 	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
       
@@ -130,7 +129,7 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 </dl>
 
 </div>
-<input type="submit" name="submit" class="button" id="save-node-type">
+<input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
 </form>
 
 

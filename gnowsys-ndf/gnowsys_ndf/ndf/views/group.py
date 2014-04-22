@@ -22,53 +22,74 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 
-from gnowsys_ndf.ndf.models import GSystemType, GSystem
+from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
 from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups,get_all_user_groups
 from gnowsys_ndf.ndf.views.methods import *
+
 
 #######################################################################################################################################
 
 from django.contrib.auth.models import User
 db = get_database()
 gst_collection = db[GSystemType.collection_name]
+collection_tr = db[Triple.collection_name]
 gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
-
+get_all_usergroups=get_all_user_groups()
 #######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
 #######################################################################################################################################
 
 
-def group(request, group_id,app_id):
+def group(request, group_id, app_id):
     """Renders a list of all 'Group-type-GSystems' available within the database.
     """
     group_nodes = []
-    excl_gr_nodes=[]
-    col_Group = db[Group.collection_name]
-    user_list=[]
-    users=User.objects.all()
-    for each in users:
-        user_list.append(each.username)
-    colg = col_Group.Group.find({'_type': u'Group'})
-    colg.sort('name')
-    gr = list(colg)
-    for items in gr:
-            group_nodes.append(items)
-    group_nodes_count = len(group_nodes)
-    colg = col_Group.Group.find({'$and':[{'_type': u'Group'},{'name':{'$nin':user_list}}]})
-    colg.sort('name')
-    gr = list(colg)
-    for items in gr:
-            excl_gr_nodes.append(items)
-    return render_to_response("ndf/group.html", {'group_nodes': group_nodes, 'group_nodes_excluding_users':excl_gr_nodes,'group_nodes_count': group_nodes_count,'groupid': group_id,'group_id': group_id}, context_instance=RequestContext(request))
+    group_count = 0
+
+    auth = collection.Node.one({'_type': u"Author", 'name': unicode(request.user.username)})
+
+    if auth:
+        # Logged-In View
+        cur_groups_user = collection.Node.find({'_type': "Group", 
+                                                '_id': {'$nin': [ObjectId(group_id), auth._id]},
+                                                'name': {'$nin': ["home"]},
+                                                '$or': [{'created_by': request.user.id}, {'group_type': 'PUBLIC'}, {'author_set': request.user.id}]
+                                            })
+        if cur_groups_user.count():
+            for group in cur_groups_user:
+                group_nodes.append(group)
+
+        group_count = cur_groups_user.count()
+        
+    else:
+        # Without Log-In View
+        cur_public = collection.Node.find({'_type': "Group", 
+                                           '_id': {'$nin': [ObjectId(group_id)]},
+                                           'name': {'$nin': ["home"]},
+                                           'group_type': "PUBLIC"
+                                       })
+    
+        if cur_public.count():
+            for group in cur_public:
+                group_nodes.append(group)
+        
+        group_count = cur_public.count()
+
+    return render_to_response("ndf/group.html", 
+                              {'group_nodes': group_nodes, 
+                               'group_nodes_count': group_count, 
+                               'groupid': group_id, 'group_id': group_id
+                              }, context_instance=RequestContext(request))
     
 
 
 
 def create_group(request,group_id):
+
     if request.method == "POST":
         col_Group = db[Group.collection_name]
         colg = col_Group.Group()
@@ -106,7 +127,33 @@ def create_group(request,group_id):
             colg.post_node.append(Mod_colg._id)
             colg.save()
 
-        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,'groupid':group_id,'group_id':group_id},context_instance=RequestContext(request))
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+
+        has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+        dbref_has_shelf = has_shelf_RT.get_dbref()
+
+        if auth:
+            shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+            shelves = []
+            shelf_list = {}
+
+        if shelf:
+            for each in shelf:
+                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                shelves.append(shelf_name)
+
+                shelf_list[shelf_name.name] = []         
+                for ID in shelf_name.collection_set:
+                    shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                    shelf_list[shelf_name.name].append(shelf_item.name)
+                    
+        else:
+            shelves = []
+
+        return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,
+                                                             'groupid':group_id,'group_id':group_id,
+                                                             'shelf_list': shelf_list,'shelves': shelves
+                                                            },context_instance=RequestContext(request))
 
     return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id},RequestContext(request))
     
@@ -122,9 +169,13 @@ def create_group(request,group_id):
 
 
 def group_dashboard(request,group_id=None):
+
     try:
         groupobj="" 
         grpid=""
+        shelf_list = {}
+        shelves = []
+
         if group_id == None:
             groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
             grpid=groupobj['_id']
@@ -132,26 +183,46 @@ def group_dashboard(request,group_id=None):
             groupobj=gs_collection.Group.one({'_id':ObjectId(group_id)})
             grpid=groupobj['_id']
 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+
+        if auth:
+
+            has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+            dbref_has_shelf = has_shelf_RT.get_dbref()
+
+            shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+            shelf_list = {}
+
+            if shelf:
+                for each in shelf:
+                    shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                    shelves.append(shelf_name)
+
+                    shelf_list[shelf_name.name] = []         
+                    for ID in shelf_name.collection_set:
+                        shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                        shelf_list[shelf_name.name].append(shelf_item.name)
+                    
+            else:
+                shelves = []
+
+
     except Exception as e:
         groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
         grpid=groupobj['_id']
         pass
 
-    #if groupobj.status == u"DRAFT":
-    #    groupobj,ver=get_versioned_page(groupobj)
-
-    #elif groupobj.status == u"PUBLISHED":
-    #    groupobj = groupobj
-    #the below method would give u the drafted or published contents depending on the user 
-    #upper code is not required
+    
     groupobj,ver=get_page(request,groupobj)    
     # First time breadcrumbs_list created on click of page details
     breadcrumbs_list = []
     # Appends the elements in breadcrumbs_list first time the resource which is clicked
     breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
-    
+
     return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
                                                          'group_id':grpid, 'user':request.user, 
+                                                         'shelf_list': shelf_list,
+                                                         'shelves': shelves, 
                                                          'breadcrumbs_list': breadcrumbs_list
                                                         },context_instance=RequestContext(request)
                             )
@@ -159,6 +230,7 @@ def group_dashboard(request,group_id=None):
 @login_required
 def edit_group(request,group_id):
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
+
     if request.method == "POST":
             get_node_common_fields(request, page_node, group_id, gst_group)
             if page_node.access_policy == "PUBLIC":
@@ -182,21 +254,26 @@ def edit_group(request,group_id):
 def switch_group(request,group_id,node_id):
     try:
         node=collection.Node.one({"_id":ObjectId(node_id)})
+        exstng_grps=node.group_set
         if request.method == "POST":
+            node.group_set=[]
             new_grps = request.POST['new_grps']
             new_grps_list=new_grps.split(",")
             if new_grps_list:
                 for each in new_grps_list:
                     if each:
-                        if ObjectId(each) not in node.group_set:
-                            node.group_set.append(ObjectId(each));
+                        node.group_set.append(ObjectId(each));
                 node.save()
             return HttpResponse("Success")
         else:
             coll_obj_list = []
             data_list=[]
             user_id=request.user.id
-            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}}]})
+            all_user_groups=[]
+            for each in get_all_user_groups():
+                all_user_groups.append(each.name)
+            print "list usergrps",all_user_groups
+            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
             for each in node.group_set:
                 coll_obj_list.append(collection.Node.one({'_id':each}))
             data_list=set_drawer_widget(st,coll_obj_list)
@@ -205,7 +282,10 @@ def switch_group(request,group_id,node_id):
     except Exception as e:
         print "Exception in switch_group"+str(e)
         return HttpResponse("Failure")
+
+
 def publish_group(request,group_id,node):
+
   node=collection.Node.one({'_id':ObjectId(node)})
    
   page_node,v=get_page(request,node)
@@ -220,10 +300,6 @@ def publish_group(request,group_id,node):
                                  { 'group_id':group_id,
                                    'node':node,
                                    'groupid':group_id
-                                   
-                                
-                                 
-                                 
                                  },
                                   context_instance=RequestContext(request)
                               )

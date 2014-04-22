@@ -27,16 +27,17 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
 
-from gnowsys_ndf.ndf.models import Node, GSystem
+from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, neighbourhood_nodes, get_translate_common_fields,get_page
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page
 
 #######################################################################################################################################
 
 db = get_database()
 collection = db[Node.collection_name]
+collection_tr = db[Triple.collection_name]
 gst_page = collection.Node.one({'_type': 'GSystemType', 'name': GAPPS[0]})
 history_manager = HistoryManager()
 rcs = RCS()
@@ -160,16 +161,36 @@ def page(request, group_id, app_id=None):
         # Appends the elements in breadcrumbs_list first time the resource which is clicked
         breadcrumbs_list.append( (str(page_node._id), page_node.name) )
 
-        # location = []
-        # for each in page_node.location:
-        #   location.append(json.dumps(each))
+        shelves = []
+        shelf_list = {}
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
         
+        if auth:
+          has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+          dbref_has_shelf = has_shelf_RT.get_dbref()
+          shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+          shelf_list = {}
+
+          if shelf:
+            for each in shelf:
+                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+                shelves.append(shelf_name)
+
+                shelf_list[shelf_name.name] = []         
+                for ID in shelf_name.collection_set:
+                	shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                	shelf_list[shelf_name.name].append(shelf_item.name)
+
+          else:
+            shelves = []
+
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
+                                    'shelf_list': shelf_list,
+                                    'shelves': shelves,
                                     'groupid':group_id,
-                                    'breadcrumbs_list': breadcrumbs_list,
-                                    # 'location': location
+                                    'breadcrumbs_list': breadcrumbs_list
                                   },
                                   context_instance = RequestContext(request)
         )        
@@ -185,19 +206,25 @@ def create_edit_page(request, group_id, node_id=None):
                           'groupid': group_id
                       }
     
+    available_nodes = collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(each.name)
+
     if node_id:
         page_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
         page_node = collection.GSystem()
+        
 
-    
     if request.method == "POST":
         
         get_node_common_fields(request, page_node, group_id, gst_page)
 
         page_node.save()
-        
-        return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
+
+        return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:
         
@@ -206,6 +233,9 @@ def create_edit_page(request, group_id, node_id=None):
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
+            context_variables['nodes_list'] = json.dumps(nodes_list)
+        else:
+            context_variables['nodes_list'] = json.dumps(nodes_list)
 
         print "would get out of the page  "
         return render_to_response("ndf/page_create_edit.html",
