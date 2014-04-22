@@ -828,3 +828,17 @@ def check_existence_textObj_mobwrite(node_id):
     return check
 #textb 
 
+@register.assignment_tag
+def get_version_of_module(module_id):
+  ''''
+  This method will return version number of module
+  '''
+  ver_at = collection.Node.one({'_type':'AttributeType','name':'version'})
+  if ver_at:
+    attr = collection.Triple.one({'_type':'GAttribute','attribute_type.$id':ver_at._id,'subject':ObjectId(module_id)})
+    if attr:
+      return attr.object_value
+    else:
+      return ""
+  else:
+    return ""
