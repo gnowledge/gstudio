@@ -37,7 +37,9 @@
 
 <body>
 
-	<div id="map" data-mode="{{mode}}"><input type="hidden" data-map-markers="{{ node.location }}" value="" name="map-geojson-data"/></div>
+	<div id="map" data-mode="{{mode}}">
+		<input type="hidden" data-map-markers="{{ node.location }}" value="{{location}}" name="map-geojson-data"/>
+	</div>
 
 	<div style="display:none;">
 		<div class="popup-html">
@@ -74,8 +76,22 @@
 
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
-	 	mapdata = $("input:hidden[name=map-geojson-data]").attr("data-map-markers");
-	 	
+		{% if source == "custom_template_edit" %}
+
+	 		mapdata = $("input:hidden[name=map-geojson-data]").val();
+
+	 		if(mapdata && typeof(mapdata) == "string")
+	 		{
+	 			mapdata = mapdata.trim();
+
+	 			mapdata = mapdata[0]!="["?"["+mapdata:mapdata ;
+	 			mapdata = mapdata[mapdata.length-1]!="]"? mapdata+"]":mapdata ;
+	 		}
+
+	 	{% else %}
+	 		mapdata = $("input:hidden[name=map-geojson-data]").attr("data-map-markers");
+	 	{% endif %}
+
 	 	markerGeoJSON = [];
 	 	popupBasicHtml = $(".popup-html").html()
 
