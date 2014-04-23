@@ -186,104 +186,11 @@ a#toggle-shelf i{
 	-webkit-transition: opacity .5s ease-in;
 	-o-transition: opacity .5s ease-in;
 
-}
-.card>*:hover{
+    &:hover{
 	border: 1px solid #ddd;
 	opacity:1;
 }
-/* Create card */
-.create.card>*{
-	background-color: #999;
-	opacity:1;
-}
-.create.card>*:hover{
-	background-color: #008759;
-}
-.create.card h4{
-	color:white;
-}
-.create.card .button{
-	border:1px solid #00ba7b;
-}
-.create.card label{
-	color:white;
-}
-.create.card .switch label{
-	color:inherit;
-}
-/* Content Tabs */
-article .tabs{
-
-}
-article .tabs i{
-	margin-right: 5px;
-	font-size: 1.3rem;
-}
-article .tabs dd a{
-	color:#aaa;
-	background-color: inherit;
-	padding: 0.5rem;
-	padding-left: 1rem;
-}
-article .tabs dd a:hover{
-	background-color: inherit;
-	color:#999;
-}
-article .tabs dd.active a{
-	color:#222;
-	background-color: inherit;
-}
-
-.tabs-content>.content{
-	padding-top: 0;
-}
-
-/* Default card */
-.card header{
-	margin-bottom: 0;
-}
-.card h4{
-	font-weight: bold;
-	font-size: 1rem;
-}
-.card p{
-	font-size: 0.9rem;
-}
-.card .th{
-	margin:20px auto;
-	width:80px;
-	height: 80px;
-	overflow: hidden;
-	display: none;
-}
-.gallery .card .th{
-	display: block;
-}
-.card .th:hover{
-	width: 150px;
-	height: 150px;
-}
-.card .th img{
-	width: 100%;
-}
-.card section{
-	background-color: #ddd;
-}
-.card .button{
-	opacity:0.1;
-}
-.card.create .button{
-	opacity:0.5;
-}
-.card>*:hover .button{
-	opacity:1;
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
-}
-/* Card icons */
-.card>*>i{
+    &>i{
 	position: absolute;
 	top: -12px;
 	right: 20px;
@@ -291,16 +198,126 @@ article .tabs dd.active a{
 	color:#eee;
 	opacity: 0.4;
 }
+}
+
+/* Create card */
+.create.card>*{
+	background-color: #999;
+	opacity:1;
+    
+    &:hover{
+	background-color: #008759;
+    }
+}
+
+.create.card{
+    h4{
+	color:white;
+}
+    .button{
+	border:1px solid #00ba7b;
+        opacity:0.5;
+}
+    label{
+	color:white;
+}
+    .switch label{
+	color:inherit;
+}
+   
+}
+
+/* Content Tabs */
+article .tabs{
+    i{
+	margin-right: 5px;
+	font-size: 1.3rem;
+}
+    dd.active a{
+	color:#222;
+	background-color: inherit;
+}
+dd a{
+	color:#aaa;
+	background-color: inherit;
+	padding: 0.5rem;
+	padding-left: 1rem;
+    &:hover{
+	background-color: inherit;
+	color:#999;
+}
+}
+}
+
+.tabs-content>.content{
+	padding-top: 0;
+}
+
+/* Default card */
+.card>:hover .label{
+	opacity:1;
+}
+.card{
+    
+header{
+	margin-bottom: 0;
+}
+    .label{
+	opacity:0.5;
+}
+h4{
+	font-weight: bold;
+	font-size: 1rem;
+}
+p{
+	font-size: 0.9rem;
+}
+.th{
+	margin:20px auto;
+	width:80px;
+	height: 80px;
+	overflow: hidden;
+	display: none;
+    &:hover{
+	width: 150px;
+	height: 150px;
+}
+    img{
+	width: 100%;
+}
+}
+    section{
+	background-color: #ddd;
+}
+    .button{
+	opacity:0.1;
+}
+    
+}
+
+.gallery .card .th{
+	display: block;
+}
+
+.card>*:hover .button{
+	opacity:1;
+	transition: opacity .5s ease-in ease-in;
+	-moz-transition: opacity .5s ease-in;
+	-webkit-transition: opacity .5s ease-in;
+	-o-transition: opacity .5s ease-in;
+}
+
 /* Inline label list */
 .label{
 	font-weight: bold;
 	color: orange;
 	background-color: inherit;border: 1px dotted orange;
 	display: inline-block;
-}
-.label:hover{
+    &:hover{
 	background-color: orange;
 	color:white;
+}
+
 }
 
 .label-list{
@@ -308,65 +325,59 @@ article .tabs dd.active a{
 	text-align: left;
 }
 
-.card .label{
-	opacity:0.5;
-}
-.card>:hover .label{
-	opacity:1;
-}
+
+
 
 /*************************** 2. Custom CSS overrides ***********************/
+
 main aside{
 	padding-top: 1rem;
-}
-
-main aside.fade{
+    &.fade{
 	opacity:0.8;
 }
+}
+
+
 aside>section{
 	margin:inherit!important;
 	margin-bottom:5px;
 	padding-bottom: 3rem;
-}
-
-aside>section>div{
+    &>div{
 	padding: 15px;
 }
-
-aside>section h3,aside>section h4,aside>section h5 {
-
 }
+
+
 aside .meta i{color: #ccc;}
 aside:hover .meta i{color: black;}
 
 main .button{
 	background-color:#008759 ;
-}
-main .button:hover{
+    &:hover{
 	background-color:#00ba7b ;
 }
+}
+
 
 /* Content area */
 article{
 	margin-top: 0.5rem;
 	padding-bottom: 4rem; 
 	background-color: white;
-}
-
-article header{
+    header{
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 1rem!important;
 }
-article footer{
+    footer{
 	border-top: 1px dotted #ddd;
 }
-article .breadcrumbs{
+    .breadcrumbs{
 	display: none;
 	background-color: #eee;
 }
-article nav{
-
 }
+
+
 
 pre{
 	width:92%;
@@ -380,9 +391,7 @@ pre{
 	padding-left:0.5rem;
 	font-family: monospace;
 }
-article p{
 
-}
 textarea{
 	min-height: 6rem;
 }
@@ -482,24 +491,3 @@ input.node-title{
 
 /****************** CUSTOM *********************/
 
-.graph-div {
-  height: 90%;
-  width: -webkit-calc(100% - 10px); width:-o-calc(100% - 10px); width: -moz-calc(100% - 10px); width: calc(100% - 10px);
-  top: 5% !important;
-  left: 5px !important;
-  padding: 0px !important;
-  margin-left: 0 !important;
-}
-
-.graph-div h3{
-  border-bottom: 2px inset #154534;
-  padding: 0.25em 0;
-}
-
-#view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal{
-  z-index:1; background-color: captiontext; padding: 5px 15px 10px; color:white !important; opacity:0.8; font-size: 2rem; box-shadow: 0 1px 10px 2px #A9A9A9;
-}
-
-#view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover{
-background-color: white; border-radius: 30px; padding: 5px 15px 10px; transition:2s; opacity:1; color:black !important; font-size: 2rem;
-}

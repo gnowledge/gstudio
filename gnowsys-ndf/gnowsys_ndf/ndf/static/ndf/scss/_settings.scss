@@ -154,7 +154,6 @@ $primary-color: #33C284;
 // We use these to style paragraphs
 // $paragraph-font-family: inherit;
 // $paragraph-font-weight: normal;
- $paragraph-font-size: 5rem;
 // $paragraph-line-height: 1.6;
 // $paragraph-margin-bottom: rem-calc(20);
 // $paragraph-aside-font-size: rem-calc(14);
@@ -1133,12 +1132,12 @@ $primary-color: #33C284;
 // $include-html-top-bar-classes: $include-html-classes;
 
 // Background color for the top bar
- $topbar-bg-color: #222;
+ $topbar-bg-color: red;
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin
-// $topbar-height: 45px;
-// $topbar-margin-bottom: 0;
+ $topbar-height: inherit;
+ $topbar-margin-bottom: 5px;
 
 // Controlling the styles for the title in the top bar
 // $topbar-title-weight: normal;
