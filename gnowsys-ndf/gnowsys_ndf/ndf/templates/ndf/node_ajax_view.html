@@ -37,6 +37,14 @@ height:40px;
 background-repeat:no-repeat; background-size: 48px 48px
 }
 
+ul#graph-hover.f-dropdown{
+  width: inherit !important;
+}
+
+#graph-hover > li > a:hover {
+  color: #555555;
+}
+
 </style>
 
 
@@ -65,8 +73,8 @@ background-repeat:no-repeat; background-size: 48px 48px
     <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
     <dd>
-        <a href="#" data-dropdown="hover1" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
-            <ul id="hover1" class="f-dropdown" data-dropdown-content>
+        <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+            <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
                 <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
                 <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
                 <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
@@ -215,6 +223,27 @@ background-repeat:no-repeat; background-size: 48px 48px
     {% if node.collection_set and user.is_authenticated%}
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
+
+    {% if node %}
+     {% get_publish_policy request groupid node as group_policy %}
+        {% check_group node as is_group %}
+
+  	{% if group_policy == "allow" %}
+  	{% if is_group %} 
+   <div>
+   <a class="button small" href="{% url 'publish_group'  group_id node %}"> Publish </a>
+    </a>
+   </div>
+  	{% else %}
+  	<div>
+   <a class="button small" href="{% url 'publish_page'  group_id node %}"> Publish
+   </a>  
+   </div>
+	{% endif %}
+    {% endif %}
+   {% endif %}
+ 
+
 
      {% edit_policy groupid node request.user as status %}
      

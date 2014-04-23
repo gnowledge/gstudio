@@ -1,35 +1,57 @@
 {% extends "ndf/base.html" %}
 {% load pagination_tags %}
+{% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 {% block body_content %}
-<div class="row">
-  <div class="small-3 large-3 columns">
-    <a href="{% url 'create_edit' groupid %}" class="button">create</a>
-  </div>
-</div>
+
 {% autopaginate course_coll 23 %}
-<div class="row">
-  <div class="small-6 large-12 columns">
-    <ul class="pricing-table">
-      {% for course in course_coll %}
-      <li class="bullet-item text-left">
-	<div class="row">
-          <div class="small-5 columns ">
-            <a href="{% url 'course_detail' groupid course %}">
-	      <b>{{course.name}}</b>
-	    </a>
-          </div>                
-          <div class="small-7 columns text-right">
-            <i class="label secondary" >Created by {{course.user_details_dict.created_by}} on {{course.created_at|date:"j F Y"}} </i>
-          </div>    
-          <div class="small-12 columns" style="padding-top:5px;">
-	    {{ course.html_content|removetags:"h1 p"|safe|truncatewords:15 }}
-          </div>
-	</div>
-      </li>
-      {% endfor %}
-    </ul>
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  <li class="create card">
+  <div class="page">
+    <h4><i class="fi-plus"></i> New</h4>
+      {% if user.is_authenticated %}
+      <a class="button expand" href="{% url 'create_edit' groupid %}">
+        Create {{title}}
+      </a>
+      {% endif %}
   </div>
-</div>
+</li>
+
+{% for node in course_coll %}
+<li class="card">
+  <div class="page">
+    <header>
+      <div class="label-list">
+        {% for tag in node.tags %}
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        {% endfor %}
+      </div>
+      <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+      <h4>{{ node.name }}
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </h4>
+    </header>
+    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+    <a class="small button expand" href="{% url 'course_detail' groupid node %}">Detail</a>
+    {% comment %}
+    {% get_user_object node.created_by as user_obj %}
+    {% ifequal user_obj.username user.username %}
+    <a class="button alert tiny" href="{% url 'delete_module' groupid node %}?next={{request.path}}">Delete </a>
+    {% endifequal %}
+    {% endcomment %}
+    <footer class="row">
+    </footer>
+  </div>
+</li>  
+{% endfor %}
+</ul>
+
+
+
+
+
 {% paginate %}
 {% endblock %}

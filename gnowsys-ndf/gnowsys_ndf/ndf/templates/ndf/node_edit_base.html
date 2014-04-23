@@ -237,27 +237,10 @@ background-repeat:no-repeat; background-size: 48px 48px
   {% block add_fields %} {% endblock %}
   
   <div class="row" >
-    <input type="submit" id="save-node" value="Save As Draft" class="button medium-6 columns"/>
+    <input type="submit" id="save-node" value="Save as Draft And Preview" class="button medium-6 columns"/>
   </div>
   
-  {% if node %}
-  	{% get_publish_policy groupid node as group_policy %}
-
-	{% check_group node as is_group %}
-
-  	{% if group_policy == "allow" %}
-  	{% if is_group %} 
   
-  <a class="button medium-6 columns" href="{% url 'publish_group'  group_id node %}"> Publish 
-   </a>
-   
-  	{% else %}
-   <a class="button medium-6 columns" href="{% url 'publish_page'  group_id node %}"> Publish
-   </a>  
-	{% endif %}
-    {% endif %}
- {% endif %}
-
  <!-- Overlay : Map Widget -->
      <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
@@ -268,7 +251,7 @@ background-repeat:no-repeat; background-size: 48px 48px
       <!-- #{#%# endif %} -->
     </div>
 
-    <input type="hidden" id="nodes_list" name="title-of-node" value="{{nodes_list}}">						
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">						
 </form>
 
 
