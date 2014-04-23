@@ -1,22 +1,15 @@
-/*
-*   _settings.scss - Metstudio responsive grid settings stylesheet using ZURB foundation
-*/
-
-@import "foundation";
+@import "../components/foundation/scss/foundation/settings";
+@import "../components/foundation/scss/foundation/functions";
 
 //
 // FOUNDATION SETTINGS
 //
 
 // This is the default html and body font-size for the base rem value.
-$rem-base: 16px;
-$primary-color: #33C284;
-
-//
-// Settings below are only for reference, copy the appropriate line to the top
-//
+ $rem-base: 16px;
 
 // Allows the use of rem-calc() or lower-bound() in your settings
+@import "foundation/functions";
 
 // $experimental: true;
 
@@ -1133,7 +1126,7 @@ $primary-color: #33C284;
 // $include-html-top-bar-classes: $include-html-classes;
 
 // Background color for the top bar
- $topbar-bg-color: #222;
+// $topbar-bg-color: #333;
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin
@@ -1145,8 +1138,9 @@ $primary-color: #33C284;
 // $topbar-title-font-size: rem-calc(17);
 
 // Style the top bar dropdown elements
+// $topbar-dropdown-bg: #333;
 // $topbar-dropdown-link-color: #fff;
- $topbar-dropdown-link-bg: #333;
+// $topbar-dropdown-link-bg: #333;
 // $topbar-dropdown-link-weight: normal;
 // $topbar-dropdown-toggle-size: 5px;
 // $topbar-dropdown-toggle-color: #fff;
