@@ -10,7 +10,7 @@
 from tempfile import NamedTemporaryFile
 from subprocess import call
 import urllib
-
+import commands
 from gnowsys_ndf.settings import EMACS_INIT_FILE_PATH
 
 ###########################################################################
@@ -67,8 +67,20 @@ def org2html(org_content, file_prefix="", file_delete=True):
     # Example (filename_html): "/tmp/wiliname-usrname-tmptCd4aq.html"
     ext_html = ".html"
     filename_html = filename_org[:-4] + ext_html
-    
-    cmd = "emacs -l " + EMACS_INIT_FILE_PATH  + " --batch " + filename_org + " --eval '(org-export-as-html nil)'"
+    # batch command to get the org-version
+    cmd_check_org_version ="emacs" + " --batch "+" --eval '(message (org-version))'"
+    cmd_exe = call(cmd_check_org_version, shell=True)
+    org_version = commands.getoutput(cmd_check_org_version)[:3]
+    # check org_version
+
+    if (float(org_version) >= 8): 
+        export_to_html="org-html-export-to-html"
+    else:
+        export_to_html="org-export-as-html"
+
+    cmd = "emacs -l " + EMACS_INIT_FILE_PATH  + " --batch " + filename_org + " --eval '(" + export_to_html + " nil)'"
+    #cmd = "emacs -l " + EMACS_INIT_FILE_PATH  + " --batch " + filename_org + " --eval '(org-export-as-html nil)'"
+        
     cmd_res = call((cmd + ' </dev/null'), shell=True)
             
     # Close ".org" temporary file
