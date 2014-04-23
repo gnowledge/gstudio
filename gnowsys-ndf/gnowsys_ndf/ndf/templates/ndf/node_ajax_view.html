@@ -37,6 +37,14 @@ height:40px;
 background-repeat:no-repeat; background-size: 48px 48px
 }
 
+ul#graph-hover.f-dropdown{
+  width: inherit !important;
+}
+
+#graph-hover > li > a:hover {
+  color: #555555;
+}
+
 </style>
 
 
@@ -65,8 +73,8 @@ background-repeat:no-repeat; background-size: 48px 48px
     <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
     <dd>
-        <a href="#" data-dropdown="hover1" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
-            <ul id="hover1" class="f-dropdown" data-dropdown-content>
+        <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+            <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
                 <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
                 <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
                 <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
