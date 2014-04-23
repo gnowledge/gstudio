@@ -552,6 +552,22 @@ class Node(DjangoDocument):
         return possible_relations
 
 
+    def get_neighbourhood(self, member_of):
+        """Attaches attributes and relations of the node to itself;
+        i.e. key's types to it's structure and key's values to itself 
+        """
+
+        attributes = self.get_possible_attributes(member_of)
+        for key, value in attributes.iteritems():
+            self.structure[key] = value['data_type']
+            self[key] = value['object_value']
+
+        relations = self.get_possible_relations(member_of)
+        for key, value in relations.iteritems():
+            self.structure[key] = value['object_type']
+            self[key] = value['right_subject_list']
+
+
 @connection.register
 class MetaType(Node):
     """MetaType class - A collection of Types 
