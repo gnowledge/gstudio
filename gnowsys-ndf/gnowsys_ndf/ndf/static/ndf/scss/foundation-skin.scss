@@ -5,3 +5,7 @@
 @import "skins/default";
 @import "foundation";
 
+nav.top-bar{
+    /* Fixes clearing issue in firefox */
+    height:inherit;
+}

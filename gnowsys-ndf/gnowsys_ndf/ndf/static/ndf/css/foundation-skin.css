@@ -1649,8 +1649,8 @@ select {
   padding: 0.875rem 1.5rem 0.875rem 0.875rem;
   font-size: 0.8125rem;
   transition: opacity 300ms ease-out;
-  background-color: red;
-  border-color: #db0000;
+  background-color: #33c284;
+  border-color: #2ca772;
   color: white;
 }
 /* line 113, ../components/foundation/scss/foundation/components/_alert-boxes.scss */
@@ -2263,7 +2263,7 @@ select {
   font-size: 0.6875rem;
   line-height: 0.6875rem;
   text-transform: uppercase;
-  color: red;
+  color: #33c284;
 }
 /* line 68, ../components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *:hover a, .breadcrumbs > *:focus a {
@@ -2271,7 +2271,7 @@ select {
 }
 /* line 70, ../components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > * a {
-  color: red;
+  color: #33c284;
 }
 /* line 75, ../components/foundation/scss/foundation/components/_breadcrumbs.scss */
 .breadcrumbs > *.current {
@@ -2336,14 +2336,14 @@ button, .button {
   padding-bottom: 1.0625rem;
   padding-left: 2rem;
   font-size: 1rem;
-  background-color: red;
-  border-color: #cc0000;
+  background-color: #33c284;
+  border-color: #299b6a;
   color: white;
   transition: background-color 300ms ease-out;
 }
 /* line 134, ../components/foundation/scss/foundation/components/_buttons.scss */
 button:hover, button:focus, .button:hover, .button:focus {
-  background-color: #cc0000;
+  background-color: #299b6a;
 }
 /* line 145, ../components/foundation/scss/foundation/components/_buttons.scss */
 button:hover, button:focus, .button:hover, .button:focus {
@@ -2441,8 +2441,8 @@ button.round, .button.round {
 }
 /* line 208, ../components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled, button[disabled], .button.disabled, .button[disabled] {
-  background-color: red;
-  border-color: #cc0000;
+  background-color: #33c284;
+  border-color: #299b6a;
   color: white;
   cursor: default;
   opacity: 0.7;
@@ -2450,7 +2450,7 @@ button.disabled, button[disabled], .button.disabled, .button[disabled] {
 }
 /* line 134, ../components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
-  background-color: #cc0000;
+  background-color: #299b6a;
 }
 /* line 145, ../components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
@@ -2458,7 +2458,7 @@ button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[dis
 }
 /* line 155, ../components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
-  background-color: red;
+  background-color: #33c284;
 }
 /* line 209, ../components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary, button[disabled].secondary, .button.disabled.secondary, .button[disabled].secondary {
@@ -4087,7 +4087,7 @@ kbd {
   margin-bottom: inherit;
   padding: 0.25rem 0.5rem 0.375rem;
   font-size: 0.6875rem;
-  background-color: red;
+  background-color: #33c284;
   color: white;
 }
 /* line 96, ../components/foundation/scss/foundation/components/_labels.scss */
@@ -4579,14 +4579,14 @@ ul.pagination li.unavailable:hover a, ul.pagination li.unavailable a:focus {
 }
 /* line 64, ../components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li.current a {
-  background: red;
+  background: #33c284;
   color: white;
   font-weight: bold;
   cursor: default;
 }
 /* line 71, ../components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li.current a:hover, ul.pagination li.current a:focus {
-  background: red;
+  background: #33c284;
 }
 /* line 124, ../components/foundation/scss/foundation/components/_pagination.scss */
 ul.pagination li {
@@ -4640,10 +4640,10 @@ ul.pagination li {
 .panel.callout {
   border-style: solid;
   border-width: 1px;
-  border-color: #ffb9b9;
+  border-color: #c7f0df;
   margin-bottom: 1.25rem;
   padding: 1.25rem;
-  background: #fff0f0;
+  background: #f2fcf8;
 }
 /* line 52, ../components/foundation/scss/foundation/components/_panels.scss */
 .panel.callout > :first-child {
@@ -4668,7 +4668,7 @@ ul.pagination li {
 }
 /* line 78, ../components/foundation/scss/foundation/components/_panels.scss */
 .panel.callout a:not(.button) {
-  color: red;
+  color: #33c284;
 }
 /* line 83, ../components/foundation/scss/foundation/components/_panels.scss */
 .panel.radius {
@@ -4746,7 +4746,7 @@ ul.pagination li {
 }
 /* line 61, ../components/foundation/scss/foundation/components/_progress-bars.scss */
 .progress .meter {
-  background: red;
+  background: #33c284;
   height: 100%;
   display: block;
 }
@@ -4831,12 +4831,12 @@ ul.pagination li {
 }
 /* line 130, ../components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.radius .range-slider-handle {
-  background: red;
+  background: #33c284;
   border-radius: 3px;
 }
 /* line 99, ../components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.radius .range-slider-handle:hover {
-  background: #e00000;
+  background: #2dab74;
 }
 /* line 132, ../components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round {
@@ -4845,12 +4845,12 @@ ul.pagination li {
 }
 /* line 134, ../components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round .range-slider-handle {
-  background: red;
+  background: #33c284;
   border-radius: 1000px;
 }
 /* line 99, ../components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider.round .range-slider-handle:hover {
-  background: #e00000;
+  background: #2dab74;
 }
 
 /* line 137, ../components/foundation/scss/foundation/components/_range-slider.scss */
@@ -4871,11 +4871,11 @@ ul.pagination li {
   height: 1.375rem;
   border: 1px solid none;
   cursor: pointer;
-  background: red;
+  background: #33c284;
 }
 /* line 99, ../components/foundation/scss/foundation/components/_range-slider.scss */
 .range-slider-handle:hover {
-  background: #e00000;
+  background: #2dab74;
 }
 
 /* line 162, ../components/foundation/scss/foundation/components/_reveal.scss */
@@ -5055,15 +5055,15 @@ dialog[open] {
 /* line 66, ../components/foundation/scss/foundation/components/_side-nav.scss */
 .side-nav li a:not(.button) {
   display: block;
-  color: red;
+  color: #33c284;
 }
 /* line 70, ../components/foundation/scss/foundation/components/_side-nav.scss */
 .side-nav li a:not(.button):hover, .side-nav li a:not(.button):focus {
-  color: #ff4d4d;
+  color: #6cd8a9;
 }
 /* line 73, ../components/foundation/scss/foundation/components/_side-nav.scss */
 .side-nav li.active > a:first-child:not(.button) {
-  color: #ff4d4d;
+  color: #6cd8a9;
   font-weight: normal;
   font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 }
@@ -5251,7 +5251,7 @@ dialog[open] {
 .sub-nav li.active a {
   border-radius: 3px;
   font-weight: normal;
-  background: red;
+  background: #33c284;
   padding: 0.1875rem 1rem;
   cursor: default;
   color: white;
@@ -5260,7 +5260,7 @@ dialog[open] {
 .sub-nav dt.active a:hover,
 .sub-nav dd.active a:hover,
 .sub-nav li.active a:hover {
-  background: #db0000;
+  background: #2ca772;
 }
 
 /* line 269, ../components/foundation/scss/foundation/components/_switch.scss */
@@ -5644,7 +5644,7 @@ table tfoot tr td {
 }
 /* line 51, ../components/foundation/scss/foundation/components/_thumbs.scss */
 .th:hover, .th:focus {
-  box-shadow: 0 0 6px 1px rgba(255, 0, 0, 0.5);
+  box-shadow: 0 0 6px 1px rgba(51, 194, 132, 0.5);
 }
 /* line 65, ../components/foundation/scss/foundation/components/_thumbs.scss */
 .th.radius {
@@ -5661,8 +5661,8 @@ table tfoot tr td {
 }
 /* line 44, ../components/foundation/scss/foundation/components/_tooltips.scss */
 .has-tip:hover, .has-tip:focus {
-  border-bottom: dotted 1px #730000;
-  color: red;
+  border-bottom: dotted 1px #17573b;
+  color: #33c284;
 }
 /* line 50, ../components/foundation/scss/foundation/components/_tooltips.scss */
 .has-tip.tip-left, .has-tip.tip-right {
@@ -5714,8 +5714,8 @@ table tfoot tr td {
 }
 /* line 93, ../components/foundation/scss/foundation/components/_tooltips.scss */
 .tooltip.opened {
-  color: red !important;
-  border-bottom: dotted 1px #730000 !important;
+  color: #33c284 !important;
+  border-bottom: dotted 1px #17573b !important;
 }
 
 /* line 99, ../components/foundation/scss/foundation/components/_tooltips.scss */
@@ -5970,13 +5970,13 @@ meta.foundation-mq-topbar {
   font-size: 0.8125rem;
   padding-right: 15px;
   padding-left: 15px;
-  background-color: red;
-  border-color: #cc0000;
+  background-color: #33c284;
+  border-color: #299b6a;
   color: white;
 }
 /* line 134, ../components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button:hover, .top-bar-section ul li > a.button:focus {
-  background-color: #cc0000;
+  background-color: #299b6a;
 }
 /* line 145, ../components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button:hover, .top-bar-section ul li > a.button:focus {
@@ -6029,13 +6029,13 @@ meta.foundation-mq-topbar {
   font-size: 0.8125rem;
   padding-right: 15px;
   padding-left: 15px;
-  background-color: red;
-  border-color: #cc0000;
+  background-color: #33c284;
+  border-color: #299b6a;
   color: white;
 }
 /* line 134, ../components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button:hover, .top-bar-section ul li > button:focus {
-  background-color: #cc0000;
+  background-color: #299b6a;
 }
 /* line 145, ../components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button:hover, .top-bar-section ul li > button:focus {
@@ -6090,12 +6090,12 @@ meta.foundation-mq-topbar {
 }
 /* line 343, ../components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li.active > a {
-  background: red;
+  background: #33c284;
   color: white;
 }
 /* line 346, ../components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li.active > a:hover {
-  background: #db0000;
+  background: #2ca772;
   color: white;
 }
 /* line 354, ../components/foundation/scss/foundation/components/_top-bar.scss */
@@ -6287,11 +6287,11 @@ meta.foundation-mq-topbar {
     padding: 0 15px;
     line-height: 45px;
     color: white;
-    background: red;
+    background: #33c284;
   }
   /* line 494, ../components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.active:not(.has-form) a:not(.button):hover {
-    background: #db0000;
+    background: #2ca772;
   }
   /* line 503, ../components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .has-dropdown > a {
@@ -6417,7 +6417,7 @@ meta.foundation-mq-topbar {
   }
   /* line 624, ../components/foundation/scss/foundation/components/_top-bar.scss */
   .no-js .top-bar-section ul li:active > a {
-    background: red;
+    background: #33c284;
     color: white;
   }
   /* line 632, ../components/foundation/scss/foundation/components/_top-bar.scss */
@@ -6689,13 +6689,13 @@ td {
 /* Default Link Styles */
 /* line 199, ../components/foundation/scss/foundation/components/_type.scss */
 a {
-  color: red;
+  color: #33c284;
   text-decoration: none;
   line-height: inherit;
 }
 /* line 205, ../components/foundation/scss/foundation/components/_type.scss */
 a:hover, a:focus {
-  color: #db0000;
+  color: #2ca772;
 }
 /* line 207, ../components/foundation/scss/foundation/components/_type.scss */
 a img {
@@ -7799,4 +7799,10 @@ th.hide-for-touch {
 /* line 343, ../components/foundation/scss/foundation/components/_visibility.scss */
 .touch th.show-for-touch {
   display: table-cell !important;
+}
+
+/* line 8, ../scss/foundation-skin.scss */
+nav.top-bar {
+  /* Fixes clearing issue in firefox */
+  height: inherit;
 }
