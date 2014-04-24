@@ -29,7 +29,7 @@ body > header {
 /* line 26, ../scss/application.scss */
 .workspace {
   min-height: 100%;
-  margin-bottom: -100px !important;
+  margin-bottom: -130px !important;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -38,20 +38,20 @@ body > header {
 .workspace:after {
   content: "";
   display: block;
-  height: 100px;
+  height: 130px;
 }
 
 /* line 44, ../scss/application.scss */
 body > footer {
-  border-top: 6px solid #008759;
-  background-color: #222;
-  color: #888;
+  border-top: 2px dotted #ccc;
   padding: 20px 0;
   position: relative;
+  margin: 0 2rem;
+  color: #888;
 }
 /* line 52, ../scss/application.scss */
 body > footer a {
-  color: #bbb;
+  color: #777;
 }
 
 /* line 58, ../scss/application.scss */
@@ -402,21 +402,7 @@ article .breadcrumbs {
   background-color: #eee;
 }
 
-/* line 362, ../scss/application.scss */
-pre {
-  width: 92%;
-  overflow: auto;
-  margin: 2rem 0;
-  border: 1px solid #eee;
-  border-left: 1rem solid #eee;
-  font: lighter 1.2rem/2rem Monaco;
-  background: url("/static/ndf/images/pre.png");
-  background-size: 1px 4rem;
-  padding-left: 0.5rem;
-  font-family: monospace;
-}
-
-/* line 375, ../scss/application.scss */
+/* line 363, ../scss/application.scss */
 textarea {
   min-height: 6rem;
 }
@@ -430,7 +416,7 @@ textarea {
 
 }
 */
-/* line 387, ../scss/application.scss */
+/* line 375, ../scss/application.scss */
 #content > p:first-of-type {
   font-size: 120%;
   line-height: 1.4;
@@ -438,17 +424,17 @@ textarea {
 }
 
 /*************************** 3. Custom CSS Below ***********************/
-/* line 394, ../scss/application.scss */
+/* line 382, ../scss/application.scss */
 .user {
   color: inherit;
 }
 
-/* line 397, ../scss/application.scss */
+/* line 385, ../scss/application.scss */
 .user {
   color: inherit;
 }
 
-/* line 400, ../scss/application.scss */
+/* line 388, ../scss/application.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -457,65 +443,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 407, ../scss/application.scss */
+/* line 395, ../scss/application.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 411, ../scss/application.scss */
+/* line 399, ../scss/application.scss */
 a.node {
   display: block;
 }
 
-/* line 415, ../scss/application.scss */
+/* line 403, ../scss/application.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 418, ../scss/application.scss */
+/* line 406, ../scss/application.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 423, ../scss/application.scss */
+/* line 411, ../scss/application.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 428, ../scss/application.scss */
+/* line 416, ../scss/application.scss */
 main .search {
   margin: 0;
 }
 
-/* line 431, ../scss/application.scss */
+/* line 419, ../scss/application.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 434, ../scss/application.scss */
+/* line 422, ../scss/application.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 441, ../scss/application.scss */
+/* line 429, ../scss/application.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 446, ../scss/application.scss */
+/* line 434, ../scss/application.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 453, ../scss/application.scss */
+/* line 441, ../scss/application.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -523,18 +509,18 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 460, ../scss/application.scss */
+/* line 448, ../scss/application.scss */
 .graph-height {
   height: 70%;
 }
 
 /* Splash Page */
-/* line 465, ../scss/application.scss */
+/* line 453, ../scss/application.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 468, ../scss/application.scss */
+/* line 456, ../scss/application.scss */
 #splash > img {
   position: absolute;
 }

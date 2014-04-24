@@ -26,7 +26,7 @@ html, body {
 		.workspace{
             //This is the main content container between the header and footer
 			min-height: 100%;
-			margin-bottom: -100px!important;
+			margin-bottom: -130px!important;
 			-webkit-box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
@@ -35,7 +35,7 @@ html, body {
             //Hack for setting div height to the height of the browser window
 			content:"";
 			display:block;
-			height:100px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
+			height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
 		}
             
 		}
@@ -43,14 +43,14 @@ html, body {
 
 		body>footer{
             //Site footer
-			border-top:6px solid #008759;
-			background-color:#222;
-			color: #888;
+            border-top: 2px dotted #ccc;
 			padding:20px 0;
 			position: relative;
+            margin: 0 2rem;
+            color:#888;
             
             a{
-			color: #bbb;
+			color: #777;
 		}
 		}
 
@@ -359,18 +359,6 @@ article{
 
 
 
-pre{
-	width:92%;
-	overflow: auto;
-	margin: 2rem 0;
-	border: 1px solid #eee;
-	border-left: 1rem solid #eee;
-	font: lighter 1.2rem/2rem Monaco;
-	background: url('/static/ndf/images/pre.png');
-	background-size:1px 4rem;
-	padding-left:0.5rem;
-	font-family: monospace;
-}
 
 textarea{
 	min-height: 6rem;
