@@ -3,28 +3,30 @@
 *
 *   Use this stylesheet for placements, positioning and sizing of elements
 */
-/* line 7, ../scss/application.scss */
+@import url("css.css");
+/* line 8, ../scss/application.scss */
 html, body {
   height: 100%;
 }
 
-/* line 11, ../scss/application.scss */
+/* line 12, ../scss/application.scss */
 nav h1 img {
+  /* Logo */
   height: 1.8rem;
   margin-right: 5px;
 }
 
-/* line 15, ../scss/application.scss */
+/* line 17, ../scss/application.scss */
 nav h1 a {
   color: white !important;
 }
 
-/* line 20, ../scss/application.scss */
+/* line 21, ../scss/application.scss */
 body > header {
   position: relative;
 }
 
-/* line 24, ../scss/application.scss */
+/* line 26, ../scss/application.scss */
 .workspace {
   min-height: 100%;
   margin-bottom: -100px !important;
@@ -32,14 +34,14 @@ body > header {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-/* line 31, ../scss/application.scss */
+/* line 34, ../scss/application.scss */
 .workspace:after {
   content: "";
   display: block;
   height: 100px;
 }
 
-/* line 40, ../scss/application.scss */
+/* line 44, ../scss/application.scss */
 body > footer {
   border-top: 6px solid #008759;
   background-color: #222;
@@ -47,42 +49,36 @@ body > footer {
   padding: 20px 0;
   position: relative;
 }
-/* line 47, ../scss/application.scss */
+/* line 52, ../scss/application.scss */
 body > footer a {
   color: #bbb;
 }
 
-/* line 53, ../scss/application.scss */
+/* line 58, ../scss/application.scss */
 .coll-arrows {
   cursor: pointer;
   display: block;
   padding: 0.5rem;
 }
-/* line 58, ../scss/application.scss */
+/* line 63, ../scss/application.scss */
 .coll-arrows:hover {
   background-color: #D3D3D3;
 }
 
 /*************************** 1. Foundation CSS overrides ***********************/
 /* Foundation hacks */
-/* line 67, ../scss/application.scss */
+/* line 72, ../scss/application.scss */
 .row {
   max-width: inherit;
   /* Expand to full browser width instead of 960px */
 }
 
-/* line 71, ../scss/application.scss */
-nav.top-bar .has-dropdown .button {
-  /* Needs testing */
-  top: 0;
-}
-
-/* line 76, ../scss/application.scss */
+/* line 77, ../scss/application.scss */
 input[type="checkbox"] + label, input[type="radio"] + label {
   margin: inherit !important;
 }
 
-/* line 82, ../scss/application.scss */
+/* line 83, ../scss/application.scss */
 .top-bar-section a.app.active-menu {
   /* Active App */
   background-color: #008759 !important;
@@ -93,7 +89,7 @@ input[type="checkbox"] + label, input[type="radio"] + label {
   margin-bottom: -1px;
 }
 
-/* line 91, ../scss/application.scss */
+/* line 92, ../scss/application.scss */
 .top-bar-section li.group a.active-menu {
   /* Active group */
   background-color: #154534 !important;
@@ -101,57 +97,57 @@ input[type="checkbox"] + label, input[type="radio"] + label {
 }
 
 /* Sections */
-/* line 98, ../scss/application.scss */
+/* line 99, ../scss/application.scss */
 body {
   font-family: FreeSans;
 }
 
-/* line 101, ../scss/application.scss */
+/* line 102, ../scss/application.scss */
 main > aside {
   margin-bottom: 0.5rem;
 }
 
-/* line 104, ../scss/application.scss */
+/* line 105, ../scss/application.scss */
 main > aside header {
   margin-top: 1rem;
 }
 
-/* line 107, ../scss/application.scss */
+/* line 108, ../scss/application.scss */
 main > aside a {
   color: #008759;
 }
 
-/* line 110, ../scss/application.scss */
+/* line 111, ../scss/application.scss */
 main > aside a:hover {
   color: inherit;
 }
 
-/* line 114, ../scss/application.scss */
+/* line 115, ../scss/application.scss */
 h2:not(.subheader) {
   color: #222;
   font-family: "Georgia Serif", Serif;
   margin: 0;
 }
 
-/* line 119, ../scss/application.scss */
+/* line 120, ../scss/application.scss */
 h3 {
   font-size: 1.4rem;
 }
 
-/* line 123, ../scss/application.scss */
+/* line 124, ../scss/application.scss */
 p {
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
 /* Off canvas navigation */
-/* line 128, ../scss/application.scss */
+/* line 129, ../scss/application.scss */
 aside.left-off-canvas-menu {
   background-color: #222;
   color: white;
 }
 
-/* line 132, ../scss/application.scss */
+/* line 133, ../scss/application.scss */
 a#toggle-shelf {
   position: absolute;
   top: 1rem;
@@ -160,17 +156,17 @@ a#toggle-shelf {
   z-index: 10;
 }
 
-/* line 139, ../scss/application.scss */
+/* line 140, ../scss/application.scss */
 a#toggle-shelf:hover {
   color: black;
 }
 
-/* line 142, ../scss/application.scss */
+/* line 143, ../scss/application.scss */
 a#toggle-shelf i {
   font-size: 30px;
 }
 
-/* line 146, ../scss/application.scss */
+/* line 147, ../scss/application.scss */
 .inner-wrap > aside h4 {
   color: white;
   padding: 10px;
@@ -178,19 +174,19 @@ a#toggle-shelf i {
 
 /* Should be in Foundation */
 /* Effects */
-/* line 156, ../scss/application.scss */
+/* line 157, ../scss/application.scss */
 .drop-shadow {
   -webkit-box-shadow: 2px 2px 4px 1px #333;
   box-shadow: 2px 2px 4px 1px #333;
 }
 
-/* line 160, ../scss/application.scss */
+/* line 161, ../scss/application.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 164, ../scss/application.scss */
+/* line 165, ../scss/application.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -199,7 +195,7 @@ a#toggle-shelf i {
 }
 
 /* Card block */
-/* line 172, ../scss/application.scss */
+/* line 173, ../scss/application.scss */
 .card > * {
   position: relative;
   background-color: white;
@@ -216,12 +212,12 @@ a#toggle-shelf i {
   -webkit-transition: opacity .5s ease-in;
   -o-transition: opacity .5s ease-in;
 }
-/* line 188, ../scss/application.scss */
+/* line 189, ../scss/application.scss */
 .card > *:hover {
   border: 1px solid #ddd;
   opacity: 1;
 }
-/* line 192, ../scss/application.scss */
+/* line 193, ../scss/application.scss */
 .card > * > i {
   position: absolute;
   top: -12px;
@@ -232,87 +228,87 @@ a#toggle-shelf i {
 }
 
 /* Create card */
-/* line 203, ../scss/application.scss */
+/* line 204, ../scss/application.scss */
 .create.card > * {
   background-color: #999;
   opacity: 1;
 }
-/* line 207, ../scss/application.scss */
+/* line 208, ../scss/application.scss */
 .create.card > *:hover {
   background-color: #008759;
 }
 
-/* line 213, ../scss/application.scss */
+/* line 214, ../scss/application.scss */
 .create.card h4 {
   color: white;
 }
-/* line 216, ../scss/application.scss */
+/* line 217, ../scss/application.scss */
 .create.card .button {
   border: 1px solid #00ba7b;
   opacity: 0.5;
 }
-/* line 220, ../scss/application.scss */
+/* line 221, ../scss/application.scss */
 .create.card label {
   color: white;
 }
-/* line 223, ../scss/application.scss */
+/* line 224, ../scss/application.scss */
 .create.card .switch label {
   color: inherit;
 }
 
 /* Content Tabs */
-/* line 231, ../scss/application.scss */
+/* line 232, ../scss/application.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
-/* line 235, ../scss/application.scss */
+/* line 236, ../scss/application.scss */
 article .tabs dd.active a {
   color: #222;
   background-color: inherit;
 }
-/* line 239, ../scss/application.scss */
+/* line 240, ../scss/application.scss */
 article .tabs dd a {
   color: #aaa;
   background-color: inherit;
   padding: 0.5rem;
   padding-left: 1rem;
 }
-/* line 244, ../scss/application.scss */
+/* line 245, ../scss/application.scss */
 article .tabs dd a:hover {
   background-color: inherit;
   color: #999;
 }
 
-/* line 251, ../scss/application.scss */
+/* line 252, ../scss/application.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
 /* Default card */
-/* line 256, ../scss/application.scss */
+/* line 257, ../scss/application.scss */
 .card > :hover .label {
   opacity: 1;
 }
 
-/* line 261, ../scss/application.scss */
+/* line 262, ../scss/application.scss */
 .card header {
   margin-bottom: 0;
 }
-/* line 264, ../scss/application.scss */
+/* line 265, ../scss/application.scss */
 .card .label {
   opacity: 0.5;
 }
-/* line 267, ../scss/application.scss */
+/* line 268, ../scss/application.scss */
 .card h4 {
   font-weight: bold;
   font-size: 1rem;
 }
-/* line 271, ../scss/application.scss */
+/* line 272, ../scss/application.scss */
 .card p {
   font-size: 0.9rem;
 }
-/* line 274, ../scss/application.scss */
+/* line 275, ../scss/application.scss */
 .card .th {
   margin: 20px auto;
   width: 80px;
@@ -320,30 +316,30 @@ article .tabs dd a:hover {
   overflow: hidden;
   display: none;
 }
-/* line 280, ../scss/application.scss */
+/* line 281, ../scss/application.scss */
 .card .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 284, ../scss/application.scss */
+/* line 285, ../scss/application.scss */
 .card .th img {
   width: 100%;
 }
-/* line 288, ../scss/application.scss */
+/* line 289, ../scss/application.scss */
 .card section {
   background-color: #ddd;
 }
-/* line 291, ../scss/application.scss */
+/* line 292, ../scss/application.scss */
 .card .button {
   opacity: 0.1;
 }
 
-/* line 297, ../scss/application.scss */
+/* line 298, ../scss/application.scss */
 .gallery .card .th {
   display: block;
 }
 
-/* line 301, ../scss/application.scss */
+/* line 302, ../scss/application.scss */
 .card > *:hover .button {
   opacity: 1;
   transition: opacity .5s ease-in ease-in;
@@ -353,7 +349,7 @@ article .tabs dd a:hover {
 }
 
 /* Inline label list */
-/* line 310, ../scss/application.scss */
+/* line 311, ../scss/application.scss */
 .label {
   font-weight: bold;
   color: orange;
@@ -361,81 +357,81 @@ article .tabs dd a:hover {
   border: 1px dotted orange;
   display: inline-block;
 }
-/* line 315, ../scss/application.scss */
+/* line 316, ../scss/application.scss */
 .label:hover {
   background-color: orange;
   color: white;
 }
 
-/* line 322, ../scss/application.scss */
+/* line 323, ../scss/application.scss */
 .label-list {
   display: inline-block;
   text-align: left;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 332, ../scss/application.scss */
+/* line 333, ../scss/application.scss */
 main aside {
   padding-top: 1rem;
 }
-/* line 334, ../scss/application.scss */
+/* line 335, ../scss/application.scss */
 main aside.fade {
   opacity: 0.8;
 }
 
-/* line 340, ../scss/application.scss */
+/* line 341, ../scss/application.scss */
 aside > section {
   margin: inherit !important;
   margin-bottom: 5px;
   padding-bottom: 3rem;
 }
-/* line 344, ../scss/application.scss */
+/* line 345, ../scss/application.scss */
 aside > section > div {
   padding: 15px;
 }
 
-/* line 350, ../scss/application.scss */
+/* line 351, ../scss/application.scss */
 aside .meta i {
   color: #ccc;
 }
 
-/* line 351, ../scss/application.scss */
+/* line 352, ../scss/application.scss */
 aside:hover .meta i {
   color: black;
 }
 
-/* line 353, ../scss/application.scss */
+/* line 354, ../scss/application.scss */
 main .button {
   background-color: #008759;
 }
-/* line 355, ../scss/application.scss */
+/* line 356, ../scss/application.scss */
 main .button:hover {
   background-color: #00ba7b;
 }
 
 /* Content area */
-/* line 362, ../scss/application.scss */
+/* line 363, ../scss/application.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
   background-color: white;
 }
-/* line 366, ../scss/application.scss */
+/* line 367, ../scss/application.scss */
 article header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 370, ../scss/application.scss */
+/* line 371, ../scss/application.scss */
 article footer {
   border-top: 1px dotted #ddd;
 }
-/* line 373, ../scss/application.scss */
+/* line 374, ../scss/application.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 381, ../scss/application.scss */
+/* line 382, ../scss/application.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -449,7 +445,7 @@ pre {
   font-family: monospace;
 }
 
-/* line 394, ../scss/application.scss */
+/* line 395, ../scss/application.scss */
 textarea {
   min-height: 6rem;
 }
@@ -463,7 +459,7 @@ textarea {
 
 }
 */
-/* line 406, ../scss/application.scss */
+/* line 407, ../scss/application.scss */
 #content > p:first-of-type {
   font-size: 120%;
   line-height: 1.4;
@@ -471,17 +467,17 @@ textarea {
 }
 
 /*************************** 3. Custom CSS Below ***********************/
-/* line 413, ../scss/application.scss */
+/* line 414, ../scss/application.scss */
 .user {
   color: inherit;
 }
 
-/* line 416, ../scss/application.scss */
+/* line 417, ../scss/application.scss */
 .user {
   color: inherit;
 }
 
-/* line 419, ../scss/application.scss */
+/* line 420, ../scss/application.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -490,65 +486,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 426, ../scss/application.scss */
+/* line 427, ../scss/application.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 430, ../scss/application.scss */
+/* line 431, ../scss/application.scss */
 a.node {
   display: block;
 }
 
-/* line 434, ../scss/application.scss */
+/* line 435, ../scss/application.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 437, ../scss/application.scss */
+/* line 438, ../scss/application.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 442, ../scss/application.scss */
+/* line 443, ../scss/application.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 447, ../scss/application.scss */
+/* line 448, ../scss/application.scss */
 main .search {
   margin: 0;
 }
 
-/* line 450, ../scss/application.scss */
+/* line 451, ../scss/application.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 453, ../scss/application.scss */
+/* line 454, ../scss/application.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 460, ../scss/application.scss */
+/* line 461, ../scss/application.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 465, ../scss/application.scss */
+/* line 466, ../scss/application.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 472, ../scss/application.scss */
+/* line 473, ../scss/application.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -556,18 +552,18 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 479, ../scss/application.scss */
+/* line 480, ../scss/application.scss */
 .graph-height {
   height: 70%;
 }
 
 /* Splash Page */
-/* line 484, ../scss/application.scss */
+/* line 485, ../scss/application.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 487, ../scss/application.scss */
+/* line 488, ../scss/application.scss */
 #splash > img {
   position: absolute;
 }

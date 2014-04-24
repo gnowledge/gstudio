@@ -1,5 +1,5 @@
 /*
-*   foundation-metastudio.scss - Metstudio foundation framework
+*   foundation-skin.scss - Customized foundation stylesheet
 */
 /*
 *   _settings.scss - Metstudio responsive grid settings stylesheet using ZURB foundation
@@ -7801,8 +7801,10 @@ th.hide-for-touch {
   display: table-cell !important;
 }
 
-/* line 8, ../scss/foundation-skin.scss */
+/*
+*   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
+*/
+/* line 17, ../scss/foundation-skin.scss */
 nav.top-bar {
-  /* Fixes clearing issue in firefox */
   height: inherit;
 }

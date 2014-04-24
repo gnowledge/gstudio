@@ -3,12 +3,14 @@
 *
 *   Use this stylesheet for placements, positioning and sizing of elements
 */
-    
+@import url("css.css");
+
 html, body {
 			height: 100%;
 		}
 
 		nav h1 img{
+            /* Logo */
 			height: 1.8rem;
 			margin-right: 5px;
 		}
@@ -16,12 +18,13 @@ html, body {
 			color:white!important;
 		}
 
-		body>header
-		{
+		body>header{
+            //Site header
 			position: relative;
 		}
 
 		.workspace{
+            //This is the main content container between the header and footer
 			min-height: 100%;
 			margin-bottom: -100px!important;
 			-webkit-box-sizing: border-box;
@@ -29,15 +32,17 @@ html, body {
 			box-sizing: border-box;
             
             &:after{
+            //Hack for setting div height to the height of the browser window
 			content:"";
 			display:block;
-			height:100px;
+			height:100px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
 		}
             
 		}
 
 
 		body>footer{
+            //Site footer
 			border-top:6px solid #008759;
 			background-color:#222;
 			color: #888;
@@ -66,10 +71,6 @@ html, body {
 /* Foundation hacks */
 .row{
 	max-width:inherit;/* Expand to full browser width instead of 960px */
-}
-
-nav.top-bar .has-dropdown .button{ /* Needs testing */
-	top:0;
 }
 
 
