@@ -35,7 +35,13 @@
 <div id="existing_forums">
 	<ul class="small-block-grid-1 medium-block-grid-2">
 		{% for each in existing_forums %}
-		<li class="card"><h4><a href="{% url 'show' groupid each %}">{{each.name}}</a></h4></li>
+              
+		<li class="card">
+            <a href="{% url 'show' groupid each %}">  
+            <h3>{{each.name}}</h3>
+                </a>
+            </li>
+            
 
 		{% endfor %}
 	</ul>

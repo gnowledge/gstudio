@@ -9,6 +9,9 @@
 
 // This is the default html and body font-size for the base rem value.
 // $rem-base: 2px;
+
+$theme-color:#0E1B12;
+
 $primary-color: #33C284;
 
 
@@ -44,13 +47,14 @@ $primary-color: #33C284;
 // $include-xl-html-grid-classes: false;
 
 // $row-width: rem-calc(1000);
+$row-width: inherit;    //Expand to full browser width instead of 960px
 // $column-gutter: rem-calc(30);
 // $total-columns: 5;
 
 // We use these to control various global styles
 // $body-bg: #fff;
 // $body-font-color: #222;
-// $body-font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+ $body-font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
 // $body-font-style: normal;
 
@@ -1134,7 +1138,7 @@ $primary-color: #33C284;
 // $include-html-top-bar-classes: $include-html-classes;
 
 // Background color for the top bar
-// $topbar-bg-color: red;
+ $topbar-bg-color: $theme-color;
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin
@@ -1161,8 +1165,8 @@ $primary-color: #33C284;
 // $topbar-link-weight: normal;
 // $topbar-link-font-size: rem-calc(13);
 // $topbar-link-hover-lightness: -10%; // Darken by 10%
-// $topbar-link-bg-hover: #272727  ;
-// $topbar-link-bg-active: $primary-color;
+ $topbar-link-bg-hover: scale-color($theme-color, $lightness: 20%);
+ $topbar-link-bg-active: scale-color($theme-color, $lightness: 10%);
 // $topbar-link-bg-active-hover: scale-color($primary-color, $lightness: -14%);
 // $topbar-link-font-family: $body-font-family;
 
