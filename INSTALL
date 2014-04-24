@@ -8,7 +8,7 @@ Use corresponding package names if you are using an RPM based distro
 1. Installing required packages and its dependencies
 
 #+BEGIN_EXAMPLE
-sudo apt-get install python-setuptools git build-essential python-dev rcs mongodbemacs24 python-virtualenv libjpeg-dev ffmpeg ffmpeg2theora
+sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev ffmpeg ffmpeg2theora
 #+END_EXAMPLE
 
 2. Get latest version of gstudio-mongokit
