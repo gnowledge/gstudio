@@ -146,7 +146,7 @@ a#toggle-shelf i{
 
 .medium-block-grid-2 > .card:first-child{
     // First card
-    width: 100%;
+    //width: 100%;
 }
 .card>*{
 	position: relative;
@@ -237,32 +237,32 @@ dd a{
 }
 .card{
     
-header{
-	margin-bottom: 0;
-}
-    .label{
-	opacity:0.5;
-}
-h4{
-	font-weight: bold;
-	font-size: 1rem;
-}
-p{
-	font-size: 0.9rem;
-}
-.th{
-	margin:20px auto;
-	width:80px;
-	height: 80px;
-	overflow: hidden;
-	display: none;
-    &:hover{
-	width: 150px;
-	height: 150px;
-}
-    img{
-	width: 100%;
-}
+    header{
+        margin-bottom: 0;
+    }
+        .label{
+        opacity:0.5;
+    }
+    h4{
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    p{
+        font-size: 0.9rem;
+    }
+    .th{
+        margin:20px auto;
+        width:80px;
+        height: 80px;
+        overflow: hidden;
+        display: none;
+        &:hover{
+        width: 150px;
+        height: 150px;
+    }
+        img{
+        width: 100%;
+    }
 }
     section{
 	background-color: #ddd;
@@ -329,12 +329,7 @@ aside>section{
 aside .meta i{color: #ccc;}
 aside:hover .meta i{color: black;}
 
-main .button{
-	background-color:#008759 ;
-    &:hover{
-	background-color:#00ba7b ;
-}
-}
+
 
 
 /* Content area */

@@ -1,5 +1,7 @@
 /*
 *   foundation-skin.scss - Customized foundation stylesheet
+*
+*   
 */
 
 //Imports
@@ -9,7 +11,6 @@
 @import "skins/metastudio";     //Skin settings
 @import "foundation";           //Foundation grid framework
 @import "application";          //Application styles
-@import "compass/css3/text-shadow";
 
 
 /*
@@ -38,14 +39,16 @@ pre{
 	font-family: monospace;
 }
 
-.fixme{
-    opacity: 0.1;
+
+.xfixme{
+    // Use this class for any placeholder text to be replaced by variables by the developer
+    opacity: 0.5;
     &:hover{
         opacity:1;
         color:inherit;
         &:after{
-            content:" fixme and remove this class";
-            color:red;
+            content:" fixme";
+            color:orange;
         }
     }
 }

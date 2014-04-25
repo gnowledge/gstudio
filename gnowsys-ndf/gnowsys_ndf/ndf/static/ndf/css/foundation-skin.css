@@ -1,5 +1,7 @@
 /*
 *   foundation-skin.scss - Customized foundation stylesheet
+*
+*   
 */
 /*
 *   _settings.scss - Metstudio style variables settings file
@@ -7964,11 +7966,6 @@ a#toggle-shelf i {
 }
 
 /* Card block */
-/* line 147, ../scss/_application.scss */
-.medium-block-grid-2 > .card:first-child {
-  width: 100%;
-}
-
 /* line 151, ../scss/_application.scss */
 .card > * {
   position: relative;
@@ -8174,38 +8171,29 @@ aside:hover .meta i {
   color: black;
 }
 
-/* line 332, ../scss/_application.scss */
-main .button {
-  background-color: #008759;
-}
-/* line 334, ../scss/_application.scss */
-main .button:hover {
-  background-color: #00ba7b;
-}
-
 /* Content area */
-/* line 341, ../scss/_application.scss */
+/* line 336, ../scss/_application.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
   background-color: white;
 }
-/* line 345, ../scss/_application.scss */
+/* line 340, ../scss/_application.scss */
 article header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 349, ../scss/_application.scss */
+/* line 344, ../scss/_application.scss */
 article footer {
   border-top: 1px dotted #ddd;
 }
-/* line 352, ../scss/_application.scss */
+/* line 347, ../scss/_application.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 361, ../scss/_application.scss */
+/* line 356, ../scss/_application.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8219,7 +8207,7 @@ textarea {
 
 }
 */
-/* line 373, ../scss/_application.scss */
+/* line 368, ../scss/_application.scss */
 #content > p:first-of-type {
   font-size: 120%;
   line-height: 1.4;
@@ -8227,17 +8215,17 @@ textarea {
 }
 
 /*************************** 3. Custom CSS Below ***********************/
-/* line 380, ../scss/_application.scss */
+/* line 375, ../scss/_application.scss */
 .user {
   color: inherit;
 }
 
-/* line 383, ../scss/_application.scss */
+/* line 378, ../scss/_application.scss */
 .user {
   color: inherit;
 }
 
-/* line 386, ../scss/_application.scss */
+/* line 381, ../scss/_application.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -8246,65 +8234,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 393, ../scss/_application.scss */
+/* line 388, ../scss/_application.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 397, ../scss/_application.scss */
+/* line 392, ../scss/_application.scss */
 a.node {
   display: block;
 }
 
-/* line 401, ../scss/_application.scss */
+/* line 396, ../scss/_application.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 404, ../scss/_application.scss */
+/* line 399, ../scss/_application.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 409, ../scss/_application.scss */
+/* line 404, ../scss/_application.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 414, ../scss/_application.scss */
+/* line 409, ../scss/_application.scss */
 main .search {
   margin: 0;
 }
 
-/* line 417, ../scss/_application.scss */
+/* line 412, ../scss/_application.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 420, ../scss/_application.scss */
+/* line 415, ../scss/_application.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 427, ../scss/_application.scss */
+/* line 422, ../scss/_application.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 432, ../scss/_application.scss */
+/* line 427, ../scss/_application.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 439, ../scss/_application.scss */
+/* line 434, ../scss/_application.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8312,18 +8300,18 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 446, ../scss/_application.scss */
+/* line 441, ../scss/_application.scss */
 .graph-height {
   height: 70%;
 }
 
 /* Splash Page */
-/* line 451, ../scss/_application.scss */
+/* line 446, ../scss/_application.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 454, ../scss/_application.scss */
+/* line 449, ../scss/_application.scss */
 #splash > img {
   position: absolute;
 }
@@ -8332,7 +8320,7 @@ input.node-title {
 /*
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
-/* line 19, ../scss/foundation-skin.scss */
+/* line 20, ../scss/foundation-skin.scss */
 nav.top-bar {
   height: inherit;
 }
@@ -8340,7 +8328,7 @@ nav.top-bar {
 /*
 *   Foundation extensions
 */
-/* line 28, ../scss/foundation-skin.scss */
+/* line 29, ../scss/foundation-skin.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -8354,17 +8342,17 @@ pre {
   font-family: monospace;
 }
 
-/* line 41, ../scss/foundation-skin.scss */
-.fixme {
-  opacity: 0.1;
-}
 /* line 43, ../scss/foundation-skin.scss */
-.fixme:hover {
+.xfixme {
+  opacity: 0.5;
+}
+/* line 46, ../scss/foundation-skin.scss */
+.xfixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 46, ../scss/foundation-skin.scss */
-.fixme:hover:after {
-  content: " fixme and remove this class";
-  color: red;
+/* line 49, ../scss/foundation-skin.scss */
+.xfixme:hover:after {
+  content: " fixme";
+  color: orange;
 }
