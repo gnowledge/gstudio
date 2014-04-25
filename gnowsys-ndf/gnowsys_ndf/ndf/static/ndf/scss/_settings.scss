@@ -1178,7 +1178,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $topbar-link-font-size: rem-calc(13);
 // $topbar-link-hover-lightness: -10%; // Darken by 10%
  $topbar-link-bg-hover: scale-color($theme-color-invert, $lightness: 20%);
- $topbar-link-bg-active: scale-color($theme-color-invert, $lightness: 10%);
+ $topbar-link-bg-active: $theme-color;
 // $topbar-link-bg-active-hover: scale-color($primary-color, $lightness: -14%);
 // $topbar-link-font-family: $body-font-family;
 
