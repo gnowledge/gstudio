@@ -1,0 +1,84 @@
+{% extends "ndf/base.html" %}
+
+{% block style %}
+
+		#all-markers-map-widget { background-color:inherit; height:calc(100vh - 60px); }
+
+		#app-set-item li { padding:0.5em }
+		#app-set-item li:hover { background-color:#e5e5e5; }
+
+		#app-set-item > a { color:inherit; }
+
+{% endblock %}
+
+<!-- Concern Information Block -->
+{% block concern_information %}
+<div>
+	<h4>Observations</h4>
+	<hr>
+	
+	<ul class="no-bullet" id="app-set-item">
+		{% for each in app_collection_set %}
+			<a href="{% url "observations_app" groupid app_id each.name|slugify each.id %}">
+				<li class="">
+					{{each.name}} &nbsp;&nbsp;&nbsp;<i class="fi-marker"></i> {{each.obj_count}} 
+				</li>
+			</a>
+		{% endfor%}
+	</ul>
+
+	{% if user.is_authenticated %}{% endif %}
+
+</div>
+{% endblock %}
+<!-- END of Concern Information Block -->
+
+
+<!-- Meta content Block -->
+{% block meta_content %}
+	
+{% endblock %}
+<!-- END of Meta content Block -->
+
+
+<!-- Body content Block -->
+{% block body_content %}
+
+	<!-- Landing page view -->
+	
+	{% if template_view == "landing_page_view" %}
+		<div class="row">
+			<div id="all-markers-map-widget" class="small-12 large-12 columns" >
+				{% include "ndf/observations_map.html" with mode="read" %}
+			</div>
+		</div>
+	{% endif %}
+	
+	<!-- END of Landing page view -->
+	<!-- ======================== -->
+
+
+	{% if template_view == "app_set_view" %}
+		<div class="row">
+			<div id="all-markers-map-widget" class="small-12 large-12 columns" >
+				{% include "ndf/observations_map.html" with mode="edit" %}
+			</div>
+		</div>
+	{% endif %}
+	
+
+
+<script type="text/javascript">
+
+
+</script>
+
+
+{% endblock %}
+<!-- END of Body content Block -->
+
+
+{% block script %}
+
+
+{% endblock %}

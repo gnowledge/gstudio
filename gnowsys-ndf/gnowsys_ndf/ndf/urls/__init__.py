@@ -42,8 +42,8 @@ urlpatterns = patterns('',
 
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
 
-    (r'^(?P<group_id>[^/]+)/observation/(?P<app_id>[\w-]+)$', include('gnowsys_ndf.ndf.urls.observations_urls')),
-    #(r'^(?P<group_id>[^/]+)/observations/(?P<app_id>[\w-]+)$', include('gnowsys_ndf.ndf.urls.observations_urls')),
+    # (r'^(?P<group_id>[^/]+)/observation/(?P<app_id>[\w-]+)$', include('gnowsys_ndf.ndf.urls.observations_urls')),
+    (r'^(?P<group_id>[^/]+)/observations/(?P<app_id>[\w-]+)', include('gnowsys_ndf.ndf.urls.observations_urls')),
     
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', custom_app_view, name='GAPPS'),       
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', custom_app_view, name='GAPPS_set'),

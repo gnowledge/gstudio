@@ -57,7 +57,6 @@ def all_observations(request, group_id, app_id=None):
 				
 		app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
 
-
 	# print "\napp_name : ", app_name, "\napp_set_id : ", app_set_id
 
 	# print "\n app_collection_set : ", app_collection_set
@@ -81,12 +80,41 @@ def all_observations(request, group_id, app_id=None):
     #     app_menu = "yes"
     #     title = app_name
 
-	return render_to_response("ndf/observations_app.html",
+	return render_to_response("ndf/observations.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,
+							 		'app_name':app_name, 'app_id':app_id,
 							 		'template_view': 'landing_page_view',
 							 		'map_type': 'all_app_markers'
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
+
+def observations_app(request, group_id, app_id=None, app_name=None, slug=None, app_set_id=None):
+
+	app = collection.Node.find_one({"_id":ObjectId(app_id)})
+	app_name = app.name
+	app_collection_set = []
+
+	for each in app.collection_set:
+		
+		app_element = collection.Node.find_one({"_id":each})
+		obj_count = ""
+		if app_element:
+			app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
+			obj_count = app_element_content_objects.count()
+				
+		app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
+
+
+	return render_to_response("ndf/observations.html",
+							 	{
+							 		'app_collection_set': app_collection_set,
+							 		'groupid':group_id, 'group_id':group_id,
+							 		'app_name':app_name, 'app_id':app_id,
+							 		'template_view': 'app_set_view'
+							 	},
+							 	context_instance=RequestContext(request) 
+							 )
+
