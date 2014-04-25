@@ -540,15 +540,16 @@
 	    </div>
 
 	    <h4>{{each.name}}</h4>
-	    
-	    <small>Created by <span class="user">{{user_obj.username}}</span> <em>{{each.created_at}}</em></small>
-	    
+	    <div>
+	      <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{each.user_details_dict.created_by}}</span>
+	      </small>
+	    </div>
+
           </header>
-	  <p>This file is a..</p>
-         
-	 
-	 
-          </div>
+	  <p>This file is a ..</p>
+          <a class="button expand" href ="{% url 'video_detail' groupid each %}?vid_id={{source_id}}">View details</a>
+	  </div>
+          
       </li>
 {% endfor %}
 
