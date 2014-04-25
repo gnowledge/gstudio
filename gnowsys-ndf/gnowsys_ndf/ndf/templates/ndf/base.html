@@ -27,8 +27,7 @@
 	<!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
 	<script src="/static/ndf/js/jquery-migrate-1.0.0.js"></script>
 
-	<!-- External default stylesheet-->
-	<link href="/static/ndf/css/style.css" rel="stylesheet">
+	<!-- External library stylesheets-->
 	<link href="/static/ndf/css/jqtree.css" rel="stylesheet">
 
 	<!-- Enable HTML5 on old browsers -->
@@ -50,11 +49,11 @@
 	<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
 	
 
-	<header class="drop-shadow">
+	<header>
 
 		<!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
 		
-		<nav class="top-bar" data-topbar>
+		<nav class="top-bar drop-shadow" data-topbar>
 			<ul class="title-area">
 				<li class="name">
 					<h1><a href="/home" accesskey="q"><img src="/static/ndf/scss/metastudio/logo.svg"> meta<b>Studio</b></a></h1>
@@ -347,6 +346,8 @@
 		{% block script %} {% endblock %}	
 
 	</script>
+
+<script src="/static/ndf/js/app.js"></script>
 
 </body>
 
