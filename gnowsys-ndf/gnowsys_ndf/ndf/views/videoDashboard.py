@@ -71,6 +71,7 @@ def video_detail(request, group_id, _id):
         )
 def video_edit(request,group_id,_id):
     vid_node = collection.File.one({"_id": ObjectId(_id)})
+    video_obj=request.GET.get("vid_id","")
     if request.method == "POST":
         get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save()
@@ -80,7 +81,8 @@ def video_edit(request,group_id,_id):
         return render_to_response("ndf/video_edit.html",
                                   { 'node': vid_node,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid':group_id,
+                                    'video_obj':video_obj
                                 },
                                   context_instance=RequestContext(request)
                               )
