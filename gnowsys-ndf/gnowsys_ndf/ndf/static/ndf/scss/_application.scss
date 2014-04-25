@@ -5,9 +5,6 @@
 */
 @import url("css.css");
 
-html, body {
-			height: 100%;
-		}
 
 		nav h1 img{
             /* Logo */
@@ -37,9 +34,7 @@ html, body {
 			display:block;
 			height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
 		}
-            
 		}
-
 
 		body>footer{
             //Site footer
@@ -73,8 +68,6 @@ html, body {
 input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
 }
-
-
 
 /* Sections */
 
@@ -150,6 +143,11 @@ a#toggle-shelf i{
 }
 
 /* Card block */
+
+.medium-block-grid-2 > .card:first-child{
+    // First card
+    width: 100%;
+}
 .card>*{
 	position: relative;
 	background-color: white;
