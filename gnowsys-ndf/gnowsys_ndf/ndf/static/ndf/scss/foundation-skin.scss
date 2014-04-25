@@ -1,5 +1,5 @@
 /*
-*   foundation-skin.scss - Customized foundation stylesheet
+*   foundation-skin.scss - Customized foundation stylesheet 
 *
 *   
 */
@@ -7,10 +7,11 @@
 //Imports
 //The order of files allows the sass variables to be set first and then foundation is built using these variables
 
+@import "metastudio/theme";     //Skin settings
 @import "settings";             //Foundation settings
-@import "skins/metastudio";     //Skin settings
+
 @import "foundation";           //Foundation grid framework
-@import "application";          //Application styles
+@import "styles";          //Application styles
 
 
 /*
@@ -40,7 +41,7 @@ pre{
 }
 
 
-.xfixme{
+.fixme{
     // Use this class for any placeholder text to be replaced by variables by the developer
     opacity: 0.5;
     &:hover{

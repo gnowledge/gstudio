@@ -38,7 +38,7 @@ Stylesheets are authored in [sass](http://sass-lang.com/guide) for easy manageme
 * scss/_application.scss - Contains the main styles for the application
 * scss/foundation-skin.scss - Is the final stylesheet compiled from the above partials. This file also contains any styles to override any default foundation rules.
 
-* css/css.css - The only css file that is available for editing. This is to be used for making quick style fixes without the need to edit the sass stylesheets.
+* css/css.css - The only css file that is available for direct editing. This is to be used for making quick style fixes without the need to edit the sass stylesheets.
 
 ### Compiling styles
 

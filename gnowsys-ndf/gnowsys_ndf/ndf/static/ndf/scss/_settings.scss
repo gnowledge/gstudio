@@ -8,7 +8,7 @@
 //
 
 // Color Pallette
-$theme-color:#33C284;
+$theme-color:#33C284 !default;
 $theme-color-invert:scale-color($theme-color, $lightness: -90%);
 
 
@@ -23,12 +23,6 @@ $secondary-color: rgb(220, 230, 223);
 // $success-color: #43AC6A;
  $warning-color: #f2bf8a;
 // $info-color: #a0d3e8;
-
-
-
-
-
-
 
 
 
