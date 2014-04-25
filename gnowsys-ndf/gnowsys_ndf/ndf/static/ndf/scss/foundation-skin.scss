@@ -1,0 +1,49 @@
+/*
+*   foundation-skin.scss - Customized foundation stylesheet
+*/
+
+//Imports
+//The order of files allows the sass variables to be set first and then foundation is built using these variables
+
+@import "settings";             //Foundation settings
+@import "skins/metastudio";     //Skin settings
+@import "foundation";           //Foundation grid framework
+
+
+/*
+*   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
+*/
+
+nav.top-bar{
+    // Icons in the top-bar links caused heights of the li to vary by a few pixels and broke the layout of content below in firefox browser
+    height:inherit;
+}
+
+/*
+*   Foundation extensions
+*/
+
+pre{
+    width:92%;
+	overflow: auto;
+	margin: 2rem 0;
+	border: 1px solid #eee;
+	border-left: 1rem solid #eee;
+	font: lighter 1.2rem/2rem Monaco;
+	background: url('/static/ndf/images/pre.png');
+	background-size:1px 4rem;
+	padding-left:0.5rem;
+	font-family: monospace;
+}
+
+.fixme{
+    opacity: 0.1;
+    &:hover{
+        opacity:1;
+        color:inherit;
+        &:after{
+            content:" fixme and remove this class";
+            color:red;
+        }
+    }
+}

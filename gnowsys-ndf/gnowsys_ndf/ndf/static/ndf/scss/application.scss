@@ -1,73 +1,84 @@
+/*
+*   application.scss - Metstudio app layout stylsheet
+*
+*   Use this stylesheet for placements, positioning and sizing of elements
+*/
+@import url("css.css");
+
+html, body {
+			height: 100%;
+		}
+
+		nav h1 img{
+            /* Logo */
+			height: 1.8rem;
+			margin-right: 5px;
+		}
+		nav h1 a{
+			color:white!important;
+		}
+
+		body>header{
+            //Site header
+			position: relative;
+		}
+
+		.workspace{
+            //This is the main content container between the header and footer
+			min-height: 100%;
+			margin-bottom: -130px!important;
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+            
+            &:after{
+            //Hack for setting div height to the height of the browser window
+			content:"";
+			display:block;
+			height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
+		}
+            
+		}
+
+
+		body>footer{
+            //Site footer
+            border-top: 2px dotted #ccc;
+			padding:20px 0;
+			position: relative;
+            margin: 0 2rem;
+            color:#888;
+            
+            a{
+			color: #777;
+		}
+		}
+
+
+		.coll-arrows{
+			cursor:pointer;
+			display: block;
+			padding: 0.5rem;
+            
+            &:hover{
+			background-color: #D3D3D3;
+		}
+		}
+
 
 /*************************** 1. Foundation CSS overrides ***********************/
 
 /* Foundation hacks */
-.row{
-	max-width:inherit;/* Expand to full browser width instead of 960px */
-}
-.top-bar input{	/* Issue filed at github */
-	height:auto;
-	padding-top:.35rem;
-	padding-bottom:.35rem;
-}
-nav.top-bar .has-dropdown .button{ /* Needs testing */
-	top:0;
-}
-
 
 input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
 }
 
 
-/* Top bar */
-body>header{
-	border-bottom: 1px solid black;
-}
-.top-bar,.top-bar-section ul,body>header{
-	background-color: #222;
-}
-.top-bar-section li:not(.has-form) a{
-	background-color: #222!important;
-}
-.top-bar-section .has-form{
-	background-color: #222;
-}
-
-
-.top-bar-section a.app.active-menu{
-	/* Active App */
-	background-color: #008759!important;
-	font-weight: bold;
-	color:white;
-	opacity:1;
-	border-bottom: 1px solid black;
-	margin-bottom: -1px;
-}
-.top-bar-section a.app:hover{
-	color:white;
-	opacity:1;
-}
-.top-bar-section a.app{ 
-	/* Apps */
-	opacity:0.7;
-	background-color: inherit;
-	top:0;
-}
-.top-bar-section li.group a.active-menu{ 
-	/* Active group */
-	background-color: #154534!important;
-	font-weight: bold!important;
-}
-.top-bar-section li:not(.has-form) a:hover{
-	/* Top bar hover */
-	background-color: #008759!important;
-}
 
 /* Sections */
-body{
-	font-family: FreeSans;
-}
+
+
 main>aside{
 	margin-bottom: 0.5rem;
 }
@@ -155,104 +166,11 @@ a#toggle-shelf i{
 	-webkit-transition: opacity .5s ease-in;
 	-o-transition: opacity .5s ease-in;
 
-}
-.card>*:hover{
+    &:hover{
 	border: 1px solid #ddd;
 	opacity:1;
 }
-/* Create card */
-.create.card>*{
-	background-color: #999;
-	opacity:1;
-}
-.create.card>*:hover{
-	background-color: #008759;
-}
-.create.card h4{
-	color:white;
-}
-.create.card .button{
-	border:1px solid #00ba7b;
-}
-.create.card label{
-	color:white;
-}
-.create.card .switch label{
-	color:inherit;
-}
-/* Content Tabs */
-article .tabs{
-
-}
-article .tabs i{
-	margin-right: 5px;
-	font-size: 1.3rem;
-}
-article .tabs dd a{
-	color:#aaa;
-	background-color: inherit;
-	padding: 0.5rem;
-	padding-left: 1rem;
-}
-article .tabs dd a:hover{
-	background-color: inherit;
-	color:#999;
-}
-article .tabs dd.active a{
-	color:#222;
-	background-color: inherit;
-}
-
-.tabs-content>.content{
-	padding-top: 0;
-}
-
-/* Default card */
-.card header{
-	margin-bottom: 0;
-}
-.card h4{
-	font-weight: bold;
-	font-size: 1rem;
-}
-.card p{
-	font-size: 0.9rem;
-}
-.card .th{
-	margin:20px auto;
-	width:80px;
-	height: 80px;
-	overflow: hidden;
-	display: none;
-}
-.gallery .card .th{
-	display: block;
-}
-.card .th:hover{
-	width: 150px;
-	height: 150px;
-}
-.card .th img{
-	width: 100%;
-}
-.card section{
-	background-color: #ddd;
-}
-.card .button{
-	opacity:0.1;
-}
-.card.create .button{
-	opacity:0.5;
-}
-.card>*:hover .button{
-	opacity:1;
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
-}
-/* Card icons */
-.card>*>i{
+    &>i{
 	position: absolute;
 	top: -12px;
 	right: 20px;
@@ -260,16 +178,126 @@ article .tabs dd.active a{
 	color:#eee;
 	opacity: 0.4;
 }
+}
+
+/* Create card */
+.create.card>*{
+	background-color: #999;
+	opacity:1;
+    
+    &:hover{
+	background-color: #008759;
+    }
+}
+
+.create.card{
+    h4{
+	color:white;
+}
+    .button{
+	border:1px solid #00ba7b;
+        opacity:0.5;
+}
+    label{
+	color:white;
+}
+    .switch label{
+	color:inherit;
+}
+   
+}
+
+/* Content Tabs */
+article .tabs{
+    i{
+	margin-right: 5px;
+	font-size: 1.3rem;
+}
+    dd.active a{
+	color:#222;
+	background-color: inherit;
+}
+dd a{
+	color:#aaa;
+	background-color: inherit;
+	padding: 0.5rem;
+	padding-left: 1rem;
+    &:hover{
+	background-color: inherit;
+	color:#999;
+}
+}
+}
+
+.tabs-content>.content{
+	padding-top: 0;
+}
+
+/* Default card */
+.card>:hover .label{
+	opacity:1;
+}
+.card{
+    
+header{
+	margin-bottom: 0;
+}
+    .label{
+	opacity:0.5;
+}
+h4{
+	font-weight: bold;
+	font-size: 1rem;
+}
+p{
+	font-size: 0.9rem;
+}
+.th{
+	margin:20px auto;
+	width:80px;
+	height: 80px;
+	overflow: hidden;
+	display: none;
+    &:hover{
+	width: 150px;
+	height: 150px;
+}
+    img{
+	width: 100%;
+}
+}
+    section{
+	background-color: #ddd;
+}
+    .button{
+	opacity:0.1;
+}
+    
+}
+
+.gallery .card .th{
+	display: block;
+}
+
+.card>*:hover .button{
+	opacity:1;
+	transition: opacity .5s ease-in ease-in;
+	-moz-transition: opacity .5s ease-in;
+	-webkit-transition: opacity .5s ease-in;
+	-o-transition: opacity .5s ease-in;
+}
+
 /* Inline label list */
 .label{
 	font-weight: bold;
 	color: orange;
 	background-color: inherit;border: 1px dotted orange;
 	display: inline-block;
-}
-.label:hover{
+    &:hover{
 	background-color: orange;
 	color:white;
+}
+
 }
 
 .label-list{
@@ -277,81 +305,61 @@ article .tabs dd.active a{
 	text-align: left;
 }
 
-.card .label{
-	opacity:0.5;
-}
-.card>:hover .label{
-	opacity:1;
-}
+
+
 
 /*************************** 2. Custom CSS overrides ***********************/
+
 main aside{
 	padding-top: 1rem;
-}
-
-main aside.fade{
+    &.fade{
 	opacity:0.8;
 }
+}
+
+
 aside>section{
 	margin:inherit!important;
 	margin-bottom:5px;
 	padding-bottom: 3rem;
-}
-
-aside>section>div{
+    &>div{
 	padding: 15px;
 }
-
-aside>section h3,aside>section h4,aside>section h5 {
-
 }
+
+
 aside .meta i{color: #ccc;}
 aside:hover .meta i{color: black;}
 
 main .button{
 	background-color:#008759 ;
-}
-main .button:hover{
+    &:hover{
 	background-color:#00ba7b ;
 }
+}
+
 
 /* Content area */
 article{
 	margin-top: 0.5rem;
 	padding-bottom: 4rem; 
 	background-color: white;
-}
-
-article header{
+    header{
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 1rem!important;
 }
-article footer{
+    footer{
 	border-top: 1px dotted #ddd;
 }
-article .breadcrumbs{
+    .breadcrumbs{
 	display: none;
 	background-color: #eee;
 }
-article nav{
-	
 }
 
-pre{
-	width:92%;
-	overflow: auto;
-	margin: 2rem 0;
-	border: 1px solid #eee;
-	border-left: 1rem solid #eee;
-	font: lighter 1.2rem/2rem Monaco;
-	background: url('/static/ndf/images/pre.png');
-	background-size:1px 4rem;
-	padding-left:0.5rem;
-	font-family: monospace;
-}
-article p{
 
-}
+
+
 textarea{
 	min-height: 6rem;
 }
@@ -448,3 +456,6 @@ input.node-title{
 #splash>img{
 	position: absolute;
 }
+
+/****************** CUSTOM *********************/
+
