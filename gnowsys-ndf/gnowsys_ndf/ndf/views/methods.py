@@ -392,7 +392,9 @@ def get_user_page(request,node):
           rev_no=rev_no[1].strip( '\t\n\r')
           rev_no=rev_no.strip(' ')
        if line.find('updated')!=-1:
-          if line.find(str(request.user))!=-1:
+          up_ind=line.find('updated')
+          print line.find(str(request.user),up_ind)
+          if line.find(str(request.user),up_ind) !=-1:
                rev_no=rev_no.strip(' ')
                node=history_manager.get_version_document(node,rev_no)
                proc1.kill()
@@ -414,11 +416,11 @@ and if he has published his contents then he would be shown the current publishe
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
-     if  ver2 != '1.1':                
-         
+     if  ver2 != '1.1':                           
 	    if node2 is not None:
-		
+		print "direct"
                 if node2.status == 'PUBLISHED':
+                  
 			if float(ver2) > float(ver1):			
 				return (node2,ver2)
 			elif float(ver2) < float(ver1):
@@ -428,15 +430,14 @@ and if he has published his contents then he would be shown the current publishe
 		elif node2.status == 'DRAFT':
                        #========== conditions for Group===============#
 
-                        if  node1.status == 'DRAFT' and node._type == "Group":
-			    #check to perform if the person has recently joined the group
+                        if   node._type == "Group":
+			    
 			    count=check_page_first_creation(request,node2)
                             if count == 1:
                                 return (node1,ver1)
                             elif count == 2:
-				return (node2,ver2)
-
-                            
+                               	return (node2,ver2)
+                        
                         return (node2,ver2)  
 	    else:
                         
@@ -444,11 +445,11 @@ and if he has published his contents then he would be shown the current publishe
 	    
      else:
          
-         if node._type == "GSystem" and node1.status == "DRAFT":
-              if node1.created_by ==request.user.id:
-                   return (node2,ver2)
-              else:
-		   return ('None','None')
+        # if node._type == "GSystem" and node1.status == "DRAFT":
+        #     if node1.created_by ==request.user.id:
+        #           return (node2,ver2)
+        #      else:
+	#	   return (node2,ver2)
          return (node1,ver1)
 	 
 def check_page_first_creation(request,node):

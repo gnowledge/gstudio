@@ -1,12 +1,45 @@
+/*
+*   _settings.scss - Metstudio responsive grid settings stylesheet using ZURB foundation
+*/
+
+
+//
+// THEME CONTROL SETTINGS
+//
+
+// Color Pallette
+$theme-color:#33C284;
+$theme-color-invert:scale-color($theme-color, $lightness: -90%);
+
+
 //
 // FOUNDATION SETTINGS
 //
 
-// This is the default html and body font-size for the base rem value.
-// $rem-base: 16px;
+// We use these as default colors throughout
+$primary-color: $theme-color;
+$secondary-color: rgb(220, 230, 223);
+// $alert-color: #f04124;
+// $success-color: #43AC6A;
+ $warning-color: #f2bf8a;
+// $info-color: #a0d3e8;
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Settings below are only for reference, copy the appropriate line to the top from components/foundation/_settings
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 // Allows the use of rem-calc() or lower-bound() in your settings
-@import "foundation/functions";
 
 // $experimental: true;
 
@@ -32,13 +65,14 @@
 // $include-xl-html-grid-classes: false;
 
 // $row-width: rem-calc(1000);
+$row-width: inherit;    //Expand to full browser width instead of 960px
 // $column-gutter: rem-calc(30);
-// $total-columns: 12;
+// $total-columns: 5;
 
 // We use these to control various global styles
 // $body-bg: #fff;
 // $body-font-color: #222;
-// $body-font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+ $body-font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
 // $body-font-style: normal;
 
@@ -144,7 +178,6 @@
 // We use these to style paragraphs
 // $paragraph-font-family: inherit;
 // $paragraph-font-weight: normal;
-// $paragraph-font-size: 1rem;
 // $paragraph-line-height: 1.6;
 // $paragraph-margin-bottom: rem-calc(20);
 // $paragraph-aside-font-size: rem-calc(14);
@@ -1123,21 +1156,20 @@
 // $include-html-top-bar-classes: $include-html-classes;
 
 // Background color for the top bar
-// $topbar-bg-color: #333;
+ $topbar-bg-color: $theme-color-invert;
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin
-// $topbar-height: 45px;
-// $topbar-margin-bottom: 0;
+// $topbar-height: inherit;
+// $topbar-margin-bottom: 5px;
 
 // Controlling the styles for the title in the top bar
 // $topbar-title-weight: normal;
 // $topbar-title-font-size: rem-calc(17);
 
 // Style the top bar dropdown elements
-// $topbar-dropdown-bg: #333;
 // $topbar-dropdown-link-color: #fff;
-// $topbar-dropdown-link-bg: #333;
+// $topbar-dropdown-link-bg: blue;
 // $topbar-dropdown-link-weight: normal;
 // $topbar-dropdown-toggle-size: 5px;
 // $topbar-dropdown-toggle-color: #fff;
@@ -1151,8 +1183,8 @@
 // $topbar-link-weight: normal;
 // $topbar-link-font-size: rem-calc(13);
 // $topbar-link-hover-lightness: -10%; // Darken by 10%
-// $topbar-link-bg-hover: #272727  ;
-// $topbar-link-bg-active: $primary-color;
+ $topbar-link-bg-hover: scale-color($theme-color-invert, $lightness: 20%);
+ $topbar-link-bg-active: scale-color($theme-color-invert, $lightness: 10%);
 // $topbar-link-bg-active-hover: scale-color($primary-color, $lightness: -14%);
 // $topbar-link-font-family: $body-font-family;
 
