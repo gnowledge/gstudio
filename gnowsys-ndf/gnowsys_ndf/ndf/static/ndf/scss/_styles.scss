@@ -5,9 +5,6 @@
 */
 @import url("css.css");
 
-html, body {
-			height: 100%;
-		}
 
 		nav h1 img{
             /* Logo */
@@ -21,6 +18,7 @@ html, body {
 		body>header{
             //Site header
 			position: relative;
+            padding-bottom: 10px;
 		}
 
 		.workspace{
@@ -37,9 +35,7 @@ html, body {
 			display:block;
 			height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
 		}
-            
 		}
-
 
 		body>footer{
             //Site footer
@@ -73,8 +69,6 @@ html, body {
 input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
 }
-
-
 
 /* Sections */
 
@@ -150,6 +144,11 @@ a#toggle-shelf i{
 }
 
 /* Card block */
+
+.medium-block-grid-2 > .card:first-child{
+    // First card
+    //width: 100%;
+}
 .card>*{
 	position: relative;
 	background-color: white;
@@ -239,32 +238,32 @@ dd a{
 }
 .card{
     
-header{
-	margin-bottom: 0;
-}
-    .label{
-	opacity:0.5;
-}
-h4{
-	font-weight: bold;
-	font-size: 1rem;
-}
-p{
-	font-size: 0.9rem;
-}
-.th{
-	margin:20px auto;
-	width:80px;
-	height: 80px;
-	overflow: hidden;
-	display: none;
-    &:hover{
-	width: 150px;
-	height: 150px;
-}
-    img{
-	width: 100%;
-}
+    header{
+        margin-bottom: 0;
+    }
+        .label{
+        opacity:0.5;
+    }
+    h4{
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    p{
+        font-size: 0.9rem;
+    }
+    .th{
+        margin:20px auto;
+        width:80px;
+        height: 80px;
+        overflow: hidden;
+        display: none;
+        &:hover{
+        width: 150px;
+        height: 150px;
+    }
+        img{
+        width: 100%;
+    }
 }
     section{
 	background-color: #ddd;
@@ -331,12 +330,7 @@ aside>section{
 aside .meta i{color: #ccc;}
 aside:hover .meta i{color: black;}
 
-main .button{
-	background-color:#008759 ;
-    &:hover{
-	background-color:#00ba7b ;
-}
-}
+
 
 
 /* Content area */

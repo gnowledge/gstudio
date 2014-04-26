@@ -1,13 +1,17 @@
 /*
-*   foundation-skin.scss - Customized foundation stylesheet
+*   foundation-skin.scss - Customized foundation stylesheet 
+*
+*   
 */
 
 //Imports
 //The order of files allows the sass variables to be set first and then foundation is built using these variables
 
+@import "metastudio/theme";     //Skin settings
 @import "settings";             //Foundation settings
-@import "skins/metastudio";     //Skin settings
+
 @import "foundation";           //Foundation grid framework
+@import "styles";          //Application styles
 
 
 /*
@@ -36,14 +40,16 @@ pre{
 	font-family: monospace;
 }
 
+
 .fixme{
-    opacity: 0.1;
+    // Use this class for any placeholder text to be replaced by variables by the developer
+    opacity: 0.5;
     &:hover{
         opacity:1;
         color:inherit;
         &:after{
-            content:" fixme and remove this class";
-            color:red;
+            content:" fixme";
+            color:orange;
         }
     }
 }
