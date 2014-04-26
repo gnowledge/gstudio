@@ -171,6 +171,7 @@ class Node(DjangoDocument):
         'content_org': unicode,
 
         'collection_set': [ObjectId],		# List of ObjectId's of different GTypes/GSystems
+        'property_order': [],
 
         'start_publication': datetime.datetime,
         'tags': [unicode],
