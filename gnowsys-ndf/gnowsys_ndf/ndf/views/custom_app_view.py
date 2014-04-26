@@ -93,6 +93,10 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         for tab_name, fields_order in property_order:
             display_fields = []
             for field, altname in fields_order:
+                if not system[field]:
+                    display_fields.append((altname, system[field]))
+                    continue
+
                 if system.structure[field] == bool:
                     display_fields.append((altname, ("Yes" if system[field] else "No")))
 
