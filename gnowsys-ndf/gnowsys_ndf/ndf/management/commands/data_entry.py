@@ -159,6 +159,8 @@ class Command(BaseCommand):
                 # for error in log_list:
                 #     print error
                 # print "\n"
+
+                log_list.append("\n ============================== End of Iteration ==============================\n")
             
                 log_file_name = gsystem_type_name + ".log"
                 log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
@@ -457,6 +459,81 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
     if node is None:
         try:
             node = collection.GSystem()
+
+            personal_details = []
+            address_details = []
+            details_12 = []
+            graduation_details = []
+            property_order = []
+
+            if gsystem_type_name in ["Student"]:
+                personal_details = [
+                    ("first_name", "First Name"), 
+                    ("middle_name", "Middle Name"), 
+                    ("last_name", "Last Name"),
+                    ("gender", "Gender"),
+                    ("dob", "Date of Birth"),
+                    ("religion", "Religion"),
+                    ("languages_known", "Languages Known"),
+                    ("mobile_number", "Contact Number (Mobile)"),
+                    ("alternate_number", "Alternate Number/Landline"),
+                    ("email_id", "Email ID")
+                ]
+
+            if gsystem_type_name in ["College", "University", "Student"]:
+                address_details = [
+                    ("house_street", "House No./Street Name"),
+                    ("village", "Village"),
+                    ("taluka", "Taluka"),
+                    ("town_city", "Town/City"),
+                    ("pin_code", "Pin Code")
+                ]
+            
+            if gsystem_type_name in ["Student"]:
+                details_12 = [
+                    ("student_has_domicile", "State/Union Territory of Domicile"),
+                    ("12_passing_year", "Year of Passing XII")
+                ]
+
+                graduation_details = [
+                    ("person_belongs_to_college", "College (Graduation)"),
+                    ("degree_name", "Course/Stream"),
+                    ("degree_year", "Year of Study"),
+                    ("college_enroll_num", "College Enrollment No./Roll No."),
+                    ("person_belongs_to_university", "University"),
+                    ("is_nss_registered", "Are you registered for NSS?"),
+                    ("is_dropout_student", "Are you a dropout student?")
+                ]
+
+            if gsystem_type_name in ["College", "University"]:
+                address_details.insert(4, ("organization_belongs_to_country", "Country"))
+                address_details.insert(4, ("organization_belongs_to_state", "State"))
+                address_details.insert(4, ("organization_belongs_to_district", "District"))
+
+                property_order = [
+                    ["Address", address_details]
+                ]
+
+            if gsystem_type_name in ["University"]:
+                affiliated_college_details = [
+                    ("affiliated_college", "Affiliated Colleges")
+                ]
+
+                property_order.append(["Affiliated Colleges", affiliated_college_details])
+
+            if gsystem_type_name in ["Student"]:
+                address_details.insert(4, ("person_belongs_to_country", "Country"))
+                address_details.insert(4, ("person_belongs_to_state", "State"))
+                address_details.insert(4, ("person_belongs_to_district", "District"))
+
+                property_order = [
+                    ["Personal", personal_details],
+                    ["Address", address_details],
+                    ["XII", details_12],
+                    ["Graduation", graduation_details]
+                ]
+
+            node.property_order = property_order
 
             # Save Node first with it's basic attribute fields
             for key in json_document.keys():
