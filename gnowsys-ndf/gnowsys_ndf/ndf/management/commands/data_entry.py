@@ -160,7 +160,7 @@ class Command(BaseCommand):
                 #     print error
                 # print "\n"
 
-                log_list.append("\n ============================== End of Iteration ==============================\n")
+                log_list.append("\n ============================================================ End of Iteration ============================================================\n")
             
                 log_file_name = gsystem_type_name + ".log"
                 log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
@@ -230,6 +230,9 @@ def parse_data_create_gsystem(json_file_path):
                     n_name += json_document["middle name"] + " "
                 n_name += json_document["last name"]
                 json_document["name"] = n_name
+
+            info_message = "\n ============ Start of "+gsystem_type_name+"'s GSystem ("+json_document['name']+") creation/updation ============\n"
+            log_list.append(info_message)
 
             parsed_json_document = {}
             attribute_relation_list = []
@@ -426,9 +429,6 @@ def parse_data_create_gsystem(json_file_path):
                                 break
 
 
-            info_message = "\n ============ End of "+gsystem_type_name+"'s GSystem ("+json_document['name']+") creation/updation ============\n"
-            log_list.append(info_message)
-
         except Exception as e:
             error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
             log_list.append(error_message)
@@ -522,6 +522,8 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                 property_order.append(["Affiliated Colleges", affiliated_college_details])
 
             if gsystem_type_name in ["Student"]:
+                personal_details.insert(6, ("student_of_caste_category", "Caste Category"))
+
                 address_details.insert(4, ("person_belongs_to_country", "Country"))
                 address_details.insert(4, ("person_belongs_to_state", "State"))
                 address_details.insert(4, ("person_belongs_to_district", "District"))
