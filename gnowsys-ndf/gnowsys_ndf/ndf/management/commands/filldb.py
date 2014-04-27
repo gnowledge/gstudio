@@ -297,8 +297,8 @@ for n in cur:
 # For delete the profile_pic as GST 
 profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_pic'})
 if profile_pic_obj:
-	profile_pic_obj.delete()
-	print "Deleted GST document of profile_pic"
+    profile_pic_obj.delete()
+    print "Deleted GST document of profile_pic"
 
 
 # For adding visited_location field (default value set as []) in User Groups.
@@ -334,11 +334,4 @@ try:
 
 except Exception as e:
     print str(e)
-
-
-# Adds "property_order" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
-collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'property_order': {'$exists': False}}, 
-                  {'$set': {'property_order': []}}, 
-                  upsert=False, multi=True
-)
 
