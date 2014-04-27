@@ -4,6 +4,14 @@
 
 {% block title %} {{ title }} {% endblock %}
 
+{% block head%}  
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+{% endblock%}
+
 {% block meta_content %}
 <ul class="side-nav"> 
   {% for each in app_collection_set %}
@@ -80,120 +88,303 @@
 
 {# template for showing apt_set_instance details #}
 {% if app_set_instance_template %}
-<a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id app_set_instance_id %}" class="button medium">Edit</a>
-<br/>
-  <div style="display:table;  border:1px;   border-spacing:15px; " class="small-6 columns">
+
+  {% if node.property_order|length > 0 %}
+
+  <!-- Consistent details-view -->
+  {% if user.is_authenticated %}
+  <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+  {% endif %}
+
+  <!-- Header of the page -->
+
+  <header class="row page">
+
+    <section class="medium-12 columns" >
+      <h2>
+	<span class='node'>{{node.name}}</span>
+	<small class="label-list"> 
+	  {% for tag in node.tags %}
+	  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+	  {% endfor %}
+	</small>      
+      </h2>
+
+      <dl class="row tabs" data-tab>
+	<dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+	
+	<dd>
+          <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+          <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+            <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+            <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+            <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+          </ul>
+	</dd>
+	
+	<dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+	
+	<dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+    </section>
+    
+  </header>
+
+
+  <div class="row">
+
+    <section class="medium-9 columns">
+      <div class="tabs-content">
+
+	<!-- Tab content -->
+	<dl class="row columns tabs" data-tab>
+	  {% for tab_name, display_fields in property_display_order %}
+	  <dd {% if forloop.first %}class="active"{% endif %}><a href="#panel_{{tab_name|cut:' '}}">{{tab_name}}</a></dd>
+	  {% endfor %}
+	</dl>
+	<div class="small-12 columns tabs-content">
+	  <br/>
+	  {% for tab_name, display_fields in property_display_order %}
+	  <div class="content {% if forloop.first %}active{% endif %}" id="panel_{{tab_name|cut:' '}}">
+	    {% for altname, value in display_fields %}
+	    <div class="row">
+	      <div class="small-4 columns">
+		<label>{{altname}}</label>
+	      </div>
+	      <div class="small-8 columns">
+		<p>{{value}}</p>
+	      </div>
+	    </div>
+	    {% endfor %}
+	  </div>
+	  {% endfor %}
+	</div>
+	  
+	<!-- Content for Concept Graph -->
+	<div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
+	  <a class="close-reveal-modal">&#215;</a>
+	  {% include "ndf/graph_concept.html" %}
+	</div>
+
+	<!-- Content for Collection Graph -->
+	<div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+	  <a class="close-reveal-modal">&#215;</a>
+	  {% include "ndf/graph_collection.html" %}
+	</div>
+
+	<!-- Content for dependency Graph -->
+	<div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+	  <a class="close-reveal-modal">&#215;</a>
+	  {% include "ndf/graph_dependency.html" %}
+	</div>
+      
+	<!-- Tab View Map Widget -->
+	<div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
+	  <a class="close-reveal-modal" >&#215;</a>
+	  {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
+	</div>
+
+      </div>
+    </section>
+
+    <section class="medium-3 columns">
+      <div class="panel">
+	<h3 class="subheader"></h3>
+	Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
+	<small>
+          <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+            {% for seq_no, version_no in node.version_dict.items reversed %}
+            <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+            {% endfor %}
+          </div>
+	</small>
+  
+	<!-- Button that converts collection into module-->
+	
+	{% if node.collection_set and user.is_authenticated%}
+	<a href="#" class="button" id="module"></i> <span>Make Module</a>
+	{% endif %}
+
+        {% if node %}
+          {% get_publish_policy request groupid node as group_policy %}
+          {% check_group node as is_group %}
+
+  	  {% if group_policy == "allow" %}
+  	    {% if is_group %} 
+            <div>
+	      <a class="button small" href="{% url 'publish_group'  group_id node %}"> Publish </a>
+	    </div>
+
+  	    {% else %}
+  	    <div>
+	      <a class="button small" href="{% url 'publish_page'  group_id node %}"> Publish </a>  
+	    </div>
+	    {% endif %}
+	  {% endif %}
+	{% endif %}
+
+	{% edit_policy groupid node request.user as status %}
+     
+	{% if status == "allow" %}
+	  {% get_edit_url node.pk as edit_url %}
+	  {% switch_group_conditions request.user group_id as switch_conditions %}
+	  {% check_group node as is_group %}
+
+	  {% get_user_object node.created_by as created_user %}
+
+	  {% if is_group %}
+            {% ifequal created_user request.user %}     
+	    <a href="{#% url edit_url node %#}" class="small button split edit">
+	      <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
+	    </a> 
+            {% endifequal %}
+
+	  {% else %}
+            {% if switch_conditions %}     
+	    <input type="button" id="switch_group" class="button small" value="Publish in group/s">
+	    <div id="mySystemtype" class="reveal-modal" data-reveal >
+	      <h2>Select Groups</h2>
+	      <div id="module_drawer" >
+		{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+	      </div>
+	      <a class="close-reveal-modal st">&#215;</a>
+	      <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
+		</div>
+	    {% endif %}
+
+	    <!-- <a href="{#% url edit_url groupid node %#}" class="small button split edit"> -->
+	    <a href="{% url 'GAPPS_set_instance_edit' groupid app_name app_id app_set_id app_set_instance_id %}" class="small button split edit">
+	      <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
+	    </a>
+
+	    <ul id="edit-options" class="f-dropdown">
+	      <li>
+		<a href="{% url 'page_create_edit' groupid %}">Create a new page</a>
+	      </li>
+	    </ul>
+
+	  {% endif %}    
+
+	{% endif %}
+
+      </div>
+    </section>
+
+  </div>
+
+  {% else %}
+  <!-- Previously existing details-view -->
+  <a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id app_set_instance_id %}" class="button medium">Edit</a>
+  <br/>
+  <div style="display:table; border:1px; border-spacing:15px; " class="small-6 columns">
     <div style="display:table-row;">
-      <div style="display:table-cell;"> 
-	<font size="3"> {{app_set_name}}'s Title</font> 
+      <div style="display:table-cell;">
+	<font size="3"> {{app_set_name}}'s Title</font>
       </div>
       <div style="display:table-cell;">
 	<font size="3">{{app_set_instance_name}}</font>
       </div>
     </div>
-  {% if app_set_instance_atlist %}
-  {% for at in app_set_instance_atlist %}
-     <div style="display:table-row;">
-       <div style="display:table-cell;"> 
-	 <font size="3"> {{at.type}} </font> 
-       </div>
-       <div style="display:table-cell;">
-	 <font size="3"> {{at.value}} </font>
-       </div>
-     </div>
-  {% endfor %}
-  {% endif %}
-  {% if app_set_instance_rtlist %}
-  {% for rt in app_set_instance_rtlist %}
-     <div style="display:table-row;">
-       <div style="display:table-cell;"> 
-	 <font size="3"> {{rt.type}} </font> 
-       </div>
-       <div style="display:table-cell;">
-	 <font size="3"> {{rt.value_name}} </font>
-       </div>
-     </div>
-  {% endfor %}
-  {% endif %}
-
-  <!-- for location/map widget : VIEW -->
-  <div style="display:table-row;">
-  
-    <div style="display:table-cell;"> 
-      <font size="3"> Location </font> 
+    {% if app_set_instance_atlist %}
+    {% for at in app_set_instance_atlist %}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> {{at.type}} </font>
+      </div>
+      <div style="display:table-cell;">
+	<font size="3"> {{at.value}} </font>
+      </div>
     </div>
-  
-    <div style="display:table-cell;">
-      <a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a>
+    {% endfor %}
+    {% endif %}
+    {% if app_set_instance_rtlist %}
+    {% for rt in app_set_instance_rtlist %}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> {{rt.type}} </font>
+      </div>
+      <div style="display:table-cell;">
+	<font size="3"> {{rt.value_name}} </font>
+      </div>
     </div>
-  
-  </div>
+    {% endfor %}
+    {% endif %}
 
+    <!-- for location/map widget : VIEW -->
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> Location </font>
+      </div>
+  
+      <div style="display:table-cell;">
+	<a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a>
+      </div>
+    </div>
 
     <!-- Overlay : Map VIEW Widget -->
-    <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
-      
+    <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
         <a class="close-reveal-modal" >&#215;</a>
         {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
-
     </div>
     <!-- END of Map Widget Overlay -->
 
-  <!-- END of location/map widget -->
-
-     {% if tags %}
-     <div style="display:table-row;">
-       <div style="display:table-cell;"> 
-	 <font size="3"> tags </font> 
-       </div>
-       <div style="display:table-cell;">
-	 <font size="3"> {{tags}} </font>
-       </div>
-     </div>
-     {% endif %}
-     {% if system_type == "File"%}
-     <div style="display:table-row;">
-       <div style="display:table-cell;"> 
-	 <font size="3"> Uploaded File </font> 
-       </div>
-       {% if mime_type %}
-       {% if "image" in mime_type %}
-       <a href = "{% url 'file_detail' groupid system_id %}">
-       <div style="display:table-cell;">
-	  <img  src="{% url 'getImageThumbnail' groupid system_id %}" />
-       </div>
-       </a>
-       {% elif "video" in mime_type %}
-       <a href = "{% url 'file_detail' groupid system_id %}">
-       <div style="display:table-cell;">
-	  <img  src="{% url 'getImageThumbnail' groupid system_id %}" />
-       </div>
-       </a>
-       {% else %}
-       <a href ="{% url 'file_detail' groupid system_id %}">
-       <div style="display:table-cell;">
-	  <font size="3">{{app_set_instance_name}}</font>
-       </div>
-       </a>
-       {% endif %}
-       {% endif %}
-     </div>
-     {% endif %}
-
-     {% if content %}
+    <!-- END of location/map widget -->
+    
+    {% if tags %}
     <div style="display:table-row;">
-       <div style="display:table-cell;"> 
-	 <font size="3"> content: </font>
-       </div>
+      <div style="display:table-cell;">
+	<font size="3"> tags </font>
+      </div>
+      <div style="display:table-cell;">
+	<font size="3"> {{tags}} </font>
+      </div>
+    </div>
+    {% endif %}
+    {% if system_type == "File"%}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> Uploaded File </font>
+      </div>
+      {% if mime_type %}
+      {% if "image" in mime_type %}
+      <a href = "{% url 'file_detail' groupid system_id %}">
+	<div style="display:table-cell;">
+	  <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+	</div>
+      </a>
+      {% elif "video" in mime_type %}
+      <a href = "{% url 'file_detail' groupid system_id %}">
+	<div style="display:table-cell;">
+	  <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+	</div>
+      </a>
+      {% else %}
+      <a href ="{% url 'file_detail' groupid system_id %}">
+	<div style="display:table-cell;">
+	  <font size="3">{{app_set_instance_name}}</font>
+	</div>
+      </a>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if content %}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> content: </font>
+      </div>
     </div>
     
     <div style="display:block">
-    {% with content|safe as description %}
-    {{ description }}
-    {% endwith %}
+      {% with content|safe as description %}
+      {{ description }}
+      {% endwith %}
     </div>
     {% endif %}
-  </div>    
+  </div>
+  
+  {% endif %}
+
 {% endif %}
 
 {# template for showing apt_set_instance new form #}
