@@ -336,3 +336,9 @@ except Exception as e:
     print str(e)
 
 
+# Adds "property_order" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
+collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'property_order': {'$exists': False}}, 
+                  {'$set': {'property_order': []}}, 
+                  upsert=False, multi=True
+)
+
