@@ -88,8 +88,10 @@
 
 {# template for showing apt_set_instance details #}
 {% if app_set_instance_template %}
-  <!-- Consistent-View -->
 
+  {% if node.property_order|length > 0 %}
+
+  <!-- Consistent details-view -->
   {% if user.is_authenticated %}
   <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
   {% endif %}
@@ -268,6 +270,120 @@
     </section>
 
   </div>
+
+  {% else %}
+  <!-- Previously existing details-view -->
+  <a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id app_set_instance_id %}" class="button medium">Edit</a>
+  <br/>
+  <div style="display:table; border:1px; border-spacing:15px; " class="small-6 columns">
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> {{app_set_name}}'s Title</font>
+      </div>
+      <div style="display:table-cell;">
+	<font size="3">{{app_set_instance_name}}</font>
+      </div>
+    </div>
+    {% if app_set_instance_atlist %}
+    {% for at in app_set_instance_atlist %}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> {{at.type}} </font>
+      </div>
+      <div style="display:table-cell;">
+	<font size="3"> {{at.value}} </font>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if app_set_instance_rtlist %}
+    {% for rt in app_set_instance_rtlist %}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> {{rt.type}} </font>
+      </div>
+      <div style="display:table-cell;">
+	<font size="3"> {{rt.value_name}} </font>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- for location/map widget : VIEW -->
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> Location </font>
+      </div>
+  
+      <div style="display:table-cell;">
+	<a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a>
+      </div>
+    </div>
+
+    <!-- Overlay : Map VIEW Widget -->
+    <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
+        <a class="close-reveal-modal" >&#215;</a>
+        {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
+    </div>
+    <!-- END of Map Widget Overlay -->
+
+    <!-- END of location/map widget -->
+    
+    {% if tags %}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> tags </font>
+      </div>
+      <div style="display:table-cell;">
+	<font size="3"> {{tags}} </font>
+      </div>
+    </div>
+    {% endif %}
+    {% if system_type == "File"%}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> Uploaded File </font>
+      </div>
+      {% if mime_type %}
+      {% if "image" in mime_type %}
+      <a href = "{% url 'file_detail' groupid system_id %}">
+	<div style="display:table-cell;">
+	  <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+	</div>
+      </a>
+      {% elif "video" in mime_type %}
+      <a href = "{% url 'file_detail' groupid system_id %}">
+	<div style="display:table-cell;">
+	  <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+	</div>
+      </a>
+      {% else %}
+      <a href ="{% url 'file_detail' groupid system_id %}">
+	<div style="display:table-cell;">
+	  <font size="3">{{app_set_instance_name}}</font>
+	</div>
+      </a>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if content %}
+    <div style="display:table-row;">
+      <div style="display:table-cell;">
+	<font size="3"> content: </font>
+      </div>
+    </div>
+    
+    <div style="display:block">
+      {% with content|safe as description %}
+      {{ description }}
+      {% endwith %}
+    </div>
+    {% endif %}
+  </div>
+  
+  {% endif %}
 
 {% endif %}
 
