@@ -46,7 +46,11 @@
 	<i class='fi-graph-bar'></i>
 	{% endif %}
 
-	{{app_dict.name|title}}</a>
+	{% if app_dict.altname == None %}
+		{{app_dict.name|title}}</a>
+	{% else %}
+		{{app_dict.altname}}</a>
+	{% endif %}
 
 </li>
 

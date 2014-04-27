@@ -785,7 +785,7 @@ def get_visited_location(request, group_id):
 @login_required
 def get_online_editing_user(request, group_id):
     '''
-    get user who online editing org editor
+    get user who is currently online and editing the node
     '''
     if request.is_ajax() and request.method =="POST":
         editorid = request.POST.get('editorid',"")
