@@ -86,13 +86,13 @@ class Command(BaseCommand):
 
                     if is_json_file_exists:
                         # Process json file and create required SystemTypes, RelationTypes, and AttributeTypes
-                        print "\n Do processing json file task..."
+                        print "\n Task initiated: Processing json-file...\n"
 
                         parse_data_create_gtype(file_path)
                     
                         # End of processing json file
 
-                    print "\n Done everything...\n"
+                    print "\n Task finised: Successfully processed json-file.\n"
 
                     # End of creation of respective Types for Enrollment
 

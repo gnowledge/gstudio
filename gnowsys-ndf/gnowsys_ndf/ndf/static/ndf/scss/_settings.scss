@@ -1,5 +1,5 @@
 /*
-*   _settings.scss - Metstudio responsive grid settings stylesheet using ZURB foundation
+*   _settings.scss - Metstudio style variables settings file
 */
 
 
@@ -8,7 +8,7 @@
 //
 
 // Color Pallette
-$theme-color:#33C284;
+$theme-color:#33C284 !default;
 $theme-color-invert:scale-color($theme-color, $lightness: -90%);
 
 
@@ -23,12 +23,6 @@ $secondary-color: rgb(220, 230, 223);
 // $success-color: #43AC6A;
  $warning-color: #f2bf8a;
 // $info-color: #a0d3e8;
-
-
-
-
-
-
 
 
 
@@ -1184,7 +1178,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $topbar-link-font-size: rem-calc(13);
 // $topbar-link-hover-lightness: -10%; // Darken by 10%
  $topbar-link-bg-hover: scale-color($theme-color-invert, $lightness: 20%);
- $topbar-link-bg-active: scale-color($theme-color-invert, $lightness: 10%);
+ $topbar-link-bg-active: $theme-color;
 // $topbar-link-bg-active-hover: scale-color($primary-color, $lightness: -14%);
 // $topbar-link-font-family: $body-font-family;
 

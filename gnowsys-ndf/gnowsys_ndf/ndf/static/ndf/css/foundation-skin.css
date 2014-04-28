@@ -1,13 +1,16 @@
 /*
-*   foundation-skin.scss - Customized foundation stylesheet
-*/
-/*
-*   _settings.scss - Metstudio responsive grid settings stylesheet using ZURB foundation
+*   foundation-skin.scss - Customized foundation stylesheet 
+*
+*   
 */
 /*
 *   Metstudio Default Skin File
 */
 /*  Colors  */
+/*
+*   _settings.scss - Metstudio style variables settings file
+*/
+@import url("css.css");
 /* line 260, ../components/foundation/scss/foundation/components/_global.scss */
 meta.foundation-version {
   font-family: "/5.2.2/";
@@ -6090,7 +6093,7 @@ meta.foundation-mq-topbar {
 }
 /* line 343, ../components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li.active > a {
-  background: #0f3a27;
+  background: #33c284;
   color: white;
 }
 /* line 346, ../components/foundation/scss/foundation/components/_top-bar.scss */
@@ -6287,7 +6290,7 @@ meta.foundation-mq-topbar {
     padding: 0 15px;
     line-height: 45px;
     color: white;
-    background: #0f3a27;
+    background: #33c284;
   }
   /* line 494, ../components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.active:not(.has-form) a:not(.button):hover {
@@ -6417,7 +6420,7 @@ meta.foundation-mq-topbar {
   }
   /* line 624, ../components/foundation/scss/foundation/components/_top-bar.scss */
   .no-js .top-bar-section ul li:active > a {
-    background: #0f3a27;
+    background: #33c284;
     color: white;
   }
   /* line 632, ../components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7802,9 +7805,523 @@ th.hide-for-touch {
 }
 
 /*
+*   application.scss - Metstudio app layout stylsheet
+*
+*   Use this stylesheet for placements, positioning and sizing of elements
+*/
+/* line 9, ../scss/_styles.scss */
+nav h1 img {
+  /* Logo */
+  height: 1.8rem;
+  margin-right: 5px;
+}
+
+/* line 14, ../scss/_styles.scss */
+nav h1 a {
+  color: white !important;
+}
+
+/* line 18, ../scss/_styles.scss */
+body > header {
+  position: relative;
+  padding-bottom: 10px;
+}
+
+/* line 24, ../scss/_styles.scss */
+.workspace {
+  min-height: 100%;
+  margin-bottom: -130px !important;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* line 32, ../scss/_styles.scss */
+.workspace:after {
+  content: "";
+  display: block;
+  height: 130px;
+}
+
+/* line 40, ../scss/_styles.scss */
+body > footer {
+  border-top: 2px dotted #ccc;
+  padding: 20px 0;
+  position: relative;
+  margin: 0 2rem;
+  color: #888;
+}
+/* line 48, ../scss/_styles.scss */
+body > footer a {
+  color: #777;
+}
+
+/* line 54, ../scss/_styles.scss */
+.coll-arrows {
+  cursor: pointer;
+  display: block;
+  padding: 0.5rem;
+}
+/* line 59, ../scss/_styles.scss */
+.coll-arrows:hover {
+  background-color: #D3D3D3;
+}
+
+/*************************** 1. Foundation CSS overrides ***********************/
+/* Foundation hacks */
+/* line 69, ../scss/_styles.scss */
+input[type="checkbox"] + label, input[type="radio"] + label {
+  margin: inherit !important;
+}
+
+/* Sections */
+/* line 76, ../scss/_styles.scss */
+main > aside {
+  margin-bottom: 0.5rem;
+}
+
+/* line 79, ../scss/_styles.scss */
+main > aside header {
+  margin-top: 1rem;
+}
+
+/* line 82, ../scss/_styles.scss */
+main > aside a {
+  color: #008759;
+}
+
+/* line 85, ../scss/_styles.scss */
+main > aside a:hover {
+  color: inherit;
+}
+
+/* line 89, ../scss/_styles.scss */
+h2:not(.subheader) {
+  color: #222;
+  font-family: "Georgia Serif", Serif;
+  margin: 0;
+}
+
+/* line 94, ../scss/_styles.scss */
+h3 {
+  font-size: 1.4rem;
+}
+
+/* line 98, ../scss/_styles.scss */
+p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Off canvas navigation */
+/* line 103, ../scss/_styles.scss */
+aside.left-off-canvas-menu {
+  background-color: #222;
+  color: white;
+}
+
+/* line 107, ../scss/_styles.scss */
+a#toggle-shelf {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: black;
+  z-index: 10;
+}
+
+/* line 114, ../scss/_styles.scss */
+a#toggle-shelf:hover {
+  color: black;
+}
+
+/* line 117, ../scss/_styles.scss */
+a#toggle-shelf i {
+  font-size: 30px;
+}
+
+/* line 121, ../scss/_styles.scss */
+.inner-wrap > aside h4 {
+  color: white;
+  padding: 10px;
+}
+
+/* Should be in Foundation */
+/* Effects */
+/* line 131, ../scss/_styles.scss */
+.drop-shadow {
+  -webkit-box-shadow: 2px 2px 4px 1px #333;
+  box-shadow: 2px 2px 4px 1px #333;
+}
+
+/* line 135, ../scss/_styles.scss */
+.rounded {
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+}
+
+/* line 139, ../scss/_styles.scss */
+.transition-opacity {
+  transition: opacity .3s ease;
+  -moz-transition: opacity .3s ease;
+  -webkit-transition: opacity .3s ease;
+  -o-transition: opacity .3s ease;
+}
+
+/* Card block */
+/* line 152, ../scss/_styles.scss */
+.card > * {
+  position: relative;
+  background-color: white;
+  margin: 2px;
+  padding: 10px;
+  border: 1px solid #eaeaea;
+  display: block;
+  color: inherit !important;
+  -webkit-box-shadow: 2px 2px 4px 1px #ddd;
+  box-shadow: 2px 2px 4px 1px #ddd;
+  opacity: 0.8;
+  transition: opacity .5s ease-in ease-in;
+  -moz-transition: opacity .5s ease-in;
+  -webkit-transition: opacity .5s ease-in;
+  -o-transition: opacity .5s ease-in;
+}
+/* line 168, ../scss/_styles.scss */
+.card > *:hover {
+  border: 1px solid #ddd;
+  opacity: 1;
+}
+/* line 172, ../scss/_styles.scss */
+.card > * > i {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  font-size: 4rem;
+  color: #eee;
+  opacity: 0.4;
+}
+
+/* Create card */
+/* line 183, ../scss/_styles.scss */
+.create.card > * {
+  background-color: #999;
+  opacity: 1;
+}
+/* line 187, ../scss/_styles.scss */
+.create.card > *:hover {
+  background-color: #008759;
+}
+
+/* line 193, ../scss/_styles.scss */
+.create.card h4 {
+  color: white;
+}
+/* line 196, ../scss/_styles.scss */
+.create.card .button {
+  border: 1px solid #00ba7b;
+  opacity: 0.5;
+}
+/* line 200, ../scss/_styles.scss */
+.create.card label {
+  color: white;
+}
+/* line 203, ../scss/_styles.scss */
+.create.card .switch label {
+  color: inherit;
+}
+
+/* Content Tabs */
+/* line 211, ../scss/_styles.scss */
+article .tabs i {
+  margin-right: 5px;
+  font-size: 1.3rem;
+}
+/* line 215, ../scss/_styles.scss */
+article .tabs dd.active a {
+  color: #222;
+  background-color: inherit;
+}
+/* line 219, ../scss/_styles.scss */
+article .tabs dd a {
+  color: #aaa;
+  background-color: inherit;
+  padding: 0.5rem;
+  padding-left: 1rem;
+}
+/* line 224, ../scss/_styles.scss */
+article .tabs dd a:hover {
+  background-color: inherit;
+  color: #999;
+}
+
+/* line 231, ../scss/_styles.scss */
+.tabs-content > .content {
+  padding-top: 0;
+}
+
+/* Default card */
+/* line 236, ../scss/_styles.scss */
+.card > :hover .label {
+  opacity: 1;
+}
+
+/* line 241, ../scss/_styles.scss */
+.card header {
+  margin-bottom: 0;
+}
+/* line 244, ../scss/_styles.scss */
+.card .label {
+  opacity: 0.5;
+}
+/* line 247, ../scss/_styles.scss */
+.card h4 {
+  font-weight: bold;
+  font-size: 1rem;
+}
+/* line 251, ../scss/_styles.scss */
+.card p {
+  font-size: 0.9rem;
+}
+/* line 254, ../scss/_styles.scss */
+.card .th {
+  margin: 20px auto;
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  display: none;
+}
+/* line 260, ../scss/_styles.scss */
+.card .th:hover {
+  width: 150px;
+  height: 150px;
+}
+/* line 264, ../scss/_styles.scss */
+.card .th img {
+  width: 100%;
+}
+/* line 268, ../scss/_styles.scss */
+.card section {
+  background-color: #ddd;
+}
+/* line 271, ../scss/_styles.scss */
+.card .button {
+  opacity: 0.1;
+}
+
+/* line 277, ../scss/_styles.scss */
+.gallery .card .th {
+  display: block;
+}
+
+/* line 281, ../scss/_styles.scss */
+.card > *:hover .button {
+  opacity: 1;
+  transition: opacity .5s ease-in ease-in;
+  -moz-transition: opacity .5s ease-in;
+  -webkit-transition: opacity .5s ease-in;
+  -o-transition: opacity .5s ease-in;
+}
+
+/* Inline label list */
+/* line 290, ../scss/_styles.scss */
+.label {
+  font-weight: bold;
+  color: orange;
+  background-color: inherit;
+  border: 1px dotted orange;
+  display: inline-block;
+}
+/* line 295, ../scss/_styles.scss */
+.label:hover {
+  background-color: orange;
+  color: white;
+}
+
+/* line 302, ../scss/_styles.scss */
+.label-list {
+  display: inline-block;
+  text-align: left;
+}
+
+/*************************** 2. Custom CSS overrides ***********************/
+/* line 312, ../scss/_styles.scss */
+main aside {
+  padding-top: 1rem;
+}
+/* line 314, ../scss/_styles.scss */
+main aside.fade {
+  opacity: 0.8;
+}
+
+/* line 320, ../scss/_styles.scss */
+aside > section {
+  margin: inherit !important;
+  margin-bottom: 5px;
+  padding-bottom: 3rem;
+}
+/* line 324, ../scss/_styles.scss */
+aside > section > div {
+  padding: 15px;
+}
+
+/* line 330, ../scss/_styles.scss */
+aside .meta i {
+  color: #ccc;
+}
+
+/* line 331, ../scss/_styles.scss */
+aside:hover .meta i {
+  color: black;
+}
+
+/* Content area */
+/* line 337, ../scss/_styles.scss */
+article {
+  margin-top: 0.5rem;
+  padding-bottom: 4rem;
+  background-color: white;
+}
+/* line 341, ../scss/_styles.scss */
+article header {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 1rem !important;
+}
+/* line 345, ../scss/_styles.scss */
+article footer {
+  border-top: 1px dotted #ddd;
+}
+/* line 348, ../scss/_styles.scss */
+article .breadcrumbs {
+  display: none;
+  background-color: #eee;
+}
+
+/* line 357, ../scss/_styles.scss */
+textarea {
+  min-height: 6rem;
+}
+
+/*
+.orgitdown textarea{
+	min-height: 15rem!important;
+}
+#content{
+	min-height: 10rem;
+
+}
+*/
+/* line 369, ../scss/_styles.scss */
+#content > p:first-of-type {
+  font-size: 120%;
+  line-height: 1.4;
+  color: #222;
+}
+
+/*************************** 3. Custom CSS Below ***********************/
+/* line 376, ../scss/_styles.scss */
+.user {
+  color: inherit;
+}
+
+/* line 379, ../scss/_styles.scss */
+.user {
+  color: inherit;
+}
+
+/* line 382, ../scss/_styles.scss */
+.user i {
+  padding: 0.2em 0.5em;
+  margin-right: 0.4em;
+  color: white;
+  background-color: #ddd;
+  opacity: 0.8;
+}
+
+/* line 389, ../scss/_styles.scss */
+.user:hover i {
+  opacity: 1;
+}
+
+/* line 393, ../scss/_styles.scss */
+a.node {
+  display: block;
+}
+
+/* line 397, ../scss/_styles.scss */
+a.app {
+  overflow: hidden;
+}
+
+/* line 400, ../scss/_styles.scss */
+a.app i {
+  font-size: 15px;
+  color: white;
+  margin-right: 8px;
+}
+
+/* line 405, ../scss/_styles.scss */
+.button.edit {
+  margin-bottom: 0;
+}
+
+/* Sidebar Search Results */
+/* line 410, ../scss/_styles.scss */
+main .search {
+  margin: 0;
+}
+
+/* line 413, ../scss/_styles.scss */
+main .search div > * {
+  margin: 0;
+}
+
+/* line 416, ../scss/_styles.scss */
+#search-results {
+  list-style: none;
+  margin: 0;
+}
+
+/* line 423, ../scss/_styles.scss */
+#search-results a {
+  background-color: black;
+  padding: 0.5rem;
+  display: block;
+}
+
+/* line 428, ../scss/_styles.scss */
+#search-results a:hover {
+  background-color: #444;
+}
+
+/************ Forms **************/
+/* Node edit */
+/* line 435, ../scss/_styles.scss */
+input.node-title {
+  font-size: 3rem;
+  height: 4rem;
+  display: inline-block;
+}
+
+/* view-graph in node_details_base.html */
+/* line 442, ../scss/_styles.scss */
+.graph-height {
+  height: 70%;
+}
+
+/* Splash Page */
+/* line 447, ../scss/_styles.scss */
+#splash {
+  background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
+}
+
+/* line 450, ../scss/_styles.scss */
+#splash > img {
+  position: absolute;
+}
+
+/****************** CUSTOM *********************/
+/*
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
-/* line 17, ../scss/foundation-skin.scss */
+/* line 21, ../scss/foundation-skin.scss */
 nav.top-bar {
   height: inherit;
 }
@@ -7812,7 +8329,7 @@ nav.top-bar {
 /*
 *   Foundation extensions
 */
-/* line 26, ../scss/foundation-skin.scss */
+/* line 30, ../scss/foundation-skin.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -7826,17 +8343,17 @@ pre {
   font-family: monospace;
 }
 
-/* line 39, ../scss/foundation-skin.scss */
+/* line 44, ../scss/foundation-skin.scss */
 .fixme {
-  opacity: 0.1;
+  opacity: 0.5;
 }
-/* line 41, ../scss/foundation-skin.scss */
+/* line 47, ../scss/foundation-skin.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 44, ../scss/foundation-skin.scss */
+/* line 50, ../scss/foundation-skin.scss */
 .fixme:hover:after {
-  content: " fixme and remove this class";
-  color: red;
+  content: " fixme";
+  color: orange;
 }
