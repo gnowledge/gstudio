@@ -1,6 +1,12 @@
 #+TITLE: Feature list of gStudio 
 
+GNOWSYS-studio (gstudio for short) is a feature rich online
+collaborative application/resource creation, curation and publication
+framework. The following is a list of such features with breif
+description of what is expected from each feature.
+
 * Pages
+  A base App
 ** Collaboratively edit pages
 ** text processing using orgmode (JS plain text editor with orgmode menu)
 ** support for LaTeX using MathJax
@@ -110,6 +116,8 @@
 ** Observations app
 * Extra feathers to be added to the cap of gstudio!
 ** Audio, video meetings
+** Badges
+** Multi-lingual dictionary/thesaurus wordnet 
 ** Text annotation and analysis
 ** Integrating with other popularly used applications
 *** gnu mailman (mailing list) integration

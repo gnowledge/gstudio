@@ -126,9 +126,6 @@ $(document).ready(function()
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
 
-
-<p>You can subscribe registered members to this group</p>
-
 {% include "ndf/invite_users.html" %}   
 
 <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
