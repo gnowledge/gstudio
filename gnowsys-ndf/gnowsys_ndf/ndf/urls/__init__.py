@@ -9,7 +9,7 @@ from registration.backends.default.views import RegistrationView
 from gnowsys_ndf.ndf.forms import *
 from gnowsys_ndf.ndf.views.home import HomeRedirectView, homepage
 from gnowsys_ndf.ndf.views.methods import tag_info
-from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view
+from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_new_view, custom_app_create_edit
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -46,8 +46,10 @@ urlpatterns = patterns('',
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', custom_app_view, name='GAPPS'),       
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', custom_app_view, name='GAPPS_set'),
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)$', custom_app_view, name='GAPPS_set_instance'),
+    url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)/edit/$', custom_app_create_edit, name='custom_app_create_edit'),
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)/edit/$', custom_app_new_view, name='GAPPS_set_instance_edit'),
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/new/$', custom_app_new_view, name='GAPPS_set_new_instance'),
+
    # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),

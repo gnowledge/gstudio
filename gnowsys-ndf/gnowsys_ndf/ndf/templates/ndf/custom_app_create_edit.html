@@ -1,0 +1,76 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block head%}  
+{% endblock%}
+
+{% block meta_content %}
+<ul class="side-nav"> 
+  {% for each in app_collection_set %}
+    {% get_memberof_objects_count each.id groupid as count %}
+    {% ifequal each.id app_set_id %}
+    <li class="active"> 
+      <div>
+	<a href="{% url 'GAPPS_set_new_instance' groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+	<a href="{% url 'GAPPS_set' groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+      </div>
+    </li>
+    {% else %}
+    <li> 
+      <div>
+	<a href="{% url 'GAPPS_set_new_instance' groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+	<a href="{% url 'GAPPS_set' groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+      </div>
+    </li>
+    {% endifequal %}
+  {% endfor %}
+</ul>
+{% endblock %}
+
+{% block body_content %}
+
+<form data-abide id="form-edit-app" method="POST" action="">
+  {% csrf_token %}
+
+  <header class="row">
+    <h2 class="medium-12 columns">
+      {% if node %}
+        Editing {{title}}
+      {% else %}
+        Create a New {{title}}
+      {% endif %}
+    </h2>
+    
+    <nav class="medium-12 columns">
+      <dl class="tabs" data-tab>
+	{% for tab_name, display_fields in property_display_order %}
+	  <dd {% if forloop.first %}class="active"{% endif %}><a href="#panel_{{tab_name|cut:' '}}">{{tab_name}}</a></dd>
+	{% endfor %}
+      </dl>
+    </nav>
+  </header>
+
+  <div id="app-instance-edit-div" class="tabs-content" > 
+    <br/>
+    {% for tab_name, display_fields in property_display_order %}
+    <div class="content {% if forloop.first %}active{% endif %}" id="panel_{{tab_name|cut:' '}}">
+      {% for altname, value in display_fields %}
+      <div class="row">
+	<div class="small-4 columns">
+	  <label>{{altname}}</label>
+	</div>
+	<div class="small-8 columns">
+	  <p>{{value}}</p>
+	</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+</form>
+
+{% endblock %}
