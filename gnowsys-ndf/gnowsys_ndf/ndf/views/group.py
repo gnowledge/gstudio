@@ -39,6 +39,8 @@ gst_group = gst_collection.GSystemType.one({'name': GAPPS[2]})
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
 get_all_usergroups=get_all_user_groups()
+at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+
 #######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
 #######################################################################################################################################
@@ -260,6 +262,19 @@ def edit_group(request,group_id):
                                       context_instance=RequestContext(request)
                                       )
 
+def app_selection(request,group_id,node_id):
+    try:
+        grp=collection.Node.one({"_id":ObjectId(group_id)})
+        if not at_apps_list:
+            HttpResponse("failure")
+        poss_atts=grp.get_possible_attributes(at_apps_list._id)
+        list_apps=poss_atts['apps_list']['object_value']
+        st = collection.Node.find({'type':'Group'})
+        data_list=set_drawer_widget(st,list_apps)
+        return HttpResponse(json.dumps(data_list))
+    except Exception as e:
+        print "Error in app_selection "+str(e)
+     
 
 def switch_group(request,group_id,node_id):
     try:
