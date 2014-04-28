@@ -54,7 +54,7 @@ def page(request, group_id, app_id=None):
     con=[]
     group_object=collection.Group.one({'_id':ObjectId(group_id)})
     if request.method == "POST":
-        # Written for implementing search-functionality
+	#Page search view
         title = gst_page.name
         
         search_field = request.POST['search_field']
@@ -75,6 +75,7 @@ def page(request, group_id, app_id=None):
         )
 
     elif gst_page._id == ObjectId(app_id):
+        #Page List view 
         #code for moderated Groups
         # collection.Node.reload()
         group_type = collection.Node.one({'_id':ObjectId(group_id)})
@@ -125,20 +126,22 @@ def page(request, group_id, app_id=None):
                                            'group_set': {'$all': [ObjectId(group_id)]},
                                            'status': {'$nin': ['HIDDEN']}
                                        })
-	      for nodes in page_nodes:
-		node,ver=get_page(request,nodes)
-                if node != 'None':
-                	content.append(node)	
-              #page_nodes.sort('last_update', -1)
+	      page_nodes.sort('last_update', -1)		
+	      #for nodes in page_nodes:
+	      #	node,ver=get_page(request,nodes)
+              #  if node != 'None':
+              #  	content.append(node)	
+              
               page_nodes_count = page_nodes.count()
-
+              
               return render_to_response("ndf/page_list.html",
                                   {
-                                   'page_nodes':content,'groupid':group_id,'page_nodes_count':  page_nodes_count,'group_id':group_id
+                                   'page_nodes':page_nodes,'groupid':group_id,'page_nodes_count':  page_nodes_count,'group_id':group_id
                                   },
                                   context_instance=RequestContext(request))
         
     else:
+        #Page Single instance view
         Group_node = collection.Node.one({"_id": ObjectId(group_id)})                
        
         if  Group_node.prior_node: 
@@ -146,7 +149,7 @@ def page(request, group_id, app_id=None):
             
         else:
           node = collection.Node.one({"_id":ObjectId(app_id)})
-          if Group_node.edit_policy == "EDITABLE_NON_MODERATED":
+          if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None or Group_node.edit_policy == "NON_EDITABLE":
             page_node,ver=get_page(request,node)
           else:
              #else part is kept for time being until all the groups are implemented
@@ -237,7 +240,6 @@ def create_edit_page(request, group_id, node_id=None):
         else:
             context_variables['nodes_list'] = json.dumps(nodes_list)
 
-        print "would get out of the page  "
         return render_to_response("ndf/page_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -250,9 +252,7 @@ def delete_page(request, group_id, node_id):
     Just hide the page from users!
     """
 
-    print "\n node: ", type(node_id), "\n"
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
-    print " op: ", op, "\n"
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
 
@@ -442,7 +442,7 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         return ""
         
 def publish_page(request,group_id,node):
-     
+  print "getting in tite"   
   node=collection.Node.one({'_id':ObjectId(node)})
   page_node,v=get_page(request,node)
   node.content = page_node.content
@@ -455,3 +455,9 @@ def publish_page(request,group_id,node):
    # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
 
   return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
+
+  
+  
+  
+  
+  

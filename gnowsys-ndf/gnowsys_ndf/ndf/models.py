@@ -171,6 +171,7 @@ class Node(DjangoDocument):
         'content_org': unicode,
 
         'collection_set': [ObjectId],		# List of ObjectId's of different GTypes/GSystems
+        'property_order': [],                   # Determines the order & grouping in which attribute(s)/relation(s) displayed on form
 
         'start_publication': datetime.datetime,
         'tags': [unicode],
@@ -498,7 +499,7 @@ class Node(DjangoDocument):
               'altnames': Value of RelationType node's altnames field,
               'object_type': Value of RelationType node's object_type field,
               'inverse_name': Value of RelationType node's inverse_name field,
-              'right_subject': Value of GRelation node's right_subject field
+              'right_subject_list': List of Value(s) of GRelation node's right_subject field
           }
         }
         
@@ -550,6 +551,22 @@ class Node(DjangoDocument):
                     RelationType.append_relation(rel_type, possible_relations)
 
         return possible_relations
+
+
+    def get_neighbourhood(self, member_of):
+        """Attaches attributes and relations of the node to itself;
+        i.e. key's types to it's structure and key's values to itself 
+        """
+
+        attributes = self.get_possible_attributes(member_of)
+        for key, value in attributes.iteritems():
+            self.structure[key] = value['data_type']
+            self[key] = value['object_value']
+
+        relations = self.get_possible_relations(member_of)
+        for key, value in relations.iteritems():
+            self.structure[key] = value['object_type']
+            self[key] = value['right_subject_list']
 
 
 @connection.register
@@ -745,7 +762,7 @@ class RelationType(Node):
               'altnames': Value of RelationType node's altnames field,
               'object_type': Value of RelationType node's object_type field,
               'inverse_name': Value of RelationType node's inverse_name field,
-              'right_subject': Value of GRelation node's right_subject field
+              'right_subject_list': List of Value(s) of GRelation node's right_subject field
           }
         }
         """

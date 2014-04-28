@@ -463,6 +463,8 @@ def get_module_json(request, group_id):
     data = walk(node.module_set)
     return HttpResponse(json.dumps(data))
 
+
+
 # ------------- For generating graph json data ------------
 def graph_nodes(request, group_id):
 
@@ -548,6 +550,7 @@ def graph_nodes(request, group_id):
         #     i += 1
 
         # else:
+
         for each in value:
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)
@@ -580,7 +583,7 @@ def graph_nodes(request, group_id):
           i += 1 
       
       else:
-        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_metadata += '{"screen_name":"' + value + '", "_id":"'+ str(i) +'_n"},'
         node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
         i += 1 
     # End of if - else
@@ -596,6 +599,8 @@ def graph_nodes(request, group_id):
   return StreamingHttpResponse(node_graph_data)
 
 # ------ End of processing for graph ------
+
+
 
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []
@@ -780,7 +785,7 @@ def get_visited_location(request, group_id):
 @login_required
 def get_online_editing_user(request, group_id):
     '''
-    get user who online editing org editor
+    get user who is currently online and editing the node
     '''
     if request.is_ajax() and request.method =="POST":
         editorid = request.POST.get('editorid',"")
