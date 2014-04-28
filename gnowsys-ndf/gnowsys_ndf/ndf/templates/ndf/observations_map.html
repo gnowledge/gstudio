@@ -13,6 +13,11 @@
 	<script src="/static/ndf/leaflet/leaflet.awesome-markers.js"></script>
 	
 	<!-- <link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.css"> -->
+	
+	<script src="/static/ndf/js/jquery-ui.js"></script>
+	<script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
+	<script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
+	
 
 {% endblock %}
 
@@ -32,15 +37,48 @@
 		
 		.popup-content:focus {	background-color: #FFFFE0; border-color: buttonface; border-style: dashed; margin-bottom: 0.5em; padding: 0.25em; }		
 
+		.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+		.ui-timepicker-div dl { text-align: left; }
+		.ui-timepicker-div dl dt { float: left; clear:left; padding: 0 0 0 5px; }
+		.ui-timepicker-div dl dd { margin: 0 10px 10px 45%; }
+		.ui-timepicker-div td { font-size: 90%; }
+		.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+
+		.ui-timepicker-rtl{ direction: rtl; }
+		.ui-timepicker-rtl dl { text-align: right; padding: 0 5px 0 0; }
+		.ui-timepicker-rtl dl dt{ float: right; clear: right; }
+		.ui-timepicker-rtl dl dd { margin: 0 45% 10px 10px; }
+
 	</style>
 
 
 <body>
 
+
+	<div style="background-color:buttonface; width:300px;">
+		<div class="popup-html">
+			<!-- description/observation/note -->
+			<input type="text" class="marker-place-name" placeholder="Place Name"/>
+			<input type="text" class="marker-dtstamp" />
+			<div class="popup-content" contenteditable="true">
+				Sample Content	
+			</div>
+			<input type="text" class="marker-tags" placeholder="Enter Tags"/>
+			<input type="file" class="marker-tags" />
+
+			<div class="row">
+				<div class="small-5 popup-add-content-button text-center"><i class="fi-page-edit">&nbsp; edit</i></div>			
+				<div class="small-5 popup-delete-content-button text-center"><i class="fi-trash">&nbsp; marker</i></div>			
+			</div>
+		</div>
+	</div>
+	<br/>
+
+
 	<div id="map" data-mode="{{mode}}">
 		<input type="hidden" data-map-markers="{{ node.location }}" value="{{location}}" name="map-geojson-data"/>
 	</div>
-
+<!-- 
 	<div style="display:none;">
 		<div class="popup-html">
 			<div class="popup-content" contenteditable="true"></div>
@@ -50,11 +88,12 @@
 			</div>
 		</div>
 	</div>
-
+ -->
 	<input type="hidden" value="{{ visited_location }}" name="last_visited_location"/>
 	
 	<script type="text/javascript">
 		 
+		$('.marker-dtstamp').datetimepicker();
 
 	 	// We’ll add a OSM tile layer to our map
 	 	var osmUrl 	  = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
@@ -236,7 +275,7 @@
 
 		// Script for adding marker on map click
 		function onMapClick(e) {
-			console.log("jjjj");
+
 			var tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+ initialPopContent +'</div>');
 
 			var marker = L.marker(e.latlng, {
