@@ -54,7 +54,7 @@ def page(request, group_id, app_id=None):
     con=[]
     group_object=collection.Group.one({'_id':ObjectId(group_id)})
     if request.method == "POST":
-        # Written for implementing search-functionality
+	#Page search view
         title = gst_page.name
         
         search_field = request.POST['search_field']
@@ -75,6 +75,7 @@ def page(request, group_id, app_id=None):
         )
 
     elif gst_page._id == ObjectId(app_id):
+        #Page List view 
         #code for moderated Groups
         # collection.Node.reload()
         group_type = collection.Node.one({'_id':ObjectId(group_id)})
@@ -125,20 +126,22 @@ def page(request, group_id, app_id=None):
                                            'group_set': {'$all': [ObjectId(group_id)]},
                                            'status': {'$nin': ['HIDDEN']}
                                        })
-	      for nodes in page_nodes:
-		node,ver=get_page(request,nodes)
-                if node != 'None':
-                	content.append(node)	
-              #page_nodes.sort('last_update', -1)
+	      page_nodes.sort('last_update', -1)		
+	      #for nodes in page_nodes:
+	      #	node,ver=get_page(request,nodes)
+              #  if node != 'None':
+              #  	content.append(node)	
+              
               page_nodes_count = page_nodes.count()
-
+              
               return render_to_response("ndf/page_list.html",
                                   {
-                                   'page_nodes':content,'groupid':group_id,'page_nodes_count':  page_nodes_count,'group_id':group_id
+                                   'page_nodes':page_nodes,'groupid':group_id,'page_nodes_count':  page_nodes_count,'group_id':group_id
                                   },
                                   context_instance=RequestContext(request))
         
     else:
+        #Page Single instance view
         Group_node = collection.Node.one({"_id": ObjectId(group_id)})                
        
         if  Group_node.prior_node: 

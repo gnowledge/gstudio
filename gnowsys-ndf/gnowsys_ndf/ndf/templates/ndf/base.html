@@ -13,7 +13,7 @@
 
 	<!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
 	<link rel="stylesheet" href="/static/ndf/components/foundation/css/normalize.css">
-	<link rel="stylesheet" href="/static/ndf/components/foundation/css/foundation.css">
+	<link rel="stylesheet" href="/static/ndf/css/foundation-skin.css">
 
 	<!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
 	<link rel="stylesheet" href="/static/ndf/foundation-icons/foundation-icons.css">
@@ -27,8 +27,7 @@
 	<!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
 	<script src="/static/ndf/js/jquery-migrate-1.0.0.js"></script>
 
-	<!-- External default stylesheet-->
-	<link href="/static/ndf/css/default.css" rel="stylesheet">
+	<!-- External library stylesheets-->
 	<link href="/static/ndf/css/jqtree.css" rel="stylesheet">
 
 	<!-- Enable HTML5 on old browsers -->
@@ -40,60 +39,6 @@
 
 	<style>
 
-		html, body {
-			height: 100%;
-		}
-
-		nav h1 img{
-			height: 1.8rem;
-			margin-right: 5px;
-		}
-		nav h1 a{
-			color:white!important;
-		}
-
-		body>header
-		{
-			position: relative;
-		}
-
-		.workspace{
-			min-height: 100%;
-			margin-bottom: -100px!important;
-			-webkit-box-sizing: border-box;
-			-moz-box-sizing: border-box;
-			box-sizing: border-box;
-			background-color: #fafafa;
-		}
-
-		.workspace:after{
-			content:"";
-			display:block;
-			height:100px;
-		}
-
-		body>footer{
-			border-top:6px solid #008759;
-			background-color:#222;
-			color: #888;
-			padding:20px 0;
-			position: relative;
-		}
-
-		body>footer a{
-			color: #bbb;
-		}
-
-		.coll-arrows{
-			cursor:pointer;
-			display: block;
-			padding: 0.5rem;
-		}
-
-		.coll-arrows:hover{
-			background-color: #D3D3D3;
-		}
-
 		{% block style %}  {% endblock %}
 
 	</style>
@@ -104,14 +49,14 @@
 	<center><img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif"></center>
 	
 
-	<header class="drop-shadow">
+	<header>
 
 		<!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
 		
-		<nav class="top-bar row" data-topbar>
+		<nav class="top-bar drop-shadow" data-topbar>
 			<ul class="title-area">
 				<li class="name">
-					<h1><a href="/home" accesskey="q"><img src="/static/ndf/images/icon/meta.svg"> meta<b>Studio</b></a></h1>
+					<h1><a href="/home" accesskey="q"><img src="/static/ndf/scss/metastudio/logo.svg"> meta<b>Studio</b></a></h1>
 				</li>
 				<li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
 			</ul>
@@ -401,6 +346,8 @@
 		{% block script %} {% endblock %}	
 
 	</script>
+
+<script src="/static/ndf/js/app.js"></script>
 
 </body>
 
