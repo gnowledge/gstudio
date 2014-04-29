@@ -36,6 +36,8 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/module/', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
 
+    (r'^(?P<group_id>[^/]+)/browse resource/', include('gnowsys_ndf.ndf.urls.browse_resource')),
+
     (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
 
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
