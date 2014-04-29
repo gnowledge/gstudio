@@ -289,7 +289,7 @@ def get_gapps_menubar(group_id, selectedGapp):
       if node:
         if node.name not in ["Image", "Video"]:
           i = i+1;
-          gapps[i] = {'id': node._id, 'name': node.name.lower(), 'altname': node.altnames}
+          gapps[i] = {'id': node._id, 'name': node.name.lower()}
     selectedGapp = selectedGapp.split("/")[2]
     if group_id == None:
       group_id=gpid._id
