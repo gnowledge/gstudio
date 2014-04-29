@@ -286,7 +286,7 @@ def get_gapps_menubar(group_id, selectedGapp):
     
     nroer_GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}, {'name': {'$in':["Browse Topic", "Browse Resource"] } }]}).sort("created_at")
 
-    if not nroer_GAPPS:
+    if not nroer_GAPPS.count():
       # GAPPS for NUSSD gstudio instance
       for node in GAPPS:
         #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
