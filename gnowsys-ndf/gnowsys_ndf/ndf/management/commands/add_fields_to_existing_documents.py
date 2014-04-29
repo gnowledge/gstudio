@@ -21,6 +21,13 @@ class Command(BaseCommand):
         collection = get_database()[Node.collection_name]
         # Keep latest fields to be added at top
 
+        # Adds "group_set" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
+        res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'group_set': {'$exists': False}}, 
+                                {'$set': {'group_set': []}}, 
+                                upsert=False, multi=True
+        )
+        print "\n group_set field added to following no. of documents: ", res['n']
+
         # Adds "property_order" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
         res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'property_order': {'$exists': False}}, 
                                 {'$set': {'property_order': []}}, 

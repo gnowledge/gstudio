@@ -284,12 +284,24 @@ def get_gapps_menubar(group_id, selectedGapp):
     meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
     GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
     
-    for node in GAPPS:
-      #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
-      if node:
-        if node.name not in ["Image", "Video"]:
+    nroer_GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}, {'name': {'$in':["Browse Topic", "Browse Resource"] } }]}).sort("created_at")
+
+    if not nroer_GAPPS.count():
+      # GAPPS for NUSSD gstudio instance
+      for node in GAPPS:
+        #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+        if node:
+          if node.name not in ["Image", "Video"]:
+            i = i+1;
+            gapps[i] = {'id': node._id, 'name': node.name.lower()}
+
+    else:
+      # GAPPS for NROER instance
+      for node in nroer_GAPPS:
+        if node:
           i = i+1;
-          gapps[i] = {'id': node._id, 'name': node.name.lower(), 'altname': node.altnames}
+          gapps[i] = {'id': node._id, 'name': node.name.lower()}
+
     selectedGapp = selectedGapp.split("/")[2]
     if group_id == None:
       group_id=gpid._id

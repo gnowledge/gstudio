@@ -13,7 +13,18 @@
    autoOpen: 0
   });
   });
+
+$('.tree').bind(
+    'tree.click',
+    function(event) {
+        // The clicked node is 'event.node'
+        var node = event.node;
+        alert(node.id);
+    }
+);
   });
+
+
 </script>
 {% endblock %}
 
