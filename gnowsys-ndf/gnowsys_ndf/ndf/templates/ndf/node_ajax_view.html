@@ -1,3 +1,4 @@
+
 {% load ndf_tags %}
 
 {% block head%}  
@@ -47,7 +48,6 @@ ul#graph-hover.f-dropdown{
 
 </style>
 
-
 {% if user.is_authenticated %}
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
 {% endif %}
@@ -84,8 +84,7 @@ ul#graph-hover.f-dropdown{
     <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
     <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-
-  </section>
+     </section>
 
 </header>
 
@@ -155,8 +154,7 @@ ul#graph-hover.f-dropdown{
 	{% endif %}
 	{% endif %}
 	{% endif %}
-
-        {% block add_fields %} {% endblock %}
+      {% block add_fields %} {% endblock %}
 
         <ul class="inline-list">
           {% if user.is_authenticated %}
@@ -187,19 +185,17 @@ ul#graph-hover.f-dropdown{
        <a class="close-reveal-modal">&#215;</a>
        {% include "ndf/graph_dependency.html" %}
      </div>
-
      <!-- Tab View Map Widget -->
-     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
+     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
+        
        <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
        <a class="close-reveal-modal" >&#215;</a>
        {% include "ndf/map_widget.html" with mode="read" %}
        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
        <!-- #{#%# endif %} -->
      </div>
-
     </div>
   </section>
-
   <section class="medium-3 columns">
     <div class="panel">
      <h3 class="subheader"></h3>
@@ -400,7 +396,6 @@ $.ajax({
 });
 
   });
-
   $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
       
     map.invalidateSize();  
