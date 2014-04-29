@@ -6,8 +6,7 @@ from difflib import HtmlDiff
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
@@ -35,7 +34,6 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
 
 #######################################################################################################################################
-
 
 db = get_database()
 collection = db[Node.collection_name]
@@ -91,7 +89,10 @@ def all_observations(request, group_id, app_id=None):
 							 	context_instance=RequestContext(request) 
 							 )
 
-def observations_app(request, group_id, app_id=None, app_name=None, slug=None, app_set_id=None):
+def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
+
+	user_id = int(request.user.id)  			# getting django user id
+	user_name = unicode(request.user.username)  # getting django user name
 
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
@@ -112,9 +113,18 @@ def observations_app(request, group_id, app_id=None, app_name=None, slug=None, a
 							 	{
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,
-							 		'app_name':app_name, 'app_id':app_id,
-							 		'template_view': 'app_set_view'
+							 		'app_name':app_name, 'app_id':app_id, 'app_set_id':app_set_id,
+							 		'user_name':user_name, 'template_view': 'app_set_view'
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
 
+
+def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, user_name=None):
+
+	marker_geojson = request.POST["marker_geojson"]
+
+	app_set = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+	print app_set
+
+	return HttpResponse(json.dumps(marker_geojson))
