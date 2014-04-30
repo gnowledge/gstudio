@@ -137,8 +137,13 @@
 
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
+	 	mapdata = [];
 		// exctracting GeoJson sent from server
- 		mapdata = $("input:hidden[name=map-geojson-data]").val();
+		{% for each in app_collection_set %}
+			tempdata = $("input:hidden[name='hidden_{{each.name|slugify}}']").val();
+			mapdata += tempdata.slice(1,tempdata.length-1)			
+		{% endfor%}
+ 		
 
  		// check mapdata value or else converting it into JSON.parse() acceptable format
  		if(mapdata && typeof(mapdata) == "string")
@@ -295,8 +300,8 @@
 			}).addTo(map);
 
 			marker.feature.properties.id = marker._leaflet_id;
-
-			console.log(JSON.stringify(marker.toGeoJSON()));
+			// console.log(marker);
+			// console.log(JSON.stringify(marker.toGeoJSON()));
 
 			// var addLeafletID = marker.toGeoJSON();
 	 		// $(addLeafletID).attr("properties", {"id": marker._leaflet_id, "created_by":"{{user_name}}", "edited_by":["{{user_name}}"] });
@@ -319,47 +324,48 @@
            	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
 
            	var tempMarkerGeoJSON = this.toGeoJSON();
+           	// console.log(this);
 			// console.log( JSON.stringify(tempMarkerGeoJSON))
 
-			var placename = tempMarkerGeoJSON.properties.placename,
-				datetime = tempMarkerGeoJSON.properties.datetime,
-				description = tempMarkerGeoJSON.properties.description,
-				tags = tempMarkerGeoJSON.properties.tags ;
+			// var placename = tempMarkerGeoJSON.properties.placename,
+			// 	datetime = tempMarkerGeoJSON.properties.datetime,
+			// 	description = tempMarkerGeoJSON.properties.description,
+			// 	tags = tempMarkerGeoJSON.properties.tags ;
 
-			// preserving and updating GeoJson of marker
-			if(! description)
-			{
-				$.each(markerGeoJSON, function(i, val) {
+			// // preserving and updating GeoJson of marker
+			// if(! description)
+			// {
+			// 	$.each(markerGeoJSON, function(i, val) {
 				            	
-					            		var getID = $.parseJSON(val).properties.id,
-					            			getDescription = $.parseJSON(val).properties.description; 
+			// 		            		var getID = $.parseJSON(val).properties.id,
+			// 		            			getDescription = $.parseJSON(val).properties.description; 
 				
-					            		if(getID == lID){
+			// 		            		if(getID == lID){
 
-					            			description = getDescription?getDescription:"";  
-					            		}  
-					           		})
-			}
+			// 		            			description = getDescription?getDescription:"";  
+			// 		            		}  
+			// 		           		})
+			// }
 
-			if(description)
-			{					
-				$(".marker-obs-note:visible").val(description)
-			}
+			// if(description)
+			// {					
+			// 	$(".marker-obs-note:visible").val(description)
+			// }
 
-			// console.log($(".popup-content:visible").text(description));
+			// // console.log($(".popup-content:visible").text(description));
 
-			// tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();					
+			// // tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();					
 
-			tempMarkerGeoJSON.properties.id = lID;	
+			// tempMarkerGeoJSON.properties.id = lID;	
 			
 					
-			var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
+			// var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
 			
-            $.each(markerGeoJSON, function(i, val) {
+   //          $.each(markerGeoJSON, function(i, val) {
             	
-	        	var getID = $.parseJSON(val).properties.id; 
-	        	if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
-            })
+	  //       	var getID = $.parseJSON(val).properties.id; 
+	  //       	if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+   //          })
 
             var changedMarkerLatLng = []
             changedMarkerLatLng.push(changedPos.lat);

@@ -2,12 +2,12 @@
 
 {% block style %}
 
-		#all-markers-map-widget { background-color:inherit; height:calc(100vh - 60px); }
+	#all-markers-map-widget { background-color:inherit; height:calc(100vh - 60px); }
 
-		#app-set-item li { padding:0.5em }
-		#app-set-item li:hover { background-color:#e5e5e5; }
+	#app-set-item li { padding:0.5em }
+	#app-set-item li:hover { background-color:#e5e5e5; }
 
-		#app-set-item > a { color:inherit; }
+	#app-set-item > a { color:inherit; }
 
 {% endblock %}
 
@@ -21,9 +21,10 @@
 		{% for each in app_collection_set %}
 			<a href="{% url "observations_app" groupid app_id each.name|slugify each.id %}">
 				<li class="">
-					{{each.name}} &nbsp;&nbsp;&nbsp;<i class="fi-marker"></i> {{each.obj_count}} 
+					{{each.name}} &nbsp;&nbsp;&nbsp;<i class="fi-marker"></i> {{each.total_locations}} 
 				</li>
 			</a>
+			<input type="hidden" name="hidden_{{each.name|slugify}}" value="{{each.locations}}" />
 		{% endfor%}
 	</ul>
 

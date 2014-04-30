@@ -46,18 +46,28 @@ def all_observations(request, group_id, app_id=None):
 	app_collection_set = []
 
 	for each in app.collection_set:
+
+		app_set_element = collection.Node.find_one({'_id':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 		
-		app_element = collection.Node.find_one({"_id":each})
-		obj_count = ""
-		if app_element:
-			app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
-			obj_count = app_element_content_objects.count()
+		# app_element = collection.Node.find_one({"_id":each})
+		if app_set_element:
+
+			locs = len(app_set_element.location)
+			locations = app_set_element.location
+
+			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
+			# obj_count = app_element_content_objects.count()
 				
-		app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
+		app_collection_set.append({ 
+									"id":str(app_set_element._id),
+									"name":app_set_element.name,
+									"locations": locations,
+									"total_locations": locs
+								  })
 
 	# print "\napp_name : ", app_name, "\napp_set_id : ", app_set_id
 
-	# print "\n app_collection_set : ", app_collection_set
+	print "\n app_collection_set : ", app_collection_set
 
     # if app_set_id:
     #     classtype = ""
@@ -77,7 +87,6 @@ def all_observations(request, group_id, app_id=None):
     # else :
     #     app_menu = "yes"
     #     title = app_name
-
 	return render_to_response("ndf/observations.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
@@ -99,14 +108,29 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	app_collection_set = []
 
 	for each in app.collection_set:
+
+		app_set_element = collection.Node.find_one({'_id':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 		
-		app_element = collection.Node.find_one({"_id":each})
-		obj_count = ""
-		if app_element:
-			app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
-			obj_count = app_element_content_objects.count()
+		# app_element = collection.Node.find_one({"_id":each})
+		if app_set_element:
+
+			locs = len(app_set_element.location)
+
+			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
+			# obj_count = app_element_content_objects.count()
 				
-		app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
+		app_collection_set.append({"id":str(app_set_element._id),"name":app_set_element.name, "total_locations": locs})
+
+
+	# for each in app.collection_set:
+		
+	# 	app_element = collection.Node.find_one({"_id":each})
+	# 	obj_count = ""
+	# 	if app_element:
+	# 		app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
+	# 		obj_count = app_element_content_objects.count()
+				
+	# 	app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
 
 
 	return render_to_response("ndf/observations.html",
@@ -124,7 +148,10 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 	marker_geojson = request.POST["marker_geojson"]
 
-	app_set = collection.Node.find_one({"_id":ObjectId(app_set_id)})
-	print app_set
+	# app_set = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
 
-	return HttpResponse(json.dumps(marker_geojson))
+	app_set_element.location.append(json.loads(marker_geojson))
+	app_set_element.save()
+	
+	return HttpResponse(len(app_set_element.location))
