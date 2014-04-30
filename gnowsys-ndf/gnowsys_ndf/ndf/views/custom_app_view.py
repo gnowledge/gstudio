@@ -71,11 +71,12 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
     else :
         #print "\nin else part of app_set_id"
         ST_theme = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-        nodes = list(collection.Node.find({'member_of': {'$all': [ST_theme._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+        if ST_theme:
+            nodes = list(collection.Node.find({'member_of': {'$all': [ST_theme._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
 
-        nodes_dict = []
-        for each in nodes:
-            nodes_dict.append({"id":str(each._id), "name":each.name})
+            nodes_dict = []
+            for each in nodes:
+                nodes_dict.append({"id":str(each._id), "name":each.name})
 
         app_menu = "yes"
         title = app_name
