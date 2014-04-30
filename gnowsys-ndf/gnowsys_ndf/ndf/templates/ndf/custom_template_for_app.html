@@ -32,8 +32,26 @@
     </li>
     {% endifequal %}
     {% endfor %}
+
+    <br/>
+    {% if app_name == "browse topic" %}  
+      <li> 
+        <div>
+          <a href="{% url 'GAPPS' groupid app_name app_id %}"> <input class="small button split" type="button" value="Themes Hierarchy" > </a>
+        </div>
+      </li>
+    {% endif %}
+
 </ul>
 {% endblock %}
+
+{% block extra_content %}
+<!-- This block shows Themes Hierarchy (landing page of Browse Topic) -->
+{% if app == "Browse Topic" %}
+  {% include "ndf/theme.html" %}
+{% endif %}
+{% endblock %}
+
 
 {% block body_content %} 
 {# template for showing apt_set_instance list #}
