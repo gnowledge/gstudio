@@ -69,7 +69,7 @@ def get_apps_for_groups(groupid):
       for each in list_apps:
         obdict={}
         obdict['id']=each['_id']
-        obdict['name']=each['name']
+        obdict['name']=each['name'].lower()
         ret_dict[counter]=obdict
         counter+=1 
       return ret_dict 
