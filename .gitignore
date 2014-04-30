@@ -60,4 +60,5 @@ local/
 include/
 rcs-repo/
 mathjax/
+schema_files/
 *.db

@@ -32,9 +32,14 @@
 	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
       </div>
       {% endif %}
+
+      {% if translate %}
+      {% if list == "name" or list == "inverse_name" or list == "altnames" %}
+      {% get_input_fields class_structure|get_dict_item:list list translate %}
+      {% endif %}{% endif %}
     </div>
     {% endfor %}
-  </div>
+  </div></div>
   </dd>
 </dl>
 <dl class="accordion" data-accordion>
