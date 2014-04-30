@@ -528,32 +528,32 @@
       <!-- </li> -->
 {% autopaginate wetube_videos 25 %}
 {% for each in wetube_videos %}
- {% get_source_id each.pk as source_id %}     
- {% get_user_object each.created_by as user_obj %}      
+ {% get_source_id each.pk as source_id %}
+      {% get_user_object each.created_by as user_obj %}
+      {% for src_id,contributor in source_id.items %}
       <li class="card">
 	<div class="file">
 	  <header>
             <div class="th">
-	      <a href="http://wetube.gnowledge.org/{{source_id}}/480p.webm">
-		<img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+	      <a href="http://wetube.gnowledge.org/{{src_id}}/480p.webm">
+		<img src="http://wetube.gnowledge.org/{{src_id}}/icon128.jpg">
 	      </a>
 	    </div>
 
 	    <h4>{{each.name}}</h4>
 	    <div>
-	      <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{each.user_details_dict.created_by}}</span>
+	      <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{contributor}}@wetube.gnowledge.org</span>
 	      </small>
 	    </div>
 
           </header>
 	  <p>This file is a ..</p>
-          <a class="button expand" href ="{% url 'video_detail' groupid each %}?vid_id={{source_id}}">View details</a>
+          <a class="button expand" href ="{% url 'video_detail' groupid each %}?vid_id={{src_id}}">View details</a>
 	  </div>
           
       </li>
 {% endfor %}
-
-
+{% endfor %}
       
     </ul>
 {% paginate %}
