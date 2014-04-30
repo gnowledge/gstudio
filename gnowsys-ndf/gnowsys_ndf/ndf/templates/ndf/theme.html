@@ -1,0 +1,11 @@
+{% load ndf_tags %}
+
+<h2>Themes Hierarchy</h2><br/>
+<hr>
+
+{% if nodes %}
+	{% for each in nodes %}
+		<p><a><h5>{{each.name}}</h5></a></p>
+	{% endfor %}
+{% endif %}
+
