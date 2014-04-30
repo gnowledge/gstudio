@@ -24,9 +24,15 @@ history_manager = HistoryManager()
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
+coln=db[GSystem.collection_name]
+
+
+def get_all_gapps():
+  meta_type_gapp=coln.Node.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]})
+  all_gapps=coln.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type_gapp._id]}}]})    
+  return list(all_gapps)
 
 def get_forum_repl_type(forrep_id):
-  coln=db[GSystem.collection_name]
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
   if obj:

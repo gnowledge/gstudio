@@ -265,13 +265,35 @@ def edit_group(request,group_id):
 def app_selection(request,group_id,node_id):
     try:
         grp=collection.Node.one({"_id":ObjectId(group_id)})
-        if not at_apps_list:
-            HttpResponse("failure")
-        poss_atts=grp.get_possible_attributes(at_apps_list._id)
-        list_apps=poss_atts['apps_list']['object_value']
-        st = collection.Node.find({'type':'Group'})
-        data_list=set_drawer_widget(st,list_apps)
-        return HttpResponse(json.dumps(data_list))
+        if request.method == "POST":
+            lst=[]
+            apps_to_set = request.POST['apps_to_set']
+            apps_list=apps_to_set.split(",")
+            if apps_list:
+                for each in apps_list:
+                    if each:
+                        obj=collection.Node.one({'_id':ObjectId(each)})
+                        lst.append(obj);
+                gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_apps_list._id}]})
+                if gattribute:
+                    gattribute.delete()
+                if lst:
+                    create_attribute=collection.GAttribute()
+                    create_attribute.attribute_type=at_apps_list
+                    create_attribute.subject=grp._id
+                    create_attribute.object_value=lst
+                    create_attribute.save()            
+            return HttpResponse("Success")
+        else:
+            list_apps=[]
+            if not at_apps_list:
+                return HttpResponse("failure")
+            poss_atts=grp.get_possible_attributes(at_apps_list._id)
+            if poss_atts:
+                list_apps=poss_atts['apps_list']['object_value']
+            st = get_all_gapps()
+            data_list=set_drawer_widget(st,list_apps)
+            return HttpResponse(json.dumps(data_list))
     except Exception as e:
         print "Error in app_selection "+str(e)
      
@@ -297,7 +319,6 @@ def switch_group(request,group_id,node_id):
             all_user_groups=[]
             for each in get_all_user_groups():
                 all_user_groups.append(each.name)
-            print "list usergrps",all_user_groups
             st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
             for each in node.group_set:
                 coll_obj_list.append(collection.Node.one({'_id':each}))

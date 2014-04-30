@@ -264,7 +264,7 @@ ul#graph-hover.f-dropdown{
 	<input type="button" id="switch_group" class="button small" value="Publish in group/s">
 <div id="mySystemtype" class="reveal-modal" data-reveal >
      <h2>Select Groups</h2>
-      <div id="module_drawer" >
+      <div id="group_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       </div>
      <a class="close-reveal-modal st">&#215;</a>
@@ -343,7 +343,6 @@ var turl='/{{groupid}}/switch_group/'+'{{node}}';
 saveflag = 1;
 get_new_groups();
 new_groups=data_list;
-alert(new_groups);
 $.ajax({
        url: turl,
        type: 'POST',
