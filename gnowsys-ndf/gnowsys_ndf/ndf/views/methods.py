@@ -482,3 +482,50 @@ def tag_info(request, group_id, tagname):
   # print group_id
 
   return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
+
+#code for merging two text Documents
+import difflib
+def diff_string(original,revised):
+        
+        # build a list of sentences for each input string
+        original_text = _split_with_maintain(original)
+        new_text = _split_with_maintain(revised)
+        
+        return '\n'.join(new_text)
+STANDARD_REGEX = '[.!?]'
+def _split_with_maintain(value, treat_trailing_spaces_as_sentence = True, split_char_regex = STANDARD_REGEX):
+        result = []
+        check = value
+        
+        # compile regex
+        rx = re.compile(split_char_regex)
+        
+        # traverse the string
+        while len(check) > 0:
+            found  = rx.search(str(check))
+            if found == None:
+                result.append(check)
+                break
+            
+            idx = found.start()
+            result.append(str(check[:idx]))            # append the string
+            result.append(str(check[idx:idx+1]))    # append the puncutation so changing ? to . doesn't invalidate the whole sentence
+            check = check[idx + 1:]
+            
+            # group the trailing spaces if requested
+            if treat_trailing_spaces_as_sentence:
+                space_idx = 0
+                while True:
+                    if space_idx >= len(check):
+                        break
+                    if check[space_idx] != " ":
+                        break
+                    space_idx += 1
+                
+                if space_idx != 0:
+                    result.append(check[0:space_idx])
+            
+                check = check[space_idx:]
+            
+        return result
+    

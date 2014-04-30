@@ -32,6 +32,7 @@
 	  <select class="" id="version_1" name="version_1">
 	    {% for version_no in node.version_dict.values %}
 	      {% ifequal version_no selected_versions.1 %}
+                 
 	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
 	      {% else %}
 	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
@@ -51,8 +52,18 @@
 	    {% endfor %}
 	  </select>
 	</td>
-        <td>
+        <td> 
 	  <input id="compare_versions" type="submit"  value="Go" class="btn btn-large btn-primary" />
+          
+
+	  {% if  selected_versions.1   and   selected_versions.2  %}
+            
+	   <a class="button tiny"  > Merge </a>	
+	  {% endif %}
+          {% if  selected_versions.1   and   selected_versions.2  %} 
+	   <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.1 %}" > Revert to {{selected_versions.1}} </a>
+      	  <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.2 %}" > Revert to {{selected_versions.2}} </a>
+	  {% endif %} 	
 	</td>
       </tr>
     </table>
@@ -64,6 +75,10 @@
     <div id="single-view" style="padding-bottom: 20px">
       <table cellpadding="8">
 	<tr>
+		
+        
+	
+          
           <th align="right">Fields</th>
           <th align="left">Version #{{selected_versions.1}}</th>
 	</tr>
@@ -77,10 +92,38 @@
     </div>
   
   {% else %}
+ <div class="row">  
+ <div class="medium-5 columns"> 
     <div id="compare-view" style="padding-bottom: 20px">
-      {{content|safe}}
+       <table>
+       	
+	    {% for k,v in content.items %}
+		<tr>
+	          <td align="right" valign="top">{{k}}</td>
+	          <td>{{v|safe|safe}}</td>
+		</tr>
+	   
+		{% endfor %}
+	      
+	    </table>
+    
+     </div>
     </div>
-  
+ <div class="medium-6 columns">  
+         <table>
+       	
+	    {% for k,v in content1.items %}
+		<tr>
+	          <td align="right" valign="top">{{k}}</td>
+	          <td>{{v|safe|safe}}</td>
+		</tr>
+	   
+		{% endfor %}
+	      
+	    </table>
+    </div>
+ </div>
+
   {% endifequal %}
 
 {% endblock %}
