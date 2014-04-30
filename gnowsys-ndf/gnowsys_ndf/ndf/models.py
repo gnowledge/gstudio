@@ -151,17 +151,17 @@ class Node(DjangoDocument):
         
         'language': unicode,
 
-        'type_of': [ObjectId],                    # To define type_of GSystemType for particular node              
+        'type_of': [ObjectId],                  # To define type_of GSystemType for particular node              
         'member_of': [ObjectId],
         'access_policy': unicode,               # To Create Public or Private node
 
       	'created_at': datetime.datetime,
-        'created_by': int,			# Primary Key of User(django's) Class who created the document
+        'created_by': int,			            # Primary Key of User(django's) Class who created the document
 
         'last_update': datetime.datetime,
-        'modified_by': int,		        # Primary Key of User(django's) Class who lastly modified the document
+        'modified_by': int,		                # Primary Key of User(django's) Class who lastly modified the document
 
-        'contributors': [int],		        # List of Primary Keys of User(django's) Class
+        'contributors': [int],		            # List of Primary Keys of User(django's) Class
 
         # 'rating': RatingField(),
 
@@ -170,7 +170,9 @@ class Node(DjangoDocument):
         'content': unicode,
         'content_org': unicode,
 
-        'collection_set': [ObjectId],		# List of ObjectId's of different GTypes/GSystems
+        'group_set': [ObjectId],                # List of ObjectId's of Groups to which this document belongs
+        'collection_set': [ObjectId],		    # List of ObjectId's of different GTypes/GSystems
+        'property_order': [],                   # Determines the order & grouping in which attribute(s)/relation(s) displayed on form
 
         'start_publication': datetime.datetime,
         'tags': [unicode],
@@ -498,7 +500,7 @@ class Node(DjangoDocument):
               'altnames': Value of RelationType node's altnames field,
               'object_type': Value of RelationType node's object_type field,
               'inverse_name': Value of RelationType node's inverse_name field,
-              'right_subject': Value of GRelation node's right_subject field
+              'right_subject_list': List of Value(s) of GRelation node's right_subject field
           }
         }
         
@@ -761,7 +763,7 @@ class RelationType(Node):
               'altnames': Value of RelationType node's altnames field,
               'object_type': Value of RelationType node's object_type field,
               'inverse_name': Value of RelationType node's inverse_name field,
-              'right_subject': Value of GRelation node's right_subject field
+              'right_subject_list': List of Value(s) of GRelation node's right_subject field
           }
         }
         """
@@ -838,7 +840,6 @@ class GSystem(Node):
         # 'relation_set': [ObjectId],		# ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
-        'group_set': [ObjectId],                # List of ObjectId's of Groups to which this document belongs
         'author_set': [int]                     # List of Authors
     }
     

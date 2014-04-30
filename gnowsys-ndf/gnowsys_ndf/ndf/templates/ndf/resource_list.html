@@ -75,14 +75,14 @@
             <div class="large-12 columns">
               <input type="text" placeholder="Name of the File" />
               <textarea placeholder="Describe the File"></textarea>
-	      
+        
               <div class="login-mode switch round">
                 <input id="PUBLIC" name="login-mode" type="radio" checked>
                 <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-		
+    
                 <input id="PRIVATE" name="login-mode" type="radio">
                 <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-		
+    
                 <span></span>
               </div>
 
@@ -94,7 +94,7 @@
             <span class="fi-upload">  Upload File</span>
           </a>
           {% endif %}
-	</div>
+  </div>
       </li>
  
       {% if files.count != 0 %}
@@ -107,41 +107,41 @@
       {% get_grid_fs_object file as grid_fs_obj %}
       <li class="card">
         <div class="file">
-	  
+    
           <header>
               <div class="label-list">
                 {% for tag in file.tags %}
                 <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
-	      
+        
               <div class="th">
-		<a href="{% url 'read_file' groupid file.pk grid_fs_obj.filename %}">
-		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
-		  <img src="{% url 'getFileThumbnail' groupid file %}">
-		</a>
-	      </div>
+    <a href="{% url 'read_file' groupid file.pk grid_fs_obj.filename %}">
+      <!--<img src="/static/ndf/images/icon/meta.svg">-->
+      <img src="{% url 'getFileThumbnail' groupid file %}">
+    </a>
+        </div>
               <h4>{{file.name}}</h4>
-	      <div>
-		<small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
-		</small>
-	      </div>
+        <div>
+    <small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+    </small>
+        </div>
           </header>
 
           <p>File description</p>
 
-          <a class="button expand" href ="{% url 'file_detail' groupid file %}">View details</a>
+          <a class="button expand" href ="{% url 'resource_detail' groupid file %}">View details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
           <a class="button alert tiny" href="{% url 'delete_file' groupid file %}?next={{request.path}}">Delete </a>
           {% endifequal %}
-	  
+    
           <footer class="row">
             <div class="small-6 columns">{{file.mime_type}}</div>
             <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
           </footer>
-	  
+    
         </div>
       </li>
 
@@ -160,21 +160,21 @@
             </div>
         
             <div class="th">
-	      <a href="{% url 'read_file' groupid file.pk grid_fs_obj.filename %}">
-		<!--<img src="/static/ndf/images/icon/meta.svg">-->
-		<img src="{% url 'getFileThumbnail' groupid file %}">
-	      </a>
-	    </div>
+        <a href="{% url 'read_file' groupid file.pk grid_fs_obj.filename %}">
+    <!--<img src="/static/ndf/images/icon/meta.svg">-->
+    <img src="{% url 'getFileThumbnail' groupid file %}">
+        </a>
+      </div>
             <h4>{{file.name}}</h4>
-	    <div>
-		<small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
-		</small>
-	      </div>
+      <div>
+    <small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+    </small>
+        </div>
           </header>
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'file_detail' groupid file %}">View details</a>
+          <a class="button expand" href ="{% url 'resource_detail' groupid file %}">View details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
@@ -215,38 +215,38 @@
       {% get_grid_fs_object doc as grid_fs_obj %}
       <li class="card">
         <div class="file">
-	  
+    
           <header>
               <div class="label-list">
                 {% for tag in doc.tags %}
                 <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
-	      
+        
               <div class="th">
-		<a href="{% url 'read_file' groupid doc.pk grid_fs_obj.filename %}">
-		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
-		  <img src="{% url 'getFileThumbnail' groupid doc %}">
-		</a>
-	      </div>
+    <a href="{% url 'read_file' groupid doc.pk grid_fs_obj.filename %}">
+      <!--<img src="/static/ndf/images/icon/meta.svg">-->
+      <img src="{% url 'getFileThumbnail' groupid doc %}">
+    </a>
+        </div>
               <h4>{{doc.name}}</h4>
               <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
           </header>
 
           <p>File description</p>
 
-          <a class="button expand" href ="{% url 'file_detail' groupid doc %}">View details</a>
+          <a class="button expand" href ="{% url 'resource_detail' groupid doc %}">View details</a>
 
           {% get_user_object doc.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
           <a class="button alert tiny" href="{% url 'delete_file' groupid doc %}?next={{request.path}}">Delete </a>
           {% endifequal %}
-	  
+    
           <footer class="row">
             <div class="small-6 columns">{{doc.mime_type}}</div>
             <div class="small-6 columns"><strong>{{doc.file_size.size}}</strong> {{doc.file_size.unit}}</div> 
           </footer>
-	  
+    
         </div>
       </li>
 
@@ -265,18 +265,18 @@
             </div>
         
             <div class="th">
-	      <a href="{% url 'read_file' groupid doc.pk grid_fs_obj.filename %}">
-		<!--<img src="/static/ndf/images/icon/meta.svg">-->
-		<img src="{% url 'getFileThumbnail' groupid doc %}">
-	      </a>
-	    </div>
+        <a href="{% url 'read_file' groupid doc.pk grid_fs_obj.filename %}">
+    <!--<img src="/static/ndf/images/icon/meta.svg">-->
+    <img src="{% url 'getFileThumbnail' groupid doc %}">
+        </a>
+      </div>
             <h4>{{doc.name}}</h4>
             <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
           </header>
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'file_detail' groupid doc %}">View details</a>
+          <a class="button expand" href ="{% url 'resource_detail' groupid doc %}">View details</a>
 
           {% get_user_object doc.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
@@ -310,20 +310,20 @@
       <li class="create card">
         <div class="file">
           <h4><i class="fi-plus"></i> New Upload</h4>
-	  <!--
+    <!--
           <div class="row">
 
             <div class="large-12 columns">
               <input type="text" placeholder="Name of the File" />
               <textarea placeholder="Describe the File"></textarea>
-	      
+        
               <div class="login-mode switch round">
                 <input id="PUBLIC" name="login-mode" type="radio" checked>
                 <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-		
+    
                 <input id="PRIVATE" name="login-mode" type="radio">
                 <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-		
+    
                 <span></span>
               </div>
 
@@ -336,7 +336,7 @@
             <span class="fi-upload"> Upload File</span>
           </a>
           {% endif %}
-	</div>
+  </div>
       </li>
 
       {% if imageCollection.count != 0 %}
@@ -347,7 +347,7 @@
       {% get_grid_fs_object image as grid_fs_obj %}
       <li class="card">
         <div class="file">
-	  
+    
           <header>
 
               <div class="label-list">
@@ -355,18 +355,18 @@
                 <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
-	      
+        
               <div class="th">
-		<a href="{% url 'read_file' groupid image.pk grid_fs_obj.filename %}">
-		  <img src="{% url 'getImageThumbnail' groupid image %}" />
-		</a>
-	      </div>
+    <a href="{% url 'read_file' groupid image.pk grid_fs_obj.filename %}">
+      <img src="{% url 'getImageThumbnail' groupid image %}" />
+    </a>
+        </div>
               <h4>{{image.name}}</h4>
-	      <div>
-		<small class="subheader">{{ image.member_of_names_list|join:', ' }} created {{image.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{image.user_details_dict.created_by}}</span> 
-		</small>
-	      </div>
-	      
+        <div>
+    <small class="subheader">{{ image.member_of_names_list|join:', ' }} created {{image.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{image.user_details_dict.created_by}}</span> 
+    </small>
+        </div>
+        
           </header>
 
           <p>This file is a..</p>
@@ -377,12 +377,12 @@
           {% ifequal  user_obj.username  user.username  %}
           <a class="button alert tiny" href="{% url 'delete_file' groupid image %}?next={{request.path}}">Delete </a>
           {% endifequal %}
-	  
+    
           <footer class="row">
             <div class="small-6 columns">{{image.mime_type}}</div>
             <div class="small-6 columns"><strong>{{image.file_size.size}}</strong> {{image.file_size.unit}}</div> 
           </footer>
-	  
+    
         </div>
       </li>
       {% endfor %}
@@ -402,7 +402,7 @@
       <li class="create card">
         <div class="file">
           <h4><i class="fi-plus"></i> New Upload</h4>
-	  <!--
+    <!--
           <div class="row">
 
             <div class="large-12 columns">
@@ -448,17 +448,17 @@
               </div>
 
               <div class="th">
-		<a href="{% url 'read_file' groupid video.pk grid_fs_obj.filename %}">
-		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
-		  <img src="{% url 'getvideoThumbnail' groupid video %}">
-		</a>
-	      </div>
+    <a href="{% url 'read_file' groupid video.pk grid_fs_obj.filename %}">
+      <!--<img src="/static/ndf/images/icon/meta.svg">-->
+      <img src="{% url 'getvideoThumbnail' groupid video %}">
+    </a>
+        </div>
               <h4>{{video.name}}</h4>
-	      <div>
-		<small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{video.user_details_dict.created_by}}</span>
-		</small>
-	      </div>
-	      
+        <div>
+    <small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{video.user_details_dict.created_by}}</span>
+    </small>
+        </div>
+        
           </header>
 
           <p>This file is a..</p>
@@ -504,14 +504,14 @@
       <!--       <div class="large-12 columns"> -->
       <!--         <input type="text" placeholder="Name of the File" /> -->
       <!--         <textarea placeholder="Describe the File"></textarea> -->
-	      
+        
       <!--         <div class="login-mode switch round"> -->
       <!--           <input id="PUBLIC" name="login-mode" type="radio" checked> -->
       <!--           <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label> -->
-		
+    
       <!--           <input id="PRIVATE" name="login-mode" type="radio"> -->
       <!--           <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label> -->
-		
+    
       <!--           <span></span> -->
       <!--         </div> -->
 
@@ -524,36 +524,36 @@
       <!--       <span class="fi-upload"> Upload File</span> -->
       <!--     </a> -->
       <!--     {% endif %} -->
-      <!-- 	</div> -->
+      <!--  </div> -->
       <!-- </li> -->
 {% autopaginate wetube_videos 25 %}
 {% for each in wetube_videos %}
- {% get_source_id each.pk as source_id %}
-      {% get_user_object each.created_by as user_obj %}
-      {% for src_id,contributor in source_id.items %}
+ {% get_source_id each.pk as source_id %}     
+ {% get_user_object each.created_by as user_obj %}      
       <li class="card">
-	<div class="file">
-	  <header>
+  <div class="file">
+    <header>
             <div class="th">
-	      <a href="http://wetube.gnowledge.org/{{src_id}}/480p.webm">
-		<img src="http://wetube.gnowledge.org/{{src_id}}/icon128.jpg">
-	      </a>
-	    </div>
+        <a href="http://wetube.gnowledge.org/{{source_id}}/480p.webm">
+    <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+        </a>
+      </div>
 
-	    <h4>{{each.name}}</h4>
-	    <div>
-	      <small class="subheader">{{ each.member_of_names_list|join:', ' }} created by <span href="#" class="user" data-gnow="">{{contributor}}@wetube.gnowledge.org</span>
-	      </small>
-	    </div>
+      <h4>{{each.name}}</h4>
+      <div>
+        <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{each.user_details_dict.created_by}}</span>
+        </small>
+      </div>
 
           </header>
-	  <p>This file is a ..</p>
-          <a class="button expand" href ="{% url 'video_detail' groupid each %}?vid_id={{src_id}}">View details</a>
-	  </div>
+    <p>This file is a ..</p>
+          <a class="button expand" href ="{% url 'video_detail' groupid each %}?vid_id={{source_id}}">View details</a>
+    </div>
           
       </li>
 {% endfor %}
-{% endfor %}
+
+
       
     </ul>
 {% paginate %}

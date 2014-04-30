@@ -24,6 +24,7 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
     atlist = []
     rtlist = []
     app = collection.Node.find_one({"_id":ObjectId(app_id)})
+    App_Name = app.name 
     app_set = ""
     nodes = ""
     nodes_dict = ""
@@ -36,31 +37,52 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
     tags = ""
     content = ""
     location = ""
+    system = None
     system_id = ""
     system_type = ""
     system_mime_type = ""
+    property_display_order = []
+
     for eachset in app.collection_set:
 	 app_set = collection.Node.find_one({"_id":eachset})
 	 app_collection_set.append({"id":str(app_set._id),"name":app_set.name}) 	
+
     if app_set_id:
         classtype = ""
         app_set_template = "yes"
+        App_Name = None
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
         title = systemtype_name
+        #print "title in app_set_id: ",title
+
         if request.method=="POST":
             search = request.POST.get("search","")
             classtype = request.POST.get("class","")
             nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}))
         else :
             nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+
         nodes_dict = []
         for each in nodes:
             nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
+                         
+        #print "\n in app_set_id"
     else :
+        #print "\nin else part of app_set_id"
+        ST_theme = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+        if ST_theme:
+            nodes = list(collection.Node.find({'member_of': {'$all': [ST_theme._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+
+            nodes_dict = []
+            for each in nodes:
+                nodes_dict.append({"id":str(each._id), "name":each.name})
+
         app_menu = "yes"
         title = app_name
+
     if app_set_instance_id :
+        #print "\n in app_set_instance_id"
         app_set_instance_template = "yes"
         app_set_template = ""
         systemtype_attributetype_set = []
@@ -79,21 +101,61 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
             for eachrelation in collection.Node.find({"_type":"GRelation", "subject":system._id, "relation_type.$id":ObjectId(eachrtset["type_id"])}):
                 right_subject = collection.Node.find_one({"_id":ObjectId(eachrelation.right_subject)})
                 rtlist.append({"type":eachrtset["rt_name"],"type_id":eachrtset["type_id"],"value_name": right_subject.name,"value_id":str(right_subject._id)})
-                
 
-        
+        # To support consistent view
+
+        property_order = system.property_order
+        system.get_neighbourhood(systemtype._id)
+
+        for tab_name, fields_order in property_order:
+            display_fields = []
+            for field, altname in fields_order:
+                if system.structure[field] == bool:
+                    display_fields.append((altname, ("Yes" if system[field] else "No")))
+
+                elif not system[field]:
+                    display_fields.append((altname, system[field]))
+                    continue
+
+                elif system.structure[field] == datetime.datetime:
+                    display_fields.append((altname, system[field].date()))
+
+                elif type(system.structure[field]) == list:
+                    if system[field]:
+                        if type(system.structure[field][0]) == ObjectId:
+                            name_list = []
+                            for right_sub_dict in system[field]:
+                                name_list.append(right_sub_dict.name)
+                            display_fields.append((altname, ", ".join(name_list)))
+                        else:
+                            display_fields.append((altname, ", ".join(system[field])))
+
+                else:
+                    display_fields.append((altname, system[field]))
+
+            property_display_order.append((tab_name, display_fields))
+
+        # End of code
+
         tags = ",".join(system.tags)
         content = system.content
         location = system.location
         app_set_name = systemtype.name
         system_id = system._id
         system_type = system._type
+
         if system_type == 'File':
             system_mime_type = system.mime_type
+
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
+
     template = "ndf/custom_template_for_app.html"
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id})
+
+    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id
+
+                                        , "node":system, 'group_id':group_id, 'app':App_Name, "property_display_order": property_display_order})
+
     return render_to_response(template, variable)
       
 @login_required
@@ -273,6 +335,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                     newrelation.relation_type = relationtype_key
                     newrelation.right_subject = right_subject._id
                     newrelation.save()
+
         if app_set_instance_id : # editing instance
             for each in systemtype_attributetype_set:
                 if each["database_id"]:
@@ -287,6 +350,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                         newattribute.attribute_type = attributetype_key
                         newattribute.object_value = request.POST.get(each["type_id"],"")
                         newattribute.save()
+
             for eachrt in systemtype_relationtype_set:
                 if eachrt["database_id"]:
                     relation_instance = collection.Node.find_one({"_id":ObjectId(eachrt['database_id'])})

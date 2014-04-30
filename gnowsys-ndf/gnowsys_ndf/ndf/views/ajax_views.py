@@ -1,3 +1,4 @@
+
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 
@@ -566,8 +567,8 @@ def graph_nodes(request, group_id):
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
           else:
-            node_metadata += '{"screen_name":"' + each + '", "_id":"'+ each +'_n"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ each +'_n"},'
+            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
             i += 1
     
     else:
@@ -605,7 +606,6 @@ def graph_nodes(request, group_id):
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []
     node_id = request.GET.get("object_id","")
-    print "nodeid",node_id
     st = collection.Node.find({"_type":"Group"})
     node = collection.Node.one({"_id":ObjectId(node_id)})
     for each in node.group_set:
@@ -632,26 +632,37 @@ def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
     '''
-    print "st=",st,"coln",coll_obj_list
+    stobjs=[]
+    coll_objs=[]
     data_list = []
     d1 = []
     d2 = []
     draw1 = {}
     draw2 = {}
-    
-    drawer1 = list(set(st) - set(coll_obj_list))
+    drawer1=[]
+    drawer2=[]
+    for each in st:
+        stobjs.append(each['_id'])
+    for each in coll_obj_list:
+        coll_objs.append(each['_id'])
+    drawer1_set = set(stobjs) - set(coll_objs)
+    lstset=[]
+    for each in drawer1_set:
+        obj=collection.Node.one({'_id':each})
+        lstset.append(obj)
+    drawer1=lstset
     drawer2 = coll_obj_list
     for each in drawer1:
        dic = {}
-       dic['id'] = str(each._id)
-       dic['name'] = each.name
+       dic['id'] = str(each['_id'])
+       dic['name'] = each['name']
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
     for each in drawer2:
        dic = {}
-       dic['id'] = str(each._id)
-       dic['name'] = each.name
+       dic['id'] = str(each['_id'])
+       dic['name'] = each['name']
        d2.append(dic)
     draw2['drawer2'] = d2
     data_list.append(draw2)
@@ -785,7 +796,7 @@ def get_visited_location(request, group_id):
 @login_required
 def get_online_editing_user(request, group_id):
     '''
-    get user who online editing org editor
+    get user who is currently online and editing the node
     '''
     if request.is_ajax() and request.method =="POST":
         editorid = request.POST.get('editorid',"")

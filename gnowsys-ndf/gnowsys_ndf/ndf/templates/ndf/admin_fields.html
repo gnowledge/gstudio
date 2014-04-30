@@ -27,14 +27,19 @@
   background-repeat:no-repeat; background-size: 48px 48px
   }
 </style>
-
 {% if fields_type == "unicode" or fields_name == "tags" %}
 <div style="display:table-cell;">
   {% if fields_name == "tags" %}
   <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|join:', '|default_if_none:''}}"></font>
   {% else %}
+  {% if translate %}
+  <font size="3"> <input type="textbox" name="{{fields_name}}_trans" value="{{fields_value|default_if_none:''}}"></font>
+   
+{% else %}
+
   <font size="3"> <input type="textbox" name="{{fields_name}}" value="{{fields_value|default_if_none:''}}"></font>
-  {% endif %}  
+  {% endif %}
+  {% endif %}
 </div>
 
 {% elif fields_type == "bool" %}
@@ -57,6 +62,7 @@
 {% elif fields_type == "list" %}
 <div id="list_drawer" style="border-spacing:0px;">
   {#% edit_drawer_widget fields_name groupid node %#}
+
   {% list_widget fields_name fields_type fields_value %}
   {% if fields_name in field_type_list %}
   <input id="{{fields_name}}_type" type="hidden" name="{{fields_name}}" value="" />

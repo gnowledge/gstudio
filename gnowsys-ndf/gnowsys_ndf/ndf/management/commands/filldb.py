@@ -16,21 +16,14 @@ from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.settings import META_TYPE
-
+from gnowsys_ndf.factory_type import factory_gsystem_types, factory_attribute_types, factory_relation_types
 
 ####################################################################################################################
 #global variables
 db = get_database()
 collection = db[Node.collection_name]
 
-#append gsystem_type name to create factory GSystemType
-factory_gsystem_types = ['Twist', 'Reply', 'Author', 'Shelf', 'QuizItem', 'Pandora_video']
 
-#fill attribute name,data_type,gsystem_type name in bellow dict to create factory Attribute Type
-factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'], 'data_type':'str(QUIZ_TYPE_CHOICES_TU)'}},{'options':{'gsystem_names_list':['QuizItem'], 'data_type':'"[" + DATA_TYPE_CHOICES[6] + "]"'}}, {'correct_answer':{'gsystem_names_list':['QuizItem'], 'data_type':'"[" + DATA_TYPE_CHOICES[6] + "]"'}}, {'start_time':{'gsystem_names_list':['QuizItem','Forum'], 'data_type':'DATA_TYPE_CHOICES[9]'}}, {'end_time':{'gsystem_names_list':['QuizItem','Forum'], 'data_type':'DATA_TYPE_CHOICES[9]'}}, {'module_set_md5':{'gsystem_names_list':['Module'], 'data_type':'u""'}},{'source_id':{'gsystem_names_list':['Pandora_video'], 'data_type':'u""'}},{'version':{'gsystem_names_list':['Module'], 'data_type':'u""'}} ]
-
-#fill relation_type_name,inverse_name,subject_type,object_type in bellow dict to create factory Relation Type
-factory_relation_types = [{'has_shelf':{'subject_type':['Author'],'object_type':['Shelf'], 'inverse_name':'shelf_of'}}, {'translation_of':{'subject_type':['Page'],'object_type':['Page'], 'inverse_name':'translation_of'}}, {'has_module':{'subject_type':['Page'],'object_type':['Module'], 'inverse_name':'generated_from'}}, {'has_profile_pic':{'subject_type':['Author'],'object_type':['Image'], 'inverse_name':'profile_pic_of'}}]
 
 #for taking input json file
 import json
@@ -52,6 +45,14 @@ class Command(BaseCommand):
         user_id = 1 
         node_doc = None
         meta_type_name = META_TYPE[0]
+
+        for each in META_TYPE:
+            meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':each}]})
+            if meta_type == None:                
+                create_meta_type(user_id,each)
+            else:
+                print "Meta_Type",each,"already created"
+
         meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]}) # getting MetaType Object
         if meta_type == None:
             meta_type = create_meta_type(user_id) #creating MetaType
@@ -139,20 +140,21 @@ class Command(BaseCommand):
 
         # --- End of handle() ---
 
-def create_meta_type(user_id):
+def create_meta_type(user_id,meta_type):
     '''
     creating meta_type in database
     '''
     meta = collection.MetaType()
-    meta.name = META_TYPE[0]
+    meta.name = meta_type
     meta.created_by = user_id # default hardcode
     meta.modified_by = user_id
     if user_id not in meta.contributors:
         meta.contributors.append(user_id)
     meta.save()
-    return meta
+    print "succesfully created META_TYPE:",meta_type
+    
 
-def create_gsystem_type(st_name, user_id):
+def create_gsystem_type(st_name, user_id, meta_type_id = None):
     '''
     creating factory GSystemType's 
     '''
@@ -163,6 +165,8 @@ def create_gsystem_type(st_name, user_id):
             gs_node.name = unicode(st_name)
             gs_node.created_by = user_id
             gs_node.modified_by = user_id
+            if meta_type_id:
+                gs_node.member_of.append(meta_type_id)
             if user_id not in gs_node.contributors:
                 gs_node.contributors.append(user_id)
             gs_node.save()
@@ -170,9 +174,14 @@ def create_gsystem_type(st_name, user_id):
         except Exception as e:
             print 'GsystemType',st_name,'fails to create because:',e
     else:
+        if not node.member_of:
+            if meta_type_id:
+                node.member_of.append(meta_type_id)
+                print "Edited member_of",node.name
+                node.save()
         print 'GSystemType',st_name,'already created'
 
-def create_attribute_type(at_name, user_id, data_type, system_type_id_list):
+def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta_type_id = None):
     '''
     creating factory AttributeType's
     '''
@@ -183,6 +192,9 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list):
             at.name = unicode(at_name)
             at.created_by = user_id
             at.modified_by = user_id
+            if meta_type_id:
+                at.member_of.append(meta_type_id)
+
             if user_id not in at.contributors:
                 at.contributors.append(user_id)
             at.data_type = data_type              
@@ -193,10 +205,15 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list):
         except Exception as e:
             print 'AttributeType',at_name,'fails to create because:',e
     else:
+        if not node.member_of:
+            if meta_type_id:
+                node.member_of.append(meta_type_id)
+                print "Edited member_of",node.name
+                node.save()
         print 'AttributeType',at_name,'already created'
 
 
-def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list):
+def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id = None):
     '''
     creating factory RelationType's
     '''
@@ -212,6 +229,9 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
                 rt_node.object_type.append(ot_id)
             rt_node.created_by = user_id
             rt_node.modified_by = user_id
+            if meta_type_id:
+                rt_node.member_of.append(meta_type_id)
+
             if user_id not in rt_node.contributors:
                 rt_node.contributors.append(user_id)
             rt_node.save()
@@ -219,41 +239,68 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
         except Exception as e:
             print 'RelationType',rt_name,'fails to create because:',e
     else:
+        if not rt_node.member_of:
+            if meta_type_id:
+                rt_node.member_of.append(meta_type_id)
+                rt_node.save()
+                print "Edited member_of",rt_node.name
         print 'RelationType',rt_node.name,'already created'
 
 
 def create_ats(factory_attribute_types,user_id):
+    meta_type_id = ""
     for each in factory_attribute_types:
         gsystem_id_list = []
         for key,value in each.items():
             at_name = key
             data_type = value['data_type']
+
+            if value.has_key("meta_type"):
+                meta_type_name = value['meta_type']
+                meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
+                if meta_type:
+                    meta_type_id = meta_type._id
+
             for e in value['gsystem_names_list']:
                 node = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': e}]})
                 if node is not None:
                     gsystem_id_list.append(node._id)
                 else:
                     print e,"as GSystemType not present in database"
-        create_attribute_type(at_name, user_id, data_type, gsystem_id_list)
+        create_attribute_type(at_name, user_id, data_type, gsystem_id_list, meta_type_id)
 
-def create_rts(factory_relation_types,user_id):     
+def create_rts(factory_relation_types,user_id):
+    meta_type_id = ""
     for each in factory_relation_types:
         subject_type_id_list = []
         object_type_id_list = []
         for key,value in each.items():
             at_name = key
             inverse_name = value['inverse_name']
+
+            if value.has_key("meta_type"):
+                meta_type_name = value['meta_type']
+                meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
+                if meta_type:
+                    meta_type_id = meta_type._id
+
             for s in value['subject_type']:
                 node_s = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
                 subject_type_id_list.append(node_s._id)
             for rs in value['object_type']:
                 node_rs = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': rs}]})
                 object_type_id_list.append(node_rs._id)
-        create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list)
+        create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id)
 
 def create_sts(factory_gsystem_types,user_id):
+    meta_type_id = ""
     for each in factory_gsystem_types:
-        create_gsystem_type(each, user_id)
+        name = each['name']
+        meta_type_name = each['meta_type']
+        meta_type = collection.GSystemType.one({'$and':[{'_type':'MetaType'},{'name':meta_type_name}]})
+        if meta_type:
+            meta_type_id = meta_type._id
+        create_gsystem_type(name, user_id, meta_type_id)
 
 # Update type_of field to list
 type_of_cursor=collection.find({'type_of':{'$exists':True}})
@@ -297,8 +344,8 @@ for n in cur:
 # For delete the profile_pic as GST 
 profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_pic'})
 if profile_pic_obj:
-	profile_pic_obj.delete()
-	print "Deleted GST document of profile_pic"
+    profile_pic_obj.delete()
+    print "Deleted GST document of profile_pic"
 
 
 # For adding visited_location field (default value set as []) in User Groups.
@@ -334,5 +381,4 @@ try:
 
 except Exception as e:
     print str(e)
-
 
