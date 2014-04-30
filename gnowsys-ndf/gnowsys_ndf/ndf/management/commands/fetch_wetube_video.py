@@ -40,8 +40,9 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
     pandora_video_st=collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
     source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
     pandora_video_id=[]
+    
     source_id_set=[]
-    for each in allVideosData[:1000]:
+    for each in allVideosData[:10]:
         gattribute=collection.Node.one({'$and':[{'object_value':each['id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
         if gattribute is None:
             #gs=collection.GSystem()                                                                                     
@@ -57,13 +58,11 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
 
                 at=collection.GAttribute()
                 at.attribute_type=source_id_at
-                at.object_value=each['id']
+                at.object_value={each['id']:each['user']}
                 at.subject=gs._id
                 at.save()
-
-
+                
 
     get_member_set=collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'File'}]})
-    print list(get_member_set)[0]
 
 

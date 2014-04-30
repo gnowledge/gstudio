@@ -193,7 +193,7 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
             at.created_by = user_id
             at.modified_by = user_id
             if meta_type_id:
-                gs_node.member_of.append(meta_type_id)
+                at.member_of.append(meta_type_id)
 
             if user_id not in at.contributors:
                 at.contributors.append(user_id)
@@ -230,7 +230,7 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
             rt_node.created_by = user_id
             rt_node.modified_by = user_id
             if meta_type_id:
-                gs_node.member_of.append(meta_type_id)
+                rt_node.member_of.append(meta_type_id)
 
             if user_id not in rt_node.contributors:
                 rt_node.contributors.append(user_id)

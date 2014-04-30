@@ -13,40 +13,44 @@
 {% endblock%}
 
 {% block meta_content %}
-  <ul class="side-nav"> 
-    {% for each in app_collection_set %}
-      {% get_memberof_objects_count each.id groupid as count %}
-        {% ifequal each.id app_set_id %}
-          <li class="active"> 
-            <div>
-            
-              <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
-                +&nbsp;Add
-              </a>
-              <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >
-                {{each.name}} ({{count}})
-              </a> 
-              
-            </div>
-          </li>
-        {% else %}
-          <li> 
-            <div>
+<ul class="side-nav"> 
+  {% for each in app_collection_set %}
+  {% get_memberof_objects_count each.id groupid as count %}
+  {% ifequal each.id app_set_id %}
+  <li class="active"> 
+    <div>
+    <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+    </div>
+  </li>
+    {% else %}
+    <li> 
+      <div>
+      <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
+      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
+      </div>
+    </li>
+    {% endifequal %}
+    {% endfor %}
 
-              <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
-                +&nbsp;Add
-              </a>
-              <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >
-                {{each.name}} ({{count}})
-              </a> 
+    <br/>
+    {% if app_name == "browse topic" %}  
+      <li> 
+        <div>
+          <a href="{% url 'GAPPS' groupid app_name app_id %}"> <input class="small button split" type="button" value="Themes Hierarchy" > </a>
+        </div>
+      </li>
+    {% endif %}
 
-            </div>
-          </li>
-          {% endifequal %}
-      {% endfor %}
-  </ul>
+</ul>
 {% endblock %}
 
+{% block extra_content %}
+<!-- This block shows Themes Hierarchy (landing page of Browse Topic) -->
+{% if app == "Browse Topic" %}
+  {% include "ndf/theme.html" %}
+{% endif %}
+{% endblock %}
 
 
 {% block body_content %} 
@@ -265,7 +269,6 @@
 		</div>
 	    {% endif %}
 
-	    <!-- <a href="{#% url edit_url groupid node %#}" class="small button split edit"> -->
 	    <a href="{% url 'GAPPS_set_instance_edit' groupid app_name app_id app_set_id app_set_instance_id %}" class="small button split edit">
 	      <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
 	    </a>
