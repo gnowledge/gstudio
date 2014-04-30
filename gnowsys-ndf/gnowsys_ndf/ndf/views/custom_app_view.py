@@ -348,7 +348,6 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                         newrelation.relation_type = relationtype_key
                         newrelation.right_subject = right_subject._id
                         newrelation.save()
-        
 
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
     
