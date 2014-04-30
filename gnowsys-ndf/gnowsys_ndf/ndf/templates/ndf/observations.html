@@ -9,6 +9,8 @@
 
 	#app-set-item > a { color:inherit; }
 
+	.selected-app-set-item { background-color:#33C284; }
+
 {% endblock %}
 
 <!-- Concern Information Block -->
@@ -20,8 +22,13 @@
 	<ul class="no-bullet" id="app-set-item">
 		{% for each in app_collection_set %}
 			<a href="{% url "observations_app" groupid app_id each.name|slugify each.id %}">
-				<li class="">
-					{{each.name}} &nbsp;&nbsp;&nbsp;<i class="fi-marker"></i> {{each.total_locations}} 
+				
+			{% if app_set_name_slug == each.name|slugify %}
+				<li class="{{each.name|slugify}} selected-app-set-item" id="{{each.id}}">
+			{% else %}
+				<li class="{{each.name|slugify}}" id="{{each.id}}">
+			{% endif %}
+					{{each.name}} &nbsp;&nbsp;&nbsp;<span class="fi-marker"> {{each.total_locations}} </span>  
 				</li>
 			</a>
 			<input type="hidden" name="hidden_{{each.name|slugify}}" value="{{each.locations}}" />
@@ -50,7 +57,7 @@
 	{% if template_view == "landing_page_view" %}
 		<div class="row">
 			<div id="all-markers-map-widget" class="small-12 large-12 columns" >
-				{% include "ndf/observations_map.html" with mode="read" %}
+				{% include "ndf/observations_map.html" with mode="read" template_view=template_view %}
 			</div>
 		</div>
 	{% endif %}
@@ -62,18 +69,16 @@
 	{% if template_view == "app_set_view" %}
 		<div class="row">
 			<div id="all-markers-map-widget" class="small-12 large-12 columns" >
-				{% include "ndf/observations_map.html" with mode="edit" %}
+				{% include "ndf/observations_map.html" with mode="edit" template_view=template_view %}
 			</div>
 		</div>
 	{% endif %}
 	
 
-
+<!-- 
 <script type="text/javascript">
-
-
 </script>
-
+ -->
 
 {% endblock %}
 <!-- END of Body content Block -->
@@ -81,5 +86,6 @@
 
 {% block script %}
 
-
+	$("#node_search_form").parent().hide();
+	
 {% endblock %}

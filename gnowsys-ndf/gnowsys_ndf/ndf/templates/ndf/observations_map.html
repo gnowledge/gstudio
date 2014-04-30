@@ -58,12 +58,15 @@
 	<!-- Popup structure -->
 	<div style="display:none; ">
 		<div class="popup-html">
-
+			<label>Place Name</label>
 			<input type="text" class="marker-place-name" placeholder="Place Name"/>
+			<label>Date Time</label>
 			<input type="text" class="marker-dtstamp" placeholder="Date Time"/>
-			<textarea class="marker-obs-note" placeholder="Observation note ..."></textarea>
+			<label>Observations</label>
+			<textarea class="marker-obs-note" placeholder="Observation"></textarea>
+			<label>Tags</label>
 			<input type="text" class="marker-tags" placeholder="Tags"/>
-			<input type="file" class="marker-file-upload" />
+			<!-- <input type="file" class="marker-file-upload" /> -->
 
 			<div class="row">
 				<div class="small-push-1 small-4 popup-add-content-button text-center"><i class="fi-page-edit"> &nbsp; edit</i></div>			
@@ -72,7 +75,7 @@
 		</div>
 	</div>
 
-	<div id="map" data-mode="{{ mode }}">
+	<div id="map" data-mode="{{ mode }}" data-template-view="{{ template_view }}">
 		<input type="hidden" data-map-markers="{{ node.location }}" value="{{ location }}" name="map-geojson-data"/>
 	</div>
 
@@ -137,13 +140,25 @@
 
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
-	 	mapdata = [];
+	 	mapdata = "";
 		// exctracting GeoJson sent from server
-		{% for each in app_collection_set %}
-			tempdata = $("input:hidden[name='hidden_{{each.name|slugify}}']").val();
-			mapdata += tempdata.slice(1,tempdata.length-1)			
-		{% endfor%}
+		
+		{% if template_view == "landing_page_view" %}
+		
+			{% for each in app_collection_set %}
+				
+				tempdata = $("input:hidden[name='hidden_{{each.name|slugify}}']").val();
+				mapdata = (mapdata.length > 0 && tempdata != '[]')? mapdata+"," : mapdata;
+				mapdata = (tempdata != '[]')?mapdata+tempdata.slice(1,tempdata.length-1) : mapdata;			
+
+			{% endfor%}
  		
+ 		{% elif template_view == "app_set_view" %}
+
+ 			tempdata = $("input:hidden[name='hidden_{{app_set_name_slug}}']").val();
+			mapdata += tempdata.slice(1,tempdata.length-1)			
+
+ 		{% endif %}
 
  		// check mapdata value or else converting it into JSON.parse() acceptable format
  		if(mapdata && typeof(mapdata) == "string")
@@ -175,30 +190,48 @@
 			    
 			    pointToLayer: function (feature, latlng) {
 
-					var tempPopupContent;	// update popupBasicHtml with GeoJson data
+					var tempPopupContent = "",	// update popupBasicHtml with GeoJson data
+						hasDataFlag = false;
 
 					var placename = feature.properties.placename,
 						datetime = feature.properties.datetime,
 						description = feature.properties.description,
-						tags = feature.properties.tags ;
+						tags = feature.properties.tags 
+						created_by = feature.properties.created_by;
 
-					if(description)
-					{
-						// tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+description+'</div>');
-					}
-					else
-					{
-						// tempPopupContent = popupBasicHtml.replace('<div class="popup-content" contenteditable="true"></div>','<div class="popup-content" contenteditable="true">'+ initialPopContent +'</div>');
-					}
+				// console.log(placename + " == " + datetime + " == " + description + " == " + tags + " == " + created_by);
+
+					{% if mode == "read"%}
+
+						tempPopupContent = placename? "Placename : "+placename :tempPopupContent;
+						tempPopupContent = datetime? tempPopupContent + "<hr/>Date Time : " + datetime :tempPopupContent;
+						tempPopupContent = description? tempPopupContent + "<hr/>Description : " + description :tempPopupContent;
+						tempPopupContent = tags? tempPopupContent + "<hr/>Tags : " + tags :tempPopupContent;
+
+						hasDataFlag = tempPopupContent.length>0 ? true : false;
+					{% endif %}
+
+					{% if mode == "edit" %}
+
+						var tc = popupBasicHtml;
+			
+						tc = placename? tc.replace('class="marker-place-name"', 'class="marker-place-name" value="'+placename+'"') :tc;
+						tc = datetime? tc.replace('class="marker-dtstamp"', 'class="marker-dtstamp" value="'+datetime+'"') :tc;
+						tc = description? tc.replace('placeholder="Observation">', 'placeholder="Observation">'+description) :tc;
+						tc = tags? tc.replace('class="marker-tags"', 'class="marker-tags" value="'+tags+'"') :tc;
+
+						tempPopupContent = tc;
+
+					{% endif %}
 
 					var marker = L.marker(latlng, {
-						icon: (description)?infoMarker:nonInfoMarker,
+						icon: (placename||datetime||description||tags)?infoMarker:nonInfoMarker,
 						title: (description)?description:"Resource Location",
 						alt: (description)?description:"Resource Location",
 						riseOnHover:true
 
 			    	{% if mode == "edit" %}	        	
-							,draggable:true,
+							,draggable:true
 						}).bindPopup(tempPopupContent);
 
 			        	marker.on("popupopen", onPopupOpen );
@@ -208,7 +241,8 @@
 			        {% elif mode == "read" %}
 
 						}); // End of marker for read
-						if(description){ marker.bindPopup(feature.properties.description); }
+						if(hasDataFlag){ marker.bindPopup(tempPopupContent); }
+						// marker.bindPopup(tempPopupContent);
 
 			       	{% endif %}
 
@@ -219,13 +253,15 @@
 			    }
 			}).addTo(map);
 
-						
+			
 	        // Adding mapdata values in markerGeoJSON.
 	        $.each(tempArr, function(i, val){ 
 
+				tempArr[i].feature.properties.id = tempArr[i]._leaflet_id;
+
 	        	var addLeafletID = tempArr[i].toGeoJSON();
 	        	
-	        	// console.log(tempArr[i].feature.properties.description);
+	        	// console.log(JSON.stringify(tempArr[i].toGeoJSON()));
 	        	
 	        	$(addLeafletID).attr("properties", {"id": tempArr[i]._leaflet_id, "description":tempArr[i].feature.properties.description});
 	        	markerGeoJSON.push(JSON.stringify(addLeafletID));
@@ -324,6 +360,7 @@
            	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
 
            	var tempMarkerGeoJSON = this.toGeoJSON();
+           	
            	// console.log(this);
 			// console.log( JSON.stringify(tempMarkerGeoJSON))
 
@@ -381,23 +418,36 @@
 
 		function onPopupOpen()
 		{
+			// getting marker instance
 			tempMarker = this;
 
 			// attaching datetimepicker after getting marker popup html
-			var popupHtmlObj = tempMarker._popup._contentNode.getElementsByClassName("marker-dtstamp");
-			$(popupHtmlObj).datetimepicker();
+			var popupHtmlObjDt = tempMarker._popup._contentNode.getElementsByClassName("marker-dtstamp");
+			$(popupHtmlObjDt).datetimepicker();
+
+			var popupHtmlObj = tempMarker._popup._contentNode;
 
 			// tempMarker._popup
 
+			// marker GeoJson
 			var tempMarkerGeoJSON = this.toGeoJSON();
 			// console.log(JSON.stringify(tempMarkerGeoJSON));
 
 			var lID = tempMarker._leaflet_id;		// Getting Leaflet ID of this marker
 
-			var placename = tempMarkerGeoJSON.properties.placename,
-				datetime = tempMarkerGeoJSON.properties.datetime,
-				description = tempMarkerGeoJSON.properties.description,
-				tags = tempMarkerGeoJSON.properties.tags ;
+			// getting all the values from feature of marker
+			var placename = tempMarker.feature.properties.placename,
+				datetime = tempMarker.feature.properties.datetime,
+				description = tempMarker.feature.properties.description,
+				tags = tempMarker.feature.properties.tags,
+				created_by = tempMarker.feature.properties.created_by;
+
+			$(popupHtmlObj).children("input.marker-place-name").val(placename);
+			$(popupHtmlObj).children("input.marker-dtstamp").val(datetime);
+			$(popupHtmlObj).children("textarea.marker-obs-note").val(description);
+			$(popupHtmlObj).children("input.marker-tags").val(tags);
+
+				// console.log(placename + " == " + datetime + " == " + description + " == " + tags + " == " + created_by);
 
 			// preserving and updating GeoJson of marker
             var MarkerLatLng = []
@@ -405,17 +455,19 @@
             MarkerLatLng.push(tempMarker.getLatLng().lng);
             updateHiddenTagContent(MarkerLatLng);
 
+
+
             // sometimes description exist and sometimes not
-			if(! description)
-			{
-				$.each(markerGeoJSON, function(i, val) {
+			// if(! description)
+			// {
+			// 	$.each(markerGeoJSON, function(i, val) {
 				            	
-					            		var getID = $.parseJSON(val).properties.id,
-					            			getDescription = $.parseJSON(val).properties.description; 
+			// 		            		var getID = $.parseJSON(val).properties.id,
+			// 		            			getDescription = $.parseJSON(val).properties.description; 
 				
-					            		if(getID == lID) { description = getDescription?getDescription:"";  }  
-					           		})
-			}
+			// 		            		if(getID == lID) { description = getDescription?getDescription:"";  }  
+			// 		           		})
+			// }
 			 			
 			if(description)
 			{					
@@ -425,26 +477,41 @@
 			// To remove marker on click of delete
 			$(".popup-delete-content-button:visible").click(function(){
 
-				$.each(markerGeoJSON, function(i, val) {
+				if("{{user_name}}" == created_by)
+				{
+					// saving marker data in database 
+					$.ajax({
 
-	            		getID = JSON.parse(val).properties.id; 
+						type:'post',
+						url: "{% url 'delete_observation' groupid app_id app_set_id app_set_name_slug %}",
+						dataType: 'json',
+			  			data: { marker_geojson:JSON.stringify(tempMarkerGeoJSON), csrfmiddlewaretoken: '{{ csrf_token }}'},
+			  			success: function(data){
 
-	            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
-            		})
+			  				var ajaxUrl = this.url,
+			  					listId = ajaxUrl.split("/")[5];
+	
+			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
 
-				map.removeLayer(tempMarker);
+			  				$.each(markerGeoJSON, function(i, val) {
+	
+			            		getID = JSON.parse(val).properties.id; 
+		
+			            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
+	        	    		})
+			
+							map.removeLayer(tempMarker);
+							updateHiddenTagContent();
+	
+				  		}// END OF success
 
-				updateHiddenTagContent();
+					});// END of ajax
+					
+				}
 			});
 
 			// check if popup form gets changed
 			$(".leaflet-popup-content:visible input, textarea").bind("keyup keypress onmouseup blur change", function(){
-
-// <input type="text" class="marker-place-name" placeholder="Place Name"/>
-// 			<input type="text" class="marker-dtstamp" placeholder="Date Time"/>
-// 			<textarea class="marker-obs-note" placeholder="Observation note ..."></textarea>
-// 			<input type="text" class="marker-tags" placeholder="Tags"/>
-// 			<input type="file" class="marker-file-upload" />
 
 				var inputEl = $(this);
 
@@ -471,7 +538,7 @@
 					thisPopupContent = $(this).parent().parent();
 					$(thisPopupContent).children("input[type=text].marker-place-name").focus();
 				}
-				else if($(this).children("i").hasClass("fi-save"))
+				else if($(this).children("i").hasClass("fi-save"))	// when click on save btn
 				{
 					thisPopupContent = $(this).parent().parent();
 
@@ -483,7 +550,7 @@
 						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
 						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
 
-					if(getPlace.length && getPlace != placename )
+					if( getPlace.length && getPlace != placename )
 					{
 						tempMarker.setIcon(infoMarker);
 
@@ -494,18 +561,19 @@
 						tempMarker.setIcon(nonInfoMarker);	
 					}
 
-					tempMarkerGeoJSON.properties.placename = getPlace;
-					tempMarkerGeoJSON.properties.created_at = getDT;
-					tempMarkerGeoJSON.properties.description = getObsNote.replace(/'/gm, "");	// temp fix.
-					tempMarkerGeoJSON.properties.tags = getTags;
+					tempMarker.feature.properties.placename = getPlace;
+					tempMarker.feature.properties.datetime = getDT;
+					tempMarker.feature.properties.created_at = getDT;
+					tempMarker.feature.properties.description = getObsNote.replace(/'/gm, "");	// temp fix.
+					tempMarker.feature.properties.tags = getTags;
 									
-					if(! tempMarkerGeoJSON.properties.id)
+					if(! tempMarker.feature.properties.id)
 					{
-						tempMarkerGeoJSON.properties.id = lID;	
+						tempMarker.feature.properties.id = lID;	
 					}
-					
-					var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
-					
+
+					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
+					// console.log(updatedGeoJSON);
             		$.each(markerGeoJSON, function(i, val) {
             	
 	            		var getID = $.parseJSON(val).properties.id;
@@ -518,13 +586,15 @@
 					$.ajax({
 
 						type:'post',
-						url: "{% url 'save_observation' groupid app_id app_set_id user_name %}",
+						url: "{% url 'save_observation' groupid app_id app_set_id app_set_name_slug %}",
 						dataType: 'json',
 			  			data: { marker_geojson:updatedGeoJSON, csrfmiddlewaretoken: '{{ csrf_token }}'},
 			  			success: function(data){
 
-			  				console.log(data);
-
+			  				var ajaxUrl = this.url,
+			  					listId = ajaxUrl.split("/")[5];
+	
+			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
 				  		}// END OF success
 
 					});// END of ajax

@@ -1,6 +1,6 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-import json
+import json, ast
 from difflib import HtmlDiff
 
 ''' -- imports from installed packages -- '''
@@ -58,7 +58,7 @@ def all_observations(request, group_id, app_id=None):
 			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 			# obj_count = app_element_content_objects.count()
 				
-		app_collection_set.append({ 
+			app_collection_set.append({ 
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
 									"locations": locations,
@@ -67,7 +67,7 @@ def all_observations(request, group_id, app_id=None):
 
 	# print "\napp_name : ", app_name, "\napp_set_id : ", app_set_id
 
-	print "\n app_collection_set : ", app_collection_set
+	# print "\n app_collection_set : ", app_collection_set
 
     # if app_set_id:
     #     classtype = ""
@@ -100,8 +100,9 @@ def all_observations(request, group_id, app_id=None):
 
 def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
-	user_id = int(request.user.id)  			# getting django user id
-	user_name = unicode(request.user.username)  # getting django user name
+	# getting django user id
+	user_id = int(request.user.id)  if request.user.id 	else ""		
+	user_name = unicode(request.user.username) if request.user.username  else "" # getting django user name
 
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
@@ -115,11 +116,16 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 		if app_set_element:
 
 			locs = len(app_set_element.location)
-
+			locations = app_set_element.location
 			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 			# obj_count = app_element_content_objects.count()
 				
-		app_collection_set.append({"id":str(app_set_element._id),"name":app_set_element.name, "total_locations": locs})
+			app_collection_set.append({ 
+									"id":str(app_set_element._id),
+									"name":app_set_element.name,
+									"locations": locations,
+									"total_locations": locs
+								  })
 
 
 	# for each in app.collection_set:
@@ -137,21 +143,41 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 							 	{
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,
-							 		'app_name':app_name, 'app_id':app_id, 'app_set_id':app_set_id,
+							 		'app_name':app_name, 'app_id':app_id, 'app_set_id':app_set_id, 'app_set_name_slug':slug,
 							 		'user_name':user_name, 'template_view': 'app_set_view'
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
 
 
-def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, user_name=None):
+def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
 	marker_geojson = request.POST["marker_geojson"]
+	marker_geojson = ast.literal_eval(marker_geojson)
+	marker_geojson['properties']['ref'] = str(ObjectId())
 
-	# app_set = collection.Node.find_one({"_id":ObjectId(app_set_id)})
 	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
 
-	app_set_element.location.append(json.loads(marker_geojson))
-	app_set_element.save()
+	if app_set_element:
+		app_set_element.location.append(marker_geojson)
+		app_set_element.save()
 	
+	return HttpResponse(len(app_set_element.location))
+
+
+
+def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
+
+	marker_geojson = request.POST["marker_geojson"]
+	marker_geojson = ast.literal_eval(marker_geojson)
+	marker_ref = marker_geojson['properties']['ref']
+
+	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
+
+	for each in app_set_element.location:
+		
+		if each['properties']['ref'] == marker_ref:
+			app_set_element.location.remove(each)
+			app_set_element.save()
+		
 	return HttpResponse(len(app_set_element.location))
