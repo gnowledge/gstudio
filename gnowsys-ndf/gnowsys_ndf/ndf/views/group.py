@@ -181,6 +181,18 @@ def create_group(request,group_id):
 
 def group_dashboard(request,group_id=None):
 
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	if group_ins:
+	    group_id = str(group_ins._id)
+	else :
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if auth :
+	    	group_id = str(auth._id)	
+    else :
+	pass
     try:
         groupobj="" 
         grpid=""
@@ -274,7 +286,7 @@ def app_selection(request,group_id,node_id):
                     if each:
                         obj=collection.Node.one({'_id':ObjectId(each)})
                         lst.append(obj);
-                gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_apps_list._id}]})
+                gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_apps_list._id},{'subject':grp._id}]})
                 if gattribute:
                     gattribute.delete()
                 if lst:
