@@ -53,12 +53,12 @@
 	  </select>
 	</td>
         <td> 
-	  <input id="compare_versions" type="submit"  value="Go" class="btn btn-large btn-primary" />
+	  <input id="compare_versions" type="submit" value="Go" class="button tiny" />
           
-
+         
 	  {% if  selected_versions.1   and   selected_versions.2  %}
             
-	   <a class="button tiny"  > Merge </a>	
+	   <a class="button tiny" href="{% url 'merge_doc' group_id node  selected_versions.1 selected_versions.2 %}" > Merge </a>	
 	  {% endif %}
           {% if  selected_versions.1   and   selected_versions.2  %} 
 	   <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.1 %}" > Revert to {{selected_versions.1}} </a>
@@ -71,36 +71,38 @@
   </form>
   </div>
 
-  {% ifequal view "single" %}
+  {% if  view == "single" %}
     <div id="single-view" style="padding-bottom: 20px">
       <table cellpadding="8">
 	<tr>
-		
-        
-	
-          
-          <th align="right">Fields</th>
+	<th align="right">Fields</th>
           <th align="left">Version #{{selected_versions.1}}</th>
 	</tr>
-	{% for k, v in content.items %}
+        {% for k, v in content.items %}
 	<tr>
+          
           <td align="right" valign="top">{{k}}</td>
           <td>{{v}}</td>
 	</tr>
 	{% endfor %}
       </table>
-    </div>
-  
+   
+ </div>
+{% elif view == "merge" or view == "revert" %}
+  <script>
+        document.location.href = '/{{group_id}}/page/{{node}}/version/{{ver}}'</script>
+
   {% else %}
  <div class="row">  
  <div class="medium-5 columns"> 
     <div id="compare-view" style="padding-bottom: 20px">
        <table>
-       	
-	    {% for k,v in content.items %}
+       	    Version #{{selected_versions.1}}
+	    {% for k,v in content1.items %}
 		<tr>
+                  
 	          <td align="right" valign="top">{{k}}</td>
-	          <td>{{v|safe|safe}}</td>
+	          <td>{{v|safe}}</td>
 		</tr>
 	   
 		{% endfor %}
@@ -109,13 +111,14 @@
     
      </div>
     </div>
+
  <div class="medium-6 columns">  
          <table>
-       	
-	    {% for k,v in content1.items %}
+       	    Version #{{selected_versions.2}}
+	    {% for k,v in content.items %}
 		<tr>
 	          <td align="right" valign="top">{{k}}</td>
-	          <td>{{v|safe|safe}}</td>
+	          <td>{{v|safe}}</td>
 		</tr>
 	   
 		{% endfor %}
@@ -123,8 +126,9 @@
 	    </table>
     </div>
  </div>
+	
 
-  {% endifequal %}
+  {% endif %}
 
 {% endblock %}
 

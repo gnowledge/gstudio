@@ -17,7 +17,7 @@ from gnowsys_ndf.ndf.views.methods import get_versioned_page
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 from gnowsys_ndf.mobwrite.diff_match_patch import diff_match_patch
 from django_mongokit import get_database
-from gnowsys_ndf.ndf.PyFreeDiff import DiffEngine
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -41,7 +41,7 @@ collection_tr = db[Triple.collection_name]
 gst_page = collection.Node.one({'_type': 'GSystemType', 'name': GAPPS[0]})
 history_manager = HistoryManager()
 rcs = RCS()
-t=DiffEngine()
+
 #######################################################################################################################################
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
 #######################################################################################################################################
@@ -286,9 +286,6 @@ def version_node(request, group_id, node_id, version_no):
 	selected_versions = {"1": version_1, "2": version_2}
    	doc=history_manager.get_version_document(node,version_1)
 	doc1=history_manager.get_version_document(node,version_2)     
-        #newcontent=t.diff(str(doc),str(doc1))
-        #patch=t.apply_patch(node,newcontent)
-        #results=t.generate_html_diffs(patch)
         
         for i in doc1:
 	   
@@ -324,7 +321,7 @@ def version_node(request, group_id, node_id, version_no):
 
         selected_versions = {"1": version_no, "2": ""}
         content = data
-        content1='none'
+        content_1='none'
     return render_to_response("ndf/version_page.html",
                               {'view': view,
                                'node': node,
@@ -529,9 +526,10 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      doc2.content=con3
      node.content_org=doc2.content_org
      node.content=doc2.content
+     node.modified_by=request.user.id
      node.save()
-     
-     view='single'
+     ver=history_manager.get_current_version(node)
+     view='merge'
      
      return render_to_response("ndf/version_page.html",
                                {'view': view,
@@ -539,7 +537,8 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
                                 'node':node,
                                 'groupid':group_id,
                                 'group_id':group_id,
-                                'content':node
+                                'content':node,
+                                'ver':ver
                                },
                              
                               context_instance = RequestContext(request)
@@ -553,8 +552,10 @@ def revert_doc(request,group_id,node_id,version_1):
    for attr in doc:
       if attr != '_type':
 	    node[attr] = doc[attr];
+   node.modified_by=request.user.id
    node.save()
-   view ='single'
+   view ='revert'
+   ver=history_manager.get_current_version(node)
    selected_versions=selected_versions = {"1": version_1, "2": ""}
    
    return render_to_response("ndf/version_page.html",
@@ -563,7 +564,9 @@ def revert_doc(request,group_id,node_id,version_1):
                                 'node':node,
                                 'groupid':group_id,
                                 'group_id':group_id,
-                                'content':node
+                                'content':node,
+                                'ver':ver    
+                           
                                },
                              
                               context_instance = RequestContext(request)
