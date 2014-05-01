@@ -24,7 +24,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^$', HomeRedirectView.as_view()),        
     (r'^home/','gnowsys_ndf.ndf.views.group.group_dashboard'),
-        
+
     (r'^(?P<group_id>[^/]+)/file/', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image/', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_id>[^/]+)/video/', include('gnowsys_ndf.ndf.urls.video')),
@@ -35,13 +35,17 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/course/', include('gnowsys_ndf.ndf.urls.course')),
     (r'^(?P<group_id>[^/]+)/module/', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
+
     (r'^(?P<group_id>[^/]+)/browse resource/', include('gnowsys_ndf.ndf.urls.browse_resource')),
-    
+
     (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
 
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
 
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
+
+    (r'^(?P<group_id>[^/]+)/observation/(?P<app_id>[\w-]+)$', include('gnowsys_ndf.ndf.urls.observations_urls')),
+    (r'^(?P<group_id>[^/]+)/observations/(?P<app_id>[\w-]+)', include('gnowsys_ndf.ndf.urls.observations_urls')),
     
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', custom_app_view, name='GAPPS'),       
     url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', custom_app_view, name='GAPPS_set'),

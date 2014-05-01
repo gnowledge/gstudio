@@ -1,6 +1,6 @@
- $("nav.top-bar").delay(1000).animate({
-        top:"-40px"
-    },500);
+ // $("nav.top-bar").delay(1000).animate({
+ //        top:"-40px"
+ //    },500);
 
 // $("body>header").hover(function() {
 //     // Top bar animation on hover
@@ -13,4 +13,4 @@
 //         top:"-40px"
 //     },500);
 // }
-                      );
+                      // );

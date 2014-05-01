@@ -51,7 +51,7 @@ def check_gapp_menus(groupid):
   grp=collection.Node.one({'_id':ObjectId(groupid)})
   if not at_apps_list:
     return False
-  poss_atts=grp.get_possible_attributes(at_apps_list._id)
+  poss_atts=grp.get_possible_attributes(grp.member_of)
   if not poss_atts:
     return False
   return True
@@ -205,7 +205,7 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
-
+  print "fields_name",fields_name
   drawer1 = {}
   drawer2 = None
   groupid = ""
@@ -216,11 +216,11 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 
   alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
 
-  fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+  fields_selection1 = ["subject_type","language","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
 
   fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
 
-  fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType"}
+  fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
   types = fields[fields_name]
 
   if fields_name in fields_selection1:
@@ -236,6 +236,10 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
     elif fields_name in ("data_type"):
       for each in DATA_TYPE_CHOICES:
         drawer1[each] = each
+    elif fields_name in ("language"):
+        drawer1['hi']='hi'
+        drawer1['en']='en'
+        drawer1['mar']='mar'
     else:
       drawer = collection.Node.find({"_type":types})
       for each in drawer:
@@ -291,23 +295,13 @@ def get_gapps_menubar(group_id, selectedGapp):
     gapps = {}
     i = 0;
     meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+    
     GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
     
-    nroer_GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}, {'name': {'$in':["Browse Topic", "Browse Resource"] } }]}).sort("created_at")
-
-    if not nroer_GAPPS.count():
-      # GAPPS for NUSSD gstudio instance
-      for node in GAPPS:
-        #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
-        if node:
-          if node.name not in ["Image", "Video"]:
-            i = i+1;
-            gapps[i] = {'id': node._id, 'name': node.name.lower()}
-
-    else:
-      # GAPPS for NROER instance
-      for node in nroer_GAPPS:
-        if node:
+    for node in GAPPS:
+      #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+      if node:
+        if node.name not in ["Image", "Video"]:
           i = i+1;
           gapps[i] = {'id': node._id, 'name': node.name.lower()}
 

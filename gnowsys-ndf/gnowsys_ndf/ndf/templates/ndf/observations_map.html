@@ -1,0 +1,621 @@
+{% block head %}
+
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+	<!-- Leaflet -->
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+
+	<!-- Search	 -->
+	<!-- <script src="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.js" type="text/javascript" ></script> -->
+	<!-- <link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.css"> -->
+
+	<!-- Markers -->
+	<link rel="stylesheet" href="/static/ndf/leaflet/leaflet.awesome-markers.css">
+	<script src="/static/ndf/leaflet/leaflet.awesome-markers.js"></script>
+
+	<!-- Datetimepicker  -->
+	<!-- <link rel="stylesheet" media="all" type="text/css" href="/static/ndf/css/jquery-ui.css" /> -->
+	<link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<script src="/static/ndf/js/jquery-ui.js"></script>
+	<script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
+	<script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
+	<link rel="stylesheet" href="/static/ndf/css/jquery-ui-timepicker-addon.css">
+	
+
+{% endblock %}
+
+	<style type="text/css">
+		
+		#map { height: 100%; width: 100%; }
+
+		.leaflet-popup-content {	min-width:166px; max-width: auto;	}
+
+		.leaflet-popup-content > textarea { 
+			min-height: 4.5em !important;
+			resize:vertical;
+		}
+
+		.popup-add-content-button {
+			background-color: #199369; color: #FFFFFF; display: block; 
+			float: left; padding: 1px 2px; cursor: pointer;	
+		}
+
+		.popup-add-content-button:hover { background-color: #00BA7B; }
+
+		.popup-delete-content-button {
+			background-color: #d84b33; color: #FFFFFF; display: inline-block; 
+			float: right; padding: 1px 2px; cursor: pointer;	
+		}
+
+		.popup-delete-content-button:hover { background-color: #f15439; }
+
+	</style>
+
+
+<body>
+
+	<!-- Popup structure -->
+	<div style="display:none; ">
+		<div class="popup-html">
+			<label>Place Name</label>
+			<input type="text" class="marker-place-name" placeholder="Place Name"/>
+			<label>Date Time</label>
+			<input type="text" class="marker-dtstamp" placeholder="Date Time"/>
+			<label>Observations</label>
+			<textarea class="marker-obs-note" placeholder="Observation"></textarea>
+			<label>Tags</label>
+			<input type="text" class="marker-tags" placeholder="Tags"/>
+			<!-- <input type="file" class="marker-file-upload" /> -->
+
+			<div class="row">
+				<div class="small-push-1 small-4 popup-add-content-button text-center"><i class="fi-page-edit"> &nbsp; edit</i></div>			
+				<div class="small-pull-1 small-4 popup-delete-content-button text-center"><i class="fi-trash"> &nbsp; delete</i></div>			
+			</div>
+		</div>
+	</div>
+
+	<div id="map" data-mode="{{ mode }}" data-template-view="{{ template_view }}">
+		<input type="hidden" data-map-markers="{{ node.location }}" value="{{ location }}" name="map-geojson-data"/>
+	</div>
+
+	<input type="hidden" value="{{ visited_location }}" name="last_visited_location"/>
+	
+	<script type="text/javascript">
+		 
+	 	// We’ll add a OSM tile layer to our map
+	 	var osmUrl 	  = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+	 	osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	 	osm 	  = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
+
+	 	// instantiate map instantiate
+	 	var map = L.map('map').addLayer(osm);
+	 	map.setView([25.92,79.84], 5);
+		// getting logged in user last visited location	 	
+		$.ajax({
+
+			url: "{% url 'get_visited_location' groupid %}",
+  		
+  			success: function(data){
+
+  				var lastVisitedLocationVal = JSON.parse(data);
+
+		    	if(lastVisitedLocationVal == "[]")
+			    {
+			    	lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+			    }
+
+			    if(lastVisitedLocationVal)
+			    {
+			    	if(lastVisitedLocationVal == "[]")
+				    {
+				    	lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+				    }
+
+			 	    if(lastVisitedLocationVal.length > 0)
+			    	{
+				      	// lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+				        var zoom = lastVisitedLocationVal.pop(),
+				        lng = lastVisitedLocationVal[1],
+				        lat = lastVisitedLocationVal[0];
+				        map.setView([lat, lng], zoom);
+			      	}
+	    		}
+	    		// else if( tempArr.length )
+			    // {
+			    //   var group = new L.featureGroup(tempArr)
+			    //       map.fitBounds(group.getBounds());
+			    // }
+			    else
+			    {
+			    	map.setView([25.92,79.84], 5);
+			    }
+
+	  		}// END OF success
+
+		});// END of ajax
+
+
+		// defining markers
+	 	nonInfoMarker = L.AwesomeMarkers.icon({ markerColor: 'blue', iconColor: 'white', spin:false });
+	 	infoMarker = L.AwesomeMarkers.icon({ icon: 'info', prefix: 'fi', markerColor: 'blue', iconColor: 'white', spin:false });
+
+	 	// var initialPopContent = "Add description.. <i>(optional)</i>",
+	 	// 	initialPopContentText = "Add description.. (optional)";
+
+	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
+
+	 	mapdata = "";
+		// exctracting GeoJson sent from server
+		
+		{% if template_view == "landing_page_view" %}
+		
+			{% for each in app_collection_set %}
+				
+				tempdata = $("input:hidden[name='hidden_{{each.name|slugify}}']").val();
+				mapdata = (mapdata.length > 0 && tempdata != '[]')? mapdata+"," : mapdata;
+				mapdata = (tempdata != '[]')?mapdata+tempdata.slice(1,tempdata.length-1) : mapdata;			
+
+			{% endfor%}
+ 		
+ 		{% elif template_view == "app_set_view" %}
+
+ 			tempdata = $("input:hidden[name='hidden_{{app_set_name_slug}}']").val();
+			mapdata += tempdata.slice(1,tempdata.length-1)			
+
+ 		{% endif %}
+
+ 		// check mapdata value or else converting it into JSON.parse() acceptable format
+ 		if(mapdata && typeof(mapdata) == "string")
+ 		{
+ 			mapdata = mapdata.trim();
+
+ 			mapdata = mapdata[0]!="["?"["+mapdata:mapdata ;
+ 			mapdata = mapdata[mapdata.length-1]!="]"? mapdata+"]":mapdata ;
+ 		}
+
+ 		// declaring global variables
+	 	markerGeoJSON = [];							// takes all markers updated geojson
+	 	popupBasicHtml = $(".popup-html").html()	// marker popup html content
+	 	tempArr = []								// to catch newly created markers in following if()
+
+	 	if( mapdata.length > 0 )
+	 	{
+	 		// Adding mapdata on map
+
+		 	// L.geoJson(mapdata, {onEachFeature: function (feature, layer) {
+		 	// 	// layer.bindPopup("feature.properties.description");
+		 	// }}).addTo(map);
+
+			mapdata = mapdata.replace(/'/gm, '"');
+	 		mapdata = mapdata.replace(/u"/gm, '"');
+	 		mapdata = JSON.parse(mapdata);
+			
+			L.geoJson(mapdata, {
+			    
+			    pointToLayer: function (feature, latlng) {
+
+					var tempPopupContent = "",	// update popupBasicHtml with GeoJson data
+						hasDataFlag = false;
+
+					var placename = feature.properties.placename,
+						datetime = feature.properties.datetime,
+						description = feature.properties.description,
+						tags = feature.properties.tags 
+						created_by = feature.properties.created_by;
+
+				// console.log(placename + " == " + datetime + " == " + description + " == " + tags + " == " + created_by);
+
+					{% if mode == "read"%}
+
+						tempPopupContent = placename? "Placename : "+placename :tempPopupContent;
+						tempPopupContent = datetime? tempPopupContent + "<hr/>Date Time : " + datetime :tempPopupContent;
+						tempPopupContent = description? tempPopupContent + "<hr/>Description : " + description :tempPopupContent;
+						tempPopupContent = tags? tempPopupContent + "<hr/>Tags : " + tags :tempPopupContent;
+
+						hasDataFlag = tempPopupContent.length>0 ? true : false;
+					{% endif %}
+
+					{% if mode == "edit" %}
+
+						var tc = popupBasicHtml;
+			
+						tc = placename? tc.replace('class="marker-place-name"', 'class="marker-place-name" value="'+placename+'"') :tc;
+						tc = datetime? tc.replace('class="marker-dtstamp"', 'class="marker-dtstamp" value="'+datetime+'"') :tc;
+						tc = description? tc.replace('placeholder="Observation">', 'placeholder="Observation">'+description) :tc;
+						tc = tags? tc.replace('class="marker-tags"', 'class="marker-tags" value="'+tags+'"') :tc;
+
+						tempPopupContent = tc;
+
+					{% endif %}
+
+					var marker = L.marker(latlng, {
+						icon: (placename||datetime||description||tags)?infoMarker:nonInfoMarker,
+						title: (description)?description:"Resource Location",
+						alt: (description)?description:"Resource Location",
+						riseOnHover:true
+
+			    	{% if mode == "edit" %}	        	
+							,draggable:true
+						}).bindPopup(tempPopupContent);
+
+			        	marker.on("popupopen", onPopupOpen );
+			        	marker.on("popupclose", onPopupClose );
+						marker.on("dragend", dragend);
+
+			        {% elif mode == "read" %}
+
+						}); // End of marker for read
+						if(hasDataFlag){ marker.bindPopup(tempPopupContent); }
+						// marker.bindPopup(tempPopupContent);
+
+			       	{% endif %}
+
+					tempArr.push(marker);
+						
+					return marker;
+					
+			    }
+			}).addTo(map);
+
+			
+	        // Adding mapdata values in markerGeoJSON.
+	        $.each(tempArr, function(i, val){ 
+
+				tempArr[i].feature.properties.id = tempArr[i]._leaflet_id;
+
+	        	var addLeafletID = tempArr[i].toGeoJSON();
+	        	
+	        	// console.log(JSON.stringify(tempArr[i].toGeoJSON()));
+	        	
+	        	$(addLeafletID).attr("properties", {"id": tempArr[i]._leaflet_id, "description":tempArr[i].feature.properties.description});
+	        	markerGeoJSON.push(JSON.stringify(addLeafletID));
+
+	        })
+
+			{% if mode == "edit" %}	        
+	        	updateHiddenTagContent();
+	        {% endif %}
+	 	}
+	 		 	 	
+
+	{% if mode == "edit" %}
+
+		function updateHiddenTagContent(visitedMarker)
+	 	{
+	 		$('input:hidden[name=map-geojson-data]').attr("data-map-markers", markerGeoJSON)
+			$('input:hidden[name=map-geojson-data]').attr("value", markerGeoJSON)
+
+			// To set user's latest accessed marker.
+			if(visitedMarker)
+			{
+				if(!visitedMarker[2])
+				{
+					visitedMarker.push(map.getZoom());
+				}	
+				
+				$('input:hidden[name=last_visited_location]').attr("value", visitedMarker);
+			}
+	 	}
+		
+		map.on('click', onMapClick );
+
+		// Script for adding marker on map click
+		function onMapClick(e) 
+		{
+			var geojsonFeature = {
+								    "type": "Feature",
+								    "properties": {
+								        "created_by": "{{user_name}}",
+								        "edited_by": ["{{user_name}}"],
+								    },
+								    "geometry": {
+								        "type": "Point",
+								        "coordinates": [e.latlng.lat, e.latlng.lng]
+								    }
+								};
+
+			var marker;
+
+			L.geoJson(geojsonFeature, {
+			    
+			    pointToLayer: function (feature, latlng) {
+
+					marker = L.marker(e.latlng, {
+
+						icon: nonInfoMarker,
+						title: "Resource Location",
+						alt: "Resource Location",
+						riseOnHover:true,
+						draggable:true,
+			
+					}).bindPopup(popupBasicHtml);
+
+
+		        	marker.on("popupopen", onPopupOpen );
+		        	marker.on("popupclose", onPopupClose );
+					marker.on("dragend", dragend);
+
+					return marker;					
+			    }
+			}).addTo(map);
+
+			marker.feature.properties.id = marker._leaflet_id;
+			// console.log(marker);
+			// console.log(JSON.stringify(marker.toGeoJSON()));
+
+			// var addLeafletID = marker.toGeoJSON();
+	 		// $(addLeafletID).attr("properties", {"id": marker._leaflet_id, "created_by":"{{user_name}}", "edited_by":["{{user_name}}"] });
+	 		
+	        markerGeoJSON.push(JSON.stringify(marker.toGeoJSON()));
+
+	        updateHiddenTagContent();
+
+		}
+
+
+		// Update marker on changing it's position
+		function dragend(ev){
+
+			var	changedPos = ev.target.getLatLng(),
+				zoom;
+			
+           	this.setLatLng(changedPos).update();	// Update the marker position
+
+           	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
+
+           	var tempMarkerGeoJSON = this.toGeoJSON();
+           	
+           	// console.log(this);
+			// console.log( JSON.stringify(tempMarkerGeoJSON))
+
+			// var placename = tempMarkerGeoJSON.properties.placename,
+			// 	datetime = tempMarkerGeoJSON.properties.datetime,
+			// 	description = tempMarkerGeoJSON.properties.description,
+			// 	tags = tempMarkerGeoJSON.properties.tags ;
+
+			// // preserving and updating GeoJson of marker
+			// if(! description)
+			// {
+			// 	$.each(markerGeoJSON, function(i, val) {
+				            	
+			// 		            		var getID = $.parseJSON(val).properties.id,
+			// 		            			getDescription = $.parseJSON(val).properties.description; 
+				
+			// 		            		if(getID == lID){
+
+			// 		            			description = getDescription?getDescription:"";  
+			// 		            		}  
+			// 		           		})
+			// }
+
+			// if(description)
+			// {					
+			// 	$(".marker-obs-note:visible").val(description)
+			// }
+
+			// // console.log($(".popup-content:visible").text(description));
+
+			// // tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();					
+
+			// tempMarkerGeoJSON.properties.id = lID;	
+			
+					
+			// var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
+			
+   //          $.each(markerGeoJSON, function(i, val) {
+            	
+	  //       	var getID = $.parseJSON(val).properties.id; 
+	  //       	if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+   //          })
+
+            var changedMarkerLatLng = []
+            changedMarkerLatLng.push(changedPos.lat);
+            changedMarkerLatLng.push(changedPos.lng);
+
+            updateHiddenTagContent(changedMarkerLatLng);
+
+		    //	var addLeafletID = this.toGeoJSON();
+			// 	$(addLeafletID).attr("properties", {"id": lID});
+        }
+
+
+
+		function onPopupOpen()
+		{
+			// getting marker instance
+			tempMarker = this;
+
+			// attaching datetimepicker after getting marker popup html
+			var popupHtmlObjDt = tempMarker._popup._contentNode.getElementsByClassName("marker-dtstamp");
+			$(popupHtmlObjDt).datetimepicker();
+
+			var popupHtmlObj = tempMarker._popup._contentNode;
+
+			// tempMarker._popup
+
+			// marker GeoJson
+			var tempMarkerGeoJSON = this.toGeoJSON();
+			// console.log(JSON.stringify(tempMarkerGeoJSON));
+
+			var lID = tempMarker._leaflet_id;		// Getting Leaflet ID of this marker
+
+			// getting all the values from feature of marker
+			var placename = tempMarker.feature.properties.placename,
+				datetime = tempMarker.feature.properties.datetime,
+				description = tempMarker.feature.properties.description,
+				tags = tempMarker.feature.properties.tags,
+				created_by = tempMarker.feature.properties.created_by;
+
+			$(popupHtmlObj).children("input.marker-place-name").val(placename);
+			$(popupHtmlObj).children("input.marker-dtstamp").val(datetime);
+			$(popupHtmlObj).children("textarea.marker-obs-note").val(description);
+			$(popupHtmlObj).children("input.marker-tags").val(tags);
+
+				// console.log(placename + " == " + datetime + " == " + description + " == " + tags + " == " + created_by);
+
+			// preserving and updating GeoJson of marker
+            var MarkerLatLng = []
+            MarkerLatLng.push(tempMarker.getLatLng().lat);
+            MarkerLatLng.push(tempMarker.getLatLng().lng);
+            updateHiddenTagContent(MarkerLatLng);
+
+
+
+            // sometimes description exist and sometimes not
+			// if(! description)
+			// {
+			// 	$.each(markerGeoJSON, function(i, val) {
+				            	
+			// 		            		var getID = $.parseJSON(val).properties.id,
+			// 		            			getDescription = $.parseJSON(val).properties.description; 
+				
+			// 		            		if(getID == lID) { description = getDescription?getDescription:"";  }  
+			// 		           		})
+			// }
+			 			
+			if(description)
+			{					
+				$(".marker-obs-note:visible").val(description)
+			}			
+			
+			// To remove marker on click of delete
+			$(".popup-delete-content-button:visible").click(function(){
+
+				if("{{user_name}}" == created_by)
+				{
+					// saving marker data in database 
+					$.ajax({
+
+						type:'post',
+						url: "{% url 'delete_observation' groupid app_id app_set_id app_set_name_slug %}",
+						dataType: 'json',
+			  			data: { marker_geojson:JSON.stringify(tempMarkerGeoJSON), csrfmiddlewaretoken: '{{ csrf_token }}'},
+			  			success: function(data){
+
+			  				var ajaxUrl = this.url,
+			  					listId = ajaxUrl.split("/")[5];
+	
+			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
+
+			  				$.each(markerGeoJSON, function(i, val) {
+	
+			            		getID = JSON.parse(val).properties.id; 
+		
+			            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
+	        	    		})
+			
+							map.removeLayer(tempMarker);
+							updateHiddenTagContent();
+	
+				  		}// END OF success
+
+					});// END of ajax
+					
+				}
+			});
+
+			// check if popup form gets changed
+			$(".leaflet-popup-content:visible input, textarea").bind("keyup keypress onmouseup blur change", function(){
+
+				var inputEl = $(this);
+
+				inputEl.change(function(){
+
+				// if( tempContentText != initialPopContentText )
+				// {
+					$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
+				// }
+				// else
+				// {
+				// 	$(this).siblings().find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
+				// }
+
+				})
+				
+			});
+			
+			// To add content on click of add_content
+			$(".popup-add-content-button:visible").click(function(){
+
+				if($(this).children("i").hasClass("fi-page-edit"))
+				{	
+					thisPopupContent = $(this).parent().parent();
+					$(thisPopupContent).children("input[type=text].marker-place-name").focus();
+				}
+				else if($(this).children("i").hasClass("fi-save"))	// when click on save btn
+				{
+					thisPopupContent = $(this).parent().parent();
+
+					$(this).find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
+
+					// exctract all the values from popup content
+					var getPlace = $(thisPopupContent).children("input[type=text].marker-place-name").val().trim(),
+						getDT = $(thisPopupContent).children("input[type=text].marker-dtstamp").val().trim(),	
+						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
+						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
+
+					if( getPlace.length && getPlace != placename )
+					{
+						tempMarker.setIcon(infoMarker);
+
+						tempMarker.options.title = tempMarkerGeoJSON.properties.description;
+					}
+					else
+					{
+						tempMarker.setIcon(nonInfoMarker);	
+					}
+
+					tempMarker.feature.properties.placename = getPlace;
+					tempMarker.feature.properties.datetime = getDT;
+					tempMarker.feature.properties.created_at = getDT;
+					tempMarker.feature.properties.description = getObsNote.replace(/'/gm, "");	// temp fix.
+					tempMarker.feature.properties.tags = getTags;
+									
+					if(! tempMarker.feature.properties.id)
+					{
+						tempMarker.feature.properties.id = lID;	
+					}
+
+					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
+					// console.log(updatedGeoJSON);
+            		$.each(markerGeoJSON, function(i, val) {
+            	
+	            		var getID = $.parseJSON(val).properties.id;
+	            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
+            		})
+
+            		updateHiddenTagContent(MarkerLatLng);
+
+			        // saving marker data in database 
+					$.ajax({
+
+						type:'post',
+						url: "{% url 'save_observation' groupid app_id app_set_id app_set_name_slug %}",
+						dataType: 'json',
+			  			data: { marker_geojson:updatedGeoJSON, csrfmiddlewaretoken: '{{ csrf_token }}'},
+			  			success: function(data){
+
+			  				var ajaxUrl = this.url,
+			  					listId = ajaxUrl.split("/")[5];
+	
+			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
+				  		}// END OF success
+
+					});// END of ajax
+				}
+			});			
+
+		}
+
+		function onPopupClose()
+		{
+			if($("#ui-datepicker-div").is(":visible"))
+			{
+				$("#ui-datepicker-div").fadeOut();
+			}
+		}
+
+	{% endif %}
+
+	</script>
