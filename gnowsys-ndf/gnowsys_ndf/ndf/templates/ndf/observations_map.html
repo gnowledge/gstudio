@@ -90,7 +90,7 @@
 
 	 	// instantiate map instantiate
 	 	var map = L.map('map').addLayer(osm);
-
+	 	map.setView([25.92,79.84], 5);
 		// getting logged in user last visited location	 	
 		$.ajax({
 
@@ -99,7 +99,12 @@
   			success: function(data){
 
   				var lastVisitedLocationVal = JSON.parse(data);
-    
+
+		    	if(lastVisitedLocationVal == "[]")
+			    {
+			    	lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+			    }
+
 			    if(lastVisitedLocationVal)
 			    {
 			    	if(lastVisitedLocationVal == "[]")
