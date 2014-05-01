@@ -111,7 +111,7 @@
 				<ul class="left">
 					<li class="has-dropdown group">
 					  {% get_group_object groupid as group_object %}
-						<a class="active-menu" href="{% url 'groupchange' group_object %}"><i class="fi-home"></i> {{group_object.name}}</a>
+						<a class="active-menu" href="{% url 'groupchange' group_object.name %}"><i class="fi-home"></i> {{group_object.name}}</a>
 
 						<!-- If logged in show user groups -->
 						
@@ -130,7 +130,7 @@
 							{% else %}
 							{% for gp_id in groups %}						  		
 								
-							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id.name}}</a></li>		
+							<li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id.name %}">{{gp_id.name}}</a></li>		
 
 							{% endfor %}	
 							
