@@ -286,7 +286,7 @@ def app_selection(request,group_id,node_id):
                     if each:
                         obj=collection.Node.one({'_id':ObjectId(each)})
                         lst.append(obj);
-                gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_apps_list._id}]})
+                gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_apps_list._id},{'subject':grp._id}]})
                 if gattribute:
                     gattribute.delete()
                 if lst:
