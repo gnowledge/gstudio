@@ -509,7 +509,6 @@
 			$(".popup-delete-content-button:visible").click(function(){
 
 				var flag = false;
-
 				flag = tempMarker.feature.properties.ref ? true: false;
 
 				var tempCreated_by = tempMarker.feature.properties.created_by;
@@ -525,60 +524,40 @@
 						dataType: 'json',
 			  			
 			  			data: { 
-			  				marker_geojson:JSON.stringify(tempMarkerGeoJSON), 
-			  				csrfmiddlewaretoken: '{{ csrf_token }}'
+			  				marker_geojson:JSON.stringify(tempMarker.toGeoJSON()), 
+			  				csrfmiddlewaretoken: '{{ csrf_token }}',
+			  				{% if user.is_authenticated%}
+			  					user: "authenticated",
+			  				{% else %}
+			  					user: "anonymous",
+			  				{% endif %}
+			  				user_session_id: '{{ request.COOKIES.sessionid }}'
 			  				 },
 			  			success: function(data){
 
-			  				var ajaxUrl = this.url,
-			  					listId = ajaxUrl.split("/")[5];
-	
-			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
+			  				if(data[1] == "marker_deleted")
+			  				{
 
-			  				$.each(markerGeoJSON, function(i, val) {
-	
-			            		getID = JSON.parse(val).properties.id; 
+				  				var ajaxUrl = this.url,
+				  					listId = ajaxUrl.split("/")[5];
 		
-			            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
-	        	    		})
+				  				$("#"+listId).children("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500);
+
+				  				$.each(markerGeoJSON, function(i, val) {
+		
+				            		getID = JSON.parse(val).properties.id; 
 			
-							map.removeLayer(tempMarker);
-							updateHiddenTagContent();
+				            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
+		        	    		})
+				
+								map.removeLayer(tempMarker);
+								updateHiddenTagContent();
+							}
 	
 				  		}// END OF success
 
 					});// END of ajax
 					
-				}
-				else if((tempCreated_by.search("anonymous_") == 0) && flag)
-				{
-					// deleting marker data in database 
-					$.ajax({
-
-						type:'post',
-						url: "{% url 'delete_observation' groupid app_id app_set_id app_set_name_slug %}",
-						dataType: 'json',
-			  			data: { marker_geojson:JSON.stringify(tempMarkerGeoJSON), csrfmiddlewaretoken: '{{ csrf_token }}', user_type:"anonymous" },
-			  			success: function(data){
-
-			  				var ajaxUrl = this.url,
-			  					listId = ajaxUrl.split("/")[5];
-	
-			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
-
-			  				$.each(markerGeoJSON, function(i, val) {
-	
-			            		getID = JSON.parse(val).properties.id; 
-		
-			            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
-	        	    		})
-			
-							map.removeLayer(tempMarker);
-							updateHiddenTagContent();
-	
-				  		}// END OF success
-
-					});// END of ajax
 				}
 				else
 				{
@@ -634,7 +613,8 @@
 						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
 						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
 
-					if( getPlace.length && getPlace != placename )
+					// if( getPlace.length && getPlace != placename )
+					if( getPlace.length || getDT.length || getObsNote.length || getTags.length )
 					{
 						tempMarker.setIcon(infoMarker);
 
