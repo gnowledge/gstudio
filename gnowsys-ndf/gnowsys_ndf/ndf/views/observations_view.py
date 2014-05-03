@@ -155,7 +155,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
-	marker_geojson = request.POST["marker_geojson"]
+	marker_geojson = request.POST["marker_geojson"]	
 	marker_geojson = ast.literal_eval(marker_geojson)
 
 	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
@@ -198,6 +198,9 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 	marker_geojson = request.POST["marker_geojson"]
 	marker_geojson = ast.literal_eval(marker_geojson)
 	marker_ref = marker_geojson['properties']['ref']
+	user_type = request.POST["user_type"]
+	# csrf_token = request.POST["csrf_token"]
+	print request # user_type,":::", csrf_token
 
 	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
 
