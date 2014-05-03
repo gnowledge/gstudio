@@ -160,7 +160,8 @@ def parse_data_create_gtype(json_file_path):
             except Exception as e:
             	error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
             	log_list.append(error_message)
-                continue
+            	print error_message # Keep it!
+            	# continue
 
             try:
                 info_message = "\n Creating "+type_name+"(" + json_document['name'] + ") ..."
@@ -201,7 +202,8 @@ def parse_data_create_gtype(json_file_path):
             except Exception as e:
             	error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
             	log_list.append(error_message)
-                continue
+            	print error_message # Keep it!
+            	# continue
 
             try:
                 info_message = "\n Creating "+type_name+"(" + json_document['name'] + ") ..."
@@ -229,7 +231,8 @@ def parse_data_create_gtype(json_file_path):
             except Exception as e:
             	error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
             	log_list.append(error_message)
-                continue
+            	print error_message # Keep it!
+            	# continue
 
             try:
                 info_message = "\n Creating "+type_name+"(" + json_document['name'] + ") ..."
@@ -282,6 +285,12 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
             else:
                 if eval_field == "complex_data_type":
                     type_convert_objectid = "Sub-" + type_convert_objectid
+
+                elif eval_field in ["attribute_type_set", "relation_type_set"]:
+                	json_document[eval_field] = type_list
+               		error_message = "\n "+type_convert_objectid+"Error ("+eval_field+"): This "+type_convert_objectid+" (" + data + ") doesn't exists for creating "+type_to_create+" (" + json_document['name'] + ") !!!\n"
+               		log_list.append(error_message)
+               		continue
 
                 error_message = "\n "+type_convert_objectid+"Error ("+eval_field+"): This "+type_convert_objectid+" (" + data + ") doesn't exists for creating "+type_to_create+" (" + json_document['name'] + ") !!!\n"
                 log_list.append(error_message)
