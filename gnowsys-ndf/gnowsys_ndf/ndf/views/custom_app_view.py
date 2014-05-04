@@ -54,7 +54,6 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
         title = systemtype_name
-        #print "title in app_set_id: ",title
 
         if request.method=="POST":
             search = request.POST.get("search","")
@@ -67,9 +66,7 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         for each in nodes:
             nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
                          
-        #print "\n in app_set_id"
     else :
-        #print "\nin else part of app_set_id"
         ST_theme = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
         if ST_theme:
             nodes = list(collection.Node.find({'member_of': {'$all': [ST_theme._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
@@ -82,7 +79,6 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         title = app_name
 
     if app_set_instance_id :
-        #print "\n in app_set_instance_id"
         app_set_instance_template = "yes"
         app_set_template = ""
         systemtype_attributetype_set = []
@@ -199,7 +195,6 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
         for each in systemtype.attribute_type_set:
             systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type})
 
-        print "\n systemtype(" + systemtype_name + " \n", systemtype.relation_type_set, "\n"
         for eachrt in systemtype.relation_type_set:
             # object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in collection.Node.find({'member_of': {'$all': [ collection.Node.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
             object_type_cur = collection.Node.find({'member_of': {'$in': eachrt.object_type}})
