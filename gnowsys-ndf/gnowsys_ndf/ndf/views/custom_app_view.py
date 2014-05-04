@@ -44,8 +44,8 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
     property_display_order = []
 
     for eachset in app.collection_set:
-	 app_set = collection.Node.find_one({"_id":eachset})
-	 app_collection_set.append({"id":str(app_set._id),"name":app_set.name}) 	
+         app_set = collection.Node.find_one({"_id":eachset})
+         app_collection_set.append({"id": str(app_set._id), "name": app_set.name})
 
     if app_set_id:
         classtype = ""
@@ -189,17 +189,24 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
     user_name = unicode(request.user.username)  # getting django user name
 
     for eachset in app.collection_set:
-	 app_set = collection.Node.find_one({"_id":eachset})
-	 app_collection_set.append({"id":str(app_set._id),"name":app_set.name}) 	
+      app_set = collection.Node.find_one({"_id":eachset})
+      app_collection_set.append({"id": str(app_set._id), "name": app_set.name})
+
     if app_set_id:
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
         title = systemtype_name + " - new"
         for each in systemtype.attribute_type_set:
             systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type})
+
+        print "\n systemtype(" + systemtype_name + " \n", systemtype.relation_type_set, "\n"
         for eachrt in systemtype.relation_type_set:
-            object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in collection.Node.find({'member_of': {'$all': [ collection.Node.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
-            systemtype_relationtype_set.append({"rt_name":eachrt.name,"type_id":str(eachrt._id),"object_type":object_type})
+            # object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in collection.Node.find({'member_of': {'$all': [ collection.Node.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
+            object_type_cur = collection.Node.find({'member_of': {'$in': eachrt.object_type}})
+            object_type = []
+            for each in object_type_cur:
+              object_type.append({"name":each.name, "id":str(each._id)})
+            systemtype_relationtype_set.append({"rt_name": eachrt.name, "type_id": str(eachrt._id), "object_type": object_type})
     
     request_at_dict = {}
     request_rt_dict = {}
@@ -278,9 +285,13 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
 
         newgsystem.name = name
         newgsystem.member_of=[ObjectId(app_set_id)]
+        
         if not app_set_instance_id :
             newgsystem.created_by = request.user.id
-            newgsystem.modified_by = request.user.id
+        
+        newgsystem.modified_by = request.user.id
+        newgsystem.status = u"PUBLISHED"
+
         newgsystem.group_set.append(ObjectId(group_id))
 
         if tags:
