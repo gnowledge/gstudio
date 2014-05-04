@@ -13,6 +13,14 @@
   <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
   <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
 
+  <!-- Datetimepicker  -->
+  <!-- <link rel="stylesheet" media="all" type="text/css" href="/static/ndf/css/jquery-ui.css" /> -->
+  <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+  <script src="/static/ndf/js/jquery-ui.js"></script>
+  <script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
+  <script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
+  <link rel="stylesheet" href="/static/ndf/css/jquery-ui-timepicker-addon.css">
+
 {% endblock%}
 
 {% block meta_content %}
@@ -662,4 +670,14 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
   });
 
 
+   // for datetimepicker
+   
+   startDtInput = $("font:contains('start_time')");
+   endDtInput = $("font:contains('end_time')");
+
+   if(startDtInput.length > 0)
+   { startDtInput.parent().next().find("input").datetimepicker(); }
+   if(endDtInput.length > 0)
+   { endDtInput.parent().next().find("input").datetimepicker(); }
+   
 {% endblock %}	
