@@ -82,7 +82,7 @@
 	<input type="hidden" value="{{ visited_location }}" name="last_visited_location"/>
 	
 	<script type="text/javascript">
-		 
+
 	 	// We’ll add a OSM tile layer to our map
 	 	var osmUrl 	  = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
 	 	osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -92,6 +92,8 @@
 	 	var map = L.map('map').addLayer(osm);
 	 	map.setView([25.92,79.84], 5);
 		// getting logged in user last visited location	 	
+
+		{% if user.is_authenticated %}
 		$.ajax({
 
 			url: "{% url 'get_visited_location' groupid %}",
@@ -134,7 +136,7 @@
 	  		}// END OF success
 
 		});// END of ajax
-
+		{% endif %}
 
 		// defining markers
 	 	nonInfoMarker = L.AwesomeMarkers.icon({ markerColor: 'blue', iconColor: 'white', spin:false });
@@ -277,7 +279,13 @@
 	        	updateHiddenTagContent();
 	        {% endif %}
 	 	}
-	 		 	 	
+	 	
+	 	// if( tempArr.length )
+			    // {
+			    //   var group = new L.featureGroup(tempArr)
+			    //       map.fitBounds(group.getBounds());
+			    // }
+
 
 	{% if mode == "edit" %}
 
@@ -306,8 +314,14 @@
 			var geojsonFeature = {
 								    "type": "Feature",
 								    "properties": {
-								        "created_by": "{{user_name}}",
-								        "edited_by": ["{{user_name}}"],
+
+								    	{% if user.is_authenticated %}
+									        "created_by": "{{user_name}}",
+									        "edited_by": ["{{user_name}}"]
+									    {% else %}
+									    	"created_by": "anonymous_{{client_ip}}_{{ csrf_token }}",
+									        "edited_by": ["anonymous_{{client_ip}}"]
+								        {% endif %}
 								    },
 								    "geometry": {
 								        "type": "Point",
@@ -341,6 +355,13 @@
 			}).addTo(map);
 
 			marker.feature.properties.id = marker._leaflet_id;
+
+			
+				
+				// marker.feature.properties.created_by = "{{user_name}}"
+
+			
+
 			// console.log(marker);
 			// console.log(JSON.stringify(marker.toGeoJSON()));
 
@@ -362,9 +383,9 @@
 			
            	this.setLatLng(changedPos).update();	// Update the marker position
 
-           	var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
+           	// var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
 
-           	var tempMarkerGeoJSON = this.toGeoJSON();
+           	// var tempMarkerGeoJSON = this.toGeoJSON();
            	
            	// console.log(this);
 			// console.log( JSON.stringify(tempMarkerGeoJSON))
@@ -415,8 +436,6 @@
 
             updateHiddenTagContent(changedMarkerLatLng);
 
-		    //	var addLeafletID = this.toGeoJSON();
-			// 	$(addLeafletID).attr("properties", {"id": lID});
         }
 
 
@@ -482,9 +501,15 @@
 			// To remove marker on click of delete
 			$(".popup-delete-content-button:visible").click(function(){
 
-				if("{{user_name}}" == created_by)
+				var flag = false;
+
+				flag = tempMarker.feature.properties.ref ? true: false;
+
+				var tempCreated_by = tempMarker.feature.properties.created_by;
+
+				if("{{user_name}}" == created_by && flag)
 				{
-					// saving marker data in database 
+					// deleting marker data in database 
 					$.ajax({
 
 						type:'post',
@@ -512,6 +537,48 @@
 
 					});// END of ajax
 					
+				}
+				else if((tempCreated_by.search("anonymous_") == 0) && flag)
+				{
+					// deleting marker data in database 
+					$.ajax({
+
+						type:'post',
+						url: "{% url 'delete_observation' groupid app_id app_set_id app_set_name_slug %}",
+						dataType: 'json',
+			  			data: { marker_geojson:JSON.stringify(tempMarkerGeoJSON), csrfmiddlewaretoken: '{{ csrf_token }}', user_type:"anonymous" },
+			  			success: function(data){
+
+			  				var ajaxUrl = this.url,
+			  					listId = ajaxUrl.split("/")[5];
+	
+			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
+
+			  				$.each(markerGeoJSON, function(i, val) {
+	
+			            		getID = JSON.parse(val).properties.id; 
+		
+			            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
+	        	    		})
+			
+							map.removeLayer(tempMarker);
+							updateHiddenTagContent();
+	
+				  		}// END OF success
+
+					});// END of ajax
+				}
+				else
+				{
+					$.each(markerGeoJSON, function(i, val) {
+	
+	            		getID = JSON.parse(val).properties.id; 
+
+	            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
+    	    		})
+	
+					map.removeLayer(tempMarker);
+					updateHiddenTagContent();
 				}
 			});
 
@@ -568,7 +635,7 @@
 
 					tempMarker.feature.properties.placename = getPlace;
 					tempMarker.feature.properties.datetime = getDT;
-					tempMarker.feature.properties.created_at = getDT;
+					// tempMarker.feature.properties.created_at = getDT;
 					tempMarker.feature.properties.description = getObsNote.replace(/'/gm, "");	// temp fix.
 					tempMarker.feature.properties.tags = getTags;
 									
@@ -577,15 +644,10 @@
 						tempMarker.feature.properties.id = lID;	
 					}
 
-					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
-					// console.log(updatedGeoJSON);
-            		$.each(markerGeoJSON, function(i, val) {
-            	
-	            		var getID = $.parseJSON(val).properties.id;
-	            		if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
-            		})
+					var now = new Date(),
+						formatedDateTime = now.toLocaleDateString() + " " + now.getHours() + ":" + now.getMinutes();
 
-            		updateHiddenTagContent(MarkerLatLng);
+					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
 
 			        // saving marker data in database 
 					$.ajax({
@@ -596,11 +658,29 @@
 			  			data: { marker_geojson:updatedGeoJSON, csrfmiddlewaretoken: '{{ csrf_token }}'},
 			  			success: function(data){
 
+			  				tempMarker.feature.properties.ref = data[1]
+			  				
 			  				var ajaxUrl = this.url,
 			  					listId = ajaxUrl.split("/")[5];
 	
-			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
-				  		}// END OF success
+							if (data[2] == "create_new")
+			  				{
+			  					tempMarker.feature.properties.created_at = formatedDateTime;
+			  					$("#"+listId).children("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500); 
+			  				}
+
+							
+				  		},// END OF success
+				  		complete: function(){
+
+		            		$.each(markerGeoJSON, function(i, val) {
+            	
+	    	        			var getID = $.parseJSON(val).properties.id;
+	        	    			if(getID == lID) { markerGeoJSON[i] = JSON.stringify(tempMarker.toGeoJSON()); }  
+            				});
+
+			  				updateHiddenTagContent(MarkerLatLng);
+				  		} // end of complete
 
 					});// END of ajax
 				}

@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response, render
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps
+from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
@@ -22,10 +22,15 @@ from django.contrib.sites.models import Site
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
-
-
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
 
+@register.assignment_tag
+def get_group_resources(group):
+  try:
+    res=get_all_resources_for_group(group['_id'])
+    return res.count
+  except Exception as e:
+    print "Error in get_group_resources "+str(e)
   
 @register.assignment_tag
 def all_gapps():
