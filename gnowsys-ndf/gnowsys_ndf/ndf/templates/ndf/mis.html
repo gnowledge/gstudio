@@ -8,13 +8,10 @@
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-  <!-- Datetimepicker  -->
-  <!-- <link rel="stylesheet" media="all" type="text/css" href="/static/ndf/css/jquery-ui.css" /> -->
-  <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
-  <script src="/static/ndf/js/jquery-ui.js"></script>
-  <script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
-  <script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
-  <link rel="stylesheet" href="/static/ndf/css/jquery-ui-timepicker-addon.css">
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
 
 {% endblock%}
 
@@ -27,11 +24,11 @@
 	{% ifequal each.id app_set_id %}
 	<li class="active"> 
 		<div>
-			<a href="{% url 'GAPPS_set_new_instance' groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
+			<a href="{% url 'mis_app_instance_create' groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
 		    +&nbsp;Add
 			</a>
 
-			<a href="{% url 'GAPPS_set' groupid app_name app_id each.id %}" >
+			<a href="{% url 'mis_app_detail' groupid app_id each.id %}" >
         {{each.name}} ({{count}})
 			</a> 
 		</div>
@@ -40,11 +37,11 @@
 	{% else %}
 	<li> 
     <div>
-      <a href="{% url 'GAPPS_set_new_instance' groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
+      <a href="{% url 'mis_app_instance_create' groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
         +&nbsp;Add
       </a>
 
-      <a href="{% url 'GAPPS_set' groupid app_name app_id each.id %}" >
+      <a href="{% url 'mis_app_detail' groupid app_id each.id %}" >
         {{each.name}} ({{count}})
       </a> 
     </div>
@@ -126,10 +123,10 @@
           <tr>
         
             <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance" groupid app_name app_id app_set_id each.id %}">{{each.name}}</a></td>
+            <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_detail' groupid app_id app_set_id each.id %}">{{each.name}}</a></td>
             <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
             <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
-            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id each.id %}" class="button medium">Edit</a></td>
+            <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_edit' groupid app_id app_set_id each.id %}" class="button medium">Edit</a></td>
         
           </tr>
           
@@ -151,138 +148,352 @@
 
 {% if app_set_instance_template %}
 
-    <a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id app_set_instance_id %}" class="button medium">
-      Edit
-    </a>
-    <br/>
+  <!-- Consistent details-view -->
+  {% if user.is_authenticated %}
+    <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+  {% endif %}
 
-    <div style="display:table; border:1px; border-spacing:15px; " class="small-6 columns">
+  <!-- Header of the page -->
+
+  <header class="row page">
+
+    <section class="medium-12 columns" >
+      <h2>
+      	<span class='node'>{{node.name}}</span>
+      	<small class="label-list"> 
       
-      <div style="display:table-row;">
-        
-        <div style="display:table-cell;">
-   <font size="3"> {{app_set_name}}'s Title</font>
-        </div>
-        
-        <div style="display:table-cell;">
-   <font size="3">{{app_set_instance_name}}</font>
-        </div>
-
-      </div>
+      	  {% for tag in node.tags %}
+        	  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+      	  {% endfor %}
       
-      {% if app_set_instance_atlist %}
-        {% for at in app_set_instance_atlist %}
-          <div style="display:table-row;">
-            
-            <div style="display:table-cell;">
-       <font size="3"> {{at.type}} </font>
-            </div>
-            
-            <div style="display:table-cell;">
-       <font size="3"> {{at.value}} </font>
-            </div>
+      	</small>      
+      </h2>
 
-          </div>
-        {% endfor %}
-      {% endif %}
+      <dl class="row tabs" data-tab>
 
-      {% if app_set_instance_rtlist %}
-        {% for rt in app_set_instance_rtlist %}
-          <div style="display:table-row;">
-            
-            <div style="display:table-cell;">
-       <font size="3"> {{rt.type}} </font>
-            </div>
-            
-            <div style="display:table-cell;">
-       <font size="3"> {{rt.value_name}} </font>
-            </div>
+      	<dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+      	<dd>
+          <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+          <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+            <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+            <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+            <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+          </ul>
+      	</dd>
+      	<dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+      	<dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
 
-          </div>
-        {% endfor %}
-      {% endif %}
-
-      <!-- for location/map widget : VIEW -->
-      <div style="display:table-row;">
-        
-        <div style="display:table-cell;">
-   <font size="3"> Location </font>
-        </div>
+      </dl>
+    </section>
     
-        <div style="display:table-cell;">
-   <a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a>
-        </div>
+  </header>
 
-      </div>
 
-      <!-- Overlay : Map VIEW Widget -->
-      <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
-        <a class="close-reveal-modal" >&#215;</a>
-        {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
-      </div>
-      <!-- END of Map Widget Overlay -->
+  <div class="row">
 
-      <!-- END of location/map widget -->
-      
-      {% if tags %}
-        <div style="display:table-row;">
-          
-          <div style="display:table-cell;">
-     <font size="3"> tags </font>
-          </div>
-          <div style="display:table-cell;">
-            <font size="3"> {{tags}} </font>
-          </div>
+    <section class="medium-9 columns">
+      <div class="tabs-content">
 
-        </div>
-      {% endif %}
-      
-      {% if system_type == "File"%}
-        <div style="display:table-row;">
-          
-          <div style="display:table-cell;">
-     <font size="3"> Uploaded File </font>
-          </div>
-          
+      	<!-- Read Tab content -->
+        <div id="view-page">
+
           {% if mime_type %}
+          <div class="row">
             {% if "image" in mime_type %}
-              <a href = "{% url 'file_detail' groupid system_id %}">
-         <div style="display:table-cell;">
-         <img src="{% url 'getImageThumbnail' groupid system_id %}" />
-         </div>
-              </a>
-            {% elif "video" in mime_type %}
-            <a href = "{% url 'file_detail' groupid system_id %}">
-       <div style="display:table-cell;">
-       <img src="{% url 'getImageThumbnail' groupid system_id %}" />
-       </div>
+            <a class="small-12 columns" href="{% url 'file_detail' groupid system_id %}">
+              <img src="{% url 'getImageThumbnail' groupid system_id %}" />
             </a>
-            {% else %}
-            <a href ="{% url 'file_detail' groupid system_id %}">
-       <div style="display:table-cell;">
-       <font size="3">{{app_set_instance_name}}</font>
-       </div>
-            </a>
-            {% endif %}
-          {% endif %}
-      </div>
-    {% endif %}
-    
-    {% if content %}
-    <div style="display:table-row;">
-      <div style="display:table-cell;">
-<font size="3"> content: </font>
-      </div>
-    </div>
-    
-    <div style="display:block">
-      {% with content|safe as description %}
-      {{ description }}
-      {% endwith %}
-    </div>
-    {% endif %}
-  </div>
 
+            {% elif "video" in mime_type %}
+            <a class="small-12 columns" href="{% url 'file_detail' groupid system_id %}">
+              <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+            </a>
+
+            {% else %}
+            <a class="small-12 columns" href="{% url 'file_detail' groupid system_id %}">
+              <font size="3">{{app_set_instance_name}}</font>
+            </a>
+
+            {% endif %}
+          </div>
+          {% endif %}
+          
+
+          {% if node.content %}
+          <div class="row" id="about">
+            <div class="small-12 columns">
+            {% with node.html_content|safe as description %}
+            {{description}}
+            {% endwith %}  
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.college_affiliated_to %}
+          <br/>
+
+          <div class="row" id="college_affiliated_to">
+            <label class="small-3 columns">
+              Affiliated to
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.college_affiliated_to|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.college_affiliated_to|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.college_of_person %}
+          <br/>
+
+          <div class="row" id="college_of_person">
+            <label class="small-3 columns">
+              People
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.college_of_person|slice:":5" %}
+              <a href="#">{{n.name|title}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.college_of_person|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.person_belongs_to_college %}
+          <br/>
+
+          <div class="row" id="person_belongs_to_college">
+            <label class="small-3 columns">
+              College
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.person_belongs_to_college|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.person_belongs_to_college|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.affiliated_college %}
+          <br/>
+
+          <div class="row" id="affiliated_college">
+            <label class="small-3 columns">
+              Affiliated Colleges
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.affiliated_college|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.affiliated_college|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.university_of_person %}
+          <br/>
+
+          <div class="row" id="university_of_person">
+            <label class="small-3 columns">
+              People
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.university_of_person|slice:":5" %}
+              <a href="#">{{n.name|title}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.university_of_person|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.person_belongs_to_university %}
+          <br/>
+
+          <div class="row" id="person_belongs_to_university">
+            <label class="small-3 columns">
+              University
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.person_belongs_to_university|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.person_belongs_to_university|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.person_belongs_to_country %}
+          <br/>
+
+          <div class="row" id="address">
+            <label class="small-3 columns">
+              Address
+            </label>
+            <div class="small-9 columns">
+              {{node.house_street|default_if_none:""}}{% if node.house_street %}; {% endif %}
+              {{node.village|default_if_none:""}}{% if node.village %}; {% endif %}
+              {{node.taluka|default_if_none:""}}{% if node.taluka %}; {% endif %}
+              {{node.town_city|default_if_none:""}}{% if node.town_city %}; {% endif %}
+              {% for n in node.person_belongs_to_district|slice:":1" %}
+                <a href="#">{{n.name}}</a>{% if n.name %}; {% endif %}
+              {% endfor %}
+              {% for n in node.person_belongs_to_state|slice:":1" %}
+                <a href="#">{{n.name}}</a>{% if n.name %} - {% endif %}
+              {% endfor %}
+              {{node.pin_code|default_if_none:""}}{% if node.pin_code %}; {% endif %}
+              {% for n in node.person_belongs_to_country|slice:":1" %}
+                <a href="#">{{n.name}}</a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+
+        </div>
+
+      	<!-- Content for Concept Graph -->
+      	<div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
+      	  
+          <a class="close-reveal-modal">&#215;</a>
+      	  {% include "ndf/graph_concept.html" %}
+
+      	</div>
+
+      	<!-- Content for Collection Graph -->
+      	<div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+      	  
+          <a class="close-reveal-modal">&#215;</a>
+      	  {% include "ndf/graph_collection.html" %}
+
+      	</div>
+
+      	<!-- Content for dependency Graph -->
+      	<div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+      	  
+          <a class="close-reveal-modal">&#215;</a>
+      	  {% include "ndf/graph_dependency.html" %}
+
+      	</div>
+            
+      	<!-- Tab View Map Widget -->
+      	<div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
+      	  
+          <a class="close-reveal-modal" >&#215;</a>
+      	  {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
+
+      	</div>
+
+      </div>
+    </section>
+
+    <section class="medium-3 columns">
+      <div class="panel">
+      	
+        <h3 class="subheader"></h3>
+      	
+        Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
+
+      	<small>
+          <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+            {% for seq_no, version_no in node.version_dict.items reversed %}
+          
+              <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+
+            {% endfor %}
+          </div>
+        </small>
+  
+      	<!-- Button that converts collection into module-->
+      	
+      	{% if node.collection_set and user.is_authenticated%}
+        	<a href="#" class="button" id="module"></i> <span>Make Module</a>
+      	{% endif %}
+
+        {% if node %}
+          
+          {% get_publish_policy request groupid node as group_policy %}
+          {% check_group node as is_group %}
+
+        	{% if group_policy == "allow" %}
+        	  {% if is_group %} 
+              <div>
+      	        <a class="button small" href="{% url 'publish_group'  group_id node %}"> Publish </a>
+      	      </div>
+
+        	  {% else %}
+        	    <div>
+      	        <a class="button small" href="{% url 'publish_page'  group_id node %}"> Publish </a>  
+      	      </div>
+      	    {% endif %}
+
+          {% endif %}
+	      
+        {% endif %}
+
+	      {% edit_policy groupid node request.user as status %}
+     
+      	{% if status == "allow" %}
+
+      	  {% get_edit_url node.pk as edit_url %}
+      	  {% switch_group_conditions request.user group_id as switch_conditions %}
+      	  {% check_group node as is_group %}
+      	  {% get_user_object node.created_by as created_user %}
+
+      	  {% if is_group %}
+            {% ifequal created_user request.user %}     
+        	  
+              <a href="{#% url edit_url node %#}" class="small button split edit">
+        	      <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
+        	    </a> 
+            
+            {% endifequal %}
+
+      	  {% else %}
+                  {% if switch_conditions %}     
+      	    <input type="button" id="switch_group" class="button small" value="Publish in group/s">
+      	    <div id="mySystemtype" class="reveal-modal" data-reveal >
+      	      <h2>Select Groups</h2>
+      	      <div id="module_drawer" >
+      		{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+      	      </div>
+      	      <a class="close-reveal-modal st">&#215;</a>
+      	      <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
+      		</div>
+      	    {% endif %}
+
+      	    <a href="{% url 'mis_app_instance_edit' groupid app_id app_set_id app_set_instance_id %}" class="small button split edit">
+      	      <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
+      	    </a>
+
+      	    <ul id="edit-options" class="f-dropdown">
+      	      <li>
+      		<a href="{% url 'page_create_edit' groupid %}">Create a new page</a>
+      	      </li>
+      	    </ul>
+
+      	  {% endif %}    
+
+      	{% endif %}
+
+      </div>
+    </section>
+
+  </div>
 
 {% endif %}
 
@@ -585,14 +796,4 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
   });
 
 
-   // for datetimepicker
-   
-   startDtInput = $("font:contains('start_time')");
-   endDtInput = $("font:contains('end_time')");
-
-   if(startDtInput.length > 0)
-   { startDtInput.parent().next().find("input").datetimepicker(); }
-   if(endDtInput.length > 0)
-   { endDtInput.parent().next().find("input").datetimepicker(); }
-   
 {% endblock %}	

@@ -16,10 +16,12 @@ from gnowsys_ndf.ndf.views.file import *
 db = get_database()
 collection = db['Nodes']
 
-def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_set_instance_id=None):
+def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=None):
     """
     custom view for custom GAPPS
     """
+    print "\n\n Going from here...\n\n"
+    app_name = "mis"
     app_collection_set = [] 
     atlist = []
     rtlist = []
@@ -146,7 +148,7 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
 
-    template = "ndf/custom_template_for_app.html"
+    template = "ndf/mis.html"
 
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id
 
@@ -155,10 +157,12 @@ def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_se
     return render_to_response(template, variable)
       
 @login_required
-def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, app_set_instance_id=None):
+def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None):
     """
     create new instance of app_set of apps view for custom GAPPS
     """
+    print "\n\n Going from EDIT here...\n\n"
+    app_name = "mis"
     app_collection_set = [] 
     app = collection.Node.find_one({"_id":ObjectId(app_id)})
     app_set = ""
@@ -268,7 +272,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                 if obj_id_ins.is_valid(f):
                     newgsystem = collection.Node.one({'_id':f})
                 else:
-                    template = "ndf/custom_template_for_app.html"
+                    template = "ndf/mis.html"
                     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
                     return render_to_response(template, variable)
             else:
@@ -375,7 +379,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
 
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
     
-    template = "ndf/custom_template_for_app.html"
+    template = "ndf/mis.html"
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
       
