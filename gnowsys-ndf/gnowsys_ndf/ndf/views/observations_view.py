@@ -132,7 +132,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 	# for each in app.collection_set:
 		
-	# 	app_element = collection.Node.find_one({"_id":each})
+	# 	app_element = collection.Node.ifnd_one({"_id":each})
 	# 	obj_count = ""
 	# 	if app_element:
 	# 		app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
