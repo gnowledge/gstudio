@@ -230,6 +230,141 @@
           </div>
           {% endif %}
 
+          {% if node.college_affiliated_to %}
+          <br/>
+
+          <div class="row" id="college_affiliated_to">
+            <label class="small-3 columns">
+              Affiliated to
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.college_affiliated_to|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.college_affiliated_to|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.college_of_person %}
+          <br/>
+
+          <div class="row" id="college_of_person">
+            <label class="small-3 columns">
+              People
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.college_of_person|slice:":5" %}
+              <a href="#">{{n.name|title}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.college_of_person|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.person_belongs_to_college %}
+          <br/>
+
+          <div class="row" id="person_belongs_to_college">
+            <label class="small-3 columns">
+              College
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.person_belongs_to_college|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.person_belongs_to_college|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.affiliated_college %}
+          <br/>
+
+          <div class="row" id="affiliated_college">
+            <label class="small-3 columns">
+              Affiliated Colleges
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.affiliated_college|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.affiliated_college|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.university_of_person %}
+          <br/>
+
+          <div class="row" id="university_of_person">
+            <label class="small-3 columns">
+              People
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.university_of_person|slice:":5" %}
+              <a href="#">{{n.name|title}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.university_of_person|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.person_belongs_to_university %}
+          <br/>
+
+          <div class="row" id="person_belongs_to_university">
+            <label class="small-3 columns">
+              University
+            </label>
+            <div class="small-9 columns">
+            {% for n in node.person_belongs_to_university|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.person_belongs_to_university|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.person_belongs_to_country %}
+          <br/>
+
+          <div class="row" id="address">
+            <label class="small-3 columns">
+              Address
+            </label>
+            <div class="small-9 columns">
+              {{node.house_street|default_if_none:""}}{% if node.house_street %}; {% endif %}
+              {{node.village|default_if_none:""}}{% if node.village %}; {% endif %}
+              {{node.taluka|default_if_none:""}}{% if node.taluka %}; {% endif %}
+              {{node.town_city|default_if_none:""}}{% if node.town_city %}; {% endif %}
+              {% for n in node.person_belongs_to_district|slice:":1" %}
+                <a href="#">{{n.name}}</a>{% if n.name %}; {% endif %}
+              {% endfor %}
+              {% for n in node.person_belongs_to_state|slice:":1" %}
+                <a href="#">{{n.name}}</a>{% if n.name %} - {% endif %}
+              {% endfor %}
+              {{node.pin_code|default_if_none:""}}{% if node.pin_code %}; {% endif %}
+              {% for n in node.person_belongs_to_country|slice:":1" %}
+                <a href="#">{{n.name}}</a>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+
         </div>
 
       	<!-- Content for Concept Graph -->
