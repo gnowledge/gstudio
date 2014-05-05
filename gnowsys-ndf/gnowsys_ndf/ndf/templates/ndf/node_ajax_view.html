@@ -240,7 +240,7 @@ ul#graph-hover.f-dropdown{
      {% edit_policy groupid node request.user as status %}
      
      {% if status == "allow" %}
-    {% get_edit_url node.pk as edit_url %}
+	{% get_edit_url node.pk as edit_url %}
     {% switch_group_conditions request.user group_id as switch_conditions %}
     {% check_group node as is_group %}
 
@@ -276,6 +276,8 @@ ul#graph-hover.f-dropdown{
 	
 
       <li><a href="{% url 'page_create_edit' groupid %}">Create a new page</a></li>
+      <li><a href="{% url 'node_translation' groupid node %} ">Translate</a></li>
+
     </ul>
 
   </div>

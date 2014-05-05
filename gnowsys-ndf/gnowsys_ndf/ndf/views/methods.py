@@ -20,6 +20,8 @@ import string
 ######################################################################################################################################
 
 db = get_database()
+collection = db[Node.collection_name]
+
 history_manager = HistoryManager()
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
@@ -69,6 +71,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     
     if checked:     
       if checked == "Page":
+ 
         gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
@@ -111,6 +114,11 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+      elif checked == "Pandora_video":
+        gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
+        print group_id,"grp"
+        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
 
@@ -147,6 +155,17 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       dict_drawer['2'] = dict2
 
     return dict_drawer
+
+def get_resource_type(request,node_id):
+  a=collection.Node.one({'_id':ObjectId(node_id)})
+
+       
+  get_type=a._type
+  
+  print get_type,"get_type"
+  page_node = eval("collection"+"."+ get_type)()
+  return page_node  
+   
 
 def get_translate_common_fields(request, node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """

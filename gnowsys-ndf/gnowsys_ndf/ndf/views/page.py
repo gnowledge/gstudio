@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type
 
 #######################################################################################################################################
 
@@ -326,11 +326,22 @@ def translate_node(request,group_id,node_id=None):
                           'groupid': group_id
                       }
 
-    page_node = collection.GSystem()
+    #page_node = collection.GSystem()
     
 
     if request.method == "POST":
-        get_translate_common_fields(request, page_node, group_id, gst_page, node_id)
+        page_node=get_resource_type(request, node_id)
+        
+        get_translate_common_fields(request, page_node, group_id, gst_page,node_id)
+        # a=collection.Node.one({'_id':ObjectId(node_id)})
+
+       
+        # get_type=a._type
+        
+        # print get_type,"get_type"
+        # page_node = eval("collection"+"."+ get_type)()
+        print gst_page,"gst_page"
+        print page_node,"page_node"
         page_node.save()
        
         # add triple to the GRelation 

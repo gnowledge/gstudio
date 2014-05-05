@@ -127,7 +127,6 @@ def collection_nav(request, group_id):
       collection = db[Node.collection_name]
 
       node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-
       return render_to_response('ndf/node_ajax_view.html', 
                                   { 'node': node_obj,
                                     'group_id': group_id,
