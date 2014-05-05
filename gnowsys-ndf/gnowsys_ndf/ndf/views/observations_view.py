@@ -61,7 +61,7 @@ def all_observations(request, group_id, app_id=None):
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
-									"locations": locations,
+									"locations": json.dumps(locations),
 									"total_locations": locs
 								  })
 
@@ -130,7 +130,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
-									"locations": locations,
+									"locations": json.dumps(locations),
 									"total_locations": locs
 								  })
 

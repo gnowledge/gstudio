@@ -196,8 +196,8 @@
 		 	// 	// layer.bindPopup("feature.properties.description");
 		 	// }}).addTo(map);
 
-			mapdata = mapdata.replace(/'/gm, '"');
-	 		mapdata = mapdata.replace(/u"/gm, '"');
+			// mapdata = mapdata.replace(/'/gm, '"');
+	 	// 	mapdata = mapdata.replace(/u"/gm, '"');
 	 		mapdata = JSON.parse(mapdata);
 			
 			L.geoJson(mapdata, {
@@ -628,7 +628,7 @@
 					tempMarker.feature.properties.placename = getPlace;
 					tempMarker.feature.properties.datetime = getDT;
 					// tempMarker.feature.properties.created_at = getDT;
-					tempMarker.feature.properties.description = getObsNote.replace(/'/gm, "");	// temp fix.
+					tempMarker.feature.properties.description = getObsNote;//.replace(/'/gm, "");	// temp fix.
 					tempMarker.feature.properties.tags = getTags;
 									
 					if(! tempMarker.feature.properties.id)
