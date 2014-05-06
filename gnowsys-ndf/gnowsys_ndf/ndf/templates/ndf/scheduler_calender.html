@@ -1,0 +1,60 @@
+{% block head %}
+
+	<meta charset='utf-8' />
+
+	<link href='/static/ndf/css/fullcalendar/fullcalendar.css' rel='stylesheet' />
+	<link href='/static/ndf/css/fullcalendar/fullcalendar.print.css' rel='stylesheet' media='print' />
+
+	<script src='/static/ndf/js/fullcalendar/moment.min.js'></script>
+	<script src='/static/ndf/js/jquery.js'></script>
+	<script src='/static/ndf/js/fullcalendar/jquery-ui.custom.min.js'></script>
+	<script src='/static/ndf/js/fullcalendar/fullcalendar.min.js'></script>
+
+	<style>
+			#view-scheduler-calendar table { border: none; }
+		
+			#calendar {
+
+				width: 900px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+	</style>
+
+	<script>
+
+		$('#view-scheduler-calendar').on('toggled', function (event, tab) {
+		
+			/* initialize the calendar 
+			-------------------------- */
+			
+			$('#calendar').fullCalendar({
+
+				// to call an event on day click
+				// dayClick: function() { alert('a day has been clicked!'); }
+
+				// header
+				header: { left: 'title', center: '', right: 'today prev,next' }, // prevYear,nextYear
+
+				// button Icons
+				// buttonIcons : { prev: 'prev', next: 'next' },
+
+				// theme
+				// theme: false,
+
+			});
+			
+			
+		});
+
+	</script>
+
+{% endblock %}
+
+
+<div>
+	
+	<div id='calendar'></div>
+
+</div>

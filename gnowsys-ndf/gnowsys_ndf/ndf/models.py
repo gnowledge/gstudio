@@ -496,11 +496,20 @@ class Node(DjangoDocument):
         Key -- Name of the relation
         Value -- It's again a dictionary that holds key and values as shown below:
         {
+          // If inverse_relation - False
           'relation-type-name': {
-              'altnames': Value of RelationType node's altnames field,
-              'object_type': Value of RelationType node's object_type field,
+              'altnames': Value of RelationType node's altnames field [0th index-element],
+              'subject_or_object_type': Value of RelationType node's object_type field,
               'inverse_name': Value of RelationType node's inverse_name field,
-              'right_subject_list': List of Value(s) of GRelation node's right_subject field
+              'subject_or_right_subject_list': List of Value(s) of GRelation node's right_subject field
+          }
+          
+          // If inverse_relation - True
+          'relation-type-name': {
+              'altnames': Value of RelationType node's altnames field [1st index-element],
+              'subject_or_object_type': Value of RelationType node's subject_type field,
+              'inverse_name': Value of RelationType node's name field,
+              'subject_or_right_subject_list': List of Value(s) of GRelation node's subject field
           }
         }
         
@@ -526,6 +535,8 @@ class Node(DjangoDocument):
                     error_message = "\n ObjectIdError: Invalid ObjectId (" + gsystem_type_id + ") found while finding relations !!!\n"
                     raise Exception(error_message)
             
+            # Relation ===================================================================================================================
+            inverse_relation = False
             # Case - While editing GSystem
             # Checking in GRelation collection - to collect relations' values, if already set!
             if self.has_key("_id"):
@@ -534,14 +545,15 @@ class Node(DjangoDocument):
                 for rel_obj in relations:
                     # rel_obj is of type - GRelation [subject(node._id), relation_type(RelationType), right_subject(value of related object)]
                     # Must convert rel_obj.relation_type [dictionary] to collection.Node(rel_obj.relation_type) [document-object]
-                    RelationType.append_relation(collection.RelationType(rel_obj.relation_type), possible_relations, rel_obj.right_subject)
+                    RelationType.append_relation(collection.RelationType(rel_obj.relation_type), 
+                                                  possible_relations, inverse_relation, rel_obj.right_subject)
 
             # Case - While creating GSystem / if new relations get added
             # Checking in RelationType collection - because to collect newly added user-defined relations, if any!
             relations = collection.Node.find({'_type': 'RelationType', 'subject_type': gsystem_type_id})
             for rel_type in relations:
                 # Here rel_type is of type -- RelationType
-                RelationType.append_relation(rel_type, possible_relations)
+                RelationType.append_relation(rel_type, possible_relations, inverse_relation)
 
             # type_of check for current GSystemType to which the node belongs to
             gsystem_type_node = collection.Node.one({'_id': gsystem_type_id}, {'name': 1, 'type_of': 1})
@@ -549,10 +561,37 @@ class Node(DjangoDocument):
                 relations = collection.Node.find({'_type': 'RelationType', 'subject_type': {'$in': gsystem_type_node.type_of}})
                 for rel_type in relations:
                     # Here rel_type is of type -- RelationType
-                    RelationType.append_relation(rel_type, possible_relations)
+                    RelationType.append_relation(rel_type, possible_relations, inverse_relation)
+
+            # Inverse-Relation ==============================================================================================================
+            inverse_relation = True
+            # Case - While editing GSystem
+            # Checking in GRelation collection - to collect inverse-relations' values, if already set!
+            if self.has_key("_id"):
+                # If - node has key '_id'
+                relations = collection.Triple.find({'_type': "GRelation", 'right_subject': self._id})
+                for rel_obj in relations:
+                    # rel_obj is of type - GRelation [subject(node._id), relation_type(RelationType), right_subject(value of related object)]
+                    # Must convert rel_obj.relation_type [dictionary] to collection.Node(rel_obj.relation_type) [document-object]
+                    RelationType.append_relation(collection.RelationType(rel_obj.relation_type), 
+                                                                          possible_relations, inverse_relation, rel_obj.subject)
+
+            # Case - While creating GSystem / if new relations get added
+            # Checking in RelationType collection - because to collect newly added user-defined relations, if any!
+            relations = collection.Node.find({'_type': 'RelationType', 'object_type': gsystem_type_id})
+            for rel_type in relations:
+                # Here rel_type is of type -- RelationType
+                RelationType.append_relation(rel_type, possible_relations, inverse_relation)
+
+            # type_of check for current GSystemType to which the node belongs to
+            gsystem_type_node = collection.Node.one({'_id': gsystem_type_id}, {'name': 1, 'type_of': 1})
+            if gsystem_type_node.type_of:
+                relations = collection.Node.find({'_type': 'RelationType', 'object_type': {'$in': gsystem_type_node.type_of}})
+                for rel_type in relations:
+                    # Here rel_type is of type -- RelationType
+                    RelationType.append_relation(rel_type, possible_relations, inverse_relation)
 
         return possible_relations
-
 
     def get_neighbourhood(self, member_of):
         """Attaches attributes and relations of the node to itself;
@@ -566,8 +605,8 @@ class Node(DjangoDocument):
 
         relations = self.get_possible_relations(member_of)
         for key, value in relations.iteritems():
-            self.structure[key] = value['object_type']
-            self[key] = value['right_subject_list']
+            self.structure[key] = value['subject_or_object_type']
+            self[key] = value['subject_or_right_subject_list']
 
 
 @connection.register
@@ -747,54 +786,87 @@ class RelationType(Node):
     ##########  User-Defined Functions ##########
 
     @staticmethod
-    def append_relation(rel_type_node, rel_dict, right_subject_value=None):
+    def append_relation(rel_type_node, rel_dict, inverse_relation, left_or_right_subject=None):
         """Appends details of a relation in format described below.
         
         Keyword arguments:
         rel_type_node -- Document of RelationType node
         rel_dict -- Dictionary to which relation-details are appended
-        right_subject_vale -- Actual value of related-subjects (only if provided, otherwise by default it's None)
+        inverse_relation -- Boolean variable that indicates whether appending an relation or inverse-relation
+        left_or_right_subject -- Actual value of related-subjects (only if provided, otherwise by default it's None)
         
         Returns: Dictionary that holds details as follows:
         Key -- Name of the relation
         Value -- It's again a dictionary that holds key and values as shown below:
         {
+          // If inverse_relation - False
           'relation-type-name': {
-              'altnames': Value of RelationType node's altnames field,
-              'object_type': Value of RelationType node's object_type field,
+              'altnames': Value of RelationType node's altnames field [0th index-element],
+              'subject_or_object_type': Value of RelationType node's object_type field,
               'inverse_name': Value of RelationType node's inverse_name field,
-              'right_subject_list': List of Value(s) of GRelation node's right_subject field
+              'subject_or_right_subject_list': List of Value(s) of GRelation node's right_subject field
+          }
+          
+          // If inverse_relation - True
+          'relation-type-name': {
+              'altnames': Value of RelationType node's altnames field [1st index-element],
+              'subject_or_object_type': Value of RelationType node's subject_type field,
+              'inverse_name': Value of RelationType node's name field,
+              'subject_or_right_subject_list': List of Value(s) of GRelation node's subject field
           }
         }
         """
 
         collection = get_database()[Node.collection_name]
 
-        right_subject_node = None
+        left_or_right_subject_node = None
 
-        if right_subject_value:
-            right_subject_node = collection.Node.one({'_id': right_subject_value})
+        if left_or_right_subject:
+            left_or_right_subject_node = collection.Node.one({'_id': left_or_right_subject})
 
-            if not right_subject_node:
-                error_message = "\n AppendRelationError: Right subject with this ObjectId("+str(right_subject_value)+") doesn't exists !!!"
+            if not left_or_right_subject_node:
+                error_message = "\n AppendRelationError: Right subject with this ObjectId("+str(left_or_right_subject)+") doesn't exists !!!"
                 raise Exception(error_message)
 
-        if not rel_dict.has_key(rel_type_node.name):
-            right_subject_list = [right_subject_node] if right_subject_node else []
+        rel_name = ""
+        opp_rel_name = ""
+        alt_names = ""
+        subject_or_object_type = None
 
-            rel_dict[rel_type_node.name] = {
-                'altnames': rel_type_node.altnames,
-                'object_type': rel_type_node.object_type,
-                'inverse_name': rel_type_node.inverse_name,
-                'right_subject_list': right_subject_list
-            }
-        
+        if inverse_relation:
+          # inverse_relation = True
+          # Means looking from object type
+          # relation-type's name & inverse-name will be swapped
+          rel_name = rel_type_node.inverse_name
+          opp_rel_name = rel_type_node.name
+          alt_names = rel_type_node.altnames.split(";")[1] if ";" in rel_type_node.altnames else rel_type_node.altnames
+          subject_or_object_type = rel_type_node.subject_type
+          
         else:
-            right_subject_list = rel_dict[rel_type_node.name]["right_subject_list"] if rel_dict[rel_type_node.name]["right_subject_list"] else []
-            if right_subject_node:
-                if not (right_subject_node in right_subject_list):
-                    right_subject_list.append(right_subject_node)
-                    rel_dict[rel_type_node.name]["right_subject_list"] = right_subject_list
+          # inverse_relation = False
+          # Means looking from subject type
+          # relation-type's name & inverse-name will be as it is
+          rel_name = rel_type_node.name
+          opp_rel_name = rel_type_node.inverse_name
+          alt_names = rel_type_node.altnames.split(";")[0] if ";" in rel_type_node.altnames else rel_type_node.altnames
+          subject_or_object_type = rel_type_node.object_type
+
+        if not rel_dict.has_key(rel_name):
+            subject_or_right_subject_list = [left_or_right_subject_node] if left_or_right_subject_node else []
+
+            rel_dict[rel_name] = {
+                'altnames': alt_names,
+                'subject_or_object_type': subject_or_object_type,
+                'inverse_name': opp_rel_name,
+                'subject_or_right_subject_list': subject_or_right_subject_list
+            }
+
+        else:
+            subject_or_right_subject_list = rel_dict[rel_name]["subject_or_right_subject_list"] if rel_dict[rel_name]["subject_or_right_subject_list"] else []
+            if left_or_right_subject_node:
+                if not (left_or_right_subject_node in subject_or_right_subject_list):
+                    subject_or_right_subject_list.append(left_or_right_subject_node)
+                    rel_dict[rel_name]["subject_or_right_subject_list"] = subject_or_right_subject_list
 
         return rel_dict
 
