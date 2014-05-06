@@ -164,17 +164,14 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     return dict_drawer
 
 def get_resource_type(request,node_id):
-  a=collection.Node.one({'_id':ObjectId(node_id)})
-
-       
-  get_type=a._type
-  
+  get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
+  get_type=get_resource_type._type
   print get_type,"get_type"
   page_node = eval("collection"+"."+ get_type)()
-  return page_node  
+  return get_type 
    
 
-def get_translate_common_fields(request, node, group_id, node_type, node_id):
+def get_translate_common_fields(request,get_type,node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
   gcollection = db[Node.collection_name]
@@ -185,11 +182,28 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
   tags = request.POST.get('tags')
   usrid = int(request.user.id)
   language= request.POST.get('lan')
+  if get_type == "File":
+    get_parent_node=collection.Node.one({'_id':ObjectId(node_id)})
+    get_mime_type=get_parent_node.mime_type
+    get_fs_file_ids=get_parent_node.fs_file_ids
+    node.mime_type=get_mime_type
+    node.fs_file_ids=get_fs_file_ids
+ 
   if not node.has_key('_id'):
-    
     node.created_by = usrid
-    node.member_of.append(node_type._id)
-
+    if get_type == "File":
+        get_node_type = collection.Node.one({'name':get_type})
+        node.member_of.append(get_node_type._id)
+        if 'image' in get_mime_type:
+          get_image_type = collection.Node.one({'name':'Image'})
+          node.member_of.append(get_image_type._id)
+        if 'video' in get_mime_type:
+          get_video_type = collection.Node.one({'name':'Video'})
+          node.member_of.append(get_video_type._id)
+        
+    else:
+      node.member_of.append(node_type._id)
+ 
   node.name = unicode(name)
   node.language=unicode(language)
 
