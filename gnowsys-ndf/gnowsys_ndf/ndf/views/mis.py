@@ -20,7 +20,6 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
     """
     custom view for custom GAPPS
     """
-    print "\n\n Going from here...\n\n"
     app_name = "mis"
     app_collection_set = [] 
     atlist = []
@@ -161,7 +160,6 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     """
     create new instance of app_set of apps view for custom GAPPS
     """
-    print "\n\n Going from EDIT here...\n\n"
     app_name = "mis"
     app_collection_set = [] 
     app = collection.Node.find_one({"_id":ObjectId(app_id)})
