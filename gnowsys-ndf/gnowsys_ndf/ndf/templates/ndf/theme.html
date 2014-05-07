@@ -120,8 +120,13 @@
 	        <tr>
 	    	
 	       	{% if nodes %}
-	    
-	            <th width="20"> <input class="checkedAll" type="checkbox"></th>
+
+	            <th width="20">
+	            	{% if user_access == "allow" %}
+	            	 <input class="checkedAll" type="checkbox">
+	            	{% endif %}
+	            </th>
+
 	            <th width="150">Title</th>
 	            <th width="150">Created by</th>
 	            <th width="150">Creation date</th>
@@ -137,12 +142,16 @@
 	        {% for each in nodes %}
 	       		<tr>
 	        
-	            <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+	            <td  id="{{each.id}}" class="objectsCheckbox"> 
+	            	{% if user_access == "allow" %}
+	            		<input type="checkbox"> 
+	            	{% endif %}
+	            </td>
 	            <td  class="name" style="font-size:11px;"><a href="">{{each.name}}</a></td>
 	            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
 	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
   		  		{% if user_access == "allow" %}
-	            <td  class="name" style="font-size:11px;"><a href="" class="button medium">Edit</a></td>
+	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
 	        	{% endif %}
 	          	</tr>
 	          
