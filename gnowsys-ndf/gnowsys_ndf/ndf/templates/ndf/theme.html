@@ -100,7 +100,9 @@
 	      	</div>
 
       		{% if user.is_authenticated %}
+      			{% if user_access == "allow" %}
         		<input class="button deleteObjects" type="button" value="Delete">
+        		{% endif %}
       		{% endif %}
       
       		<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
