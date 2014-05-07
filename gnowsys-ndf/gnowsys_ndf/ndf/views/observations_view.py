@@ -108,8 +108,9 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	request.session.set_test_cookie()
 
 	# getting django user id
-	user_id = int(request.user.id)  if request.user.id 	else ""		
+	user_id = int(request.user.id)  if request.user.id 	else request.session.set_expiry(0)
 	user_name = unicode(request.user.username) if request.user.username  else "" # getting django user name
+	
 
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
@@ -187,11 +188,12 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 					if cookie_added_markers.find(marker_ref) > 0:
 						anonymous_flag = True
 					else:
-						operation_performed = "You have not created this marker or you lost your session."
+						operation_performed = "You have not created this marker or you had lost your session !"
 				else:
-					operation_performed = "You have not created this marker or you are lost your session"
+					operation_performed = "You have not created this marker or you are had lost your session !"
 			else:
 				operation_performed = "You have not created this marker or we think you had disabled support for cookies !"
+
 
 			if (user_type == "authenticated") or anonymous_flag:
 			
@@ -261,9 +263,9 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 			if cookie_added_markers.find(marker_ref) > 0:
 				anonymous_flag = True
 			else:
-				operation_performed = "You have not created this marker or you lost your session."
+				operation_performed = "You have not created this marker or you had lost your session !"
 		else:
-			operation_performed = "You have not created this marker or you are lost your session"
+			operation_performed = "You have not created this marker or you had lost your session !"
 	else:
 		operation_performed = "You have not created this marker or we think you had disabled support for cookies !"
 
