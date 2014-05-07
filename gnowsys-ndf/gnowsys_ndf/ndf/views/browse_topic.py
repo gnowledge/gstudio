@@ -28,7 +28,6 @@ db = get_database()
 collection = db[Node.collection_name]
 #######################################################################################################################################
 
-@login_required
 def themes(request, group_id, app_id=None, app_set_id=None):
 
 	app_collection_set = [] 
