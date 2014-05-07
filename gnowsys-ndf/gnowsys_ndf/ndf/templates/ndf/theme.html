@@ -27,8 +27,11 @@
 {% endblock%}
 
 {% block meta_content %}
+{% if user.is_authenticated %}
+{% user_access_policy groupid request.user as user_access %}
 
 <ul class="side-nav"> 
+
   {% for each in app_collection_set %}
   
     {% get_memberof_objects_count each.id groupid as count %}
@@ -36,10 +39,11 @@
   
       <li class="active"> 
         <div>
-          
+  		  {% if user_access == "allow" %}
           <a href="{% url "theme_topic_create" groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
             +&nbsp;Add
           </a>
+          {% endif %}
 
           <a href="{% url "theme_list" groupid app_id each.id %}" >
             {{each.name}} ({{count}})
@@ -48,8 +52,6 @@
         </div>
       </li>
   
-      
-
   {% endfor %}
   	<br/>
 
@@ -62,10 +64,14 @@
   	<br/>
   
 </ul>
+{% endif %}
 {% endblock %}
 
 
 {% block body_content %}
+
+{% user_access_policy groupid request.user as user_access %}
+
 	{% if themes_hierarchy %}
 
 		<h3>Themes Hierarchy<h3>
@@ -94,7 +100,9 @@
 	      	</div>
 
       		{% if user.is_authenticated %}
+      			{% if user_access == "allow" %}
         		<input class="button deleteObjects" type="button" value="Delete">
+        		{% endif %}
       		{% endif %}
       
       		<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
@@ -110,15 +118,16 @@
 	    <table >
 	   		<thead>
 	        <tr>
-	    
+	    	
 	       	{% if nodes %}
 	    
 	            <th width="20"> <input class="checkedAll" type="checkbox"></th>
 	            <th width="150">Title</th>
 	            <th width="150">Created by</th>
 	            <th width="150">Creation date</th>
+  		  		{% if user_access == "allow" %}
 	            <th width="150">Edit</th>
-	      
+	      		{% endif %}
 	       	{% endif %}
 	    
 	       	</tr>
@@ -132,8 +141,9 @@
 	            <td  class="name" style="font-size:11px;"><a href="">{{each.name}}</a></td>
 	            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
 	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
+  		  		{% if user_access == "allow" %}
 	            <td  class="name" style="font-size:11px;"><a href="" class="button medium">Edit</a></td>
-	        
+	        	{% endif %}
 	          	</tr>
 	          
 	       	{% empty %}
@@ -150,7 +160,11 @@
 	{% endif %}
 
 	{% if create_edit %}
-		{% include "ndf/theme_topic_create_edit.html" %}
+		{% if title == "Theme" %}
+			{% include "ndf/theme_create_edit.html" %}
+		{% else %}
+			{% include "ndf/topic_create_edit.html" %}
+		{% endif %}
 	{% endif %}
 
 {% endblock %}
