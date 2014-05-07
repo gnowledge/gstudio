@@ -178,7 +178,14 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	    <div class="content" id="panel-collection" style="width:95%;">
 	    <div class="row">
-					
+	    	{% if node %}
+			<div class="small-3 columns">		
+	    		<a href="{% url "theme_topic_create" groupid app_id theme_GST_id %}"> <input class="small button split" type="button" value=" + Add Theme" > </a>
+			</div>
+			<div class="small-9 columns">		
+				<a href="{% url "theme_topic_create" groupid app_id topic_GST_id %}"> <input class="small button split" type="button" value=" + Add Topic" > </a>
+			</div>
+			{% endif %}
 			<div class="small-12 columns">
 		  		<div id="collection_drawer" >
 		    		{% edit_drawer_widget "collection" groupid node title %}
@@ -231,36 +238,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 			}
 
 		});
-	});
-
-
-	$("input:radio").click(function() {
-
-		cn_arr = []
-
-		$(".node_id").each(function (){
-			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
-				cn_arr.push($(this).val());
-			}
-		});
-
-		var cn_list = cn_arr.join(',');
-
-		$.ajax({
-			type: "POST",
-			url: "{% url 'select_drawer' groupid %}",
-			datatype: "html",
-			data:{
-				homo_collection: this.value,
-				collection_list: cn_list,
-				node_id: '{{node.pk}}',
-				csrfmiddlewaretoken: '{{ csrf_token }}'
-			},
-			success: function(data) {
-				$("#collection_drawer").html(data);
-			}
-		});
-
 	});
 
 
