@@ -50,37 +50,29 @@
 
 {% block meta_content %}
 <ul class="side-nav"> 
-
-	{% for each in app_collection_set %}
-	{% get_memberof_objects_count each.id groupid as count %}
-
-	{% ifequal each.id app_set_id %}
-	<li class="active"> 
-		<div>
-			<a href="{% url 'mis_app_instance_create' groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
-		    +&nbsp;Add
-			</a>
-
-			<a href="{% url 'mis_app_detail' groupid app_id each.id %}" >
-        {{each.name}} ({{count}})
-			</a> 
-		</div>
+	<li>
+		<a></a>
 	</li>
 
-	{% else %}
+	{% for each in app_collection_set %}
+	{% get_memberof_objects_count each.pk groupid as count %}
+
 	<li> 
-    <div>
-      <a href="{% url 'mis_app_instance_create' groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
+    <div class="row">
+      {% if each.type_of or each.name == "Caste" %}
+      <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" >
+        {{each.name}} ({{count}})
+      </a> 
+      <a class="small-4 columns" href="{% url 'mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
         +&nbsp;Add
       </a>
 
-      <a href="{% url 'mis_app_detail' groupid app_id each.id %}" >
-        {{each.name}} ({{count}})
-      </a> 
+      {% else %}
+        {{each.name}}
+
+      {% endif %}
     </div>
 	</li>
-
-	{% endifequal %}
 
 	{% endfor %}
 
@@ -267,10 +259,10 @@
           <br/>
 
           <div class="row" id="college_affiliated_to">
-            <label class="small-3 columns">
+            <label class="small-4 columns">
               Affiliated to
             </label>
-            <div class="small-9 columns">
+            <div class="small-8 columns">
             {% for n in node.college_affiliated_to|slice:":5" %}
               <a href="#">{{n.name}}</a><br/>
               {% if forloop.counter0 == 4%}
@@ -281,36 +273,39 @@
           </div>
           {% endif %}
 
-          {% if node.college_of_person %}
+          {% if node.college_of_student %}
           <br/>
 
-          <div class="row" id="college_of_person">
-            <label class="small-3 columns">
-              People
+          <div class="row" id="college_of_student">
+            <label class="small-4 columns">
+              No. of Students Enrolled
             </label>
-            <div class="small-9 columns">
-            {% for n in node.college_of_person|slice:":5" %}
+            <div class="small-8 columns">
+            {% if node.college_of_student|length > 5 %}
+              <a href="#">{{node.college_of_student|length}}</a>
+
+            {% else %}
+            {% for n in node.college_of_student %}
               <a href="#">{{n.name|title}}</a><br/>
-              {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.college_of_person|length|add:"-5"}} more</a>
-              {% endif %}
-            {% endfor %}    
+            {% endfor %}
+
+            {% endif %}
             </div>
           </div>
           {% endif %}
 
-          {% if node.person_belongs_to_college %}
+          {% if node.student_belongs_to_college %}
           <br/>
 
-          <div class="row" id="person_belongs_to_college">
-            <label class="small-3 columns">
+          <div class="row" id="student_belongs_to_college">
+            <label class="small-4 columns">
               College
             </label>
-            <div class="small-9 columns">
-            {% for n in node.person_belongs_to_college|slice:":5" %}
+            <div class="small-8 columns">
+            {% for n in node.student_belongs_to_college|slice:":5" %}
               <a href="#">{{n.name}}</a><br/>
               {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.person_belongs_to_college|length|add:"-5"}} more</a>
+              ... <a href="#">See {{node.student_belongs_to_college|length|add:"-5"}} more</a>
               {% endif %}
             {% endfor %}    
             </div>
@@ -321,10 +316,10 @@
           <br/>
 
           <div class="row" id="affiliated_college">
-            <label class="small-3 columns">
+            <label class="small-4 columns">
               Affiliated Colleges
             </label>
-            <div class="small-9 columns">
+            <div class="small-8 columns">
             {% for n in node.affiliated_college|slice:":5" %}
               <a href="#">{{n.name}}</a><br/>
               {% if forloop.counter0 == 4%}
@@ -335,36 +330,39 @@
           </div>
           {% endif %}
 
-          {% if node.university_of_person %}
+          {% if node.university_of_student %}
           <br/>
 
-          <div class="row" id="university_of_person">
-            <label class="small-3 columns">
-              People
+          <div class="row" id="university_of_student">
+            <label class="small-4 columns">
+              No. of Students Enrolled
             </label>
-            <div class="small-9 columns">
-            {% for n in node.university_of_person|slice:":5" %}
+            <div class="small-8 columns">
+            {% if node.university_of_student|length > 5 %}
+              <a href="#">{{node.university_of_student|length}}</a>
+
+            {% else %}
+            {% for n in node.university_of_student %}
               <a href="#">{{n.name|title}}</a><br/>
-              {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.university_of_person|length|add:"-5"}} more</a>
-              {% endif %}
-            {% endfor %}    
+            {% endfor %}
+
+            {% endif %}
             </div>
           </div>
           {% endif %}
 
-          {% if node.person_belongs_to_university %}
+          {% if node.student_belongs_to_university %}
           <br/>
 
-          <div class="row" id="person_belongs_to_university">
-            <label class="small-3 columns">
+          <div class="row" id="student_belongs_to_university">
+            <label class="small-4 columns">
               University
             </label>
-            <div class="small-9 columns">
-            {% for n in node.person_belongs_to_university|slice:":5" %}
+            <div class="small-8 columns">
+            {% for n in node.student_belongs_to_university|slice:":5" %}
               <a href="#">{{n.name}}</a><br/>
               {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.person_belongs_to_university|length|add:"-5"}} more</a>
+              ... <a href="#">See {{node.student_belongs_to_university|length|add:"-5"}} more</a>
               {% endif %}
             {% endfor %}    
             </div>
@@ -375,10 +373,10 @@
           <br/>
 
           <div class="row" id="address">
-            <label class="small-3 columns">
+            <label class="small-4 columns">
               Address
             </label>
-            <div class="small-9 columns">
+            <div class="small-8 columns">
               {{node.house_street|default_if_none:""}}{% if node.house_street %}; {% endif %}
               {{node.village|default_if_none:""}}{% if node.village %}; {% endif %}
               {{node.taluka|default_if_none:""}}{% if node.taluka %}; {% endif %}
