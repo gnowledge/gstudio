@@ -39,6 +39,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/browse topic/', include('gnowsys_ndf.ndf.urls.browse_topic')),
     (r'^(?P<group_id>[^/]+)/browse resource/', include('gnowsys_ndf.ndf.urls.browse_resource')),
     (r'^(?P<group_id>[^/]+)/mis/', include('gnowsys_ndf.ndf.urls.mis')),
+    (r'^(?P<group_id>[^/]+)/mis-po/', include('gnowsys_ndf.ndf.urls.mis')),
 
     (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
 
