@@ -180,6 +180,8 @@ def edit_drawer_widget(field, group_id, node, checked=None):
     if field == "collection":
       if checked == "Quiz":
         checked = "QuizItem"
+      elif checked == "Theme":
+        checked = "Theme"
       else:
         checked = None
       drawers = get_drawers(group_id, node._id, node.collection_set, checked)
@@ -196,6 +198,9 @@ def edit_drawer_widget(field, group_id, node, checked=None):
   else:
     if field == "collection" and checked == "Quiz":
       checked = "QuizItem"
+
+    elif field == "collection" and checked == "Theme":
+      checked = "Theme"
       
     elif field == "module":
       checked = "Module"

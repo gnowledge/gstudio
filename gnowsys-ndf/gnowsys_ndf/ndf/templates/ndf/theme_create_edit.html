@@ -178,44 +178,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	    <div class="content" id="panel-collection" style="width:95%;">
 	    <div class="row">
-			<div class="small-12 columns">
-				<h5>Add or edit Collection : </h5>
-			</div>				
-			<br/><br/>
-		
-			<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
-		  		<div id="SelectApp" class="row">
-		    		<div class="small-2 columns line-height-2pt5">
-		      			Classify by :
-		    		</div>
-		    		<div class="small-2 columns">
-		      			<input type="radio" name="col" value="Page"/>
-		      			Page <span class="divider-line">|</span>
-		      			<span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
-		    		</div>
-		    		<div class="small-2 columns">
-		      			<input type="radio" name="col" value="File" />
-			      		File <span class="divider-line">|</span>
-			      		<span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
-		    		</div>
-				    <div class="small-2 columns">
-				    	<input type="radio" name="col" value="Image" />
-					 	Image <span class="divider-line">|</span>
-					    <span class="fontsize-x-large"><i class="step fi-photo"></i></span>
-				    </div>
-		    		<div class="small-2 columns">
-		      			<input type="radio" name="col" value="Video" />
-		      			Video <span class="divider-line">|</span>
-		      			<span class="fontsize-x-large"><i class="step fi-video"></i></span>
-		    		</div>
-		    		<div class="small-2 columns">
-		      			<input type="radio" name="col" value="QuizObj" />
-		      			Quiz <span class="divider-line">|</span>
-		      			<span class="fontsize-x-large"><i class="step fi-pencil"></i></span>
-		    		</div>
-		  		</div>
-			</div>
-		
+					
 			<div class="small-12 columns">
 		  		<div id="collection_drawer" >
 		    		{% edit_drawer_widget "collection" groupid node title %}
