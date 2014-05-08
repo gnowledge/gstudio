@@ -20,7 +20,6 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
     """
     custom view for custom GAPPS
     """
-    print "\n\n Going from here...\n\n"
     app_name = "mis"
     app_collection_set = [] 
     atlist = []
@@ -46,8 +45,9 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
     property_display_order = []
 
     for eachset in app.collection_set:
-         app_set = collection.Node.find_one({"_id":eachset})
-         app_collection_set.append({"id": str(app_set._id), "name": app_set.name})
+         app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+         # app_set = collection.Node.find_one({"_id":eachset})
+         # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
         classtype = ""
@@ -125,6 +125,11 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
                             for right_sub_dict in system[field]:
                                 name_list.append(right_sub_dict.name)
                             display_fields.append((altname, ", ".join(name_list)))
+                        elif system.structure[field][0] == datetime.datetime:
+                            date_list = []
+                            for dt in system[field]:
+                                date_list.append(dt.strftime("%d/%m/%Y"))
+                            display_fields.append((altname, ", ".join(date_list)))
                         else:
                             display_fields.append((altname, ", ".join(system[field])))
 
@@ -161,7 +166,6 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     """
     create new instance of app_set of apps view for custom GAPPS
     """
-    print "\n\n Going from EDIT here...\n\n"
     app_name = "mis"
     app_collection_set = [] 
     app = collection.Node.find_one({"_id":ObjectId(app_id)})
@@ -189,8 +193,9 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     user_name = unicode(request.user.username)  # getting django user name
 
     for eachset in app.collection_set:
-      app_set = collection.Node.find_one({"_id":eachset})
-      app_collection_set.append({"id": str(app_set._id), "name": app_set.name})
+      app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+      # app_set = collection.Node.find_one({"_id":eachset})
+      # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})

@@ -839,7 +839,11 @@ class RelationType(Node):
           # relation-type's name & inverse-name will be swapped
           rel_name = rel_type_node.inverse_name
           opp_rel_name = rel_type_node.name
-          alt_names = rel_type_node.altnames.split(";")[1] if ";" in rel_type_node.altnames else rel_type_node.altnames
+          if rel_type_node.altnames:
+          	if ";" in rel_type_node.altnames:
+          		alt_names = rel_type_node.altnames.split(";")[1]
+          else:
+          	alt_names = u""
           subject_or_object_type = rel_type_node.subject_type
           
         else:
@@ -848,7 +852,11 @@ class RelationType(Node):
           # relation-type's name & inverse-name will be as it is
           rel_name = rel_type_node.name
           opp_rel_name = rel_type_node.inverse_name
-          alt_names = rel_type_node.altnames.split(";")[0] if ";" in rel_type_node.altnames else rel_type_node.altnames
+          if rel_type_node.altnames:
+          	if ";" in rel_type_node.altnames:
+          		alt_names = rel_type_node.altnames.split(";")[0]
+          else:
+          	alt_names = u""
           subject_or_object_type = rel_type_node.object_type
 
         if not rel_dict.has_key(rel_name):
