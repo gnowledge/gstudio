@@ -823,6 +823,27 @@ def get_source_id(obj_id):
     return 'null'
  
 
+@register.assignment_tag
+def get_possible_translations(obj_id):
+  try:
+    relation_set=obj_id.get_possible_relations(obj_id.member_of)
+    translation_set=[]
+    for key,value in relation_set.items():
+      if key == 'translation_of':
+        for k,v in value.items():
+          if k == "subject_or_right_subject_list":
+            for each in v:
+              dic={}
+              dic[each['_id']]=each['language']
+              translation_set.append(dic)
+
+    return translation_set
+  except Exception as e:
+    print str(e)
+    return 'null'
+ 
+
+
   #code commented in case required for groups not assigned edit_policy        
   #elif group_type is  None:
   #  group=user_access_policy(groupid,request.user)
