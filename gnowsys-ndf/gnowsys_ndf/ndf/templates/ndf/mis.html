@@ -43,6 +43,15 @@
 
     .ui-slider-horizontal { margin-top: 1em; }
 
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+      background-color:#efefef;
+      padding:0.5em 0 0.5em 0.5em; 
+      margin-left: -10px !important;
+    }
+
+    .active-app-set-edit{ border-right: 4px solid #808080; }
+
+    .active-app-set-view{ border-left: 4px solid #808080; }
   </style>
 
 
@@ -58,13 +67,17 @@
   {% get_memberof_objects_count each.pk groupid as count %}
 
   {% if app_set_id == each|safe %}
-  <li style="background-color:#efefef; padding:0.5em;">
+    {% if '/new/' in request.path %}
+    <li class="active-app-set-edit">
+    {% else %}
+    <li class="active-app-set-view">
+    {% endif %}
   {% else %}
   <li>
   {% endif %}
     <div class="row">
       {% if each.type_of or each.name == "Caste" %}
-      <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" >
+      <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
         {{each.name}} ({{count}})
       </a> 
       <a class="small-4 columns" href="{% url 'mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
@@ -876,6 +889,7 @@ $(document).foundation({
     //   }); 
     // }
 
+  if(startDtInput.length > 0){
     startDtInput.datetimepicker({ 
 
       hourGrid: 6,
@@ -900,9 +914,9 @@ $(document).foundation({
         endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate') );
       }
     });
+  }
 
-
-
+  if(endDtInput.length > 0){
     endDtInput.datetimepicker({ 
       hourGrid: 6,
       minuteGrid: 15,
@@ -922,7 +936,7 @@ $(document).foundation({
         startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
       }
     });
-
+  }
 
     // totWhen ---------------
     var totWhen = $("font:contains('tot_when')").parent().next().find("input");
