@@ -12,9 +12,9 @@ from django_mongokit import get_database
 from mongokit import IS
 
 try:
-    from bson import ObjectId
+  from bson import ObjectId
 except ImportError:  # old pymongo
-    from pymongo.objectid import ObjectId
+  from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
@@ -425,10 +425,13 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
             address_details = []
             details_12 = []
             graduation_details = []
+            work_experience = []
+            education_details = []
+            tot_details = []
             property_order = []
 
             # TODO: Name of attributes/relation to be replaced with their respective ObjectIds
-            if gsystem_type_name in ["Student"]:
+            if gsystem_type_name in ["Student", "Voluntary Teacher"]:
                 personal_details = [
                     ("first_name", "First Name"), 
                     ("middle_name", "Middle Name"), 
@@ -442,7 +445,7 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                     ("email_id", "Email ID")
                 ]
 
-            if gsystem_type_name in ["College", "University", "Student"]:
+            if gsystem_type_name in ["College", "University", "Student", "Voluntary Teacher"]:
                 address_details = [
                     ("house_street", "House No./Street Name"),
                     ("village", "Village"),
@@ -450,7 +453,29 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                     ("town_city", "Town/City"),
                     ("pin_code", "Pin Code")
                 ]
-            
+
+            if gsystem_type_name in ["Voluntary Teacher"]:
+                work_experience = [
+                    ("key_skills", "Key Skills"),
+                    ("profession", "Profession"),
+                    ("designation", "Profession"),
+                    ("work_exp", "Year of Experience (if Any)")
+                ]
+
+                education_details = [
+                    ("degree_name", "Highest degree_name"),
+                    ("degree_specialization", "Degree Specialization"),
+                    ("degree_passing_year", "Year of Passing Degree"),
+                    ("other_qualifications", "Any other Qualification")
+                ]
+
+                tot_details = [
+                    ("trainer_of_college", "Volunteer to teach College(s) [At max. 2]"),
+                    ("trainer_of_course", "Volunteer to teach Course(s) [At max. 2]"),
+                    ("is_tot_attended", "Did you attend TOT?"),
+                    ("tot_when", "When did you attend TOT?"),
+                ]
+
             if gsystem_type_name in ["Student"]:
                 details_12 = [
                     ("student_has_domicile", "State/Union Territory of Domicile"),
@@ -483,6 +508,19 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
 
                 property_order.append(["Affiliated Colleges", affiliated_college_details])
 
+            if gsystem_type_name in ["Voluntary Teacher"]:
+                address_details.insert(4, ("person_belongs_to_country", "Country"))
+                address_details.insert(4, ("person_belongs_to_state", "State"))
+                address_details.insert(4, ("person_belongs_to_district", "District"))
+
+                property_order = [
+                    ["Personal", personal_details],
+                    ["Address", address_details],
+                    ["Education", education_details],
+                    ["Work Experience", work_experience],
+                    ["TOT Details", tot_details],
+                    
+                ]
             if gsystem_type_name in ["Student"]:
                 personal_details.insert(6, ("student_of_caste_category", "Caste Category"))
 
@@ -596,6 +634,9 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
     type_list = []
     for data in json_document[eval_field]:
         if type_convert_objectid is None:
+          if eval_field == "when did you attend tot?":
+            type_list.append(datetime.datetime.strptime(data, "%d/%m/%Y"))
+          else:
             type_list.append(data)
 
         else:
