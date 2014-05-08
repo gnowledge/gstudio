@@ -918,5 +918,49 @@ $(document).foundation({
       }
     });
 
+
+    // totWhen ---------------
+    var totWhen = $("font:contains('tot_when')").parent().next().find("input");
+
+    if(totWhen.length > 0)
+    {
+      totWhen.datetimepicker();
+      $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
+      $("input.tiny").after("<div id='tot-when-date-list'></div>")
+
+    }
+
+    $(totWhen).change(function(){ 
+
+    if($(totWhen).val().length > 0)
+    {
+      $("input.tiny").removeClass("disabled");
+    }
+    else
+    {
+      $("input.tiny").addClass("disabled");
+    }
+
+  });
+
+    $("input.tiny").click(function(){
+      if(!$(this).hasClass("disabled")) 
+      {
+        // console.log("hello");
+        $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>')
+      }
+    })
+
+    function getTotWhen()
+    {
+      var datesList = []
+      dts = $("#tot-when-date-list .date-item");
+      $.each(dts, function(i, val){datesList.push($(val).text().trim())});
+
+      return datesList;
+    }
+
+    $("li.active").css("background-color", "#efefef");
+
 // </script>
 {% endblock %}	

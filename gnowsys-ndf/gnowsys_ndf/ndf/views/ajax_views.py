@@ -295,12 +295,20 @@ def get_tree_hierarchy(request, group_id, node_id):
     node = collection.Node.one({'_id':ObjectId(node_id)})
     data = ""
     collection_list = []
+    themes_list = []
 
     cur = collection.Node.find({'member_of': node._id,'group_set':ObjectId(group_id) })
 
+    for e in cur:
+      for l in e.collection_set:
+        themes_list.append(l)
+
+    cur.rewind()
+
     for each in cur:
-      collection_list.append({'name': each.name, 'id': each.pk})
-      collection_list = get_collection_list(collection_list, each)
+      if each._id not in themes_list:
+        collection_list.append({'name': each.name, 'id': each.pk})
+        collection_list = get_collection_list(collection_list, each)
 
     data = collection_list
 
