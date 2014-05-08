@@ -54,10 +54,14 @@
 		<a></a>
 	</li>
 
-	{% for each in app_collection_set %}
-	{% get_memberof_objects_count each.pk groupid as count %}
+  {% for each in app_collection_set %}
+  {% get_memberof_objects_count each.pk groupid as count %}
 
-	<li> 
+  {% if app_set_id == each|safe %}
+  <li style="background-color:#efefef; padding:0.5em;">
+  {% else %}
+  <li>
+  {% endif %}
     <div class="row">
       {% if each.type_of or each.name == "Caste" %}
       <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" >
@@ -69,7 +73,6 @@
 
       {% else %}
         {{each.name}}
-
       {% endif %}
     </div>
 	</li>
@@ -948,8 +951,9 @@ $(document).foundation({
     $("input.tiny").click(function(){
       if(!$(this).hasClass("disabled")) 
       {
-        // console.log("hello");
-        $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>')
+        $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
+        $(totWhen).val("");
+        $("input.tiny").addClass("disabled");
       }
     })
 
@@ -961,8 +965,6 @@ $(document).foundation({
 
       return datesList;
     }
-
-    $("li.active").css("background-color", "#efefef");
 
 // </script>
 {% endblock %}	
