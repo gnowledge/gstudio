@@ -5,390 +5,260 @@
 {% block title %} {{ title }} {% endblock %}
 
 {% block head%}  
+
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <!-- Scripts required for D3 graph -->
-  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
-  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
-  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+
+  <!-- Datetimepicker  -->
+  <!-- <link rel="stylesheet" media="all" type="text/css" href="/static/ndf/css/jquery-ui.css" /> -->
+  <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+  <script src="/static/ndf/js/jquery-ui.js"></script>
+  <script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
+  <script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
+  <link rel="stylesheet" href="/static/ndf/css/jquery-ui-timepicker-addon.css">
+
 {% endblock%}
 
 {% block meta_content %}
 <ul class="side-nav"> 
-  {% for each in app_collection_set %}
-  {% get_memberof_objects_count each.id groupid as count %}
-  {% ifequal each.id app_set_id %}
-  <li class="active"> 
-    <div>
-    <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
-    <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
-    </div>
-  </li>
-    {% else %}
-    <li> 
-      <div>
-      <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">+&nbsp;Add</a>
-      <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >{{each.name}} ({{count}})</a> 
-      </div>
-    </li>
-    {% endifequal %}
-    {% endfor %}
 
-    <br/>
-    {% if app_name == "browse topic" %}  
-      <li> 
-        <div>
-          <a href="{% url 'GAPPS' groupid app_name app_id %}"> <input class="small button split" type="button" value="Themes Hierarchy" > </a>
-        </div>
-      </li>
-    {% endif %}
+	{% for each in app_collection_set %}
+	{% get_memberof_objects_count each.id groupid as count %}
+
+	{% ifequal each.id app_set_id %}
+	<li class="active"> 
+		<div>
+			<a href="{% url 'GAPPS_set_new_instance' groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
+		    +&nbsp;Add
+			</a>
+
+			<a href="{% url 'GAPPS_set' groupid app_name app_id each.id %}" >
+        {{each.name}} ({{count}})
+			</a> 
+		</div>
+	</li>
+
+	{% else %}
+	<li> 
+    <div>
+      <a href="{% url 'GAPPS_set_new_instance' groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
+        +&nbsp;Add
+      </a>
+
+      <a href="{% url 'GAPPS_set' groupid app_name app_id each.id %}" >
+        {{each.name}} ({{count}})
+      </a> 
+    </div>
+	</li>
+
+	{% endifequal %}
+
+	{% endfor %}
 
 </ul>
 {% endblock %}
 
-{% block extra_content %}
-<!-- This block shows Themes Hierarchy (landing page of Browse Topic) -->
-{% if app == "Browse Topic" %}
-  {% include "ndf/theme.html" %}
-{% endif %}
-{% endblock %}
-
-
 {% block body_content %} 
-{# template for showing apt_set_instance list #}
-{% if app_set_template %}
-{% if nodes %}
-{% autopaginate nodes 25 %}
-<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
-<h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
-<input class="button confirmDeleteObjects" type="button" value="Confirm">
-<input class="button cancelDeleteObjects" type="button" value="Cancel">
-<div id="deletion_results">
-</div>
-<a class="close-reveal-modal">&#215;</a> </div>
-{% if user.is_authenticated %}
-<input class="button deleteObjects" type="button" value="Delete">
-{% endif %}
-<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
-  {% csrf_token %}
-  <input name="search" type="textbox" value="" style="width:300px;">
-  <input type="hidden" name="class" value="{{class_name}}">
-  <input type="submit" value="search" style="width:100px;">
-</form>
-{% endif %}
-<table >
-  <thead>
-    <tr>
-      {% if nodes %}
-      <th width="20"> <input class="checkedAll" type="checkbox"></th>
-      <th width="150">Title</th>
-      <th width="150">Created by</th>
-      <th width="150">Creation date</th>
-      <th width="150">Edit</th>
+  
+  {# template for showing apt_set_instance list #}
+
+  {% if app_set_template %}
+    
+    {% if nodes %}
+      {% autopaginate nodes 25 %}
+    
+      <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+        <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
+        
+        <input class="button confirmDeleteObjects" type="button" value="Confirm">
+        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+        <div id="deletion_results"></div>
+        <a class="close-reveal-modal">&#215;</a>
+
+      </div>
+
+      {% if user.is_authenticated %}
+        <input class="button deleteObjects" type="button" value="Delete">
       {% endif %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for each in nodes %}
-    <tr>
-      <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-      <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance" groupid app_name app_id app_set_id each.id %}">{{each.name}}</a></td>
-      <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
-      <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
-      <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id each.id %}" class="button medium">Edit</a></td>
-    </tr>
-    {% empty %}
-    <h3>No data to display</h3>
-    {% endfor %}
-  </tbody>
-</table>
-{% paginate %}
-{% endif %}
+      
+      <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
 
-{# template for showing apt_set_instance details #}
-{% if app_set_instance_template %}
+        {% csrf_token %}
+        <input name="search" type="textbox" value="" style="width:300px;">
+        <input type="hidden" name="class" value="{{class_name}}">
+        <input type="submit" value="search" style="width:100px;">
 
-  {% if node.property_order|length > 0 %}
+      </form>
+    {% endif %}
 
-  <!-- Consistent details-view -->
-  {% if user.is_authenticated %}
-  <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+    <table >
+      <thead>
+        <tr>
+    
+          {% if nodes %}
+    
+            <th width="20"> <input class="checkedAll" type="checkbox"></th>
+            <th width="150">Title</th>
+            <th width="150">Created by</th>
+            <th width="150">Creation date</th>
+            <th width="150">Edit</th>
+      
+          {% endif %}
+    
+        </tr>
+      </thead>
+      
+      <tbody>
+        {% for each in nodes %}
+          <tr>
+        
+            <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance" groupid app_name app_id app_set_id each.id %}">{{each.name}}</a></td>
+            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
+            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
+            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id each.id %}" class="button medium">Edit</a></td>
+        
+          </tr>
+          
+          {% empty %}
+
+          <h3>No data to display</h3>
+
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+    {% paginate %}
   {% endif %}
 
-  <!-- Header of the page -->
-
-  <header class="row page">
-
-    <section class="medium-12 columns" >
-      <h2>
-	<span class='node'>{{node.name}}</span>
-	<small class="label-list"> 
-	  {% for tag in node.tags %}
-	  <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-	  {% endfor %}
-	</small>      
-      </h2>
-
-      <dl class="row tabs" data-tab>
-	<dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
-	
-	<dd>
-          <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
-          <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-            <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
-            <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
-            <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
-          </ul>
-	</dd>
-	
-	<dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
-	
-	<dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-    </section>
-    
-  </header>
 
 
-  <div class="row">
+{# template for showing apt_set_instance details #}
 
-    <section class="medium-9 columns">
-      <div class="tabs-content">
+{% if app_set_instance_template %}
 
-	<!-- Tab content -->
-	<dl class="row columns tabs" data-tab>
-	  {% for tab_name, display_fields in property_display_order %}
-	  <dd {% if forloop.first %}class="active"{% endif %}><a href="#panel_{{tab_name|cut:' '}}">{{tab_name}}</a></dd>
-	  {% endfor %}
-	</dl>
-	<div class="small-12 columns tabs-content">
-	  <br/>
-	  {% for tab_name, display_fields in property_display_order %}
-	  <div class="content {% if forloop.first %}active{% endif %}" id="panel_{{tab_name|cut:' '}}">
-	    {% for altname, value in display_fields %}
-	    <div class="row">
-	      <div class="small-4 columns">
-		<label>{{altname}}</label>
-	      </div>
-	      <div class="small-8 columns">
-		<p>{{value}}</p>
-	      </div>
-	    </div>
-	    {% endfor %}
-	  </div>
-	  {% endfor %}
-	</div>
-	  
-	<!-- Content for Concept Graph -->
-	<div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
-	  <a class="close-reveal-modal">&#215;</a>
-	  {% include "ndf/graph_concept.html" %}
-	</div>
+    <a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id app_set_instance_id %}" class="button medium">
+      Edit
+    </a>
+    <br/>
 
-	<!-- Content for Collection Graph -->
-	<div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-	  <a class="close-reveal-modal">&#215;</a>
-	  {% include "ndf/graph_collection.html" %}
-	</div>
-
-	<!-- Content for dependency Graph -->
-	<div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
-	  <a class="close-reveal-modal">&#215;</a>
-	  {% include "ndf/graph_dependency.html" %}
-	</div>
+    <div style="display:table; border:1px; border-spacing:15px; " class="small-6 columns">
       
-	<!-- Tab View Map Widget -->
-	<div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
-	  <a class="close-reveal-modal" >&#215;</a>
-	  {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
-	</div>
+      <div style="display:table-row;">
+        
+        <div style="display:table-cell;">
+   <font size="3"> {{app_set_name}}'s Title</font>
+        </div>
+        
+        <div style="display:table-cell;">
+   <font size="3">{{app_set_instance_name}}</font>
+        </div>
 
       </div>
-    </section>
+      
+      {% if app_set_instance_atlist %}
+        {% for at in app_set_instance_atlist %}
+          <div style="display:table-row;">
+            
+            <div style="display:table-cell;">
+       <font size="3"> {{at.type}} </font>
+            </div>
+            
+            <div style="display:table-cell;">
+       <font size="3"> {{at.value}} </font>
+            </div>
 
-    <section class="medium-3 columns">
-      <div class="panel">
-	<h3 class="subheader"></h3>
-	Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
-	<small>
-          <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
-            {% for seq_no, version_no in node.version_dict.items reversed %}
-            <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
-            {% endfor %}
           </div>
-	</small>
-  
-	<!-- Button that converts collection into module-->
-	
-	{% if node.collection_set and user.is_authenticated%}
-	<a href="#" class="button" id="module"></i> <span>Make Module</a>
-	{% endif %}
+        {% endfor %}
+      {% endif %}
 
-        {% if node %}
-          {% get_publish_policy request groupid node as group_policy %}
-          {% check_group node as is_group %}
+      {% if app_set_instance_rtlist %}
+        {% for rt in app_set_instance_rtlist %}
+          <div style="display:table-row;">
+            
+            <div style="display:table-cell;">
+       <font size="3"> {{rt.type}} </font>
+            </div>
+            
+            <div style="display:table-cell;">
+       <font size="3"> {{rt.value_name}} </font>
+            </div>
 
-  	  {% if group_policy == "allow" %}
-  	    {% if is_group %} 
-            <div>
-	      <a class="button small" href="{% url 'publish_group'  group_id node %}"> Publish </a>
-	    </div>
+          </div>
+        {% endfor %}
+      {% endif %}
 
-  	    {% else %}
-  	    <div>
-	      <a class="button small" href="{% url 'publish_page'  group_id node %}"> Publish </a>  
-	    </div>
-	    {% endif %}
-	  {% endif %}
-	{% endif %}
-
-	{% edit_policy groupid node request.user as status %}
-     
-	{% if status == "allow" %}
-	  {% get_edit_url node.pk as edit_url %}
-	  {% switch_group_conditions request.user group_id as switch_conditions %}
-	  {% check_group node as is_group %}
-
-	  {% get_user_object node.created_by as created_user %}
-
-	  {% if is_group %}
-            {% ifequal created_user request.user %}     
-	    <a href="{#% url edit_url node %#}" class="small button split edit">
-	      <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
-	    </a> 
-            {% endifequal %}
-
-	  {% else %}
-            {% if switch_conditions %}     
-	    <input type="button" id="switch_group" class="button small" value="Publish in group/s">
-	    <div id="mySystemtype" class="reveal-modal" data-reveal >
-	      <h2>Select Groups</h2>
-	      <div id="module_drawer" >
-		{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-	      </div>
-	      <a class="close-reveal-modal st">&#215;</a>
-	      <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
-		</div>
-	    {% endif %}
-
-	    <a href="{% url 'GAPPS_set_instance_edit' groupid app_name app_id app_set_id app_set_instance_id %}" class="small button split edit">
-	      <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
-	    </a>
-
-	    <ul id="edit-options" class="f-dropdown">
-	      <li>
-		<a href="{% url 'page_create_edit' groupid %}">Create a new page</a>
-	      </li>
-	    </ul>
-
-	  {% endif %}    
-
-	{% endif %}
+      <!-- for location/map widget : VIEW -->
+      <div style="display:table-row;">
+        
+        <div style="display:table-cell;">
+   <font size="3"> Location </font>
+        </div>
+    
+        <div style="display:table-cell;">
+   <a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a>
+        </div>
 
       </div>
-    </section>
 
-  </div>
-
-  {% else %}
-  <!-- Previously existing details-view -->
-  <a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id app_set_instance_id %}" class="button medium">Edit</a>
-  <br/>
-  <div style="display:table; border:1px; border-spacing:15px; " class="small-6 columns">
-    <div style="display:table-row;">
-      <div style="display:table-cell;">
-	<font size="3"> {{app_set_name}}'s Title</font>
-      </div>
-      <div style="display:table-cell;">
-	<font size="3">{{app_set_instance_name}}</font>
-      </div>
-    </div>
-    {% if app_set_instance_atlist %}
-    {% for at in app_set_instance_atlist %}
-    <div style="display:table-row;">
-      <div style="display:table-cell;">
-	<font size="3"> {{at.type}} </font>
-      </div>
-      <div style="display:table-cell;">
-	<font size="3"> {{at.value}} </font>
-      </div>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% if app_set_instance_rtlist %}
-    {% for rt in app_set_instance_rtlist %}
-    <div style="display:table-row;">
-      <div style="display:table-cell;">
-	<font size="3"> {{rt.type}} </font>
-      </div>
-      <div style="display:table-cell;">
-	<font size="3"> {{rt.value_name}} </font>
-      </div>
-    </div>
-    {% endfor %}
-    {% endif %}
-
-    <!-- for location/map widget : VIEW -->
-    <div style="display:table-row;">
-      <div style="display:table-cell;">
-	<font size="3"> Location </font>
-      </div>
-  
-      <div style="display:table-cell;">
-	<a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a>
-      </div>
-    </div>
-
-    <!-- Overlay : Map VIEW Widget -->
-    <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
+      <!-- Overlay : Map VIEW Widget -->
+      <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
         <a class="close-reveal-modal" >&#215;</a>
         {% include "ndf/map_widget.html" with mode="read" source="custom_template_edit" %}
-    </div>
-    <!-- END of Map Widget Overlay -->
+      </div>
+      <!-- END of Map Widget Overlay -->
 
-    <!-- END of location/map widget -->
-    
-    {% if tags %}
-    <div style="display:table-row;">
-      <div style="display:table-cell;">
-	<font size="3"> tags </font>
-      </div>
-      <div style="display:table-cell;">
-	<font size="3"> {{tags}} </font>
-      </div>
-    </div>
-    {% endif %}
-    {% if system_type == "File"%}
-    <div style="display:table-row;">
-      <div style="display:table-cell;">
-	<font size="3"> Uploaded File </font>
-      </div>
-      {% if mime_type %}
-      {% if "image" in mime_type %}
-      <a href = "{% url 'file_detail' groupid system_id %}">
-	<div style="display:table-cell;">
-	  <img src="{% url 'getImageThumbnail' groupid system_id %}" />
-	</div>
-      </a>
-      {% elif "video" in mime_type %}
-      <a href = "{% url 'file_detail' groupid system_id %}">
-	<div style="display:table-cell;">
-	  <img src="{% url 'getImageThumbnail' groupid system_id %}" />
-	</div>
-      </a>
-      {% else %}
-      <a href ="{% url 'file_detail' groupid system_id %}">
-	<div style="display:table-cell;">
-	  <font size="3">{{app_set_instance_name}}</font>
-	</div>
-      </a>
+      <!-- END of location/map widget -->
+      
+      {% if tags %}
+        <div style="display:table-row;">
+          
+          <div style="display:table-cell;">
+     <font size="3"> tags </font>
+          </div>
+          <div style="display:table-cell;">
+            <font size="3"> {{tags}} </font>
+          </div>
+
+        </div>
       {% endif %}
-      {% endif %}
-    </div>
+      
+      {% if system_type == "File"%}
+        <div style="display:table-row;">
+          
+          <div style="display:table-cell;">
+     <font size="3"> Uploaded File </font>
+          </div>
+          
+          {% if mime_type %}
+            {% if "image" in mime_type %}
+              <a href = "{% url 'file_detail' groupid system_id %}">
+         <div style="display:table-cell;">
+         <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+         </div>
+              </a>
+            {% elif "video" in mime_type %}
+            <a href = "{% url 'file_detail' groupid system_id %}">
+       <div style="display:table-cell;">
+       <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+       </div>
+            </a>
+            {% else %}
+            <a href ="{% url 'file_detail' groupid system_id %}">
+       <div style="display:table-cell;">
+       <font size="3">{{app_set_instance_name}}</font>
+       </div>
+            </a>
+            {% endif %}
+          {% endif %}
+      </div>
     {% endif %}
     
     {% if content %}
     <div style="display:table-row;">
       <div style="display:table-cell;">
-	<font size="3"> content: </font>
+<font size="3"> content: </font>
       </div>
     </div>
     
@@ -399,181 +269,160 @@
     </div>
     {% endif %}
   </div>
-  
-  {% endif %}
+
 
 {% endif %}
 
+
 {# template for showing apt_set_instance new form #}
+
 {% if create_new %}
-  {% if already_uploaded_file %}
-  <div >
-    <font size ="5" color="red">This file :{{already_uploaded_file}} Already uploaded please choose another file</font>
-  </div>
-  {% endif %}
-<form method="POST" action="."  enctype="multipart/form-data">
-  {% csrf_token %}
-  <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
-     <div style="display:table-row;">
-       <div style="display:table-cell;"> 
-	 <font size="3"> {{app_set_name}}'s Title</font> 
-       </div>
-       <div style="display:table-cell;">
-	 <font size="3"> <input type="textbox" name="name" value="{{app_set_instance_name}}"></font>
-       </div>
-     </div>
-     {% if systemtype_attributetype_set %}
-     {% for at in systemtype_attributetype_set %}
-     <div style="display:table-row;">
-       <div style="display:table-cell;"> 
-	 <font size="3"> {{at.type}} </font> 
-       </div>
-       <div style="display:table-cell;">
-	 {% if at.value == "bool" %}
-	 <select id="id_auto_now_add" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
-	   {% if at.database_value %}
-	   <option value="">Unknown</option>
-	   {% else %}
-	   <option selected="selected" value="">Unknown</option>
-	   {% endif %}
-	   {% if at.database_value == "Yes"%}
-	   <option selected="selected" value="Yes">Yes</option>
-	   {% else %}
-	   <option value="Yes">Yes</option>
-	   {% endif %}
-	   {% if at.database_value == "No"%}
-	   <option selected="selected" value="No">No</option>
-	   {% else %}
-	   <option value="No">No</option>
-	   {% endif %}
-	 </select>
-	 {% else %}
-	 <font size="3"> <input type="textbox" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" value="{{at.database_value}}"></font>
-	 {% endif %}
-       </div>
-       {% if systemtype_attributetype_set %}
-       {% for at in systemtype_attributetype_set %}
-       <div style="display:table-row;">
-         <div style="display:table-cell;"> 
-  	 <font size="3"> {{at.type}} </font> 
-         </div>
-         <div style="display:table-cell;">
-  	 {% if at.value == "bool" %}
-  	 <select id="id_auto_now_add" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
-  	   {% if at.database_value %}
-  	   <option value="">Unknown</option>
-  	   {% else %}
-  	   <option selected="selected" value="">Unknown</option>
-  	   {% endif %}
-  	   {% if at.database_value == "Yes"%}
-  	   <option selected="selected" value="Yes">Yes</option>
-  	   {% else %}
-  	   <option value="Yes">Yes</option>
-  	   {% endif %}
-  	   {% if at.database_value == "No"%}
-  	   <option selected="selected" value="No">No</option>
-  	   {% else %}
-  	   <option value="No">No</option>
-  	   {% endif %}
-  	 </select>
-  	 {% else %}
-  	 <font size="3"> <input type="textbox" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" value="{{at.database_value}}"></font>
-  	 {% endif %}
-         </div>
-       </div>
-       {% endfor %}
-       {% endif %}
-       {% if systemtype_relationtype_set %}
-       {% for rt in systemtype_relationtype_set %}
-       <div style="display:table-row;">
-         <div style="display:table-cell;"> 
-  	 <font size="3"> {{rt.rt_name}} </font> 
-         </div>
-         <div style="display:table-cell;">
-  	 <select id="relation_selection" name="{% if rt.database_id %} {{rt.database_id}} {% else %}{{rt.type_id}} {% endif %}" style="width:50%">
-  	   {% if rt.database_value_id %}
-  	   <option value="">Unknown</option>
-  	   {% else %}
-  	   <option selected="selected" value="">Unknown</option>
-  	   {% endif %}
-  	   {% for each_gsystem in rt.object_type %}
-  	   {% if rt.database_value_id == each_gsystem.id %}
-  	   <option selected="selected" value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
-  	   {% else %}
-  	   <option value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
-  	   {% endif %} 
-  	   {% endfor %}
-  	 </select>
-         </div>
-       </div>
-       {% endfor %}
-       {% endif %}
+	{% if already_uploaded_file %}
+	<div>
+		<font size ="5" color="red">This file :{{already_uploaded_file}} Already uploaded please choose another file</font>
+	</div>
+	{% endif %}
 
-       <!-- map/location widget : EDIT -->
-      <div style="display:table-row;">
-        
-        <div style="display:table-cell;"> 
-          <font size="3"> Add Location </font> 
-        </div>
-        
-        <div style="display:table-cell;">
-          <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-            <i class="fi-marker"></i> &nbsp; Add Location
-          </a>
-        </div>      
+	<form method="POST" action="."  enctype="multipart/form-data">
+	{% csrf_token %}
 
-      </div>  
+		<div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
 
-      <!-- Overlay : Map EDIT Widget -->
-      <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> {{app_set_name}}'s Title</font> 
+				</div>
+				<div style="display:table-cell;">
+					<font size="3"> <input type="textbox" name="name" value="{{app_set_instance_name}}"></font>
+				</div>
+			</div>
 
-          <a class="close-reveal-modal" >&#215;</a>
-          {% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
+			{% if systemtype_attributetype_set %}
+			{% for at in systemtype_attributetype_set %}
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> {{at.type}} </font> 
+				</div>
+				<div style="display:table-cell;">
+					{% if at.value == "bool" %}
+					<select id="id_auto_now_add" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
 
-      </div>
-      <!-- END of Map Widget Overlay -->
+						{% if at.database_value %}
+						<option value="">Unknown</option>
+						{% else %}
+						<option selected="selected" value="">Unknown</option>
+						{% endif %}
 
-      <!-- END of location/map widget -->
+						{% if at.database_value == "Yes"%}
+						<option selected="selected" value="Yes">Yes</option>
+						{% else %}
+						<option value="Yes">Yes</option>
+						{% endif %}
 
-       <div style="display:table-row;">
-         <div style="display:table-cell;"> 
-  	 <font size="3"> Tags</font> 
-         </div>
-         <div style="display:table-cell;">
-           <input id="tags_id" name="tags" type="textbox" value="{{tags}}" placeholder="Separate tags with commas...">
-         </div>
-       </div>
+						{% if at.database_value == "No"%}
+						<option selected="selected" value="No">No</option>
+						{% else %}
+						<option value="No">No</option>
+						{% endif %}
+
+					</select>
+
+					{% else %}
+					<font size="3"> <input type="textbox" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" value="{{at.database_value}}"></font>
+					{% endif %}
+				</div>
+			</div>
+			{% endfor %}
+			{% endif %}
+
+			{% if systemtype_relationtype_set %}
+			{% for rt in systemtype_relationtype_set %}
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> {{rt.rt_name}} </font> 
+				</div>
+				<div style="display:table-cell;">
+					<select id="relation_selection" name="{% if rt.database_id %} {{rt.database_id}} {% else %}{{rt.type_id}} {% endif %}" style="width:50%">
+						{% if rt.database_value_id %}
+						<option value="">Unknown</option>
+						{% else %}
+						<option selected="selected" value="">Unknown</option>
+						{% endif %}
+
+						{% for each_gsystem in rt.object_type %}
+						{% if rt.database_value_id == each_gsystem.id %}
+						<option selected="selected" value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
+						{% else %}
+						<option value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
+						{% endif %} 
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+			{% endfor %}
+			{% endif %}
+
+			<!-- map/location widget : EDIT -->
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> Add Location </font> 
+				</div>
+
+				<div style="display:table-cell;">
+					<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+						<i class="fi-marker"></i> &nbsp; Add Location
+					</a>
+				</div>      
+			</div>  
+
+			<!-- Overlay : Map EDIT Widget -->
+			<div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+				<a class="close-reveal-modal" >&#215;</a>
+				{% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
+			</div>
+			<!-- END of Map Widget Overlay -->
+
+			<!-- END of location/map widget -->
+
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> Tags</font> 
+				</div>
+				<div style="display:table-cell;">
+					<input id="tags_id" name="tags" type="textbox" value="{{tags}}" placeholder="Separate tags with commas...">
+				</div>
+			</div>
        
-       {% if File == "True" %}
-       <div style="display:table-row;">
-         <div style="display:table-cell;"> 
-  	 <font size="3">Upload File</font> 
-         </div>
-         <div style="display:table-cell;">
-           <input id="file_id" name="file" type="file">
-         </div>
-       </div>
-       {% endif %}
-      <div style="display:table-row;">
-        <div style="display:table-cell;"> 
-  	<font size="3"> Content</font> 
-        </div>
-        <div style="display:table-cell">
-  	<div id="contentlist" class="content">
-  	  <div class="">
-  	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=content_org node_id=app_set_instance_id %}
-  	  </div>
-  	</div>
-        </div>
-      </div>
+			{% if File == "True" %}
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3">Upload File</font> 
+				</div>
+				<div style="display:table-cell;">
+					<input id="file_id" name="file" type="file">
+				</div>
+			</div>
+			{% endif %}
+      
+			<div style="display:table-row;">
+				<div style="display:table-cell;"> 
+					<font size="3"> Content</font> 
+				</div>
+				<div style="display:table-cell">
+					<div id="contentlist" class="content">
+						<div class="">
+						{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=content_org node_id=app_set_instance_id %}
+						</div>
+					</div>
+				</div>
+			</div>
 
-    </div>
+    	</div>
    
-
-    <input type="submit" name="submit" class="button" id="save-system" value="submit">
+		<input type="submit" name="submit" class="button" id="save-system" value="submit">
    
-  </form>
-  {% endif %}
+	</form>
+{% endif %}
 
 {% endblock %}
 
@@ -723,4 +572,14 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
   });
 
 
+   // for datetimepicker
+   
+   startDtInput = $("font:contains('start_time')");
+   endDtInput = $("font:contains('end_time')");
+
+   if(startDtInput.length > 0)
+   { startDtInput.parent().next().find("input").datetimepicker(); }
+   if(endDtInput.length > 0)
+   { endDtInput.parent().next().find("input").datetimepicker(); }
+   
 {% endblock %}	

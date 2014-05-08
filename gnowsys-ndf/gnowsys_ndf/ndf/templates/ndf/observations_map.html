@@ -50,6 +50,25 @@
 
 		.popup-delete-content-button:hover { background-color: #f15439; }
 
+		.marker-alert, .marker-alert-success, .marker-alert-error{
+
+			color: white;
+			border-style: solid;
+			border-width: 0.5em;
+			padding: 1em;
+			position: absolute;
+			text-align: center;
+			width: 98%;
+			z-index: 10001;
+			border-color: white;
+			opacity: 0.95;
+			display: none;
+		}
+
+		.marker-alert-success {	background-color: #43AC6A;	}
+		
+		.marker-alert-error {	background-color: #f04124;	}
+
 	</style>
 
 
@@ -75,6 +94,10 @@
 		</div>
 	</div>
 
+	<div class="marker-alert-success"> Good work ! &nbsp;&nbsp;You had succesfully added the Marker </div>
+
+	<div class="marker-alert-error"> Something went wrong : </div>
+
 	<div id="map" data-mode="{{ mode }}" data-template-view="{{ template_view }}">
 		<input type="hidden" data-map-markers="{{ node.location }}" value="{{ location }}" name="map-geojson-data"/>
 	</div>
@@ -91,8 +114,8 @@
 	 	// instantiate map instantiate
 	 	var map = L.map('map').addLayer(osm);
 	 	map.setView([25.92,79.84], 5);
-		// getting logged in user last visited location	 	
 
+		// getting logged in user last visited location	 	
 		{% if user.is_authenticated %}
 		$.ajax({
 
@@ -180,6 +203,13 @@
 	 	markerGeoJSON = [];							// takes all markers updated geojson
 	 	popupBasicHtml = $(".popup-html").html()	// marker popup html content
 	 	tempArr = []								// to catch newly created markers in following if()
+	 	
+	 	// setting var to user type i.e: authenticated/annonymous
+	 	{% if user.is_authenticated %}
+	 		user_type = "authenticated";
+	 	{% else %}
+	 		user_type = "anonymous";
+	 	{% endif %}
 
 	 	if( mapdata.length > 0 )
 	 	{
@@ -189,8 +219,8 @@
 		 	// 	// layer.bindPopup("feature.properties.description");
 		 	// }}).addTo(map);
 
-			mapdata = mapdata.replace(/'/gm, '"');
-	 		mapdata = mapdata.replace(/u"/gm, '"');
+			// mapdata = mapdata.replace(/'/gm, '"');
+	 	// 	mapdata = mapdata.replace(/u"/gm, '"');
 	 		mapdata = JSON.parse(mapdata);
 			
 			L.geoJson(mapdata, {
@@ -455,16 +485,16 @@
 
 			// marker GeoJson
 			var tempMarkerGeoJSON = this.toGeoJSON();
-			// console.log(JSON.stringify(tempMarkerGeoJSON));
+			console.log(this);
 
 			var lID = tempMarker._leaflet_id;		// Getting Leaflet ID of this marker
 
 			// getting all the values from feature of marker
-			var placename = tempMarker.feature.properties.placename,
-				datetime = tempMarker.feature.properties.datetime,
-				description = tempMarker.feature.properties.description,
-				tags = tempMarker.feature.properties.tags,
-				created_by = tempMarker.feature.properties.created_by;
+			var placename = this.feature.properties.placename,
+				datetime = this.feature.properties.datetime,
+				description = this.feature.properties.description,
+				tags = this.feature.properties.tags,
+				created_by = this.feature.properties.created_by;
 
 			$(popupHtmlObj).children("input.marker-place-name").val(placename);
 			$(popupHtmlObj).children("input.marker-dtstamp").val(datetime);
@@ -502,34 +532,55 @@
 			$(".popup-delete-content-button:visible").click(function(){
 
 				var flag = false;
+				flag = tempMarker.feature.properties.ref ? true: false;
 
-				if(tempMarker.feature.properties.ref){ flag = true; }else{ flag = false; }
+				var tempCreated_by = tempMarker.feature.properties.created_by;
 
-				if("{{user_name}}" == created_by && flag)
+				// if("{{user_name}}" == created_by && flag)
+				if(tempMarker.feature.properties.ref)
 				{
-					// saving marker data in database 
+					// deleting marker data in database 
 					$.ajax({
 
 						type:'post',
 						url: "{% url 'delete_observation' groupid app_id app_set_id app_set_name_slug %}",
 						dataType: 'json',
-			  			data: { marker_geojson:JSON.stringify(tempMarkerGeoJSON), csrfmiddlewaretoken: '{{ csrf_token }}'},
+			  			
+			  			data: { 
+			  				marker_geojson:JSON.stringify(tempMarker.toGeoJSON()), 
+			  				csrfmiddlewaretoken: '{{ csrf_token }}',
+			  				{% if user.is_authenticated%}
+			  					user: "authenticated",
+			  				{% else %}
+			  					user: "anonymous",
+			  				{% endif %}
+			  				user_session_id: '{{ request.COOKIES.sessionid }}'
+			  				 },
 			  			success: function(data){
 
-			  				var ajaxUrl = this.url,
-			  					listId = ajaxUrl.split("/")[5];
-	
-			  				$("#"+listId).children("span").text(" "+data+" ").fadeOut(300).fadeIn(500);
+			  				if(data[1] == "marker_deleted")
+			  				{
+			  					$(".marker-alert-success").html("You had successfully <b><u>deleted</u></b> the Marker.").fadeIn(600).fadeOut(10000);
 
-			  				$.each(markerGeoJSON, function(i, val) {
-	
-			            		getID = JSON.parse(val).properties.id; 
+				  				var ajaxUrl = this.url,
+				  					listId = ajaxUrl.split("/")[5];
 		
-			            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
-	        	    		})
+				  				$("#"+listId).children("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500);
+
+				  				$.each(markerGeoJSON, function(i, val) {
+		
+				            		getID = JSON.parse(val).properties.id; 
 			
-							map.removeLayer(tempMarker);
-							updateHiddenTagContent();
+				            		if(getID == lID) { markerGeoJSON.splice(i,1);	return false; }  
+		        	    		})
+
+								map.removeLayer(tempMarker);
+								updateHiddenTagContent();
+							}
+							else
+							{
+								$(".marker-alert-error").text(data[1]).fadeIn(600, "swing").fadeOut(10000);
+							}
 	
 				  		}// END OF success
 
@@ -580,6 +631,7 @@
 				}
 				else if($(this).children("i").hasClass("fi-save"))	// when click on save btn
 				{
+
 					thisPopupContent = $(this).parent().parent();
 
 					$(this).find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
@@ -590,7 +642,8 @@
 						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
 						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
 
-					if( getPlace.length && getPlace != placename )
+					// if( getPlace.length && getPlace != placename )
+					if( getPlace.length || getDT.length || getObsNote.length || getTags.length )
 					{
 						tempMarker.setIcon(infoMarker);
 
@@ -603,8 +656,8 @@
 
 					tempMarker.feature.properties.placename = getPlace;
 					tempMarker.feature.properties.datetime = getDT;
-					tempMarker.feature.properties.created_at = getDT;
-					tempMarker.feature.properties.description = getObsNote.replace(/'/gm, "");	// temp fix.
+					// tempMarker.feature.properties.created_at = getDT;
+					tempMarker.feature.properties.description = getObsNote;//.replace(/'/gm, "");	// temp fix.
 					tempMarker.feature.properties.tags = getTags;
 									
 					if(! tempMarker.feature.properties.id)
@@ -612,28 +665,59 @@
 						tempMarker.feature.properties.id = lID;	
 					}
 
-					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
+					var now = new Date(),
+						formatedDateTime = now.toLocaleDateString() + " " + now.getHours() + ":" + now.getMinutes();
 
+					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
 			        // saving marker data in database 
 					$.ajax({
 
 						type:'post',
 						url: "{% url 'save_observation' groupid app_id app_set_id app_set_name_slug %}",
 						dataType: 'json',
-			  			data: { marker_geojson:updatedGeoJSON, csrfmiddlewaretoken: '{{ csrf_token }}'},
+			  			data: {
+			  					marker_geojson:updatedGeoJSON,
+			  					csrfmiddlewaretoken: '{{ csrf_token }}',
+			  					{% if user.is_authenticated%}
+			  						user: "authenticated",
+			  					{% else %}
+			  						user: "anonymous",
+			  					{% endif %}
+			  					user_session_id: '{{ request.COOKIES.sessionid }}'
+			  				},
 			  			success: function(data){
-
-			  				tempMarker.feature.properties.ref = data[1]
 			  				
 			  				var ajaxUrl = this.url,
 			  					listId = ajaxUrl.split("/")[5];
 	
 							if (data[2] == "create_new")
-			  				{ $("#"+listId).children("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500); }
+			  				{
+			  					tempMarker.feature.properties.ref = data[1]
+			  					tempMarker.feature.properties.created_at = formatedDateTime;
+			  					$("#"+listId).children("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500); 
+			  					
+			  					$(".marker-alert-success").html("Good Work ! You had successfully <b><u>added</u></b> the Marker.").fadeIn(600, "swing").fadeOut(10000);
 
+			  				}
+			  				else if(data[2] == "edit")
+			  				{
+			  					tempMarker.feature.properties.ref = data[1]
+			  					$(".marker-alert-success").html("You had successfully <b><u>edited</u></b> the Marker.").fadeIn(600, "swing").fadeOut(10000);
+			  				}
+			  				else
+			  				{			  					
+			  					$(".marker-alert-error").text(data[2] + " Changes will not be saved.").fadeIn(600, "swing").fadeOut(10000);
+
+			  					tempMarker.feature.properties.placename = placename;
+								tempMarker.feature.properties.datetime = datetime;
+								tempMarker.feature.properties.description = description;
+								tempMarker.feature.properties.tags = tags;
+			  				}
 							
 				  		},// END OF success
 				  		complete: function(){
+
+							tempMarker.closePopup();
 
 		            		$.each(markerGeoJSON, function(i, val) {
             	

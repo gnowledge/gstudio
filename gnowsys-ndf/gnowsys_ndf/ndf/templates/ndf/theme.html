@@ -1,11 +1,180 @@
+{% extends "ndf/base.html" %}
+{% load i18n %}
+
 {% load ndf_tags %}
+{% load pagination_tags %}
 
-<h2>Themes Hierarchy</h2><br/>
-<hr>
+{% block title %} {{ title }} {% endblock %}
 
-{% if nodes %}
-	{% for each in nodes %}
-		<p><a><h5>{{each.name}}</h5></a></p>
-	{% endfor %}
+{% block head%}  
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+  <script src="/static/ndf/js/tree.jquery.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function()
+    {
+    $(function() {
+    $('.themes').tree();
+    });
+    });
+  </script>
+{% endblock%}
+
+{% block meta_content %}
+{% if user.is_authenticated %}
+{% user_access_policy groupid request.user as user_access %}
+
+<ul class="side-nav"> 
+
+  {% for each in app_collection_set %}
+  
+    {% get_memberof_objects_count each.id groupid as count %}
+  
+  
+      <li class="active"> 
+        <div>
+  		  {% if user_access == "allow" %}
+          <a href="{% url "theme_topic_create" groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
+            +&nbsp;Add
+          </a>
+          {% endif %}
+
+          <a href="{% url "theme_list" groupid app_id each.id %}" >
+            {{each.name}} ({{count}})
+          </a> 
+
+        </div>
+      </li>
+  
+  {% endfor %}
+  	<br/>
+
+  	<li>
+      	<div>
+        	<a href="{% url 'theme_page' groupid app_id %}"> <input class="small button split" type="button" value="Themes Hierarchy" > </a>
+      	</div>
+    </li>
+
+  	<br/>
+  
+</ul>
 {% endif %}
+{% endblock %}
+
+
+{% block body_content %}
+
+{% user_access_policy groupid request.user as user_access %}
+
+	{% if themes_hierarchy %}
+
+		<h3>Themes Hierarchy<h3>
+		<hr/>
+		{% if node %}
+			<!-- If "Theme" node -->
+			<div class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
+		{% endif %}
+
+	{% endif %}
+
+
+	{% if themes_list_items %}
+		{% if nodes %}
+      	{% autopaginate nodes 25 %}
+    
+      		<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+		        <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
+		        
+		        <input class="button confirmDeleteObjects" type="button" value="Confirm">
+		        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+		        <div id="deletion_results"></div>
+		        <a class="close-reveal-modal">&#215;</a>
+
+	      	</div>
+
+      		{% if user.is_authenticated %}
+      			{% if user_access == "allow" %}
+        		<input class="button deleteObjects" type="button" value="Delete">
+        		{% endif %}
+      		{% endif %}
+      
+      		<form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+
+		        {% csrf_token %}
+		        <input name="search" type="textbox" value="" style="width:300px;">
+		        <input type="hidden" name="class" value="{{class_name}}">
+		        <input type="submit" value="search" style="width:100px;">
+
+      		</form>
+  		{% endif %}
+
+	    <table >
+	   		<thead>
+	        <tr>
+	    	
+	       	{% if nodes %}
+
+	            <th width="20">
+	            	{% if user_access == "allow" %}
+	            	 <input class="checkedAll" type="checkbox">
+	            	{% endif %}
+	            </th>
+
+	            <th width="150">Title</th>
+	            <th width="150">Created by</th>
+	            <th width="150">Creation date</th>
+  		  		{% if user_access == "allow" %}
+	            <th width="150">Edit</th>
+	      		{% endif %}
+	       	{% endif %}
+	    
+	       	</tr>
+	      	</thead>
+      
+	      	<tbody>
+	        {% for each in nodes %}
+	       		<tr>
+	        
+	            <td  id="{{each.id}}" class="objectsCheckbox"> 
+	            	{% if user_access == "allow" %}
+	            		<input type="checkbox"> 
+	            	{% endif %}
+	            </td>
+	            <td  class="name" style="font-size:11px;"><a href="">{{each.name}}</a></td>
+	            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
+	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
+  		  		{% if user_access == "allow" %}
+	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
+	        	{% endif %}
+	          	</tr>
+	          
+	       	{% empty %}
+
+	       		<h3>No data to display</h3>
+
+	        {% endfor %}
+
+	      	</tbody>
+	  	</table>
+
+    	{% paginate %}
+	
+	{% endif %}
+
+	{% if create_edit %}
+		{% if title == "Theme" %}
+			{% include "ndf/theme_create_edit.html" %}
+		{% else %}
+			{% include "ndf/topic_create_edit.html" %}
+		{% endif %}
+	{% endif %}
+
+{% endblock %}
 

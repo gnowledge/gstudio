@@ -35,7 +35,7 @@ class Command(BaseCommand):
     help = "Based on "
 
     def handle(self, *args, **options):
-    	try:
+        try:
             for file_name in args:
                 file_path = os.path.join(SCHEMA_ROOT, file_name)
 
@@ -46,20 +46,20 @@ class Command(BaseCommand):
                         log_list.append(error_message)
                         raise Exception(error_message)
 
-	                # file_extension = mimetypes.guess_type(file_name)[0]
+                    # file_extension = mimetypes.guess_type(file_name)[0]
                     file_extension = os.path.splitext(file_name)[1]
 
                     if "csv" in file_extension:
                         # Process csv file and convert it to json format at first
                         info_message = "\n CSVType: Follwoing file (" + file_path + ") found !"
                         log_list.append(info_message)
-	                
+                  
                         try:
                             csv_file_path = file_path
                             json_file_name = file_name.rstrip("csv") + "json"
                             json_file_path = os.path.join(SCHEMA_ROOT, json_file_name)
                             json_file_content = ""
-	                    
+                      
                             with open(csv_file_path, 'rb') as csv_file:
                                 csv_file_content = csv.DictReader(csv_file, delimiter=",")
                                 json_file_content = []
@@ -81,7 +81,7 @@ class Command(BaseCommand):
                         except Exception as e:
                             error_message = "\n CSV-JSONError: " + str(e)
                             log_list.append(error_message)
-	                
+                  
                         # End of csv-json coversion
 
                     elif "json" in file_extension:
@@ -98,7 +98,7 @@ class Command(BaseCommand):
                         log_list.append(info_message)
 
                         parse_data_create_gtype(file_path)
-	                
+                  
                         # End of processing json file
 
                         info_message = "\n Task finised: Successfully processed json-file.\n"
@@ -114,7 +114,7 @@ class Command(BaseCommand):
         except Exception as e:
             error_message = str(e)
             print "\n >>> >>>> >>>>>\n " + error_message
-                            
+		                    
         finally:
             if log_list:
 
@@ -144,8 +144,8 @@ def parse_data_create_gtype(json_file_path):
     json_documents_list = json.loads(json_file_content)
 
     if "ST" in json_file_path:
-    	type_name = "GSystemType"
-
+        type_name = "GSystemType"
+        
         for json_document in json_documents_list:
             # Process data in proper format
             try:
@@ -158,9 +158,10 @@ def parse_data_create_gtype(json_file_path):
                 perform_eval_type("collection_set", json_document, type_name, "GSystemType")
 
             except Exception as e:
-            	error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
-            	log_list.append(error_message)
-                continue
+              error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
+              log_list.append(error_message)
+              print error_message # Keep it!
+              # continue
 
             try:
                 info_message = "\n Creating "+type_name+"(" + json_document['name'] + ") ..."
@@ -173,14 +174,14 @@ def parse_data_create_gtype(json_file_path):
                 print error_message # Keep it!
 
     elif "AT" in json_file_path:
-    	type_name = "AttributeType"
+      	type_name = "AttributeType"
 
         for json_document in json_documents_list:
             # Process data in proper format
             try:
                 json_document['name'] = unicode(json_document['name'])
                 json_document['altnames'] = unicode(json_document['altnames'])
-	            
+              
                 if not json_document['required'].istitle():
                     json_document['required'] = ast.literal_eval(json_document['required'].title())
 
@@ -199,9 +200,10 @@ def parse_data_create_gtype(json_file_path):
                 perform_eval_type("subject_type", json_document, type_name, "GSystemType")
 
             except Exception as e:
-            	error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
-            	log_list.append(error_message)
-                continue
+              error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
+              log_list.append(error_message)
+              print error_message # Keep it!
+              # continue
 
             try:
                 info_message = "\n Creating "+type_name+"(" + json_document['name'] + ") ..."
@@ -215,7 +217,7 @@ def parse_data_create_gtype(json_file_path):
 
         
     elif "RT" in json_file_path:
-    	type_name = "RelationType"
+      	type_name = "RelationType"
 
         for json_document in json_documents_list:
             # Process data in proper format
@@ -227,9 +229,10 @@ def parse_data_create_gtype(json_file_path):
                 perform_eval_type("object_type", json_document, type_name, "GSystemType")
 
             except Exception as e:
-            	error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
-            	log_list.append(error_message)
-                continue
+              error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
+              log_list.append(error_message)
+              print error_message # Keep it!
+              # continue
 
             try:
                 info_message = "\n Creating "+type_name+"(" + json_document['name'] + ") ..."
@@ -257,7 +260,7 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
             json_document[eval_field] = json_document[eval_field].replace(u"\u201d", "\"")
 
         try:
-        	json_document[eval_field] = ast.literal_eval(json_document[eval_field])
+          json_document[eval_field] = ast.literal_eval(json_document[eval_field])
         except Exception as e:
             error_message = " InvalidDataError: For " + type_to_create + " (" + json_document['name'] + ") invalid data found -- " + str(e) + "!!!\n"
             raise Exception(error_message)
@@ -282,6 +285,12 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
             else:
                 if eval_field == "complex_data_type":
                     type_convert_objectid = "Sub-" + type_convert_objectid
+
+                elif eval_field in ["attribute_type_set", "relation_type_set"]:
+                  json_document[eval_field] = type_list
+                  error_message = "\n "+type_convert_objectid+"Error ("+eval_field+"): This "+type_convert_objectid+" (" + data + ") doesn't exists for creating "+type_to_create+" (" + json_document['name'] + ") !!!\n"
+                  log_list.append(error_message)
+                  continue
 
                 error_message = "\n "+type_convert_objectid+"Error ("+eval_field+"): This "+type_convert_objectid+" (" + data + ") doesn't exists for creating "+type_to_create+" (" + json_document['name'] + ") !!!\n"
                 log_list.append(error_message)
@@ -330,7 +339,11 @@ def create_edit_type(type_name, json_document, user_id):
             for key in json_document.iterkeys():
                 if type(node[key]) == list:
                     if set(node[key]) != set(json_document[key]):
-                        node[key] = json_document[key]
+                        # node[key].extend(json_document[key])
+                        for each in json_document[key]:
+                        	if each not in node[key]:
+                        		node[key].append(each)
+
                         is_node_changed = True
 
                 elif type(node[key]) == dict:

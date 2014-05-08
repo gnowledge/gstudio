@@ -25,6 +25,13 @@ history_manager = HistoryManager()
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
 coln=db[GSystem.collection_name]
+grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
+ins_objectid  = ObjectId()
+
+def get_all_resources_for_group(group_id):
+  if ins_objectid.is_valid(group_id):
+    obj_resources=coln.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'File'}]},{'group_set':{'$all':[ObjectId(group_id)]}},{'member_of':{'$nin':[grp_st._id]}}]})
+    return obj_resources
 
 
 def get_all_gapps():
@@ -111,6 +118,12 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
+      elif checked == "Theme":
+        theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}})        
+
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
 

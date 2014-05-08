@@ -259,6 +259,62 @@ def shelf(request, group_id):
       )
 
 
+
+def get_collection_list(collection_list, node):
+  inner_list = []
+  error_list = []
+  
+  if node.collection_set:
+    for each in node.collection_set:
+      col_obj = collection.Node.one({'_id': ObjectId(each)})
+      if col_obj:
+        for cl in collection_list:
+          if cl['id'] == node.pk:
+            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
+            inner_sub_list = [inner_sub_dict]
+            inner_sub_list = get_collection_list(inner_sub_list, col_obj)
+
+            if inner_sub_list:
+              inner_list.append(inner_sub_list[0])
+            else:
+              inner_list.append(inner_sub_dict)
+
+            cl.update({'children': inner_list })
+      else:
+        error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
+        print "\n " + error_message
+
+    return collection_list
+
+  else:
+    return collection_list
+
+
+def get_tree_hierarchy(request, group_id, node_id):
+
+    node = collection.Node.one({'_id':ObjectId(node_id)})
+    data = ""
+    collection_list = []
+    themes_list = []
+
+    cur = collection.Node.find({'member_of': node._id,'group_set':ObjectId(group_id) })
+
+    for e in cur:
+      for l in e.collection_set:
+        themes_list.append(l)
+
+    cur.rewind()
+
+    for each in cur:
+      if each._id not in themes_list:
+        collection_list.append({'name': each.name, 'id': each.pk})
+        collection_list = get_collection_list(collection_list, each)
+
+    data = collection_list
+
+    return HttpResponse(json.dumps(data))
+
+
 @login_required
 def change_group_settings(request,group_id):
     '''
