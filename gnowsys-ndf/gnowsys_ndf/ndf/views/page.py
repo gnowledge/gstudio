@@ -31,7 +31,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type
 
 #######################################################################################################################################
 
@@ -320,40 +320,26 @@ def version_node(request, group_id, node_id, version_no):
 
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
-
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id
                       }
-
-    page_node = collection.GSystem()
-    
-
     if request.method == "POST":
-        get_translate_common_fields(request, page_node, group_id, gst_page, node_id)
+        get_type=get_resource_type(request, node_id)
+        page_node = eval("collection"+"."+ get_type)()
+        get_translate_common_fields(request, get_type,page_node, group_id, gst_page,node_id)
         page_node.save()
-       
         # add triple to the GRelation 
         # then append this ObjectId of GRelation instance in respective subject and object Nodes' relation_set field.
         relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
-        
         grelation=collection.GRelation()
         grelation.relation_type=relation_type
         grelation.subject=ObjectId(node_id)
         grelation.right_subject=page_node._id
         grelation.name=u""
         grelation.save()
-        # subject_node=collection.Node.one({'_id':ObjectId(node_id)})
-        # object_node=collection.Node.one({'_id':ObjectId(page_node._id)})
-        # subject_node.relation_set.append(grelation._id)
-        # object_node.relation_set.append(grelation._id)
-        # subject_node.save()
-        # object_node.save()
-               
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id}))
         
-
-
     node = collection.Node.one({"_id": ObjectId(node_id)})
         
     fp = history_manager.get_file_path(node)
