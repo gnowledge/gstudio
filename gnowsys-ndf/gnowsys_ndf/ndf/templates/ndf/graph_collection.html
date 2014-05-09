@@ -185,7 +185,7 @@
 					return e;
 				}).filter(function(e)
 				{
-					return collectiong_nodes_by_id[e.from] && collectiong_nodes_by_id[e.to] && e.type=="collection_set"  && e.to.slice(-2) != "_n"
+					return collectiong_nodes_by_id[e.from] && collectiong_nodes_by_id[e.to] && e.type == "collection_set"
 				}).value();  
 			}
 // -------------------End Of collectiong_init()---------------------

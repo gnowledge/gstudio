@@ -186,7 +186,7 @@
 					return e;
 				}).filter(function(e)
 				{
-					return dependencyg_nodes_by_id[e.from] && dependencyg_nodes_by_id[e.to]&& e.type!="title" && e.type!="content" && e.type!="authors" && e.type!="plural" && e.type!="altnames" && e.type!="access_policy" && e.type!="collection_set"
+					return dependencyg_nodes_by_id[e.from] && dependencyg_nodes_by_id[e.to]&& e.type=="prior_node";
 				}).value();  
 			}
 // -------------------End Of dependencyg_init()---------------------
