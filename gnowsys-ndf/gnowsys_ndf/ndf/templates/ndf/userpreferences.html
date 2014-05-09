@@ -1,0 +1,26 @@
+{% load ndf_tags %}
+
+{% block title %} {{username}} - Preferences  {% endblock %}
+
+{% block body_content %}
+{% all_gapps as all_apps %}
+<div class="row">
+<dl class="accordion" data-accordion>
+ <dd>
+
+    <a id="notification_pref" href="#test">Click here to set notification preferences </a>
+<div id="test" class="content">
+
+Forum Notification <input type="radio" value="On" name="col">On
+ <input type="radio" value="Off" name="col">Off
+
+
+
+</div>
+</dd>
+</dl>
+</div>	
+	
+
+
+{% endblock %}
