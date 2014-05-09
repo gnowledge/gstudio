@@ -43,6 +43,15 @@
 
     .ui-slider-horizontal { margin-top: 1em; }
 
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+      background-color:#efefef;
+      padding:0.5em 0 0.5em 0.5em; 
+      margin-left: -10px !important;
+    }
+
+    .active-app-set-edit{ border-right: 4px solid #808080; }
+
+    .active-app-set-view{ border-left: 4px solid #808080; }
   </style>
 
 
@@ -54,13 +63,21 @@
 		<a></a>
 	</li>
 
-	{% for each in app_collection_set %}
-	{% get_memberof_objects_count each.pk groupid as count %}
+  {% for each in app_collection_set %}
+  {% get_memberof_objects_count each.pk groupid as count %}
 
-	<li> 
+  {% if app_set_id == each|safe %}
+    {% if '/new/' in request.path %}
+    <li class="active-app-set-edit">
+    {% else %}
+    <li class="active-app-set-view">
+    {% endif %}
+  {% else %}
+  <li>
+  {% endif %}
     <div class="row">
       {% if each.type_of or each.name == "Caste" %}
-      <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" >
+      <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
         {{each.name}} ({{count}})
       </a> 
       <a class="small-4 columns" href="{% url 'mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
@@ -69,7 +86,6 @@
 
       {% else %}
         {{each.name}}
-
       {% endif %}
     </div>
 	</li>
@@ -873,6 +889,7 @@ $(document).foundation({
     //   }); 
     // }
 
+  if(startDtInput.length > 0){
     startDtInput.datetimepicker({ 
 
       hourGrid: 6,
@@ -897,9 +914,9 @@ $(document).foundation({
         endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate') );
       }
     });
+  }
 
-
-
+  if(endDtInput.length > 0){
     endDtInput.datetimepicker({ 
       hourGrid: 6,
       minuteGrid: 15,
@@ -919,6 +936,49 @@ $(document).foundation({
         startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
       }
     });
+  }
+
+    // totWhen ---------------
+    var totWhen = $("font:contains('tot_when')").parent().next().find("input");
+
+    if(totWhen.length > 0)
+    {
+      totWhen.datetimepicker();
+      $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
+      $("input.tiny").after("<div id='tot-when-date-list'></div>")
+
+    }
+
+    $(totWhen).change(function(){ 
+
+    if($(totWhen).val().length > 0)
+    {
+      $("input.tiny").removeClass("disabled");
+    }
+    else
+    {
+      $("input.tiny").addClass("disabled");
+    }
+
+  });
+
+    $("input.tiny").click(function(){
+      if(!$(this).hasClass("disabled")) 
+      {
+        $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
+        $(totWhen).val("");
+        $("input.tiny").addClass("disabled");
+      }
+    })
+
+    function getTotWhen()
+    {
+      var datesList = []
+      dts = $("#tot-when-date-list .date-item");
+      $.each(dts, function(i, val){datesList.push($(val).text().trim())});
+
+      return datesList;
+    }
 
 // </script>
 {% endblock %}	
