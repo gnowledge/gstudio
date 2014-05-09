@@ -248,25 +248,14 @@ ul#graph-hover.f-dropdown{
 
     {% if is_group %}
 
-             {% ifequal created_user request.user %}     
+             {% if request.user == created_user or request.user.is_superuser %}     
                    
       <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
-             {% endifequal %}
+
+             {% endif %}
 
     {% else %}
 
-             {% if switch_conditions %}     
-
-	<input type="button" id="switch_group" class="button small" value="Publish in group/s">
-<div id="mySystemtype" class="reveal-modal" data-reveal >
-     <h2>Select Groups</h2>
-      <div id="group_drawer" >
-        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-      </div>
-     <a class="close-reveal-modal st">&#215;</a>
-<input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
-</div>
-              {% endif %}
 
       <a href="{% url edit_url groupid node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
   
@@ -306,72 +295,6 @@ ul#graph-hover.f-dropdown{
   </footer>
 
 <script type="text/javascript">
-var data_list = ""
-var saveflag = 0
-function setdrawer(){
-      $('#mySystemtype').foundation('reveal', 'open');
-       $('.close-reveal-modal.st').click(function(){
-       if (saveflag == 0){
-         alert("This will cancel the save");
-      }
-});
-}
-function get_new_groups(){
- $.each($('#mySystemtype #collection_set_drawer2 li'),function(index,item){
-         data_list=data_list+String(item.id)+",";
-         });
-}
-
-$(document).on('click',"#switch_group",function(){
-$('#mySystemtype #collection_set_drawer1').html("");
- $('#mySystemtype #collection_set_drawer2').html("");
- $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
-var url='/{{groupid}}/switch_group/'+'{{node}}';
- $.getJSON( url, function( data ) {
-  $.each(data ,function(index , drawer_elements){
-   if(index == 0)
-    {
-     $.each(drawer_elements.drawer1, function(index, element) {
-        $('#mySystemtype #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
-   }
-   if(index == 1)
-    {
-    $.each(drawer_elements.drawer2, function(index, element) {
-        $('#mySystemtype #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
-    }
-
- });
-   });
-setdrawer();
-});
-
-$(document).on('click',"#save_switch_group",function(){
-var turl='/{{groupid}}/switch_group/'+'{{node}}';
-saveflag = 1;
-get_new_groups();
-new_groups=data_list;
-$.ajax({
-       url: turl,
-       type: 'POST',
-       data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
-       beforeSend: function(){
-              $("#ajax_load_image").show();
-              $("#body").css({"opacity":"0.1",})
-                              },
-        success: function(data){
-                       alert("Successfully switched groups");
-                       $('.close-reveal-modal.st').trigger('click');
-           },
-       complete: function(){
-                    $("#ajax_load_image").hide();
-                $("#body").css({"opacity":"",})
-
-          }
-});  //end of ajax
-
-});  //end of document click
 
 
   $(document).on('open', '#view-map-widget[data-reveal]', function () {  
