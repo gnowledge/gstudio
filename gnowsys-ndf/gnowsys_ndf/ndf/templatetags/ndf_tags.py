@@ -24,6 +24,12 @@ db = get_database()
 collection = db[Node.collection_name]
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
 
+@register.inclusion_tag('ndf/userpreferences.html')
+def get_user_preferences(group,user):
+  return {'groupid':group,'author':user}
+
+
+
 @register.assignment_tag
 def get_group_resources(group):
   try:
@@ -114,8 +120,8 @@ def switch_group_conditions(user,group_id):
   try:
     ret_policy=False
     req_user_id=User.objects.get(username=user).id
-    print "id",req_user_id
     group=collection.Node.one({'_id':ObjectId(group_id)})
+    print "groupauth",group.author_set,group.group_type
     if req_user_id in group.author_set and group.group_type == 'PUBLIC':
       ret_policy=True
     return ret_policy
