@@ -46,9 +46,21 @@ at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'app
 #######################################################################################################################################
 
 
-def group(request, group_id, app_id):
+def group(request, group_id, app_id=None):
     """Renders a list of all 'Group-type-GSystems' available within the database.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	if group_ins:
+	    group_id = str(group_ins._id)
+	else :
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if auth :
+	    	group_id = str(auth._id)	
+    else :
+	pass
     group_nodes = []
     group_count = 0
 
@@ -91,6 +103,18 @@ def group(request, group_id, app_id):
 
 
 def create_group(request,group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	if group_ins:
+	    group_id = str(group_ins._id)
+	else :
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if auth :
+	    	group_id = str(auth._id)	
+    else :
+	pass
 
     if request.method == "POST":
         col_Group = db[Group.collection_name]
@@ -252,6 +276,18 @@ def group_dashboard(request,group_id=None):
 
 @login_required
 def edit_group(request,group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	if group_ins:
+	    group_id = str(group_ins._id)
+	else :
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if auth :
+	    	group_id = str(auth._id)	
+    else :
+	pass
     page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
 
     if request.method == "POST":
@@ -275,6 +311,18 @@ def edit_group(request,group_id):
                                       )
 
 def app_selection(request,group_id,node_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	if group_ins:
+	    group_id = str(group_ins._id)
+	else :
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if auth :
+	    	group_id = str(auth._id)	
+    else :
+	pass
     try:
         grp=collection.Node.one({"_id":ObjectId(group_id)})
         if request.method == "POST":
@@ -311,6 +359,18 @@ def app_selection(request,group_id,node_id):
      
 
 def switch_group(request,group_id,node_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	if group_ins:
+	    group_id = str(group_ins._id)
+	else :
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if auth :
+	    	group_id = str(auth._id)	
+    else :
+	pass
     try:
         node=collection.Node.one({"_id":ObjectId(node_id)})
         exstng_grps=node.group_set
@@ -343,6 +403,18 @@ def switch_group(request,group_id,node_id):
 
 
 def publish_group(request,group_id,node):
+  ins_objectid  = ObjectId()
+  if ins_objectid.is_valid(group_id) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+	if group_ins:
+	    group_id = str(group_ins._id)
+	else :
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if auth :
+	    	group_id = str(auth._id)	
+  else :
+	pass
 
   node=collection.Node.one({'_id':ObjectId(node)})
    

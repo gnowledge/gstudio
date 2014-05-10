@@ -16,10 +16,26 @@ from gnowsys_ndf.ndf.views.file import *
 db = get_database()
 collection = db['Nodes']
 
-def custom_app_view(request, group_id, app_name, app_id, app_set_id=None, app_set_instance_id=None):
+def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, app_set_instance_id=None):
     """
     custom view for custom GAPPS
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if app_id is None:
+        app_ins = collection.Node.find_one({'_type':"GSystemType", "name":app_name})
+        if app_ins:
+            app_id = str(app_ins._id)
     app_collection_set = [] 
     atlist = []
     rtlist = []
@@ -163,6 +179,22 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
     """
     create new instance of app_set of apps view for custom GAPPS
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if app_id is None:
+        app_ins = collection.Node.find_one({'_type':"GSystemType", "name":app_name})
+        if app_ins:
+            app_id = str(app_ins._id)
     app_collection_set = [] 
     app = collection.Node.find_one({"_id":ObjectId(app_id)})
     app_set = ""

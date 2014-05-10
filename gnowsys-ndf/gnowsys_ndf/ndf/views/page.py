@@ -49,6 +49,23 @@ rcs = RCS()
 def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if app_id is None:
+        app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Page"})
+        if app_ins:
+            app_id = str(app_ins._id)
+        
     content=[]
     version=[]
     con=[]
@@ -204,6 +221,19 @@ def page(request, group_id, app_id=None):
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
                           'groupid': group_id
@@ -251,6 +281,18 @@ def delete_page(request, group_id, node_id):
     
     Just hide the page from users!
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
 
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     
@@ -269,6 +311,19 @@ def version_node(request, group_id, node_id, version_no):
     In compared version-view, comparitive information in tabular form about the node 
     for the given version-numbers is provided.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     view = ""          # either single or compare
     selected_versions = {}
     node = collection.Node.one({"_id": ObjectId(node_id)})
@@ -320,6 +375,18 @@ def version_node(request, group_id, node_id, version_no):
 
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
@@ -442,19 +509,31 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
         return ""
         
 def publish_page(request,group_id,node):
-  print "getting in tite"   
-  node=collection.Node.one({'_id':ObjectId(node)})
-  page_node,v=get_page(request,node)
-  node.content = page_node.content
-  node.content_org=page_node.content_org
-  node.status=unicode("PUBLISHED")
-  node.modified_by = int(request.user.id)
-  node.save() 
-  #no need to use this section as seprate view is created for group publish
-  #if node._type == 'Group':
-   # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
 
-  return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
+    node=collection.Node.one({'_id':ObjectId(node)})
+    page_node,v=get_page(request,node)
+    node.content = page_node.content
+    node.content_org=page_node.content_org
+    node.status=unicode("PUBLISHED")
+    node.modified_by = int(request.user.id)
+    node.save() 
+    #no need to use this section as seprate view is created for group publish
+    #if node._type == 'Group':
+    # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
+
+    return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
 
   
   
