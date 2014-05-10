@@ -696,7 +696,6 @@ def user_access_policy(node,user):
   group_gst = col_Group.Group.one({'_id':ObjectId(node)})
   # if user.id in group_gst.group_set or group_gst.created_by == user.id:
   if user.id in group_gst.author_set or group_gst.created_by == user.id:
-    
     return 'allow'
 	    
 	  
@@ -715,14 +714,12 @@ def resource_info(node):
 def edit_policy(groupid,node,user):
   group_access= group_type_info(groupid,user)
   resource_infor=resource_info(node)
-  
   #code for public Groups and its Resources
   
   if group_access == "PUBLIC":
-      user_access=user_access_policy(groupid,user)
-      if user_access == "allow":
-        return "allow"
-            
+      #user_access=user_access_policy(groupid,user)
+      #if user_access == "allow":
+      return "allow"
   elif group_access == "PRIVATE":
       return "allow"
   elif group_access == "BaseModerated":

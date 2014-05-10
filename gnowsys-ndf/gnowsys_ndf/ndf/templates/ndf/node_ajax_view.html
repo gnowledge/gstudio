@@ -208,8 +208,6 @@ ul#graph-hover.f-dropdown{
         </div>
       </small>
 
-    
-      
   
     <!-- added button to convert collection into module-->
     {% if node.collection_set and user.is_authenticated%}
@@ -246,7 +244,7 @@ ul#graph-hover.f-dropdown{
 
     {% get_user_object node.created_by as created_user %}
 
-    {% if is_group %}
+         {% if is_group %}
 
              {% if request.user == created_user or request.user.is_superuser %}     
                    
@@ -254,12 +252,12 @@ ul#graph-hover.f-dropdown{
 
              {% endif %}
 
-    {% else %}
+         {% else %}
 
 
       <a href="{% url edit_url groupid node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
   
-    {% endif %}    
+         {% endif %}    
     {% endif %}
 
     <ul id="edit-options" class="f-dropdown">
