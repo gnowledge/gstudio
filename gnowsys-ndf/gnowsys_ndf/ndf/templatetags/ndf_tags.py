@@ -26,6 +26,12 @@ at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'app
 translation_set=[]
 check=[]
 
+@register.inclusion_tag('ndf/userpreferences.html')
+def get_user_preferences(group,user):
+  return {'groupid':group,'author':user}
+
+
+
 @register.assignment_tag
 def get_group_resources(group):
   try:
@@ -128,8 +134,8 @@ def switch_group_conditions(user,group_id):
   try:
     ret_policy=False
     req_user_id=User.objects.get(username=user).id
-    print "id",req_user_id
     group=collection.Node.one({'_id':ObjectId(group_id)})
+    print "groupauth",group.author_set,group.group_type
     if req_user_id in group.author_set and group.group_type == 'PUBLIC':
       ret_policy=True
     return ret_policy
@@ -713,7 +719,6 @@ def user_access_policy(node,user):
   group_gst = col_Group.Group.one({'_id':ObjectId(node)})
   # if user.id in group_gst.group_set or group_gst.created_by == user.id:
   if user.id in group_gst.author_set or group_gst.created_by == user.id:
-    
     return 'allow'
 	    
 	  
@@ -732,14 +737,12 @@ def resource_info(node):
 def edit_policy(groupid,node,user):
   group_access= group_type_info(groupid,user)
   resource_infor=resource_info(node)
-  
   #code for public Groups and its Resources
   
   if group_access == "PUBLIC":
-      user_access=user_access_policy(groupid,user)
-      if user_access == "allow":
-        return "allow"
-            
+      #user_access=user_access_policy(groupid,user)
+      #if user_access == "allow":
+      return "allow"
   elif group_access == "PRIVATE":
       return "allow"
   elif group_access == "BaseModerated":
