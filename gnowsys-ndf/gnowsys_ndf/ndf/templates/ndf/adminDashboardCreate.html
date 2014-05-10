@@ -8,10 +8,24 @@
         {% get_class_type_list class_name %}
      {% endifequal %}
 {% endblock %}
+
+
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 <form method="post" action="" name="{{class_name}}">
 {% csrf_token %}
+{% if translate %}
+ <div class="large-12 columns">
+<table class="large-6 columns">
+<div class="row">
+<div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
+<div class="large-6 columns"><select name="lan" id="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option\
+><option id="mar" value="mar">mar</option></select>
+</div>
+<hr style="height:5px;background-color: #0B6580;" />
+</div>
+</table></div>
+{% endif %}
 
 <h2>{{node.name}}</h2>
 
@@ -64,6 +78,10 @@ $(".orgitdown .orgitdownButton7 a").css({"background-image":'url("/static/ndf/or
 $(".orgitdown .orgitdownButton8 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/html.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/close.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 
+$(document).ready(function(){
+
+$("#lan option[value={{node.language}}]").remove();
+});
 
 </script>
 

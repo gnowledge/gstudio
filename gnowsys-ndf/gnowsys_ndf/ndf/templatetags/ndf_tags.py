@@ -23,6 +23,8 @@ register = Library()
 db = get_database()
 collection = db[Node.collection_name]
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+translation_set=[]
+check=[]
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
@@ -536,7 +538,7 @@ def get_group_name(val):
 def get_edit_url(groupid):
 
   node = collection.Node.one({'_id': ObjectId(groupid) }) 
-
+  print "node_edit_url",node
   if node._type == 'GSystem':
 
     type_name = collection.Node.one({'_id': node.member_of[0]}).name
@@ -552,7 +554,6 @@ def get_edit_url(groupid):
     return 'edit_group'
 
   elif node._type == 'File':
-
     if node.mime_type == 'video':      
       return 'video_edit'       
     elif 'image' in node.mime_type:
@@ -828,6 +829,47 @@ def get_source_id(obj_id):
     print str(e)
     return 'null'
  
+
+# @register.assignment_tag
+# def get_possible_translations(obj_id):
+#   if not str(obj_id._id) in check:
+#       check.append(str(obj_id._id))
+#       relation_set=obj_id.get_possible_relations(obj_id.member_of)
+#       if relation_set.has_key('translation_of'):
+#         for k,v in relation_set['translation_of'].items():
+#           if k == "subject_or_right_subject_list":
+#             for each in v:
+#               if not str(each._id) in check:
+#                 dic={}
+#                 dic[each['_id']]=each['language']
+#                 print dic,"dddddddddddddddddddddddddddiiiiiiiiiiiiiiiiiiiiccccccccccccccc"
+#                 translation_set.append(dic)
+        
+#                 get_possible_translations(each)
+          
+#   return translation_set
+
+
+@register.assignment_tag
+def get_possible_translations(obj_id):
+  try:
+    relation_set=obj_id.get_possible_relations(obj_id.member_of)
+    translation_set=[]
+    for key,value in relation_set.items():
+      if key == 'translation_of':
+        for k,v in value.items():
+          if k == "subject_or_right_subject_list":
+            for each in v:
+              dic={}
+              dic[each['_id']]=each['language']
+              translation_set.append(dic)
+
+    return translation_set
+  except Exception as e:
+    print str(e)
+    return 'null'
+ 
+
 
   #code commented in case required for groups not assigned edit_policy        
   #elif group_type is  None:
