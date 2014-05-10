@@ -40,6 +40,9 @@ gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
 get_all_usergroups=get_all_user_groups()
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+ins_objectid  = ObjectId()
+
+
 
 #######################################################################################################################################
 #      V I E W S   D E F I N E D   F O R   G A P P -- ' G R O U P '
@@ -63,7 +66,6 @@ def group(request, group_id, app_id=None):
 	pass
     group_nodes = []
     group_count = 0
-
     auth = collection.Node.one({'_type': u"Author", 'name': unicode(request.user.username)})
 
     if auth:
@@ -92,10 +94,11 @@ def group(request, group_id, app_id=None):
                 group_nodes.append(group)
         
         group_count = cur_public.count()
+       
 
     return render_to_response("ndf/group.html", 
                               {'group_nodes': group_nodes, 
-                               'group_nodes_count': group_count, 
+                               'group_nodes_count': group_count,
                                'groupid': group_id, 'group_id': group_id
                               }, context_instance=RequestContext(request))
     
@@ -205,7 +208,6 @@ def create_group(request,group_id):
 
 def group_dashboard(request,group_id=None):
 
-    ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
 	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 

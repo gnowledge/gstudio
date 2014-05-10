@@ -61,7 +61,7 @@ def all_observations(request, group_id, app_id=None):
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
-									"locations": locations,
+									"locations": json.dumps(locations),
 									"total_locations": locs
 								  })
 
@@ -87,6 +87,10 @@ def all_observations(request, group_id, app_id=None):
     # else :
     #     app_menu = "yes"
     #     title = app_name
+
+	# request.session.flush()
+	request.session.set_test_cookie()
+
 	return render_to_response("ndf/observations.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
@@ -101,10 +105,12 @@ def all_observations(request, group_id, app_id=None):
 def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
 	client_ip = request.META['REMOTE_ADDR']
+	request.session.set_test_cookie()
 
 	# getting django user id
-	user_id = int(request.user.id)  if request.user.id 	else ""		
+	user_id = int(request.user.id)  if request.user.id 	else request.session.set_expiry(0)
 	user_name = unicode(request.user.username) if request.user.username  else "" # getting django user name
+	
 
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
@@ -125,21 +131,20 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
-									"locations": locations,
+									"locations": json.dumps(locations),
 									"total_locations": locs
 								  })
 
-
+	
 	# for each in app.collection_set:
 		
-	# 	app_element = collection.Node.find_one({"_id":each})
+	# 	app_element = collection.Node.ifnd_one({"_id":each})
 	# 	obj_count = ""
 	# 	if app_element:
 	# 		app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 	# 		obj_count = app_element_content_objects.count()
 				
 	# 	app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
-
 
 	return render_to_response("ndf/observations.html",
 							 	{
@@ -155,37 +160,77 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
-	marker_geojson = request.POST["marker_geojson"]	
+	user_type = request.POST["user"]
+	user_session_id = request.POST["user_session_id"]
+	marker_geojson = request.POST["marker_geojson"]
 	marker_geojson = ast.literal_eval(marker_geojson)
 
-	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
+	is_cookie_supported = request.session.test_cookie_worked()
+	operation_performed = ""
+	unique_token = str(ObjectId())
 
+	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
+	
 	# to update existing location
 	if "ref" in marker_geojson['properties']:
 		marker_ref = marker_geojson['properties']['ref']
 
 		if app_set_element:
+
+			# for anonymous user
+			anonymous_flag = False
+
+			if (user_type == "anonymous" and is_cookie_supported):
+
+				cookie_added_markers = request.session.get('anonymous_added_markers')
+
+				if (cookie_added_markers != None) and (cookie_added_markers[:cookie_added_markers.find(",")] == user_session_id):
+					if cookie_added_markers.find(marker_ref) > 0:
+						anonymous_flag = True
+					else:
+						operation_performed = "You have not created this marker or you had lost your session !"
+				else:
+					operation_performed = "You have not created this marker or you are had lost your session !"
+			else:
+				operation_performed = "You have not created this marker or we think you had disabled support for cookies !"
+
+
+			if (user_type == "authenticated") or anonymous_flag:
 			
-			for each in app_set_element.location:
-				
-				if each['properties']['ref'] == marker_ref:
-					app_set_element.location.remove(each)
-					app_set_element.location.append(marker_geojson)
-					app_set_element.save()
-					unique_token = marker_ref
-					operation_performed = "edit"
+				for each in app_set_element.location:
+					
+					if each['properties']['ref'] == marker_ref:
+						app_set_element.location.remove(each)
+						app_set_element.location.append(marker_geojson)
+						app_set_element.save()
+						unique_token = marker_ref
+						operation_performed = "edit"
 
 	
 	# to create/add new location
 	else:
-		unique_token = str(ObjectId())
+
 		marker_geojson['properties']['ref'] = unique_token
 
 		if app_set_element:
 			app_set_element.location.append(marker_geojson)
 			app_set_element.save()
 			operation_performed = "create_new"
+			
+		# for anonymous user
+		if user_type == "anonymous" and is_cookie_supported:
+			cookie_added_markers = request.session.get('anonymous_added_markers')
+
+			if cookie_added_markers == None or cookie_added_markers[:cookie_added_markers.find(",")] != user_session_id:
+				cookie_added_markers = user_session_id + "," + unique_token 
+
+			elif cookie_added_markers[:cookie_added_markers.find(",")] == user_session_id:
+				cookie_added_markers += "," + unique_token
+
+			request.session['anonymous_added_markers'] = cookie_added_markers
 	
+	# print "\n create/save :  ", request.session.items()
+			
 	response_data = [len(app_set_element.location), unique_token, operation_performed]
 	response_data = json.dumps(response_data)
 
@@ -195,19 +240,47 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
+	user_type = request.POST["user"]
+	user_session_id = request.POST["user_session_id"]
 	marker_geojson = request.POST["marker_geojson"]
+
 	marker_geojson = ast.literal_eval(marker_geojson)
 	marker_ref = marker_geojson['properties']['ref']
-	user_type = request.POST["user_type"]
-	# csrf_token = request.POST["csrf_token"]
-	print request # user_type,":::", csrf_token
+
+	is_cookie_supported = request.session.test_cookie_worked()
+	operation_performed = ""
 
 	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
 
-	for each in app_set_element.location:
-		
-		if each['properties']['ref'] == marker_ref:
-			app_set_element.location.remove(each)
-			app_set_element.save()
-		
-	return HttpResponse(len(app_set_element.location))
+	# for anonymous user
+	anonymous_flag = False
+
+	if (user_type == "anonymous" and is_cookie_supported):
+
+		cookie_added_markers = request.session.get('anonymous_added_markers')
+
+		if (cookie_added_markers != None) and (cookie_added_markers[:cookie_added_markers.find(",")] == user_session_id):
+			if cookie_added_markers.find(marker_ref) > 0:
+				anonymous_flag = True
+			else:
+				operation_performed = "You have not created this marker or you had lost your session !"
+		else:
+			operation_performed = "You have not created this marker or you had lost your session !"
+	else:
+		operation_performed = "You have not created this marker or we think you had disabled support for cookies !"
+
+
+	if (user_type == "authenticated") or anonymous_flag:
+			
+		for each in app_set_element.location:
+			
+			if each['properties']['ref'] == marker_ref:
+				app_set_element.location.remove(each)
+				app_set_element.save()
+
+				operation_performed = "marker_deleted"	
+
+	response_data = [len(app_set_element.location), operation_performed]
+	response_data = json.dumps(response_data)
+
+	return StreamingHttpResponse(response_data)

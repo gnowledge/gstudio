@@ -20,11 +20,20 @@ import string
 ######################################################################################################################################
 
 db = get_database()
+collection = db[Node.collection_name]
+
 history_manager = HistoryManager()
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
 coln=db[GSystem.collection_name]
+grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
+ins_objectid  = ObjectId()
+
+def get_all_resources_for_group(group_id):
+  if ins_objectid.is_valid(group_id):
+    obj_resources=coln.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'File'}]},{'group_set':{'$all':[ObjectId(group_id)]}},{'member_of':{'$nin':[grp_st._id]}}]})
+    return obj_resources
 
 
 def get_all_gapps():
@@ -69,6 +78,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     
     if checked:     
       if checked == "Page":
+ 
         gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
@@ -111,6 +121,14 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+      elif checked == "Pandora Video":
+        gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
+        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
+      elif checked == "Theme":
+        theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
 
@@ -148,7 +166,14 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     return dict_drawer
 
-def get_translate_common_fields(request, node, group_id, node_type, node_id):
+# get type of resource
+def get_resource_type(request,node_id):
+  get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
+  get_type=get_resource_type._type
+  return get_type 
+   
+
+def get_translate_common_fields(request,get_type,node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
   gcollection = db[Node.collection_name]
@@ -159,11 +184,28 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
   tags = request.POST.get('tags')
   usrid = int(request.user.id)
   language= request.POST.get('lan')
+  if get_type == "File":
+    get_parent_node=collection.Node.one({'_id':ObjectId(node_id)})
+    get_mime_type=get_parent_node.mime_type
+    get_fs_file_ids=get_parent_node.fs_file_ids
+    node.mime_type=get_mime_type
+    node.fs_file_ids=get_fs_file_ids
+ 
   if not node.has_key('_id'):
-    
     node.created_by = usrid
-    node.member_of.append(node_type._id)
-
+    if get_type == "File":
+        get_node_type = collection.Node.one({'name':get_type})
+        node.member_of.append(get_node_type._id)
+        if 'image' in get_mime_type:
+          get_image_type = collection.Node.one({'name':'Image'})
+          node.member_of.append(get_image_type._id)
+        if 'video' in get_mime_type:
+          get_video_type = collection.Node.one({'name':'Video'})
+          node.member_of.append(get_video_type._id)
+        
+    else:
+      node.member_of.append(node_type._id)
+ 
   node.name = unicode(name)
   node.language=unicode(language)
 
@@ -488,3 +530,4 @@ def tag_info(request, group_id, tagname):
   # print group_id
 
   return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
+

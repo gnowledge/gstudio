@@ -16,31 +16,16 @@ from gnowsys_ndf.ndf.views.file import *
 db = get_database()
 collection = db['Nodes']
 
-def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, app_set_instance_id=None):
+def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=None):
     """
     custom view for custom GAPPS
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
-    if app_id is None:
-        app_ins = collection.Node.find_one({'_type':"GSystemType", "name":app_name})
-        if app_ins:
-            app_id = str(app_ins._id)
+    app_name = "mis"
     app_collection_set = [] 
-    nodes_dict = []
     atlist = []
     rtlist = []
     app = collection.Node.find_one({"_id":ObjectId(app_id)})
+    App_Name = app.name 
     app_set = ""
     nodes = ""
     nodes_dict = ""
@@ -60,15 +45,18 @@ def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, a
     property_display_order = []
 
     for eachset in app.collection_set:
-         app_set = collection.Node.find_one({"_id":eachset})
-         app_collection_set.append({"id": str(app_set._id), "name": app_set.name})
+         app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+         # app_set = collection.Node.find_one({"_id":eachset})
+         # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
         classtype = ""
         app_set_template = "yes"
+        App_Name = None
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
         title = systemtype_name
+
         if request.method=="POST":
             search = request.POST.get("search","")
             classtype = request.POST.get("class","")
@@ -79,8 +67,15 @@ def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, a
         nodes_dict = []
         for each in nodes:
             nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
-
+                         
     else :
+        ST_theme = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+        if ST_theme:
+            nodes = list(collection.Node.find({'member_of': {'$all': [ST_theme._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+
+            nodes_dict = []
+            for each in nodes:
+                nodes_dict.append({"id":str(each._id), "name":each.name})
 
         app_menu = "yes"
         title = app_name
@@ -130,6 +125,11 @@ def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, a
                             for right_sub_dict in system[field]:
                                 name_list.append(right_sub_dict.name)
                             display_fields.append((altname, ", ".join(name_list)))
+                        elif system.structure[field][0] == datetime.datetime:
+                            date_list = []
+                            for dt in system[field]:
+                                date_list.append(dt.strftime("%d/%m/%Y"))
+                            display_fields.append((altname, ", ".join(date_list)))
                         else:
                             display_fields.append((altname, ", ".join(system[field])))
 
@@ -153,35 +153,20 @@ def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, a
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
 
-    template = "ndf/custom_template_for_app.html"
+    template = "ndf/mis.html"
 
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id
 
-                                        , "node":system, 'group_id':group_id, "property_display_order": property_display_order})
+                                        , "node":system, 'group_id':group_id, 'app':App_Name, "property_display_order": property_display_order})
 
     return render_to_response(template, variable)
       
 @login_required
-def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, app_set_instance_id=None):
+def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None):
     """
     create new instance of app_set of apps view for custom GAPPS
     """
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
-    else :
-        pass
-    if app_id is None:
-        app_ins = collection.Node.find_one({'_type':"GSystemType", "name":app_name})
-        if app_ins:
-            app_id = str(app_ins._id)
+    app_name = "mis"
     app_collection_set = [] 
     app = collection.Node.find_one({"_id":ObjectId(app_id)})
     app_set = ""
@@ -208,8 +193,9 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
     user_name = unicode(request.user.username)  # getting django user name
 
     for eachset in app.collection_set:
-      app_set = collection.Node.find_one({"_id":eachset})
-      app_collection_set.append({"id": str(app_set._id), "name": app_set.name})
+      app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+      # app_set = collection.Node.find_one({"_id":eachset})
+      # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
@@ -291,7 +277,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
                 if obj_id_ins.is_valid(f):
                     newgsystem = collection.Node.one({'_id':f})
                 else:
-                    template = "ndf/custom_template_for_app.html"
+                    template = "ndf/mis.html"
                     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
                     return render_to_response(template, variable)
             else:
@@ -398,7 +384,7 @@ def custom_app_new_view(request, group_id, app_name, app_id, app_set_id=None, ap
 
         return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
     
-    template = "ndf/custom_template_for_app.html"
+    template = "ndf/mis.html"
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
       

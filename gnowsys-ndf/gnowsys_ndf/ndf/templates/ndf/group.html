@@ -82,7 +82,8 @@
           <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
           {% endfor %}
         </div>
-        
+     {% get_group_resources node as obj_count %}
+   
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
         <h4>{{ node.name }}</h4>
 	<div>
@@ -91,12 +92,13 @@
           </div>
       </header>
       
-      <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
+      <p>
+{{node.html_content|default_if_none:'Please edit to add content..'|truncatewords_html:10|safe}}</p>
       <a class="button expand"  href="/{{node.pk}}">View Group</a>
       
       <footer class="row">
         <div class="small-6 columns"><strong>{{node.author_set|length}}</strong> Members</div>
-        <div class="small-6 columns"><strong>56</strong> Objects</div>
+        <div class="small-6 columns"><strong>{{obj_count}}</strong> Objects</div>
       </footer>
       
     </div>
