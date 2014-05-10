@@ -301,7 +301,7 @@ def app_selection(request,group_id,node_id):
         else:
             list_apps=[]
             if not at_apps_list:
-                return HttpResponse("failure")
+                return HttpResponse("Failure")
             poss_atts=grp.get_possible_attributes(at_apps_list._id)
             if poss_atts:
                 list_apps=poss_atts['apps_list']['object_value']
