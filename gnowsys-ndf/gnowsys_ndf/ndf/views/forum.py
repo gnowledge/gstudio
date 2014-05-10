@@ -48,36 +48,49 @@ def forum(request,group_id,node_id):
 
 def create_forum(request,group_id):
     if request.method == "POST":
+
         colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
-        colf=gs_collection.GSystem()
-        name=unicode(request.POST.get('forum_name',""))
-        colf.name=name
+
+        colf = gs_collection.GSystem()
+
+        name = unicode(request.POST.get('forum_name',""))
+        colf.name = name
+        
         content_org = request.POST.get('content_org',"")
         if content_org:
             colf.content_org = unicode(content_org)
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             colf.content = org2html(content_org, file_prefix=filename)
+        
         usrid=int(request.user.id)
         usrname = unicode(request.user.username)
+        
         colf.created_by=usrid
         colf.modified_by = usrid
         if usrid not in colf.contributors:
             colf.contributors.append(usrid)
+        
         colf.group_set.append(colg._id)
-        user_group_obj=gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+
+        user_group_obj = gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
         if user_group_obj:
             if user_group_obj._id not in colf.group_set:
                 colf.group_set.append(user_group_obj._id)     
+
         colf.member_of.append(forum_st._id)
+
         sdate=request.POST.get('sdate',"")
         shrs= request.POST.get('shrs',"") 
         smts= request.POST.get('smts',"")
+        
         edate= request.POST.get('edate',"")
         ehrs= request.POST.get('ehrs',"")
         emts=request.POST.get('emts',"")
+        
         start_dt={}
         end_dt={}
+        
         if not shrs:
             shrs=0
         if not smts:
@@ -86,6 +99,7 @@ def create_forum(request,group_id):
             sdate1=sdate.split("/") 
             st_date = datetime.datetime(int(sdate1[2]),int(sdate1[0]),int(sdate1[1]),int(shrs),int(smts))
             start_dt[start_time.name]=st_date
+        
         if not ehrs:
             ehrs=0
         if not emts:

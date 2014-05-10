@@ -7,8 +7,8 @@
 
 {% block meta_content %}
 
-    <a href="#"> Browse forums</a>
-    <h3>Threads</h3>
+    <!-- <a href="#"> Browse forums</a> -->
+  <h2>Threads</h2>
   <p>Threads are new ideas on the topic</p>
   {% if user.is_authenticated %}
   {% include "ndf/replyforum.html" %}
@@ -68,4 +68,8 @@
     <hr>
     {% endfor %}
   </div>
+{% endblock %}
+
+{% block script %}
+  $("#node_search_form").parent().hide();
 {% endblock %}
