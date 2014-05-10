@@ -45,7 +45,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% endblock %}
 
 {% block meta_content %}
-
+{% get_group_name groupid as group_name_tag %}
 <!--This content possibly comes from page_details.html-->
 
 <p>
@@ -61,7 +61,7 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 <p>
   Version{{ node.version_dict|length|pluralize }}: 
   {% for seq_no, version_no in node.version_dict.items reversed %}
-  <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+  <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
   {% endfor %}
 </p>
 

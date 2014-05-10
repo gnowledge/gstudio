@@ -16,13 +16,13 @@
 {% endblock %}
 
 {% block body_content %}
-
+{% get_group_name groupid as group_name_tag %}
 <header class="row">
 
 	<div class="medium-12 columns">
 		{% if user.is_authenticated %}
 
-		<a href="{% url 'create_forum' groupid %}">
+		<a href="{% url 'create_forum' group_name_tag %}">
 			<input type="submit" class="button" value="Create a New forum" />
 		</a>
 
@@ -37,7 +37,7 @@
 		{% for each in existing_forums %}
               
 		<li class="card">
-            <a href="{% url 'show' groupid each %}">  
+            <a href="{% url 'show' group_name_tag each %}">  
             <h3>{{each.name}}</h3>
                 <p class="fixme">This is the forum description text</p>
                 </a>

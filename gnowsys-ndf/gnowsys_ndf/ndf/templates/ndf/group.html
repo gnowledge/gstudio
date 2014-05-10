@@ -17,6 +17,7 @@
 
 
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 <header class="row">
   <dl class="tabs" data-tab>
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
@@ -57,7 +58,7 @@
       {% if user.is_authenticated %}
          {% get_create_group_visibility as create_group %}
          {% if create_group %}
-             <a class="button expand" href="{% url 'create_group' groupid %}">
+             <a class="button expand" href="{% url 'create_group' group_name_tag %}">
                 Create Group
              </a>
          {% endif %}

@@ -16,7 +16,7 @@
 {% endblock%}
 
 {% block meta_content %}
-
+{% get_group_name groupid as group_name_tag %}
 <ul class="side-nav"> 
   {% for each in app_collection_set %}
   
@@ -27,11 +27,11 @@
       <li class="active"> 
         <div>
           
-          <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
+          <a href="{% url "GAPPS_set_new_instance" group_name_tag app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
             +&nbsp;Add
           </a>
           
-          <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >
+          <a href="{% url "GAPPS_set" group_name_tag app_name app_id each.id %}" >
             {{each.name}} ({{count}})
           </a> 
 
@@ -44,10 +44,10 @@
   
         <div>
         
-          <a href="{% url "GAPPS_set_new_instance" groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
+          <a href="{% url "GAPPS_set_new_instance" group_name_tag app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
             +&nbsp;Add
           </a>
-          <a href="{% url "GAPPS_set" groupid app_name app_id each.id %}" >
+          <a href="{% url "GAPPS_set" group_name_tag app_name app_id each.id %}" >
             {{each.name}} ({{count}})
           </a> 
           
@@ -65,7 +65,7 @@
 
     <li> 
       <div>
-        <a href="{% url 'GAPPS' groupid app_name app_id %}"> <input class="small button split" type="button" value="Themes Hierarchy" > </a>
+        <a href="{% url 'GAPPS' group_name_tag app_name app_id %}"> <input class="small button split" type="button" value="Themes Hierarchy" > </a>
       </div>
     </li>
 
@@ -88,7 +88,7 @@
 
 
 {% block body_content %} 
-  
+  {% get_group_name groupid as group_name_tag %}
   {# template for showing apt_set_instance list #}
 
   {% if app_set_template %}
@@ -143,10 +143,10 @@
           <tr>
         
             <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance" groupid app_name app_id app_set_id each.id %}">{{each.name}}</a></td>
+            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance" group_name_tag app_name app_id app_set_id each.id %}">{{each.name}}</a></td>
             <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
             <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
-            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id each.id %}" class="button medium">Edit</a></td>
+            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" group_name_tag app_name app_id app_set_id each.id %}" class="button medium">Edit</a></td>
         
           </tr>
           
@@ -293,7 +293,7 @@
           <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
             {% for seq_no, version_no in node.version_dict.items reversed %}
           
-              <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+              <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
 
             {% endfor %}
           </div>
@@ -357,13 +357,13 @@
       		</div>
       	    {% endif %}
 
-      	    <a href="{% url 'GAPPS_set_instance_edit' groupid app_name app_id app_set_id app_set_instance_id %}" class="small button split edit">
+      	    <a href="{% url 'GAPPS_set_instance_edit' group_name_tag app_name app_id app_set_id app_set_instance_id %}" class="small button split edit">
       	      <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
       	    </a>
 
       	    <ul id="edit-options" class="f-dropdown">
       	      <li>
-      		<a href="{% url 'page_create_edit' groupid %}">Create a new page</a>
+      		<a href="{% url 'page_create_edit' group_name_tag %}">Create a new page</a>
       	      </li>
       	    </ul>
 
@@ -380,7 +380,7 @@
 
   <!-- Previously existing details-view -->
     
-    <a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id app_set_instance_id %}" class="button medium">
+    <a href="{% url "GAPPS_set_instance_edit" group_name_tag app_name app_id app_set_id app_set_instance_id %}" class="button medium">
       Edit
     </a>
     <br/>
@@ -475,19 +475,19 @@
           
           {% if mime_type %}
             {% if "image" in mime_type %}
-              <a href = "{% url 'file_detail' groupid system_id %}">
+              <a href = "{% url 'file_detail' group_name_tag system_id %}">
         	      <div style="display:table-cell;">
-        	        <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+        	        <img src="{% url 'getImageThumbnail' group_name_tag system_id %}" />
         	      </div>
               </a>
             {% elif "video" in mime_type %}
-            <a href = "{% url 'file_detail' groupid system_id %}">
+            <a href = "{% url 'file_detail' group_name_tag system_id %}">
       	<div style="display:table-cell;">
-      	  <img src="{% url 'getImageThumbnail' groupid system_id %}" />
+      	  <img src="{% url 'getImageThumbnail' group_name_tag system_id %}" />
       	</div>
             </a>
             {% else %}
-            <a href ="{% url 'file_detail' groupid system_id %}">
+            <a href ="{% url 'file_detail' group_name_tag system_id %}">
       	<div style="display:table-cell;">
       	  <font size="3">{{app_set_instance_name}}</font>
       	</div>

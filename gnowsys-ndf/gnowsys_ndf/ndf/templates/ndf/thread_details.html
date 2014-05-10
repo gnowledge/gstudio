@@ -2,6 +2,7 @@
 {% load ndf_tags %}
 {% block title %}{{thread.name}}{% endblock %}
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 <style type="text/css">
 #maindiv
 {
@@ -23,7 +24,7 @@ border-radius: 5px;
 <div class="row">
       <div class="large-12 columns">
 	<div id="maindiv" class="large-6 columns">
-	  <font size ="6"  >Forum :     <a href="/{{groupid}}/forum/show/{{forum}}">
+	  <font size ="6"  >Forum :     <a href="/{{group_name_tag}}/forum/show/{{forum}}">
 {{forum.name}}</a></font> </p>
 	  <font size="5" color="green">{{thread.name}}</font>
 	  {% with thread.content|safe as thread_content %}
