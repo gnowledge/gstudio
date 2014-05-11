@@ -691,12 +691,14 @@ def group_type_info(groupid,user=0):
       
 @register.assignment_tag
 def user_access_policy(node,user):
-  
-  col_Group=db[Group.collection_name]
-  group_gst = col_Group.Group.one({'_id':ObjectId(node)})
-  # if user.id in group_gst.group_set or group_gst.created_by == user.id:
-  if user.id in group_gst.author_set or group_gst.created_by == user.id:
-    return 'allow'
+  try:
+    col_Group=db[Group.collection_name]
+    group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+    # if user.id in group_gst.group_set or group_gst.created_by == user.id:
+    if user.id in group_gst.author_set or group_gst.created_by == user.id or user.is_superuser:
+      return 'allow'
+  except Exception as e:
+    print "Exception in user_access_policy- "+str(e)
 	    
 	  
 @register.assignment_tag
@@ -810,8 +812,8 @@ def get_publish_policy(request,groupid,res_node):
    elif node.edit_policy == "EDITABLE_NON_MODERATED":
        #condition for groups
        if resnode._type == "Group":
-         if ver == "1.1" or  resnode.created_by != request.user.id:
-          return "stop"
+         if ver == "1.1" :
+           return "stop"
        if group == "allow":
          if res_node.status == "DRAFT": 
            return "allow"
