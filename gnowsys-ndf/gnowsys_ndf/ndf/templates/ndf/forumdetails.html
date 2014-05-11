@@ -1,19 +1,54 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% block title %}{{forum.name}}{% endblock %}
-{% block head %}
 
+
+{% block head %}
+<style type="text/css">
+
+  #create-thread i{
+    color: white;
+  }
+
+</style>
 {% endblock %}
+
+
+{% block help_content %}
+  <p>Threads are new ideas on the topic</p>
+{% endblock %}
+
 
 {% block meta_content %}
 
-    <!-- <a href="#"> Browse forums</a> -->
   <h2>Threads</h2>
-  <p>Threads are new ideas on the topic</p>
-  {% if user.is_authenticated %}
-  {% include "ndf/replyforum.html" %}
-  {% endif %}
+  <br/>
+  <ul class="no-bullet" id="create-thread"> 
+    <li class="create card ">
+      <div>
+        <h4><i class="fi-plus"></i> New</h4>
 
+        {% if user.is_authenticated %}
+          {% user_access_policy groupid request.user as user_access %}
+          
+          {% if user_access == "allow" %}
+            <a class="button expand" href="{% url 'create_thread' groupid forum %}">
+              Create &nbsp;Thread
+            </a>
+          {% endif %}
+
+        {% endif %}
+      </div>
+    </li>
+  </ul>
+
+    <!-- <a href="#"> Browse forums</a> -->
+  <!-- <h2>Threads</h2>
+  {% comment %}
+  {% if user.is_authenticated %}
+    {% include "ndf/replyforum.html" %}
+  {% endif %} 
+  {% endcomment %} -->
   <h4>Top Contributors</h4>
 {% endblock %}
 
@@ -70,6 +105,17 @@
   </div>
 {% endblock %}
 
+
 {% block script %}
+
+  // <script type="text/javascript">
+
   $("#node_search_form").parent().hide();
-{% endblock %}
+
+  // removing left-off-canvas behaviour
+  $("#create-thread a.left-off-canvas-toggle:lt(2)").remove();
+  $("#create-thread a.left-off-canvas-toggle").removeClass("left-off-canvas-toggle");
+
+  // </script>
+
+  {% endblock %}

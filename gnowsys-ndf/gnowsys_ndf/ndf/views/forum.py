@@ -141,7 +141,60 @@ def display_thread(request,group_id,thread_id):
     except:
         pass
 
+
+
+def create_thread(request, group_id, forum_id):
+
+    forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
+
+    if request.method == "POST":
+
+        colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
+
+        name = unicode(request.POST.get('thread_name',""))
+        
+        content_org = request.POST.get('content_org',"")
+
+        # -------------------
+        colrep = gs_collection.GSystem()
+    
+        colrep.member_of.append(twist_st._id)
+        
+        colrep.prior_node.append(forum._id)
+        colrep.name = name
+
+        if content_org:
+            colrep.content_org = unicode(content_org)
+            # Required to link temporary files with the current user who is modifying this document
+            usrname = request.user.username
+            filename = slugify(name) + "-" + usrname + "-"
+            colrep.content = org2html(content_org, file_prefix=filename)
+
+        usrid=int(request.user.id)
+        colrep.created_by=usrid
+        colrep.modified_by = usrid
+
+        if usrid not in colrep.contributors:
+            colrep.contributors.append(usrid)
+        
+        colrep.group_set.append(colg._id)
+        colrep.save()
+
+        variables = RequestContext(request,{'forum':forum,'thread':colrep,'eachrep':colrep, 'groupid':group_id,'group_id':group_id,'user':request.user})
+        return render_to_response("ndf/thread_details.html",variables)
+
+    else:
+        return render_to_response("ndf/create_thread.html",
+                                    {   'group_id':group_id,
+                                        'groupid':group_id,
+                                        'forum': forum
+                                    },
+                              RequestContext(request))
+
+
+
 def add_node(request,group_id):
+    
     try:
         sitename=Site.objects.all()[0].name.__str__()
         content_org=request.POST.get("reply","")
@@ -152,56 +205,74 @@ def add_node(request,group_id):
         tw_name=request.POST.get("twistname","")
         forumobj=""
         groupobj=""
+    
         colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
+
         if forumid:
             forumobj=gs_collection.GSystem.one({"_id": ObjectId(forumid)})
+    
         sup=gs_collection.GSystem.one({"_id": ObjectId(sup_id)})
+    
         if not sup :        
             return HttpResponse("failure")
+    
         colrep=gs_collection.GSystem()
+    
         if node == "Twist":
             name=tw_name
             colrep.member_of.append(twist_st._id)
         elif node == "Reply":
             name=unicode("Reply of:"+str(sup._id))
             colrep.member_of.append(reply_st._id)
+    
         colrep.prior_node.append(sup._id)
         colrep.name=name
+
         if content_org:
             colrep.content_org = unicode(content_org)
             # Required to link temporary files with the current user who is modifying this document
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             colrep.content = org2html(content_org, file_prefix=filename)
+
         usrid=int(request.user.id)
         colrep.created_by=usrid
         colrep.modified_by = usrid
+
         if usrid not in colrep.contributors:
             colrep.contributors.append(usrid)
+        
         colrep.group_set.append(colg._id)
         colrep.save()
         groupname=colg.name
+        
         if node == "Twist" :  
             url="http://"+sitename+"/"+str(group_id)+"/forum/thread/"+str(colrep._id)
             activity=str(request.user.username)+" -added a thread '"
             prefix="' on the forum '"+forumobj.name+"'"
             nodename=name
+        
         if node == "Reply":
             threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
             url="http://"+sitename+"/"+str(group_id)+"/forum/thread/"+str(threadobj._id)
             activity=str(request.user.username)+" -added a reply "
             prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
             nodename=""
+        
         link=url
+        
         for each in colg.author_set:
             bx=User.objects.get(id=each)
             msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"'\n"+"Please visit "+link+" to see the updated page"
             if bx:
                 ret = set_notif_val(request,group_id,msg,activity,bx)
+        
         bx=User.objects.get(id=colg.created_by)
         msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"   
+        
         if bx:
             ret = set_notif_val(request,group_id,msg,activity,bx)
+        
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]
