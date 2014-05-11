@@ -812,9 +812,7 @@ def get_publish_policy(request,groupid,res_node):
    elif node.edit_policy == "EDITABLE_NON_MODERATED":
        #condition for groups
        if resnode._type == "Group":
-         if request.user.is_superuser:
-           return "allow"
-         if ver == "1.1" or  resnode.created_by != request.user.id:
+         if ver == "1.1" :
            return "stop"
        if group == "allow":
          if res_node.status == "DRAFT": 
