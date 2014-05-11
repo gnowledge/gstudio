@@ -18,6 +18,7 @@
 {% endblock %}
 
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 <div class="row">
   <div class="small-6 large-6 columns">
     
@@ -51,7 +52,7 @@
 </div>
 <div class= "small-10 large-10 columns">
   <h4>
-    <a href="/{{groupid}}/forum/thread/{{each}}">
+    <a href="/{{group_name_tag}}/forum/thread/{{each}}">
       {{each.name}}
     </a><br/>
     <small>

@@ -53,10 +53,27 @@ GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'}
 ###################################################################################################################################
 lock=threading.Lock()
 count = 0    
-def file(request, group_id, file_id):
+def file(request, group_id, file_id=None):
     """
    * Renders a list of all 'Files' available within the database.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if file_id is None:
+        file_ins = collection.Node.find_one({'_type':"GSystemType", "name":"File"})
+        if file_ins:
+            file_id = str(file_ins._id)
+
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
        
@@ -107,6 +124,18 @@ def file(request, group_id, file_id):
         
 @login_required    
 def uploadDoc(request, group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     if request.method == "GET":
         page_url = request.GET.get("next", "")
         template = "ndf/UploadDoc.html"
@@ -123,6 +152,19 @@ def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     alreadyUploadedFiles = []
     str1 = ''
     img_type=""
@@ -392,6 +434,18 @@ def convertVideo(files, userid, objid):
 
 	
 def GetDoc(request, group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     filecollection = get_database()[File.collection_name]
     files = filecollection.File.find({'_type': u'File'})
     #return files
@@ -401,6 +455,18 @@ def GetDoc(request, group_id):
 
 
 def file_search(request, group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     if request.method == "GET":
         keyword = request.GET.get("search", "")
         files = db[File.collection_name]
@@ -413,6 +479,18 @@ def file_search(request, group_id):
 def delete_file(request, group_id, _id):
   """Delete file and its data
   """
+  ins_objectid  = ObjectId()
+  if ins_objectid.is_valid(group_id) is False :
+      group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+          group_id = str(group_ins._id)
+      else :
+          auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+          if auth :
+              group_id = str(auth._id)
+  else :
+      pass
   file_collection = db[File.collection_name]
   auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
   pageurl = request.GET.get("next", "")
@@ -433,8 +511,23 @@ def delete_file(request, group_id, _id):
 def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
 
     file_node = collection.File.one({"_id": ObjectId(_id)})
+    if file_node._type == "GSystemType":
+	return file(request, group_id, _id)
 
     file_template = ""
     if file_node.mime_type:
@@ -488,6 +581,19 @@ def file_detail(request, group_id, _id):
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if file_node is not None:
@@ -505,7 +611,19 @@ def getFileThumbnail(request, group_id, _id):
 def readDoc(request, _id, group_id, file_name = ""):
     '''Return Files 
     '''
-    print "inside read doc",group_id,file_name,_id
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     file_node = collection.File.one({"_id": ObjectId(_id)})
     if file_node is not None:
         if file_node.fs_file_ids:
@@ -521,6 +639,19 @@ def readDoc(request, _id, group_id, file_name = ""):
         return HttpResponse("")
 
 def file_edit(request,group_id,_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if request.method == "POST":

@@ -29,7 +29,7 @@
 	
 	{% endif %}
 	app">
-	<a class="app" href="{% url 'GAPPS' groupid app_dict.name app_dict.id %}">
+	<a class="app" href="{% url 'GAPPS' group_name app_dict.name %}">
 
 	{% comment %} Includes an app icon if found{% endcomment %}
 	{% if app_dict.name|lower == "page" %}
