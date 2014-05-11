@@ -18,6 +18,12 @@
 {% block meta_content %}
 
 	<h2>Forums</h2>
+
+{% endblock %}
+
+
+{% block concern_information %}
+
 	<br/>
 	<ul class="no-bullet" id="create-forum"> 
 		<li class="create card ">
@@ -79,8 +85,8 @@
 	$("#node_search_form").parent().hide();
 
 	// removing left-off-canvas behaviour
-	$("#create-forum a.left-off-canvas-toggle:lt(2)").remove();
-	$("#create-forum a.left-off-canvas-toggle").removeClass("left-off-canvas-toggle");
+	// $("#create-forum a.left-off-canvas-toggle:lt(2)").remove();
+	// $("#create-forum a.left-off-canvas-toggle").removeClass("left-off-canvas-toggle");
 
 	// </script>
 

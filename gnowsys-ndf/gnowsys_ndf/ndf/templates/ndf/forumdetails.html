@@ -20,8 +20,11 @@
 
 
 {% block meta_content %}
-
   <h2>Threads</h2>
+{% endblock %}
+
+
+{% block concern_information %}
   <br/>
   <ul class="no-bullet" id="create-thread"> 
     <li class="create card ">
@@ -113,8 +116,8 @@
   $("#node_search_form").parent().hide();
 
   // removing left-off-canvas behaviour
-  $("#create-thread a.left-off-canvas-toggle:lt(2)").remove();
-  $("#create-thread a.left-off-canvas-toggle").removeClass("left-off-canvas-toggle");
+  // $("#create-thread a.left-off-canvas-toggle:lt(2)").remove();
+  // $("#create-thread a.left-off-canvas-toggle").removeClass("left-off-canvas-toggle");
 
   // </script>
 

@@ -1,4 +1,5 @@
 ''' -- imports from installed packages -- '''
+import json
 
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
@@ -146,7 +147,19 @@ def display_thread(request,group_id,thread_id):
 def create_thread(request, group_id, forum_id):
 
     forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
-
+    forum_data = {  
+                    'name':forum.name,
+                    'content':forum.content,
+                    'created_by':User.objects.get(id=forum.created_by).username
+                }
+    print forum_data
+    forum_threads = []
+    exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+    exstng_reply.sort('created_at')
+    
+    for each in exstng_reply:
+        forum_threads.append(each.name)
+    
     if request.method == "POST":
 
         colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
@@ -180,14 +193,26 @@ def create_thread(request, group_id, forum_id):
         colrep.group_set.append(colg._id)
         colrep.save()
 
-        variables = RequestContext(request,{'forum':forum,'thread':colrep,'eachrep':colrep, 'groupid':group_id,'group_id':group_id,'user':request.user})
+        variables = RequestContext(request,
+                                    {   'forum':json.dumps(forum),
+                                        'thread':colrep,
+                                        'eachrep':colrep,
+                                        'groupid':group_id,
+                                        'group_id':group_id,
+                                        'user':request.user,
+                                        'forum_threads': json.dumps(forum_threads),
+                                        'forum_created_by':User.objects.get(id=forum.created_by).username
+                                    })
+
         return render_to_response("ndf/thread_details.html",variables)
 
     else:
         return render_to_response("ndf/create_thread.html",
                                     {   'group_id':group_id,
                                         'groupid':group_id,
-                                        'forum': forum
+                                        'forum': forum,
+                                        'forum_threads': json.dumps(forum_threads),
+                                        'forum_created_by':User.objects.get(id=forum.created_by).username
                                     },
                               RequestContext(request))
 
