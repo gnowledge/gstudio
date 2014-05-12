@@ -112,7 +112,7 @@ def create_forum(request,group_id):
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
         colf.save()
-        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id}))
+        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id, 'created_by':usrname}))
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
 
@@ -126,8 +126,12 @@ def create_forum(request,group_id):
     return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 def display_forum(request,group_id,forum_id):
+    
     forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
-    variables=RequestContext(request,{'forum':forum,'groupid':group_id,'group_id':group_id})
+
+    usrname = User.objects.get(id=forum.created_by).username
+
+    variables=RequestContext(request,{'forum':forum,'groupid':group_id,'group_id':group_id, 'forum_created_by':usrname})
     return render_to_response("ndf/forumdetails.html",variables)
 
 def display_thread(request,group_id,thread_id):
@@ -152,7 +156,7 @@ def create_thread(request, group_id, forum_id):
                     'content':forum.content,
                     'created_by':User.objects.get(id=forum.created_by).username
                 }
-    print forum_data
+    # print forum_data
     forum_threads = []
     exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
     exstng_reply.sort('created_at')

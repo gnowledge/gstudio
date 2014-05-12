@@ -10,42 +10,58 @@
     color: white;
   }
 
+  .pricing-table li.bullet-item {  text-align: left; }
+
+  .forum-summary{
+    background-color: #efefef;
+    box-shadow: 0px 2px 2px 2px lightgray;
+    margin: 2em 1em !important;
+    padding: 1em;
+    border : medium gray;
+    border-radius: 4px;
+  }
+
+  .forum-summary .user {  font-size: 1.5em;}
+  .forum-summary .user i { border-radius: 50px; }
+
+  table { border: none }
+
 </style>
 {% endblock %}
 
 
 {% block help_content %}
-  <p>Threads are new ideas on the topic</p>
+<p>Threads are new ideas on the topic</p>
 {% endblock %}
 
 
 {% block meta_content %}
-  <h2>Threads</h2>
+<h2>Threads</h2>
 {% endblock %}
 
 
 {% block concern_information %}
-  <br/>
-  <ul class="no-bullet" id="create-thread"> 
-    <li class="create card ">
-      <div>
-        <h4><i class="fi-plus"></i> New</h4>
+<br/>
+<ul class="no-bullet" id="create-thread"> 
+  <li class="create card ">
+    <div>
+      <h4><i class="fi-plus"></i> New</h4>
 
-        {% if user.is_authenticated %}
-          {% user_access_policy groupid request.user as user_access %}
-          
-          {% if user_access == "allow" %}
-            <a class="button expand" href="{% url 'create_thread' groupid forum %}">
-              Create &nbsp;Thread
-            </a>
-          {% endif %}
+      {% if user.is_authenticated %}
+      {% user_access_policy groupid request.user as user_access %}
 
-        {% endif %}
-      </div>
-    </li>
-  </ul>
+      {% if user_access == "allow" %}
+      <a class="button expand" href="{% url 'create_thread' groupid forum %}">
+        Create &nbsp;Thread
+      </a>
+      {% endif %}
 
-    <!-- <a href="#"> Browse forums</a> -->
+      {% endif %}
+    </div>
+  </li>
+</ul>
+
+<!-- <a href="#"> Browse forums</a> -->
   <!-- <h2>Threads</h2>
   {% comment %}
   {% if user.is_authenticated %}
@@ -53,21 +69,75 @@
   {% endif %} 
   {% endcomment %} -->
   <h4>Top Contributors</h4>
-{% endblock %}
+  {% endblock %}
 
-{% block body_content %}
-  <div class="row">
-    <div class="small-6 large-6 columns">
+  {% block body_content %}
+  <!-- <div class="row"> -->
+    <!-- <div class="small-12 large-12 columns"> -->
 
-      <a title="{{forum.name}}" href="#">
-       <h2>{{forum.name}}</h2>
-     </a>
-     {% with forum.content|safe as forum_content %}
-     <font size ="2" >{{forum_content}} </font>
-     {% endwith %}
+    <a title="{{forum.name}}" href="#">
+     <h2>Forum Name : {{forum.name}}</h2>
+    </a>
+  
+    <div class="row forum-summary">
+      <div class="small-2 columns">
+        <a class="user"></a>
+        <br/><br/>
+        <i>{{ forum_created_by }}</i> <br/>
+        <small>{{forum.created_at|date:"D d M Y" }}</small>
+        <!-- <small>{#{#forum.created_by}}</small> -->
+      </div>
+      <div class="small-10 columns">
+        <blockquote>
+          <!-- #{#% with forum.content|safe as forum_content %} -->
+          <!-- #{#{forum_content|default_if_none:"No description !!"}} -->
+          <!-- #{#% endwith %} -->
+          {{forum.content|default_if_none:"No description !!"}}
+        </blockquote>
+      </div>
+    </div>
 
-   </div>
-   <div class="small-6 large-6 columns" style="height:40px">
+    <hr/>
+
+    <table width="100%">
+      <thead>
+        <tr>
+          <th width="200">Thread Name</th>
+          <th>Thread Content</th>
+          <th width="100">Total Reply</th>
+          <th width="200">Latest Activity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% get_forum_twists forum as thread %}
+
+        {% for each in thread %}
+          {% get_user_object each.created_by as user_obj %}
+
+          <tr>
+
+            <td>
+              <a href="/{{groupid}}/forum/thread/{{each}}">
+                {{each.name}}
+              </a>
+              <br/>
+                <i style="color:gray">- {{user_obj.username}}</i>
+            </td>
+          
+            <td>{{forum.content|default_if_none:"No description !!"}}</td>
+          
+            <td></td>
+            <td></td>
+          </tr>
+
+        {% endfor %}
+          
+      </tbody>
+    </table>
+    <!-- <font size ="2" >{{forum_content}} </font> -->
+
+  <!-- </div> -->
+   <!-- <div class="small-6 large-6 columns" style="height:40px">
     <ul class="sub-nav">
       <li>
        <h5>
@@ -75,13 +145,18 @@
        </h5>
      </li>
    </ul>
-  </div>
-  </div>
+ </div> -->
+<!-- </div> -->
 
-  <div class="row" style="padding-top:10px" id="thread">
-    {% get_forum_twists forum as thread %}
-    {% for each in thread %}
+{% comment %}
+<!-- 
+<div class="row" style="padding-top:10px" id="thread">
+  {% get_forum_twists forum as thread %}
+  
+  {% for each in thread %}
+    
     {% get_user_object each.created_by as user_obj %}
+    
     <div class ="small-1 large-1 columns"> 
       <div class="post-count-container new already-checked">
         <span class="reply-count new-post already-checked">NEW</span>
@@ -104,16 +179,19 @@
       {% endfor %}
     </div>
     <hr>
-    {% endfor %}
-  </div>
+  {% endfor %}
+</div>
+ -->
+{% endcomment %}
+
 {% endblock %}
 
 
 {% block script %}
 
-  // <script type="text/javascript">
+// <script type="text/javascript">
 
-  $("#node_search_form").parent().hide();
+$("#node_search_form").parent().hide();
 
   // removing left-off-canvas behaviour
   // $("#create-thread a.left-off-canvas-toggle:lt(2)").remove();

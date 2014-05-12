@@ -18,7 +18,7 @@
 
     .forum-summary{
       background-color: #efefef;
-      box-shadow: 0px 2px 2px 3px lightgray;
+      box-shadow: 0px 2px 2px 2px lightgray;
       margin: 2em 1em !important;
       padding: 1em;
       border : medium gray;
@@ -61,9 +61,12 @@
       <!-- <small>{#{#forum.created_by}}</small> -->
     </div>
     <div class="small-10 columns">
-      <font size ="5"><u>{{forum.name}}</u> : </font>
-      <br/><br/>
-      {{forum.content|default_if_none:"No description !!"}}
+      <font size ="5">Forum Name : {{forum.name}}</font>
+      <!-- <hr style="margin:0.5rem 0;" /> -->
+      <br/><br/>      
+      <blockquote>
+        {{forum.content|default_if_none:"No description !!"}}
+      </blockquote>
     </div>
   </div>
   <hr/>
