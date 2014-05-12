@@ -1,61 +1,134 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% block title %}{{thread.name}}{% endblock %}
-{% block body_content %}
+
+
+{% block head %}
 <style type="text/css">
-#maindiv
-{
- background-color:#E8E8E8 ;
-}
-#smalldiv
-background-color:#F4F4F4;
+
+	.forum-summary{
+		background-color: #efefef;
+		box-shadow: 0px 2px 2px 2px lightgray;
+		margin: 1em 1em 2em 1em !important;
+		padding: 1em;
+		border : medium gray;
+		border-radius: 4px;
+	}
+
+	/*.forum-summary > div {  padding-top: 1em; }*/
+
+	.forum-summary .user {  font-size: 1.5em;}
+	.forum-summary .user i { border-radius: 50px; }
+
+	#maindiv
+	{
+		background-color:#E8E8E8 ;
+	}
+	#smalldiv
+	background-color:#F4F4F4;
 }
 .response_change{
-margin-bottom:1px;
-padding-left:25px;
-padding-right:2px;
--moz-border-radius: 5px;
--webkit-border-radius: 5px;
-border-radius: 5px;
+	margin-bottom:1px;
+	padding-left:25px;
+	padding-right:2px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
 } 
 </style>
+{% endblock %}
 
-<div class="row">
-      <div class="large-12 columns">
-	<div id="maindiv" class="large-6 columns">
-	  <font size ="6"  >Forum :     <a href="/{{groupid}}/forum/show/{{forum}}">
-{{forum.name}}</a></font> </p>
-	  <font size="5" color="green">{{thread.name}}</font>
-	  {% with thread.content|safe as thread_content %}
-	  <font size ="2" >{{thread_content}} </font>
-	  {% endwith %}
 
-	  {% get_user_object thread.created_by as user_obj %}
-	      <small>
-		by:<a class="user" href="#" data-gnow="#337700">{{user_obj.username}}</a>
-	      </small>
-      <small>
-      on:<strong>{{thread.created_at}}</strong>
-    </small>
+{% block meta_content %}
+<h2> Thread - reply </h2>
+{% endblock %}
 
+
+{% block help_content %}
+<p>Threads are new ideas on the topic</p>
+<p>Here you can post reply to thread.</p>
+{% endblock %}
+
+
+{% block body_content %}
+
+	<div class="row forum-summary">
+		<div class="small-2 columns">
+			<a class="user"></a>
+			<br/><br/>
+			<i>{{ forum_created_by }}</i> <br/>
+			<small>{{forum.created_at|date:"D d M Y" }}</small>
+			<!-- <small>{#{#forum.created_by}}</small> -->
+		</div>
+		<div class="small-10 columns">
+			<font size ="5">Forum Name : <a href="/{{groupid}}/forum/show/{{forum}}">
+				{{forum.name}}</a></font>
+				<!-- <hr style="margin:0.5rem 0;" /> -->
+				<br/><br/>      
+				<blockquote>
+					{{forum.content|default_if_none:"No description !!"}}
+				</blockquote>
+		</div>
 	</div>
-       <div id="smalldiv" class="large-6 columns">
-	 {% if user.is_authenticated %}
-	 {% if thread %}
-	 {% include "ndf/replytwistrep.html" %}
-	 {% endif %}
-	 {% endif %}
-       </div>
-    </div>
-</div>
-<div class="row">
+	<hr/>
 
-<div class="response_change" id="refreshthread" class="large-12 columns">
-  <div style="margin-left:40px;margin-bottom:1px">  
-    {% get_reply thread thread forum csrf_token request.user groupid %}
-  </div>
-</div>
-</div>
+
+	<div class="row">
+		<div class="large-12 columns">
+			
+			{% comment %}
+			<!-- <div id="maindiv" class="large-6 columns">
+				<font size ="6"  >Forum :     <a href="/{{groupid}}/forum/show/{{forum}}">
+					{{forum.name}}</a></font> </p>
+					<font size="5" color="green">{{thread.name}}</font>
+					{% with thread.content|safe as thread_content %}
+					<font size ="2" >{{thread_content}} </font>
+					{% endwith %}
+
+					{% get_user_object thread.created_by as user_obj %}
+					<small>
+						by:<a class="user" href="#" data-gnow="#337700">{{user_obj.username}}</a>
+					</small>
+					<small>
+						on:<strong>{{thread.created_at}}</strong>
+					</small>
+
+			</div>
+ -->
+ 			{% endcomment %}
+
+			<div id="smalldiv" class="large-12 columns">
+
+				{% if user.is_authenticated %}
+					{% if thread %}
+						{% include "ndf/replytwistrep.html" %}
+					{% endif %}
+				{% endif %}
+
+			</div>
+		</div>
+	</div>
+	
+
+	<div class="row">
+		<div class="response_change" id="refreshthread" class="large-12 columns">
+			<div style="margin-left:40px;margin-bottom:1px">  
+				{% get_reply thread thread forum csrf_token request.user groupid %}
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+
+{% block script %}
+
+	// <script type="text/javascript">
+
+	$("#node_search_form").parent().hide();
+
+
+	// </script>
 
 {% endblock %}
 

@@ -112,7 +112,7 @@ def create_forum(request,group_id):
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
         colf.save()
-        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id, 'created_by':usrname}))
+        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id, 'forum_created_by':usrname}))
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
 
@@ -141,7 +141,16 @@ def display_thread(request,group_id,thread_id):
         for each in thread.prior_node:
             forum=gs_collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
             if forum:
-                variables=RequestContext(request,{'forum':forum,'thread':thread,'groupid':group_id,'group_id':group_id,'eachrep':thread,'user':request.user})
+                usrname = User.objects.get(id=forum.created_by).username
+                variables = RequestContext(request,
+                                            {   'forum':forum,
+                                                'thread':thread,
+                                                'groupid':group_id,
+                                                'group_id':group_id,
+                                                'eachrep':thread,
+                                                'user':request.user,
+                                                'forum_created_by':usrname
+                                            })
                 return render_to_response("ndf/thread_details.html",variables)
     except:
         pass
