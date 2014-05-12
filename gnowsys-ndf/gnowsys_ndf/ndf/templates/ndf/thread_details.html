@@ -9,7 +9,7 @@
 	.forum-summary{
 		background-color: #efefef;
 		box-shadow: 0px 2px 2px 2px lightgray;
-		margin: 1em 1em 2em 1em !important;
+		margin: 2em 1em !important;
 		padding: 1em;
 		border : medium gray;
 		border-radius: 4px;
@@ -40,7 +40,7 @@
 
 
 {% block meta_content %}
-<h2> Thread - reply </h2>
+<h2> Thread </h2>
 {% endblock %}
 
 
@@ -52,29 +52,36 @@
 
 {% block body_content %}
 
+	<h3>
+		<a href="/{{groupid}}/forum/show/{{forum}}" title="Forum Name">
+			{{forum.name}}
+		</a>
+		&nbsp; <i class="fi-shuffle"></i> &nbsp;
+		<span title="Thread Name">{{thread.name}}</span>
+	</h3>
+
 	<div class="row forum-summary">
 		<div class="small-2 columns">
 			<a class="user"></a>
 			<br/><br/>
-			<i>{{ forum_created_by }}</i> <br/>
-			<small>{{forum.created_at|date:"D d M Y" }}</small>
-			<!-- <small>{#{#forum.created_by}}</small> -->
+			{% get_user_object thread.created_by as user_obj %}
+			<i>{{user_obj.username}}</i> <br/>
+			<small>{{thread.created_at|date:"D d M Y" }}</small>
 		</div>
 		<div class="small-10 columns">
-			<font size ="5">Forum Name : <a href="/{{groupid}}/forum/show/{{forum}}">
-				{{forum.name}}</a></font>
+			<font size ="5">Thread Name : {{thread.name}} </font>
 				<!-- <hr style="margin:0.5rem 0;" /> -->
 				<br/><br/>      
 				<blockquote>
-					{{forum.content|default_if_none:"No description !!"}}
+					{{thread.content|default_if_none:"No description !!"}}
 				</blockquote>
 		</div>
 	</div>
 	<hr/>
 
 
-	<div class="row">
-		<div class="large-12 columns">
+	<!-- <div class="row"> -->
+		<!-- <div class="large-12 columns"> -->
 			
 			{% comment %}
 			<!-- <div id="maindiv" class="large-6 columns">
@@ -97,7 +104,7 @@
  -->
  			{% endcomment %}
 
-			<div id="smalldiv" class="large-12 columns">
+			<div id="smalldiv" >
 
 				{% if user.is_authenticated %}
 					{% if thread %}
@@ -106,8 +113,8 @@
 				{% endif %}
 
 			</div>
-		</div>
-	</div>
+		<!-- </div> -->
+	<!-- </div> -->
 	
 
 	<div class="row">

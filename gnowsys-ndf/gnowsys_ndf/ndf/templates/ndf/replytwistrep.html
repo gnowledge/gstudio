@@ -9,7 +9,9 @@
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
 <script type="text/javascript">
+
   $(document).ready(function(){
+    
     $("#orgitdownreps{{eachrep}}").orgitdown(mySettings);
     $("#reply_forum{{eachrep}}").on("click",function(){
       document.getElementById('org{{eachrep}}').style.visibility='visible';
@@ -66,15 +68,25 @@
 </script>
 
 <style type="text/css">
+  
   .orgitdown{
-    height:100px;
+    /*height:100px;*/
+    width: 20em !important;
   }
+  
   .orgitdownContainer{
-    height:100px;
+    /*height:100px;*/
+    background-color: #EEEEEE;
+    padding: 0 1em;
   }
-  .orgitdownEditor{
+
+  .orgitdownContainer > ul
+  {
+    margin-bottom: 0 !important; 
+  }
+  /*.orgitdownEditor{
     height:60px;
-  }
+  */}
 </style>
 {% endblock %}
 <!-- end of head block -->
@@ -91,7 +103,7 @@
 
 <div id="org{{eachrep}}" style="display:none">
   <div id="showorgeditor{{eachrep}}" class="orgcont" data-reveal="">
-    Reply :
+    <!-- Reply : -->
     <textarea id="orgitdownreps{{eachrep}}" name="content_org" placeholder="Please enter description..."></textarea>
     <input id="savereply{{eachrep}}" type="button" value="Save">
     <input type="hidden" id="rep{{eachrep}}" style="visibility:hidden" value="{{eachrep}}">
