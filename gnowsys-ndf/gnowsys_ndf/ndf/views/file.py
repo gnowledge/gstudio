@@ -35,7 +35,7 @@ from django.http import Http404
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 
-from gnowsys_ndf.ndf.models import Node, GRelation
+from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
@@ -44,6 +44,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 db = get_database()
 collection = db[Node.collection_name]
+collection_tr = db[Triple.collection_name]
 GST_FILE = collection.GSystemType.one({'name': GAPPS[1], '_type':'GSystemType'})
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
@@ -52,10 +53,27 @@ GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'}
 ###################################################################################################################################
 lock=threading.Lock()
 count = 0    
-def file(request, group_id, file_id):
+def file(request, group_id, file_id=None):
     """
    * Renders a list of all 'Files' available within the database.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if file_id is None:
+        file_ins = collection.Node.find_one({'_type':"GSystemType", "name":"File"})
+        if file_ins:
+            file_id = str(file_ins._id)
+
     if GST_FILE._id == ObjectId(file_id):
         title = GST_FILE.name
        
@@ -65,66 +83,34 @@ def file(request, group_id, file_id):
         videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
         already_uploaded = request.GET.getlist('var', "")
     
-        '''                                                                                                                                 saving wetube.gnowledge.org videos data in GSystem, with locking                                                            
-        '''
-        lock.acquire()
-        try:
-                api=ox.api.API("http://wetube.gnowledge.org/api")
-                #countVideo = api.find({"query":{"operator":"&","conditions":[{"operator":"==","key":"project","value":"NROER"}]}})
-                #totalVideoNo=countVideo['data']['items']
-                allVideo = api.find({"keys":["id","title","director","id","posterRatio","year","user"],"query":{"conditions":[{"oper\
-ator":"==","key":"project","value":"NROER"}],"operator":"&"},"sort":[{"operator":"+","key":"title"}]})
+        pandora_video_st=collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
+        source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
 
-                allVideosData=allVideo['data']['items']
-
-                pandora_video_st=collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]}) 
-                source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]}) 
-                pandora_video_id=[] 
-                source_id_set=[]
-                for each in allVideosData[:50]: 
-                    gattribute=collection.Node.one({'$and':[{'object_value':each['id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]}) 
-                    if gattribute is None: 
-                        #gs=collection.GSystem() 
-                        gs=collection.File()
-                        gs.mime_type="video"
-                        gs.member_of=[pandora_video_st._id] 
-                        gs.name=each['title'].lower()
-                        gs.created_by=1
-                        gs.modified_by = 1
-                        if 1 not in gs.contributors:
-                            gs.contributors.append(1)
-                        gs.save() 
-
-                        at=collection.GAttribute() 
-                        at.attribute_type=source_id_at 
-                        at.object_value=each['id'] 
-                        at.subject=gs._id 
-                        at.save() 
-                get_member_set=collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'Fil\
-e'}]})
-      
-                for each in get_member_set:
-                    pandora_video_id.append(each['_id'])
-                for each in pandora_video_id:
-                    att_set=collection.Node.one({'$and':[{'subject':each},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
-                    if att_set:
-                        object1=collection.Node.one({'_id':each})
-                        obj_set={}
-                        obj_set['id']=att_set.object_value
-                        obj_set['object']=object1
-                        source_id_set.append(obj_set)
-
+        pandora_video_id=[]
+        source_id_set=[]
+        get_member_set=collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'File'}]})
+        
+        #for each in get_member_set:
+    
+         #  pandora_video_id.append(each['_id'])
+        # for each in get_member_set:
+        #     att_set=collection.Node.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+        #     if att_set:
+        #         obj_set={}
+        #         obj_set['id']=att_set.object_value
+        #         obj_set['object']=each
+        #         source_id_set.append(obj_set)
+    
                 # for each in pandora_video_id:
                 #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
         
                 
-        finally:
-            lock.release()
-
+       
         return render_to_response("ndf/file.html", 
                                   {'title': title, 
                                    'files': files,
                                    'sourceid':source_id_set,
+                                   "wetube_videos":get_member_set,
                                    'docCollection': docCollection,
                                    'imageCollection': imageCollection,
                                    'videoCollection': videoCollection,
@@ -138,6 +124,18 @@ e'}]})
         
 @login_required    
 def uploadDoc(request, group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     if request.method == "GET":
         page_url = request.GET.get("next", "")
         template = "ndf/UploadDoc.html"
@@ -154,6 +152,19 @@ def submitDoc(request, group_id):
     """
     submit files for saving into gridfs and creating object
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     alreadyUploadedFiles = []
     str1 = ''
     img_type=""
@@ -423,6 +434,18 @@ def convertVideo(files, userid, objid):
 
 	
 def GetDoc(request, group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     filecollection = get_database()[File.collection_name]
     files = filecollection.File.find({'_type': u'File'})
     #return files
@@ -432,6 +455,18 @@ def GetDoc(request, group_id):
 
 
 def file_search(request, group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     if request.method == "GET":
         keyword = request.GET.get("search", "")
         files = db[File.collection_name]
@@ -444,6 +479,18 @@ def file_search(request, group_id):
 def delete_file(request, group_id, _id):
   """Delete file and its data
   """
+  ins_objectid  = ObjectId()
+  if ins_objectid.is_valid(group_id) is False :
+      group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+          group_id = str(group_ins._id)
+      else :
+          auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+          if auth :
+              group_id = str(auth._id)
+  else :
+      pass
   file_collection = db[File.collection_name]
   auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
   pageurl = request.GET.get("next", "")
@@ -464,7 +511,23 @@ def delete_file(request, group_id, _id):
 def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
+
     file_node = collection.File.one({"_id": ObjectId(_id)})
+    if file_node._type == "GSystemType":
+	return file(request, group_id, _id)
 
     file_template = ""
     if file_node.mime_type:
@@ -481,10 +544,35 @@ def file_detail(request, group_id, _id):
 
     breadcrumbs_list = []
     breadcrumbs_list.append(( str(file_node._id), file_node.name ))
+
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    shelves = []
+    shelf_list = {}
+
+    if auth:
+        has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+        dbref_has_shelf = has_shelf_RT.get_dbref()
+        shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+        
+        if shelf:
+            for each in shelf:
+                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                shelves.append(shelf_name)
+
+                shelf_list[shelf_name.name] = []         
+                for ID in shelf_name.collection_set:
+                    shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                    shelf_list[shelf_name.name].append(shelf_item.name)
+                
+        else:
+            shelves = []
+
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
                                 'groupid':group_id,
+                                'shelf_list': shelf_list,
+                                'shelves': shelves, 
                                 'breadcrumbs_list': breadcrumbs_list
                               },
                               context_instance = RequestContext(request)
@@ -493,6 +581,19 @@ def file_detail(request, group_id, _id):
 def getFileThumbnail(request, group_id, _id):
     """Returns thumbnail of respective file
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if file_node is not None:
@@ -510,7 +611,19 @@ def getFileThumbnail(request, group_id, _id):
 def readDoc(request, _id, group_id, file_name = ""):
     '''Return Files 
     '''
-    print "inside read doc",group_id,file_name,_id
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     file_node = collection.File.one({"_id": ObjectId(_id)})
     if file_node is not None:
         if file_node.fs_file_ids:
@@ -526,7 +639,21 @@ def readDoc(request, _id, group_id, file_name = ""):
         return HttpResponse("")
 
 def file_edit(request,group_id,_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+
     file_node = collection.File.one({"_id": ObjectId(_id)})
+
     if request.method == "POST":
         get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save()

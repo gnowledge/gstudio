@@ -1,5 +1,13 @@
-{% load ndf_tags %}
 
+{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+{% block head%}  
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+{% endblock%}
 
 <!-- css for drawer widget -->
 <style type = "text/css">
@@ -30,11 +38,20 @@ height:40px;
 background-repeat:no-repeat; background-size: 48px 48px
 }
 
+ul#graph-hover.f-dropdown{
+  width: inherit !important;
+}
+
+#graph-hover > li > a:hover {
+  color: #555555;
+}
+
 </style>
 
-
-
+{% if user.is_authenticated %}
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+{% endif %}
+
 
 <header class="row page">
 
@@ -47,7 +64,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     <h2>
       <span class='node'>{{node.name}}</span>      <small class="label-list"> 
       {% for tag in node.tags %}
-      <span class="radius label">{{tag}}</span> 
+      <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
       {% endfor %}
     </small>      
   </h2>
@@ -55,189 +72,212 @@ background-repeat:no-repeat; background-size: 48px 48px
   <dl class="row tabs" data-tab>
     <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
-    {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
-
-    <dd><a href="#view-graph" data-reveal-id="view-graph"><i class="fi-share"></i> Graph</a></dd>
-
-    {% endif %}
+    <dd>
+        <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+            <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+                <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+                <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+                <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+            </ul>
+    </dd>
 
     <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
     <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-
-  </section>
+     </section>
 
 </header>
+
 <div class="row">
+
   <section class="medium-9 columns">
+
     <div class="tabs-content">
 
       <!-- Tab content -->
       <div class="content active" id="view-page">
         
-       {% if node.prior_node|length > 0 %}
-       <div class="panel">
-       
-         <h6>You may want to read these first:</h6>
+	{% if node.prior_node|length > 0 %}
+	<div class="panel">
+          <h6>You may want to read these first:</h6>
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
           {% if each_node.mime_type %}
-          <a href="{% url 'read_file' groupid each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
           {% else %}
-          <a href="{% url 'page_details' groupid each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
           {% endif %}
           {% endfor %}
         </div>
         {% endif %}
 
         {% if node.mime_type %}
-       {% if 'Pandora_video' in node.member_of_names_list %}
-       <div>
-       <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
-	 <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
-	   Your browser does not support the video tag.
-       </video>
-       </br>
-       <a download="480.webm" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" class="button tiny secondary"> 
-	 <i class="fi-download large"> download </i>
-      </a>
-	
-      </div>
-       {% else %}
-       {% if 'video' in node.mime_type %}
-       <div>
-	 <video width="640px" controls buffered>
-	   <source src="{% url 'getFullvideo' groupid node %}" type="video/webm">
-	     <source src="{% url 'getFullvideo' groupid node %}" type="video/ogg">
+	{% if 'Pandora_video' in node.member_of_names_list %}
+	<div>
+	  <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+	    <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
+	      Your browser does not support the video tag.
+	  </video>
+          </br>
+	</div>
+
+	{% else %}
+	{% if 'video' in node.mime_type %}
+	<div>
+	  <video width="640px" controls buffered>
+	    <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
+	      <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">
 	       Your browser does not support the video tag.
-	 </video>
-	 <br/>
-	 <a href="{% url 'getFullvideo' groupid node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
-	   <i class="fi-download large"> download </i>
-	 </a>
-	 
-</div>
+	  </video>
+	  <br/>
+	  <a href="{% url 'getFullvideo' group_name_tag node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
+	    <i class="fi-download large"> download </i>
+	  </a>
+	</div>
 
-{% else %}
-
-{% get_grid_fs_object node as grid_fs_obj %}
-<div>        <!-- Code for showing media details -->
-
+	{% else %}
+	{% get_grid_fs_object node as grid_fs_obj %}
+	<div>   
 	  {% if 'image' in node.mime_type %}
-  	  <a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}">
-    	    <img src="{% url 'getFullImage' groupid node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
+  	  <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+    	    <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
   	  </a> 
 	  {% else %}
-         <a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}"> {{ grid_fs_obj.filename }} </a><br/>     
-      {% endif %}
-  	 <br/>
-  	 <a href="{% url 'read_file' groupid node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
-  	   <i class="fi-download large"> download </i>
-	 </a>
+          <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}"> {{ grid_fs_obj.filename }} </a><br/>     
+	  {% endif %}
+  	  <br/>
+  	  <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
+  	    <i class="fi-download large"> download </i>
+	  </a>
 	</div>
 	
 	{% endif %}
 	{% endif %}
-       {% endif %}
-        {% block add_fields %} {% endblock %}
+	{% endif %}
+      {% block add_fields %} {% endblock %}
 
         <ul class="inline-list">
-         {% if user.is_authenticated %}
-         {% block add_list %}{% endblock %}
-         {% endif %}
-       </ul>
+          {% if user.is_authenticated %}
+          {% block add_list %}{% endblock %}
+          {% endif %}
+	</ul>
 
-       {% with node.html_content|safe as description %}
+	{% with node.html_content|safe as description %}
+	{% if description != "None" %}
+	{{ description }}
+	{% endif %}
+	{% endwith %}
 
-       {% if description != "None" %}
-       {{ description }}
-       {% endif %}
-
-       {% endwith %}
-     </div>
-
-
-     <!-- Tab View Graph -->
-     <div class="content reveal-modal graph-div" id="view-graph" data-reveal>    
+      </div>
       
-      {% if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%}
+      <!-- Content for Concept Graph -->
+      <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
         <a class="close-reveal-modal">&#215;</a>
-      {% include "ndf/node_graph.html" %}
-      {% endif %}
-    </div>
-
+        {% include "ndf/graph_concept.html" %}
+      </div>
+      <!-- Content for Collection Graph -->
+      <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+	<a class="close-reveal-modal">&#215;</a>
+	{% include "ndf/graph_collection.html" %}
+      </div>
+      <!-- Content for dependency Graph -->
+     <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+       <a class="close-reveal-modal">&#215;</a>
+       {% include "ndf/graph_dependency.html" %}
+     </div>
      <!-- Tab View Map Widget -->
-     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
-      
-      <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
-        <a class="close-reveal-modal" >&#215;</a>
-        {% include "ndf/map_widget.html" with mode="read" %}
-        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
-      <!-- #{#%# endif %} -->
+     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
+        
+       <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+       <a class="close-reveal-modal" >&#215;</a>
+       {% include "ndf/map_widget.html" with mode="read" %}
+       <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+       <!-- #{#%# endif %} -->
+     </div>
     </div>
-
   </section>
-
   <section class="medium-3 columns">
     <div class="panel">
-     <h5 class="subheader">
+     <h3 class="subheader"></h3>
        Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
        <small>
-         <div><a href="#view-changes"><i class="fi-clock"></i> View changes </a>
+         <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
           {% for seq_no, version_no in node.version_dict.items reversed %}
-          <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+          <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
           {% endfor %}
         </div>
       </small>
-    </h5>
-    
-      
+
   
     <!-- added button to convert collection into module-->
     {% if node.collection_set and user.is_authenticated%}
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
     {% endif %}
 
-	<input type="button" id="switch_group" class="button small" value="Switch Group">
-<div id="mySystemtype" class="reveal-modal" data-reveal >
-     <h2>Select Groups</h2>
-      <div id="module_drawer" >
-        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-      </div>
-     <a class="close-reveal-modal st">&#215;</a>
-<input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
-</div>
+    {% if node %}
+     {% get_publish_policy request groupid node as group_policy %}
+        {% check_group node as is_group %}
+
+  	{% if group_policy == "allow" %}
+  	{% if is_group %} 
+   <div>
+   <a class="button small" href="{% url 'publish_group'  group_name_tag node %}"> Publish </a>
+    </a>
+   </div>
+  	{% else %}
+  	<div>
+   <a class="button small" href="{% url 'publish_page'  group_name_tag node %}"> Publish
+   </a>  
+   </div>
+	{% endif %}
+    {% endif %}
+   {% endif %}
+ 
+
 
      {% edit_policy groupid node request.user as status %}
      
      {% if status == "allow" %}
-    {% get_edit_url node.pk as edit_url %}
-
+	{% get_edit_url node.pk as edit_url %}
+    {% switch_group_conditions request.user group_id as switch_conditions %}
     {% check_group node as is_group %}
 
-    {% if is_group %}
+    {% get_user_object node.created_by as created_user %}
 
-             {% get_user_object node.created_by as created_user %}
+         {% if is_group %}
 
-             {% ifequal created_user request.user %}     
-       
-      <a href="{% url edit_url node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
-         {% endifequal %}
+             {% if request.user == created_user or request.user.is_superuser %}     
+                   
+      <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
+             {% endif %}
 
-    {% else %}
+         {% else %}
 
-      <a href="{% url edit_url groupid node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+
+      <a href="{% url edit_url group_name_tag node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
     {% endif %}    
     {% endif %}
+
     <ul id="edit-options" class="f-dropdown">
 	
 
-      <li><a href="{% url 'page_create_edit' groupid %}">Create a new page</a></li>
+      <li><a href="{% url 'page_create_edit' group_name_tag %}">Create a new page</a></li>
+      <li><a href="{% url 'node_translation' group_name_tag node %} ">Translation</a></li>
     </ul>
 
   </div>
+ <div>
+ Languages
+<br></br>
+{% get_possible_translations node as tran %}
+{% for each in tran %}
+{% for k,v in each.items %}
+ <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
+{% endfor %}
+{% endfor %}
 
+ </div>
 
 
 </section>
@@ -247,88 +287,75 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 <footer>
   <p><small>
-    <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
+    <em>Created by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
   </footer>
 
 <script type="text/javascript">
-var data_list = ""
-var saveflag = 0
-function setdrawer(){
-      $('#mySystemtype').foundation('reveal', 'open');
-       $('.close-reveal-modal.st').click(function(){
-       if (saveflag == 0){
-         alert("This will cancel the save");
+
+
+  $(document).on('open', '#view-map-widget[data-reveal]', function () {  
+    
+    $.ajax({
+  url: "{% url 'get_visited_location' groupid %}",
+  success: function(data){ 
+
+    data = JSON.parse(data);
+
+    var lastVisitedLocationVal = data;
+    
+    if(lastVisitedLocationVal){
+
+      if(lastVisitedLocationVal == "[]"){
+        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
       }
-});
-}
-function get_new_groups(){
- $.each($('#mySystemtype #collection_set_drawer2 li'),function(index,item){
-         data_list=data_list+String(item.id)+",";
-         });
-}
 
-$(document).on('click',"#switch_group",function(){
-$('#mySystemtype #collection_set_drawer1').html("");
- $('#mySystemtype #collection_set_drawer2').html("");
- $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
-var url='/{{groupid}}/switch_group/'+'{{node}}';
- $.getJSON( url, function( data ) {
-  $.each(data ,function(index , drawer_elements){
-   if(index == 0)
-    {
-     $.each(drawer_elements.drawer1, function(index, element) {
-        $('#mySystemtype #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
-   }
-   if(index == 1)
-    {
-    $.each(drawer_elements.drawer2, function(index, element) {
-        $('#mySystemtype #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
+      if(lastVisitedLocationVal.length > 0){
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+              map.setView([lat, lng], zoom);
+            }
     }
-
- });
-   });
-setdrawer();
-});
-
-$(document).on('click',"#save_switch_group",function(){
-var turl='/{{groupid}}/switch_group/'+'{{node}}';
-saveflag = 1;
-get_new_groups();
-new_groups=data_list;
-alert(new_groups);
-$.ajax({
-       url: turl,
-       type: 'POST',
-       data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
-       beforeSend: function(){
-              $("#ajax_load_image").show();
-              $("#body").css({"opacity":"0.1",})
-                              },
-        success: function(data){
-                       alert("Successfully switched groups");
-                       $('.close-reveal-modal.st').trigger('click');
-           },
-       complete: function(){
-                    $("#ajax_load_image").hide();
-                $("#body").css({"opacity":"",})
-
-          }
-});  //end of ajax
-
-});  //end of document click
-
-
-  $(document).on('opened', '[data-reveal]', function () {  
-      
-    map.invalidateSize();  
-
-    if( tempArr.length )
+    else if( tempArr.length )
     {
       var group = new L.featureGroup(tempArr)
           map.fitBounds(group.getBounds());
     }
+
+  }
+});
+
+  });
+  $(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+    // if(lastVisitedLocationVal){
+
+    //   if(lastVisitedLocationVal == "[]"){
+    //     lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+    //   }
+
+    //   if(lastVisitedLocationVal.length > 0){
+    //         lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+    //         var zoom = lastVisitedLocationVal.pop(),
+    //             lng = lastVisitedLocationVal[1],
+    //             lat = lastVisitedLocationVal[0];
+    //           map.setView([lat, lng], zoom);
+    //         }
+    // }
+
+
+    // if( tempArr.length )
+    // {
+    //   var group = new L.featureGroup(tempArr)
+    //       map.fitBounds(group.getBounds());
+    // }
+
+    // map.setView([lat, lng], zoom);
+
   });
 
 

@@ -1,23 +1,23 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load pagination_tags %}
 {% block title %} Group {% endblock %}
 
 {% block meta_content %}
 <h2>Groups</h2>
 {% endblock %}
 
-{% block help_content %}
 
+{% block help_content %}
 <p>Groups are an easy way to share content and conversation, either privately or with the world. Many times, a group already exist for a specific interest or topic. If you can't find one you like, feel free to start your own.</p>
 
 <h5>How do groups work?</h5>
 <p>Groups can either be public, restricted (users may read a brief description or overview but not view content) or completely private. Every group has a wiki, a pool for resources, and a discussion board for talking.</p>
-
 {% endblock %}
 
-{% get_user_group request.user as groups %}
 
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 <header class="row">
   <dl class="tabs" data-tab>
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
@@ -25,8 +25,6 @@
   </dl>
 </header>
 
-
-{% load url from future %}
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
   <!-- Node create card-->
@@ -56,24 +54,24 @@
             });
           </script>
        -->
+
       {% if user.is_authenticated %}
-      <a class="button expand" href="{% url 'create_group' groupid %}">
-        Create Group
-      </a>
+         {% get_create_group_visibility as create_group %}
+         {% if create_group %}
+             <a class="button expand" href="{% url 'create_group' group_name_tag %}">
+                Create Group
+             </a>
+         {% endif %}
       {% endif %}
       </div>
 
   </li>
   
   <!-- Existing card list-->
-  {% get_group_type request.path request.user as group_type %}
-  
-  {% if groups == "None" %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
-  {% else %}
 
-  {% for node in groups %}
-  {% if node.name != request.user.username %}
+  {% autopaginate groups 23 %}
+
+  {% for node in group_nodes %}
   
   <li class="card">
     <div class="group">
@@ -81,11 +79,12 @@
       <header>
         <div class="label-list">
           {% for tag in node.tags %}
-          <span class="label">{{tag}}</span>
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
           {% endfor %}
         </div>
-        
-        <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+     {% get_group_resources node as obj_count %}
+   
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
         <h4>{{ node.name }}</h4>
 	<div>
             <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
@@ -93,23 +92,23 @@
           </div>
       </header>
       
-      <p>This is a group for the people interested in this group. We do a bunch of cool things here.</p>
+      <p>
+{{node.html_content|default_if_none:'Please edit to add content..'|truncatewords_html:10|safe}}</p>
       <a class="button expand"  href="/{{node.pk}}">View Group</a>
       
       <footer class="row">
         <div class="small-6 columns"><strong>{{node.author_set|length}}</strong> Members</div>
-        <div class="small-6 columns"><strong>56</strong> Objects</div>
+        <div class="small-6 columns"><strong>{{obj_count}}</strong> Objects</div>
       </footer>
       
     </div>
   </li>
-  {% endif %}
   
   {% empty %}
-  <p><em>Currently NO nodes in the gnowledge base!!!</em></p>
+  <p><em>No groups found!</em></p>
   {% endfor %}
   
-  {% endif %}
   
 </ul>
+{% paginate %}
 {% endblock %}

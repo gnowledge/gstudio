@@ -160,7 +160,12 @@ INSTALLED_APPS = (
     'registration',
     'djangoratings',
     'notification',
-    'pagination'
+    'pagination',
+    'gnowsys_ndf.mobwrite',	#textb
+#    'south',			#textb
+    'django_extensions',	#textb
+    'reversion',		#textb
+    'django.contrib.flatpages',	#textb
 )
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
@@ -202,10 +207,13 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-META_TYPE = [u"GAPP"]
+META_TYPE = [u"GAPP",u"factory_types"]
 
 #Default APPs inculde in beloow GAPPS list
 GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module"]
+
+#Visibility for 'Create Group'
+CREATE_GROUP_VISIBILITY=True
 
 EMACS_INIT_FILE_PATH = "~/.emacs"
 
@@ -263,3 +271,9 @@ except:
     #print "Default settings applied"
     pass
 
+#textb
+import warnings
+warnings.filterwarnings(
+        'error', r"DateTimeField received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields')
+#textb

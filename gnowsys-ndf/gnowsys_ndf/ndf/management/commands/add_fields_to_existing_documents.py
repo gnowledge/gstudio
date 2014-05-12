@@ -21,26 +21,60 @@ class Command(BaseCommand):
         collection = get_database()[Node.collection_name]
         # Keep latest fields to be added at top
 
-        # Adding "modified_by" field with None as it's default value
-        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': {'$exists': False}}, {'$set': {'modified_by': None}}, upsert=False, multi=True)
+        # Adds "group_set" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
+        res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'group_set': {'$exists': False}}, 
+                                {'$set': {'group_set': []}}, 
+                                upsert=False, multi=True
+        )
+        print "\n group_set field added to following no. of documents: ", res['n']
 
-        # Adding "property_order" field with empty list as it's default value
-        collection.update( {'_type': 'GSystemType', 'property_order': {'$exists': False}}, {'$set': {'property_order': []}}, upsert=False, multi=True )
+        # Adds "property_order" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
+        res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'property_order': {'$exists': False}}, 
+                                {'$set': {'property_order': []}}, 
+                                upsert=False, multi=True
+        )
+        print "\n property_order field added to following no. of documents: ", res['n']
+
+        # Adding "modified_by" field with None as it's default value
+        res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': {'$exists': False}}, 
+                                {'$set': {'modified_by': None}}, 
+                                upsert=False, multi=True
+        )
+        print "\n modified_by field added to following no. of documents: ", res['n']
 
         # Adding "complex_data_type" field with empty list as it's default value
-        collection.update( {'_type': 'AttributeType', 'complex_data_type': {'$exists': False}}, {'$set': {'complex_data_type': []}}, upsert=False, multi=True )
+        res = collection.update({'_type': 'AttributeType', 'complex_data_type': {'$exists': False}}, 
+                                {'$set': {'complex_data_type': []}}, 
+                                upsert=False, multi=True
+        )
+        print "\n complex_data_type field added to following no. of documents: ", res['n']
 
         # Adding "post_node" field with empty list as it's default value
-        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'post_node': {'$exists': False}}, {'$set': {'post_node': []}}, upsert=False, multi=True)
+        res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'post_node': {'$exists': False}}, 
+                                {'$set': {'post_node': []}}, 
+                                upsert=False, multi=True
+        )
+        print "\n post_node field added to following no. of documents: ", res['n']
 
         # Adding "collection_set" field with empty list as it's default value
-        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'collection_set': {'$exists': False}}, {'$set': {'collection_set': []}}, upsert=False, multi=True)
+        res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'collection_set': {'$exists': False}}, 
+                                {'$set': {'collection_set': []}}, 
+                                upsert=False, multi=True
+        )
+        print "\n collection_set field added to following no. of documents: ", res['n']
 
         # Adding "location" field with no default value
-        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'location': {'$exists': False}}, {'$set': {'location': []}}, upsert=False, multi=True)
+        res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'location': {'$exists': False}}, 
+                                {'$set': {'location': []}}, 
+                                upsert=False, multi=True
+        )
+        print "\n location field added to following no. of documents: ", res['n']
 
         # Adding "language" field with no default value
-        collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'language': {'$exists': False}}, {'$set': {'language':unicode('')}}, upsert=False, multi=True)
+        res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'language': {'$exists': False}}, 
+                                {'$set': {'language': unicode('')}}, 
+                                upsert=False, multi=True
+        )
         
         # Adding "access_policy" field
         # For Group documents, access_policy value is set depending upon their 

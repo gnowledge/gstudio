@@ -1,0 +1,72 @@
+{% extends "ndf/node_details_base.html" %}
+{% block title %} {{title}} {% endblock %}
+{% block url %}{% url 'create_edit' groupid node %}{% endblock %}
+
+<!-- overide head block from base.html -->
+{% block head %}
+<script src="/static/ndf/js/tree.jquery.js"></script>
+<script type="text/javascript">
+  $(document).ready(function()
+  {
+  $(function() {
+  $('.tree').tree({
+   autoOpen: 0
+  });
+  });
+  });
+</script>
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block meta_content %}
+
+{% endblock %}
+
+<!-- overiding block_related content -->
+{% block related_content %}
+<section class="medium-6 large-12 columns">
+  <h3>Modules</h3>
+  <div class ="row">
+    <!-- bellow div for making tree from json data -->
+    <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{node.pk}}"></div>
+  </div>
+</section>
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block collection_content %}
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
+{% block body_content %}
+<header class="row page">
+  <section class="medium-2 columns">
+    
+    <div class="label-list"> 
+      {% for tag in node.tags %}
+      <span class="radius label">{{tag}}</span> 
+      {% endfor %}
+    </div>
+  </section>
+  <section class="medium-10 columns" >
+    <h2>
+      <span class='node'>{{node.name}}</span>
+      <!--<span><a class="button" href="{% url 'create_edit' groupid node.pk %}">Edit</a></span>-->
+    </h2>
+    <h3 class="subheader"></h3>
+      <small> 
+	Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>
+      </small>
+
+  </section>
+</header>
+
+<div class="row">
+  {% with node.html_content|safe as description %}
+  {% if description != "None" %}
+  {{ description }}
+  {% endif %}
+  {% endwith %}
+</div>
+
+{% endblock %}

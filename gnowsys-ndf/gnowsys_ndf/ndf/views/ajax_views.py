@@ -1,3 +1,4 @@
+
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 
@@ -11,6 +12,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 import ast
 
@@ -27,6 +29,8 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
 from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.mobwrite.models import ViewObj
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 import json
  
 db = get_database()
@@ -119,11 +123,10 @@ def collection_nav(request, group_id):
     
     if request.is_ajax() and request.method == "POST":    
       node_id = request.POST.get("node_id", '')
-
+      
       collection = db[Node.collection_name]
 
       node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-
       return render_to_response('ndf/node_ajax_view.html', 
                                   { 'node': node_obj,
                                     'group_id': group_id,
@@ -169,9 +172,150 @@ def collection_view(request, group_id):
                                  context_instance = RequestContext(request)
     )
 
+@login_required
+def shelf(request, group_id):
+    
+    if request.is_ajax() and request.method == "POST":    
+      shelf = request.POST.get("shelf_name", '')
+      shelf_add = request.POST.get("shelf_add", '')
+      shelf_item_remove = request.POST.get("shelf_item_remove", '')
+
+      shelf_available = ""
+      shelf_item_available = ""
+      collection= db[Node.collection_name]
+      collection_tr = db[Triple.collection_name]
+
+      shelf_gst = collection.Node.one({'_type': u'GSystemType', 'name': u'Shelf'})
+
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      has_shelf_RT = collection.Node.one({'_type': u'RelationType', 'name': u'has_shelf'}) 
+      dbref_has_shelf = has_shelf_RT.get_dbref()
+
+      if shelf:
+        shelf_gs = collection.Node.one({'name': unicode(shelf), 'member_of': [ObjectId(shelf_gst._id)] })
+        if shelf_gs is None:
+          shelf_gs = collection.GSystem()
+          shelf_gs.name = unicode(shelf)
+          shelf_gs.created_by = int(request.user.id)
+          shelf_gs.member_of.append(shelf_gst._id)
+          shelf_gs.save()
+
+          shelf_R = collection_tr.GRelation()        
+          shelf_R.subject = ObjectId(auth._id)
+          shelf_R.relation_type = has_shelf_RT
+          shelf_R.right_subject = ObjectId(shelf_gs._id)
+          shelf_R.save()
+        else:
+          if shelf_add:
+            shelf_item = ObjectId(shelf_add)  
+
+            if shelf_item in shelf_gs.collection_set:
+              shelf_Item = collection.Node.one({'_id': ObjectId(shelf_item)}).name       
+              shelf_item_available = shelf_Item
+            else:
+              collection.update({'_id': shelf_gs._id}, {'$push': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)
+              shelf_gs.reload()
+
+          elif shelf_item_remove:
+            shelf_item = collection.Node.one({'name': unicode(shelf_item_remove)})._id
+            collection.update({'_id': shelf_gs._id}, {'$pull': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)      
+            shelf_gs.reload()
+          
+          else:
+            shelf_available = shelf
+
+      else:
+        shelf_gs = None
+
+      shelves = []
+      shelf_list = {}
+
+      if auth:
+        shelf = collection_tr.Triple.find({'_type': 'GRelation','subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+        
+        if shelf:
+          for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})  
+            shelves.append(shelf_name)
+
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_list[shelf_name.name].append(shelf_item.name)
+            
+        else:
+          shelves = []
+
+      return render_to_response('ndf/shelf.html', 
+                                  { 'shelf_obj': shelf_gs,
+                                    'shelf_list': shelf_list, 
+                                    'shelves': shelves,
+                                    'shelf_available': shelf_available,
+                                    'shelf_item_available': shelf_item_available,
+                                    'groupid':group_id
+                                  },
+                                  context_instance = RequestContext(request)
+      )
+
+
+
+def get_collection_list(collection_list, node):
+  inner_list = []
+  error_list = []
+  
+  if node.collection_set:
+    for each in node.collection_set:
+      col_obj = collection.Node.one({'_id': ObjectId(each)})
+      if col_obj:
+        for cl in collection_list:
+          if cl['id'] == node.pk:
+            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
+            inner_sub_list = [inner_sub_dict]
+            inner_sub_list = get_collection_list(inner_sub_list, col_obj)
+
+            if inner_sub_list:
+              inner_list.append(inner_sub_list[0])
+            else:
+              inner_list.append(inner_sub_dict)
+
+            cl.update({'children': inner_list })
+      else:
+        error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
+        print "\n " + error_message
+
+    return collection_list
+
+  else:
+    return collection_list
+
+
+def get_tree_hierarchy(request, group_id, node_id):
+
+    node = collection.Node.one({'_id':ObjectId(node_id)})
+    data = ""
+    collection_list = []
+    themes_list = []
+
+    cur = collection.Node.find({'member_of': node._id,'group_set':ObjectId(group_id) })
+
+    for e in cur:
+      for l in e.collection_set:
+        themes_list.append(l)
+
+    cur.rewind()
+
+    for each in cur:
+      if each._id not in themes_list:
+        collection_list.append({'name': each.name, 'id': each.pk})
+        collection_list = get_collection_list(collection_list, each)
+
+    data = collection_list
+
+    return HttpResponse(json.dumps(data))
+
 
 @login_required
-def change_group_settings(request, group_name):
+def change_group_settings(request,group_id):
     '''
 	changing group's object data
     '''
@@ -183,7 +327,7 @@ def change_group_settings(request, group_name):
             visibility_policy = request.POST['visibility_policy']
             disclosure_policy = request.POST['disclosure_policy']
             encryption_policy = request.POST['encryption_policy']
-            group_id = request.POST['group_id']
+           # group_id = request.POST['group_id']
             group_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
             if group_node :
                 group_node.edit_policy = edit_policy
@@ -254,13 +398,13 @@ def make_module_set(request, group_id):
                         gsystem_obj.contributors.append(user_id)
                     gsystem_obj.module_set.append(dict)
                     module_set_md5 = hashlib.md5(str(gsystem_obj.module_set)).hexdigest() #get module_set's md5
-                    
                     check =check_module_exits(module_set_md5)          #checking module already exits or not
                     if(check == 'True'):
                         return HttpResponse("This module already Exists")
                     else:
                         gsystem_obj.save()
                         create_relation_of_module(node._id, gsystem_obj._id)
+                        create_version_of_module(gsystem_obj._id,node._id)
                         check1 = sotore_md5_module_set(gsystem_obj._id, module_set_md5)
                         if (check1 == 'True'):
                             return HttpResponse("module succesfull created")
@@ -273,7 +417,8 @@ def make_module_set(request, group_id):
             else:
                 return HttpResponse("Not a valid id passed")
         except Exception as e:
-              return HttpResponse(e)
+            print "Error:",e
+            return HttpResponse(e)
 
 def sotore_md5_module_set(object_id,module_set_md5):
     '''
@@ -288,6 +433,7 @@ def sotore_md5_module_set(object_id,module_set_md5):
             attr_obj.object_value = unicode(module_set_md5)
             attr_obj.save()
         except Exception as e:
+            print "Exception:",e
             return 'False'
         return 'True'
     else:
@@ -295,12 +441,38 @@ def sotore_md5_module_set(object_id,module_set_md5):
         return 'False'
 
 #-- under construction
-def create_version_of_module():
+def create_version_of_module(subject_id,node_id):
     '''
     This method will create attribute version_no of module with at type version
     '''
+    rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
+    relation = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_module._id,'subject':node_id})
     at_version = collection.Node.one({'_type':'AttributeType', 'name':'version'})
-
+    attr_versions = []
+    if relation.count() > 0:
+        for each in relation:
+            module_id = collection.Triple.one({'_id':each['_id']})
+            if module_id:
+                attr = collection.Triple.one({'_type':'GAttribute','attribute_type.$id':at_version._id,'subject':ObjectId(module_id.right_subject)})
+            if attr:
+                attr_versions.append(attr.object_value)
+    print attr_versions,"Test version"
+    if attr_versions:
+        attr_versions.sort()
+        attr_ver = float(attr_versions[-1])
+        attr = collection.GAttribute()
+        attr.attribute_type = at_version
+        attr.subject = subject_id
+        attr.object_value = round((attr_ver+0.1),1)
+        attr.save()
+    else:
+        attr = collection.GAttribute()
+        attr.attribute_type = at_version
+        attr.subject = ObjectId(subject_id)
+        attr.object_value = 1
+        print "berfore save",attr
+        attr.save()
+            
 #-- under construction    
 def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
@@ -346,6 +518,8 @@ def get_module_json(request, group_id):
     node = collection.Node.one({'_id':ObjectId(_id)})
     data = walk(node.module_set)
     return HttpResponse(json.dumps(data))
+
+
 
 # ------------- For generating graph json data ------------
 def graph_nodes(request, group_id):
@@ -412,7 +586,7 @@ def graph_nodes(request, group_id):
   i = 1
   for key, value in page_node.items():
     
-    if key in exception_items:
+    if (key in exception_items) or (not value):      
       pass
 
     elif isinstance(value, list):
@@ -432,6 +606,7 @@ def graph_nodes(request, group_id):
         #     i += 1
 
         # else:
+
         for each in value:
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)
@@ -464,7 +639,7 @@ def graph_nodes(request, group_id):
           i += 1 
       
       else:
-        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
+        node_metadata += '{"screen_name":"' + value + '", "_id":"'+ str(i) +'_n"},'
         node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
         i += 1 
     # End of if - else
@@ -481,10 +656,11 @@ def graph_nodes(request, group_id):
 
 # ------ End of processing for graph ------
 
+
+
 def get_data_for_switch_groups(request,group_id):
     coll_obj_list = []
     node_id = request.GET.get("object_id","")
-    print "nodeid",node_id
     st = collection.Node.find({"_type":"Group"})
     node = collection.Node.one({"_id":ObjectId(node_id)})
     for each in node.group_set:
@@ -511,26 +687,37 @@ def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
     '''
-    print "st=",st,"coln",coll_obj_list
+    stobjs=[]
+    coll_objs=[]
     data_list = []
     d1 = []
     d2 = []
     draw1 = {}
     draw2 = {}
-    
-    drawer1 = list(set(st) - set(coll_obj_list))
+    drawer1=[]
+    drawer2=[]
+    for each in st:
+        stobjs.append(each['_id'])
+    for each in coll_obj_list:
+        coll_objs.append(each['_id'])
+    drawer1_set = set(stobjs) - set(coll_objs)
+    lstset=[]
+    for each in drawer1_set:
+        obj=collection.Node.one({'_id':each})
+        lstset.append(obj)
+    drawer1=lstset
     drawer2 = coll_obj_list
     for each in drawer1:
        dic = {}
-       dic['id'] = str(each._id)
-       dic['name'] = each.name
+       dic['id'] = str(each['_id'])
+       dic['name'] = each['name']
        d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
     for each in drawer2:
        dic = {}
-       dic['id'] = str(each._id)
-       dic['name'] = each.name
+       dic['id'] = str(each['_id'])
+       dic['name'] = each['name']
        d2.append(dic)
     draw2['drawer2'] = d2
     data_list.append(draw2)
@@ -602,8 +789,9 @@ def get_data_for_drawer_of_relationtype_set(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
 
+@login_required
 def deletion_instances(request, group_id):
-    '''                                                                                                                                           delete class's objects                                                                                                                        '''
+    '''delete class's objects'''
     send_dict = []
     if request.is_ajax() and request.method =="POST":
        deleteobjects = request.POST['deleteobjects']
@@ -641,3 +829,49 @@ def deletion_instances(request, group_id):
     if confirm:
         return StreamingHttpResponse(str(len(deleteobjects.split(",")))+" objects deleted")         
     return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
+
+def get_visited_location(request, group_id):
+
+  usrid = request.user.id
+  visited_location = ""
+
+  if(usrid):
+
+    usrid = int(request.user.id)
+    usrname = unicode(request.user.username)
+        
+    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = collection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
+    
+    if user_group_location:
+      visited_location = user_group_location.visited_location
+  
+  return StreamingHttpResponse(json.dumps(visited_location))
+
+@login_required
+def get_online_editing_user(request, group_id):
+    '''
+    get user who is currently online and editing the node
+    '''
+    if request.is_ajax() and request.method =="POST":
+        editorid = request.POST.get('editorid',"")
+    viewobj = ViewObj.objects.filter(filename=editorid)
+    userslist = []
+    if viewobj:
+        for each in viewobj:
+            if not each.username == request.user.username:
+                blankdict = {}
+                blankdict['username']=each.username
+                get_profile =  get_profile_pic(each.username)
+                if get_profile :
+                    blankdict['pro_img'] = "/"+str(group_id)+"/image/thumbnail/"+str(get_profile._id)
+                else :
+                    blankdict['pro_img'] = "no";
+                userslist.append(blankdict)
+        if len(userslist) == 0:
+            userslist.append("No users")
+    else :
+        userslist.append("No users")
+    return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+        
+

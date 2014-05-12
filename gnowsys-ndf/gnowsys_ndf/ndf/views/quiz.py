@@ -45,9 +45,25 @@ rcs = RCS()
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
 #######################################################################################################################################
 
-def quiz(request, group_id, app_id):
+def quiz(request, group_id, app_id=None):
     """Renders a list of all 'Quiz-type-GSystems' available within the database.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if app_id is None:
+        app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Quiz"})
+        if app_ins:
+            app_id = str(app_ins._id)
     if gst_quiz._id == ObjectId(app_id):
         title = gst_quiz.name
         quiz_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
@@ -96,7 +112,18 @@ def quiz(request, group_id, app_id):
 def create_edit_quiz_item(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     gst_quiz_item = collection.Node.one({'_type': u'GSystemType', 'name': u'QuizItem'})
 
     context_variables = { 'title': gst_quiz_item.name,
@@ -211,6 +238,18 @@ def create_edit_quiz_item(request, group_id, node_id=None):
 def create_edit_quiz(request, group_id, node_id=None):
     """Creates/Edits quiz category.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     context_variables = { 'title': gst_quiz.name,
                           'group_id': group_id,
                           'groupid': group_id

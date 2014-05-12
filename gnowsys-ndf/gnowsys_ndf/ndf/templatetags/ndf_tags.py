@@ -11,17 +11,144 @@ from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, META_TYPE
+from gnowsys_ndf.settings import GAPPS, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group
+from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
-
+from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
+from django.contrib.sites.models import Site
 
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
+at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
+translation_set=[]
+check=[]
 
+@register.inclusion_tag('ndf/userpreferences.html')
+def get_user_preferences(group,user):
+  return {'groupid':group,'author':user}
+
+
+
+@register.assignment_tag
+def get_group_resources(group):
+  try:
+    res=get_all_resources_for_group(group['_id'])
+    return res.count
+  except Exception as e:
+    print "Error in get_group_resources "+str(e)
+  
+@register.assignment_tag
+def all_gapps():
+  try:
+    return get_all_gapps()
+  except Exception as expt:
+    print "Error in get_all_gapps "+str(expt)
+
+@register.assignment_tag
+def get_create_group_visibility():
+  if CREATE_GROUP_VISIBILITY:
+    return True
+  else:
+    return False
+
+@register.assignment_tag
+def get_site_info():
+  sitename=Site.objects.all()[0].name.__str__()
+  return sitename
+
+@register.assignment_tag
+def check_gapp_menus(groupid):
+  ins_objectid  = ObjectId()
+  if ins_objectid.is_valid(groupid) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": groupid}) 
+	if group_ins:
+	    groupid = str(group_ins._id)
+  else :
+	pass
+  grp=collection.Node.one({'_id':ObjectId(groupid)})
+  if not at_apps_list:
+    return False
+  poss_atts=grp.get_possible_attributes(grp.member_of)
+  if not poss_atts:
+    return False
+  return True
+  
+ 
+@register.assignment_tag
+def get_apps_for_groups(groupid):
+  try:
+    ret_dict={}
+    grp=collection.Node.one({'_id':ObjectId(groupid)})
+    poss_atts=grp.get_possible_attributes(at_apps_list._id)
+    if poss_atts:
+      list_apps=poss_atts['apps_list']['object_value']
+      counter=1
+      for each in list_apps:
+        obdict={}
+        obdict['id']=each['_id']
+        obdict['name']=each['name'].lower()
+        ret_dict[counter]=obdict
+        counter+=1 
+      return ret_dict 
+    else:
+      gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+      gapps = {}
+      i = 0;
+      meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+      GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+      group_obj=collection.Group.one({'_id':ObjectId(groupid)})
+      if group_obj.name == "home":
+	not_in_menu_bar = ["Image", "Video"]
+      else :
+	not_in_menu_bar = ["Image", "Video", "Group"]
+      for node in GAPPS:
+        if node:
+          if node.name not in not_in_menu_bar:
+            i = i+1;
+            gapps[i] = {'id': node._id, 'name': node.name.lower()}
+      return gapps
+  except Exception as exptn:
+    print "Exception in get_apps_for_groups "+str(exptn)
+
+
+
+@register.assignment_tag
+def check_is_user_group(group_id):
+  try:
+    lst_grps=[]
+    all_user_grps=get_all_user_groups()
+    grp=collection.Node.one({'_id':ObjectId(group_id)})
+    for each in all_user_grps:
+      lst_grps.append(each.name)
+    if grp.name in lst_grps:
+      return True
+    else:
+      return False
+  except Exception as exptn:
+    print "Exception in check_user_group "+str(exptn)
+@register.assignment_tag
+def switch_group_conditions(user,group_id):
+  try:
+    ret_policy=False
+    req_user_id=User.objects.get(username=user).id
+    group=collection.Node.one({'_id':ObjectId(group_id)})
+    print "groupauth",group.author_set,group.group_type
+    if req_user_id in group.author_set and group.group_type == 'PUBLIC':
+      ret_policy=True
+    return ret_policy
+  except Exception as ex:
+    print "Exception in switch_group_conditions"+str(ex)
+ 
+@register.assignment_tag
+def get_all_user_groups():
+  try:
+    all_groups=collection.Node.find({'_type':'Author'})
+    return list(all_groups)
+  except:
+    print "Exception in get_all_user_groups"
 
 @register.assignment_tag
 def get_group_object(group_id = None):
@@ -73,6 +200,8 @@ def edit_drawer_widget(field, group_id, node, checked=None):
     if field == "collection":
       if checked == "Quiz":
         checked = "QuizItem"
+      elif checked == "Theme":
+        checked = "Theme"
       else:
         checked = None
       drawers = get_drawers(group_id, node._id, node.collection_set, checked)
@@ -89,6 +218,9 @@ def edit_drawer_widget(field, group_id, node, checked=None):
   else:
     if field == "collection" and checked == "Quiz":
       checked = "QuizItem"
+
+    elif field == "collection" and checked == "Theme":
+      checked = "Theme"
       
     elif field == "module":
       checked = "Module"
@@ -103,7 +235,7 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
-
+  print "fields_name",fields_name
   drawer1 = {}
   drawer2 = None
   groupid = ""
@@ -114,11 +246,11 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 
   alltypes = ["GSystemType","MetaType","AttributeType","RelationType"]
 
-  fields_selection1 = ["subject_type","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
+  fields_selection1 = ["subject_type","language","object_type","applicable_node_type","subject_applicable_nodetype","object_applicable_nodetype","data_type"]
 
   fields_selection2 = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
 
-  fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType"}
+  fields = {"subject_type":"GSystemType", "object_type":"GSystemType", "meta_type_set":"MetaType", "attribute_type_set":"AttributeType", "relation_type_set":"RelationType", "member_of":"MetaType", "prior_node":"all_types", "applicable_node_type":"NODE_TYPE_CHOICES", "subject_applicable_nodetype":"NODE_TYPE_CHOICES", "object_applicable_nodetype":"NODE_TYPE_CHOICES", "data_type": "DATA_TYPE_CHOICES", "type_of": "GSystemType","language":"GSystemType"}
   types = fields[fields_name]
 
   if fields_name in fields_selection1:
@@ -134,6 +266,10 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
     elif fields_name in ("data_type"):
       for each in DATA_TYPE_CHOICES:
         drawer1[each] = each
+    elif fields_name in ("language"):
+        drawer1['hi']='hi'
+        drawer1['en']='en'
+        drawer1['mar']='mar'
     else:
       drawer = collection.Node.find({"_type":types})
       for each in drawer:
@@ -183,28 +319,41 @@ def get_gapps_menubar(group_id, selectedGapp):
   """Get Gapps menu-bar
   """
   try:
+    group_name = ""
     collection = db[Node.collection_name]
     gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 #    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
     gapps = {}
     i = 0;
     meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-    GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
     
+    GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+    group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+    not_in_menu_bar = []
+    if group_obj.name == "home":
+	not_in_menu_bar = ["Image", "Video"]
+    else :
+	not_in_menu_bar = ["Image", "Video", "Group"]						
     for node in GAPPS:
       #node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
       if node:
-        if node.name not in ["Image", "Video"]:
+        if node.name not in not_in_menu_bar:
           i = i+1;
           gapps[i] = {'id': node._id, 'name': node.name.lower()}
-    selectedGapp = selectedGapp.split("/")[2]
+
+    if len(selectedGapp.split("/")) > 2 :
+	selectedGapp = selectedGapp.split("/")[2]
+    else :
+	selectedGapp = selectedGapp.split("/")[1]
     if group_id == None:
       group_id=gpid._id
     group_obj=collection.Group.one({'_id':ObjectId(group_id)})
     if not group_obj:
       group_id=gpid._id
+    else :
+	group_name = group_obj.name
 
-    return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+    return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
   except invalid_id:
     gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     group_id=gpid._id
@@ -237,8 +386,6 @@ def get_twist_replies(twist):
   exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(twist._id)}]})
   for each in exstng_reply:
     lst=get_rec_objs(each)
-        
-      
   return ret_replies
 
 
@@ -349,12 +496,12 @@ def get_user_group(user):
     if auth_obj:
       auth_type = auth_obj._id
 
-    colg = col_Group.Group.find({ '_type': u'Group', 
+    colg = col_Group.Group.find({ '_type': {'$in': ['Group','Author']},  
                                 'name': {'$nin': ['home']},
-                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id}, {'member_of': {'$all':[auth_type]}} ] 
+                                '$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id} ] 
                               })
 
-    auth = col_Group.Group.one({'_type': u"Group", 'name': unicode(user.username)})
+    auth = col_Group.Group.one({'_type': u"Author", 'name': unicode(user.username)})
     
     if auth:
       for items in colg:
@@ -382,15 +529,18 @@ def get_user_group(user):
 def get_profile_pic(user):
 
   ID = User.objects.get(username=user).pk
-  auth = collection.Node.one({'_type': u'Group', 'name': unicode(user) })
+  auth = collection.Node.one({'_type': u'Author', 'name': unicode(user)})
 
-  prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+  if auth:
+    prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
 
-  if prof_pic_rel.count() > 0 :
-    index = prof_pic_rel.count() - 1
-    prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+    if prof_pic_rel.count() > 0 :
+      index = prof_pic_rel.count() - 1
+      prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject)})      
+    else:
+      prof_pic = "" 
   else:
-    prof_pic = "" 
+    prof_pic = ""
 
   return prof_pic
 
@@ -411,7 +561,7 @@ def get_group_name(val):
 def get_edit_url(groupid):
 
   node = collection.Node.one({'_id': ObjectId(groupid) }) 
-
+  print "node_edit_url",node
   if node._type == 'GSystem':
 
     type_name = collection.Node.one({'_id': node.member_of[0]}).name
@@ -423,11 +573,10 @@ def get_edit_url(groupid):
     elif type_name == 'QuizItem':
       return 'quiz_item_edit'
 
-  elif node._type == 'Group':
+  elif node._type == 'Group' or node._type == 'Author' :
     return 'edit_group'
 
   elif node._type == 'File':
-
     if node.mime_type == 'video':      
       return 'video_edit'       
     elif 'image' in node.mime_type:
@@ -541,13 +690,13 @@ def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
 @register.inclusion_tag('ndf/admin_fields.html')
-def get_input_fields(fields_type,fields_name):
+def get_input_fields(fields_type,fields_name,translate=None):
   """Get html tags 
   """
   field_type_list = ["meta_type_set","attribute_type_set","relation_type_set","prior_node","member_of","type_of"]
   return {'template': 'ndf/admin_fields.html', 
           "fields_name":fields_name, "fields_type": fields_type[0], "fields_value": fields_type[1], 
-          "field_type_list":field_type_list}
+          "field_type_list":field_type_list,"translate":translate}
   
 
 @register.assignment_tag
@@ -565,12 +714,14 @@ def group_type_info(groupid,user=0):
       
 @register.assignment_tag
 def user_access_policy(node,user):
-  col_Group=db[Group.collection_name]
-  group_gst = col_Group.Group.one({'_id':ObjectId(node)})
-	    
-  # if user.id in group_gst.group_set or group_gst.created_by == user.id:
-  if user.id in group_gst.author_set or group_gst.created_by == user.id:
-    return 'allow'
+  try:
+    col_Group=db[Group.collection_name]
+    group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+    # if user.id in group_gst.group_set or group_gst.created_by == user.id:
+    if user.id in group_gst.author_set or group_gst.created_by == user.id or user.is_superuser:
+      return 'allow'
+  except Exception as e:
+    print "Exception in user_access_policy- "+str(e)
 	    
 	  
 @register.assignment_tag
@@ -588,14 +739,12 @@ def resource_info(node):
 def edit_policy(groupid,node,user):
   group_access= group_type_info(groupid,user)
   resource_infor=resource_info(node)
-  
   #code for public Groups and its Resources
   
   if group_access == "PUBLIC":
-      user_access=user_access_policy(groupid,user)
-      if user_access == "allow":
-        return "allow"
-            
+      #user_access=user_access_policy(groupid,user)
+      #if user_access == "allow":
+      return "allow"
   elif group_access == "PRIVATE":
       return "allow"
   elif group_access == "BaseModerated":
@@ -663,21 +812,154 @@ def Group_Editing_policy(groupid,node,user):
 
 
 @register.assignment_tag
-def get_publish_policy(groupid,resnode):
-  col_Group = db[Group.collection_name]
-  node=col_Group.Group.one({"_id":ObjectId(groupid)})
-  group_type=group_type_info(groupid)
-  if group_type == "Moderated":
-     base_group=get_prior_post_node(groupid)
-
-     if base_group is not None:
-       if base_group.status == "DRAFT" or node.status == "DRAFT":
+def get_publish_policy(request,groupid,res_node):
+ col_Group = db[Group.collection_name]
+ node=col_Group.Group.one({"_id":ObjectId(groupid)})
+ resnode=col_Group.Group.one({"_id":ObjectId(res_node._id)})
+ group_type=group_type_info(groupid)
+ group=user_access_policy(groupid,request.user)
+ ver=node.current_version
+ if request.user.id:
+   if group_type == "Moderated":
+      base_group=get_prior_post_node(groupid)
+      if base_group is not None:
+        if base_group.status == "DRAFT" or node.status == "DRAFT":
+            return "allow"
+   elif node.edit_policy == "NON_EDITABLE":
+    if resnode._type == "Group":
+      if ver == "1.1" or resnode.created_by != request.user.id :
+         return "stop"
+    if group == "allow":          
+      if res_node.status == "DRAFT": 
+          return "allow"    
+   elif node.edit_policy == "EDITABLE_NON_MODERATED":
+       #condition for groups
+       if resnode._type == "Group":
+         if ver == "1.1" :
+           return "stop"
+       if group == "allow":
+         if res_node.status == "DRAFT": 
            return "allow"
-           
-  elif node.edit_policy == "NON_EDITABLE":
-       return "allow"    
-  elif node.edit_policy == "EDITABLE_NON_MODERATED":
-      if resnode.status == "DRAFT": 
-         print "working section",resnode.status  
-         return "allow"
+
+@register.assignment_tag
+def get_source_id(obj_id):
+  try:
+    source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+    return att_set.object_value
+  except Exception as e:
+    print str(e)
+    return 'null'
+ 
+
+# @register.assignment_tag
+# def get_possible_translations(obj_id):
+#   if not str(obj_id._id) in check:
+#       check.append(str(obj_id._id))
+#       relation_set=obj_id.get_possible_relations(obj_id.member_of)
+#       if relation_set.has_key('translation_of'):
+#         for k,v in relation_set['translation_of'].items():
+#           if k == "subject_or_right_subject_list":
+#             for each in v:
+#               if not str(each._id) in check:
+#                 dic={}
+#                 dic[each['_id']]=each['language']
+#                 print dic,"dddddddddddddddddddddddddddiiiiiiiiiiiiiiiiiiiiccccccccccccccc"
+#                 translation_set.append(dic)
+        
+#                 get_possible_translations(each)
+          
+#   return translation_set
+
+
+@register.assignment_tag
+def get_possible_translations(obj_id):
+  try:
+    relation_set=obj_id.get_possible_relations(obj_id.member_of)
+    translation_set=[]
+    for key,value in relation_set.items():
+      if key == 'translation_of':
+        for k,v in value.items():
+          if k == "subject_or_right_subject_list":
+            for each in v:
+              dic={}
+              dic[each['_id']]=each['language']
+              translation_set.append(dic)
+
+    return translation_set
+  except Exception as e:
+    print str(e)
+    return 'null'
+ 
+
+
+  #code commented in case required for groups not assigned edit_policy        
+  #elif group_type is  None:
+  #  group=user_access_policy(groupid,request.user)
+  #  if group == "allow":
+  #   if resnode.status == "DRAFT":
+  #      return "allow"
+      
   
+
+#textb
+@register.filter("mongo_id")
+def mongo_id(value):
+     # Retrieve _id value
+    if type(value) == type({}):
+        if value.has_key('_id'):
+            value = value['_id']
+   
+    # Return value
+    return unicode(str(value))
+
+@register.simple_tag
+def check_existence_textObj_mobwrite(node_id):
+    '''
+	to check object already created or not, if not then create 
+	input nodeid 
+    '''		
+    check = ""
+    system = collection.Node.find_one({"_id":ObjectId(node_id)})
+    filename = TextObj.safe_name(str(system._id))
+    textobj = TextObj.objects.filter(filename=filename)
+    if textobj:
+       textobj = TextObj.objects.get(filename=filename)
+       pass
+    else:
+       if system.content_org == None:
+	   content_org = "None"
+       else :
+	   content_org = system.content_org
+       textobj = TextObj(filename=filename,text=content_org)
+       textobj.save()
+    check = textobj.filename
+    return check
+#textb 
+
+@register.assignment_tag
+def get_version_of_module(module_id):
+  ''''
+  This method will return version number of module
+  '''
+  ver_at = collection.Node.one({'_type':'AttributeType','name':'version'})
+  if ver_at:
+    attr = collection.Triple.one({'_type':'GAttribute','attribute_type.$id':ver_at._id,'subject':ObjectId(module_id)})
+    if attr:
+      return attr.object_value
+    else:
+      return ""
+  else:
+    return ""
+
+@register.assignment_tag
+def get_group_name(groupid):
+  group_name = ""
+  ins_objectid  = ObjectId()
+  if ins_objectid.is_valid(groupid) is True :
+        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(groupid)})
+        if group_ins:
+            group_name = group_ins.name
+  else :
+        pass
+  return group_name 

@@ -125,6 +125,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% endif %}	    
 	  </div>
 	</div>
+
+	<div id="message" style="display:none; color:red"></div>
+					
+
 	<div class="row">
 	  
 	  <div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
@@ -139,7 +143,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	<div class="row">
 	  <div class="medium-12 columns">
-	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
+	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
 	  </div>
 	</div>
 	
@@ -150,7 +154,30 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
 	  </div>		
 	</div>
-	
+
+{% switch_group_conditions request.user group_id as switch_conditions %}
+    {% check_group node as is_group %}
+{% if not is_group %}
+{% if switch_conditions %}
+
+<dl class="accordion" data-accordion>
+
+  <dd>
+
+    <a id="switch_group" href="#switchgrp">Click here to publish {{node.name}} in group/s</a>
+
+       <div id="switchgrp" class="content">
+         <h4>Select Groups</h4>
+	 <div id="group_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+      </div>
+        <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
+      </div>
+
+  </dd>
+</dl>
+{% endif %}
+{% endif %}
       </div>
     </div>
     
@@ -207,6 +234,11 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      <input type="radio" name="col" value="Video" />
 	      Video <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-video"></i>
+	      </span></div>
+	      <div class="small-2 columns">
+	      <input type="radio" name="col" value="Pandora Video" />
+	      Pandora Video <span class="divider-line">|</span>
+	      <span class="fontsize-x-large"><i class="step fi-video"></i>
 	      </span>
 	    </div>
 	    <div class="small-2 columns">
@@ -233,27 +265,10 @@ background-repeat:no-repeat; background-size: 48px 48px
   {% block add_fields %} {% endblock %}
   
   <div class="row" >
-    <input type="submit" id="save-node" value="Save As Draft" class="button medium-6 columns"/>
+    <input type="submit" id="save-node" value="Save as Draft And Preview" class="button medium-6 columns"/>
   </div>
   
-  {% if node %}
-  	{% get_publish_policy groupid node as group_policy %}
-
-	{% check_group node as is_group %}
-
-  	{% if group_policy == "allow" %}
-  	{% if is_group %} 
   
-  <a class="button medium-6 columns" href="{% url 'publish_group'  group_id node %}"> Publish 
-   </a>
-   
-  	{% else %}
-   <a class="button medium-6 columns" href="{% url 'publish_page'  group_id node %}"> Publish
-   </a>  
-	{% endif %}
-    {% endif %}
- {% endif %}
-
  <!-- Overlay : Map Widget -->
      <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
@@ -264,11 +279,102 @@ background-repeat:no-repeat; background-size: 48px 48px
       <!-- #{#%# endif %} -->
     </div>
 
-
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">						
 </form>
 
 
 <script type="text/javascript">
+var data_list = ""
+var saveflag = 0
+function setdrawer(){
+      $('#switchgrp').foundation('reveal', 'open');
+       $('.close-reveal-modal.st').click(function(){
+       if (saveflag == 0){
+         alert("This will cancel the save");
+      }
+});
+}
+function get_new_groups(){
+ $.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
+         data_list=data_list+String(item.id)+",";
+         });
+}
+
+$(document).on('click',"#switch_group",function(){
+$('#switchgrp #collection_set_drawer1').html("");
+ $('#switchgrp #collection_set_drawer2').html("");
+ $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+var url='/{{groupid}}/switch_group/'+'{{node}}';
+ $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+  
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+
+ });
+   });
+
+});
+
+$(document).on('click',"#save_switch_group",function(){
+var turl='/{{groupid}}/switch_group/'+'{{node}}';
+saveflag = 1;
+get_new_groups();
+new_groups=data_list;
+$.ajax({
+       url: turl,
+       type: 'POST',
+       data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
+       beforeSend: function(){
+              alert("atthis");
+              $("#ajax_load_image").show();
+              $("#body").css({"opacity":"0.1",})
+                              },
+        success: function(data){
+                       alert("Successfully switched groups");
+            
+           },
+       complete: function(){
+                    $("#ajax_load_image").hide();
+                $("#body").css({"opacity":"",})
+
+          }
+});  //end of ajax
+
+});  //end of document click
+
+
+
+	$(document).ready(function(){
+		$("#name_id").change(function(){
+
+			var name = $("#name_id").val();
+			var nodes = $("#nodes_list").val();
+
+			if (nodes.indexOf(name) > 0)  
+			{
+				$("#message").css("display", "block");
+				$("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
+			}
+			else
+			{
+				$("#message").css("display", "none");
+			}
+
+		});
+	});
+
 
 	$("input:radio").click(function() {
 
@@ -327,22 +433,93 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% block base_save_on_click %}{% endblock %}
 	});
 
-	$(document).on('opened', '[data-reveal]', function () {  
+
+  $(document).on('open', '#view-map-edit-widget[data-reveal]', function () {  
+    
+    $.ajax({
+  url: "{% url 'get_visited_location' groupid %}",
+  success: function(data){ 
+   
+  	data = JSON.parse(data);
+
+    var lastVisitedLocationVal = data;
+    
+    if(lastVisitedLocationVal){
+
+      if(lastVisitedLocationVal == "[]"){
+        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+      }
+
+      if(lastVisitedLocationVal.length > 0){
+            // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+            var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+              map.setView([lat, lng], zoom);
+            }
+    }
+    else if( tempArr.length )
+    {
+      var group = new L.featureGroup(tempArr)
+          map.fitBounds(group.getBounds());
+    }
+   
+  }
+});
+
+  });
+
+	$(document).on('opened', '#view-map-edit-widget[data-reveal]', function () {  
 	
 		map.invalidateSize();  
 
-		if( tempArr.length )
-    	{
-			var group = new L.featureGroup(tempArr)
- 				map.fitBounds(group.getBounds());
- 		}
+	    // var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
+	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.startsWith("["))){
+	    	
+	    // 	lastVisitedLocationVal = "[" + lastVisitedLocationVal;
+	    // }
+	    // if((lastVisitedLocationVal) && (!lastVisitedLocationVal.endsWith("]"))){
+	    	
+	    // 	lastVisitedLocationVal += "]";
+	    // }
+	    // lastVisitedLocationVal = lastVisitedLocationVal.trim();
+	    // if(lastVisitedLocationVal){
+
+	    // 	if(lastVisitedLocationVal == "[]"){
+     //    lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+     //  }
+     //  if(lastVisitedLocationVal.length > 0){
+     //        lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+     //        var zoom = lastVisitedLocationVal.pop(),
+     //            lng = lastVisitedLocationVal[1],
+     //            lat = lastVisitedLocationVal[0];
+     //          map.setView([lat, lng], zoom);}
+    	// }
+
+		// if(lastVisitedLocationVal){
+
+		// 	var zoom = lastVisitedLocationVal.pop();
+
+		// 	map.setView(lastVisitedLocationVal, zoom);
+		// }
+
+		// if( tempArr.length )
+  		//   	{
+		// 	var group = new L.featureGroup(tempArr)
+ 		// 			map.fitBounds(group.getBounds());
+ 		// 	}
+
+ 		// map.setView([lat, lng], zoom); 		
 	});
 
-	// $(document).on('close', '[data-reveal]', function () {  
-	// 	var mapLng = map.getCenter().lng,
-	// 		mapLat = map.getCenter().lat,
-	// 		mapZoom = map.getZoom();
-	// 	// console.log(mapLng + " lat :" + mapLat + " zoom : " + mapZoom);
+	// $(document).on('close', '#view-map-edit-widget[data-reveal]', function () {  
+	// 	var mapZoom = map.getZoom();
+	// 	var lastVisitedLocationVal = $('input:hidden[name=last_visited_location]').attr("value");
+	// 	lastVisitedLocationVal = JSON.parse("["+lastVisitedLocationVal+"]");
+	// 	lastVisitedLocationVal.pop();
+	// 	lastVisitedLocationVal.push(mapZoom)
+	// 	$('input:hidden[name=last_visited_location]').attr("value", lastVisitedLocationVal);
 	// });
 
 </script>

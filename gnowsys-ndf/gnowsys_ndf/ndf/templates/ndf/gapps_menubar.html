@@ -1,22 +1,35 @@
+{% load ndf_tags %}
 
 <!-- GApps Menubar -->
+{% check_gapp_menus groupid as check_menu %}
+
+
+{% if check_menu %}
+
+{% get_apps_for_groups groupid as gapps %}
+
+
+{% endif %}
+
+
 <input type="hidden" value="{{newgroup}}">
+
 {% for index_key, app_dict in gapps.items %}
 
-<li>
-	<a class="
+<li class="
 
 	{% comment %} Sets active-menu class on active app{% endcomment %}
 	{% if app_dict.name|lower == selectedGapp|lower %}
 	
-	active-menu 
+	active 
 
 	{% elif app_dict.id|safe == selectedGapp|safe %}
 
-	active-menu
+	active
 	
 	{% endif %}
-	app" href="{% url 'GAPPS' groupid app_dict.name app_dict.id %}">
+	app">
+	<a class="app" href="{% url 'GAPPS' group_name app_dict.name %}">
 
 	{% comment %} Includes an app icon if found{% endcomment %}
 	{% if app_dict.name|lower == "page" %}

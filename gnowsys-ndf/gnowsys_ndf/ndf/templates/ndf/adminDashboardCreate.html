@@ -8,10 +8,24 @@
         {% get_class_type_list class_name %}
      {% endifequal %}
 {% endblock %}
+
+
 {% block body_content %} 
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 <form method="post" action="" name="{{class_name}}">
 {% csrf_token %}
+{% if translate %}
+ <div class="large-12 columns">
+<table class="large-6 columns">
+<div class="row">
+<div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
+<div class="large-6 columns"><select name="lan" id="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option\
+><option id="mar" value="mar">mar</option></select>
+</div>
+<hr style="height:5px;background-color: #0B6580;" />
+</div>
+</table></div>
+{% endif %}
 
 <h2>{{node.name}}</h2>
 
@@ -32,9 +46,14 @@
 	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
       </div>
       {% endif %}
+
+      {% if translate %}
+      {% if list == "name" or list == "inverse_name" or list == "altnames" %}
+      {% get_input_fields class_structure|get_dict_item:list list translate %}
+      {% endif %}{% endif %}
     </div>
     {% endfor %}
-  </div>
+  </div></div>
   </dd>
 </dl>
 <dl class="accordion" data-accordion>
@@ -44,7 +63,7 @@
 
       {% for list in contentlist %}
       <div class="medium-12 columns">
-	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+	{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
       </div>
       {% endfor %}
 <script type="text/javascript">
@@ -59,6 +78,10 @@ $(".orgitdown .orgitdownButton7 a").css({"background-image":'url("/static/ndf/or
 $(".orgitdown .orgitdownButton8 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/html.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/orgitdown/skins/gstudio/images/close.jpeg")','background-color':'#EEEEEE','background-position':'center center','background-repeat':'no-repeat'});
 
+$(document).ready(function(){
+
+$("#lan option[value={{node.language}}]").remove();
+});
 
 </script>
 
@@ -99,7 +122,7 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 </dl>
 
 </div>
-<input type="submit" name="submit" class="button" id="save-node-type">
+<input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
 </form>
 {% endblock %}
 
@@ -136,3 +159,4 @@ event.preventDefault();
 var type_list = []
 </script>
 {% endblock %}
+

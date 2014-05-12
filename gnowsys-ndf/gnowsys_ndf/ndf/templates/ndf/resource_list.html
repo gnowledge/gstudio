@@ -1,0 +1,678 @@
+{% extends "ndf/base.html" %}
+  {% load ndf_tags %}
+{% load pagination_tags %}
+{% block title %} {{title}} {% endblock %}
+
+{% block help_content %}
+<p>Upload your files from your computer to metaStudio. You can view the existing files in the group and create collections.</p>
+
+{% endblock %}
+
+{% block meta_content %}
+<h2>Gallery</h2>
+{% endblock %}
+
+{% block search_content %}
+{% get_group_name groupid as group_name_tag %}
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name_tag %}">
+
+  <div class="row collapse">
+    <div class="small-10 columns">
+      <input type="text" placeholder="search files" name="search">
+    </div>
+    <div class="small-2 columns">
+      <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
+        <i class="fi-magnifying-glass large"></i>
+      </a>
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+<header class="row">
+
+   <dl class="tabs" data-tab>
+     <dd class="active"><a href="#view-all"><i class="fi-eye"></i> All files</a></dd>
+     <dd><a href="#view-doc"><i class="fi-page-filled"></i> Documents</a></dd>
+     <dd><a href="#view-image"><i class="fi-camera"></i>Images</a></dd>
+     <dd><a href="#view-video"><i class="fi-video"></i> Videos</a></dd>
+     <dd><a href="#view-pandora-video"><i class="fi-pandoravideo"></i> Pandora Videos</a></dd>
+
+     <!-- <dd><a href="#panel2-4"><i class="fi-list-thumbnails"></i> File list</a></dd> -->
+   </dl>
+
+</header>
+
+<div class="tabs-content gallery">
+
+  {% if already_uploaded %} 
+  <div id="message">
+    <span style="color:red">Listed below files are already uploaded please choose different files</span>
+    <ul>
+      {% for each in already_uploaded %}
+      <li>{{each}}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Tab View #1 - All -->
+  <div class="content active" id="view-all">
+    <!-- Card -->
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Node create card-->
+      <li class="create card">
+        <div class="file">
+         <h4><i class="fi-plus"></i> New Upload</h4>
+
+         <!-- <div class="row">
+
+            <div class="large-12 columns">
+              <input type="text" placeholder="Name of the File" />
+              <textarea placeholder="Describe the File"></textarea>
+        
+              <div class="login-mode switch round">
+                <input id="PUBLIC" name="login-mode" type="radio" checked>
+                <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+    
+                <input id="PRIVATE" name="login-mode" type="radio">
+                <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+    
+                <span></span>
+              </div>
+
+            </div>
+
+          </div>-->
+          {% if user.is_authenticated %}
+          <a class="button expand" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+            <span class="fi-upload">  Upload File</span>
+          </a>
+          {% endif %}
+  </div>
+      </li>
+ 
+      {% if files.count != 0 %}
+      <!-- Existing card list-->
+      {% autopaginate files 23 %}
+      {% for file in files %}      
+      {% if file.created_by == request.user.pk %}
+
+      {% get_user_object file.created_by as user_obj %}
+      {% get_grid_fs_object file as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+    
+          <header>
+              <div class="label-list">
+                {% for tag in file.tags %}
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                {% endfor %}
+              </div>
+        
+              <div class="th">
+    <a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
+      <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+      <img src="{% url 'getFileThumbnail' group_name_tag file %}">
+    </a>
+        </div>
+              <h4>{{file.name}}</h4>
+        <div>
+    <small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+    </small>
+        </div>
+          </header>
+
+          <p>File description</p>
+
+          <a class="button expand" href ="{% url 'resource_detail' group_name_tag file %}">View details</a>
+
+          {% get_user_object file.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+    
+          <footer class="row">
+            <div class="small-6 columns">{{file.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
+          </footer>
+    
+        </div>
+      </li>
+
+      {% else %}
+        {% if file.access_policy == "PUBLIC" %}          
+          {% get_user_object file.created_by as user_obj %}
+          {% get_grid_fs_object file as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+    
+          <header>
+            <div class="label-list">
+              {% for tag in file.tags %}
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+              {% endfor %}
+            </div>
+        
+            <div class="th">
+        <a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
+    <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+    <img src="{% url 'getFileThumbnail' group_name_tag file %}">
+        </a>
+      </div>
+            <h4>{{file.name}}</h4>
+      <div>
+    <small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+    </small>
+        </div>
+          </header>
+
+          <p>This file is a..</p>
+
+          <a class="button expand" href ="{% url 'resource_detail' group_name_tag file %}">View details</a>
+
+          {% get_user_object file.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+    
+          <footer class="row">
+            <div class="small-6 columns">{{file.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
+          </footer>
+    
+        </div>
+      </li>
+        {% endif %}
+      {% endif %}
+      
+      {% endfor %}
+      
+      {% else %}
+      <p><em>No resources found!</em></p>
+      {% endif %}
+    </ul>
+{% paginate %}
+  </div>
+
+  <!-- Tab View 2 - Documents -->
+  <div class="content" id="view-doc">
+    <!-- Card -->
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      {% if docCollection.count != 0 %}
+      <!-- Existing card list-->
+      {% autopaginate docCollection 23 %}
+      {% for doc in docCollection %}      
+      {% if doc.created_by == request.user.pk %}
+
+      {% get_user_object doc.created_by as user_obj %}
+      {% get_grid_fs_object doc as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+    
+          <header>
+              <div class="label-list">
+                {% for tag in doc.tags %}
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                {% endfor %}
+              </div>
+        
+              <div class="th">
+    <a href="{% url 'read_file' group_name_tag doc.pk grid_fs_obj.filename %}">
+      <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+      <img src="{% url 'getFileThumbnail' group_name_tag doc %}">
+    </a>
+        </div>
+              <h4>{{doc.name}}</h4>
+              <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
+          </header>
+
+          <p>File description</p>
+
+          <a class="button expand" href ="{% url 'resource_detail' group_name_tag doc %}">View details</a>
+
+          {% get_user_object doc.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+          <a class="button alert tiny" href="{% url 'delete_file' groupid doc %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+    
+          <footer class="row">
+            <div class="small-6 columns">{{doc.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{doc.file_size.size}}</strong> {{doc.file_size.unit}}</div> 
+          </footer>
+    
+        </div>
+      </li>
+
+      {% else %}
+        {% if doc.access_policy == "PUBLIC" %}
+          {% get_user_object doc.created_by as user_obj %}
+          {% get_grid_fs_object doc as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+    
+          <header>
+            <div class="label-list">
+              {% for tag in doc.tags %}
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+              {% endfor %}
+            </div>
+        
+            <div class="th">
+        <a href="{% url 'read_file' group_name_tag doc.pk grid_fs_obj.filename %}">
+    <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+    <img src="{% url 'getFileThumbnail' group_name_tag doc %}">
+        </a>
+      </div>
+            <h4>{{doc.name}}</h4>
+            <small>Created by <span class="user">{{ user_obj.username }}</span> <em>33 days ago</em></small>
+          </header>
+
+          <p>This file is a..</p>
+
+          <a class="button expand" href ="{% url 'resource_detail' group_name_tag doc %}">View details</a>
+
+          {% get_user_object doc.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag doc %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+    
+          <footer class="row">
+            <div class="small-6 columns">{{doc.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{doc.file_size.size}}</strong> {{doc.file_size.unit}}</div> 
+          </footer>
+    
+        </div>
+      </li>
+        {% endif %}
+      {% endif %}
+      
+      {% endfor %}
+      
+      {% else %}
+      <p><em>No resources found!</em></p>
+      {% endif %}
+    </ul>
+{% paginate %}
+  </div>
+  
+  <!-- Tab View #3 - Images -->
+  <div class="content" id="view-image">
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Node create card-->
+      <li class="create card">
+        <div class="file">
+          <h4><i class="fi-plus"></i> New Upload</h4>
+    <!--
+          <div class="row">
+
+            <div class="large-12 columns">
+              <input type="text" placeholder="Name of the File" />
+              <textarea placeholder="Describe the File"></textarea>
+        
+              <div class="login-mode switch round">
+                <input id="PUBLIC" name="login-mode" type="radio" checked>
+                <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+    
+                <input id="PRIVATE" name="login-mode" type="radio">
+                <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+    
+                <span></span>
+              </div>
+
+            </div>
+
+          </div>-->
+
+          {% if user.is_authenticated %}
+          <a class="button expand" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+            <span class="fi-upload"> Upload File</span>
+          </a>
+          {% endif %}
+  </div>
+      </li>
+
+      {% if imageCollection.count != 0 %}
+      {% autopaginate imageCollection 23 %}
+      <!-- Existing card list-->
+      {% for image in imageCollection %}
+      {% get_user_object image.created_by as user_obj %}
+      {% get_grid_fs_object image as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+    
+          <header>
+
+              <div class="label-list">
+                {% for tag in image.tags %}
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                {% endfor %}
+              </div>
+        
+              <div class="th">
+    <a href="{% url 'read_file' group_name_tag image.pk grid_fs_obj.filename %}">
+      <img src="{% url 'getImageThumbnail' group_name_tag image %}" />
+    </a>
+        </div>
+              <h4>{{image.name}}</h4>
+        <div>
+    <small class="subheader">{{ image.member_of_names_list|join:', ' }} created {{image.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{image.user_details_dict.created_by}}</span> 
+    </small>
+        </div>
+        
+          </header>
+
+          <p>This file is a..</p>
+
+          <a class="button expand" href ="{% url 'image_detail' group_name_tag image %}">View details</a>
+
+          {% get_user_object image.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag image %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+    
+          <footer class="row">
+            <div class="small-6 columns">{{image.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{image.file_size.size}}</strong> {{image.file_size.unit}}</div> 
+          </footer>
+    
+        </div>
+      </li>
+      {% endfor %}
+      
+      {% else %}
+      <p><em>No images found!</em></p>
+      {% endif %}
+
+     </ul>
+{% paginate %}
+   </div>
+<!-- Tab View #4 - Videos -->
+  <div class="content" id="view-video">
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Node create card-->
+      <li class="create card">
+        <div class="file">
+          <h4><i class="fi-plus"></i> New Upload</h4>
+    <!--
+          <div class="row">
+
+            <div class="large-12 columns">
+              <input type="text" placeholder="Name of the File" />
+              <textarea placeholder="Describe the File"></textarea>
+
+              <div class="login-mode switch round">
+                <input id="PUBLIC" name="login-mode" type="radio" checked>
+                <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+                <input id="PRIVATE" name="login-mode" type="radio">
+                <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+
+                <span></span>
+              </div>
+</div>
+
+          </div>-->
+
+          {% if user.is_authenticated %}
+          <a class="button expand" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+            <span class="fi-upload"> Upload File</span>
+          </a>
+          {% endif %}
+</div>
+      </li>
+
+      {% if videoCollection.count != 0 %}
+      {% autopaginate videoCollection 23 %}
+      <!-- Existing card list-->
+      {% for video in videoCollection %}
+      {% get_user_object video.created_by as user_obj %}
+      {% get_grid_fs_object video as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+
+          <header>
+
+              <div class="label-list">
+                {% for tag in video.tags %}
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+                {% endfor %}
+              </div>
+
+              <div class="th">
+    <a href="{% url 'read_file' group_name_tag video.pk grid_fs_obj.filename %}">
+      <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+      <img src="{% url 'getvideoThumbnail' group_name_tag video %}">
+    </a>
+        </div>
+              <h4>{{video.name}}</h4>
+        <div>
+    <small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{video.user_details_dict.created_by}}</span>
+    </small>
+        </div>
+        
+          </header>
+
+          <p>This file is a..</p>
+
+          <a class="button expand" href ="{% url 'video_detail' group_name_tag video %}">View details</a>
+
+          {% get_user_object video.created_by as user_obj %}
+          {% ifequal user_obj.username user.username %}
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag video %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+
+          <footer class="row">
+            <div class="small-6 columns">{{video.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{video.file_size.size}}</strong> {{video.file_size.unit}}</div>
+          </footer>
+
+        </div>
+      </li>
+      
+      {% endfor %}
+      
+      {% else %}
+      <p><em>No videos found!</em></p>
+      {% endif %}
+
+    </ul>
+{% paginate %}
+  </div>
+
+  <!-- Tab View #5 - pandora Videos -->
+  <div class="content" id="view-pandora-video">
+{% autopaginate sourceid 23 %}
+  
+
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+      <!-- Node create card-->
+      <!-- <li class="create card"> -->
+      <!--   <div class="file"> -->
+      <!--     <h4><i class="fi-plus"></i> New Upload</h4> -->
+
+      <!--     <div class="row"> -->
+
+      <!--       <div class="large-12 columns"> -->
+      <!--         <input type="text" placeholder="Name of the File" /> -->
+      <!--         <textarea placeholder="Describe the File"></textarea> -->
+        
+      <!--         <div class="login-mode switch round"> -->
+      <!--           <input id="PUBLIC" name="login-mode" type="radio" checked> -->
+      <!--           <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label> -->
+    
+      <!--           <input id="PRIVATE" name="login-mode" type="radio"> -->
+      <!--           <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label> -->
+    
+      <!--           <span></span> -->
+      <!--         </div> -->
+
+      <!--       </div> -->
+
+      <!--     </div> -->
+
+      <!--     {% if user.is_authenticated %} -->
+      <!--     <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}"> -->
+      <!--       <span class="fi-upload"> Upload File</span> -->
+      <!--     </a> -->
+      <!--     {% endif %} -->
+      <!--  </div> -->
+      <!-- </li> -->
+{% autopaginate wetube_videos 25 %}
+{% for each in wetube_videos %}
+ {% get_source_id each.pk as source_id %}     
+ {% get_user_object each.created_by as user_obj %}      
+      <li class="card">
+  <div class="file">
+    <header>
+            <div class="th">
+        <a href="http://wetube.gnowledge.org/{{source_id}}/480p.webm">
+    <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+        </a>
+      </div>
+
+      <h4>{{each.name}}</h4>
+      <div>
+        <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{each.user_details_dict.created_by}}</span>
+        </small>
+      </div>
+
+          </header>
+    <p>This file is a ..</p>
+          <a class="button expand" href ="{% url 'video_detail' group_name_tag each %}?vid_id={{source_id}}">View details</a>
+    </div>
+          
+      </li>
+{% endfor %}
+
+
+      
+    </ul>
+{% paginate %}
+
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+<!-- Moved from videoDashboard -->
+
+ {% block script %}
+ var eventhandler = function(e) { e.preventDefault();}
+
+ $(document).on('click',".video",function(){
+ //$('#body').css({opacity: "0.4"});
+ $("#backcover").show();
+ $('#body').bind('click', eventhandler);
+ $('#pop_video').show();
+ var video_id = this.id;
+ var video_index = $('.video').index(this)
+ var video_total = $('.video').length;
+ var pre = $(".video_pre");
+ var next = $(".video_next");
+ var url = "/{{groupid}}/video/fullvideo/"+video_id
+ $("#play_video").attr("src",url);
+ $(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_id)
+ if(video_index >= 1 && video_index < video_total-1)
+ {
+ pre.attr("id",video_index-1);
+ next.attr("id",video_index+1);
+}
+else if(video_index == 0)
+{
+  pre.hide();
+  next.attr("id",video_index+1);
+}
+else if(video_index == video_total-1){
+pre.attr("id",video_index-1);
+next.hide();
+}
+else{
+pre.hide();
+next.hide();
+}
+});
+
+$(document).on('click',"#close",function(){
+$('#pop_video').hide();
+$("#backcover").hide();
+$("#play_video").attr("src","");
+$('#body').css({opacity: "1"});
+$('#body').unbind('click', eventhandler);
+});
+
+$(document).on('click',".video_pre",function(){
+var video_id = this.id;
+var video_index = parseInt(this.id);
+var video_total = $('.video').length;
+var pre = $(".video_pre");
+var next = $(".video_next");
+pre.show();
+next.show();
+var video_url = $(".video")[this.id].id
+var url = "/{{groupid}}/video/fullvideo/"+video_url
+$("#play_video").attr("src",url);
+$(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
+if(video_index >= 1 && video_index < video_total-1)
+{
+  pre.attr("id",video_index-1);
+  next.attr("id",video_index + 1);
+}
+else if(video_index == 0)
+{
+  pre.hide();
+  next.attr("id",video_index+1);
+}
+else if(video_index == video_total-1){
+pre.attr("id",video_index-1);
+next.hide();
+}
+else{
+pre.hide();
+next.hide();
+}
+});
+
+$(document).on('click',".video_next",function(){
+var video_id = this.id;
+var video_index = parseInt(this.id);
+var video_total = $('.video').length;
+var pre = $(".video_pre");
+var next = $(".video_next");
+pre.show();
+next.show();
+var video_url = $(".video")[this.id].id
+var url = "/{{groupid}}/video/fullvideo/"+video_url
+$("#play_video").attr("src",url);
+$(".video_details_link").attr("href","/{{groupid}}/video/video_detail/"+video_url)
+if(video_index >= 1 && video_index < video_total-1)
+{
+  pre.attr("id",video_index-1);
+  next.attr("id",video_index+1);
+}
+else if(video_index == 0)
+{
+  pre.hide();
+  next.attr("id",video_index+1);
+}
+else if(video_index == video_total-1){
+pre.attr("id",video_index-1);
+next.hide();
+}
+else{
+pre.hide();
+next.hide();
+}
+});
+
+{% endblock %}

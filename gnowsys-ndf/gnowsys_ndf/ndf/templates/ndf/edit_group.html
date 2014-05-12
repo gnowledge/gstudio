@@ -8,11 +8,83 @@
 
 {% block body_content %} 
 
+<!-- css for drawer widget -->
+<style type = "text/css">
+
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer {
+border-color: #D3D3D3; border-style: solid;
+padding: 0 !important;
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px;
+background-repeat:no-repeat; background-size: 48px 48px
+}
+
+ul#graph-hover.f-dropdown{
+  width: inherit !important;
+}
+
+#graph-hover > li > a:hover {
+  color: #555555;
+}
+
+</style>
+
+
 <dl class="accordion" data-accordion>
 
   <dd>
-    <a href="#change_settings">Click here to change {{node.name}}'s settings </a>
-    
+    <a href="#change_settings">Click here
+ to change {{node.name}}'s settings </a>
+
+    {% if node.name == request.user.username %}
+      <div id="change_settings" class="content">
+
+        <div style='display:table-row;'>
+
+          <div style='display:table-cell;'> 
+            <font size="3" > Following policy</font>
+          </div>
+
+          <div style='display:table-cell;'> 
+            <select name="subscription_policy" id="subscription_policy">
+              <option id="OPEN">OPEN</option>
+              <option id="BY_REQUEST">BY_REQUEST</option>
+              <option id="BY_INVITATION">BY_INVITATION</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div style='display:table-row;'>
+ 
+          <div style='display:table-cell;' colspan='2' align="middle"> 
+            <input type="button" id="changeButton" value="Change"  class="button">
+            <img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
+            <font id="status"></font>
+          </div>
+        </div>
+        
+      </div>
+        
+    {% else %}
     <div id="change_settings" class="content">
 
      <div style='display:table;  border:1px;   border-spacing:10px; '>
@@ -102,6 +174,26 @@
     <font id="status"></font>
   </div>
 </div>
+{% endif %}
+</dd>
+</dl>
+<br/>
+<dl class="accordion" data-accordion>
+
+  <dd>
+
+    <a id="app_selected" href="#mySystemtype">Click here to select apps for {{node.name}} </a>
+
+      <div id="mySystemtype" class="content">
+
+	<div id="app_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+       </div>
+<input type="button" id="save_gapps" class="button small-10 small-push-1 column" value="Save">
+
+
+       </div>
+	  
 
 </dd>
 </dl>
@@ -113,6 +205,62 @@
 
 
 {% block script %}
+var datas= ""
+$(document).on('click',"#app_selected",function(){
+$('#mySystemtype #collection_set_drawer1').html("");
+ $('#mySystemtype #collection_set_drawer2').html("");
+ $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+var url='/{{groupid}}/app_selection/'+'{{node}}';
+ $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#mySystemtype #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#mySystemtype #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+
+ });
+   });
+});
+
+
+function get_all_data(){
+ $.each($('#mySystemtype #collection_set_drawer2 li'),function(index,item){
+         datas=datas+String(item.id)+",";
+         });
+}
+
+
+$(document).on('click',"#save_gapps",function(){
+get_all_data();
+apps_to_set=datas;
+$.ajax({
+url:'/{{groupid}}/app_selection/{{node}}',
+type: 'POST',
+data: {apps_to_set:apps_to_set,csrfmiddlewaretoken: '{{csrf_token}}'},
+       beforeSend: function(){
+              $("#ajax_load_image").show();
+              $("#body").css({"opacity":"0.1",})
+                              },
+        success: function(data){
+                       alert("Successfully set apps for this group");
+           },
+       complete: function(){
+                    $("#ajax_load_image").hide();
+                $("#body").css({"opacity":"",})
+
+          }
+
+}); //end of ajax
+}); //end_of_click_save_gapps
+
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
 var edit_policy  = document.getElementById("edit_policy")
@@ -144,7 +292,7 @@ encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_po
 $(document).on('click',"#changeButton",function(){
 
 $.ajax({
-url:'/{{node.altnames}}/ajax/change_group_settings/',
+url:'/{{node}}/ajax/change_group_settings/',
 type: 'POST',
 data: {edit_policy:edit_policy.value, group_type:group_type.value, subscription_policy:subscription_policy.value, visibility_policy:visibility_policy.value, disclosure_policy:disclosure_policy.value, encryption_policy:encryption_policy.value, csrfmiddlewaretoken: '{{ csrf_token }}', group_id:"{{node}}"},
 beforeSend: function() {

@@ -14,13 +14,21 @@ from django.contrib.auth.decorators import login_required
 function change_label(label)
 {   
 	if(chk_login=="AnonymousUser")
-		{document.location.href = '/accounts/login/';
-}
+	{  document.location.href = '/accounts/login/';
+        }
+        else if(label == "Join")
+        {  $("#notify").val("Unsubscribe");
+        }
+        else if(label == "Unsubscribe")
+        { $("#notify").val("Join");
+        }
+        else if(label == "Follow")
+        { $("#notify").val("Stop following");
+        }
+        else if(label == "Stop following")
+        { $("#notify").val("Follow");
+        }
 
-else if(label == "Join")
-  { $("#notify").val("Unsubscribe");}
-else
-  { $("#notify").val("Join");}
 }
 
 //function for sending notifications for Join and Unsubscribe
@@ -37,6 +45,7 @@ function notify(node,activity)
     success: function(data){
       $("#ajax_load_image").hide();
       $("#body").css({"opacity":"",})
+      location.reload();
     },
     complete: function(){
       $("#ajax_load_image").hide();
@@ -53,18 +62,31 @@ $(document).ready(function()
   var groupn = $("#groupname").val();
   var label = $("#notify").val();
   $("#notify").click(function(){
-   if (label == "Join")
+   if (label == "Follow")
+   {
+     notify(groupn,"join");
+     change_label("Follow");
+     label="Stop following"
+   }
+   else if (label == "Join")
    {
      notify(groupn,"join");
      change_label("Join");
-     label="Unsubscribed"
+     label="Unsubscribe"
    }
-   else {
+   else if (label == "Unsubscribe")
+   {
     notify(groupn,"remove");
     change_label("remove");
     label="Join"
-
-  }
+   }
+   else if (label == "Stop following")
+   {
+    notify(groupn,"remove");
+    change_label("Stop following");
+    label="Follow"
+   }
+  
   }); //end notify_click()
 }); //end document_ready()
 
@@ -78,6 +100,8 @@ $(document).ready(function()
 
 <!-- overide related_content block from base.html -->
 {% block related_content %}
+{% check_is_user_group group_id as is_user_group %}
+
 <p> Members in this group :{{node.author_set|length}} </p>
 
 {% get_group_policy node request.user as policy %}
@@ -86,17 +110,21 @@ $(document).ready(function()
 {% check_user_join request groupid as user_is_joined %}
 <input type="hidden" id="groupname" value="{{node}}">
 {% if user_is_joined == "joined" %}
-<input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible" >
+  {% if is_user_group %}
+       <input class="button tiny" type="submit" id="notify" value="Stop following" class="button" align="center" style="visibility:visible" >
+  {% else %}
+       <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible">
+  {% endif %} 
 {% elif user_is_joined == "not" or not user.is_authenticated  %}
-
-<input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
+  {% if is_user_group %}
+       <input class="button tiny" type="submit" id="notify" value="Follow" class="button" align="center" style="visibility:visible" >
+  {% else %}
+       <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
+  {% endif %}
 {% endif %}
 
 {% get_user_object node.created_by as user_obj %}
 {% ifequal  user_obj.username  user.username  %}
-
-<h3>Manage</h3>
-<p>You can invite other members to be a part of this group</p>
 
 {% include "ndf/invite_users.html" %}   
 

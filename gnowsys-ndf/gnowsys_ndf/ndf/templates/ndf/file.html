@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-  {% load ndf_tags %}
+{% load ndf_tags %}
 {% load pagination_tags %}
 {% block title %} {{title}} {% endblock %}
 
@@ -9,12 +9,12 @@
 {% endblock %}
 
 {% block meta_content %}
-<h2>Gallery</h2>
+<h3>Search Resources</h3>
 {% endblock %}
 
 {% block search_content %}
-
-<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' groupid %}">
+{% get_group_name groupid as group_name_tag %}
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name_tag %}">
 
   <div class="row collapse">
     <div class="small-10 columns">
@@ -32,7 +32,7 @@
 {% endblock %}
 
 {% block body_content %}
-
+{% get_group_name groupid as group_name_tag %}
 <header class="row">
 
    <dl class="tabs" data-tab>
@@ -90,7 +90,7 @@
 
           </div>-->
           {% if user.is_authenticated %}
-          <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
+          <a class="button expand" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
             <span class="fi-upload">  Upload File</span>
           </a>
           {% endif %}
@@ -99,6 +99,7 @@
  
       {% if files.count != 0 %}
       <!-- Existing card list-->
+      {% autopaginate files 23 %}
       {% for file in files %}      
       {% if file.created_by == request.user.pk %}
 
@@ -110,14 +111,14 @@
           <header>
               <div class="label-list">
                 {% for tag in file.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
               <div class="th">
-		<a href="{% url 'read_file' groupid file.pk grid_fs_obj.filename %}">
-		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
-		  <img src="{% url 'getFileThumbnail' groupid file %}">
+		<a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
+		  <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+		  <img src="{% url 'getFileThumbnail' group_name_tag file %}">
 		</a>
 	      </div>
               <h4>{{file.name}}</h4>
@@ -129,11 +130,11 @@
 
           <p>File description</p>
 
-          <a class="button expand" href ="{% url 'file_detail' groupid file %}">View details</a>
+          <a class="button expand" href ="{% url 'file_detail' group_name_tag file %}">View details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' groupid file %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
           {% endifequal %}
 	  
           <footer class="row">
@@ -154,14 +155,14 @@
           <header>
             <div class="label-list">
               {% for tag in file.tags %}
-              <span class="label">{{tag}}</span>
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
               {% endfor %}
             </div>
         
             <div class="th">
-	      <a href="{% url 'read_file' groupid file.pk grid_fs_obj.filename %}">
-		<!--<img src="/static/ndf/images/icon/meta.svg">-->
-		<img src="{% url 'getFileThumbnail' groupid file %}">
+	      <a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
+		<!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+		<img src="{% url 'getFileThumbnail' group_name_tag file %}">
 	      </a>
 	    </div>
             <h4>{{file.name}}</h4>
@@ -173,11 +174,11 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'file_detail' groupid file %}">View details</a>
+          <a class="button expand" href ="{% url 'file_detail' group_name_tag file %}">View details</a>
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' groupid file %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
           {% endifequal %}
     
           <footer class="row">
@@ -193,9 +194,10 @@
       {% endfor %}
       
       {% else %}
-      <p><em>Currently NO file uploaded!!!</em></p>
+      <p><em>No resources found!</em></p>
       {% endif %}
     </ul>
+{% paginate %}
   </div>
 
   <!-- Tab View 2 - Documents -->
@@ -205,6 +207,7 @@
 
       {% if docCollection.count != 0 %}
       <!-- Existing card list-->
+      {% autopaginate docCollection 23 %}
       {% for doc in docCollection %}      
       {% if doc.created_by == request.user.pk %}
 
@@ -216,14 +219,14 @@
           <header>
               <div class="label-list">
                 {% for tag in doc.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
               <div class="th">
-		<a href="{% url 'read_file' groupid doc.pk grid_fs_obj.filename %}">
-		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
-		  <img src="{% url 'getFileThumbnail' groupid doc %}">
+		<a href="{% url 'read_file' group_name_tag doc.pk grid_fs_obj.filename %}">
+		  <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+		  <img src="{% url 'getFileThumbnail' group_name_tag doc %}">
 		</a>
 	      </div>
               <h4>{{doc.name}}</h4>
@@ -232,11 +235,11 @@
 
           <p>File description</p>
 
-          <a class="button expand" href ="{% url 'file_detail' groupid doc %}">View details</a>
+          <a class="button expand" href ="{% url 'file_detail' group_name_tag doc %}">View details</a>
 
           {% get_user_object doc.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' groupid doc %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag doc %}?next={{request.path}}">Delete </a>
           {% endifequal %}
 	  
           <footer class="row">
@@ -257,14 +260,14 @@
           <header>
             <div class="label-list">
               {% for tag in doc.tags %}
-              <span class="label">{{tag}}</span>
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
               {% endfor %}
             </div>
         
             <div class="th">
-	      <a href="{% url 'read_file' groupid doc.pk grid_fs_obj.filename %}">
-		<!--<img src="/static/ndf/images/icon/meta.svg">-->
-		<img src="{% url 'getFileThumbnail' groupid doc %}">
+	      <a href="{% url 'read_file' group_name_tag doc.pk grid_fs_obj.filename %}">
+		<!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+		<img src="{% url 'getFileThumbnail' group_name_tag doc %}">
 	      </a>
 	    </div>
             <h4>{{doc.name}}</h4>
@@ -273,11 +276,11 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'file_detail' groupid doc %}">View details</a>
+          <a class="button expand" href ="{% url 'file_detail' group_name_tag doc %}">View details</a>
 
           {% get_user_object doc.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' groupid doc %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag doc %}?next={{request.path}}">Delete </a>
           {% endifequal %}
     
           <footer class="row">
@@ -293,9 +296,10 @@
       {% endfor %}
       
       {% else %}
-      <p><em>Currently NO file uploaded!!!</em></p>
+      <p><em>No resources found!</em></p>
       {% endif %}
     </ul>
+{% paginate %}
   </div>
   
   <!-- Tab View #3 - Images -->
@@ -328,7 +332,7 @@
           </div>-->
 
           {% if user.is_authenticated %}
-          <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
+          <a class="button expand" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
             <span class="fi-upload"> Upload File</span>
           </a>
           {% endif %}
@@ -336,7 +340,7 @@
       </li>
 
       {% if imageCollection.count != 0 %}
-
+      {% autopaginate imageCollection 23 %}
       <!-- Existing card list-->
       {% for image in imageCollection %}
       {% get_user_object image.created_by as user_obj %}
@@ -348,13 +352,13 @@
 
               <div class="label-list">
                 {% for tag in image.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 	      
               <div class="th">
-		<a href="{% url 'read_file' groupid image.pk grid_fs_obj.filename %}">
-		  <img src="{% url 'getImageThumbnail' groupid image %}" />
+		<a href="{% url 'read_file' group_name_tag image.pk grid_fs_obj.filename %}">
+		  <img src="{% url 'getImageThumbnail' group_name_tag image %}" />
 		</a>
 	      </div>
               <h4>{{image.name}}</h4>
@@ -367,11 +371,11 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'image_detail' groupid image %}">View details</a>
+          <a class="button expand" href ="{% url 'image_detail' group_name_tag image %}">View details</a>
 
           {% get_user_object image.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-          <a class="button alert tiny" href="{% url 'delete_file' groupid image %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag image %}?next={{request.path}}">Delete </a>
           {% endifequal %}
 	  
           <footer class="row">
@@ -384,10 +388,11 @@
       {% endfor %}
       
       {% else %}
-      <p><em>Currently NO image uploaded!!!</em></p>
+      <p><em>No images found!</em></p>
       {% endif %}
 
      </ul>
+{% paginate %}
    </div>
 <!-- Tab View #4 - Videos -->
   <div class="content" id="view-video">
@@ -418,7 +423,7 @@
           </div>-->
 
           {% if user.is_authenticated %}
-          <a class="button expand" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
+          <a class="button expand" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
             <span class="fi-upload"> Upload File</span>
           </a>
           {% endif %}
@@ -426,7 +431,7 @@
       </li>
 
       {% if videoCollection.count != 0 %}
-
+      {% autopaginate videoCollection 23 %}
       <!-- Existing card list-->
       {% for video in videoCollection %}
       {% get_user_object video.created_by as user_obj %}
@@ -438,14 +443,14 @@
 
               <div class="label-list">
                 {% for tag in video.tags %}
-                <span class="label">{{tag}}</span>
+                <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
                 {% endfor %}
               </div>
 
               <div class="th">
-		<a href="{% url 'read_file' groupid video.pk grid_fs_obj.filename %}">
-		  <!--<img src="/static/ndf/images/icon/meta.svg">-->
-		  <img src="{% url 'getvideoThumbnail' groupid video %}">
+		<a href="{% url 'read_file' group_name_tag video.pk grid_fs_obj.filename %}">
+		  <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+		  <img src="{% url 'getvideoThumbnail' group_name_tag video %}">
 		</a>
 	      </div>
               <h4>{{video.name}}</h4>
@@ -458,11 +463,11 @@
 
           <p>This file is a..</p>
 
-          <a class="button expand" href ="{% url 'video_detail' groupid video %}">View details</a>
+          <a class="button expand" href ="{% url 'video_detail' group_name_tag video %}">View details</a>
 
           {% get_user_object video.created_by as user_obj %}
           {% ifequal user_obj.username user.username %}
-          <a class="button alert tiny" href="{% url 'delete_file' groupid video %}?next={{request.path}}">Delete </a>
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag video %}?next={{request.path}}">Delete </a>
           {% endifequal %}
 
           <footer class="row">
@@ -476,16 +481,18 @@
       {% endfor %}
       
       {% else %}
-      <p><em>Currently NO video uploaded!!!</em></p>
+      <p><em>No videos found!</em></p>
       {% endif %}
 
     </ul>
+{% paginate %}
   </div>
 
   <!-- Tab View #5 - pandora Videos -->
   <div class="content" id="view-pandora-video">
 {% autopaginate sourceid 23 %}
   
+
     <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
       <!-- Node create card-->
       <!-- <li class="create card"> -->
@@ -519,32 +526,34 @@
       <!--     {% endif %} -->
       <!-- 	</div> -->
       <!-- </li> -->
- 
-{% for each in sourceid %}
-      
- {% get_user_object each.object.created_by as user_obj %}      
+{% autopaginate wetube_videos 25 %}
+{% for each in wetube_videos %}
+ {% get_source_id each.pk as source_id %}
+      {% get_user_object each.created_by as user_obj %}
+      {% for src_id,contributor in source_id.items %}
       <li class="card">
 	<div class="file">
 	  <header>
             <div class="th">
-	      <a href="http://wetube.gnowledge.org/{{each.id}}/480p.webm">
-		<img src="http://wetube.gnowledge.org/{{each.id}}/icon128.jpg">
+	      <a href="http://wetube.gnowledge.org/{{src_id}}/480p.webm">
+		<img src="http://wetube.gnowledge.org/{{src_id}}/icon128.jpg">
 	      </a>
 	    </div>
 
-	    <h4>{{each.object.name}}</h4>
-	    
-	    <small>Created by <span class="user">{{user_obj.username}}</span> <em>{{each.object.created_at}}</em></small>
-	    
+	    <h4>{{each.name}}</h4>
+	    <div>
+	      <small class="subheader">{{each.member_of_names_list|join:', '}} created by <span href="#" class="user" data-gnow="">{{contributor}}@wetube.gnowledge.org</span>
+	      </small>
+	    </div>
+
           </header>
-	  <p>This file is a..</p>
-         
-	  <a class="button expand" href ="{% url 'video_detail' groupid each.object %}?vid_id={{each.id}}">View details</a>
-          </div>
+	  <p>This file is a ..</p>
+          <a class="button expand" href ="{% url 'video_detail' group_name_tag each %}?vid_id={{src_id}}">View details</a>
+	  </div>
+          
       </li>
 {% endfor %}
-
-
+{% endfor %}
       
     </ul>
 {% paginate %}

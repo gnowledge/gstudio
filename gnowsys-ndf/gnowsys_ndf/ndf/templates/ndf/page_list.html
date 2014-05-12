@@ -1,6 +1,8 @@
 {% extends "ndf/base.html" %}
 {% block title %} {{title}} {% endblock %}
 {% load ndf_tags %}
+{% load pagination_tags %}
+
 {% block help_topics %}
 <li><a href="#">Pages Introduction</a></li>
 <li><a href="#">Working with Pages</a></li>
@@ -21,7 +23,7 @@
 {% endblock %}
 
 {% block body_content %} 
-
+{% get_group_name groupid as group_name_tag %}
 <header class="row">
 
   <dl class="tabs" data-tab>
@@ -82,14 +84,17 @@
         </div>
       </div>-->
       {% if user.is_authenticated %}
-      <a class="button expand" href="{% url 'page_create_edit' groupid %}">
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+      <a class="button expand" href="{% url 'page_create_edit' group_name_tag %}">
         Create {{title}}
       </a>
+      {% endif %}
       {% endif %}
     </div>
   </li>
 
-
+{% autopaginate page_nodes 23 %}
     <!-- Existing card list-->
     {% for node in page_nodes %}
         
@@ -103,12 +108,12 @@
 
        <div class="label-list">
         {% for tag in node.tags %}
-        <span class="label">{{tag}}</span>
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
         {% endfor %}
       </div>
 
 
-        <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
         <h4>{{ node.name }}
           <div>
             <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
@@ -119,10 +124,10 @@
       
       <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
       
-      <a class="small button expand" href="{% url 'page_details' groupid node %}">Page Details</a>
+      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
 
       {% if node.created_by == request.user.id %}
-      <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
+      <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
       {% endif %}
      {% group_type_info groupid request.user as grouptype %}
      {% if  grouptype == "Moderated" %}
@@ -151,7 +156,7 @@
         {% endfor %}
       </div>
 
-      <div class="th"><img src="/static/ndf/images/icon/meta.svg"></div>
+      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
 
       <h4>{{ node.name }}
         <div>
@@ -164,10 +169,10 @@
 
     <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
 
-    <a class="small button expand" href="{% url 'page_details' groupid node %}">Page Details</a>
+    <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
 
     {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
+    <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
     {% endif %}
           
     
@@ -191,7 +196,7 @@
 
   <div class="row">
     <div class="small-12 columns">
-     <p>Currently <b>NO Pages</b>!!!</p>
+     <p>No pages found in this project group!</p>
    </div>
  </div>
 </li>
@@ -200,6 +205,6 @@
 
 {% endfor %}
 </ul>
-
+{% paginate %}
 {% endblock %}
 

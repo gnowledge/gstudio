@@ -10,7 +10,7 @@
 from tempfile import NamedTemporaryFile
 from subprocess import call
 import urllib
-
+import commands
 from gnowsys_ndf.settings import EMACS_INIT_FILE_PATH
 
 ###########################################################################
@@ -41,54 +41,74 @@ def org2html(org_content, file_prefix="", file_delete=True):
 
     """
             
-    # org editor content manipulation for temporary file (".org")
-    org_content_header_for_file = "\n#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" \
-                                + "\n#+TITLE: \n"
+    try:
+        # org editor content manipulation for temporary file (".org")
+        org_content_header_for_file = "\n#+OPTIONS: timestamp:nil author:nil creator:nil ^:{} H:3 num:nil toc:nil @:t ::t |:t ^:t -:t f:t *:t <:t" \
+                                      + "\n#+TITLE: \n"
 
-    org_content_for_file = org_content.replace("\r", "")
+        org_content_for_file = org_content.replace("\r", "")
 
-    # Creating a temporary file with ".org" extension 
-    file_suffix=".org"        # ".org" suffix must; otherwise emacs command won't work!
-    org_file_obj = NamedTemporaryFile('w+t', suffix=file_suffix, prefix=file_prefix, delete=file_delete)
+        # Creating a temporary file with ".org" extension 
+        file_suffix=".org"        # ".org" suffix must; otherwise emacs command won't work!
+        org_file_obj = NamedTemporaryFile('w+t', suffix=file_suffix, prefix=file_prefix, delete=file_delete)
 
-    filename_org = org_file_obj.name
-    # Example (filename_org): "/tmp/wikiname-usrname-tmptCd4aq.org"
+        filename_org = org_file_obj.name
+        # Example (filename_org): "/tmp/wikiname-usrname-tmptCd4aq.org"
 
-    encode_content = (org_content_header_for_file + org_content_for_file).encode('utf-8')
+        encode_content = (org_content_header_for_file + org_content_for_file).encode('utf-8')
 
-    org_file_obj.write(encode_content)
-    # NOTE: Don't close this file till the time, html file is created
+        org_file_obj.write(encode_content)
+        # NOTE: Don't close this file till the time, html file is created
 
-    # Move the cursor - pointing to start of the file
-    # Must, otherwise cursor remains @ end (as this file isn't closed after writing data into it) and you won't get any data
-    org_file_obj.seek(0)
+        # Move the cursor - pointing to start of the file
+        # Must, otherwise cursor remains @ end (as this file isn't closed after writing data into it) and you won't get any data
+        org_file_obj.seek(0)
 
-    # Exporting the above created ".org" file to html
-    # Example (filename_html): "/tmp/wiliname-usrname-tmptCd4aq.html"
-    ext_html = ".html"
-    filename_html = filename_org[:-4] + ext_html
-    
-    cmd = "emacs -l " + EMACS_INIT_FILE_PATH  + " --batch " + filename_org + " --eval '(org-export-as-html nil)'"
-    cmd_res = call((cmd + ' </dev/null'), shell=True)
+        # Exporting the above created ".org" file to html
+        # Example (filename_html): "/tmp/wiliname-usrname-tmptCd4aq.html"
+        ext_html = ".html"
+        filename_html = filename_org[:-4] + ext_html
+
+        # Batch command to get the org-version
+        cmd_check_org_version ="emacs" + " --batch "+" --eval '(message (org-version))'"
+        cmd_res = commands.getoutput(cmd_check_org_version)
+        cmd_res_list = cmd_res.splitlines() # Converting a string into list of lines based on newline character
+        org_version_data = cmd_res_list[(len(cmd_res_list)-1)] # Collecting last line from the list, i.e. "7.9.3f"
+        org_version = org_version_data[:(org_version_data.rfind("."))] # Stripping content from right decimal point (including the decimal)
+
+        if (float(org_version) >= 8): 
+            export_to_html="org-html-export-to-html"
+        else:
+            export_to_html="org-export-as-html"
+
+        # Batch command that converts org-file into corresponding HTML-file
+        cmd = "emacs -l " + EMACS_INIT_FILE_PATH  + " --batch " + filename_org + " --eval '(" + export_to_html + " nil)'"
+        cmd_res = call((cmd + ' </dev/null'), shell=True)
             
-    # Close ".org" temporary file
-    org_file_obj.close()
+        # Close ".org" temporary file
+        org_file_obj.close()
             
-    if cmd_res <= 0:
-        print "\n\n Html file created @ {0}\n".format(filename_html)
-    else:
-        # TODO: Throw error, may be I/O
-        print "\n\n Some error occurred!!!\n"
+        if cmd_res <= 0:
+            print "\n\n Html file created @ {0}\n".format(filename_html)
+        else:
+            cmd_res_str = commands.getoutput(cmd)
+            cmd_res_list = cmd_res_str.splitlines()
+            cmd_res_error = cmd_res_list[len(cmd_res_list)-1]
+            error_message = "\n\n OrgtoHTMLError: "+cmd_res_error+" !!!\n"
+            raise Exception(error_message)
         
-    # Reading data from ".html" file and pasting it in wikipage object's "content" variable 
-    with open(filename_html, 'r') as html_file_obj:
-        html_data = html_file_obj.readlines()
+        # Reading data from ".html" file and pasting it in wikipage object's "content" variable 
+        with open(filename_html, 'r') as html_file_obj:
+            html_data = html_file_obj.readlines()
 
-    # Stripping and storing html data i.e. between <body>...</body> (Both elements are not included)
-    strip_html_data = ""
-    start_index = html_data.index("<body>\n") + 1         # Start copying data after <body>\n element
-    end_index = html_data.index("</body>\n")              # Copy data until you reach before </body>\n element
-    for line in html_data[start_index:end_index]:
-        strip_html_data += line.decode('utf-8').lstrip()
+        # Stripping and storing html data i.e. between <body>...</body> (Both elements are not included)
+        strip_html_data = ""
+        start_index = html_data.index("<body>\n") + 1         # Start copying data after <body>\n element
+        end_index = html_data.index("</body>\n")              # Copy data until you reach before </body>\n element
+        for line in html_data[start_index:end_index]:
+            strip_html_data += line.decode('utf-8').lstrip()
+
+    except Exception as e:
+        raise Exception(e)
 
     return strip_html_data

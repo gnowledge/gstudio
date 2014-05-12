@@ -1,45 +1,25 @@
 gstudio
 =======
 
-A Django application to recreate gnowsys-studio from scratch using
-mongodb as storage. It uses django_mongokit. 
-
-This project will eventually metamorphose into an implementation of
-http://www.gnu.org/software/gnowsys/ framework to create generic network
-networks using Node Description Framework (NDF). 
+gstudio is an implementation of http://www.gnu.org/software/gnowsys/
+which is a Node Description Framework (NDF). It is a frame-based 
 
 The project is released under GNU AGPL v3 license.
 
-Currently Implemented Features
-------------------------------
+Features of gstudio
+-------------------
 
-- create nodes
-- comment nodes
-- add tags
-- create collections
-- create nested collections
-- create project groups
-- join and unsubscribe from groups
-- registration and login for multiple users
-- upload files
-- seggregate videos and images from uploaded files for separate video and image apps
-- versioning all changes (history mangagement using RCS)
+Read the file Features.org
 
-TODO
-----
+Expected release of the version 1.0 during August 2014. until then
+enjoy the beta.
 
-- create heterogeneous collections
-- collaboratively building open online courses
-- course player
-- standard learning resources metadata
-- threaded discussion forum
-- scheduling online meetings
-- quiz and quiz items
-- concept mapping (semantic networking)
-- json and RDF exchange 
-- citizen science interface
-- data visualization
-- agenda, scheduling, todo, and project planner
+Live sites using gstudio
+------------------------
+
+- http://www.metastudio.org/ 
+- http://studio.tiss.edu/
+- http://sandbox.metastudio.org/ This is where you can try the bleedingedge version of gstudio.  Meant as a playground and for functional testing.
 
 Mailing list
 ------------

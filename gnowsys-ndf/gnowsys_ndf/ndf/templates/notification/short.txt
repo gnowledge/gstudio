@@ -1,1 +1,9 @@
-{% load i18n %}{% blocktrans %}{{ notice }}{% endblocktrans %}
+{% load i18n %}
+{% load ndf_tags %}
+{% get_site_info as site_info %}
+
+{% blocktrans %}
+
+Activity notification from  {{site_info}}
+
+{% endblocktrans %}

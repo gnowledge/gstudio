@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load ndf_tags %}
 {% block title %}{{ title }}{% endblock %}
 
 {% block head %}
@@ -22,23 +22,21 @@
 {% endblock %}
 
 {% block meta_content %}
+{% get_group_name groupid as group_name_tag %}
+    <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
 
-    <h3>About</h3>
-
-    <p class="text-justify">By <b>Quiz Item</b>, you can create a miscellaneous quiz-question. This quiz-question can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
-
-    <p class="text-justify">By <b>Quiz</b>, you can build a quiz having list of quiz-items. Quiz-Items can be added to quiz in two ways:
+    <p class="text-justify">You can build a quiz in two ways:
       <ol  class="text-justify">
 	<li>By editing, Quiz node (via collection-list).</li>
-	<li>By using Quiz-Item button corresponding to the Quiz node (i.e. this will automatically add the quiz-item node to your quiz node).</li>
+	<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
       </ol>
     </p>
 
     <!-- Add button -->
     {% if user.is_authenticated %}
     <p>
-    <a href="{% url 'quiz_create' groupid %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create' groupid %}" class="button small right">+ Add {{title}} Item</a>
+    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">+ Add {{title}} Item</a>
     </p>
     {% endif %}
     
@@ -52,7 +50,7 @@
       <ul class="inline-list">
 	<li><h3>Question</h3></li>
 	{% if user.is_authenticated %}
-	<li><a href="{% url 'quiz_item_edit' groupid node %}" class="button small">Edit this Question</a></li>
+	<li><a href="{% url 'quiz_item_edit' group_name_tag node %}" class="button small">Edit this Question</a></li>
 	{% endif %}
       </ul>
       <p>
@@ -67,7 +65,7 @@
       <p>
 	Version{{ node.version_dict|length|pluralize }}: 
 	{% for seq_no, version_no in node.version_dict.items reversed %}
-	<abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+	<abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
 	{% endfor %}
       </p>
       {% if node.tags|length > 0 %}

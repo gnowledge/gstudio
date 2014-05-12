@@ -1,4 +1,5 @@
 {% extends "ndf/node_details_base.html" %}
+{% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 {% block url %}{% url 'create_edit' groupid node %}{% endblock %}
 
@@ -13,7 +14,18 @@
    autoOpen: 0
   });
   });
+
+$('.tree').bind(
+    'tree.click',
+    function(event) {
+        // The clicked node is 'event.node'
+        var node = event.node;
+        alert(node.id);
+    }
+);
   });
+
+
 </script>
 {% endblock %}
 
@@ -36,7 +48,12 @@
 {% endblock %}
 
 <!-- overiding block from node_detail_base.html -->
+{% block collection_content %}
+{% endblock %}
+
+<!-- overiding block from node_detail_base.html -->
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 <header class="row page">
   <section class="medium-2 columns">
     
@@ -49,13 +66,13 @@
   <section class="medium-10 columns" >
     <h2>
       <span class='node'>{{node.name}}</span>
-      <span><a class="button" href="{% url 'create_edit' groupid node.pk %}">Edit</a></span>
+      <span><a class="button" href="{% url 'create_edit' group_name_tag node.pk %}">Edit</a></span>
     </h2>
-    <h3 class="subheader">
+    <h3 class="subheader"></h3>
       <small> 
 	Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>
       </small>
-    </h3>
+
   </section>
 </header>
 

@@ -23,6 +23,22 @@ collection = db[File.collection_name]
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4]})
 
 def videoDashboard(request, group_id, video_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if video_id is None:
+        video_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Video"})
+        if video_ins:
+            video_id = str(video_ins._id)
     vid_col = collection.GSystem.find({'member_of': {'$all': [ObjectId(video_id)]},'_type':'File', 'group_set': {'$all': [group_id]}})
     template = "ndf/videoDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
@@ -30,6 +46,18 @@ def videoDashboard(request, group_id, video_id):
     return render_to_response(template, variable)
 
 def getvideoThumbnail(request, group_id, _id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     videoobj = collection.File.one({"_id": ObjectId(_id)})
     if (videoobj.fs.files.exists(videoobj.fs_file_ids[1])):
         f = videoobj.fs.files.get(ObjectId(videoobj.fs_file_ids[1]))
@@ -37,6 +65,18 @@ def getvideoThumbnail(request, group_id, _id):
         
     
 def getFullvideo(request, group_id, _id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     videoobj = collection.File.one({"_id": ObjectId(_id)})
     if len(videoobj.fs_file_ids) > 2:
     	if (videoobj.fs.files.exists(videoobj.fs_file_ids[2])):
@@ -49,6 +89,18 @@ def getFullvideo(request, group_id, _id):
        
         
 def video_search(request,group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     vidcol=collection.File.find({'mime_type':{'$regex': 'video'}})
     if request.method=="GET":
         keyword=request.GET.get("search","")
@@ -59,7 +111,21 @@ def video_search(request,group_id):
 
 
 def video_detail(request, group_id, _id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     vid_node = collection.File.one({"_id": ObjectId(_id)})
+    if vid_node._type == "GSystemType":
+	return videoDashboard(request, group_id, _id)
     video_obj=request.GET.get("vid_id","")
     return render_to_response("ndf/video_detail.html",
                                   { 'node': vid_node,
@@ -70,7 +136,20 @@ def video_detail(request, group_id, _id):
                                   context_instance = RequestContext(request)
         )
 def video_edit(request,group_id,_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     vid_node = collection.File.one({"_id": ObjectId(_id)})
+    video_obj=request.GET.get("vid_id","")
     if request.method == "POST":
         get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save()
@@ -80,7 +159,8 @@ def video_edit(request,group_id,_id):
         return render_to_response("ndf/video_edit.html",
                                   { 'node': vid_node,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid':group_id,
+                                    'video_obj':video_obj
                                 },
                                   context_instance=RequestContext(request)
                               )

@@ -1,12 +1,12 @@
 {% extends "ndf/base.html" %}
-
+{% load ndf_tags %}
 {% block title %} {{username}}'s - Dashboard  {% endblock %}
 
 {% block meta_content %}
 
     <h3>About</h3>
 
-    <p><b>Dashboard</b> shows users own activities in Metastudio also it explicitly shows what you have for creating a course</p>   
+    <p><b>Dashboard</b> shows users' own activities in the site.</p>   
 
 {% endblock %}
 
@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block body_content %}
-{% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
 <div class="row">
 
 	<!-- Users General Information -->
@@ -41,7 +41,7 @@
 				{% endif %}
 
 			<div id="pic_div" style="display:none;">
-				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'userDashboard' groupid %}">
+				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'userDashboard' group_name_tag %}">
 					{% csrf_token %}
 					<input type="file" name="doc[]"  id="docFile" multiple/>
 
@@ -421,6 +421,41 @@
 			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
 		</div>
 	</div>
+        <!-- User preferences -->
+
+	<div>
+	    {% get_user_preferences group_id author %}
+  	</div>
+
+	<br/>
+
+	
+	<div class="row">
+		{% for each in shelves %} 
+		{% for key,val in shelf_list.items %}
+		<div class="small-12 columns">
+
+			{% if key == each.name %}          
+
+				<h6 align="center"><b>{{key}}</b></h6>
+				<ul class="pricing-table resource-drawer" id="collaborators_drawer"> 
+				{% if val %}
+					{% for name in val %}
+
+						<li class="bullet-item" value="{{name}}"> 												
+							<a href="#"><b>{{name}} </b></a>  							
+						</li>							
+								
+					{% endfor %}
+				{% endif %}
+				</ul>
+			{% endif %}
+
+		</div>
+		{% endfor %}
+		{% endfor %}
+	</div>
+	
 	
 
 </div>

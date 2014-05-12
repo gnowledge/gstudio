@@ -86,19 +86,20 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     contentlist = []
     dependencylist = []
     options = []
-
+    translate=request.GET.get('translate','')
+    print translate,"trans"
     if class_name == "AttributeType":
-        definitionlist = ['name','altnames','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
+        definitionlist = ['name','altnames','language','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     elif class_name == "GSystemType":
-        definitionlist = ['name','altnames','status','member_of','meta_type_set','attribute_type_set','relation_type_set','type_of']
+        definitionlist = ['name','altnames','language','status','member_of','meta_type_set','attribute_type_set','relation_type_set','type_of']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
     elif class_name == "RelationType":
-        definitionlist = ['name','inverse_name','altnames','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status','member_of']
+        definitionlist = ['name','inverse_name','altnames','language','subject_type','object_type','subject_cardinality','object_cardinality','subject_applicable_nodetype','object_applicable_nodetype','is_symmetric','is_reflexive','is_transitive','status','member_of']
         contentlist = ['content_org']
         dependencylist = ['prior_node']
         options = ['featured','created_at','start_publication','tags','url','last_update','login_required']
@@ -119,6 +120,9 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
         new_instance_type = eval("collection"+"."+class_name)()
 
     if request.method=="POST":
+        if translate:
+            new_instance_type = eval("collection"+"."+class_name)()
+            
         for key,value in class_structure.items():
             if value == bool:
                 if request.POST.get(key,""):
@@ -130,6 +134,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
                             
             elif value == unicode:
                 if request.POST.get(key,""):
+                    
                     if key == "content_org":
                         new_instance_type[key] = unicode(request.POST.get(key,""))
                         # Required to link temporary files with the current user who is modifying this document
@@ -137,7 +142,20 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
                         filename = slugify(new_instance_type['name']) + "-" + usrname + "-"
                         new_instance_type['content'] = org2html(new_instance_type[key], file_prefix=filename)
                     else :
-                        new_instance_type[key] = unicode(request.POST.get(key,""))
+                        if translate:
+                            print translate,"trannn"
+                            if key in ("name","altnames","inverse_name"):
+                                print "inside if"
+                                a=unicode(request.POST.get(key+"_trans",""))
+                                print a,"a"
+                                new_instance_type[key] = unicode(request.POST.get(key+"_trans",""))
+                                                
+                                
+                            else:
+                                new_instance_type[key] = unicode(request.POST.get(key,""))
+                        else:
+                            print "else tra"
+                            new_instance_type[key] = unicode(request.POST.get(key,""))
 
             elif value == list:
                 if request.POST.get(key,""):
@@ -199,10 +217,14 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
             # newdict[key] = "bool"
             newdict[key] = ["bool", new_instance_type[key]]
         elif value == unicode:
-            # newdict[key] = "unicode"
-            newdict[key] = ["unicode", new_instance_type[key]]
+            if key == "language":
+                newdict[key] = ["list", new_instance_type[key]]
+            else:
+                # newdict[key] = "unicode"
+                newdict[key] = ["unicode", new_instance_type[key]]
         elif value == list:
             # newdict[key] = "list"
+            
             newdict[key] = ["list", new_instance_type[key]]
         elif type(value) == list:
             # newdict[key] = "list"
@@ -232,17 +254,18 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     variable = None
     class_structure_with_values = {}
     if node_id:
+        
         for key, value in class_structure.items():
             class_structure_with_values[key] = [class_structure[key][0], new_instance_type[key]]
 
         variable = RequestContext(request, {'node': new_instance_type,
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
-                                            'options': options, 'required_fields': required_fields,
+                                            'options': options, 'required_fields': required_fields,"translate":translate,
                                             'groupid': groupid
                                         })
     else:
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid})
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate})
 
     return render_to_response(template, variable)
 

@@ -32,6 +32,7 @@ except ImportError:  # old pymongo
 
 db = get_database()
 gs_collection = db[Node.collection_name]
+collection = db[Node.collection_name]
 forum_st = gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
 start_time=gs_collection.AttributeType.one({'$and':[{'_type':'AttributeType'},{'name':'start_time'}]})
 end_time=gs_collection.AttributeType.one({'$and':[{'_type':'AttributeType'},{'name':'end_time'}]})
@@ -40,13 +41,41 @@ twist_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':
 
 
 
-def forum(request,group_id,node_id):
+def forum(request,group_id,node_id=None):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if node_id is None:
+        node_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Forum"})
+        if node_ins:
+            node_id = str(node_ins._id)
     existing_forums = gs_collection.GSystem.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     existing_forums.sort('name')
     variables=RequestContext(request,{'existing_forums':existing_forums,'groupid':group_id,'group_id':group_id})
     return render_to_response("ndf/forum.html",variables)
 
 def create_forum(request,group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     if request.method == "POST":
         colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
         colf=gs_collection.GSystem()
@@ -100,14 +129,49 @@ def create_forum(request,group_id):
         return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id}))
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
-    return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id},RequestContext(request))
+
+
+    available_nodes = gs_collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(each.name)
+
+    return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 def display_forum(request,group_id,forum_id):
-    forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
-    variables=RequestContext(request,{'forum':forum,'groupid':group_id,'group_id':group_id})
+
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    forum_object = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
+    if forum_object._type == "GSystemType":
+	return forum(request, group_id, forum_id)
+    variables=RequestContext(request,{'forum':forum_object,'groupid':group_id,'group_id':group_id})
     return render_to_response("ndf/forumdetails.html",variables)
 
-def display_thread(request,group_id,thread_id):
+def display_thread(request,group_id, thread_id, forum_id=None):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     try:
         thread = gs_collection.GSystemType.one({'_id': ObjectId(thread_id)})
         forum=""
@@ -120,6 +184,18 @@ def display_thread(request,group_id,thread_id):
         pass
 
 def add_node(request,group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     try:
         sitename=Site.objects.all()[0].name.__str__()
         content_org=request.POST.get("reply","")

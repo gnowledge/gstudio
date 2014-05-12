@@ -1,3 +1,5 @@
+{% load ndf_tags %}
+
 <!-- orgitdown! -->
 <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
 <!-- orgitdown! toolbar settings -->
@@ -5,8 +7,79 @@
 <!-- orgitdown! skin -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
-<textarea id="orgitdown_{{var_name}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}">{{var_value}}</textarea>
+<!-- start of mobwrite -->
+{% if node_id %}
+	<script src="/static/js/mobwrite/diff_match_patch.js"></script>
+	<script src="/static/js/mobwrite/core.js"></script>
+	<script src="/static/js/mobwrite/form.js"></script>
+	<script src="/static/js/mobwrite/iframe.js"></script>
+	<script>
+	mobwrite.syncGateway = '/mobwrite/';
+        mobwrite.syncUsername = "{{request.user.username}}";
+	$(function(){
+	        mobwrite.share('{{node_id|mongo_id}}');
+		
+	});
+// ajax call for editing users
+        var onlineuser = function() {
+        $.ajax({
+          url: "{% url 'get_online_editing_user' 'groupid' %}",
+          type: "POST",
+          data: ({
+            editorid: '{{node_id}}',
+	    csrfmiddlewaretoken: '{{ csrf_token }}',
+          }),
+          beforeSend: function() {  },
+          error: function(request){
+		$("#plistOnlineUser").html("error"); },
+          success: function(data) {
+		$("#userVisible").show();
+		$("#plistOnlineUser").html("");
+		$("#listOnlineUser").html("");
+		if(data[0] == "No users"){$("#plistOnlineUser").html("No Users");}
+		else{
+			for(var item in data)
+			{
+			 var li = $("<li class='user'></li>")
+                                 .appendTo($("#listOnlineUser"));
+			if(data[item]['pro_img'] == "no"){
+				itag = $('<i class="fi-torso" style="background-color:#aabb44"></i>')
+					.appendTo(li);
+				li.append(data[item]['username']); }
+			else{
+				imgtag = $('<img height="30" width="30" style="margin-right:0.4em;" src='+data[item]['pro_img']+'>')
+					.appendTo(li);
+				li.append(data[item]['username']);
 
+			}
+				
+			}
+			}
+		    }
+		
+        }); //end of ajax
+
+      };
+	setInterval(onlineuser, 5000);
+	</script>
+{% endif %}
+<!-- end of mobwrite -->
+
+{% if node_id %}
+<input type="hidden" value="{% check_existence_textObj_mobwrite node_id %}">
+<div id="userVisible" style="display:none">
+<h3>Other users currently editing this resource</h3>
+<p id="plistOnlineUser"></p>
+<ul style="color: green; max-height: 100px; overflow: auto;" id="listOnlineUser"></ul>
+</div>
+<textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}" value="{{var_value}}">{{var_value}}</textarea>
+{% else %}
+<textarea id="orgitdown_{{var_name}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}" value="{{var_value}}">{{var_value}}</textarea>
+{% endif %}
 <script>
+{% if node_id %}
+  $("#{{node_id|mongo_id}}").orgitdown(mySettings);
+{% else %}
   $("#orgitdown_{{var_name}}").orgitdown(mySettings);
+{% endif %}
 </script>

@@ -4,6 +4,8 @@
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from django.shortcuts import render_to_response, render
+from django.template import RequestContext
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
@@ -18,13 +20,28 @@ import string
 ######################################################################################################################################
 
 db = get_database()
+collection = db[Node.collection_name]
+
 history_manager = HistoryManager()
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
+coln=db[GSystem.collection_name]
+grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
+ins_objectid  = ObjectId()
+
+def get_all_resources_for_group(group_id):
+  if ins_objectid.is_valid(group_id):
+    obj_resources=coln.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'File'}]},{'group_set':{'$all':[ObjectId(group_id)]}},{'member_of':{'$nin':[grp_st._id]}}]})
+    return obj_resources
+
+
+def get_all_gapps():
+  meta_type_gapp=coln.Node.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]})
+  all_gapps=coln.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type_gapp._id]}}]})    
+  return list(all_gapps)
 
 def get_forum_repl_type(forrep_id):
-  coln=db[GSystem.collection_name]
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
   if obj:
@@ -41,7 +58,7 @@ def check_existing_group(group_name):
   if type(group_name) == 'unicode':
     colg = collection.Node.find({'_type': u'Group', "name": group_name})
   else:
-    colg = collection.Node.find({'_type': u'Group', "_id": group_name._id})
+    colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
 
   if colg.count() >= 1:
     return True
@@ -61,6 +78,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     
     if checked:     
       if checked == "Page":
+ 
         gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
@@ -103,6 +121,14 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+      elif checked == "Pandora Video":
+        gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
+        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
+      elif checked == "Theme":
+        theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
 
@@ -140,7 +166,14 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     return dict_drawer
 
-def get_translate_common_fields(request, node, group_id, node_type, node_id):
+# get type of resource
+def get_resource_type(request,node_id):
+  get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
+  get_type=get_resource_type._type
+  return get_type 
+   
+
+def get_translate_common_fields(request,get_type,node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
   gcollection = db[Node.collection_name]
@@ -151,11 +184,28 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
   tags = request.POST.get('tags')
   usrid = int(request.user.id)
   language= request.POST.get('lan')
+  if get_type == "File":
+    get_parent_node=collection.Node.one({'_id':ObjectId(node_id)})
+    get_mime_type=get_parent_node.mime_type
+    get_fs_file_ids=get_parent_node.fs_file_ids
+    node.mime_type=get_mime_type
+    node.fs_file_ids=get_fs_file_ids
+ 
   if not node.has_key('_id'):
-    
     node.created_by = usrid
-    node.member_of.append(node_type._id)
-
+    if get_type == "File":
+        get_node_type = collection.Node.one({'name':get_type})
+        node.member_of.append(get_node_type._id)
+        if 'image' in get_mime_type:
+          get_image_type = collection.Node.one({'name':'Image'})
+          node.member_of.append(get_image_type._id)
+        if 'video' in get_mime_type:
+          get_video_type = collection.Node.one({'name':'Video'})
+          node.member_of.append(get_video_type._id)
+        
+    else:
+      node.member_of.append(node_type._id)
+ 
   node.name = unicode(name)
   node.language=unicode(language)
 
@@ -185,7 +235,7 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
 
 def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node."""
-  print"has come here"
+  
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
@@ -201,7 +251,8 @@ def get_node_common_fields(request, node, group_id, node_type):
   module_list = request.POST.get('module_list','')
   content_org = request.POST.get('content_org')
   map_geojson_data = request.POST.get('map-geojson-data')
-  
+  user_last_visited_location = request.POST.get('last_visited_location')
+
   if map_geojson_data:
     map_geojson_data = map_geojson_data + ","
     map_geojson_data = list(ast.literal_eval(map_geojson_data))
@@ -254,7 +305,15 @@ def get_node_common_fields(request, node, group_id, node_type):
         node.group_set.append(user_group_obj._id)
 
   if tags:
-    node.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
+    tags_list = []
+
+    for tag in tags.split(","):
+      tag = unicode(tag.strip())
+
+      if tag:
+        tags_list.append(tag)
+
+    node.tags = tags_list
 
   # -------------------------------------------------------------------------------- prior_node
 
@@ -311,66 +370,24 @@ def get_node_common_fields(request, node, group_id, node_type):
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
 
-  
-
-# ------ Some work for relational graph - (II) ------
-  
-def neighbourhood_nodes(page_node):
-
-  collection = db[Node.collection_name]
-        
-  gs = collection.Node.find( {'$or':[{'_type':'GSystem'},{'_type':'File'}]}  )
-  gs_cur = []
-
-  for each in gs:
-      gs_cur.append(each)
-
-  gs.rewind()
-
-  flag = False
-
-  # Initiate and append this line compulsory for viewing node.
-  graphData = '{"name":"'+ page_node.name +'", "degree":1, "children":['
-
-  # Scan each document in cursor 'gs'
-  for val in gs:
+  # ----------------------------------------------------------------------------- visited_location in author class
+  if user_last_visited_location:
     
-    # If vieving page _id exist in collection set of current document
-    if page_node._id in val.collection_set:
-      
-      flag = True      
-      # Start adding children 
-      graphData += '{"name":"'+ val.name +'","degree" : 2'   #},'
-      
-      # If there is only one matching item in collection set
-      if len(val.collection_set) == 1:
-        graphData += '},'
-        
-      # If there is more than one _id in collection set, start adding children of children.
-      elif len(val.collection_set) > 1:
-        graphData += ', "children":['
-        
-        for each in val.collection_set:
-          node_name = (filter( lambda x: x['_id'] == each, gs_cur ))[0].name
-          
-          # Escape name matching current page node name
-          if(page_node._id == each):
-            pass
-          else:
-            graphData += '{"name":"'+ node_name + '"},'
+    user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
-        graphData = graphData[:-1] + ']},'
+    author = gcollection.Node.one({'_type': "GSystemType", 'name': "Author"})
+    user_group_location = gcollection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
 
-  if flag:
-    graphData = graphData[:-1] + ']}' 
-  else:
-    graphData += ']}' 
+    if user_group_location:
 
-  return graphData
-# ------ End of processing for graph ------
+      if node._type == "Author" and user_group_location._id == node._id:
+        node['visited_location'] = user_last_visited_location
 
+      else:
+        user_group_location['visited_location'] = user_last_visited_location
+        user_group_location.save()
 
-
+# ============= END of def get_node_common_fields() ==============
   
   
 def get_versioned_page(node):
@@ -423,7 +440,9 @@ def get_user_page(request,node):
           rev_no=rev_no[1].strip( '\t\n\r')
           rev_no=rev_no.strip(' ')
        if line.find('updated')!=-1:
-          if line.find(str(request.user))!=-1:
+          up_ind=line.find('updated')
+          print line.find(str(request.user),up_ind)
+          if line.find(str(request.user),up_ind) !=-1:
                rev_no=rev_no.strip(' ')
                node=history_manager.get_version_document(node,rev_no)
                proc1.kill()
@@ -445,11 +464,11 @@ and if he has published his contents then he would be shown the current publishe
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
-     if  ver2 != '1.1':                
-         
+     if  ver2 != '1.1':                           
 	    if node2 is not None:
-		
+		print "direct"
                 if node2.status == 'PUBLISHED':
+                  
 			if float(ver2) > float(ver1):			
 				return (node2,ver2)
 			elif float(ver2) < float(ver1):
@@ -459,15 +478,14 @@ and if he has published his contents then he would be shown the current publishe
 		elif node2.status == 'DRAFT':
                        #========== conditions for Group===============#
 
-                        if  node1.status == 'DRAFT' and node._type == "Group":
-			    #check to perform if the person has recently joined the group
+                        if   node._type == "Group":
+			    
 			    count=check_page_first_creation(request,node2)
                             if count == 1:
                                 return (node1,ver1)
                             elif count == 2:
-				return (node2,ver2)
-
-                            
+                               	return (node2,ver2)
+                        
                         return (node2,ver2)  
 	    else:
                         
@@ -475,11 +493,11 @@ and if he has published his contents then he would be shown the current publishe
 	    
      else:
          
-         if node._type == "GSystem" and node1.status == "DRAFT":
-              if node1.created_by ==request.user.id:
-                   return (node2,ver2)
-              else:
-		   return ('None','None')
+        # if node._type == "GSystem" and node1.status == "DRAFT":
+        #     if node1.created_by ==request.user.id:
+        #           return (node2,ver2)
+        #      else:
+	#	   return (node2,ver2)
          return (node1,ver1)
 	 
 def check_page_first_creation(request,node):
@@ -503,3 +521,13 @@ def check_page_first_creation(request,node):
     if count == 1:
 	return(count)     
       
+
+def tag_info(request, group_id, tagname):
+  '''
+  Function to get all the resources related to tag
+  '''
+
+  # print group_id
+
+  return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
+
