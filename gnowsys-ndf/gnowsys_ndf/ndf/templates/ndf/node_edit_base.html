@@ -156,7 +156,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
 
 {% switch_group_conditions request.user group_id as switch_conditions %}
-    {% check_group node as is_group %}
+    {% check_group groupid as is_group %}
 {% if not is_group %}
 {% if switch_conditions %}
 
@@ -286,77 +286,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 <script type="text/javascript">
 var data_list = ""
 var saveflag = 0
-function setdrawer(){
-      $('#switchgrp').foundation('reveal', 'open');
-       $('.close-reveal-modal.st').click(function(){
-       if (saveflag == 0){
-         alert("This will cancel the save");
-      }
-});
-}
-function get_new_groups(){
- $.each($('#switchgrp #collection_set_drawer2 li'),function(index,item){
-         data_list=data_list+String(item.id)+",";
-         });
-}
-
-$(document).on('click',"#switch_group",function(){
-$('#switchgrp #collection_set_drawer1').html("");
- $('#switchgrp #collection_set_drawer2').html("");
- $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
-var url='/{{groupid}}/switch_group/'+'{{node}}';
- $.getJSON( url, function( data ) {
-  $.each(data ,function(index , drawer_elements){
-  
-   if(index == 0)
-    {
-     $.each(drawer_elements.drawer1, function(index, element) {
-        $('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
-   }
-   if(index == 1)
-    {
-    $.each(drawer_elements.drawer2, function(index, element) {
-        $('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
-      });
-    }
-
- });
-   });
-
-});
-
-$(document).on('click',"#save_switch_group",function(){
-var turl='/{{groupid}}/switch_group/'+'{{node}}';
-saveflag = 1;
-get_new_groups();
-new_groups=data_list;
-$.ajax({
-       url: turl,
-       type: 'POST',
-       data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
-       beforeSend: function(){
-              alert("atthis");
-              $("#ajax_load_image").show();
-              $("#body").css({"opacity":"0.1",})
-                              },
-        success: function(data){
-                       alert("Successfully switched groups");
-            
-           },
-       complete: function(){
-                    $("#ajax_load_image").hide();
-                $("#body").css({"opacity":"",})
-
-          }
-});  //end of ajax
-
-});  //end of document click
-
-
-
-	$(document).ready(function(){
-		$("#name_id").change(function(){
+$(document).ready(function(){
+$("#name_id").change(function(){
 
 			var name = $("#name_id").val();
 			var nodes = $("#nodes_list").val();
