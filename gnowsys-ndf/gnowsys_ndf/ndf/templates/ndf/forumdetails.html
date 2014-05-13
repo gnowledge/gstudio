@@ -24,7 +24,7 @@
   .forum-summary .user {  font-size: 1.5em;}
   .forum-summary .user i { border-radius: 50px; }
 
-  #content > p:first-of-type { color: #6F6F6F !important; font-size: in }
+  #content > p:first-of-type { color: #6F6F6F !important; font-size: inherit }
 
   table { border: none }
 
@@ -75,6 +75,7 @@
   {% endblock %}
 
   {% block body_content %}
+  {% get_group_name groupid as group_name_tag %}
   <!-- <div class="row"> -->
     <!-- <div class="small-12 large-12 columns"> -->
 
@@ -129,7 +130,7 @@
                 {{each.name}}
               </a>
               <br/>
-                <i style="color:gray">- {{user_obj.username}}</i>
+                <i style="color:gray">by {{user_obj.username}}</i>
             </td>
           
             <td>
@@ -170,6 +171,7 @@
 {% comment %}
 <!-- 
 <div class="row" style="padding-top:10px" id="thread">
+<<<<<<< HEAD
   {% get_forum_twists forum as thread %}
   
   {% for each in thread %}
@@ -198,6 +200,30 @@
       {% endfor %}
     </div>
     <hr>
+=======
+{% get_forum_twists forum as thread %}
+{% for each in thread %}
+{% get_user_object each.created_by as user_obj %}
+<div class ="small-1 large-1 columns"> 
+  <div class="post-count-container new already-checked">
+    <span class="reply-count new-post already-checked">NEW</span>
+  </div>
+</div>
+<div class= "small-10 large-10 columns">
+  <h4>
+    <a href="/{{group_name_tag}}/forum/thread/{{each}}">
+      {{each.name}}
+    </a><br/>
+    <small>
+      by:<a class="user" href="#" data-gnow="#337700">{{user_obj.username}}</a>
+    </small>
+  </h4>
+  {% with each.content|safe as twist_content %}
+  <font size ="1" >{{twist_content}} </font>
+  {% endwith %}
+  {% for tag in each.tags %}
+  <span class="radius secondary label">{{tag}}</span>
+>>>>>>> a9189814ddea1b324e086e6dc06dc41833cb2438
   {% endfor %}
 </div>
  -->

@@ -182,7 +182,7 @@ ul#graph-hover.f-dropdown{
 
   <dd>
 
-    <a id="app_select" href="#mySystemtype">Click here to select apps for {{node.name}} </a>
+    <a id="app_selected" href="#mySystemtype">Click here to select apps for {{node.name}} </a>
 
       <div id="mySystemtype" class="content">
 
@@ -206,35 +206,7 @@ ul#graph-hover.f-dropdown{
 
 {% block script %}
 var datas= ""
-{% get_user_object node.created_by as user_obj %}
-{% ifequal  user_obj.username  user.username  %}
-var edit_policy  = document.getElementById("edit_policy")
-var group_type  = document.getElementById("group_type")
-var subscription_policy  = document.getElementById("subscription_policy")
-var visibility_policy  = document.getElementById("visibility_policy")
-var disclosure_policy  = document.getElementById("disclosure_policy")
-var encryption_policy  = document.getElementById("encryption_policy")
-{% if node.edit_policy %}
-edit_policy.selectedIndex = edit_policy.options.{{node.edit_policy}}.index
-{% endif %}
-{% if node.group_type %}
-group_type.selectedIndex = group_type.options.{{node.group_type}}.index
-{% endif %}
-{% if node.subscription_policy %}
-subscription_policy.selectedIndex = subscription_policy.options.{{node.subscription_policy}}.index
-{% endif %}
-{% if node.visibility_policy %}
-visibility_policy.selectedIndex = visibility_policy.options.{{node.visibility_policy}}.index
-{% endif %}
-{% if node.disclosure_policy %}
-disclosure_policy.selectedIndex = disclosure_policy.options.{{node.disclosure_policy}}.index
-{% endif %}
-{% if node.encryption_policy %}
-encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_policy}}.index
-{% endif %}
-
-
-$(document).on('click',"#app_select",function(){
+$(document).on('click',"#app_selected",function(){
 $('#mySystemtype #collection_set_drawer1').html("");
  $('#mySystemtype #collection_set_drawer2').html("");
  $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
@@ -288,6 +260,33 @@ data: {apps_to_set:apps_to_set,csrfmiddlewaretoken: '{{csrf_token}}'},
 
 }); //end of ajax
 }); //end_of_click_save_gapps
+
+{% get_user_object node.created_by as user_obj %}
+{% ifequal  user_obj.username  user.username  %}
+var edit_policy  = document.getElementById("edit_policy")
+var group_type  = document.getElementById("group_type")
+var subscription_policy  = document.getElementById("subscription_policy")
+var visibility_policy  = document.getElementById("visibility_policy")
+var disclosure_policy  = document.getElementById("disclosure_policy")
+var encryption_policy  = document.getElementById("encryption_policy")
+{% if node.edit_policy %}
+edit_policy.selectedIndex = edit_policy.options.{{node.edit_policy}}.index
+{% endif %}
+{% if node.group_type %}
+group_type.selectedIndex = group_type.options.{{node.group_type}}.index
+{% endif %}
+{% if node.subscription_policy %}
+subscription_policy.selectedIndex = subscription_policy.options.{{node.subscription_policy}}.index
+{% endif %}
+{% if node.visibility_policy %}
+visibility_policy.selectedIndex = visibility_policy.options.{{node.visibility_policy}}.index
+{% endif %}
+{% if node.disclosure_policy %}
+disclosure_policy.selectedIndex = disclosure_policy.options.{{node.disclosure_policy}}.index
+{% endif %}
+{% if node.encryption_policy %}
+encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_policy}}.index
+{% endif %}
 
 
 $(document).on('click',"#changeButton",function(){

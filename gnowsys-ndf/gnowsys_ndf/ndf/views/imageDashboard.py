@@ -21,10 +21,26 @@ db = get_database()
 collection = db[File.collection_name]
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 
-def imageDashboard(request, group_id, image_id):
+def imageDashboard(request, group_id, image_id=None):
     '''
     fetching image acording to group name
     '''
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if image_id is None:
+        image_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Image"})
+        if image_ins:
+            image_id = str(image_ins._id)
     img_col= collection.GSystem.find({'member_of': {'$all': [ObjectId(image_id)]},'_type':'File', 'group_set': {'$all': [ObjectId(group_id)]}})
     template = "ndf/ImageDashboard.html"
     already_uploaded=request.GET.getlist('var',"")
@@ -34,6 +50,18 @@ def getImageThumbnail(request, group_id, _id):
     '''
     this funciton can be called to get thumbnail of image throw url
     '''
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     img_obj = collection.File.one({"_type": u"File", "_id": ObjectId(_id)})
     if img_obj is not None:
         if (img_obj.fs.files.exists(img_obj.fs_file_ids[1])):
@@ -44,6 +72,18 @@ def getImageThumbnail(request, group_id, _id):
         
     
 def getFullImage(request, group_id, _id, file_name = ""):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     img_obj = collection.File.one({"_id": ObjectId(_id)})
     if img_obj is not None:
         if (img_obj.fs.files.exists(img_obj.fs_file_ids[0])):
@@ -55,6 +95,18 @@ def getFullImage(request, group_id, _id, file_name = ""):
         return HttpResponse("")
 
 def get_mid_size_img(request, group_id, _id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     img_obj = collection.File.one({"_id": ObjectId(_id)})
     try:
         f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[2]))
@@ -65,6 +117,18 @@ def get_mid_size_img(request, group_id, _id):
         
 
 def image_search(request,group_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     imgcol=collection.File.find({'mime_type':{'$regex': 'image'}})
     if request.method=="GET":
         keyword=request.GET.get("search","")
@@ -74,8 +138,21 @@ def image_search(request,group_id):
         return render_to_response(template,variable)
 
 def image_detail(request, group_id, _id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     img_node = collection.File.one({"_id": ObjectId(_id)})
-    print img_node.name
+    if img_node._type == "GSystemType":
+	return imageDashboard(request, group_id, _id)
     return render_to_response("ndf/image_detail.html",
                                   { 'node': img_node,
                                     'group_id': group_id,
@@ -85,6 +162,18 @@ def image_detail(request, group_id, _id):
         )
 
 def image_edit(request,group_id,_id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     img_node = collection.File.one({"_id": ObjectId(_id)})
     if request.method == "POST":
         get_node_common_fields(request, img_node, group_id, GST_IMAGE)

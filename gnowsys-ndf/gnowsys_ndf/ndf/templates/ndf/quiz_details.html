@@ -1,10 +1,10 @@
 <!-- This template probably not in use -->
 
 {% extends "ndf/node_details_base.html" %}
-
+{% load ndf_tags %}
 
 {% block meta_content %}
-
+{% get_group_name groupid as group_name_tag %}
 
     <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
 
@@ -18,8 +18,8 @@
     <!-- Add button -->
     {% if user.is_authenticated %}
     <p>
-    <a href="{% url 'quiz_create' groupid %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create' groupid %}" class="button small right">+ Add {{title}} Item</a>
+    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">+ Add {{title}} Item</a>
     </p>
     {% endif %}
     

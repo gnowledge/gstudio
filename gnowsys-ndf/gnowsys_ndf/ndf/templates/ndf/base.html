@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 {% load ndf_tags %}
-
+{% get_group_name groupid as group_name_tag %}
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -83,12 +83,12 @@
 						{% get_profile_pic  request.user as prof_pic %}
 						{% if prof_pic %}
 
-							<a href="{% url 'userDashboard' groupid %}">
-							<img  src="{% url 'getImageThumbnail' groupid prof_pic %}" height="30" width="30"></img>
+							<a href="{% url 'userDashboard' group_name_tag %}">
+							<img  src="{% url 'getImageThumbnail' group_name_tag prof_pic %}" height="30" width="30"></img>
 							{{ user.username }} </a>
 
 						{% else %}
-							<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' groupid %}">
+							<a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_name_tag %}">
 							{{ user.username }}</a>
 						{% endif %}
 					

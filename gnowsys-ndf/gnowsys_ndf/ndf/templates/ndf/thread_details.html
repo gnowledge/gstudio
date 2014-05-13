@@ -4,6 +4,7 @@
 
 
 {% block head %}
+
 <style type="text/css">
 
 	.forum-summary{
@@ -53,6 +54,7 @@
 
 
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 
 	<h3>
 		<a href="/{{groupid}}/forum/show/{{forum}}" title="Forum Name">
@@ -107,6 +109,7 @@
 			</div>
  -->
  			{% endcomment %}
+
 
 			<div id="smalldiv" >
 

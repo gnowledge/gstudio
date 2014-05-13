@@ -11,6 +11,10 @@
 		color: white;
 	}
 
+	#content > p:first-of-type { color: #6F6F6F !important; font-size: inherit; }
+
+	p { color: #6F6F6F !important; font-size: inherit; }
+
 </style>
 {% endblock %}
 
@@ -55,6 +59,7 @@
 
 
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 
 	{% autopaginate existing_forums 23 %}
 	<h2>Latest Forums</h2><hr/>
@@ -65,7 +70,11 @@
 				<li class="card">
 					<a href="{% url 'show' groupid each %}">  
 						<h3>{{each.name}}</h3>
-						<p class="fixme">This is the forum description text</p>
+						<p class="">
+							{% with each.content|safe as forum_content %}
+					          {{forum_content|default_if_none:"No description !!"}}
+					        {% endwith %}
+						</p>
 					</a>
 				</li>
 			{% endfor %}
