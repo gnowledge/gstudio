@@ -3,14 +3,14 @@
 {% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 {% block body_content %}
-
+{% get_group_name groupid as group_name_tag %}
 {% autopaginate course_coll 23 %}
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   <li class="create card">
   <div class="page">
     <h4><i class="fi-plus"></i> New</h4>
       {% if user.is_authenticated %}
-      <a class="button expand" href="{% url 'create_edit' groupid %}">
+      <a class="button expand" href="{% url 'create_edit' group_name_tag %}">
         Create {{title}}
       </a>
       {% endif %}
@@ -35,11 +35,11 @@
       </h4>
     </header>
     <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-    <a class="small button expand" href="{% url 'course_detail' groupid node %}">Detail</a>
+    <a class="small button expand" href="{% url 'course_detail' group_name_tag node %}">Detail</a>
     {% comment %}
     {% get_user_object node.created_by as user_obj %}
     {% ifequal user_obj.username user.username %}
-    <a class="button alert tiny" href="{% url 'delete_module' groupid node %}?next={{request.path}}">Delete </a>
+    <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
     {% endifequal %}
     {% endcomment %}
     <footer class="row">

@@ -43,6 +43,15 @@
 
     .ui-slider-horizontal { margin-top: 1em; }
 
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+      background-color:#efefef;
+      padding:0.5em 0 0.5em 0.5em; 
+      margin-left: -10px !important;
+    }
+
+    .active-app-set-edit{ border-right: 4px solid #808080; }
+
+    .active-app-set-view{ border-left: 4px solid #808080; }
   </style>
 
 
@@ -50,37 +59,36 @@
 
 {% block meta_content %}
 <ul class="side-nav"> 
-
-	{% for each in app_collection_set %}
-	{% get_memberof_objects_count each.id groupid as count %}
-
-	{% ifequal each.id app_set_id %}
-	<li class="active"> 
-		<div>
-			<a href="{% url 'mis_app_instance_create' groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
-		    +&nbsp;Add
-			</a>
-
-			<a href="{% url 'mis_app_detail' groupid app_id each.id %}" >
-        {{each.name}} ({{count}})
-			</a> 
-		</div>
+	<li>
+		<a></a>
 	</li>
 
-	{% else %}
-	<li> 
-    <div>
-      <a href="{% url 'mis_app_instance_create' groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
+  {% for each in app_collection_set %}
+  {% get_memberof_objects_count each.pk groupid as count %}
+
+  {% if app_set_id == each|safe %}
+    {% if '/new/' in request.path %}
+    <li class="active-app-set-edit">
+    {% else %}
+    <li class="active-app-set-view">
+    {% endif %}
+  {% else %}
+  <li>
+  {% endif %}
+    <div class="row">
+      {% if each.type_of or each.name == "Caste" %}
+      <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+        {{each.name}} ({{count}})
+      </a> 
+      <a class="small-4 columns" href="{% url 'mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
         +&nbsp;Add
       </a>
 
-      <a href="{% url 'mis_app_detail' groupid app_id each.id %}" >
-        {{each.name}} ({{count}})
-      </a> 
+      {% else %}
+        {{each.name}}
+      {% endif %}
     </div>
 	</li>
-
-	{% endifequal %}
 
 	{% endfor %}
 
@@ -263,126 +271,32 @@
           </div>
           {% endif %}
 
-          {% if node.college_affiliated_to %}
-          <br/>
 
-          <div class="row" id="college_affiliated_to">
-            <label class="small-3 columns">
-              Affiliated to
-            </label>
-            <div class="small-9 columns">
-            {% for n in node.college_affiliated_to|slice:":5" %}
-              <a href="#">{{n.name}}</a><br/>
-              {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.college_affiliated_to|length|add:"-5"}} more</a>
-              {% endif %}
-            {% endfor %}    
+          {% for tab_name, display_fields in property_display_order %}
+          {% ifnotequal tab_name "Address" %}
+          {% for altname, value in display_fields %}
+          <div class="row">
+            <div class="small-4 columns">
+              <label>{{altname}}</label>
+            </div>
+            <div class="small-8 columns">
+              <p>{{value}}</p>
             </div>
           </div>
-          {% endif %}
+          {% endfor %}
 
-          {% if node.college_of_person %}
-          <br/>
-
-          <div class="row" id="college_of_person">
-            <label class="small-3 columns">
-              People
-            </label>
-            <div class="small-9 columns">
-            {% for n in node.college_of_person|slice:":5" %}
-              <a href="#">{{n.name|title}}</a><br/>
-              {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.college_of_person|length|add:"-5"}} more</a>
-              {% endif %}
-            {% endfor %}    
-            </div>
-          </div>
-          {% endif %}
-
-          {% if node.person_belongs_to_college %}
-          <br/>
-
-          <div class="row" id="person_belongs_to_college">
-            <label class="small-3 columns">
-              College
-            </label>
-            <div class="small-9 columns">
-            {% for n in node.person_belongs_to_college|slice:":5" %}
-              <a href="#">{{n.name}}</a><br/>
-              {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.person_belongs_to_college|length|add:"-5"}} more</a>
-              {% endif %}
-            {% endfor %}    
-            </div>
-          </div>
-          {% endif %}
-
-          {% if node.affiliated_college %}
-          <br/>
-
-          <div class="row" id="affiliated_college">
-            <label class="small-3 columns">
-              Affiliated Colleges
-            </label>
-            <div class="small-9 columns">
-            {% for n in node.affiliated_college|slice:":5" %}
-              <a href="#">{{n.name}}</a><br/>
-              {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.affiliated_college|length|add:"-5"}} more</a>
-              {% endif %}
-            {% endfor %}    
-            </div>
-          </div>
-          {% endif %}
-
-          {% if node.university_of_person %}
-          <br/>
-
-          <div class="row" id="university_of_person">
-            <label class="small-3 columns">
-              People
-            </label>
-            <div class="small-9 columns">
-            {% for n in node.university_of_person|slice:":5" %}
-              <a href="#">{{n.name|title}}</a><br/>
-              {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.university_of_person|length|add:"-5"}} more</a>
-              {% endif %}
-            {% endfor %}    
-            </div>
-          </div>
-          {% endif %}
-
-          {% if node.person_belongs_to_university %}
-          <br/>
-
-          <div class="row" id="person_belongs_to_university">
-            <label class="small-3 columns">
-              University
-            </label>
-            <div class="small-9 columns">
-            {% for n in node.person_belongs_to_university|slice:":5" %}
-              <a href="#">{{n.name}}</a><br/>
-              {% if forloop.counter0 == 4%}
-              ... <a href="#">See {{node.person_belongs_to_university|length|add:"-5"}} more</a>
-              {% endif %}
-            {% endfor %}    
-            </div>
-          </div>
-          {% endif %}
-
+          {% else %}
           {% if node.person_belongs_to_country %}
-          <br/>
-
-          <div class="row" id="address">
-            <label class="small-3 columns">
-              Address
-            </label>
-            <div class="small-9 columns">
+          <div class="row">
+            <div class="small-4 columns">
+              <label>Address</label>
+            </div>
+            <div class="small-8 columns">
               {{node.house_street|default_if_none:""}}{% if node.house_street %}; {% endif %}
               {{node.village|default_if_none:""}}{% if node.village %}; {% endif %}
               {{node.taluka|default_if_none:""}}{% if node.taluka %}; {% endif %}
               {{node.town_city|default_if_none:""}}{% if node.town_city %}; {% endif %}
+              <br/>
               {% for n in node.person_belongs_to_district|slice:":1" %}
                 <a href="#">{{n.name}}</a>{% if n.name %}; {% endif %}
               {% endfor %}
@@ -395,8 +309,112 @@
               {% endfor %}
             </div>
           </div>
+          <br/>
           {% endif %}
 
+          {% endifnotequal %}
+          {% endfor %}
+
+
+          {% if node.college_affiliated_to %}
+          <br/>
+
+          <div class="row" id="college_affiliated_to">
+            <label class="small-4 columns">
+              Affiliated to
+            </label>
+            <div class="small-8 columns">
+            {% for n in node.college_affiliated_to|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.college_affiliated_to|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.college_of_student %}
+          <br/>
+
+          <div class="row" id="college_of_student">
+            <label class="small-4 columns">
+              No. of Students Enrolled
+            </label>
+            <div class="small-8 columns">
+            {% if node.college_of_student|length > 5 %}
+              <a href="#">{{node.college_of_student|length}}</a>
+
+            {% else %}
+            {% for n in node.college_of_student %}
+              <a href="#">{{n.name|title}}</a><br/>
+            {% endfor %}
+
+            {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.college_has_trainer %}
+          <br/>
+
+          <div class="row" id="college_has_trainer">
+            <label class="small-4 columns">
+              No. of Teachers Enrolled
+            </label>
+            <div class="small-8 columns">
+            {% if node.college_has_trainer|length > 5 %}
+              <a href="#">{{node.college_has_trainer|length}}</a>
+
+            {% else %}
+            {% for n in node.college_has_trainer %}
+              <a href="#">{{n.name|title}}</a><br/>
+            {% endfor %}
+
+            {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+
+          {% if node.affiliated_college %}
+          <br/>
+
+          <div class="row" id="affiliated_college">
+            <label class="small-4 columns">
+              Affiliated Colleges
+            </label>
+            <div class="small-8 columns">
+            {% for n in node.affiliated_college|slice:":5" %}
+              <a href="#">{{n.name}}</a><br/>
+              {% if forloop.counter0 == 4%}
+              ... <a href="#">See {{node.affiliated_college|length|add:"-5"}} more</a>
+              {% endif %}
+            {% endfor %}    
+            </div>
+          </div>
+          {% endif %}
+
+          {% if node.university_of_student %}
+          <br/>
+
+          <div class="row" id="university_of_student">
+            <label class="small-4 columns">
+              No. of Students Enrolled
+            </label>
+            <div class="small-8 columns">
+            {% if node.university_of_student|length > 5 %}
+              <a href="#">{{node.university_of_student|length}}</a>
+
+            {% else %}
+            {% for n in node.university_of_student %}
+              <a href="#">{{n.name|title}}</a><br/>
+            {% endfor %}
+
+            {% endif %}
+            </div>
+          </div>
+          {% endif %}
 
         </div>
 
@@ -871,6 +889,7 @@ $(document).foundation({
     //   }); 
     // }
 
+  if(startDtInput.length > 0){
     startDtInput.datetimepicker({ 
 
       hourGrid: 6,
@@ -895,9 +914,9 @@ $(document).foundation({
         endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate') );
       }
     });
+  }
 
-
-
+  if(endDtInput.length > 0){
     endDtInput.datetimepicker({ 
       hourGrid: 6,
       minuteGrid: 15,
@@ -917,6 +936,49 @@ $(document).foundation({
         startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
       }
     });
+  }
+
+    // totWhen ---------------
+    var totWhen = $("font:contains('tot_when')").parent().next().find("input");
+
+    if(totWhen.length > 0)
+    {
+      totWhen.datetimepicker();
+      $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
+      $("input.tiny").after("<div id='tot-when-date-list'></div>")
+
+    }
+
+    $(totWhen).change(function(){ 
+
+    if($(totWhen).val().length > 0)
+    {
+      $("input.tiny").removeClass("disabled");
+    }
+    else
+    {
+      $("input.tiny").addClass("disabled");
+    }
+
+  });
+
+    $("input.tiny").click(function(){
+      if(!$(this).hasClass("disabled")) 
+      {
+        $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
+        $(totWhen).val("");
+        $("input.tiny").addClass("disabled");
+      }
+    })
+
+    function getTotWhen()
+    {
+      var datesList = []
+      dts = $("#tot-when-date-list .date-item");
+      $.each(dts, function(i, val){datesList.push($(val).text().trim())});
+
+      return datesList;
+    }
 
 // </script>
 {% endblock %}	

@@ -1,6 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
-{% block title %} {{ node.member_of_names_list|join:", " }} - {{ node.name }}  {% endblock %}
+{% block title %} {{ node.member_of_names_list|join:", " }} - {{ node.name }  {% endblock %}
 {% block head %}
 
 <!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
@@ -45,25 +45,25 @@ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorM
 {% endblock %}
 
 {% block meta_content %}
-
+{% get_group_name groupid as group_name_tag %}
 <!--This content possibly comes from page_details.html-->
 
-<p>
-  {{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
-</p>
-<p>
-  Contributed by: {{ node.user_details_dict.contributors|join:', ' }}
-</p>
-<p>
+<!-- <p> -->
+<!--   {{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }} -->
+<!-- </p> -->
+<!-- <p> -->
+<!--   Contributed by: {{ node.user_details_dict.contributors|join:', ' }} -->
+<!-- </p> -->
+<!-- <p> -->
 
-  Last update: {{ node.last_update|date:"j F Y" }}
-</p>
-<p>
-  Version{{ node.version_dict|length|pluralize }}: 
-  {% for seq_no, version_no in node.version_dict.items reversed %}
-  <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
-  {% endfor %}
-</p>
+<!--   Last update: {{ node.last_update|date:"j F Y" }} -->
+<!-- </p> -->
+<!-- <p> -->
+<!--   Version{{ node.version_dict|length|pluralize }}:  -->
+<!--   {% for seq_no, version_no in node.version_dict.items reversed %} -->
+<!--   <abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr>  -->
+<!--   {% endfor %} -->
+<!-- </p> -->
 
 {% endblock %}
 

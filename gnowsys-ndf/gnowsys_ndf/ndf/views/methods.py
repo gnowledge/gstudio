@@ -121,10 +121,13 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-      elif checked == "Pandora_video":
+      elif checked == "Pandora Video":
         gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
-        print group_id,"grp"
-        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
+      elif checked == "Theme":
+        theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
@@ -163,11 +166,10 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     return dict_drawer
 
+# get type of resource
 def get_resource_type(request,node_id):
   get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
   get_type=get_resource_type._type
-  print get_type,"get_type"
-  page_node = eval("collection"+"."+ get_type)()
   return get_type 
    
 
@@ -528,3 +530,4 @@ def tag_info(request, group_id, tagname):
   # print group_id
 
   return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
+

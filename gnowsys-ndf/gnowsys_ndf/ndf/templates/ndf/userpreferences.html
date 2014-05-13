@@ -1,0 +1,105 @@
+{% load ndf_tags %}
+
+{% block title %} {{author}} - Preferences  {% endblock %}
+<style type="text/css">
+.resource-drawer {
+border-color: #D3D3D3; border-style: solid;
+padding: 0 !important;
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px;
+background-repeat:no-repeat; background-size: 48px 48px
+}
+</style>
+
+{% block body_content %}
+{% all_gapps as all_apps %}
+
+<dl class="accordion" data-accordion>
+<dd>
+     <a id="forum_notif_pref" href="#preference">Click here to set notification preferences </a>
+     <div id="preference" class="content">
+       <div class="row">
+         <div class="large-10 small-2 columns">
+              <div class="large-4 columns">
+                 <font size="5"> Forum Notifications </font>
+	      </div> <!-- large-3 closes -->
+	      <div class="large-4 columns">
+              
+	      <div id="options" class="large-2 columns">
+		 <input type="radio" value="On" name="forum">On
+</div>
+	      <div id="options" class="large-2 columns">
+
+                 <input type="radio" value="Off" name="forum">Off
+              </div>
+</div>
+        </div>
+	</div>
+	 <div class="row">
+         <div class="large-10 small-4 columns">
+	      <font size="5">Select Groups</font>
+	 <div id="group_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+      </div>
+       
+              <div class="large-3 columns">
+	        <input type="button" id="save_preference" class="button small-10 small-push-1 colum" value="Save preferences" onclick="savepreference()">
+              </div>
+         </div>  <!-- large-2 small-2 closes -->
+     </div>  <!-- div row closes -->
+    </div> <!-- class content closes -->
+</dd>
+</dl>
+{% endblock %}
+
+<script type="text/javascript">
+var checkoptions = document.getElementsByName('forum');
+$(document).on('click','#options',function(){
+for ( var i = 0; i < checkoptions.length; i++) {
+    if(checkoptions[i].checked) {
+var selected=checkoptions[i].value; }
+};
+});
+
+$(document).on('click',"#forum_notif_pref",function(){
+$('#switchgrp #collection_set_drawer1').html("");
+ $('#switchgrp #collection_set_drawer2').html("");
+ $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
+var url='/{{group_id}}/user_preference/'+'{{author}}/';
+var data = {item:'forum',csrfmiddlewaretoken:'{{ csrf_token }}'};
+ $.getJSON( url, data,function( data ) {
+  $.each(data ,function(index , drawer_elements){
+  
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#switchgrp #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#switchgrp #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+
+ });
+   });
+
+});
+
+$(document).on('click','#save_preference',function(){
+
+});
+</script>

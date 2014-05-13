@@ -19,46 +19,53 @@
 {% endblock%}
 
 {% block meta_content %}
+{% get_group_name groupid as group_name_tag %}
 <ul class="side-nav"> 
+  {% for each in app_collection_set %}
+  
+    {% get_memberof_objects_count each.id groupid as count %}
+  
+    {% ifequal each.id app_set_id %}
+  
+      <li class="active"> 
+        <div>
+          
+          <a href="{% url "GAPPS_set_new_instance" group_name_tag app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
+            +&nbsp;Add
+          </a>
+          
+          <a href="{% url "GAPPS_set" group_name_tag app_name app_id each.id %}" >
+            {{each.name}} ({{count}})
+          </a> 
 
-	{% for each in app_collection_set %}
-	{% get_memberof_objects_count each.id groupid as count %}
+        </div>
+      </li>
+      
+    {% else %}
 
-	{% ifequal each.id app_set_id %}
-	<li class="active"> 
-		<div>
-			<a href="{% url 'GAPPS_set_new_instance' groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
-		    +&nbsp;Add
-			</a>
+      <li> 
+  
+        <div>
+        
+          <a href="{% url "GAPPS_set_new_instance" group_name_tag app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
+            +&nbsp;Add
+          </a>
+          <a href="{% url "GAPPS_set" group_name_tag app_name app_id each.id %}" >
+            {{each.name}} ({{count}})
+          </a> 
+          
+        </div>
+  
+      </li>
 
-			<a href="{% url 'GAPPS_set' groupid app_name app_id each.id %}" >
-        {{each.name}} ({{count}})
-			</a> 
-		</div>
-	</li>
-
-	{% else %}
-	<li> 
-    <div>
-      <a href="{% url 'GAPPS_set_new_instance' groupid app_name app_id each.id %}" style="float:right" title="Add {{each.name}}">
-        +&nbsp;Add
-      </a>
-
-      <a href="{% url 'GAPPS_set' groupid app_name app_id each.id %}" >
-        {{each.name}} ({{count}})
-      </a> 
-    </div>
-	</li>
-
-	{% endifequal %}
-
-	{% endfor %}
-
+    {% endifequal %}
+  
+  {% endfor %}
 </ul>
 {% endblock %}
 
 {% block body_content %} 
-  
+  {% get_group_name groupid as group_name_tag %}
   {# template for showing apt_set_instance list #}
 
   {% if app_set_template %}
@@ -113,10 +120,10 @@
           <tr>
         
             <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance" groupid app_name app_id app_set_id each.id %}">{{each.name}}</a></td>
+            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance" group_name_tag app_name app_id app_set_id each.id %}">{{each.name}}</a></td>
             <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
             <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
-            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id each.id %}" class="button medium">Edit</a></td>
+            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" group_name_tag app_name app_id app_set_id each.id %}" class="button medium">Edit</a></td>
         
           </tr>
           
@@ -131,14 +138,15 @@
 
     {% paginate %}
   {% endif %}
-
+    
 
 
 {# template for showing apt_set_instance details #}
 
 {% if app_set_instance_template %}
+    
+    <a href="{% url "GAPPS_set_instance_edit" group_name_tag app_name app_id app_set_id app_set_instance_id %}" class="button medium">
 
-    <a href="{% url "GAPPS_set_instance_edit" groupid app_name app_id app_set_id app_set_instance_id %}" class="button medium">
       Edit
     </a>
     <br/>
@@ -233,22 +241,22 @@
           
           {% if mime_type %}
             {% if "image" in mime_type %}
-              <a href = "{% url 'file_detail' groupid system_id %}">
-         <div style="display:table-cell;">
-         <img src="{% url 'getImageThumbnail' groupid system_id %}" />
-         </div>
+              <a href = "{% url 'file_detail' group_name_tag system_id %}">
+        	      <div style="display:table-cell;">
+        	        <img src="{% url 'getImageThumbnail' group_name_tag system_id %}" />
+        	      </div>
               </a>
             {% elif "video" in mime_type %}
-            <a href = "{% url 'file_detail' groupid system_id %}">
-       <div style="display:table-cell;">
-       <img src="{% url 'getImageThumbnail' groupid system_id %}" />
-       </div>
+            <a href = "{% url 'file_detail' group_name_tag system_id %}">
+      	<div style="display:table-cell;">
+      	  <img src="{% url 'getImageThumbnail' group_name_tag system_id %}" />
+      	</div>
             </a>
             {% else %}
-            <a href ="{% url 'file_detail' groupid system_id %}">
-       <div style="display:table-cell;">
-       <font size="3">{{app_set_instance_name}}</font>
-       </div>
+            <a href ="{% url 'file_detail' group_name_tag system_id %}">
+      	<div style="display:table-cell;">
+      	  <font size="3">{{app_set_instance_name}}</font>
+      	</div>
             </a>
             {% endif %}
           {% endif %}

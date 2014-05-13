@@ -19,6 +19,7 @@
   {% endblock %}
 
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 {% for node in module_coll %}
 {% get_version_of_module node.pk as version %}
@@ -39,10 +40,10 @@
       </h4>
     </header>
     <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-    <a class="small button expand" href="{% url 'module_detail' groupid node %}">Detail</a> 
+    <a class="small button expand" href="{% url 'module_detail' group_name_tag node %}">Detail</a> 
     {% get_user_object node.created_by as user_obj %}
     {% ifequal user_obj.username user.username %}
-    <a class="button alert tiny" href="{% url 'delete_module' groupid node %}?next={{request.path}}">Delete </a>
+    <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
     {% endifequal %}
     
     <footer class="row">
