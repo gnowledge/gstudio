@@ -15,6 +15,8 @@
 		border-radius: 4px;
 	}
 
+	#content > p:first-of-type { color: #6F6F6F !important; font-size: in }
+
 	/*.forum-summary > div {  padding-top: 1em; }*/
 
 	.forum-summary .user {  font-size: 1.5em;}
@@ -24,8 +26,8 @@
 	{
 		background-color:#E8E8E8 ;
 	}
-	#smalldiv
-	background-color:#F4F4F4;
+	/*#smalldiv*/
+	/*background-color:#F4F4F4;*/
 }
 .response_change{
 	margin-bottom:1px;
@@ -73,7 +75,9 @@
 				<!-- <hr style="margin:0.5rem 0;" /> -->
 				<br/><br/>      
 				<blockquote>
-					{{thread.content|default_if_none:"No description !!"}}
+					<!-- #{#{thread.content|default_if_none:"No description !!"}} -->
+					{{ thread.content|safe}}
+
 				</blockquote>
 		</div>
 	</div>
@@ -134,7 +138,7 @@
 
 	$("#node_search_form").parent().hide();
 
-
+	$("#refreshthread button.button.large.postfix").removeClass("large");
 	// </script>
 
 {% endblock %}

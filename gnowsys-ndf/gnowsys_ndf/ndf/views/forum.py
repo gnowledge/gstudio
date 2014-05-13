@@ -112,7 +112,7 @@ def create_forum(request,group_id):
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
         colf.save()
-        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id, 'forum_created_by':usrname}))
+        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id }))
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
 
@@ -207,7 +207,7 @@ def create_thread(request, group_id, forum_id):
         colrep.save()
 
         variables = RequestContext(request,
-                                    {   'forum':json.dumps(forum),
+                                    {   'forum':forum,
                                         'thread':colrep,
                                         'eachrep':colrep,
                                         'groupid':group_id,

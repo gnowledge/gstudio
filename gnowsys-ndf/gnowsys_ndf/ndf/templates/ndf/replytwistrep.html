@@ -11,33 +11,45 @@
 <script type="text/javascript">
 
   $(document).ready(function(){
-    
+
     $("#orgitdownreps{{eachrep}}").orgitdown(mySettings);
+
     $("#reply_forum{{eachrep}}").on("click",function(){
+
       document.getElementById('org{{eachrep}}').style.visibility='visible';
       $("#org{{eachrep}}").css("display","block");
+
     });
+
     $("#savereply{{eachrep}}").on("click",function(){
+
       var contento=$('#orgitdownreps{{eachrep}}').val()
+
       $('#orgitdownreps{{eachrep}}').val("");
+      
       if (contento != "")
       {
-
         var repl=$("#rep{{eachrep}}").val();
         var thd=$("#thd{{eachrep}}").val();
         var twname=""
         var fid="{{forum}}"
         var gpid="{{groupid}}"
         var ajurl="/"+gpid+"/forum/add_node/"
+
         $.ajax({
+
           url: ajurl,
           type: 'POST',
           data: {node:'Reply',thread:thd,forumid:fid,supnode:repl,reply:contento,twistname:twname,csrfmiddlewaretoken: '{{ csrf_token }}'},
+
           beforeSend: function() {
+
             $("#ajax_load_image").show();
             $("#body").css({"opacity":"0.1",})
           },
+
           success: function(data){
+
             $("#ajax_load_image").hide();
             document.getElementById('org{{eachrep}}').style.visibility='hidden';
             $("#org{{eachrep}}").css("display","none");
@@ -74,19 +86,49 @@
     width: 20em !important;
   }
   
-  .orgitdownContainer{
+  .row.orgitdownContainer{
     /*height:100px;*/
     background-color: #EEEEEE;
     padding: 0 1em;
   }
 
-  .orgitdownContainer > ul
+  .row.orgitdownContainer > ul
   {
     margin-bottom: 0 !important; 
   }
   /*.orgitdownEditor{
     height:60px;
   */}
+
+  .orgitdownContainer::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px; 
+  
+  }
+
+  .reply-button{
+    margin-left: -1.3em;
+    margin-top: -1em;
+    position: relative;
+    width: 21.87rem;
+  }
+/*
+  div#insidediv{
+    background-color:#e2f6ed ;
+  }*/
+
 </style>
 {% endblock %}
 <!-- end of head block -->
@@ -101,12 +143,16 @@
  </div>
 </div>
 
-<div id="org{{eachrep}}" style="display:none">
+<div id="org{{eachrep}}" style="display:none; margin-left:1em;" class="try">
   <div id="showorgeditor{{eachrep}}" class="orgcont" data-reveal="">
     <!-- Reply : -->
+
     <textarea id="orgitdownreps{{eachrep}}" name="content_org" placeholder="Please enter description..."></textarea>
-    <input id="savereply{{eachrep}}" type="button" value="Save">
+  
+    <input id="savereply{{eachrep}}" type="button" value="Post Reply"  class="button tiny reply-button">
+  
     <input type="hidden" id="rep{{eachrep}}" style="visibility:hidden" value="{{eachrep}}">
     <input type="hidden" id="thd{{eachrep}}" style="visibility:hidden" value="{{thread}}">
+  
   </div>
 </div>

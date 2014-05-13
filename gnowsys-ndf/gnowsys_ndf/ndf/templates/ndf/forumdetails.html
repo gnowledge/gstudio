@@ -24,6 +24,8 @@
   .forum-summary .user {  font-size: 1.5em;}
   .forum-summary .user i { border-radius: 50px; }
 
+  #content > p:first-of-type { color: #6F6F6F !important; font-size: in }
+
   table { border: none }
 
 </style>
@@ -36,7 +38,8 @@
 
 
 {% block meta_content %}
-<h2>Threads</h2>
+<!-- <h2>Threads</h2> -->
+<h3> &nbsp;Add thread to this forum</h3>
 {% endblock %}
 
 
@@ -90,15 +93,19 @@
       </div>
       <div class="small-10 columns">
         <blockquote>
-          <!-- #{#% with forum.content|safe as forum_content %} -->
-          <!-- #{#{forum_content|default_if_none:"No description !!"}} -->
-          <!-- #{#% endwith %} -->
-          {{forum.content|default_if_none:"No description !!"}}
+          {% with forum.content|safe as forum_content %}
+          {{forum_content|default_if_none:"No description !!"}}
+          {% endwith %}
+          <!-- #{#{forum.content|default_if_none:"No description !!"}} -->
         </blockquote>
       </div>
     </div>
 
     <hr/>
+
+    {% get_forum_twists forum as thread %}
+
+    {% if thread %}
 
     <table width="100%">
       <thead>
@@ -110,7 +117,7 @@
         </tr>
       </thead>
       <tbody>
-        {% get_forum_twists forum as thread %}
+
 
         {% for each in thread %}
           {% get_user_object each.created_by as user_obj %}
@@ -125,7 +132,11 @@
                 <i style="color:gray">- {{user_obj.username}}</i>
             </td>
           
-            <td>{{forum.content|default_if_none:"No description !!"}}</td>
+            <td>
+              {% with thread.content|safe as thread_content %}
+                {{thread_content|default_if_none:"No description !!"}}
+              {% endwith %}
+            </td>
           
             <td></td>
             <td></td>
@@ -135,6 +146,13 @@
           
       </tbody>
     </table>
+    
+    {% else %}
+    
+    <h5>This Forum dosen't have any Threads. &nbsp;&nbsp;&nbsp;Be first to create the Thread !</h5>
+
+    {% endif %}
+
     <!-- <font size ="2" >{{forum_content}} </font> -->
 
   <!-- </div> -->
