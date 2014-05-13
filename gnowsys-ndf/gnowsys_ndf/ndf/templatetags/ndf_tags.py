@@ -695,7 +695,7 @@ def user_access_policy(node,user):
     col_Group=db[Group.collection_name]
     group_gst = col_Group.Group.one({'_id':ObjectId(node)})
     # if user.id in group_gst.group_set or group_gst.created_by == user.id:
-    if user.id in group_gst.author_set or group_gst.created_by == user.id or user.is_superuser:
+    if user.id in group_gst.author_set or group_gst.created_by == user.id :
       return 'allow'
   except Exception as e:
     print "Exception in user_access_policy- "+str(e)

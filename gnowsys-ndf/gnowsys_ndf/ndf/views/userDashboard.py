@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
 
 from django_mongokit import get_database
@@ -32,7 +33,7 @@ db = get_database()
 collection = db[Node.collection_name]
 collection_tr = db[Triple.collection_name]
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
-at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference'}]})
+at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
 ins_objectid  = ObjectId()
 
 
@@ -151,7 +152,7 @@ def dashboard(request, group_id):
 def user_preferences(request,group_id):
     try:
         print "inside userprefview"
-        node=collection.Node.one({'_id':ObjectId(group_id)})
+        grp=collection.Node.one({'_id':ObjectId(group_id)})
         if request.method == "POST":
             return HttpResponse("Success") 
         else:  
@@ -160,7 +161,7 @@ def user_preferences(request,group_id):
                 return HttpResponse("Failure")
             poss_attrs=grp.get_possible_attributes(at_user_pref._id)
             if poss_attrs:
-                list_at_apps=poss_attrs['user_preference']['object_value']
+                list_at_apps=poss_attrs['user_preference_off']['object_value']
             st=get_all_gapps()
             data_list=set_drawer_widget(st,list_at_apps)
             return HttpResponse(json.dumps(data_list))

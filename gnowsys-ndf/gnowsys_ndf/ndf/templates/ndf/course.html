@@ -10,9 +10,12 @@
   <div class="page">
     <h4><i class="fi-plus"></i> New</h4>
       {% if user.is_authenticated %}
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
       <a class="button expand" href="{% url 'create_edit' groupid %}">
         Create {{title}}
       </a>
+      {% endif %}
       {% endif %}
   </div>
 </li>

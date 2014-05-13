@@ -211,7 +211,11 @@ ul#graph-hover.f-dropdown{
   
     <!-- added button to convert collection into module-->
     {% if node.collection_set and user.is_authenticated%}
+    {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+     
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
+    {% endif %}
     {% endif %}
 
     {% if node %}

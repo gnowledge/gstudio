@@ -21,11 +21,13 @@
 
 	<div class="medium-12 columns">
 		{% if user.is_authenticated %}
-
+                {% user_access_policy groupid request.user as user_access %}
+                {% if user_access == "allow" %}
+     
 		<a href="{% url 'create_forum' groupid %}">
 			<input type="submit" class="button" value="Create a New forum" />
 		</a>
-
+                {% endif %}
 		{% endif %}
 	</div>
 </header>
