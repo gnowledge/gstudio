@@ -16,7 +16,7 @@
 		border-radius: 4px;
 	}
 
-	#content > p:first-of-type { color: #6F6F6F !important; font-size: in }
+	#content > p:first-of-type { color: #6F6F6F !important; font-size: inherit;  }
 
 	/*.forum-summary > div {  padding-top: 1em; }*/
 
@@ -38,6 +38,18 @@
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 } 
+
+/*#content > p:first-of-type:before {
+display: block;
+content: "\201C";
+font-size: 80px;
+position: absolute;
+left: 15px;
+top: 30px;
+color: #7a7a7a;
+}
+
+*/
 </style>
 {% endblock %}
 
@@ -73,7 +85,7 @@
 			<small>{{thread.created_at|date:"D d M Y" }}</small>
 		</div>
 		<div class="small-10 columns">
-			<font size ="5">Thread Name : {{thread.name}} </font>
+			<font size ="5">Thread: {{thread.name}} </font>
 				<!-- <hr style="margin:0.5rem 0;" /> -->
 				<br/><br/>      
 				<blockquote>
