@@ -532,7 +532,6 @@ def get_group_name(val):
 def get_edit_url(groupid):
 
   node = collection.Node.one({'_id': ObjectId(groupid) }) 
-  print "node_edit_url",node
   if node._type == 'GSystem':
 
     type_name = collection.Node.one({'_id': node.member_of[0]}).name
@@ -823,46 +822,27 @@ def get_source_id(obj_id):
     print str(e)
     return 'null'
  
-
-# @register.assignment_tag
-# def get_possible_translations(obj_id):
-#   if not str(obj_id._id) in check:
-#       check.append(str(obj_id._id))
-#       relation_set=obj_id.get_possible_relations(obj_id.member_of)
-#       if relation_set.has_key('translation_of'):
-#         for k,v in relation_set['translation_of'].items():
-#           if k == "subject_or_right_subject_list":
-#             for each in v:
-#               if not str(each._id) in check:
-#                 dic={}
-#                 dic[each['_id']]=each['language']
-#                 print dic,"dddddddddddddddddddddddddddiiiiiiiiiiiiiiiiiiiiccccccccccccccc"
-#                 translation_set.append(dic)
-        
-#                 get_possible_translations(each)
-          
-#   return translation_set
-
+def get_translation_relation(obj_id, translation_list = [], r_list = []):
+  r_list.append(obj_id._id)
+  relation_set=obj_id.get_possible_relations(obj_id.member_of)
+  if relation_set.has_key('translation_of'):  
+    for k,v in relation_set['translation_of'].items():                      
+      if k == 'subject_or_right_subject_list':
+        for each in v:
+          dic={}
+          if (each['_id'] not in r_list):
+            r_list.append(each['_id'])
+            dic[each['_id']]=each['language']
+            translation_list.append(dic)
+            get_translation_relation(each,translation_list, r_list)
+  return translation_list
 
 @register.assignment_tag
 def get_possible_translations(obj_id):
-  try:
-    relation_set=obj_id.get_possible_relations(obj_id.member_of)
-    translation_set=[]
-    for key,value in relation_set.items():
-      if key == 'translation_of':
-        for k,v in value.items():
-          if k == "subject_or_right_subject_list":
-            for each in v:
-              dic={}
-              dic[each['_id']]=each['language']
-              translation_set.append(dic)
+  translation_list = []
+  r_list1 = []
+  return get_translation_relation(obj_id,r_list1,translation_list)
 
-    return translation_set
-  except Exception as e:
-    print str(e)
-    return 'null'
- 
 
 
   #code commented in case required for groups not assigned edit_policy        

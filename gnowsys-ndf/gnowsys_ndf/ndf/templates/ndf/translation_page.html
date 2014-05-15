@@ -12,8 +12,13 @@
 {% csrf_token %}
 <script type="text/javascript">
 $(document).ready(function(){
+{%  get possible_translations node as translations %}
+{% for each in translations %}
+{% for k,v in each.items %}
 
-$("#lan option[value={{node.language}}]").remove();
+$("#lan option[value={{v}}]").remove();
+{% endfor %}
+{% endfor %}
 });
 
 </script>
