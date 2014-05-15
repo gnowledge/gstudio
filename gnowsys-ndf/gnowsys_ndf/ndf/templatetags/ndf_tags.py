@@ -564,7 +564,7 @@ def get_group_name(val):
 def get_edit_url(groupid):
 
   node = collection.Node.one({'_id': ObjectId(groupid) }) 
-  print "node_edit_url",node
+
   if node._type == 'GSystem':
 
     type_name = collection.Node.one({'_id': node.member_of[0]}).name
