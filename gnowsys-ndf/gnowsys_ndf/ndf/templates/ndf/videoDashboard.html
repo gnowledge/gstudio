@@ -2,7 +2,7 @@
 {% load ndf_tags %}
 {% block title %} video Gallery {% endblock %}
 {% block body_content %} 
-
+{% get_group_name groupid as group_name_tag %}
 {% if already_uploaded %} 
 <div id="message">
   <span style="color:red">Listed below files are already uploaded please choose different files</span>
@@ -16,7 +16,7 @@
 
 
 
-<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' groupid %}">
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name_tag %}">
   <div class="row"  style="padding-top:20px">
     <div class="large-7 columns">
       <div class="row collapse">
@@ -29,7 +29,7 @@
 	    </a>
 	  </div>
 	  <div class="small-2 columns">
-            <a href="{% url 'uploadDoc' groupid %}?next={{request.path}}" class="button postfix secondary">
+            <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="button postfix secondary">
 	      <i class="fi-paperclip">upload</i>
 	    </a>
 	  </div>
@@ -42,7 +42,7 @@
   {% for video in videoCollection %}
   <li>
     <a class="video" id="{{video}}" href="#">
-      <img src="{% url 'getvideoThumbnail' groupid video %}" style="border-radius:10px;"></img>
+      <img src="{% url 'getvideoThumbnail' group_name_tag video %}" style="border-radius:10px;"></img>
       <span align="left">{{video.name}}</span>
     </a>
     {% get_user_object video.created_by as user_obj %}

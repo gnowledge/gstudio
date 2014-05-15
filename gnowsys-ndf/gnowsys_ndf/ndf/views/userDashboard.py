@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import get_drawers
+from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.settings import GAPPS
 
@@ -32,6 +32,8 @@ db = get_database()
 collection = db[Node.collection_name]
 collection_tr = db[Triple.collection_name]
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
+at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference'}]})
+ins_objectid  = ObjectId()
 
 
 #######################################################################################################################################
@@ -40,7 +42,18 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
 
 
 def dashboard(request, group_id):	
-    
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
     uploaded = "None"
@@ -134,6 +147,7 @@ def dashboard(request, group_id):
                               {'username': request.user.username, 'user_id': ID, 'DOJ': date_of_join, 
                                'prof_pic_obj': img_obj,
                                'group_id':group_id,              
+                               'author':auth,
                                'already_uploaded': uploaded,
                                'shelf_list': shelf_list,'shelves': shelves,
                                'page_drawer':page_drawer,'image_drawer': image_drawer,
@@ -145,3 +159,22 @@ def dashboard(request, group_id):
                               context_instance=RequestContext(request)
     )
 
+def user_preferences(request,group_id):
+    try:
+        print "inside userprefview"
+        node=collection.Node.one({'_id':ObjectId(group_id)})
+        if request.method == "POST":
+            return HttpResponse("Success") 
+        else:  
+            list_at_apps=[]
+            if not at_user_pref:
+                return HttpResponse("Failure")
+            poss_attrs=grp.get_possible_attributes(at_user_pref._id)
+            if poss_attrs:
+                list_at_apps=poss_attrs['user_preference']['object_value']
+            st=get_all_gapps()
+            data_list=set_drawer_widget(st,list_at_apps)
+            return HttpResponse(json.dumps(data_list))
+    except Exception as e:
+        print "Exception in userpreference view "+str(e)
+        return HttpResponse("Failure")

@@ -124,6 +124,10 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Pandora Video":
         gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
         drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
+      elif checked == "Theme":
+        theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   

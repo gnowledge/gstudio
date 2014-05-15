@@ -1,52 +1,102 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load pagination_tags %}
-{% block title %}Forum{% endblock %}
+
+{% block title %} Forum {% endblock %}
+
+{% block head %}
+<style type="text/css">
+
+	#create-forum i{
+		color: white;
+	}
+
+	#content > p:first-of-type { color: #6F6F6F !important; font-size: inherit; }
+
+	p { color: #6F6F6F !important; font-size: inherit; }
+
+</style>
+{% endblock %}
+
 
 {% block meta_content %}
 
-<h2>Forums</h2>
+	<h2>Forums</h2>
 
 {% endblock %}
+
+
+{% block concern_information %}
+
+	<br/>
+	<ul class="no-bullet" id="create-forum"> 
+		<li class="create card ">
+			<div>
+				<h4><i class="fi-plus"></i> New</h4>
+
+				{% if user.is_authenticated %}
+					{% user_access_policy groupid request.user as user_access %}
+					
+					{% if user_access == "allow" %}
+						<a class="button expand" href="{% url 'create_forum' groupid %}">
+							Create &nbsp;Forum
+						</a>
+					{% endif %}
+
+				{% endif %}
+			</div>
+		</li>
+	</ul>
+
+{% endblock %}
+
 
 {% block help_content %}
 
-<p>The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others.</p>
+	<p>The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others.</p>
 
 {% endblock %}
+
 
 {% block body_content %}
+{% get_group_name groupid as group_name_tag %}
 
-<header class="row">
+	{% autopaginate existing_forums 23 %}
+	<h2>Latest Forums</h2><hr/>
+	<div id="existing_forums">
+		<ul class="small-block-grid-1 medium-block-grid-2">
+			{% for each in existing_forums %}
 
-	<div class="medium-12 columns">
-		{% if user.is_authenticated %}
-
-		<a href="{% url 'create_forum' groupid %}">
-			<input type="submit" class="button" value="Create a New forum" />
-		</a>
-
-		{% endif %}
+				<li class="card">
+					<a href="{% url 'show' groupid each %}">  
+						<h3>{{each.name}}</h3>
+						<p class="">
+							{% with each.content|safe as forum_content %}
+					          {{forum_content|default_if_none:"No description !!"}}
+					        {% endwith %}
+						</p>
+					</a>
+				</li>
+			{% endfor %}
+		</ul>
 	</div>
-</header>
 
+	{% paginate %}
 
-{% autopaginate existing_forums 23 %}
-<div id="existing_forums">
-	<ul class="small-block-grid-1 medium-block-grid-2">
-		{% for each in existing_forums %}
-              
-		<li class="card">
-            <a href="{% url 'show' groupid each %}">  
-            <h3>{{each.name}}</h3>
-                <p class="fixme">This is the forum description text</p>
-                </a>
-            </li>
-            
-
-		{% endfor %}
-	</ul>
-</div>
-{% paginate %}
 {% endblock %}
 
+
+
+{% block script %}
+
+// <script type="text/javascript">
+
+	$("#node_search_form").parent().hide();
+
+	// removing left-off-canvas behaviour
+	// $("#create-forum a.left-off-canvas-toggle:lt(2)").remove();
+	// $("#create-forum a.left-off-canvas-toggle").removeClass("left-off-canvas-toggle");
+
+	// </script>
+
+	{% endblock %}

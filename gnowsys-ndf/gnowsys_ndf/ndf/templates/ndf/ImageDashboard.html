@@ -2,6 +2,7 @@
 {% load ndf_tags %}
 {% block title %} Image Gallery {% endblock %}
 {% block body_content %} 
+{% get_group_name groupid as group_name_tag %}
 <script type="text/javascript" src="http://jqueryrotate.googlecode.com/svn/trunk/jQueryRotate.js"></script>
 {% if already_uploaded %} 
 <div id="message">
@@ -15,7 +16,7 @@
 {% endif %}
 
 
-<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' groupid %}">
+<form id ="file_search" enctype="multipart/form-data" method="GET" action="{% url 'image_search' group_name_tag %}">
   <div class="row"  style="padding-top:20px">
     <div class="large-7 columns">
       <div class="row collapse">
@@ -28,7 +29,7 @@
 	    </a>
 	  </div>
 	  <div class="small-2 columns">
-            <a href="{% url 'uploadDoc' groupid %}?next={{request.path}}" class="button postfix secondary">
+            <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="button postfix secondary">
 	      <i class="fi-paperclip">upload</i>
 	    </a>
 	  </div>
@@ -40,8 +41,8 @@
 <ul class="clearing-thumbs" data-clearing>
   {% for image in imageCollection %}
   <li  class="clearing-featured-img">
-    <a href="{% url 'get_mid_size_img' groupid image %}">
-      <img  src="{% url 'getImageThumbnail' groupid image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' groupid image %}'>{{image.name}}</a> <script type='text/javascript'>
+    <a href="{% url 'get_mid_size_img' group_name_tag image %}">
+      <img  src="{% url 'getImageThumbnail' group_name_tag image %}"  class="th" data-caption="<div class='img_rotate'> <i class='fi-refresh large'></i> </div><a href='{% url 'image_detail' group_name_tag image %}'>{{image.name}}</a> <script type='text/javascript'>
 											   var angle = 0;
 											   $('.img_rotate').on('click', function() {
 											   angle += 90;
