@@ -85,6 +85,13 @@
 			<textarea class="marker-obs-note" placeholder="Observation"></textarea>
 			<label>Tags</label>
 			<input type="text" class="marker-tags" placeholder="Tags"/>
+			
+			<!-- adding created by field for anonymous user -->
+			{% if not user.is_authenticated %}
+			<label>Enter Your Name:</label>
+			<input type="text" class="marker-creator" placeholder="Enter your name"/>
+			{% endif %}
+			
 			<!-- <input type="file" class="marker-file-upload" /> -->
 
 			<div class="row">
@@ -244,6 +251,7 @@
 						tempPopupContent = datetime? tempPopupContent + "<hr/>Date Time : " + datetime :tempPopupContent;
 						tempPopupContent = description? tempPopupContent + "<hr/>Description : " + description :tempPopupContent;
 						tempPopupContent = tags? tempPopupContent + "<hr/>Tags : " + tags :tempPopupContent;
+						tempPopupContent = created_by? tempPopupContent + "<hr/>created_by : " + created_by :tempPopupContent;
 
 						hasDataFlag = tempPopupContent.length>0 ? true : false;
 					{% endif %}
