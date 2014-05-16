@@ -2,6 +2,7 @@
 {% block title %} {{title}} {% endblock %}
 {% load ndf_tags %}
 {% load pagination_tags %}
+
 {% block help_topics %}
 <li><a href="#">Pages Introduction</a></li>
 <li><a href="#">Working with Pages</a></li>
@@ -22,7 +23,7 @@
 {% endblock %}
 
 {% block body_content %} 
-
+{% get_group_name groupid as group_name_tag %}
 <header class="row">
 
   <dl class="tabs" data-tab>
@@ -85,7 +86,7 @@
       {% if user.is_authenticated %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user_access == "allow" %}
-      <a class="button expand" href="{% url 'page_create_edit' groupid %}">
+      <a class="button expand" href="{% url 'page_create_edit' group_name_tag %}">
         Create {{title}}
       </a>
       {% endif %}
@@ -123,10 +124,10 @@
       
       <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
       
-      <a class="small button expand" href="{% url 'page_details' groupid node %}">Page Details</a>
+      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
 
       {% if node.created_by == request.user.id %}
-      <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
+      <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
       {% endif %}
      {% group_type_info groupid request.user as grouptype %}
      {% if  grouptype == "Moderated" %}
@@ -168,10 +169,10 @@
 
     <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
 
-    <a class="small button expand" href="{% url 'page_details' groupid node %}">Page Details</a>
+    <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
 
     {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url 'page_delete' groupid node %}">Delete</a>
+    <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
     {% endif %}
           
     

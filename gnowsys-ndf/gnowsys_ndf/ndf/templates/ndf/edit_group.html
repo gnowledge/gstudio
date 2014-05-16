@@ -210,7 +210,7 @@ $(document).on('click',"#app_selected",function(){
 $('#mySystemtype #collection_set_drawer1').html("");
  $('#mySystemtype #collection_set_drawer2').html("");
  $('#mySystemtype #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
-var url='/{{groupid}}/app_selection/'+'{{node}}';
+var url='/{{groupid}}/group/app_selection/';
  $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
    if(index == 0)

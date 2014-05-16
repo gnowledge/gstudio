@@ -21,10 +21,26 @@ collection = db[Node.collection_name]
 GST_COLLECTION = db[GSystemType.collection_name]
 GST_COURSE = GST_COLLECTION.GSystemType.one({'name': GAPPS[7]})
 
-def course(request, group_id, course_id):
+def course(request, group_id, course_id=None):
     """
    * Renders a list of all 'courses' available within the database.
     """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if course_id is None:
+        course_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Course"})
+        if course_ins:
+            course_id = str(course_ins._id)
     if GST_COURSE._id == ObjectId(course_id):
         title = GST_COURSE.name
         course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
@@ -36,7 +52,18 @@ def course(request, group_id, course_id):
 def create_edit(request, group_id, node_id = None):
     """Creates/Modifies details about the given quiz-item.
     """
-
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     context_variables = { 'title': GST_COURSE.name,
                           'group_id': group_id,
                           'groupid':group_id
@@ -50,7 +77,7 @@ def create_edit(request, group_id, node_id = None):
     if request.method == "POST":
         get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save()
-        return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id, 'course_id': GST_COURSE._id}))
+        return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id}))
         
     else:
         if node_id:
@@ -63,7 +90,21 @@ def create_edit(request, group_id, node_id = None):
                               )
 
 def course_detail(request, group_id, _id):
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     course_node = collection.Node.one({"_id": ObjectId(_id)})
+    if course_node._type == "GSystemType":
+	return course(request, group_id, _id)
     return render_to_response("ndf/course_detail.html",
                                   { 'node': course_node,
                                     'groupid': group_id,

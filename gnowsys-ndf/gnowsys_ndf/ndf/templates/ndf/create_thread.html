@@ -1,0 +1,181 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% block title %}Creating Thread to Forum : {{forum.name}} {% endblock %}
+
+{% block head %}
+
+  <!-- orgitdown! -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
+  <style type="text/css">
+    #save_form{ margin-top: 2em; }
+    
+    .pricing-table li.bullet-item {  text-align: left; }
+
+    .forum-summary{
+      background-color: #efefef;
+      box-shadow: 0px 2px 2px 2px lightgray;
+      margin: 2em 1em !important;
+      padding: 1em;
+      border : medium gray;
+      border-radius: 4px;
+    }
+
+    .forum-summary .user {  font-size: 1.5em;}
+    .forum-summary .user i { border-radius: 50px; }
+  </style>
+  
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2 style="border-bottom: medium dotted #008759; margin-top: -1.3rem; padding-bottom: 1rem;">Thread</h2>
+  <br/>  
+{% endblock %}
+
+
+{% block concern_information %}
+  <div id="thread-listing"></div>
+{% endblock %}
+
+
+{% block help_content %}
+  <p>Threads are new ideas on the topic</p>
+{% endblock %}
+
+
+{% block body_content %} 
+    
+  <h2>Add a new Thread to forum</h2>
+  
+  <div class="row forum-summary">
+    <div class="small-2 columns">
+      <a class="user"></a>
+      <br/><br/>
+      <i>{{ forum_created_by }}</i> <br/>
+      <small>{{forum.created_at|date:"D d M Y" }}</small>
+      <!-- <small>{#{#forum.created_by}}</small> -->
+    </div>
+    <div class="small-10 columns">
+      <font size ="5">Forum Name : <a href="/{{groupid}}/forum/show/{{forum}}">
+        {{forum.name}}</a></font>
+      <!-- <hr style="margin:0.5rem 0;" /> -->
+      <br/><br/>      
+      <blockquote>
+        <!-- #{#{forum.content|default_if_none:"No description !!"}} -->
+        {% with forum.content|safe as forum_content %}
+          {{forum_content}}
+        {% endwith %}
+      </blockquote>
+    </div>
+  </div>
+  <hr/>
+  <!-- <hr/> -->
+
+  <form id="create_thread" method="POST">
+  {% csrf_token %}
+
+    <!-- forum name   -->
+    <div class="row">
+      <div class="large-2 medium-4 columns "><h5><b>Thread name : </b></h5></div>
+      <div class="large-pull-4 large-6 medium-8 columns">
+        <input type="text" placeholder="Enter the name of forum here" 
+        name="thread_name" id="thread_name">
+        <input type="hidden" id="forum_threads" value="{{forum_threads}}"/>          
+      </div>
+    </div>
+    <br/><br/>
+
+    <!-- Description org editor -->
+    <h5><b>Thread Content :</b></h5>
+    <div class="row">
+      <div class="large-8 large-pull-4 large-offset-4 columns" 
+           style="padding:0 1.65em 0 1.4em;">
+
+        <textarea id="orgitdown" name="content_org" 
+        placeholder="Some description about forum ..."></textarea>
+        <div id="message" style="display:none; color:red"></div>
+        <!-- <input type="button" id="save_edit_cont" class="button" value="Save"> -->
+      </div>
+      <br/>
+
+      <!-- Final Create forum button -->
+      <div class="large-8 columns">
+
+        <input type="submit" id="forum" value="Create Forum" style="display:none">
+        <!-- <input id="forum" type="hidden" value="{{forum}}"> -->
+        <input type="button" id="save_form" class="button expand" value="Create thread" onclick="saveforum()">
+      </div>
+
+    </div>
+ 
+  </form>
+
+{% endblock %}
+
+
+{% block script %}
+
+  // <script type="text/javascript">
+  $("#node_search_form").parent().hide();
+
+  var flag = false;
+  var nodes = JSON.parse($("#forum_threads").val());
+
+  html = '<ul class="pricing-table"> <li class="title"> Existing threads of forum </li>'
+  nodes.forEach( function(s, i){ html += '<li class="bullet-item">' + s + '</li>' });
+
+  $("#thread-listing").html(html + "</ul>")
+  
+
+  $(document).ready(function(){
+
+    $("#thread_name").change(function(){
+
+      var name = $("#thread_name").val().toLowerCase();
+      nodes.forEach( function(s, i){ nodes[i] = s.toLowerCase()})
+
+      if (nodes.indexOf(name) > -1)
+      {
+        flag = false;
+        $("#message").css("display", "block");
+        $("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+        $("#thread_name").val("");
+      }
+      else
+      {
+        flag = true;
+        $("#message").css("display", "none");
+      }
+
+    });
+  });
+
+  function saveforum(){
+    var name=$("#thread_name").val();
+    if (name=="" )
+    {
+      alert("Please enter forum name");
+    }
+    else if(!flag)
+    {
+      alert("Thread with same name already exist !")
+    }
+    else
+    {
+      $("#forum").trigger('click');
+    }
+  }
+
+
+  // ==================================
+
+  // orgitdown
+  $('#orgitdown').orgitdown(mySettings);
+
+  // </script>
+{% endblock %}

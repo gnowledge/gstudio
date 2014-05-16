@@ -55,16 +55,18 @@ background-repeat:no-repeat; background-size: 48px 48px
 <div class="large-6 small-2 columns">
 <font size="4">Select Groups:</font>
 </div>
+{% comment %}
 <div class="large-5 small-2 columns">
 <input id="selectall" type="checkbox"><font size="4">Select All</font>
 </div>
+{% endcomment %}
 </div>
 </div>
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       
        
               <div class="large-3 columns">
-	        <input type="button" id="save_preference" class="button small-10 small-push-1 colum" value="Save preferences" onclick="savepreference()">
+	        <input type="button" id="save_preference" class="button small-10 small-push-1 colum" value="Save preferences">
               </div>
      </div> <!--div userpref -->
      </div>  <!-- div row closes -->
@@ -74,21 +76,23 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% endblock %}
 
 <script type="text/javascript">
-var selected=""
+var data_prefs = "";
+var selected = "";
+var drawer2_empty=1;
 $(document).ready(function(){
 var a=$('input[name=forum]')[1].checked=true;
+selected="On";
 });
 var checkoptions = document.getElementsByName('forum');
 $(document).on('click','#options',function(){
 selected=$('input[name=forum]:checked').val();
-alert(selected);
 });
 
 $(document).on('click',"#forum_notif_pref",function(){
 $('#userpref #collection_set_drawer1').html("");
  $('#userpref #collection_set_drawer2').html("");
  $('#userpref #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
-var url='/{{groupid}}/user_preference/'+'{{author}}/';
+var url='/{{groupid}}/user_preference/'+'{{author}}';
 var data = {item:'forum',csrfmiddlewaretoken:'{{ csrf_token }}'};
  $.getJSON( url, data,function( data ) {
   $.each(data ,function(index , drawer_elements){
@@ -103,6 +107,7 @@ var data = {item:'forum',csrfmiddlewaretoken:'{{ csrf_token }}'};
     {
     $.each(drawer_elements.drawer2, function(index, element) {
         $('#userpref #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        drawer2_empty=0;
       });
     }
 
@@ -110,14 +115,54 @@ var data = {item:'forum',csrfmiddlewaretoken:'{{ csrf_token }}'};
    });
 
 });
-$(document).on('click','#selectall',function(){
-$(".price").each(function(){
-alert($(this));
-});
-});
-//
-//$("#collection_set_btnRight").trigger('click');
-$(document).on('click','#save_preference',function(){
+//$(document).on('click','#selectall',function(){
+//var lst=$('ul li.bullet-item text-left');
+//alert(lst.length);
+//});
 
-});
+
+function get_status(){
+
+}
+
+function get_all_data(){
+ $.each($('#userpref #collection_set_drawer2 li'),function(index,item){
+         data_prefs=data_prefs+String(item.id)+",";
+         });
+}
+
+$(document).on('click','#save_preference',function(){
+get_all_data();
+var pref_to_set=data_prefs;
+var vurl='/{{groupid}}/user_preference/'+'{{author}}';
+alert(selected);
+if (selected=='Off'){
+     $.ajax({
+             url: vurl,
+             type: 'POST',
+             data: {pref_to_set:pref_to_set,csrfmiddlewaretoken: '{{csrf_token}}'},
+             beforeSend: function(){
+              $("#ajax_load_image").show();
+              $("#body").css({"opacity":"0.1",})
+                              },
+             success: function(data){
+                       alert("Successfully set preferences ");
+               },
+             complete: function(){
+                    $("#ajax_load_image").hide();
+                $("#body").css({"opacity":"",})
+
+          }
+
+          }); //end of ajax
+
+    } //end_of_if_selected()
+    else
+    {
+     if (drawer2_empty){
+          alert("choose off option to turn off notifications");
+        }
+    }
+}); //end_of_click_save_gapps
+
 </script>

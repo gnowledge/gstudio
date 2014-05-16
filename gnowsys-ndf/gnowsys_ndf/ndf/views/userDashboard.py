@@ -25,7 +25,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.settings import GAPPS
-
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 #######################################################################################################################################
 
@@ -43,7 +43,18 @@ ins_objectid  = ObjectId()
 
 
 def dashboard(request, group_id):	
-    
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
     uploaded = "None"
@@ -149,21 +160,47 @@ def dashboard(request, group_id):
                               context_instance=RequestContext(request)
     )
 
-def user_preferences(request,group_id):
+def user_preferences(request,group_id,auth_id):
     try:
         print "inside userprefview"
-        grp=collection.Node.one({'_id':ObjectId(group_id)})
+        grp=collection.Node.one({'_id':ObjectId(auth_id)})
+        print "authna=",grp.name
         if request.method == "POST":
-            return HttpResponse("Success") 
+            lst=[]
+            pref_to_set = request.POST['pref_to_set']
+            pref_list=pref_to_set.split(",")
+            print "preflist=",pref_list
+            if pref_list:
+                for each in pref_list:
+                    if each:
+                        obj=collection.Node.one({'_id':ObjectId(each)})
+                        lst.append(obj);
+                print "lst=",lst
+                gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_user_pref._id},{'subject':grp._id}]})
+                if gattribute:
+                    gattribute.delete()
+                if lst:
+                    create_attribute=collection.GAttribute()
+                    create_attribute.attribute_type=at_user_pref
+                    create_attribute.subject=grp._id
+                    create_attribute.object_value=lst
+                    create_attribute.save()            
+            return HttpResponse("Success")
+
+
         else:  
-            list_at_apps=[]
+            list_at_pref=[]
+            user_id=request.user.id
             if not at_user_pref:
                 return HttpResponse("Failure")
             poss_attrs=grp.get_possible_attributes(at_user_pref._id)
             if poss_attrs:
-                list_at_apps=poss_attrs['user_preference_off']['object_value']
-            st=get_all_gapps()
-            data_list=set_drawer_widget(st,list_at_apps)
+                list_at_pref=poss_attrs['user_preference_off']['object_value']
+            all_user_groups=[]
+            for each in get_all_user_groups():
+                all_user_groups.append(each.name)
+            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
+            data_list=set_drawer_widget(st,list_at_pref)
             return HttpResponse(json.dumps(data_list))
     except Exception as e:
         print "Exception in userpreference view "+str(e)

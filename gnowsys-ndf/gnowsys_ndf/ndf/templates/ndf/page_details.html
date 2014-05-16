@@ -1,9 +1,9 @@
 {% extends "ndf/node_details_base.html" %}
-
+{% load ndf_tags %}
 <!-- This page has been commented out, everything has been integrated to node_details_base-->
 
 {% block meta_content %}
-
+{% get_group_name groupid as group_name_tag %}
 <!-- <p> -->
 <!-- {{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by <a href="#" class="user">{{ node.user_details_dict.created_by }}</a> -->
 <!-- </p> -->
