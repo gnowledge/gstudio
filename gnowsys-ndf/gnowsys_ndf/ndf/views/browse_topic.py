@@ -32,6 +32,24 @@ topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 
 def themes(request, group_id, app_id=None, app_set_id=None):
 
+	ins_objectid  = ObjectId()
+	if ins_objectid.is_valid(group_id) is False :
+		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		if group_ins:
+		    group_id = str(group_ins._id)
+		else :
+		    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		    if auth :
+		        group_id = str(auth._id)
+	else :
+	    pass
+	if app_id is None:
+	    app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'Browse Topic'})
+	    if app_ins:
+	        app_id = str(app_ins._id)
+
+
 	app_collection_set = [] 
 	appName = "browse topic"
    	title = appName

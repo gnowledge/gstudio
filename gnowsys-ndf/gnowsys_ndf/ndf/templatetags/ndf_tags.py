@@ -943,6 +943,11 @@ def get_group_name(groupid):
         group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(groupid)})
         if group_ins:
             group_name = group_ins.name
+	else :
+	    auth = collection.Node.one({'_type': 'Author', "_id": ObjectId(groupid) })
+	    if auth :
+	    	group_name = auth.name
+
   else :
         pass
   return group_name 
