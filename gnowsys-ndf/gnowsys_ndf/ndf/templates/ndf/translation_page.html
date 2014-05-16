@@ -1,4 +1,5 @@
 {% extends "ndf/node_details_base.html" %}
+{% load ndf_tags %}
 
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
@@ -12,8 +13,14 @@
 {% csrf_token %}
 <script type="text/javascript">
 $(document).ready(function(){
-
 $("#lan option[value={{node.language}}]").remove();
+{% get_possible_translations node as translations %}
+{% for each in translations %}
+{% for k,v in each.items %}
+$("#lan option[value={{v}}]").remove();
+
+{% endfor %}
+{% endfor %}
 });
 
 </script>
