@@ -29,7 +29,19 @@
 		
 		#map { height: 100%; width: 100%; }
 
-		.leaflet-popup-content {	min-width:166px; max-width: auto;	}
+		.leaflet-popup-content {
+			min-width:166px; 
+			max-width: auto;	
+			/*border-radius: 10px;*/
+		    /*padding: 1em;*/
+		}
+
+		.leaflet-popup-content .pricing-table{
+			border: none ;
+		}
+
+		.leaflet-popup-content .pricing-table .bullet-item { text-align: left; font-size: small; }
+		.leaflet-popup-content .pricing-table .title { border-top-left-radius: 9px;  border-top-right-radius: 9px; }
 
 		.leaflet-popup-content > textarea { 
 			min-height: 4.5em !important;
@@ -88,7 +100,7 @@
 			
 			<!-- adding created by field for anonymous user -->
 			{% if not user.is_authenticated %}
-			<label>Enter Your Name:</label>
+			<label>Contributor</label>
 			<input type="text" class="marker-creator" placeholder="Enter your name"/>
 			{% endif %}
 			
@@ -178,8 +190,8 @@
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
 	 	mapdata = "";
+
 		// exctracting GeoJson sent from server
-		
 		{% if template_view == "landing_page_view" %}
 		
 			{% for each in app_collection_set %}
@@ -247,11 +259,19 @@
 
 					{% if mode == "read"%}
 
-						tempPopupContent = placename? "Placename : "+placename :tempPopupContent;
-						tempPopupContent = datetime? tempPopupContent + "<hr/>Date Time : " + datetime :tempPopupContent;
-						tempPopupContent = description? tempPopupContent + "<hr/>Description : " + description :tempPopupContent;
-						tempPopupContent = tags? tempPopupContent + "<hr/>Tags : " + tags :tempPopupContent;
-						tempPopupContent = created_by? tempPopupContent + "<hr/>created_by : " + created_by :tempPopupContent;
+						tempPopupContent = placename? '<ul class="pricing-table"><li class="title"><b>Placename : </b> '+placename +'</li>':tempPopupContent;
+
+						tempPopupContent = datetime? tempPopupContent + '<li class="bullet-item"><b>Date Time : </b>'+datetime+'</li>':tempPopupContent;
+
+						tempPopupContent = description? tempPopupContent + '<li class="bullet-item"><b>Description : </b> ' + description + '</li>' :tempPopupContent;
+
+						tempPopupContent = tags? tempPopupContent + '<li class="bullet-item"><b>Tags : </b>' + tags + '</li>' :tempPopupContent;
+
+						tempPopupContent += '</ul>'
+
+						created_by = (created_by.indexOf("anonymous_"))? created_by.split("_")[2] : created_by;
+
+						tempPopupContent = created_by? tempPopupContent + '<i style="color:gray; margin-left:"> Contributed by : ' + created_by + '</i>':tempPopupContent;
 
 						hasDataFlag = tempPopupContent.length>0 ? true : false;
 					{% endif %}
@@ -394,11 +414,7 @@
 
 			marker.feature.properties.id = marker._leaflet_id;
 
-			
-				
-				// marker.feature.properties.created_by = "{{user_name}}"
-
-			
+			// marker.feature.properties.created_by = "{{user_name}}"
 
 			// console.log(marker);
 			// console.log(JSON.stringify(marker.toGeoJSON()));
@@ -421,59 +437,13 @@
 			
            	this.setLatLng(changedPos).update();	// Update the marker position
 
-           	// var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
-
-           	// var tempMarkerGeoJSON = this.toGeoJSON();
-           	
-           	// console.log(this);
-			// console.log( JSON.stringify(tempMarkerGeoJSON))
-
-			// var placename = tempMarkerGeoJSON.properties.placename,
-			// 	datetime = tempMarkerGeoJSON.properties.datetime,
-			// 	description = tempMarkerGeoJSON.properties.description,
-			// 	tags = tempMarkerGeoJSON.properties.tags ;
-
-			// // preserving and updating GeoJson of marker
-			// if(! description)
-			// {
-			// 	$.each(markerGeoJSON, function(i, val) {
-				            	
-			// 		            		var getID = $.parseJSON(val).properties.id,
-			// 		            			getDescription = $.parseJSON(val).properties.description; 
-				
-			// 		            		if(getID == lID){
-
-			// 		            			description = getDescription?getDescription:"";  
-			// 		            		}  
-			// 		           		})
-			// }
-
-			// if(description)
-			// {					
-			// 	$(".marker-obs-note:visible").val(description)
-			// }
-
-			// // console.log($(".popup-content:visible").text(description));
-
 			// // tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();					
-
-			// tempMarkerGeoJSON.properties.id = lID;	
-			
-					
-			// var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
-			
-   //          $.each(markerGeoJSON, function(i, val) {
-            	
-	  //       	var getID = $.parseJSON(val).properties.id; 
-	  //       	if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
-   //          })
 
             var changedMarkerLatLng = []
             changedMarkerLatLng.push(changedPos.lat);
             changedMarkerLatLng.push(changedPos.lng);
 
             updateHiddenTagContent(changedMarkerLatLng);
-
         }
 
 
@@ -493,7 +463,6 @@
 
 			// marker GeoJson
 			var tempMarkerGeoJSON = this.toGeoJSON();
-			console.log(this);
 
 			var lID = tempMarker._leaflet_id;		// Getting Leaflet ID of this marker
 
@@ -508,8 +477,7 @@
 			$(popupHtmlObj).children("input.marker-dtstamp").val(datetime);
 			$(popupHtmlObj).children("textarea.marker-obs-note").val(description);
 			$(popupHtmlObj).children("input.marker-tags").val(tags);
-
-				// console.log(placename + " == " + datetime + " == " + description + " == " + tags + " == " + created_by);
+			$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
 
 			// preserving and updating GeoJson of marker
             var MarkerLatLng = []
@@ -517,24 +485,11 @@
             MarkerLatLng.push(tempMarker.getLatLng().lng);
             updateHiddenTagContent(MarkerLatLng);
 
-
-
-            // sometimes description exist and sometimes not
-			// if(! description)
-			// {
-			// 	$.each(markerGeoJSON, function(i, val) {
-				            	
-			// 		            		var getID = $.parseJSON(val).properties.id,
-			// 		            			getDescription = $.parseJSON(val).properties.description; 
-				
-			// 		            		if(getID == lID) { description = getDescription?getDescription:"";  }  
-			// 		           		})
-			// }
-			 			
-			if(description)
-			{					
-				$(".marker-obs-note:visible").val(description)
-			}			
+ 			
+			// if(description)
+			// {					
+			// 	$(".marker-obs-note:visible").val(description)
+			// }			
 			
 			// To remove marker on click of delete
 			$(".popup-delete-content-button:visible").click(function(){
@@ -612,22 +567,23 @@
 			// check if popup form gets changed
 			$(".leaflet-popup-content:visible input, textarea").bind("keyup keypress onmouseup blur change", function(){
 
-				var inputEl = $(this);
-
+				inputEl = $(this);
+				// inputEl.val().trim().length
 				inputEl.change(function(){
-
-				// if( tempContentText != initialPopContentText )
-				// {
 					$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
-				// }
-				// else
-				// {
-				// 	$(this).siblings().find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
-				// }
 
 				})
 				
 			});
+			
+			if( getPlace.length && getDT.length && getObsNote.length && getTags.length && getCreator.length )
+			{
+				$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
+			}
+			else
+			{
+				$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-page-edit").text(" edit");
+			}
 			
 			// To add content on click of add_content
 			$(".popup-add-content-button:visible").click(function(){
@@ -649,9 +605,12 @@
 						getDT = $(thisPopupContent).children("input[type=text].marker-dtstamp").val().trim(),	
 						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
 						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
+						{% if not user.is_authenticated %}
+							getCreator = $(thisPopupContent).children("input[type=text].marker-creator").val().trim();
+						{% endif %}
 
 					// if( getPlace.length && getPlace != placename )
-					if( getPlace.length || getDT.length || getObsNote.length || getTags.length )
+					if( getPlace.length || getDT.length || getObsNote.length || getTags.length || getCreator.length )
 					{
 						tempMarker.setIcon(infoMarker);
 
@@ -664,9 +623,11 @@
 
 					tempMarker.feature.properties.placename = getPlace;
 					tempMarker.feature.properties.datetime = getDT;
-					// tempMarker.feature.properties.created_at = getDT;
 					tempMarker.feature.properties.description = getObsNote;//.replace(/'/gm, "");	// temp fix.
 					tempMarker.feature.properties.tags = getTags;
+					{% if not user.is_authenticated %}
+						tempMarker.feature.properties.created_by = "anonymous_{{client_ip}}_" + getCreator ;
+					{% endif %}
 									
 					if(! tempMarker.feature.properties.id)
 					{
@@ -720,6 +681,7 @@
 								tempMarker.feature.properties.datetime = datetime;
 								tempMarker.feature.properties.description = description;
 								tempMarker.feature.properties.tags = tags;
+								tempMarker.feature.properties.created_by = created_by;
 			  				}
 							
 				  		},// END OF success
