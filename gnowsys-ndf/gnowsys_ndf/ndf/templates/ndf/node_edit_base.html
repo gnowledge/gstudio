@@ -156,7 +156,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
 
 {% switch_group_conditions request.user group_id as switch_conditions %}
+{% if node %}
     {% check_group node as is_group %}
+{% endif %}
 {% if not is_group %}
 {% if switch_conditions %}
 
