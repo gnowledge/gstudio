@@ -138,7 +138,6 @@ def switch_group_conditions(user,group_id):
     ret_policy=False
     req_user_id=User.objects.get(username=user).id
     group=collection.Node.one({'_id':ObjectId(group_id)})
-    print "groupauth",group.author_set,group.group_type
     if req_user_id in group.author_set and group.group_type == 'PUBLIC':
       ret_policy=True
     return ret_policy
