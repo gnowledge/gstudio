@@ -257,6 +257,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   collection = None
 
   name = request.POST.get('name')
+  sub_theme_name = request.POST.get("sub_theme_name", '')
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
@@ -293,8 +294,14 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+  if sub_theme_name:
+    node.name = unicode(sub_theme_name) 
+
   node.status = unicode("DRAFT")
-  node.language = unicode(language) 
+  if language:
+    node.language = unicode(language) 
+  else:
+    node.language = u"en"
   node.location = map_geojson_data # Storing location data
 
   if access_policy:
@@ -304,6 +311,8 @@ def get_node_common_fields(request, node, group_id, node_type):
       node.access_policy = u"PUBLIC"
     else:
       node.access_policy = u"PRIVATE"
+  else:
+    node.access_policy = u"PUBLIC"
 
   node.modified_by = usrid
 
