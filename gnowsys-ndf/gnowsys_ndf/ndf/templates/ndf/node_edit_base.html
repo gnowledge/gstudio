@@ -156,10 +156,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</div>
 
 {% switch_group_conditions request.user group_id as switch_conditions %}
-    {% check_group node as is_group %}
-{% if not is_group %}
-{% if switch_conditions %}
 
+    {% check_group node as is_group %}
+
+{% if not is_group %}
 <dl class="accordion" data-accordion>
 
   <dd>
@@ -176,7 +176,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   </dd>
 </dl>
-{% endif %}
 {% endif %}
       </div>
     </div>
@@ -304,7 +303,7 @@ $(document).on('click',"#switch_group",function(){
 $('#switchgrp #collection_set_drawer1').html("");
  $('#switchgrp #collection_set_drawer2').html("");
  $('#switchgrp #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="collection_set_search" class="margin-0"></li>');
-var url='/{{groupid}}/switch_group/'+'{{node}}';
+var url='/{{groupid}}/group/switch_group/'+'{{node}}';
  $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
   
@@ -327,7 +326,7 @@ var url='/{{groupid}}/switch_group/'+'{{node}}';
 });
 
 $(document).on('click',"#save_switch_group",function(){
-var turl='/{{groupid}}/switch_group/'+'{{node}}';
+var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
 saveflag = 1;
 get_new_groups();
 new_groups=data_list;
@@ -336,7 +335,6 @@ $.ajax({
        type: 'POST',
        data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
        beforeSend: function(){
-              alert("atthis");
               $("#ajax_load_image").show();
               $("#body").css({"opacity":"0.1",})
                               },
@@ -349,14 +347,12 @@ $.ajax({
                 $("#body").css({"opacity":"",})
 
           }
-});  //end of ajax
+}); //end of ajax
 
-});  //end of document click
+}); //end of document click
 
-
-
-	$(document).ready(function(){
-		$("#name_id").change(function(){
+$(document).ready(function(){
+$("#name_id").change(function(){
 
 			var name = $("#name_id").val();
 			var nodes = $("#nodes_list").val();
