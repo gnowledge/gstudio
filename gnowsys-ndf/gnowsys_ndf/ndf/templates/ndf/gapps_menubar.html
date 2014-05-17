@@ -1,5 +1,5 @@
 {% load ndf_tags %}
-
+{% get_group_name groupid as group_name_tag %}
 <!-- GApps Menubar -->
 {% check_gapp_menus groupid as check_menu %}
 
@@ -29,7 +29,7 @@
 	
 	{% endif %}
 	app">
-	<a class="app" href="{% url 'GAPPS' group_name app_dict.name %}">
+	<a class="app" href="{% url 'GAPPS' group_name_tag app_dict.name %}">
 
 	{% comment %} Includes an app icon if found{% endcomment %}
 	{% if app_dict.name|lower == "page" %}

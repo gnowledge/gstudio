@@ -54,7 +54,7 @@
 {% get_user_object eachrep.created_by as user_obj %}
 
 <div class="row">
-  <div id="insidediv" class="large-3 columns">
+  <div id="insidediv" class="large-6 columns">
 
 
     <div class="row ">
@@ -76,7 +76,7 @@
 
   </div>
   <br/>
-  <div class="large-9 columns">
+  <div class="large-6 columns">
 
     {% if user.is_authenticated %}
     {% include "ndf/replytwistrep.html" %}
@@ -95,4 +95,8 @@
 
 
 {% endblock %}
+
+<script type="text/javascript">
+  $("#refreshthread button.button.large.postfix").removeClass("large");
+</script>
 

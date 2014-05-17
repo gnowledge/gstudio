@@ -24,7 +24,7 @@
   .forum-summary .user {  font-size: 1.5em;}
   .forum-summary .user i { border-radius: 50px; }
 
-  #content > p:first-of-type { color: #6F6F6F !important; font-size: inherit }
+  .org-content-style, #content > p:first-of-type { color: #6F6F6F !important; font-size: small; }
 
   table { border: none }
 
@@ -79,8 +79,9 @@
   <!-- <div class="row"> -->
     <!-- <div class="small-12 large-12 columns"> -->
 
+    <h2>Forum: 
     <a title="{{forum.name}}" href="#">
-     <h2>Forum Name : <a href="/{{groupid}}/forum/show/{{forum}}">
+     <a href="/{{groupid}}/forum/show/{{forum}}">
         {{forum.name}}</a></h2>
     </a>
   
@@ -133,9 +134,9 @@
                 <i style="color:gray">by {{user_obj.username}}</i>
             </td>
           
-            <td>
-              {% with thread.content|safe as thread_content %}
-                {{thread_content|default_if_none:"No description !!"}}
+            <td class="org-content-style">
+              {% with each.content|safe as thread_content %}
+                {{thread_content|truncatewords:25}}
               {% endwith %}
             </td>
           
@@ -150,7 +151,7 @@
     
     {% else %}
     
-    <h5>This Forum dosen't have any Threads. &nbsp;&nbsp;&nbsp;Be first to create the Thread !</h5>
+    <h2 ><small>&#8220;This forum dosen't have any threads. Be the first to create a thread!&#8221;</small></h2>
 
     {% endif %}
 

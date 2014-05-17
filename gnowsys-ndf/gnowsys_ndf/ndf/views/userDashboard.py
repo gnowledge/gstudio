@@ -118,10 +118,10 @@ def dashboard(request, group_id):
     shelf_list = {}
     if auth:
       # prof_pic_rel will get the cursor object of relation of user with its profile picture 
-      prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
-      if prof_pic_rel.count() > 0 :
-        index = prof_pic_rel.count() - 1
-        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+      prof_pic_rel = collection.Node.one({'$and':[{'subject': ObjectId(auth._id) },{'_type':'GRelation'}]})
+      if prof_pic_rel :
+#        index = prof_pic_rel.count() - 1
+        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      
       else:
         img_obj = "" 
 
@@ -162,20 +162,16 @@ def dashboard(request, group_id):
 
 def user_preferences(request,group_id,auth_id):
     try:
-        print "inside userprefview"
         grp=collection.Node.one({'_id':ObjectId(auth_id)})
-        print "authna=",grp.name
         if request.method == "POST":
             lst=[]
             pref_to_set = request.POST['pref_to_set']
             pref_list=pref_to_set.split(",")
-            print "preflist=",pref_list
             if pref_list:
                 for each in pref_list:
                     if each:
                         obj=collection.Node.one({'_id':ObjectId(each)})
                         lst.append(obj);
-                print "lst=",lst
                 gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_user_pref._id},{'subject':grp._id}]})
                 if gattribute:
                     gattribute.delete()

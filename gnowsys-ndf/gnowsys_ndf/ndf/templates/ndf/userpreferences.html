@@ -28,49 +28,37 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 <dl class="accordion" data-accordion>
 <dd>
-     <a id="forum_notif_pref" href="#preference">Click here to turn off notification preferences for groups</a>
-     <div id="preference" class="content">
-       <div class="row">
-         <div class="large-4 small-2 columns">
-              <div class="large-3 columns">
-                 <font size="5"> Forum_notifications </font>
+<a id="forum_notif_pref" href="#preference">Click here to turn off notification preferences for groups</a>
+<div id="preference" class="content">
 
-	      </div> <!-- large-3 closes -->
-	      <div class="large-6 columns">
-              
-	      <div id="options">
-		 <input type="radio" value="On" name="forum"><font size="4">On</font> &nbsp;
+<div class="small-8 columns" style="display:table; border:1px; border-spacing:10px;left:-40px;">
+<div style="display:table-row;">
+    <div style="display:table-cell">
+           <font size="5"> Forum Notifications </font>
+    </div>
+    <div style="display:table-cell">
+             <div id="options">
+                 <input type="radio" value="On" name="forum"><font size="4">On</font> &nbsp;
 
                  <input type="radio" value="Off" name="forum"><font size="4">Off</font>
               </div>
-          </div>
-        </div>
-	</div>
-                 <hr>
-	 <div class="row">
-      
-<div id="userpref">
-<div class="row">
-<div class="large-3 small-2 columns">
-<div class="large-6 small-2 columns">
-<font size="4">Select Groups:</font>
+    </div>
+</div> <!-- table row closes-->
+<div style="display:table-row;">
+   <div style="display:table-cell;">
+      Select Groups:
+  </div>
 </div>
-{% comment %}
-<div class="large-5 small-2 columns">
-<input id="selectall" type="checkbox"><font size="4">Select All</font>
-</div>
-{% endcomment %}
-</div>
-</div>
+</div> <!-- div small-10 columns closes --> 
+
+     <div class="row" id="userpref">
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-      
-       
-              <div class="large-3 columns">
-	        <input type="button" id="save_preference" class="button small-10 small-push-1 colum" value="Save preferences">
+              <div class="row">
+	        <input type="button" id="save_preference" class="button medium-12 columns" value="Save preferences">
               </div>
-     </div> <!--div userpref -->
-     </div>  <!-- div row closes -->
-    </div> <!-- class content closes -->
+     </div>
+
+</div> <!-- class content closes -->
 </dd>
 </dl>
 {% endblock %}
@@ -80,8 +68,9 @@ var data_prefs = "";
 var selected = "";
 var drawer2_empty=1;
 $(document).ready(function(){
-var a=$('input[name=forum]')[1].checked=true;
-selected="On";
+
+var a=$('input[name=forum]')[2].checked=true;
+selected="Off";
 });
 var checkoptions = document.getElementsByName('forum');
 $(document).on('click','#options',function(){
@@ -135,7 +124,6 @@ $(document).on('click','#save_preference',function(){
 get_all_data();
 var pref_to_set=data_prefs;
 var vurl='/{{groupid}}/user_preference/'+'{{author}}';
-alert(selected);
 if (selected=='Off'){
      $.ajax({
              url: vurl,
