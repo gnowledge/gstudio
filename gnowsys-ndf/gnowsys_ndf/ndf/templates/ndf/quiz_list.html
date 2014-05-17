@@ -33,8 +33,13 @@
   <div class="medium-12 columns">
    <!-- Add button -->
    {% if user.is_authenticated %}
+
+   {% user_access_policy groupid request.user as user_access %}
+   {% if user_access == "allow" %}
     <a href="{% url 'quiz_create' group_name_tag %}" class="button small">+ Add {{title}}</a>
     <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small">+ Add {{title}} Item</a>
+
+  {% endif %}
   {% endif %}
 </div>
 </header>

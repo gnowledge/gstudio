@@ -54,12 +54,28 @@ def get_forum_repl_type(forrep_id):
 
 def check_existing_group(group_name):
   collection = db[Node.collection_name]
-
   if type(group_name) == 'unicode':
     colg = collection.Node.find({'_type': u'Group', "name": group_name})
+    if colg.count()>0:
+      return True
+    if ins_objectid.is_valid(group_name):    #if group_name holds group_id
+      colg = collection.Node.find({'_type': u'Group', "_id": ObjectId(group_name)})
+    if colg.count()>0:
+      return True
+    else:
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True      
   else:
-    colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
-
+    if ins_objectid.is_valid(group_name):     #if group_name holds group_id
+      colg = collection.Node.find({'_type': u'Group', "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True
+    else:
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
   if colg.count() >= 1:
     return True
   else:
@@ -392,7 +408,6 @@ def get_node_common_fields(request, node, group_id, node_type):
   
 def get_versioned_page(node):
             content=[] 
-       
             #check if same happens for multiple nodes
             i=node.current_version
           

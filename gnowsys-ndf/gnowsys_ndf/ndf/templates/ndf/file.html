@@ -90,9 +90,12 @@
 
           </div>-->
           {% if user.is_authenticated %}
+          {% user_access_policy groupid request.user as user_access %}
+          {% if user_access == "allow" %}
           <a class="button expand" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
             <span class="fi-upload">  Upload File</span>
           </a>
+          {% endif %}
           {% endif %}
 	</div>
       </li>

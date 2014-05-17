@@ -312,7 +312,8 @@ def edit_group(request,group_id):
                                       context_instance=RequestContext(request)
                                       )
 
-def app_selection(request,group_id,node_id):
+def app_selection(request,group_id):
+    print "grpid=",group_id
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
 	group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
@@ -354,6 +355,7 @@ def app_selection(request,group_id,node_id):
             if poss_atts:
                 list_apps=poss_atts['apps_list']['object_value']
             st = get_all_gapps()
+            print "inapp_list view",st,list_apps
             data_list=set_drawer_widget(st,list_apps)
             return HttpResponse(json.dumps(data_list))
     except Exception as e:

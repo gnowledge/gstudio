@@ -138,7 +138,6 @@ def switch_group_conditions(user,group_id):
     ret_policy=False
     req_user_id=User.objects.get(username=user).id
     group=collection.Node.one({'_id':ObjectId(group_id)})
-    print "groupauth",group.author_set,group.group_type
     if req_user_id in group.author_set and group.group_type == 'PUBLIC':
       ret_policy=True
     return ret_policy
@@ -530,16 +529,13 @@ def get_user_group(user):
 
 @register.assignment_tag
 def get_profile_pic(user):
-
   ID = User.objects.get(username=user).pk
   auth = collection.Node.one({'_type': u'Author', 'name': unicode(user)})
-
   if auth:
-    prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
-
-    if prof_pic_rel.count() > 0 :
-      index = prof_pic_rel.count() - 1
-      prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject)})      
+    prof_pic_rel = collection.Node.one({'$and':[{'_type':'GRelation'},{'subject':ObjectId(auth._id) }]})
+    if prof_pic_rel :
+#      index = prof_pic_rel.count() - 1
+      prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject'])})      
     else:
       prof_pic = "" 
   else:
@@ -720,7 +716,7 @@ def user_access_policy(node,user):
     col_Group=db[Group.collection_name]
     group_gst = col_Group.Group.one({'_id':ObjectId(node)})
     # if user.id in group_gst.group_set or group_gst.created_by == user.id:
-    if user.id in group_gst.author_set or group_gst.created_by == user.id or user.is_superuser:
+    if user.id in group_gst.author_set or group_gst.created_by == user.id :
       return 'allow'
   except Exception as e:
     print "Exception in user_access_policy- "+str(e)
@@ -837,9 +833,11 @@ def get_publish_policy(request,groupid,res_node):
    elif node.edit_policy == "EDITABLE_NON_MODERATED":
        #condition for groups
        if resnode._type == "Group":
-         if ver == "1.1" :
+         if ver == "1.1" or resnode.created_by != request.user.id:
+           print "version=1.1"
            return "stop"
        if group == "allow":
+         print "grop=allow"
          if res_node.status == "DRAFT": 
            return "allow"
 
