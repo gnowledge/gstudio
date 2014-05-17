@@ -89,11 +89,24 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    <div class="active content" id="panel-collection" style="width:95%;">
 		    <div class="row">
 		    	{% if node %}
-				<div class="small-3 columns">		
-		    		<a href="{% url "theme_topic_create" groupid app_id theme_GST_id %}"> <input class="small button split" type="button" value=" + Add Theme" > </a>
+				<div class="small-5 columns">		
+		    		
+		    		<dl class="accordion" data-accordion>
+		    			<dd>
+          					<a class="add_theme medium-4 columns" href="#sub_theme"> + Add Sub-Theme </a>
+         					
+          					<div id="sub_theme" class="content">
+          						<br/><br/>
+          						<label>{{title}} Name</label>
+		    					<input id="sub_theme_id" type="text" placeholder="Enter name...">
+		    					<!-- <small class="error">Please give your theme a descriptive name. It's helpful for others and for yourself.</small> -->
+	    						<input id="save-sub-theme" value="Save" class="button medium-2 columns"> 
+	          					
+          					</div>
+
 				</div>
-				<div class="small-9 columns">		
-					<a href="{% url "theme_topic_create" groupid app_id topic_GST_id %}"> <input class="small button split" type="button" value=" + Add Topic" > </a>
+				<div class="small-7 columns">		
+					<a href="{% url "theme_topic_create" groupid app_id topic_GST_id %}"> <input class="small button split" disabled type="button" value=" + Add Topic"> </a>
 				</div>
 				{% endif %}
 				<div class="small-12 columns">
@@ -139,23 +152,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 							{% endif %}
 								<span></span>
 							</div>
-
-						{% else %}
-
-							{% if not node %}
-								<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
-								<div class="privacy-mode switch round">
-							
-									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-									<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-									<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-								
-									<span></span>
-								</div>
-
-							{% endif %}
 
 						{% endif %}	    
 		  			</div>
@@ -343,11 +339,33 @@ background-repeat:no-repeat; background-size: 48px 48px
 			}
 
 		});
+		
 	});
 
 
-	$("#save-node").click(function() {
+	$("#save-sub-theme").click(function() {
 
+	    $.ajax({
+	      type: "POST",
+	      url: "{% url 'add_sub_themes' groupid %}",
+	      datatype: "html",
+	      data:{
+	        context_node: "{{node.pk}}",
+	        sub_theme_name: $("#sub_theme_id").val(),
+	        csrfmiddlewaretoken: '{{ csrf_token }}'
+	      },
+	      success: function(data) {
+
+	        location.reload(true);
+	        $("#sub_theme_id").val("");
+	      }
+	    });
+
+
+  	});
+
+
+	$("#save-node").click(function() {
 		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
@@ -371,6 +389,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		$("#module_list").val(md_arr)   
 
 		{% block base_save_on_click %}{% endblock %}
+
 	});
 
 
