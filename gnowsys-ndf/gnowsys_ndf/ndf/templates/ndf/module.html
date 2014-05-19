@@ -1,6 +1,9 @@
 {% extends "ndf/base.html" %}
+
 {% load pagination_tags %}
 {% load ndf_tags %}
+{% get_group_name groupid as group_name_tag %}
+
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
@@ -16,51 +19,115 @@
     });
     });
   </script>
-  {% endblock %}
+{% endblock %}
 
+
+{% block help_content %}
+<p>About Module... <em>coming soon</em></p>
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2>Modules</h2>
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+  
 {% block body_content %}
-{% get_group_name groupid as group_name_tag %}
+
+<header class="row">
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Modules {% if module_coll.count %}({{ module_coll.count }}){% endif %}</a></dd>
+  </dl>
+</header>
+
+{% if searching and module_coll.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{module_coll.count}} {{title|lower}}{{module_coll.count|pluralize}}.</span></p>
+  </div>
+</div>
+
+{% elif searching and module_coll.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert">No {{title|lower}}{{module_coll.count|pluralize}} matched your search criteria!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-{% for node in module_coll %}
-{% get_version_of_module node.pk as version %}
-<li class="card">
-  <div class="page">
-    <header>
-      <div class="label-list">
-        {% for tag in node.tags %}
-        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-        {% endfor %}
-      </div>
-      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-      <h4>{{ node.name }} <font color = "red"><b>Ver.</b>{{version}}</font>
+
+  {% autopaginate module_coll 23 %}
+
+  {% for node in module_coll %}
+  {% get_version_of_module node.pk as version %}
+  <li class="card">
+    <div class="course">
+
+      <header>
+        <div class="label-list">
+          {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          {% endfor %}
+        </div>
+
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+        <h4>{{ node.name|truncatechars:20 }} <font color = "red"><b>Ver.</b>{{version}}</font></h4>
+
         <div>
-          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+          <br/>
+          by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
           </small>
         </div>
-      </h4>
-    </header>
-    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-    <a class="small button expand" href="{% url 'module_detail' group_name_tag node %}">Detail</a> 
-    {% get_user_object node.created_by as user_obj %}
-    {% ifequal user_obj.username user.username %}
-    <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
-    {% endifequal %}
-    
-    <footer class="row">
-    </footer>
-  </div>
-</li>  
-{% endfor %}
+      </header>
+
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+      <a class="small button expand" href="{% url 'module_detail' group_name_tag node %}">Detail</a> 
+
+      {% get_user_object node.created_by as user_obj %}
+      {% ifequal user_obj.username user.username %}
+      <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete</a>
+      {% endifequal %}
+      
+      <footer class="row">
+        <div class="small-7 columns"><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</div>
+        <div class="small-5 columns"><div class="right"><strong>{{course.version_dict|length}}</strong> Edit{{course.version_dict|pluralize}}</div></div>
+      </footer>
+
+    </div>
+  </li>  
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-12 columns">
+        <h5>This group doesn't have any modules. <b>Be the first to create a Module!</b></h5>
+      </div>
+    </div>
+    {% endif %}
+
+  {% endfor %}
+
+  {% paginate %}
+
 </ul>
-
-
-
 
 {% comment %}
 {% autopaginate module_coll 23 %}
   <div class="row">
     <div class="small-6 large-12 columns">
-      <ul class="pricing-table">
+      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
 	{% for module in module_coll %}
 	<li class="bullet-item text-left">
 	  <div class="row">
@@ -76,13 +143,17 @@
             </div>
 	  </div>
 	</li>
+
 	{% empty %}
-	<p> <em>No module in this project group!</em></P>
+	  <div class="row">
+	    <div class="small-12 columns">
+        <h5>This group doesn't have any modules. <b>Be the first to create a Module!</b></h5>
+	    </div>
+	  </div>
+
 	{% endfor %}
-      </ul>
-    </div>
-  </div>
 {% paginate %}
 {% endcomment %}
+
 {% endblock %}
 

@@ -13,20 +13,13 @@ from gnowsys_ndf.ndf.views.methods import *
 
 from gnowsys_ndf.ndf.views.file import *
 
-db = get_database()
-collection = db['Nodes']
-
-print "\n Going in MIS-view... \n\n"
+collection = get_database()[Node.collection_name]
 
 def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     custom view for custom GAPPS
     """
-    print "\n Coming in mis_detail view \n\n"
-    # print "\n app_name: ", app_name, "\n"
-    # app_name = "MIS"
 
-    # ins_objectid  = ObjectId()
     if ObjectId.is_valid(group_id) is False :
       group_ins = collection.Node.one({'_type': "Group","name": group_id})
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -44,12 +37,10 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
       if app:
         app_id = str(app._id)
-        print "\n app_id: ", app_id, "\n"
     else:
       app = collection.Node.one({'_id': ObjectId(app_id)})
 
     app_name = app.name 
-    print "\n app_name: ", app_name, "\n"
 
     app_collection_set = [] 
     atlist = []

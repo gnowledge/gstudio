@@ -170,7 +170,6 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 
 	else:
 		app_node = None
-		
 		app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
 		if app_GST:
 			if app_GST.name == "Theme" or app_GST.name == "Topic":
@@ -188,8 +187,6 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 				elif topic_GST._id in app_GST.member_of:
 					title = topic_GST.name
 					node = app_GST
-
-
 
 	return render_to_response("ndf/theme.html",
 	                           {'app_collection_set':app_collection_set,
