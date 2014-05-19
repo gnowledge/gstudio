@@ -416,34 +416,34 @@ def get_node_common_fields(request, node, group_id, node_type):
   
   
 def get_versioned_page(node):
-            content=[] 
-            #check if same happens for multiple nodes
-            i=node.current_version
-          
-            #get the particular document Document
-                   
-            doc=history_manager.get_version_document(node,i)
+            
+       
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+	(fp)
+    rev_no =""
+    proc1=subprocess.Popen(cmd,shell=True,
+				stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+       
+       if line.find('revision')!=-1 and line.find('selected') == -1:
 
-          
-            #check for the published status for the particular version
-          
-            while (doc.status != "PUBLISHED"):
-              currentRev = i
-
-              splitVersion = currentRev.split('.')
-              previousSubNumber = int(splitVersion[1]) - 1 
-
-              if previousSubNumber <= 0:
-               previousSubNumber = 1
-
-              prev_ver=splitVersion[0] +"."+ str(previousSubNumber)
-              i=prev_ver 
-
-              doc=history_manager.get_version_document(node,i)
-              if (i == '1.1'):
-                  return (doc,i)
-            return (doc,i)
-
+          rev_no=string.split(line,'revision')
+          rev_no=rev_no[1].strip( '\t\n\r')
+          rev_no=rev_no.strip(' ')
+       if line.find('status')!=-1:
+          up_ind=line.find('status')
+          if line.find(('PUBLISHED'),up_ind) !=-1:
+               rev_no=rev_no.strip(' ')
+               node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
+               return (node,rev_no)    
+       if rev_no == '1.1':
+           node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
+           return(node,'1.1')
+        
 
 def get_user_page(request,node):
     ''' function gives the last docment submited by the currently logged in user either it
@@ -465,7 +465,6 @@ def get_user_page(request,node):
           rev_no=rev_no.strip(' ')
        if line.find('updated')!=-1:
           up_ind=line.find('updated')
-          print line.find(str(request.user),up_ind)
           if line.find(str(request.user),up_ind) !=-1:
                rev_no=rev_no.strip(' ')
                node=history_manager.get_version_document(node,rev_no)
@@ -554,4 +553,57 @@ def tag_info(request, group_id, tagname):
   # print group_id
 
   return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
+
+
+#code for merging two text Documents
+import difflib
+def diff_string(original,revised):
+        
+        # build a list of sentences for each input string
+        original_text = _split_with_maintain(original)
+        new_text = _split_with_maintain(revised)
+        a=original_text + new_text
+        strings='\n'.join(a)
+        #f=(strings.replace("*", ">").replace("-","="))
+        #f=(f.replace("> 1 >",">").replace("= 1 =","="))
+
+        
+        return strings
+STANDARD_REGEX = '[.!?]'
+def _split_with_maintain(value, treat_trailing_spaces_as_sentence = True, split_char_regex = STANDARD_REGEX):
+        result = []
+        check = value
+        
+        # compile regex
+        rx = re.compile(split_char_regex)
+        
+        # traverse the string
+        while len(check) > 0:
+            found  = rx.search(str(check))
+            if found == None:
+                result.append(check)
+                break
+            
+            idx = found.start()
+            result.append(str(check[:idx]))            # append the string
+            result.append(str(check[idx:idx+1]))    # append the puncutation so changing ? to . doesn't invalidate the whole sentence
+            check = check[idx + 1:]
+            
+            # group the trailing spaces if requested
+            if treat_trailing_spaces_as_sentence:
+                space_idx = 0
+                while True:
+                    if space_idx >= len(check):
+                        break
+                    if check[space_idx] != " ":
+                        break
+                    space_idx += 1
+                
+                if space_idx != 0:
+                    result.append(check[0:space_idx])
+            
+                check = check[space_idx:]
+            
+        return result
+    
 
