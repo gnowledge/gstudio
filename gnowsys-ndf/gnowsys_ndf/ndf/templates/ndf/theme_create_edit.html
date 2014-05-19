@@ -53,28 +53,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  	<!-- change name of collection tab overide block in your code -->
 		  		<a href="#panel-name-description"> {{title}} </a>
 			</dd>
-			<dd title="Click here to add/edit Prior Node">
-		  		<a href="#panel-prior-node">Prior Node</a>
-			</dd>
 			<!-- change name of collection tab overide block in your code -->
 			<dd class="active" title="Click here to add/edit collection">
 		  		<a href="#panel-collection">Collection </a> 
 			</dd>  
 			  
-		{% else %}
-			<dd><h3>View:</h3></dd>
-		
-			<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
-		  	<!-- change name of collection tab overide block in your code -->
-		  		<a href="#panel-name-description"> {{title}} </a>
-			</dd>
-			<dd title="Click here to add/edit Prior Node">
-		  		<a href="#panel-prior-node">Prior Node</a>
-			</dd>
-			<!-- change name of collection tab overide block in your code -->
-			<dd title="Click here to add/edit collection">
-		  		<a href="#panel-collection">Collection </a> 
-			</dd>  
+			
 		{% endif %}
      	</dl>
   	</nav>
@@ -84,40 +68,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   	<div id="node-details-edit-div" class="tabs-content" > 
   		{% if node %}
-
-  		<!-- Collection tab block -->
-	    <div class="active content" id="panel-collection" style="width:95%;">
-		    <div class="row">
-		    	{% if node %}
-				<div class="small-5 columns">		
-		    		
-		    		<dl class="accordion" data-accordion>
-		    			<dd>
-          					<a class="add_theme medium-4 columns" href="#sub_theme"> + Add Sub-Theme </a>
-         					
-          					<div id="sub_theme" class="content">
-          						<br/><br/>
-          						<label>{{title}} Name</label>
-		    					<input id="sub_theme_id" type="text" placeholder="Enter name...">
-		    					<!-- <small class="error">Please give your theme a descriptive name. It's helpful for others and for yourself.</small> -->
-	    						<input id="save-sub-theme" value="Save" class="button medium-2 columns"> 
-	          					
-          					</div>
-
-				</div>
-				<div class="small-7 columns">		
-					<a href="{% url "theme_topic_create" groupid app_id topic_GST_id %}"> <input class="small button split" disabled type="button" value=" + Add Topic"> </a>
-				</div>
-				{% endif %}
-				<div class="small-12 columns">
-			  		<div id="collection_drawer" >
-			    		{% edit_drawer_widget "collection" groupid node title %}
-			  		</div>
-				</div>
-		      
-		  	</div>
-	 	</div>
-
 
   		<!-- Block Description -->
 		<div class="content row" id="panel-name-description">
@@ -188,23 +138,43 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  		</div>
 		</div>
 
-  		<!-- Prior node block -->
-    	<div class="content" id="panel-prior-node"  style="width:95%;">
-	      	<div class="row">
-				<div class="small-12 columns">
-		  			<h5>Add or edit Prior Node : </h5>
-				</div>
-				<br/>
-		
-				<div class="small-12 columns">
-		  			<div id="prior_node_drawer">
-		    			{% edit_drawer_widget "prior_node" groupid node title %}
-		  			</div>
-				</div>
-	      	</div>
-    	</div>
 
+		<!-- Collection tab block -->
+	    <div class="active content" id="panel-collection" style="width:95%;">
+		    <div class="row">
+		    	{% if node %}
+				<div class="small-5 columns">		
+		    		
+		    		<dl class="accordion" data-accordion>
+		    			<dd>
+          					<a class="add_theme medium-4 columns" href="#sub_theme"> + Add Sub-Theme </a>
+         					
+          					<div id="sub_theme" class="content">
+          						<br/><br/>
+          						<label>{{title}} Name</label>
+		    					<input id="sub_theme_id" type="text" placeholder="Enter name...">
+		    					<!-- <small class="error">Please give your theme a descriptive name. It's helpful for others and for yourself.</small> -->
+	    						<input id="save-sub-theme" value="Save" class="button medium-2 columns"> 
+	          					
+          					</div>
 
+				</div>
+				<div class="small-7 columns">		
+					<a href="{% url "theme_topic_create" groupid app_id topic_GST_id %}"> <input class="small button split" disabled type="button" value=" + Add Topic"> </a>
+				</div>
+				{% endif %}
+				<div class="small-12 columns">
+			  		<div id="collection_drawer" >
+			    		<!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
+			    		{% include "ndf/theme_drawer.html" %}
+
+			  		</div>
+				</div>
+		      
+		  	</div>
+	 	</div>
+
+  		
 	    {% else %}
 	    	<!-- Block Description -->
 	    	<div class="active content row" id="panel-name-description">
@@ -264,36 +234,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 		
 	      		</div>
   			</div>
-
-  		<!-- Prior node block -->
-    	<div class="content" id="panel-prior-node"  style="width:95%;">
-	      	<div class="row">
-				<div class="small-12 columns">
-		  			<h5>Add or edit Prior Node : </h5>
-				</div>
-				<br/>
-		
-				<div class="small-12 columns">
-		  			<div id="prior_node_drawer">
-		    			{% edit_drawer_widget "prior_node" groupid "" title %}
-		  			</div>
-				</div>
-	      	</div>
-    	</div>
-    
-
-	    <!-- Collection tab block -->
-	    <div class="content" id="panel-collection" style="width:95%;">
-		    <div class="row">
-		    	
-				<div class="small-12 columns">
-			  		<div id="collection_drawer" >
-			    		{% edit_drawer_widget "collection" groupid "" title %}
-			  		</div>
-				</div>
-		      
-		  	</div>
-	 	</div>
 
 	    {% endif %}
 
@@ -371,24 +311,14 @@ background-repeat:no-repeat; background-size: 48px 48px
 		md_arr = [] //for adding module
 
 		$(".node_id").each(function (){
-			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
-				pn_arr.push($(this).val());
-			}
 
-			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+			if ($(this).parent(".bullet-item").parent("#collection_drawer").attr("id") == "collection_drawer") {
 				cn_arr.push($(this).val());
 			}
 
-			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
-  				md_arr.push($(this).val());
-  			}
 		});
 
-		$("#prior_node_list").val(pn_arr)
 		$("#collection_list").val(cn_arr) 
-		$("#module_list").val(md_arr)   
-
-		{% block base_save_on_click %}{% endblock %}
 
 	});
 
@@ -433,6 +363,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		map.invalidateSize();  
 	   
 	});
+
 
 </script>
 

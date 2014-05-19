@@ -531,17 +531,25 @@ def get_user_group(user):
 def get_profile_pic(user):
   ID = User.objects.get(username=user).pk
   auth = collection.Node.one({'_type': u'Author', 'name': unicode(user)})
+  collection_tr = db[Triple.collection_name]
+
   if auth:
-    prof_pic_rel = collection.Node.one({'$and':[{'_type':'GRelation'},{'subject':ObjectId(auth._id) }]})
-    if prof_pic_rel :
-#      index = prof_pic_rel.count() - 1
-      prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject'])})      
-    else:
-      prof_pic = "" 
+  	profile_pic_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_profile_pic' })
+   	dbref_profile_pic = profile_pic_RT.get_dbref()
+   	prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
+
+   	if prof_pic_rel.count() :
+          index = prof_pic_rel.count() - 1
+          Index = prof_pic_rel[index].right_subject
+          # prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject'])})      
+          prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
+        else:
+          prof_pic = "" 
   else:
     prof_pic = ""
-
+    
   return prof_pic
+
 
 
 @register.assignment_tag
