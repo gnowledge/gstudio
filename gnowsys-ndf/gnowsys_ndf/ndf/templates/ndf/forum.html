@@ -1,6 +1,8 @@
 {% extends "ndf/base.html" %}
+
 {% load ndf_tags %}
 {% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
 
 {% block title %} Forum {% endblock %}
 
@@ -19,84 +21,122 @@
 {% endblock %}
 
 
-{% block meta_content %}
-
-	<h2>Forums</h2>
-
-{% endblock %}
-
-
-{% block concern_information %}
-
-	<br/>
-	<ul class="no-bullet" id="create-forum"> 
-		<li class="create card ">
-			<div>
-				<h4><i class="fi-plus"></i> New</h4>
-
-				{% if user.is_authenticated %}
-					{% user_access_policy groupid request.user as user_access %}
-					
-					{% if user_access == "allow" %}
-						<a class="button expand" href="{% url 'create_forum' groupid %}">
-							Create &nbsp;Forum
-						</a>
-					{% endif %}
-
-				{% endif %}
-			</div>
-		</li>
-	</ul>
-
-{% endblock %}
-
-
 {% block help_content %}
+<p>The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others.</p>
+{% endblock %}
 
-	<p>The Forum is a place for discussion. You can create a new one for your idea and build on it with the help of others.</p>
 
+{% block meta_content %}
+  <h2>Forums</h2>
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+	{% user_access_policy groupid request.user as user_access %}
+	{% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="forum">
+      <br/>
+      <a class="button medium" href="{% url 'create_forum' group_name_tag %}">
+	     <span class="fi-plus">&nbsp;&nbsp;New Forum</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
 {% endblock %}
 
 
 {% block body_content %}
-{% get_group_name groupid as group_name_tag %}
 
-	{% autopaginate existing_forums 23 %}
-	<h2>Latest Forums</h2><hr/>
-	<div id="existing_forums">
-		<ul class="small-block-grid-1 medium-block-grid-2">
-			{% for each in existing_forums %}
+<header class="row">
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Forums {% if existing_forums.count %}({{ existing_forums.count }}){% endif %}</a></dd>
+  </dl>
+</header>
 
-				<li class="card">
-					<a href="{% url 'show' groupid each %}">  
-						<h3>{{each.name}}</h3>
-						<p class="">
-							{% with each.content|safe as forum_content %}
-					          {{forum_content|default_if_none:"No description !!"}}
-					        {% endwith %}
-						</p>
-					</a>
-				</li>
-			{% endfor %}
-		</ul>
-	</div>
+{% if searching and existing_forums.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{existing_forums.count}} {{title|lower}}{{existing_forums.count|pluralize}}.</span></p>
+  </div>
+</div>
 
-	{% paginate %}
+{% elif searching and existing_forums.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert">No {{title|lower}}{{existing_forums.count|pluralize}} matched your search criteria!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+
+<ul class="small-block-grid-1 medium-block-grid-2">
+  {% autopaginate existing_forums 23 %}
+
+  {% for each in existing_forums %}
+  <li class="card">
+    <div class="forum">
+
+    <header>
+      <div class="label-list">
+      {% for tag in each.tags|slice:":3" %}
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+      {% endfor %}
+      </div>
+
+      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+      <h4>
+        {{ each.name|safe|striptags|truncatechars:20 }}
+        <div>
+          <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
+          <br/>
+          by <span href="#" class="user" data-gnow="">{{ each.user_details_dict.created_by }}</span> 
+          </small>
+        </div>
+      </h4>
+    </header>
+      
+    <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+    <a class="small button expand" href="{% url 'show' groupid each %}">View Details</a>
+
+    {% comment %}
+    {% if node.created_by == request.user.id %}
+    <a class="button alert tiny" href="{% url '' group_name_tag each %}">Delete</a>
+    {% endif %}
+    {% endcomment %}
+
+    <footer class="row">
+      <div class="small-7 columns"><strong>{{each.contributors|length}}</strong> Contributor{{each.contributors|pluralize}}</div>
+      <div class="small-5 columns"><div class="right"><strong>#</strong> Thread</div></div> 
+    </footer>
+
+    </div>
+  </li>
+  
+  {% empty %}
+    {% if not searching %}
+  	<div class="row">
+  	  <div class="small-12 columns">
+  	    <h5>This group doesn't have any forums. <b>Be the first to create a Forum!</b></h5>
+  	  </div>
+  	</div>
+    {% endif %}
+  
+  {% endfor %}
+</ul>
+
+{% paginate %}
 
 {% endblock %}
 
-
-
-{% block script %}
-
-// <script type="text/javascript">
-
-	$("#node_search_form").parent().hide();
-
-	// removing left-off-canvas behaviour
-	// $("#create-forum a.left-off-canvas-toggle:lt(2)").remove();
-	// $("#create-forum a.left-off-canvas-toggle").removeClass("left-off-canvas-toggle");
-
-	// </script>
-
-	{% endblock %}

@@ -68,41 +68,106 @@ def group(request, group_id, app_id=None):
     group_count = 0
     auth = collection.Node.one({'_type': u"Author", 'name': unicode(request.user.username)})
 
-    if auth:
+    if request.method == "POST":
+      #Page search view
+      title = gst_group.name
+      
+      search_field = request.POST['search_field']
+
+      if auth:
         # Logged-In View
         cur_groups_user = collection.Node.find({'_type': "Group", 
-                                                '_id': {'$nin': [ObjectId(group_id), auth._id]},
-                                                'name': {'$nin': ["home"]},
-                                                '$or': [{'created_by': request.user.id}, {'group_type': 'PUBLIC'}, {'author_set': request.user.id}]
-                                            })
+                                         '_id': {'$nin': [ObjectId(group_id), auth._id]},
+                                         '$or': [
+                                            {'$and': [
+                                              {'name': {'$regex': search_field, '$options': 'i'}},
+                                              {'$or': [
+                                                {'created_by': request.user.id}, 
+                                                {'group_type': 'PUBLIC'}, 
+                                                {'author_set': request.user.id}
+                                                ]
+                                              }                                  
+                                            ]
+                                            },
+                                            {'$and': [
+                                              {'tags': {'$regex':search_field, '$options': 'i'}},
+                                              {'$or': [
+                                                {'created_by': request.user.id}, 
+                                                {'group_type': 'PUBLIC'}, 
+                                                {'author_set': request.user.id}
+                                                ]
+                                              }                                  
+                                            ]
+                                            }, 
+                                          ],
+                                          'name': {'$nin': ["home"]},
+                                     }).sort('last_update', -1)
         if cur_groups_user.count():
             for group in cur_groups_user:
                 group_nodes.append(group)
 
         group_count = cur_groups_user.count()
-        
-    else:
+          
+      else:
         # Without Log-In View
         cur_public = collection.Node.find({'_type': "Group", 
-                                           '_id': {'$nin': [ObjectId(group_id)]},
-                                           'name': {'$nin': ["home"]},
-                                           'group_type': "PUBLIC"
-                                       })
+                                         '_id': {'$nin': [ObjectId(group_id)]},
+                                         '$or': [
+                                            {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                            {'tags': {'$regex':search_field, '$options': 'i'}}
+                                          ],
+                                          'name': {'$nin': ["home"]},
+                                          'group_type': "PUBLIC"
+                                     }).sort('last_update', -1)
     
         if cur_public.count():
             for group in cur_public:
                 group_nodes.append(group)
         
         group_count = cur_public.count()
-       
 
-    return render_to_response("ndf/group.html", 
-                              {'group_nodes': group_nodes, 
-                               'group_nodes_count': group_count,
-                               'groupid': group_id, 'group_id': group_id
-                              }, context_instance=RequestContext(request))
+      return render_to_response("ndf/group.html",
+                                {'title': title, 
+                                 'searching': True, 'query': search_field,
+                                 'group_nodes': group_nodes, 'group_nodes_count': group_count,
+                                 'groupid':group_id, 'group_id':group_id
+                                }, 
+                                context_instance=RequestContext(request)
+      )
+
+    else:
+      if auth:
+        # Logged-In View
+        cur_groups_user = collection.Node.find({'_type': "Group", 
+                                                '_id': {'$nin': [ObjectId(group_id), auth._id]},
+                                                'name': {'$nin': ["home"]},
+                                                '$or': [{'created_by': request.user.id}, {'group_type': 'PUBLIC'}, {'author_set': request.user.id}]
+                                            }).sort('last_update', -1)
+        if cur_groups_user.count():
+            for group in cur_groups_user:
+                group_nodes.append(group)
+
+        group_count = cur_groups_user.count()
+          
+      else:
+        # Without Log-In View
+        cur_public = collection.Node.find({'_type': "Group", 
+                                           '_id': {'$nin': [ObjectId(group_id)]},
+                                           'name': {'$nin': ["home"]},
+                                           'group_type': "PUBLIC"
+                                       }).sort('last_update', -1)
     
+        if cur_public.count():
+            for group in cur_public:
+                group_nodes.append(group)
+        
+        group_count = cur_public.count()
 
+      return render_to_response("ndf/group.html", 
+                                {'group_nodes': group_nodes, 
+                                 'group_nodes_count': group_count,
+                                 'groupid': group_id, 'group_id': group_id
+                                }, context_instance=RequestContext(request))
 
 
 def create_group(request,group_id):
@@ -191,7 +256,6 @@ def create_group(request,group_id):
     nodes_list = []
     for each in available_nodes:
       nodes_list.append(each.name)
-
 
     return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
     

@@ -31,6 +31,125 @@ def get_user_preferences(group,user):
   return {'groupid':group,'author':user}
 
 
+@register.assignment_tag
+def get_group_resources(group):
+  try:
+    res=get_all_resources_for_group(group['_id'])
+    return res.count
+  except Exception as e:
+    print "Error in get_group_resources "+str(e)
+  
+@register.assignment_tag
+def all_gapps():
+  try:
+    return get_all_gapps()
+  except Exception as expt:
+    print "Error in get_all_gapps "+str(expt)
+
+@register.assignment_tag
+def get_create_group_visibility():
+  if CREATE_GROUP_VISIBILITY:
+    return True
+  else:
+    return False
+
+@register.assignment_tag
+def get_site_info():
+  sitename=Site.objects.all()[0].name.__str__()
+  return sitename
+
+@register.assignment_tag
+def check_gapp_menus(groupid):
+  ins_objectid  = ObjectId()
+  if ins_objectid.is_valid(groupid) is False :
+	group_ins = collection.Node.find_one({'_type': "Group","name": groupid}) 
+	if group_ins:
+	    groupid = str(group_ins._id)
+  else :
+	pass
+  grp=collection.Node.one({'_id':ObjectId(groupid)})
+  if not at_apps_list:
+    return False
+  poss_atts=grp.get_possible_attributes(grp.member_of)
+  if not poss_atts:
+    return False
+  return True
+  
+ 
+@register.assignment_tag
+def get_apps_for_groups(groupid):
+  try:
+    ret_dict={}
+    grp=collection.Node.one({'_id':ObjectId(groupid)})
+    poss_atts=grp.get_possible_attributes(at_apps_list._id)
+    if poss_atts:
+      list_apps=poss_atts['apps_list']['object_value']
+      counter=1
+      for each in list_apps:
+        obdict={}
+        obdict['id']=each['_id']
+        obdict['name']=each['name'].lower()
+        ret_dict[counter]=obdict
+        counter+=1 
+      return ret_dict 
+    else:
+      gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+      gapps = {}
+      i = 0;
+      meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+      GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+      group_obj=collection.Group.one({'_id':ObjectId(groupid)})
+      if group_obj.name == "home":
+	not_in_menu_bar = ["Image", "Video"]
+      else :
+	not_in_menu_bar = ["Image", "Video", "Group"]
+      for node in GAPPS:
+        if node:
+          if node.name not in not_in_menu_bar:
+            i = i+1;
+	    if node.name in setting_gapps:
+		gapps[i] = {'id': node._id, 'name': node.name.lower()}
+	    else:
+	        gapps[i] = {'id': node._id, 'name': node.name}
+      return gapps
+  except Exception as exptn:
+    print "Exception in get_apps_for_groups "+str(exptn)
+
+
+
+@register.assignment_tag
+def check_is_user_group(group_id):
+  try:
+    lst_grps=[]
+    all_user_grps=get_all_user_groups()
+    grp=collection.Node.one({'_id':ObjectId(group_id)})
+    for each in all_user_grps:
+      lst_grps.append(each.name)
+    if grp.name in lst_grps:
+      return True
+    else:
+      return False
+  except Exception as exptn:
+    print "Exception in check_user_group "+str(exptn)
+@register.assignment_tag
+def switch_group_conditions(user,group_id):
+  try:
+    ret_policy=False
+    req_user_id=User.objects.get(username=user).id
+    group=collection.Node.one({'_id':ObjectId(group_id)})
+    if req_user_id in group.author_set and group.group_type == 'PUBLIC':
+      ret_policy=True
+    return ret_policy
+  except Exception as ex:
+    print "Exception in switch_group_conditions"+str(ex)
+ 
+@register.assignment_tag
+def get_all_user_groups():
+  try:
+    all_groups=collection.Node.find({'_type':'Author'})
+    return list(all_groups)
+  except:
+    print "Exception in get_all_user_groups"
 
 @register.assignment_tag
 def get_group_resources(group):
@@ -237,7 +356,6 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
-  print "fields_name",fields_name
   drawer1 = {}
   drawer2 = None
   groupid = ""
@@ -842,10 +960,10 @@ def get_publish_policy(request,groupid,res_node):
        #condition for groups
        if resnode._type == "Group":
          if ver == "1.1" or resnode.created_by != request.user.id:
-           print "version=1.1"
+           # print "\n version = 1.1\n"
            return "stop"
        if group == "allow":
-         print "grop=allow"
+         # print "\n group = allow\n"
          if res_node.status == "DRAFT": 
            return "allow"
 

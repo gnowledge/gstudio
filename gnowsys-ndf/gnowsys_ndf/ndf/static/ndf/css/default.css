@@ -383,7 +383,7 @@ article .tabs dd.active a {
 /* line 255, ../scss/default.scss */
 .card > * > i {
   position: absolute;
-  top: -12px;
+  top: 20px;
   right: 20px;
   font-size: 4rem;
   color: #eee;
