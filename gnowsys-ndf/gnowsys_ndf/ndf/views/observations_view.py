@@ -100,6 +100,8 @@ def all_observations(request, group_id, app_id=None):
 
 def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
+	client_ip = request.META['REMOTE_ADDR']
+
 	# getting django user id
 	user_id = int(request.user.id)  if request.user.id 	else ""		
 	user_name = unicode(request.user.username) if request.user.username  else "" # getting django user name
@@ -144,7 +146,8 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,
 							 		'app_name':app_name, 'app_id':app_id, 'app_set_id':app_set_id, 'app_set_name_slug':slug,
-							 		'user_name':user_name, 'template_view': 'app_set_view'
+							 		'user_name':user_name, 'client_ip':client_ip,
+							 		'template_view': 'app_set_view'
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
@@ -154,15 +157,39 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 	marker_geojson = request.POST["marker_geojson"]
 	marker_geojson = ast.literal_eval(marker_geojson)
-	marker_geojson['properties']['ref'] = str(ObjectId())
 
 	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
 
-	if app_set_element:
-		app_set_element.location.append(marker_geojson)
-		app_set_element.save()
+	# to update existing location
+	if "ref" in marker_geojson['properties']:
+		marker_ref = marker_geojson['properties']['ref']
+
+		if app_set_element:
+			
+			for each in app_set_element.location:
+				
+				if each['properties']['ref'] == marker_ref:
+					app_set_element.location.remove(each)
+					app_set_element.location.append(marker_geojson)
+					app_set_element.save()
+					unique_token = marker_ref
+					operation_performed = "edit"
+
 	
-	return HttpResponse(len(app_set_element.location))
+	# to create/add new location
+	else:
+		unique_token = str(ObjectId())
+		marker_geojson['properties']['ref'] = unique_token
+
+		if app_set_element:
+			app_set_element.location.append(marker_geojson)
+			app_set_element.save()
+			operation_performed = "create_new"
+	
+	response_data = [len(app_set_element.location), unique_token, operation_performed]
+	response_data = json.dumps(response_data)
+
+	return StreamingHttpResponse(response_data)
 
 
 

@@ -287,13 +287,15 @@ def version_node(request, group_id, node_id, version_no):
    	doc=history_manager.get_version_document(node,version_1)
 	doc1=history_manager.get_version_document(node,version_2)     
         
-        for i in doc1:
-	   
-           s=d.diff_compute(str(doc[i]),str(doc1[i]),True)
+        for i in node1:
+	   try:
+    
+    	       s=d.diff_compute(str(doc[i]),str(doc1[i]),True)
+               l=diff_prettyHtml(s)
+	       node1[i]=l
+           except:
+                node1[i]=node1[i]		       
            
-           l=diff_prettyHtml(s)
-	   
-           node1[i]=l
         
     
         content = node1
@@ -519,9 +521,12 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      con2=diff_string(a,b)
      con3=diff_string(c,d)
      doc2.update(doc)
-     for attr in doc2:
+     for attr in node:
        if attr != '_type':
-	node[attr] = doc2[attr];
+        try:
+		node[attr] = doc2[attr];
+        except:
+		node[attr]=node[attr]
      doc2.content_org=con2
      doc2.content=con3
      node.content_org=doc2.content_org
@@ -548,10 +553,17 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
   
 def revert_doc(request,group_id,node_id,version_1):
    node=collection.Node.one({'_id':ObjectId(node_id)})
+   group=collection.Node.one({'_id':ObjectId(group_id)})
    doc=history_manager.get_version_document(node,version_1)
-   for attr in doc:
+   
+   print node
+   
+   for attr in node:
       if attr != '_type':
-	    node[attr] = doc[attr];
+            try:
+	    	node[attr] = doc[attr];
+            except:
+		node[attr] =node[attr]
    node.modified_by=request.user.id
    node.save()
    view ='revert'
