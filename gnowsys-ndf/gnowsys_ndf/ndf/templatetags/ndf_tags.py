@@ -138,7 +138,6 @@ def switch_group_conditions(user,group_id):
     ret_policy=False
     req_user_id=User.objects.get(username=user).id
     group=collection.Node.one({'_id':ObjectId(group_id)})
-    print "groupauth",group.author_set,group.group_type
     if req_user_id in group.author_set and group.group_type == 'PUBLIC':
       ret_policy=True
     return ret_policy
@@ -530,22 +529,27 @@ def get_user_group(user):
 
 @register.assignment_tag
 def get_profile_pic(user):
-
   ID = User.objects.get(username=user).pk
   auth = collection.Node.one({'_type': u'Author', 'name': unicode(user)})
+  collection_tr = db[Triple.collection_name]
 
   if auth:
-    prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
+  	profile_pic_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_profile_pic' })
+   	dbref_profile_pic = profile_pic_RT.get_dbref()
+   	prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
 
-    if prof_pic_rel.count() > 0 :
-      index = prof_pic_rel.count() - 1
-      prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject)})      
-    else:
-      prof_pic = "" 
+   	if prof_pic_rel.count() :
+          index = prof_pic_rel.count() - 1
+          Index = prof_pic_rel[index].right_subject
+          # prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject'])})      
+          prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
+        else:
+          prof_pic = "" 
   else:
     prof_pic = ""
-
+    
   return prof_pic
+
 
 
 @register.assignment_tag
@@ -564,7 +568,6 @@ def get_group_name(val):
 def get_edit_url(groupid):
 
   node = collection.Node.one({'_id': ObjectId(groupid) }) 
-
   if node._type == 'GSystem':
 
     type_name = collection.Node.one({'_id': node.member_of[0]}).name
@@ -721,7 +724,7 @@ def user_access_policy(node,user):
     col_Group=db[Group.collection_name]
     group_gst = col_Group.Group.one({'_id':ObjectId(node)})
     # if user.id in group_gst.group_set or group_gst.created_by == user.id:
-    if user.id in group_gst.author_set or group_gst.created_by == user.id or user.is_superuser:
+    if user.id in group_gst.author_set or group_gst.created_by == user.id :
       return 'allow'
   except Exception as e:
     print "Exception in user_access_policy- "+str(e)
@@ -838,9 +841,11 @@ def get_publish_policy(request,groupid,res_node):
    elif node.edit_policy == "EDITABLE_NON_MODERATED":
        #condition for groups
        if resnode._type == "Group":
-         if ver == "1.1" :
+         if ver == "1.1" or resnode.created_by != request.user.id:
+           print "version=1.1"
            return "stop"
        if group == "allow":
+         print "grop=allow"
          if res_node.status == "DRAFT": 
            return "allow"
 
@@ -854,46 +859,27 @@ def get_source_id(obj_id):
     print str(e)
     return 'null'
  
-
-# @register.assignment_tag
-# def get_possible_translations(obj_id):
-#   if not str(obj_id._id) in check:
-#       check.append(str(obj_id._id))
-#       relation_set=obj_id.get_possible_relations(obj_id.member_of)
-#       if relation_set.has_key('translation_of'):
-#         for k,v in relation_set['translation_of'].items():
-#           if k == "subject_or_right_subject_list":
-#             for each in v:
-#               if not str(each._id) in check:
-#                 dic={}
-#                 dic[each['_id']]=each['language']
-#                 print dic,"dddddddddddddddddddddddddddiiiiiiiiiiiiiiiiiiiiccccccccccccccc"
-#                 translation_set.append(dic)
-        
-#                 get_possible_translations(each)
-          
-#   return translation_set
-
+def get_translation_relation(obj_id, translation_list = [], r_list = []):
+  r_list.append(obj_id._id)
+  relation_set=obj_id.get_possible_relations(obj_id.member_of)
+  if relation_set.has_key('translation_of'):  
+    for k,v in relation_set['translation_of'].items():                      
+      if k == 'subject_or_right_subject_list':
+        for each in v:
+          dic={}
+          if (each['_id'] not in r_list):
+            r_list.append(each['_id'])
+            dic[each['_id']]=each['language']
+            translation_list.append(dic)
+            get_translation_relation(each,translation_list, r_list)
+  return translation_list
 
 @register.assignment_tag
 def get_possible_translations(obj_id):
-  try:
-    relation_set=obj_id.get_possible_relations(obj_id.member_of)
-    translation_set=[]
-    for key,value in relation_set.items():
-      if key == 'translation_of':
-        for k,v in value.items():
-          if k == "subject_or_right_subject_list":
-            for each in v:
-              dic={}
-              dic[each['_id']]=each['language']
-              translation_set.append(dic)
+  translation_list = []
+  r_list1 = []
+  return get_translation_relation(obj_id,r_list1,translation_list)
 
-    return translation_set
-  except Exception as e:
-    print str(e)
-    return 'null'
- 
 
 
   #code commented in case required for groups not assigned edit_policy        

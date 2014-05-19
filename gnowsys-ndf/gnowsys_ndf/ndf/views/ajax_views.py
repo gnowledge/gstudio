@@ -27,7 +27,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
@@ -313,6 +313,34 @@ def get_tree_hierarchy(request, group_id, node_id):
 
     return HttpResponse(json.dumps(data))
 
+
+def add_sub_themes(request, group_id):
+
+  if request.is_ajax() and request.method == "POST":    
+
+    context_node_id = request.POST.get("context_node", '')
+    sub_theme_name = request.POST.get("sub_theme_name", '')
+
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
+    
+    # Save the sub-theme first  
+    if sub_theme_name:
+
+      node = collection.GSystem()
+      get_node_common_fields(request, node, group_id, theme_GST)
+      
+      node.save()
+      node.reload()
+      # Add this sub-theme into context nodes collection_set
+      collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+      context_node.reload()
+
+      return HttpResponse("success")
+    else:
+      return HttpResponse("failure")
+  
 
 @login_required
 def change_group_settings(request,group_id):

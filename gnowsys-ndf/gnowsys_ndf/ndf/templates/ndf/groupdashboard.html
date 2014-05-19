@@ -110,13 +110,13 @@ $(document).ready(function()
 {% check_user_join request groupid as user_is_joined %}
 <input type="hidden" id="groupname" value="{{node}}">
 {% if user_is_joined == "joined" %}
-  {% if is_user_group %}
+  {% if is_user_group and node.created_by != request.user %}
        <input class="button tiny" type="submit" id="notify" value="Stop following" class="button" align="center" style="visibility:visible" >
   {% else %}
        <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible">
   {% endif %} 
 {% elif user_is_joined == "not" or not user.is_authenticated  %}
-  {% if is_user_group %}
+  {% if is_user_group and node.created_by != request.user %}
        <input class="button tiny" type="submit" id="notify" value="Follow" class="button" align="center" style="visibility:visible" >
   {% else %}
        <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >

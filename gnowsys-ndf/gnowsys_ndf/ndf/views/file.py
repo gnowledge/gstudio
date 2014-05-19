@@ -163,6 +163,7 @@ def submitDoc(request, group_id):
             if auth :
                 group_id = str(auth._id)
     else :
+        print group_id
         pass
 
     alreadyUploadedFiles = []
@@ -236,10 +237,13 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 filetype1 = ""
             filename = files.name
             fileobj.name = unicode(title)
+
             if language:
                 fileobj.language= unicode(language)
             fileobj.created_by = int(userid)
+
             fileobj.modified_by = int(userid)
+
             if int(userid) not in fileobj.contributors:
                 fileobj.contributors.append(int(userid))
             
@@ -247,12 +251,12 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 fileobj.access_policy = unicode(access_policy) # For giving privacy to file objects   
             
             fileobj.file_size = size
-            group_object=fcol.Group.one({'_id':ObjectId(group_id)})
+            group_object=collection.Group.one({'_id':ObjectId(group_id)})
             
             if group_object._id not in fileobj.group_set:
                 fileobj.group_set.append(group_object._id)        #group id stored in group_set field
             if usrname:
-                user_group_object=fcol.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+                user_group_object=collection.Node.one({'$and':[{'_type':u'Author'},{'name':usrname}]})
                 if user_group_object:
                     if user_group_object._id not in fileobj.group_set:                 # File creator_group_id stored in group_set field
                         fileobj.group_set.append(user_group_object._id)
