@@ -121,7 +121,7 @@ def dashboard(request, group_id):
       prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
 
       # prof_pic_rel will get the cursor object of relation of user with its profile picture 
-      if prof_pic_rel :
+      if prof_pic_rel.count() :
         index = prof_pic_rel.count() - 1
         Index = prof_pic_rel[index].right_subject
         # img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      

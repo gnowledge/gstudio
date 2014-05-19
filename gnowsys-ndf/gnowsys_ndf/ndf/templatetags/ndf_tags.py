@@ -538,7 +538,7 @@ def get_profile_pic(user):
    	dbref_profile_pic = profile_pic_RT.get_dbref()
    	prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
 
-   	if prof_pic_rel :
+   	if prof_pic_rel.count() :
           index = prof_pic_rel.count() - 1
           Index = prof_pic_rel[index].right_subject
           # prof_pic = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject'])})      
