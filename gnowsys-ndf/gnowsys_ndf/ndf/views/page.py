@@ -560,35 +560,22 @@ def publish_page(request,group_id,node):
         pass
 
     node=collection.Node.one({'_id':ObjectId(node)})
-    page_node,v=get_page(request,node)
-    node.content = page_node.content
-    node.content_org=page_node.content_org
-    node.status=unicode("PUBLISHED")
-    node.modified_by = int(request.user.id)
-    node.save() 
+    group=collection.Node.one({'_id':ObjectId(group_id)})
+    if group.post_node:
+        node.status=unicode("PUBLISHED")
+        node.save('UnderModeration')
+    else:
+        page_node,v=get_page(request,node)
+        node.content = page_node.content
+        node.content_org=page_node.content_org
+        node.status=unicode("PUBLISHED")
+        node.modified_by = int(request.user.id)
+        node.save() 
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
 
     return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
-  print "getting in tite"   
-  node=collection.Node.one({'_id':ObjectId(node)})
-  group=collection.Node.one({'_id':ObjectId(group_id)})
-  if group.post_node:
-	 node.status=unicode("PUBLISHED")
-	 node.save('UnderModeration')
-  else:
-	  page_node,v=get_page(request,node)
-	  node.content = page_node.content
-	  node.content_org=page_node.content_org
-	  node.status=unicode("PUBLISHED")
-	  node.modified_by = int(request.user.id)
-	  node.save() 
-  #no need to use this section as seprate view is created for group publish
-  #if node._type == 'Group':
-   # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
-
-  return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
 
 
 def merge_doc(request,group_id,node_id,version_1,version_2):
