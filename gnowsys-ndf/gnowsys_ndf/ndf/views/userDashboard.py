@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 
 
 from django_mongokit import get_database
@@ -24,7 +25,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.settings import GAPPS
-
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 #######################################################################################################################################
 
@@ -32,7 +33,7 @@ db = get_database()
 collection = db[Node.collection_name]
 collection_tr = db[Triple.collection_name]
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
-at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference'}]})
+at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
 ins_objectid  = ObjectId()
 
 
@@ -116,11 +117,15 @@ def dashboard(request, group_id):
     shelves = []
     shelf_list = {}
     if auth:
+      dbref_profile_pic = prof_pic.get_dbref()
+      prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
+
       # prof_pic_rel will get the cursor object of relation of user with its profile picture 
-      prof_pic_rel = collection.GRelation.find({'subject': ObjectId(auth._id) })
-      if prof_pic_rel.count() > 0 :
+      if prof_pic_rel.count() :
         index = prof_pic_rel.count() - 1
-        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel[index].right_subject) })      
+        Index = prof_pic_rel[index].right_subject
+        # img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      
+        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
       else:
         img_obj = "" 
 
@@ -159,21 +164,43 @@ def dashboard(request, group_id):
                               context_instance=RequestContext(request)
     )
 
-def user_preferences(request,group_id):
+def user_preferences(request,group_id,auth_id):
     try:
-        print "inside userprefview"
-        node=collection.Node.one({'_id':ObjectId(group_id)})
+        grp=collection.Node.one({'_id':ObjectId(auth_id)})
         if request.method == "POST":
-            return HttpResponse("Success") 
+            lst=[]
+            pref_to_set = request.POST['pref_to_set']
+            pref_list=pref_to_set.split(",")
+            if pref_list:
+                for each in pref_list:
+                    if each:
+                        obj=collection.Node.one({'_id':ObjectId(each)})
+                        lst.append(obj);
+                gattribute=collection.Node.one({'$and':[{'_type':'GAttribute'},{'attribute_type.$id':at_user_pref._id},{'subject':grp._id}]})
+                if gattribute:
+                    gattribute.delete()
+                if lst:
+                    create_attribute=collection.GAttribute()
+                    create_attribute.attribute_type=at_user_pref
+                    create_attribute.subject=grp._id
+                    create_attribute.object_value=lst
+                    create_attribute.save()            
+            return HttpResponse("Success")
+
+
         else:  
-            list_at_apps=[]
+            list_at_pref=[]
+            user_id=request.user.id
             if not at_user_pref:
                 return HttpResponse("Failure")
             poss_attrs=grp.get_possible_attributes(at_user_pref._id)
             if poss_attrs:
-                list_at_apps=poss_attrs['user_preference']['object_value']
-            st=get_all_gapps()
-            data_list=set_drawer_widget(st,list_at_apps)
+                list_at_pref=poss_attrs['user_preference_off']['object_value']
+            all_user_groups=[]
+            for each in get_all_user_groups():
+                all_user_groups.append(each.name)
+            st = collection.Node.find({'$and':[{'_type':'Group'},{'author_set':{'$in':[user_id]}},{'name':{'$nin':all_user_groups}}]})
+            data_list=set_drawer_widget(st,list_at_pref)
             return HttpResponse(json.dumps(data_list))
     except Exception as e:
         print "Exception in userpreference view "+str(e)

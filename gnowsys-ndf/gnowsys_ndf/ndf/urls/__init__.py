@@ -35,20 +35,17 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
-    (r'^(?P<group_id>[^/]+)/browse resource/', include('gnowsys_ndf.ndf.urls.browse_resource')),
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
    # (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
     url(r'^(?P<group_id>[^/]+)$','gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
-    (r'^(?P<group_id>[^/]+)/browse topic/', include('gnowsys_ndf.ndf.urls.browse_topic')),
-    (r'^(?P<group_id>[^/]+)/browse resource/', include('gnowsys_ndf.ndf.urls.browse_resource')),
+    (r'^(?P<group_id>[^/]+)/browse topic', include('gnowsys_ndf.ndf.urls.browse_topic')),
+    (r'^(?P<group_id>[^/]+)/browse resource', include('gnowsys_ndf.ndf.urls.browse_resource')),
     (r'^(?P<group_id>[^/]+)/mis/', include('gnowsys_ndf.ndf.urls.mis')),
     (r'^(?P<group_id>[^/]+)/mis-po/', include('gnowsys_ndf.ndf.urls.mis')),
 
 #    (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
 
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
-
-
 
     (r'^(?P<group_id>[^/]+)/observation/(?P<app_id>[\w-]+)$', include('gnowsys_ndf.ndf.urls.observations_urls')),
     (r'^(?P<group_id>[^/]+)/observations/(?P<app_id>[\w-]+)', include('gnowsys_ndf.ndf.urls.observations_urls')),

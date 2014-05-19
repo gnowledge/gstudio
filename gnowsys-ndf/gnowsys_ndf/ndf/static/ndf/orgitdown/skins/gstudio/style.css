@@ -43,6 +43,9 @@
 	min-height: 100px;
 }
 
+.orgitdownHeader ul {
+	margin-left: 0px;
+}
 
 /*
 .orgitdown .orgitdownButton0 a {
