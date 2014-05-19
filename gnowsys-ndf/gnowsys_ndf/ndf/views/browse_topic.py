@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 
 from gnowsys_ndf.ndf.models import Node
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers
 
 #######################################################################################################################################
 db = get_database()
@@ -108,6 +108,8 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
  	title = ""
  	node = ""
  	theme_topic_node = ""
+ 	drawers = None
+	drawer = None
 
  	app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
  	if app_GST:
@@ -154,6 +156,10 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 					theme_topic_node.save() 
 					title = theme_GST.name
 					node = theme_topic_node
+					# To display the theme-topic drawer while create or edit theme
+					checked = "Theme"
+					drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+					drawer = drawers['2']
 
 				elif topic_GST._id in app_GST.member_of:
 					get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
@@ -164,6 +170,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 
 	else:
 		app_node = None
+		
 		app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
 		if app_GST:
 			if app_GST.name == "Theme" or app_GST.name == "Topic":
@@ -173,14 +180,20 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 				if theme_GST._id in app_GST.member_of:
 					title = theme_GST.name
 					node = app_GST 
+					# To display the theme-topic drawer while create or edit theme
+					checked = "Theme"
+					drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+					drawer = drawers['2']
+
 				elif topic_GST._id in app_GST.member_of:
 					title = topic_GST.name
 					node = app_GST
 
-	
+
+
 	return render_to_response("ndf/theme.html",
 	                           {'app_collection_set':app_collection_set,
-	                           	'group_id': group_id,'groupid': group_id, 
+	                           	'group_id': group_id,'groupid': group_id, 'drawer': drawer,
 	                           	'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,
 	                           	'nodes_list': nodes_list,'title': title,'node': node,
 	                           	'theme_GST_id': theme_GST._id, 'topic_GST_id': topic_GST._id,
