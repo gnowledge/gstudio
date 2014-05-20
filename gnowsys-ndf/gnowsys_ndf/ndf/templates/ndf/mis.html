@@ -75,8 +75,9 @@
   {% else %}
   <li>
   {% endif %}
+  
     <div class="row">
-      {% if each.type_of or each.name == "Caste" %}
+      {% if each.type_of or each.name == "Caste" or each.name == "Course" %}
       <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
         {{each.name}} ({{count}})
       </a> 
@@ -93,18 +94,6 @@
 	{% endfor %}
 
 </ul>
-{% endblock %}
-
-
-{% block extra_content %}
-<!-- This block shows Themes Hierarchy (landing page of Browse Topic) -->
-  
-  {% if app == "Browse Topic" %}
-  
-    {% include "ndf/theme.html" %}
-
-  {% endif %}
-
 {% endblock %}
 
 
