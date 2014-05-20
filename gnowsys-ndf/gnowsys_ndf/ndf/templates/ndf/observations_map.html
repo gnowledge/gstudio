@@ -280,9 +280,10 @@
 
 						tempPopupContent = datetime? tempPopupContent + '<li class="bullet-item"><b>Date Time : </b>'+datetime+'</li>':tempPopupContent;
 
-						var regex = /(ftp|https?:\/\/([-\w\.]+)+(:\d+)?(\/([\w\/_\.]*(\?\S+)?)?)?)/ig
+						var regex = /((ftp|https?):\/\/([-\w\.]+)+(:\d+)?(\/([\w\-/_\.]*(\?\S+)?)?)?)/ig
 						// var regex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
 						// var regex = (((ftp|https?):\/\/)(www\.)?|www\.)([\da-z-_\.]+)([a-z\.]{2,7})([\/\w\.-_\?\&]*)*\/?
+						// var regex = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-=?]*)*\/?/
 
 						var testLinks = description.replace(regex,"<a href='$1' target='_blank'>$1</a>");
 
@@ -460,11 +461,11 @@
 			
            	this.setLatLng(changedPos).update();	// Update the marker position
            	
-           	// changeEditToSaveBtn = this.getPopup();
-           	// changeEditToSaveBtn = changeEditToSaveBtn.getContent();
+           	changeEditToSaveBtn = this.getPopup();
+           	changeEditToSaveBtn = changeEditToSaveBtn.getContent();
            	// console.log(changeEditToSaveBtn);
-           	// changeEditToSaveBtn.replace('<i class="fi-page-edit">', '<i class="fi-save"> &nbsp; save</i>');
-           	
+           	changeEditToSaveBtn = changeEditToSaveBtn.replace('<i class="fi-page-edit"> &nbsp; edit</i>', '<i class="fi-save"> &nbsp; save</i>');
+			this.setPopupContent(changeEditToSaveBtn);
            	// changeEditToSaveBtn = this._popup._contentNode.getElementsByClassName("fi-page-edit");
 
            	// $(changeEditToSaveBtn).attr("class", "fi-save").text(" save");
@@ -733,7 +734,20 @@
 			  				}
 			  				else if(data[2] == "edit")
 			  				{
-			  					tempMarker.feature.properties.ref = data[1]
+			  					tempMarker.feature.properties.ref = data[1];
+
+			  					// Add user name if user is authenticated.
+			  					{% if user.is_authenticated%}
+
+			  						var getEditedBy = tempMarker.feature.properties.edited_by;
+
+			  						if(getEditedBy.indexOf("{{user_name}}") < 0 )
+			  						{
+			  							tempMarker.feature.properties.edited_by.push("{{user_name}}");
+			  						}
+
+			  					{% endif %}
+
 			  					$(".marker-alert-success").html("You had successfully <b><u>edited</u></b> the Marker.").fadeIn(600, "swing").fadeOut(10000);
 			  				}
 			  				else
