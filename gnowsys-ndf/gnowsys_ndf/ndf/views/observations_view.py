@@ -40,7 +40,6 @@ collection = db[Node.collection_name]
 
 
 def all_observations(request, group_id, app_id=None):
-	print "\n in observations views\n"
 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :

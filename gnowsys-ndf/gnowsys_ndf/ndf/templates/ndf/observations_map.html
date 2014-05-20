@@ -271,6 +271,8 @@
 						description = feature.properties.description,
 						tags = feature.properties.tags 
 						created_by = feature.properties.created_by;
+						edited_by = feature.properties.edited_by;
+						// console.log(feature)
 
 				// console.log(placename + " == " + datetime + " == " + description + " == " + tags + " == " + created_by);
 
@@ -293,9 +295,15 @@
 
 						tempPopupContent += '</ul>'
 
+						// adding created by in popup
 						created_by = (created_by.indexOf("anonymous_") == 0)? (created_by.split("_")[2])?created_by.split("_")[2]+ " (Anonymous User)":"Anonymous User" : created_by;
 
 						tempPopupContent = created_by? tempPopupContent + '<i style="color:gray; margin-left:"> Contributed by : ' + created_by + '</i>':tempPopupContent;
+
+			  						// console.log(edited_by);
+
+						// adding edited_by field
+						tempPopupContent = (edited_by.length > 1)? tempPopupContent + '<br/><br/><i style="color:#b2b2b2; margin-left:"> Edited by : ' + edited_by + '</i>':tempPopupContent;
 
 						hasDataFlag = tempPopupContent.length>0 ? true : false;
 					{% endif %}
@@ -505,12 +513,27 @@
 				description = this.feature.properties.description,
 				tags = this.feature.properties.tags,
 				created_by = this.feature.properties.created_by;
+				edited_by = this.feature.properties.edited_by;
 
 			$(popupHtmlObj).children("input.marker-place-name").val(placename);
 			$(popupHtmlObj).children("input.marker-dtstamp").val(datetime);
 			$(popupHtmlObj).children("textarea.marker-obs-note").val(description);
 			$(popupHtmlObj).children("input.marker-tags").val(tags);
 			$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
+			
+			{% comment %}
+			// {% if not user.is_authenticated %}
+			// 	if(created_by.indexOf("anonymous_") == 0)
+			// 	{
+			// 		$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
+			// 	}
+			// 	else
+			// 	{
+			// 		$(popupHtmlObj).children("input.marker-creator").
+			// 	}
+
+			// {% endif %}
+			{% endcomment %}
 
 			// preserving and updating GeoJson of marker
             var MarkerLatLng = []
@@ -640,15 +663,7 @@
 				
 			});
 			
-			// if( getPlace.length && getDT.length && getObsNote.length && getTags.length && getCreator.length )
-			// {
-			// 	$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
-			// }
-			// else
-			// {
-			// 	$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-page-edit").text(" edit");
-			// }
-			
+						
 			// To add content on click of add_content
 			$(".popup-add-content-button:visible").click(function(){
 
@@ -689,14 +704,29 @@
 					tempMarker.feature.properties.datetime = getDT;
 					tempMarker.feature.properties.description = getObsNote;//.replace(/'/gm, "");	// temp fix.
 					tempMarker.feature.properties.tags = getTags;
+
 					{% if not user.is_authenticated %}
 						tempMarker.feature.properties.created_by = "anonymous_{{client_ip}}_" + getCreator ;
+						tempMarker.feature.properties.edited_by = [getCreator+" (Anonymous)"] ;
 					{% endif %}
 									
 					if(! tempMarker.feature.properties.id)
 					{
 						tempMarker.feature.properties.id = lID;	
 					}
+
+					// Add user name if user is authenticated.
+  					{% if user.is_authenticated%}
+
+  						var getEditedBy = tempMarker.feature.properties.edited_by;
+
+  						if(getEditedBy.indexOf("{{user_name}}") < 0 )
+  						{
+  							tempMarker.feature.properties.edited_by.push("{{user_name}}");
+  						}
+
+  					{% endif %}
+
 
 					var now = new Date(),
 						formatedDateTime = now.toLocaleDateString() + " " + now.getHours() + ":" + now.getMinutes();
@@ -735,18 +765,6 @@
 			  				else if(data[2] == "edit")
 			  				{
 			  					tempMarker.feature.properties.ref = data[1];
-
-			  					// Add user name if user is authenticated.
-			  					{% if user.is_authenticated%}
-
-			  						var getEditedBy = tempMarker.feature.properties.edited_by;
-
-			  						if(getEditedBy.indexOf("{{user_name}}") < 0 )
-			  						{
-			  							tempMarker.feature.properties.edited_by.push("{{user_name}}");
-			  						}
-
-			  					{% endif %}
 
 			  					$(".marker-alert-success").html("You had successfully <b><u>edited</u></b> the Marker.").fadeIn(600, "swing").fadeOut(10000);
 			  				}
