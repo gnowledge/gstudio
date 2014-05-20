@@ -41,6 +41,24 @@ collection = db[Node.collection_name]
 
 def all_observations(request, group_id, app_id=None):
 
+	ins_objectid  = ObjectId()
+	if ins_objectid.is_valid(group_id) is False :
+	    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if group_ins:
+	        group_id = str(group_ins._id)
+	    else :
+	        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	        if auth :
+	            group_id = str(auth._id)
+	else :
+	    pass
+	if app_id is None:
+	    app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Observation"})
+	    if app_ins:
+	        app_id = str(app_ins._id)
+
+
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
 	app_collection_set = []
@@ -91,7 +109,7 @@ def all_observations(request, group_id, app_id=None):
 	# request.session.flush()
 	request.session.set_test_cookie()
 
-	return render_to_response("ndf/observations.html",
+	return render_to_response("ndf/observation.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,
@@ -103,6 +121,24 @@ def all_observations(request, group_id, app_id=None):
 							 )
 
 def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
+
+	ins_objectid  = ObjectId()
+	if ins_objectid.is_valid(group_id) is False :
+	    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    if group_ins:
+	        group_id = str(group_ins._id)
+	    else :
+	        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	        if auth :
+	            group_id = str(auth._id)
+	else :
+	    pass
+	if app_id is None:
+	    app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Page"})
+	    if app_ins:
+	        app_id = str(app_ins._id)
+
 
 	client_ip = request.META['REMOTE_ADDR']
 	request.session.set_test_cookie()
@@ -146,7 +182,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 				
 	# 	app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
 
-	return render_to_response("ndf/observations.html",
+	return render_to_response("ndf/observation.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,

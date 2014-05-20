@@ -48,8 +48,10 @@ urlpatterns = patterns('',
 
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
 
-    (r'^(?P<group_id>[^/]+)/observation/(?P<app_id>[\w-]+)$', include('gnowsys_ndf.ndf.urls.observations_urls')),
-    (r'^(?P<group_id>[^/]+)/observations/(?P<app_id>[\w-]+)', include('gnowsys_ndf.ndf.urls.observations_urls')),
+
+    (r'^(?P<group_id>[^/]+)/Observation', include('gnowsys_ndf.ndf.urls.observation')),
+    (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
+
     (r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)', include('gnowsys_ndf.ndf.urls.custom_app')),    
   #  url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', custom_app_view, name='GAPPS'),       
    # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', custom_app_view, name='GAPPS_set'),
