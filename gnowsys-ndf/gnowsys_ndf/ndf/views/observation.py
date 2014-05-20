@@ -109,7 +109,7 @@ def all_observations(request, group_id, app_id=None):
 	# request.session.flush()
 	request.session.set_test_cookie()
 
-	return render_to_response("ndf/observations.html",
+	return render_to_response("ndf/observation.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,
@@ -182,7 +182,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 				
 	# 	app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
 
-	return render_to_response("ndf/observations.html",
+	return render_to_response("ndf/observation.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,

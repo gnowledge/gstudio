@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-urlpatterns = patterns('gnowsys_ndf.ndf.views.observations_view',
+urlpatterns = patterns('gnowsys_ndf.ndf.views.observation',
 					url(r'^$', 'all_observations', name='all_observations'),
 					# url(r'^/(?P<app_id>[\w-]+)$', 'all_observations', name='all_observations'),
 					url(r'^/(?P<app_id>[\w-]+)/(?P<slug>[-\w]+)/(?P<app_set_id>[^/]+)$', 'observations_app', name='observations_app'),
