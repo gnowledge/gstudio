@@ -13,19 +13,39 @@ from gnowsys_ndf.ndf.views.methods import *
 
 from gnowsys_ndf.ndf.views.file import *
 
-db = get_database()
-collection = db['Nodes']
+collection = get_database()[Node.collection_name]
 
-def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=None):
+def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     custom view for custom GAPPS
     """
-    app_name = "mis"
+
+    if ObjectId.is_valid(group_id) is False :
+      group_ins = collection.Node.one({'_type': "Group","name": group_id})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+          group_id = str(auth._id)
+    else :
+      pass
+
+    app = None
+    if app_id is None:
+      app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+      if app:
+        app_id = str(app._id)
+    else:
+      app = collection.Node.one({'_id': ObjectId(app_id)})
+
+    app_name = app.name 
+
     app_collection_set = [] 
     atlist = []
     rtlist = []
-    app = collection.Node.find_one({"_id":ObjectId(app_id)})
-    App_Name = app.name 
+    
     app_set = ""
     nodes = ""
     nodes_dict = ""
@@ -45,40 +65,32 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
     property_display_order = []
 
     for eachset in app.collection_set:
-         app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
-         # app_set = collection.Node.find_one({"_id":eachset})
-         # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
+      app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+      # app_set = collection.Node.find_one({"_id":eachset})
+      # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
-        classtype = ""
-        app_set_template = "yes"
-        App_Name = None
-        systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
-        systemtype_name = systemtype.name
-        title = systemtype_name
+      classtype = ""
+      app_set_template = "yes"
+      App_Name = None
+      systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+      systemtype_name = systemtype.name
+      title = systemtype_name
 
-        if request.method=="POST":
-            search = request.POST.get("search","")
-            classtype = request.POST.get("class","")
-            nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}))
-        else :
-            nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+      if request.method=="POST":
+        search = request.POST.get("search","")
+        classtype = request.POST.get("class","")
+        nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}))
+      else :
+        nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
 
-        nodes_dict = []
-        for each in nodes:
-            nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
+      nodes_dict = []
+      for each in nodes:
+        nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
                          
     else :
-        ST_theme = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-        if ST_theme:
-            nodes = list(collection.Node.find({'member_of': {'$all': [ST_theme._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
-
-            nodes_dict = []
-            for each in nodes:
-                nodes_dict.append({"id":str(each._id), "name":each.name})
-
-        app_menu = "yes"
-        title = app_name
+      app_menu = "yes"
+      title = app_name
 
     if app_set_instance_id :
         app_set_instance_template = "yes"
@@ -157,12 +169,12 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
 
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id
 
-                                        , "node":system, 'group_id':group_id, 'app':App_Name, "property_display_order": property_display_order})
+                                        , "node":system, 'group_id':group_id, "property_display_order": property_display_order})
 
     return render_to_response(template, variable)
       
 @login_required
-def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None):
+def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     create new instance of app_set of apps view for custom GAPPS
     """

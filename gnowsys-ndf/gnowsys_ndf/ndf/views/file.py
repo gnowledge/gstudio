@@ -48,11 +48,14 @@ collection_tr = db[Triple.collection_name]
 GST_FILE = collection.GSystemType.one({'name': GAPPS[1], '_type':'GSystemType'})
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
+pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
 
-####################################################################################################################################                                             V I E W S   D E F I N E D   F O R   G A P P -- ' F I L E '
+###################################################################################################################################
+# VIEWS DEFINED FOR GAPP -- 'FILE'
 ###################################################################################################################################
 lock=threading.Lock()
 count = 0    
+
 def file(request, group_id, file_id=None):
     """
    * Renders a list of all 'Files' available within the database.
@@ -74,53 +77,103 @@ def file(request, group_id, file_id=None):
         if file_ins:
             file_id = str(file_ins._id)
 
-    if GST_FILE._id == ObjectId(file_id):
-        title = GST_FILE.name
-       
-        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'fs_file_ids':{'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-        already_uploaded = request.GET.getlist('var', "")
-    
-        pandora_video_st=collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
-        source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    if request.method == "POST":
+      # File search view
+      title = GST_FILE.name
+      
+      search_field = request.POST['search_field']
 
-        pandora_video_id=[]
-        source_id_set=[]
-        get_member_set=collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'File'}]})
-        
-        #for each in get_member_set:
-    
-         #  pandora_video_id.append(each['_id'])
-        # for each in get_member_set:
-        #     att_set=collection.Node.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
-        #     if att_set:
-        #         obj_set={}
-        #         obj_set['id']=att_set.object_value
-        #         obj_set['object']=each
-        #         source_id_set.append(obj_set)
-    
-                # for each in pandora_video_id:
-                #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
-        
-                
-       
-        return render_to_response("ndf/file.html", 
-                                  {'title': title, 
-                                   'files': files,
-                                   'sourceid':source_id_set,
-                                   "wetube_videos":get_member_set,
-                                   'docCollection': docCollection,
-                                   'imageCollection': imageCollection,
-                                   'videoCollection': videoCollection,
-                                   'already_uploaded': already_uploaded,
-                                   'groupid': group_id,
-                                   'group_id':group_id
-                                  }, 
-                                  context_instance = RequestContext(request))
+      files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
+                                    '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
+                                            {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                    'group_set': {'$all': [ObjectId(group_id)]}
+                                  }).sort('last_update', -1)
+
+      docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
+                                            '_type': 'File', 
+                                            '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                    {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                            'group_set': {'$all': [ObjectId(group_id)]}
+                                          }).sort("last_update", -1)
+
+      imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+                                              '_type': 'File', 
+                                              '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                      {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                              'group_set': {'$all': [ObjectId(group_id)]}
+                                            }).sort("last_update", -1)
+
+      videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, 
+                                              '_type': 'File', 
+                                              '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                      {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                              'group_set': {'$all': [ObjectId(group_id)]}
+                                            }).sort("last_update", -1)
+
+      pandoraCollection = collection.Node.find({'member_of': {'$all': [ObjectId(pandora_video_st._id)]}, 
+                                                '_type': 'File', 
+                                                '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                        {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                                'group_set': {'$all': [ObjectId(group_id)]}
+                                            }).sort("last_update", -1)
+
+      already_uploaded = request.GET.getlist('var', "")
+
+      return render_to_response("ndf/file.html",
+                                {'title': title, 
+                                 'searching': True, 'query': search_field,
+                                 'already_uploaded': already_uploaded,
+                                 'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
+                                 'videoCollection': videoCollection, 'pandoraCollection': pandoraCollection,
+                                 'groupid': group_id, 'group_id':group_id
+                                }, 
+                                context_instance=RequestContext(request)
+      )
+
+    elif GST_FILE._id == ObjectId(file_id):
+      # File list view
+      title = GST_FILE.name
+     
+      files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'fs_file_ids':{'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+      docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+      imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+      videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+      already_uploaded = request.GET.getlist('var', "")
+  
+      
+      # source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+
+      # pandora_video_id = []
+      # source_id_set=[]
+      get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'File'}]})
+      
+      #for each in get_member_set:
+  
+       #  pandora_video_id.append(each['_id'])
+      # for each in get_member_set:
+      #     att_set=collection.Node.one({'$and':[{'subject':each['_id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+      #     if att_set:
+      #         obj_set={}
+      #         obj_set['id']=att_set.object_value
+      #         obj_set['object']=each
+      #         source_id_set.append(obj_set)
+  
+              # for each in pandora_video_id:
+              #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
+      
+              
+     
+      return render_to_response("ndf/file.html", 
+                                {'title': title, 
+                                 'already_uploaded': already_uploaded,
+                                 # 'sourceid':source_id_set,
+                                 'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
+                                 'videoCollection': videoCollection, 'pandoraCollection':get_member_set,
+                                 'groupid': group_id, 'group_id':group_id
+                                }, 
+                                context_instance = RequestContext(request))
     else:
-        return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
+      return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
         
 @login_required    
 def uploadDoc(request, group_id):
@@ -163,7 +216,7 @@ def submitDoc(request, group_id):
             if auth :
                 group_id = str(auth._id)
     else :
-        print group_id
+        # print group_id
         pass
 
     alreadyUploadedFiles = []
@@ -637,7 +690,6 @@ def readDoc(request, _id, group_id, file_name = ""):
             else:
                 return HttpResponse("")
         else:
-            print "else in fs_file_ids"
             return HttpResponse("")
     else:
         return HttpResponse("")
