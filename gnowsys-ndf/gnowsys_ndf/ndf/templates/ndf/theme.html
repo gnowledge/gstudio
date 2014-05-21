@@ -18,12 +18,12 @@
   <script src="/static/ndf/js/tree.jquery.js"></script>
 
   <script type="text/javascript">
-    $(document).ready(function()
-    {
+    $(document).ready(function() {
     	$(function() {
     		$('.themes').tree();
     	});
     });
+   
   </script>
 {% endblock%}
 
@@ -76,8 +76,11 @@
 
 	{% if themes_hierarchy %}
 
-		<h3>Themes Hierarchy<h3>
+		<h2> Themes </h2> 
+		<a class="fold"><b><i class="fi-plus"></i> Fold </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
+		<a class="unfold"><b><i class="fi-minus"></i> Unfold </b></a>
 		<hr/>
+
 		{% if node %}
 			<!-- If "Theme" node -->
 			<div class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
@@ -177,5 +180,25 @@
 			{% include "ndf/topic_create_edit.html" %}
 		{% endif %}
 	{% endif %}
+
+	<script type="text/javascript">
+		$(".fold").click(function() {
+			$(function() {
+				$('.themes').tree();
+
+			});
+		});
+
+	    $(".unfold").click(function() {
+	    	$(function() {
+	    		$('.themes').tree({
+	    			autoOpen: true,
+	    			slide: false,
+	    		});
+	    	});
+	    });	
+
+	</script>
+
 
 {% endblock %}
