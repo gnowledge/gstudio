@@ -163,6 +163,11 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 					node = theme_GST
 				
 			else:
+				# For edititng themes 
+				themes_list_items = False				
+				create_edit = False
+				themes_hierarchy = True
+
 				theme_topic_node = collection.Node.one({'_id': ObjectId(app_GST._id)})
 				if theme_GST._id in app_GST.member_of:
 					if name:
@@ -187,12 +192,9 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 					# End of storing collection
 
 					title = theme_GST.name
-					node = theme_topic_node
-					
-					# To display the theme-topic drawer while create or edit theme
-					checked = "Theme"
-					drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-					drawer = drawers['2']
+					# This will return to Themes Hierarchy  
+					if theme_GST:
+						node = theme_GST
 
 
 				elif topic_GST._id in app_GST.member_of:
