@@ -100,6 +100,19 @@
 			<input type="text" class="marker-dtstamp" placeholder="Date Time"/>
 			<label>Observations</label>
 			<textarea class="marker-obs-note" placeholder="Observation"></textarea>
+			
+			<!-- <input type="file" class="marker-file-upload" /> -->
+			<input type="file" name="doc[]" class="image-upload" accept="image/*" />
+
+
+<!-- 			<div class="file">
+				<br/>
+				<a class="button medium" href="#{#%# url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+					<span class="fi-upload">&nbsp;&nbsp;New File</span>
+				</a>
+			</div>
+ -->
+
 			<label>Tags</label>
 			<input type="text" class="marker-tags" placeholder="Tags"/>
 			
@@ -109,7 +122,6 @@
 			<input type="text" class="marker-creator" placeholder="Enter your name"/>
 			{% endif %}
 			
-			<!-- <input type="file" class="marker-file-upload" /> -->
 
 			<div class="row">
 				<div class="small-push-1 small-4 popup-add-content-button text-center"><i class="fi-page-edit"> &nbsp; edit</i></div>			

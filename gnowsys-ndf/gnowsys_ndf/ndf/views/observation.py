@@ -206,6 +206,33 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 	unique_token = str(ObjectId())
 
 	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
+
+
+	# for uploaded images saving
+	print "\n\n=========", request.FILES.getlist("doc[]", ""), "\n\n"
+	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+		print "\n\n :::::  ", each
+		fcol = db[File.collection_name]
+		fileobj = fcol.File()
+		filemd5 = hashlib.md5(each.read()).hexdigest()
+
+		if fileobj.fs.files.exists({"md5":filemd5}):
+
+			coll = get_database()['fs.files']
+			a = coll.find_one({"md5":filemd5})
+	    	# prof_image takes the already available document of uploaded image from its md5 
+			prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+
+    	else:
+    
+			# If uploaded image is not found in gridfs stores this new image 
+			submitDoc(request, group_id)
+			# prof_image takes the already available document of uploaded image from its name
+			prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+
+
+	# --- END of images saving
+
 	
 	# to update existing location
 	if "ref" in marker_geojson['properties']:
