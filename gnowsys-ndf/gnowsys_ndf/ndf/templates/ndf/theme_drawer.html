@@ -75,13 +75,10 @@
 <script type="text/javascript">
 
     //To allocate space of 10 resources listing for drawers.
-    liHeight = $("#collection_drawer > li").outerHeight();
-    $(".resource-drawer").height(liHeight * 5);
+    $(".resource-drawer").height(400);
 
     // To select the single as well as multiple items from list 
-
      $(document).on('click','#collection_drawer li.bullet-item',function(e){
-    //$("#collection_drawer li.bullet-item").click(function(e){
       
       if (e.ctrlKey)
       {        
@@ -94,7 +91,6 @@
       }     
       
     });
-    
     
 
     function checkUpDownButton()
