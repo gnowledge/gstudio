@@ -71,7 +71,6 @@ def check_gapp_menus(groupid):
 	if not at_apps_list:
 		return False
 	poss_atts=grp.get_possible_attributes(grp.member_of)
-	print "\n poss_atts: ", poss_atts, "\n"
 	if not poss_atts:
 		return False
 	return True

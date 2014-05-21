@@ -162,9 +162,9 @@ def page(request, group_id, app_id=None):
         elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:
           """
           Below query returns only those documents:
-          (a) which are pages
-          (b) which belongs to given group
-          (c) which has status either as DRAFT or PUBLISHED
+          (a) which are pages,
+          (b) which belongs to given group,
+          (c) which has status either as DRAFT or PUBLISHED, and 
           (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
           """
           page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
