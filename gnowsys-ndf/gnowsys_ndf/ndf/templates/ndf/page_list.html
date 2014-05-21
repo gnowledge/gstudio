@@ -24,6 +24,7 @@
 
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
+
 <header class="row">
 
   <dl class="tabs" data-tab>
@@ -55,13 +56,12 @@
 </ul>
 {% endif %}
 
-
-
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-
+<div class="tabs-content">
+<div class="content active" id="panel2-1">
+  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   <!-- Node create card-->
   <li class="create card">
-  <div class="page">
+    <div class="page">
       <h4><i class="fi-plus"></i> New</h4>
       <!--<div class="row">
         <div class="large-12 columns">
@@ -95,15 +95,16 @@
   </li>
 
 {% autopaginate page_nodes 23 %}
-    <!-- Existing card list-->
-    {% for node in page_nodes %}
-        
-       {% if node.created_by == request.user.pk %}
-        
-    <li class="card">
-      <div class="page">
+  <!-- Existing card list-->
 
+  {% for node in page_nodes %}
 
+  {% if node.created_by == request.user.pk %}
+        
+  <li class="card">
+    <div class="page">
+
+      
       <header>
 
        <div class="label-list">
@@ -114,7 +115,7 @@
 
 
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-        <h4>{{ node.name }}
+        <h4>{{ node.name }} {% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
           <div>
             <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
             </small>
@@ -201,10 +202,168 @@
  </div>
 </li>
 {% endif %}
-        
-
 {% endfor %}
-</ul>
+  </ul>
 {% paginate %}
+</div>
+<div class="content" id="panel2-4">
+{% get_resource_collection "Page" as coll %}
+  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  <!-- Node create card-->
+  <li class="create card">
+    <div class="page">
+      <h4><i class="fi-plus"></i> New</h4>
+      <!--<div class="row">
+        <div class="large-12 columns">
+
+          <input type="text" placeholder="Name of the {{title}}" />
+          <textarea placeholder="Describe the {{title}}"></textarea>
+
+          <div class="login-mode switch round">
+
+            <input id="PUBLIC" name="login-mode" type="radio" checked>
+            <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+            <input id="PRIVATE" name="login-mode" type="radio">
+            <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+
+            <span></span>
+
+          </div>
+
+        </div>
+      </div>-->
+      {% if user.is_authenticated %}
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+      <a class="button expand" href="{% url 'page_create_edit' group_name_tag %}">
+        Create {{title}}
+      </a>
+      {% endif %}
+      {% endif %}
+    </div>
+  </li>
+
+{% autopaginate coll 23 %}
+  <!-- Existing card list-->
+
+  {% for node in coll %}
+
+  {% if node.created_by == request.user.pk %}
+        
+  <li class="card">
+    <div class="page">
+
+      
+      <header>
+
+       <div class="label-list">
+        {% for tag in node.tags %}
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        {% endfor %}
+      </div>
+
+
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+        <h4>{{ node.name }} {% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+          <div>
+            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            </small>
+          </div>
+        </h4>
+      </header>
+      
+      <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+      
+      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
+
+      {% if node.created_by == request.user.id %}
+      <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+      {% endif %}
+     {% group_type_info groupid request.user as grouptype %}
+     {% if  grouptype == "Moderated" %}
+      {% if node.status == "DRAFT" %}
+      <a class="button alert tiny" >Under Moderation</a>
+      {% endif %}
+       {% endif %} 
+      <footer class="row">
+        <div class="small-7 columns"><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</div>
+        <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div> 
+      </footer>
+
+    </div>
+  </li>  
+  
+{% else %}
+{% if node.access_policy == "PUBLIC" %}
+<li class="card">
+  <div class="page">
+
+    <header>
+
+      <div class="label-list">
+        {% for tag in node.tags %}
+        <span class="label">{{tag}}</span>
+        {% endfor %}
+      </div>
+
+      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+      <h4>{{ node.name }}
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </h4>
+
+    </header>
+
+    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+
+    <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
+
+    {% if node.created_by == request.user.id %}
+    <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+    {% endif %}
+          
+    
+
+    <footer class="row">
+      <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
+      <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
+    </footer>
+
+  </div>
+</li>
+
+{% endif %}
+
+{% endif %}
+
+{% empty %}
+
+{% if not searching %}
+<li class="bullet-item text-left">
+
+  <div class="row">
+    <div class="small-12 columns">
+     <p>No pages found in this project group!</p>
+   </div>
+ </div>
+</li>
+{% endif %}
+{% endfor %}
+  </ul>
+{% paginate %}
+</div>
+
+</div>
+
+
+</div>
+
+
+
+
 {% endblock %}
 

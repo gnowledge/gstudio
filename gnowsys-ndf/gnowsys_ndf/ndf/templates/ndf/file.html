@@ -40,7 +40,8 @@
      <dd><a href="#view-doc"><i class="fi-page-filled"></i> Documents</a></dd>
      <dd><a href="#view-image"><i class="fi-camera"></i>Images</a></dd>
      <dd><a href="#view-video"><i class="fi-video"></i> Videos</a></dd>
-     <dd><a href="#view-pandora-video"><i class="fi-pandoravideo"></i> Pandora Videos</a></dd>
+     <dd><a href="#view-pandora-video"><i class="fi-video"></i> Pandora Videos</a></dd>
+     <dd><a href="#view-collection"><i class="fi-page-multiple"></i> Collections</a></dd>
 
      <!-- <dd><a href="#panel2-4"><i class="fi-list-thumbnails"></i> File list</a></dd> -->
    </dl>
@@ -124,7 +125,7 @@
 		  <img src="{% url 'getFileThumbnail' group_name_tag file %}">
 		</a>
 	      </div>
-              <h4>{{file.name}}</h4>
+              <h4>{{file.name}}  {% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h4>
 	      <div>
 		<small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
 		</small>
@@ -562,6 +563,128 @@
 {% paginate %}
 
   </div>
+ <div class="content" id="view-collection">
+{% get_resource_collection "File" as coll %}
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Node create card-->
+      <li class="create card">
+        <div class="file">
+         <h4><i class="fi-plus"></i> New Upload</h4>
+
+          {% if user.is_authenticated %}
+          {% user_access_policy groupid request.user as user_access %}
+          {% if user_access == "allow" %}
+          <a class="button expand" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+            <span class="fi-upload">  Upload File</span>
+          </a>
+          {% endif %}
+          {% endif %}
+	</div>
+      </li>
+ 
+      {% if coll.count != 0 %}
+      <!-- Existing card list-->
+      {% autopaginate coll 23 %}
+      {% for file in coll %}      
+      {% if file.created_by == request.user.pk %}
+
+      {% get_user_object file.created_by as user_obj %}
+      {% get_grid_fs_object file as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+	  
+          <header>
+              <div class="label-list">
+                {% for tag in file.tags %}
+                <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
+                {% endfor %}
+              </div>
+	      
+              <div class="th">
+		<a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
+		  <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+		  <img src="{% url 'getFileThumbnail' group_name_tag file %}">
+		</a>
+	      </div>
+              <h4>{{file.name}}  {% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h4>
+	      <div>
+		<small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+		</small>
+	      </div>
+          </header>
+
+          <p>File description</p>
+
+          <a class="button expand" href ="{% url 'file_detail' group_name_tag file %}">View details</a>
+
+          {% get_user_object file.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+	  
+          <footer class="row">
+            <div class="small-6 columns">{{file.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
+          </footer>
+	  
+        </div>
+      </li>
+
+      {% else %}
+        {% if file.access_policy == "PUBLIC" %}          
+          {% get_user_object file.created_by as user_obj %}
+          {% get_grid_fs_object file as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+    
+          <header>
+            <div class="label-list">
+              {% for tag in file.tags %}
+              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+              {% endfor %}
+            </div>
+        
+            <div class="th">
+	      <a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
+		<!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+		<img src="{% url 'getFileThumbnail' group_name_tag file %}">
+	      </a>
+	    </div>
+            <h4>{{file.name}}</h4>
+	    <div>
+		<small class="subheader">{{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+		</small>
+	      </div>
+          </header>
+
+          <p>This file is a..</p>
+
+          <a class="button expand" href ="{% url 'file_detail' group_name_tag file %}">View details</a>
+
+          {% get_user_object file.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
+          {% endifequal %}
+    
+          <footer class="row">
+            <div class="small-6 columns">{{file.mime_type}}</div>
+            <div class="small-6 columns"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div> 
+          </footer>
+    
+        </div>
+      </li>
+        {% endif %}
+      {% endif %}
+      
+      {% endfor %}
+      
+      {% else %}
+      <p><em>No resources found!</em></p>
+      {% endif %}
+    </ul>
+{% paginate %}
+</div>
 </div>
 
 
