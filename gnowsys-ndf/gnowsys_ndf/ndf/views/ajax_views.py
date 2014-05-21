@@ -320,6 +320,9 @@ def add_sub_themes(request, group_id):
 
     context_node_id = request.POST.get("context_node", '')
     sub_theme_name = request.POST.get("sub_theme_name", '')
+    themes_list = request.POST.get("nodes_list", '')
+    themes_list = themes_list.replace("&quot;","'")
+    themes_list = ast.literal_eval(themes_list)
 
     theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
     topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
@@ -327,19 +330,22 @@ def add_sub_themes(request, group_id):
     
     # Save the sub-theme first  
     if sub_theme_name:
+      if not sub_theme_name.upper() in (theme_name.upper() for theme_name in themes_list):
 
-      node = collection.GSystem()
-      get_node_common_fields(request, node, group_id, theme_GST)
+        node = collection.GSystem()
+        get_node_common_fields(request, node, group_id, theme_GST)
       
-      node.save()
-      node.reload()
-      # Add this sub-theme into context nodes collection_set
-      collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
-      context_node.reload()
+        node.save()
+        node.reload()
+        # Add this sub-theme into context nodes collection_set
+        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        context_node.reload()
 
-      return HttpResponse("success")
-    else:
+        return HttpResponse("success")
+
       return HttpResponse("failure")
+
+    return HttpResponse("None")
   
 
 @login_required
