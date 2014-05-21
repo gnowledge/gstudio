@@ -1,19 +1,5 @@
 {% extends "ndf/node_details_base.html" %}
-{% load ndf_tags %}
-{% get_group_name groupid as group_name_tag %}
 
 {% block meta_content %}
-
 <h2>Media</h2>
-
-{% if user.is_authenticated %}
-{% user_access_policy groupid request.user as user_access %}
-{% if user_access == "allow" %}
-<br/>
-<a class="button small" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-  <span class="fi-upload">  Upload File</span>
-</a>
-{% endif %}
-{% endif %}
-
 {% endblock %}
