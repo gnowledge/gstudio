@@ -76,11 +76,31 @@ def page(request, group_id, app_id=None):
       title = gst_page.name
       
       search_field = request.POST['search_field']
-      page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
-                                         '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                 {'tags': {'$regex':search_field, '$options': 'i'}}], 
-                                         'group_set': {'$all': [ObjectId(group_id)]}
-                                     }).sort('last_update', -1)
+      page_nodes = collection.Node.find({
+                                          'member_of': {'$all': [ObjectId(app_id)]},
+                                          '$or': [
+                                            {'$and': [
+                                              {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                              {'$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                              }
+                                              ]
+                                            },
+                                            {'$and': [
+                                              {'tags': {'$regex':search_field, '$options': 'i'}},
+                                              {'$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                              }
+                                              ]
+                                            }
+                                          ], 
+                                          'group_set': {'$all': [ObjectId(group_id)]},
+                                          'status': {'$nin': ['HIDDEN']}
+                                      }).sort('last_update', -1)
 
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
@@ -140,8 +160,23 @@ def page(request, group_id, app_id=None):
             )
 
         elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:
+          """
+          Below query returns only those documents:
+          (a) which are pages
+          (b) which belongs to given group
+          (c) which has status either as DRAFT or PUBLISHED
+          (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
+          """
           page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
                                              'group_set': {'$all': [ObjectId(group_id)]},
+                                             '$or': [
+                                              {'access_policy': u"PUBLIC"},
+                                              {'$and': [
+                                                {'access_policy': u"PRIVATE"}, 
+                                                {'created_by': request.user.id}
+                                                ]
+                                              }
+                                             ],
                                              'status': {'$nin': ['HIDDEN']}
                                          }).sort('last_update', -1)
 
