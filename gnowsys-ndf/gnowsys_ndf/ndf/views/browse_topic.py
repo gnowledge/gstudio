@@ -130,6 +130,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 			themes_list_items = ""
 			root_themes = []
 			name = request.POST.get('name')
+			collection_list = request.POST.get('collection_list','')
 
 			# To find the root nodes to maintain the uniquness while creating and editing themes
 			nodes = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
@@ -166,16 +167,33 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 				if theme_GST._id in app_GST.member_of:
 					if name:
 						if not name.upper() in (theme_name.upper() for theme_name in root_themes):
-
 							get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
 							theme_topic_node.save() 
 
+					# For storing and maintaning collection order
+					theme_topic_node.collection_set = []
+					if collection_list != '':
+					    collection_list = collection_list.split(",")
+
+					i = 0
+					while (i < len(collection_list)):
+						node_id = ObjectId(collection_list[i])
+					    
+						if collection.Node.one({"_id": node_id}):
+							theme_topic_node.collection_set.append(node_id)
+
+						i = i+1
+					theme_topic_node.save() 
+					# End of storing collection
+
 					title = theme_GST.name
 					node = theme_topic_node
+					
 					# To display the theme-topic drawer while create or edit theme
 					checked = "Theme"
 					drawers = get_drawers(group_id, node._id, node.collection_set, checked)
 					drawer = drawers['2']
+
 
 				elif topic_GST._id in app_GST.member_of:
 					get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
