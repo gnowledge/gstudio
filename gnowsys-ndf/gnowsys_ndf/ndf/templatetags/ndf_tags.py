@@ -695,6 +695,20 @@ def get_memberof_objects_count(key,group_id):
 def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
+
+@register.assignment_tag
+def get_policy(group, user):
+  if group.group_type =='PUBLIC':
+    return False
+  elif user.is_superuser:
+    return True
+  elif user.id in group.author_set:
+    return True
+  elif user.id == group.created_by:
+    return True
+  else:
+    return False
+
 @register.inclusion_tag('ndf/admin_fields.html')
 def get_input_fields(fields_type,fields_name,translate=None):
   """Get html tags 
