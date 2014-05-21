@@ -11,7 +11,7 @@ from django.template import RequestContext
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
-
+from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
 import subprocess
 import re
@@ -605,5 +605,22 @@ def _split_with_maintain(value, treat_trailing_spaces_as_sentence = True, split_
                 check = check[space_idx:]
             
         return result
-    
 
+def update_mobwrite_content_org(node_system):   
+  '''
+	on revert or merge of nodes,a content_org is synced to mobwrite object
+	input : 
+		node
+  ''' 
+  system = node_system
+  filename = TextObj.safe_name(str(system._id))
+  textobj = TextObj.objects.filter(filename=filename)
+  content_org = system.content_org
+  if textobj:
+    textobj = TextObj.objects.get(filename=filename)
+    textobj.text = content_org
+    textobj.save()
+  else:
+    textobj = TextObj(filename=filename,text=content_org)
+    textobj.save()
+  return textobj

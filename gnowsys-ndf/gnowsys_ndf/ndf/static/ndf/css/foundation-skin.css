@@ -8210,13 +8210,11 @@ textarea {
 
 }
 */
-/* line 369, ../scss/_styles.scss */
-#content > p:first-of-type {
-  font-size: 120%;
-  line-height: 1.4;
-  color: #222;
-}
-
+/*#content>p{
+	font-size: inherit;
+	line-height: 1.4;
+	color: #222;
+}*/
 /*************************** 3. Custom CSS Below ***********************/
 /* line 376, ../scss/_styles.scss */
 .user {
