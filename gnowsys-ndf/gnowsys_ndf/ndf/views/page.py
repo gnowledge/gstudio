@@ -13,7 +13,7 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 
-from gnowsys_ndf.ndf.views.methods import get_versioned_page
+from gnowsys_ndf.ndf.views.methods import get_versioned_page, update_mobwrite_content_org
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 from gnowsys_ndf.mobwrite.diff_match_patch import diff_match_patch
 from django_mongokit import get_database
@@ -606,6 +606,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      node.content=doc2.content
      node.modified_by=request.user.id
      node.save()
+     update_mobwrite = update_mobwrite_content_org(node)
      ver=history_manager.get_current_version(node)
      view='merge'
      
@@ -639,6 +640,7 @@ def revert_doc(request,group_id,node_id,version_1):
 		node[attr] =node[attr]
    node.modified_by=request.user.id
    node.save()
+   update_mobwrite = update_mobwrite_content_org(node)
    view ='revert'
    ver=history_manager.get_current_version(node)
    selected_versions=selected_versions = {"1": version_1, "2": ""}
