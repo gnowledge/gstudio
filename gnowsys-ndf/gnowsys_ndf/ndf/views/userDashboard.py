@@ -69,16 +69,18 @@ def dashboard(request, group_id):
     	fileobj = fcol.File()
     	filemd5 = hashlib.md5(each.read()).hexdigest()
     	if fileobj.fs.files.exists({"md5":filemd5}):
-    	  coll = get_database()['fs.files']
-    	  a = coll.find_one({"md5":filemd5})
-    	  # prof_image takes the already available document of uploaded image from its md5 
-    	  prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+            
+            coll = get_database()['fs.files']
+            a = coll.find_one({"md5":filemd5})
+        	# prof_image takes the already available document of uploaded image from its md5 
+    	    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
 
     	else:
-    	  # If uploaded image is not found in gridfs stores this new image 
-      	  submitDoc(request, group_id)
-      	  # prof_image takes the already available document of uploaded image from its name
-      	  prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+            print "\n\n :: not in gridfs or new file\n\n"
+        	# If uploaded image is not found in gridfs stores this new image 
+            submitDoc(request, group_id)
+      	    # prof_image takes the already available document of uploaded image from its name
+      	    prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
 
       # prof_img takes already available relation of user with its profile image
       prof_img = collection.GRelation.one({'subject': ObjectId(auth._id), 'right_subject': ObjectId(prof_image._id) })
@@ -117,11 +119,15 @@ def dashboard(request, group_id):
     shelves = []
     shelf_list = {}
     if auth:
+      dbref_profile_pic = prof_pic.get_dbref()
+      prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
+
       # prof_pic_rel will get the cursor object of relation of user with its profile picture 
-      prof_pic_rel = collection.Node.one({'$and':[{'subject': ObjectId(auth._id) },{'_type':'GRelation'}]})
-      if prof_pic_rel :
-#        index = prof_pic_rel.count() - 1
-        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      
+      if prof_pic_rel.count() :
+        index = prof_pic_rel.count() - 1
+        Index = prof_pic_rel[index].right_subject
+        # img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      
+        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
       else:
         img_obj = "" 
 

@@ -16,37 +16,87 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import GSystemType, Node 
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
-db = get_database()
-collection = db[Node.collection_name]
-GST_COLLECTION = db[GSystemType.collection_name]
-GST_COURSE = GST_COLLECTION.GSystemType.one({'name': GAPPS[7]})
+collection = get_database()[Node.collection_name]
+GST_COURSE = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 
 def course(request, group_id, course_id=None):
     """
-   * Renders a list of all 'courses' available within the database.
+    * Renders a list of all 'courses' available within the database.
     """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+      group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
-            group_id = str(group_ins._id)
-        else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
+        if auth :
+          group_id = str(auth._id)
     else :
         pass
+    
     if course_id is None:
-        course_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Course"})
-        if course_ins:
-            course_id = str(course_ins._id)
-    if GST_COURSE._id == ObjectId(course_id):
-        title = GST_COURSE.name
-        course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-        template = "ndf/course.html"
-        variable = RequestContext(request, {'course_coll': course_coll,'groupid':group_id,'group_id':group_id })
-        return render_to_response(template, variable)
+      course_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Course"})
+      if course_ins:
+        course_id = str(course_ins._id)
+
+    if request.method == "POST":
+      # Course search view
+      title = GST_COURSE.name
+      
+      search_field = request.POST['search_field']
+      course_coll = collection.Node.find({'member_of': {'$all': [ObjectId(GST_COURSE._id)]},
+                                         '$or': [
+                                            {'$and': [
+                                              {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                              {'$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                              }
+                                              ]
+                                            },
+                                            {'$and': [
+                                              {'tags': {'$regex':search_field, '$options': 'i'}},
+                                              {'$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                              }
+                                              ]
+                                            }
+                                          ],
+                                         'group_set': {'$all': [ObjectId(group_id)]}
+                                     }).sort('last_update', -1)
+
+      # course_nodes_count = course_coll.count()
+
+      return render_to_response("ndf/course.html",
+                                {'title': title, 
+                                 'searching': True, 'query': search_field,
+                                 'course_coll': course_coll, 'groupid':group_id, 'group_id':group_id
+                                }, 
+                                context_instance=RequestContext(request)
+                                )
+
+    elif GST_COURSE._id == ObjectId(course_id):
+      # Course list view
+      title = GST_COURSE.name
+      course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 
+                                             'group_set': {'$all': [ObjectId(group_id)]},
+                                             '$or': [
+                                              {'access_policy': u"PUBLIC"},
+                                              {'$and': [
+                                                {'access_policy': u"PRIVATE"}, 
+                                                {'created_by': request.user.id}
+                                                ]
+                                              }
+                                             ]
+                                            })
+      template = "ndf/course.html"
+      variable = RequestContext(request, {'title': title, 'course_nodes_count': course_coll.count(), 'course_coll': course_coll, 'groupid':group_id, 'group_id':group_id})
+      return render_to_response(template, variable)
 
 @login_required
 def create_edit(request, group_id, node_id = None):

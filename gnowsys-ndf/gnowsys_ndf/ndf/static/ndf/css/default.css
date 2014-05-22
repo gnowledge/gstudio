@@ -383,7 +383,7 @@ article .tabs dd.active a {
 /* line 255, ../scss/default.scss */
 .card > * > i {
   position: absolute;
-  top: -12px;
+  top: 20px;
   right: 20px;
   font-size: 4rem;
   color: #eee;
@@ -519,11 +519,11 @@ textarea {
 }
 */
 /* line 367, ../scss/default.scss */
-#content > p:first-of-type {
+/*#content > p {
   font-size: 120%;
   line-height: 1.4;
   color: #222;
-}
+}*/
 
 /*************************** 3. Custom CSS Below ***********************/
 /* line 374, ../scss/default.scss */
