@@ -195,7 +195,6 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 
 def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
-
 	user_type = request.POST["user"]
 	user_session_id = request.POST["user_session_id"]
 	marker_geojson = request.POST["marker_geojson"]
@@ -208,8 +207,8 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
 
 	# for uploaded images saving
-	# print "\n\n=========", request.FILES.getlist("doc[]", ""), "\n\n"
-	print "\n\nimage file : ", request.POST["image_file"]
+	print "\n\n=========", request.FILES.getlist("photos[]", ""), "\n\n"
+	# print "\n\nimage file : ", request.POST["photos"]
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
 
 
@@ -350,3 +349,11 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 	response_data = json.dumps(response_data)
 
 	return StreamingHttpResponse(response_data)
+
+
+def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
+
+	if request.method == "POST" :
+		print "\n\n\hkkkkkkkkkkkkkkkkkkkkkk\n\n"
+
+		return StreamingHttpResponse("response_data")	
