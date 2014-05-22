@@ -20,15 +20,38 @@
   <script type="text/javascript">
     $(document).ready(function() {
     	$(function() {
-    		$('.themes').tree();
+    		// $('.themes').tree();
+    		var $tree = $('.themes');
+
+    		$tree.tree({
+    			autoOpen: false,
+        		onCreateLi: function(node, $li) {
+
+            		$li.find('.jqtree-element').append(
+
+                		'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+            		);
+
+        		}
+    		});
+   
     	});
     });
+
 
   </script>
   <style>
   	#app-set-item li { padding:0.5em }
 	#app-set-item li:hover { background-color:#e5e5e5; }
 	.selected-app-set-item { background-color:#e5e5e5; }
+
+	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
+        content: "\f07b";
+    }
+    .jqtree-tree i {
+        margin-right: 4px;
+    }
+
   </style>
 {% endblock%}
 
@@ -90,7 +113,8 @@
 
 		{% if node %}
 			<!-- If "Theme" node -->
-			<a id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></a>
+			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
+			
 		{% endif %}
 
 	{% endif %}
@@ -191,7 +215,17 @@
 	<script type="text/javascript">
 		$(".fold").click(function() {
 			$(function() {
-				$('.themes').tree();
+				$('.themes').tree({
+					autoOpen: false,
+	        		onCreateLi: function(node, $li) {
+
+	            		$li.find('.jqtree-element').append(
+
+	                		'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+	            		);
+
+	        		}
+				});
 
 			});
 		});
@@ -201,6 +235,15 @@
 	    		$('.themes').tree({
 	    			autoOpen: true,
 	    			slide: false,
+	    			onCreateLi: function(node, $li) {
+
+	            		$li.find('.jqtree-element').append(
+
+	                		'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+	            		);
+
+	        		}
+	    			
 	    		});
 	    	});
 	    });	
