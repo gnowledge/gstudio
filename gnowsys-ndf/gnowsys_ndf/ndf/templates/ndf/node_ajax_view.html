@@ -1,13 +1,13 @@
-
 {% load ndf_tags %}
 {% get_group_name groupid as group_name_tag %}
-{% block head%}  
+
+{% block head %}
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <!-- Scripts required for D3 graph -->
   <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
   <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
   <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
-{% endblock%}
+{% endblock %}
 
 <!-- css for drawer widget -->
 <style type = "text/css">
@@ -96,9 +96,9 @@ ul#graph-hover.f-dropdown{
 
       <!-- Tab content -->
       <div class="content active" id="view-page">
-        
-	{% if node.prior_node|length > 0 %}
-	<div class="panel">
+
+        {% if node.prior_node|length > 0 %}
+        <div class="panel">
           <h6>You may want to read these first:</h6>
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
@@ -111,62 +111,83 @@ ul#graph-hover.f-dropdown{
         </div>
         {% endif %}
 
+        <!-- Code for showing media details -->
         {% if node.mime_type %}
-	{% if 'Pandora_video' in node.member_of_names_list %}
-	<div>
-	  <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
-	    <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
-	      Your browser does not support the video tag.
-	  </video>
-          </br>
-	</div>
 
-	{% else %}
-	{% if 'video' in node.mime_type %}
-	<div>
-	  <video width="640px" controls buffered>
-	    <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-	      <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">
-	       Your browser does not support the video tag.
-	  </video>
-	  <br/>
-	  <a href="{% url 'getFullvideo' group_name_tag node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
-	    <i class="fi-download large"> download </i>
-	  </a>
-	</div>
+          {% get_grid_fs_object node as grid_fs_obj %}
 
-	{% else %}
-	{% get_grid_fs_object node as grid_fs_obj %}
-	<div>   
-	  {% if 'image' in node.mime_type %}
-  	  <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-    	    <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
-  	  </a> 
-	  {% else %}
-          <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}"> {{ grid_fs_obj.filename }} </a><br/>     
-	  {% endif %}
-  	  <br/>
-  	  <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
-  	    <i class="fi-download large"> download </i>
-	  </a>
-	</div>
-	
-	{% endif %}
-	{% endif %}
-	{% endif %}
-      {% block add_fields %} {% endblock %}
+          {% if 'Pandora_video' in node.member_of_names_list %}
+          <div>
+            <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+              <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
+              Your browser does not support the video tag.
+            </video>
+
+            {% if user.is_authenticated %}
+            <br/>
+            <br/>
+            <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm" > 
+              <span class="fi-download large"> Download </span>
+            </a>
+            {% endif %}
+          </div>
+
+          {% elif 'video' in node.mime_type %}
+          <div>
+            <video width="640px" controls buffered>
+              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
+              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
+              Your browser does not support the video tag.
+            </video>
+
+            {% if user.is_authenticated %}
+            <br/>
+            <br/>
+            <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+              <span class="fi-download large"> Download </span>
+            </a>
+            {% endif %}
+          </div>
+	  
+          {% else %}		
+          <div>
+            {% if 'image' in node.mime_type %}
+            <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+              <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
+            </a>
+
+            {% else %}
+            <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+              {{ grid_fs_obj.filename }}
+            </a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            <br/>
+            <br/>
+            <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+              <span class="fi-download large"> Download </span>
+            </a>
+            {% endif %}
+          </div>
+	  
+          {% endif %}
+	  
+        {% endif %}
+        
+        {% block add_fields %} {% endblock %}
 
         <ul class="inline-list">
-          {% if user.is_authenticated %}
-          {% block add_list %}{% endblock %}
-          {% endif %}
-	</ul>
+        {% if user.is_authenticated %}
+        {% block add_list %}{% endblock %}
+        {% endif %}
+        </ul>
 
-	{% with node.html_content|safe as description %}
-	{% if description != "None" %}
-	{{ description }}
-	{% endif %}
-	{% endwith %}
+      	{% with node.html_content|safe as description %}
+      	{% if description != "None" %}
+      	{{ description }}
+      	{% endif %}
+      	{% endwith %}
 
       </div>
       
@@ -177,8 +198,8 @@ ul#graph-hover.f-dropdown{
       </div>
       <!-- Content for Collection Graph -->
       <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-	<a class="close-reveal-modal">&#215;</a>
-	{% include "ndf/graph_collection.html" %}
+      	<a class="close-reveal-modal">&#215;</a>
+      	{% include "ndf/graph_collection.html" %}
       </div>
       <!-- Content for dependency Graph -->
      <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
@@ -187,7 +208,6 @@ ul#graph-hover.f-dropdown{
      </div>
      <!-- Tab View Map Widget -->
      <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
-        
        <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
        <a class="close-reveal-modal" >&#215;</a>
        {% include "ndf/map_widget.html" with mode="read" %}
@@ -207,7 +227,6 @@ ul#graph-hover.f-dropdown{
           {% endfor %}
         </div>
       </small>
-
   
     <!-- added button to convert collection into module-->
     {% if node.collection_set and user.is_authenticated%}
@@ -237,9 +256,7 @@ ul#graph-hover.f-dropdown{
     {% endif %}
    {% endif %}
  
-
-
-     {% edit_policy groupid node request.user as status %}
+    {% edit_policy groupid node request.user as status %}
      
      {% if status == "allow" %}
 	{% get_edit_url node.pk as edit_url %}
@@ -283,7 +300,6 @@ ul#graph-hover.f-dropdown{
 
  </div>
 
-
 </section>
 
 
@@ -291,8 +307,9 @@ ul#graph-hover.f-dropdown{
 
 <footer>
   <p><small>
-    <em>Created by {{ node.user_details_dict.contributors|join:', ' }}</em></small></p>
-  </footer>
+      <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
+  </small></p>
+</footer>
 
 <script type="text/javascript">
 

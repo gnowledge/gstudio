@@ -1,369 +1,223 @@
 {% extends "ndf/base.html" %}
-{% block title %} {{title}} {% endblock %}
 {% load ndf_tags %}
 {% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+{% block title %} {{title}} {% endblock %}
 
 {% block help_topics %}
-<li><a href="#">Pages Introduction</a></li>
-<li><a href="#">Working with Pages</a></li>
-<li><a href="#">Page types</a></li>
+  <li><a href="#">Pages Introduction</a></li>
+  <li><a href="#">Working with Pages</a></li>
+  <li><a href="#">Page types</a></li>
 {% endblock %}
+
 
 {% block help_content %}
-
-<p>Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.</p>
-
-<h5>Who can make a page?</h5>
-<p>Anyone with an account can create a new article. When creating a new article, the initial contributor can choose to have a defined list of authors, all of whom can edit the page, or have an open, wiki-like format where anyone can contribute.</p>
-
+  <p>
+    Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.
+  </p>
+  
+  <h5>Who can make a page?</h5>
+  <p>
+    Anyone with an account can create a new article. When creating a new article, the initial contributor can choose to have a defined list of authors, all of whom can edit the page, or have an open, wiki-like format where anyone can contribute.
+  </p>
 {% endblock %}
+
 
 {% block meta_content %}
-<h2>Pages</h2>
+  <h2>Pages</h2>
 {% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="page">
+      <br/>
+      <a class="button medium" href="{% url 'page_create_edit' group_name_tag %}">
+      	<span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
 
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
 
 <header class="row">
-
   <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages ({{ page_nodes_count }})</a></dd>
-    <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd>
+    <!--<dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>-->
   </dl>
-
 </header>
 
+{% if searching and page_nodes.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{page_nodes.count}} {{title|lower}}{{page_nodes.count|pluralize}}.</span></p>
+  </div>
+</div>
 
-{% if searching and page_nodes_count > 0 %}
-<ul class="pricing-table">
-  <li class="bullet-item text-left">
-    <div class="row">
-      <div class="small-12 columns end">
-       <p>Search Results: <span class="label success round">Found {{page_nodes_count}} {{title|lower}}{{page_nodes_count|pluralize}}.</span></p>
-     </div>
-   </div>
- </li>
+{% elif searching and page_nodes.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert">No {{title|lower}}{{page_nodes.count|pluralize}} matched your search criteria!!!</span></p>
+  </div>  
+</div>  
 
- {% elif searching and page_nodes_count == 0 %}
- <li class="bullet-item text-left">
-  <div class="row">
-    <div class="small-12 columns">
-     <p>Search Results: <span class="label alert">No {{title|lower}}{{page_nodes_count|pluralize}} matched your search criteria!!!</span></p>
-   </div>  
- </div>  
-</li>
-</ul>
 {% endif %}
-
 <div class="tabs-content">
 <div class="content active" id="panel2-1">
-  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-  <!-- Node create card-->
-  <li class="create card">
-    <div class="page">
-      <h4><i class="fi-plus"></i> New</h4>
-      <!--<div class="row">
-        <div class="large-12 columns">
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-          <input type="text" placeholder="Name of the {{title}}" />
-          <textarea placeholder="Describe the {{title}}"></textarea>
+  {% autopaginate page_nodes 23 %}
 
-          <div class="login-mode switch round">
-
-            <input id="PUBLIC" name="login-mode" type="radio" checked>
-            <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-            <input id="PRIVATE" name="login-mode" type="radio">
-            <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-
-            <span></span>
-
-          </div>
-
-        </div>
-      </div>-->
-      {% if user.is_authenticated %}
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-      <a class="button expand" href="{% url 'page_create_edit' group_name_tag %}">
-        Create {{title}}
-      </a>
-      {% endif %}
-      {% endif %}
-    </div>
-  </li>
-
-{% autopaginate page_nodes 23 %}
   <!-- Existing card list-->
-
   {% for node in page_nodes %}
-
-  {% if node.created_by == request.user.pk %}
-        
-  <li class="card">
-    <div class="page">
-
-      
+  
+    <li class="card">
+      <div class="page">
       <header>
-
-       <div class="label-list">
-        {% for tag in node.tags %}
-        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        <div class="label-list">
+        {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
         {% endfor %}
-      </div>
-
+        </div>
 
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-        <h4>{{ node.name }} {% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+        <h4>
+          {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
           <div>
-            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            <br/>
+            by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
             </small>
           </div>
         </h4>
       </header>
       
-      <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-      
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+  
       <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
 
       {% if node.created_by == request.user.id %}
       <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
       {% endif %}
-     {% group_type_info groupid request.user as grouptype %}
-     {% if  grouptype == "Moderated" %}
+
+      {% group_type_info groupid request.user as grouptype %}
+      {% if grouptype == "Moderated" %}
       {% if node.status == "DRAFT" %}
       <a class="button alert tiny" >Under Moderation</a>
       {% endif %}
-       {% endif %} 
+      {% endif %} 
+
       <footer class="row">
         <div class="small-7 columns"><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</div>
-        <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div> 
+        <div class="small-5 columns"><div class="right"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div></div>
       </footer>
 
-    </div>
-  </li>  
-  
-{% else %}
-{% if node.access_policy == "PUBLIC" %}
-<li class="card">
-  <div class="page">
-
-    <header>
-
-      <div class="label-list">
-        {% for tag in node.tags %}
-        <span class="label">{{tag}}</span>
-        {% endfor %}
       </div>
+    </li>  
+  
 
-      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
-      <h4>{{ node.name }}
-        <div>
-          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-          </small>
+  {% empty %}
+    {% if not searching %}
+      <div class="row">
+        <div class="small-12 columns">
+          <h5>This group doesn't have any pages. <b>Be the first to create a Page!</b></h5>
         </div>
-      </h4>
-
-    </header>
-
-    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-
-    <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
-
-    {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+      </div>
     {% endif %}
-          
-    
 
-    <footer class="row">
-      <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
-      <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
-    </footer>
+  {% endfor %}
 
-  </div>
-</li>
+</ul>
 
-{% endif %}
-
-{% endif %}
-
-{% empty %}
-
-{% if not searching %}
-<li class="bullet-item text-left">
-
-  <div class="row">
-    <div class="small-12 columns">
-     <p>No pages found in this project group!</p>
-   </div>
- </div>
-</li>
-{% endif %}
-{% endfor %}
-  </ul>
 {% paginate %}
+
 </div>
 <div class="content" id="panel2-4">
 {% get_resource_collection "Page" as coll %}
-  <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-  <!-- Node create card-->
-  <li class="create card">
-    <div class="page">
-      <h4><i class="fi-plus"></i> New</h4>
-      <!--<div class="row">
-        <div class="large-12 columns">
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-          <input type="text" placeholder="Name of the {{title}}" />
-          <textarea placeholder="Describe the {{title}}"></textarea>
+  {% autopaginate coll 23 %}
 
-          <div class="login-mode switch round">
-
-            <input id="PUBLIC" name="login-mode" type="radio" checked>
-            <label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-            <input id="PRIVATE" name="login-mode" type="radio">
-            <label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-
-            <span></span>
-
-          </div>
-
-        </div>
-      </div>-->
-      {% if user.is_authenticated %}
-      {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-      <a class="button expand" href="{% url 'page_create_edit' group_name_tag %}">
-        Create {{title}}
-      </a>
-      {% endif %}
-      {% endif %}
-    </div>
-  </li>
-
-{% autopaginate coll 23 %}
   <!-- Existing card list-->
-
   {% for node in coll %}
-
-  {% if node.created_by == request.user.pk %}
-        
-  <li class="card">
-    <div class="page">
-
-      
+  
+    <li class="card">
+      <div class="page">
       <header>
-
-       <div class="label-list">
-        {% for tag in node.tags %}
-        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        <div class="label-list">
+        {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
         {% endfor %}
-      </div>
-
+        </div>
 
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-        <h4>{{ node.name }} {% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+        <h4>
+          {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
           <div>
-            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            <br/>
+            by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
             </small>
           </div>
         </h4>
       </header>
       
-      <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-      
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+  
       <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
 
       {% if node.created_by == request.user.id %}
       <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
       {% endif %}
-     {% group_type_info groupid request.user as grouptype %}
-     {% if  grouptype == "Moderated" %}
+
+      {% group_type_info groupid request.user as grouptype %}
+      {% if grouptype == "Moderated" %}
       {% if node.status == "DRAFT" %}
       <a class="button alert tiny" >Under Moderation</a>
       {% endif %}
-       {% endif %} 
+      {% endif %} 
+
       <footer class="row">
         <div class="small-7 columns"><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</div>
-        <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div> 
+        <div class="small-5 columns"><div class="right"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div></div>
       </footer>
 
-    </div>
-  </li>  
-  
-{% else %}
-{% if node.access_policy == "PUBLIC" %}
-<li class="card">
-  <div class="page">
-
-    <header>
-
-      <div class="label-list">
-        {% for tag in node.tags %}
-        <span class="label">{{tag}}</span>
-        {% endfor %}
       </div>
+    </li>  
+  
 
-      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
-      <h4>{{ node.name }}
-        <div>
-          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-          </small>
+  {% empty %}
+    {% if not searching %}
+      <div class="row">
+        <div class="small-12 columns">
+          <h5>This group doesn't have any Collection. </h5>
         </div>
-      </h4>
-
-    </header>
-
-    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-
-    <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
-
-    {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+      </div>
     {% endif %}
-          
-    
 
-    <footer class="row">
-      <div class="small-7 columns"><strong>{{node.modified_by|length}}</strong> Contributors</div>
-      <div class="small-5 columns"><strong>{{node.version_dict|length}}</strong> Edits</div> 
-    </footer>
+  {% endfor %}
 
-  </div>
-</li>
+</ul>
 
-{% endif %}
-
-{% endif %}
-
-{% empty %}
-
-{% if not searching %}
-<li class="bullet-item text-left">
-
-  <div class="row">
-    <div class="small-12 columns">
-     <p>No collection found in this project group!</p>
-   </div>
- </div>
-</li>
-{% endif %}
-{% endfor %}
-  </ul>
 {% paginate %}
-</div>
 
 </div>
-
-
 </div>
-
-
-
 
 {% endblock %}
 
