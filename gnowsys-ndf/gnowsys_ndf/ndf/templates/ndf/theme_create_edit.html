@@ -151,10 +151,11 @@ background-repeat:no-repeat; background-size: 48px 48px
           						<br/><br/>
           						<label>{{title}} Name</label>
 		    					<input id="sub_theme_id" type="text" placeholder="Enter name...">
-		    					<!-- <small class="error">Please give your theme a descriptive name. It's helpful for others and for yourself.</small> -->
 	    						<input id="save-sub-theme" value="Save" class="button medium-2 columns"> 
 	          					
           					</div>
+          				</dd>
+          			</dl>
 
 				</div>
 				<div class="small-7 columns">		
@@ -163,7 +164,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 				{% endif %}
 				<div class="small-12 columns">
 			  		<div id="collection_drawer" >
-			    		<!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
+
 			    		{% include "ndf/theme_drawer.html" %}
 
 			  		</div>
@@ -246,14 +247,12 @@ background-repeat:no-repeat; background-size: 48px 48px
   	<!-- Overlay : Map Widget -->
     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
-      	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
   		<a class="close-reveal-modal" >&#215;</a>
         {% include "ndf/map_widget.html" with mode="edit" %}
-        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
-      	<!-- #{#%# endif %} -->
     </div>
 
-    <input type="hidden" id="nodes_list" value="{{nodes_list}}">						
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">	
+    <input type="hidden" id="parent_nodes_list" value="{{parent_nodes_collection}}">						
 </form>
 
 <script type="text/javascript">
@@ -263,20 +262,21 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			var name = $("#name_id").val();
 			var nodes = $("#nodes_list").val();
+			var parent_nodes = $("#parent_nodes_list").val();
 
 			if (nodes.indexOf(name) > 0)  
 			{
-				$("#message").css("display", "block");
-				$("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
 				$("#name_id").val("");
 			}
-			else
+			if (parent_nodes.indexOf(name) > 0)  
 			{
-				$("#message").css("display", "none");
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
 			}
 
 		});
-		
+
 	});
 
 
@@ -288,24 +288,32 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      datatype: "html",
 	      data:{
 	        context_node: "{{node.pk}}",
+	        nodes_list: "{{nodes_list}}",
 	        sub_theme_name: $("#sub_theme_id").val(),
 	        csrfmiddlewaretoken: '{{ csrf_token }}'
 	      },
 	      success: function(data) {
+
+	      	var theme = $("#sub_theme_id").val();
+
+	      	if ($.trim(data) === "failure") {
+	      		alert("Theme name "+ theme +" already available, Please choose different name");
+	      	}
+
+	      	if ($.trim(data) === "None") {
+	      		alert("Please enter sub theme name");
+	      	}
 
 	        location.reload(true);
 	        $("#sub_theme_id").val("");
 	      }
 	    });
 
-
   	});
 
 
 	$("#save-node").click(function() {
-		pn_arr = []
 		cn_arr = []
-		md_arr = [] //for adding module
 
 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#collection_drawer").attr("id") == "collection_drawer") {
@@ -314,7 +322,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 		});
 
-		$("#collection_list").val(cn_arr) 
+		$("#collection_list").val(cn_arr); 
+		location.reload(true);
 
 	});
 
