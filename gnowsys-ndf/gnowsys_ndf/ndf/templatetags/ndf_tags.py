@@ -724,7 +724,11 @@ def get_group_type(group_id, user):
       if ObjectId.is_valid(gid):
         colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
       else:
-        colg = None
+	colg = col_Group.Group.find_one({'_type': 'Group', 'name': gid})
+	if colg :
+		pass
+	else:		
+	        colg = None
     
     #check if Group exist in the database
     if colg is not None:
