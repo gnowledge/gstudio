@@ -91,6 +91,64 @@
 
 <body>
 
+	<form id="file-form" action="{% url 'save_observation' groupid app_id app_set_id app_set_name_slug %}" method="POST">
+		<input type="file" id="file-select" name="photos[]" multiple/>
+		<button type="submit" id="upload-button">Upload</button>
+	</form>
+	
+	<script type="text/javascript">
+		var form = document.getElementById('file-form');
+		var fileSelect = document.getElementById('file-select');
+		var uploadButton = document.getElementById('upload-button');
+
+		form.onsubmit = function(event) {
+			event.preventDefault();
+
+			// Update button text.
+			uploadButton.innerHTML = 'Uploading...';
+
+			// The rest of the code will go here...
+
+			// Get the selected files from the input.
+			var files = fileSelect.files;
+
+			// Create a new FormData object.
+			var formData = new FormData();
+
+			// Loop through each of the selected files.
+			for (var i = 0; i < files.length; i++) {
+			  var file = files[i];
+
+			  // Check the file type.
+			  if (!file.type.match('image.*')) {
+			    continue;
+			  }
+
+			  // Add the file to the request.
+			  formData.append('photos[]', file, file.name);
+			}
+
+			// Set up the request.
+			var xhr = new XMLHttpRequest();
+
+			// Open the connection.
+			xhr.open('POST', "{% url 'save_observation' groupid app_id app_set_id app_set_name_slug %}", true);
+
+			// Set up a handler for when the request finishes.
+			xhr.onload = function () {
+			  if (xhr.status === 200) {
+			    // File(s) uploaded.
+			    uploadButton.innerHTML = 'Upload';
+			  } else {
+			    alert('An error occurred!');
+			  }
+			};
+
+			// Send the Data.
+			xhr.send(formData);
+		}
+	</script>
+
 	<!-- Popup structure -->
 	<div style="display:none; ">
 		<div class="popup-html">
@@ -102,7 +160,10 @@
 			<textarea class="marker-obs-note" placeholder="Observation"></textarea>
 			
 			<!-- <input type="file" class="marker-file-upload" /> -->
-			<input type="file" name="doc[]" class="image-upload" accept="image/*" />
+			<form method="post" enctype="multipart/form-data" class="popup-form">
+				<input type="file" name="doc[]" class="image-upload" multiple/>
+			</form>
+			<!-- <input type="file" name="doc[]"  id="docFile" multiple/> -->
 
 
 <!-- 			<div class="file">
@@ -527,6 +588,22 @@
 				created_by = this.feature.properties.created_by;
 				edited_by = this.feature.properties.edited_by;
 
+			// Variable to store your files
+			var files;
+
+			// Add events
+			// $('input[type=file]').on('change', prepareUpload);
+			// $(popupHtmlObj).children("form input[type=file].image-upload").on('change', prepareUpload);
+
+			$(popupHtmlObj).children("form").children("input[type=file].image-upload").on('change', prepareUpload);
+
+			// Grab the files and set them to our variable
+			function prepareUpload(event)
+			{
+			  files = event.target.files;
+			}
+			// console.log(files);
+
 			$(popupHtmlObj).children("input.marker-place-name").val(placename);
 			$(popupHtmlObj).children("input.marker-dtstamp").val(datetime);
 			$(popupHtmlObj).children("textarea.marker-obs-note").val(description);
@@ -675,7 +752,6 @@
 				
 			});
 			
-						
 			// To add content on click of add_content
 			$(".popup-add-content-button:visible").click(function(){
 
@@ -696,6 +772,8 @@
 						getDT = $(thisPopupContent).children("input[type=text].marker-dtstamp").val().trim(),	
 						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
 						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
+						// getImage = $(thisPopupContent).children("input[type=file].image-upload");
+						// console.log(thisPopupContent.children);
 						{% if not user.is_authenticated %}
 							getCreator = $(thisPopupContent).children("input[type=text].marker-creator").val().trim();
 						{% endif %}
@@ -744,14 +822,47 @@
 						formatedDateTime = now.toLocaleDateString() + " " + now.getHours() + ":" + now.getMinutes();
 
 					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
+
+					// console.log(files);
+					// Create a formdata object and add the files
+					// var imageData = new FormData();
+					// $.each(files, function(key, value)
+					// {
+					// 	imageData.append(key, value);
+					// });
+										
+					var formData = new FormData($(popupHtmlObj).children("form")[0]);
+					// Loop through each of the selected files.
+					for (var i = 0; i < files.length; i++) {
+					  var file = files[i];
+
+					  // Check the file type.
+					  // if (!file.type.match('image.*')) {
+					  //   continue;
+					  // }
+
+					  // Add the file to the request.
+					  formData.append('doc[]', file, file.name);
+					}
+					console.log(formData);
+
+					$(".leaflet-popup-content:visible").children("form.popup-form:visible")
+					// console.log($(popupHtmlObj).children("form"));
+					// console.log($(popupHtmlObj).children("form")[0]);
+					// var formData = new FormData($(popupHtmlObj).children("form")[0]); // Create an arbitrary FormData instance
+					// console.log(formData);
+
 			        // saving marker data in database 
 					$.ajax({
 
 						type:'post',
 						url: "{% url 'save_observation' groupid app_id app_set_id app_set_name_slug %}",
 						dataType: 'json',
+						processData: false, // Don't process the files
+        				contentType: false, // Set content type to false as jQuery will tell the server its a query string request
 			  			data: {
 			  					marker_geojson:updatedGeoJSON,
+			  					image_file: formData,
 			  					csrfmiddlewaretoken: '{{ csrf_token }}',
 			  					{% if user.is_authenticated%}
 			  						user: "authenticated",
