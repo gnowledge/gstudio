@@ -15,7 +15,7 @@ from django.contrib.sites.models import Site
 
 
 from django_mongokit import get_database
-from gnowsys_ndf.ndf.views.methods import get_forum_repl_type
+from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
 from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
@@ -305,6 +305,7 @@ def add_node(request,group_id):
         pass
 
     try:
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         sitename=Site.objects.all()[0].name.__str__()
         content_org=request.POST.get("reply","")
         node=request.POST.get("node","")
@@ -374,13 +375,17 @@ def add_node(request,group_id):
             bx=User.objects.get(id=each)
             msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"'\n"+"Please visit "+link+" to see the updated page"
             if bx:
-                ret = set_notif_val(request,group_id,msg,activity,bx)
+                no_check=forum_notification_status(group_id,auth._id)
+                if no_check:
+                    ret = set_notif_val(request,group_id,msg,activity,bx)
         
         bx=User.objects.get(id=colg.created_by)
         msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"   
         
         if bx:
-            ret = set_notif_val(request,group_id,msg,activity,bx)
+            no_check=forum_notification_status(group_id,auth._id)
+            if no_check:
+                ret = set_notif_val(request,group_id,msg,activity,bx)
         
         if node == "Reply":
             # if exstng_reply:
