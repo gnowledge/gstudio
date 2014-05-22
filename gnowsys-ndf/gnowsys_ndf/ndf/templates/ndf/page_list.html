@@ -85,8 +85,6 @@
   <!-- Existing card list-->
   {% for node in page_nodes %}
   
-    {% if node.created_by == request.user.pk %}
-        
     <li class="card">
       <div class="page">
 
@@ -133,49 +131,6 @@
       </div>
     </li>  
   
-    {% else %}
-    {% if node.access_policy == "PUBLIC" %}
-    <li class="card">
-      <div class="page">
-
-      <header>
-        <div class="label-list">
-        {% for tag in node.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-        {% endfor %}
-        </div>
-
-        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
-        <h4>
-          {{ node.name|safe|striptags|truncatechars:20 }}
-          <div>
-            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-            <br/>
-            by <span href="#" class="user" data-gnow="">{{ node.user_details_dict.created_by }}</span> 
-            </small>
-          </div>
-        </h4>
-      </header>
-      
-      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-
-      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
-
-      {% if node.created_by == request.user.id %}
-      <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
-      {% endif %}
-
-      <footer class="row">
-        <div class="small-7 columns"><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</div>
-        <div class="small-5 columns"><div class="right"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div></div> 
-      </footer>
-
-      </div>
-    </li>
-
-    {% endif %}
-    {% endif %}
 
   {% empty %}
     {% if not searching %}

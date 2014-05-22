@@ -47,8 +47,26 @@ def course(request, group_id, course_id=None):
       
       search_field = request.POST['search_field']
       course_coll = collection.Node.find({'member_of': {'$all': [ObjectId(GST_COURSE._id)]},
-                                         '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                 {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                         '$or': [
+                                            {'$and': [
+                                              {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                              {'$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                              }
+                                              ]
+                                            },
+                                            {'$and': [
+                                              {'tags': {'$regex':search_field, '$options': 'i'}},
+                                              {'$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                              }
+                                              ]
+                                            }
+                                          ],
                                          'group_set': {'$all': [ObjectId(group_id)]}
                                      }).sort('last_update', -1)
 
@@ -65,7 +83,17 @@ def course(request, group_id, course_id=None):
     elif GST_COURSE._id == ObjectId(course_id):
       # Course list view
       title = GST_COURSE.name
-      course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+      course_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(course_id)]}, 
+                                             'group_set': {'$all': [ObjectId(group_id)]},
+                                             '$or': [
+                                              {'access_policy': u"PUBLIC"},
+                                              {'$and': [
+                                                {'access_policy': u"PRIVATE"}, 
+                                                {'created_by': request.user.id}
+                                                ]
+                                              }
+                                             ]
+                                            })
       template = "ndf/course.html"
       variable = RequestContext(request, {'title': title, 'course_nodes_count': course_coll.count(), 'course_coll': course_coll, 'groupid':group_id, 'group_id':group_id})
       return render_to_response(template, variable)
