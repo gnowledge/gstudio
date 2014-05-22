@@ -534,7 +534,7 @@
 {% for each in wetube_videos %}
  {% get_source_id each.pk as source_id %}
       {% get_user_object each.created_by as user_obj %}
-      {% for src_id,contributor in source_id.items %}
+      {% for src_id in source_id %}
       <li class="card">
 	<div class="file">
 	  <header>
@@ -546,7 +546,7 @@
 
 	    <h4>{{each.name}}</h4>
 	    <div>
-	      <small class="subheader">{{each.member_of_names_list|join:', '}} created by <span href="#" class="user" data-gnow="">{{contributor}}@wetube.gnowledge.org</span>
+	      <small class="subheader">{{each.member_of_names_list|join:', '}} created by <span href="#" class="user" data-gnow="">@wetube.gnowledge.org</span>
 	      </small>
 	    </div>
 

@@ -857,8 +857,10 @@ def get_resource_collection(resource_type):
     page_collection=[]
     gst=collection.Node.one({'name':resource_type,'_type':'GSystemType'})
     page_coll=collection.Node.find({'member_of':gst._id,'_type':'GSystem'})
-    if page_coll is None:
+    if list(page_coll) == []:
       page_coll=collection.Node.find({'member_of':gst._id,'_type':'File'})
+    else:    
+      page_coll=collection.Node.find({'member_of':gst._id,'_type':'GSystem'})
         
     for each in page_coll:
       if each.collection_set:
