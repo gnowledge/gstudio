@@ -5,6 +5,7 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+
 {% block title %} {{ title }} {% endblock %}
 
 {% block head%}  
@@ -31,8 +32,12 @@
         			if (user == "True")
         			{
         				$li.find('.jqtree-element').append(
+        					{% user_access_policy groupid request.user as user_access %}
+        					{% if user_access == "allow" %}
 
-                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+                			
+                			{% endif %}
             			);	
         			}
             		
@@ -229,8 +234,12 @@
 	        			if (user == "True")
         				{
         					$li.find('.jqtree-element').append(
+        						{% user_access_policy groupid request.user as user_access %}
+        						{% if user_access == "allow" %}
 
-	                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+
+	                			{% endif %}
 	            			);	
         				}
 
@@ -254,8 +263,12 @@
 	    				if (user == "True")
         				{
 		            		$li.find('.jqtree-element').append(
+		            			{% user_access_policy groupid request.user as user_access %}
+        						{% if user_access == "allow" %}
 
-		                		'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+		                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+		                			
+		                		{% endif %}
 		            		);
 		            	}
 
