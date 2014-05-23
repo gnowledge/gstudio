@@ -223,6 +223,7 @@
 	{% endif %}
 
 	<script type="text/javascript">
+		// script for fold themes hierarchy
 		$(".fold").click(function() {
 			$(function() {
 				
@@ -249,6 +250,7 @@
 			});
 		});
 
+		// script for unfold themes hierarchy
 	    $(".unfold").click(function() {
 	    	$(function() {
 
@@ -277,6 +279,144 @@
 	    		});
 	    	});
 	    });	
+
+	    // script for delete themes
+	    $(document).on('click',".button.deleteObjects",function(){
+	    	var selectedobject = $(".objectsCheckbox input:checked")
+
+	    	if(selectedobject.length > 0)
+	    	{
+           		$('#myModal').foundation('reveal', 'open');
+
+           		var i = 0;
+             	var str = "";  
+	            $.map(selectedobject,function(each){
+	                if(i == 0)
+	                {
+	                	str = str.concat(each.parentElement.id)
+	                }
+	                else 
+	                {
+	                	str = str.concat(","+each.parentElement.id)
+	                }
+	                
+	                i= i+1
+	            })
+
+           		$.ajax({
+		            url: "{% url 'deletion_instances' groupid %}",
+		            type: 'POST',
+		            data:{
+		            	deleteobjects: str,
+		            	csrfmiddlewaretoken: '{{ csrf_token }}'
+		            },
+		            beforeSend: function() {  },
+             		success: function(result){
+
+             			$("#deletion_results").html("");
+                        for(var obj in result)
+                        {
+	                        var ulist = $("<ul>"+"</ul>")
+	                                    .attr("id","conceptlist")
+	                                    .appendTo($("#deletion_results"));
+	                        var li = $("<li><b>"+result[obj].title+"</b></li>")
+	                                    .appendTo(ulist);
+	                        var ulist1 = $("<ul>"+"</ul>")
+	                                    .attr("id","conceptlist")
+	                                    .appendTo(li);
+	                        for(var obj2 in result[obj].content)
+	                        {
+		                        object = result[obj].content[obj2]
+		                        for(var obj3 in  object)
+		                        {
+			                        for(var each in object[obj3])
+			                        {
+				                        var li1 = $("<li>"+object[obj3][each]+"</li>")
+				                                    .appendTo(ulist1);
+		                        	}
+	                    		}
+                        	}
+                        }
+
+             		},
+             		complete: function(){   }
+             	});
+
+           	}
+           	else
+           	{
+        		alert("select object to delete")
+        	}
+
+	    });
+
+		// Script for delete themes after confirm delete.
+		$(document).on('click',".button.confirmDeleteObjects",function(){
+	        var selectedobject = $(".objectsCheckbox input:checked")
+	        $('#myModal').foundation('reveal', 'open');
+
+	        if(selectedobject.length > 0)
+	        {
+	            var i = 0;
+	            var str = "";  
+
+	            $.map(selectedobject,function(each){
+	            	if(i == 0)
+	            	{
+	            		str = str.concat(each.parentElement.id)
+	            	}
+	                else 
+	                {
+	                	str = str.concat(","+each.parentElement.id)
+	                }
+
+	                i= i+1
+	            });
+
+	            $.ajax({
+	            	url: "{% url 'deletion_instances' groupid %}",
+	             	type: 'POST',
+	             	data:{
+	             		deleteobjects: str,
+	             		csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"
+	             	},
+	             	beforeSend: function() {  },
+	             	success: function(result){
+	             	},
+	             	complete: function(){ 
+	                	$('#myModal').foundation('reveal', 'close');
+	             	}
+	            });
+	             
+	            $.map(selectedobject,function(each){
+	            	each.parentElement.parentElement.remove()
+	            });
+	            
+	            $('#myModal').foundation('reveal', 'close');
+	             
+	        }
+	        else{
+	        alert("select object to delete")
+	        }
+
+		});
+
+		// Script for selecting all objects 
+		$(document).on('click',".checkedAll",function(){
+			if($(this).is(":checked")==true)
+			{
+				$('.objectsCheckbox input').prop( "checked", true );
+			}
+			else
+			{
+				$('.objectsCheckbox input').prop( "checked", false );
+			}
+		});
+
+		// Script for cancel option for deleting themes
+		$(document).on('click',".button.cancelDeleteObjects",function(){
+             $('#myModal').foundation('reveal', 'close');
+		});
 
 	</script>
 
