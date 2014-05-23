@@ -902,4 +902,38 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
         
-
+def get_author_set_users(request, group_id):
+    '''
+    This ajax function will give all users present in node's author_set field
+    '''
+    user_list = []
+    if request.is_ajax():
+        _id = request.GET.get('_id',"")
+        node = collection.Node.one({'_id':ObjectId(_id)})
+        if node._type == 'Group':
+            for each in node.author_set:
+                user_list.append(User.objects.get(id = each))
+            return render_to_response("ndf/refresh_subscribed_users.html", 
+                                       {"user_list":user_list}, 
+                                       context_instance=RequestContext(request)
+            )
+        else:
+            return "node provide is not a Group type"
+    else:
+        return "Invalid ajax call"
+                
+def get_filterd_user_list(request, group_id):
+    '''
+    This function will return (all user's) - (subscribed user for perticular group) 
+    '''
+    user_list = []
+    if request.is_ajax():
+        _id = request.GET.get('_id',"")
+        node = collection.Node.one({'_id':ObjectId(_id)})
+        all_users_list =  [each.username for each in User.objects.all()]
+        if node._type == 'Group':
+            for each in node.author_set:
+                user_list.append(User.objects.get(id = each).username)
+        print all_users_list,set(user_list)
+        filtered_users = list(set(all_users_list) - set(user_list))
+        return HttpResponse(json.dumps(filtered_users))
