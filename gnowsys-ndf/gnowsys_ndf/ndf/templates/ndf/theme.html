@@ -22,15 +22,20 @@
     	$(function() {
     		// $('.themes').tree();
     		var $tree = $('.themes');
+    		var user = "{{user.is_authenticated}}"
 
     		$tree.tree({
     			autoOpen: false,
         		onCreateLi: function(node, $li) {
 
-            		$li.find('.jqtree-element').append(
+        			if (user == "True")
+        			{
+        				$li.find('.jqtree-element').append(
 
-                		'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
-            		);
+                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+            			);	
+        			}
+            		
 
         		}
     		});
@@ -215,14 +220,19 @@
 	<script type="text/javascript">
 		$(".fold").click(function() {
 			$(function() {
+				
+				var user = "{{user.is_authenticated}}"
+
 				$('.themes').tree({
 					autoOpen: false,
 	        		onCreateLi: function(node, $li) {
+	        			if (user == "True")
+        				{
+        					$li.find('.jqtree-element').append(
 
-	            		$li.find('.jqtree-element').append(
-
-	                		'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
-	            		);
+	                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+	            			);	
+        				}
 
 	        		}
 				});
@@ -232,15 +242,22 @@
 
 	    $(".unfold").click(function() {
 	    	$(function() {
+
+	    		var user = "{{user.is_authenticated}}"
+
 	    		$('.themes').tree({
 	    			autoOpen: true,
 	    			slide: false,
+
 	    			onCreateLi: function(node, $li) {
 
-	            		$li.find('.jqtree-element').append(
+	    				if (user == "True")
+        				{
+		            		$li.find('.jqtree-element').append(
 
-	                		'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
-	            		);
+		                		'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+		            		);
+		            	}
 
 	        		}
 	    			
