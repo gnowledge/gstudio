@@ -58,6 +58,7 @@ def dashboard(request, group_id):
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
     uploaded = "None"
+    print request.FILES.getlist("doc[]","")
 
     if request.method == "POST" :
       """

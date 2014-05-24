@@ -93,7 +93,7 @@
 	{% if mode == "edit" %}
 	<form id="file-form" action="{% url 'save_image' groupid app_id app_set_id app_set_name_slug %}" method="POST">
 	{% csrf_token %}
-		<input type="file" id="file-select" name="photos[]" multiple/>
+		<input type="file" id="file-select" name="doc[]" />
 		<button type="submit" id="upload-button">Upload</button>
 	</form>
 	
@@ -126,9 +126,10 @@
 			  }
 
 			  // Add the file to the request.
-			  formData.append('photos[]', file, file.name);
+			  formData.append('doc[]', file, file.name);
 			}
 			formData.append('csrfmiddlewaretoken', '{{csrf_token}}')
+			formData.append('user','{{request.user.id}}')
 
 			// Set up the request.
 			var xhr = new XMLHttpRequest();
