@@ -1,0 +1,19 @@
+  <h2>List Of Members.</h2>
+  <table>
+    <thead>
+      <tr>
+        <th width="500">Users</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in user_list %}
+      <tr>
+        <td>{{user.username}}</td>
+        <td></td>
+      </tr>
+      {% endfor %}
+  </tbody>
+  </table>
+<a class="close-reveal-modal">&#215;</a>
+

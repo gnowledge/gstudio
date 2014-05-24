@@ -28,6 +28,9 @@ user_list[i]=key;
 i=i+1;
 }
 
+
+user_list =JSON.parse(update_user_list())
+
 $( "#userInvite" ).autocomplete({
    source: user_list
 });
@@ -43,6 +46,7 @@ $('option:selected',$select).remove();
 
 
 $(document).on('click',"#addToList",function() {
+      UserInvitation();
       data = $("#userInvite").val();//attr('value');
       if(data != ""){
            $("#selectOfInviteUser").append(new Option(data, data));
@@ -108,6 +112,18 @@ $("#hideUserInvitation").hide();
 }
 
 
+function update_user_list()
+{
+var ajurl ="{% url 'get_filterd_user_list' groupid %}?_id={{node.pk}}";
+var users = [];
+  $.ajax({
+	url:ajurl,
+	async: false, 	
+  success: function(data){
+  users = data; },
+  });
+return users;
+}			 
 </script>
 <style type="text/css">
 #selectOfInviteUser{

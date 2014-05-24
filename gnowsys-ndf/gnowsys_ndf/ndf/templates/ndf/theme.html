@@ -5,6 +5,7 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+
 {% block title %} {{ title }} {% endblock %}
 
 {% block head%}  
@@ -20,15 +21,47 @@
   <script type="text/javascript">
     $(document).ready(function() {
     	$(function() {
-    		$('.themes').tree();
+    		// $('.themes').tree();
+    		var $tree = $('.themes');
+    		var user = "{{user.is_authenticated}}"
+
+    		$tree.tree({
+    			autoOpen: false,
+        		onCreateLi: function(node, $li) {
+
+        			if (user == "True")
+        			{
+        				$li.find('.jqtree-element').append(
+        					{% user_access_policy groupid request.user as user_access %}
+        					{% if user_access == "allow" %}
+
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+                			
+                			{% endif %}
+            			);	
+        			}
+            		
+
+        		}
+    		});
+   
     	});
     });
+
 
   </script>
   <style>
   	#app-set-item li { padding:0.5em }
 	#app-set-item li:hover { background-color:#e5e5e5; }
 	.selected-app-set-item { background-color:#e5e5e5; }
+
+	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
+        content: "\f07b";
+    }
+    .jqtree-tree i {
+        margin-right: 4px;
+    }
+
   </style>
 {% endblock%}
 
@@ -90,7 +123,8 @@
 
 		{% if node %}
 			<!-- If "Theme" node -->
-			<a id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></a>
+			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
+			
 		{% endif %}
 
 	{% endif %}
@@ -191,16 +225,55 @@
 	<script type="text/javascript">
 		$(".fold").click(function() {
 			$(function() {
-				$('.themes').tree();
+				
+				var user = "{{user.is_authenticated}}"
+
+				$('.themes').tree({
+					autoOpen: false,
+	        		onCreateLi: function(node, $li) {
+	        			if (user == "True")
+        				{
+        					$li.find('.jqtree-element').append(
+        						{% user_access_policy groupid request.user as user_access %}
+        						{% if user_access == "allow" %}
+
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+
+	                			{% endif %}
+	            			);	
+        				}
+
+	        		}
+				});
 
 			});
 		});
 
 	    $(".unfold").click(function() {
 	    	$(function() {
+
+	    		var user = "{{user.is_authenticated}}"
+
 	    		$('.themes').tree({
 	    			autoOpen: true,
 	    			slide: false,
+
+	    			onCreateLi: function(node, $li) {
+
+	    				if (user == "True")
+        				{
+		            		$li.find('.jqtree-element').append(
+		            			{% user_access_policy groupid request.user as user_access %}
+        						{% if user_access == "allow" %}
+
+		                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+		                			
+		                		{% endif %}
+		            		);
+		            	}
+
+	        		}
+	    			
 	    		});
 	    	});
 	    });	

@@ -9,6 +9,22 @@ from django.contrib.auth.decorators import login_required
   var chk_login = "{{ user }}";
 </script>
 
+<!-- Ajax for getting user List  -->
+<script type="text/javascript">
+  jQuery(document).ready(function($) { 
+  $('#btn_list_member').on("click",function() {
+  var ajurl ="{% url 'get_author_set_users' groupid %}?_id={{node.pk}}";
+  $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#firstModal').html(data); },
+  }); });
+  });
+
+</script> 
+<!-- End Ajax -->
+
+
 <script type="text/javascript">
 //function to toggle the lable Join and Unsubscribe
 function change_label(label)
@@ -107,29 +123,11 @@ $(document).ready(function()
 {% get_policy node request.user as policy  %}
 {% if policy %}
 <!-- Triggers the modals -->
-<a href="#" data-reveal-id="firstModal" class="radius button">List Members</a>
+<a href="#" id ="btn_list_member"data-reveal-id="firstModal" class="radius button">List Members</a>
 
 <!-- Reveal Modals begin -->
 <div id="firstModal" class="reveal-modal" data-reveal>
-  <h2>List Of Members.</h2>
-  <table>
-    <thead> 
-      <tr> 
-	<th width="500">Users</th>
-	<th>Action</th> 
-      </tr>
-    </thead> 
-    <tbody>
-      {% for each in node.author_set %}
-      {% get_user_object each as user %}
-      <tr>
-	<td>{{user.username}}</td> 
-	<td></td> 
-      </tr> 
-      {% endfor %}
-  </tbody>
-  </table>
-<a class="close-reveal-modal">&#215;</a>
+
 </div>
 {% endif %}
 <!-- Reveal Model end -->
