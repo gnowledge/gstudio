@@ -86,6 +86,13 @@
 			color: #f15439;
 		}
 
+		.marker-popup-image-icon {
+			color: #e5e5e5;
+			font-size: 3.95em;
+			margin-top: -15px;
+			position: absolute;
+		}
+
 	</style>
 
 
@@ -163,20 +170,25 @@
 			<label>Observations</label>
 			<textarea class="marker-obs-note" placeholder="Observation"></textarea>
 			
-			<!-- <input type="file" class="marker-file-upload" /> -->
+			{% if user.is_authenticated %}
+
+			<div class="row">
+				<div class="small-3 columns">
+					<i class="fi-photo marker-popup-image-icon"></i>
+				</div>
+				<div class="small-9 columns">
+					<div class="button tiny expand">
+						<i class="fi-paperclip "></i> &nbsp;&nbsp;Attach Image
+					</div>
+				</div>
+			</div>
+
+			{% endif %}
+
+			<!-- 
 			<form method="post" enctype="multipart/form-data" class="popup-form">
 				<input type="file" name="doc[]" class="image-upload" multiple/>
-			</form>
-			<!-- <input type="file" name="doc[]"  id="docFile" multiple/> -->
-
-
-<!-- 			<div class="file">
-				<br/>
-				<a class="button medium" href="#{#%# url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-					<span class="fi-upload">&nbsp;&nbsp;New File</span>
-				</a>
-			</div>
- -->
+			</form> -->
 
 			<label>Tags</label>
 			<input type="text" class="marker-tags" placeholder="Tags"/>
