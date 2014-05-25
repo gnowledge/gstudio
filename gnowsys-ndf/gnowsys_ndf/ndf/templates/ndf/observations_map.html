@@ -120,10 +120,10 @@
 			for (var i = 0; i < files.length; i++) {
 			  var file = files[i];
 
-			  // Check the file type.
-			  if (!file.type.match('image.*')) {
-			    continue;
-			  }
+			  // // Check the file type.
+			  // if (!file.type.match('image.*')) {
+			  //   continue;
+			  // }
 
 			  // Add the file to the request.
 			  formData.append('doc[]', file, file.name);
@@ -132,7 +132,7 @@
 			formData.append('user','{{request.user.id}}')
 
 			// Set up the request.
-			var xhr = new XMLHttpRequest();
+			xhr = new XMLHttpRequest();
 
 			// Open the connection.
 			xhr.open('POST', "{% url 'save_image' groupid app_id app_set_id app_set_name_slug %}", true);

@@ -347,9 +347,12 @@ def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, s
                     submitDoc(request, group_id)
                     
                     # prof_image takes the already available document of uploaded image from its name
-                    prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+                    coll = get_database()['fs.files']
+                    a = coll.find_one({"md5":filemd5})
+                    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+                    # prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
                     print "------------", prof_image
                     
                     # --- END of images saving
                     
-            return StreamingHttpResponse({"image":prof_image})	
+                return StreamingHttpResponse(str(prof_image._id))	
