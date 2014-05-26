@@ -88,9 +88,25 @@
 
 		.marker-popup-image-icon {
 			color: #e5e5e5;
-			font-size: 3.95em;
-			margin-top: -15px;
+			font-size: 3.75em;
+			margin-top: -12px;
 			position: absolute;
+		}
+
+		.marker-popup-attach-icon{
+			color: #a1c7b7;
+			font-size: 1.7em;
+			left: 0.9em;
+			position: absolute;
+			top: 0.3em;
+		}
+
+		.marker-popup-image-uploader{
+			background-color: #FAFAFA; border: thin solid #EFEFEF; border-radius: 5px; margin-bottom: 0.5em !important;
+		}
+
+		.marker-popup-image-uploader > div{
+			margin-bottom: -1em;
 		}
 
 	</style>
@@ -98,16 +114,23 @@
 
 <body>
 	{% if mode == "edit" %}
-	<form id="file-form" action="{% url 'save_image' groupid app_id app_set_id app_set_name_slug %}" method="POST">
-	{% csrf_token %}
-		<input type="file" id="file-select" name="doc[]" />
-		<button type="submit" id="upload-button">Upload</button>
-	</form>
+
+	<div id="image-uploader-overlay" class="reveal-modal small" style="z-index:10001;" data-reveal>
+		<a class="close-reveal-modal">&#215;</a>
+		<h3 class="text-center">Attach Image</h3>
+		<hr/>			
+		<form id="file-form" action="{% url 'save_image' groupid app_id app_set_id app_set_name_slug %}" method="POST">
+		{% csrf_token %}
+			<input type="file" id="file-select" name="doc[]" onchange="checkImageAttached(this.value)" />
+			<button type="submit" id="upload-button">Upload</button>
+		</form>
+	</div>
 	
 	<script type="text/javascript"> 
 		var form = document.getElementById('file-form');
 		var fileSelect = document.getElementById('file-select');
 		var uploadButton = document.getElementById('upload-button');
+
 
 		form.onsubmit = function(event) {
 			event.preventDefault();
@@ -148,6 +171,10 @@
 			xhr.onload = function () {
 			  if (xhr.status === 200) {
 			    // File(s) uploaded.
+			    $('#image-uploader-overlay').foundation('reveal', 'close');
+
+			    $(".leaflet-popup-content:visible").children("div.images-list").addClass("marker-popup-image-uploader");
+
 			    uploadButton.innerHTML = 'Upload';
 			  } else {
 			    alert('An error occurred!');
@@ -157,7 +184,18 @@
 			// Send the Data.
 			xhr.send(formData);
 		}
-	</script> 
+
+		$(document).on('open', '#image-uploader-overlay[data-reveal]', function () {
+			fileSelect.value = "";
+			uploadButton.disabled = true;			
+		});
+
+		function checkImageAttached(imageValue)
+		{
+			uploadButton.disabled = (imageValue)? false:true;
+		}
+
+	</script>
 
 	{% endif %}
 	<!-- Popup structure -->
@@ -172,13 +210,16 @@
 			
 			{% if user.is_authenticated %}
 
-			<div class="row">
+			<div class="row images-list">
+				<ul class="attached-images" data-image-list=""></ul>
 				<div class="small-3 columns">
-					<i class="fi-photo marker-popup-image-icon"></i>
+					<i class="fi-camera marker-popup-image-icon"></i>
 				</div>
 				<div class="small-9 columns">
-					<div class="button tiny expand">
-						<i class="fi-paperclip "></i> &nbsp;&nbsp;Attach Image
+					<!-- <a href="#" data-reveal-id="myModal"></a> -->
+					<div class="button tiny expand" data-reveal-id="image-uploader-overlay">
+						<i class="fi-paperclip marker-popup-attach-icon"></i>
+						<span class="right" style="margin-right:0.7em;">Attach Image</span>
 					</div>
 				</div>
 			</div>
