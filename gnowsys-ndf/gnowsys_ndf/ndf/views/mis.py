@@ -62,7 +62,14 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     system_id = ""
     system_type = ""
     system_mime_type = ""
+    template = ""
     property_display_order = []
+
+    template_prefix = ""
+    if app_name == "MIS":
+      template_prefix = "mis"
+    else:
+      template_prefix = "mis_po"
 
     for eachset in app.collection_set:
       app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
@@ -72,7 +79,9 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     if app_set_id:
       classtype = ""
       app_set_template = "yes"
-      App_Name = None
+      print "\n Going here...\n"
+      template = "ndf/"+template_prefix+"_list.html"
+
       systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
       systemtype_name = systemtype.name
       title = systemtype_name
@@ -90,10 +99,13 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                          
     else :
       app_menu = "yes"
+      template = "ndf/"+template_prefix+"_list.html"
       title = app_name
 
     if app_set_instance_id :
         app_set_instance_template = "yes"
+        template = "ndf/"+template_prefix+"_details.html"
+
         app_set_template = ""
         systemtype_attributetype_set = []
         systemtype_relationtype_set = []
@@ -165,8 +177,6 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
 
-    template = "ndf/mis.html"
-
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id
 
                                         , "node":system, 'group_id':group_id, "property_display_order": property_display_order})
@@ -178,9 +188,32 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     """
     create new instance of app_set of apps view for custom GAPPS
     """
-    app_name = "mis"
+
+    if ObjectId.is_valid(group_id) is False :
+      group_ins = collection.Node.one({'_type': "Group","name": group_id})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+          group_id = str(auth._id)
+    else :
+      pass
+
+    app = None
+    if app_id is None:
+      app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+      if app:
+        app_id = str(app._id)
+    else:
+      app = collection.Node.one({'_id': ObjectId(app_id)})
+
+    app_name = app.name 
+
+    # app_name = "mis"
     app_collection_set = [] 
-    app = collection.Node.find_one({"_id":ObjectId(app_id)})
+    # app = collection.Node.find_one({"_id":ObjectId(app_id)})
     app_set = ""
     app_set_instance_name = ""
     nodes = ""
@@ -200,6 +233,12 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     app_type_of_id = ""
     File = 'False'
     obj_id_ins = ObjectId()
+
+    template_prefix = ""
+    if app_name == "MIS":
+      template_prefix = "mis"
+    else:
+      template_prefix = "mis_po"
 
     user_id = int(request.user.id)  # getting django user id
     user_name = unicode(request.user.username)  # getting django user name
@@ -289,7 +328,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                 if obj_id_ins.is_valid(f):
                     newgsystem = collection.Node.one({'_id':f})
                 else:
-                    template = "ndf/mis.html"
+                    template = "ndf/mis_list.html"
                     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
                     return render_to_response(template, variable)
             else:
@@ -394,9 +433,9 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         newrelation.save()
         
 
-        return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
+        return HttpResponseRedirect(reverse(template_prefix+'_app_detail', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
     
-    template = "ndf/mis.html"
+    template = "ndf/"+template_prefix+"_create_edit.html"
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
       
