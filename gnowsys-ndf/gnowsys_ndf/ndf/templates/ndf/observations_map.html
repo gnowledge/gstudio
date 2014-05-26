@@ -109,6 +109,20 @@
 			margin-bottom: -1em;
 		}
 
+		.attached-images > li {
+			background-color: #EDEDED;
+			border: thin solid #E5E5E5;
+			border-radius: 5px;
+			margin: 5px;
+			text-align: left;
+			padding-left: 0.35em;
+			color: gray;
+		}
+			
+		.attached-images > li > a { padding-left: 0.75em; }
+
+		.attached-images > li > span { cursor: pointer; }
+
 	</style>
 
 
@@ -167,16 +181,40 @@
 			// Open the connection.
 			xhr.open('POST', "{% url 'save_image' groupid app_id app_set_id app_set_name_slug %}", true);
 
-			// Set up a handler for when the request finishes.
+			// Set up a handler for when the request finishes sucessfully.
 			xhr.onload = function () {
-			  if (xhr.status === 200) {
+
+			  if (xhr.status === 200) 
+			  {
 			    // File(s) uploaded.
 			    $('#image-uploader-overlay').foundation('reveal', 'close');
 
-			    $(".leaflet-popup-content:visible").children("div.images-list").addClass("marker-popup-image-uploader");
+			    var $attachedImages = $(".leaflet-popup-content:visible").find("ul.attached-images");
+
+			    var imagesList = $attachedImages.attr("data-image-list");
+
+			    imagesList = JSON.parse(imagesList);
+
+			    // check if image is not in the list, add it.
+			    if(imagesList.indexOf(xhr.responseText) < 0){
+			    
+			    	imagesList.push(xhr.responseText);
+
+			    	$attachedImages.attr("data-image-list", JSON.stringify(imagesList));
+
+			    	$attachedImages.append("<li><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/thumbnail/"+xhr.responseText+"' target='_blank' data-id='"+xhr.responseText+"'>"+fileSelect.value+"</a></li>")
+
+			    }
+
+			    if(imagesList.length > 0)
+			    {
+			    	$(".leaflet-popup-content:visible").children("div.images-list").addClass("marker-popup-image-uploader");
+				}
 
 			    uploadButton.innerHTML = 'Upload';
-			  } else {
+			  }
+			  else
+			  {
 			    alert('An error occurred!');
 			  }
 			};
@@ -184,6 +222,20 @@
 			// Send the Data.
 			xhr.send(formData);
 		}
+
+		function removeImage(imageEl)
+    	{
+    		// console.log(imageEl);
+    		var image_id = imageEl.attr("data-id"),
+    			$ul = imageEl.closest("ul.attached-images"),
+    			imagesList = JSON.parse($ul.attr("data-image-list"));
+
+    		imagesList.splice(imagesList.indexOf(image_id), 1);
+    		$ul.attr("data-image-list", JSON.stringify(imagesList));
+
+    		imageEl.parent("li").remove();
+    		console.log(imagesList);
+    	}
 
 		$(document).on('open', '#image-uploader-overlay[data-reveal]', function () {
 			fileSelect.value = "";
@@ -211,7 +263,7 @@
 			{% if user.is_authenticated %}
 
 			<div class="row images-list">
-				<ul class="attached-images" data-image-list=""></ul>
+				<ul class="attached-images no-bullet" data-image-list="[]"></ul>
 				<div class="small-3 columns">
 					<i class="fi-camera marker-popup-image-icon"></i>
 				</div>
@@ -644,6 +696,9 @@
 				tags = this.feature.properties.tags,
 				created_by = this.feature.properties.created_by;
 				edited_by = this.feature.properties.edited_by;
+				// var $attachedImages = $(".leaflet-popup-content:visible").find("ul.attached-images");
+			 //    var imagesList = $attachedImages.attr("data-image-list");
+
 
 			// Variable to store your files
 			var files;
@@ -829,6 +884,7 @@
 						getDT = $(thisPopupContent).children("input[type=text].marker-dtstamp").val().trim(),	
 						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
 						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
+						getImagesList = $(thisPopupContent).find("ul.attached-images").attr("data-image-list");
 						// getImage = $(thisPopupContent).children("input[type=file].image-upload");
 						// console.log(thisPopupContent.children);
 						{% if not user.is_authenticated %}
