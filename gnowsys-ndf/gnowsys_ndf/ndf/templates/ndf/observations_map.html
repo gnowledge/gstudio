@@ -138,7 +138,7 @@
 			<input type="file" id="file-select" name="doc[]" onchange="checkImageAttached(this.value)" />
 			<button type="submit" id="upload-button">Upload</button>
 		</form>
-		<input type="hidden" name="images-metadata" value="[]" data-images-metadata="[]">
+		<input type="hidden" name="images-metadata" value="[]" data-images-metadata="{{file_metadata | default:'[]'}}">
 	</div>
 	
 	<script type="text/javascript"> 
@@ -149,6 +149,39 @@
 		var fileSelect = document.getElementById('file-select');
 		var uploadButton = document.getElementById('upload-button');
 
+		var popupHtmlObj = tempMarker._popup._contentNode,
+			getFileList = tempMarker.feature.properties.attached_files,
+			$attachedImages = $(popupHtmlObj).find("ul.attached-images"),
+			imagesMetaData = $("#image-uploader-overlay > input[name='images-metadata']").attr("value");
+
+			imagesMetaData = JSON.parse(imagesMetaData);
+
+			$attachedImages.attr("data-image-list", getFileList );
+
+
+		if(getFileList && (JSON.parse(getFileList).length > 0) )
+		{
+			getFileList = JSON.parse(getFileList);
+
+			$(".leaflet-popup-content:visible").children("div.images-list").addClass("marker-popup-image-uploader");
+
+			$.each(getFileList, function(i, val){				
+
+			    if (imagesMetaData.length > 0)
+			    {
+			    	$.each(imagesMetaData, function(i, imageDict){ 
+
+			    		if( imagesMetaData[i].id == val )
+			    		{
+
+		    				$attachedImages.append("<li title='"+imageDict.name+"''><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/thumbnail/"+imageDict.id+"' target='_blank' data-id='"+imageDict.id+"'>"+imageDict.mimetype+"</a></li>");
+			    		}
+			    	});
+			    }
+
+
+			})
+		}
 
 		form.onsubmit = function(event) {
 
@@ -194,7 +227,7 @@
 			    // File(s) uploaded.
 			    $('#image-uploader-overlay').foundation('reveal', 'close');
 
-			    var $attachedImages = $(".leaflet-popup-content:visible").find("ul.attached-images");
+			    // var $attachedImages = $(".leaflet-popup-content:visible").find("ul.attached-images");
 
 			    var imagesList = $attachedImages.attr("data-image-list");
 
@@ -273,7 +306,6 @@
 		$ul.attr("data-image-list", JSON.stringify(imagesList));
 
 		imageEl.parent("li").remove();
-		console.log(imagesList);
 	}
 
 
@@ -307,7 +339,7 @@
 					<!-- <a href="#" data-reveal-id="myModal"></a> -->
 					<div class="button tiny expand" data-reveal-id="image-uploader-overlay">
 						<i class="fi-paperclip marker-popup-attach-icon"></i>
-						<span class="right" style="margin-right:0.7em;">Attach File</span>
+						<span class="right" style="margin-right:2em;">Attach File</span>
 					</div>
 				</div>
 			</div>
@@ -976,7 +1008,6 @@
 
 					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
 
-					console.log(updatedGeoJSON);
 					// Create a formdata object and add the files
 					// var imageData = new FormData();
 					// $.each(files, function(key, value)

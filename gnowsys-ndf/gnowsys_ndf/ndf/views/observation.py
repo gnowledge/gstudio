@@ -161,14 +161,18 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 			locs = len(app_set_element.location)
 			locations = app_set_element.location
-			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
-			# obj_count = app_element_content_objects.count()
+			file_metadata = []
+
+			# "[{"id":"5384b8f81d41c8399153dba5","name":"sample data","mimetype":""}]"
+			if unicode(each) == app_set_id:
+				print locations
 				
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
 									"locations": json.dumps(locations),
-									"total_locations": locs
+									"total_locations": locs,
+									"file_metadata":file_metadata
 								  })
 
 	
