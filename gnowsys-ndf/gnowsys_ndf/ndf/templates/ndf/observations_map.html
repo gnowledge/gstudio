@@ -129,24 +129,29 @@
 <body>
 	{% if mode == "edit" %}
 
-	<div id="image-uploader-overlay" class="reveal-modal small" style="z-index:10001;" data-reveal>
+	<div id="image-uploader-overlay" class="reveal-modal small" style="z-index:1001;" data-reveal>
 		<a class="close-reveal-modal">&#215;</a>
-		<h3 class="text-center">Attach Image</h3>
+		<h3 class="text-center">Attach File</h3>
 		<hr/>			
 		<form id="file-form" action="{% url 'save_image' groupid app_id app_set_id app_set_name_slug %}" method="POST">
 		{% csrf_token %}
 			<input type="file" id="file-select" name="doc[]" onchange="checkImageAttached(this.value)" />
 			<button type="submit" id="upload-button">Upload</button>
 		</form>
+		<input type="hidden" name="images-metadata" value="[]" data-images-metadata="[]">
 	</div>
 	
 	<script type="text/javascript"> 
+	
+	function imageHandler(tempMarker)
+	{
 		var form = document.getElementById('file-form');
 		var fileSelect = document.getElementById('file-select');
 		var uploadButton = document.getElementById('upload-button');
 
 
 		form.onsubmit = function(event) {
+
 			event.preventDefault();
 
 			// Update button text.
@@ -202,7 +207,8 @@
 
 			    	$attachedImages.attr("data-image-list", JSON.stringify(imagesList));
 
-			    	$attachedImages.append("<li><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/thumbnail/"+xhr.responseText+"' target='_blank' data-id='"+xhr.responseText+"'>"+fileSelect.value+"</a></li>")
+			    	$attachedImages.append("<li title='"+fileSelect.value+"''><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/thumbnail/"+xhr.responseText+"' target='_blank' data-id='"+xhr.responseText+"'>"+fileSelect.files[0].type+"</a></li>");
+			    	// fileSelect.files[0].type.split("/")[0]
 
 			    }
 
@@ -212,6 +218,33 @@
 				}
 
 			    uploadButton.innerHTML = 'Upload';
+
+			    // updating metadata of files
+			    var imagesMetaData = $("#image-uploader-overlay > input[name='images-metadata']").attr("value");
+
+			    imagesMetaData = JSON.parse(imagesMetaData);
+
+			    var flagIsInList = false;
+
+			    if (imagesMetaData.length > 0)
+			    {
+			    	$.each(imagesMetaData, function(i, val){ 
+
+			    		if( imagesMetaData[i].id == xhr.responseText )
+			    		{
+			    			flagIsInList = true;
+			    		}
+			    	});
+			    }
+			    
+			    if( (imagesMetaData.length == 0) || (!flagIsInList) )
+			    {
+			    	var tempDict = { "id": xhr.responseText, "name":fileSelect.value, "mimetype":fileSelect.files[0].type }
+
+			    	imagesMetaData.push(tempDict);
+			    	
+			    	$("#image-uploader-overlay > input[name='images-metadata']").attr("value", JSON.stringify(imagesMetaData));
+			    }
 			  }
 			  else
 			  {
@@ -223,29 +256,32 @@
 			xhr.send(formData);
 		}
 
-		function removeImage(imageEl)
-    	{
-    		// console.log(imageEl);
-    		var image_id = imageEl.attr("data-id"),
-    			$ul = imageEl.closest("ul.attached-images"),
-    			imagesList = JSON.parse($ul.attr("data-image-list"));
-
-    		imagesList.splice(imagesList.indexOf(image_id), 1);
-    		$ul.attr("data-image-list", JSON.stringify(imagesList));
-
-    		imageEl.parent("li").remove();
-    		console.log(imagesList);
-    	}
-
 		$(document).on('open', '#image-uploader-overlay[data-reveal]', function () {
 			fileSelect.value = "";
 			uploadButton.disabled = true;			
 		});
 
-		function checkImageAttached(imageValue)
-		{
-			uploadButton.disabled = (imageValue)? false:true;
-		}
+	}
+	function removeImage(imageEl)
+	{
+		// console.log(imageEl);
+		var image_id = imageEl.attr("data-id"),
+			$ul = imageEl.closest("ul.attached-images"),
+			imagesList = JSON.parse($ul.attr("data-image-list"));
+
+		imagesList.splice(imagesList.indexOf(image_id), 1);
+		$ul.attr("data-image-list", JSON.stringify(imagesList));
+
+		imageEl.parent("li").remove();
+		console.log(imagesList);
+	}
+
+
+	function checkImageAttached(imageValue)
+	{
+		var uploadButton = document.getElementById('upload-button');
+		uploadButton.disabled = (imageValue)? false:true;
+	}
 
 	</script>
 
@@ -271,7 +307,7 @@
 					<!-- <a href="#" data-reveal-id="myModal"></a> -->
 					<div class="button tiny expand" data-reveal-id="image-uploader-overlay">
 						<i class="fi-paperclip marker-popup-attach-icon"></i>
-						<span class="right" style="margin-right:0.7em;">Attach Image</span>
+						<span class="right" style="margin-right:0.7em;">Attach File</span>
 					</div>
 				</div>
 			</div>
@@ -676,6 +712,8 @@
 			// getting marker instance
 			tempMarker = this;
 
+			imageHandler(tempMarker);
+
 			// attaching datetimepicker after getting marker popup html
 			var popupHtmlObjDt = tempMarker._popup._contentNode.getElementsByClassName("marker-dtstamp");
 			$(popupHtmlObjDt).datetimepicker();
@@ -696,7 +734,6 @@
 				tags = this.feature.properties.tags,
 				created_by = this.feature.properties.created_by;
 				edited_by = this.feature.properties.edited_by;
-				// var $attachedImages = $(".leaflet-popup-content:visible").find("ul.attached-images");
 			 //    var imagesList = $attachedImages.attr("data-image-list");
 
 
@@ -721,6 +758,7 @@
 			$(popupHtmlObj).children("textarea.marker-obs-note").val(description);
 			$(popupHtmlObj).children("input.marker-tags").val(tags);
 			$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
+			// $(popupHtmlObj).children("div.images-list").find("ul.attached-images");
 			
 			{% comment %}
 			// {% if not user.is_authenticated %}
@@ -885,6 +923,7 @@
 						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
 						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
 						getImagesList = $(thisPopupContent).find("ul.attached-images").attr("data-image-list");
+
 						// getImage = $(thisPopupContent).children("input[type=file].image-upload");
 						// console.log(thisPopupContent.children);
 						{% if not user.is_authenticated %}
@@ -907,6 +946,7 @@
 					tempMarker.feature.properties.datetime = getDT;
 					tempMarker.feature.properties.description = getObsNote;//.replace(/'/gm, "");	// temp fix.
 					tempMarker.feature.properties.tags = getTags;
+					tempMarker.feature.properties.attached_files = getImagesList;
 
 					{% if not user.is_authenticated %}
 						tempMarker.feature.properties.created_by = "anonymous_{{client_ip}}_" + getCreator ;
@@ -936,7 +976,7 @@
 
 					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
 
-					// console.log(files);
+					console.log(updatedGeoJSON);
 					// Create a formdata object and add the files
 					// var imageData = new FormData();
 					// $.each(files, function(key, value)
@@ -1013,6 +1053,7 @@
 								tempMarker.feature.properties.description = description;
 								tempMarker.feature.properties.tags = tags;
 								tempMarker.feature.properties.created_by = created_by;
+								// tempMarker.feature.properties.attached_files = "";
 			  				}
 							
 				  		},// END OF success
