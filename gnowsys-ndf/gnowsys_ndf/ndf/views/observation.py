@@ -151,6 +151,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
 	app_collection_set = []
+	file_metadata = []
 
 	for each in app.collection_set:
 
@@ -161,18 +162,32 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 			locs = len(app_set_element.location)
 			locations = app_set_element.location
-			file_metadata = []
+			# file_metadata = []
 
 			# "[{"id":"5384b8f81d41c8399153dba5","name":"sample data","mimetype":""}]"
 			if unicode(each) == app_set_id:
-				print locations
-				
+				# file_metadata = []
+				for loc in locations:
+					files_list = ast.literal_eval(loc["properties"].get("attached_files", '[]'))
+					
+					for file_id in files_list:
+
+						file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+						# print file_id, "===", type(file_id)
+						
+						temp_dict = {}
+						temp_dict['id'] = file_obj._id.__str__()
+						temp_dict['name'] = file_obj.name
+						temp_dict['mimetype'] = file_obj.mime_type
+
+						file_metadata.append(temp_dict)
+			
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
 									"locations": json.dumps(locations),
 									"total_locations": locs,
-									"file_metadata":file_metadata
+									# "file_metadata":file_metadata
 								  })
 
 	
@@ -192,7 +207,8 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 							 		'groupid':group_id, 'group_id':group_id,
 							 		'app_name':app_name, 'app_id':app_id, 'app_set_id':app_set_id, 'app_set_name_slug':slug,
 							 		'user_name':user_name, 'client_ip':client_ip,
-							 		'template_view': 'app_set_view'
+							 		'template_view': 'app_set_view',
+							 		"file_metadata":file_metadata
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
