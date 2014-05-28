@@ -58,6 +58,7 @@ def dashboard(request, group_id):
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
     uploaded = "None"
+    print request.FILES.getlist("doc[]","")
 
     if request.method == "POST" :
       """
@@ -69,16 +70,18 @@ def dashboard(request, group_id):
     	fileobj = fcol.File()
     	filemd5 = hashlib.md5(each.read()).hexdigest()
     	if fileobj.fs.files.exists({"md5":filemd5}):
-    	  coll = get_database()['fs.files']
-    	  a = coll.find_one({"md5":filemd5})
-    	  # prof_image takes the already available document of uploaded image from its md5 
-    	  prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+            
+            coll = get_database()['fs.files']
+            a = coll.find_one({"md5":filemd5})
+        	# prof_image takes the already available document of uploaded image from its md5 
+    	    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
 
     	else:
-    	  # If uploaded image is not found in gridfs stores this new image 
-      	  submitDoc(request, group_id)
-      	  # prof_image takes the already available document of uploaded image from its name
-      	  prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+            print "\n\n :: not in gridfs or new file\n\n"
+        	# If uploaded image is not found in gridfs stores this new image 
+            submitDoc(request, group_id)
+      	    # prof_image takes the already available document of uploaded image from its name
+      	    prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
 
       # prof_img takes already available relation of user with its profile image
       prof_img = collection.GRelation.one({'subject': ObjectId(auth._id), 'right_subject': ObjectId(prof_image._id) })
