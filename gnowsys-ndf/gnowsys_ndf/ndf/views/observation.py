@@ -62,6 +62,7 @@ def all_observations(request, group_id, app_id=None):
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
 	app_collection_set = []
+	file_metadata = []
 
 	for each in app.collection_set:
 
@@ -72,6 +73,24 @@ def all_observations(request, group_id, app_id=None):
 
 			locs = len(app_set_element.location)
 			locations = app_set_element.location
+
+			for loc in locations:
+				files_list = ast.literal_eval(loc["properties"].get("attached_files", '[]'))
+				
+				for file_id in files_list:
+
+					# for preventing duplicate dict forming
+					if not file_id in [d['id'] for d in file_metadata]:
+
+						file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+						# print file_id, "===", type(file_id)
+						
+						temp_dict = {}
+						temp_dict['id'] = file_obj._id.__str__()
+						temp_dict['name'] = file_obj.name
+						temp_dict['mimetype'] = file_obj.mime_type
+
+						file_metadata.append(temp_dict)
 
 			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 			# obj_count = app_element_content_objects.count()
@@ -115,7 +134,8 @@ def all_observations(request, group_id, app_id=None):
 							 		'groupid':group_id, 'group_id':group_id,
 							 		'app_name':app_name, 'app_id':app_id,
 							 		'template_view': 'landing_page_view',
-							 		'map_type': 'all_app_markers'
+							 		'map_type': 'all_app_markers',
+									'file_metadata':json.dumps(file_metadata)
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
@@ -151,6 +171,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
 	app_collection_set = []
+	file_metadata = []
 
 	for each in app.collection_set:
 
@@ -161,14 +182,36 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 			locs = len(app_set_element.location)
 			locations = app_set_element.location
-			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
-			# obj_count = app_element_content_objects.count()
-				
+			# file_metadata = []
+
+			# "[{"id":"5384b8f81d41c8399153dba5","name":"sample data","mimetype":""}]"
+			if unicode(each) == app_set_id:
+				# file_metadata = []
+				for loc in locations:
+					files_list = ast.literal_eval(loc["properties"].get("attached_files", '[]'))
+					
+					for file_id in files_list:
+
+						# for preventing duplicate dict forming
+						if not file_id in [d['id'] for d in file_metadata]:
+
+							file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+							# print file_id, "===", type(file_id)
+							
+							temp_dict = {}
+							temp_dict['id'] = file_obj._id.__str__()
+							temp_dict['name'] = file_obj.name
+							temp_dict['mimetype'] = file_obj.mime_type
+
+							file_metadata.append(temp_dict)
+							# print file_metadata
+			
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
 									"name":app_set_element.name,
 									"locations": json.dumps(locations),
-									"total_locations": locs
+									"total_locations": locs,
+									# "file_metadata":file_metadata
 								  })
 
 	
@@ -181,21 +224,21 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	# 		obj_count = app_element_content_objects.count()
 				
 	# 	app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
-
+	
 	return render_to_response("ndf/observation.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
 							 		'groupid':group_id, 'group_id':group_id,
 							 		'app_name':app_name, 'app_id':app_id, 'app_set_id':app_set_id, 'app_set_name_slug':slug,
 							 		'user_name':user_name, 'client_ip':client_ip,
-							 		'template_view': 'app_set_view'
+							 		'template_view': 'app_set_view',
+							 		"file_metadata":json.dumps(file_metadata)
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
 
 
 def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
-
 	user_type = request.POST["user"]
 	user_session_id = request.POST["user_session_id"]
 	marker_geojson = request.POST["marker_geojson"]
@@ -320,3 +363,39 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 	response_data = json.dumps(response_data)
 
 	return StreamingHttpResponse(response_data)
+
+
+def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
+
+	if request.method == "POST" :
+            # for uploaded images saving
+            # print "\n\n=========", request.FILES.getlist("doc[]", ""), "\n\n"
+            for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+                
+                fcol = db[File.collection_name]
+                fileobj = fcol.File()
+                filemd5 = hashlib.md5(each.read()).hexdigest()
+                # print "\nmd5 : ", filemd5
+
+                if fileobj.fs.files.exists({"md5":filemd5}):
+
+                    coll = get_database()['fs.files']
+                    a = coll.find_one({"md5":filemd5})
+                    # prof_image takes the already available document of uploaded image from its md5 
+                    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+                    # print "======= ||| =====", prof_image
+	    	else:
+                    # print "\n\n index : ", index
+                    # If uploaded image is not found in gridfs stores this new image 
+                    submitDoc(request, group_id)
+                    
+                    # prof_image takes the already available document of uploaded image from its name
+                    coll = get_database()['fs.files']
+                    a = coll.find_one({"md5":filemd5})
+                    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+                    # prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+                    # print "------------", prof_image
+                    
+                    # --- END of images saving
+                    
+                return StreamingHttpResponse(str(prof_image._id))	
