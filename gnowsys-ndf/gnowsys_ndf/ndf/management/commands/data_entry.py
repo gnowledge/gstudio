@@ -274,7 +274,8 @@ def parse_data_create_gsystem(json_file_path):
                                         json_document[key] = None
                                     
                                 elif attr_value['data_type'] == datetime.datetime:
-                                    if key == "dob":
+
+                                    if key == "dob" or key == "date of birth":
                                         json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
                                     else:
                                         json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")

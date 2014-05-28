@@ -79,7 +79,6 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     if app_set_id:
       classtype = ""
       app_set_template = "yes"
-      print "\n Going here...\n"
       template = "ndf/"+template_prefix+"_list.html"
 
       systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
