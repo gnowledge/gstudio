@@ -62,6 +62,7 @@ def all_observations(request, group_id, app_id=None):
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
 	app_name = app.name
 	app_collection_set = []
+	file_metadata = []
 
 	for each in app.collection_set:
 
@@ -72,6 +73,24 @@ def all_observations(request, group_id, app_id=None):
 
 			locs = len(app_set_element.location)
 			locations = app_set_element.location
+
+			for loc in locations:
+				files_list = ast.literal_eval(loc["properties"].get("attached_files", '[]'))
+				
+				for file_id in files_list:
+
+					# for preventing duplicate dict forming
+					if not file_id in [d['id'] for d in file_metadata]:
+
+						file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+						# print file_id, "===", type(file_id)
+						
+						temp_dict = {}
+						temp_dict['id'] = file_obj._id.__str__()
+						temp_dict['name'] = file_obj.name
+						temp_dict['mimetype'] = file_obj.mime_type
+
+						file_metadata.append(temp_dict)
 
 			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 			# obj_count = app_element_content_objects.count()
@@ -115,7 +134,8 @@ def all_observations(request, group_id, app_id=None):
 							 		'groupid':group_id, 'group_id':group_id,
 							 		'app_name':app_name, 'app_id':app_id,
 							 		'template_view': 'landing_page_view',
-							 		'map_type': 'all_app_markers'
+							 		'map_type': 'all_app_markers',
+									'file_metadata':json.dumps(file_metadata)
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
@@ -172,15 +192,19 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 					
 					for file_id in files_list:
 
-						file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
-						# print file_id, "===", type(file_id)
-						
-						temp_dict = {}
-						temp_dict['id'] = file_obj._id.__str__()
-						temp_dict['name'] = file_obj.name
-						temp_dict['mimetype'] = file_obj.mime_type
+						# for preventing duplicate dict forming
+						if not file_id in [d['id'] for d in file_metadata]:
 
-						file_metadata.append(temp_dict)
+							file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+							# print file_id, "===", type(file_id)
+							
+							temp_dict = {}
+							temp_dict['id'] = file_obj._id.__str__()
+							temp_dict['name'] = file_obj.name
+							temp_dict['mimetype'] = file_obj.mime_type
+
+							file_metadata.append(temp_dict)
+							# print file_metadata
 			
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
@@ -200,7 +224,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 	# 		obj_count = app_element_content_objects.count()
 				
 	# 	app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
-
+	
 	return render_to_response("ndf/observation.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
@@ -208,7 +232,7 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 							 		'app_name':app_name, 'app_id':app_id, 'app_set_id':app_set_id, 'app_set_name_slug':slug,
 							 		'user_name':user_name, 'client_ip':client_ip,
 							 		'template_view': 'app_set_view',
-							 		"file_metadata":file_metadata
+							 		"file_metadata":json.dumps(file_metadata)
 							 	},
 							 	context_instance=RequestContext(request) 
 							 )
@@ -348,7 +372,6 @@ def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, s
             # print "\n\n=========", request.FILES.getlist("doc[]", ""), "\n\n"
             for index, each in enumerate(request.FILES.getlist("doc[]", "")):
                 
-                print "\n\n :::::  ", each
                 fcol = db[File.collection_name]
                 fileobj = fcol.File()
                 filemd5 = hashlib.md5(each.read()).hexdigest()
@@ -360,9 +383,9 @@ def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, s
                     a = coll.find_one({"md5":filemd5})
                     # prof_image takes the already available document of uploaded image from its md5 
                     prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
-                    print "======= ||| =====", prof_image
+                    # print "======= ||| =====", prof_image
 	    	else:
-                    print "\n\n index : ", index
+                    # print "\n\n index : ", index
                     # If uploaded image is not found in gridfs stores this new image 
                     submitDoc(request, group_id)
                     
@@ -371,7 +394,7 @@ def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, s
                     a = coll.find_one({"md5":filemd5})
                     prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
                     # prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
-                    print "------------", prof_image
+                    # print "------------", prof_image
                     
                     # --- END of images saving
                     
