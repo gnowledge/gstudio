@@ -35,7 +35,8 @@
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+
                 			
                 			{% endif %}
             			);	
@@ -119,9 +120,30 @@
 		<h2> Themes </h2> 
 		<a class="fold"><b><i class="fi-plus"></i> Fold </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
 		<a class="unfold"><b><i class="fi-minus"></i> Unfold </b></a>
+
+		{% if user.is_authenticated %}
+    		{% if user_access == "allow" %}
+    			<input class="button tiny deleteObjects right" type="button" value="Delete">
+    			<span class="right"><input class="checkedAll" type="checkbox"> Select All &nbsp;&nbsp;</span>
+
+    			<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+			        <h3>Are you sure you want to delete? All of the related items for the following themes also will be deleted:</h3> 
+			        
+			        <input class="button confirmDeleteObjects" type="button" value="Confirm">
+			        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+			        <div id="deletion_results"></div>
+			        <a class="close-reveal-modal">&#215;</a>
+
+		      	</div>
+
+    		{% endif %}
+		{% endif %}
+
 		<hr/>
 
 		{% if node %}
+
 			<!-- If "Theme" node -->
 			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
 			
@@ -136,7 +158,7 @@
     
       		<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
         
-		        <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
+		        <h3>Are you sure you want to delete? All of the related items for the following themes also will be deleted:</h3> 
 		        
 		        <input class="button confirmDeleteObjects" type="button" value="Confirm">
 		        <input class="button cancelDeleteObjects" type="button" value="Cancel">
@@ -304,42 +326,21 @@
 	            })
 
            		$.ajax({
-		            url: "{% url 'deletion_instances' groupid %}",
+		            url: "{% url 'delete_themes' groupid %}",
 		            type: 'POST',
 		            data:{
 		            	deleteobjects: str,
 		            	csrfmiddlewaretoken: '{{ csrf_token }}'
 		            },
-		            beforeSend: function() {  },
              		success: function(result){
 
              			$("#deletion_results").html("");
                         for(var obj in result)
                         {
-	                        var ulist = $("<ul>"+"</ul>")
-	                                    .attr("id","conceptlist")
-	                                    .appendTo($("#deletion_results"));
-	                        var li = $("<li><b>"+result[obj].title+"</b></li>")
-	                                    .appendTo(ulist);
-	                        var ulist1 = $("<ul>"+"</ul>")
-	                                    .attr("id","conceptlist")
-	                                    .appendTo(li);
-	                        for(var obj2 in result[obj].content)
-	                        {
-		                        object = result[obj].content[obj2]
-		                        for(var obj3 in  object)
-		                        {
-			                        for(var each in object[obj3])
-			                        {
-				                        var li1 = $("<li>"+object[obj3][each]+"</li>")
-				                                    .appendTo(ulist1);
-		                        	}
-	                    		}
-                        	}
+	                  		var li = $("<ul><li><b>"+result[obj].title+"</b></li></ul>").appendTo($("#deletion_results"));
                         }
 
              		},
-             		complete: function(){   }
              	});
 
            	}
@@ -374,24 +375,20 @@
 	            });
 
 	            $.ajax({
-	            	url: "{% url 'deletion_instances' groupid %}",
+	            	url: "{% url 'delete_themes' groupid %}",
 	             	type: 'POST',
 	             	data:{
 	             		deleteobjects: str,
-	             		csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"
+	             		confirm:"yes",
+	             		csrfmiddlewaretoken: '{{ csrf_token }}'
 	             	},
-	             	beforeSend: function() {  },
 	             	success: function(result){
+	             		alert("Themes deleted successfully");
+	             		location.reload(true);
 	             	},
-	             	complete: function(){ 
-	                	$('#myModal').foundation('reveal', 'close');
-	             	}
+	             	
 	            });
 	             
-	            $.map(selectedobject,function(each){
-	            	each.parentElement.parentElement.remove()
-	            });
-	            
 	            $('#myModal').foundation('reveal', 'close');
 	             
 	        }
