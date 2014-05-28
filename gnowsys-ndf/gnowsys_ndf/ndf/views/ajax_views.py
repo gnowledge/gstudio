@@ -346,6 +346,78 @@ def add_sub_themes(request, group_id):
       return HttpResponse("failure")
 
     return HttpResponse("None")
+
+
+
+def node_collection(node=None, group_id=None):
+
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+
+    if node.collection_set:
+      for each in node.collection_set:
+        
+        each_node = collection.Node.one({'_id': ObjectId(each)})
+        
+        if each_node.collection_set:
+          
+          node_collection(each_node, group_id)
+        else:
+          # After deleting theme instance it's should also remove from collection_set
+          cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+          for e in cur:
+            if each_node._id in e.collection_set:
+              collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
+
+
+          # print "\n node ", each_node.name ,"has been deleted \n"
+          each_node.delete()
+
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    else:
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    return True
+
+
+def delete_themes(request, group_id):
+  '''delete themes objects'''
+  send_dict = []
+  if request.is_ajax() and request.method =="POST":
+     deleteobjects = request.POST['deleteobjects']
+     confirm = request.POST.get("confirm","")
+  for each in  deleteobjects.split(","):
+      node = collection.Node.one({ '_id': ObjectId(each)})
+      # print "\n confirmed objects: ", node.name
+
+      if confirm:
+        node_collection(node, group_id)
+
+      else:
+        send_dict.append({"title":node.name})
+
+  return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
+
   
 
 @login_required
