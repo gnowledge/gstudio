@@ -363,30 +363,18 @@ def submitDoc(request, group_id):
     obj_id_instance = ObjectId()
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
-        print 'mtitle',mtitle
         userid = request.POST.get("user", "")
-        print 'userid',userid
         language = request.POST.get("lan", "")
-        print 'language',userid
         img_type = request.POST.get("type", "")
-        print 'img_type',userid
         usrname = request.user.username
-        print 'usrname',userid
         page_url = request.POST.get("page_url", "")
-        print 'page_url',userid
         content_org = request.POST.get('content_org', '')
-        print 'content_org',userid
         access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
-        print 'access_policy',userid
         tags = request.POST.get('tags')
-        print 'tags',userid
-        print "\n\n~~~~~~~~~~", request.FILES.getlist("doc[]", ""), "\n\n"
 
         i = 1
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-            # print "\n read file", each.read()
             if mtitle:
-                print "\n\nIt's multi\n\n"
                 if index == 0:
 
                     f = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
@@ -395,7 +383,6 @@ def submitDoc(request, group_id):
                     f = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
                     i = i + 1
             else:
-                print "\n\nIt's NON multi\n\n", each
                 title = each.name
                 f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
             if not obj_id_instance.is_valid(f):
@@ -421,9 +408,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
     this will create file object and save files in gridfs collection
     """
-    print "\n\n In save_file()\n\n"
-    print files,"\n",title,"\n", userid,"\n", group_id,"\n", content_org,"\n", tags, "\n",img_type, "\n",language ,"\n", usrname ,"\n", access_policy
-    # print "\n\n ==== files in save_file : ", files.read()
     global count,first_object
     fcol = db[File.collection_name]
     fileobj = fcol.File()
@@ -432,7 +416,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
     if fileobj.fs.files.exists({"md5":filemd5}):
-        print "\n\n in save_file(): file exist", files.name
         return files.name                                                                #return already exist file
     else:
         try:
@@ -810,8 +793,8 @@ def getFileThumbnail(request, group_id, _id):
 
     if file_node is not None:
         if file_node.fs_file_ids:
-            if (file_node.fs.files.exists(file_node.fs_file_ids[0])):
-                f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
+            if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
+                f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
                 return HttpResponse(f.read(), content_type=f.content_type)
             else:
                 return HttpResponse("")
