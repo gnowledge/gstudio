@@ -73,26 +73,23 @@
 
 <ul class="no-bullet" id="app-set-item"> 
 
-  {% for each in app_collection_set %}
-  
-    {% get_memberof_objects_count each.id groupid as count %}
+    {% get_memberof_objects_count theme_GST_id groupid as count %}
   
       <li class="selected-app-set-item"> 
         <div>
   		  {% if user_access == "allow" %}
-          <a href="{% url "theme_topic_create" groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
+          <a href="{% url "theme_topic_create" groupid app_id theme_GST_id %}" style="float:right" title="Add Theme">
             +&nbsp;Add
           </a>
           {% endif %}
 
-          <a href="{% url "theme_list" groupid app_id each.id %}" >
-            {{each.name}} ({{count}})
+          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" >
+            Theme ({{count}})
           </a> 
 
         </div>
       </li>
   
-  {% endfor %}
 </ul>
 <hr/>
 <br/>
