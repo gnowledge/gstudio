@@ -149,9 +149,9 @@ background-repeat:no-repeat; background-size: 48px 48px
          					
           					<div id="sub_theme" class="content">
           						<br/><br/>
-          						<label>{{title}} Name</label>
+          						<label>Theme Name</label>
 		    					<input id="sub_theme_id" type="text" placeholder="Enter name...">
-	    						<input id="save-sub-theme" value="Save" class="button medium-2 columns"> 
+	    						<input id="save-sub-theme" value="Save" class="button small medium-2 columns"> 
 	          					
           					</div>
           				</dd>
@@ -159,11 +159,26 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				</div>
 				<div class="small-7 columns">		
-					<a href="{% url "theme_topic_create" groupid app_id topic_GST_id %}"> <input class="small button split" disabled type="button" value=" + Add Topic"> </a>
+					<!-- <a href="{#% url "theme_topic_create" groupid app_id topic_GST_id %#}"> <input class="small button split" disabled type="button" value=" + Add Topic"> </a> -->
+
+					<dl class="accordion" data-accordion>
+		    			<dd>
+          					<a class="add_topic medium-4 columns" href="#add_topic"> + Add Topic </a>
+         					
+          					<div id="add_topic" class="content">
+          						<br/><br/>
+          						<label>Topic Name</label>
+		    					<input id="add_topic_id" type="text" placeholder="Enter name...">
+	    						<input id="save-topic" value="Save" class="button small medium-2 columns"> 
+	          					
+          					</div>
+          				</dd>
+          			</dl>
+
 				</div>
 				{% endif %}
 				<div class="small-12 columns">
-			  		<div id="collection_drawer" >
+			  		<div id="collection_drawer">
 
 			    		{% include "ndf/theme_drawer.html" %}
 
@@ -310,6 +325,39 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    });
 
   	});
+
+
+  	$("#add-topic").click(function() {
+
+	    // $.ajax({
+	    //   type: "POST",
+	    //   url: "{#% url 'add_topics' groupid %#}",
+	    //   datatype: "html",
+	    //   data:{
+	    //     context_node: "{{node.pk}}",
+	    //     nodes_list: "{{nodes_list}}",
+	    //     sub_theme_name: $("#add_topic_id").val(),
+	    //     csrfmiddlewaretoken: '{{ csrf_token }}'
+	    //   },
+	    //   success: function(data) {
+
+	    //   	var theme = $("#sub_theme_id").val();
+
+	    //   	if ($.trim(data) === "failure") {
+	    //   		alert("Topic name "+ topic +" already available, Please choose different name");
+	    //   	}
+
+	    //   	if ($.trim(data) === "None") {
+	    //   		alert("Please enter topic name");
+	    //   	}
+
+	    //     location.reload(true);
+	    //     $("#add_topic_id").val("");
+	    //   }
+	    // });
+
+  	});
+
 
 
 	$("#save-node").click(function() {

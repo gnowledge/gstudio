@@ -163,12 +163,13 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 					node = theme_GST
 				
 			else:
-				# For edititng themes 
 				themes_list_items = False				
 				create_edit = False
 				themes_hierarchy = True
 
 				theme_topic_node = collection.Node.one({'_id': ObjectId(app_GST._id)})
+
+				# For edititng themes 
 				if theme_GST._id in app_GST.member_of:
 					if name:
 						if not name.upper() in (theme_name.upper() for theme_name in root_themes):
@@ -196,7 +197,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 					if theme_GST:
 						node = theme_GST
 
-
+				# For editing topics
 				elif topic_GST._id in app_GST.member_of:
 					get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
 					theme_topic_node.save()
