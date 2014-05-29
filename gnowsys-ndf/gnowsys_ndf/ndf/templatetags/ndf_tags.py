@@ -549,6 +549,24 @@ def get_profile_pic(user):
 	return prof_pic
 
 
+@register.assignment_tag
+def get_theme_node(groupid, node):
+
+	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+	theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+
+	# code for finding nodes collection has only topic instances or not
+	# It checks if first element in collection is theme instance or topic instance accordingly provide checks
+	if node.collection_set:
+		collection_nodes = collection.Node.one({'_id': ObjectId(node.collection_set[0]) })
+		if theme_GST._id in collection_nodes.member_of:
+			return "Theme_Enabled"
+		if topic_GST._id in collection_nodes.member_of:
+			return "Topic_Enabled"
+		
+	else:
+		return True
+
 
 @register.assignment_tag
 def get_group_name(val):
