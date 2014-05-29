@@ -1,31 +1,19 @@
 {% extends "ndf/node_details_base.html" %}
 
-<!-- This page has been commented out, everything has been integrated to node_details_base-->
+{% block help_content %}
+  <p>
+    Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.
+  </p>
+  
+  <h5>Who can make a page?</h5>
+  <p>
+    Anyone with an account can create a new article. When creating a new article, the initial contributor can choose to have a defined list of authors, all of whom can edit the page, or have an open, wiki-like format where anyone can contribute.
+  </p>
+{% endblock %}
+
 
 {% block meta_content %}
-
-<p>
-{{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by <a href="#" class="user">{{ node.user_details_dict.created_by }}</a>
-</p>
-<p>
-	Contributors: {{ node.user_details_dict.contributors|join:', ' }}
-</p>
-<p>
-	Version{{ node.version_dict|length|pluralize }}: 
-	{% for seq_no, version_no in node.version_dict.items reversed %}
-	<abbr title={{version_no}}><a href="{% url 'node_version' groupid node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
-	{% endfor %}
-</p>
-
-<!-- Add button -->
-{% if user.is_authenticated %}
-<p>
-
-	<a href="{% url 'page_create_edit' groupid %}" class="button small">Create a new page</a>
-	<a href="{% url 'node_translation' groupid node %} " class="button small">Translate</a>
-
-</p>
-{% endif %}
-
+  <h2>Page</h2>
 {% endblock %}
+
 

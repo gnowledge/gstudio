@@ -1,24 +1,5 @@
 {% extends "ndf/node_details_base.html" %}
-{% load ndf_tags %}
 
-{% block add_list %}
-<h2> Heading 2</h2>
-
-{% get_grid_fs_object node as grid_fs_obj %}
-
-
-<li>
-<a href="{% url 'read_file' groupid node grid_fs_obj.filename %}" class="button tiny secondary"  download="{{ grid_fs_obj.filename }}">
-  <i class="fi-download large"> download  </i>
-</a>
-</li>
-{% endblock %}
-
-{% block add_fields %}
-{% get_grid_fs_object node as grid_fs_obj %}
-<div>
-  <a href="{% url 'getFullImage' groupid node grid_fs_obj.filename %}">
-    <img src="{% url 'getFullImage' groupid node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
-  </a>
-</div>
+{% block meta_content %}
+<h2>Media</h2>
 {% endblock %}

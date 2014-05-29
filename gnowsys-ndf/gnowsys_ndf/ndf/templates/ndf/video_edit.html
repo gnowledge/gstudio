@@ -1,2 +1,14 @@
 {% extends "ndf/node_edit_base.html" %}
 
+{% block meta_content %}
+
+<h2>Gallery</h2>
+
+{% if user.is_authenticated %}
+<br/>
+<a class="button small" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
+  <span class="fi-upload">  Upload File</span>
+</a>
+{% endif %}
+
+{% endblock %}
