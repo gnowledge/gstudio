@@ -258,6 +258,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   name = request.POST.get('name')
   sub_theme_name = request.POST.get("sub_theme_name", '')
+  add_topic_name = request.POST.get("add_topic_name", '')
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
@@ -296,6 +297,8 @@ def get_node_common_fields(request, node, group_id, node_type):
   node.name = unicode(name)
   if sub_theme_name:
     node.name = unicode(sub_theme_name) 
+  if add_topic_name:
+    node.name = unicode(add_topic_name)
 
   node.status = unicode("DRAFT")
   if language:

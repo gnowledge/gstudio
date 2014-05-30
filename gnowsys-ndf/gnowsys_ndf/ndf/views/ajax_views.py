@@ -325,7 +325,6 @@ def add_sub_themes(request, group_id):
     themes_list = ast.literal_eval(themes_list)
 
     theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
     context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
     
     # Save the sub-theme first  
@@ -338,6 +337,39 @@ def add_sub_themes(request, group_id):
         node.save()
         node.reload()
         # Add this sub-theme into context nodes collection_set
+        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        context_node.reload()
+
+        return HttpResponse("success")
+
+      return HttpResponse("failure")
+
+    return HttpResponse("None")
+
+
+def add_topics(request, group_id):
+  if request.is_ajax() and request.method == "POST":    
+    print "\n Inside add_topics ajax view\n"
+    context_node_id = request.POST.get("context_node", '')
+    add_topic_name = request.POST.get("add_topic_name", '')
+    topics_list = request.POST.get("nodes_list", '')
+    topics_list = topics_list.replace("&quot;","'")
+    topics_list = ast.literal_eval(topics_list)
+
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
+
+
+    # Save the topic first  
+    if add_topic_name:
+      print "\ntopic name: ", add_topic_name
+      if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
+        node = collection.GSystem()
+        get_node_common_fields(request, node, group_id, topic_GST)
+      
+        node.save()
+        node.reload()        
+        # Add this topic into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
         context_node.reload()
 
