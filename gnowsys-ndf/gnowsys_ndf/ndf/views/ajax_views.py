@@ -710,7 +710,44 @@ def get_data_for_drawer(request, group_id):
     data_list=set_drawer_widget(st,coll_obj_list)
     return HttpResponse(json.dumps(data_list))
 
-    
+def get_data_for_user_drawer(request, group_id):
+    '''
+    This method will return data for user widget
+    '''
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    drawer1 = []
+    drawer2 = []
+    data_list = []
+    all_batch_user = []
+    users = []
+    st_batch_id = request.GET.get('st_batch_id','')
+    if st_batch_id:
+        batch_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        group = collection.Node.one({'_id':ObjectId(group_id)})
+        if batch_coll:
+            for each in batch_coll:
+                users = users+each.author_set
+        else:
+            users = []
+        user_list = list(set(group.author_set) - set(users))
+        print user_list,"Test"
+        for each in user_list:
+            user= User.objects.get(id=each)
+            dic = {}
+            dic['id'] = user.id   
+            dic['name'] = user.username
+            d1.append(dic)
+        draw1['drawer1'] = d1
+        data_list.append(draw1)
+        draw1['drawer2'] = d2
+        data_list.append(draw1)
+        return HttpResponse(json.dumps(data_list))
+    else:
+        return HttpResponse("GSystemType for batch required")
+
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget

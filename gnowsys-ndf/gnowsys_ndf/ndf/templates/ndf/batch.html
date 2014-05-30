@@ -1,0 +1,136 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+{% block style %}
+<!-- Style for drawer widget -->
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer {
+border-color: #D3D3D3; border-style: solid;
+padding: 0 !important;
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px;
+background-repeat:no-repeat; background-size: 48px 48px
+<!-- End -->
+{% endblock %}
+
+{% block script %}
+
+function checkIt()
+{   
+var totla_users = '{{users_in_group|length}}'
+var batch_count = $('#txt_batch_count').val
+alert(batch_count,total_users)
+if (batch_count > total_users)   
+{      
+alert('No of batches should be less than No fo users in this group');
+     return false;   
+}   
+return true;
+}
+{% endblock %}
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  <li class="create card">
+  <div class="page">
+    <h4><i class="fi-plus"></i> New</h4>
+      {% if user.is_authenticated %}
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+      <a id ="btn_create" class="button expand" data-reveal-id="firstModal" href="">
+        Create {{title}}
+      </a>
+      {% endif %}
+      {% endif %}
+  </div>
+</li>
+
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+{% for node in batch_coll %}
+<li class="card">
+  <div class="page">
+    <header>
+      <div class="label-list">
+        {% for tag in node.tags %}
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        {% endfor %}
+      </div>
+      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+      <h4>{{ node.name }} 
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </h4>
+    </header>
+    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+    <a class="small button expand" href="{% url 'module_detail' group_name_tag node %}">Detail</a> 
+    {% get_user_object node.created_by as user_obj %}
+    {% ifequal user_obj.username user.username %}
+    <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
+    {% endifequal %}
+    
+    <footer class="row">
+    </footer>
+  </div>
+</li>  
+{% endfor %}
+</ul>
+
+
+
+<!-- Reveal Modals begin -->
+
+<div id="firstModal" class="reveal-modal" data-reveal>
+<form data-abide id="form-create-batch" method="POST" action="{% url 'create' groupid %}" onsubmit="return checkIt();">{% csrf_token %}
+<div class="row">
+  <div class="small-2 large-4 columns">
+    <b>Users Present in this group:{{users_in_group|length}}</b>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="large-4 columns">
+    <label>Enter No Of Batches to Create
+      <input type="text" pattern="\d*" id="txt_batch_count" name="batch_count" placeholder="Enter Number Only" required>
+    </label>
+    <small class="error">Entered value should be numbers</small>
+  </div>
+</div>
+
+<div class="row">
+  <div class="large-4 columns">
+    <input type="submit" class="button"  value="Next" />
+  </div>
+</div>
+<a class="close-reveal-modal">&#215;</a>
+</form>
+</div>
+
+<!-- Reveal Model end -->
+
+
+{% paginate %}
+{% endblock %}
