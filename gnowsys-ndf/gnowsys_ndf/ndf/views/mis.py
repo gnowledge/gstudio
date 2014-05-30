@@ -176,9 +176,17 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
 
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id
-
-                                        , "node":system, 'group_id':group_id, "property_display_order": property_display_order})
+    variable = RequestContext(request, {
+                                        'groupid':group_id, 'app_name':app_name, 'app_id':app_id,
+                                        "app_collection_set":app_collection_set, "app_set_id":app_set_id, 
+                                        "nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template,
+                                        "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name,
+                                        "app_set_instance_name":app_set_instance_name, "title":title,
+                                        "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 
+                                        'tags':tags, 'location':location, "content":content, "system_id":system_id,
+                                        "system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id,
+                                        "node":system, 'group_id':group_id, "property_display_order": property_display_order
+                                        })
 
     return render_to_response(template, variable)
       

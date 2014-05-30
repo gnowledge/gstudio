@@ -410,12 +410,13 @@ $(document).foundation({
 
 
    // for datetimepicker
-   
-   var startDtInput = $("font:contains('start_time')");
-   startDtInput = startDtInput.parent().next().find("input");
+   var startDtInput = $("font:contains('start_time'), font:contains('Start Time')").parent().next().find("input");
+   // var startDtInput = $("font:contains('start_time'), font:contains('Start Time')");
+   // startDtInput = startDtInput.parent().next().find("input");
 
-   var endDtInput = $("font:contains('end_time')");
-   endDtInput = endDtInput.parent().next().find("input");
+   var endDtInput = $("font:contains('end_time'), font:contains('End Time')").parent().next().find("input");
+   // var endDtInput = $("font:contains('end_time')");
+   // endDtInput = endDtInput.parent().next().find("input");
 
    // if(startDtInput.length > 0){ startDtInput.datetimepicker( { hourGrid: 6, minuteGrid: 15 }); }
    
