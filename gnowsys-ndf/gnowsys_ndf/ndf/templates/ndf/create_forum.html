@@ -50,17 +50,28 @@
   
 {% endblock %}
 
-{% block meta_content %}
-    
 
+{% block meta_content %}
+  <h3>Starting Discussions</h3>
+  <p class="text-justify">Use a relevant topic for the <b>forum</b> so that interested people can join the discussion</p>
 {% endblock %}
 
 
-{% block concern_information %}
-
-  <h3>Starting Discussions</h3>
-  <p>Use a relevant topic for the forum so that interested people can join the discussion</p>
-
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="forum">
+      <br/>
+      <a class="button medium" href="{% url 'create_forum' group_name_tag %}">
+       <span class="fi-plus">&nbsp;&nbsp;New Forum</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
 {% endblock %}
 
 

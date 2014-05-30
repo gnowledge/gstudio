@@ -320,26 +320,136 @@ def add_sub_themes(request, group_id):
 
     context_node_id = request.POST.get("context_node", '')
     sub_theme_name = request.POST.get("sub_theme_name", '')
+    themes_list = request.POST.get("nodes_list", '')
+    themes_list = themes_list.replace("&quot;","'")
+    themes_list = ast.literal_eval(themes_list)
 
     theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
     context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
     
     # Save the sub-theme first  
     if sub_theme_name:
+      if not sub_theme_name.upper() in (theme_name.upper() for theme_name in themes_list):
 
-      node = collection.GSystem()
-      get_node_common_fields(request, node, group_id, theme_GST)
+        node = collection.GSystem()
+        get_node_common_fields(request, node, group_id, theme_GST)
       
-      node.save()
-      node.reload()
-      # Add this sub-theme into context nodes collection_set
-      collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
-      context_node.reload()
+        node.save()
+        node.reload()
+        # Add this sub-theme into context nodes collection_set
+        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        context_node.reload()
 
-      return HttpResponse("success")
-    else:
+        return HttpResponse("success")
+
       return HttpResponse("failure")
+
+    return HttpResponse("None")
+
+
+def add_topics(request, group_id):
+  if request.is_ajax() and request.method == "POST":    
+    print "\n Inside add_topics ajax view\n"
+    context_node_id = request.POST.get("context_node", '')
+    add_topic_name = request.POST.get("add_topic_name", '')
+    topics_list = request.POST.get("nodes_list", '')
+    topics_list = topics_list.replace("&quot;","'")
+    topics_list = ast.literal_eval(topics_list)
+
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
+
+
+    # Save the topic first  
+    if add_topic_name:
+      print "\ntopic name: ", add_topic_name
+      if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
+        node = collection.GSystem()
+        get_node_common_fields(request, node, group_id, topic_GST)
+      
+        node.save()
+        node.reload()        
+        # Add this topic into context nodes collection_set
+        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        context_node.reload()
+
+        return HttpResponse("success")
+
+      return HttpResponse("failure")
+
+    return HttpResponse("None")
+
+
+
+def node_collection(node=None, group_id=None):
+
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+
+    if node.collection_set:
+      for each in node.collection_set:
+        
+        each_node = collection.Node.one({'_id': ObjectId(each)})
+        
+        if each_node.collection_set:
+          
+          node_collection(each_node, group_id)
+        else:
+          # After deleting theme instance it's should also remove from collection_set
+          cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+          for e in cur:
+            if each_node._id in e.collection_set:
+              collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
+
+
+          # print "\n node ", each_node.name ,"has been deleted \n"
+          each_node.delete()
+
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    else:
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    return True
+
+
+def delete_themes(request, group_id):
+  '''delete themes objects'''
+  send_dict = []
+  if request.is_ajax() and request.method =="POST":
+     deleteobjects = request.POST['deleteobjects']
+     confirm = request.POST.get("confirm","")
+  for each in  deleteobjects.split(","):
+      node = collection.Node.one({ '_id': ObjectId(each)})
+      # print "\n confirmed objects: ", node.name
+
+      if confirm:
+        node_collection(node, group_id)
+
+      else:
+        send_dict.append({"title":node.name})
+
+  return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
+
   
 
 @login_required

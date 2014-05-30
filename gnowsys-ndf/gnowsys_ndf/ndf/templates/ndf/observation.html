@@ -16,12 +16,13 @@
 <!-- Concern Information Block -->
 {% block concern_information %}
 <div>
-	<h4>Observations</h4>
+	<!-- <h4>Observations</h4> -->
+	<h4 title="All Observations"><a href='{% url "all_observations" groupid %}'>Observations</a></h4>
 	<hr>
 	
 	<ul class="no-bullet" id="app-set-item">
 		{% for each in app_collection_set %}
-			<a href="{% url "observations_app" groupid app_id each.name|slugify each.id %}">
+			<a href='{% url "observations_app" groupid app_id each.name|slugify each.id %}'>
 				
 			{% if app_set_name_slug == each.name|slugify %}
 				<li class="{{each.name|slugify}} selected-app-set-item" id="{{each.id}}">

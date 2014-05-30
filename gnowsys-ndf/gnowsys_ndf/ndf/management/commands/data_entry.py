@@ -274,7 +274,8 @@ def parse_data_create_gsystem(json_file_path):
                                         json_document[key] = None
                                     
                                 elif attr_value['data_type'] == datetime.datetime:
-                                    if key == "dob":
+
+                                    if key == "dob" or key == "date of birth":
                                         json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
                                     else:
                                         json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")
@@ -441,16 +442,16 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                     ("religion", "Religion"),
                     ("languages_known", "Languages Known"),
                     ("mobile_number", "Contact Number (Mobile)"),
-                    ("alternate_number", "Alternate Number/Landline"),
+                    ("alternate_number", "Alternate Number / Landline"),
                     ("email_id", "Email ID")
                 ]
 
             if gsystem_type_name in ["College", "University", "Student", "Voluntary Teacher"]:
                 address_details = [
-                    ("house_street", "House No./Street Name"),
+                    ("house_street", "House / Street"),
                     ("village", "Village"),
                     ("taluka", "Taluka"),
-                    ("town_city", "Town/City"),
+                    ("town_city", "Town / City"),
                     ("pin_code", "Pin Code")
                 ]
 
@@ -463,7 +464,7 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                 ]
 
                 education_details = [
-                    ("degree_name", "Highest degree_name"),
+                    ("degree_name", "Degree Name / Highest Degree"),
                     ("degree_specialization", "Degree Specialization"),
                     ("degree_passing_year", "Year of Passing Degree"),
                     ("other_qualifications", "Any other Qualification")
@@ -483,11 +484,11 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
                 ]
 
                 graduation_details = [
-                    ("person_belongs_to_college", "College (Graduation)"),
-                    ("degree_name", "Course/Stream"),
+                    ("student_belongs_to_college", "College (Graduation)"),
+                    ("degree_name", "Degree Name / Highest Degree"),
                     ("degree_year", "Year of Study"),
-                    ("college_enroll_num", "College Enrollment No./Roll No."),
-                    ("person_belongs_to_university", "University"),
+                    ("college_enroll_num", "College Enrolment Number / Roll No"),
+                    ("student_belongs_to_university", "University"),
                     ("is_nss_registered", "Are you registered for NSS?"),
                     ("is_dropout_student", "Are you a dropout student?")
                 ]
