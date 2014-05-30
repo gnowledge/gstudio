@@ -41,6 +41,20 @@ def get_all_gapps():
   all_gapps=coln.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type_gapp._id]}}]})    
   return list(all_gapps)
 
+#checks forum notification turn off for an author object
+def forum_notification_status(group_id,user_id):
+  grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
+  auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
+  at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
+  if at_user_pref:
+    poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
+    if poss_attrs:
+      list_at_pref=poss_attrs['user_preference_off']['object_value']
+      if grp_obj in list_at_pref:
+        return False
+      else:
+        return True
+
 def get_forum_repl_type(forrep_id):
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
