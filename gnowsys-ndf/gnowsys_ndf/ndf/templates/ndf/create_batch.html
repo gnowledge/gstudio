@@ -72,6 +72,25 @@ $("#save-node").click(function() {
 $("#collection_set_list").val(cn_arr)
 alert(cn_arr);
 });
+
+<!-- script for making batch name -->
+$('#sel_course').change(function () {
+     var optionSelected = $(this).find("option:selected");
+     var textSelected   = optionSelected.text();
+     var  batch_name = textSelected + "-Batch-" + '{{batch_count}}'
+   
+     if(textSelected == "--select--")
+     {
+         $('#txt_batch_name').val(" ")
+     }
+     else
+     {
+         $('#txt_batch_name').val(batch_name)
+     }
+   
+ });
+<!-- end-->
+
 {% endblock %}
 
 
@@ -79,25 +98,24 @@ alert(cn_arr);
 <form data-abide id="form-create-batch" method="POST" action="{% url 'save' groupid %}">{% csrf_token %}
   <div class="row">
     <div class="large-9 columns">
-      <label>Enter Batch Name
-	<input type="text" placeholder="Batch Name" name="batch_name" />
-	<input type="hidden" name="batch_count" value="{{batch_count}}"/>
-      </label>
-    </div>
-  </div>
-  <div class="row">
-    <div class="large-9 columns">
       <label>select course
-	<select>
-          <option value="course1">Course1</option>
-          <option value="course2">Course2</option>
-          <option value="course3">Course3</option>
-          <option value="course1">Course4</option>
+	<select name="courses" id="sel_course">
+	  <option value="">--select--</option>
+	  {% for each in fc_courses %}
+          <option value="{{each.pk}}">{{each.name}}</option>
+          {% endfor %}
 	</select>
       </label>
     </div>
   </div>
-  
+   <div class="row">
+    <div class="large-9 columns">
+      <label>Enter Batch Name
+	<input type="text" placeholder="Batch Name" id="txt_batch_name" name="batch_name" />
+	<input type="hidden" name="batch_count" value="{{batch_count}}"/>
+      </label>
+    </div>
+  </div>
   <div class="row">
     <div class="large-11 columns" >
       <label><h3>Choose users</h3>

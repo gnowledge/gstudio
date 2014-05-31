@@ -46,6 +46,47 @@ alert('No of batches should be less than No fo users in this group');
 }   
 return true;
 }
+
+<!-- Ajax for getting user List  -->
+  jQuery(document).ready(function($) { 
+  $('.small.button.expand').on("click",function() {
+  node_id = $(this).attr("id")
+  var ajurl ="{% url 'get_author_set_users' groupid %}?_id="+node_id;
+  $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#batch_users').html(data); },
+  }); });
+  
+<!-- End Ajax -->
+
+
+<!-- Ajax for removing user from  List  -->
+  $(document).on('click',".button.alert.tiny.remove",function(){
+  user_id = $(this).attr("id")
+  node_id = $('#node_id').val()
+  var ajurl ="{% url 'remove_user_from_author_set' groupid %}?_id="+node_id+"&user_id="+user_id;
+   $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#batch_users').html(data); },
+  });}); 
+
+  });
+<!-- End Ajax -->
+
+<!-- Script to validate form -->
+$("form").submit(function(event) {
+var len_user = '{{users_in_group|length}}'
+var txt_input = $("#txt_batch_count").val()
+if(txt_input > len_user)
+{
+ alert("No of batches should not be more than No of Users");
+ event.preventDefault();
+}
+});
+<!-- End -->
+
 {% endblock %}
 
 {% block body_content %}
@@ -86,12 +127,11 @@ return true;
       </h4>
     </header>
     <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-    <a class="small button expand" href="{% url 'module_detail' group_name_tag node %}">Detail</a> 
+    <a  class="small button expand" href="#" data-reveal-id="batch_users" id="{{node.pk}}">Detail</a> 
     {% get_user_object node.created_by as user_obj %}
     {% ifequal user_obj.username user.username %}
     <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
     {% endifequal %}
-    
     <footer class="row">
     </footer>
   </div>
@@ -104,7 +144,7 @@ return true;
 <!-- Reveal Modals begin -->
 
 <div id="firstModal" class="reveal-modal" data-reveal>
-<form data-abide id="form-create-batch" method="POST" action="{% url 'create' groupid %}" onsubmit="return checkIt();">{% csrf_token %}
+<form data-abide id="form-create-batch" method="POST" action="{% url 'create' groupid %}">{% csrf_token %}
 <div class="row">
   <div class="small-2 large-4 columns">
     <b>Users Present in this group:{{users_in_group|length}}</b>
@@ -128,7 +168,8 @@ return true;
 <a class="close-reveal-modal">&#215;</a>
 </form>
 </div>
-
+<div id="batch_users" class="reveal-modal" data-reveal>
+</div>
 <!-- Reveal Model end -->
 
 
