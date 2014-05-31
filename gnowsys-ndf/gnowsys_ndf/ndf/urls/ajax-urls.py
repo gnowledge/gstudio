@@ -25,6 +25,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^get_visited_location/', 'get_visited_location', name='get_visited_location'),
 		       url(r'^get_online_editing_user/', 'get_online_editing_user', name="get_online_editing_user"),
                        url(r'^get_author_set_users/', 'get_author_set_users', name="get_author_set_users"),
-                       url(r'^get_filterd_user_list/', 'get_filterd_user_list', name="get_filterd_user_list")
+                        url(r'^remove_user_from_author_set/', 'remove_user_from_author_set', name="remove_user_from_author_set"),
+                       url(r'^get_filterd_user_list/', 'get_filterd_user_list', name="get_filterd_user_list"),
+                       url(r'^get_data_for_user_drawer/', 'get_data_for_user_drawer', name='get_data_for_user_drawer'),
                        
 )
