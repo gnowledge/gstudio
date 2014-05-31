@@ -27,7 +27,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
@@ -123,11 +123,10 @@ def collection_nav(request, group_id):
     
     if request.is_ajax() and request.method == "POST":    
       node_id = request.POST.get("node_id", '')
-
+      
       collection = db[Node.collection_name]
 
       node_obj = collection.Node.one({'_id': ObjectId(node_id)})
-
       return render_to_response('ndf/node_ajax_view.html', 
                                   { 'node': node_obj,
                                     'group_id': group_id,
@@ -314,6 +313,144 @@ def get_tree_hierarchy(request, group_id, node_id):
 
     return HttpResponse(json.dumps(data))
 
+
+def add_sub_themes(request, group_id):
+
+  if request.is_ajax() and request.method == "POST":    
+
+    context_node_id = request.POST.get("context_node", '')
+    sub_theme_name = request.POST.get("sub_theme_name", '')
+    themes_list = request.POST.get("nodes_list", '')
+    themes_list = themes_list.replace("&quot;","'")
+    themes_list = ast.literal_eval(themes_list)
+
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
+    
+    # Save the sub-theme first  
+    if sub_theme_name:
+      if not sub_theme_name.upper() in (theme_name.upper() for theme_name in themes_list):
+
+        node = collection.GSystem()
+        get_node_common_fields(request, node, group_id, theme_GST)
+      
+        node.save()
+        node.reload()
+        # Add this sub-theme into context nodes collection_set
+        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        context_node.reload()
+
+        return HttpResponse("success")
+
+      return HttpResponse("failure")
+
+    return HttpResponse("None")
+
+
+def add_topics(request, group_id):
+  if request.is_ajax() and request.method == "POST":    
+    print "\n Inside add_topics ajax view\n"
+    context_node_id = request.POST.get("context_node", '')
+    add_topic_name = request.POST.get("add_topic_name", '')
+    topics_list = request.POST.get("nodes_list", '')
+    topics_list = topics_list.replace("&quot;","'")
+    topics_list = ast.literal_eval(topics_list)
+
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
+
+
+    # Save the topic first  
+    if add_topic_name:
+      print "\ntopic name: ", add_topic_name
+      if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
+        node = collection.GSystem()
+        get_node_common_fields(request, node, group_id, topic_GST)
+      
+        node.save()
+        node.reload()        
+        # Add this topic into context nodes collection_set
+        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        context_node.reload()
+
+        return HttpResponse("success")
+
+      return HttpResponse("failure")
+
+    return HttpResponse("None")
+
+
+
+def node_collection(node=None, group_id=None):
+
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+
+    if node.collection_set:
+      for each in node.collection_set:
+        
+        each_node = collection.Node.one({'_id': ObjectId(each)})
+        
+        if each_node.collection_set:
+          
+          node_collection(each_node, group_id)
+        else:
+          # After deleting theme instance it's should also remove from collection_set
+          cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+          for e in cur:
+            if each_node._id in e.collection_set:
+              collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
+
+
+          # print "\n node ", each_node.name ,"has been deleted \n"
+          each_node.delete()
+
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    else:
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    return True
+
+
+def delete_themes(request, group_id):
+  '''delete themes objects'''
+  send_dict = []
+  if request.is_ajax() and request.method =="POST":
+     deleteobjects = request.POST['deleteobjects']
+     confirm = request.POST.get("confirm","")
+  for each in  deleteobjects.split(","):
+      node = collection.Node.one({ '_id': ObjectId(each)})
+      # print "\n confirmed objects: ", node.name
+
+      if confirm:
+        node_collection(node, group_id)
+
+      else:
+        send_dict.append({"title":node.name})
+
+  return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
+
+  
 
 @login_required
 def change_group_settings(request,group_id):
@@ -875,4 +1012,38 @@ def get_online_editing_user(request, group_id):
         userslist.append("No users")
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
         
-
+def get_author_set_users(request, group_id):
+    '''
+    This ajax function will give all users present in node's author_set field
+    '''
+    user_list = []
+    if request.is_ajax():
+        _id = request.GET.get('_id',"")
+        node = collection.Node.one({'_id':ObjectId(_id)})
+        if node._type == 'Group':
+            for each in node.author_set:
+                user_list.append(User.objects.get(id = each))
+            return render_to_response("ndf/refresh_subscribed_users.html", 
+                                       {"user_list":user_list}, 
+                                       context_instance=RequestContext(request)
+            )
+        else:
+            return "node provide is not a Group type"
+    else:
+        return "Invalid ajax call"
+                
+def get_filterd_user_list(request, group_id):
+    '''
+    This function will return (all user's) - (subscribed user for perticular group) 
+    '''
+    user_list = []
+    if request.is_ajax():
+        _id = request.GET.get('_id',"")
+        node = collection.Node.one({'_id':ObjectId(_id)})
+        all_users_list =  [each.username for each in User.objects.all()]
+        if node._type == 'Group':
+            for each in node.author_set:
+                user_list.append(User.objects.get(id = each).username)
+        print all_users_list,set(user_list)
+        filtered_users = list(set(all_users_list) - set(user_list))
+        return HttpResponse(json.dumps(filtered_users))

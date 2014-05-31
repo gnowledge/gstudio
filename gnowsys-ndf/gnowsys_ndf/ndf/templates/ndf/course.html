@@ -1,57 +1,126 @@
 {% extends "ndf/base.html" %}
-{% load pagination_tags %}
+
 {% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
 {% block title %} {{title}} {% endblock %}
+
+{% block help_content %}
+<p>About Course... <em>coming soon</em></p>
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2>Courses</h2>
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="course">
+      <br/>
+      <a class="button medium" href="{% url 'create_edit' group_name_tag %}">
+        <span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+
 {% block body_content %}
 
-{% autopaginate course_coll 23 %}
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-  <li class="create card">
-  <div class="page">
-    <h4><i class="fi-plus"></i> New</h4>
-      {% if user.is_authenticated %}
-      <a class="button expand" href="{% url 'create_edit' groupid %}">
-        Create {{title}}
-      </a>
-      {% endif %}
-  </div>
-</li>
+<header class="row">
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Courses {% if course_coll.count %}({{ course_coll.count }}){% endif %}</a></dd>
+  </dl>
+</header>
 
-{% for node in course_coll %}
-<li class="card">
-  <div class="page">
-    <header>
-      <div class="label-list">
-        {% for tag in node.tags %}
-        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-        {% endfor %}
-      </div>
-      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-      <h4>{{ node.name }}
-        <div>
-          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-          </small>
-        </div>
-      </h4>
-    </header>
-    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-    <a class="small button expand" href="{% url 'course_detail' groupid node %}">Detail</a>
-    {% comment %}
-    {% get_user_object node.created_by as user_obj %}
-    {% ifequal user_obj.username user.username %}
-    <a class="button alert tiny" href="{% url 'delete_module' groupid node %}?next={{request.path}}">Delete </a>
-    {% endifequal %}
-    {% endcomment %}
-    <footer class="row">
-    </footer>
+{% if searching and course_coll.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{course_coll.count}} {{title|lower}}{{course_coll.count|pluralize}}.</span></p>
   </div>
-</li>  
-{% endfor %}
+</div>
+
+{% elif searching and course_coll.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert">No {{title|lower}}{{course_coll.count|pluralize}} matched your search criteria!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+  {% autopaginate course_coll 23 %}
+
+  {% for course in course_coll %}
+  <li class="card">
+    <div class="course">
+      <header>
+        <div class="label-list">
+          {% for tag in course.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          {% endfor %}
+        </div>
+
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+        
+        <h4>{{ course.name|truncatechars:20 }}
+          <div>
+            <small class="subheader">{{ course.member_of_names_list|join:', ' }} created {{course.created_at|timesince}} ago 
+            <br/>
+            by <span href="#" class="user" data-gnow="">{{course.user_details_dict.created_by}}</span> 
+            </small>
+          </div>
+        </h4>
+      </header>
+    
+      <p>{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+      
+      <a class="small button expand" href="{% url 'course_detail' group_name_tag course %}">View Details</a>
+
+      {% comment %}
+      {% get_user_object node.created_by as user_obj %}
+      {% ifequal user_obj.username user.username %}
+      <a class="button alert tiny" href="{% url 'delete_module' group_name_tag course %}?next={{request.path}}">Delete </a>
+      {% endifequal %}
+      {% endcomment %}
+
+      <footer class="row">
+        <div class="small-7 columns"><strong>{{course.contributors|length}}</strong> Contributor{{course.contributors|pluralize}}</div>
+        <div class="small-5 columns"><div class="right"><strong>{{course.version_dict|length}}</strong> Edit{{course.version_dict|pluralize}}</div></div>
+      </footer>
+
+    </div>
+  </li>
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-12 columns">
+        <h5>This group doesn't have any courses. <b>Be the first to create a Course!</b></h5>
+      </div>
+    </div>
+    {% endif %}
+  
+  {% endfor %}
+
 </ul>
 
-
-
-
-
 {% paginate %}
+
 {% endblock %}

@@ -9,6 +9,22 @@ from django.contrib.auth.decorators import login_required
   var chk_login = "{{ user }}";
 </script>
 
+<!-- Ajax for getting user List  -->
+<script type="text/javascript">
+  jQuery(document).ready(function($) { 
+  $('#btn_list_member').on("click",function() {
+  var ajurl ="{% url 'get_author_set_users' groupid %}?_id={{node.pk}}";
+  $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#firstModal').html(data); },
+  }); });
+  });
+
+</script> 
+<!-- End Ajax -->
+
+
 <script type="text/javascript">
 //function to toggle the lable Join and Unsubscribe
 function change_label(label)
@@ -72,9 +88,9 @@ $(document).ready(function()
    {
      notify(groupn,"join");
      change_label("Join");
-     label="Unsubscribed"
+     label="Unsubscribe"
    }
-   else if (label == "Unsubscribed")
+   else if (label == "Unsubscribe")
    {
     notify(groupn,"remove");
     change_label("remove");
@@ -104,19 +120,31 @@ $(document).ready(function()
 
 <p> Members in this group :{{node.author_set|length}} </p>
 
+{% get_policy node request.user as policy  %}
+{% if policy %}
+<!-- Triggers the modals -->
+<a href="#" id ="btn_list_member"data-reveal-id="firstModal" class="radius button">List Members</a>
+
+<!-- Reveal Modals begin -->
+<div id="firstModal" class="reveal-modal" data-reveal>
+
+</div>
+{% endif %}
+<!-- Reveal Model end -->
+
 {% get_group_policy node request.user as policy %}
 {% get_prior_post_node  group_id as groupname     %}
 
 {% check_user_join request groupid as user_is_joined %}
 <input type="hidden" id="groupname" value="{{node}}">
 {% if user_is_joined == "joined" %}
-  {% if is_user_group %}
+  {% if is_user_group and node.created_by != request.user %}
        <input class="button tiny" type="submit" id="notify" value="Stop following" class="button" align="center" style="visibility:visible" >
   {% else %}
        <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible">
   {% endif %} 
 {% elif user_is_joined == "not" or not user.is_authenticated  %}
-  {% if is_user_group %}
+  {% if is_user_group and node.created_by != request.user %}
        <input class="button tiny" type="submit" id="notify" value="Follow" class="button" align="center" style="visibility:visible" >
   {% else %}
        <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >

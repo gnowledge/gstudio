@@ -1,29 +1,51 @@
 {% extends "ndf/base.html" %}
+{% load ndf_tags %}
+
 {% block title %} {{title}} {% endblock %}
 
-{% block meta_content %}
+{% block help_content %}
+<h3>About Quiz/QuizItem</h3>
+<p class="text-justify">By <b>Quiz Item</b>, you can create a miscellaneous quiz-question. This quiz-question can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
 
-
-    <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
-
-    <p class="text-justify">You can build a quiz in two ways:
-      <ol  class="text-justify">
-	<li>By editing, Quiz node (via collection-list).</li>
-	<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
-      </ol>
-    </p>
-
-
-
-<p><h5>Number of Quiz nodes: <b>{{ quiz_nodes_count }}</b></h5></p>
-
-
-
-
+<p class="text-justify">By <b>Quiz</b>, you can build a quiz having list of quiz-items. Quiz-Items can be added to quiz in two ways:
+  <ol  class="text-justify">
+   <li>By editing, Quiz node (via collection-list).</li>
+   <li>By using Quiz-Item button corresponding to the Quiz node (i.e. this will automatically add the quiz-item node to your quiz node).</li>
+ </ol>
+</p>
 {% endblock %}
 
-{% block body_content %} 
 
+{% block meta_content %}
+  <h2>Quizzes</h2>
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+   {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="quiz">
+      <br/>
+      <a class="button medium" href="{% url 'quiz_create' group_name_tag %}">
+	       <span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+
+{% block body_content %} 
+{% get_group_name groupid as group_name_tag %}
 <header class="row">
   <h2 class="medium-12 columns">Quiz
 
@@ -32,8 +54,13 @@
   <div class="medium-12 columns">
    <!-- Add button -->
    {% if user.is_authenticated %}
-    <a href="{% url 'quiz_create' groupid %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create' groupid %}" class="button small">+ Add {{title}} Item</a>
+
+   {% user_access_policy groupid request.user as user_access %}
+   {% if user_access == "allow" %}
+    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">+ Add {{title}}</a>
+    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small">+ Add {{title}} Item</a>
+
+  {% endif %}
   {% endif %}
 </div>
 </header>
@@ -49,12 +76,12 @@
     <div class="row">
 
       <div class="small-8 columns">
-       <label class="inline"><strong><a href="{% url 'quiz_details' groupid node %}">{{ node.name }}</a></strong></label>
+       <label class="inline"><strong><a href="{% url 'quiz_details' group_name_tag node %}">{{ node.name|truncatechars:20 }}</a></strong></label>
      </div>
 
      {% if user.is_authenticated %}
      <div class="small-4 columns">
-       <a href="{% url 'quiz_item_create' groupid %}">
+       <a href="{% url 'quiz_item_create' group_name_tag %}">
          <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
        </a>
      </div>
@@ -66,12 +93,12 @@
       <div class="row">
 
       <div class="small-8 columns">
-       <label class="inline"><strong><a href="{% url 'quiz_details' groupid node %}">{{ node.name }}</a></strong></label>
+       <label class="inline"><strong><a href="{% url 'quiz_details' group_name_tag node %}">{{ node.name|truncatechars:20 }}</a></strong></label>
      </div>
 
      {% if user.is_authenticated %}
      <div class="small-4 columns">
-       <a href="{% url 'quiz_item_create' groupid %}">
+       <a href="{% url 'quiz_item_create' group_name_tag %}">
          <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
        </a>
      </div>
@@ -80,11 +107,12 @@
    </div>
     {% endif %}
     {% endif %}
+
    {% empty %}
    <div class="row">
-
     <div class="small-12 columns">
-     <p>No quiz found!</p>
+      <h5>This group doesn't have any quiz. <b>Be the first to create a Quiz!</b></h5>
+    </div>
    </div>
 
  </div>
@@ -100,16 +128,16 @@
   <div class="row" style="padding-left:8px;">
 
     <div class="small-12 columns">
-     <label><strong><a href="{% url 'quiz_details' groupid node %}">{{ node.html_content|safe|truncatewords:30 }}</a></strong></label>
+     <label><strong><a href="{% url 'quiz_details' group_name_tag node %}">{{ node.html_content|safe|truncatewords:30 }}</a></strong></label>
    </div>
 
  </div>
 
  {% empty %}
  <div class="row">
-
   <div class="small-12 columns">
-   <p>No quiz items found!</p>
+    <h5>This group doesn't have any quiz-items. <b>Be the first to create a Quiz-Item!</b></h5>
+  </div>
  </div>
 
 </div>

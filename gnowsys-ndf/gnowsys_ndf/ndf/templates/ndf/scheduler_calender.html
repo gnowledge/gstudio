@@ -52,9 +52,10 @@
 
 {% endblock %}
 
-
+{% block body_content %}
 <div>
-	
-	<div id='calendar'></div>
+		
+	<div id='calendar' data-event-timing="{{ app_set_instance_atlist }}"></div>
 
 </div>
+{% endblock %}

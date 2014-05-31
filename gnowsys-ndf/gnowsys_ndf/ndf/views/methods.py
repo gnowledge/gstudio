@@ -11,7 +11,7 @@ from django.template import RequestContext
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
-
+from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
 import subprocess
 import re
@@ -20,6 +20,8 @@ import string
 ######################################################################################################################################
 
 db = get_database()
+collection = db[Node.collection_name]
+
 history_manager = HistoryManager()
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
@@ -52,12 +54,28 @@ def get_forum_repl_type(forrep_id):
 
 def check_existing_group(group_name):
   collection = db[Node.collection_name]
-
   if type(group_name) == 'unicode':
     colg = collection.Node.find({'_type': u'Group', "name": group_name})
+    if colg.count()>0:
+      return True
+    if ins_objectid.is_valid(group_name):    #if group_name holds group_id
+      colg = collection.Node.find({'_type': u'Group', "_id": ObjectId(group_name)})
+    if colg.count()>0:
+      return True
+    else:
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True      
   else:
-    colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
-
+    if ins_objectid.is_valid(group_name):     #if group_name holds group_id
+      colg = collection.Node.find({'_type': u'Group', "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True
+    else:
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
   if colg.count() >= 1:
     return True
   else:
@@ -76,6 +94,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     
     if checked:     
       if checked == "Page":
+ 
         gst_page_id = collection.Node.one({'_type': "GSystemType", 'name': "Page"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_page_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         
@@ -118,11 +137,13 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-
+      elif checked == "Pandora Video":
+        gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
+        drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
       elif checked == "Theme":
         theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
         topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}})        
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
     else:
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
@@ -161,7 +182,14 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     return dict_drawer
 
-def get_translate_common_fields(request, node, group_id, node_type, node_id):
+# get type of resource
+def get_resource_type(request,node_id):
+  get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
+  get_type=get_resource_type._type
+  return get_type 
+   
+
+def get_translate_common_fields(request,get_type,node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
   gcollection = db[Node.collection_name]
@@ -172,11 +200,28 @@ def get_translate_common_fields(request, node, group_id, node_type, node_id):
   tags = request.POST.get('tags')
   usrid = int(request.user.id)
   language= request.POST.get('lan')
+  if get_type == "File":
+    get_parent_node=collection.Node.one({'_id':ObjectId(node_id)})
+    get_mime_type=get_parent_node.mime_type
+    get_fs_file_ids=get_parent_node.fs_file_ids
+    node.mime_type=get_mime_type
+    node.fs_file_ids=get_fs_file_ids
+ 
   if not node.has_key('_id'):
-    
     node.created_by = usrid
-    node.member_of.append(node_type._id)
-
+    if get_type == "File":
+        get_node_type = collection.Node.one({'name':get_type})
+        node.member_of.append(get_node_type._id)
+        if 'image' in get_mime_type:
+          get_image_type = collection.Node.one({'name':'Image'})
+          node.member_of.append(get_image_type._id)
+        if 'video' in get_mime_type:
+          get_video_type = collection.Node.one({'name':'Video'})
+          node.member_of.append(get_video_type._id)
+        
+    else:
+      node.member_of.append(node_type._id)
+ 
   node.name = unicode(name)
   node.language=unicode(language)
 
@@ -212,6 +257,8 @@ def get_node_common_fields(request, node, group_id, node_type):
   collection = None
 
   name = request.POST.get('name')
+  sub_theme_name = request.POST.get("sub_theme_name", '')
+  add_topic_name = request.POST.get("add_topic_name", '')
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
@@ -248,8 +295,16 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+  if sub_theme_name:
+    node.name = unicode(sub_theme_name) 
+  if add_topic_name:
+    node.name = unicode(add_topic_name)
+
   node.status = unicode("DRAFT")
-  node.language = unicode(language) 
+  if language:
+    node.language = unicode(language) 
+  else:
+    node.language = u"en"
   node.location = map_geojson_data # Storing location data
 
   if access_policy:
@@ -259,6 +314,8 @@ def get_node_common_fields(request, node, group_id, node_type):
       node.access_policy = u"PUBLIC"
     else:
       node.access_policy = u"PRIVATE"
+  else:
+    node.access_policy = u"PUBLIC"
 
   node.modified_by = usrid
 
@@ -362,35 +419,34 @@ def get_node_common_fields(request, node, group_id, node_type):
   
   
 def get_versioned_page(node):
-            content=[] 
+            
        
-            #check if same happens for multiple nodes
-            i=node.current_version
-          
-            #get the particular document Document
-                   
-            doc=history_manager.get_version_document(node,i)
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+	(fp)
+    rev_no =""
+    proc1=subprocess.Popen(cmd,shell=True,
+				stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+       
+       if line.find('revision')!=-1 and line.find('selected') == -1:
 
-          
-            #check for the published status for the particular version
-          
-            while (doc.status != "PUBLISHED"):
-              currentRev = i
-
-              splitVersion = currentRev.split('.')
-              previousSubNumber = int(splitVersion[1]) - 1 
-
-              if previousSubNumber <= 0:
-               previousSubNumber = 1
-
-              prev_ver=splitVersion[0] +"."+ str(previousSubNumber)
-              i=prev_ver 
-
-              doc=history_manager.get_version_document(node,i)
-              if (i == '1.1'):
-                  return (doc,i)
-            return (doc,i)
-
+          rev_no=string.split(line,'revision')
+          rev_no=rev_no[1].strip( '\t\n\r')
+          rev_no=rev_no.strip(' ')
+       if line.find('status')!=-1:
+          up_ind=line.find('status')
+          if line.find(('PUBLISHED'),up_ind) !=-1:
+               rev_no=rev_no.strip(' ')
+               node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
+               return (node,rev_no)    
+       if rev_no == '1.1':
+           node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
+           return(node,'1.1')
+        
 
 def get_user_page(request,node):
     ''' function gives the last docment submited by the currently logged in user either it
@@ -412,7 +468,6 @@ def get_user_page(request,node):
           rev_no=rev_no.strip(' ')
        if line.find('updated')!=-1:
           up_ind=line.find('updated')
-          print line.find(str(request.user),up_ind)
           if line.find(str(request.user),up_ind) !=-1:
                rev_no=rev_no.strip(' ')
                node=history_manager.get_version_document(node,rev_no)
@@ -501,3 +556,74 @@ def tag_info(request, group_id, tagname):
   # print group_id
 
   return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
+
+
+#code for merging two text Documents
+import difflib
+def diff_string(original,revised):
+        
+        # build a list of sentences for each input string
+        original_text = _split_with_maintain(original)
+        new_text = _split_with_maintain(revised)
+        a=original_text + new_text
+        strings='\n'.join(a)
+        #f=(strings.replace("*", ">").replace("-","="))
+        #f=(f.replace("> 1 >",">").replace("= 1 =","="))
+
+        
+        return strings
+STANDARD_REGEX = '[.!?]'
+def _split_with_maintain(value, treat_trailing_spaces_as_sentence = True, split_char_regex = STANDARD_REGEX):
+        result = []
+        check = value
+        
+        # compile regex
+        rx = re.compile(split_char_regex)
+        
+        # traverse the string
+        while len(check) > 0:
+            found  = rx.search(str(check))
+            if found == None:
+                result.append(check)
+                break
+            
+            idx = found.start()
+            result.append(str(check[:idx]))            # append the string
+            result.append(str(check[idx:idx+1]))    # append the puncutation so changing ? to . doesn't invalidate the whole sentence
+            check = check[idx + 1:]
+            
+            # group the trailing spaces if requested
+            if treat_trailing_spaces_as_sentence:
+                space_idx = 0
+                while True:
+                    if space_idx >= len(check):
+                        break
+                    if check[space_idx] != " ":
+                        break
+                    space_idx += 1
+                
+                if space_idx != 0:
+                    result.append(check[0:space_idx])
+            
+                check = check[space_idx:]
+            
+        return result
+
+def update_mobwrite_content_org(node_system):   
+  '''
+	on revert or merge of nodes,a content_org is synced to mobwrite object
+	input : 
+		node
+  ''' 
+  system = node_system
+  filename = TextObj.safe_name(str(system._id))
+  textobj = TextObj.objects.filter(filename=filename)
+  content_org = system.content_org
+  if textobj:
+    textobj = TextObj.objects.get(filename=filename)
+    textobj.text = content_org
+    textobj.save()
+  else:
+    textobj = TextObj(filename=filename,text=content_org)
+    textobj.save()
+  return textobj

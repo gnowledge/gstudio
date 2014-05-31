@@ -224,6 +224,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
                 newdict[key] = ["unicode", new_instance_type[key]]
         elif value == list:
             # newdict[key] = "list"
+            
             newdict[key] = ["list", new_instance_type[key]]
         elif type(value) == list:
             # newdict[key] = "list"
