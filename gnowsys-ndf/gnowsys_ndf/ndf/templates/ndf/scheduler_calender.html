@@ -1,6 +1,6 @@
 {% block head %}
 
-	<meta charset='utf-8' />
+	<!-- <meta charset='utf-8' /> -->
 
 	<link href='/static/ndf/css/fullcalendar/fullcalendar.css' rel='stylesheet' />
 	<link href='/static/ndf/css/fullcalendar/fullcalendar.print.css' rel='stylesheet' media='print' />
@@ -15,9 +15,18 @@
 		
 			#calendar {
 
-				width: 900px;
+				width: auto;
 				margin-left: auto;
 				margin-right: auto;
+			}
+			
+			.fc-header-left, .fc-header-right {
+				padding-top: 1em !important;
+			}
+
+			.fc-week-number {
+				background-color: #DDDDDD;
+    			color: #808080;
 			}
 
 	</style>
@@ -35,7 +44,11 @@
 				// dayClick: function() { alert('a day has been clicked!'); }
 
 				// header
-				header: { left: 'title', center: '', right: 'today prev,next' }, // prevYear,nextYear
+				header: {
+						left: 'prev,next today',
+						center: 'title',
+						right: 'month,basicWeek,basicDay'
+					},
 
 				// button Icons
 				// buttonIcons : { prev: 'prev', next: 'next' },
@@ -43,10 +56,26 @@
 				// theme
 				// theme: false,
 
+				// number of weeks displayed in a month view ans so, week's height.
+				// weekMode:'liquid',
+
+				// to show week numbers
+				weekNumbers:true,
+
+				// first day of week e.g: Monday
+				firstDay:1,
+
+				// hide days e.g: Tuesdays and Thursdays 
+				// hiddenDays: [ 2, 4 ]
+
+				// aspectRatio: 2
+
 			});
 			
 			
 		});
+
+		
 
 	</script>
 
