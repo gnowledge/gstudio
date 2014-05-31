@@ -453,20 +453,24 @@ def get_existing_groups_excluding_username():
 			group.append(items)
 	return group
 
-
 @register.assignment_tag
 def get_existing_groups_excluded(grname):
-	group = []
-	col_Group = db[Group.collection_name]
-	colg = col_Group.Group.find({'_type':u'Group', 'group_type': "PUBLIC"})  
-	colg.sort('name')
-	gr=list(colg)
-	for items in gr:
-		if items.name != grname:
-			group.append(items)
-	if not group:
-		return "None"
-	return group
+  """
+  Returns only first 10 public group(s) (sorted by last_update field in descending order) 
+  excluding the currently selected group if it comes under the searching criteria
+
+  Keyword arguments:
+  grname -- name of the group which is currently selected
+
+  Returns:
+  list of group node(s) resulted after given searching criteria
+  """
+  group_cur = collection.Node.find({'_type':u"Group", 'name': {'$nin': [u"home", grname]}, 'group_type': "PUBLIC"}).sort('last_update', -1).limit(10)
+
+  if group_cur.count() <= 0:
+    return "None"
+
+  return group_cur
 
 @register.assignment_tag
 def get_group_policy(group_id,user):
@@ -481,48 +485,38 @@ def get_group_policy(group_id,user):
 	return policy
 
 @register.assignment_tag
-def get_user_group(user):
-	
-		group = [] 
-		author = None
-		auth_type = ""    
-		
-		col_Group = db[Group.collection_name]
-		collection = db[Node.collection_name]
-		
-		group_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Group'})
-		auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
+def get_user_group(user, selected_group_name):
+  """
+  Returns first 10 group(s) to which logged-in user is subscribed to (sorted by last_update field in descending order) 
+  excluding the currently selected group if it comes under the searching criteria
 
-		if auth_obj:
-			auth_type = auth_obj._id
+  Keyword arguments:
+  user -- django's user object
 
-		colg = col_Group.Group.find({ '_type': {'$in': ['Group','Author']},  
-																'name': {'$nin': ['home']},
-																'$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id} ] 
-															})
+  selected_group_name -- name of the group which is currently selected
 
-		auth = col_Group.Group.one({'_type': u"Author", 'name': unicode(user.username)})
-		
-		if auth:
-			for items in colg:
-				if items.created_by == user.pk:
-					if items.name == auth.name:
-						author = items
-					else:
-						if not items.prior_node:
-							group.append(items)
-				else:
-					if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
-						group.append(items)
+  Returns:
+  list of group and/or author (logged-in) node(s) resulted after given searching criteria
+  """
+  group_list = []
+  auth_group = None
 
-		if author:
-			group.append(author)
+  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(10)
 
-		if not group:
-			return "None"
+  auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
-		return group
-	
+  if group_cur.count():
+    for g in group_cur:
+      group_list.append(g)
+
+  if auth_group:
+    # Appends author node at the bottom of the list, if it exists
+    group_list.append(auth_group)
+
+  if not group_list:
+    return "None"
+
+  return group_list
 
 
 @register.assignment_tag
