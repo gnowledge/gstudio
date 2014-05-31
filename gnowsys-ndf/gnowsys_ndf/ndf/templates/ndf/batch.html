@@ -77,8 +77,8 @@ return true;
 
 <!-- Script to validate form -->
 $("form").submit(function(event) {
-var len_user = '{{users_in_group|length}}'
-var txt_input = $("#txt_batch_count").val()
+var len_user = parseInt('{{users_in_group|length}}')
+var txt_input = parseInt($("#txt_batch_count").val())
 if(txt_input > len_user)
 {
  alert("No of batches should not be more than No of Users");
