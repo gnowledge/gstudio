@@ -67,9 +67,10 @@ def save(request, group_id):
         for each in user_list:
             new_batch.author_set.append(int(each))
         new_batch.member_of.append(GST_BATCH._id)
-        new_batch.created_by = request.user.id
+        new_batch.created_by = int(request.user.id)
         new_batch.group_set.append(ObjectId(group_id))
-        new_batch.contributors.append(request.user.id)
+        new_batch.contributors.append(int(request.user.id))
+        new_batch.modified_by = int(request.user.id)
         new_batch.save()
         if course_id:
             save_course(course_id, new_batch._id)
