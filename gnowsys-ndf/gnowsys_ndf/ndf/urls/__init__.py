@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/quiz', include('gnowsys_ndf.ndf.urls.quiz')),
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
+    (r'^(?P<group_id>[^/]+)/batch', include('gnowsys_ndf.ndf.urls.batch')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
    # (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
@@ -42,13 +43,13 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/browse resource', include('gnowsys_ndf.ndf.urls.browse_resource')),
 
     (r'^(?P<group_id>[^/]+)/MIS', include('gnowsys_ndf.ndf.urls.mis'), {'app_name': "MIS"}),
-    (r'^(?P<group_id>[^/]+)/MIS-PO', include('gnowsys_ndf.ndf.urls.mis'), {'app_name': "MIS-PO"}),
+    (r'^(?P<group_id>[^/]+)/MIS-PO', include('gnowsys_ndf.ndf.urls.mis_po'), {'app_name': "MIS-PO"}),
 
 #    (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
 
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
 
-
+    (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
     (r'^(?P<group_id>[^/]+)/Observation', include('gnowsys_ndf.ndf.urls.observation')),
     (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
 
