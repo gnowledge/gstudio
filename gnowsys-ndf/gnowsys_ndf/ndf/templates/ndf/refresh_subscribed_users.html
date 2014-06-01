@@ -1,4 +1,7 @@
-  <h2>List Of Members.</h2>
+  <h3>List Of Members.</h3>
+  {% if course_name %}
+  <h3> For Course:{{course_name}}</h3>
+  {% endif %}
   <table>
     <thead>
       <tr>
@@ -10,9 +13,12 @@
       {% for user in user_list %}
       <tr>
         <td>{{user.username}}</td>
-        <td></td>
+	{% if can_remove %}
+        <td><a class="button alert tiny remove" href="#" id="{{user.id}}">Remove</a></td>
+	{% endif %}
       </tr>
       {% endfor %}
+      <input type="hidden" value="{{node_id}}" id="node_id" />
   </tbody>
   </table>
 <a class="close-reveal-modal">&#215;</a>

@@ -611,7 +611,7 @@ def create_version_of_module(subject_id,node_id):
         print "berfore save",attr
         attr.save()
             
-#-- under construction    
+
 def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
     if rt_has_module and subject_id and right_subject_id:
@@ -820,7 +820,44 @@ def get_data_for_drawer(request, group_id):
     data_list=set_drawer_widget(st,coll_obj_list)
     return HttpResponse(json.dumps(data_list))
 
-    
+def get_data_for_user_drawer(request, group_id):
+    '''
+    This method will return data for user widget
+    '''
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    drawer1 = []
+    drawer2 = []
+    data_list = []
+    all_batch_user = []
+    users = []
+    st_batch_id = request.GET.get('st_batch_id','')
+    if st_batch_id:
+        batch_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        group = collection.Node.one({'_id':ObjectId(group_id)})
+        if batch_coll:
+            for each in batch_coll:
+                users = users+each.author_set
+        else:
+            users = []
+        user_list = list(set(group.author_set) - set(users))
+        print user_list,"Test"
+        for each in user_list:
+            user= User.objects.get(id=each)
+            dic = {}
+            dic['id'] = user.id   
+            dic['name'] = user.username
+            d1.append(dic)
+        draw1['drawer1'] = d1
+        data_list.append(draw1)
+        draw1['drawer2'] = d2
+        data_list.append(draw1)
+        return HttpResponse(json.dumps(data_list))
+    else:
+        return HttpResponse("GSystemType for batch required")
+
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
@@ -1017,21 +1054,58 @@ def get_author_set_users(request, group_id):
     This ajax function will give all users present in node's author_set field
     '''
     user_list = []
+    can_remove = False
     if request.is_ajax():
         _id = request.GET.get('_id',"")
         node = collection.Node.one({'_id':ObjectId(_id)})
-        if node._type == 'Group':
+        course_name = ""
+        rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
+        if rt_has_course and node._id:
+            course = collection.Triple.one({'relation_type.$id':rt_has_course._id,'right_subject':node._id})
+            if course:
+                course_name = collection.Node.one({'_id':ObjectId(course.subject)}).name
+        if node.created_by == request.user.id:
+            can_remove = True
+        if node.author_set:
             for each in node.author_set:
                 user_list.append(User.objects.get(id = each))
             return render_to_response("ndf/refresh_subscribed_users.html", 
-                                       {"user_list":user_list}, 
+                                       {"user_list":user_list,'can_remove':can_remove,'node_id':node._id,'course_name':course_name}, 
                                        context_instance=RequestContext(request)
             )
         else:
-            return "node provide is not a Group type"
+            return StreamingHttpResponse("Empty")
     else:
-        return "Invalid ajax call"
-                
+        return StreamingHttpResponse("Invalid ajax call")
+
+@login_required
+def remove_user_from_author_set(request, group_id):
+    '''
+    This ajax function remove the user from athor_set
+    '''
+    user_list = []
+    can_remove = False
+    if request.is_ajax():
+        _id = request.GET.get('_id',"")
+        user_id = int(request.GET.get('user_id',""))
+        node = collection.Node.one({'_id':ObjectId(_id)})
+        if node.created_by == request.user.id:
+            node.author_set.remove(user_id)
+            can_remove = True
+            node.save()
+            print node.author_set,"TEst author"
+            if node.author_set:
+                for each in node.author_set:
+                    user_list.append(User.objects.get(id = each))
+            return render_to_response("ndf/refresh_subscribed_users.html", 
+                                      {"user_list":user_list,'can_remove':can_remove,'node_id':node._id}, 
+                                      context_instance=RequestContext(request)
+            )
+        else:
+            return StreamingHttpResponse("You are not authorised to remove user")
+    else:
+        return StreamingHttpResponse("Invalid Ajax call")
+    
 def get_filterd_user_list(request, group_id):
     '''
     This function will return (all user's) - (subscribed user for perticular group) 
