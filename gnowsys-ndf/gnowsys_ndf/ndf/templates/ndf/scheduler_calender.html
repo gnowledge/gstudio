@@ -34,44 +34,165 @@
 	<script>
 
 		$('#view-scheduler-calendar').on('toggled', function (event, tab) {
+
+			$('#calendar').fullCalendar({
+
+				header: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'month,agendaWeek,agendaDay'
+				},
+
+				editable: false,
+
+				events: [
+				// {
+				// 	title: 'All Day Event',
+				// 	start: '2014-01-01'
+				// },
+				// {
+				// 	title: 'Long Event',
+				// 	start: '2014-01-07',
+				// 	end: '2014-01-10'
+				// },
+				// {
+				// 	id: 999,
+				// 	title: 'Repeating Event',
+				// 	start: '2014-01-09T16:00:00'
+				// },
+				{% for each in events_arr %}
+				{
+					id: '{{each.id}}',
+					title: '{{each.title}}',
+					start: '{{each.start|date:c}}'
+				}
+				{% endfor %}
+				//,
+				// {
+				// 	title: 'Meeting',
+				// 	start: '2014-01-12T10:30:00',
+				// 	end: '2014-01-12T12:30:00'
+				// },
+				// {
+				// 	title: 'Lunch',
+				// 	start: '2014-01-12T12:00:00'
+				// },
+				// {
+				// 	title: 'Birthday Party',
+				// 	start: '2014-01-13T07:00:00'
+				// },
+				// {
+				// 	title: 'Click for Google',
+				// 	url: 'http://google.com/',
+				// 	start: '2014-01-28'
+				// }
+				]
+			});
 		
 			/* initialize the calendar 
 			-------------------------- */
 			
-			$('#calendar').fullCalendar({
+			// $('#calendar').fullCalendar({
 
-				// to call an event on day click
-				// dayClick: function() { alert('a day has been clicked!'); }
+			// 	// to call an event on day click
+			// 	// dayClick: function() { alert('a day has been clicked!'); }
 
-				// header
-				header: {
-						left: 'prev,next today',
-						center: 'title',
-						right: 'month,basicWeek,basicDay'
-					},
+			// 	// header
+			// 	header: {
+			// 			left: 'prev,next today',
+			// 			center: 'title',
+			// 			right: 'month,agendaWeek,agendaDay'
+			// 		},
 
-				// button Icons
-				// buttonIcons : { prev: 'prev', next: 'next' },
+			// 	// defaultDate: '2014-01-12',
+			// 	// editable: false,
 
-				// theme
-				// theme: false,
+			// 	// button Icons
+			// 	// buttonIcons : { prev: 'prev', next: 'next' },
 
-				// number of weeks displayed in a month view ans so, week's height.
-				// weekMode:'liquid',
+			// 	// theme
+			// 	// theme: false,
 
-				// to show week numbers
-				weekNumbers:true,
+			// 	// number of weeks displayed in a month view ans so, week's height.
+			// 	// weekMode:'liquid',
 
-				// first day of week e.g: Monday
-				firstDay:1,
+			// 	// to show week numbers
+			// 	weekNumbers:true,
 
-				// hide days e.g: Tuesdays and Thursdays 
-				// hiddenDays: [ 2, 4 ]
+			// 	// first day of week e.g: Monday
+			// 	firstDay:1,
 
-				// aspectRatio: 2
+			// 	// hide days e.g: Tuesdays and Thursdays 
+			// 	// hiddenDays: [ 2, 4 ]
 
-			});
-			
+			// 	// aspectRatio: 2
+
+			// 	// for agendaWeek and agendaDay
+			//     // agenda: 'h:mm', // 5:00
+
+			//     // for all other views
+			//     // '': 'h(:mm)t',  // 7p
+
+			//     // Determines the text that will be displayed on the calendar's column headings.
+			//     // month: 'ddd',    // Mon
+			//     // week: 'ddd M/D', // Mon 9/7
+			//     // day: 'dddd',      // Monday
+
+			//     weekNumberTitle:"Week No.",
+
+			// 	events: [
+
+			//         {
+			//         	// Uniquely identifies the given event. Different instances of repeating events should all have the same id.
+			//         	// id: 1234,
+
+			//         	// The text on an event's element
+			//             title:  'My Event',
+			            
+			//             // Whether an event occurs at a specific time-of-day.
+			//             allDay: false,
+			            
+			//             // The date/time an event begins. Required.
+			//             start:  '2014-06-01T14:30:00',
+			            
+			//             // The exclusive date/time an event ends. Optional.
+			//             end:  '2014-06-01T18:30:00',
+			            
+			//             // A URL that will be visited when this event is clicked by the user.
+			//             url: 'http://www.metastudio.org',
+			            
+			//             // A CSS class (or array of classes) that will be attached to this event's element.
+			//             className: '',
+			            
+			//             // Overrides the master editable option for this single event.
+			//             // editable:false,
+			            
+			//             // Overrides the master eventStartEditable option for this single event.
+			//             // startEditable: false
+
+			//             // Overrides the master eventDurationEditable option for this single event.
+			//             // durationEditable:
+
+			//             // Automatically populated. A reference to the event source that this event came from.
+			//             // source:
+
+			//             // Sets an event's background and border color just like the calendar-wide eventColor option.
+			//             // color: 'inherit',
+
+			//             // Sets an event's background color just like the calendar-wide eventBackgroundColor option.
+			//             // backgroundColor: '#e5e5e5'
+
+			//             // Sets an event's border color
+			//             // borderColor:
+
+			//             // Sets an event's text color just like the calendar-wide
+			//             // textColor:
+
+			//         }
+			//         // other events here...
+			//     ]
+
+			// });
 			
 		});
 
@@ -83,6 +204,7 @@
 
 {% block body_content %}
 <div>
+{{ events_arr }}
 		
 	<div id='calendar' data-event-timing="{{ app_set_instance_atlist }}"></div>
 
