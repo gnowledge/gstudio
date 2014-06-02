@@ -58,7 +58,7 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
 
                 at=collection.GAttribute()
                 at.attribute_type=source_id_at
-                at.object_value={each['id']:each['user']}
+                at.object_value=each['id']
                 at.subject=gs._id
                 at.save()
                 
