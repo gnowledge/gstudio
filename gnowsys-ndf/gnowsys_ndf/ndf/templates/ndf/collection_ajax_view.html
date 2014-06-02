@@ -17,7 +17,13 @@
   <li>
   <div class="row">
     <div class="small-2 columns" >
-      <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr>
+   {% if 'image' in each_node.mime_type %}<i class="fi-camera"></i>  {% endif %}
+    
+     {% if 'video' in each_node.mime_type %}<i class="fi-video"></i>  {% endif %}
+   
+     {% if 'Pandora_video' in each_node.member_of_names_list %}<i class="fi-video"></i>  {% endif %}
+   
+  <!-- <abbr title="Collection"><img src="/static/ndf/images/folder.png"></abbr> -->
     </div>
     <div class="small-10 columns">
       <a class="select" name="{{each_node.pk}}" style="padding-left:10px;">{{ each_node.name }}</a>
