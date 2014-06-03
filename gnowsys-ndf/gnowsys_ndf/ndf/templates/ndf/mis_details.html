@@ -348,7 +348,7 @@
         <!-- Tab View Map Widget -->
         <div class="content" id="view-scheduler-calendar" >    
 
-          {% include "ndf/scheduler_calender.html" %}
+          {% include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
 
         </div>
 
@@ -604,7 +604,7 @@ $(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[d
 $(document).foundation({
   tab: {
     callback : function (tab) {
-      console.log(tab);
+      // console.log(tab);
     }
   }
 });
