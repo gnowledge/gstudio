@@ -1,0 +1,147 @@
+* INSTALLATION Procedure for for gstudio-mongokit on Fedora
+
+The following instructions are drafted for Fedora 19 and should work for subsequent versions of fedora and other equivalent distributions such as CentOS. (The commands and instructions are assumed to be run within a terminal window)
+
+Since this is a web application, the installation essentially means setting up the server instance. Hence it would include following major task groups:
+	1. Setting up the web server environment with appropriate packages and configurations
+	2. Getting the code of web app (gstudio) and configuring it to run on your instance
+	3. Actual running and maintenance of the services.
+
+
+1. Installing required packages and its dependencies
+
+   Install the pre-requisite packages using yum on a terminal. The commands to be typed are as follows:
+
+	$ sudo yum groupinstall "Development Tools"
+	$ sudo yum install python-setuptools git python-devel rcs mongodb mongodb-server python-virtualenv ffmpeg ffmpeg2theora libjpeg-turbo-devel emacs
+
+
+
+2. Get latest version of gstudio-mongokit
+
+	$ git clone https://github.com/gnowledge/gstudio.git
+	$ cd gstudio
+	$ virtualenv --system-site-packages .
+	$ ./bin/pip install -r requirements.txt
+
+   (In case the last command 'pip install' does not complete successfully due to
+    internet disconnection, then ensure stable connection, open the file requirements.txt 
+    using any editor to find the names of packages to be installed. The remaining packages 
+    can be individually installed using ./bin/pip install <packagename> )
+
+
+3. setting up Emacs working environment:
+   * Fedora 19 provides emacs version > 24. If not sure of the emacs version then check it by using following command:
+   $ rpm -q emacs
+   
+   The version displayed should be greater than 24, if not then configure your yum repositories to point to latest fedora repo or use external repos e.g. freshrpms.net
+
+   * Check the org-version for your emacs. This can be done by starting emacs
+	$ emacs
+	and then within emacs evaluate following expression by first typing 'ESC :', 
+	then type: (info "(org)"), press enter.The version of org would be displayed within emacs. 
+	In Fedora 19, the version is usually 7.9.3f.	
+  
+   * Create a init file for emacs default settings @ path "~/.emacs"
+   with following code in it:
+
+   For org-version < 8.0
+
+
+#+BEGIN_EXAMPLE
+(custom-set-variables
+             '(inhibit-startup-screen t)
+             '(org-export-html-preamble nil)
+             '(org-export-html-postamble nil)
+             '(org-export-html-validation-link nil)
+              )
+#+END_EXAMPLE
+
+   For org-version >= 8.0
+
+#+BEGIN_EXAMPLE
+(custom-set-variables
+             '(inhibit-startup-screen t)
+             '(org-html-preamble nil)
+             '(org-html-postamble nil)
+             '(org-html-validation-link nil)
+             )
+#+END_EXAMPLE
+ 
+
+4. SMTP configuration for notifications
+ 
+   (1) To make SMTP server ready for sending mail (development purpose only) -
+
+       There are two options: 
+       1. After running project, run following command: python -m
+          smtpd -n -c DebuggingServer localhost:1025 (This will ready
+          to listen smtp messages and will print in terminal)
+
+       2. To use gmail smtp server: (If you have another smarthost to
+          deliver use that instead)
+	
+	(a) Go to settings.py file and search for "#SMTP setting for
+	sending mail" and uncomment gmail smtp setting and comment
+	default python smtp settings.  
+
+	(b) Edit following with your gmail credentials and save
+	settings.py file - EMAIL_HOST_USER = 'yourcompleteemailid'
+	EMAIL_HOST_PASSWORD = 'yourpassword'
+						 
+5. Installation of MathJax (required for rendering MathML symbols)
+   
+      (1) To install MathJax on your own server, download the
+          distribution from the following link:
+          "http://www.mathjax.org/download/" 
+
+      (2) Simply unzip the downloaded archive, rename it to 'mathjax'
+          (all in smallcaps) and put it under django-application's
+          "static" directory.
+
+	* static directory is located within your git repo at: gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static
+
+
+6. Final Steps: 
+ 
+  To run "gstudio-mongokit" project, perform the following steps: 
+
+  (1) Make sure you are in the virtualenv-folder (the git repo in folder 'gstudio') and it's activated
+    	$ source bin/activate  
+
+  (2) Move to gnowsys-ndf folder: 
+	$ cd gstudio/gnowsys-ndf 
+
+  (3) Start mongodb server:  
+	$ sudo service mongod start
+
+  (4) Run the following commands: 
+
+      (a) python manage.py initrcsrepo 
+	
+      (b) python manage.py migrate_member_of
+
+      (c) python manage.py filldb 
+		
+	(if an error occurs related to 'auth_user' then run (d) followed by (c).)
+
+      (d) python manage.py syncdb 
+
+      (e) python manage.py runserver 
+
+	NOTE: Always run (d) & (e) commands together.
+
+     After running (e) point your browser to http://localhost:8000 to see gstudio on your browser.  Enjoy.  
+
+     Since gstudio is frequently updated, please obtain the latest code
+     from git repo. After each update run (d) before running (c).
+
+
+Any issues with this procedure or you need any further help, or to
+file bugs etc. visit or ask us in the mailing list:
+
+http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
+
+Or check the issue tracker and raise bugs here:
+http://glab.metastudio.org/issues
+
