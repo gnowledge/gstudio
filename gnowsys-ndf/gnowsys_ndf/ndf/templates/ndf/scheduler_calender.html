@@ -11,8 +11,12 @@
 	<script src='/static/ndf/js/fullcalendar/fullcalendar.min.js'></script>
 
 	<style>
-			#view-scheduler-calendar table { border: none; }
 		
+			#view-scheduler-calendar table {
+				border: none;
+				margin-bottom: 0px;
+			}
+
 			#calendar {
 
 				width: auto;
@@ -31,6 +35,19 @@
 
 	</style>
 
+{% endblock %}
+
+
+{% block body_content %}
+	
+	<div>
+		<div id='calendar' data-event-timing="{{ app_set_instance_atlist }}"></div>
+	</div>
+
+{% endblock %}
+
+
+{% block script %}
 	<script>
 
 		$('#view-scheduler-calendar').on('toggled', function (event, tab) {
@@ -43,51 +60,33 @@
 					right: 'month,agendaWeek,agendaDay'
 				},
 
+				// first day of week e.g: Monday
+				firstDay:1,
+
 				editable: false,
 
+				eventBackgroundColor:'#2980b9',
+
 				events: [
-				// {
-				// 	title: 'All Day Event',
-				// 	start: '2014-01-01'
-				// },
-				// {
-				// 	title: 'Long Event',
-				// 	start: '2014-01-07',
-				// 	end: '2014-01-10'
-				// },
-				// {
-				// 	id: 999,
-				// 	title: 'Repeating Event',
-				// 	start: '2014-01-09T16:00:00'
-				// },
+				
 				{% for each in events_arr %}
-				{
-					id: '{{each.id}}',
-					title: '{{each.title}}',
-					start: '{{each.start|time}}'
-				}
+
+					{
+						id: '{{each.id}}',
+						title: '{{each.title}}',
+						start: '{{each.start|date:"c"}}',
+						end: '{{each.end|date:"c"}}'
+						{% if 'week' in each.start|timesince:each.end or 'weeks' in each.start|timesince:each.end or 'days' in each.start|timesince:each.end %}
+							,allDay: true
+						{% endif %}
+
+					}{% if not forloop.last %},{% endif %}
+
 				{% endfor %}
-				//,
-				// {
-				// 	title: 'Meeting',
-				// 	start: '2014-01-12T10:30:00',
-				// 	end: '2014-01-12T12:30:00'
-				// },
-				// {
-				// 	title: 'Lunch',
-				// 	start: '2014-01-12T12:00:00'
-				// },
-				// {
-				// 	title: 'Birthday Party',
-				// 	start: '2014-01-13T07:00:00'
-				// },
-				// {
-				// 	title: 'Click for Google',
-				// 	url: 'http://google.com/',
-				// 	start: '2014-01-28'
-				// }
+				
 				]
 			});
+		});
 		
 			/* initialize the calendar 
 			-------------------------- */
@@ -193,20 +192,8 @@
 			//     ]
 
 			// });
-			
-		});
-
-		
+		// });
 
 	</script>
 
-{% endblock %}
-
-{% block body_content %}
-<div>
-{{ events_arr }}
-		
-	<div id='calendar' data-event-timing="{{ app_set_instance_atlist }}"></div>
-
-</div>
 {% endblock %}

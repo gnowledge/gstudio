@@ -133,15 +133,20 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
         # array of dict for events ---------------------
                 
-        if system.has_key('organiser_of_event'): # gives list of events
+        if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
 
             for event in system.organiser_of_event:
                 event.get_neighbourhood(event.member_of)
                 
                 tempdict = {}
                 tempdict['title'] = event.name
-                tempdict['start'] = event.start_time
-                tempdict['end'] = event.end_time
+                
+                if event.start_time and len(event.start_time) == 16:
+                    dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
+                    tempdict['start'] = dt
+                if event.end_time and len(event.end_time) == 16:
+                    dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
+                    tempdict['end'] = dt
                 tempdict['id'] = str(event._id)
                 events_arr.append(tempdict)
 
@@ -152,32 +157,14 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
                 tempdict = {}
                 tempdict['title'] = host.name
-                tempdict['start'] = system.start_time
-#                 print "\n\n============", datetime.strptime(system.start_time, "%Y-%m-%d %H:%M:%S+0000")
-#                 In [21]: b.split("/")
-# Out[21]: [u'05', u'31', u'2014 00:00']
 
-# In [22]: b.split("/"," ")
-# ---------------------------------------------------------------------------
-# TypeError                                 Traceback (most recent call last)
-# <ipython-input-22-b8803a896e3a> in <module>()
-# ----> 1 b.split("/"," ")
-
-# TypeError: an integer is required
-
-# In [23]: b.split("/")[2]
-# Out[23]: u'2014 00:00'
-
-# In [24]: b.split("/")[2].split(" ")
-# Out[24]: [u'2014', u'00:00']
-
-# In [25]: b.split("/")[2].split(" ")[1].split(":")
-# Out[25]: [u'00', u'00']
-
-# In [26]: 
-
-
-                tempdict['end'] = system.end_time
+                if system.start_time and len(system.start_time) == 16:
+                    dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
+                    tempdict['start'] = dt
+                if system.end_time and len(system.start_time) == 16:
+                    dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
+                    tempdict['end'] = dt
+                
                 tempdict['id'] = str(host._id)
                 events_arr.append(tempdict)
 
