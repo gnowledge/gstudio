@@ -134,6 +134,20 @@
 		ul.read-images > li {
 			padding: 2px 0;
 		}
+		
+		.ask-register-div{
+
+			background-color: #87CEEB;
+			color: inherit;
+			height: 78%;
+			margin-right: 1.68em;
+			/*opacity: 0.9;*/
+			padding: 0.5em;
+			position: absolute;
+			color: #FFFFFF;
+    		font-size: 1.9em;
+			font-family: Georgia Serif,Serif;
+		}
 
 	</style>
 
@@ -622,9 +636,8 @@
 						tempPopupContent = (edited_by.length > 1)? tempPopupContent + '<br/><br/><i style="color:#b2b2b2; margin-left:"> Edited by : ' + edited_by + '</i>':tempPopupContent;
 
 						hasDataFlag = tempPopupContent.length>0 ? true : false;
-					{% endif %}
 
-					{% if mode == "edit" %}
+					{% elif mode == "edit" %}
 
 						var tc = popupBasicHtml;
 			
@@ -875,7 +888,9 @@
 				tags = this.feature.properties.tags,
 				created_by = this.feature.properties.created_by,
 				edited_by = this.feature.properties.edited_by,
-			    attached_files = this.feature.properties.attached_files;
+			    attached_files = this.feature.properties.attached_files,
+			    ref = this.feature.properties.ref;
+
 
 
 			// Variable to store your files
@@ -900,6 +915,31 @@
 			$(popupHtmlObj).children("input.marker-tags").val(tags);
 			$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
 			// $(popupHtmlObj).children("div.images-list").find("ul.attached-images");
+
+			// #{#{#request.session.anonymous_added_markers}}
+
+			{% if not user.is_authenticated %}
+
+				// makes input boxes enable for which user has created
+				if( 
+					// (ref == undefined) ||
+					(("{{request.session.anonymous_added_markers}}").indexOf(ref) > 1) && 
+					(("{{request.session.anonymous_added_markers}}").indexOf("{{request.session.session_key}}") == 0)
+				  ){
+
+					$(".leaflet-popup-content:visible input, textarea").prop("disabled", false);
+					
+				}
+				else // makes input boxes Disabled for which user has NOT created
+				{
+					$(".leaflet-popup-content:visible input, textarea").prop("disabled", true);
+					$(popupHtmlObj).children("div.row").replaceWith("<a class='button tiny expand alert' title='click to register' href='/accounts/login/'>Login / Register</a>")
+					$(".leaflet-popup-content:visible label:nth-child(1)").before('<div class="ask-register-div">Please register yourself before contributing any resource<hr/><span style="font-size:0.5em; ">NOTE : You can only read but can not edit any fields</span></div>');
+					$(".leaflet-popup-content:visible div.ask-register-div").fadeOut(30000);
+				}
+
+			{% endif %}
+
 			
 			{% comment %}
 			// {% if not user.is_authenticated %}
