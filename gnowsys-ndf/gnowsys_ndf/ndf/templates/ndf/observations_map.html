@@ -914,6 +914,10 @@
 			$(popupHtmlObj).children("textarea.marker-obs-note").val(description);
 			$(popupHtmlObj).children("input.marker-tags").val(tags);
 			$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
+			
+			{% if user.is_authenticated %}
+				$(popupHtmlObj).children("input.marker-tags").after("<div style='color:gray'> by : "+created_by+"</div><br/>");	
+			{% endif %}
 			// $(popupHtmlObj).children("div.images-list").find("ul.attached-images");
 
 			// #{#{#request.session.anonymous_added_markers}}
@@ -922,9 +926,9 @@
 
 				// makes input boxes enable for which user has created
 				if( 
-					// (ref == undefined) ||
-					(("{{request.session.anonymous_added_markers}}").indexOf(ref) > 1) && 
-					(("{{request.session.anonymous_added_markers}}").indexOf("{{request.session.session_key}}") == 0)
+					(ref == undefined) ||
+					((("{{request.session.anonymous_added_markers}}").indexOf(ref) > 1) && 
+					(("{{request.session.anonymous_added_markers}}").indexOf("{{request.session.session_key}}") == 0))
 				  ){
 
 					$(".leaflet-popup-content:visible input, textarea").prop("disabled", false);
@@ -933,7 +937,7 @@
 				else // makes input boxes Disabled for which user has NOT created
 				{
 					$(".leaflet-popup-content:visible input, textarea").prop("disabled", true);
-					$(popupHtmlObj).children("div.row").replaceWith("<a class='button tiny expand alert' title='click to register' href='/accounts/login/'>Login / Register</a>")
+					$(popupHtmlObj).children("div.row").replaceWith("<a class='button tiny expand success' title='click to register' href='/accounts/login/' target='_blank'>Login / Register</a>")
 					$(".leaflet-popup-content:visible label:nth-child(1)").before('<div class="ask-register-div">Please register yourself before contributing any resource<hr/><span style="font-size:0.5em; ">NOTE : You can only read but can not edit any fields</span></div>');
 					$(".leaflet-popup-content:visible div.ask-register-div").fadeOut(30000);
 				}
