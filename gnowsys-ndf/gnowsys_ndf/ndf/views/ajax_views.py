@@ -258,6 +258,59 @@ def shelf(request, group_id):
       )
 
 
+def drawer_widget(request, group_id):
+  if request.is_ajax() and request.method == "POST":
+    drawers = None
+    drawer1 = None
+    drawer2 = None
+
+    node = request.POST.get("node_id", '')
+    field = request.POST.get("field", '')
+    app = request.POST.get("app", '')
+    # print "\nfield: ", field
+    # print "\n app: ", app
+
+    if node:
+      node = collection.Node.one({'_id': ObjectId(node) })
+      if field == "prior_node":
+        app = None
+
+        drawers = get_drawers(group_id, node._id, node.prior_node, app)
+      elif field == "collection":
+        if app == "Quiz":
+          app = "QuizItem"
+        elif app == "Theme":
+          app = "Theme"
+        elif app == "Module":
+          app = "Module"
+        else:
+          app = None
+
+        drawers = get_drawers(group_id, node._id, node.collection_set, app)
+      
+      drawer1 = drawers['1']
+      drawer2 = drawers['2']
+
+    else:
+      if field == "collection" and app == "Quiz":
+        app = "QuizItem"
+      elif field == "collection" and app == "Theme":
+        app = "Theme"
+      elif field == "collection" and app == "Course":
+        app = "Module"
+      else:
+        app = None
+
+      drawer1 = get_drawers(group_id, None, [], app)
+
+
+    return render_to_response('ndf/drawer_widget.html', 
+                                { 'widget_for': field,'drawer1': drawer1, 'drawer2': drawer2,
+                                  'group_id': group_id,'groupid': group_id
+                                },
+                                context_instance = RequestContext(request)
+    )
+
 
 def get_collection_list(collection_list, node):
   inner_list = []

@@ -190,49 +190,49 @@ def get_all_replies(parent):
 	 return ex_reply
 
 
-@register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_id, node, checked=None):
+# @register.inclusion_tag('ndf/drawer_widget.html')
+# def edit_drawer_widget(field, group_id, node, checked=None):
 
-	drawers = None
-	drawer1 = None
-	drawer2 = None
+# 	drawers = None
+# 	drawer1 = None
+# 	drawer2 = None
 
-	if node :
-		if field == "collection":
-			if checked == "Quiz":
-				checked = "QuizItem"
-			elif checked == "Theme":
-				checked = "Theme"
-			else:
-				checked = None
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-		elif field == "prior_node":
-			checked = None
-			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
-		elif field == "module":
-			checked = "Module"
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+# 	if node :
+# 		if field == "collection":
+# 			if checked == "Quiz":
+# 				checked = "QuizItem"
+# 			elif checked == "Theme":
+# 				checked = "Theme"
+# 			else:
+# 				checked = None
+# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+# 		elif field == "prior_node":
+# 			checked = None
+# 			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+# 		elif field == "module":
+# 			checked = "Module"
+# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
 		
-		drawer1 = drawers['1']
-		drawer2 = drawers['2']
+# 		drawer1 = drawers['1']
+# 		drawer2 = drawers['2']
 
-	else:
-		if field == "collection" and checked == "Quiz":
-			checked = "QuizItem"
+# 	else:
+# 		if field == "collection" and checked == "Quiz":
+# 			checked = "QuizItem"
 
-		elif field == "collection" and checked == "Theme":
-			checked = "Theme"
+# 		elif field == "collection" and checked == "Theme":
+# 			checked = "Theme"
 			
-		elif field == "module":
-			checked = "Module"
+# 		elif field == "module":
+# 			checked = "Module"
 			
-		else:
-			# To make the collection work as Heterogenous one, by default
-			checked = None
+# 		else:
+# 			# To make the collection work as Heterogenous one, by default
+# 			checked = None
 
-		drawer1 = get_drawers(group_id, None, [], checked)
+# 		drawer1 = get_drawers(group_id, None, [], checked)
 
-	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
+# 	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
