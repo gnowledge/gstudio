@@ -708,16 +708,38 @@ def get_dict_item(dictionary, key):
 
 @register.assignment_tag
 def get_policy(group, user):
-  if group.group_type =='PUBLIC':
-    return False
-  elif user.is_superuser:
+  # if group.group_type =='PUBLIC':
+  #   return False
+  # elif user.is_superuser:
+  #   return True
+  # elif user.id in group.author_set:
+  #   return True
+  # elif user.id == group.created_by:
+  #   return True
+  # else:
+  #   return False
+  print "\n username: ", user.username
+
+  if user.is_superuser:
+    print " -- superuser\n"
     return True
-  elif user.id in group.author_set:
-    return True
-  elif user.id == group.created_by:
-    return True
+
   else:
-    return False
+    if group.edit_policy == "NON_EDITABLE":
+      print " -- NON_EDITABLE group\n"
+      return False
+
+    elif user.id == group.created_by:
+      print " -- creator of group\n"
+      return True
+
+    elif user.id == group.author_set:
+      print " -- member of group\n"
+      return True
+
+    else:
+      return False
+
 
 @register.inclusion_tag('ndf/admin_fields.html')
 def get_input_fields(fields_type,fields_name,translate=None):
@@ -744,14 +766,27 @@ def group_type_info(groupid,user=0):
 			
 @register.assignment_tag
 def user_access_policy(node,user):
-	try:
-		col_Group=db[Group.collection_name]
-		group_gst = col_Group.Group.one({'_id':ObjectId(node)})
-		# if user.id in group_gst.group_set or group_gst.created_by == user.id:
-		if user.id in group_gst.author_set or group_gst.created_by == user.id :
-			return 'allow'
-	except Exception as e:
-		print "Exception in user_access_policy- "+str(e)
+	# try:
+	# 	col_Group=db[Group.collection_name]
+	# 	group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+	# 	# if user.id in group_gst.group_set or group_gst.created_by == user.id:
+	# 	if user.id in group_gst.author_set or group_gst.created_by == user.id :
+	# 		return 'allow'
+	# except Exception as e:
+	# 	print "Exception in user_access_policy- "+str(e)
+
+  try:
+    group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+
+    if get_policy(group_node, user):
+      return "allow"
+
+    else:
+      return "disallow"
+
+  except Exception as e:
+    error_message = "\n UserAccessPolicyError: " + str(e) + " !!!\n"
+    raise Exception(error_message)
 			
 		
 @register.assignment_tag
