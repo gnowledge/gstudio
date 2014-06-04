@@ -119,22 +119,20 @@ Since this is a web application, the installation essentially means setting up t
 
       (a) python manage.py initrcsrepo 
 	
-      (b) python manage.py migrate_member_of
-
-      (c) python manage.py filldb 
+      (b) python manage.py filldb 
 		
-	(if an error occurs related to 'auth_user' then run (d) followed by (c).)
+	(if an error occurs related to 'auth_user' then run (c) followed by (b).)
 
-      (d) python manage.py syncdb 
+      (c) python manage.py syncdb 
 
-      (e) python manage.py runserver 
+      (d) python manage.py runserver 
 
-	NOTE: Always run (d) & (e) commands together.
+	NOTE: Always run (c) & (d) commands together.
 
-     After running (e) point your browser to http://localhost:8000 to see gstudio on your browser.  Enjoy.  
+     After running (d) point your browser to http://localhost:8000 to see gstudio on your browser.  Enjoy.  
 
      Since gstudio is frequently updated, please obtain the latest code
-     from git repo. After each update run (d) before running (c).
+     from git repo. After each update run (b) before running (d).
 
 
 Any issues with this procedure or you need any further help, or to
