@@ -443,6 +443,30 @@ input.node-title{
 	height:70%;
 }
 
+/*for graph and location*/
+.graph-div {
+  height: 90%;
+  width: -webkit-calc(100% - 10px); width:-o-calc(100% - 10px); width: -moz-calc(100% - 10px); width: calc(100% - 10px) !important;
+  top: 5% !important;
+  left: 5px !important;
+  padding: 0px !important;
+  margin-left: 0 !important;
+}
+
+/*for graph and location*/
+.graph-div h3{
+  border-bottom: 2px inset #154534;
+  padding: 0.25em 0;
+}
+
+#view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal{
+  z-index:1; background-color: captiontext; padding: 5px 15px 10px; color:white !important; opacity:0.8; font-size: 2rem; box-shadow: 0 1px 10px 2px #A9A9A9;
+}
+
+#view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover{
+background-color: white; border-radius: 30px; padding: 5px 15px 10px; transition:2s; opacity:1; color:black !important; font-size: 2rem;
+}
+
 /* Splash Page */
 #splash{
 	background-image: url('http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg');
