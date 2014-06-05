@@ -190,49 +190,49 @@ def get_all_replies(parent):
 	 return ex_reply
 
 
-@register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_id, node, checked=None):
+# @register.inclusion_tag('ndf/drawer_widget.html')
+# def edit_drawer_widget(field, group_id, node, checked=None):
 
-	drawers = None
-	drawer1 = None
-	drawer2 = None
+# 	drawers = None
+# 	drawer1 = None
+# 	drawer2 = None
 
-	if node :
-		if field == "collection":
-			if checked == "Quiz":
-				checked = "QuizItem"
-			elif checked == "Theme":
-				checked = "Theme"
-			else:
-				checked = None
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-		elif field == "prior_node":
-			checked = None
-			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
-		elif field == "module":
-			checked = "Module"
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+# 	if node :
+# 		if field == "collection":
+# 			if checked == "Quiz":
+# 				checked = "QuizItem"
+# 			elif checked == "Theme":
+# 				checked = "Theme"
+# 			else:
+# 				checked = None
+# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+# 		elif field == "prior_node":
+# 			checked = None
+# 			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+# 		elif field == "module":
+# 			checked = "Module"
+# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
 		
-		drawer1 = drawers['1']
-		drawer2 = drawers['2']
+# 		drawer1 = drawers['1']
+# 		drawer2 = drawers['2']
 
-	else:
-		if field == "collection" and checked == "Quiz":
-			checked = "QuizItem"
+# 	else:
+# 		if field == "collection" and checked == "Quiz":
+# 			checked = "QuizItem"
 
-		elif field == "collection" and checked == "Theme":
-			checked = "Theme"
+# 		elif field == "collection" and checked == "Theme":
+# 			checked = "Theme"
 			
-		elif field == "module":
-			checked = "Module"
+# 		elif field == "module":
+# 			checked = "Module"
 			
-		else:
-			# To make the collection work as Heterogenous one, by default
-			checked = None
+# 		else:
+# 			# To make the collection work as Heterogenous one, by default
+# 			checked = None
 
-		drawer1 = get_drawers(group_id, None, [], checked)
+# 		drawer1 = get_drawers(group_id, None, [], checked)
 
-	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
+# 	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
@@ -453,20 +453,24 @@ def get_existing_groups_excluding_username():
 			group.append(items)
 	return group
 
-
 @register.assignment_tag
 def get_existing_groups_excluded(grname):
-	group = []
-	col_Group = db[Group.collection_name]
-	colg = col_Group.Group.find({'_type':u'Group', 'group_type': "PUBLIC"})  
-	colg.sort('name')
-	gr=list(colg)
-	for items in gr:
-		if items.name != grname:
-			group.append(items)
-	if not group:
-		return "None"
-	return group
+  """
+  Returns only first 10 public group(s) (sorted by last_update field in descending order) 
+  excluding the currently selected group if it comes under the searching criteria
+
+  Keyword arguments:
+  grname -- name of the group which is currently selected
+
+  Returns:
+  list of group node(s) resulted after given searching criteria
+  """
+  group_cur = collection.Node.find({'_type':u"Group", 'name': {'$nin': [u"home", grname]}, 'group_type': "PUBLIC"}).sort('last_update', -1).limit(10)
+
+  if group_cur.count() <= 0:
+    return "None"
+
+  return group_cur
 
 @register.assignment_tag
 def get_group_policy(group_id,user):
@@ -481,48 +485,38 @@ def get_group_policy(group_id,user):
 	return policy
 
 @register.assignment_tag
-def get_user_group(user):
-	
-		group = [] 
-		author = None
-		auth_type = ""    
-		
-		col_Group = db[Group.collection_name]
-		collection = db[Node.collection_name]
-		
-		group_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Group'})
-		auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
+def get_user_group(user, selected_group_name):
+  """
+  Returns first 10 group(s) to which logged-in user is subscribed to (sorted by last_update field in descending order) 
+  excluding the currently selected group if it comes under the searching criteria
 
-		if auth_obj:
-			auth_type = auth_obj._id
+  Keyword arguments:
+  user -- django's user object
 
-		colg = col_Group.Group.find({ '_type': {'$in': ['Group','Author']},  
-																'name': {'$nin': ['home']},
-																'$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id} ] 
-															})
+  selected_group_name -- name of the group which is currently selected
 
-		auth = col_Group.Group.one({'_type': u"Author", 'name': unicode(user.username)})
-		
-		if auth:
-			for items in colg:
-				if items.created_by == user.pk:
-					if items.name == auth.name:
-						author = items
-					else:
-						if not items.prior_node:
-							group.append(items)
-				else:
-					if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
-						group.append(items)
+  Returns:
+  list of group and/or author (logged-in) node(s) resulted after given searching criteria
+  """
+  group_list = []
+  auth_group = None
 
-		if author:
-			group.append(author)
+  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(10)
 
-		if not group:
-			return "None"
+  auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
-		return group
-	
+  if group_cur.count():
+    for g in group_cur:
+      group_list.append(g)
+
+  if auth_group:
+    # Appends author node at the bottom of the list, if it exists
+    group_list.append(auth_group)
+
+  if not group_list:
+    return "None"
+
+  return group_list
 
 
 @register.assignment_tag
@@ -548,6 +542,24 @@ def get_profile_pic(user):
 		
 	return prof_pic
 
+
+@register.assignment_tag
+def get_theme_node(groupid, node):
+
+	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+	theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+
+	# code for finding nodes collection has only topic instances or not
+	# It checks if first element in collection is theme instance or topic instance accordingly provide checks
+	if node.collection_set:
+		collection_nodes = collection.Node.one({'_id': ObjectId(node.collection_set[0]) })
+		if theme_GST._id in collection_nodes.member_of:
+			return "Theme_Enabled"
+		if topic_GST._id in collection_nodes.member_of:
+			return "Topic_Enabled"
+		
+	else:
+		return True
 
 
 @register.assignment_tag
@@ -865,14 +877,36 @@ def get_publish_policy(request,groupid,res_node):
 					 return "allow"
 
 @register.assignment_tag
+def get_resource_collection(resource_type):
+  
+  try:
+    
+    page_collection=[]
+    gst=collection.Node.one({'name':resource_type,'_type':'GSystemType'})
+    page_coll=collection.Node.find({'member_of':gst._id,'_type':'GSystem'})
+    if list(page_coll) == []:
+      page_coll=collection.Node.find({'member_of':gst._id,'_type':'File'})
+    else:    
+      page_coll=collection.Node.find({'member_of':gst._id,'_type':'GSystem'})
+        
+    for each in page_coll:
+      if each.collection_set:
+        page_collection.append(each)
+    return page_collection
+  except Exception as e:
+    print str(e)
+    return 'null'
+
+@register.assignment_tag
 def get_source_id(obj_id):
-	try:
-		source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
-		att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
-		return att_set.object_value
-	except Exception as e:
-		print str(e)
-		return 'null'
+  try:
+    source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+    return att_set.object_value
+  except Exception as e:
+    print str(e)
+    return 'null'
+
  
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
 	r_list.append(obj_id._id)

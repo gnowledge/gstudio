@@ -56,11 +56,11 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  <a href="#panel-name-description">{% block page_tab %} Page {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
-	  <a href="#panel-prior-node">Prior Node</a>
+	  <a href="#panel-prior-node" class="prior_node_tab">Prior Node</a>
 	</dd>
 	<!-- change name of collection tab overide block in your code -->
 	<dd title="Click here to add/edit collection">
-	  <a href="#panel-collection">{% block collection_tab %}Collection {% endblock %}</a> 
+	  <a href="#panel-collection" class="collection_tab">{% block collection_tab %}Collection {% endblock %}</a> 
 	</dd>  
 	
      </dl>
@@ -192,7 +192,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	<div class="small-12 columns">
 	  <div id="prior_node_drawer">
-	    {% edit_drawer_widget "prior_node" groupid node title %}
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
 	  </div>
 	</div>
       </div>
@@ -252,7 +252,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	<div class="small-12 columns">
 	  <div id="collection_drawer" >
-	    {% edit_drawer_widget "collection" groupid node title %}
+	    <!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
 	  </div>
 	</div>
       </div>
@@ -397,6 +397,59 @@ $("#name_id").change(function(){
 			},
 			success: function(data) {
 				$("#collection_drawer").html(data);
+			}
+		});
+
+	});
+
+	$(".prior_node_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#prior_node_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "prior_node",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				// alert(data);
+				$("#prior_node_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+
+	$(".collection_tab").click(function() {
+
+		$("#SelectApp").css("display", "none");
+		$("#save-node").css("display", "none");
+		$('#collection_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+		$("#module_drawer").html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "collection",
+				app:"{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				// alert(data);
+				$("#collection_drawer").html(data);
+				$("#module_drawer").html(data);
+				$("#SelectApp").css("display", "block");				
+				$("#save-node").css("display", "block");
 			}
 		});
 

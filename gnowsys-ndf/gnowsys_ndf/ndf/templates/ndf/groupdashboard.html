@@ -19,7 +19,21 @@ from django.contrib.auth.decorators import login_required
   success: function(data){
   $('#firstModal').html(data); },
   }); });
+
+
+<!-- Ajax for removing user from  List  -->
+  $(document).on('click',".button.alert.tiny.remove",function(){
+  user_id = $(this).attr("id")
+  node_id = $('#node_id').val()
+  var ajurl ="{% url 'remove_user_from_author_set' groupid %}?_id="+node_id+"&user_id="+user_id;
+   $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#firstModal').html(data); },
+  });}); 
   });
+<!-- End Ajax -->
+
 
 </script> 
 <!-- End Ajax -->
@@ -123,7 +137,7 @@ $(document).ready(function()
 {% get_policy node request.user as policy  %}
 {% if policy %}
 <!-- Triggers the modals -->
-<a href="#" id ="btn_list_member"data-reveal-id="firstModal" class="radius button">List Members</a>
+<a href="#" id ="btn_list_member" data-reveal-id="firstModal" class="radius button">List Members</a>
 
 <!-- Reveal Modals begin -->
 <div id="firstModal" class="reveal-modal" data-reveal>

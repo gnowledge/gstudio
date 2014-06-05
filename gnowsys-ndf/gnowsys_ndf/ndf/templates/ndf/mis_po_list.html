@@ -1,0 +1,426 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block head%}  
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <!-- Datetimepicker  -->
+  <!-- <link rel="stylesheet" media="all" type="text/css" href="/static/ndf/css/jquery-ui.css" /> -->
+  <!--   <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+  <script src="/static/ndf/js/jquery-ui.js"></script>
+  <script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
+  <script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
+  <link rel="stylesheet" href="/static/ndf/css/jquery-ui-timepicker-addon.css">
+ -->
+  <style type="text/css">
+    
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+      background-color:#efefef;
+      padding:0.5em 0 0.5em 0.5em; 
+      margin-left: -10px !important;
+    }
+
+    .active-app-set-edit{ border-right: 4px solid #808080; }
+
+    .active-app-set-view{ border-left: 4px solid #808080; }
+
+  </style>
+
+
+{% endblock%}
+
+{% block meta_content %}
+<ul class="side-nav"> 
+	<li>
+		<a></a>
+	</li>
+
+  {% for each in app_collection_set %}
+  {% get_memberof_objects_count each.pk groupid as count %}
+
+  {% if app_set_id == each|safe %}
+    {% if '/new/' in request.path %}
+    <li class="active-app-set-edit">
+    {% else %}
+    <li class="active-app-set-view">
+    {% endif %}
+  {% else %}
+  <li>
+  {% endif %}
+  
+    <div class="row">
+      {% if each.type_of or each.name == "Caste" or each.name == "Foundation Course" %}
+      <a class="small-8 columns" href="{% url 'mis_po_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+        {{each.name}} ({{count}})
+      </a> 
+      <a class="small-4 columns" href="{% url 'mis_po_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+        +&nbsp;Add
+      </a>
+
+      {% else %}
+        {{each.name}}
+      {% endif %}
+    </div>
+	</li>
+
+	{% endfor %}
+
+</ul>
+{% endblock %}
+
+
+{% block body_content %} 
+  
+  {# template for showing apt_set_instance list #}
+
+  {% if app_set_template %}
+    
+    {% if nodes %}
+      {% autopaginate nodes 25 %}
+    
+      <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+        <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
+        
+        <input class="button confirmDeleteObjects" type="button" value="Confirm">
+        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+        <div id="deletion_results"></div>
+        <a class="close-reveal-modal">&#215;</a>
+
+      </div>
+
+      {% if user.is_authenticated %}
+        <input class="button deleteObjects" type="button" value="Delete">
+      {% endif %}
+      
+      <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+
+        {% csrf_token %}
+        <input name="search" type="textbox" value="" style="width:300px;">
+        <input type="hidden" name="class" value="{{class_name}}">
+        <input type="submit" value="search" style="width:100px;">
+
+      </form>
+    {% endif %}
+
+    <table >
+      <thead>
+        <tr>
+    
+          {% if nodes %}
+    
+            <th width="20"> <input class="checkedAll" type="checkbox"></th>
+            <th width="150">Title</th>
+            <th width="150">Created by</th>
+            <th width="150">Creation date</th>
+            <th width="150">Edit</th>
+      
+          {% endif %}
+    
+        </tr>
+      </thead>
+      
+      <tbody>
+        {% for each in nodes %}
+          <tr>
+        
+            <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+            <td  class="name" style="font-size:11px;"><a href="{% url 'mis_po_app_instance_detail' groupid app_id app_set_id each.id %}">{{each.name}}</a></td>
+            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
+            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
+            <td  class="name" style="font-size:11px;"><a href="{% url 'mis_po_app_instance_edit' groupid app_id app_set_id each.id %}" class="button medium">Edit</a></td>
+        
+          </tr>
+          
+          {% empty %}
+
+          <h3>No data to display</h3>
+
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+    {% paginate %}
+  {% endif %}
+
+
+{% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+
+$(document).on('click',".checkedAll",function(){
+  if($(this).is(":checked")==true){
+    $('.objectsCheckbox input').prop( "checked", true );
+  }
+  else{
+    $('.objectsCheckbox input').prop( "checked", false );
+  }
+});
+$(document).on('click',".button.confirmDeleteObjects",function(){
+  var selectedobject = $(".objectsCheckbox input:checked")
+  $('#myModal').foundation('reveal', 'open');
+       // $('#myModal').foundation('reveal', 'close');
+       if(selectedobject.length > 0){
+         var i = 0;
+         var str = "";  
+         $.map(selectedobject,function(each){
+          if(i == 0){str = str.concat(each.parentElement.id)}
+            else {str = str.concat(","+each.parentElement.id)}
+              i= i+1
+          })
+
+         $.ajax({
+           url: "{% url 'deletion_instances' groupid %}",
+           type: 'POST',
+           data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}',confirm:"yes"},
+           beforeSend: function() {     },
+           success: function(result){
+           },
+           complete: function(){ 
+            $('#myModal').foundation('reveal', 'close');
+          }
+        });
+         
+         $.map(selectedobject,function(each){
+          each.parentElement.parentElement.remove()
+        })
+         $('#myModal').foundation('reveal', 'close');
+
+         
+       }
+       else{
+        alert("select object to delete")
+      }
+
+    });
+$(document).on('click',".button.deleteObjects",function(){
+  var selectedobject = $(".objectsCheckbox input:checked")
+       // $('#myModal').foundation('reveal', 'close');
+       if(selectedobject.length > 0){
+         $('#myModal').foundation('reveal', 'open');
+
+//             var confirmed = confirm("Deleting "+selectedobject.length+" objects");
+//             if(confirmed == true){
+ var i = 0;
+ var str = "";  
+ $.map(selectedobject,function(each){
+  if(i == 0){str = str.concat(each.parentElement.id)}
+    else {str = str.concat(","+each.parentElement.id)}
+      i= i+1
+  })
+
+ $.ajax({
+   url: "{% url 'deletion_instances' groupid %}",
+   type: 'POST',
+   data: {deleteobjects:str,csrfmiddlewaretoken: '{{ csrf_token }}'},
+   beforeSend: function() {     },
+   success: function(result){
+    $("#deletion_results").html("");
+    for(var obj in result){
+      var ulist = $("<ul>"+"</ul>")
+      .attr("id","conceptlist")
+      .appendTo($("#deletion_results"));
+      var li = $("<li><b>"+result[obj].title+"</b></li>")
+      .appendTo(ulist);
+      var ulist1 = $("<ul>"+"</ul>")
+      .attr("id","conceptlist")
+      .appendTo(li);
+      for(var obj2 in result[obj].content){
+        object = result[obj].content[obj2]
+        for(var obj3 in  object){
+          for(var each in object[obj3]){
+            var li1 = $("<li>"+object[obj3][each]+"</li>")
+            .appendTo(ulist1);
+          }}
+        }
+      }
+
+    },
+    complete: function(){   }
+  });
+  //           }
+}
+else{
+  alert("select object to delete")
+}
+
+});
+$(document).on('click',".button.cancelDeleteObjects",function(){
+ $('#myModal').foundation('reveal', 'close');
+});
+
+
+$(document).on('open', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
+  
+  $.ajax({
+    
+    url: "{% url 'get_visited_location' groupid %}",
+
+    success: function(data){ 
+     
+      data = JSON.parse(data);
+
+      var lastVisitedLocationVal = data;
+      
+      if(lastVisitedLocationVal){
+
+        if(lastVisitedLocationVal == "[]"){
+          lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+        }
+
+        if(lastVisitedLocationVal.length > 0){
+                // lastVisitedLocationVal = JSON.parse(lastVisitedLocationVal);
+                var zoom = lastVisitedLocationVal.pop(),
+                lng = lastVisitedLocationVal[1],
+                lat = lastVisitedLocationVal[0];
+                map.setView([lat, lng], zoom);
+              }
+            }
+            else if( tempArr.length )
+            {
+              var group = new L.featureGroup(tempArr)
+              map.fitBounds(group.getBounds());
+            }
+            
+          }
+        });
+
+});
+
+$(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
+  
+  map.invalidateSize();  
+});
+
+$(document).foundation({
+  tab: {
+    callback : function (tab) {
+      console.log(tab);
+    }
+  }
+});
+
+
+   // for datetimepicker
+   
+   var startDtInput = $("font:contains('start_time')");
+   startDtInput = startDtInput.parent().next().find("input");
+
+   var endDtInput = $("font:contains('end_time')");
+   endDtInput = endDtInput.parent().next().find("input");
+
+   // if(startDtInput.length > 0){ startDtInput.datetimepicker( { hourGrid: 6, minuteGrid: 15 }); }
+   
+   // startDtInput.val().trim()
+   
+   // if(endDtInput.length > 0)
+   // {
+      // endDtInput.datetimepicker({
+
+        // hourGrid: 6,
+        // minuteGrid: 15,
+        /*numberOfMonths: 2,
+        minDate: new Date(2010, 1, 20, 8, 30),
+        maxDate: new Date(2010, 1, 31, 17, 30)*/
+    //   }); 
+    // }
+
+  if(startDtInput.length > 0){
+    startDtInput.datetimepicker({ 
+
+      hourGrid: 6,
+      minuteGrid: 15,
+
+      onClose: function(dateText, inst) {
+
+        if (endDtInput.val() != '') {
+
+          var testStartDate = startDtInput.datetimepicker('getDate');
+          var testEndDate = endDtInput.datetimepicker('getDate');
+
+          if (testStartDate > testEndDate)
+            endDtInput.datetimepicker('setDate', testStartDate);
+
+        }
+        else {
+          endDtInput.val(dateText);
+        }
+      },
+      onSelect: function (selectedDateTime){
+        endDtInput.datetimepicker('option', 'minDate', startDtInput.datetimepicker('getDate') );
+      }
+    });
+  }
+
+  if(endDtInput.length > 0){
+    endDtInput.datetimepicker({ 
+      hourGrid: 6,
+      minuteGrid: 15,
+      numberOfMonths: 2,
+      onClose: function(dateText, inst) {
+        if (startDtInput.val() != '') {
+          var testStartDate = startDtInput.datetimepicker('getDate');
+          var testEndDate = endDtInput.datetimepicker('getDate');
+          if (testStartDate > testEndDate)
+            startDtInput.datetimepicker('setDate', testEndDate);
+        }
+        else {
+          startDtInput.val(dateText);
+        }
+      },
+      onSelect: function (selectedDateTime){
+        startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
+      }
+    });
+  }
+
+    // totWhen ---------------
+    var totWhen = $("font:contains('tot_when')").parent().next().find("input");
+
+    if(totWhen.length > 0)
+    {
+      totWhen.datetimepicker();
+      $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
+      $("input.tiny").after("<div id='tot-when-date-list'></div>")
+
+    }
+
+    $(totWhen).change(function(){ 
+
+    if($(totWhen).val().length > 0)
+    {
+      $("input.tiny").removeClass("disabled");
+    }
+    else
+    {
+      $("input.tiny").addClass("disabled");
+    }
+
+  });
+
+    $("input.tiny").click(function(){
+      if(!$(this).hasClass("disabled")) 
+      {
+        $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
+        $(totWhen).val("");
+        $("input.tiny").addClass("disabled");
+      }
+    })
+
+    function getTotWhen()
+    {
+      var datesList = []
+      dts = $("#tot-when-date-list .date-item");
+      $.each(dts, function(i, val){datesList.push($(val).text().trim())});
+
+      return datesList;
+    }
+
+// </script>
+{% endblock %}	
