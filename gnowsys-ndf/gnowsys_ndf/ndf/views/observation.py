@@ -299,21 +299,29 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 		# for anonymous user
 		if user_type == "anonymous" and is_cookie_supported:
 			cookie_added_markers = request.session.get('anonymous_added_markers')
+			print "==",cookie_added_markers
 
 			if cookie_added_markers == None or cookie_added_markers[:cookie_added_markers.find(",")] != user_session_id:
 				cookie_added_markers = user_session_id + "," + unique_token 
+				print "==--",cookie_added_markers
 
 			elif cookie_added_markers[:cookie_added_markers.find(",")] == user_session_id:
 				cookie_added_markers += "," + unique_token
+				print "====",cookie_added_markers
 
 			request.session['anonymous_added_markers'] = cookie_added_markers
+			# HttpResponse.set_cookie('anonymous_added_markers', value=cookie_added_markers)
 	
 	# print "\n create/save :  ", request.session.items()
 			
 	response_data = [len(app_set_element.location), unique_token, operation_performed]
 	response_data = json.dumps(response_data)
 
-	return StreamingHttpResponse(response_data)
+	# response = HttpResponse(response_data)
+	# response.cookies['anonymous_added_markers'] = cookie_added_markers
+
+	# return response
+	return StreamingHttpResponse(response_data, {'anonymous_added_markers':cookie_added_markers})
 
 
 

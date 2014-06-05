@@ -924,6 +924,15 @@
 
 			{% if not user.is_authenticated %}
 
+				// console.log("{{request.session.anonymous_added_markers}}");
+				console.log(ref)
+				console.log("{{request.session.session_key}}")
+				console.log("{{anonymous_added_markers}}")
+				// console.log( 
+				// 	(ref == undefined) ||
+				// 	((("{{request.session.anonymous_added_markers}}").indexOf(ref) > 1) && 
+				// 	(("{{request.session.anonymous_added_markers}}").indexOf("{{request.session.session_key}}") == 0))
+				//   )
 				// makes input boxes enable for which user has created
 				if( 
 					(ref == undefined) ||
@@ -939,7 +948,7 @@
 					$(".leaflet-popup-content:visible input, textarea").prop("disabled", true);
 					$(popupHtmlObj).children("div.row").replaceWith("<a class='button tiny expand success' title='click to register' href='/accounts/login/' target='_blank'>Login / Register</a>")
 					$(".leaflet-popup-content:visible label:nth-child(1)").before('<div class="ask-register-div">Please register yourself before contributing any resource<hr/><span style="font-size:0.5em; ">NOTE : You can only read but can not edit any fields</span></div>');
-					$(".leaflet-popup-content:visible div.ask-register-div").fadeOut(30000);
+					$(".leaflet-popup-content:visible div.ask-register-div").fadeOut(15000);
 				}
 
 			{% endif %}
