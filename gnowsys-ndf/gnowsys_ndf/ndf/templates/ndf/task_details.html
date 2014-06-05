@@ -1,0 +1,159 @@
+{% extends "ndf/base.html" %}
+
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block help_content %}
+{% endblock %}
+
+{% block meta_content %}
+  <h2>Task</h2>
+{% endblock %}
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+     <div class="task">
+      <br/>
+      <a class="button medium" href="{% url 'task_create_edit' group_name %}">
+      	<span class="fi-plus">&nbsp;&nbsp;New Task</span>
+      </a>
+    </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+  
+{% block body_content %}
+<div class="row">
+
+  <section class="medium-9 columns">
+<h2>
+<span class='node'>{{node.name}}</span> 
+</h2>
+    <div style="display:table; border:1px; border-spacing:6px; " class="medium-12 columns">
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Parent task:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if parent %}{{parent}}{% else %} -- {% endif %}</label>
+	  </div>
+	<!</div>
+	<!<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Status:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if Status %}{{Status}}{% else %} -- {% endif %} </label>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Start date:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if start_time %}{{start_time}}{% else %} -- {% endif %}</label>
+	  </div>
+	<!</div>	
+	<!<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Priority:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if Priority %}{{Priority}}{% else %} -- {% endif %}</label>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Due date:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if end_time %}{{end_time}}{% else %} -- {% endif %}</label>
+	  </div>
+	<!</div>	
+	<!<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Assignee:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if Assignee %}{{Assignee}}{% else %} -- {% endif %}</label>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Estimated time:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if Estimated_time %}{{Estimated_time}}{% else %} -- {% endif %}</label>
+	  </div>
+	  <div class="medium-6 columns">
+	  </div>		
+	</div>
+	<hr>
+	<div class="row">
+	  <div class="medium-12 columns">
+	    <label><b>Description:</b></label>
+	    <div id="contentlist" class="content" style="padding-left:20px;">
+      	{% with node.html_content|safe as description %}
+      	{% if description != "None" %}
+      	{{ description }}
+	{% else %} -- {% endif %}
+      	{% endwith %}
+	    </div>
+	  </div>
+	</div>	
+       <hr>
+	<div class="row">
+	  <div class="medium-12 columns">
+	    <label><b>History:</b></label>
+	  </div>
+	</div>
+	<div class="history_task" style="padding-left:20px;">
+{% for each_history in history %}
+	<div class="panel">
+		{% if each_history.content %}
+			      	{% with each_history.content|safe as history_description %}
+ 			      	{{ history_description }}
+  				{% endwith %}
+		{% endif %}
+		{% for each_altnames in each_history.altnames %}		
+			<p style="color:#999999">{{each_altnames}}</p>
+		{% endfor %}
+		<div align="right">
+			<label>- Updated by <em>{{ each_history.created_by }}  {{ each_history.created_at|timesince }}</em> ago</label>
+		</div>
+	</div>
+{% endfor %}	
+        </div>
+    </div>
+  </section>
+  <section class="medium-3 columns">
+    <div class="panel">
+     <h3 class="subheader"></h3>
+       Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
+       <small>
+         <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+          {% for seq_no, version_no in node.version_dict.items reversed %}
+          <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+          {% endfor %}
+        </div>
+      </small>
+     <a href="{% url 'task_edit' group_name node %}" class="small button split edit"><i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span></a> 
+
+    </div>
+
+  </section>
+
+{% endblock %}
+
