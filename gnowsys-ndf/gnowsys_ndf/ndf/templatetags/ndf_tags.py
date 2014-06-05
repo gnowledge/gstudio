@@ -668,7 +668,12 @@ def get_grid_fs_object(f):
 	try:
 		file_collection = db[File.collection_name]
 		file_obj = file_collection.File.one({'_id':ObjectId(f['_id'])})
-		grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
+                if file_obj.mime_type == 'video':
+                        if len(file_obj.fs_file_ids) > 2:
+                                if (file_obj.fs.files.exists(file_obj.fs_file_ids[2])):
+                                        grid_fs_obj = file_obj.fs.files.get(ObjectId(file_obj.fs_file_ids[2]))
+                else:
+                        grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
 	except Exception as e:
 		print "Object does not exist", e
 	return grid_fs_obj

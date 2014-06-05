@@ -415,6 +415,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     files.seek(0)
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
+    print "TeSt",img_type, content_org, tags
     if fileobj.fs.files.exists({"md5":filemd5}):
         return files.name                                                                #return already exist file
     else:
@@ -454,7 +455,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
 
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
-            if img_type == None:
+            if img_type == "" or img_type == None:
                 if content_org:
                     fileobj.content_org = unicode(content_org)
                     # Required to link temporary files with the current user who is modifying this document
@@ -822,7 +823,12 @@ def readDoc(request, _id, group_id, file_name = ""):
     file_node = collection.File.one({"_id": ObjectId(_id)})
     if file_node is not None:
         if file_node.fs_file_ids:
-            if (file_node.fs.files.exists(file_node.fs_file_ids[0])):
+            if file_node.mime_type == 'video':
+                if len(file_node.fs_file_ids) > 2:
+                    if (file_node.fs.files.exists(file_node.fs_file_ids[2])):
+                        f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[2]))
+                        return HttpResponse(f.read(), content_type=f.content_type)
+            elif (file_node.fs.files.exists(file_node.fs_file_ids[0])):
                 grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
                 return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
             else:
