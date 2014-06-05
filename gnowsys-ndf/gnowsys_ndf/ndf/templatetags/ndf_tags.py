@@ -708,37 +708,16 @@ def get_dict_item(dictionary, key):
 
 @register.assignment_tag
 def get_policy(group, user):
-  # if group.group_type =='PUBLIC':
-  #   return False
-  # elif user.is_superuser:
-  #   return True
-  # elif user.id in group.author_set:
-  #   return True
-  # elif user.id == group.created_by:
-  #   return True
-  # else:
-  #   return False
-  print "\n username: ", user.username
-
-  if user.is_superuser:
-    print " -- superuser\n"
+  if group.group_type =='PUBLIC':
+    return False
+  elif user.is_superuser:
     return True
-
+  elif user.id in group.author_set:
+    return True
+  elif user.id == group.created_by:
+    return True
   else:
-    if group.edit_policy == "NON_EDITABLE":
-      print " -- NON_EDITABLE group\n"
-      return False
-
-    elif user.id == group.created_by:
-      print " -- creator of group\n"
-      return True
-
-    elif user.id == group.author_set:
-      print " -- member of group\n"
-      return True
-
-    else:
-      return False
+    return False
 
 
 @register.inclusion_tag('ndf/admin_fields.html')
@@ -765,7 +744,24 @@ def group_type_info(groupid,user=0):
 
 			
 @register.assignment_tag
-def user_access_policy(node,user):
+def user_access_policy(node, user):
+  """
+  Returns status whether logged-in user is able to access any resource.
+
+  Check is performed in given sequence as follows (sequence has importance):
+  - If user is superuser, then he/she is allowed
+  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
+  - Else if user is creator of the group, then he/she is allowed
+  - Else if user is member of the group, then he/she is allowed
+  - Else user is NOT allowed!
+
+  Arguments:
+  node -- group's node that is currently selected by the user_access
+  user -- user's node that is currently logged-in
+
+  Returns:
+  string value (allow/disallow), i.e. whether user is allowed or not!
+  """
 	# try:
 	# 	col_Group=db[Group.collection_name]
 	# 	group_gst = col_Group.Group.one({'_id':ObjectId(node)})
@@ -775,10 +771,28 @@ def user_access_policy(node,user):
 	# except Exception as e:
 	# 	print "Exception in user_access_policy- "+str(e)
 
-  try:
-    group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+  user_access = False
 
-    if get_policy(group_node, user):
+  try:
+    if user.is_superuser:
+      user_access = True
+
+    else:
+      group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+
+      if group_node.edit_policy == "NON_EDITABLE":
+        user_access = False
+
+      elif user.id == group_node.created_by:
+        user_access = True
+
+      elif user.id == group_node.author_set:
+        user_access = True
+
+      else:
+        user_access = False
+
+    if user_access:
       return "allow"
 
     else:
