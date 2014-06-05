@@ -258,26 +258,24 @@ ul#graph-hover.f-dropdown{
  
     {% edit_policy groupid node request.user as status %}
      
-     {% if status == "allow" %}
-	{% get_edit_url node.pk as edit_url %}
-    {% switch_group_conditions request.user group_id as switch_conditions %}
-    {% check_group node as is_group %}
+    {% if status == "allow" %}
+      {% get_edit_url node.pk as edit_url %}
+      {% switch_group_conditions request.user group_id as switch_conditions %}
+      {% check_group node as is_group %}
 
-    {% get_user_object node.created_by as created_user %}
+      {% get_user_object node.created_by as created_user %}
 
-         {% if is_group %}
+      {% if is_group %}
+        {% if user_access == "allow" %}
+        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
+        {% endif %}
 
-             {% if request.user == created_user or request.user.is_superuser %}     
-                   
-      <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
-             {% endif %}
+      {% else %}
+        {% if user_access == "allow" %}
+        <a href="{% url edit_url group_name_tag node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+        {% endif %}
 
-         {% else %}
-
-
-      <a href="{% url edit_url group_name_tag node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
-
-    {% endif %}    
+      {% endif %}    
     {% endif %}
 
     <ul id="edit-options" class="f-dropdown">
