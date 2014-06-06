@@ -671,7 +671,12 @@ def get_grid_fs_object(f):
 	try:
 		file_collection = db[File.collection_name]
 		file_obj = file_collection.File.one({'_id':ObjectId(f['_id'])})
-		grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
+                if file_obj.mime_type == 'video':
+                        if len(file_obj.fs_file_ids) > 2:
+                                if (file_obj.fs.files.exists(file_obj.fs_file_ids[2])):
+                                        grid_fs_obj = file_obj.fs.files.get(ObjectId(file_obj.fs_file_ids[2]))
+                else:
+                        grid_fs_obj =  file_obj.fs.files.get(file_obj.fs_file_ids[0])
 	except Exception as e:
 		print "Object does not exist", e
 	return grid_fs_obj
@@ -722,6 +727,7 @@ def get_policy(group, user):
   else:
     return False
 
+
 @register.inclusion_tag('ndf/admin_fields.html')
 def get_input_fields(fields_type,fields_name,translate=None):
 	"""Get html tags 
@@ -746,15 +752,63 @@ def group_type_info(groupid,user=0):
 
 			
 @register.assignment_tag
-def user_access_policy(node,user):
-	try:
-		col_Group=db[Group.collection_name]
-		group_gst = col_Group.Group.one({'_id':ObjectId(node)})
-		# if user.id in group_gst.group_set or group_gst.created_by == user.id:
-		if user.id in group_gst.author_set or group_gst.created_by == user.id :
-			return 'allow'
-	except Exception as e:
-		print "Exception in user_access_policy- "+str(e)
+def user_access_policy(node, user):
+  """
+  Returns status whether logged-in user is able to access any resource.
+
+  Check is performed in given sequence as follows (sequence has importance):
+  - If user is superuser, then he/she is allowed
+  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
+  - Else if user is creator of the group, then he/she is allowed
+  - Else if user is member of the group, then he/she is allowed
+  - Else user is NOT allowed!
+
+  Arguments:
+  node -- group's node that is currently selected by the user_access
+  user -- user's node that is currently logged-in
+
+  Returns:
+  string value (allow/disallow), i.e. whether user is allowed or not!
+  """
+	# try:
+	# 	col_Group=db[Group.collection_name]
+	# 	group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+	# 	# if user.id in group_gst.group_set or group_gst.created_by == user.id:
+	# 	if user.id in group_gst.author_set or group_gst.created_by == user.id :
+	# 		return 'allow'
+	# except Exception as e:
+	# 	print "Exception in user_access_policy- "+str(e)
+
+  user_access = False
+
+  try:
+    if user.is_superuser:
+      user_access = True
+
+    else:
+      group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+
+      if group_node.edit_policy == "NON_EDITABLE":
+        user_access = False
+
+      elif user.id == group_node.created_by:
+        user_access = True
+
+      elif user.id == group_node.author_set:
+        user_access = True
+
+      else:
+        user_access = False
+
+    if user_access:
+      return "allow"
+
+    else:
+      return "disallow"
+
+  except Exception as e:
+    error_message = "\n UserAccessPolicyError: " + str(e) + " !!!\n"
+    raise Exception(error_message)
 			
 		
 @register.assignment_tag

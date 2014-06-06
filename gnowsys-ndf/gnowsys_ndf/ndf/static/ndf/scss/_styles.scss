@@ -373,6 +373,12 @@ textarea{
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 
+/*CSS fix for tables generated via orgitdown*/
+#content table td, #content colgroup col{
+	float: none !important;
+}
+
+
 .user{
 	color: inherit;
 }
