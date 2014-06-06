@@ -37,7 +37,7 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
    # (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
-    url(r'^(?P<group_id>[^/]+)$','gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
+    url(r'^(?P<group_id>[^/]+)/$','gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
     (r'^(?P<group_id>[^/]+)/browse topic/', include('gnowsys_ndf.ndf.urls.browse_topic')),
     (r'^(?P<group_id>[^/]+)/browse resource/', include('gnowsys_ndf.ndf.urls.browse_resource')),
 
