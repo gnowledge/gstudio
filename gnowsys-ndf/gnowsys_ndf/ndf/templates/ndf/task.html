@@ -93,7 +93,7 @@
 
       {% get_user_object node.created_by as user_obj %}
       {% ifequal user_obj.username user.username %}
-      <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete</a>
+      <a class="button alert tiny" href="{% url 'delete_task' group_name node %}?next={{request.path}}">Delete</a>
       {% endifequal %}
 
 
