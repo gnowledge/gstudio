@@ -111,22 +111,9 @@ def create_edit_task(request, group_name, task_id=None):
 	edit_task_node = task_node
 	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     	
-    	for each in at_list:
-		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
-        	attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
-        	if attr:
-			blank_dict[each] = attr.object_value
-	if task_node.prior_node :
-		pri_node = collection.Node.one({'_id':task_node.prior_node[0]})
-		blank_dict['parent'] = pri_node.name 
-		blank_dict['parent_id'] = str(pri_node._id)
     else:
         task_node = collection.GSystem()
 
-
-    var = { 'title': 'Task','group_id': group_id, 'groupid': group_id, 'group_name': group_name, 'node':edit_task_node, 'task_id':task_id }
-    var.update(blank_dict)
-    context_variables = var
     if request.method == "POST": # create or edit
         name = request.POST.get("name","")
         content_org = request.POST.get("content_org","")
@@ -155,7 +142,7 @@ def create_edit_task(request, group_name, task_id=None):
 					changed_object = collection.Node.find_one({'_id':ObjectId(parent)})
 					changed_object.post_node.append(task_node._id)
 					changed_object.save()
-					change_list.append('parent set to '+changed_object.name.encode('utf8'))
+					change_list.append('parent set to '+changed_object.name)
 				else :
 					parent_object = collection.Node.find_one({'_id':task_node.prior_node[0]})
 					parent_object.post_node.remove(task_node._id)
@@ -164,7 +151,7 @@ def create_edit_task(request, group_name, task_id=None):
 					changed_object = collection.Node.find_one({'_id':ObjectId(parent)})
 					changed_object.post_node.append(task_node._id)
 					changed_object.save()
-					change_list.append('Parent changed from '+parent_object.name.encode('utf8')+' to '+changed_object.name.encode('utf8')) # updated details
+					change_list.append('Parent changed from '+parent_object.name+' to '+changed_object.name) # updated details
 
         task_node.save()
 	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"] # fields
@@ -205,12 +192,27 @@ def create_edit_task(request, group_name, task_id=None):
 			update_node.altnames = unicode(str(change_list))
 		update_node.prior_node = [task_node._id]		
 		update_node.save()
-		update_node.name = unicode(task_node.name.encode('utf8')+"-update_history-"+str(update_node._id))
+		update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
 		update_node.save()
 		task_node.post_node.append(update_node._id)
 		task_node.save()			
 
         return HttpResponseRedirect(reverse('task_details', kwargs={'group_name': group_name, 'task_id': str(task_node._id) }))
+
+    if task_id:
+    	for each in at_list:
+		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+        	attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+        	if attr:
+			blank_dict[each] = attr.object_value
+	if task_node.prior_node :
+		pri_node = collection.Node.one({'_id':task_node.prior_node[0]})
+		blank_dict['parent'] = pri_node.name 
+		blank_dict['parent_id'] = str(pri_node._id)
+
+    var = { 'title': 'Task','group_id': group_id, 'groupid': group_id, 'group_name': group_name, 'node':edit_task_node, 'task_id':task_id }
+    var.update(blank_dict)
+    context_variables = var
 
     return render_to_response("ndf/task_create_edit.html",
                                   context_variables,
