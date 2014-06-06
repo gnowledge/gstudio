@@ -130,7 +130,6 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         property_order = system.property_order
         system.get_neighbourhood(systemtype._id)
 
-
         # array of dict for events ---------------------
                 
         if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
@@ -171,7 +170,6 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         # print json.dumps(events_arr)
 
         # END --- array of dict for events ---------------------
-
 
         for tab_name, fields_order in property_order:
             display_fields = []

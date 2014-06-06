@@ -214,6 +214,20 @@
           {% endfor %}
 
 
+          {% if node.enrollment_code %}
+          <br/>
+
+          <div class="row" id="enrollment_code">
+            <label class="small-4 columns">
+              Enrollment Code
+            </label>
+            <div class="small-8 columns">
+            {{node.enrollment_code}}
+            </div>
+          </div>
+          {% endif %}
+
+
           {% if node.college_affiliated_to %}
           <br/>
 
