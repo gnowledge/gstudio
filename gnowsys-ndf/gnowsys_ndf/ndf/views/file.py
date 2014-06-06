@@ -84,36 +84,126 @@ def file(request, group_id, file_id=None):
       search_field = request.POST['search_field']
 
       files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
-                                    '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                            {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                    '$or': [
+                                      {'$and': [
+                                        {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                        {'$or': [
+                                          {'access_policy': u"PUBLIC"},
+                                          {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                          ]
+                                        }
+                                        ]
+                                      },
+                                      {'$and': [
+                                        {'tags': {'$regex':search_field, '$options': 'i'}},
+                                        {'$or': [
+                                          {'access_policy': u"PUBLIC"},
+                                          {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                          ]
+                                        }
+                                        ]
+                                      }
+                                    ],
                                     'group_set': {'$all': [ObjectId(group_id)]}
                                   }).sort('last_update', -1)
 
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
                                             '_type': 'File', 
-                                            '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                    {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                            '$or': [
+                                              {'$and': [
+                                                {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                {'$or': [
+                                                  {'access_policy': u"PUBLIC"},
+                                                  {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                  ]
+                                                }
+                                                ]
+                                              },
+                                              {'$and': [
+                                                {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                {'$or': [
+                                                  {'access_policy': u"PUBLIC"},
+                                                  {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                  ]
+                                                }
+                                                ]
+                                              }
+                                            ],
                                             'group_set': {'$all': [ObjectId(group_id)]}
                                           }).sort("last_update", -1)
 
       imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
                                               '_type': 'File', 
-                                              '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                      {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                              '$or': [
+                                                {'$and': [
+                                                  {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                  ]
+                                                },
+                                                {'$and': [
+                                                  {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                  ]
+                                                }
+                                              ],
                                               'group_set': {'$all': [ObjectId(group_id)]}
                                             }).sort("last_update", -1)
 
       videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, 
                                               '_type': 'File', 
-                                              '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                      {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                              '$or': [
+                                                {'$and': [
+                                                  {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                  ]
+                                                },
+                                                {'$and': [
+                                                  {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                  ]
+                                                }
+                                              ],
                                               'group_set': {'$all': [ObjectId(group_id)]}
                                             }).sort("last_update", -1)
 
       pandoraCollection = collection.Node.find({'member_of': {'$all': [ObjectId(pandora_video_st._id)]}, 
                                                 '_type': 'File', 
-                                                '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                        {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                                '$or': [
+                                                  {'$and': [
+                                                    {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                    {'$or': [
+                                                      {'access_policy': u"PUBLIC"},
+                                                      {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                      ]
+                                                    }
+                                                    ]
+                                                  },
+                                                  {'$and': [
+                                                    {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                    {'$or': [
+                                                      {'access_policy': u"PUBLIC"},
+                                                      {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                      ]
+                                                    }
+                                                    ]
+                                                  }
+                                                ],
                                                 'group_set': {'$all': [ObjectId(group_id)]}
                                             }).sort("last_update", -1)
 
@@ -134,10 +224,58 @@ def file(request, group_id, file_id=None):
       # File list view
       title = GST_FILE.name
      
-      files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'fs_file_ids':{'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-      docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-      imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
-      videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, '_type': 'File','fs_file_ids': {'$ne': []}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort("last_update", -1)
+      files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, 
+                                    '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    '$or': [
+                                      {'access_policy': u"PUBLIC"},
+                                      {'$and': [
+                                          {'access_policy': u"PRIVATE"}, 
+                                          {'created_by': request.user.id}
+                                        ]
+                                      }
+                                    ]
+                                  }).sort("last_update", -1)
+
+      docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
+                                            '_type': 'File','fs_file_ids': {'$ne': []}, 
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            '$or': [
+                                              {'access_policy': u"PUBLIC"},
+                                              {'$and': [
+                                                {'access_policy': u"PRIVATE"}, 
+                                                {'created_by': request.user.id}
+                                                ]
+                                              }
+                                            ]
+                                          }).sort("last_update", -1)
+      
+      imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+                                              '_type': 'File','fs_file_ids': {'$ne': []}, 
+                                              'group_set': {'$all': [ObjectId(group_id)]},
+                                              '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                  {'access_policy': u"PRIVATE"}, 
+                                                  {'created_by': request.user.id}
+                                                  ]
+                                                }
+                                              ]
+                                            }).sort("last_update", -1)
+      
+      videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, 
+                                              '_type': 'File','fs_file_ids': {'$ne': []}, 
+                                              'group_set': {'$all': [ObjectId(group_id)]},
+                                              '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                  {'access_policy': u"PRIVATE"}, 
+                                                  {'created_by': request.user.id}
+                                                  ]
+                                                }
+                                              ]
+                                            }).sort("last_update", -1)
+      
       already_uploaded = request.GET.getlist('var', "")
   
       
@@ -277,6 +415,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     files.seek(0)
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
+    print "TeSt",img_type, content_org, tags
     if fileobj.fs.files.exists({"md5":filemd5}):
         return files.name                                                                #return already exist file
     else:
@@ -316,7 +455,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
 
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
-            if img_type == None:
+            if img_type == "" or img_type == None:
                 if content_org:
                     fileobj.content_org = unicode(content_org)
                     # Required to link temporary files with the current user who is modifying this document
@@ -684,7 +823,12 @@ def readDoc(request, _id, group_id, file_name = ""):
     file_node = collection.File.one({"_id": ObjectId(_id)})
     if file_node is not None:
         if file_node.fs_file_ids:
-            if (file_node.fs.files.exists(file_node.fs_file_ids[0])):
+            if file_node.mime_type == 'video':
+                if len(file_node.fs_file_ids) > 2:
+                    if (file_node.fs.files.exists(file_node.fs_file_ids[2])):
+                        f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[2]))
+                        return HttpResponse(f.read(), content_type=f.content_type)
+            elif (file_node.fs.files.exists(file_node.fs_file_ids[0])):
                 grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
                 return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
             else:

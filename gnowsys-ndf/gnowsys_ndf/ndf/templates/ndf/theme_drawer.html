@@ -1,12 +1,12 @@
+{% load pagination_tags %}
 <br/><br/>
 <div>
-
-
+  {% autopaginate drawer 10 %}
   <!-- Row containing LHS Resources and middle Navigation and RHS Collection -->
   <div class="row">
-
    <!-- For collection created on RHS -->
    <div class="small-5 small-left columns resource-drawer">
+    
 
     <ul class="pricing-table" id="collection_drawer">        
       {% if drawer != "None" %}
@@ -41,11 +41,12 @@
 
       </li>
       {% endfor %}
-
+           
       {% endif %}
+      
     </ul>
-
   </div>
+  
   <!-- End of Collection created on RHS -->
 
   <!-- For arrows Up, Down -->
@@ -67,6 +68,8 @@
 
 
 </div>
+<br/>
+{% paginate %}
 </div>
 
 <input id="collection_list" type="hidden" name="collection_list" value="" />
@@ -75,13 +78,10 @@
 <script type="text/javascript">
 
     //To allocate space of 10 resources listing for drawers.
-    liHeight = $("#collection_drawer > li").outerHeight();
-    $(".resource-drawer").height(liHeight * 5);
+    $(".resource-drawer").height(400);
 
     // To select the single as well as multiple items from list 
-
      $(document).on('click','#collection_drawer li.bullet-item',function(e){
-    //$("#collection_drawer li.bullet-item").click(function(e){
       
       if (e.ctrlKey)
       {        
@@ -94,7 +94,6 @@
       }     
       
     });
-    
     
 
     function checkUpDownButton()
