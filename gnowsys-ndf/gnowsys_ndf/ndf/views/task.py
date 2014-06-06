@@ -140,6 +140,7 @@ def create_edit_task(request, group_name, task_id=None):
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
 	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
+		task_node.save()
 	if parent: # prior node saving
 		if not task_id:		
 			task_node.prior_node = [ObjectId(parent)]
@@ -216,3 +217,46 @@ def create_edit_task(request, group_name, task_id=None):
                                   context_instance=RequestContext(request)
                               )
 
+    
+@login_required    
+def delete_task(request, group_name, _id):
+    """This method will delete task object and its Attribute and Relation
+    """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_name) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    pageurl = request.GET.get("next", "")
+    try:
+        node = collection.Node.one({'_id':ObjectId(_id)})
+        if node:
+            attributes = collection.Triple.find({'_type':'GAttribute','subject':node._id})
+            relations = collection.Triple.find({'_type':'GRelation','subject':node._id})
+            if attributes.count() > 0:
+                for each in attributes:
+                    collection.Triple.one({'_id':each['_id']}).delete()
+                    
+            if relations.count() > 0:
+                for each in relations:
+                    collection.Triple.one({'_id':each['_id']}).delete()
+	    if len(node.post_node) > 0 :
+		for each in node.post_node : 
+		    sys_each_postnode = collection.Node.find_one({'_id':each})
+		    member_of_name = collection.Node.find_one({'_id':sys_each_postnode.member_of[0]}).name 
+		    if member_of_name == "Task" :
+			sys_each_postnode.prior_node.remove(node._id)
+			sys_each_postnode.save()
+		    if member_of_name == "task_update_history":
+			sys_each_postnode.delete()
+            node.delete()
+    except Exception as e:
+        print "Exception:", e
+    return HttpResponseRedirect(pageurl) 
