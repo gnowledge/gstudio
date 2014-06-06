@@ -125,7 +125,7 @@ $(document).ready(function()
 
 <!-- overide meta_content block from base.html -->
 {% block meta_content %}
-
+  <h2>Group</h2>
 {% endblock %}
 
 <!-- overide related_content block from base.html -->
@@ -157,7 +157,7 @@ $(document).ready(function()
   {% else %}
        <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible">
   {% endif %} 
-{% elif user_is_joined == "not" or not user.is_authenticated  %}
+{% elif user_is_joined == "not" or not user.is_authenticated %}
   {% if is_user_group and node.created_by != request.user %}
        <input class="button tiny" type="submit" id="notify" value="Follow" class="button" align="center" style="visibility:visible" >
   {% else %}
