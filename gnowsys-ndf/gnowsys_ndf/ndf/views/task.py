@@ -132,10 +132,16 @@ def create_edit_task(request, group_name, task_id=None):
         Due_date = request.POST.get("Due_date","")
         Assignee = request.POST.get("Assignee","")
         Estimated_time = request.POST.get("Estimated_time","")
+	watchers = request.POST.get("watchers","")
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
 	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
+		for each_watchers in watchers.split(','):
+           		 bx=User.objects.get(username=each_watchers)
+	                 task_node.author_set.append(bx.id)
+			 userlist.append(each_watchers)
 		task_node.save()
+		
 	if parent: # prior node saving
 		if not task_id:		
 			task_node.prior_node = [ObjectId(parent)]
@@ -177,8 +183,8 @@ def create_edit_task(request, group_name, task_id=None):
 	    userlist.append(request.user.username)
 	    for eachuser in list(set(userlist)):
 		activ="task reported"
-		msg="Task "+task_node.name+" has been reported by "+request.user.username+"\n Status: "+request.POST.get('Status','')+"\n Assignee: "+request.POST.get('Assignee','')+"\n Url: http://"+sitename.domain+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
-		bx=User.objects.get(username =each)
+		msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
+		bx=User.objects.get(username =eachuser)
 	        set_notif_val(request,group_id,msg,activ,bx)
 	else: #update
 	    for each in at_list:
@@ -204,9 +210,11 @@ def create_edit_task(request, group_name, task_id=None):
 				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
 	    userobj = User.objects.get(id=task_node.created_by)
 	    userlist.append(userobj.username)
+	    for each_author in task_node.author_set:
+		userlist.append(User.objects.get(id=each_author).username)
        	    for eachuser in list(set(userlist)):
 		activ="task updated"
-		msg="Task "+task_node.name+" has been updated by "+request.user.username+"\n     - Changes: "+ str(change_list).strip('[]')+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
+		msg="Task '"+task_node.name+"' has been updated by "+request.user.username+"\n     - Changes: "+ str(change_list).strip('[]')+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
 		bx=User.objects.get(username =eachuser)
 	        set_notif_val(request,group_id,msg,activ,bx)
 

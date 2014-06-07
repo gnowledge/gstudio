@@ -12,6 +12,15 @@
 <link href="/static/ndf/css/jquery-ui.css" rel="stylesheet" />
 <script type="text/javascript">
 </script>
+<style type="text/css">
+.watchers{
+    max-height: 210px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-left: 10px;
+    width: 300px;
+}
+</style>
 {% endblock %}
 
 {% block script %}
@@ -41,6 +50,13 @@ $.each(user_list, function(key,value) {
          .attr("value",value)
          .text(value)
 	 .attr("id",value)); 
+     var div = $("<div>"+"</div>")
+		.attr("class","row")
+		.appendTo($(".watchers"));
+     var input = $("<input> "+value)
+		 .attr("type","checkbox")
+		 .attr("id",value) 
+		 .appendTo(div);
 });
 {% if Status %}
 var edit_Status  = document.getElementById("customDropdown")
@@ -54,6 +70,15 @@ edit_Priority.selectedIndex = edit_Priority.options.{{Priority}}.index
 var edit_Assignee  = document.getElementById("customDropdown2")
 edit_Assignee.selectedIndex = edit_Assignee.options.{{Assignee}}.index
 {% endif %}
+
+var selected = new Array();
+$(document).on('click',"#save-node",function(){
+$('input:checkbox:checked').each(function() {     selected.push(this.id);});
+$('#hidden_watchers').val(selected);
+});
+
+
+
 {% endblock %}
 
 {% block help_content %}
@@ -174,7 +199,18 @@ edit_Assignee.selectedIndex = edit_Assignee.options.{{Assignee}}.index
 	    </div>
 	  </div>
 	</div>	
-
+	{% if not task_id %}
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label>Watchers</label>
+	  </div>
+	  <div class="medium-6 columns">
+		<div class="watchers"></div>
+	  </div>
+          <div class="medium-3 columns">
+		<input type="hidden" name="watchers" id="hidden_watchers" value="">
+          </div>
+	{% endif %}
       <div class="row" >
 	<div class="medium-6 columns">
 	    <input type="submit" id="save-node" value="Save" class="button"/>
