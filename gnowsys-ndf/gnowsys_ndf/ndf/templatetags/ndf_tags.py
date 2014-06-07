@@ -600,6 +600,26 @@ def get_edit_url(groupid):
 		else:
 			return 'file_edit'
 
+@register.assignment_tag
+def get_create_url(groupid):
+
+  node = collection.Node.one({'_id': ObjectId(groupid) }) 
+  if node._type == 'GSystem':
+
+    type_name = collection.Node.one({'_id': node.member_of[0]}).name
+
+    if type_name == 'Quiz':
+      return 'quiz_create'    
+    elif type_name == 'Page':
+      return 'page_create_edit' 
+    elif type_name == 'QuizItem':
+      return 'quiz_item_create'
+
+  elif node._type == 'Group' or node._type == 'Author' :
+    return 'create_group'
+
+  elif node._type == 'File':
+    return 'uploadDoc'
 	
 
 
@@ -785,13 +805,13 @@ def user_access_policy(node, user):
     else:
       group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
 
-      if group_node.edit_policy == "NON_EDITABLE":
-        user_access = False
-
-      elif user.id == group_node.created_by:
+      if user.id == group_node.created_by:
         user_access = True
 
-      elif user.id == group_node.author_set:
+      elif group_node.edit_policy == "NON_EDITABLE":
+        user_access = False
+
+      elif user.id in group_node.author_set:
         user_access = True
 
       else:
@@ -896,36 +916,43 @@ def Group_Editing_policy(groupid,node,user):
 
 
 @register.assignment_tag
-def get_publish_policy(request,groupid,res_node):
- col_Group = db[Group.collection_name]
- node=col_Group.Group.one({"_id":ObjectId(groupid)})
- resnode=col_Group.Group.one({"_id":ObjectId(res_node._id)})
- group_type=group_type_info(groupid)
- group=user_access_policy(groupid,request.user)
- ver=node.current_version
- if request.user.id:
-	 if group_type == "Moderated":
-			base_group=get_prior_post_node(groupid)
-			if base_group is not None:
-				if base_group.status == "DRAFT" or node.status == "DRAFT":
-						return "allow"
-	 elif node.edit_policy == "NON_EDITABLE":
-		if resnode._type == "Group":
-			if ver == "1.1" or resnode.created_by != request.user.id :
-				 return "stop"
-		if group == "allow":          
-			if res_node.status == "DRAFT": 
-					return "allow"    
-	 elif node.edit_policy == "EDITABLE_NON_MODERATED":
-			 #condition for groups
-			 if resnode._type == "Group":
-				 if ver == "1.1" or resnode.created_by != request.user.id:
-					 # print "\n version = 1.1\n"
-					 return "stop"
-			 if group == "allow":
-				 # print "\n group = allow\n"
-				 if res_node.status == "DRAFT": 
-					 return "allow"
+def get_publish_policy(request, groupid, res_node):
+  resnode = collection.Node.one({"_id": ObjectId(res_node._id)})
+
+  if resnode.status == "DRAFT":
+    node = collection.Node.one({"_id": ObjectId(groupid)})
+
+    group_type = group_type_info(groupid)
+    group = user_access_policy(groupid,request.user)
+    ver = node.current_version
+    
+    if request.user.id:
+      if group_type == "Moderated":
+      	base_group=get_prior_post_node(groupid)
+      	if base_group is not None:
+      		if base_group.status == "DRAFT" or node.status == "DRAFT":
+    				return "allow"
+
+      elif node.edit_policy == "NON_EDITABLE":
+        if resnode._type == "Group":
+        	if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+        		return "stop"
+        if group == "allow":          
+        	if resnode.status == "DRAFT": 
+        			return "allow"    
+
+      elif node.edit_policy == "EDITABLE_NON_MODERATED":
+        #condition for groups
+        if resnode._type == "Group":
+          if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+            # print "\n version = 1.1\n"
+            return "stop"
+
+        if group == "allow":
+          # print "\n group = allow\n"
+          if resnode.status == "DRAFT": 
+            return "allow"
+
 
 @register.assignment_tag
 def get_resource_collection(resource_type):
