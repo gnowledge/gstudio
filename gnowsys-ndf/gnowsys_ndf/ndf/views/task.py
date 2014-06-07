@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 try:
     from bson import ObjectId
@@ -15,7 +16,13 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import GSystemType, Node 
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 collection = get_database()[Node.collection_name]
+sitename=Site.objects.all()
+if sitename :
+	sitename = sitename[0]
+else : 
+	sitename = ""
 
 
 def task(request, group_name, task_id=None):
@@ -93,6 +100,7 @@ def create_edit_task(request, group_name, task_id=None):
     edit_task_node = ""
     change_list = []
     parent_task_check = ""
+    userlist = []
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_name) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
@@ -164,11 +172,21 @@ def create_edit_task(request, group_name, task_id=None):
                 	newattribute.attribute_type = attributetype_key
                 	newattribute.object_value = request.POST.get(each,"")
                 	newattribute.save()
+			if each == "Assignee" :
+				userlist.append(request.POST.get(each,""))
+	    userlist.append(request.user.username)
+	    for eachuser in list(set(userlist)):
+		activ="task reported"
+		msg="Task "+task_node.name+" has been reported by "+request.user.username+"\n Status: "+request.POST.get('Status','')+"\n Assignee: "+request.POST.get('Assignee','')+"\n Url: http://"+sitename.domain+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
+		bx=User.objects.get(username =each)
+	        set_notif_val(request,group_id,msg,activ,bx)
 	else: #update
 	    for each in at_list:
 		if request.POST.get(each,""):
 			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+			if each == "Assignee" :
+				userlist.append(request.POST.get(each,""))
 			if attr : # already attribute exist 
 				if not attr.object_value == request.POST.get(each,"") :	
 					change_list.append(each.encode('utf8')+' changed from '+attr.object_value.encode('utf8')+' to '+request.POST.get(each,"").encode('utf8')) # updated details	  
@@ -184,6 +202,14 @@ def create_edit_task(request, group_name, task_id=None):
                 		newattribute.object_value = request.POST.get(each,"")
                 		newattribute.save()
 				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
+	    userobj = User.objects.get(id=task_node.created_by)
+	    userlist.append(userobj.username)
+       	    for eachuser in list(set(userlist)):
+		activ="task updated"
+		msg="Task "+task_node.name+" has been updated by "+request.user.username+"\n     - Changes: "+ str(change_list).strip('[]')+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
+		bx=User.objects.get(username =eachuser)
+	        set_notif_val(request,group_id,msg,activ,bx)
+
 	    if change_list or content_org :
 		GST_task_update_history = collection.Node.one({'_type': "GSystemType", 'name': 'task_update_history'})
 	        update_node = collection.GSystem()
