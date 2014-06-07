@@ -81,9 +81,11 @@
 
      {% if user.is_authenticated %}
      <div class="small-4 columns">
+     {% if user_access == "allow" %}
        <a href="{% url 'quiz_item_create' group_name_tag %}">
          <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
        </a>
+     {% endif %}
      </div>
      {% endif %}
 
@@ -98,9 +100,11 @@
 
      {% if user.is_authenticated %}
      <div class="small-4 columns">
+     {% if user_access == "allow" %}
        <a href="{% url 'quiz_item_create' group_name_tag %}">
          <input type="button" class="button small" style="float:right;" value="+ Add Quiz Item" />
        </a>
+     {% endif %}
      </div>
      {% endif %}
 

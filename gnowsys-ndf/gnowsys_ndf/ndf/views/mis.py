@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 import ast
 
@@ -64,6 +65,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     system_mime_type = ""
     template = ""
     property_display_order = []
+    events_arr = []
 
     template_prefix = ""
     if app_name == "MIS":
@@ -128,6 +130,49 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         property_order = system.property_order
         system.get_neighbourhood(systemtype._id)
 
+
+        # array of dict for events ---------------------
+                
+        if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
+
+            for event in system.organiser_of_event:
+                event.get_neighbourhood(event.member_of)
+                
+                tempdict = {}
+                tempdict['title'] = event.name
+                
+                if event.start_time and len(event.start_time) == 16:
+                    dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
+                    tempdict['start'] = dt
+                if event.end_time and len(event.end_time) == 16:
+                    dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
+                    tempdict['end'] = dt
+                tempdict['id'] = str(event._id)
+                events_arr.append(tempdict)
+
+        elif system.has_key('event_organised_by'): # gives list of colleges/host of events
+
+            for host in system.event_organised_by:
+                host.get_neighbourhood(host.member_of)
+
+                tempdict = {}
+                tempdict['title'] = host.name
+
+                if system.start_time and len(system.start_time) == 16:
+                    dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
+                    tempdict['start'] = dt
+                if system.end_time and len(system.start_time) == 16:
+                    dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
+                    tempdict['end'] = dt
+                
+                tempdict['id'] = str(host._id)
+                events_arr.append(tempdict)
+
+        # print json.dumps(events_arr)
+
+        # END --- array of dict for events ---------------------
+
+
         for tab_name, fields_order in property_order:
             display_fields = []
             for field, altname in fields_order:
@@ -176,9 +221,18 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
 
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id
-
-                                        , "node":system, 'group_id':group_id, "property_display_order": property_display_order})
+    variable = RequestContext(request, {
+                                        'groupid':group_id, 'app_name':app_name, 'app_id':app_id,
+                                        "app_collection_set":app_collection_set, "app_set_id":app_set_id, 
+                                        "nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template,
+                                        "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name,
+                                        "app_set_instance_name":app_set_instance_name, "title":title,
+                                        "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 
+                                        'tags':tags, 'location':location, "content":content, "system_id":system_id,
+                                        "system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id,
+                                        "node":system, 'group_id':group_id, "property_display_order": property_display_order,
+                                        "events_arr":events_arr
+                                        })
 
     return render_to_response(template, variable)
       
