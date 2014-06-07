@@ -307,13 +307,18 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 				cookie_added_markers += "," + unique_token
 
 			request.session['anonymous_added_markers'] = cookie_added_markers
+			# HttpResponse.set_cookie('anonymous_added_markers', value=cookie_added_markers)
 	
 	# print "\n create/save :  ", request.session.items()
 			
-	response_data = [len(app_set_element.location), unique_token, operation_performed]
+	response_data = [len(app_set_element.location), unique_token, operation_performed, str(cookie_added_markers)]
 	response_data = json.dumps(response_data)
 
-	return StreamingHttpResponse(response_data)
+	# response = HttpResponse(response_data)
+	# response.cookies['anonymous_added_markers'] = cookie_added_markers
+
+	# return response
+	return StreamingHttpResponse(response_data, {'anonymous_added_markers':cookie_added_markers})
 
 
 

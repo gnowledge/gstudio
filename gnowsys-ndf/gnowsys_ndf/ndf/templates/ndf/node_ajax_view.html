@@ -229,8 +229,9 @@ ul#graph-hover.f-dropdown{
       </small>
   
     <!-- added button to convert collection into module-->
-    {% if node.collection_set and user.is_authenticated%}
     {% user_access_policy groupid request.user as user_access %}
+    
+    {% if node.collection_set and user.is_authenticated%}    
       {% if user_access == "allow" %}
      
     <a href="#" class="button" id="module"></i> <span>Make Module</a>
@@ -257,7 +258,6 @@ ul#graph-hover.f-dropdown{
    {% endif %}
  
     {% edit_policy groupid node request.user as status %}
-     
     {% if status == "allow" %}
       {% get_edit_url node.pk as edit_url %}
       {% switch_group_conditions request.user group_id as switch_conditions %}
