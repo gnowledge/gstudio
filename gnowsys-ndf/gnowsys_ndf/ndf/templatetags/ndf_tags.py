@@ -955,25 +955,31 @@ def get_publish_policy(request, groupid, res_node):
 
 
 @register.assignment_tag
-def get_resource_collection(resource_type):
-  
+def get_resource_collection(groupid, resource_type):
+  """
+  Returns collections of given resource-type belonging to currently selected group
+
+  Arguments:
+  groupid -- ObjectId (in string format) of currently selected group
+  resource_type -- Type of resource (Page/File) whose collections need to find
+
+  Returns:
+  Mongodb's cursor object holding nodes having collections
+  """
   try:
-    
-    page_collection=[]
-    gst=collection.Node.one({'name':resource_type,'_type':'GSystemType'})
-    page_coll=collection.Node.find({'member_of':gst._id,'_type':'GSystem'})
-    if list(page_coll) == []:
-      page_coll=collection.Node.find({'member_of':gst._id,'_type':'File'})
-    else:    
-      page_coll=collection.Node.find({'member_of':gst._id,'_type':'GSystem'})
-        
-    for each in page_coll:
-      if each.collection_set:
-        page_collection.append(each)
-    return page_collection
+    gst = collection.Node.one({'_type': "GSystemType", 'name': unicode(resource_type)})
+
+    res_cur = collection.Node.find({'_type': {'$in': [u"GSystem", u"File"]},
+                                    'member_of': gst._id,
+                                    'group_set': ObjectId(groupid),
+                                    'collection_set': {'$exists': True, '$not': {'$size': 0}}
+                                  })
+    return res_cur
+
   except Exception as e:
-    print str(e)
-    return 'null'
+    error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
+    raise Exception(error_message)
+
 
 @register.assignment_tag
 def get_source_id(obj_id):
