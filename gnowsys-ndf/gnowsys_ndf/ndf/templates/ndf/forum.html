@@ -28,11 +28,13 @@
 
 {% block meta_content %}
   <h2>Forums</h2>
+  <br/>
 {% endblock %}
 
 
 {% block search_content %}
   {% include "ndf/node_search_base.html" %}
+  <br/>
 {% endblock %}
 
 
@@ -83,6 +85,7 @@
   {% autopaginate existing_forums 23 %}
 
   {% for each in existing_forums %}
+  <!-- #{#% for each in forum_detail_list %} -->
   <li class="card">
     <div class="forum">
 
@@ -108,17 +111,17 @@
       
     <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-    <a class="small button expand" href="{% url 'show' groupid each %}">View Details</a>
+    <a class="small button expand" href="{% url 'show' groupid each.id %}">View Details</a>
 
     {% comment %}
     {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url '' group_name_tag each %}">Delete</a>
+    <a class="button alert tiny" href="{% url '' group_name_tag each.id %}">Delete</a>
     {% endif %}
     {% endcomment %}
 
     <footer class="row">
       <div class="small-7 columns"><strong>{{each.contributors|length}}</strong> Contributor{{each.contributors|pluralize}}</div>
-      <div class="small-5 columns"><div class="right"><strong>#</strong> Thread</div></div> 
+      <div class="small-5 columns"><div class="right"><strong>{{each.threads}}</strong> Thread</div></div> 
     </footer>
 
     </div>
