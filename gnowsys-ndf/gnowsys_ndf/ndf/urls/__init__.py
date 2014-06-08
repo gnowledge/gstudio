@@ -24,7 +24,6 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^$', HomeRedirectView.as_view()),        
 
-
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_id>[^/]+)/video', include('gnowsys_ndf.ndf.urls.video')),
@@ -37,31 +36,35 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/batch', include('gnowsys_ndf.ndf.urls.batch')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
-   # (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
+    
+    
     (r'^(?P<group_id>[^/]+)/browse topic', include('gnowsys_ndf.ndf.urls.browse_topic')),
     (r'^(?P<group_id>[^/]+)/browse resource', include('gnowsys_ndf.ndf.urls.browse_resource')),
-    url(r'^(?P<group_id>[^/]+)/$','gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),    
-
+    
     (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis'), {'app_name': "MIS"}),
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis_po'), {'app_name': "MIS-PO"}),
-
-#    (r'^(?P<group_id>[^/]+)/',include('gnowsys_ndf.ndf.urls.group')),
-
-    url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
 
     (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
     # (r'^(?P<group_id>[^/]+)/Observation', include('gnowsys_ndf.ndf.urls.observation')),
     (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
+    
+    url(r'^(?P<group_id>[^/]+)/$', 'gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),    
+    #(r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.group')),
+
+    url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
 
     (r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)', include('gnowsys_ndf.ndf.urls.custom_app')),    
-  #  url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', custom_app_view, name='GAPPS'),       
-   # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', custom_app_view, name='GAPPS_set'),
-   # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)$', custom_app_view, name='GAPPS_set_instance'),
-   # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)/edit/$', custom_app_new_view, name='GAPPS_set_instance_edit'),
-   # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/new/$', custom_app_new_view, name='GAPPS_set_new_instance'),
-   (r'^home','gnowsys_ndf.ndf.views.group.group_dashboard'),
-   # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
+    # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)$', custom_app_view, name='GAPPS'),       
+    # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)$', custom_app_view, name='GAPPS_set'),
+    # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)$', custom_app_view, name='GAPPS_set_instance'),
+    # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)/edit/$', custom_app_new_view, name='GAPPS_set_instance_edit'),
+    # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/new/$', custom_app_new_view, name='GAPPS_set_new_instance'),
+    
+    (r'^home','gnowsys_ndf.ndf.views.group.group_dashboard'),
+    # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
+    
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
+    
     url(r'^accounts/password/change/done/', auth_views.password_change_done, name='password_change_done'),
     url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),
     url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form': UserResetform},name='password_reset_confirm'),
@@ -76,8 +79,9 @@ urlpatterns = patterns('',
         },
         name='password_reset'
     ),
+    
     url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
     (r'^accounts/', include('registration.backends.default.urls')),
+    
     url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
-
 )
