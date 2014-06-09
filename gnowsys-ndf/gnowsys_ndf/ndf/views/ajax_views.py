@@ -6,6 +6,7 @@
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
+from django.http import Http404
 from django.core.urlresolvers import reverse
 
 from django.shortcuts import render_to_response
@@ -1174,3 +1175,37 @@ def get_filterd_user_list(request, group_id):
         print all_users_list,set(user_list)
         filtered_users = list(set(all_users_list) - set(user_list))
         return HttpResponse(json.dumps(filtered_users))
+
+def search_tasks(request, group_id):
+    '''
+    This function will return (all task's) 
+    '''
+    user_list = []
+    app_id = collection.Node.find_one({'_type':"GSystemType", "name":"Task"})
+    if request.is_ajax():
+        term = request.GET.get('term',"")
+        task_nodes = collection.Node.find({
+                                          'member_of': {'$all': [app_id._id]},
+					  'name': {'$regex': term, '$options': 'i'}, 
+                                          'group_set': {'$all': [ObjectId(group_id)]},
+                                          'status': {'$nin': ['HIDDEN']}
+                                      }).sort('last_update', -1)
+	for each in task_nodes :
+		user_list.append({"label":each.name,"value":each.name,"id":str(each._id)})	
+        return HttpResponse(json.dumps(user_list))
+    else:
+	raise Http404
+
+def get_group_member_user(request, group_id):
+    '''
+    This function will return (all task's) 
+    '''
+    user_list = []
+    group = collection.Node.find_one({'_id':ObjectId(group_id)})
+    if request.is_ajax():
+        if group.author_set:
+            for each in group.author_set:
+                user_list.append(User.objects.get(id = each).username)
+        return HttpResponse(json.dumps(user_list))
+    else:
+	raise Http404
