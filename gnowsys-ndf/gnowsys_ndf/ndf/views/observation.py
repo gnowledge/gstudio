@@ -373,34 +373,34 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
 	if request.method == "POST" :
-            # for uploaded images saving
-            # print "\n\n=========", request.FILES.getlist("doc[]", ""), "\n\n"
-            for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-                
-                fcol = db[File.collection_name]
-                fileobj = fcol.File()
-                filemd5 = hashlib.md5(each.read()).hexdigest()
-                # print "\nmd5 : ", filemd5
+		# for uploaded images saving
+		# print "\n\n=========", request.FILES.getlist("doc[]", ""), "\n\n"
+		for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+		    
+		    fcol = db[File.collection_name]
+		    fileobj = fcol.File()
+		    filemd5 = hashlib.md5(each.read()).hexdigest()
+		    # print "\nmd5 : ", filemd5
 
-                if fileobj.fs.files.exists({"md5":filemd5}):
+		    if fileobj.fs.files.exists({"md5":filemd5}):
 
-                    coll = get_database()['fs.files']
-                    a = coll.find_one({"md5":filemd5})
-                    # prof_image takes the already available document of uploaded image from its md5 
-                    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
-                    # print "======= ||| =====", prof_image
-	    	else:
-                    # print "\n\n index : ", index
-                    # If uploaded image is not found in gridfs stores this new image 
-                    submitDoc(request, group_id)
-                    
-                    # prof_image takes the already available document of uploaded image from its name
-                    coll = get_database()['fs.files']
-                    a = coll.find_one({"md5":filemd5})
-                    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
-                    # prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
-                    # print "------------", prof_image
-                    
-                    # --- END of images saving
-                    
-                return StreamingHttpResponse(str(prof_image._id))	
+		        coll = get_database()['fs.files']
+		        a = coll.find_one({"md5":filemd5})
+		        # prof_image takes the already available document of uploaded image from its md5 
+		        prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+		        # print "======= ||| =====", prof_image
+		    else:
+			    # print "\n\n index : ", index
+			    # If uploaded image is not found in gridfs stores this new image 
+			    submitDoc(request, group_id)
+			    
+			    # prof_image takes the already available document of uploaded image from its name
+			    coll = get_database()['fs.files']
+			    a = coll.find_one({"md5":filemd5})
+			    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+			    # prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+			    # print "------------", prof_image
+			    
+			    # --- END of images saving
+		        
+		    return StreamingHttpResponse(str(prof_image._id))	
