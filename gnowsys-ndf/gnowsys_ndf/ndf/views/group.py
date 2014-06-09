@@ -330,13 +330,14 @@ def group_dashboard(request,group_id=None):
       else:
           shelves = []
 
-
   except Exception as e:
     groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
     grpid=groupobj['_id']
     pass
-  
-  groupobj,ver=get_page(request,groupobj)    
+
+  if groupobj.status == u"DRAFT":
+    groupobj, ver = get_page(request, groupobj)
+
   # First time breadcrumbs_list created on click of page details
   breadcrumbs_list = []
   # Appends the elements in breadcrumbs_list first time the resource which is clicked
@@ -381,7 +382,9 @@ def edit_group(request,group_id):
     group_id=page_node._id
     return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
 
-  page_node,ver=get_page(request,page_node)
+  else:
+    if page_node.status == u"DRAFT":
+      page_node, ver = get_page(request, page_node)
 
   return render_to_response("ndf/edit_group.html",
                                     { 'node': page_node,
