@@ -636,8 +636,12 @@ def get_group_type(group_id, user):
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
 			else:
-				colg = None
-		
+				colg = col_Group.Group.find_one({'_type': 'Group', 'name': gid})
+				if colg :
+					pass
+				else:		
+					colg = None
+  		
 		#check if Group exist in the database
 		if colg is not None:
 
@@ -665,7 +669,6 @@ def get_group_type(group_id, user):
 		print "Error in group_type_tag "+str(e)
 		colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return "pass"
-		
 
 
 
@@ -702,7 +705,7 @@ def get_grid_fs_object(f):
 def get_class_list(class_name):
 	"""Get list of class 
 	"""
-	class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]
+	class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "MetaType", "GRelation", "GAttribute"]
 	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data"}
 
 @register.inclusion_tag('ndf/admin_class.html')
