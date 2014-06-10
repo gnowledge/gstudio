@@ -820,7 +820,7 @@ def get_data_for_drawer(request, group_id):
     data_list=set_drawer_widget(st,coll_obj_list)
     return HttpResponse(json.dumps(data_list))
 
-def get_data_for_user_drawer(request, group_id):
+def get_data_for_user_drawer(request, group_id,):
     '''
     This method will return data for user widget
     '''
@@ -834,6 +834,7 @@ def get_data_for_user_drawer(request, group_id):
     all_batch_user = []
     users = []
     st_batch_id = request.GET.get('st_batch_id','')
+    node_id = request.GET.get('_id','')
     if st_batch_id:
         batch_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         group = collection.Node.one({'_id':ObjectId(group_id)})
@@ -843,7 +844,6 @@ def get_data_for_user_drawer(request, group_id):
         else:
             users = []
         user_list = list(set(group.author_set) - set(users))
-        print user_list,"Test"
         for each in user_list:
             user= User.objects.get(id=each)
             dic = {}
@@ -852,6 +852,13 @@ def get_data_for_user_drawer(request, group_id):
             d1.append(dic)
         draw1['drawer1'] = d1
         data_list.append(draw1)
+        if node_id:
+            for each in collection.Node.one({'_id':ObjectId(node_id)}).author_set:
+                user= User.objects.get(id=each)
+                dic = {}
+                dic['id'] = user.id   
+                dic['name'] = user.username
+                d2.append(dic)
         draw1['drawer2'] = d2
         data_list.append(draw1)
         return HttpResponse(json.dumps(data_list))

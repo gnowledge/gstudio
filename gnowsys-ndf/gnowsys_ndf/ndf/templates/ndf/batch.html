@@ -132,6 +132,7 @@ if(txt_input > len_user)
     {% ifequal user_obj.username user.username %}
     <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
     {% endifequal %}
+     <a class="button  tiny" href="{% url 'edit' groupid node %}">Edit</a>
     <footer class="row">
     </footer>
   </div>
