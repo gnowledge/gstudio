@@ -370,7 +370,7 @@ def submitDoc(request, group_id):
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
         access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
-        tags = request.POST.get('tags')
+        tags = request.POST.get('tags', "")
 
         i = 1
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
