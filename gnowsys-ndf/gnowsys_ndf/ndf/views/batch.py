@@ -48,6 +48,8 @@ def create_and_edit(request, group_id, _id = None):
         course_name = ""
         if request.method == 'POST':
             batch_count = request.POST.get('batch_count','')
+        else:
+            batch_count = 1
         group = collection.Node.one({"_id":ObjectId(group_id)})
         fc_st = collection.Node.one({'_type':'GSystemType','name':'Foundation Course'})
         rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
@@ -62,7 +64,7 @@ def create_and_edit(request, group_id, _id = None):
                 course_name = collection.Node.one({'_id':ObjectId(course.subject)}).name
 
         template = "ndf/create_batch.html"
-        variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':batch_count,'st_batch_id':GST_BATCH._id,'fc_courses':fc_courses,'batch':batch,'course_name':course_name,'batch_count':1})
+        variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':batch_count,'st_batch_id':GST_BATCH._id,'fc_courses':fc_courses,'batch':batch,'course_name':course_name})
         return render_to_response(template, variable)
     
 def save_and_update(request, group_id):
