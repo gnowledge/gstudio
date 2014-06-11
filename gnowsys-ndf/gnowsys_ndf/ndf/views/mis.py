@@ -304,7 +304,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         systemtype_name = systemtype.name
         title = systemtype_name + " - new"
         for each in systemtype.attribute_type_set:
-            systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type})
+            systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type, 'altnames': each.altnames})
 
         for eachrt in systemtype.relation_type_set:
             # object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in collection.Node.find({'member_of': {'$all': [ collection.Node.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
