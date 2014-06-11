@@ -279,7 +279,7 @@
 
 			    	$attachedImages.attr("data-image-list", JSON.stringify(imagesList));
 
-			    	$attachedImages.append("<li title='"+fileSelect.value+"''><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/readDoc/"+xhr.responseText+"/"+fileSelect.value+"' target='_blank' data-id='"+xhr.responseText+"'>"+fileSelect.files[0].type+"</a></li>");
+			    	$attachedImages.append("<li title='"+fileSelect.value+"'><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/readDoc/"+xhr.responseText+"/"+fileSelect.value+"' target='_blank' data-id='"+xhr.responseText+"'>"+fileSelect.files[0].type+"</a></li>");
 			    	// fileSelect.files[0].type.split("/")[0]
 
 			    	$inputEl = $(".leaflet-popup-content:visible").children("input, textarea");
