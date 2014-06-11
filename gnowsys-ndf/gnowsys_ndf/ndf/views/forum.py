@@ -77,9 +77,28 @@ def forum(request, group_id, node_id=None):
       )
 
     elif forum_st._id == ObjectId(node_id):
+      
       # Forum list view
+
       existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
-      variables=RequestContext(request,{'existing_forums': existing_forums, 'groupid': group_id, 'group_id': group_id})
+      forum_detail_list = []
+
+      for each in existing_forums:
+        
+        temp_forum = {}
+        temp_forum['name'] = each.name
+        temp_forum['created_at'] = each.created_at
+        temp_forum['tags'] = each.tags
+        temp_forum['member_of_names_list'] = each.member_of_names_list
+        temp_forum['user_details_dict'] = each.user_details_dict
+        temp_forum['html_content'] = each.html_content
+        temp_forum['contributors'] = each.contributors
+        temp_forum['id'] = each._id
+        temp_forum['threads'] = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(each._id)}]}).count()
+        
+        forum_detail_list.append(temp_forum)
+
+      variables=RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
       return render_to_response("ndf/forum.html",variables)
 
 def create_forum(request,group_id):

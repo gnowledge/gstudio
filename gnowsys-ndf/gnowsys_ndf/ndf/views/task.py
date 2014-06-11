@@ -85,7 +85,11 @@ def task_details(request, group_name, task_id):
 		if member_of_name == "Task" :
 			subtask.append({'id':str(sys_each_postnode._id), 'name':sys_each_postnode.name, 'created_by':sys_each_postnode_user.username, 'created_at':sys_each_postnode.created_at})
 		if member_of_name == "task_update_history":
-			history.append({'id':str(sys_each_postnode._id), 'name':sys_each_postnode.name, 'created_by':sys_each_postnode_user.username, 'created_at':sys_each_postnode.created_at, 'altnames':eval(sys_each_postnode.altnames), 'content':sys_each_postnode.content})
+			if sys_each_postnode.altnames == None:
+				postnode_task = '[]'
+			else :
+				postnode_task = sys_each_postnode.altnames
+			history.append({'id':str(sys_each_postnode._id), 'name':sys_each_postnode.name, 'created_by':sys_each_postnode_user.username, 'created_at':sys_each_postnode.created_at, 'altnames':eval(postnode_task), 'content':sys_each_postnode.content})
     history.reverse()
     var = { 'title': task_node.name,'group_id': group_id, 'groupid': group_id, 'group_name': group_name, 'node':task_node, 'history':history, 'subtask':subtask}
     var.update(blank_dict)
@@ -183,7 +187,7 @@ def create_edit_task(request, group_name, task_id=None):
 	    userlist.append(request.user.username)
 	    for eachuser in list(set(userlist)):
 		activ="task reported"
-		msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
+		msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
 		bx=User.objects.get(username =eachuser)
 	        set_notif_val(request,group_id,msg,activ,bx)
 	else: #update
@@ -224,6 +228,8 @@ def create_edit_task(request, group_name, task_id=None):
 		get_node_common_fields(request, update_node, group_id, GST_task_update_history)
 		if change_list :
 			update_node.altnames = unicode(str(change_list))
+		else :
+			update_node.altnames = unicode('[]')
 		update_node.prior_node = [task_node._id]		
 		update_node.save()
 		update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
