@@ -404,7 +404,7 @@ def submitDoc(request, group_id):
 
     
 first_object = ''
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, **kwargs):
     """
     this will create file object and save files in gridfs collection
     """
@@ -417,7 +417,17 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     size = {'size':round(size, 2), 'unit':unicode(unit)}
     print "TeSt",img_type, content_org, tags
     if fileobj.fs.files.exists({"md5":filemd5}):
-        return files.name                                                                #return already exist file
+        
+        if kwargs["oid"]:
+            coll_oid = get_database()['fs.files']
+            cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
+            # print "\n\n cur_oid : ", cur_oid["docid"]
+            #file_oid = collection.Node.one({'_type': 'File', '_id': ObjectId(cur_oid['docid']) })                                                                                                                  
+            #print "\n\n file_oid : ", file_oid, "\n\n _id : ", file_oid._id                                                                                                                                        
+            return cur_oid["docid"]
+        else:
+            return files.name
+
     else:
         try:
             files.seek(0)
@@ -783,7 +793,7 @@ def getFileThumbnail(request, group_id, _id):
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-        else :
+g        else :
             auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
