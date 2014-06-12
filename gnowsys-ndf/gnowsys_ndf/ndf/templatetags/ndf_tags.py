@@ -991,13 +991,12 @@ def get_source_id(obj_id):
     att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
     return att_set.object_value
   except Exception as e:
-    print str(e)
     return 'null'
 
  
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
-	r_list.append(obj_id._id)
-	relation_set=obj_id.get_possible_relations(obj_id.member_of)
+        r_list.append(obj_id._id)
+    	relation_set=obj_id.get_possible_relations(obj_id.member_of)
 	if relation_set.has_key('translation_of'):  
 		for k,v in relation_set['translation_of'].items():                      
 			if k == 'subject_or_right_subject_list':
@@ -1012,7 +1011,7 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
 
 @register.assignment_tag
 def get_possible_translations(obj_id):
-	translation_list = []
+        translation_list = []
 	r_list1 = []
 	return get_translation_relation(obj_id,r_list1,translation_list)
 

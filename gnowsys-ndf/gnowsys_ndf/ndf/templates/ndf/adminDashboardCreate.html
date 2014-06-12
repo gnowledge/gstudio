@@ -122,14 +122,16 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 $(document).ready(function(){
 
 $("#lan option[value={{node.language}}]").remove();
+{% if node %}
 {% get_possible_translations node as translations %}
+
 {% for each in translations %}
 {% for k,v in each.items %}
 $("#lan option[value={{v}}]").remove();
 
 {% endfor %}
 {% endfor %}
-
+{% endif %}
 });
 
 </script>
@@ -174,15 +176,16 @@ $("#lan option[value={{v}}]").remove();
 </form>
 {% if translate %}   
 <div class="text-right small-9">
-
+{% if node %}
    Languages
       <br></br>
       {% get_possible_translations node as tran %}
       {% for each in tran %}
         {% for k,v in each.items %}
-        <li><a href="{% url 'adminDesignerDashboardClassEdit' class_name k %}">{{v}}</a></li>
+        <li><a href="{% url 'adminDesignerDashboardClassEdit' class_name k %}?translate=True">{{v}}</a></li>
         {% endfor %}
       {% endfor %}
+{% endif %}
 </div>
 
 {% endif %}
