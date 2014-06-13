@@ -53,28 +53,11 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  	<!-- change name of collection tab overide block in your code -->
 		  		<a href="#panel-name-description"> {{title}} </a>
 			</dd>
-			<dd title="Click here to add/edit Prior Node">
-		  		<a href="#panel-prior-node">Prior Node</a>
-			</dd>
 			<!-- change name of collection tab overide block in your code -->
 			<dd class="active" title="Click here to add/edit collection">
 		  		<a href="#panel-collection">Collection </a> 
 			</dd>  
 			  
-		{% else %}
-			<dd><h3>View:</h3></dd>
-		
-			<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
-		  	<!-- change name of collection tab overide block in your code -->
-		  		<a href="#panel-name-description"> {{title}} </a>
-			</dd>
-			<dd title="Click here to add/edit Prior Node">
-		  		<a href="#panel-prior-node">Prior Node</a>
-			</dd>
-			<!-- change name of collection tab overide block in your code -->
-			<dd title="Click here to add/edit collection">
-		  		<a href="#panel-collection">Collection </a> 
-			</dd>  
 		{% endif %}
      	</dl>
   	</nav>
@@ -84,27 +67,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   	<div id="node-details-edit-div" class="tabs-content" > 
   		{% if node %}
-
-  		<!-- Collection tab block -->
-	    <div class="active content" id="panel-collection" style="width:95%;">
-		    <div class="row">
-		    	{% if node %}
-				<div class="small-3 columns">		
-		    		<a href="{% url "theme_topic_create" groupid app_id theme_GST_id %}"> <input class="small button split" type="button" value=" + Add Theme" > </a>
-				</div>
-				<div class="small-9 columns">		
-					<a href="{% url "theme_topic_create" groupid app_id topic_GST_id %}"> <input class="small button split" type="button" value=" + Add Topic" > </a>
-				</div>
-				{% endif %}
-				<div class="small-12 columns">
-			  		<div id="collection_drawer" >
-			    		{% edit_drawer_widget "collection" groupid node title %}
-			  		</div>
-				</div>
-		      
-		  	</div>
-	 	</div>
-
 
   		<!-- Block Description -->
 		<div class="content row" id="panel-name-description">
@@ -139,23 +101,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 							{% endif %}
 								<span></span>
 							</div>
-
-						{% else %}
-
-							{% if not node %}
-								<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
-								<div class="privacy-mode switch round">
-							
-									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-									<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-									<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-								
-									<span></span>
-								</div>
-
-							{% endif %}
 
 						{% endif %}	    
 		  			</div>
@@ -192,22 +137,60 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  		</div>
 		</div>
 
-  		<!-- Prior node block -->
-    	<div class="content" id="panel-prior-node"  style="width:95%;">
-	      	<div class="row">
-				<div class="small-12 columns">
-		  			<h5>Add or edit Prior Node : </h5>
-				</div>
-				<br/>
-		
-				<div class="small-12 columns">
-		  			<div id="prior_node_drawer">
-		    			{% edit_drawer_widget "prior_node" groupid node title %}
-		  			</div>
-				</div>
-	      	</div>
-    	</div>
+		<!-- Collection tab block -->
+	    <div class="active content" id="panel-collection" style="width:95%;">
+		    <div class="row">
+		    	{% if node %}
 
+		    	{% get_theme_node groupid node as add_topic %}
+				<div class="small-5 columns">		
+					{% if add_topic == True or add_topic == "Theme_Enabled" %}
+		    		<dl class="accordion" data-accordion>
+		    			<dd>
+          					<a class="add_theme medium-4 columns" href="#sub_theme"> + Add Sub-Theme </a>
+         					
+          					<div id="sub_theme" class="content">
+          						<br/><br/>
+          						<label>Theme Name</label>
+		    					<input id="sub_theme_id" type="text" placeholder="Enter name...">
+	    						<input id="save-sub-theme" value="Save" class="button small medium-2 columns"> 
+	          					
+          					</div>
+          				</dd>
+          			</dl>
+          			{% endif %}
+				</div>
+				<div class="small-7 columns">		
+
+					{% if add_topic == True or add_topic == "Topic_Enabled" %}
+
+					<dl class="accordion" data-accordion>
+		    			<dd>
+          					<a class="add_topic medium-4 columns" href="#add_topic"> + Add Topic </a>
+         					
+          					<div id="add_topic" class="content">
+          						<br/><br/>
+          						<label>Topic Name</label>
+		    					<input id="add_topic_id" type="text" placeholder="Enter name...">
+	    						<input id="save-topic" value="Save" class="button small medium-2 columns"> 
+	          					
+          					</div>
+          				</dd>
+          			</dl>
+          			{% endif %}
+
+				</div>
+				{% endif %}
+				<div class="small-12 columns">
+			  		<div id="collection_drawer">
+
+			    		{% include "ndf/theme_drawer.html" %}
+
+			  		</div>
+				</div>
+		      
+		  	</div>
+	 	</div>
 
 	    {% else %}
 	    	<!-- Block Description -->
@@ -269,36 +252,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      		</div>
   			</div>
 
-  		<!-- Prior node block -->
-    	<div class="content" id="panel-prior-node"  style="width:95%;">
-	      	<div class="row">
-				<div class="small-12 columns">
-		  			<h5>Add or edit Prior Node : </h5>
-				</div>
-				<br/>
-		
-				<div class="small-12 columns">
-		  			<div id="prior_node_drawer">
-		    			{% edit_drawer_widget "prior_node" groupid "" title %}
-		  			</div>
-				</div>
-	      	</div>
-    	</div>
-    
-
-	    <!-- Collection tab block -->
-	    <div class="content" id="panel-collection" style="width:95%;">
-		    <div class="row">
-		    	
-				<div class="small-12 columns">
-			  		<div id="collection_drawer" >
-			    		{% edit_drawer_widget "collection" groupid "" title %}
-			  		</div>
-				</div>
-		      
-		  	</div>
-	 	</div>
-
 	    {% endif %}
 
     	
@@ -313,14 +266,12 @@ background-repeat:no-repeat; background-size: 48px 48px
   	<!-- Overlay : Map Widget -->
     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
-      	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
   		<a class="close-reveal-modal" >&#215;</a>
         {% include "ndf/map_widget.html" with mode="edit" %}
-        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
-      	<!-- #{#%# endif %} -->
     </div>
 
-    <input type="hidden" id="nodes_list" value="{{nodes_list}}">						
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">	
+    <input type="hidden" id="parent_nodes_list" value="{{parent_nodes_collection}}">						
 </form>
 
 <script type="text/javascript">
@@ -330,47 +281,102 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			var name = $("#name_id").val();
 			var nodes = $("#nodes_list").val();
+			var parent_nodes = $("#parent_nodes_list").val();
 
 			if (nodes.indexOf(name) > 0)  
 			{
-				$("#message").css("display", "block");
-				$("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
 				$("#name_id").val("");
 			}
-			else
+			if (parent_nodes.indexOf(name) > 0)  
 			{
-				$("#message").css("display", "none");
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
 			}
 
 		});
+
 	});
 
 
-	$("#save-node").click(function() {
+	$("#save-sub-theme").click(function() {
 
-		pn_arr = []
+	    $.ajax({
+	      type: "POST",
+	      url: "{% url 'add_sub_themes' groupid %}",
+	      datatype: "html",
+	      data:{
+	        context_node: "{{node.pk}}",
+	        nodes_list: "{{nodes_list}}",
+	        sub_theme_name: $("#sub_theme_id").val(),
+	        csrfmiddlewaretoken: '{{ csrf_token }}'
+	      },
+	      success: function(data) {
+
+	      	var theme = $("#sub_theme_id").val();
+
+	      	if ($.trim(data) === "failure") {
+	      		alert("Theme name "+ theme +" already available, Please choose different name");
+	      	}
+
+	      	if ($.trim(data) === "None") {
+	      		alert("Please enter sub theme name");
+	      	}
+
+	        location.reload(true);
+	        $("#sub_theme_id").val("");
+	      }
+	    });
+
+  	});
+
+
+  	$("#save-topic").click(function() {
+
+	    $.ajax({
+	      type: "POST",
+	      url: "{% url 'add_topics' groupid %}",
+	      datatype: "html",
+	      data:{
+	        context_node: "{{node.pk}}",
+	        nodes_list: "{{nodes_list}}",
+	        add_topic_name: $("#add_topic_id").val(),
+	        csrfmiddlewaretoken: '{{ csrf_token }}'
+	      },
+	      success: function(data) {
+
+	      	var topic = $("#add_topic_id").val();
+
+	      	if ($.trim(data) === "failure") {
+	      		alert("Topic name "+ topic +" already available, Please choose different name");
+	      	}
+
+	      	if ($.trim(data) === "None") {
+	      		alert("Please enter topic name");
+	      	}
+
+	        location.reload(true);
+	        $("#add_topic_id").val("");
+	      }
+	    });
+
+  	});
+
+
+
+	$("#save-node").click(function() {
 		cn_arr = []
-		md_arr = [] //for adding module
 
 		$(".node_id").each(function (){
-			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
-				pn_arr.push($(this).val());
-			}
-
-			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+			if ($(this).parent(".bullet-item").parent("#collection_drawer").attr("id") == "collection_drawer") {
 				cn_arr.push($(this).val());
 			}
 
-			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
-  				md_arr.push($(this).val());
-  			}
 		});
 
-		$("#prior_node_list").val(pn_arr)
-		$("#collection_list").val(cn_arr) 
-		$("#module_list").val(md_arr)   
+		$("#collection_list").val(cn_arr); 
+		location.reload(true);
 
-		{% block base_save_on_click %}{% endblock %}
 	});
 
 

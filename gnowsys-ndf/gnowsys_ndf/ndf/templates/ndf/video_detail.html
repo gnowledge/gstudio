@@ -1,23 +1,19 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
-
-{% block add_list %}
-{% get_grid_fs_object node as grid_fs_obj %}
 {% get_group_name groupid as group_name_tag %}
-<li>
-<a href="{% url 'getFullvideo' group_name_tag node %}" class="button tiny secondary" download="{{ grid_fs_obj.filename }}">
-  <i class="fi-download large"> download </i>
+
+{% block meta_content %}
+
+<h2>Media</h2>
+
+{% if user.is_authenticated %}
+{% user_access_policy groupid request.user as user_access %}
+{% if user_access == "allow" %}
+<br/>
+<a class="button small" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+  <span class="fi-upload">  Upload File</span>
 </a>
-</li>
-{% endblock %}
+{% endif %}
+{% endif %}
 
-{% block add_fields %}
-{% get_group_name groupid as group_name_tag %}
-<div>
-  <video width="640px" controls buffered>
-  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-  <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">
-Your browser does not support the video tag.
-</video>
-</div>
 {% endblock %}

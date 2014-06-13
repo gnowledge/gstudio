@@ -1,2 +1,26 @@
 {% extends "ndf/node_edit_base.html" %}
 
+{% load ndf_tags %}
+
+{% block meta_content %} 
+<h3>Uploading</h3>
+<p class="text-justify">You can upload <b>files</b> of any format to your group library. Also edit the details regarding the same.</p>
+{% endblock %} 
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="file">
+      <br/>
+      <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+      	<span class="fi-upload">&nbsp;&nbsp;New File</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}

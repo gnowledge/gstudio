@@ -6,6 +6,9 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
+# List of Indian Languages 
+LANGUAGES = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
+
 #SMTP setting for sending mail (Using python default SMTP server)
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'localhost'
@@ -210,7 +213,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 META_TYPE = [u"GAPP",u"factory_types"]
 
 #Default APPs inculde in beloow GAPPS list
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module"]
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task"]
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True

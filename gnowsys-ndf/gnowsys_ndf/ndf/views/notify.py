@@ -56,8 +56,9 @@ def send_invitation(request,group_id):
         for each in list_of_users:
             bx=User.objects.get(id=each)
             ret = set_notif_val(request,group_id,msg,activ,bx)
-            colg.author_set.append(bx.id)
-            colg.save()
+            if bx.id not in colg.author_set:
+                colg.author_set.append(bx.id)
+                colg.save()
         if ret :
             return HttpResponse("success")
         else:

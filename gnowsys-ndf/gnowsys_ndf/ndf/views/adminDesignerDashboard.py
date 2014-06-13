@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from django_mongokit import get_database
 
+from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.views.methods import *
 import json
 
@@ -87,7 +88,6 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     dependencylist = []
     options = []
     translate=request.GET.get('translate','')
-    print translate,"trans"
     if class_name == "AttributeType":
         definitionlist = ['name','altnames','language','subject_type','data_type','applicable_node_type','member_of','verbose_name','null','blank','help_text','max_digits','decimal_places','auto_now','auto_now_add','path','verify_exist','status']
         contentlist = ['content_org']
@@ -112,7 +112,6 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     class_structure = eval(class_name).structure
     required_fields = eval(class_name).required_fields
     newdict = {}
-
     if node_id:
         new_instance_type = collection.Node.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
 
@@ -143,18 +142,13 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
                         new_instance_type['content'] = org2html(new_instance_type[key], file_prefix=filename)
                     else :
                         if translate:
-                            print translate,"trannn"
-                            if key in ("name","altnames","inverse_name"):
-                                print "inside if"
-                                a=unicode(request.POST.get(key+"_trans",""))
-                                print a,"a"
+                            if key in ("name","inverse_name"):
                                 new_instance_type[key] = unicode(request.POST.get(key+"_trans",""))
                                                 
                                 
                             else:
                                 new_instance_type[key] = unicode(request.POST.get(key,""))
                         else:
-                            print "else tra"
                             new_instance_type[key] = unicode(request.POST.get(key,""))
 
             elif value == list:
@@ -206,7 +200,15 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
             new_instance_type.contributors.append(user_id)
 
         new_instance_type.save()
-
+        if translate:        
+            relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
+            grelation=collection.GRelation()
+            grelation.relation_type=relation_type
+            grelation.subject=new_instance_type['_id']
+            grelation.right_subject=ObjectId(node_id)
+            grelation.name=u""
+            grelation.save()
+            
         return HttpResponseRedirect("/admin/designer/"+class_name)
 
 
@@ -222,6 +224,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
             else:
                 # newdict[key] = "unicode"
                 newdict[key] = ["unicode", new_instance_type[key]]
+              
         elif value == list:
             # newdict[key] = "list"
             
@@ -243,7 +246,6 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
             newdict[key] = [value, new_instance_type[key]]
 
     class_structure = newdict
-
     groupid = ""
     group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
@@ -251,7 +253,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
 
     template = "ndf/adminDashboardCreate.html"
 
-    variable = None
+    variable =  None
     class_structure_with_values = {}
     if node_id:
         
@@ -261,11 +263,11 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
         variable = RequestContext(request, {'node': new_instance_type,
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
-                                            'options': options, 'required_fields': required_fields,"translate":translate,
+                                            'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
                                             'groupid': groupid
                                         })
     else:
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate})
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,})
 
     return render_to_response(template, variable)
 

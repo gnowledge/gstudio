@@ -117,11 +117,15 @@ def dashboard(request, group_id):
     shelves = []
     shelf_list = {}
     if auth:
+      dbref_profile_pic = prof_pic.get_dbref()
+      prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
+
       # prof_pic_rel will get the cursor object of relation of user with its profile picture 
-      prof_pic_rel = collection.Node.one({'$and':[{'subject': ObjectId(auth._id) },{'_type':'GRelation'}]})
-      if prof_pic_rel :
-#        index = prof_pic_rel.count() - 1
-        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      
+      if prof_pic_rel.count() :
+        index = prof_pic_rel.count() - 1
+        Index = prof_pic_rel[index].right_subject
+        # img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      
+        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
       else:
         img_obj = "" 
 

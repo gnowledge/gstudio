@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 import ast
 
@@ -13,19 +14,39 @@ from gnowsys_ndf.ndf.views.methods import *
 
 from gnowsys_ndf.ndf.views.file import *
 
-db = get_database()
-collection = db['Nodes']
+collection = get_database()[Node.collection_name]
 
-def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=None):
+def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     custom view for custom GAPPS
     """
-    app_name = "mis"
+
+    if ObjectId.is_valid(group_id) is False :
+      group_ins = collection.Node.one({'_type': "Group","name": group_id})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+          group_id = str(auth._id)
+    else :
+      pass
+
+    app = None
+    if app_id is None:
+      app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+      if app:
+        app_id = str(app._id)
+    else:
+      app = collection.Node.one({'_id': ObjectId(app_id)})
+
+    app_name = app.name 
+
     app_collection_set = [] 
     atlist = []
     rtlist = []
-    app = collection.Node.find_one({"_id":ObjectId(app_id)})
-    App_Name = app.name 
+    
     app_set = ""
     nodes = ""
     nodes_dict = ""
@@ -42,46 +63,50 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
     system_id = ""
     system_type = ""
     system_mime_type = ""
+    template = ""
     property_display_order = []
+    events_arr = []
+
+    template_prefix = ""
+    if app_name == "MIS":
+      template_prefix = "mis"
+    else:
+      template_prefix = "mis_po"
 
     for eachset in app.collection_set:
-         app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
-         # app_set = collection.Node.find_one({"_id":eachset})
-         # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
+      app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+      # app_set = collection.Node.find_one({"_id":eachset})
+      # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
-        classtype = ""
-        app_set_template = "yes"
-        App_Name = None
-        systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
-        systemtype_name = systemtype.name
-        title = systemtype_name
+      classtype = ""
+      app_set_template = "yes"
+      template = "ndf/"+template_prefix+"_list.html"
 
-        if request.method=="POST":
-            search = request.POST.get("search","")
-            classtype = request.POST.get("class","")
-            nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}))
-        else :
-            nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+      systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+      systemtype_name = systemtype.name
+      title = systemtype_name
 
-        nodes_dict = []
-        for each in nodes:
-            nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
+      if request.method=="POST":
+        search = request.POST.get("search","")
+        classtype = request.POST.get("class","")
+        nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}))
+      else :
+        nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+
+      nodes_dict = []
+      for each in nodes:
+        nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
                          
     else :
-        ST_theme = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-        if ST_theme:
-            nodes = list(collection.Node.find({'member_of': {'$all': [ST_theme._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
-
-            nodes_dict = []
-            for each in nodes:
-                nodes_dict.append({"id":str(each._id), "name":each.name})
-
-        app_menu = "yes"
-        title = app_name
+      app_menu = "yes"
+      template = "ndf/"+template_prefix+"_list.html"
+      title = app_name
 
     if app_set_instance_id :
         app_set_instance_template = "yes"
+        template = "ndf/"+template_prefix+"_details.html"
+
         app_set_template = ""
         systemtype_attributetype_set = []
         systemtype_relationtype_set = []
@@ -104,6 +129,49 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
 
         property_order = system.property_order
         system.get_neighbourhood(systemtype._id)
+
+
+        # array of dict for events ---------------------
+                
+        if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
+
+            for event in system.organiser_of_event:
+                event.get_neighbourhood(event.member_of)
+                
+                tempdict = {}
+                tempdict['title'] = event.name
+                
+                if event.start_time and len(event.start_time) == 16:
+                    dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
+                    tempdict['start'] = dt
+                if event.end_time and len(event.end_time) == 16:
+                    dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
+                    tempdict['end'] = dt
+                tempdict['id'] = str(event._id)
+                events_arr.append(tempdict)
+
+        elif system.has_key('event_organised_by'): # gives list of colleges/host of events
+
+            for host in system.event_organised_by:
+                host.get_neighbourhood(host.member_of)
+
+                tempdict = {}
+                tempdict['title'] = host.name
+
+                if system.start_time and len(system.start_time) == 16:
+                    dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
+                    tempdict['start'] = dt
+                if system.end_time and len(system.start_time) == 16:
+                    dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
+                    tempdict['end'] = dt
+                
+                tempdict['id'] = str(host._id)
+                events_arr.append(tempdict)
+
+        # print json.dumps(events_arr)
+
+        # END --- array of dict for events ---------------------
+
 
         for tab_name, fields_order in property_order:
             display_fields = []
@@ -153,22 +221,52 @@ def mis_detail(request, group_id, app_id, app_set_id=None, app_set_instance_id=N
         app_set_instance_name = system.name
         title =  systemtype.name +"-" +system.name
 
-    template = "ndf/mis.html"
-
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set,"app_set_id":app_set_id,"nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template, "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name, "app_set_instance_name":app_set_instance_name, "title":title, "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 'tags':tags, 'location':location, "content":content, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id
-
-                                        , "node":system, 'group_id':group_id, 'app':App_Name, "property_display_order": property_display_order})
+    variable = RequestContext(request, {
+                                        'groupid':group_id, 'app_name':app_name, 'app_id':app_id,
+                                        "app_collection_set":app_collection_set, "app_set_id":app_set_id, 
+                                        "nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template,
+                                        "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name,
+                                        "app_set_instance_name":app_set_instance_name, "title":title,
+                                        "app_set_instance_atlist":atlist, "app_set_instance_rtlist":rtlist, 
+                                        'tags':tags, 'location':location, "content":content, "system_id":system_id,
+                                        "system_type":system_type,"mime_type":system_mime_type, "app_set_instance_id":app_set_instance_id,
+                                        "node":system, 'group_id':group_id, "property_display_order": property_display_order,
+                                        "events_arr":events_arr
+                                        })
 
     return render_to_response(template, variable)
       
 @login_required
-def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None):
+def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
     """
     create new instance of app_set of apps view for custom GAPPS
     """
-    app_name = "mis"
+
+    if ObjectId.is_valid(group_id) is False :
+      group_ins = collection.Node.one({'_type': "Group","name": group_id})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+          group_id = str(auth._id)
+    else :
+      pass
+
+    app = None
+    if app_id is None:
+      app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+      if app:
+        app_id = str(app._id)
+    else:
+      app = collection.Node.one({'_id': ObjectId(app_id)})
+
+    app_name = app.name 
+
+    # app_name = "mis"
     app_collection_set = [] 
-    app = collection.Node.find_one({"_id":ObjectId(app_id)})
+    # app = collection.Node.find_one({"_id":ObjectId(app_id)})
     app_set = ""
     app_set_instance_name = ""
     nodes = ""
@@ -188,6 +286,12 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     app_type_of_id = ""
     File = 'False'
     obj_id_ins = ObjectId()
+
+    template_prefix = ""
+    if app_name == "MIS":
+      template_prefix = "mis"
+    else:
+      template_prefix = "mis_po"
 
     user_id = int(request.user.id)  # getting django user id
     user_name = unicode(request.user.username)  # getting django user name
@@ -277,7 +381,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                 if obj_id_ins.is_valid(f):
                     newgsystem = collection.Node.one({'_id':f})
                 else:
-                    template = "ndf/mis.html"
+                    template = "ndf/mis_list.html"
                     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
                     return render_to_response(template, variable)
             else:
@@ -382,9 +486,9 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         newrelation.save()
         
 
-        return HttpResponseRedirect(reverse('GAPPS_set', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
+        return HttpResponseRedirect(reverse(template_prefix+'_app_detail', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
     
-    template = "ndf/mis.html"
+    template = "ndf/"+template_prefix+"_create_edit.html"
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
       

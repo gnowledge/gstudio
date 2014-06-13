@@ -31,18 +31,15 @@ except ImportError:  # old pymongo
 
 ###########################################################################
 
-db = get_database()
-gs_collection = db[Node.collection_name]
-collection = db[Node.collection_name]
-forum_st = gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
-start_time=gs_collection.AttributeType.one({'$and':[{'_type':'AttributeType'},{'name':'start_time'}]})
-end_time=gs_collection.AttributeType.one({'$and':[{'_type':'AttributeType'},{'name':'end_time'}]})
-reply_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':'Reply'}]})
-twist_st=gs_collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':'Twist'}]})
+collection = get_database()[Node.collection_name]
+forum_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
+start_time = collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'start_time'}]})
+end_time = collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'end_time'}]})
+reply_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Reply'}]})
+twist_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Twist'}]})
 
 
-
-def forum(request,group_id,node_id=None):
+def forum(request, group_id, node_id=None):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -59,10 +56,50 @@ def forum(request,group_id,node_id=None):
         node_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Forum"})
         if node_ins:
             node_id = str(node_ins._id)
-    existing_forums = gs_collection.GSystem.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
-    existing_forums.sort('name')
-    variables=RequestContext(request,{'existing_forums':existing_forums,'groupid':group_id,'group_id':group_id})
-    return render_to_response("ndf/forum.html",variables)
+    
+    if request.method == "POST":
+      # Forum search view
+      title = forum_st.name
+      
+      search_field = request.POST['search_field']
+      existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(forum_st._id)]},
+                                         '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                 {'tags': {'$regex':search_field, '$options': 'i'}}], 
+                                         'group_set': {'$all': [ObjectId(group_id)]}
+                                     }).sort('last_update', -1)
+
+      return render_to_response("ndf/forum.html",
+                                {'title': title, 
+                                 'searching': True, 'query': search_field,
+                                 'existing_forums': existing_forums, 'groupid':group_id, 'group_id':group_id
+                                }, 
+                                context_instance=RequestContext(request)
+      )
+
+    elif forum_st._id == ObjectId(node_id):
+      
+      # Forum list view
+
+      existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+      forum_detail_list = []
+
+      for each in existing_forums:
+        
+        temp_forum = {}
+        temp_forum['name'] = each.name
+        temp_forum['created_at'] = each.created_at
+        temp_forum['tags'] = each.tags
+        temp_forum['member_of_names_list'] = each.member_of_names_list
+        temp_forum['user_details_dict'] = each.user_details_dict
+        temp_forum['html_content'] = each.html_content
+        temp_forum['contributors'] = each.contributors
+        temp_forum['id'] = each._id
+        temp_forum['threads'] = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(each._id)}]}).count()
+        
+        forum_detail_list.append(temp_forum)
+
+      variables=RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
+      return render_to_response("ndf/forum.html",variables)
 
 def create_forum(request,group_id):
     ins_objectid  = ObjectId()
@@ -79,9 +116,9 @@ def create_forum(request,group_id):
         pass
     if request.method == "POST":
 
-        colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
+        colg = collection.Group.one({'_id':ObjectId(group_id)})
 
-        colf = gs_collection.GSystem()
+        colf = collection.GSystem()
 
         name = unicode(request.POST.get('forum_name',""))
         colf.name = name
@@ -103,7 +140,7 @@ def create_forum(request,group_id):
         
         colf.group_set.append(colg._id)
 
-        user_group_obj = gs_collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
+        user_group_obj = collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
         if user_group_obj:
             if user_group_obj._id not in colf.group_set:
                 colf.group_set.append(user_group_obj._id)     
@@ -146,7 +183,7 @@ def create_forum(request,group_id):
         # return render_to_response("ndf/forumdetails.html",variables)
 
 
-    available_nodes = gs_collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
+    available_nodes = collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
 
     nodes_list = []
     for each in available_nodes:
@@ -156,7 +193,7 @@ def create_forum(request,group_id):
 
 def display_forum(request,group_id,forum_id):
     
-    forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
+    forum = collection.Node.one({'_id': ObjectId(forum_id)})
 
     usrname = User.objects.get(id=forum.created_by).username
 
@@ -172,7 +209,7 @@ def display_forum(request,group_id,forum_id):
                 group_id = str(auth._id)
     else :
         pass
-    forum_object = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
+    forum_object = collection.Node.one({'_id': ObjectId(forum_id)})
     if forum_object._type == "GSystemType":
        return forum(request, group_id, forum_id)
 
@@ -194,10 +231,10 @@ def display_thread(request,group_id, thread_id, forum_id=None):
     else :
         pass
     try:
-        thread = gs_collection.GSystemType.one({'_id': ObjectId(thread_id)})
+        thread = collection.Node.one({'_id': ObjectId(thread_id)})
         forum=""
         for each in thread.prior_node:
-            forum=gs_collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
+            forum=collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
             if forum:
                 usrname = User.objects.get(id=forum.created_by).username
                 variables = RequestContext(request,
@@ -217,7 +254,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
 
 def create_thread(request, group_id, forum_id):
 
-    forum = gs_collection.GSystemType.one({'_id': ObjectId(forum_id)})
+    forum = collection.Node.one({'_id': ObjectId(forum_id)})
     forum_data = {  
                     'name':forum.name,
                     'content':forum.content,
@@ -225,7 +262,7 @@ def create_thread(request, group_id, forum_id):
                 }
     # print forum_data
     forum_threads = []
-    exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+    exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
     exstng_reply.sort('created_at')
     
     for each in exstng_reply:
@@ -233,14 +270,14 @@ def create_thread(request, group_id, forum_id):
     
     if request.method == "POST":
 
-        colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
+        colg = collection.Group.one({'_id':ObjectId(group_id)})
 
         name = unicode(request.POST.get('thread_name',""))
         
         content_org = request.POST.get('content_org',"")
 
         # -------------------
-        colrep = gs_collection.GSystem()
+        colrep = collection.GSystem()
     
         colrep.member_of.append(twist_st._id)
         
@@ -316,17 +353,17 @@ def add_node(request,group_id):
         forumobj=""
         groupobj=""
     
-        colg = gs_collection.Group.one({'_id':ObjectId(group_id)})
+        colg = collection.Group.one({'_id':ObjectId(group_id)})
 
         if forumid:
-            forumobj=gs_collection.GSystem.one({"_id": ObjectId(forumid)})
+            forumobj=collection.GSystem.one({"_id": ObjectId(forumid)})
     
-        sup=gs_collection.GSystem.one({"_id": ObjectId(sup_id)})
+        sup=collection.GSystem.one({"_id": ObjectId(sup_id)})
     
         if not sup :        
             return HttpResponse("failure")
     
-        colrep=gs_collection.GSystem()
+        colrep=collection.GSystem()
     
         if node == "Twist":
             name=tw_name
@@ -363,7 +400,7 @@ def add_node(request,group_id):
             nodename=name
         
         if node == "Reply":
-            threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
+            threadobj=collection.GSystem.one({"_id": ObjectId(thread)})
             url="http://"+sitename+"/"+str(group_id)+"/forum/thread/"+str(threadobj._id)
             activity=str(request.user.username)+" -added a reply "
             prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
@@ -393,7 +430,7 @@ def add_node(request,group_id):
             #     exstng_reply.prior_node.append(colrep._id)
             #     exstng_reply.save()
 
-            threadobj=gs_collection.GSystem.one({"_id": ObjectId(thread)})
+            threadobj=collection.GSystem.one({"_id": ObjectId(thread)})
             variables=RequestContext(request,{'thread':threadobj,'user':request.user,'forum':forumobj,'groupid':group_id,'group_id':group_id})
             return render_to_response("ndf/refreshtwist.html",variables)
         else:

@@ -1,3 +1,4 @@
+
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
@@ -13,11 +14,11 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 
-from gnowsys_ndf.ndf.views.methods import get_versioned_page
+from gnowsys_ndf.ndf.views.methods import get_versioned_page, update_mobwrite_content_org
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
-
+from gnowsys_ndf.mobwrite.diff_match_patch import diff_match_patch
 from django_mongokit import get_database
-
+from gnowsys_ndf.settings import LANGUAGES
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -31,7 +32,7 @@ from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string
 
 #######################################################################################################################################
 
@@ -43,7 +44,7 @@ history_manager = HistoryManager()
 rcs = RCS()
 
 #######################################################################################################################################
-#                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
+# VIEWS DEFINED FOR GAPP -- 'PAGE'
 #######################################################################################################################################
 
 def page(request, group_id, app_id=None):
@@ -70,98 +71,135 @@ def page(request, group_id, app_id=None):
     version=[]
     con=[]
     group_object=collection.Group.one({'_id':ObjectId(group_id)})
-    if request.method == "POST":
-	#Page search view
-        title = gst_page.name
-        
-        search_field = request.POST['search_field']
-        page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
-                                           '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
-                                                   {'tags': {'$regex':search_field, '$options': 'i'}}], 
-                                           'group_set': {'$all': [ObjectId(group_id)]}
-                                       })
-        page_nodes.sort('last_update', -1)
-        page_nodes_count = page_nodes.count()
 
-        return render_to_response("ndf/page_list.html",
-                                  {'title': title, 
-                                   'searching': True, 'query': search_field,
-                                   'page_nodes': page_nodes, 'groupid':group_id,'page_nodes_count': page_nodes_count,'group_id':group_id
-                                  }, 
-                                  context_instance=RequestContext(request)
-        )
+    if request.method == "POST":
+    	# Page search view
+      title = gst_page.name
+      
+      search_field = request.POST['search_field']
+      page_nodes = collection.Node.find({
+                                          'member_of': {'$all': [ObjectId(app_id)]},
+                                          '$or': [
+                                            {'$and': [
+                                              {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                              {'$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                              }
+                                              ]
+                                            },
+                                            {'$and': [
+                                              {'tags': {'$regex':search_field, '$options': 'i'}},
+                                              {'$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                              }
+                                              ]
+                                            }
+                                          ], 
+                                          'group_set': {'$all': [ObjectId(group_id)]},
+                                          'status': {'$nin': ['HIDDEN']}
+                                      }).sort('last_update', -1)
+
+      return render_to_response("ndf/page_list.html",
+                                {'title': title, 
+                                 'searching': True, 'query': search_field,
+                                 'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
+                                }, 
+                                context_instance=RequestContext(request)
+      )
 
     elif gst_page._id == ObjectId(app_id):
-        #Page List view 
-        #code for moderated Groups
+        # Page list view 
+        # code for moderated Groups
         # collection.Node.reload()
         group_type = collection.Node.one({'_id':ObjectId(group_id)})
         group_info=group_type_info(group_id)
+
+        title = gst_page.name
+
         if  group_info == "Moderated":
           
           title = gst_page.name
           node=group_type.prior_node[0]
           page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
                                              'group_set': {'$all': [ObjectId(node)]},
-                                       })
-          
-          page_nodes.sort('last_update', -1)
-          page_nodes_count = page_nodes.count()        
-          return render_to_response("ndf/page_list.html",
-                                  {'title': title, 
-                                   'page_nodes': page_nodes,'groupid':group_id,'page_nodes_count':page_nodes_count,             
-                                    'group_id':group_id
+                                       }).sort('last_update', -1)
 
-                                  }, 
-                                  context_instance=RequestContext(request))
+          return render_to_response("ndf/page_list.html",
+                                    {'title': title, 
+                                     'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
+                                    }, 
+                                    context_instance=RequestContext(request))
         
         elif group_info == "BaseModerated":
           #code for parent Groups
           node = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]}, 
-                                           'group_set': {'$all': [ObjectId(group_id)]},                                           
-                                           'status': {'$nin': ['HIDDEN']}
-                                      })  
+                                       'group_set': {'$all': [ObjectId(group_id)]},                                           
+                                       'status': {'$nin': ['HIDDEN']}
+                                      }).sort('last_update', -1)
+
           if node is None:
             node = collection.Node.find({'member_of':ObjectId(app_id)})
+
           for nodes in node:
             node,ver=get_versioned_page(nodes) 
             content.append(node)  
 
                     
           # rcs content ends here
+          
           return render_to_response("ndf/page_list.html",
-                                  { 'page_nodes':content,
-                                    'groupid':group_id,
-                                    'group_id':group_id
-                                  }, 
-                                  context_instance=RequestContext(request)
+                                    {'title': title, 
+                                     'page_nodes':content,
+                                     'groupid':group_id,
+                                     'group_id':group_id
+                                    }, 
+                                    context_instance=RequestContext(request)
             )
 
         elif group_info == "PUBLIC" or group_info == "PRIVATE" or group_info is None:
-              content =[]
-              page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
-                                           'group_set': {'$all': [ObjectId(group_id)]},
-                                           'status': {'$nin': ['HIDDEN']}
-                                       })
-	      page_nodes.sort('last_update', -1)		
-	      #for nodes in page_nodes:
-	      #	node,ver=get_page(request,nodes)
-              #  if node != 'None':
-              #  	content.append(node)	
-              
-              page_nodes_count = page_nodes.count()
-              
-              return render_to_response("ndf/page_list.html",
-                                  {
-                                   'page_nodes':page_nodes,'groupid':group_id,'page_nodes_count':  page_nodes_count,'group_id':group_id
-                                  },
-                                  context_instance=RequestContext(request))
+          """
+          Below query returns only those documents:
+          (a) which are pages,
+          (b) which belongs to given group,
+          (c) which has status either as DRAFT or PUBLISHED, and 
+          (d) which has access_policy either as PUBLIC or if PRIVATE then it's created_by must be the logged-in user
+          """
+          page_nodes = collection.Node.find({'member_of': {'$all': [ObjectId(app_id)]},
+                                             'group_set': {'$all': [ObjectId(group_id)]},
+                                             '$or': [
+                                              {'access_policy': u"PUBLIC"},
+                                              {'$and': [
+                                                {'access_policy': u"PRIVATE"}, 
+                                                {'created_by': request.user.id}
+                                                ]
+                                              }
+                                             ],
+                                             'status': {'$nin': ['HIDDEN']}
+                                         }).sort('last_update', -1)
+
+          # content =[]
+          # for nodes in page_nodes:
+        		# node,ver=get_page(request,nodes)
+          #   if node != 'None':
+          #     content.append(node)	
+
+          return render_to_response("ndf/page_list.html",
+                                    {'title': title,
+                                     'page_nodes': page_nodes,
+                                     'groupid':group_id,
+                                     'group_id':group_id
+                                    },
+                                    context_instance=RequestContext(request))
         
     else:
         #Page Single instance view
         Group_node = collection.Node.one({"_id": ObjectId(group_id)})                
        
-        if  Group_node.prior_node: 
+        if Group_node.prior_node: 
             page_node = collection.Node.one({"_id": ObjectId(app_id)})            
             
         else:
@@ -169,13 +207,13 @@ def page(request, group_id, app_id=None):
           if Group_node.edit_policy == "EDITABLE_NON_MODERATED" or Group_node.edit_policy is None or Group_node.edit_policy == "NON_EDITABLE":
             page_node,ver=get_page(request,node)
           else:
-             #else part is kept for time being until all the groups are implemented
-             if node.status == u"DRAFT":
-            	page_node,ver=get_versioned_page(node)
-             elif node.status == u"PUBLISHED":
-                page_node = node
+            #else part is kept for time being until all the groups are implemented
+            if node.status == u"DRAFT":
+              page_node,ver=get_versioned_page(node)
+            elif node.status == u"PUBLISHED":
+              page_node = node
 
-        
+      
         # First time breadcrumbs_list created on click of page details
         breadcrumbs_list = []
         # Appends the elements in breadcrumbs_list first time the resource which is clicked
@@ -236,6 +274,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
+                          'lan':LANGUAGES,
                           'groupid': group_id
                       }
     
@@ -324,10 +363,12 @@ def version_node(request, group_id, node_id, version_no):
     else :
         pass
 
+    d=diff_match_patch()
+
     view = ""          # either single or compare
     selected_versions = {}
     node = collection.Node.one({"_id": ObjectId(node_id)})
-
+    node1 = collection.Node.one({"_id": ObjectId(node_id)})
     fp = history_manager.get_file_path(node)
 
     if request.method == "POST":
@@ -335,12 +376,27 @@ def version_node(request, group_id, node_id, version_no):
 
         version_1 = request.POST["version_1"]
         version_2 = request.POST["version_2"]
-
         diff = get_html_diff(fp, version_1, version_2)
-
-        selected_versions = {"1": version_1, "2": version_2}
-        content = diff
-
+	selected_versions = {"1": version_1, "2": version_2}
+   	doc=history_manager.get_version_document(node,version_1)
+	doc1=history_manager.get_version_document(node,version_2)     
+        
+        for i in node1:
+	   try:
+    
+    	       s=d.diff_compute(str(doc[i]),str(doc1[i]),True)
+               l=diff_prettyHtml(s)
+	       node1[i]=l
+           except:
+                node1[i]=node1[i]		       
+           
+        
+    
+        content = node1
+        content_1=doc
+        
+        
+	
     else:
         view = "single"
 
@@ -361,17 +417,50 @@ def version_node(request, group_id, node_id, version_no):
 
         selected_versions = {"1": version_no, "2": ""}
         content = data
-
+        content_1='none'
     return render_to_response("ndf/version_page.html",
                               {'view': view,
                                'node': node,
                                'group_id':group_id,
                                'groupid':group_id,
                                'selected_versions': selected_versions,
-                               'content': content
+                               'content': content,
+                               'content1':content_1,
+                               
                               },
                               context_instance = RequestContext(request)
     )        
+
+
+def diff_prettyHtml(diffs):
+    """Convert a diff array into a pretty HTML report.
+
+    Args:
+      diffs: Array of diff tuples.
+
+    Returns:
+      HTML representation.
+    """
+    html = []
+    DIFF_DELETE = -1
+    DIFF_INSERT = 1
+    DIFF_EQUAL = 0
+    i = 0
+    for (op, data) in diffs:
+      text = (data.replace("&", "&amp;").replace("<", "&lt;")
+                 .replace(">", "&gt;").replace("\n", "<BR>"))
+      if op == DIFF_INSERT:
+        html.append("<INS STYLE=\"background:#b3ffb3;\" TITLE=\"i=%i\">%s</INS>"
+            % (i, text))
+      elif op == DIFF_DELETE:
+        html.append("<DEL STYLE=\"background:#ffb3b3;\" TITLE=\"i=%i\">%s</DEL>"
+            % (i, text))
+      elif op == DIFF_EQUAL:
+        html.append("<SPAN TITLE=\"i=%i\">%s</SPAN>" % (i, text))
+      if op != DIFF_DELETE:
+        i += len(data)
+    return "".join(html)
+
 
 def translate_node(request,group_id,node_id=None):
     """ translate the node content"""
@@ -433,13 +522,16 @@ def translate_node(request,group_id,node_id=None):
             node_name=content['name']
             node_content_org=content['content_org']
             node_tags=content['tags']
+        print "aaaaaaaaaaaaaaaaaa"
+        print LANGUAGES,"HHHHHHHHHHHHHHHHHHHH"
             
         return render_to_response("ndf/translation_page.html",
                                {'content': content,
                                 'node':node,
                                 'node_name':node_name,
                                 'groupid':group_id,
-                                'group_id':group_id
+                                'group_id':group_id,
+                                'lan':LANGUAGES
                                },
                              
                               context_instance = RequestContext(request)
@@ -452,6 +544,7 @@ def translate_node(request,group_id,node_id=None):
 #######################################################################################################################################
 
 def get_html_diff(versionfile, fromfile="", tofile=""):
+
     if versionfile != "":
         if fromfile == "":
             fromfile = rcs.head(versionfile)
@@ -484,12 +577,14 @@ def get_html_diff(versionfile, fromfile="", tofile=""):
 
         # Remove retrieved rcs-file belonging to the given version-number
         rcs.checkin(versionfile)
-
+        #---------------------------------------------
+        
         fromfile = "Version #" + fromfile
         tofile = "Version #" + tofile
-
+       
+        
         return HtmlDiff(wrapcolumn=60).make_file(fromlines, tolines, fromfile, tofile)
-
+        #return gh
     else:
         print "\n Please pass a valid rcs-version-file!!!\n"
         #TODO: Throw an error indicating the above message!
@@ -510,20 +605,97 @@ def publish_page(request,group_id,node):
         pass
 
     node=collection.Node.one({'_id':ObjectId(node)})
-    page_node,v=get_page(request,node)
-    node.content = page_node.content
-    node.content_org=page_node.content_org
-    node.status=unicode("PUBLISHED")
-    node.modified_by = int(request.user.id)
-    node.save() 
+    group=collection.Node.one({'_id':ObjectId(group_id)})
+    if group.post_node:
+        node.status=unicode("PUBLISHED")
+        node.save('UnderModeration')
+    else:
+        page_node,v=get_page(request,node)
+        node.content = page_node.content
+        node.content_org=page_node.content_org
+        node.status=unicode("PUBLISHED")
+        node.modified_by = int(request.user.id)
+        node.save() 
     #no need to use this section as seprate view is created for group publish
     #if node._type == 'Group':
     # return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id': group_id}))    
 
     return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': node._id}))
 
+
+def merge_doc(request,group_id,node_id,version_1,version_2):
+     node=collection.Node.one({'_id':ObjectId(node_id)})
+     doc=history_manager.get_version_document(node,version_1)
+     doc2=history_manager.get_version_document(node,version_2)
+     a=doc.content_org
+     b=doc2.content_org
+     c=doc.content
+     d=doc2.content   
+     con2=diff_string(a,b)
+     con3=diff_string(c,d)
+     doc2.update(doc)
+     for attr in node:
+       if attr != '_type':
+        try:
+		node[attr] = doc2[attr];
+        except:
+		node[attr]=node[attr]
+     doc2.content_org=con2
+     doc2.content=con3
+     node.content_org=doc2.content_org
+     node.content=doc2.content
+     node.modified_by=request.user.id
+     node.save()
+     update_mobwrite = update_mobwrite_content_org(node)
+     ver=history_manager.get_current_version(node)
+     view='merge'
+     
+     return render_to_response("ndf/version_page.html",
+                               {'view': view,
+                                'version_no':version_1,
+                                'node':node,
+                                'groupid':group_id,
+                                'group_id':group_id,
+                                'content':node,
+                                'ver':ver
+                               },
+                             
+                              context_instance = RequestContext(request)
+    )        
+
   
   
-  
-  
-  
+def revert_doc(request,group_id,node_id,version_1):
+   node=collection.Node.one({'_id':ObjectId(node_id)})
+   group=collection.Node.one({'_id':ObjectId(group_id)})
+   doc=history_manager.get_version_document(node,version_1)
+   
+   print node
+   
+   for attr in node:
+      if attr != '_type':
+            try:
+	    	node[attr] = doc[attr];
+            except:
+		node[attr] =node[attr]
+   node.modified_by=request.user.id
+   node.save()
+   update_mobwrite = update_mobwrite_content_org(node)
+   view ='revert'
+   ver=history_manager.get_current_version(node)
+   selected_versions=selected_versions = {"1": version_1, "2": ""}
+   
+   return render_to_response("ndf/version_page.html",
+                               {'view': view,
+                                'selected_versions': selected_versions, 
+                                'node':node,
+                                'groupid':group_id,
+                                'group_id':group_id,
+                                'content':node,
+                                'ver':ver    
+                           
+                               },
+                             
+                              context_instance = RequestContext(request)
+    )
+			  
