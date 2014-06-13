@@ -26,11 +26,13 @@ $("#lan option[value={{v}}]").remove();
 </script>
 
        <div class="large-12 columns">
-      
 <table class="large-6 columns">
 <div class="row">
 <div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
-<div class="large-6 columns"><select name="lan" id="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select>
+<div class="large-6 columns">
+<select name="lan" id="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
+
+
 </div>
 <hr style="height:5px;background-color: #0B6580;" />
 </div>
