@@ -208,7 +208,9 @@
 
 			    		if( imagesMetaData[i].id == val )
 			    		{
-		    				$attachedImages.append("<li title='"+imageDict.name+"'><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/readDoc/"+imageDict.id+"/"+imageDict.name+"' target='_blank' data-id='"+imageDict.id+"'>"+imageDict.mimetype+"</a></li>");
+			    			var filetype = (imageDict.mimetype.trim().length)>0?imageDict.mimetype:"file";
+
+		    				$attachedImages.append("<li title='"+imageDict.name+"'><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/readDoc/"+imageDict.id+"/"+imageDict.name+"' target='_blank' data-id='"+imageDict.id+"'>"+filetype+"</a></li>");
 			    		}
 			    	});
 			    }
@@ -279,7 +281,9 @@
 
 			    	$attachedImages.attr("data-image-list", JSON.stringify(imagesList));
 
-			    	$attachedImages.append("<li title='"+fileSelect.value+"'><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/readDoc/"+xhr.responseText+"/"+fileSelect.value+"' target='_blank' data-id='"+xhr.responseText+"'>"+fileSelect.files[0].type+"</a></li>");
+			    	var filetype = (fileSelect.files[0].type.trim().length)>0?fileSelect.files[0].type:"file";
+
+			    	$attachedImages.append("<li title='"+fileSelect.files[0].name+"'><span onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/readDoc/"+xhr.responseText+"/"+fileSelect.files[0].name+"' target='_blank' data-id='"+xhr.responseText+"'>"+filetype+"</a></li>");
 			    	// fileSelect.files[0].type.split("/")[0]
 
 			    	$inputEl = $(".leaflet-popup-content:visible").children("input, textarea");
@@ -318,7 +322,7 @@
 			    
 			    if( (imagesMetaData.length == 0) || (!flagIsInList) )
 			    {
-			    	var tempDict = { "id": xhr.responseText, "name":fileSelect.value, "mimetype":fileSelect.files[0].type }
+			    	var tempDict = { "id": xhr.responseText, "name":fileSelect.files[0].name, "mimetype":fileSelect.files[0].type }
 
 			    	imagesMetaData.push(tempDict);
 			    	
@@ -336,7 +340,9 @@
 		}
 
 		$(document).on('open', '#image-uploader-overlay[data-reveal]', function () {
-			fileSelect.value = "";
+			if(fileSelect.files.length > 0){
+				fileSelect.value = "";
+			}
 			uploadButton.disabled = true;			
 		});
 
