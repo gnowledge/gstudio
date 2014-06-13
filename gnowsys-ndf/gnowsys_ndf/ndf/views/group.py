@@ -360,7 +360,12 @@ def app_selection(request,group_id):
             return HttpResponse(json.dumps(data_list))
     except Exception as e:
         print "Error in app_selection "+str(e)
-     
+
+def invite_users(request,group_id):
+    try:
+        node=collection.Node.one({"_id":ObjectId(group_id)})
+    except Exception as e:
+        print "Error in invite users" + str(e)
 
 def switch_group(request,group_id,node_id):
     ins_objectid  = ObjectId()

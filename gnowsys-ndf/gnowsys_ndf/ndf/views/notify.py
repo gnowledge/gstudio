@@ -25,7 +25,7 @@ def get_user(username):
         return 0
 
 
-# A general function used to send all kind of notifications
+# A general function used to send all kinds of notifications
 def set_notif_val(request,group_id,msg,activ,bx):
     try:
         group_obj=col_Group.Group.one({'_id':ObjectId(group_id)})
@@ -36,7 +36,7 @@ def set_notif_val(request,group_id,msg,activ,bx):
         notification.send([bx], render, {"from_user": request.user})
         return True
     except Exception as e:
-        print "Error in sending notification-",e
+        print "Error in sending notification- "+str(e)
         return False
 
 # Send invitation to any user to join or unsubscribe
@@ -49,6 +49,7 @@ def send_invitation(request,group_id):
         sending_user=User.objects.get(id=sender.id)
         list_of_users=list_of_invities.split(",")
         activ="invitation to join in group"
+
         msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+"'"
 
         ret=""

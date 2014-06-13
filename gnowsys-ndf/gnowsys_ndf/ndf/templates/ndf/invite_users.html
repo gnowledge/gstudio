@@ -1,5 +1,3 @@
-
-
 {% load ndf_tags %}
 
 <script src="/static/ndf/js/jquery-ui.js"></script>
@@ -9,72 +7,40 @@
 
 var items={}
 var user_list=[]
-function handle(){
-   var aa=$("#selectOfInviteUser").val();
-   var conf_delete=confirm("pressing OK will remove the entry from the list, OK?")
-   if (conf_delete==true)
-      { $("#selectOfInviteUser option[value='"+aa+"']").remove(); }
-}
+
+$(document).on('click',"#subscr_users",function() {
+
+ $('#inviteusers #invite_users_set_drawer1').html("");
+ $('#inviteusers #invite_users_set_drawer2').html("");
+ $('#inviteusers #invite_users_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="invite_users_set_search" class="margin-0"></li>');
+var url="/{{node}}/group/invite_users/"
+ $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#inviteusers #invite_users_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#inviteusers #invite_users_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+
+ }); //close each
+   }); //getjson
+}); //document click
 
 
-function UserInvitation()
-{
-
-$.extend(items,{% get_all_users_to_invite %});
-i=0;
-for (var key in items)
-{
-user_list[i]=key;
-i=i+1;
-}
-
-$( "#userInvite" ).autocomplete({
-   source: user_list
-});
-$(".invitation").show();
-
-}
-
-
-$(document).on('click',".removeList",function() {
-var $select = $('#selecctOfInviteUser');
-$('option:selected',$select).remove();
-});
-
-
-$(document).on('click',"#addToList",function() {
-      data = $("#userInvite").val();//attr('value');
-      if(data != ""){
-           $("#selectOfInviteUser").append(new Option(data, data));
-           $("#userInvite").val("");
-           $("#selectOfInviteUser").show();
-           $(".removeList").show()
-           $("#submitUserInvite").show();
-      }
-      else{
-$('.responseToInvite').html("select users to invite");
-$('.responseToInvite').css("color","red");
-
-          }
-});
 
 
 
 
 $(document).on('click',"#submitUserInvite",function(){
-      var listobject, listobjectLength
-      list_users=[]
-      listobject = selectOfInviteUser.options,
-      listobjectLength = listobject.length
-      for (var i = 0; i < listobjectLength; i++) {
-           list_users[i] = items[listobject[i].value];
-                    }
-       var join_list_users= list_users.join(',');
-       data = $("#userInvite").val();//attr('value');
-       var surl="/{{node}}/group/notify/send_invitation/"
-
+ var surl="/{{node}}/group/notify/send_invitation/"
 $.ajax({
-
         url: surl,
         type: 'POST',
         data: {users:join_list_users,csrfmiddlewaretoken: '{{ csrf_token }}'},
@@ -85,12 +51,10 @@ $.ajax({
        success: function(data){
                 if(data=="success")
                     { alert("Successfully subscribed members and e-mail notification send");
-$(".invitation").hide();
-}
+                     }
 
                 else{
-                      $(".invitation").hide();
-	               alert("failed to subscribe");
+                      alert("failed to subscribe");
                         }
 
                              },
@@ -100,38 +64,47 @@ $(".invitation").hide();
           }
 }); });
 
-function HideUserInvitation()
+
+
+
+function attributetype_set_drawer_value(node_id)
 {
-$(".invitation").hide();
-$("#UserInvitation").show();
-$("#hideUserInvitation").hide();
+ $('#inviteusers #invite_users_set_drawer1').html("");
+ $('#inviteusers #invite_users_set_drawer2').html("");
+ $('#inviteusers #invite_users_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="invite_users_set_search" class="margin-0"></li>');
+  var url = '/{{groupid}}/ajax/get_data_for_drawer_of_attributetype_set/?id='+node_id ;
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#inviteusers #invite_users_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#inviteusers #invite_users_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
 }
+
+
 
 
 </script>
-<style type="text/css">
-#selectOfInviteUser{
-height:150px;
-}
-</style>
 
-
-
-<input type="button" class="button tiny" id="UserInvitation" value="Subscribe Registered Members" onclick="UserInvitation()">
-<br/>
-<input type="button" id="hideUserInvitation" Value= "Hide Invitation" onclick="HideUserInvitation()" style="display:none;">
-<div class="invitation" style="display:none">
-
-<input id="userInvite">
-
-<input type="button" id="addToList" class="button tiny" value="Add">
-
-<input type="button" class="button tiny" id="submitUserInvite" value="Subscribe" style="display:none"/>
-<p class="responseToInvite"></p>
-
-<select id="selectOfInviteUser" multiple="multiple" style="display:none" onchange="handle()">
-
-</select>
+<div id="subscr_users">
+<input type="button" class="button small" data-reveal-id="inviteusers" value="Subscribe registered users">
+<div id="inviteusers" class="reveal-modal " data-reveal >
+     <h2>Select users</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="invite_users_set"  %}
+      </div>
+      <input type="button" id="#submitUserInvite" class="button small" value="submit"> 
+     <a class="close-reveal-modal rt">&#215;</a>
 </div>
-
+</div>
 
