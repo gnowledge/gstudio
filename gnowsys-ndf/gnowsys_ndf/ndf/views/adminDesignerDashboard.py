@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from django_mongokit import get_database
 
+from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.views.methods import *
 import json
 
@@ -112,7 +113,6 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     required_fields = eval(class_name).required_fields
     newdict = {}
     if node_id:
-        print node_id,"2222222222222222222222"
         new_instance_type = collection.Node.one({'_type': unicode(class_name), '_id': ObjectId(node_id)})
 
     else:
@@ -224,6 +224,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
             else:
                 # newdict[key] = "unicode"
                 newdict[key] = ["unicode", new_instance_type[key]]
+              
         elif value == list:
             # newdict[key] = "list"
             
@@ -245,7 +246,6 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
             newdict[key] = [value, new_instance_type[key]]
 
     class_structure = newdict
-
     groupid = ""
     group_obj= collection.Node.find({'$and':[{"_type":u'Group'},{"name":u'home'}]})
     if group_obj:
@@ -253,7 +253,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
 
     template = "ndf/adminDashboardCreate.html"
 
-    variable = None
+    variable =  None
     class_structure_with_values = {}
     if node_id:
         
@@ -263,11 +263,11 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
         variable = RequestContext(request, {'node': new_instance_type,
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
-                                            'options': options, 'required_fields': required_fields,"translate":translate,
+                                            'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
                                             'groupid': groupid
                                         })
     else:
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate})
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,})
 
     return render_to_response(template, variable)
 

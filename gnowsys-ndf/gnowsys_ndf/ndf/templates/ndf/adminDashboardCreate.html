@@ -20,8 +20,7 @@
 <div class="row">
 <div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
 
-<div class="large-6 columns"><select name="language" id="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option\
-><option id="mar" value="mar">mar</option></select>
+<div class="large-6 columns"><select name="language" id="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
 </div>
 <hr style="height:5px;background-color: #0B6580;" />
 </div>
@@ -122,14 +121,16 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 $(document).ready(function(){
 
 $("#lan option[value={{node.language}}]").remove();
+{% if node %}
 {% get_possible_translations node as translations %}
+
 {% for each in translations %}
 {% for k,v in each.items %}
 $("#lan option[value={{v}}]").remove();
 
 {% endfor %}
 {% endfor %}
-
+{% endif %}
 });
 
 </script>
@@ -174,15 +175,16 @@ $("#lan option[value={{v}}]").remove();
 </form>
 {% if translate %}   
 <div class="text-right small-9">
-
+{% if node %}
    Languages
       <br></br>
       {% get_possible_translations node as tran %}
       {% for each in tran %}
         {% for k,v in each.items %}
-        <li><a href="{% url 'adminDesignerDashboardClassEdit' class_name k %}">{{v}}</a></li>
+        <li><a href="{% url 'adminDesignerDashboardClassEdit' class_name k %}?translate=True">{{v}}</a></li>
         {% endfor %}
       {% endfor %}
+{% endif %}
 </div>
 
 {% endif %}
