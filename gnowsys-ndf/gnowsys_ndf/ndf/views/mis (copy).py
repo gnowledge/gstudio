@@ -1,6 +1,3 @@
-''' -- imports from python libraries -- '''
-import ast
-
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -10,10 +7,12 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 
-''' -- imports from application folders/files -- '''
-# from gnowsys_ndf.ndf.views.methods import *
-# from gnowsys_ndf.ndf.views.file import *
-from gnowsys_ndf.ndf.views.event import *
+import ast
+
+from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.methods import *
+
+from gnowsys_ndf.ndf.views.file import *
 
 collection = get_database()[Node.collection_name]
 
@@ -80,34 +79,6 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
-      app_set = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
-      
-      view_file_extension = ".py"
-      app_set_view_file_name = ""
-      app_set_view_file_path = ""
-
-      if app_set.type_of:
-        app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
-
-        app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
-        print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
-
-      else:
-        app_set_view_file_name = app_set.name.lower().replace(" ", "_")
-        print "\n app_set_view_file_name: ", app_set_view_file_name, "\n"
-
-      app_set_view_file_path = os.path.join(os.path.dirname(__file__), app_set_view_file_name + view_file_extension)
-      print "\n app_set_view_file_path: ", app_set_view_file_path, "\n"
-
-      if os.path.exists(app_set_view_file_path):
-        print "\n Call this function...\n"
-        return eval(app_set_view_file_name + "_detail")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
-
-
-      else:
-        print "\n Perform fallback code...\n"
-
-      print "\n Going herer...\n\n"
       classtype = ""
       app_set_template = "yes"
       template = "ndf/"+template_prefix+"_list.html"
@@ -265,7 +236,6 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                                         })
 
     return render_to_response(template, variable)
-      
       
 @login_required
 def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
