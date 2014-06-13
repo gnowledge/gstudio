@@ -408,22 +408,27 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
     this will create file object and save files in gridfs collection
     """
+    
     global count,first_object
+    
     fcol = db[File.collection_name]
     fileobj = fcol.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
+    
     print "TeSt",img_type, content_org, tags
+    
     if fileobj.fs.files.exists({"md5":filemd5}):
         
-        if kwargs["oid"]:
+        # if calling function is passing oid=True as last parameter then reply with id and name.
+        if kwargs["oid"]: 
+
             coll_oid = get_database()['fs.files']
             cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
-            # print "\n\n cur_oid : ", cur_oid["docid"]
-            #file_oid = collection.Node.one({'_type': 'File', '_id': ObjectId(cur_oid['docid']) })                                                                                                                  
-            #print "\n\n file_oid : ", file_oid, "\n\n _id : ", file_oid._id                                                                                                                                        
+            # returning only ObjectId (of GSystem containing file info) in dict format.
+            # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
             return cur_oid["docid"]
         else:
             return files.name
@@ -793,7 +798,7 @@ def getFileThumbnail(request, group_id, _id):
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
-g        else :
+        else :
             auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
