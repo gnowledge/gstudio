@@ -131,7 +131,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	<div class="row">
 	  
-	  <div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+	  <div class="large-6 columns"><label>Language<select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select></label>
 	     </div>
 
 	  <div class="large-6 columns" style="padding: 1.8em;">

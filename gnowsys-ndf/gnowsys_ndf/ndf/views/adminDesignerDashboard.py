@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from django_mongokit import get_database
 
+from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.views.methods import *
 import json
 
@@ -262,11 +263,11 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
         variable = RequestContext(request, {'node': new_instance_type,
                                             'class_name': class_name, 'class_structure': class_structure_with_values, 'url': "designer", 
                                             'definitionlist': definitionlist, 'contentlist': contentlist, 'dependencylist': dependencylist, 
-                                            'options': options, 'required_fields': required_fields,"translate":translate,
+                                            'options': options, 'required_fields': required_fields,"translate":translate,"lan":LANGUAGES,
                                             'groupid': groupid
                                         })
     else:
-        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate})
+        variable = RequestContext(request, {'class_name':class_name, "url":"designer", "class_structure":class_structure, 'definitionlist':definitionlist, 'contentlist':contentlist, 'dependencylist':dependencylist, 'options':options, "required_fields":required_fields,"groupid":groupid,"translate":translate,"lan":LANGUAGES,})
 
     return render_to_response(template, variable)
 
