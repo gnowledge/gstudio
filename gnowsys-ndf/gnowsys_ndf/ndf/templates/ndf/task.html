@@ -1,0 +1,121 @@
+{% extends "ndf/base.html" %}
+
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block help_content %}
+{% endblock %}
+
+{% block meta_content %}
+  <h2>Task</h2>
+{% endblock %}
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+     <div class="task">
+      <br/>
+      <a class="button medium" href="{% url 'task_create_edit' group_name %}">
+      	<span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+      </a>
+    </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+  
+{% block body_content %}
+
+<header class="row">
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Task {% if TASK_inst.count %}({{ TASK_inst.count }}){% endif %}</a></dd>
+  </dl>
+</header>
+
+{% if searching and TASK_inst.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{TASK_inst.count}} {{title|lower}}{{TASK_inst.count|pluralize}}.</span></p>
+  </div>
+</div>
+
+{% elif searching and TASK_inst.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert">No {{title|lower}}{{TASK_inst.count|pluralize}} matched your search criteria!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+  {% autopaginate TASK_inst 23 %}
+
+  {% for node in TASK_inst %}
+  {% get_version_of_module node.pk as version %}
+  <li class="card">
+    <div class="course">
+
+      <header>
+        <div class="label-list">
+          {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          {% endfor %}
+        </div>
+
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+        <h4>{{ node.name|truncatechars:20 }} <font color = "red"><b>Ver.</b>{{version}}</font></h4>
+
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+          <br/>
+          by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </header>
+
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+      <a class="small button expand" href="{% url 'task_details' group_name_tag node %}">Detail</a> 
+
+      {% get_user_object node.created_by as user_obj %}
+      {% ifequal user_obj.username user.username %}
+      <a class="button alert tiny" href="{% url 'delete_task' group_name node %}?next={{request.path}}">Delete</a>
+      {% endifequal %}
+
+
+    </div>
+  </li>  
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-12 columns">
+        <h5>This group doesn't have any task. <b>Be the first to create a Task!</b></h5>
+      </div>
+    </div>
+    {% endif %}
+
+  {% endfor %}
+
+  {% paginate %}
+
+</ul>
+
+
+
+{% endblock %}
+

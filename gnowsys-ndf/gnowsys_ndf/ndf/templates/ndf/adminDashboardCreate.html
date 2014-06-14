@@ -15,27 +15,50 @@
 <form method="post" action="" name="{{class_name}}">
 {% csrf_token %}
 {% if translate %}
- <div class="large-12 columns">
+<div class="large-12 columns">
 <table class="large-6 columns">
 <div class="row">
 <div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
-<div class="large-6 columns"><select name="lan" id="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option\
-><option id="mar" value="mar">mar</option></select>
+
+<div class="large-6 columns"><select name="language" id="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
 </div>
 <hr style="height:5px;background-color: #0B6580;" />
 </div>
 </table></div>
 {% endif %}
-
+ 
 <h2>{{node.name}}</h2>
-
 <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
+{% for list in definitionlist %}
+{% if translate %}
+{% if list == "name" or list == "inverse_name" %}
+<div style="display:table-row;">
+      <div style="display:table-cell;"> 
+	<font size="3"> {{list}}</font> 
+      </div>
+
+{% get_input_fields class_structure|get_dict_item:list list translate %}
+
+</div>
+{% endif %}
+{% endif %}
+  
+{% endfor %}
+</div>
+{% if translate %}
+<div style="display:table; display:none; border:1px;   border-spacing:15px;" class="small-12 columns">
+{% else %}
+<div style="display:table; border:1px;   border-spacing:15px;" class="small-12 columns">
+
+{% endif %}
 <dl class="accordion" data-accordion>
   <dd>
     <a href="#definitionlist">Definition</a>
   <div id="definitionlist" class="content active">
     
     {% for list in definitionlist %}
+    {% if translate and list != "language" %}
+	
     <div style="display:table-row;">
       <div style="display:table-cell;"> 
 	<font size="3"> {{list}}</font> 
@@ -47,13 +70,30 @@
       </div>
       {% endif %}
 
-      {% if translate %}
-      {% if list == "name" or list == "inverse_name" or list == "altnames" %}
-      {% get_input_fields class_structure|get_dict_item:list list translate %}
-      {% endif %}{% endif %}
     </div>
+{% endif %}
+
+    {% if not translate %}
+	
+    <div style="display:table-row;">
+      <div style="display:table-cell;"> 
+	<font size="3"> {{list}}</font> 
+      </div>
+      {% get_input_fields class_structure|get_dict_item:list list %}
+      {% if list in  required_fields %}
+      <div style="display:table-cell;">
+	<font size="3" color="red"> * </font><font id="{{list}}_required" style="display:none" color="red">This field required</font>
+      </div>
+      {% endif %}
+
+    </div>
+{% endif %}
+
+
+
     {% endfor %}
-  </div></div>
+    
+  </div>
   </dd>
 </dl>
 <dl class="accordion" data-accordion>
@@ -81,6 +121,16 @@ $(".orgitdown .orgitdownButton9 a").css({"background-image":'url("/static/ndf/or
 $(document).ready(function(){
 
 $("#lan option[value={{node.language}}]").remove();
+{% if node %}
+{% get_possible_translations node as translations %}
+
+{% for each in translations %}
+{% for k,v in each.items %}
+$("#lan option[value={{v}}]").remove();
+
+{% endfor %}
+{% endfor %}
+{% endif %}
 });
 
 </script>
@@ -120,10 +170,25 @@ $("#lan option[value={{node.language}}]").remove();
     </div>
   </dd>
 </dl>
-
 </div>
 <input type="submit" name="submit" class="button" id="save-node-type" value="Submit">
 </form>
+{% if translate %}   
+<div class="text-right small-9">
+{% if node %}
+   Languages
+      <br></br>
+      {% get_possible_translations node as tran %}
+      {% for each in tran %}
+        {% for k,v in each.items %}
+        <li><a href="{% url 'adminDesignerDashboardClassEdit' class_name k %}?translate=True">{{v}}</a></li>
+        {% endfor %}
+      {% endfor %}
+{% endif %}
+</div>
+
+{% endif %}
+
 {% endblock %}
 
 {% block script %}

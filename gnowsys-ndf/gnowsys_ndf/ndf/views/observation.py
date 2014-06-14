@@ -247,6 +247,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 	is_cookie_supported = request.session.test_cookie_worked()
 	operation_performed = ""
 	unique_token = str(ObjectId())
+        cookie_added_markers = ""
 
 	app_set_element = collection.Node.find_one({'_id':ObjectId(app_set_id), 'group_set':{'$all': [ObjectId(group_id)]}})
 	
@@ -261,7 +262,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 			if (user_type == "anonymous" and is_cookie_supported):
 
-				cookie_added_markers = request.session.get('anonymous_added_markers')
+				cookie_added_markers = request.session.get('anonymous_added_markers', "")
 
 				if (cookie_added_markers != None) and (cookie_added_markers[:cookie_added_markers.find(",")] == user_session_id):
 					if cookie_added_markers.find(marker_ref) > 0:
@@ -298,7 +299,7 @@ def save_observation(request, group_id, app_id=None, app_name=None, app_set_id=N
 			
 		# for anonymous user
 		if user_type == "anonymous" and is_cookie_supported:
-			cookie_added_markers = request.session.get('anonymous_added_markers')
+			cookie_added_markers = request.session.get('anonymous_added_markers', "")
 
 			if cookie_added_markers == None or cookie_added_markers[:cookie_added_markers.find(",")] != user_session_id:
 				cookie_added_markers = user_session_id + "," + unique_token 
@@ -372,35 +373,20 @@ def delete_observation(request, group_id, app_id=None, app_name=None, app_set_id
 
 def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, slug=None):
 
-	if request.method == "POST" :
-            # for uploaded images saving
-            # print "\n\n=========", request.FILES.getlist("doc[]", ""), "\n\n"
-            for index, each in enumerate(request.FILES.getlist("doc[]", "")):
-                
-                fcol = db[File.collection_name]
-                fileobj = fcol.File()
-                filemd5 = hashlib.md5(each.read()).hexdigest()
-                # print "\nmd5 : ", filemd5
+    if request.method == "POST" :
+        
+        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
 
-                if fileobj.fs.files.exists({"md5":filemd5}):
+            title = each.name
+            userid = request.POST.get("user", "")
+            content_org = request.POST.get('content_org', '')
+            tags = request.POST.get('tags', "")
+            img_type = request.POST.get("type", "")
+            language = request.POST.get("lan", "")
+            usrname = request.user.username
+            page_url = request.POST.get("page_url", "")
+            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object                                                                                         
+            
+            obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
-                    coll = get_database()['fs.files']
-                    a = coll.find_one({"md5":filemd5})
-                    # prof_image takes the already available document of uploaded image from its md5 
-                    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
-                    # print "======= ||| =====", prof_image
-	    	else:
-                    # print "\n\n index : ", index
-                    # If uploaded image is not found in gridfs stores this new image 
-                    submitDoc(request, group_id)
-                    
-                    # prof_image takes the already available document of uploaded image from its name
-                    coll = get_database()['fs.files']
-                    a = coll.find_one({"md5":filemd5})
-                    prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
-                    # prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
-                    # print "------------", prof_image
-                    
-                    # --- END of images saving
-                    
-                return StreamingHttpResponse(str(prof_image._id))	
+        return StreamingHttpResponse(str(obs_image))	

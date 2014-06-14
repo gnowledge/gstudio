@@ -6,56 +6,52 @@ Use corresponding package names if you are using an RPM based distro
 
 
 1. Installing required packages and its dependencies
+	
+    (1) sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev ffmpeg ffmpeg2theora
 
-#+BEGIN_EXAMPLE
-sudo apt-get install python-setuptools git build-essential python-dev rcs mongodb emacs24 python-virtualenv libjpeg-dev ffmpeg ffmpeg2theora
-#+END_EXAMPLE
+2. Get latest version of gstudio-mongokit -  Try one of the following commands:
 
-2. Get latest version of gstudio-mongokit
+    (1) git clone git@github.com:gnowledge/gstudio.git  
+    (2) git clone https://github.com/gnowledge/gstudio.git
 
-#+BEGIN_EXAMPLE
-git clone git@github.com:gnowledge/gstudio.git
-cd gstudio
-virtualenv --system-site-packages .
-./bin/pip install -r requirements.txt
-#+END_EXAMPLE
+3. Set up virtual environment for gstudio-mongokit
 
+    (1) cd gstudio
+    (2) virtualenv --system-site-packages .      # NOTE: Here '.' indicates current directory
+    (3) source bin/activate                      # Activates virtual environment [To deactivate, please use given command - "deactivate"]
+    (4) ./bin/pip install -r requirements.txt    # NOTE: Here '.' indicates current directory
 
-3. Incase your distribution of GNU/Linux is not latest, you may not
-   find emacs24 in your repos.  In that case, satisfy the requirement
+3. In case your distribution of GNU/Linux is not latest, you may not
+   find emacs24 in your repositories. In that case, satisfy the requirement
    by following these instructions:
 
     (1) sudo add-apt-repository ppa:cassou/emacs
     (2) sudo apt-get update
     (3) sudo apt-get install emacs24 emacs24-el emacs24-common-non-dfsg
 
-4. setting up Emacs working environment:
+4. Setting up Emacs working environment:
 
-   Create a init file for emacs default settings @ path "~/.emacs"
+   Create an init file for emacs's default settings at given path "~/.emacs"
    with following code in it:
 
-For org-version < 8.0
+   NOTE: How to get org-version?
+	 (1) Open emacs editor
+	 (2) Press Alt + "X"
+	 (3) Enter following command - org-version [Then Press Enter]
 
+   (a) For org-version < 8.0: Copy following lines of code in above specified file and save it
+	(custom-set-variables
+	  '(inhibit-startup-screen t)
+	  '(org-export-html-preamble nil)
+	  '(org-export-html-postamble nil)
+	)
 
-#+BEGIN_EXAMPLE
-(custom-set-variables
-             '(inhibit-startup-screen t)
-             '(org-export-html-preamble nil)
-             '(org-export-html-postamble nil)
-             '(org-export-html-validation-link nil)
-              )
-#+END_EXAMPLE
-
-For org-version >= 8.0
-
-#+BEGIN_EXAMPLE
-(custom-set-variables
-             '(inhibit-startup-screen t)
-             '(org-html-preamble nil)
-             '(org-html-postamble nil)
-             '(org-html-validation-link nil)
-             )
-#+END_EXAMPLE
+   (b) For org-version >= 8.0: : Copy following lines of code in above specified file and save it
+	(custom-set-variables
+	  '(inhibit-startup-screen t)
+	  '(org-html-preamble nil)
+	  '(org-html-postamble nil)
+	)
 
 5. SMTP configuration for notifications
  
@@ -79,46 +75,43 @@ For org-version >= 8.0
 						 
 6. Installation of MathJax (required for rendering MathML symbols)
    
-      (1) To install MathJax on your own server, download the
-          distribution from the following link:
-          "http://www.mathjax.org/download/" 
+    (1) To install MathJax on your own server, download the
+        distribution from the following link:
+        "http://www.mathjax.org/download/" 
 
-       (2) Simply unzip the downloaded archive, rename it to 'mathjax'
-          (all in smallcaps) and put it under django-application's
-          "static" directory.
+    (2) Simply unzip the downloaded archive, rename it to 'mathjax'
+        (all in smallcaps) and put it under django-application's
+        "static" directory.
 
 
-7. Final Steps: 
- 
-  To run "gstudio-mongokit" project, perform the following steps: 
+7. To run "gstudio-mongokit" project, perform following steps: 
 
-  (1) Make sure you are in the virtual­env-folder and it's activated
-    (source bin/activate).  
+    (1) Make sure you are in the virtualenv-folder and it's activated
+        (source bin/activate).  
 
-  (2) Move to gnowsys­ndf folder: cd gstudio/gnowsys-ndf 
+    (2) Move to folder where your "manage.py" file resides: cd gstudio/gnowsys-ndf 
 
-  (3) Start mongodb server: sudo service mongodb start 
+    (3) Start mongodb server: sudo service mongodb start 
 
-  (4) Run the following commands: 
+    (4) Run the following commands: 
 
-      (a) python manage.py initrcsrepo 
+        (a) python manage.py initrcsrepo 
 
-      (b) python manage.py filldb 
+        (b) python manage.py syncdb
 
-      (c) python manage.py syncdb 
+        (c) python manage.py filldb 
 
-      (d) python manage.py runserver 
+        (d) python manage.py runserver 
 
-      NOTE: Always run (c) & (d) commands together.
 
-After running (d) point your browser to http://localhost:8000 to see
-gstudio on your browser.  Enjoy.  
+* After running (d) point your browser to http://localhost:8000 to see
+  gstudio on your browser.  Enjoy.  
 
-Since gstudio is frequently updated, please obtain the latest code
-from git repo. After each update run (b) before running (d).
+* Since gstudio is frequently updated, please obtain the latest code
+  from git repo. After each update run (b) & (c) commands before running (d).
 
-Any issues with this procedure or you need any further help, or to
-file bugs etc. visit ask us in the mailing list:
+* Any issues with this procedure or you need any further help, or to
+  file bugs etc. visit ask us in the mailing list:
 
-http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
+  - http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
 
