@@ -360,15 +360,35 @@ def get_gapps_menubar(group_id, selectedGapp):
 		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
+def thread_count( oid, count ):
+	thr_rep = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}]})
+		
+	if thr_rep and (thr_rep.count() > 0):
+		count += thr_rep.count()
+		print "\n\n ~~~~~~~~~~~~ : ", count
+		for each in thr_rep:
+			thread_count(each._id, count)
+		return count
+	
+	elif thr_rep.count() == 0:
+		return count
+	
+
 @register.assignment_tag
 def get_forum_twists(forum):
 	gs_collection = db[Node.collection_name]
-	ret_replies=[]
-	exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+	ret_replies = []
+	exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
 	exstng_reply.sort('created_at')
+	count = 0
 	for each in exstng_reply:
 		ret_replies.append(each)
+		
+		if thread_count(each._id, count):
+			count += thread_count(each._id, count) 
+		print "\n\n---------------------- : ", count
 	return ret_replies
+
 
 lp=[]
 def get_rec_objs(ob_id):

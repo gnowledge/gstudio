@@ -213,7 +213,11 @@ def display_forum(request,group_id,forum_id):
     if forum_object._type == "GSystemType":
        return forum(request, group_id, forum_id)
 
-    variables=RequestContext(request,{'forum':forum,'groupid':group_id,'group_id':group_id, 'forum_created_by':usrname})
+    variables = RequestContext(request,{
+                                        'forum':forum,
+                                        'groupid':group_id,'group_id':group_id,
+                                        'forum_created_by':usrname
+                                        })
 
     return render_to_response("ndf/forumdetails.html",variables)
 
