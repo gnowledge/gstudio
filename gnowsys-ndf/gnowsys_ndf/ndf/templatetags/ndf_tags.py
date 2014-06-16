@@ -361,16 +361,30 @@ def get_gapps_menubar(group_id, selectedGapp):
 
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
+global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
 def thread_reply_count( oid ):
 	'''
 	Method to count total replies for the thread.
 	'''
 	thr_rep = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}]})
-	global global_thread_rep_counter		# to acces global_thread_rep_counter as global and not as local
+	global global_thread_rep_counter		# to acces global_thread_rep_counter as global and not as local, 
+	global global_thread_latest_reply
 
 	if thr_rep and (thr_rep.count() > 0):
 		for each in thr_rep:
+
 			global_thread_rep_counter += 1
+
+			if not global_thread_latest_reply["content_org"]:
+				global_thread_latest_reply["content_org"] = each.content_org
+				global_thread_latest_reply["last_update"] = each.last_update
+				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+			else:
+				if global_thread_latest_reply["last_update"] < each.last_update:
+					global_thread_latest_reply["content_org"] = each.content_org
+					global_thread_latest_reply["last_update"] = each.last_update
+					global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+					
 			thread_reply_count(each._id)
 	
 	return global_thread_rep_counter
@@ -383,14 +397,15 @@ def get_forum_twists(forum):
 	exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
 	exstng_reply.sort('created_at')
 	global global_thread_rep_counter 		# to acces global global_thread_rep_counter and reset it to zero
-
+	global global_thread_latest_reply
 	# for loop to get count of each thread's total reply
 	for each in exstng_reply:
 		global_thread_rep_counter = 0		# reset global_thread_rep_counter to zero
-		
+		global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
+
 		# as each thread is dict, adding one more field of thread_reply_count
 		each['thread_reply_count'] = thread_reply_count(each._id)
-		
+		each['latest_reply'] = global_thread_latest_reply
 		ret_replies.append(each)
 
 	return ret_replies
