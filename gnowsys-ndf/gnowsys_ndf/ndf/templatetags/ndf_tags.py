@@ -360,18 +360,20 @@ def get_gapps_menubar(group_id, selectedGapp):
 		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
-def thread_count( oid, count ):
+global_thread_rep_counter = 0	# global variable to count thread's total reply
+def thread_reply_count( oid ):
+	'''
+	Method to count total replies for the thread.
+	'''
 	thr_rep = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}]})
-		
+	global global_thread_rep_counter		# to acces global_thread_rep_counter as global and not as local
+
 	if thr_rep and (thr_rep.count() > 0):
-		count += thr_rep.count()
-		print "\n\n ~~~~~~~~~~~~ : ", count
 		for each in thr_rep:
-			thread_count(each._id, count)
-		return count
+			global_thread_rep_counter += 1
+			thread_reply_count(each._id)
 	
-	elif thr_rep.count() == 0:
-		return count
+	return global_thread_rep_counter
 	
 
 @register.assignment_tag
@@ -380,13 +382,17 @@ def get_forum_twists(forum):
 	ret_replies = []
 	exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
 	exstng_reply.sort('created_at')
-	count = 0
+	global global_thread_rep_counter 		# to acces global global_thread_rep_counter and reset it to zero
+
+	# for loop to get count of each thread's total reply
 	for each in exstng_reply:
-		ret_replies.append(each)
+		global_thread_rep_counter = 0		# reset global_thread_rep_counter to zero
 		
-		if thread_count(each._id, count):
-			count += thread_count(each._id, count) 
-		print "\n\n---------------------- : ", count
+		# as each thread is dict, adding one more field of thread_reply_count
+		each['thread_reply_count'] = thread_reply_count(each._id)
+		
+		ret_replies.append(each)
+
 	return ret_replies
 
 

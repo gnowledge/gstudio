@@ -464,5 +464,3 @@ def get_profile_pic(username):
         img_obj = "" 
 
     return img_obj
-
-
