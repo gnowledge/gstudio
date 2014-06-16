@@ -117,7 +117,7 @@
             <small class="subheader">
               {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
               <br/>
-              by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+              by <a class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</a> 
             </small>
             </div>
             </h4>
@@ -207,7 +207,7 @@
             <small class="subheader">
               {{ doc.member_of_names_list|join:', ' }} created {{doc.created_at|timesince}} ago 
               <br/>
-              by <span href="#" class="user" data-gnow="">{{doc.user_details_dict.created_by}}</span> 
+              by <a class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{doc.user_details_dict.created_by}}</a> 
             </small>
             </div>
           </header>
@@ -292,7 +292,7 @@
             <small class="subheader">
               {{ image.member_of_names_list|join:', ' }} created {{image.created_at|timesince}} ago
               <br/>
-              by <span href="#" class="user" data-gnow="">{{image.user_details_dict.created_by}}</span> 
+              by <a class="user" href="{% url 'userDashboard' group_name_tag image.created_by %}" data-gnow="">{{image.user_details_dict.created_by}}</a> 
             </small>
             </div>
             </h4>
@@ -379,7 +379,7 @@
             <div>
               <small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago 
               <br/>
-              by <span href="#" class="user" data-gnow="">{{video.user_details_dict.created_by}}</span>
+              by <a class="user" href="{% url 'userDashboard' group_name_tag video.created_by %}" data-gnow="">{{video.user_details_dict.created_by}}</a>
               </small>
             </div>
             </h4>
@@ -535,7 +535,7 @@
             <small class="subheader">
               {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
               <br/>
-              by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+              by <a class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</a> 
             </small>
             </div>
             </h4>
