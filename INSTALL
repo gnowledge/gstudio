@@ -73,7 +73,28 @@ Use corresponding package names if you are using an RPM based distro
 	settings.py file - EMAIL_HOST_USER = 'yourcompleteemailid'
 	EMAIL_HOST_PASSWORD = 'yourpassword'
 						 
-6. Installation of MathJax (required for rendering MathML symbols)
+6. Install JS/CSS dependencies:
+    
+    (1) Activate your virtual environment: 
+        source bin/activate
+
+    (2) A tool to create isolated node.js environment which is integrated 
+        with environment built by python virtualenv: 
+        pip install nodeenv
+
+    (3) Appending nodeenv settings to virtualenv: (This takes time .. wait till it complete)
+        nodeenv --python-virtualenv        
+
+    (4) Installing Bower:
+        npm install -g bower
+
+    (5) Now go to static folder:  
+        cd gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/
+
+    (6) To install JS/CSS dependencies:
+        bower install
+
+7. Installation of MathJax (required for rendering MathML symbols)
    
     (1) To install MathJax on your own server, download the
         distribution from the following link:
@@ -84,7 +105,7 @@ Use corresponding package names if you are using an RPM based distro
         "static" directory.
 
 
-7. To run "gstudio-mongokit" project, perform following steps: 
+8. To run "gstudio-mongokit" project, perform following steps: 
 
     (1) Make sure you are in the virtualenv-folder and it's activated
         (source bin/activate).  
