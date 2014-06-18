@@ -542,7 +542,7 @@ def get_user_group(user, selected_group_name):
   group_list = []
   auth_group = None
 
-  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(10)
+  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(9)
 
   auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
