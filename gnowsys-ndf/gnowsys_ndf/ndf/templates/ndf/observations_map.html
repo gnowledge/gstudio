@@ -648,8 +648,13 @@
 
 				    imagesList = JSON.parse(imagesList);
 
+				    // if file is not uploaded sucessfully
+				    if(xhr.responseText == "UploadError")
+				    {
+				    	$(".marker-alert-error").text("Error while uploading file. This might be because of file is currupted or invalid file format !").fadeIn(600, "swing").fadeOut(10000);
+				    }
 				    // check if image is not in the list, add it.
-				    if(imagesList.indexOf(xhr.responseText) < 0)
+				    else if(imagesList.indexOf(xhr.responseText) < 0 )
 				    {
 				    	
 				    	imagesList.push(xhr.responseText);
@@ -676,32 +681,35 @@
 
 				    uploadButton.innerHTML = 'Upload';
 
-				    // updating metadata of files
-				    var imagesMetaData = $("#image-uploader-overlay > input[name='images-metadata']").attr("value");
-
-				    imagesMetaData = JSON.parse(imagesMetaData);
-
-				    var flagIsInList = false;
-
-				    if (imagesMetaData.length > 0)
+				    // updating metadata of files, if file is uploaded sucessfully
+				    if(xhr.responseText != "UploadError")
 				    {
-				    	$.each(imagesMetaData, function(i, val){ 
+				    	var imagesMetaData = $("#image-uploader-overlay > input[name='images-metadata']").attr("value");
 
-				    		if( imagesMetaData[i].id == xhr.responseText )
-				    		{
-				    			// console.log(imagesMetaData[i].id + "====" + xhr.responseText)
-				    			flagIsInList = true;
-				    		}
-				    	});
-				    }
-				    
-				    if( (imagesMetaData.length == 0) || (!flagIsInList) )
-				    {
-				    	var tempDict = { "id": xhr.responseText, "name":fileSelect.files[0].name, "mimetype":fileSelect.files[0].type }
+				    	imagesMetaData = JSON.parse(imagesMetaData);
 
-				    	imagesMetaData.push(tempDict);
-				    	
-				    	$("#image-uploader-overlay > input[name='images-metadata']").attr("value", JSON.stringify(imagesMetaData));
+				    	var flagIsInList = false;
+
+				    	if (imagesMetaData.length > 0)
+				    	{
+				    		$.each(imagesMetaData, function(i, val){ 
+
+				    			if( imagesMetaData[i].id == xhr.responseText )
+				    			{
+				    				    			// console.log(imagesMetaData[i].id + "====" + xhr.responseText)
+				    				    			flagIsInList = true;
+				    				    		}
+				    				    	});
+				    	}
+
+				    	if( (imagesMetaData.length == 0) || (!flagIsInList) )
+				    	{
+				    		var tempDict = { "id": xhr.responseText, "name":fileSelect.files[0].name, "mimetype":fileSelect.files[0].type }
+
+				    		imagesMetaData.push(tempDict);
+
+				    		$("#image-uploader-overlay > input[name='images-metadata']").attr("value", JSON.stringify(imagesMetaData));
+				    	}
 				    }
 				  }
 				  else
