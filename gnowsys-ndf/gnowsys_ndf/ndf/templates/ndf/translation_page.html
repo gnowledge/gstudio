@@ -14,6 +14,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
 $("#lan option[value={{node.language}}]").remove();
+{% if node %}
 {% get_possible_translations node as translations %}
 {% for each in translations %}
 {% for k,v in each.items %}
@@ -21,6 +22,7 @@ $("#lan option[value={{v}}]").remove();
 
 {% endfor %}
 {% endfor %}
+{% endif %}
 });
 
 </script>
@@ -41,19 +43,20 @@ $("#lan option[value={{v}}]").remove();
 
 <div class="row">
 <div class="medium-8 columns">
-<label>Page Name</label>
-<input type="text" value="{{node.name}}" class="field left" readonly="readonly" >
+ Page Name  :  {{node.name}}</br></br>
+
               </div>
    </div>
+</br>
 <div class="row">
 <div class="medium-8 columns">
-<label> Description</label>
+ Description  :</br></br>
 <textarea name="content" class="field left">{{node.content_org|default_if_none:""}}</textarea>
           </div></div>
 <div class="row">
 <div class="medium-8 columns">
-<label> Tags</label>
-<input type="text" value="{{node.tags|join:', '|default_if_none:""}}" class="field left" readonly="readonly" >
+Tags  : </br></br>
+{{node.tags|join:', '|default_if_none:""}}
               </div></div>
   
   
