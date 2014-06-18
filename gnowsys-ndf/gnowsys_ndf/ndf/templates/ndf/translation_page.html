@@ -43,19 +43,20 @@ $("#lan option[value={{v}}]").remove();
 
 <div class="row">
 <div class="medium-8 columns">
-<label>Page Name {{node}}{{drawer}}{{title}}</label>
-<input type="text" value="{{node.name}}" class="field left" readonly="readonly" >
+ Page Name  :  {{node.name}}</br></br>
+
               </div>
    </div>
+</br>
 <div class="row">
 <div class="medium-8 columns">
-<label> Description</label>
+ Description  :</br></br>
 <textarea name="content" class="field left">{{node.content_org|default_if_none:""}}</textarea>
           </div></div>
 <div class="row">
 <div class="medium-8 columns">
-<label> Tags</label>
-<input type="text" value="{{node.tags|join:', '|default_if_none:""}}" class="field left" readonly="readonly" >
+Tags  : </br></br>
+{{node.tags|join:', '|default_if_none:""}}
               </div></div>
   
   

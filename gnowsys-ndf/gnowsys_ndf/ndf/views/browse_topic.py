@@ -90,7 +90,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     )       
 
 
-def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None,app_set_id1=None):
+def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 
 	nodes_dict = []
  	create_edit = True
@@ -103,13 +103,10 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None,app_
 	drawer = None
 	nodes_list = []
 	parent_nodes_collection = ""
-        translate=request.GET.get('translate','')      
+        #translate=request.GET.get('translate','')      
 	if request.method == "POST":
-                if app_set_id:
-                    app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
-                else:
-                    app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id1)})
-		if app_GST:
+                app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+         	if app_GST:
 			create_edit = True
 			themes_list_items = ""
 			root_themes = []
@@ -226,11 +223,8 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None,app_
 	else:
 		app_node = None
 		nodes_list = []
-                if app_set_id:
-                    app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
-                else:
-                    app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id1)})
-		if app_GST:
+                app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+                if app_GST:
 			# For adding new Theme & Topic
 			if app_GST.name == "Theme" or app_GST.name == "Topic":
 				title = app_GST.name
@@ -301,20 +295,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None,app_
 
 					parent_nodes_collection = json.dumps(prior_theme_collection)
 					# End of finding unique theme names for editing name
-        if translate :
-            return render_to_response("ndf/translation_page.html",
-                                              {'group_id': group_id,'groupid': group_id, 'drawer': drawer,
-                                               'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,
-                                               'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
-                                               'theme_GST_id': theme_GST._id, 'topic_GST_id': topic_GST._id,
-                                               'themes_list_items': themes_list_items,'nodes':nodes_dict
-                                        },context_instance = RequestContext(request)
-                                      
-                                          )
-
-        else:
-                    
-            return render_to_response("ndf/theme.html",
+        return render_to_response("ndf/theme.html",
                                       {'group_id': group_id,'groupid': group_id, 'drawer': drawer,
                                        'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,
                                        'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
