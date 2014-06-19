@@ -112,7 +112,6 @@
 
 
 {% block body_content %}
-
 {% user_access_policy groupid request.user as user_access %}
 
 	{% if themes_hierarchy %}
@@ -220,6 +219,10 @@
 	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
   		  		{% if user_access == "allow" %}
 	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
+
+		    <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}?translate=true&appid={{theme_GST_id}}" class="button medium">Translate</a></td>
+	        
+	        	{% endif %}
      	       	       
  	{% endif %}
 	          	</tr>
