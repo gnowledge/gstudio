@@ -1,0 +1,25 @@
+server {
+    listen 443;
+    server_name  chatb.org;
+
+    ssl  on;
+    ssl_certificate /path/to/chatb.org.crt;
+    ssl_certificate_key /path/to/chatb.org.key;
+
+    root /home/ishem/g/chatb/chatb/static; #/path/to/chatb/static;
+
+    index index.html;
+
+    location / {
+        if (!-f $request_filename) {
+            proxy_pass http://127.0.0.1:8000;
+            break;
+        }
+    }
+    location /_rooms {
+        proxy_pass http://127.0.0.1:8000/_rooms;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
