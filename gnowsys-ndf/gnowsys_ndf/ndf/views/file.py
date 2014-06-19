@@ -370,7 +370,7 @@ def submitDoc(request, group_id):
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
         access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
-        tags = request.POST.get('tags')
+        tags = request.POST.get('tags', "")
 
         i = 1
 	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
@@ -404,19 +404,35 @@ def submitDoc(request, group_id):
 
     
 first_object = ''
-def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None):
+def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None, **kwargs):
     """
     this will create file object and save files in gridfs collection
     """
+    
     global count,first_object
+    
     fcol = db[File.collection_name]
     fileobj = fcol.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
     files.seek(0)
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
+    
+    print "TeSt",img_type, content_org, tags
+    
     if fileobj.fs.files.exists({"md5":filemd5}):
-        return files.name                                                                #return already exist file
+        
+        # if calling function is passing oid=True as last parameter then reply with id and name.
+        if kwargs["oid"]: 
+
+            coll_oid = get_database()['fs.files']
+            cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
+            # returning only ObjectId (of GSystem containing file info) in dict format.
+            # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
+            return cur_oid["docid"]
+        else:
+            return files.name
+
     else:
         try:
             files.seek(0)
@@ -454,7 +470,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
 
             fileobj.member_of.append(GST_FILE._id)
             fileobj.mime_type = filetype
-            if img_type == None:
+            if img_type == "" or img_type == None:
                 if content_org:
                     fileobj.content_org = unicode(content_org)
                     # Required to link temporary files with the current user who is modifying this document
@@ -822,7 +838,12 @@ def readDoc(request, _id, group_id, file_name = ""):
     file_node = collection.File.one({"_id": ObjectId(_id)})
     if file_node is not None:
         if file_node.fs_file_ids:
-            if (file_node.fs.files.exists(file_node.fs_file_ids[0])):
+            if file_node.mime_type == 'video':
+                if len(file_node.fs_file_ids) > 2:
+                    if (file_node.fs.files.exists(file_node.fs_file_ids[2])):
+                        f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[2]))
+                        return HttpResponse(f.read(), content_type=f.content_type)
+            elif (file_node.fs.files.exists(file_node.fs_file_ids[0])):
                 grid_fs_obj = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[0]))
                 return HttpResponse(grid_fs_obj.read(), content_type = grid_fs_obj.content_type)
             else:

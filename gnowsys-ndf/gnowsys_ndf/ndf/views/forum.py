@@ -77,9 +77,28 @@ def forum(request, group_id, node_id=None):
       )
 
     elif forum_st._id == ObjectId(node_id):
+      
       # Forum list view
+
       existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
-      variables=RequestContext(request,{'existing_forums': existing_forums, 'groupid': group_id, 'group_id': group_id})
+      forum_detail_list = []
+
+      for each in existing_forums:
+        
+        temp_forum = {}
+        temp_forum['name'] = each.name
+        temp_forum['created_at'] = each.created_at
+        temp_forum['tags'] = each.tags
+        temp_forum['member_of_names_list'] = each.member_of_names_list
+        temp_forum['user_details_dict'] = each.user_details_dict
+        temp_forum['html_content'] = each.html_content
+        temp_forum['contributors'] = each.contributors
+        temp_forum['id'] = each._id
+        temp_forum['threads'] = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(each._id)}]}).count()
+        
+        forum_detail_list.append(temp_forum)
+
+      variables=RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
       return render_to_response("ndf/forum.html",variables)
 
 def create_forum(request,group_id):
@@ -194,7 +213,11 @@ def display_forum(request,group_id,forum_id):
     if forum_object._type == "GSystemType":
        return forum(request, group_id, forum_id)
 
-    variables=RequestContext(request,{'forum':forum,'groupid':group_id,'group_id':group_id, 'forum_created_by':usrname})
+    variables = RequestContext(request,{
+                                        'forum':forum,
+                                        'groupid':group_id,'group_id':group_id,
+                                        'forum_created_by':usrname
+                                        })
 
     return render_to_response("ndf/forumdetails.html",variables)
 
@@ -423,3 +446,21 @@ def add_node(request,group_id):
     except Exception as e:
         return HttpResponse(""+str(e))
     return HttpResponse("success")
+
+
+def get_profile_pic(username):
+    
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(username) })
+    prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
+    dbref_profile_pic = prof_pic.get_dbref()
+    collection_tr = db[Triple.collection_name]
+    prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })
+
+    # prof_pic_rel will get the cursor object of relation of user with its profile picture 
+    if prof_pic_rel.count() :
+        index = prof_pic_rel[prof_pic_rel.count() - 1].right_subject
+        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(index) })        
+    else:
+        img_obj = "" 
+
+    return img_obj

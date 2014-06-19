@@ -62,6 +62,9 @@
   </dl>
 </header>
 
+<div class="tabs-content">
+<div class="content active" id="panel2-1">
+
 {% if searching and page_nodes.count > 0 %}
 <div class="row">
   <div class="small-12 columns end">
@@ -77,8 +80,7 @@
 </div>  
 
 {% endif %}
-<div class="tabs-content">
-<div class="content active" id="panel2-1">
+
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   {% autopaginate page_nodes 23 %}
@@ -101,7 +103,7 @@
           <div>
             <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
             <br/>
-            by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            by <a class="user" href="{% url 'userDashboard' group_name_tag node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
             </small>
           </div>
         </h4>
@@ -147,15 +149,16 @@
 {% paginate %}
 
 </div>
+
 <div class="content" id="panel2-4">
-{% get_resource_collection "Page" as coll %}
+{% get_resource_collection groupid title as page_collections %}
+
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-  {% autopaginate coll 23 %}
+  {% autopaginate page_collections 23 %}
 
   <!-- Existing card list-->
-  {% for node in coll %}
-  
+  {% for node in page_collections %}
     <li class="card">
       <div class="page">
       <header>
@@ -171,7 +174,7 @@
           <div>
             <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
             <br/>
-            by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            by <a class="user" data-gnow="" href="{% url 'userDashboard' group_name_tag node.created_by %}">{{node.user_details_dict.created_by}}</a> 
             </small>
           </div>
         </h4>
@@ -200,12 +203,11 @@
       </div>
     </li>  
   
-
   {% empty %}
     {% if not searching %}
       <div class="row">
         <div class="small-12 columns">
-          <h5>This group doesn't have any Collection. </h5>
+          <h5>This group doesn't have any collections.</h5>
         </div>
       </div>
     {% endif %}
