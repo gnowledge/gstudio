@@ -92,7 +92,7 @@
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
         <h4>{{ node.name|truncatechars:20 }}
       	<div>
-            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
             </small>
         </div>
         </h4>

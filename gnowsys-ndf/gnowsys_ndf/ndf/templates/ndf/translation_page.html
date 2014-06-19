@@ -27,11 +27,13 @@ $("#lan option[value={{v}}]").remove();
 </script>
 
        <div class="large-12 columns">
-      
 <table class="large-6 columns">
 <div class="row">
 <div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
-<div class="large-6 columns"><select name="lan" id="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select>
+<div class="large-6 columns">
+<select name="lan" id="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
+
+
 </div>
 <hr style="height:5px;background-color: #0B6580;" />
 </div>
@@ -40,19 +42,20 @@ $("#lan option[value={{v}}]").remove();
 
 <div class="row">
 <div class="medium-8 columns">
-<label>Page Name</label>
-<input type="text" value="{{node.name}}" class="field left" readonly="readonly" >
+ Page Name  :  {{node.name}}</br></br>
+
               </div>
    </div>
+</br>
 <div class="row">
 <div class="medium-8 columns">
-<label> Description</label>
+ Description  :</br></br>
 <textarea name="content" class="field left">{{node.content_org|default_if_none:""}}</textarea>
           </div></div>
 <div class="row">
 <div class="medium-8 columns">
-<label> Tags</label>
-<input type="text" value="{{node.tags|join:', '|default_if_none:""}}" class="field left" readonly="readonly" >
+Tags  : </br></br>
+{{node.tags|join:', '|default_if_none:""}}
               </div></div>
   
   
