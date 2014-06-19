@@ -8,12 +8,12 @@
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block body_content %}
-
 <form data-abide id="form-edit-node" method="POST" action="">
 {% csrf_token %}
 <script type="text/javascript">
 $(document).ready(function(){
 $("#lan option[value={{node.language}}]").remove();
+{% if node %}
 {% get_possible_translations node as translations %}
 {% for each in translations %}
 {% for k,v in each.items %}
@@ -21,6 +21,7 @@ $("#lan option[value={{v}}]").remove();
 
 {% endfor %}
 {% endfor %}
+{% endif %}
 });
 
 </script>
