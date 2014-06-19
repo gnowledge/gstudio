@@ -1133,3 +1133,136 @@ def get_group_name(groupid):
 	else :
 		pass
 	return group_name 
+
+@register.filter
+def get_field_type(node_structure, field_name):
+  """Returns data-type value associated with given field_name.
+  """
+  return node_structure.get(field_name)
+
+
+@register.inclusion_tag('ndf/html_field_widget.html')
+def html_widget(field, field_type, field_value):
+  """
+  Returns html-widget for given attribute-field; that is, passed in form of
+  field_name (as attribute's name) and field_type (as attribute's data-type)
+  """
+  # special_tab_fields_list = ["data_structure",
+  #                            "subject_type", "object_type",
+  #                            "attribute_type_set", "relation_type_set"
+  #                           ] # Fields that require a tab for itself
+  # is_special_tab_field = False
+  
+  # if field_name in special_tab_fields_list:
+  #   is_special_tab_field = True
+  
+  # is_field_complex = False # Apart from simple data-types
+  field_value_choices = []
+
+  LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
+              "[<type 'unicode'>]", "[<type 'basestring'>]",
+              "[<type 'int'>]", "[<type 'float'>]", "[<type 'long'>]"
+            ]
+  is_list_of = False
+
+  SPECIAL_FIELDS = {"location": "ndf/location_widget.html",
+                    "content_org": "ndf/add_editor.html"
+                    }
+  is_special_field = False
+  included_template_name = ""
+
+  is_required_field = False
+
+  try:
+    field_name = field["name"]
+    # print "\n ", field_name, " -- ", field_type, " -- ", type(field_type)
+    # type_check = type(field_type).__name__ # Returns a string
+      # print "\n ", field_name, " -- ", type_check
+
+    # if type_check == "type":
+    #   # Basic data-type
+    #   is_field_complex = False
+      
+    # elif type_check == "IS":
+    #   # Mongokit's special data-type
+      
+    #   # Extract field's various value-choices
+    #   field_value_choices = eval(field_name.upper() + "_CHOICES")
+
+    #   # Overwrite field_type with type_check value; makes it easy for checking on template
+    #   field_type = type_check # string value assigned as "IS"
+
+    # else:
+    #   is_field_complex = True # Apart from simple data-types; say [unicode], [int]...
+      
+    # ==========================================
+
+    if type(field_type) == type:
+      field_type = field_type.__name__
+    else:
+      field_type = field_type.__str__()
+
+    is_list_of = (field_type in LIST_OF)
+    if is_list_of:
+      if field_value:
+        field_value = ", ".join(field_value)
+      else:
+        field_value = ""
+
+    is_special_field = (field_name in SPECIAL_FIELDS.keys())
+    if is_special_field:
+      included_template_name = SPECIAL_FIELDS[field_name]
+
+    is_AT_RT_base = field["_type"]
+    # print "\n is_AT_RT_base: ", is_AT_RT_base
+    is_attribute_field = False
+    is_relation_field = False
+    is_base_field = False
+    if is_AT_RT_base == "BaseField":
+      is_base_field = True
+      is_required_field = field["required"]
+      # print "\n Base field ("+field_name+") found !"
+      # print " is_special_field: ", is_special_field
+      # print " included_template_name: ", included_template_name
+      # print " field_type: ", field_type
+
+      # print " Field keys: ", ", ".join(field.keys())
+
+    elif is_AT_RT_base == "AttributeType":
+      is_attribute_field = True
+      is_required_field = field["required"]
+      # print "\n AttributeType ("+field_name+") found !"
+      # print " field_type: ", field_type
+      # print " Field keys: ", ", ".join(field.keys())
+
+    elif is_AT_RT_base == "RelationType":
+      is_relation_field = True
+      is_required_field = True
+      # print "\n RelationType ("+field_name+") found !"
+      # print " field_type: ", field_type
+      # print " Field keys: ", ", ".join(field.keys())
+      # print "\n ", field["object_type"]
+      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}},
+                                                            {'_id': 1, 'name': 1}
+                                                          )
+                                      )
+                                )
+
+      # print "\n field_value: ", field_value
+
+    return {'template': 'ndf/html_field_widget.html',
+            'field_name': field_name, 'field_altnames': field["altnames"], 'field_type': field_type, 'field_value': field_value if not field_value else "",
+            'field_value_choices': field_value_choices,
+            'is_base_field': is_base_field,
+            'is_attribute_field': is_attribute_field,
+            'is_relation_field': is_relation_field,
+            'is_list_of': is_list_of,
+            'is_special_field': is_special_field, 'included_template_name': included_template_name,
+            'is_required_field': is_required_field
+            # 'is_special_tab_field': is_special_tab_field
+    }
+
+  except Exception as e:
+    error_message = " HtmlWidgetTagError: " + str(e) + " !!!"
+    raise Exception(error_message)
+  

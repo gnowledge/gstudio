@@ -1,6 +1,3 @@
-''' -- imports from python libraries -- '''
-# import os -- Keep such imports here
-
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
@@ -13,10 +10,14 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
+
+''' -- imports from python libraries -- '''
+# import os -- Keep such imports here
 import subprocess
 import re
 import ast
 import string
+from datetime import datetime
 ######################################################################################################################################
 
 db = get_database()
@@ -295,7 +296,8 @@ def get_node_common_fields(request, node, group_id, node_type):
   if not node.has_key('_id'):
     
     node.created_by = usrid
-    node.member_of.append(node_type._id)
+    if node_type._id not in node.member_of:
+      node.member_of.append(node_type._id)
 
     if group_obj._id not in node.group_set:
       node.group_set.append(group_obj._id)
@@ -641,3 +643,233 @@ def update_mobwrite_content_org(node_system):
     textobj = TextObj(filename=filename,text=content_org)
     textobj.save()
   return textobj
+
+def parse_template_data(field_data_type, field_value, **kwargs):
+  """
+  Pareses the value fetched from request (GET/POST) object based on the data-type of the given field.
+
+  Arguments:
+  field_data_type -- data-type of the field
+  field_value -- value of the field retrieved from GET/POST object
+
+  Returns:
+  Parsed value based on the data-type of the field
+  """
+  
+  '''
+  kwargs_keys_list = [
+                      "date_format_string",     # date-format in string representation
+                      "field_instance"          # dict-object reperesenting AT/RT node
+                    ]
+  '''
+  DATA_TYPE_STR_CHOICES = [
+                            "unicode", "basestring",
+                            "int", "float", "long",
+                            "list", "dict",
+                            "datetime",
+                            "bool",
+                            "ObjectId"
+                          ]
+
+  try:
+
+    if type(field_data_type) == type:
+      field_data_type = field_data_type.__name__
+      # print " (if)--> ", field_data_type, (field_data_type == "datetime"), "\n"
+
+      if not field_value:
+        if field_data_type == "dict":
+          return {}
+
+        elif field_data_type == "list":
+          return []
+
+        else:
+          return None
+
+      if field_data_type == "unicode":
+        field_value = unicode(field_value)
+
+      elif field_data_type == "basestring":
+        field_value = str(field_value)
+
+      elif field_data_type == "int":
+        field_value = int(field_value)
+
+      elif field_data_type == "float":
+        field_value = float(field_value)
+
+      elif field_data_type == "long":
+        field_value = long(field_value)
+
+      elif field_data_type == "list":
+        field_value = "???"
+
+      elif field_data_type == "dict":
+        field_value = "???"
+
+      elif field_data_type == "datetime":
+        field_value = datetime.strptime(field_value, kwargs["date_format_string"])
+
+      elif field_data_type == "bool":
+        field_value = bool(int(field_value))
+
+      elif field_data_type == "ObjectId":
+        field_value = ObjectId(field_value)
+
+      else:
+        error_message = "Unknown data-type ("+field_data_type+") found"
+        raise Exception(error_message)
+
+      # print "\n parsed field_value: ", field_value
+
+    elif type(field_data_type) == list:
+      # Write code...
+      if not field_value:
+        return []
+
+      if kwargs["field_instance"]["_type"] == RelationType or kwargs["field_instance"]["_type"] == "RelationType":
+        # Write RT related code 
+        if not field_value:
+          return None
+
+        # print "\n field_value (going herre): ", field_value
+        field_value = collection.Node.one({'_id': ObjectId(field_value), 'member_of': {'$in': kwargs["field_instance"]["object_type"]}}, {'_id': 1})
+        if field_value:
+          field_value = field_value._id
+          # print "\n field_value (innerobjectid): ", field_value, " -- ", type(field_value)
+        else:
+          error_message = "This ObjectId("+field_type+") doesn't exists"
+          raise Exception(error_message)
+      
+    elif type(field_data_type) == dict:
+      # Write code...
+      if not field_value:
+        return {}
+
+    elif type(field_data_type) == mongokit.operators.IS:
+      # Write code...
+      if not field_value:
+        return None
+
+    elif type(field_data_type) == mongokit.document.R:
+      # Write code...
+      if kwargs["field_instance"]["_type"] == AttributeType or kwargs["field_instance"]["_type"] == "AttributeType":
+        # Write AT related code 
+        if not field_value:
+          if field_data_type == "dict":
+            return {}
+
+          elif field_data_type == "list":
+            return []
+
+          else:
+            return None
+
+      else:
+        error_message = "Neither AttributeType nor RelationType found"
+        raise Exception(error_message)
+
+    else:
+      error_message = "Unknown data-type found"
+      raise Exception(error_message)
+
+    return field_value
+
+  except Exception as e:
+    error_message = "\n TemplateDataParsingError: "+str(e)+" !!!\n"
+    raise Exception(error_message)
+
+def create_gattribute(subject_id, attribute_type_node, object_value):
+  ga_node = None
+
+  ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
+
+  if ga_node is None:
+    # Code for creation
+    try:
+      ga_node = collection.GAttribute()
+
+      ga_node.subject = subject_id
+      ga_node.attribute_type = attribute_type_node
+      ga_node.object_value = object_value
+      
+      ga_node.status = u"PUBLISHED"
+      ga_node.save()
+      info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+      print "\n ", info_message
+
+    except Exception as e:
+      error_message = "\n GAttributeCreateError: " + str(e) + "\n"
+      raise Exception(error_message)
+
+  else:
+    # Code for updation
+    is_ga_node_changed = False
+
+    try:
+      if type(ga_node.object_value) == list:
+        if set(ga_node.object_value) != set(object_value):
+          ga_node.object_value = object_value
+          is_ga_node_changed = True
+
+      elif type(ga_node.object_value) == dict:
+        if cmp(ga_node.object_value, object_value) != 0:
+          ga_node.object_value = object_value
+          is_ga_node_changed = True
+
+      else:
+        if ga_node.object_value != object_value:
+          ga_node.object_value = object_value
+          is_ga_node_changed = True
+
+      if is_ga_node_changed:
+        ga_node.status = u"PUBLISHED"
+        ga_node.save()
+        info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+        print "\n", info_message
+
+      else:
+        info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+        print "\n", info_message
+
+    except Exception as e:
+      error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
+      raise Exception(error_message)
+
+  return ga_node
+
+
+def create_grelation(subject_id, relation_type_node, right_subject_id):
+  gr_node = None
+
+  try:
+    gr_node = collection.Triple.one({'_type': "GRelation", 
+                                     'subject': subject_id, 
+                                     'relation_type': relation_type_node.get_dbref(),
+                                     'right_subject': right_subject_id
+                                 })
+
+    if gr_node is None:
+      # Code for creation
+      gr_node = collection.GRelation()
+
+      gr_node.subject = subject_id
+      gr_node.relation_type = relation_type_node
+      gr_node.right_subject = right_subject_id
+
+      gr_node.status = u"PUBLISHED"
+      
+      gr_node.save()
+      info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+      print "\n", info_message
+
+    else:
+      info_message = " GRelation ("+gr_node.name+") already exists !\n"
+      print "\n", info_message
+
+    return gr_node
+
+  except Exception as e:
+      error_message = "\n GRelationCreateError: " + str(e) + "\n"
+      raise Exception(error_message)

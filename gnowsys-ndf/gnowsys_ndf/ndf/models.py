@@ -191,142 +191,275 @@ class Node(DjangoDocument):
 
     ########## Setter(@x.setter) & Getter(@property) ##########
 
+    def get_property_order(self):
+      """
+      This getter function returns property_order for a given GSystemType/GSystem.
+      - If GSystemType found, depending upon whether type_of exists or not returns property_order.
+      - If GSystem found, converts corresponding tab's list of ObjectIds (from it's GSystemType's property_order) 
+        into list of name, data-type & value; and stores in it's property_order.
+      """
+      # print "\n Getter used... ", self['property_order']
+      collection = get_database()[Node.collection_name]
+      new_property_order = []
+
+      try:
+        if self["_type"] not in ["MetaType", "GSystemType", "AttributeType", "RelationType"]:
+          # If GSystems found, then only perform following statements
+          demo = eval("collection"+"."+self['_type'])()
+          # demo i.e., copy of self is created to avoid conflicts in structure that comes after get_neighbourhoood() function
+          demo.member_of = self.member_of
+          demo.get_neighbourhood(demo.member_of)
+          
+          demo["property_order"] = []
+          gst_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'property_order': 1})
+          # print "\n gst_nodes.count: ", gst_nodes.count()
+          for gst in gst_nodes:
+            for po in gst["property_order"]:
+              demo["property_order"].append(po)
+
+          # print "\n demo['property_order'] (b): ", demo["property_order"], "\n"
+          # demo.get_neighbourhood(demo["member_of"])
+          # print "\n demo['property_order'] (a): ", demo["property_order"], "\n"
+
+          for tab_name, list_field_id in demo['property_order']:
+            list_field_set = []
+            for field_id_or_name in list_field_id:
+              if ObjectId.is_valid(field_id_or_name):
+                # For attribute-field(s) and/or relation-field(s)
+                
+                # field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'name': 1, 'altnames': 1})
+                field = collection.Node.one({'_id': ObjectId(field_id_or_name)})
+                
+                # type_check = type(demo.structure[field.name]).__name__  # Returns a string
+                # print "\n type_check("+field.name+") (b): " + type_check
+
+                # field_data_type = demo.structure[field.name]
+                # if type(field_data_type) == type:
+                #   field_data_type = field_data_type.__name__
+                # else:
+                #   field_data_type = field_data_type.__str__()
+
+                # print " field_type("+field.name+") (a): " + field_data_type + "\n"
+
+                # list_field_set.append([demo.structure, field._type, field.name, field.altnames, demo[field.name]])
+                list_field_set.append([demo.structure, field, demo[field.name]])
+
+              else:
+                # For node's base-field(s)
+
+                # field_data_type = demo.structure[field_id_or_name]
+                # if type(field_data_type) == type:
+                #   field_data_type = field_data_type.__name__
+
+                # base_field_altnames = {
+                #   'name': "Name",
+                #   'content_org': "Content",
+                #   'featured': "Featured",
+                #   'location': "Location",
+                #   'status': "Status",
+                #   'tags': "Tags"
+                # }
+
+                base_field = {
+                  'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
+                  'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Content", 'required': False},
+                  # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
+                  'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
+                  # 'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
+                  'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
+                }
+                # list_field_set.append([demo.structure, "BaseField", field_id_or_name, base_field_altnames[field_id_or_name], demo[field_id_or_name]])
+                list_field_set.append([demo.structure, base_field[field_id_or_name], demo[field_id_or_name]])
+
+            new_property_order.append([tab_name, list_field_set])
+            # print " new_property_order: ", new_property_order
+
+          demo["property_order"] = new_property_order
+          # print "\n demo['property_order'] (f): ", demo["property_order"], "\n"
+        
+        else:
+          # Otherwise (if GSystemType found) depending upon whether type_of exists or not returns property_order.
+          if not demo["property_order"] and demo.has_key("_id"):
+            type_of_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["type_of"]}}, {'property_order': 1})
+            
+            if type_of_nodes.count():
+              demo["property_order"] = []
+              for to in type_of_nodes:
+                for po in to["property_order"]:
+                  demo["property_order"].append(po)
+
+            collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
+
+        # new_property_order = demo["property_order"]
+
+        # if demo.has_key('_id'):
+        #   demo = collection.Node.one({'_id': demo._id})
+
+        # else:
+        #   a = eval("collection" + "." + demo['_type'])()
+        #   print "\n demo.keys(): ", collection.GSystem().keys(), "\n"
+
+        # demo["property_order"] = new_property_order
+        print "\n demo.keys(): ", demo.keys()
+        print "\n self.keys(): ", self.keys()
+        
+        self['property_order'] = demo['property_order']
+
+        return self['property_order']
+
+      except Exception as e:
+        error_message = "\n PropertyOrderModifyError: " + str(e) + " !!!\n"
+        raise Exception(error_message)
+
+    def set_property_order(self, value):
+      self.property_order.append(value)
+
+    property_order = property(get_property_order, set_property_order)
+
+
     @property
     def user_details_dict(self):
-        """Retrieves names of created-by & modified-by users from the given node, 
-        and appends those to 'user_details' dict-variable
-        """
-        user_details = {}
-        if self.created_by:
-            user_details['created_by'] = User.objects.get(pk=self.created_by).username
+      """Retrieves names of created-by & modified-by users from the given node, 
+      and appends those to 'user_details' dict-variable
+      """
+      user_details = {}
+      if self.created_by:
+        user_details['created_by'] = User.objects.get(pk=self.created_by).username
 
-        contributor_names = []
-        for each_pk in self.contributors:
-            contributor_names.append(User.objects.get(pk=each_pk).username)
-        # user_details['modified_by'] = contributor_names
-        user_details['contributors'] = contributor_names
+      contributor_names = []
+      for each_pk in self.contributors:
+        contributor_names.append(User.objects.get(pk=each_pk).username)
 
-        if self.modified_by:
-            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
+      # user_details['modified_by'] = contributor_names
+      user_details['contributors'] = contributor_names
 
-        return user_details
+      if self.modified_by:
+        user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
+
+      return user_details
 
     @property
     def member_of_names_list(self):
-        """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
-        built from 'member_of' field (list of ObjectIds)
-        """
-        member_of_names = []
+      """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
+      built from 'member_of' field (list of ObjectIds)
+      """
+      member_of_names = []
 
-        collection = get_database()[Node.collection_name]
-        if self.member_of:
-            for each_member_id in self.member_of:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem=collection.Node.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        else:
-            for each_member_id in self.gsystem_type:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem=collection.Node.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        return member_of_names
+      collection = get_database()[Node.collection_name]
+      if self.member_of:
+        for each_member_id in self.member_of:
+          if type(each_member_id) == ObjectId:
+            _id = each_member_id
+
+          else:
+            _id = each_member_id['$oid']
+
+          if _id:
+            mem=collection.Node.one({'_id': ObjectId(_id)})
+            if mem:
+              member_of_names.append(mem.name)
+
+      else:
+        for each_member_id in self.gsystem_type:
+          if type(each_member_id) == ObjectId:
+            _id = each_member_id
+
+          else:
+            _id = each_member_id['$oid']
+
+          if _id:
+            mem=collection.Node.one({'_id': ObjectId(_id)})
+            if mem:
+              member_of_names.append(mem.name)
+
+      return member_of_names
 
     @property        
     def prior_node_dict(self):
-        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-        pair respectively for prior_node objects of the given node.
-        """
-        
-        collection = get_database()[Node.collection_name]
-        
-        obj_dict = {}
+      """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+      pair respectively for prior_node objects of the given node.
+      """
+      collection = get_database()[Node.collection_name]
+      obj_dict = {}
 
-        i = 0
-        for each_id in self.prior_node:
-            i = i + 1
+      i = 0
+      for each_id in self.prior_node:
+        i = i + 1
 
-            if each_id != self._id:
-                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
-                dict_key = i
-                dict_value = node_collection_object
-                
-                obj_dict[dict_key] = dict_value
+        if each_id != self._id:
+          node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
+          dict_key = i
+          dict_value = node_collection_object
+          
+          obj_dict[dict_key] = dict_value
 
-        return obj_dict
+      return obj_dict
 
     @property
     def collection_dict(self):
-        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-        pair respectively for collection_set objects of the given node.
-        """
+      """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+      pair respectively for collection_set objects of the given node.
+      """
 
-        collection = get_database()[Node.collection_name]
-        
-        obj_dict = {}
+      collection = get_database()[Node.collection_name]
+      obj_dict = {}
 
-        i = 0;
-        for each_id in self.collection_set:
-            i = i + 1
+      i = 0;
+      for each_id in self.collection_set:
+        i = i + 1
 
-            if each_id != self._id:
-                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
-                dict_key = i
-                dict_value = node_collection_object
-                
-                obj_dict[dict_key] = dict_value
+        if each_id != self._id:
+          node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
+          dict_key = i
+          dict_value = node_collection_object
+          
+          obj_dict[dict_key] = dict_value
 
-        return obj_dict
+      return obj_dict
 
     @property
     def html_content(self):
-        """Returns the content in proper html-format.
-        """
-        if MARKUP_LANGUAGE == 'markdown':
-            return markdown(self.content, MARKDOWN_EXTENSIONS)
-        elif MARKUP_LANGUAGE == 'textile':
-            return textile(self.content)
-        elif MARKUP_LANGUAGE == 'restructuredtext':
-            return restructuredtext(self.content)
-        return self.content
+      """Returns the content in proper html-format.
+      """
+      if MARKUP_LANGUAGE == 'markdown':
+        return markdown(self.content, MARKDOWN_EXTENSIONS)
+
+      elif MARKUP_LANGUAGE == 'textile':
+        return textile(self.content)
+
+      elif MARKUP_LANGUAGE == 'restructuredtext':
+        return restructuredtext(self.content)
+
+      return self.content
         
     @property
     def current_version(self):
-        history_manager= HistoryManager()
-        return history_manager.get_current_version(self)    
+      history_manager= HistoryManager()
+      return history_manager.get_current_version(self)    
 
     @property
     def version_dict(self):
-        """Returns a dictionary containing list of revision numbers of
-        the given node.
-        
-        Example:
-        {
-         "1": "1.1",
-         "2": "1.2",
-         "3": "1.3",
-        }
-        """
-        history_manager = HistoryManager()
-        return history_manager.get_version_dict(self)
+      """Returns a dictionary containing list of revision numbers of
+      the given node.
+      
+      Example:
+      {
+       "1": "1.1",
+       "2": "1.2",
+       "3": "1.3",
+      }
+      """
+      history_manager = HistoryManager()
+      return history_manager.get_version_dict(self)
 
 
     ########## Built-in Functions (Overridden) ##########
     
     def __unicode__(self):
-        return self._id
+      return self._id
     
     def identity(self):
-        return self.__unicode__()
+      return self.__unicode__()
     
     def save(self, *args, **kwargs):
         is_new = False
@@ -393,6 +526,7 @@ class Node(DjangoDocument):
             rcs_obj.checkout(fp)
 
             try:
+                # print "\n Updating...", self._id, " -- ", self.name
                 if history_manager.create_or_replace_json_file(self):
                     user = User.objects.get(pk=self.modified_by).username
                     message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")

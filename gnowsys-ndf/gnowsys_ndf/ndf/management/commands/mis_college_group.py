@@ -31,6 +31,7 @@ class Command(BaseCommand):
   help = "\tThis script handles works related to MIS app."
 
   def handle(self, *args, **options):
+    print "\n options: ", options, "\n"
 
     # Creating private groups ------------------------------------------------------------------------------------------
     if False:
@@ -41,6 +42,16 @@ class Command(BaseCommand):
         error_message = "\n CollegeGroupCreateError: " + str(e) + " !!!\n"
         log_list.append(error_message)
         raise Exception(error_message)
+
+      finally:
+        if log_list:
+            log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+
+            log_file_name = os.path.splitext(os.path.basename(__file__))[0] + ".log"
+            log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+
+            with open(log_file_path, 'a') as log_file:
+              log_file.writelines(log_list)
 
     # Assigning Student & Voluntary Teacher Nodes' to respective college groups ----------------------------------------
     if False:
@@ -62,6 +73,17 @@ class Command(BaseCommand):
         error_message = "\n CollegeGroupUpdateError ("+system_type+"): " + str(e) + " !!!\n"
         log_list.append(error_message)
         raise Exception(error_message)
+
+      finally:
+        if log_list:
+            log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+
+            log_file_name = os.path.splitext(os.path.basename(__file__))[0] + ".log"
+            log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+
+            with open(log_file_path, 'a') as log_file:
+              log_file.writelines(log_list)
+
 
     # Creating enrollement code for Students ---------------------------------------------------------------------------
     if True:
