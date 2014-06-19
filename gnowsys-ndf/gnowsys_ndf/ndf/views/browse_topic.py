@@ -238,7 +238,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
                     app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
                     # For adding new Theme & Topic
                  
-			if app_GST.name == "Theme" or app_GST.name == "Topic" or translate == True:
+                    if app_GST.name == "Theme" or app_GST.name == "Topic" or translate == True:
                                 title = app_GST.name
 				node = ""
 				root_themes = []
@@ -260,7 +260,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 				nodes_list = root_themes
 				# End of finding unique root level Themes
 
-			else:
+                    else:
 				# For editing theme & topic
 				if theme_GST._id in app_GST.member_of:
 				        title = theme_GST.name
