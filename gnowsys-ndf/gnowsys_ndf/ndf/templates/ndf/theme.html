@@ -25,11 +25,10 @@
     		$('.themes').html('<img src="/static/ndf/images/ajax-loader-trans.gif" height="100" width="100">');
 
     		var $tree = $('.themes');
-    		var user = "{{user.is_authenticated}}"
+    		var user = "{{user.is_authenticated}}";
 
     		$tree.tree({
     			autoOpen: false,
-    			dataUrl: "{% url 'get_tree_hierarchy' groupid node.pk %}",
 
         		onCreateLi: function(node, $li) {
 
@@ -146,7 +145,7 @@
 		{% if node %}
 
 			<!-- If "Theme" node -->
-			<div id="app-set-item" class="themes"></div>
+			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
 			
 		{% endif %}
 
