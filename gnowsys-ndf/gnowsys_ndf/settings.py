@@ -2,7 +2,7 @@
 
 import os
 
-DEBUG = True
+DEBUG = True 
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
@@ -42,7 +42,7 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
-        'NAME': 'studio-dev',
+        'NAME': 'dev',#studio-dev initially
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -126,6 +126,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
+    'online_status.middleware.OnlineStatusMiddleware',#chatb
+
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -166,6 +168,9 @@ INSTALLED_APPS = (
     'django_extensions',	#textb
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
+    'gnowsys_ndf.chatb',	#chatb
+    'gnowsys_ndf.online_status',#chatb
+    'gnowsys_ndf.online_status.templatetags.online_status_tags' , #chatb
 )
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
