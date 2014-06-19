@@ -1,0 +1,37 @@
+{% load ndf_tags %}
+
+<!-- Base fields / AttributeType fields -->
+{% if is_base_field or is_attribute_field %}
+  {% if is_special_field %}
+  <!-- Intentionally put this field at the top, as below because of it's data-type different widget may come -->
+  {% include included_template_name with var_name=field_name var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+
+  {% elif field_type == "unicode" %}
+  <input type="text" id="{{field_name}}" name="{{field_name}}" value="" {% if is_required_field %}required{% endif %} />
+  {% if is_required_field %}
+  <small class="error">Please select {{field_altnames}}!!!</small>
+  {% endif %}
+
+  {% elif field_type == "datetime" %}
+  <input type="text" id="{{field_name}}" name="{{field_name}}" value="" {% if is_required_field %}required{% endif %} />
+  {% if is_required_field %}
+  <small class="error">Please select {{field_altnames}}!!!</small>
+  {% endif %}
+
+  {% elif is_list_of %}
+  <input type="text" id="{{field_name}}" name="{{field_name}}" value="{{field_value|join:', '|default_if_none:""}}" placeholder="Separate {{field_altnames|lower}} by commas..." >
+
+  {% endif %}
+
+
+<!-- RelationType fields -->
+{% elif is_relation_field %}
+  <select id="{{field_name}}" class="medium" name="{{field_name}}" required="">
+    <option value="">- - - Select {{field_altnames|lower}} - - -</option>
+    {% for choice in field_value_choices %}
+      <option value="{{choice.pk}}" {% if choice.pk == field_value %}selected{% endif %} >{{choice.name}}</option>
+    {% endfor %}
+  </select>
+  <small class="error">Please select {{field_altnames}}!!!</small>
+
+{% endif %}
