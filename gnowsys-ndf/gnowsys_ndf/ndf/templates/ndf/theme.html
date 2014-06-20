@@ -220,7 +220,7 @@
   		  		{% if user_access == "allow" %}
 	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
 
-		    <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}?translate=true&appid={{theme_GST_id}}" class="button medium">Translate</a></td>
+		    <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}?trans=true" class="button medium">Translate</a></td>
 	        
 	        	{% endif %}
      	       	       

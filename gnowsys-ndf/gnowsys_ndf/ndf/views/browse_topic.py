@@ -102,14 +102,18 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 	drawer = None
 	nodes_list = []
 	parent_nodes_collection = ""
+        trans=request.GET.get('trans','')
         translate=request.GET.get('translate','')
+                
         appsetid=request.GET.get('appid','')
+        node1=collection.Node.find_one({"_id":ObjectId(app_set_id)})
+	
         if request.method == "POST":
                 
  		app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
                 if translate:
                     app_GST = collection.Node.find_one({"_id":ObjectId(appsetid)})
-                    node1=collection.Node.find_one({"_id":ObjectId(app_set_id)})
+                    #node1=collection.Node.find_one({"_id":ObjectId(app_set_id)})
 		if app_GST or translate == True:
 
 			create_edit = True
@@ -307,7 +311,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 
 					parent_nodes_collection = json.dumps(prior_theme_collection)
 					# End of finding unique theme names for editing name
-        if translate:
+        if trans:
             return render_to_response("ndf/translation_page.html",
 	                           {'group_id': group_id,'groupid': group_id, 'drawer': drawer,
 	                           	'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,
