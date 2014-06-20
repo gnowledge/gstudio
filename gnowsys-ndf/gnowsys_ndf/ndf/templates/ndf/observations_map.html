@@ -155,7 +155,7 @@
 
 
 <body>
-
+<div class="button" onclick="bestFitZoom()">Best fit zoom</div>
 	<!-- giving option of image upload -->
 	{% if mode == "edit" %} 
 
@@ -538,11 +538,13 @@
 	        {% endif %}
 	 	}
 	 	
-	 	// if( tempArr.length )
-			    // {
-			    //   var group = new L.featureGroup(tempArr)
-			    //       map.fitBounds(group.getBounds());
-			    // }
+
+	 	function bestFitZoom()
+	 	{
+	 		var group = new L.featureGroup
+	 		$.each(map._layers, function(ml){if(map._layers[ml].feature){group.addLayer(this)}})
+	 		map.fitBounds(group.getBounds());
+	 	}
 
 
 
