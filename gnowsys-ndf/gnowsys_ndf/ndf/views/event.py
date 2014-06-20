@@ -150,77 +150,77 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
         # array of dict for events ---------------------
                 
-        if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
+        # if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
 
-            for event in system.organiser_of_event:
-                event.get_neighbourhood(event.member_of)
+        #     for event in system.organiser_of_event:
+        #         event.get_neighbourhood(event.member_of)
                 
-                tempdict = {}
-                tempdict['title'] = event.name
+        #         tempdict = {}
+        #         tempdict['title'] = event.name
                 
-                if event.start_time and len(event.start_time) == 16:
-                    dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
-                    tempdict['start'] = dt
-                if event.end_time and len(event.end_time) == 16:
-                    dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
-                    tempdict['end'] = dt
-                tempdict['id'] = str(event._id)
-                events_arr.append(tempdict)
+        #         if event.start_time:# and len(event.start_time) == 16:
+        #             dt = event.start_timedatetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
+        #             tempdict['start'] = dt
+        #         if event.end_time and len(event.end_time) == 16:
+        #             dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
+        #             tempdict['end'] = dt
+        #         tempdict['id'] = str(event._id)
+        #         events_arr.append(tempdict)
 
-        elif system.has_key('event_organised_by'): # gives list of colleges/host of events
+        # elif system.has_key('event_organised_by'): # gives list of colleges/host of events
 
-            for host in system.event_organised_by:
-                host.get_neighbourhood(host.member_of)
+        #     for host in system.event_organised_by:
+        #         host.get_neighbourhood(host.member_of)
 
-                tempdict = {}
-                tempdict['title'] = host.name
+        #         tempdict = {}
+        #         tempdict['title'] = host.name
 
-                if system.start_time and len(system.start_time) == 16:
-                    dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
-                    tempdict['start'] = dt
-                if system.end_time and len(system.start_time) == 16:
-                    dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
-                    tempdict['end'] = dt
+        #         if system.start_time and len(system.start_time) == 16:
+        #             dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
+        #             tempdict['start'] = dt
+        #         if system.end_time and len(system.start_time) == 16:
+        #             dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
+        #             tempdict['end'] = dt
                 
-                tempdict['id'] = str(host._id)
-                events_arr.append(tempdict)
+        #         tempdict['id'] = str(host._id)
+        #         events_arr.append(tempdict)
 
         # print json.dumps(events_arr)
 
         # END --- array of dict for events ---------------------
 
-        for tab_name, fields_order in property_order:
-            display_fields = []
-            for field, altname in fields_order:
-                if system.structure[field] == bool:
-                    display_fields.append((altname, ("Yes" if system[field] else "No")))
+        # for tab_name, fields_order in property_order:
+        #     display_fields = []
+        #     for field, altname in fields_order:
+        #         if system.structure[field] == bool:
+        #             display_fields.append((altname, ("Yes" if system[field] else "No")))
 
-                elif not system[field]:
-                    display_fields.append((altname, system[field]))
-                    continue
+        #         elif not system[field]:
+        #             display_fields.append((altname, system[field]))
+        #             continue
 
-                elif system.structure[field] == datetime.datetime:
-                    display_fields.append((altname, system[field].date()))
+        #         elif system.structure[field] == datetime.datetime:
+        #             display_fields.append((altname, system[field].date()))
 
-                elif type(system.structure[field]) == list:
-                    if system[field]:
-                        if type(system.structure[field][0]) == ObjectId:
-                            name_list = []
-                            for right_sub_dict in system[field]:
-                                name_list.append(right_sub_dict.name)
-                            display_fields.append((altname, ", ".join(name_list)))
-                        elif system.structure[field][0] == datetime.datetime:
-                            date_list = []
-                            for dt in system[field]:
-                                date_list.append(dt.strftime("%d/%m/%Y"))
-                            display_fields.append((altname, ", ".join(date_list)))
-                        else:
-                            display_fields.append((altname, ", ".join(system[field])))
+        #         elif type(system.structure[field]) == list:
+        #             if system[field]:
+        #                 if type(system.structure[field][0]) == ObjectId:
+        #                     name_list = []
+        #                     for right_sub_dict in system[field]:
+        #                         name_list.append(right_sub_dict.name)
+        #                     display_fields.append((altname, ", ".join(name_list)))
+        #                 elif system.structure[field][0] == datetime.datetime:
+        #                     date_list = []
+        #                     for dt in system[field]:
+        #                         date_list.append(dt.strftime("%d/%m/%Y"))
+        #                     display_fields.append((altname, ", ".join(date_list)))
+        #                 else:
+        #                     display_fields.append((altname, ", ".join(system[field])))
 
-                else:
-                    display_fields.append((altname, system[field]))
+        #         else:
+        #             display_fields.append((altname, system[field]))
 
-            property_display_order.append((tab_name, display_fields))
+        #     property_display_order.append((tab_name, display_fields))
 
         # End of code
 
@@ -320,7 +320,6 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
   if app_set_id:
     event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = event_gst.name
-    # print "\n event_gst:\n", event_gst, "\n"
     event_gs = collection.GSystem()
     event_gs.member_of.append(event_gst._id)
 
@@ -329,9 +328,6 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
 
   property_order_list = get_property_order_with_value(event_gs)#.property_order
 
-  # print "\n property_order_list: ", property_order_list, "\n"
-  # print "\n event_gs: \n", event_gs, "\n"
-  
   if request.method == "POST":
     # [A] Save event-node's base-field(s)
     # print "\n Going before....", type(event_gs), "\n event_gs.keys(): ", event_gs.keys()
@@ -346,67 +342,44 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
     # [B] Store AT and/or RT field(s) of given event-node (i.e., event_gs)
     for tab_details in property_order_list:
       for field_set in tab_details[1]:
-        # field_set pattern -- [field_set[0]:node_structure, field_set[1]:field_base/AT/RT_instance, field_set[2]:node_value]
-        # print " ", field_set[1]["name"], " -- ", type(field_set[1]), " -- ", (type(field_set[1]) in [AttributeType, RelationType])
+        # field_set pattern -- {[field_set[0]:node_structure, field_set[1]:field_base/AT/RT_instance{'_id':, 'name':, 'altnames':}, field_set[2]:node_value]}
+        # field_set pattern -- {'_id', 'data_type', 'name', 'altnames', 'value'}
+        # print " ", field_set["name"]
 
         # * Fetch only Attribute field(s) / Relation field(s)
-        field_instance = field_set[1]
-        field_instance_type = type(field_instance)
-        if field_instance_type in [AttributeType, RelationType]:
+        if field_set.has_key('_id'):
+          field_instance = collection.Node.one({'_id': field_set['_id']})
+          field_instance_type = type(field_instance)
 
-          if field_instance["name"] == "attendees":
-            continue
+          if field_instance_type in [AttributeType, RelationType]:
+            
+            if field_instance["name"] == "attendees":
+              continue
 
-          # Fetch corresponding AT/RT-fields value from request object
-          field_value = request.POST[field_instance["name"]]
-          # print " ", field_instance["name"], " -- ", field_value
+            # Fetch corresponding AT/RT-fields value from request object
+            field_value = request.POST[field_instance["name"]]
+            # print " ", field_instance["name"], " -- ", field_value
 
-          field_data_type = field_set[0][field_instance["name"]]
-          # print " --> ", field_set[0][field_instance["name"]], " -- ", type(field_data_type)
+            field_data_type = field_set['data_type']
+            # print " --> ", type(field_data_type)
 
-          # 2) Parse fetched-value depending upon AT/RT--fields' data-type
-          if field_instance_type == AttributeType:
-            field_instance_type = "GAttribute"
-            field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
-            # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
-            # event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
+            # 2) Parse fetched-value depending upon AT/RT--fields' data-type
+            if field_instance_type == AttributeType:
+              field_instance_type = "GAttribute"
+              field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+              # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
+              event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
+              print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
-            # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
-
-          else:
-            field_instance_type = "GRelation"
-            field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
-            # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
-            # event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value)
-
-            # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
-          # print "\n ", field_instance["name"], " -- ", field_value, " -- ", type(field_value), "\n"
-
-          # 3) Create an empty corresponding triple's instance
-          # event_gs_triple_instance = eval("collection." + field_instance_type)()
-          # print " ", field_instance["name"], " -- event triple keys: ", event_gs_triple_instance.keys()
-          
-          # if type(field_data_type) == type:
-          #   # 4.1) AT-field identified
-          #   field_data_type = field_data_type.__name__
-          #   # print " (if)--> ", field_data_type, (field_data_type == "datetime"), "\n"
-
-          #   if field_data_type == "datetime":
-          #     if field_value:
-          #       field_value = datetime.strptime(field_value, "%m/%d/%Y %H:%M")
-          #     # print "\n parsed field_value: ", field_value
-
-          # else:
-          #   # 4.2) RT-field identified
-          #   field_data_type = field_data_type.__str__()
-          #   # print " (else)--> ", field_data_type, "\n"
-          #   print "\n ", field_instance["name"], " -- ", field_value
-          #   field_value = collection.Triple.one({'_id': ObjectId(field_value), 'member_of': {'$in': field_instance["object_type"]}})
-          #   if field_value:
-          #     print "\n ", field_value._id, " -- ", field_value.name
-
-
+            else:
+              field_instance_type = "GRelation"
+              field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
+              # print "\n ", type(collection.RelationType(field_instance)), " -- \n", collection.RelationType(field_instance)
+              event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value)
+              print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
+    
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
+    return HttpResponseRedirect(reverse(template_prefix+'_app_detail', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
   
   template = "ndf/event_create_edit.html"
   default_template = "ndf/"+template_prefix+"_create_edit.html"

@@ -1143,22 +1143,13 @@ def get_field_type(node_structure, field_name):
 
 @register.inclusion_tag('ndf/html_field_widget.html')
 # def html_widget(node_id, field, field_type, field_value):
-def html_widget(node_id, node_member_of, field, field_value):
+# def html_widget(node_id, node_member_of, field, field_value):
+def html_widget(node_id, field):
   """
   Returns html-widget for given attribute-field; that is, passed in form of
   field_name (as attribute's name) and field_type (as attribute's data-type)
   """
-  # special_tab_fields_list = ["data_structure",
-  #                            "subject_type", "object_type",
-  #                            "attribute_type_set", "relation_type_set"
-  #                           ] # Fields that require a tab for itself
-  # is_special_tab_field = False
-  
-  # if field_name in special_tab_fields_list:
-  #   is_special_tab_field = True
-  
-  # is_field_complex = False # Apart from simple data-types
-  gs = None
+  # gs = None
   field_value_choices = []
 
   is_list_of = False
@@ -1178,43 +1169,21 @@ def html_widget(node_id, node_member_of, field, field_value):
   try:
     if node_id:
       node_id = ObjectId(node_id)
-    # print "\n node_id: ", node_id, " -- ", type(node_id), "\n"
 
-    # print "\n node_member_of: ", node_member_of, " -- ", type(node_member_of)
-    if node_member_of:
-      gs = collection.GSystem()
-      gs.get_neighbourhood(node_member_of)
+    # if node_member_of:
+    #   gs = collection.GSystem()
+    #   gs.get_neighbourhood(node_member_of)
 
-    field_type = gs.structure[field['name']]
+    # field_type = gs.structure[field['name']]
+    field_type = field['data_type']
+    field_value = field['value']
+    print "\n ", field['name'], " -- ", field['value'], " -- ", type(field_value)
 
     if field.has_key('_id'):
       field = collection.Node.one({'_id': field['_id']})
 
     if not field_value:
       field_value = ""
-
-    # print "\n ", field_name, " -- ", field_value, "\n"
-    # print "\n ", field_name, " -- ", field_type, " -- ", type(field_type)
-    # type_check = type(field_type).__name__ # Returns a string
-      # print "\n ", field_name, " -- ", type_check
-
-    # if type_check == "type":
-    #   # Basic data-type
-    #   is_field_complex = False
-      
-    # elif type_check == "IS":
-    #   # Mongokit's special data-type
-      
-    #   # Extract field's various value-choices
-    #   field_value_choices = eval(field_name.upper() + "_CHOICES")
-
-    #   # Overwrite field_type with type_check value; makes it easy for checking on template
-    #   field_type = type_check # string value assigned as "IS"
-
-    # else:
-    #   is_field_complex = True # Apart from simple data-types; say [unicode], [int]...
-      
-    # ==========================================
 
     if type(field_type) == type:
       field_type = field_type.__name__
@@ -1228,7 +1197,6 @@ def html_widget(node_id, node_member_of, field, field_value):
       included_template_name = SPECIAL_FIELDS[field['name']]
 
     is_AT_RT_base = field["_type"]
-    # print "\n is_AT_RT_base: ", is_AT_RT_base
 
     is_attribute_field = False
     is_relation_field = False
@@ -1236,36 +1204,20 @@ def html_widget(node_id, node_member_of, field, field_value):
     if is_AT_RT_base == "BaseField":
       is_base_field = True
       is_required_field = field["required"]
-      # print "\n Base field ("+field_name+") found !"
-      # print " is_special_field: ", is_special_field
-      # print " included_template_name: ", included_template_name
-      # print " field_type: ", field_type
-
-      # print " Field keys: ", ", ".join(field.keys())
 
     elif is_AT_RT_base == "AttributeType":
       is_attribute_field = True
       is_required_field = field["required"]
-      # print "\n AttributeType ("+field_name+") found !"
-      # print " field_type: ", field_type
-      # print " Field keys: ", ", ".join(field.keys())
 
     elif is_AT_RT_base == "RelationType":
       is_relation_field = True
       is_required_field = True
-      # print "\n RelationType ("+field_name+") found !"
-      # print " field_type: ", field_type
-      # print " Field keys: ", ", ".join(field.keys())
-      # print "\n ", field["object_type"]
       field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}},
                                                             {'_id': 1, 'name': 1}
                                                           )
                                       )
                                 )
-
-      # print "\n field_value: ", field_value
-    # if not field_value:
-    #   field_value = []
+      field_value = [str(each._id) for each in field_value]
 
     return {'template': 'ndf/html_field_widget.html',
             'field': field, 'field_type': field_type, 'field_value': field_value,

@@ -29,7 +29,7 @@
   <select id="{{field.name}}" class="medium" name="{{field.name}}" required="">
     <option value="">- - - Select {{field.altnames|lower}} - - -</option>
     {% for choice in field_value_choices %}
-      <option value="{{choice.pk}}" {% if choice.pk == field_value %}selected{% endif %} >{{choice.name}}</option>
+      <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{{choice.name}}</option>
     {% endfor %}
   </select>
   <small class="error">Please select {{field.altnames}}!!!</small>

@@ -738,83 +738,43 @@ def update_mobwrite_content_org(node_system):
   return textobj
 
 def get_property_order_with_value(node):
-  # print "\n Getter used... ", node['property_order']
-  # collection = get_database()[Node.collection_name]
   new_property_order = []
   demo = None
-  # print "\n node.keys(): ", node.keys()
 
   if node.has_key('_id'):
     demo = collection.Node.one({'_id': node._id})
-    print "\n existing node...\n"
-    print "\n demo.content_org: ", demo.content_org
-    # print "\n demo.keys(): ", demo.keys()
+
   else:
     demo = eval("collection"+"."+node['_type'])()
     demo["member_of"] = node["member_of"]
-    print "\n new node...\n"
-    # print "\n demo.keys(): ", demo.keys()
-    # print "\n demo.member_of: ", demo.member_of
-    print "\n"
-  # demo i.e., copy of node is created to avoid conflicts in structure that comes after get_neighbourhoood() function
-  # for k, v in node.iteritems():
-  #   demo[k] = v
 
-  # try:
   if demo["_type"] not in ["MetaType", "GSystemType", "AttributeType", "RelationType"]:
     # If GSystems found, then only perform following statements
     
     demo["property_order"] = []
     gst_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'property_order': 1})
-    # print "\n gst_nodes.count: ", gst_nodes.count()
     for gst in gst_nodes:
       for po in gst["property_order"]:
         demo["property_order"].append(po)
 
-    # print "\n demo['property_order'] (b): ", demo["property_order"], "\n"
     demo.get_neighbourhood(node["member_of"])
-    # demo.get_neighbourhood(demo.member_of)
-    # print "\n demo['property_order'] (a): ", demo["property_order"], "\n"
 
     for tab_name, list_field_id in demo['property_order']:
       list_field_set = []
       for field_id_or_name in list_field_id:
-        if ObjectId.is_valid(field_id_or_name):
+        if type(field_id_or_name) == ObjectId: #ObjectId.is_valid(field_id_or_name):
           # For attribute-field(s) and/or relation-field(s)
           
           field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_id': 1, 'name': 1, 'altnames': 1})
-          # field = collection.Node.one({'_id': ObjectId(field_id_or_name)})
-          
-          # type_check = type(demo.structure[field.name]).__name__  # Returns a string
-          # print "\n type_check("+field.name+") (b): " + type_check
-
-          # field_data_type = demo.structure[field.name]
-          # if type(field_data_type) == type:
-          #   field_data_type = field_data_type.__name__
-          # else:
-          #   field_data_type = field_data_type.__str__()
-
-          # print " field_type("+field.name+") (a): " + field_data_type + "\n"
-
-          # list_field_set.append([demo.structure, field._type, field.name, field.altnames, demo[field.name]])
-          # list_field_set.append([demo.structure, field, demo[field.name]])
-          list_field_set.append([demo['member_of'], field, demo[field.name]])
+          # list_field_set.append([demo['member_of'], field, demo[field.name]])
+          list_field_set.append({ '_id': field._id, 
+                                  'data_type': demo.structure[field.name],
+                                  'name': field.name, 'altnames': field.altnames,
+                                  'value': demo[field.name]
+                                })
 
         else:
           # For node's base-field(s)
-
-          # field_data_type = demo.structure[field_id_or_name]
-          # if type(field_data_type) == type:
-          #   field_data_type = field_data_type.__name__
-
-          # base_field_altnames = {
-          #   'name': "Name",
-          #   'content_org': "Content",
-          #   'featured': "Featured",
-          #   'location': "Location",
-          #   'status': "Status",
-          #   'tags': "Tags"
-          # }
 
           base_field = {
             'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
@@ -824,15 +784,17 @@ def get_property_order_with_value(node):
             # 'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
             'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
           }
-          # list_field_set.append([demo.structure, "BaseField", field_id_or_name, base_field_altnames[field_id_or_name], demo[field_id_or_name]])
-          # print "\n ", field_id_or_name, " -- ", demo[field_id_or_name]
-          list_field_set.append([demo['member_of'], base_field[field_id_or_name], demo[field_id_or_name]])
+          # list_field_set.append([demo['member_of'], base_field[field_id_or_name], demo[field_id_or_name]])
+          list_field_set.append({ '_type': base_field[field_id_or_name]['_type'],
+                                  'data_type': demo.structure[field_id_or_name],
+                                  'name': field_id_or_name, 'altnames': base_field[field_id_or_name]['altnames'],
+                                  'value': demo[field_id_or_name],
+                                  'required': base_field[field_id_or_name]['required']
+                                })
 
       new_property_order.append([tab_name, list_field_set])
-      # print " new_property_order: ", new_property_order
 
     demo["property_order"] = new_property_order
-    # print "\n demo['property_order'] (f): ", demo["property_order"], "\n"
   
   else:
     # Otherwise (if GSystemType found) depending upon whether type_of exists or not returns property_order.
@@ -847,31 +809,16 @@ def get_property_order_with_value(node):
 
       collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
 
-  # new_property_order = demo["property_order"]
-
-  # if demo.has_key('_id'):
-  #   demo = collection.Node.one({'_id': demo._id})
-
-  # else:
-  #   a = eval("collection" + "." + demo['_type'])()
-  #   print "\n demo.keys(): ", collection.GSystem().keys(), "\n"
-
-  # demo["property_order"] = new_property_order
-  # print "\n demo.keys(): ", demo.keys()
-  # print "\n node.keys(): ", node.keys()
   new_property_order = demo['property_order']
 
   if demo.has_key('_id'):
     node = collection.Node.one({'_id': demo._id})
-    print "\n existing node...\n"
-    # print "\n demo.keys(): ", demo.keys()
+
   else:
     node = eval("collection"+"."+demo['_type'])()
-    print "\n new node...\n"
     node["member_of"] = demo["member_of"]
   
   node['property_order'] = new_property_order
-  # print "\n node['property_order']: ", node['property_order'], "\n"
 
   return node['property_order']
 

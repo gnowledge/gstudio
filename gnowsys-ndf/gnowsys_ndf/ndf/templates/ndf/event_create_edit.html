@@ -40,15 +40,15 @@
     <div id="event-details-edit-div" class="tabs-content" >
       {% for tab_name, tab_fields_list in property_order_list %}
       <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
-        {#% for node_structure, field, field_value in tab_fields_list %#}
-        {% for node_member_of, field, field_value in tab_fields_list %}
+        {#% for node_member_of, field, field_value in tab_fields_list %#}
+        {% for field in tab_fields_list %}
         <div class="row">
           <div class="small-2 columns"> 
             <label for="{{field.name}}" class="left inline"> {{field.altnames}} </label>
           </div>
           <div class="small-5 end columns">
-            {#% html_widget node.pk field node_structure|get_field_type:field.name field_value %#}
-            {% html_widget node.pk node_member_of field field_value %}
+            {#% html_widget node.pk node_member_of field field_value %#}
+            {% html_widget node.pk field %}
           </div>
         </div>
         {% endfor %}
