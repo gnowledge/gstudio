@@ -8,7 +8,7 @@
     <header class="row">
       <h2 class="medium-12 columns">
         {% if node %}
-        Editing {{title}}: {{node.name}}
+        Editing Event: {{node.name}}
         {% else %}
         Create a New {{title}} Event
         {% endif %}
@@ -46,7 +46,7 @@
             <label for="{{field.name}}" class="left inline"> {{field.altnames}} </label>
           </div>
           <div class="small-5 end columns">
-            {% html_widget field node_structure|get_field_type:field.name field_value %}
+            {% html_widget node.pk field node_structure|get_field_type:field.name field_value %}
           </div>
         </div>
         {% endfor %}

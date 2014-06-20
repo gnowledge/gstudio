@@ -266,14 +266,17 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
 
 def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node."""
-  
+  print "\n Coming here...\n\n"
+
+  print "\n node.keys(): ", node.keys(), "\n"
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
+  is_changed = False
 
-  name = request.POST.get('name')
-  sub_theme_name = request.POST.get("sub_theme_name", '')
-  add_topic_name = request.POST.get("add_topic_name", '')
+  name = unicode(request.POST.get('name', ""))
+  sub_theme_name = unicode(request.POST.get("sub_theme_name", ''))
+  add_topic_name = unicode(request.POST.get("add_topic_name", ''))
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
@@ -282,7 +285,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   prior_node_list = request.POST.get('prior_node_list','')
   collection_list = request.POST.get('collection_list','')
   module_list = request.POST.get('module_list','')
-  content_org = request.POST.get('content_org')
+  content_org = unicode(request.POST.get('content_org'))
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
 
@@ -296,6 +299,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   if not node.has_key('_id'):
     
     node.created_by = usrid
+    
     if node_type._id not in node.member_of:
       node.member_of.append(node_type._id)
 
@@ -306,37 +310,52 @@ def get_node_common_fields(request, node, group_id, node_type):
       node.access_policy = unicode(access_policy)
     else:
       node.access_policy = unicode(access_policy)
+
+    node.status = "PUBLISHED"
+
+    is_changed = True
           
     # End of if
 
   # --------------------------------------------------------------------------- For create/edit
-  node.name = unicode(name)
-  if sub_theme_name:
-    node.name = unicode(sub_theme_name) 
-  if add_topic_name:
-    node.name = unicode(add_topic_name)
 
-  node.status = unicode("DRAFT")
+  # -------------------------------------------------------------------------------- name
+ 
+  if name:
+    if node.name != name:
+      node.name = name
+      is_changed = True
+  
+  if sub_theme_name:
+    if node.name != sub_theme_name:
+      node.name = sub_theme_name
+      is_changed = True
+  
+  if add_topic_name:
+    if node.name != add_topic_name:
+      node.name = add_topic_name
+      is_changed = True
+
+  # -------------------------------------------------------------------------------- language
+
   if language:
     node.language = unicode(language) 
   else:
     node.language = u"en"
-  node.location = map_geojson_data # Storing location data
+
+  # -------------------------------------------------------------------------------- access_policy
 
   if access_policy:
     # Policy will be changed only by the creator of the resource
     # via access_policy(public/private) option on the template which is visible only to the creator
-    if access_policy == "PUBLIC":
+    if access_policy == "PUBLIC" and node.access_policy != access_policy:
       node.access_policy = u"PUBLIC"
-    else:
+      is_changed = True
+    elif access_policy == "PRIVATE" and node.access_policy != access_policy:
       node.access_policy = u"PRIVATE"
+      is_changed = True
   else:
     node.access_policy = u"PUBLIC"
-
-  node.modified_by = usrid
-
-  if usrid not in node.contributors:
-    node.contributors.append(usrid)
 
   # For displaying nodes in home group as well as in creator group.
   user_group_obj=gcollection.Node.one({'$and':[{'_type':ObjectId(group_id)},{'name':usrname}]})
@@ -348,6 +367,8 @@ def get_node_common_fields(request, node, group_id, node_type):
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
 
+  # -------------------------------------------------------------------------------- tags
+
   if tags:
     tags_list = []
 
@@ -357,80 +378,144 @@ def get_node_common_fields(request, node, group_id, node_type):
       if tag:
         tags_list.append(tag)
 
-    node.tags = tags_list
+    if set(node.tags) != set(tags_list):
+      node.tags = tags_list
+      is_changed = True
 
   # -------------------------------------------------------------------------------- prior_node
 
-  node.prior_node = []
-  if prior_node_list != '':
-    prior_node_list = prior_node_list.split(",")
+  # node.prior_node = []
+  # if prior_node_list != '':
+  #   prior_node_list = prior_node_list.split(",")
 
-  i = 0
-  while (i < len(prior_node_list)):
-    node_id = ObjectId(prior_node_list[i])
-    if gcollection.Node.one({"_id": node_id}):
-      node.prior_node.append(node_id)
+  # i = 0
+  # while (i < len(prior_node_list)):
+  #   node_id = ObjectId(prior_node_list[i])
+  #   if gcollection.Node.one({"_id": node_id}):
+  #     node.prior_node.append(node_id)
     
-    i = i+1
+  #   i = i+1
  
+  if prior_node_list != '':
+    prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
 
+    if set(node.prior_node) != set(prior_node_list):
+      i = 0
+      while (i < len(prior_node_list)):
+        node_id = ObjectId(prior_node_list[i])
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.prior_node:
+            node.prior_node.append(node_id)
+        
+        i = i+1
+      is_changed = True
+ 
   # -------------------------------------------------------------------------------- collection
 
-  node.collection_set = []
-  if collection_list != '':
-      collection_list = collection_list.split(",")
+  # node.collection_set = []
+  # if collection_list != '':
+  #     collection_list = collection_list.split(",")
 
-  i = 0
-  while (i < len(collection_list)):
-    node_id = ObjectId(collection_list[i])
+  # i = 0
+  # while (i < len(collection_list)):
+  #   node_id = ObjectId(collection_list[i])
     
-    if gcollection.Node.one({"_id": node_id}):
-      node.collection_set.append(node_id)
+  #   if gcollection.Node.one({"_id": node_id}):
+  #     node.collection_set.append(node_id)
     
-    i = i+1
- 
+  #   i = i+1
+
+  if collection_list != '':
+    collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
+
+    if set(node.collection_set) != set(collection_list):
+      i = 0
+      while (i < len(collection_list)):
+        node_id = ObjectId(collection_list[i])
+        
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.collection_set:
+            node.collection_set.append(node_id)
+        
+        i = i+1
+      is_changed = True
+     
   # -------------------------------------------------------------------------------- Module
 
-  node.collection_set = []
-  if module_list != '':
-      collection_list = module_list.split(",")
+  # node.collection_set = []
+  # if module_list != '':
+  #     collection_list = module_list.split(",")
 
-  i = 0
-  while (i < len(collection_list)):
-    node_id = ObjectId(collection_list[i])
+  # i = 0
+  # while (i < len(collection_list)):
+  #   node_id = ObjectId(collection_list[i])
     
-    if gcollection.Node.one({"_id": node_id}):
-      node.collection_set.append(node_id)
+  #   if gcollection.Node.one({"_id": node_id}):
+  #     node.collection_set.append(node_id)
     
-    i = i+1
- 
+  #   i = i+1
+
+  if module_list != '':
+    collection_list = [ObjectId(each.strip()) for each in module_list.split(",")]
+
+    if set(node.collection_set) != set(collection_list):
+      i = 0
+      while (i < len(collection_list)):
+        node_id = ObjectId(collection_list[i])
+        
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.collection_set:
+            node.collection_set.append(node_id)
+        
+        i = i+1
+      is_changed = True
     
   # ------------------------------------------------------------------------------- org-content
+  
   if content_org:
-    node.content_org = unicode(content_org)
-    
-    # Required to link temporary files with the current user who is modifying this document
-    usrname = request.user.username
-    filename = slugify(name) + "-" + usrname + "-"
-    node.content = org2html(content_org, file_prefix=filename)
+    if node.content_org != content_org:
+      node.content_org = content_org
+      
+      # Required to link temporary files with the current user who is modifying this document
+      usrname = request.user.username
+      filename = slugify(name) + "-" + usrname + "-"
+      node.content = org2html(content_org, file_prefix=filename)
+
+      is_changed = True
 
   # ----------------------------------------------------------------------------- visited_location in author class
+  if node.location != map_geojson_data:
+    node.location = map_geojson_data # Storing location data
+    is_changed = True
+  
   if user_last_visited_location:
-    
     user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
     author = gcollection.Node.one({'_type': "GSystemType", 'name': "Author"})
     user_group_location = gcollection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
 
     if user_group_location:
-
       if node._type == "Author" and user_group_location._id == node._id:
-        node['visited_location'] = user_last_visited_location
+        if node['visited_location'] != user_last_visited_location:
+          node['visited_location'] = user_last_visited_location
+          is_changed = True
 
       else:
         user_group_location['visited_location'] = user_last_visited_location
         user_group_location.save()
 
+  if is_changed:
+    node.status = unicode("DRAFT")
+
+    node.modified_by = usrid
+
+    if usrid not in node.contributors:
+      node.contributors.append(usrid)
+
+  print "\n node: \n", node.keys()
+
+  print "\n Reached here ...\n\n"
+  return is_changed
 # ============= END of def get_node_common_fields() ==============
   
   
@@ -440,10 +525,10 @@ def get_versioned_page(node):
     rcs = RCS()
     fp = history_manager.get_file_path(node)
     cmd= 'rlog  %s' % \
-	(fp)
+  (fp)
     rev_no =""
     proc1=subprocess.Popen(cmd,shell=True,
-				stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE)
     for line in iter(proc1.stdout.readline,b''):
        
        if line.find('revision')!=-1 and line.find('selected') == -1:
@@ -643,6 +728,143 @@ def update_mobwrite_content_org(node_system):
     textobj = TextObj(filename=filename,text=content_org)
     textobj.save()
   return textobj
+
+def get_property_order_with_value(node):
+  # print "\n Getter used... ", node['property_order']
+  # collection = get_database()[Node.collection_name]
+  new_property_order = []
+  demo = None
+  # print "\n node.keys(): ", node.keys()
+
+  if node.has_key('_id'):
+    demo = collection.Node.one({'_id': node._id})
+    print "\n existing node...\n"
+    print "\n demo.content_org: ", demo.content_org
+    # print "\n demo.keys(): ", demo.keys()
+  else:
+    demo = eval("collection"+"."+node['_type'])()
+    demo["member_of"] = node["member_of"]
+    print "\n new node...\n"
+    # print "\n demo.keys(): ", demo.keys()
+    # print "\n demo.member_of: ", demo.member_of
+    print "\n"
+  # demo i.e., copy of node is created to avoid conflicts in structure that comes after get_neighbourhoood() function
+  # for k, v in node.iteritems():
+  #   demo[k] = v
+
+  # try:
+  if demo["_type"] not in ["MetaType", "GSystemType", "AttributeType", "RelationType"]:
+    # If GSystems found, then only perform following statements
+    
+    demo["property_order"] = []
+    gst_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'property_order': 1})
+    # print "\n gst_nodes.count: ", gst_nodes.count()
+    for gst in gst_nodes:
+      for po in gst["property_order"]:
+        demo["property_order"].append(po)
+
+    # print "\n demo['property_order'] (b): ", demo["property_order"], "\n"
+    demo.get_neighbourhood(node["member_of"])
+    # demo.get_neighbourhood(demo.member_of)
+    # print "\n demo['property_order'] (a): ", demo["property_order"], "\n"
+
+    for tab_name, list_field_id in demo['property_order']:
+      list_field_set = []
+      for field_id_or_name in list_field_id:
+        if ObjectId.is_valid(field_id_or_name):
+          # For attribute-field(s) and/or relation-field(s)
+          
+          # field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'name': 1, 'altnames': 1})
+          field = collection.Node.one({'_id': ObjectId(field_id_or_name)})
+          
+          # type_check = type(demo.structure[field.name]).__name__  # Returns a string
+          # print "\n type_check("+field.name+") (b): " + type_check
+
+          # field_data_type = demo.structure[field.name]
+          # if type(field_data_type) == type:
+          #   field_data_type = field_data_type.__name__
+          # else:
+          #   field_data_type = field_data_type.__str__()
+
+          # print " field_type("+field.name+") (a): " + field_data_type + "\n"
+
+          # list_field_set.append([demo.structure, field._type, field.name, field.altnames, demo[field.name]])
+          list_field_set.append([demo.structure, field, demo[field.name]])
+
+        else:
+          # For node's base-field(s)
+
+          # field_data_type = demo.structure[field_id_or_name]
+          # if type(field_data_type) == type:
+          #   field_data_type = field_data_type.__name__
+
+          # base_field_altnames = {
+          #   'name': "Name",
+          #   'content_org': "Content",
+          #   'featured': "Featured",
+          #   'location': "Location",
+          #   'status': "Status",
+          #   'tags': "Tags"
+          # }
+
+          base_field = {
+            'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
+            'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Content", 'required': False},
+            # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
+            'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
+            # 'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
+            'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
+          }
+          # list_field_set.append([demo.structure, "BaseField", field_id_or_name, base_field_altnames[field_id_or_name], demo[field_id_or_name]])
+          # print "\n ", field_id_or_name, " -- ", demo[field_id_or_name]
+          list_field_set.append([demo.structure, base_field[field_id_or_name], demo[field_id_or_name]])
+
+      new_property_order.append([tab_name, list_field_set])
+      # print " new_property_order: ", new_property_order
+
+    demo["property_order"] = new_property_order
+    # print "\n demo['property_order'] (f): ", demo["property_order"], "\n"
+  
+  else:
+    # Otherwise (if GSystemType found) depending upon whether type_of exists or not returns property_order.
+    if not demo["property_order"] and demo.has_key("_id"):
+      type_of_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["type_of"]}}, {'property_order': 1})
+      
+      if type_of_nodes.count():
+        demo["property_order"] = []
+        for to in type_of_nodes:
+          for po in to["property_order"]:
+            demo["property_order"].append(po)
+
+      collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
+
+  # new_property_order = demo["property_order"]
+
+  # if demo.has_key('_id'):
+  #   demo = collection.Node.one({'_id': demo._id})
+
+  # else:
+  #   a = eval("collection" + "." + demo['_type'])()
+  #   print "\n demo.keys(): ", collection.GSystem().keys(), "\n"
+
+  # demo["property_order"] = new_property_order
+  # print "\n demo.keys(): ", demo.keys()
+  # print "\n node.keys(): ", node.keys()
+  new_property_order = demo['property_order']
+
+  if demo.has_key('_id'):
+    node = collection.Node.one({'_id': demo._id})
+    print "\n existing node...\n"
+    # print "\n demo.keys(): ", demo.keys()
+  else:
+    node = eval("collection"+"."+demo['_type'])()
+    print "\n new node...\n"
+    node["member_of"] = demo["member_of"]
+  
+  node['property_order'] = new_property_order
+
+  return node['property_order']
+
 
 def parse_template_data(field_data_type, field_value, **kwargs):
   """

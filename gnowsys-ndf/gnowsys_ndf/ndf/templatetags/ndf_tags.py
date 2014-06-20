@@ -1142,7 +1142,7 @@ def get_field_type(node_structure, field_name):
 
 
 @register.inclusion_tag('ndf/html_field_widget.html')
-def html_widget(field, field_type, field_value):
+def html_widget(node_id, field, field_type, field_value):
   """
   Returns html-widget for given attribute-field; that is, passed in form of
   field_name (as attribute's name) and field_type (as attribute's data-type)
@@ -1159,22 +1159,29 @@ def html_widget(field, field_type, field_value):
   # is_field_complex = False # Apart from simple data-types
   field_value_choices = []
 
+  is_list_of = False
   LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
               "[<type 'unicode'>]", "[<type 'basestring'>]",
               "[<type 'int'>]", "[<type 'float'>]", "[<type 'long'>]"
             ]
-  is_list_of = False
 
+  is_special_field = False
+  included_template_name = ""
   SPECIAL_FIELDS = {"location": "ndf/location_widget.html",
                     "content_org": "ndf/add_editor.html"
                     }
-  is_special_field = False
-  included_template_name = ""
 
   is_required_field = False
 
   try:
-    field_name = field["name"]
+    if node_id:
+      node_id = ObjectId(node_id)
+    # print "\n node_id: ", node_id, " -- ", type(node_id), "\n"
+
+    if not field_value:
+      field_value = ""
+
+    # print "\n ", field_name, " -- ", field_value, "\n"
     # print "\n ", field_name, " -- ", field_type, " -- ", type(field_type)
     # type_check = type(field_type).__name__ # Returns a string
       # print "\n ", field_name, " -- ", type_check
@@ -1203,18 +1210,14 @@ def html_widget(field, field_type, field_value):
       field_type = field_type.__str__()
 
     is_list_of = (field_type in LIST_OF)
-    if is_list_of:
-      if field_value:
-        field_value = ", ".join(field_value)
-      else:
-        field_value = ""
 
-    is_special_field = (field_name in SPECIAL_FIELDS.keys())
+    is_special_field = (field['name'] in SPECIAL_FIELDS.keys())
     if is_special_field:
-      included_template_name = SPECIAL_FIELDS[field_name]
+      included_template_name = SPECIAL_FIELDS[field['name']]
 
     is_AT_RT_base = field["_type"]
     # print "\n is_AT_RT_base: ", is_AT_RT_base
+
     is_attribute_field = False
     is_relation_field = False
     is_base_field = False
@@ -1249,9 +1252,12 @@ def html_widget(field, field_type, field_value):
                                 )
 
       # print "\n field_value: ", field_value
+    # if not field_value:
+    #   field_value = []
 
     return {'template': 'ndf/html_field_widget.html',
-            'field_name': field_name, 'field_altnames': field["altnames"], 'field_type': field_type, 'field_value': field_value if not field_value else "",
+            'field': field, 'field_type': field_type, 'field_value': field_value,
+            'node_id': node_id,
             'field_value_choices': field_value_choices,
             'is_base_field': is_base_field,
             'is_attribute_field': is_attribute_field,

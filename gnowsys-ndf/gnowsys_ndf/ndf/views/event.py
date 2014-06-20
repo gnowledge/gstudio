@@ -23,6 +23,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
 
 collection = get_database()[Node.collection_name]
@@ -326,25 +327,24 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
   if app_set_instance_id:
     event_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
-  property_order_list = event_gs.property_order
+  property_order_list = get_property_order_with_value(event_gs)#.property_order
+
   # print "\n property_order_list: ", property_order_list, "\n"
-  
   # print "\n event_gs: \n", event_gs, "\n"
   
   if request.method == "POST":
     # [A] Save event-node's base-field(s)
     # print "\n Going before....", type(event_gs), "\n event_gs.keys(): ", event_gs.keys()
-    get_node_common_fields(request, event_gs, group_id, event_gst)
+    # get_node_common_fields(request, event_gs, group_id, event_gst)
     # print "\n Going after....", type(event_gs), "\n event_gs.keys(): ", event_gs.keys()
     # print "\n event_gs: \n", event_gs.keys()
     # for k, v in event_gs.items():
     #   print "\n ", k, " -- ", v
-    event_gs.save()
-    print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
+    event_gs.save(is_changed=get_node_common_fields(request, event_gs, group_id, event_gst))
+    # print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
   
     # [B] Store AT and/or RT field(s) of given event-node (i.e., event_gs)
     for tab_details in property_order_list:
-      print "\n "
       for field_set in tab_details[1]:
         # field_set pattern -- [field_set[0]:node_structure, field_set[1]:field_base/AT/RT_instance, field_set[2]:node_value]
         # print " ", field_set[1]["name"], " -- ", type(field_set[1]), " -- ", (type(field_set[1]) in [AttributeType, RelationType])
@@ -357,7 +357,7 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
           if field_instance["name"] == "attendees":
             continue
 
-          # 1) Fetch corresponding AT/RT-fields value from request object
+          # Fetch corresponding AT/RT-fields value from request object
           field_value = request.POST[field_instance["name"]]
           # print " ", field_instance["name"], " -- ", field_value
 
@@ -369,17 +369,17 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
             field_instance_type = "GAttribute"
             field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
             # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
-            event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
+            # event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
 
-            print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
+            # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
           else:
             field_instance_type = "GRelation"
             field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
             # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
-            event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value)
+            # event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value)
 
-            print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
+            # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
           # print "\n ", field_instance["name"], " -- ", field_value, " -- ", type(field_value), "\n"
 
           # 3) Create an empty corresponding triple's instance
@@ -419,6 +419,7 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
 
   if app_set_instance_id:
     context_variables['node'] = event_gs
+    print "\n context_variables: ", context_variables['node']['content_org'], "\n"
 
   try:
     # print "\n template-list: ", [template, default_template]

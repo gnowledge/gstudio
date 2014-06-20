@@ -191,130 +191,24 @@ class Node(DjangoDocument):
 
     ########## Setter(@x.setter) & Getter(@property) ##########
 
-    def get_property_order(self):
-      """
-      This getter function returns property_order for a given GSystemType/GSystem.
-      - If GSystemType found, depending upon whether type_of exists or not returns property_order.
-      - If GSystem found, converts corresponding tab's list of ObjectIds (from it's GSystemType's property_order) 
-        into list of name, data-type & value; and stores in it's property_order.
-      """
-      # print "\n Getter used... ", self['property_order']
-      collection = get_database()[Node.collection_name]
-      new_property_order = []
+    # def get_property_order(self):
+    #   """
+    #   This getter function returns property_order for a given GSystemType/GSystem.
+    #   - If GSystemType found, depending upon whether type_of exists or not returns property_order.
+    #   - If GSystem found, converts corresponding tab's list of ObjectIds (from it's GSystemType's property_order) 
+    #     into list of name, data-type & value; and stores in it's property_order.
+    #   """
 
-      try:
-        if self["_type"] not in ["MetaType", "GSystemType", "AttributeType", "RelationType"]:
-          # If GSystems found, then only perform following statements
-          demo = eval("collection"+"."+self['_type'])()
-          # demo i.e., copy of self is created to avoid conflicts in structure that comes after get_neighbourhoood() function
-          demo.member_of = self.member_of
-          demo.get_neighbourhood(demo.member_of)
-          
-          demo["property_order"] = []
-          gst_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'property_order': 1})
-          # print "\n gst_nodes.count: ", gst_nodes.count()
-          for gst in gst_nodes:
-            for po in gst["property_order"]:
-              demo["property_order"].append(po)
+    #   return get_property_order_with_value(self)
 
-          # print "\n demo['property_order'] (b): ", demo["property_order"], "\n"
-          # demo.get_neighbourhood(demo["member_of"])
-          # print "\n demo['property_order'] (a): ", demo["property_order"], "\n"
+    #   # except Exception as e:
+    #   #   error_message = "\n PropertyOrderModifyError: " + str(e) + " !!!\n"
+    #   #   raise Exception(error_message)
 
-          for tab_name, list_field_id in demo['property_order']:
-            list_field_set = []
-            for field_id_or_name in list_field_id:
-              if ObjectId.is_valid(field_id_or_name):
-                # For attribute-field(s) and/or relation-field(s)
-                
-                # field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'name': 1, 'altnames': 1})
-                field = collection.Node.one({'_id': ObjectId(field_id_or_name)})
-                
-                # type_check = type(demo.structure[field.name]).__name__  # Returns a string
-                # print "\n type_check("+field.name+") (b): " + type_check
+    # def set_property_order(self, value):
+    #   self.property_order.append(value)
 
-                # field_data_type = demo.structure[field.name]
-                # if type(field_data_type) == type:
-                #   field_data_type = field_data_type.__name__
-                # else:
-                #   field_data_type = field_data_type.__str__()
-
-                # print " field_type("+field.name+") (a): " + field_data_type + "\n"
-
-                # list_field_set.append([demo.structure, field._type, field.name, field.altnames, demo[field.name]])
-                list_field_set.append([demo.structure, field, demo[field.name]])
-
-              else:
-                # For node's base-field(s)
-
-                # field_data_type = demo.structure[field_id_or_name]
-                # if type(field_data_type) == type:
-                #   field_data_type = field_data_type.__name__
-
-                # base_field_altnames = {
-                #   'name': "Name",
-                #   'content_org': "Content",
-                #   'featured': "Featured",
-                #   'location': "Location",
-                #   'status': "Status",
-                #   'tags': "Tags"
-                # }
-
-                base_field = {
-                  'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
-                  'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Content", 'required': False},
-                  # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
-                  'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
-                  # 'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
-                  'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
-                }
-                # list_field_set.append([demo.structure, "BaseField", field_id_or_name, base_field_altnames[field_id_or_name], demo[field_id_or_name]])
-                list_field_set.append([demo.structure, base_field[field_id_or_name], demo[field_id_or_name]])
-
-            new_property_order.append([tab_name, list_field_set])
-            # print " new_property_order: ", new_property_order
-
-          demo["property_order"] = new_property_order
-          # print "\n demo['property_order'] (f): ", demo["property_order"], "\n"
-        
-        else:
-          # Otherwise (if GSystemType found) depending upon whether type_of exists or not returns property_order.
-          if not demo["property_order"] and demo.has_key("_id"):
-            type_of_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["type_of"]}}, {'property_order': 1})
-            
-            if type_of_nodes.count():
-              demo["property_order"] = []
-              for to in type_of_nodes:
-                for po in to["property_order"]:
-                  demo["property_order"].append(po)
-
-            collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
-
-        # new_property_order = demo["property_order"]
-
-        # if demo.has_key('_id'):
-        #   demo = collection.Node.one({'_id': demo._id})
-
-        # else:
-        #   a = eval("collection" + "." + demo['_type'])()
-        #   print "\n demo.keys(): ", collection.GSystem().keys(), "\n"
-
-        # demo["property_order"] = new_property_order
-        print "\n demo.keys(): ", demo.keys()
-        print "\n self.keys(): ", self.keys()
-        
-        self['property_order'] = demo['property_order']
-
-        return self['property_order']
-
-      except Exception as e:
-        error_message = "\n PropertyOrderModifyError: " + str(e) + " !!!\n"
-        raise Exception(error_message)
-
-    def set_property_order(self, value):
-      self.property_order.append(value)
-
-    property_order = property(get_property_order, set_property_order)
+    # property_order = property(get_property_order, set_property_order)
 
 
     @property
@@ -462,6 +356,12 @@ class Node(DjangoDocument):
       return self.__unicode__()
     
     def save(self, *args, **kwargs):
+
+        if kwargs.has_key("is_changed"):
+          if not kwargs["is_changed"]:
+            print "\n self: ", self.name, " -- Nothing has changed !\n\n"
+            return
+
         is_new = False
 
         if not self.has_key('_id'):
@@ -503,6 +403,8 @@ class Node(DjangoDocument):
                     # Throw an error: " Illegal access: Invalid field found!!! "
         
         super(Node, self).save(*args, **kwargs)
+        print "\n self pc: ", self.keys(), "\n -- ", type(self)
+        print "\n\n Finally coming in save...", "\n"
         
         history_manager = HistoryManager()
         rcs_obj = RCS()
