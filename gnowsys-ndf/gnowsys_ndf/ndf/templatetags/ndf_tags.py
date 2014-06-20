@@ -1142,7 +1142,8 @@ def get_field_type(node_structure, field_name):
 
 
 @register.inclusion_tag('ndf/html_field_widget.html')
-def html_widget(node_id, field, field_type, field_value):
+# def html_widget(node_id, field, field_type, field_value):
+def html_widget(node_id, node_member_of, field, field_value):
   """
   Returns html-widget for given attribute-field; that is, passed in form of
   field_name (as attribute's name) and field_type (as attribute's data-type)
@@ -1157,6 +1158,7 @@ def html_widget(node_id, field, field_type, field_value):
   #   is_special_tab_field = True
   
   # is_field_complex = False # Apart from simple data-types
+  gs = None
   field_value_choices = []
 
   is_list_of = False
@@ -1177,6 +1179,16 @@ def html_widget(node_id, field, field_type, field_value):
     if node_id:
       node_id = ObjectId(node_id)
     # print "\n node_id: ", node_id, " -- ", type(node_id), "\n"
+
+    # print "\n node_member_of: ", node_member_of, " -- ", type(node_member_of)
+    if node_member_of:
+      gs = collection.GSystem()
+      gs.get_neighbourhood(node_member_of)
+
+    field_type = gs.structure[field['name']]
+
+    if field.has_key('_id'):
+      field = collection.Node.one({'_id': field['_id']})
 
     if not field_value:
       field_value = ""

@@ -191,26 +191,6 @@ class Node(DjangoDocument):
 
     ########## Setter(@x.setter) & Getter(@property) ##########
 
-    # def get_property_order(self):
-    #   """
-    #   This getter function returns property_order for a given GSystemType/GSystem.
-    #   - If GSystemType found, depending upon whether type_of exists or not returns property_order.
-    #   - If GSystem found, converts corresponding tab's list of ObjectIds (from it's GSystemType's property_order) 
-    #     into list of name, data-type & value; and stores in it's property_order.
-    #   """
-
-    #   return get_property_order_with_value(self)
-
-    #   # except Exception as e:
-    #   #   error_message = "\n PropertyOrderModifyError: " + str(e) + " !!!\n"
-    #   #   raise Exception(error_message)
-
-    # def set_property_order(self, value):
-    #   self.property_order.append(value)
-
-    # property_order = property(get_property_order, set_property_order)
-
-
     @property
     def user_details_dict(self):
       """Retrieves names of created-by & modified-by users from the given node, 
@@ -359,7 +339,7 @@ class Node(DjangoDocument):
 
         if kwargs.has_key("is_changed"):
           if not kwargs["is_changed"]:
-            print "\n self: ", self.name, " -- Nothing has changed !\n\n"
+            print "\n ", self.name, "(", self._id, ") -- Nothing has changed !\n\n"
             return
 
         is_new = False

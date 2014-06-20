@@ -266,9 +266,8 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
 
 def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node."""
-  print "\n Coming here...\n\n"
+  # print "\n Coming here...\n\n"
 
-  print "\n node.keys(): ", node.keys(), "\n"
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
@@ -324,16 +323,19 @@ def get_node_common_fields(request, node, group_id, node_type):
   if name:
     if node.name != name:
       node.name = name
+      print "\n Changed: name"
       is_changed = True
   
   if sub_theme_name:
     if node.name != sub_theme_name:
       node.name = sub_theme_name
+      print "\n Changed: sub-theme"
       is_changed = True
   
   if add_topic_name:
     if node.name != add_topic_name:
       node.name = add_topic_name
+      print "\n Changed: topic"
       is_changed = True
 
   # -------------------------------------------------------------------------------- language
@@ -350,9 +352,11 @@ def get_node_common_fields(request, node, group_id, node_type):
     # via access_policy(public/private) option on the template which is visible only to the creator
     if access_policy == "PUBLIC" and node.access_policy != access_policy:
       node.access_policy = u"PUBLIC"
+      print "\n Changed: access_policy (pu 2 pr)"
       is_changed = True
     elif access_policy == "PRIVATE" and node.access_policy != access_policy:
       node.access_policy = u"PRIVATE"
+      print "\n Changed: access_policy (pr 2 pu)"
       is_changed = True
   else:
     node.access_policy = u"PUBLIC"
@@ -380,6 +384,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
     if set(node.tags) != set(tags_list):
       node.tags = tags_list
+      print "\n Changed: tags"
       is_changed = True
 
   # -------------------------------------------------------------------------------- prior_node
@@ -408,6 +413,7 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.prior_node.append(node_id)
         
         i = i+1
+      print "\n Changed: prior_node"
       is_changed = True
  
   # -------------------------------------------------------------------------------- collection
@@ -438,6 +444,7 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.collection_set.append(node_id)
         
         i = i+1
+      print "\n Changed: collection_list"
       is_changed = True
      
   # -------------------------------------------------------------------------------- Module
@@ -468,6 +475,7 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.collection_set.append(node_id)
         
         i = i+1
+      print "\n Changed: module_list"
       is_changed = True
     
   # ------------------------------------------------------------------------------- org-content
@@ -480,12 +488,13 @@ def get_node_common_fields(request, node, group_id, node_type):
       usrname = request.user.username
       filename = slugify(name) + "-" + usrname + "-"
       node.content = org2html(content_org, file_prefix=filename)
-
+      print "\n Changed: content_org"
       is_changed = True
 
   # ----------------------------------------------------------------------------- visited_location in author class
   if node.location != map_geojson_data:
     node.location = map_geojson_data # Storing location data
+    print "\n Changed: map"
     is_changed = True
   
   if user_last_visited_location:
@@ -498,6 +507,7 @@ def get_node_common_fields(request, node, group_id, node_type):
       if node._type == "Author" and user_group_location._id == node._id:
         if node['visited_location'] != user_last_visited_location:
           node['visited_location'] = user_last_visited_location
+          print "\n Changed: user location"
           is_changed = True
 
       else:
@@ -512,9 +522,7 @@ def get_node_common_fields(request, node, group_id, node_type):
     if usrid not in node.contributors:
       node.contributors.append(usrid)
 
-  print "\n node: \n", node.keys()
-
-  print "\n Reached here ...\n\n"
+  # print "\n Reached here ...\n\n"
   return is_changed
 # ============= END of def get_node_common_fields() ==============
   
@@ -774,8 +782,8 @@ def get_property_order_with_value(node):
         if ObjectId.is_valid(field_id_or_name):
           # For attribute-field(s) and/or relation-field(s)
           
-          # field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'name': 1, 'altnames': 1})
-          field = collection.Node.one({'_id': ObjectId(field_id_or_name)})
+          field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_id': 1, 'name': 1, 'altnames': 1})
+          # field = collection.Node.one({'_id': ObjectId(field_id_or_name)})
           
           # type_check = type(demo.structure[field.name]).__name__  # Returns a string
           # print "\n type_check("+field.name+") (b): " + type_check
@@ -789,7 +797,8 @@ def get_property_order_with_value(node):
           # print " field_type("+field.name+") (a): " + field_data_type + "\n"
 
           # list_field_set.append([demo.structure, field._type, field.name, field.altnames, demo[field.name]])
-          list_field_set.append([demo.structure, field, demo[field.name]])
+          # list_field_set.append([demo.structure, field, demo[field.name]])
+          list_field_set.append([demo['member_of'], field, demo[field.name]])
 
         else:
           # For node's base-field(s)
@@ -817,7 +826,7 @@ def get_property_order_with_value(node):
           }
           # list_field_set.append([demo.structure, "BaseField", field_id_or_name, base_field_altnames[field_id_or_name], demo[field_id_or_name]])
           # print "\n ", field_id_or_name, " -- ", demo[field_id_or_name]
-          list_field_set.append([demo.structure, base_field[field_id_or_name], demo[field_id_or_name]])
+          list_field_set.append([demo['member_of'], base_field[field_id_or_name], demo[field_id_or_name]])
 
       new_property_order.append([tab_name, list_field_set])
       # print " new_property_order: ", new_property_order
@@ -862,13 +871,14 @@ def get_property_order_with_value(node):
     node["member_of"] = demo["member_of"]
   
   node['property_order'] = new_property_order
+  # print "\n node['property_order']: ", node['property_order'], "\n"
 
   return node['property_order']
 
 
 def parse_template_data(field_data_type, field_value, **kwargs):
   """
-  Pareses the value fetched from request (GET/POST) object based on the data-type of the given field.
+  Parses the value fetched from request (GET/POST) object based on the data-type of the given field.
 
   Arguments:
   field_data_type -- data-type of the field
