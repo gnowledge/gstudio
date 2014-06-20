@@ -146,7 +146,15 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 
 						theme_topic_node = collection.GSystem()
 						get_node_common_fields(request, theme_topic_node, group_id, app_GST)
-						theme_topic_node.save()
+                                              	theme_topic_node.save()
+                                                relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
+                                                grelation=collection.GRelation()
+                                                grelation.relation_type=relation_type
+                                                grelation.subject=node1._id
+                                                grelation.right_subject=theme_topic_node._id
+                                                grelation.name=u""
+                                                grelation.save()
+            
 
 				# This will return to Themes Hierarchy  
 				if theme_GST:
@@ -316,7 +324,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 	                           {'group_id': group_id,'groupid': group_id, 'drawer': drawer,
 	                           	'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,
 	                           	'nodes_list': nodes_list,'title': title,'node': node1, 'parent_nodes_collection': parent_nodes_collection,
-	                           	'theme_GST_id': theme_GST._id, 'topic_GST_id': topic_GST._id,
+	                                'theme_GST_id': theme_GST._id, 'topic_GST_id': topic_GST._id,'lan':LANGUAGES,
 	                                'themes_list_items': themes_list_items,'nodes':nodes_dict,'translate':translate
 	                           },context_instance = RequestContext(request)
             )
