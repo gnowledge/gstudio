@@ -4,8 +4,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils import simplejson
-from online_status.status import CACHE_USERS
-from online_status.utils import encode_json
+from status import CACHE_USERS
+from utils import encode_json
 
 
 def users(request):
@@ -27,4 +27,4 @@ def gstudio(request):
 
 def test(request):
     """Dummy view for test purpose"""
-    return HttpResponse('test')
+    return HttpResponse('testing')

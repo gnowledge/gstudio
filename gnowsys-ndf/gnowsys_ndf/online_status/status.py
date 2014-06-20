@@ -3,8 +3,8 @@ from django.core.cache import cache
 from django.conf import settings
 
 
-TIME_IDLE = getattr(settings, 'USERS_ONLINE__TIME_IDLE', 30) #30 seconds
-TIME_OFFLINE = getattr(settings, 'USERS_ONLINE__TIME_OFFLINE', 60) #60 seconds
+TIME_IDLE = getattr(settings, 'USERS_ONLINE__TIME_IDLE', 60*0.5) #30 seconds
+TIME_OFFLINE = getattr(settings, 'USERS_ONLINE__TIME_OFFLINE', 60*1) #60 seconds
 
 CACHE_PREFIX_USER = getattr(settings, 'USERS_ONLINE__CACHE_PREFIX_USER', 'online_user') + '_%d'
 CACHE_USERS = getattr(settings, 'USERS_ONLINE__CACHE_USERS', 'online_users')

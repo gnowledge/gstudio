@@ -4,7 +4,7 @@ from django.conf import settings
 
 from django import template
 from django.core.cache import cache
-from status import CACHE_USERS, TIME_OFFLINE,status_for_user ,CACHE_PREFIX_ANONYM_USER,ONLY_LOGGED_USERS 
+from gnowsys_ndf.online_status.status import CACHE_USERS, TIME_OFFLINE,status_for_user ,CACHE_PREFIX_ANONYM_USER,ONLY_LOGGED_USERS 
 from django.contrib.sessions.models import Session
     
 register = template.Library()

@@ -129,7 +129,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-    'online_status.middleware.OnlineStatusMiddleware',#chatb
+    'gnowsys_ndf.online_status.middleware.OnlineStatusMiddleware',#chatb
 
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',

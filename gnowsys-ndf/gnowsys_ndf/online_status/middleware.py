@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from online_status.status import refresh_user, refresh_users_list
+from status import refresh_user, refresh_users_list
 from status import OnlineStatus, CACHE_PREFIX_USER, CACHE_PREFIX_ANONYM_USER, ONLY_LOGGED_USERS
 
 

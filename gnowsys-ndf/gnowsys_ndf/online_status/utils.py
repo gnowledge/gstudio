@@ -1,4 +1,4 @@
-from online_status.status import OnlineStatus
+from gnowsys_ndf.online_status.status import OnlineStatus
 
 def encode_json(obj):
     if isinstance(obj, OnlineStatus):
