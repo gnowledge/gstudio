@@ -446,7 +446,7 @@
 
 							    		if( readFileMeta[i].id == val )
 							    		{
-						    				fileListHtml += '<li title="'+imageDict.name+'"><a href="/{{group_id}}/file/readDoc/'+imageDict.id+'/'+imageDict.name+'" target="_blank">'+imageDict.mimetype +'</a></li>';
+						    				fileListHtml += '<li title="'+imageDict.name+'"><a href="/{{group_id}}/file/details/'+imageDict.id+'" target="_blank">'+imageDict.mimetype +'</a></li>';
 							    		}
 							    	});
 							    }
@@ -585,7 +585,7 @@
 				    		{
 				    			var filetype = (imageDict.mimetype.trim().length)>0?imageDict.mimetype:"file";
 
-			    				$attachedImages.append("<li title='"+imageDict.name+"'><span title='Remove attached file' onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/readDoc/"+imageDict.id+"/"+imageDict.name+"' target='_blank' data-id='"+imageDict.id+"'>"+filetype+"</a></li>");
+			    				$attachedImages.append("<li title='"+imageDict.name+"'><span title='Remove attached file' onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/details/"+imageDict.id+"' target='_blank' data-id='"+imageDict.id+"'>"+filetype+"</a></li>");
 				    		}
 				    	});
 				    }
@@ -627,8 +627,9 @@
 				}
 
 				// appending csrfmiddlewaretoken and user-id
-				formData.append('csrfmiddlewaretoken', '{{csrf_token}}')
-				formData.append('user','{{request.user.id}}')
+				formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+				formData.append('user','{{request.user.id}}');
+				formData.append('location', JSON.stringify(tempMarker.toGeoJSON()));
 
 				// Set up the request.
 				xhr = new XMLHttpRequest();
@@ -663,7 +664,7 @@
 
 				    	var filetype = (fileSelect.files[0].type.trim().length)>0?fileSelect.files[0].type:"file";
 
-				    	$attachedImages.append("<li title='"+fileSelect.files[0].name+"'><span title='Remove attached file' onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/readDoc/"+xhr.responseText+"/"+fileSelect.files[0].name+"' target='_blank' data-id='"+xhr.responseText+"'>"+filetype+"</a></li>");
+				    	$attachedImages.append("<li title='"+fileSelect.files[0].name+"'><span title='Remove attached file' onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/details/"+xhr.responseText+"' target='_blank' data-id='"+xhr.responseText+"'>"+filetype+"</a></li>");
 				    	// fileSelect.files[0].type.split("/")[0]
 
 				    	$inputEl = $(".leaflet-popup-content:visible").children("input, textarea");
