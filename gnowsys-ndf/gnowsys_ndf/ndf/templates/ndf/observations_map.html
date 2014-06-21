@@ -151,6 +151,18 @@
 			z-index: 1;
 		}
 
+		.bestfitzoom-custom-control {
+			background-color: #FFFFFF;
+			padding: 7.5px;
+			font-size: 1.25em;
+			margin-top: 20px !important;
+			cursor: pointer;
+		}
+
+		.bestfitzoom-custom-control.has-tip.tip-right {
+			float: left !important;			
+		}
+
 	</style>
 
 
@@ -270,6 +282,33 @@
 	 	// instantiate map instantiate
 	 	var map = L.map('map').addLayer(osm);
 	 	map.setView([25.92,79.84], 5);
+
+
+
+	 	var bestFitZoomControl = L.Control.extend({
+	 		options: {
+	 			position: 'topleft'
+	 		},
+
+	 		onAdd: function (map) {
+		        // create the control container with a particular class name
+		        controlDiv = L.DomUtil.create('div', 'bestfitzoom-custom-control leaflet-bar');
+		        controlDiv.innerHTML = '<i class="fi-zoom-in"></i>'
+
+		        $(controlDiv).attr("title", "All markers view");
+		        $(controlDiv).attr("data-tooltip", "");
+		        $(controlDiv).addClass('has-tip tip-right radius');
+
+		        L.DomEvent
+		            .addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+		            .addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+		        		.addListener(controlDiv, 'click', bestFitZoom);
+
+		        return controlDiv;
+    		}
+		});
+
+	 	map.addControl(new bestFitZoomControl());
 
 		// getting logged in user last visited location	 	
 		{% if user.is_authenticated %}
@@ -538,11 +577,13 @@
 	        {% endif %}
 	 	}
 	 	
-	 	// if( tempArr.length )
-			    // {
-			    //   var group = new L.featureGroup(tempArr)
-			    //       map.fitBounds(group.getBounds());
-			    // }
+
+	 	function bestFitZoom()
+	 	{
+	 		var group = new L.featureGroup
+	 		$.each(map._layers, function(ml){if(map._layers[ml].feature){group.addLayer(this)}})
+	 		map.fitBounds(group.getBounds());
+	 	}
 
 
 
