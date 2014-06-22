@@ -912,6 +912,33 @@ def get_data_for_user_drawer(request, group_id):
     else:
         return HttpResponse("GSystemType for batch required")
 
+def set_drawer_widget_for_users(st,coll_obj_list):
+    '''
+    NOTE : this method is used only for user drwers (Django user class)
+    '''
+    draw2={}
+    draw1={}
+    data_list=[]
+    d1=[]
+    d2=[]
+    for each in st:
+       dic = {}
+       dic['id'] = str(each.id)
+       dic['name'] = each.username
+       d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
+    
+    for each in coll_obj_list:
+       dic = {}
+       dic['id'] = str(each.id)
+       dic['name'] = each.username
+       d2.append(dic)
+    draw2['drawer2'] = d2
+    data_list.append(draw2)
+    return data_list 
+
+
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget

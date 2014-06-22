@@ -4,29 +4,86 @@
 <link href="/static/ndf/css/jquery-ui.css" rel="stylesheet">
 
 <script type="text/javascript">
+var data_prefs="";
+var not_status="OFF";
+var inviting_users="";
 
-var items={}
-var user_list=[]
 
+
+
+$(document).on('click',"#checknotif",function() {
+
+if($('#checknotif').attr('checked')) {
+not_status="ON";
+}
+else
+{
+not_status="OFF";
+}
+});
+
+
+
+function saveinvite(){
+get_all_data();
+var inviting_users=data_prefs;
+data_prefs=""
+var surl="/{{node}}/group/notify/invite_users/"
+if (not_status=="OFF")
+{
+alert("Notification mails sent to newly selected users(if any)");
+}
+else
+{
+alert("Notification mails sent to all users except group owner");
+}
+$.ajax({
+        url: surl,
+        type: 'POST',
+        data: {users:inviting_users,notif_status:not_status,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {
+              $("#ajax_load_image").show();
+              $("#content").css({"opacity":"0.1",})
+                              },
+       success: function(data){
+                if(data=="Success")
+                    { alert("Successfully applied modifications and e-mail notifications send");
+                      $('.close-reveal-modal.group').trigger('click'); 
+
+                     }
+
+                else{
+                      alert("failed to subscribe");
+                      $('.close-reveal-modal.group').trigger('click');
+                        }
+
+                             },
+        complete: function(){
+                $("#ajax_load_image").hide();
+                $("#content").css({"opacity":"",})
+          }
+}); 
+}
 
 $(document).on('click',"#subscr_users",function() {
 
- $('#inviteusers #invite_users_set_drawer1').html("");
- $('#inviteusers #invite_users_set_drawer2').html("");
- $('#inviteusers #invite_users_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="invite_users_set_search" class="margin-0"></li>');
-var url="/{{node}}/group/invite_users/"
+ $('#inviteusers #collection_set_drawer1').html("");
+ $('#inviteusers #collection_set_drawer2').html("");
+ $('#inviteusers #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="collection_set_search" class="margin-0"></li>');
+
+var url="/{{node}}/group/notify/invite_users/"
  $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
    if(index == 0)
     {
      $.each(drawer_elements.drawer1, function(index, element) {
-        $('#inviteusers #invite_users_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#inviteusers #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
    }
    if(index == 1)
     {
     $.each(drawer_elements.drawer2, function(index, element) {
-        $('#inviteusers #invite_users_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#inviteusers #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
     }
 
@@ -37,65 +94,30 @@ var url="/{{node}}/group/invite_users/"
 
 
 
-$(document).on('click',"#addToList",function() {
-      UserInvitation();
-      data = $("#userInvite").val();//attr('value');
-      if(data != ""){
-           $("#selectOfInviteUser").append(new Option(data, data));
-           $("#userInvite").val("");
-           $("#selectOfInviteUser").show();
-           $(".removeList").show()
-           $("#submitUserInvite").show();
-      }
-      else{
-$('.responseToInvite').html("select users to invite");
-$('.responseToInvite').css("color","red");
 
-          }
-});
-
-
-
-
-$(document).on('click',"#submitUserInvite",function(){
- var surl="/{{node}}/group/notify/send_invitation/"
-$.ajax({
-        url: surl,
-        type: 'POST',
-        data: {users:join_list_users,csrfmiddlewaretoken: '{{ csrf_token }}'},
-        beforeSend: function() {
-              $("#ajax_load_image").show();
-              $("#content").css({"opacity":"0.1",})
-                              },
-       success: function(data){
-                if(data=="success")
-                    { alert("Successfully subscribed members and e-mail notification send");
-                     }
-
-                else{
-                      alert("failed to subscribe");
-                        }
-
-                             },
-        complete: function(){
-                $("#ajax_load_image").hide();
-                $("#content").css({"opacity":"",})
-          }
-}); });
-
+function get_all_data(){
+ $.each($('#inviteusers #collection_set_drawer2 li'),function(index,item){
+         data_prefs=data_prefs+String(item.id)+",";
+         });
+}
 
 
 </script>
 
 <div id="subscr_users">
 <input type="button" class="button small" data-reveal-id="inviteusers" value="Subscribe registered users">
+
 <div id="inviteusers" class="reveal-modal " data-reveal >
+     
      <h2>Select users</h2>
       <div id="module_drawer" >
-        {% include "ndf/drawer_widget.html" with widget_for="invite_users_set"  %}
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set"  %}
       </div>
-      <input type="button" id="#submitUserInvite" class="button small" value="submit"> 
-     <a class="close-reveal-modal rt">&#215;</a>
+
+            <label><input type="checkbox" id="checknotif" value="ON"> Send notification mails to all except the group owner</label>
+              
+      <input type="button" id="#submitUserInvite" class="button small" value="submit" onClick="saveinvite()"> 
+     <a class="close-reveal-modal group">&#215;</a>
 </div>
 </div>
 
