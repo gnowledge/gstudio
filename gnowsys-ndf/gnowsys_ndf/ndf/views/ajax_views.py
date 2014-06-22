@@ -37,6 +37,8 @@ import json
 db = get_database()
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
+theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 #This function is used to check (while creating a new group) group exists or not
 #This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 def checkgroup(request,group_name):
@@ -282,6 +284,8 @@ def drawer_widget(request, group_id):
           app = "QuizItem"
         elif app == "Theme":
           app = "Theme"
+        elif app == "Topic":
+          app = "Topic"
         elif app == "Module":
           app = "Module"
         else:
@@ -321,18 +325,19 @@ def get_collection_list(collection_list, node):
     for each in node.collection_set:
       col_obj = collection.Node.one({'_id': ObjectId(each)})
       if col_obj:
-        for cl in collection_list:
-          if cl['id'] == node.pk:
-            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
-            inner_sub_list = [inner_sub_dict]
-            inner_sub_list = get_collection_list(inner_sub_list, col_obj)
+        if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
+          for cl in collection_list:
+            if cl['id'] == node.pk:
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
+              inner_sub_list = [inner_sub_dict]
+              inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
-            if inner_sub_list:
-              inner_list.append(inner_sub_list[0])
-            else:
-              inner_list.append(inner_sub_dict)
+              if inner_sub_list:
+                inner_list.append(inner_sub_list[0])
+              else:
+                inner_list.append(inner_sub_dict)
 
-            cl.update({'children': inner_list })
+              cl.update({'children': inner_list })
       else:
         error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
         print "\n " + error_message
@@ -360,8 +365,9 @@ def get_tree_hierarchy(request, group_id, node_id):
 
     for each in cur:
       if each._id not in themes_list:
-        collection_list.append({'name': each.name, 'id': each.pk})
-        collection_list = get_collection_list(collection_list, each)
+        if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
+          collection_list.append({'name': each.name, 'id': each.pk})
+          collection_list = get_collection_list(collection_list, each)
 
     data = collection_list
 
