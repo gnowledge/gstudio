@@ -213,7 +213,11 @@ def display_forum(request,group_id,forum_id):
     if forum_object._type == "GSystemType":
        return forum(request, group_id, forum_id)
 
-    variables=RequestContext(request,{'forum':forum,'groupid':group_id,'group_id':group_id, 'forum_created_by':usrname})
+    variables = RequestContext(request,{
+                                        'forum':forum,
+                                        'groupid':group_id,'group_id':group_id,
+                                        'forum_created_by':usrname
+                                        })
 
     return render_to_response("ndf/forumdetails.html",variables)
 
@@ -442,3 +446,21 @@ def add_node(request,group_id):
     except Exception as e:
         return HttpResponse(""+str(e))
     return HttpResponse("success")
+
+
+def get_profile_pic(username):
+    
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(username) })
+    prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
+    dbref_profile_pic = prof_pic.get_dbref()
+    collection_tr = db[Triple.collection_name]
+    prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })
+
+    # prof_pic_rel will get the cursor object of relation of user with its profile picture 
+    if prof_pic_rel.count() :
+        index = prof_pic_rel[prof_pic_rel.count() - 1].right_subject
+        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(index) })        
+    else:
+        img_obj = "" 
+
+    return img_obj

@@ -21,12 +21,15 @@
   <script type="text/javascript">
     $(document).ready(function() {
     	$(function() {
-    		// $('.themes').tree();
+
+    		$('.themes').html('<img src="/static/ndf/images/ajax-loader-trans.gif" height="100" width="100">');
+
     		var $tree = $('.themes');
-    		var user = "{{user.is_authenticated}}"
+    		var user = "{{user.is_authenticated}}";
 
     		$tree.tree({
     			autoOpen: false,
+
         		onCreateLi: function(node, $li) {
 
         			if (user == "True")
@@ -109,7 +112,6 @@
 
 
 {% block body_content %}
-
 {% user_access_policy groupid request.user as user_access %}
 
 	{% if themes_hierarchy %}
@@ -217,7 +219,12 @@
 	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
   		  		{% if user_access == "allow" %}
 	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
+
+		    <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}?trans=true" class="button medium">Translate</a></td>
+	        
 	        	{% endif %}
+     	       	       
+ 	
 	          	</tr>
 	          
 	       	{% empty %}
