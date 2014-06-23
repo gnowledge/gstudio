@@ -53,6 +53,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  	<!-- change name of collection tab overide block in your code -->
 		  		<a href="#panel-name-description"> {{title}} </a>
 			</dd>
+			<dd title="Click here to add/edit collection">
+	  			<a href="#panel-collection" class="collection_tab"> Collection </a> 
+			</dd>
 						  
 		{% endif %}
      	</dl>
@@ -196,6 +199,68 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	    {% endif %}
 
+	    {% block collection %}
+
+	    <div class="content" id="panel-collection" style="width:95%;">
+	      <div class="row">
+		<div class="small-12 columns">
+		  <h5>Add or edit Collection : </h5>
+		</div>				
+		<br/><br/>
+		
+		<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
+		  <div id="SelectApp" class="row">
+		    <div class="small-2 columns line-height-2pt5">
+		      Classify by:
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="Page"/>
+		      Page <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="File" />
+		      File <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="Image" />
+		      Image <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-photo"></i>
+		      </span>
+		    </div>
+		    <div class="small-2 columns">
+		      <div class="row">
+		      <input type="radio" name="col" value="Video" />
+		      Video <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-video"></i>
+		      </span>
+		      </div>
+		      <div class="row">
+		      <input type="radio" name="col" value="Pandora Video" />
+		      Pandora <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-video"></i>
+		      </span>
+		      </div>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="QuizObj" />
+		      Quiz <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
+		      </span>
+		    </div>
+		  </div>
+		</div>
+		
+		<div class="small-12 columns">
+		  <div id="collection_drawer" >
+		    <!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
+		  </div>
+		</div>
+	      </div>
+	    </div>
+
+	    {% endblock %}
     	
 	</div>  
 
@@ -241,76 +306,67 @@ background-repeat:no-repeat; background-size: 48px 48px
 	});
 
 
-	$("#save-sub-theme").click(function() {
+	$("input:radio").click(function() {
 
-	    $.ajax({
-	      type: "POST",
-	      url: "{% url 'add_sub_themes' groupid %}",
-	      datatype: "html",
-	      data:{
-	        context_node: "{{node.pk}}",
-	        nodes_list: "{{nodes_list}}",
-	        sub_theme_name: $("#sub_theme_id").val(),
-	        csrfmiddlewaretoken: '{{ csrf_token }}'
-	      },
-	      success: function(data) {
+		cn_arr = []
 
-	      	var theme = $("#sub_theme_id").val();
+		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+				cn_arr.push($(this).val());
+			}
+		});
 
-	      	if ($.trim(data) === "failure") {
-	      		alert("Theme name "+ theme +" already available, Please choose different name");
-	      	}
+		var cn_list = cn_arr.join(',');
 
-	      	if ($.trim(data) === "None") {
-	      		alert("Please enter sub theme name");
-	      	}
+		$.ajax({
+			type: "POST",
+			url: "{% url 'select_drawer' groupid %}",
+			datatype: "html",
+			data:{
+				homo_collection: this.value,
+				collection_list: cn_list,
+				node_id: '{{node.pk}}',
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				$("#collection_drawer").html(data);
+			}
+		});
 
-	        location.reload(true);
-	        $("#sub_theme_id").val("");
-	      }
-	    });
+	});
 
-  	});
+	$(".collection_tab").click(function() {
 
+		$("#SelectApp").css("display", "none");
+		$("#save-node").css("display", "none");
+		$('#collection_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
 
-  	$("#save-topic").click(function() {
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "collection",
+				app:"{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				// alert(data);
+				$("#collection_drawer").html(data);
+				$("#SelectApp").css("display", "block");				
+				$("#save-node").css("display", "block");
+			}
+		});
 
-	    $.ajax({
-	      type: "POST",
-	      url: "{% url 'add_topics' groupid %}",
-	      datatype: "html",
-	      data:{
-	        context_node: "{{node.pk}}",
-	        nodes_list: "{{nodes_list}}",
-	        add_topic_name: $("#add_topic_id").val(),
-	        csrfmiddlewaretoken: '{{ csrf_token }}'
-	      },
-	      success: function(data) {
-
-	      	var topic = $("#add_topic_id").val();
-
-	      	if ($.trim(data) === "failure") {
-	      		alert("Topic name "+ topic +" already available, Please choose different name");
-	      	}
-
-	      	if ($.trim(data) === "None") {
-	      		alert("Please enter topic name");
-	      	}
-
-	        location.reload(true);
-	        $("#add_topic_id").val("");
-	      }
-	    });
-
-  	});
-
+	});
 
 
 	$("#save-node").click(function() {
 		cn_arr = []
 
 		$(".node_id").each(function (){
-			if ($(this).parent(".bullet-item").parent("#collection_drawer").attr("id") == "collection_drawer") {
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
 				cn_arr.push($(this).val());
 			}
 

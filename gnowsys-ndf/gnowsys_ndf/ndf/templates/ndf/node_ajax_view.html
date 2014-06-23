@@ -118,11 +118,19 @@ ul#graph-hover.f-dropdown{
 
           {% if 'Pandora_video' in node.member_of_names_list %}
           <div>
-            <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+           
+	    <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
               <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
               Your browser does not support the video tag.
-            </video>
+            </video><br/><br/>
 
+	    {% get_pandoravideo_metadata video_obj as metadata %}
+	    {% for k,v in metadata.items %} 
+            {% if k != "cuts" %}
+	    <h3>{{k}} : {{v}}<h3>
+		<br/>
+		{% endif %}
+	    {% endfor %}
             {% if user.is_authenticated %}
             <br/>
             <br/>
@@ -222,7 +230,7 @@ ul#graph-hover.f-dropdown{
       <!-- <h3 class="subheader"></h3> -->
       <p>
         {{ node.member_of_names_list.0 }} 
-        Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
+        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
         <br>
         <small>
           <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
@@ -249,7 +257,9 @@ ul#graph-hover.f-dropdown{
 
         {% check_group node as is_group %}
         {% if is_group %}
-        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
+        {% if user.is_superuser or node.created_by == user.id %}
+        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+        {% endif %}
 
         {% else %}
         <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
@@ -263,9 +273,11 @@ ul#graph-hover.f-dropdown{
           {% get_publish_policy request groupid node as group_policy %}
           {% if group_policy == "allow" %}
             {% if is_group %}
+            {% if user.is_superuser or node.created_by == user.id %}
             <li>
               <a class="button small" href="{% url 'publish_group' group_name_tag node %}">Publish</a>
             </li>
+            {% endif %}
             
             {% else %}
             <li>
