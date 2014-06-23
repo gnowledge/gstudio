@@ -190,7 +190,7 @@
 
 	            <th width="20">
 	            	{% if user_access == "allow" %}
-	            	 <input class="checkedAll" type="checkbox">
+	            		<input class="checkedAll" type="checkbox">
 	            	{% endif %}
 	            </th>
 
@@ -220,10 +220,11 @@
   		  		{% if user_access == "allow" %}
 	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
 
-		    <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}?trans=true" class="button medium">Translate</a></td>
-	        
-	        	{% endif %}
-     	       	       
+		    	<td  class="name" style="font-size:11px;">
+			    	<a href="{% url "theme_topic_create" groupid app_id each.id %}?trans=true" class="button medium">Translate</a>
+			    	<!-- <a href="#" class="button medium" disabled>Translate</a> -->
+		    	</td>	        
+	        	{% endif %}     	       	       
  	
 	          	</tr>
 	          
@@ -247,6 +248,7 @@
 			{% include "ndf/topic_create_edit.html" %}
 		{% endif %}
 	{% endif %}
+
 
 	<script type="text/javascript">
 		// script for fold themes hierarchy
