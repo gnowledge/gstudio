@@ -28,43 +28,42 @@
     <table cellpadding="8">
       <tr>
         <td><font size="3">Compare</font></td>
-	<td valign="bottom">
-	  <select class="" id="version_1" name="version_1">
-	    {% for version_no in node.version_dict.values %}
-	      {% ifequal version_no selected_versions.1 %}
-                 
-	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
-	      {% else %}
-	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
-	      {% endifequal %}
-	    {% endfor %}
-	  </select>
-	</td>
+        <td valign="bottom">
+      	  <select class="" id="version_1" name="version_1">
+      	    {% for version_no in node.version_dict.values %}
+      	      {% ifequal version_no selected_versions.1 %}
+      	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
+      	      {% else %}
+      	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
+      	      {% endifequal %}
+      	    {% endfor %}
+      	  </select>
+      	</td>
         <td><font size="3">with</font></td>
-	<td valign="bottom">
-	  <select id="version_2" name="version_2">
-	    {% for version_no in node.version_dict.values reversed %}
-	      {% ifequal version_no selected_versions.2 %}
-	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
-	      {% else %}
-	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
-	      {% endifequal %}
-	    {% endfor %}
-	  </select>
-	</td>
+      	<td valign="bottom">
+      	  <select id="version_2" name="version_2">
+      	    {% for version_no in node.version_dict.values reversed %}
+      	      {% ifequal version_no selected_versions.2 %}
+      	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}" selected>{{version_no}}</option>
+      	      {% else %}
+      	        <option id="{{version_no}}" name="{{version_no}}" value="{{version_no}}">{{version_no}}</option>
+      	      {% endifequal %}
+      	    {% endfor %}
+      	  </select>
+      	</td>
         <td> 
-	  <input id="compare_versions" type="submit" value="Go" class="button tiny" />
-          
-         
-	  {% if  selected_versions.1   and   selected_versions.2  %}
-            
-	   <a class="button tiny" href="{% url 'merge_doc' group_id node  selected_versions.1 selected_versions.2 %}" > Merge </a>	
-	  {% endif %}
-          {% if  selected_versions.1   and   selected_versions.2  %} 
-	   <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.1 %}" > Revert to {{selected_versions.1}} </a>
-      	  <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.2 %}" > Revert to {{selected_versions.2}} </a>
-	  {% endif %} 	
-	</td>
+          <input id="compare_versions" type="submit" value="Go" class="button tiny" />
+                
+          {% if user.is_authenticated %}
+          {% if user.is_superuser or node.created_by == user.id %}
+          {% if selected_versions.1 and selected_versions.2 %}
+          <a class="button tiny" href="{% url 'merge_doc' group_id node  selected_versions.1 selected_versions.2 %}" > Merge </a>	
+          <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.1 %}" > Revert to {{selected_versions.1}} </a>
+          <a class="button tiny" href="{% url 'revert_doc' group_id node  selected_versions.2 %}" > Revert to {{selected_versions.2}} </a>
+          {% endif %}   
+          {% endif %}   
+          {% endif %}
+        </td>
       </tr>
     </table>
 

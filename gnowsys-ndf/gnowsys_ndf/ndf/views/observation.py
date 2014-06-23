@@ -59,38 +59,45 @@ def all_observations(request, group_id, app_id=None):
 	        app_id = str(app_ins._id)
 
 
+	# app is GSystemType Observation
 	app = collection.Node.find_one({"_id":ObjectId(app_id)})
+
 	app_name = app.name
 	app_collection_set = []
 	file_metadata = []
 
-	for each in app.collection_set:
+	# retriving each GSystemType in Observation e.g.Plant Obs.., Rain Fall etc.
+	for each in app.collection_set: 
 
 		app_set_element = collection.Node.find_one({'_id':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 		
-		# app_element = collection.Node.find_one({"_id":each})
+		# Individual observations e.g. Rain Fall
 		if app_set_element:
 
 			locs = len(app_set_element.location)
 			locations = app_set_element.location
 
 			for loc in locations:
+				
+				# creating list of ObjectId's of file GSystem.
 				files_list = ast.literal_eval(loc["properties"].get("attached_files", '[]'))
 				
-				for file_id in files_list:
+				for file_id in files_list: # executes only if files_list has at least ObjectId 
 
-					# for preventing duplicate dict forming
-					if not file_id in [d['id'] for d in file_metadata]:
+					if ObjectId.is_valid(file_id) and file_id:
+					
+						# for preventing duplicate dict forming
+						if not file_id in [d['id'] for d in file_metadata]:
 
-						file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
-						# print file_id, "===", type(file_id)
-						
-						temp_dict = {}
-						temp_dict['id'] = file_obj._id.__str__()
-						temp_dict['name'] = file_obj.name
-						temp_dict['mimetype'] = file_obj.mime_type
+							file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+							# print file_id, "===", type(file_id)
+							
+							temp_dict = {}
+							temp_dict['id'] = file_obj._id.__str__()
+							temp_dict['name'] = file_obj.name
+							temp_dict['mimetype'] = file_obj.mime_type
 
-						file_metadata.append(temp_dict)
+							file_metadata.append(temp_dict)
 
 			# app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
 			# obj_count = app_element_content_objects.count()
@@ -102,30 +109,6 @@ def all_observations(request, group_id, app_id=None):
 									"total_locations": locs
 								  })
 
-	# print "\napp_name : ", app_name, "\napp_set_id : ", app_set_id
-
-	# print "\n app_collection_set : ", app_collection_set
-
-    # if app_set_id:
-    #     classtype = ""
-    #     app_set_template = "yes"
-    #     systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
-    #     systemtype_name = systemtype.name
-    #     title = systemtype_name
-    #     if request.method=="POST":
-    #         search = request.POST.get("search","")
-    #         classtype = request.POST.get("class","")
-    #         nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [systemtype._id]}}))
-    #     else :
-    #         nodes = list(collection.Node.find({'member_of': {'$all': [systemtype._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
-    #     nodes_dict = []
-    #     for each in nodes:
-    #         nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
-    # else :
-    #     app_menu = "yes"
-    #     title = app_name
-
-	# request.session.flush()
 	request.session.set_test_cookie()
 
 	return render_to_response("ndf/observation.html",
@@ -182,29 +165,36 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 
 			locs = len(app_set_element.location)
 			locations = app_set_element.location
+
 			# file_metadata = []
 
 			# "[{"id":"5384b8f81d41c8399153dba5","name":"sample data","mimetype":""}]"
 			if unicode(each) == app_set_id:
 				# file_metadata = []
+
 				for loc in locations:
+				
+					# creating list of ObjectId's of file GSystem.
 					files_list = ast.literal_eval(loc["properties"].get("attached_files", '[]'))
 					
-					for file_id in files_list:
+					for file_id in files_list: # executes only if files_list has at least ObjectId 
 
-						# for preventing duplicate dict forming
-						if not file_id in [d['id'] for d in file_metadata]:
-
-							file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
-							# print file_id, "===", type(file_id)
+						# check if file_id is valid ObjectId or not
+						if ObjectId.is_valid(file_id) and file_id: 
 							
-							temp_dict = {}
-							temp_dict['id'] = file_obj._id.__str__()
-							temp_dict['name'] = file_obj.name
-							temp_dict['mimetype'] = file_obj.mime_type
+							# for preventing duplicate dict forming
+							if not file_id in [d['id'] for d in file_metadata]:
 
-							file_metadata.append(temp_dict)
-							# print file_metadata
+								file_obj = collection.Node.one({'_type':'File', "_id":ObjectId(file_id)})
+								# print file_id, "===", type(file_id)
+								
+								temp_dict = {}
+								temp_dict['id'] = file_obj._id.__str__()
+								temp_dict['name'] = file_obj.name
+								temp_dict['mimetype'] = file_obj.mime_type
+
+								file_metadata.append(temp_dict)
+
 			
 			app_collection_set.append({ 
 									"id":str(app_set_element._id),
@@ -214,17 +204,6 @@ def observations_app(request, group_id, app_id=None, app_name=None, app_set_id=N
 									# "file_metadata":file_metadata
 								  })
 
-	
-	# for each in app.collection_set:
-		
-	# 	app_element = collection.Node.ifnd_one({"_id":each})
-	# 	obj_count = ""
-	# 	if app_element:
-	# 		app_element_content_objects = collection.Node.find({'member_of':ObjectId(each), 'group_set':{'$all': [ObjectId(group_id)]}})
-	# 		obj_count = app_element_content_objects.count()
-				
-	# 	app_collection_set.append({"id":str(app_element._id),"name":app_element.name, "obj_count": obj_count})
-	
 	return render_to_response("ndf/observation.html",
 							 	{
 							 		'app_collection_set': app_collection_set,
@@ -385,8 +364,20 @@ def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, s
             language = request.POST.get("lan", "")
             usrname = request.user.username
             page_url = request.POST.get("page_url", "")
-            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object                                                                                         
+            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
+
+            # for storing location in the file
             
+            # location = []
+            # location.append(json.loads(request.POST.get("location", "{}")))
+            # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True, location=location)
+
             obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
-        return StreamingHttpResponse(str(obs_image))	
+            if obs_image and ObjectId.is_valid(obs_image):
+            	# if image sucessfully get uploaded with returned of valid ObjectId
+            	return StreamingHttpResponse(str(obs_image))
+            
+            else:
+            	# file is not uploaded sucessfully or with error
+            	return StreamingHttpResponse("UploadError")	

@@ -25,11 +25,10 @@
     		$('.themes').html('<img src="/static/ndf/images/ajax-loader-trans.gif" height="100" width="100">');
 
     		var $tree = $('.themes');
-    		var user = "{{user.is_authenticated}}"
+    		var user = "{{user.is_authenticated}}";
 
     		$tree.tree({
     			autoOpen: false,
-    			dataUrl: "{% url 'get_tree_hierarchy' groupid node.pk %}",
 
         		onCreateLi: function(node, $li) {
 
@@ -113,7 +112,6 @@
 
 
 {% block body_content %}
-
 {% user_access_policy groupid request.user as user_access %}
 
 	{% if themes_hierarchy %}
@@ -146,7 +144,7 @@
 		{% if node %}
 
 			<!-- If "Theme" node -->
-			<div id="app-set-item" class="themes"></div>
+			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
 			
 		{% endif %}
 
@@ -192,7 +190,7 @@
 
 	            <th width="20">
 	            	{% if user_access == "allow" %}
-	            	 <input class="checkedAll" type="checkbox">
+	            		<input class="checkedAll" type="checkbox">
 	            	{% endif %}
 	            </th>
 
@@ -221,7 +219,13 @@
 	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
   		  		{% if user_access == "allow" %}
 	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
-	        	{% endif %}
+
+		    	<td  class="name" style="font-size:11px;">
+			    	<!--<a href="{#% url "theme_topic_create" groupid app_id each.id %#}?translate=true" class="button medium">Translate</a>-->
+			    	<a href="#" class="button medium" disabled>Translate</a>
+		    	</td>	        
+	        	{% endif %}     	       	       
+ 	
 	          	</tr>
 	          
 	       	{% empty %}
@@ -244,6 +248,7 @@
 			{% include "ndf/topic_create_edit.html" %}
 		{% endif %}
 	{% endif %}
+
 
 	<script type="text/javascript">
 		// script for fold themes hierarchy

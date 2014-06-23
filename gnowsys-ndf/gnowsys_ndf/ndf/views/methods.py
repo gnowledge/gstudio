@@ -103,7 +103,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
     collection = db[Node.collection_name]
-    
+        
     drawer = None    
     
     if checked:     
@@ -148,20 +148,28 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Forum":
         gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
       elif checked == "Pandora Video":
         gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
         drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
+
       elif checked == "Theme":
-        theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
-        topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id, topic_GST_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+
+      elif checked == "Topic":
+        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id, topic_GST_id]},'group_set': {'$all': [ObjectId(group_id)]}})   
 
     else:
+      # For heterogeneous collection      
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
-
            
     
     if (nid is None) and (not nlist):
