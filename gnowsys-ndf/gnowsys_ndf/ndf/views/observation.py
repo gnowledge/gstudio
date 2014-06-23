@@ -364,8 +364,14 @@ def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, s
             language = request.POST.get("lan", "")
             usrname = request.user.username
             page_url = request.POST.get("page_url", "")
-            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object                                                                                         
+            access_policy = request.POST.get("login-mode", '') # To add access policy(public or private) to file object
+
+            # for storing location in the file
             
+            # location = []
+            # location.append(json.loads(request.POST.get("location", "{}")))
+            # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True, location=location)
+
             obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
 
             if obs_image and ObjectId.is_valid(obs_image):
