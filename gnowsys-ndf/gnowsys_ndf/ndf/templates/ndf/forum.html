@@ -13,6 +13,10 @@
 		color: white;
 	}
 
+  .gray-text{
+    color: gray;
+  }
+
 	#content > p { color: #6F6F6F !important; /*font-size: inherit;*/ }
 
 	/*p { color: #6F6F6F !important; font-size: inherit; }*/
@@ -28,11 +32,13 @@
 
 {% block meta_content %}
   <h2>Forums</h2>
+  <br/>
 {% endblock %}
 
 
 {% block search_content %}
   {% include "ndf/node_search_base.html" %}
+  <br/>
 {% endblock %}
 
 
@@ -58,7 +64,7 @@
 
 <header class="row">
   <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Forums {% if existing_forums.count %}({{ existing_forums.count }}){% endif %}</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-comment-quotes gray-text"></i> All Forums {% if existing_forums|length %}({{ existing_forums|length }}){% endif %}</a></dd>
   </dl>
 </header>
 
@@ -83,6 +89,7 @@
   {% autopaginate existing_forums 23 %}
 
   {% for each in existing_forums %}
+  <!-- #{#% for each in forum_detail_list %} -->
   <li class="card">
     <div class="forum">
 
@@ -108,17 +115,17 @@
       
     <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-    <a class="small button expand" href="{% url 'show' groupid each %}">View Details</a>
+    <a class="small button expand" href="{% url 'show' groupid each.id %}">View Details</a>
 
     {% comment %}
     {% if node.created_by == request.user.id %}
-    <a class="button alert tiny" href="{% url '' group_name_tag each %}">Delete</a>
+    <a class="button alert tiny" href="{% url '' group_name_tag each.id %}">Delete</a>
     {% endif %}
     {% endcomment %}
 
     <footer class="row">
-      <div class="small-7 columns"><strong>{{each.contributors|length}}</strong> Contributor{{each.contributors|pluralize}}</div>
-      <div class="small-5 columns"><div class="right"><strong>#</strong> Thread</div></div> 
+      <div class="small-7 columns"><i class="fi-torsos-all gray-text"> </i> <strong>{{each.contributors|length}}</strong> <span class="gray-text">Contributor{{each.contributors|pluralize}}</span></div>
+      <div class="small-5 columns"><div class="right"><i class="fi-shuffle gray-text"> </i> <strong>{{each.threads}}</strong> <span class="gray-text">Thread{{each.threads|pluralize}}</span></div></div> 
     </footer>
 
     </div>

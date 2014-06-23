@@ -15,7 +15,7 @@ from django.contrib.sites.models import Site
 
 
 from django_mongokit import get_database
-from gnowsys_ndf.ndf.views.methods import get_forum_repl_type
+from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
 from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
@@ -77,9 +77,28 @@ def forum(request, group_id, node_id=None):
       )
 
     elif forum_st._id == ObjectId(node_id):
+      
       # Forum list view
+
       existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
-      variables=RequestContext(request,{'existing_forums': existing_forums, 'groupid': group_id, 'group_id': group_id})
+      forum_detail_list = []
+
+      for each in existing_forums:
+        
+        temp_forum = {}
+        temp_forum['name'] = each.name
+        temp_forum['created_at'] = each.created_at
+        temp_forum['tags'] = each.tags
+        temp_forum['member_of_names_list'] = each.member_of_names_list
+        temp_forum['user_details_dict'] = each.user_details_dict
+        temp_forum['html_content'] = each.html_content
+        temp_forum['contributors'] = each.contributors
+        temp_forum['id'] = each._id
+        temp_forum['threads'] = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(each._id)}]}).count()
+        
+        forum_detail_list.append(temp_forum)
+
+      variables=RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
       return render_to_response("ndf/forum.html",variables)
 
 def create_forum(request,group_id):
@@ -323,6 +342,7 @@ def add_node(request,group_id):
         pass
 
     try:
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         sitename=Site.objects.all()[0].name.__str__()
         content_org=request.POST.get("reply","")
         node=request.POST.get("node","")
@@ -392,13 +412,17 @@ def add_node(request,group_id):
             bx=User.objects.get(id=each)
             msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"'\n"+"Please visit "+link+" to see the updated page"
             if bx:
-                ret = set_notif_val(request,group_id,msg,activity,bx)
+                no_check=forum_notification_status(group_id,auth._id)
+                if no_check:
+                    ret = set_notif_val(request,group_id,msg,activity,bx)
         
         bx=User.objects.get(id=colg.created_by)
         msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"   
         
         if bx:
-            ret = set_notif_val(request,group_id,msg,activity,bx)
+            no_check=forum_notification_status(group_id,auth._id)
+            if no_check:
+                ret = set_notif_val(request,group_id,msg,activity,bx)
         
         if node == "Reply":
             # if exstng_reply:

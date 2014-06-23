@@ -8216,17 +8216,23 @@ textarea {
 	color: #222;
 }*/
 /*************************** 3. Custom CSS Below ***********************/
-/* line 376, ../scss/_styles.scss */
-.user {
-  color: inherit;
-}
-
-/* line 379, ../scss/_styles.scss */
-.user {
-  color: inherit;
+/*CSS fix for tables generated via orgitdown*/
+/* line 377, ../scss/_styles.scss */
+#content table td, #content colgroup col {
+  float: none !important;
 }
 
 /* line 382, ../scss/_styles.scss */
+.user {
+  color: inherit;
+}
+
+/* line 385, ../scss/_styles.scss */
+.user {
+  color: inherit;
+}
+
+/* line 388, ../scss/_styles.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -8235,65 +8241,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 389, ../scss/_styles.scss */
+/* line 395, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 393, ../scss/_styles.scss */
+/* line 399, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 397, ../scss/_styles.scss */
+/* line 403, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 400, ../scss/_styles.scss */
+/* line 406, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 405, ../scss/_styles.scss */
+/* line 411, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 410, ../scss/_styles.scss */
+/* line 416, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 413, ../scss/_styles.scss */
+/* line 419, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 416, ../scss/_styles.scss */
+/* line 422, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 423, ../scss/_styles.scss */
+/* line 429, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 428, ../scss/_styles.scss */
+/* line 434, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 435, ../scss/_styles.scss */
+/* line 441, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8301,18 +8307,61 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 442, ../scss/_styles.scss */
+/* line 448, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
+/*for graph and location*/
+/* line 453, ../scss/_styles.scss */
+.graph-div {
+  height: 90%;
+  width: -webkit-calc(100% - 10px);
+  width: -o-calc(100% - 10px);
+  width: -moz-calc(100% - 10px);
+  width: calc(100% - 10px) !important;
+  top: 5% !important;
+  left: 5px !important;
+  padding: 0px !important;
+  margin-left: 0 !important;
+}
+
+/*for graph and location*/
+/* line 463, ../scss/_styles.scss */
+.graph-div h3 {
+  border-bottom: 2px inset #154534;
+  padding: 0.25em 0;
+}
+
+/* line 468, ../scss/_styles.scss */
+#view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
+  z-index: 1;
+  background-color: captiontext;
+  padding: 5px 15px 10px;
+  color: white !important;
+  opacity: 0.8;
+  font-size: 2rem;
+  box-shadow: 0 1px 10px 2px #A9A9A9;
+}
+
+/* line 472, ../scss/_styles.scss */
+#view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
+  background-color: white;
+  border-radius: 30px;
+  padding: 5px 15px 10px;
+  transition: 2s;
+  opacity: 1;
+  color: black !important;
+  font-size: 2rem;
+}
+
 /* Splash Page */
-/* line 447, ../scss/_styles.scss */
+/* line 477, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 450, ../scss/_styles.scss */
+/* line 480, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }

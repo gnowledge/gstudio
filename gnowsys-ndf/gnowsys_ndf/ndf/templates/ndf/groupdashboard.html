@@ -1,6 +1,6 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
-from django.contrib.auth.decorators import login_required
+<!-- from django.contrib.auth.decorators import login_required -->
 {% block title %} Group Dashboard {% endblock %}
 
 {% block head %}
@@ -19,7 +19,21 @@ from django.contrib.auth.decorators import login_required
   success: function(data){
   $('#firstModal').html(data); },
   }); });
+
+
+<!-- Ajax for removing user from  List  -->
+  $(document).on('click',".button.alert.small.remove",function(){
+  user_id = $(this).attr("id")
+  node_id = $('#node_id').val()
+  var ajurl ="{% url 'remove_user_from_author_set' groupid %}?_id="+node_id+"&user_id="+user_id;
+   $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#firstModal').html(data); },
+  });}); 
   });
+<!-- End Ajax -->
+
 
 </script> 
 <!-- End Ajax -->
@@ -111,55 +125,56 @@ $(document).ready(function()
 
 <!-- overide meta_content block from base.html -->
 {% block meta_content %}
-
+  <h2>Group</h2>
 {% endblock %}
 
-<!-- overide related_content block from base.html -->
-{% block related_content %}
-{% check_is_user_group group_id as is_user_group %}
 
-<p> Members in this group :{{node.author_set|length}} </p>
+{% block concern_information %}
+  <h5> Members in this group: {{node.author_set|length}}</h5>
+  {% check_is_user_group group_id as is_user_group %}
+  {% get_policy node request.user as policy  %}
 
-{% get_policy node request.user as policy  %}
-{% if policy %}
-<!-- Triggers the modals -->
-<a href="#" id ="btn_list_member"data-reveal-id="firstModal" class="radius button">List Members</a>
+  {% if policy %}
+  <!-- Triggers the modals -->
+  <a href="#" id ="btn_list_member" data-reveal-id="firstModal" class="radius button small">List Members</a>
 
-<!-- Reveal Modals begin -->
-<div id="firstModal" class="reveal-modal" data-reveal>
-
-</div>
-{% endif %}
-<!-- Reveal Model end -->
-
-{% get_group_policy node request.user as policy %}
-{% get_prior_post_node  group_id as groupname     %}
-
-{% check_user_join request groupid as user_is_joined %}
-<input type="hidden" id="groupname" value="{{node}}">
-{% if user_is_joined == "joined" %}
-  {% if is_user_group and node.created_by != request.user %}
-       <input class="button tiny" type="submit" id="notify" value="Stop following" class="button" align="center" style="visibility:visible" >
-  {% else %}
-       <input class="button tiny" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible">
-  {% endif %} 
-{% elif user_is_joined == "not" or not user.is_authenticated  %}
-  {% if is_user_group and node.created_by != request.user %}
-       <input class="button tiny" type="submit" id="notify" value="Follow" class="button" align="center" style="visibility:visible" >
-  {% else %}
-       <input class="button tiny" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
+  <!-- Reveal Modals begin -->
+  <div id="firstModal" class="reveal-modal" data-reveal></div>
   {% endif %}
-{% endif %}
+  <!-- Reveal Model end -->
 
-{% get_user_object node.created_by as user_obj %}
-{% ifequal  user_obj.username  user.username  %}
+  {% get_group_policy node request.user as policy %}
+  {% get_prior_post_node group_id as groupname %}
+  {% check_user_join request groupid as user_is_joined %}
 
-{% include "ndf/invite_users.html" %}   
+  <input type="hidden" id="groupname" value="{{node}}">
 
-<a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
-{% endifequal %} 
+  {% if user_is_joined == "joined" %}
+    {% if is_user_group and node.created_by != request.user %}
+    <input class="button small" type="submit" id="notify" value="Stop following" class="button" align="center" style="visibility:visible" >
+
+    {% else %}
+    <input class="button small" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible">
+    {% endif %} 
+
+  {% elif user_is_joined == "not" or not user.is_authenticated %}
+    {% if is_user_group and node.created_by != request.user %}
+    <input class="button small" type="submit" id="notify" value="Follow" class="button" align="center" style="visibility:visible" >
+
+    {% else %}
+    <input class="button small" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
+    {% endif %}
+
+  {% endif %}
+
+  {% get_user_object node.created_by as user_obj %}
+  {% ifequal user_obj.username user.username %}
+    {% include "ndf/invite_users.html" %}
+    <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
+  {% endifequal %} 
 
 {% endblock %}
+
 
 {% block body_content %}
 

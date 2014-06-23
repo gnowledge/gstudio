@@ -1,12 +1,12 @@
+{% load pagination_tags %}
 <br/><br/>
 <div>
-
-
+  {% autopaginate drawer 10 %}
   <!-- Row containing LHS Resources and middle Navigation and RHS Collection -->
   <div class="row">
-
    <!-- For collection created on RHS -->
    <div class="small-5 small-left columns resource-drawer">
+    
 
     <ul class="pricing-table" id="collection_drawer">        
       {% if drawer != "None" %}
@@ -41,11 +41,12 @@
 
       </li>
       {% endfor %}
-
+           
       {% endif %}
+      
     </ul>
-
   </div>
+  
   <!-- End of Collection created on RHS -->
 
   <!-- For arrows Up, Down -->
@@ -67,6 +68,8 @@
 
 
 </div>
+<br/>
+{% paginate %}
 </div>
 
 <input id="collection_list" type="hidden" name="collection_list" value="" />
