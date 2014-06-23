@@ -221,8 +221,8 @@
 	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
 
 		    	<td  class="name" style="font-size:11px;">
-			    	<!--<a href="{#% url "theme_topic_create" groupid app_id each.id %#}?translate=true" class="button medium">Translate</a>-->
-			    	<a href="#" class="button medium" disabled>Translate</a>
+			    	<a href="{% url "theme_topic_create" groupid app_id each.id %}?trans=true" class="button medium">Translate</a>
+			    	<!-- <a href="#" class="button medium" disabled>Translate</a> -->
 		    	</td>	        
 	        	{% endif %}     	       	       
  	
