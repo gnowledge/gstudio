@@ -10,6 +10,8 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
+from mongokit import IS
+
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS as setting_gapps, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
@@ -1146,3 +1148,122 @@ def get_group_name(groupid):
 	else :
 		pass
 	return group_name 
+
+@register.filter
+def get_field_type(node_structure, field_name):
+  """Returns data-type value associated with given field_name.
+  """
+  return node_structure.get(field_name)
+
+
+@register.inclusion_tag('ndf/html_field_widget.html')
+# def html_widget(node_id, field, field_type, field_value):
+# def html_widget(node_id, node_member_of, field, field_value):
+def html_widget(node_id, field):
+  """
+  Returns html-widget for given attribute-field; that is, passed in form of
+  field_name (as attribute's name) and field_type (as attribute's data-type)
+  """
+  # gs = None
+  field_value_choices = []
+
+  is_list_of = False
+  LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
+              "[<type 'unicode'>]", "[<type 'basestring'>]",
+              "[<type 'int'>]", "[<type 'float'>]", "[<type 'long'>]"
+            ]
+
+  is_special_field = False
+  included_template_name = ""
+  SPECIAL_FIELDS = {"location": "ndf/location_widget.html",
+                    "content_org": "ndf/add_editor.html"
+                    }
+
+  is_required_field = False
+
+  is_mongokit_is_radio = False # False for drop-down True for radio buttons
+
+  try:
+    if node_id:
+      node_id = ObjectId(node_id)
+
+    # if node_member_of:
+    #   gs = collection.GSystem()
+    #   gs.get_neighbourhood(node_member_of)
+
+    # field_type = gs.structure[field['name']]
+    field_type = field['data_type']
+    field_altnames = field['altnames']
+    field_value = field['value']
+    # print "\n IS: ", IS
+    if type(field_type) == IS:
+      field_value_choices = field_type._operands
+      # print "\n operands: ", field_value
+
+      if len(field_value_choices) == 2:
+        is_mongokit_is_radio = True
+
+    # print "\n ", field['name'], " -- ", field['value'], " -- ", type(field_value)
+    # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
+
+    if field.has_key('_id'):
+      field = collection.Node.one({'_id': field['_id']})
+
+    field['altnames'] = field_altnames
+
+    if not field_value:
+      field_value = ""
+
+    if type(field_type) == type:
+      field_type = field_type.__name__
+    else:
+      field_type = field_type.__str__()
+
+    # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
+    is_list_of = (field_type in LIST_OF)
+
+    is_special_field = (field['name'] in SPECIAL_FIELDS.keys())
+    if is_special_field:
+      included_template_name = SPECIAL_FIELDS[field['name']]
+
+    is_AT_RT_base = field["_type"]
+
+    is_attribute_field = False
+    is_relation_field = False
+    is_base_field = False
+    if is_AT_RT_base == "BaseField":
+      is_base_field = True
+      is_required_field = field["required"]
+
+    elif is_AT_RT_base == "AttributeType":
+      is_attribute_field = True
+      is_required_field = field["required"]
+
+    elif is_AT_RT_base == "RelationType":
+      is_relation_field = True
+      is_required_field = True
+      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}},
+                                                            {'_id': 1, 'name': 1}
+                                                          )
+                                      )
+                                )
+      field_value = [str(each._id) for each in field_value]
+
+    return {'template': 'ndf/html_field_widget.html',
+            'field': field, 'field_type': field_type, 'field_value': field_value,
+            'node_id': node_id,
+            'field_value_choices': field_value_choices,
+            'is_base_field': is_base_field,
+            'is_attribute_field': is_attribute_field,
+            'is_relation_field': is_relation_field,
+            'is_list_of': is_list_of,
+            'is_mongokit_is_radio': is_mongokit_is_radio,
+            'is_special_field': is_special_field, 'included_template_name': included_template_name,
+            'is_required_field': is_required_field
+            # 'is_special_tab_field': is_special_tab_field
+    }
+
+  except Exception as e:
+    error_message = " HtmlWidgetTagError: " + str(e) + " !!!"
+    raise Exception(error_message)
+  

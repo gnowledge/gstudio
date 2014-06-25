@@ -1,0 +1,112 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block head %}  
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <script src="/static/ndf/js/jquery-ui.js"></script>
+  <script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
+  <script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
+  
+  <link rel="stylesheet" href="/static/ndf/css/jquery-ui-timepicker-addon.css">
+  <link rel="stylesheet" href="/static/ndf/css/jquery-ui.css">
+
+  <style type="text/css">
+
+    #ui-datepicker-div {
+
+      box-shadow: 0 5px 5px #808080;
+      width: 230px;
+    }
+
+    .ui-widget {
+
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    .ui-corner-all {
+    
+      border-radius: 0;
+    }
+
+    #ui-datepicker-div dt.ui_tpicker_minute_label {
+    
+      margin-bottom: 0;
+    }
+
+    .ui-slider-horizontal {
+    
+      margin-top: 1em;
+    }
+
+    .active-app-set, .active-app-set-edit, .active-app-set-view {
+    
+      background-color:#efefef;
+      padding:0.5em 0 0.5em 0.5em; 
+      margin-left: -10px !important;
+    }
+
+    .active-app-set-edit {
+
+      border-right: 4px solid #808080;
+    }
+
+    .active-app-set-view {
+
+      border-left: 4px solid #808080;
+    }
+  </style>
+{% endblock%}
+
+{% block meta_content %}
+  {% user_access_policy groupid request.user as user_access %}
+  <ul class="side-nav"> 
+  	<li>
+  		<a></a>
+  	</li>
+
+    {% for each in app_collection_set %}
+    {% get_memberof_objects_count each.pk groupid as count %}
+
+    {% if app_set_id == each|safe %}
+      {% if '/new/' in request.path %}
+      <li class="active-app-set-edit">
+      {% else %}
+      <li class="active-app-set-view">
+      {% endif %}
+    {% else %}
+    <li>
+    {% endif %}
+    
+      <div class="row">
+        {% if each.type_of or each.name == "Caste" or each.name == "Foundation Course" %}
+          <a class="small-8 end columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+            {{each.name}} ({{count}})
+          </a>
+          {% if user_access == "allow" %}
+          <a class="small-3 columns" href="{% url 'mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+            +&nbsp;Add
+          </a>
+          {% endif %}
+
+        {% else %}
+          {{each.name}}
+        {% endif %}
+      </div>
+  	</li>
+
+  	{% endfor %}
+
+  </ul>
+{% endblock %}
+
+{% block body_content %} 
+{% endblock %}
+
+{% block script %}
+{% endblock %}	

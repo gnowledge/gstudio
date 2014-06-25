@@ -193,142 +193,155 @@ class Node(DjangoDocument):
 
     @property
     def user_details_dict(self):
-        """Retrieves names of created-by & modified-by users from the given node, 
-        and appends those to 'user_details' dict-variable
-        """
-        user_details = {}
-        if self.created_by:
-            user_details['created_by'] = User.objects.get(pk=self.created_by).username
+      """Retrieves names of created-by & modified-by users from the given node, 
+      and appends those to 'user_details' dict-variable
+      """
+      user_details = {}
+      if self.created_by:
+        user_details['created_by'] = User.objects.get(pk=self.created_by).username
 
-        contributor_names = []
-        for each_pk in self.contributors:
-            contributor_names.append(User.objects.get(pk=each_pk).username)
-        # user_details['modified_by'] = contributor_names
-        user_details['contributors'] = contributor_names
+      contributor_names = []
+      for each_pk in self.contributors:
+        contributor_names.append(User.objects.get(pk=each_pk).username)
 
-        if self.modified_by:
-            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
+      # user_details['modified_by'] = contributor_names
+      user_details['contributors'] = contributor_names
 
-        return user_details
+      if self.modified_by:
+        user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
+
+      return user_details
 
     @property
     def member_of_names_list(self):
-        """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
-        built from 'member_of' field (list of ObjectIds)
-        """
-        member_of_names = []
+      """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
+      built from 'member_of' field (list of ObjectIds)
+      """
+      member_of_names = []
 
-        collection = get_database()[Node.collection_name]
-        if self.member_of:
-            for each_member_id in self.member_of:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem=collection.Node.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        else:
-            for each_member_id in self.gsystem_type:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem=collection.Node.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        return member_of_names
+      collection = get_database()[Node.collection_name]
+      if self.member_of:
+        for each_member_id in self.member_of:
+          if type(each_member_id) == ObjectId:
+            _id = each_member_id
+
+          else:
+            _id = each_member_id['$oid']
+
+          if _id:
+            mem=collection.Node.one({'_id': ObjectId(_id)})
+            if mem:
+              member_of_names.append(mem.name)
+
+      else:
+        for each_member_id in self.gsystem_type:
+          if type(each_member_id) == ObjectId:
+            _id = each_member_id
+
+          else:
+            _id = each_member_id['$oid']
+
+          if _id:
+            mem=collection.Node.one({'_id': ObjectId(_id)})
+            if mem:
+              member_of_names.append(mem.name)
+
+      return member_of_names
 
     @property        
     def prior_node_dict(self):
-        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-        pair respectively for prior_node objects of the given node.
-        """
-        
-        collection = get_database()[Node.collection_name]
-        
-        obj_dict = {}
+      """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+      pair respectively for prior_node objects of the given node.
+      """
+      collection = get_database()[Node.collection_name]
+      obj_dict = {}
 
-        i = 0
-        for each_id in self.prior_node:
-            i = i + 1
+      i = 0
+      for each_id in self.prior_node:
+        i = i + 1
 
-            if each_id != self._id:
-                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
-                dict_key = i
-                dict_value = node_collection_object
-                
-                obj_dict[dict_key] = dict_value
+        if each_id != self._id:
+          node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
+          dict_key = i
+          dict_value = node_collection_object
+          
+          obj_dict[dict_key] = dict_value
 
-        return obj_dict
+      return obj_dict
 
     @property
     def collection_dict(self):
-        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-        pair respectively for collection_set objects of the given node.
-        """
+      """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+      pair respectively for collection_set objects of the given node.
+      """
 
-        collection = get_database()[Node.collection_name]
-        
-        obj_dict = {}
+      collection = get_database()[Node.collection_name]
+      obj_dict = {}
 
-        i = 0;
-        for each_id in self.collection_set:
-            i = i + 1
+      i = 0;
+      for each_id in self.collection_set:
+        i = i + 1
 
-            if each_id != self._id:
-                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
-                dict_key = i
-                dict_value = node_collection_object
-                
-                obj_dict[dict_key] = dict_value
+        if each_id != self._id:
+          node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
+          dict_key = i
+          dict_value = node_collection_object
+          
+          obj_dict[dict_key] = dict_value
 
-        return obj_dict
+      return obj_dict
 
     @property
     def html_content(self):
-        """Returns the content in proper html-format.
-        """
-        if MARKUP_LANGUAGE == 'markdown':
-            return markdown(self.content, MARKDOWN_EXTENSIONS)
-        elif MARKUP_LANGUAGE == 'textile':
-            return textile(self.content)
-        elif MARKUP_LANGUAGE == 'restructuredtext':
-            return restructuredtext(self.content)
-        return self.content
+      """Returns the content in proper html-format.
+      """
+      if MARKUP_LANGUAGE == 'markdown':
+        return markdown(self.content, MARKDOWN_EXTENSIONS)
+
+      elif MARKUP_LANGUAGE == 'textile':
+        return textile(self.content)
+
+      elif MARKUP_LANGUAGE == 'restructuredtext':
+        return restructuredtext(self.content)
+
+      return self.content
         
     @property
     def current_version(self):
-        history_manager= HistoryManager()
-        return history_manager.get_current_version(self)    
+      history_manager= HistoryManager()
+      return history_manager.get_current_version(self)    
 
     @property
     def version_dict(self):
-        """Returns a dictionary containing list of revision numbers of
-        the given node.
-        
-        Example:
-        {
-         "1": "1.1",
-         "2": "1.2",
-         "3": "1.3",
-        }
-        """
-        history_manager = HistoryManager()
-        return history_manager.get_version_dict(self)
+      """Returns a dictionary containing list of revision numbers of
+      the given node.
+      
+      Example:
+      {
+       "1": "1.1",
+       "2": "1.2",
+       "3": "1.3",
+      }
+      """
+      history_manager = HistoryManager()
+      return history_manager.get_version_dict(self)
 
 
     ########## Built-in Functions (Overridden) ##########
     
     def __unicode__(self):
-        return self._id
+      return self._id
     
     def identity(self):
-        return self.__unicode__()
+      return self.__unicode__()
     
     def save(self, *args, **kwargs):
+
+        if kwargs.has_key("is_changed"):
+          if not kwargs["is_changed"]:
+            print "\n ", self.name, "(", self._id, ") -- Nothing has changed !\n\n"
+            return
+
         is_new = False
 
         if not self.has_key('_id'):
@@ -370,6 +383,8 @@ class Node(DjangoDocument):
                     # Throw an error: " Illegal access: Invalid field found!!! "
         
         super(Node, self).save(*args, **kwargs)
+        print "\n self pc: ", self.keys(), "\n -- ", type(self)
+        print "\n\n Finally coming in save...", "\n"
         
         history_manager = HistoryManager()
         rcs_obj = RCS()
@@ -393,6 +408,7 @@ class Node(DjangoDocument):
             rcs_obj.checkout(fp)
 
             try:
+                # print "\n Updating...", self._id, " -- ", self.name
                 if history_manager.create_or_replace_json_file(self):
                     user = User.objects.get(pk=self.modified_by).username
                     message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")

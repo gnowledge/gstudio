@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="/static/ndf/css/jquery-ui.css">
 
   <style type="text/css">
-    
+
     #ui-datepicker-div {
 
       box-shadow: 0 5px 5px #808080;
@@ -80,11 +80,11 @@
   
     <div class="row">
       {% if each.type_of or each.name == "Caste" or each.name == "Foundation Course" %}
-        <a class="small-8 columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
+        <a class="small-8 end columns" href="{% url 'mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
           {{each.name}} ({{count}})
         </a>
         {% if user_access == "allow" %}
-        <a class="small-4 columns" href="{% url 'mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
+        <a class="small-3 columns" href="{% url 'mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
           +&nbsp;Add
         </a>
         {% endif %}
@@ -107,150 +107,202 @@
 {# template for showing apt_set_instance new form #}
 
 {% if create_new %}
-	{% if already_uploaded_file %}
-	<div>
-		<font size ="5" color="red">This file :{{already_uploaded_file}} Already uploaded please choose another file</font>
+  {% if already_uploaded_file %}
+	<div class="row">
+    <div class="small-12 columns">
+		<p> <font size ="5" color="red">This file :{{already_uploaded_file}} Already uploaded please choose another file</font> </p>
+    <div>
 	</div>
+  <br/>
 	{% endif %}
 
 	<form method="POST" action="."  enctype="multipart/form-data">
 	{% csrf_token %}
 
-		<div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns">
-
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> {{app_set_name}}'s Title</font> 
-				</div>
-				<div style="display:table-cell;">
-					<font size="3"> <input type="textbox" name="name" value="{{app_set_instance_name}}"></font>
-				</div>
+		<!-- <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns"> -->
+        
+		<div class="row">
+			<div class="small-2 columns"> 
+        <label for="label-name" class="left inline">{{app_set_name}}'s Title</label>
 			</div>
+			<div class="small-5 end columns">
+				<input type="text" id="label-name" name="name" value="{{app_set_instance_name}}">
+			</div>
+		</div>
 
-			{% if systemtype_attributetype_set %}
-			{% for at in systemtype_attributetype_set %}
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> {{at.type}} </font> 
-				</div>
-				<div style="display:table-cell;">
-					{% if at.value == "bool" %}
-					<select id="id_auto_now_add" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
+		{% if systemtype_attributetype_set %}
+		{% for at in systemtype_attributetype_set %}
+		<div class="row">
+			<div class="small-2 columns"> 
+        <label for="label_{{at.type}}" class="left inline">{{at.altnames}}</label>
+			</div>
+			<div class="small-5 end columns">
+				{% if at.value == "bool" %}
+				<select id="id_auto_now_add" id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
 
-						{% if at.database_value %}
-						<option value="">Unknown</option>
-						{% else %}
-						<option selected="selected" value="">Unknown</option>
-						{% endif %}
-
-						{% if at.database_value == "Yes"%}
-						<option selected="selected" value="Yes">Yes</option>
-						{% else %}
-						<option value="Yes">Yes</option>
-						{% endif %}
-
-						{% if at.database_value == "No"%}
-						<option selected="selected" value="No">No</option>
-						{% else %}
-						<option value="No">No</option>
-						{% endif %}
-
-					</select>
-
+					{% if at.database_value %}
+					<option value="">Unknown</option>
 					{% else %}
-					<font size="3"> <input type="textbox" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" value="{{at.database_value}}"></font>
+					<option selected="selected" value="">Unknown</option>
 					{% endif %}
-				</div>
+
+					{% if at.database_value == "Yes"%}
+					<option selected="selected" value="Yes">Yes</option>
+					{% else %}
+					<option value="Yes">Yes</option>
+					{% endif %}
+
+					{% if at.database_value == "No"%}
+					<option selected="selected" value="No">No</option>
+					{% else %}
+					<option value="No">No</option>
+					{% endif %}
+
+				</select>
+
+				{% else %}
+				{% if at.type == "attendees" %}
+				<a href="" id="label_{{at.type}}" data-reveal-id="view-map-edit-widget1" title="Click to add attendence">Set Batch of Attendees/Students</a>
+
+        <!-- Overlay : Map EDIT Widget -->
+        <div class="content reveal-modal" id="view-map-edit-widget1" data-reveal>    
+          <a class="close-reveal-modal" >&#215;</a>
+
+          <h3>Attendence</h3>
+
+          <div class="row">
+            <div class="small-2 columns">
+              <label for="label-fc" class="left inline">Foundation Course</label>
+            </div>
+            <div  class="small-5 end columns">
+              <select id="label-fc">
+                <option>FC Check</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="small-2 columns">
+              <label for="label-batch" class="left inline">Batches</label>
+            </div>
+            <div  class="small-5 end columns">
+              <select id="label-batch">
+                <option>Batch Check</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div  class="small-7 end columns">
+            {% include "ndf/add_editor.html" %}
+            </div>
+          </div>
+
+        </div>
+        <!-- END of Map Widget Overlay -->
+
+
+				{% else %}
+				<input type="text" id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" value="{{at.database_value}}">
+
+				{% endif %}
+				{% endif %}
 			</div>
-			{% endfor %}
-			{% endif %}
+		</div>
+		{% endfor %}
+		{% endif %}
 
-			{% if systemtype_relationtype_set %}
-			{% for rt in systemtype_relationtype_set %}
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> {{rt.rt_name}} </font> 
-				</div>
-				<div style="display:table-cell;">
-					<select id="relation_selection" name="{% if rt.database_id %} {{rt.database_id}} {% else %}{{rt.type_id}} {% endif %}" style="width:50%">
-						{% if rt.database_value_id %}
-						<option value="">Unknown</option>
-						{% else %}
-						<option selected="selected" value="">Unknown</option>
-						{% endif %}
-
-						{% for each_gsystem in rt.object_type %}
-						{% if rt.database_value_id == each_gsystem.id %}
-						<option selected="selected" value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
-						{% else %}
-						<option value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
-						{% endif %} 
-						{% endfor %}
-					</select>
-				</div>
+		{% if systemtype_relationtype_set %}
+		{% for rt in systemtype_relationtype_set %}
+		<div class="row">
+			<div class="small-2 columns"> 
+				<label for="label-{{rt.rt_name}}" class="left inline">{{rt.rt_name}}</label>
 			</div>
-			{% endfor %}
-			{% endif %}
+			<div class="small-5 end columns">
+				<select id="relation_selection" id="label-{{rt.rt_name}}" name="{% if rt.database_id %} {{rt.database_id}} {% else %}{{rt.type_id}} {% endif %}">
+					{% if rt.database_value_id %}
+					<option value="">Unknown</option>
+					{% else %}
+					<option selected="selected" value="">Unknown</option>
+					{% endif %}
 
-			<!-- map/location widget : EDIT -->
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> Add Location </font> 
-				</div>
-
-				<div style="display:table-cell;">
-					<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-						<i class="fi-marker"></i> &nbsp; Add Location
-					</a>
-				</div>      
-			</div>  
-
-			<!-- Overlay : Map EDIT Widget -->
-			<div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
-				<a class="close-reveal-modal" >&#215;</a>
-				{% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
+					{% for each_gsystem in rt.object_type %}
+					{% if rt.database_value_id == each_gsystem.id %}
+					<option selected="selected" value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
+					{% else %}
+					<option value="{{each_gsystem.id}}">{{each_gsystem.name}}</option>
+					{% endif %} 
+					{% endfor %}
+				</select>
 			</div>
-			<!-- END of Map Widget Overlay -->
+		</div>
+		{% endfor %}
+		{% endif %}
 
-			<!-- END of location/map widget -->
+		<!-- map/location widget : EDIT -->
+		<div class="row">
+			<div class="small-2 columns"> 
+				<label for="label-location" class="left inline">Location</label>
+			</div>
 
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> Tags</font> 
-				</div>
-				<div style="display:table-cell;">
-					<input id="tags_id" name="tags" type="textbox" value="{{tags}}" placeholder="Separate tags with commas...">
-				</div>
+			<div class="small-5 end columns">
+				<a href="#view-map-edit-widget" id="label-location" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+					<i class="fi-marker"></i> &nbsp; Add Location
+				</a>
+			</div>      
+		</div>  
+
+		<!-- Overlay : Map EDIT Widget -->
+		<div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+			<a class="close-reveal-modal" >&#215;</a>
+			{% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
+		</div>
+		<!-- END of Map Widget Overlay -->
+
+		<!-- END of location/map widget -->
+
+		<div class="row">
+			<div class="small-2 columns"> 
+				<label for="label-tags" class="left inline">Tags</label>
 			</div>
-       
-			{% if File == "True" %}
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3">Upload File</font> 
-				</div>
-				<div style="display:table-cell;">
-					<input id="file_id" name="file" type="file">
-				</div>
+			<div class="small-5 end columns">
+				<input id="label-tags" name="tags" type="text" value="{{tags}}" placeholder="Separate tags with commas...">
 			</div>
-			{% endif %}
-      
-			<div style="display:table-row;">
-				<div style="display:table-cell;"> 
-					<font size="3"> Content</font> 
-				</div>
-				<div style="display:table-cell">
-					<div id="contentlist" class="content">
-						<div class="">
-						{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=content_org node_id=app_set_instance_id %}
-						</div>
+		</div>
+     
+		{% if File == "True" %}
+		<div class="row">
+			<div class="small-2 columns"> 
+				<label for="label-file" class="left inline">Upload File</label>
+			</div>
+			<div class="small-5 end columns">
+				<input id="label-file" name="file" type="file">
+			</div>
+		</div>
+		{% endif %}
+    
+		<div class="row">
+			<div class="small-2 columns"> 
+				<label for="label-content" class="left inline">Content</label>
+			</div>
+			<div class="small-7 end columns">
+				<div id="label-content" class="content">
+					<div class="">
+					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=content_org node_id=app_set_instance_id %}
 					</div>
 				</div>
 			</div>
+		</div>
 
-    	</div>
-   
-		<input type="submit" name="submit" class="button" id="save-system" value="submit">
-   
+	<!-- </div> -->
+ 
+    <br>
+    <div class="row">
+      <div class="small-4 small-offset-2 end columns">
+        <input type="submit" name="submit" class="small button expand" id="save-system" value="Save">
+      </div>
+    </div>
+ 
 	</form>
 {% endif %}
 
@@ -413,11 +465,15 @@ $(document).foundation({
 
 
    // for datetimepicker
-   var startDtInput = $("font:contains('start_time'), font:contains('Start Time')").parent().next().find("input");
+   //var startDtInput = $("font:contains('label_start_time'), font:contains('Start Time')").parent().next().find("input");
+   var startDtInput = $("#label_start_time")
+   // alert(startDtInput)
    // var startDtInput = $("font:contains('start_time'), font:contains('Start Time')");
    // startDtInput = startDtInput.parent().next().find("input");
 
-   var endDtInput = $("font:contains('end_time'), font:contains('End Time')").parent().next().find("input");
+   // var endDtInput = $("font:contains('label_end_time'), font:contains('End Time')").parent().next().find("input");
+   var endDtInput = $("#label_end_time")
+   // alert(endDtInput)
    // var endDtInput = $("font:contains('end_time')");
    // endDtInput = endDtInput.parent().next().find("input");
 
