@@ -9,13 +9,13 @@
   {% elif field_type == "unicode" %}
   <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} />
   {% if is_required_field %}
-  <small class="error">Please select {{field.altnames}}!!!</small>
+  <small class="error">Please fill {{field.altnames}}!!!</small>
   {% endif %}
 
   {% elif field_type == "datetime" %}
-  <input type="text" id="{{field.name}}" name="{{field.name}}" value="" {% if is_required_field %}required{% endif %} />
+  <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value}}" {% if is_required_field %}required{% endif %} />
   {% if is_required_field %}
-  <small class="error">Please select {{field.altnames}}!!!</small>
+  <small class="error">Please set {{field.altnames}}!!!</small>
   {% endif %}
 
   {% elif is_list_of %}

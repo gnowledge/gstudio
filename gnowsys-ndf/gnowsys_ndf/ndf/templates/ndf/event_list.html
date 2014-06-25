@@ -3,79 +3,72 @@
 
 {% block body_content %} 
   
-  {# template for showing apt_set_instance list #}
-
-  {% if app_set_template %}
-
-    
-    {% if nodes %}
-      {% autopaginate nodes 25 %}
-    
-      <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
-        
-        <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
-        
-        <input class="button confirmDeleteObjects" type="button" value="Confirm">
-        <input class="button cancelDeleteObjects" type="button" value="Cancel">
-        <div id="deletion_results"></div>
-        <a class="close-reveal-modal">&#215;</a>
-
-      </div>
-
-      {% if user.is_authenticated %}
-        <input class="button deleteObjects" type="button" value="Delete">
-      {% endif %}
+  {% if nodes %}
+    {% autopaginate nodes 25 %}
+  
+    <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
       
-      <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
+      <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
+      
+      <input class="button confirmDeleteObjects" type="button" value="Confirm">
+      <input class="button cancelDeleteObjects" type="button" value="Cancel">
+      <div id="deletion_results"></div>
+      <a class="close-reveal-modal">&#215;</a>
 
-        {% csrf_token %}
-        <input name="search" type="textbox" value="" style="width:300px;">
-        <input type="hidden" name="class" value="{{class_name}}">
-        <input type="submit" value="search" style="width:100px;">
+    </div>
 
-      </form>
+    {% if user.is_authenticated %}
+      <input class="button deleteObjects" type="button" value="Delete">
     {% endif %}
-
-    <table >
-      <thead>
-        <tr>
     
-          {% if nodes %}
-    
-            <th width="20"> <input class="checkedAll" type="checkbox"></th>
-            <th width="150">Title</th>
-            <th width="150">Created by</th>
-            <th width="150">Creation date</th>
-            <th width="150">Edit</th>
-      
-          {% endif %}
-    
-        </tr>
-      </thead>
-      
-      <tbody>
-        {% for each in nodes %}
-          <tr>
-        
-            <td  id="{{each.id}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-            <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_detail' groupid app_id app_set_id each.id %}">{{each.name}}</a></td>
-            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
-            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
-            <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_edit' groupid app_id app_set_id each.id %}" class="button medium">Edit</a></td>
-        
-          </tr>
-          
-          {% empty %}
-          <h5>This group doesn't have any events. <b>Be the first to create an event!</b></h5>
+    <form method="POST" style="float:right; margin-top:15px;padding-top:10px;">
 
-        {% endfor %}
+      {% csrf_token %}
+      <input name="search" type="textbox" value="" style="width:300px;">
+      <input type="hidden" name="class" value="{{class_name}}">
+      <input type="submit" value="search" style="width:100px;">
 
-      </tbody>
-    </table>
-
-    {% paginate %}
+    </form>
   {% endif %}
 
+  <table >
+    <thead>
+      <tr>
+  
+        {% if nodes %}
+  
+          <th width="20"> <input class="checkedAll" type="checkbox"></th>
+          <th width="150">Title</th>
+          <th width="150">Created by</th>
+          <th width="150">Creation date</th>
+          <th width="150">Edit</th>
+    
+        {% endif %}
+  
+      </tr>
+    </thead>
+    
+    <tbody>
+      {% for each in nodes %}
+        <tr>
+      
+          <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox"> </td>
+          <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name}}</a></td>
+          <td  class="created_by" style="font-size:11px;">{{each.user_details_dict.created_by}}</td>
+          <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
+          <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_edit' groupid app_id app_set_id each.pk %}" class="button medium">Edit</a></td>
+      
+        </tr>
+        
+        {% empty %}
+        <h5>This group doesn't have any events. <b>Be the first to create an event!</b></h5>
+
+      {% endfor %}
+
+    </tbody>
+  </table>
+
+  {% paginate %}
 
 {% endblock %}
 
