@@ -33,7 +33,7 @@
 
       <dl class="row tabs" data-tab>
         <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
-
+        <dd ><a href="#view-scheduler-calendar"><i class="fi-calendar"></i> Events </a></dd>
         <dd>
           <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
@@ -220,6 +220,13 @@
           <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
             <a class="close-reveal-modal">&#215;</a>
             {% include "ndf/graph_dependency.html" %}
+          </div>
+
+          <!-- Tab View Scheduler-Calender -->
+          <div class="content" id="view-scheduler-calendar" >    
+
+            #{#%# include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
+
           </div>
           
           <!-- Tab View Map Widget -->
