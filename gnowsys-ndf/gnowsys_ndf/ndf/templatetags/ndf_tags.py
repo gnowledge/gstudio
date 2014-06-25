@@ -1190,6 +1190,13 @@ def html_widget(node_id, field):
       if len(field_value_choices) == 2:
         is_mongokit_is_radio = True
 
+    elif field_type == bool:
+      # print "\n ", field['name'], " -- ", field_type, " -- ", field_value
+      # field_value_choices = ["True", "False"]
+      # field_value = str(field_value)
+      field_value_choices = [True, False]
+      # print " ", type(field_value), " -- ", type(field_value_choices[0])
+
     # print "\n ", field['name'], " -- ", field['value'], " -- ", type(field_value)
     # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
 

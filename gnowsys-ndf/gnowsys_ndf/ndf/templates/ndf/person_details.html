@@ -60,8 +60,7 @@
             <div class="small-3 columns"> 
               <label>{{field.altnames}}</label>
             </div>
-            <div class="small-5 end columns">
-              {{field.data_type}}
+            <div class="small-7 end columns">
               {% if field.type == "RelationType" %}
                 {% for details in field.value %}
                 <label>{{details.name}}</label>
