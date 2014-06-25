@@ -34,21 +34,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 {% block script %}
 
-function checkIt()
-{   
-var totla_users = '{{users_in_group|length}}'
-var batch_count = $('#txt_batch_count').val
-alert(batch_count,total_users)
-if (batch_count > total_users)   
-{      
-alert('No of batches should be less than No fo users in this group');
-     return false;   
-}   
-return true;
-}
 
 <!-- Ajax for getting user List  -->
-  jQuery(document).ready(function($) { 
+/*  jQuery(document).ready(function($) { 
   $('.small.button.expand').on("click",function() {
   node_id = $(this).attr("id")
   var ajurl ="{% url 'get_author_set_users' groupid %}?_id="+node_id;
@@ -57,12 +45,12 @@ return true;
   success: function(data){
   $('#batch_users').html(data); },
   }); });
-  
+  */
 <!-- End Ajax -->
 
 
 <!-- Ajax for removing user from  List  -->
-  $(document).on('click',".button.alert.tiny.remove",function(){
+/*  $(document).on('click',".button.alert.tiny.remove",function(){
   user_id = $(this).attr("id")
   node_id = $('#node_id').val()
   var ajurl ="{% url 'remove_user_from_author_set' groupid %}?_id="+node_id+"&user_id="+user_id;
@@ -73,15 +61,21 @@ return true;
   });}); 
 
   });
+*/
 <!-- End Ajax -->
 
 <!-- Script to validate form -->
 $("form").submit(function(event) {
-var len_user = parseInt('{{users_in_group|length}}')
+var len_user = parseInt('{{student_count}}')
 var txt_input = parseInt($("#txt_batch_count").val())
 if(txt_input > len_user)
 {
  alert("No of batches should not be more than No of Users");
+ event.preventDefault();
+}
+if(txt_input <= 0)
+{
+ alert("No of batches should not be equalto or less than zero");
  event.preventDefault();
 }
 });
@@ -89,11 +83,13 @@ if(txt_input > len_user)
 
 {% endblock %}
 
-{% block body_content %}
-{% get_group_name groupid as group_name_tag %}
+{% block meta_content %}
+  <h2>Batch</h2>
+{% endblock %}
 
-<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-  <li class="create card">
+
+{% block related_content %}
+  <div class="create card">
   <div class="page">
     <h4><i class="fi-plus"></i> New</h4>
       {% if user.is_authenticated %}
@@ -105,8 +101,18 @@ if(txt_input > len_user)
       {% endif %}
       {% endif %}
   </div>
-</li>
+</div>
+{% endblock %}
 
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+
+<header class="row">
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Batches {% if batch_coll.count %}({{ batch_coll.count }}){% endif %}</a></dd>
+  </dl>
+</header>
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 {% for node in batch_coll %}
@@ -126,13 +132,15 @@ if(txt_input > len_user)
         </div>
       </h4>
     </header>
-    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-    <a  class="small button expand" href="#" data-reveal-id="batch_users" id="{{node.pk}}">Detail</a> 
+   <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+    <a  class="small button expand" href="{% url 'detail' groupid node %}" id="{{node.pk}}">Detail</a> 
     {% get_user_object node.created_by as user_obj %}
     {% ifequal user_obj.username user.username %}
     <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
     {% endifequal %}
+    {% comment %}
      <a class="button  tiny" href="{% url 'edit' groupid node %}">Edit</a>
+     {% endcomment %}
     <footer class="row">
     </footer>
   </div>
@@ -145,10 +153,10 @@ if(txt_input > len_user)
 <!-- Reveal Modals begin -->
 
 <div id="firstModal" class="reveal-modal" data-reveal>
-<form data-abide id="form-create-batch" method="POST" action="{% url 'create' groupid %}">{% csrf_token %}
+<form data-abide id="form-create-batch" method="POST" action="{% url 'create_new' groupid %}">{% csrf_token %}
 <div class="row">
   <div class="small-2 large-4 columns">
-    <b>Users Present in this group:{{users_in_group|length}}</b>
+    <b>Student Present in this group:{{student_count}}</b>
   </div>
 </div>
 <br>
@@ -168,8 +176,6 @@ if(txt_input > len_user)
 </div>
 <a class="close-reveal-modal">&#215;</a>
 </form>
-</div>
-<div id="batch_users" class="reveal-modal" data-reveal>
 </div>
 <!-- Reveal Model end -->
 

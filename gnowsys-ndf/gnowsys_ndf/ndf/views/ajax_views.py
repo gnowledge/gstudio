@@ -859,12 +859,35 @@ def get_data_for_user_drawer(request, group_id,):
                 dic['id'] = user.id   
                 dic['name'] = user.username
                 d2.append(dic)
-        draw1['drawer2'] = d2
-        data_list.append(draw1)
+        draw2['drawer2'] = d2
+        data_list.append(draw2)
         return HttpResponse(json.dumps(data_list))
     else:
         return HttpResponse("GSystemType for batch required")
-
+def get_data_for_batch_drawer(request, group_id):
+    '''
+    This method will return data for batch drawer widget
+    '''
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    drawer1 = []
+    drawer2 = []
+    data_list = []
+    st = collection.Node.one({'_type':'GSystemType','name':'Student'})
+    batch_coll = collection.GSystem.find({'member_of': {'$all': [st._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    for each in batch_coll:
+        dic = {}
+        dic['id'] = str(each._id)
+        dic['name'] = each.name
+        d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
+    draw2['drawer2'] = d2
+    data_list.append(draw1)
+    return HttpResponse(json.dumps(data_list))
+        
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
