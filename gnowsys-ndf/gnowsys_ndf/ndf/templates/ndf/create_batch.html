@@ -40,7 +40,15 @@ function set_drawer_value(group_id)
  $('#collection_set_drawer2').html("");
  $('#collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="\
 collection_set_search" class="margin-0"></li>');
+  var _id = '{{batch.pk}}'
+  if (_id != "")
+  {
+  var url = '/{{groupid}}/ajax/get_data_for_user_drawer/?st_batch_id='+st_batch_id+'&'+'_id='+_id;
+  }
+  else
+  {
   var url = '/{{groupid}}/ajax/get_data_for_user_drawer/?st_batch_id='+st_batch_id;
+  }
   $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
    if(index == 0)
@@ -101,7 +109,11 @@ $('#sel_course').change(function () {
 	<select name="courses" id="sel_course">
 	  <option value="">--select--</option>
 	  {% for each in fc_courses %}
-          <option value="{{each.pk}}">{{each.name}}</option>
+	  {% if each.name == course_name %}
+          <option selected value="{{each.pk}}">{{each.name}}</option>
+	  {% else %}
+	  <option  value="{{each.pk}}">{{each.name}}</option>
+	  {% endif %}
           {% endfor %}
 	</select>
       </label>
@@ -110,8 +122,9 @@ $('#sel_course').change(function () {
    <div class="row">
     <div class="large-9 columns">
       <label>Enter Batch Name
-	<input type="text" placeholder="Batch Name" id="txt_batch_name" name="batch_name" />
+	<input type="text" placeholder="Batch Name" id="txt_batch_name" name="batch_name" value="{{batch.name}}" />
 	<input type="hidden" name="batch_count" value="{{batch_count}}"/>
+	<input type="hidden" name="node_id" value="{{batch.pk}}"/>
       </label>
     </div>
   </div>
