@@ -1,6 +1,8 @@
 ''' -- imports from python libraries -- '''
+import os
 import ast
-from datetime import datetime
+# from datetime import datetime
+import datetime
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -21,6 +23,7 @@ except ImportError:  # old pymongo
 # from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.views.event import *
+from gnowsys_ndf.ndf.views.person import *
 
 collection = get_database()[Node.collection_name]
 

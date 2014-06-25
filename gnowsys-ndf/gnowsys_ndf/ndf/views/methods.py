@@ -765,11 +765,32 @@ def get_property_order_with_value(node):
         if type(field_id_or_name) == ObjectId: #ObjectId.is_valid(field_id_or_name):
           # For attribute-field(s) and/or relation-field(s)
           
-          field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_id': 1, 'name': 1, 'altnames': 1})
+          field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'subject_type': 1, 'name': 1, 'altnames': 1})
           # list_field_set.append([demo['member_of'], field, demo[field.name]])
-          list_field_set.append({ '_id': field._id, 
+          altnames = u""
+          if field._type == RelationType or field._type == "RelationType":
+            if field.altnames:
+              if ";" in field.altnames:
+                # print "\n altnames: ", field.altnames
+                if set(demo["member_of"]).issubset(field.subject_type):
+                  # It means we are dealing with normal relation
+                  altnames = field.altnames.split(";")[1]
+                else:
+                  # It means we are dealing with inverse relation
+                  altnames = field.altnames.split(";")[0]
+              else:
+                altnames = field.altnames
+
+          else:
+            # For AttributeTypes
+            altnames = field.altnames
+
+          # print " field._id: ", field._id, " --  field.altnames: ", altnames
+
+          list_field_set.append({ 'type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
+                                  '_id': field._id, 
                                   'data_type': demo.structure[field.name],
-                                  'name': field.name, 'altnames': field.altnames,
+                                  'name': field.name, 'altnames': altnames,
                                   'value': demo[field.name]
                                 })
 

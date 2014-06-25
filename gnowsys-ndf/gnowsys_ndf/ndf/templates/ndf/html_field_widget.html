@@ -1,15 +1,32 @@
 {% load ndf_tags %}
-
+<!-- {{field.name}} -- {{field_type}} -->
 <!-- Base fields / AttributeType fields -->
 {% if is_base_field or is_attribute_field %}
   {% if is_special_field %}
   <!-- Intentionally put this field at the top, as below because of it's data-type different widget may come -->
   {% include included_template_name with var_name=field.name var_placeholder="Enter the content here" var_value=field_value|default_if_none:"" node_id=node_id %}
 
-  {% elif field_type == "unicode" %}
+  {% elif is_mongokit_is_radio %}
+  {% for value in field_value_choices %}
+  {% if forloop.counter != 1 %}
+  &nbsp;&nbsp;&nbsp;
+  {% endif %}
+  <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
+  {% endfor %}
+  {% if is_required_field %}
+  <small class="error">Please select {{field.altnames}}!!!</small>
+  {% endif %}
+
+  {% elif field_type == "unicode" or field_type == "basestring" %}
   <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} />
   {% if is_required_field %}
   <small class="error">Please fill {{field.altnames}}!!!</small>
+  {% endif %}
+
+  {% elif field_type == "long" %}
+  <input type="number" maxlength="{{field.maxlength}}" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} />
+  {% if is_required_field %}
+  <small class="error">Please fill valid {{field.altnames}}!!!</small>
   {% endif %}
 
   {% elif field_type == "datetime" %}

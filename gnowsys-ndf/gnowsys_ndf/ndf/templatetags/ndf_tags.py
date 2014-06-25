@@ -10,6 +10,8 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
+from mongokit import IS
+
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS as setting_gapps, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
@@ -1166,6 +1168,8 @@ def html_widget(node_id, field):
 
   is_required_field = False
 
+  is_mongokit_is_radio = False # False for drop-down True for radio buttons
+
   try:
     if node_id:
       node_id = ObjectId(node_id)
@@ -1176,11 +1180,23 @@ def html_widget(node_id, field):
 
     # field_type = gs.structure[field['name']]
     field_type = field['data_type']
+    field_altnames = field['altnames']
     field_value = field['value']
-    print "\n ", field['name'], " -- ", field['value'], " -- ", type(field_value)
+    # print "\n IS: ", IS
+    if type(field_type) == IS:
+      field_value_choices = field_type._operands
+      # print "\n operands: ", field_value
+
+      if len(field_value_choices) == 2:
+        is_mongokit_is_radio = True
+
+    # print "\n ", field['name'], " -- ", field['value'], " -- ", type(field_value)
+    # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
 
     if field.has_key('_id'):
       field = collection.Node.one({'_id': field['_id']})
+
+    field['altnames'] = field_altnames
 
     if not field_value:
       field_value = ""
@@ -1190,6 +1206,7 @@ def html_widget(node_id, field):
     else:
       field_type = field_type.__str__()
 
+    # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
     is_list_of = (field_type in LIST_OF)
 
     is_special_field = (field['name'] in SPECIAL_FIELDS.keys())
@@ -1227,6 +1244,7 @@ def html_widget(node_id, field):
             'is_attribute_field': is_attribute_field,
             'is_relation_field': is_relation_field,
             'is_list_of': is_list_of,
+            'is_mongokit_is_radio': is_mongokit_is_radio,
             'is_special_field': is_special_field, 'included_template_name': included_template_name,
             'is_required_field': is_required_field
             # 'is_special_tab_field': is_special_tab_field
