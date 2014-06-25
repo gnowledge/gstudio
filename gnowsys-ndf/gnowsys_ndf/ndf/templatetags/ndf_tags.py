@@ -25,6 +25,7 @@ collection = db[Node.collection_name]
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'}, {'name':'apps_list'}]})
 translation_set=[]
 check=[]
+import json,ox
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
@@ -190,49 +191,49 @@ def get_all_replies(parent):
 	 return ex_reply
 
 
-@register.inclusion_tag('ndf/drawer_widget.html')
-def edit_drawer_widget(field, group_id, node, checked=None):
+# @register.inclusion_tag('ndf/drawer_widget.html')
+# def edit_drawer_widget(field, group_id, node, checked=None):
 
-	drawers = None
-	drawer1 = None
-	drawer2 = None
+# 	drawers = None
+# 	drawer1 = None
+# 	drawer2 = None
 
-	if node :
-		if field == "collection":
-			if checked == "Quiz":
-				checked = "QuizItem"
-			elif checked == "Theme":
-				checked = "Theme"
-			else:
-				checked = None
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-		elif field == "prior_node":
-			checked = None
-			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
-		elif field == "module":
-			checked = "Module"
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+# 	if node :
+# 		if field == "collection":
+# 			if checked == "Quiz":
+# 				checked = "QuizItem"
+# 			elif checked == "Theme":
+# 				checked = "Theme"
+# 			else:
+# 				checked = None
+# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+# 		elif field == "prior_node":
+# 			checked = None
+# 			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+# 		elif field == "module":
+# 			checked = "Module"
+# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
 		
-		drawer1 = drawers['1']
-		drawer2 = drawers['2']
+# 		drawer1 = drawers['1']
+# 		drawer2 = drawers['2']
 
-	else:
-		if field == "collection" and checked == "Quiz":
-			checked = "QuizItem"
+# 	else:
+# 		if field == "collection" and checked == "Quiz":
+# 			checked = "QuizItem"
 
-		elif field == "collection" and checked == "Theme":
-			checked = "Theme"
+# 		elif field == "collection" and checked == "Theme":
+# 			checked = "Theme"
 			
-		elif field == "module":
-			checked = "Module"
+# 		elif field == "module":
+# 			checked = "Module"
 			
-		else:
-			# To make the collection work as Heterogenous one, by default
-			checked = None
+# 		else:
+# 			# To make the collection work as Heterogenous one, by default
+# 			checked = None
 
-		drawer1 = get_drawers(group_id, None, [], checked)
+# 		drawer1 = get_drawers(group_id, None, [], checked)
 
-	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
+# 	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
@@ -360,15 +361,56 @@ def get_gapps_menubar(group_id, selectedGapp):
 		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
+global_thread_rep_counter = 0	# global variable to count thread's total reply
+global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
+def thread_reply_count( oid ):
+	'''
+	Method to count total replies for the thread.
+	'''
+	thr_rep = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}]})
+	global global_thread_rep_counter		# to acces global_thread_rep_counter as global and not as local, 
+	global global_thread_latest_reply
+
+	if thr_rep and (thr_rep.count() > 0):
+		for each in thr_rep:
+
+			global_thread_rep_counter += 1
+
+			if not global_thread_latest_reply["content_org"]:
+				global_thread_latest_reply["content_org"] = each.content_org
+				global_thread_latest_reply["last_update"] = each.last_update
+				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+			else:
+				if global_thread_latest_reply["last_update"] < each.last_update:
+					global_thread_latest_reply["content_org"] = each.content_org
+					global_thread_latest_reply["last_update"] = each.last_update
+					global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+					
+			thread_reply_count(each._id)
+	
+	return global_thread_rep_counter
+	
+
 @register.assignment_tag
 def get_forum_twists(forum):
 	gs_collection = db[Node.collection_name]
-	ret_replies=[]
-	exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+	ret_replies = []
+	exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
 	exstng_reply.sort('created_at')
+	global global_thread_rep_counter 		# to acces global global_thread_rep_counter and reset it to zero
+	global global_thread_latest_reply
+	# for loop to get count of each thread's total reply
 	for each in exstng_reply:
+		global_thread_rep_counter = 0		# reset global_thread_rep_counter to zero
+		global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
+
+		# as each thread is dict, adding one more field of thread_reply_count
+		each['thread_reply_count'] = thread_reply_count(each._id)
+		each['latest_reply'] = global_thread_latest_reply
 		ret_replies.append(each)
+
 	return ret_replies
+
 
 lp=[]
 def get_rec_objs(ob_id):
@@ -453,20 +495,24 @@ def get_existing_groups_excluding_username():
 			group.append(items)
 	return group
 
-
 @register.assignment_tag
 def get_existing_groups_excluded(grname):
-	group = []
-	col_Group = db[Group.collection_name]
-	colg = col_Group.Group.find({'_type':u'Group', 'group_type': "PUBLIC"})  
-	colg.sort('name')
-	gr=list(colg)
-	for items in gr:
-		if items.name != grname:
-			group.append(items)
-	if not group:
-		return "None"
-	return group
+  """
+  Returns only first 10 public group(s) (sorted by last_update field in descending order) 
+  excluding the currently selected group if it comes under the searching criteria
+
+  Keyword arguments:
+  grname -- name of the group which is currently selected
+
+  Returns:
+  list of group node(s) resulted after given searching criteria
+  """
+  group_cur = collection.Node.find({'_type':u"Group", 'name': {'$nin': [u"home", grname]}, 'group_type': "PUBLIC"}).sort('last_update', -1).limit(10)
+
+  if group_cur.count() <= 0:
+    return "None"
+
+  return group_cur
 
 @register.assignment_tag
 def get_group_policy(group_id,user):
@@ -481,48 +527,38 @@ def get_group_policy(group_id,user):
 	return policy
 
 @register.assignment_tag
-def get_user_group(user):
-	
-		group = [] 
-		author = None
-		auth_type = ""    
-		
-		col_Group = db[Group.collection_name]
-		collection = db[Node.collection_name]
-		
-		group_gst = collection.Node.one({'_type': 'GSystemType', 'name': 'Group'})
-		auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})
+def get_user_group(user, selected_group_name):
+  """
+  Returns first 10 group(s) to which logged-in user is subscribed to (sorted by last_update field in descending order) 
+  excluding the currently selected group if it comes under the searching criteria
 
-		if auth_obj:
-			auth_type = auth_obj._id
+  Keyword arguments:
+  user -- django's user object
 
-		colg = col_Group.Group.find({ '_type': {'$in': ['Group','Author']},  
-																'name': {'$nin': ['home']},
-																'$or':[{'created_by':user.id}, {'group_type':'PUBLIC'},{'author_set':user.id} ] 
-															})
+  selected_group_name -- name of the group which is currently selected
 
-		auth = col_Group.Group.one({'_type': u"Author", 'name': unicode(user.username)})
-		
-		if auth:
-			for items in colg:
-				if items.created_by == user.pk:
-					if items.name == auth.name:
-						author = items
-					else:
-						if not items.prior_node:
-							group.append(items)
-				else:
-					if items.author_set or (items.group_type == "PUBLIC" and group_gst._id in items.member_of):
-						group.append(items)
+  Returns:
+  list of group and/or author (logged-in) node(s) resulted after given searching criteria
+  """
+  group_list = []
+  auth_group = None
 
-		if author:
-			group.append(author)
+  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(9)
 
-		if not group:
-			return "None"
+  auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
-		return group
-	
+  if group_cur.count():
+    for g in group_cur:
+      group_list.append(g)
+
+  if auth_group:
+    # Appends author node at the bottom of the list, if it exists
+    group_list.append(auth_group)
+
+  if not group_list:
+    return "None"
+
+  return group_list
 
 
 @register.assignment_tag
@@ -606,6 +642,26 @@ def get_edit_url(groupid):
 		else:
 			return 'file_edit'
 
+@register.assignment_tag
+def get_create_url(groupid):
+
+  node = collection.Node.one({'_id': ObjectId(groupid) }) 
+  if node._type == 'GSystem':
+
+    type_name = collection.Node.one({'_id': node.member_of[0]}).name
+
+    if type_name == 'Quiz':
+      return 'quiz_create'    
+    elif type_name == 'Page':
+      return 'page_create_edit' 
+    elif type_name == 'QuizItem':
+      return 'quiz_item_create'
+
+  elif node._type == 'Group' or node._type == 'Author' :
+    return 'create_group'
+
+  elif node._type == 'File':
+    return 'uploadDoc'
 	
 
 
@@ -622,8 +678,12 @@ def get_group_type(group_id, user):
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
 			else:
-				colg = None
-		
+				colg = col_Group.Group.find_one({'_type': 'Group', 'name': gid})
+				if colg :
+					pass
+				else:		
+					colg = None
+  		
 		#check if Group exist in the database
 		if colg is not None:
 
@@ -651,7 +711,6 @@ def get_group_type(group_id, user):
 		print "Error in group_type_tag "+str(e)
 		colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return "pass"
-		
 
 
 
@@ -688,7 +747,7 @@ def get_grid_fs_object(f):
 def get_class_list(class_name):
 	"""Get list of class 
 	"""
-	class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]
+	class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "MetaType", "GRelation", "GAttribute"]
 	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data"}
 
 @register.inclusion_tag('ndf/admin_class.html')
@@ -730,6 +789,7 @@ def get_policy(group, user):
   else:
     return False
 
+
 @register.inclusion_tag('ndf/admin_fields.html')
 def get_input_fields(fields_type,fields_name,translate=None):
 	"""Get html tags 
@@ -754,15 +814,63 @@ def group_type_info(groupid,user=0):
 
 			
 @register.assignment_tag
-def user_access_policy(node,user):
-	try:
-		col_Group=db[Group.collection_name]
-		group_gst = col_Group.Group.one({'_id':ObjectId(node)})
-		# if user.id in group_gst.group_set or group_gst.created_by == user.id:
-		if user.id in group_gst.author_set or group_gst.created_by == user.id :
-			return 'allow'
-	except Exception as e:
-		print "Exception in user_access_policy- "+str(e)
+def user_access_policy(node, user):
+  """
+  Returns status whether logged-in user is able to access any resource.
+
+  Check is performed in given sequence as follows (sequence has importance):
+  - If user is superuser, then he/she is allowed
+  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
+  - Else if user is creator of the group, then he/she is allowed
+  - Else if user is member of the group, then he/she is allowed
+  - Else user is NOT allowed!
+
+  Arguments:
+  node -- group's node that is currently selected by the user_access
+  user -- user's node that is currently logged-in
+
+  Returns:
+  string value (allow/disallow), i.e. whether user is allowed or not!
+  """
+	# try:
+	# 	col_Group=db[Group.collection_name]
+	# 	group_gst = col_Group.Group.one({'_id':ObjectId(node)})
+	# 	# if user.id in group_gst.group_set or group_gst.created_by == user.id:
+	# 	if user.id in group_gst.author_set or group_gst.created_by == user.id :
+	# 		return 'allow'
+	# except Exception as e:
+	# 	print "Exception in user_access_policy- "+str(e)
+
+  user_access = False
+
+  try:
+    if user.is_superuser:
+      user_access = True
+
+    else:
+      group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
+
+      if user.id == group_node.created_by:
+        user_access = True
+
+      elif group_node.edit_policy == "NON_EDITABLE":
+        user_access = False
+
+      elif user.id in group_node.author_set:
+        user_access = True
+
+      else:
+        user_access = False
+
+    if user_access:
+      return "allow"
+
+    else:
+      return "disallow"
+
+  except Exception as e:
+    error_message = "\n UserAccessPolicyError: " + str(e) + " !!!\n"
+    raise Exception(error_message)
 			
 		
 @register.assignment_tag
@@ -853,50 +961,96 @@ def Group_Editing_policy(groupid,node,user):
 
 
 @register.assignment_tag
-def get_publish_policy(request,groupid,res_node):
- col_Group = db[Group.collection_name]
- node=col_Group.Group.one({"_id":ObjectId(groupid)})
- resnode=col_Group.Group.one({"_id":ObjectId(res_node._id)})
- group_type=group_type_info(groupid)
- group=user_access_policy(groupid,request.user)
- ver=node.current_version
- if request.user.id:
-	 if group_type == "Moderated":
-			base_group=get_prior_post_node(groupid)
-			if base_group is not None:
-				if base_group.status == "DRAFT" or node.status == "DRAFT":
-						return "allow"
-	 elif node.edit_policy == "NON_EDITABLE":
-		if resnode._type == "Group":
-			if ver == "1.1" or resnode.created_by != request.user.id :
-				 return "stop"
-		if group == "allow":          
-			if res_node.status == "DRAFT": 
-					return "allow"    
-	 elif node.edit_policy == "EDITABLE_NON_MODERATED":
-			 #condition for groups
-			 if resnode._type == "Group":
-				 if ver == "1.1" or resnode.created_by != request.user.id:
-					 # print "\n version = 1.1\n"
-					 return "stop"
-			 if group == "allow":
-				 # print "\n group = allow\n"
-				 if res_node.status == "DRAFT": 
-					 return "allow"
+def get_publish_policy(request, groupid, res_node):
+  resnode = collection.Node.one({"_id": ObjectId(res_node._id)})
+
+  if resnode.status == "DRAFT":
+    node = collection.Node.one({"_id": ObjectId(groupid)})
+
+    group_type = group_type_info(groupid)
+    group = user_access_policy(groupid,request.user)
+    ver = node.current_version
+    
+    if request.user.id:
+      if group_type == "Moderated":
+      	base_group=get_prior_post_node(groupid)
+      	if base_group is not None:
+      		if base_group.status == "DRAFT" or node.status == "DRAFT":
+    				return "allow"
+
+      elif node.edit_policy == "NON_EDITABLE":
+        if resnode._type == "Group":
+        	if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+        		return "stop"
+        if group == "allow":          
+        	if resnode.status == "DRAFT": 
+        			return "allow"    
+
+      elif node.edit_policy == "EDITABLE_NON_MODERATED":
+        #condition for groups
+        if resnode._type == "Group":
+          if ver == "1.1" or (resnode.created_by != request.user.id and not request.user.is_superuser):
+            # print "\n version = 1.1\n"
+            return "stop"
+
+        if group == "allow":
+          # print "\n group = allow\n"
+          if resnode.status == "DRAFT": 
+            return "allow"
+
+
+@register.assignment_tag
+def get_resource_collection(groupid, resource_type):
+  """
+  Returns collections of given resource-type belonging to currently selected group
+
+  Arguments:
+  groupid -- ObjectId (in string format) of currently selected group
+  resource_type -- Type of resource (Page/File) whose collections need to find
+
+  Returns:
+  Mongodb's cursor object holding nodes having collections
+  """
+  try:
+    gst = collection.Node.one({'_type': "GSystemType", 'name': unicode(resource_type)})
+
+    res_cur = collection.Node.find({'_type': {'$in': [u"GSystem", u"File"]},
+                                    'member_of': gst._id,
+                                    'group_set': ObjectId(groupid),
+                                    'collection_set': {'$exists': True, '$not': {'$size': 0}}
+                                  })
+    return res_cur
+
+  except Exception as e:
+    error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
+    raise Exception(error_message)
+
+# getting video metadata from wetube.gnowledge.org
+@register.assignment_tag
+def get_pandoravideo_metadata(src_id):
+  try:
+    api=ox.api.API("http://wetube.gnowledge.org/api")
+    data=api.get({"id":src_id,"keys":""})
+    mdata=data.get('data')
+    return mdata
+  except Exception as e:
+    return 'null'
+
+
 
 @register.assignment_tag
 def get_source_id(obj_id):
-	try:
-		source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
-		att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
-		return att_set.object_value
-	except Exception as e:
-		print str(e)
-		return 'null'
+  try:
+    source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
+    return att_set.object_value
+  except Exception as e:
+    return 'null'
+
  
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
-	r_list.append(obj_id._id)
-	relation_set=obj_id.get_possible_relations(obj_id.member_of)
+        r_list.append(obj_id._id)
+    	relation_set=obj_id.get_possible_relations(obj_id.member_of)
 	if relation_set.has_key('translation_of'):  
 		for k,v in relation_set['translation_of'].items():                      
 			if k == 'subject_or_right_subject_list':
@@ -911,7 +1065,7 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
 
 @register.assignment_tag
 def get_possible_translations(obj_id):
-	translation_list = []
+        translation_list = []
 	r_list1 = []
 	return get_translation_relation(obj_id,r_list1,translation_list)
 

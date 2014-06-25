@@ -41,6 +41,20 @@ def get_all_gapps():
   all_gapps=coln.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type_gapp._id]}}]})    
   return list(all_gapps)
 
+#checks forum notification turn off for an author object
+def forum_notification_status(group_id,user_id):
+  grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
+  auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
+  at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
+  if at_user_pref:
+    poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
+    if poss_attrs:
+      list_at_pref=poss_attrs['user_preference_off']['object_value']
+      if grp_obj in list_at_pref:
+        return False
+      else:
+        return True
+
 def get_forum_repl_type(forrep_id):
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
@@ -89,7 +103,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
     collection = db[Node.collection_name]
-    
+        
     drawer = None    
     
     if checked:     
@@ -134,20 +148,28 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Forum":
         gst_forum_id = collection.Node.one({'_type': "GSystemType", 'name': "Forum"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_forum_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
       elif checked == "Module":
         gst_module_id = collection.Node.one({'_type': "GSystemType", 'name': "Module"})._id
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$all':[gst_module_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+
       elif checked == "Pandora Video":
         gst_pandora_video_id = collection.Node.one({'_type': "GSystemType", 'name': "Pandora_video"})._id
         drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
+
       elif checked == "Theme":
-        theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
-        topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST, topic_GST]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id, topic_GST_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+
+      elif checked == "Topic":
+        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id, topic_GST_id]},'group_set': {'$all': [ObjectId(group_id)]}})   
 
     else:
+      # For heterogeneous collection      
       drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
-
            
     
     if (nid is None) and (not nlist):

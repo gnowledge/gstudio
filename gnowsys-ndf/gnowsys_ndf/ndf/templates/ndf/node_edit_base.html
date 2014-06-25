@@ -56,11 +56,11 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  <a href="#panel-name-description">{% block page_tab %} Page {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
-	  <a href="#panel-prior-node">Prior Node</a>
+	  <a href="#panel-prior-node" class="prior_node_tab">Prior Node</a>
 	</dd>
 	<!-- change name of collection tab overide block in your code -->
 	<dd title="Click here to add/edit collection">
-	  <a href="#panel-collection">{% block collection_tab %}Collection {% endblock %}</a> 
+	  <a href="#panel-collection" class="collection_tab">{% block collection_tab %}Collection {% endblock %}</a> 
 	</dd>  
 	
      </dl>
@@ -131,7 +131,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	<div class="row">
 	  
-	  <div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+	  <div class="large-6 columns"><label>Language<select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select></label>
 	     </div>
 
 	  <div class="large-6 columns" style="padding: 1.8em;">
@@ -192,7 +192,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	<div class="small-12 columns">
 	  <div id="prior_node_drawer">
-	    {% edit_drawer_widget "prior_node" groupid node title %}
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
 	  </div>
 	</div>
       </div>
@@ -212,7 +212,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 	  <div id="SelectApp" class="row">
 	    <div class="small-2 columns line-height-2pt5">
-	      Classify by :
+	      Classify by:
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="Page"/>
@@ -231,15 +231,18 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      </span>
 	    </div>
 	    <div class="small-2 columns">
+	      <div class="row">
 	      <input type="radio" name="col" value="Video" />
 	      Video <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-video"></i>
-	      </span></div>
-	      <div class="small-2 columns">
+	      </span>
+	      </div>
+	      <div class="row">
 	      <input type="radio" name="col" value="Pandora Video" />
-	      Pandora Video <span class="divider-line">|</span>
+	      Pandora <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-video"></i>
 	      </span>
+	      </div>
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="QuizObj" />
@@ -252,7 +255,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	
 	<div class="small-12 columns">
 	  <div id="collection_drawer" >
-	    {% edit_drawer_widget "collection" groupid node title %}
+	    <!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
 	  </div>
 	</div>
       </div>
@@ -397,6 +400,59 @@ $("#name_id").change(function(){
 			},
 			success: function(data) {
 				$("#collection_drawer").html(data);
+			}
+		});
+
+	});
+
+	$(".prior_node_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#prior_node_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "prior_node",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				// alert(data);
+				$("#prior_node_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+
+	$(".collection_tab").click(function() {
+
+		$("#SelectApp").css("display", "none");
+		$("#save-node").css("display", "none");
+		$('#collection_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+		$("#module_drawer").html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "collection",
+				app:"{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				// alert(data);
+				$("#collection_drawer").html(data);
+				$("#module_drawer").html(data);
+				$("#SelectApp").css("display", "block");				
+				$("#save-node").css("display", "block");
 			}
 		});
 

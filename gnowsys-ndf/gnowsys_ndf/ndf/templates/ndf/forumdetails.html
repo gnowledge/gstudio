@@ -10,6 +10,10 @@
     color: white;
   }
 
+  .gray-text{
+    color: gray;
+  }
+
   .pricing-table li.bullet-item {  text-align: left; }
 
   .forum-summary{
@@ -23,6 +27,9 @@
 
   .forum-summary .user {  font-size: 1.5em;}
   .forum-summary .user i { border-radius: 50px; }
+
+  table .user {  padding-left: 0.5em;}
+  /*table .user i { border-radius: 50px;  }*/
 
   /*.org-content-style, #content > p { color: #6F6F6F !important; font-size: small; }*/
 
@@ -115,7 +122,7 @@
           <th width="200">Thread Name</th>
           <th>Thread Content</th>
           <th width="100">Total Reply</th>
-          <th width="200">Latest Activity</th>
+          <th width="300">Latest Activity</th>
         </tr>
       </thead>
       <tbody>
@@ -131,7 +138,7 @@
                 {{each.name}}
               </a>
               <br/>
-                <i style="color:gray">by {{user_obj.username}}</i>
+                <i class="gray-text">by {{user_obj.username}}</i>
             </td>
           
             <td class="org-content-style">
@@ -140,8 +147,22 @@
               {% endwith %}
             </td>
           
-            <td></td>
-            <td></td>
+            <td class="text-center">{{ each.thread_reply_count }}</td>
+            <td>
+              <div class="row">
+                <div class="small-3 columns">
+                  <a class="user"></a>
+                  <br/>
+                  <i class="gray-text">{{ each.latest_reply.user|truncatechars:10 }}</i>                  
+                </div>
+                <div class="small-9 columns">
+                  {{ each.latest_reply.content_org|truncatechars:25 }}
+                  <br/>
+                  <span class="gray-text">{{ each.latest_reply.last_update }}</span>
+                </div>
+              </div>
+
+            </td>
           </tr>
 
         {% endfor %}

@@ -6,6 +6,7 @@
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
+from django.http import Http404
 from django.core.urlresolvers import reverse
 
 from django.shortcuts import render_to_response
@@ -36,6 +37,8 @@ import json
 db = get_database()
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
+theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 #This function is used to check (while creating a new group) group exists or not
 #This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 def checkgroup(request,group_name):
@@ -258,6 +261,61 @@ def shelf(request, group_id):
       )
 
 
+def drawer_widget(request, group_id):
+  if request.is_ajax() and request.method == "POST":
+    drawers = None
+    drawer1 = None
+    drawer2 = None
+
+    node = request.POST.get("node_id", '')
+    field = request.POST.get("field", '')
+    app = request.POST.get("app", '')
+    # print "\nfield: ", field
+    # print "\n app: ", app
+
+    if node:
+      node = collection.Node.one({'_id': ObjectId(node) })
+      if field == "prior_node":
+        app = None
+
+        drawers = get_drawers(group_id, node._id, node.prior_node, app)
+      elif field == "collection":
+        if app == "Quiz":
+          app = "QuizItem"
+        elif app == "Theme":
+          app = "Theme"
+        elif app == "Topic":
+          app = "Topic"
+        elif app == "Module":
+          app = "Module"
+        else:
+          app = None
+
+        drawers = get_drawers(group_id, node._id, node.collection_set, app)
+      
+      drawer1 = drawers['1']
+      drawer2 = drawers['2']
+
+    else:
+      if field == "collection" and app == "Quiz":
+        app = "QuizItem"
+      elif field == "collection" and app == "Theme":
+        app = "Theme"
+      elif field == "collection" and app == "Course":
+        app = "Module"
+      else:
+        app = None
+
+      drawer1 = get_drawers(group_id, None, [], app)
+
+
+    return render_to_response('ndf/drawer_widget.html', 
+                                { 'widget_for': field,'drawer1': drawer1, 'drawer2': drawer2,
+                                  'group_id': group_id,'groupid': group_id
+                                },
+                                context_instance = RequestContext(request)
+    )
+
 
 def get_collection_list(collection_list, node):
   inner_list = []
@@ -267,18 +325,19 @@ def get_collection_list(collection_list, node):
     for each in node.collection_set:
       col_obj = collection.Node.one({'_id': ObjectId(each)})
       if col_obj:
-        for cl in collection_list:
-          if cl['id'] == node.pk:
-            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
-            inner_sub_list = [inner_sub_dict]
-            inner_sub_list = get_collection_list(inner_sub_list, col_obj)
+        if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
+          for cl in collection_list:
+            if cl['id'] == node.pk:
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
+              inner_sub_list = [inner_sub_dict]
+              inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
-            if inner_sub_list:
-              inner_list.append(inner_sub_list[0])
-            else:
-              inner_list.append(inner_sub_dict)
+              if inner_sub_list:
+                inner_list.append(inner_sub_list[0])
+              else:
+                inner_list.append(inner_sub_dict)
 
-            cl.update({'children': inner_list })
+              cl.update({'children': inner_list })
       else:
         error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
         print "\n " + error_message
@@ -306,8 +365,9 @@ def get_tree_hierarchy(request, group_id, node_id):
 
     for each in cur:
       if each._id not in themes_list:
-        collection_list.append({'name': each.name, 'id': each.pk})
-        collection_list = get_collection_list(collection_list, each)
+        if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
+          collection_list.append({'name': each.name, 'id': each.pk})
+          collection_list = get_collection_list(collection_list, each)
 
     data = collection_list
 
@@ -1151,3 +1211,37 @@ def get_filterd_user_list(request, group_id):
         print all_users_list,set(user_list)
         filtered_users = list(set(all_users_list) - set(user_list))
         return HttpResponse(json.dumps(filtered_users))
+
+def search_tasks(request, group_id):
+    '''
+    This function will return (all task's) 
+    '''
+    user_list = []
+    app_id = collection.Node.find_one({'_type':"GSystemType", "name":"Task"})
+    if request.is_ajax():
+        term = request.GET.get('term',"")
+        task_nodes = collection.Node.find({
+                                          'member_of': {'$all': [app_id._id]},
+					  'name': {'$regex': term, '$options': 'i'}, 
+                                          'group_set': {'$all': [ObjectId(group_id)]},
+                                          'status': {'$nin': ['HIDDEN']}
+                                      }).sort('last_update', -1)
+	for each in task_nodes :
+		user_list.append({"label":each.name,"value":each.name,"id":str(each._id)})	
+        return HttpResponse(json.dumps(user_list))
+    else:
+	raise Http404
+
+def get_group_member_user(request, group_id):
+    '''
+    This function will return (all task's) 
+    '''
+    user_list = []
+    group = collection.Node.find_one({'_id':ObjectId(group_id)})
+    if request.is_ajax():
+        if group.author_set:
+            for each in group.author_set:
+                user_list.append(User.objects.get(id = each).username)
+        return HttpResponse(json.dumps(user_list))
+    else:
+	raise Http404
