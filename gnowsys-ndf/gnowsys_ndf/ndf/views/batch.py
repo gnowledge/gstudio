@@ -21,7 +21,7 @@ GST_BATCH = collection.GSystemType.one({'name': GAPPS[9]})
 
 def batch(request, group_id):
     """
-   * Renders a list of all 'modules' available within the database.
+   * Renders a list of all 'batches' available within the database.
     """
     ins_objectid  = ObjectId()
     st_student = collection.Node.one({'_type':'GSystemType','name':'Student'})
@@ -43,15 +43,19 @@ def batch(request, group_id):
     variable = RequestContext(request, {'batch_coll': batch_coll,'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id,'student_count':student_coll.count()})
     return render_to_response(template, variable)
 
+#older methode to create and edit batch
 def create_and_edit(request, group_id, _id = None):
-        fc_courses = []
-        batch = ""
-        batch_count = ""
-        course_name = ""
-        if request.method == 'POST':
-            batch_count = request.POST.get('batch_count','')
-        else:
-            batch_count = 1
+    '''
+    This method is not in use
+    '''
+    fc_courses = []
+    batch = ""
+    batch_count = ""
+    course_name = ""
+    if request.method == 'POST':
+        batch_count = request.POST.get('batch_count','')
+    else:
+        batch_count = 1
         group = collection.Node.one({"_id":ObjectId(group_id)})
         fc_st = collection.Node.one({'_type':'GSystemType','name':'Foundation Course'})
         rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
@@ -70,13 +74,23 @@ def create_and_edit(request, group_id, _id = None):
         return render_to_response(template, variable)
 
 def new_create_and_edit(request, group_id, _id = None):
+    node = ""
+    count = ""
+    batch_count = 1
+    batch = ""
     if request.method == 'POST':
         batch_count = int(request.POST.get('batch_count',''))
-        template = "ndf/new_create_batch.html"
-        variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':xrange(batch_count),'st_batch_id':GST_BATCH._id,'count':batch_count})
-        return render_to_response(template, variable)
-    
+    if _id:
+        batch = collection.Node.one({'_id':ObjectId(_id)})
+    template = "ndf/new_create_batch.html"
+    variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':xrange(batch_count),'st_batch_id':GST_BATCH._id,'count':batch_count, 'node':batch})
+    return render_to_response(template, variable)
+
+#older save and update for batches    Not in use
 def save_and_update(request, group_id):
+    '''
+    This method is currently not in use
+    '''
     if request.method == 'POST':
         users = request.POST.get('collection_set_list', '')
         user_list = users.split(',')
@@ -112,21 +126,33 @@ def save_and_update(request, group_id):
         return render_to_response(template, variable)
 
 def save(request, group_id):
+    '''
+    This save method create new  and update existing the batches
+    '''
     if request.method == 'POST':
         batch_count = int(request.POST.get('batch_count', ''))
+        node_id = request.POST.get('node_id', '')
         for i in range(0,batch_count):
             users = request.POST.get(str(i)+'_list', '')
             user_list = users.split(',')
             batch_name = request.POST.get('batch_name_'+str(i), '')
-            save_batch(batch_name, user_list, group_id, request)
+            save_batch(batch_name, user_list, group_id, request, node_id)
         return HttpResponseRedirect('/'+group_id+'/'+'batch')
 
-def save_batch(batch_name, user_list, group_id, request):
-    new_batch = collection.GSystem()
+def save_batch(batch_name, user_list, group_id, request, node_id):
+    if node_id:
+        new_batch = collection.Node.one({'_id':ObjectId(node_id)})
+        rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'right_subject':ObjectId(node_id)})
+        for each in relation_coll:
+            rel = collection.Triple.one({'_id':each._id})
+            rel.delete()
+    else:
+        new_batch = collection.GSystem()
+        new_batch.created_by = int(request.user.id)
+        new_batch.member_of.append(GST_BATCH._id)
+        new_batch.group_set.append(ObjectId(group_id))
     new_batch.name = batch_name
-    new_batch.member_of.append(GST_BATCH._id)
-    new_batch.created_by = int(request.user.id)
-    new_batch.group_set.append(ObjectId(group_id))
     new_batch.contributors.append(int(request.user.id))
     new_batch.modified_by = int(request.user.id)
     new_batch.save()
@@ -134,7 +160,6 @@ def save_batch(batch_name, user_list, group_id, request):
     for each in user_list:
         save_relation(each, new_batch._id)
    
-
 def save_relation(student_id, right_subject_id):
     rt_has_batch_member = collection.Node.one({'_type':'RelationType', 'name':'has_batch_member'})
     if rt_has_batch_member and student_id and right_subject_id:
