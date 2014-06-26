@@ -330,11 +330,20 @@ ul#graph-hover.f-dropdown{
             </li>
 
             {% else %}
-            <li>
-              <a class="button small expand" href="{% url create_url group_name_tag %}">
-                <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
-              </a>
-            </li>
+              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+              
+                <li>
+                  <a class="button small expand" href="{% url create_url group_name_tag app_id %}">
+                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  </a>
+                </li>
+              {% else %}
+                <li>
+                  <a class="button small expand" href="{% url create_url group_name_tag %}">
+                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  </a>
+                </li>
+              {% endif %}
 
             {% endif %}
 
