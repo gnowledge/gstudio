@@ -440,6 +440,22 @@ def add_topics(request, group_id):
     return HttpResponse("None")
 
 
+def topic_detail_view(request, group_id):
+
+  node_id = request.POST.get("node_id", '')
+  obj = collection.Node.one({'_id': ObjectId(node_id)})
+  app = collection.Node.one({'_id': ObjectId(obj.member_of[0])})
+  app_id = app._id
+  
+  if app.name == "Topic":
+    return render_to_response('ndf/node_ajax_view.html', 
+                                    { 'node': obj,'app_id': app_id,
+                                      'group_id': group_id,
+                                      'groupid':group_id
+                                    },
+                                    context_instance = RequestContext(request)
+    )
+
 
 def node_collection(node=None, group_id=None):
 
