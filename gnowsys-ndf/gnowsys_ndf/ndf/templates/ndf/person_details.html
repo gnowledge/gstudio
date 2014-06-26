@@ -2,6 +2,16 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+{% block head %}  
+
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+
+{% endblock %}
+
+
 {% block body_content %} 
 
 <div id="view_event">
@@ -302,10 +312,18 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
 $(document).foundation({
   tab: {
     callback : function (tab) {
-      console.log(tab);
+      // console.log(tab);
     }
   }
 });
+
+
+// script for showing map on appearance of overlay.
+$(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
+  
+  map.invalidateSize();  
+});
+
 
 // </script>
 {% endblock %}	

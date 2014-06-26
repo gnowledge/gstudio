@@ -2,6 +2,17 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+
+{% block head %}  
+
+  <!-- Scripts required for D3 graph -->
+  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
+  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+
+{% endblock %}
+
+
 {% block body_content %} 
 
 <div id="view_event">
@@ -22,7 +33,7 @@
 
       <dl class="row tabs" data-tab>
         <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
-
+        <dd ><a href="#view-scheduler-calendar"><i class="fi-calendar"></i> Events </a></dd>
         <dd>
           <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
@@ -209,6 +220,13 @@
           <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
             <a class="close-reveal-modal">&#215;</a>
             {% include "ndf/graph_dependency.html" %}
+          </div>
+
+          <!-- Tab View Scheduler-Calender -->
+          <div class="content" id="view-scheduler-calendar" >    
+
+            #{#%# include "ndf/scheduler_calender.html" with app_set_instance_atlist=app_set_instance_atlist %}
+
           </div>
           
           <!-- Tab View Map Widget -->
@@ -418,10 +436,18 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
 $(document).foundation({
   tab: {
     callback : function (tab) {
-      console.log(tab);
+      // console.log(tab);
     }
   }
 });
+
+
+// script for showing map on appearance of overlay.
+$(document).on('opened', '#view-map-edit-widget[data-reveal], #view-map-widget[data-reveal]', function () {  
+  
+  map.invalidateSize();  
+});
+
 
 // </script>
 {% endblock %}	

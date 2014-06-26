@@ -118,11 +118,19 @@ ul#graph-hover.f-dropdown{
 
           {% if 'Pandora_video' in node.member_of_names_list %}
           <div>
-            <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+           
+	    <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
               <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
               Your browser does not support the video tag.
-            </video>
+            </video><br/><br/>
 
+	    {% get_pandoravideo_metadata video_obj as metadata %}
+	    {% for k,v in metadata.items %} 
+            {% if k != "cuts" %}
+	    <h3>{{k}} : {{v}}<h3>
+		<br/>
+		{% endif %}
+	    {% endfor %}
             {% if user.is_authenticated %}
             <br/>
             <br/>

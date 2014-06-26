@@ -37,6 +37,8 @@ import json
 db = get_database()
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
+theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 #This function is used to check (while creating a new group) group exists or not
 #This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 def checkgroup(request,group_name):
@@ -282,6 +284,8 @@ def drawer_widget(request, group_id):
           app = "QuizItem"
         elif app == "Theme":
           app = "Theme"
+        elif app == "Topic":
+          app = "Topic"
         elif app == "Module":
           app = "Module"
         else:
@@ -321,18 +325,19 @@ def get_collection_list(collection_list, node):
     for each in node.collection_set:
       col_obj = collection.Node.one({'_id': ObjectId(each)})
       if col_obj:
-        for cl in collection_list:
-          if cl['id'] == node.pk:
-            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
-            inner_sub_list = [inner_sub_dict]
-            inner_sub_list = get_collection_list(inner_sub_list, col_obj)
+        if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
+          for cl in collection_list:
+            if cl['id'] == node.pk:
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
+              inner_sub_list = [inner_sub_dict]
+              inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
-            if inner_sub_list:
-              inner_list.append(inner_sub_list[0])
-            else:
-              inner_list.append(inner_sub_dict)
+              if inner_sub_list:
+                inner_list.append(inner_sub_list[0])
+              else:
+                inner_list.append(inner_sub_dict)
 
-            cl.update({'children': inner_list })
+              cl.update({'children': inner_list })
       else:
         error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
         print "\n " + error_message
@@ -360,8 +365,9 @@ def get_tree_hierarchy(request, group_id, node_id):
 
     for each in cur:
       if each._id not in themes_list:
-        collection_list.append({'name': each.name, 'id': each.pk})
-        collection_list = get_collection_list(collection_list, each)
+        if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
+          collection_list.append({'name': each.name, 'id': each.pk})
+          collection_list = get_collection_list(collection_list, each)
 
     data = collection_list
 
@@ -874,7 +880,7 @@ def get_data_for_drawer(request, group_id):
     data_list=set_drawer_widget(st,coll_obj_list)
     return HttpResponse(json.dumps(data_list))
 
-def get_data_for_user_drawer(request, group_id):
+def get_data_for_user_drawer(request, group_id,):
     '''
     This method will return data for user widget
     '''
@@ -888,6 +894,7 @@ def get_data_for_user_drawer(request, group_id):
     all_batch_user = []
     users = []
     st_batch_id = request.GET.get('st_batch_id','')
+    node_id = request.GET.get('_id','')
     if st_batch_id:
         batch_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         group = collection.Node.one({'_id':ObjectId(group_id)})
@@ -897,7 +904,6 @@ def get_data_for_user_drawer(request, group_id):
         else:
             users = []
         user_list = list(set(group.author_set) - set(users))
-        print user_list,"Test"
         for each in user_list:
             user= User.objects.get(id=each)
             dic = {}
@@ -906,12 +912,42 @@ def get_data_for_user_drawer(request, group_id):
             d1.append(dic)
         draw1['drawer1'] = d1
         data_list.append(draw1)
-        draw1['drawer2'] = d2
-        data_list.append(draw1)
+        if node_id:
+            for each in collection.Node.one({'_id':ObjectId(node_id)}).author_set:
+                user= User.objects.get(id=each)
+                dic = {}
+                dic['id'] = user.id   
+                dic['name'] = user.username
+                d2.append(dic)
+        draw2['drawer2'] = d2
+        data_list.append(draw2)
         return HttpResponse(json.dumps(data_list))
     else:
         return HttpResponse("GSystemType for batch required")
-
+def get_data_for_batch_drawer(request, group_id):
+    '''
+    This method will return data for batch drawer widget
+    '''
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    drawer1 = []
+    drawer2 = []
+    data_list = []
+    st = collection.Node.one({'_type':'GSystemType','name':'Student'})
+    batch_coll = collection.GSystem.find({'member_of': {'$all': [st._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    for each in batch_coll:
+        dic = {}
+        dic['id'] = str(each._id)
+        dic['name'] = each.name
+        d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
+    draw2['drawer2'] = d2
+    data_list.append(draw1)
+    return HttpResponse(json.dumps(data_list))
+        
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget

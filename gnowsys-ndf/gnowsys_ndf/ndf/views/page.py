@@ -521,8 +521,6 @@ def translate_node(request,group_id,node_id=None):
             node_name=content['name']
             node_content_org=content['content_org']
             node_tags=content['tags']
-        print "aaaaaaaaaaaaaaaaaa"
-        print LANGUAGES,"HHHHHHHHHHHHHHHHHHHH"
             
         return render_to_response("ndf/translation_page.html",
                                {'content': content,

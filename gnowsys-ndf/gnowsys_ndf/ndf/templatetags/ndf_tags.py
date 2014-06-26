@@ -27,6 +27,7 @@ collection = db[Node.collection_name]
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'}, {'name':'apps_list'}]})
 translation_set=[]
 check=[]
+import json,ox
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
@@ -1025,6 +1026,18 @@ def get_resource_collection(groupid, resource_type):
   except Exception as e:
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
+
+# getting video metadata from wetube.gnowledge.org
+@register.assignment_tag
+def get_pandoravideo_metadata(src_id):
+  try:
+    api=ox.api.API("http://wetube.gnowledge.org/api")
+    data=api.get({"id":src_id,"keys":""})
+    mdata=data.get('data')
+    return mdata
+  except Exception as e:
+    return 'null'
+
 
 
 @register.assignment_tag
