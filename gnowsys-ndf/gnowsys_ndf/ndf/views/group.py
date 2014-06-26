@@ -26,6 +26,7 @@ from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
 from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups,get_all_user_groups
+from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import *
 
 
@@ -338,6 +339,16 @@ def group_dashboard(request,group_id=None):
   if groupobj.status == u"DRAFT":
     groupobj, ver = get_page(request, groupobj)
 
+  groupobj.get_neighbourhood(groupobj.member_of)
+  # print "\n groupobj.keys: ", groupobj.keys()
+
+  property_order_list = []
+  if groupobj.has_key("group_of"):
+    # print "\n Found groupobj['group_of']: ", groupobj['group_of'], "\n"
+    if groupobj['group_of']:
+      property_order_list = get_property_order_with_value(groupobj['group_of'][0])
+      print "\n ", type(property_order_list), " -- ", "\n", property_order_list  
+
   # First time breadcrumbs_list created on click of page details
   breadcrumbs_list = []
   # Appends the elements in breadcrumbs_list first time the resource which is clicked
@@ -347,7 +358,8 @@ def group_dashboard(request,group_id=None):
                                                        'group_id':grpid, 'user':request.user, 
                                                        'shelf_list': shelf_list,
                                                        'shelves': shelves, 
-                                                       'breadcrumbs_list': breadcrumbs_list
+                                                       'breadcrumbs_list': breadcrumbs_list,
+                                                       'property_order_list': property_order_list
                                                       },context_instance=RequestContext(request)
                           )
 
