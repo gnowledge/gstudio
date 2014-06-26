@@ -867,10 +867,11 @@ def get_data_for_switch_groups(request,group_id):
     return HttpResponse(json.dumps(data_list))
 
 
-'''
-designer module's drawer widget function
-'''
+
 def get_data_for_drawer(request, group_id):
+    '''
+    designer module's drawer widget function
+    '''
     coll_obj_list = []
     node_id = request.GET.get("id","")
     st = collection.Node.find({"_type":"GSystemType"})
@@ -880,9 +881,10 @@ def get_data_for_drawer(request, group_id):
     data_list=set_drawer_widget(st,coll_obj_list)
     return HttpResponse(json.dumps(data_list))
 
+# This method is not in use
 def get_data_for_user_drawer(request, group_id,):
     '''
-    This method will return data for user widget
+    This method will return data for user widget 
     '''
     d1 = []
     d2 = []
@@ -924,6 +926,7 @@ def get_data_for_user_drawer(request, group_id,):
         return HttpResponse(json.dumps(data_list))
     else:
         return HttpResponse("GSystemType for batch required")
+
 def get_data_for_batch_drawer(request, group_id):
     '''
     This method will return data for batch drawer widget
@@ -936,16 +939,34 @@ def get_data_for_batch_drawer(request, group_id):
     drawer2 = []
     data_list = []
     st = collection.Node.one({'_type':'GSystemType','name':'Student'})
+    node_id = request.GET.get('_id','')
     batch_coll = collection.GSystem.find({'member_of': {'$all': [st._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    if node_id:
+        rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'right_subject':ObjectId(node_id)})
+        for each in relation_coll:
+            dic = {}
+            n = collection.Node.one({'_id':ObjectId(each.subject)})
+            drawer2.append(n)
     for each in batch_coll:
+        drawer1.append(each)
+    drawer_set1 = set(drawer1) - set(drawer2)
+    print len(drawer_set1),"drawer1-count"
+    drawer_set2 = drawer2
+    for each in drawer_set1:
         dic = {}
         dic['id'] = str(each._id)
         dic['name'] = each.name
         d1.append(dic)
     draw1['drawer1'] = d1
     data_list.append(draw1)
+    for each in drawer_set2:
+        dic = {}
+        dic['id'] = str(each._id)
+        dic['name'] = each.name
+        d2.append(dic)
     draw2['drawer2'] = d2
-    data_list.append(draw1)
+    data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
         
 def set_drawer_widget(st,coll_obj_list):
