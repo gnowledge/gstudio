@@ -25,6 +25,7 @@ collection = db[Node.collection_name]
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'}, {'name':'apps_list'}]})
 translation_set=[]
 check=[]
+import json,ox
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
@@ -360,15 +361,56 @@ def get_gapps_menubar(group_id, selectedGapp):
 		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
+global_thread_rep_counter = 0	# global variable to count thread's total reply
+global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
+def thread_reply_count( oid ):
+	'''
+	Method to count total replies for the thread.
+	'''
+	thr_rep = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(oid)}]})
+	global global_thread_rep_counter		# to acces global_thread_rep_counter as global and not as local, 
+	global global_thread_latest_reply
+
+	if thr_rep and (thr_rep.count() > 0):
+		for each in thr_rep:
+
+			global_thread_rep_counter += 1
+
+			if not global_thread_latest_reply["content_org"]:
+				global_thread_latest_reply["content_org"] = each.content_org
+				global_thread_latest_reply["last_update"] = each.last_update
+				global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+			else:
+				if global_thread_latest_reply["last_update"] < each.last_update:
+					global_thread_latest_reply["content_org"] = each.content_org
+					global_thread_latest_reply["last_update"] = each.last_update
+					global_thread_latest_reply["user"] = User.objects.get(pk=each.created_by).username
+					
+			thread_reply_count(each._id)
+	
+	return global_thread_rep_counter
+	
+
 @register.assignment_tag
 def get_forum_twists(forum):
 	gs_collection = db[Node.collection_name]
-	ret_replies=[]
-	exstng_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+	ret_replies = []
+	exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
 	exstng_reply.sort('created_at')
+	global global_thread_rep_counter 		# to acces global global_thread_rep_counter and reset it to zero
+	global global_thread_latest_reply
+	# for loop to get count of each thread's total reply
 	for each in exstng_reply:
+		global_thread_rep_counter = 0		# reset global_thread_rep_counter to zero
+		global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
+
+		# as each thread is dict, adding one more field of thread_reply_count
+		each['thread_reply_count'] = thread_reply_count(each._id)
+		each['latest_reply'] = global_thread_latest_reply
 		ret_replies.append(each)
+
 	return ret_replies
+
 
 lp=[]
 def get_rec_objs(ob_id):
@@ -501,7 +543,7 @@ def get_user_group(user, selected_group_name):
   group_list = []
   auth_group = None
 
-  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(10)
+  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(9)
 
   auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
@@ -586,6 +628,8 @@ def get_edit_url(groupid):
 			return 'quiz_edit'    
 		elif type_name == 'Page':
 			return 'page_create_edit' 
+		elif type_name == 'Theme' or type_name == 'Topic':
+			return 'theme_topic_create'
 		elif type_name == 'QuizItem':
 			return 'quiz_item_edit'
 
@@ -612,6 +656,8 @@ def get_create_url(groupid):
       return 'quiz_create'    
     elif type_name == 'Page':
       return 'page_create_edit' 
+    elif type_name == 'Theme' or type_name == 'Topic':
+		return 'theme_topic_create'
     elif type_name == 'QuizItem':
       return 'quiz_item_create'
 
@@ -983,6 +1029,18 @@ def get_resource_collection(groupid, resource_type):
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+# getting video metadata from wetube.gnowledge.org
+@register.assignment_tag
+def get_pandoravideo_metadata(src_id):
+  try:
+    api=ox.api.API("http://wetube.gnowledge.org/api")
+    data=api.get({"id":src_id,"keys":""})
+    mdata=data.get('data')
+    return mdata
+  except Exception as e:
+    return 'null'
+
+
 
 @register.assignment_tag
 def get_source_id(obj_id):
@@ -991,13 +1049,12 @@ def get_source_id(obj_id):
     att_set=collection.Node.one({'$and':[{'subject':ObjectId(obj_id)},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
     return att_set.object_value
   except Exception as e:
-    print str(e)
     return 'null'
 
  
 def get_translation_relation(obj_id, translation_list = [], r_list = []):
-	r_list.append(obj_id._id)
-	relation_set=obj_id.get_possible_relations(obj_id.member_of)
+        r_list.append(obj_id._id)
+    	relation_set=obj_id.get_possible_relations(obj_id.member_of)
 	if relation_set.has_key('translation_of'):  
 		for k,v in relation_set['translation_of'].items():                      
 			if k == 'subject_or_right_subject_list':
@@ -1012,7 +1069,7 @@ def get_translation_relation(obj_id, translation_list = [], r_list = []):
 
 @register.assignment_tag
 def get_possible_translations(obj_id):
-	translation_list = []
+        translation_list = []
 	r_list1 = []
 	return get_translation_relation(obj_id,r_list1,translation_list)
 

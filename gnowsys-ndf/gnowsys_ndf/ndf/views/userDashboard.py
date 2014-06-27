@@ -42,7 +42,7 @@ ins_objectid  = ObjectId()
 #######################################################################################################################################
 
 
-def dashboard(request, group_id):	
+def dashboard(request, group_id, usrid):	
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -54,8 +54,16 @@ def dashboard(request, group_id):
             if auth :
                 group_id = str(auth._id)
     else :
+        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
         pass
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+
+
+    ID = int(usrid)
+    usrname = User.objects.get(pk=ID).username
+    date_of_join = request.user.date_joined
+    current_user = request.user.pk
+
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(usrname) })
     prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
     uploaded = "None"
 
@@ -93,9 +101,6 @@ def dashboard(request, group_id):
         obj_img = collection.Node.one({'_id': ObjectId(prof_img.right_subject) })
         uploaded = obj_img.name
 
-
-    ID = request.user.pk
-    date_of_join = request.user.date_joined
     
     page_drawer = get_drawers(group_id,None,None,"Page")
     image_drawer = get_drawers(group_id,None,None,"Image")
@@ -105,15 +110,15 @@ def dashboard(request, group_id):
     group_drawer = get_drawers(None,None,None,"Group")
     forum_drawer = get_drawers(group_id,None,None,"Forum")
     
-    obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'created_by': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
-    collab_drawer = []	
+    obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
     
-    for each in obj.sort('last_update', -1):  	# To populate collaborators according to their latest modification of particular resource
-        for val in each.contributors:
-            name = User.objects.get(pk=val).username 		
-            collab_drawer.append(name)			
-            
+    collab_drawer = []	
+    for each in obj.sort('last_update', -1):    # To populate collaborators according to their latest modification of particular resource:
+      for val in each.contributors:
+        name = User.objects.get(pk=val).username    
+        collab_drawer.append({'usrname':name, 'Id': val,'resource': each.name})   
 
+    
     shelves = []
     shelf_list = {}
     if auth:
@@ -149,9 +154,9 @@ def dashboard(request, group_id):
         shelves = []
 
     return render_to_response("ndf/userDashboard.html",
-                              {'username': request.user.username, 'user_id': ID, 'DOJ': date_of_join, 
-                               'prof_pic_obj': img_obj,
-                               'group_id':group_id,              
+                              {'username': usrname, 'user_id': ID, 'DOJ': date_of_join, 
+                               'prof_pic_obj': img_obj,'group': group_ins,
+                               'group_id':group_id, 'usr': current_user,             
                                'author':auth,
                                'already_uploaded': uploaded,
                                'shelf_list': shelf_list,'shelves': shelves,

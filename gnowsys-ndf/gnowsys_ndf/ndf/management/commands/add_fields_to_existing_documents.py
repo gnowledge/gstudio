@@ -20,6 +20,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         collection = get_database()[Node.collection_name]
         # Keep latest fields to be added at top
+        
+        # Adds "annotations" field (with default value as []) to all documents belonging to GSystems
+        res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]}, 'annotations': {'$exists': False}}, 
+                                {'$set': {'annotations': []}}, 
+                                upsert=False, multi=True
+        )
+        print "\n annotations field added to following no. of documents: ", res['n']
 
         # Adds "group_set" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
         res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'group_set': {'$exists': False}}, 

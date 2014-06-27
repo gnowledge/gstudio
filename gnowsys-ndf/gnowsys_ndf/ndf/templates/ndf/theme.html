@@ -21,12 +21,15 @@
   <script type="text/javascript">
     $(document).ready(function() {
     	$(function() {
-    		// $('.themes').tree();
+
+    		$('.themes').html('<img src="/static/ndf/images/ajax-loader-trans.gif" height="100" width="100">');
+
     		var $tree = $('.themes');
-    		var user = "{{user.is_authenticated}}"
+    		var user = "{{user.is_authenticated}}";
 
     		$tree.tree({
     			autoOpen: false,
+
         		onCreateLi: function(node, $li) {
 
         			if (user == "True")
@@ -35,7 +38,7 @@
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
 
                 			
                 			{% endif %}
@@ -45,6 +48,29 @@
 
         		}
     		});
+
+    		// bind 'tree.click' event
+			$tree.bind(
+			    'tree.click',
+			    function(event) {
+			        // The clicked node is 'event.node'
+			        var node = event.node;
+
+			        $.ajax({
+						type: "POST",
+						url: "{% url 'topic_detail_view' groupid %}",
+						datatype: "html",
+						data:{
+							node_id: node.id,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {
+							$("#detail_view").html(data);
+						}
+					});
+
+			    }
+			);
    
     	});
     });
@@ -78,7 +104,7 @@
       <li class="selected-app-set-item"> 
         <div>
   		  {% if user_access == "allow" %}
-          <a href="{% url "theme_topic_create" groupid app_id theme_GST_id %}" style="float:right" title="Add Theme">
+          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right" title="Add Theme">
             +&nbsp;Add
           </a>
           {% endif %}
@@ -109,7 +135,7 @@
 
 
 {% block body_content %}
-
+<div id="detail_view">
 {% user_access_policy groupid request.user as user_access %}
 
 	{% if themes_hierarchy %}
@@ -188,7 +214,7 @@
 
 	            <th width="20">
 	            	{% if user_access == "allow" %}
-	            	 <input class="checkedAll" type="checkbox">
+	            		<input class="checkedAll" type="checkbox">
 	            	{% endif %}
 	            </th>
 
@@ -216,8 +242,14 @@
 	            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
 	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
   		  		{% if user_access == "allow" %}
-	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
-	        	{% endif %}
+	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid each.id %}" class="button medium">Edit</a></td>
+
+		    	<td  class="name" style="font-size:11px;">
+			    	<a href="{% url "theme_topic_create" groupid each.id %}?translate=true" class="button medium">Translate</a>
+			    	<!-- <a href="#" class="button medium" disabled>Translate</a> -->
+		    	</td>	        
+	        	{% endif %}     	       	       
+ 	
 	          	</tr>
 	          
 	       	{% empty %}
@@ -241,6 +273,7 @@
 		{% endif %}
 	{% endif %}
 
+
 	<script type="text/javascript">
 		// script for fold themes hierarchy
 		$(".fold").click(function() {
@@ -257,7 +290,7 @@
         						{% user_access_policy groupid request.user as user_access %}
         						{% if user_access == "allow" %}
 
-	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
 
 	                			{% endif %}
 	            			);	
@@ -287,7 +320,7 @@
 		            			{% user_access_policy groupid request.user as user_access %}
         						{% if user_access == "allow" %}
 
-		                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+		                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
 		                			
 		                		{% endif %}
 		            		);
@@ -414,5 +447,5 @@
 
 	</script>
 
-
+</div>
 {% endblock %}

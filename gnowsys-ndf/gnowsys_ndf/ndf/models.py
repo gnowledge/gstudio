@@ -920,7 +920,9 @@ class GSystem(Node):
         # 'relation_set': [ObjectId],		# ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
-        'author_set': [int]                     # List of Authors
+        'author_set': [int],                     # List of Authors
+
+        'annotations' : [dict]      # List of json files for annotations on the page
     }
     
     use_dot_notation = True
