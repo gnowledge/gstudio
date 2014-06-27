@@ -10,19 +10,19 @@ DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 LANGUAGES = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
 
 #SMTP setting for sending mail (Using python default SMTP server)
-EMAIL_USE_TLS = False
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'testing@example.com'
+#EMAIL_USE_TLS = False
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 1025
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
+#DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 #SMTP setting for sending mail (Using gmail SMTP server)
-#EMAIL_USE_TLS = True
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_PORT = 587
-#EMAIL_HOST_USER = 'yourcompletegmailaddr'
-#EMAIL_HOST_PASSWORD = 'yourpassword'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'glab123456@gmail.com'
+EMAIL_HOST_PASSWORD = 'glab123456789'
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
@@ -127,11 +127,16 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
+    'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
+     
+# Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
 
 ROOT_URLCONF = 'gnowsys_ndf.ndf.urls'
 
@@ -169,7 +174,11 @@ INSTALLED_APPS = (
     'django_extensions',	#textb
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
+    'online_status',                       #for online_users     
+    # 'tracking',                           #for online_users
+     
 )
+
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
 
@@ -280,3 +289,23 @@ warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
 #textb
+
+
+#################################################################### for online_users_ramk
+
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#        'LOCATION': 'default-cache'
+#    }
+#}
+
+#USER_ONLINE_TIMEOUT = 300
+
+#USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+
+USERS_ONLINE__TIME_IDLE = 300
+USERS_ONLINE__TIME_OFFLINE = 10
+#USERS_ONLINE__CACHE_PREFIX_USER
+#USERS_ONLINE__CACHE_USERS
+
