@@ -2,7 +2,7 @@
 from django.template.defaultfilters import slugify
 import hashlib # for calculating md5
 # import os -- Keep such imports here
-
+import json
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -83,6 +83,8 @@ def file(request, group_id, file_id=None):
       
       search_field = request.POST['search_field']
 
+      datavisual = []
+
       files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
                                     '$or': [
                                       {'$and': [
@@ -106,7 +108,7 @@ def file(request, group_id, file_id=None):
                                     ],
                                     'group_set': {'$all': [ObjectId(group_id)]}
                                   }).sort('last_update', -1)
-
+    
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
                                             '_type': 'File', 
                                             '$or': [
@@ -207,6 +209,11 @@ def file(request, group_id, file_id=None):
                                                 'group_set': {'$all': [ObjectId(group_id)]}
                                             }).sort("last_update", -1)
 
+      datavisual.append({"name":"Doc", "count":docCollection.count()})
+      datavisual.append({"name":"Image","count":imageCollection.count()})
+      datavisual.append({"name":"Video","count":videoCollection.count()})
+      datavisual = json.dumps(datavisual)
+
       already_uploaded = request.GET.getlist('var', "")
 
       return render_to_response("ndf/file.html",
@@ -215,7 +222,8 @@ def file(request, group_id, file_id=None):
                                  'already_uploaded': already_uploaded,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
                                  'videoCollection': videoCollection, 'pandoraCollection': pandoraCollection,
-                                 'groupid': group_id, 'group_id':group_id
+                                 'groupid': group_id, 'group_id':group_id,
+                                 "datavisual":datavisual
                                 }, 
                                 context_instance=RequestContext(request)
       )
@@ -223,6 +231,7 @@ def file(request, group_id, file_id=None):
     elif GST_FILE._id == ObjectId(file_id):
       # File list view
       title = GST_FILE.name
+      datavisual = []
      
       files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, 
                                     '_type': 'File', 'fs_file_ids':{'$ne': []}, 
@@ -300,14 +309,22 @@ def file(request, group_id, file_id=None):
               #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
       
               
-     
+
+      datavisual.append({"name":"Doc", "count":docCollection.count()})
+      datavisual.append({"name":"Image","count":imageCollection.count()})
+      datavisual.append({"name":"Video","count":videoCollection.count()})
+      #datavisual.append({"name":"Pandora Video","count":pandoraCollection.count()})
+      datavisual = json.dumps(datavisual)
+      print datavisual
+
       return render_to_response("ndf/file.html", 
                                 {'title': title, 
                                  'already_uploaded': already_uploaded,
                                  # 'sourceid':source_id_set,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection, 'pandoraCollection':get_member_set,
-                                 'groupid': group_id, 'group_id':group_id
+                                 'groupid': group_id, 'group_id':group_id,
+                                 "datavisual":datavisual
                                 }, 
                                 context_instance = RequestContext(request))
     else:
@@ -406,7 +423,7 @@ def submitDoc(request, group_id):
 first_object = ''
 def save_file(files,title, userid, group_id, content_org, tags, img_type = None, language = None, usrname = None, access_policy=None):
     """
-    this will create file object and save files in gridfs collection
+      this will create file object and save files in gridfs collection
     """
     global count,first_object
     fcol = db[File.collection_name]
