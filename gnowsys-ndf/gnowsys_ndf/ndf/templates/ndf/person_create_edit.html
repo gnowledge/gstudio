@@ -1,0 +1,175 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block body_content %} 
+  <form data-abide id="form-edit-node" method="POST" action="">
+
+    <header class="row">
+      <h2 class="medium-12 columns">
+        {% if node %}
+        Editing {{title}}: {{node.name}}
+        {% else %}
+        Register a New {{title}}
+        {% endif %}
+      </h2>
+
+      <nav class="medium-12 columns">
+        <dl class="tabs" data-tab>
+          <dd>
+            <h4>Tabs:</h4>
+          </dd>
+
+          {% for tab_details in property_order_list %}
+          <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to add Name, start-time, end-time, attendence...">
+            <a href="#panel_{{tab_details.0}}">{{tab_details.0}}</a>
+          </dd>
+          {% endfor %}
+
+          <!-- Add more tabs below 
+          <dd title="Click here to add/edit...">
+            <a href="#panel_?" class="tab_?">Prior Node</a>
+          </dd>
+          -->
+        </dl>
+      </nav>
+    </header>
+
+    {% csrf_token %}
+
+    <div id="event-details-edit-div" class="tabs-content" >
+      {% for tab_name, tab_fields_list in property_order_list %}
+      <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+        {% for field in tab_fields_list %}
+        <div class="row">
+          <div class="small-3 columns"> 
+            <label for="{{field.name}}" class="left inline"> {{field.altnames}} </label>
+          </div>
+          <div class="small-7 end columns">
+            {% html_widget node.pk field %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+
+      <!-- Additional panels if required
+      <div class="" id="panel_?">
+      </div>
+      -->
+    </div>
+
+    <br>
+    <div class="row">
+      <div class="small-4 small-offset-2 end columns">
+        <input type="submit" class="small button expand" value="Save" />
+      </div>
+    </div>    
+
+  </form>
+
+{% endblock %}
+
+{% block script %}
+  // <script type="text/javascript">
+
+  $(document).foundation({
+    tab: {
+      callback : function (tab) {
+        console.log(tab);
+      }
+    }
+  });
+
+  var dtOBInput = $("#dob")
+  // alert(dtOBInput)
+  if(dtOBInput.length > 0) {
+    dtOBInput.datetimepicker({ 
+
+      hourGrid: 6,
+      minuteGrid: 15,
+
+      // onClose: function(dateText, inst) {
+
+      //   if (endDtInput.val() != '') {
+
+      //     var testStartDate = dtOBInput.datetimepicker('getDate');
+      //     var testEndDate = endDtInput.datetimepicker('getDate');
+
+      //     if (testStartDate > testEndDate)
+      //       endDtInput.datetimepicker('setDate', testStartDate);
+
+      //   }
+      //   else {
+      //     endDtInput.val(dateText);
+      //   }
+      // },
+      onSelect: function (selectedDateTime){
+        endDtInput.datetimepicker('option', 'minDate', dtOBInput.datetimepicker('getDate') );
+      }
+    });
+  }
+
+  // // var endDtInput = $("#end_time")
+  // // // alert(endDtInput)
+  // // if(endDtInput.length > 0) {
+  // //   endDtInput.datetimepicker({ 
+  // //     hourGrid: 6,
+  // //     minuteGrid: 15,
+  // //     numberOfMonths: 2,
+  // //     onClose: function(dateText, inst) {
+  // //       if (startDtInput.val() != '') {
+  // //         var testStartDate = startDtInput.datetimepicker('getDate');
+  // //         var testEndDate = endDtInput.datetimepicker('getDate');
+  // //         if (testStartDate > testEndDate)
+  // //           startDtInput.datetimepicker('setDate', testEndDate);
+  // //       }
+  // //       else {
+  // //         startDtInput.val(dateText);
+  // //       }
+  // //     },
+  // //     onSelect: function (selectedDateTime){
+  // //       startDtInput.datetimepicker('option', 'maxDate', endDtInput.datetimepicker('getDate') );
+  // //     }
+  // //   });
+  // // }
+
+  // // totWhen ---------------
+  // var totWhen = $("font:contains('tot_when')").parent().next().find("input");
+
+  // if(totWhen.length > 0) {
+  //   totWhen.datetimepicker();
+  //   $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
+  //   $("input.tiny").after("<div id='tot-when-date-list'></div>")
+  // }
+
+  // $(totWhen).change(function() { 
+
+  //   if($(totWhen).val().length > 0){
+
+  //     $("input.tiny").removeClass("disabled");
+  //   }
+
+  //   else{
+
+  //     $("input.tiny").addClass("disabled");
+  //   }
+  // });
+
+  // $("input.tiny").click(function() {
+  //   if(!$(this).hasClass("disabled")) {
+  //     $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
+  //     $(totWhen).val("");
+  //     $("input.tiny").addClass("disabled");
+  //   }
+  // });
+
+  // function getTotWhen() {
+  //   var datesList = []
+  //   dts = $("#tot-when-date-list .date-item");
+  //   $.each(dts, function(i, val){datesList.push($(val).text().trim())});
+
+  //   return datesList;
+  // }
+  // </script>
+{% endblock %}	

@@ -134,11 +134,11 @@
 		{% for at in systemtype_attributetype_set %}
 		<div class="row">
 			<div class="small-2 columns"> 
-        <label for="label-{{at.altnames}}" class="left inline">{{at.altnames}}</label>
+        <label for="label_{{at.type}}" class="left inline">{{at.altnames}}</label>
 			</div>
 			<div class="small-5 end columns">
 				{% if at.value == "bool" %}
-				<select id="id_auto_now_add" id="label-{{at.altnames}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
+				<select id="id_auto_now_add" id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
 
 					{% if at.database_value %}
 					<option value="">Unknown</option>
@@ -162,7 +162,7 @@
 
 				{% else %}
 				{% if at.type == "attendees" %}
-				<a href="" id="label-{{at.altnames}}" data-reveal-id="view-map-edit-widget1" title="Click to add attendence">Set Batch of Attendees/Students</a>
+				<a href="" id="label_{{at.type}}" data-reveal-id="view-map-edit-widget1" title="Click to add attendence">Set Batch of Attendees/Students</a>
 
         <!-- Overlay : Map EDIT Widget -->
         <div class="content reveal-modal" id="view-map-edit-widget1" data-reveal>    
@@ -203,7 +203,7 @@
 
 
 				{% else %}
-				<input type="text" id="label-{{at.altnames}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" value="{{at.database_value}}">
+				<input type="text" id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" value="{{at.database_value}}">
 
 				{% endif %}
 				{% endif %}
@@ -465,11 +465,15 @@ $(document).foundation({
 
 
    // for datetimepicker
-   var startDtInput = $("font:contains('start_time'), font:contains('Start Time')").parent().next().find("input");
+   //var startDtInput = $("font:contains('label_start_time'), font:contains('Start Time')").parent().next().find("input");
+   var startDtInput = $("#label_start_time")
+   // alert(startDtInput)
    // var startDtInput = $("font:contains('start_time'), font:contains('Start Time')");
    // startDtInput = startDtInput.parent().next().find("input");
 
-   var endDtInput = $("font:contains('end_time'), font:contains('End Time')").parent().next().find("input");
+   // var endDtInput = $("font:contains('label_end_time'), font:contains('End Time')").parent().next().find("input");
+   var endDtInput = $("#label_end_time")
+   // alert(endDtInput)
    // var endDtInput = $("font:contains('end_time')");
    // endDtInput = endDtInput.parent().next().find("input");
 
