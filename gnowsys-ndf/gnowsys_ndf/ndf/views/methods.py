@@ -760,10 +760,16 @@ def get_property_order_with_value(node):
     # If GSystems found, then only perform following statements
     
     demo["property_order"] = []
-    gst_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'property_order': 1})
+    type_of_set = []
+    gst_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
     for gst in gst_nodes:
+      for type_of in gst["type_of"]:
+        if type_of not in type_of_set:
+          type_of_set.append(type_of)
+
       for po in gst["property_order"]:
-        demo["property_order"].append(po)
+        if po not in demo["property_order"]:
+          demo["property_order"].append(po)
 
     demo.get_neighbourhood(node["member_of"])
 
@@ -781,11 +787,17 @@ def get_property_order_with_value(node):
               if ";" in field.altnames:
                 # print "\n altnames: ", field.altnames
                 if set(demo["member_of"]).issubset(field.subject_type):
-                  # It means we are dealing with normal relation
-                  altnames = field.altnames.split(";")[1]
+                  # It means we are dealing with normal relation & 
+                  altnames = field.altnames.split(";")[0]
+                elif type_of_set:
+                  # If current node's GST is not in subject_type
+                  # Search for that GST's type_of field value in subject_type
+                  for each in type_of_set:
+                    if each in field.subject_type:
+                      altnames = field.altnames.split(";")[0]
                 else:
                   # It means we are dealing with inverse relation
-                  altnames = field.altnames.split(";")[0]
+                  altnames = field.altnames.split(";")[1]
               else:
                 altnames = field.altnames
 
@@ -920,7 +932,17 @@ def parse_template_data(field_data_type, field_value, **kwargs):
         field_value = datetime.strptime(field_value, kwargs["date_format_string"])
 
       elif field_data_type == "bool":
-        field_value = bool(int(field_value))
+        if field_value == "Yes" or field_value == "yes" or field_value == "1":
+          if field_value == "1":
+            field_value = bool(int(field_value))
+          else:
+            field_value = True
+        
+        elif field_value == "No" or field_value == "no" or field_value == "0":
+          if field_value == "0":
+            field_value = bool(int(field_value))
+          else:
+            field_value = False
 
       elif field_data_type == "ObjectId":
         field_value = ObjectId(field_value)
@@ -959,6 +981,8 @@ def parse_template_data(field_data_type, field_value, **kwargs):
       # Write code...
       if not field_value:
         return None
+
+      field_value = unicode(field_value) if type(field_value) != unicode else field_value
 
     elif type(field_data_type) == mongokit.document.R:
       # Write code...

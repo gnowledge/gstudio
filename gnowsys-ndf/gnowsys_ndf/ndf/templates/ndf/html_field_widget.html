@@ -35,6 +35,17 @@
   <small class="error">Please set {{field.altnames}}!!!</small>
   {% endif %}
 
+  {% elif field_type == "bool" %}
+  {% for value in field_value_choices %}
+  {% if forloop.counter != 1 %}
+  &nbsp;&nbsp;&nbsp;
+  {% endif %}
+  <input type="radio" name="{{field.name}}" value="{{value|yesno:'Yes,No'}}" id="{{field.name}}{{value|yesno:'Yes,No'}}" {% if value|yesno:'Yes,No' == field_value|yesno:'Yes,No' %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value|yesno:'Yes,No'}}">{{value|yesno:'Yes,No'}}</label>
+  {% endfor %}
+  {% if is_required_field %}
+  <small class="error">Please select {{field.altnames}}!!!</small>
+  {% endif %}
+
   {% elif is_list_of %}
   <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|join:', '|default_if_none:''}}" placeholder="Separate {{field.altnames|lower}} by commas..." >
 
