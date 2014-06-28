@@ -1,5 +1,3 @@
-
-
 {% load ndf_tags %}
 
 <script src="/static/ndf/js/jquery-ui.js"></script>
@@ -17,9 +15,7 @@ function handle(){
 }
 
 
-function UserInvitation()
-{
-
+function UserInvitation(){
 $.extend(items,{% get_all_users_to_invite %});
 i=0;
 for (var key in items)
@@ -27,7 +23,6 @@ for (var key in items)
 user_list[i]=key;
 i=i+1;
 }
-
 
 user_list =JSON.parse(update_user_list())
 

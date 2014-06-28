@@ -31,5 +31,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^get_group_member_user/', 'get_group_member_user', name="get_group_member_user"),
                        url(r'^remove_user_from_author_set/', 'remove_user_from_author_set', name="remove_user_from_author_set"),
                        url(r'^get_data_for_user_drawer/', 'get_data_for_user_drawer', name='get_data_for_user_drawer'),
+                       url(r'^get_meeting_status/', 'get_meeting_status', name="get_meeting_status"),
+                       url(r'^set_meeting_status/', 'set_meeting_status', name="set_meeting_status"),
                        
 )

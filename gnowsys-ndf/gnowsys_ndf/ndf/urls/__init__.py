@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^$', HomeRedirectView.as_view()),        
 
+    (r'^(?P<group_name>[^/]+)/meeting', include('gnowsys_ndf.ndf.urls.meeting')),#chatb
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
     (r'^(?P<group_id>[^/]+)/video', include('gnowsys_ndf.ndf.urls.video')),
