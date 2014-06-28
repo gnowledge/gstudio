@@ -8,7 +8,11 @@
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block body_content %}
+{% if title %}
+<form data-abide id="form-edit-node" method="POST" action="{% url "theme_topic_create" groupid node.pk %}?translate=true">
+{% else %}
 <form data-abide id="form-edit-node" method="POST" action="">
+{% endif %}
 {% csrf_token %}
 <script type="text/javascript">
 $(document).ready(function(){
