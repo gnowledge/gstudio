@@ -3,7 +3,7 @@
 
 {% block body_content %} 
   
-  {% if nodes %}
+  {% if nodes.count %}
     {% autopaginate nodes 25 %}
   
     <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
@@ -31,20 +31,15 @@
     </form>
   {% endif %}
 
+  {% if nodes.count %}
   <table >
     <thead>
       <tr>
-  
-        {% if nodes %}
-  
           <th width="20"> <input class="checkedAll" type="checkbox"></th>
           <th width="150">Title</th>
           <th width="150">Created by</th>
           <th width="150">Creation date</th>
           <th width="150">Edit</th>
-    
-        {% endif %}
-  
       </tr>
     </thead>
     
@@ -59,14 +54,20 @@
           <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_edit' groupid app_id app_set_id each.pk %}" class="button medium">Edit</a></td>
       
         </tr>
-        
-        {% empty %}
-        <h5>This group doesn't have any events. <b>Be the first to create an event!</b></h5>
 
       {% endfor %}
 
     </tbody>
   </table>
+
+  {% else %}
+  <div class="row">
+    <div class="small-12 columns">
+      <h5>This group doesn't have any events. <b>Be the first to create the {{title}} event!</b></h5>
+    </div>
+  </div>
+
+  {% endif %}
 
   {% paginate %}
 
