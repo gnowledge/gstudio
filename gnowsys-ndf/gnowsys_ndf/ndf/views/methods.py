@@ -779,39 +779,78 @@ def get_property_order_with_value(node):
         if type(field_id_or_name) == ObjectId: #ObjectId.is_valid(field_id_or_name):
           # For attribute-field(s) and/or relation-field(s)
           
-          field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'subject_type': 1, 'name': 1, 'altnames': 1})
+          field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
           # list_field_set.append([demo['member_of'], field, demo[field.name]])
           altnames = u""
+          value = None
+          data_type = None
           if field._type == RelationType or field._type == "RelationType":
-            if field.altnames:
-              if ";" in field.altnames:
-                # print "\n altnames: ", field.altnames
-                if set(demo["member_of"]).issubset(field.subject_type):
-                  # It means we are dealing with normal relation & 
+            # For RelationTypes
+            # print "\n field.altnames: ", field.altnames, "\n"
+            # print "\n ", demo["member_of"], " === ", field.subject_type, "\n"
+            if set(demo["member_of"]).issubset(field.subject_type):
+              # It means we are dealing with normal relation & 
+              data_type = demo.structure[field.name]
+              value = demo[field.name]
+              # print "\n field.altnames(inner 1 if): ", field.altnames, "\n"
+              if field.altnames:
+                if ";" in field.altnames:
+                  # print "\n altnames: ", field.altnames
                   altnames = field.altnames.split(";")[0]
-                elif type_of_set:
-                  # If current node's GST is not in subject_type
-                  # Search for that GST's type_of field value in subject_type
-                  for each in type_of_set:
-                    if each in field.subject_type:
-                      altnames = field.altnames.split(";")[0]
                 else:
-                  # It means we are dealing with inverse relation
+                  altnames = field.altnames
+
+            elif set(demo["member_of"]).issubset(field.object_type):
+              # It means we are dealing with inverse relation
+              data_type = demo.structure[field.inverse_name]
+              # print "\n field.altnames(else`): ", field.altnames, "\n"
+              value = demo[field.inverse_name]
+              if field.altnames:
+                if ";" in field.altnames:
                   altnames = field.altnames.split(";")[1]
-              else:
-                altnames = field.altnames
+                else:
+                  altnames = field.altnames
+
+            elif type_of_set:
+              # If current node's GST is not in subject_type
+              # Search for that GST's type_of field value in subject_type
+              print "\n Coming here...\n"
+              for each in type_of_set:
+                if each in field.subject_type:
+                  data_type = demo.structure[field.name]
+                  # print "\n field.altnames(inner 2 if): ", field.altnames, "\n"
+                  value = demo[field.name]
+                  if field.altnames:
+                    if ";" in field.altnames:
+                      altnames = field.altnames.split(";")[0]
+                    else:
+                      altnames = field.altnames
+
+                elif each in field.object_type:
+                  data_type = demo.structure[field.inverse_name]
+                  # print "\n field.altnames(inner 2_2 if): ", field.altnames, "\n"
+                  value = demo[field.inverse_name]
+                  if field.altnames:
+                    if ";" in field.altnames:
+                      altnames = field.altnames.split(";")[0]
+                    else:
+                      altnames = field.altnames
+
 
           else:
             # For AttributeTypes
             altnames = field.altnames
+            data_type = demo.structure[field.name]
+            value = demo[field.name]
+
 
           # print " field._id: ", field._id, " --  field.altnames: ", altnames
 
           list_field_set.append({ 'type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
                                   '_id': field._id, 
-                                  'data_type': demo.structure[field.name],
+                                  'data_type': data_type,
                                   'name': field.name, 'altnames': altnames,
-                                  'value': demo[field.name]
+                                  'value': value
                                 })
 
         else:
@@ -1073,9 +1112,23 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
 
 
 def create_grelation(subject_id, relation_type_node, right_subject_id):
+  """
+  Creates a GRelation document (instance).
+
+  Arguments:
+  subject_id -- ObjectId of the subject-node
+  relation_type_node -- DBRef of the RelationType node (Embedded document)
+  right_subject_id -- ObjectId of the right_subject node
+
+  Returns:
+  Created GRelation document.
+  """
   gr_node = None
 
   try:
+    subject_id = ObjectId(subject_id)
+    right_subject_id = ObjectId(right_subject_id)
+
     gr_node = collection.Triple.one({'_type': "GRelation", 
                                      'subject': subject_id, 
                                      'relation_type': relation_type_node.get_dbref(),

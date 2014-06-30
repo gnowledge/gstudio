@@ -191,6 +191,33 @@ ul#graph-hover.f-dropdown{
         {% endif %}
         </ul>
 
+        {% for tab_name, tab_fields_list in property_order_list %}
+          {% for field in tab_fields_list %}
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label>{{field.altnames}}</label>
+            </div>
+            <div class="small-7 end columns">
+              {% if field.type == "RelationType" %}
+                {% if field.value|length > 5 %}
+                  <a href="#">{{field.value|length}}</a>
+
+                {% else %}
+                {% for n in field.value %}
+                  <a href="#">{{n.name|default_if_none:"--"|title}}</a><br/>
+                {% endfor %}
+
+                {% endif %}
+              {% else %}
+                <label>{{field.value|default_if_none:"--"|title}}</label>
+              {% endif %}
+            </div>
+          </div>
+          <br>
+          {% endfor %}
+        {% endfor %}
+
+        
       	{% with node.html_content|safe as description %}
       	{% if description != "None" %}
       	{{ description }}

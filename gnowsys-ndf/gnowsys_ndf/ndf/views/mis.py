@@ -178,11 +178,15 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                 tempdict = {}
                 tempdict['title'] = event.name
                 
-                if event.start_time and len(event.start_time) == 16:
-                    dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
+                if event.start_time:# and len(event.start_time) == 16:
+                    print "\n start_time: ", event.start_time, " -- ", event.start_time.strftime('%m/%d/%Y %H:%M')
+                    # dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
+                    dt = event.start_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['start'] = dt
-                if event.end_time and len(event.end_time) == 16:
-                    dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
+                if event.end_time:# and len(event.end_time) == 16:
+                    print "\n end_time: ", event.end_time, " -- ", event.end_time.strftime('%m/%d/%Y %H:%M')
+                    # dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
+                    dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
                 tempdict['id'] = str(event._id)
                 events_arr.append(tempdict)
@@ -195,11 +199,13 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                 tempdict = {}
                 tempdict['title'] = host.name
 
-                if system.start_time and len(system.start_time) == 16:
-                    dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
+                if system.start_time:# and len(system.start_time) == 16:
+                    # dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
+                    dt = event.start_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['start'] = dt
-                if system.end_time and len(system.start_time) == 16:
-                    dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
+                if system.end_time:# and len(system.start_time) == 16:
+                    # dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
+                    dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
                 
                 tempdict['id'] = str(host._id)

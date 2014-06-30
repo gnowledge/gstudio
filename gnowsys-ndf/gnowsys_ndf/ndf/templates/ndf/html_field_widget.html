@@ -30,7 +30,7 @@
   {% endif %}
 
   {% elif field_type == "datetime" %}
-  <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value}}" {% if is_required_field %}required{% endif %} />
+  <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:'m/d/Y H:i'}}" {% if is_required_field %}required{% endif %} />
   {% if is_required_field %}
   <small class="error">Please set {{field.altnames}}!!!</small>
   {% endif %}

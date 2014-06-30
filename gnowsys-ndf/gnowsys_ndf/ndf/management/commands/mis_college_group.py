@@ -34,7 +34,7 @@ class Command(BaseCommand):
     print "\n options: ", options, "\n"
 
     # Creating private groups ------------------------------------------------------------------------------------------
-    if False:
+    if True:
       try:
         create_college_group()
 
@@ -86,7 +86,7 @@ class Command(BaseCommand):
 
 
     # Creating enrollement code for Students ---------------------------------------------------------------------------
-    if True:
+    if False:
       stud_cur = None
       college_cur = None
 
