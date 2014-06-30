@@ -423,8 +423,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     if fileobj.fs.files.exists({"md5":filemd5}):
         
         # if calling function is passing oid=True as last parameter then reply with id and name.
-        if kwargs["oid"]: 
-
+        if kwargs.has_key("oid"):
+          if kwargs["oid"]: 
             coll_oid = get_database()['fs.files']
             cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
             # returning only ObjectId (of GSystem containing file info) in dict format.

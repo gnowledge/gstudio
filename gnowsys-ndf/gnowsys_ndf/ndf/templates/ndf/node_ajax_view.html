@@ -118,11 +118,19 @@ ul#graph-hover.f-dropdown{
 
           {% if 'Pandora_video' in node.member_of_names_list %}
           <div>
-            <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+           
+	    <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
               <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
               Your browser does not support the video tag.
-            </video>
+            </video><br/><br/>
 
+	    {% get_pandoravideo_metadata video_obj as metadata %}
+	    {% for k,v in metadata.items %} 
+            {% if k != "cuts" %}
+	    <h3>{{k}} : {{v}}<h3>
+		<br/>
+		{% endif %}
+	    {% endfor %}
             {% if user.is_authenticated %}
             <br/>
             <br/>
@@ -322,11 +330,20 @@ ul#graph-hover.f-dropdown{
             </li>
 
             {% else %}
-            <li>
-              <a class="button small expand" href="{% url create_url group_name_tag %}">
-                <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
-              </a>
-            </li>
+              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+              
+                <li>
+                  <a class="button small expand" href="{% url create_url group_name_tag app_id %}">
+                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  </a>
+                </li>
+              {% else %}
+                <li>
+                  <a class="button small expand" href="{% url create_url group_name_tag %}">
+                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  </a>
+                </li>
+              {% endif %}
 
             {% endif %}
 
