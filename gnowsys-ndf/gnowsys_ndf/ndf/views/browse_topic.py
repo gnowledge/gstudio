@@ -21,7 +21,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 
-from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers
 
 #######################################################################################################################################
@@ -378,3 +378,66 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                        },context_instance = RequestContext(request)
                               
     )
+
+
+def topic_detail_view(request, group_id, app_Id=None):
+
+  #####################
+  ins_objectid  = ObjectId()
+  if ins_objectid.is_valid(group_id) is False :
+    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    if group_ins:
+        group_id = str(group_ins._id)
+    else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+            group_id = str(auth._id)
+  else :
+    pass
+  ###################### 
+
+  collection_tr = db[Triple.collection_name]
+  obj = collection.Node.one({'_id': ObjectId(app_Id)})
+  app = collection.Node.one({'_id': ObjectId(obj.member_of[0])})
+  app_id = app._id
+
+  ##breadcrumbs##
+  # First time breadcrumbs_list created on click of page details
+  breadcrumbs_list = []
+  # Appends the elements in breadcrumbs_list first time the resource which is clicked
+  breadcrumbs_list.append( (str(obj._id), obj.name) )
+
+  ###shelf###
+  shelves = []
+  shelf_list = {}
+  auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+
+  if auth:
+	  has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+	  dbref_has_shelf = has_shelf_RT.get_dbref()
+	  shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+	  shelf_list = {}
+
+	  if shelf:
+	    for each in shelf:
+	        shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+	        shelves.append(shelf_name)
+
+	        shelf_list[shelf_name.name] = []         
+	        for ID in shelf_name.collection_set:
+	        	shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+	        	shelf_list[shelf_name.name].append(shelf_item.name)
+
+	  else:
+	    shelves = []
+  
+  return render_to_response('ndf/topic_details.html', 
+	                                { 'node': obj,'app_id': app_id,'breadcrumbs_list': breadcrumbs_list,
+	                                  'group_id': group_id,'shelves': shelves,
+	                                  'groupid':group_id,'shelf_list': shelf_list
+	                                },
+	                                context_instance = RequestContext(request)
+  )
+
+
