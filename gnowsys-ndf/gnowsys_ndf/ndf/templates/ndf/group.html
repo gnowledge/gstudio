@@ -1,11 +1,10 @@
 {% extends "ndf/base.html" %}
+
 {% load ndf_tags %}
 {% load pagination_tags %}
-{% block title %} Group {% endblock %}
+{% get_group_name groupid as group_name_tag %}
 
-{% block meta_content %}
-<h2>Groups</h2>
-{% endblock %}
+{% block title %} Group {% endblock %}
 
 
 {% block help_content %}
@@ -16,99 +15,116 @@
 {% endblock %}
 
 
+{% block meta_content %}
+  <h2>Groups</h2>
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+  <div class="create card">
+    <div class="group">
+      <br/>
+      <a class="button medium" href="{% url 'create_group' group_name_tag %}">
+    	<span class="fi-plus">&nbsp;&nbsp;New Group</span>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
 <header class="row">
   <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups ({{ group_nodes_count }})</a></dd>
-    <dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Groups {% if group_nodes_count %}({{ group_nodes_count }}){% endif %}</a></dd>
+    <!--<dd><a href="#panel2-3"><i class="fi-trophy"></i> Popular Groups</a></dd>-->
   </dl>
 </header>
 
+{% if searching and group_nodes_count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{group_nodes_count}} {{title|lower}}{{group_nodes_count|pluralize}}.</span></p>
+  </div>
+</div>
+
+{% elif searching and group_nodes_count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert">No {{title|lower}}{{group_nodes_count|pluralize}} matched your search criteria!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
-  <!-- Node create card-->
-  <li class="create card">
-    <div class="group">
-      <h4><i class="fi-plus"></i> New</h4>
-      <!--<div class="row">
-       <div class="large-12 columns">
-          <input type="text" placeholder="Name of the Group" />
-          <textarea placeholder="Describe the Group"></textarea>
-          <input id="ANONYMOUS" type="checkbox"><label for="ANONYMOUS">Anonymous (No login required)</label>
-
-          <div class="login-mode switch round">
-            <input id="PUBLIC" name="login-mode" type="radio" checked>
-            <label for="PUBLIC" onclick="">Public Group <i class="fi-torsos-all"></i></label>
-
-            <input id="PRIVATE" name="login-mode" type="radio">
-            <label for="PRIVATE" onclick="">Private Group <i class="fi-lock"></i></label>
-
-            <span></span>
-          </div> 
-
-          <script type="text/javascript">
-            $("#ANONYMOUS").change(function(){
-              /* Hide type group type options if anonymous*/
-              $(".login-mode").slideToggle();
-            });
-          </script>
-       -->
-
-      {% if user.is_authenticated %}
-         {% get_create_group_visibility as create_group %}
-         {% if create_group %}
-             <a class="button expand" href="{% url 'create_group' group_name_tag %}">
-                Create Group
-             </a>
-         {% endif %}
-      {% endif %}
-      </div>
-
-  </li>
-  
   <!-- Existing card list-->
-
-  {% autopaginate groups 23 %}
+  {% get_group_type request.path request.user as group_type %}
+  
+  {% autopaginate group_nodes 23 %}
 
   {% for node in group_nodes %}
+  {% if node.name != request.user.username %}
   
   <li class="card">
     <div class="group">
       
       <header>
         <div class="label-list">
-          {% for tag in node.tags %}
+          {% for tag in node.tags|slice:":3" %}
           <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
           {% endfor %}
         </div>
-     {% get_group_resources node as obj_count %}
-   
+
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-        <h4>{{ node.name }}</h4>
-	<div>
-            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+        <h4>{{ node.name|truncatechars:20 }}
+      	<div>
+            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
             </small>
-          </div>
+        </div>
+        </h4>
       </header>
       
-      <p>
-{{node.html_content|default_if_none:'Please edit to add content..'|truncatewords_html:10|safe}}</p>
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
       <a class="button expand"  href="/{{node.pk}}">View Group</a>
       
       <footer class="row">
         <div class="small-6 columns"><strong>{{node.author_set|length}}</strong> Members</div>
-        <div class="small-6 columns"><strong>{{obj_count}}</strong> Objects</div>
+        {% get_group_resources node as obj_count %}
+        <div class="small-6 columns"><div class="right"><strong>{{obj_count}}</strong> Objects</div></div>
       </footer>
       
     </div>
   </li>
-  
+  {% endif %}
+
   {% empty %}
-  <p><em>No groups found!</em></p>
+    {% if not searching %}
+      <div class="row">
+        <div class="small-12 columns">
+          <h5>There are no groups created yet. <b>Be the first to create a Group!</b></h5>
+        </div>
+      </div>
+    {% endif %}
+
   {% endfor %}
   
-  
 </ul>
+
 {% paginate %}
+
 {% endblock %}

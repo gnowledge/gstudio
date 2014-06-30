@@ -11,7 +11,7 @@ from django.template import RequestContext
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
-
+from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
 import subprocess
 import re
@@ -41,6 +41,20 @@ def get_all_gapps():
   all_gapps=coln.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type_gapp._id]}}]})    
   return list(all_gapps)
 
+#checks forum notification turn off for an author object
+def forum_notification_status(group_id,user_id):
+  grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
+  auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
+  at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
+  if at_user_pref:
+    poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
+    if poss_attrs:
+      list_at_pref=poss_attrs['user_preference_off']['object_value']
+      if grp_obj in list_at_pref:
+        return False
+      else:
+        return True
+
 def get_forum_repl_type(forrep_id):
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
@@ -54,12 +68,28 @@ def get_forum_repl_type(forrep_id):
 
 def check_existing_group(group_name):
   collection = db[Node.collection_name]
-
   if type(group_name) == 'unicode':
     colg = collection.Node.find({'_type': u'Group', "name": group_name})
+    if colg.count()>0:
+      return True
+    if ins_objectid.is_valid(group_name):    #if group_name holds group_id
+      colg = collection.Node.find({'_type': u'Group', "_id": ObjectId(group_name)})
+    if colg.count()>0:
+      return True
+    else:
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True      
   else:
-    colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
-
+    if ins_objectid.is_valid(group_name):     #if group_name holds group_id
+      colg = collection.Node.find({'_type': u'Group', "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": ObjectId(group_name)})
+      if colg.count()>0:
+        return True
+    else:
+      colg = collection.Node.find({'_type': {'$in':['Group', 'Author']}, "_id": group_name._id})
   if colg.count() >= 1:
     return True
   else:
@@ -241,6 +271,8 @@ def get_node_common_fields(request, node, group_id, node_type):
   collection = None
 
   name = request.POST.get('name')
+  sub_theme_name = request.POST.get("sub_theme_name", '')
+  add_topic_name = request.POST.get("add_topic_name", '')
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
@@ -277,8 +309,16 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # --------------------------------------------------------------------------- For create/edit
   node.name = unicode(name)
+  if sub_theme_name:
+    node.name = unicode(sub_theme_name) 
+  if add_topic_name:
+    node.name = unicode(add_topic_name)
+
   node.status = unicode("DRAFT")
-  node.language = unicode(language) 
+  if language:
+    node.language = unicode(language) 
+  else:
+    node.language = u"en"
   node.location = map_geojson_data # Storing location data
 
   if access_policy:
@@ -288,6 +328,8 @@ def get_node_common_fields(request, node, group_id, node_type):
       node.access_policy = u"PUBLIC"
     else:
       node.access_policy = u"PRIVATE"
+  else:
+    node.access_policy = u"PUBLIC"
 
   node.modified_by = usrid
 
@@ -391,35 +433,34 @@ def get_node_common_fields(request, node, group_id, node_type):
   
   
 def get_versioned_page(node):
-            content=[] 
+            
        
-            #check if same happens for multiple nodes
-            i=node.current_version
-          
-            #get the particular document Document
-                   
-            doc=history_manager.get_version_document(node,i)
+    rcs = RCS()
+    fp = history_manager.get_file_path(node)
+    cmd= 'rlog  %s' % \
+	(fp)
+    rev_no =""
+    proc1=subprocess.Popen(cmd,shell=True,
+				stdout=subprocess.PIPE)
+    for line in iter(proc1.stdout.readline,b''):
+       
+       if line.find('revision')!=-1 and line.find('selected') == -1:
 
-          
-            #check for the published status for the particular version
-          
-            while (doc.status != "PUBLISHED"):
-              currentRev = i
-
-              splitVersion = currentRev.split('.')
-              previousSubNumber = int(splitVersion[1]) - 1 
-
-              if previousSubNumber <= 0:
-               previousSubNumber = 1
-
-              prev_ver=splitVersion[0] +"."+ str(previousSubNumber)
-              i=prev_ver 
-
-              doc=history_manager.get_version_document(node,i)
-              if (i == '1.1'):
-                  return (doc,i)
-            return (doc,i)
-
+          rev_no=string.split(line,'revision')
+          rev_no=rev_no[1].strip( '\t\n\r')
+          rev_no=rev_no.strip(' ')
+       if line.find('status')!=-1:
+          up_ind=line.find('status')
+          if line.find(('PUBLISHED'),up_ind) !=-1:
+               rev_no=rev_no.strip(' ')
+               node=history_manager.get_version_document(node,rev_no)
+               proc1.kill()
+               return (node,rev_no)    
+       if rev_no == '1.1':
+           node=history_manager.get_version_document(node,'1.1')
+           proc1.kill()
+           return(node,'1.1')
+        
 
 def get_user_page(request,node):
     ''' function gives the last docment submited by the currently logged in user either it
@@ -441,7 +482,6 @@ def get_user_page(request,node):
           rev_no=rev_no.strip(' ')
        if line.find('updated')!=-1:
           up_ind=line.find('updated')
-          print line.find(str(request.user),up_ind)
           if line.find(str(request.user),up_ind) !=-1:
                rev_no=rev_no.strip(' ')
                node=history_manager.get_version_document(node,rev_no)
@@ -531,3 +571,73 @@ def tag_info(request, group_id, tagname):
 
   return render_to_response("ndf/tag_browser.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
 
+
+#code for merging two text Documents
+import difflib
+def diff_string(original,revised):
+        
+        # build a list of sentences for each input string
+        original_text = _split_with_maintain(original)
+        new_text = _split_with_maintain(revised)
+        a=original_text + new_text
+        strings='\n'.join(a)
+        #f=(strings.replace("*", ">").replace("-","="))
+        #f=(f.replace("> 1 >",">").replace("= 1 =","="))
+
+        
+        return strings
+STANDARD_REGEX = '[.!?]'
+def _split_with_maintain(value, treat_trailing_spaces_as_sentence = True, split_char_regex = STANDARD_REGEX):
+        result = []
+        check = value
+        
+        # compile regex
+        rx = re.compile(split_char_regex)
+        
+        # traverse the string
+        while len(check) > 0:
+            found  = rx.search(str(check))
+            if found == None:
+                result.append(check)
+                break
+            
+            idx = found.start()
+            result.append(str(check[:idx]))            # append the string
+            result.append(str(check[idx:idx+1]))    # append the puncutation so changing ? to . doesn't invalidate the whole sentence
+            check = check[idx + 1:]
+            
+            # group the trailing spaces if requested
+            if treat_trailing_spaces_as_sentence:
+                space_idx = 0
+                while True:
+                    if space_idx >= len(check):
+                        break
+                    if check[space_idx] != " ":
+                        break
+                    space_idx += 1
+                
+                if space_idx != 0:
+                    result.append(check[0:space_idx])
+            
+                check = check[space_idx:]
+            
+        return result
+
+def update_mobwrite_content_org(node_system):   
+  '''
+	on revert or merge of nodes,a content_org is synced to mobwrite object
+	input : 
+		node
+  ''' 
+  system = node_system
+  filename = TextObj.safe_name(str(system._id))
+  textobj = TextObj.objects.filter(filename=filename)
+  content_org = system.content_org
+  if textobj:
+    textobj = TextObj.objects.get(filename=filename)
+    textobj.text = content_org
+    textobj.save()
+  else:
+    textobj = TextObj(filename=filename,text=content_org)
+    textobj.save()
+  return textobj

@@ -3,8 +3,10 @@
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 	<!-- Leaflet -->
-	<script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
-	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+	<!-- <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script> -->
+	<script src="/static/ndf/leaflet/leaflet.js"></script>
+	<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" /> -->
+	<link rel="stylesheet" href="/static/ndf/leaflet/leaflet.css">
 
 	<!-- Search	 -->
 	<!-- <script src="https://raw.githubusercontent.com/stefanocudini/leaflet-search/master/src/leaflet-search.js" type="text/javascript" ></script> -->
@@ -16,7 +18,8 @@
 
 	<!-- Datetimepicker  -->
 	<!-- <link rel="stylesheet" media="all" type="text/css" href="/static/ndf/css/jquery-ui.css" /> -->
-	<link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<!-- <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" /> -->
+	<link rel="stylesheet" href="/static/ndf/css/jquery-ui.css">
 	<script src="/static/ndf/js/jquery-ui.js"></script>
 	<script src="/static/ndf/js/jquery-ui-sliderAccess.js"></script>
 	<script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
@@ -29,7 +32,19 @@
 		
 		#map { height: 100%; width: 100%; }
 
-		.leaflet-popup-content {	min-width:166px; max-width: auto;	}
+		.leaflet-popup-content {
+			min-width:166px; 
+			max-width: auto;	
+			/*border-radius: 10px;*/
+		    /*padding: 1em;*/
+		}
+
+		.leaflet-popup-content .pricing-table{
+			border: none ;
+		}
+
+		.leaflet-popup-content .pricing-table .bullet-item { text-align: left; font-size: small; }
+		.leaflet-popup-content .pricing-table .title { border-top-left-radius: 9px;  border-top-right-radius: 9px; }
 
 		.leaflet-popup-content > textarea { 
 			min-height: 4.5em !important;
@@ -69,10 +84,114 @@
 		
 		.marker-alert-error {	background-color: #f04124;	}
 
+		.leaflet-popup-content label::after {
+			content : " *";
+			color: #f15439;
+		}
+
+		.marker-popup-image-icon {
+			color: #e5e5e5;
+			font-size: 3.75em;
+			margin-top: -12px;
+			position: absolute;
+		}
+
+		.marker-popup-attach-icon{
+			color: #a1c7b7;
+			font-size: 1.7em;
+			left: 0.9em;
+			position: absolute;
+			top: 0.3em;
+		}
+
+		.marker-popup-image-uploader{
+			background-color: #FAFAFA; border: thin solid #EFEFEF; border-radius: 5px; margin-bottom: 0.5em !important;
+		}
+
+		.marker-popup-image-uploader > div{
+			margin-bottom: -1em;
+		}
+
+		.attached-images > li {
+			background-color: #EDEDED;
+			border: thin solid #E5E5E5;
+			border-radius: 5px;
+			margin: 5px;
+			text-align: left;
+			padding-left: 0.35em;
+			color: gray;
+		}
+			
+		.attached-images > li > a { padding-left: 0.75em; }
+
+		.attached-images > li > span { cursor: pointer; }
+
+		ul.read-images {
+		    font: inherit;
+		    padding: 0.3em;
+		}
+
+		ul.read-images > li {
+			padding: 2px 0;
+		}
+		
+		.ask-register-div{
+
+			background-color: #87CEEB;
+			color: inherit;
+			height: 85%;
+			width: 81%;
+			/*margin-right: 1.68em;*/
+			/*opacity: 0.9;*/
+			padding: 0.5em;
+			position: absolute;
+			color: #FFFFFF;
+    		font-size: 1.9em;
+			font-family: Georgia Serif,Serif;
+			z-index: 1;
+		}
+
+		.bestfitzoom-custom-control {
+			background-color: #FFFFFF;
+			padding: 7.5px;
+			font-size: 1.25em;
+			margin-top: 20px !important;
+			cursor: pointer;
+		}
+
+		.bestfitzoom-custom-control.has-tip.tip-right {
+			float: left !important;			
+		}
+
 	</style>
 
 
 <body>
+
+	<!-- giving option of image upload -->
+	{% if mode == "edit" %} 
+
+		<!-- overlay div for uploading files -->
+		<div id="image-uploader-overlay" class="reveal-modal small" style="z-index:1001;" data-reveal>
+			<a class="close-reveal-modal">&#215;</a>
+			<h3 class="text-center">Attach File</h3>
+			<hr/>			
+			<form id="file-form" action="{% url 'save_image' groupid app_id app_set_id app_set_name_slug %}" method="POST">
+			{% csrf_token %}
+				<input type="file" id="file-select" name="doc[]" onchange="checkImageAttached(this.value)" />
+				<button type="submit" id="upload-button">Upload</button>
+			</form>
+			<input type="hidden" name="images-metadata" value="{{file_metadata | default:'[]'}}" data-images-metadata="{{file_metadata | default:'[]'}}">
+		</div>
+		<!-- END of overlay div for uploading files -->
+
+	{% endif %}
+
+	<!-- END of image upload for registered users -->
+
+	{% if mode == "read" %}
+		<input type="hidden" name="file-metadata" value="{{file_metadata | default:'[]'}}"/>
+	{% endif %}
 
 	<!-- Popup structure -->
 	<div style="display:none; ">
@@ -83,11 +202,56 @@
 			<input type="text" class="marker-dtstamp" placeholder="Date Time"/>
 			<label>Observations</label>
 			<textarea class="marker-obs-note" placeholder="Observation"></textarea>
+			
+			{% if user.is_authenticated %}
+
+			<div class="row images-list">
+				<ul class="attached-images no-bullet" data-image-list="[]"></ul>
+				<div class="small-3 columns">
+					<i class="fi-camera marker-popup-image-icon"></i>
+				</div>
+				<div class="small-9 columns">
+					<div class="button tiny expand" data-reveal-id="image-uploader-overlay">
+						<i class="fi-paperclip marker-popup-attach-icon"></i>
+						<span class="right" style="margin-right:2em;">Attach File</span>
+					</div>
+				</div>
+			</div>
+
+			{% else %} 
+			<!-- for anonymous user -->
+
+			<div class="row images-list">
+				<ul class="attached-images no-bullet" data-image-list="[]"></ul>
+				<div class="small-3 columns">
+					<i class="fi-camera marker-popup-image-icon"></i>
+				</div>
+				<div class="small-9 columns">
+					<div class="button tiny expand" onclick='$(".marker-alert-error").text("You need to log-in or register for this feature.").fadeIn(600, "swing").fadeOut(10000); $(".leaflet-popup-content:visible").find("a.annon-login").delay(6000).fadeOut().fadeIn().fadeOut().fadeIn()'>
+						<i class="fi-paperclip marker-popup-attach-icon"></i>
+						<span class="right" style="margin-right:2em;">Attach File</span>
+					</div>
+				</div>
+			</div>
+
+			{% endif %}
+
+			<!-- 
+			<form method="post" enctype="multipart/form-data" class="popup-form">
+				<input type="file" name="doc[]" class="image-upload" multiple/>
+			</form> -->
+
 			<label>Tags</label>
 			<input type="text" class="marker-tags" placeholder="Tags"/>
-			<!-- <input type="file" class="marker-file-upload" /> -->
+			
+			<!-- adding created by field for anonymous user -->
+			{% if not user.is_authenticated %}
+			<label>Contributor</label>
+			<input type="text" class="marker-creator" placeholder="Enter your name"/>
+			{% endif %}
+			
 
-			<div class="row">
+			<div class="row edit-delete-cntr">
 				<div class="small-push-1 small-4 popup-add-content-button text-center"><i class="fi-page-edit"> &nbsp; edit</i></div>			
 				<div class="small-pull-1 small-4 popup-delete-content-button text-center"><i class="fi-trash"> &nbsp; delete</i></div>			
 			</div>
@@ -103,6 +267,10 @@
 	</div>
 
 	<input type="hidden" value="{{ visited_location }}" name="last_visited_location"/>
+
+	{% if not user.is_authenticated %}
+		<input type="hidden" value="" name="anonymous_added_markers" />
+	{% endif %}
 	
 	<script type="text/javascript">
 
@@ -114,6 +282,33 @@
 	 	// instantiate map instantiate
 	 	var map = L.map('map').addLayer(osm);
 	 	map.setView([25.92,79.84], 5);
+
+
+
+	 	var bestFitZoomControl = L.Control.extend({
+	 		options: {
+	 			position: 'topleft'
+	 		},
+
+	 		onAdd: function (map) {
+		        // create the control container with a particular class name
+		        controlDiv = L.DomUtil.create('div', 'bestfitzoom-custom-control leaflet-bar');
+		        controlDiv.innerHTML = '<i class="fi-zoom-in"></i>'
+
+		        $(controlDiv).attr("title", "All markers view");
+		        $(controlDiv).attr("data-tooltip", "");
+		        $(controlDiv).addClass('has-tip tip-right radius');
+
+		        L.DomEvent
+		            .addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+		            .addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+		        		.addListener(controlDiv, 'click', bestFitZoom);
+
+		        return controlDiv;
+    		}
+		});
+
+	 	map.addControl(new bestFitZoomControl());
 
 		// getting logged in user last visited location	 	
 		{% if user.is_authenticated %}
@@ -161,6 +356,17 @@
 		});// END of ajax
 		{% endif %}
 
+
+		function checkHyperlinks(content)
+		{
+			var regex = '(((ftp|https?):\/\/)(www\.)?|www\.)([\da-z-_\.]+)([a-z\.]{2,7})([\/\w\.-_\?\&]*)*\/?';
+
+			var processedContent = content.replace(regex,"<a href='$1'>$1</a>");
+
+			return (processedContent);
+		}
+
+
 		// defining markers
 	 	nonInfoMarker = L.AwesomeMarkers.icon({ markerColor: 'blue', iconColor: 'white', spin:false });
 	 	infoMarker = L.AwesomeMarkers.icon({ icon: 'info', prefix: 'fi', markerColor: 'blue', iconColor: 'white', spin:false });
@@ -171,8 +377,8 @@
 	 	// map.addControl( new L.Control.Search({layer: searchLayer}) );
 
 	 	mapdata = "";
+
 		// exctracting GeoJson sent from server
-		
 		{% if template_view == "landing_page_view" %}
 		
 			{% for each in app_collection_set %}
@@ -211,6 +417,13 @@
 	 		user_type = "anonymous";
 	 	{% endif %}
 
+	 	{% if mode == "read" %}
+
+	 		var readFileMeta = $("input:hidden[name='file-metadata']").val();
+	 			readFileMeta = JSON.parse(readFileMeta);
+
+	 	{% endif %}
+
 	 	if( mapdata.length > 0 )
 	 	{
 	 		// Adding mapdata on map
@@ -233,22 +446,76 @@
 					var placename = feature.properties.placename,
 						datetime = feature.properties.datetime,
 						description = feature.properties.description,
-						tags = feature.properties.tags 
-						created_by = feature.properties.created_by;
+						tags = feature.properties.tags,
+						created_by = feature.properties.created_by,
+						edited_by = feature.properties.edited_by,
+						attached_files = feature.properties.attached_files;
+						// console.log((attached_files));
 
-				// console.log(placename + " == " + datetime + " == " + description + " == " + tags + " == " + created_by);
 
 					{% if mode == "read"%}
 
-						tempPopupContent = placename? "Placename : "+placename :tempPopupContent;
-						tempPopupContent = datetime? tempPopupContent + "<hr/>Date Time : " + datetime :tempPopupContent;
-						tempPopupContent = description? tempPopupContent + "<hr/>Description : " + description :tempPopupContent;
-						tempPopupContent = tags? tempPopupContent + "<hr/>Tags : " + tags :tempPopupContent;
+						tempPopupContent = placename? '<ul class="pricing-table"><li class="title"><b>Placename : </b> '+placename +'</li>':tempPopupContent;
+
+						tempPopupContent = datetime? tempPopupContent + '<li class="bullet-item"><b>Date Time : </b>'+datetime+'</li>':tempPopupContent;
+
+						var regex = /((ftp|https?):\/\/([-\w\.]+)+(:\d+)?(\/([\w\-/_\.]*(\?\S+)?)?)?)/ig
+						// var regex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+						// var regex = (((ftp|https?):\/\/)(www\.)?|www\.)([\da-z-_\.]+)([a-z\.]{2,7})([\/\w\.-_\?\&]*)*\/?
+						// var regex = /(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-=?]*)*\/?/
+
+						var testLinks = description.replace(regex,"<a href='$1' target='_blank'>$1</a>");
+
+						tempPopupContent = description? tempPopupContent + '<li class="bullet-item"><b>Description : </b> ' + testLinks + '</li>' :tempPopupContent;
+
+						tempPopupContent = tags? tempPopupContent + '<li class="bullet-item"><b>Tags : </b>' + tags + '</li>' :tempPopupContent;
+
+						// fileslinks -------------------
+						
+						var fileList = attached_files?(JSON.parse(attached_files)):(JSON.parse('[]'));
+						var fileListHtml="";
+
+						// fileList.forEach(function(f){
+
+							$.each(fileList, function(i, val){				
+
+							    if (readFileMeta.length > 0)
+							    {
+							    	$.each(readFileMeta, function(i, imageDict){ 
+
+							    		if( readFileMeta[i].id == val )
+							    		{
+						    				fileListHtml += '<li title="'+imageDict.name+'"><a href="/{{group_id}}/file/details/'+imageDict.id+'" target="_blank">'+imageDict.mimetype +'</a></li>';
+							    		}
+							    	});
+							    }
+							})
+
+							// fileListHtml +='<li>'+f+'</li>'
+
+						// });
+
+						tempPopupContent = attached_files? tempPopupContent + '<li class="bullet-item"><b>Attached Files : </b><ul class="read-images">' + 
+											fileListHtml
+											+ '</ul></li>' :tempPopupContent;
+
+						tempPopupContent += '</ul>'
+
+						// END of files links ----------------
+
+						// adding created by in popup
+						created_by = (created_by.indexOf("anonymous_") == 0)? (created_by.split("_")[2])?created_by.split("_")[2]+ " (Anonymous User)":"Anonymous User" : created_by;
+
+						tempPopupContent = created_by? tempPopupContent + '<i style="color:gray; margin-left:"> Contributed by : ' + created_by + '</i>':tempPopupContent;
+
+			  						// console.log(edited_by);
+
+						// adding edited_by field
+						tempPopupContent = (edited_by.length > 1)? tempPopupContent + '<br/><br/><i style="color:#b2b2b2; margin-left:"> Edited by : ' + edited_by + '</i>':tempPopupContent;
 
 						hasDataFlag = tempPopupContent.length>0 ? true : false;
-					{% endif %}
 
-					{% if mode == "edit" %}
+					{% elif mode == "edit" %}
 
 						var tc = popupBasicHtml;
 			
@@ -310,14 +577,228 @@
 	        {% endif %}
 	 	}
 	 	
-	 	// if( tempArr.length )
-			    // {
-			    //   var group = new L.featureGroup(tempArr)
-			    //       map.fitBounds(group.getBounds());
-			    // }
+
+	 	function bestFitZoom()
+	 	{
+	 		var group = new L.featureGroup
+	 		$.each(map._layers, function(ml){if(map._layers[ml].feature){group.addLayer(this)}})
+	 		map.fitBounds(group.getBounds());
+	 	}
+
 
 
 	{% if mode == "edit" %}
+
+
+		// showing and uploading files
+		function imageHandler(tempMarker)
+		{
+			var form = document.getElementById('file-form');
+			var fileSelect = document.getElementById('file-select');
+			var uploadButton = document.getElementById('upload-button');
+
+			var popupHtmlObj = tempMarker._popup._contentNode,
+				getFileList = tempMarker.feature.properties.attached_files,
+				$attachedImages = $(popupHtmlObj).find("ul.attached-images"),
+				imagesMetaData = $("#image-uploader-overlay > input[name='images-metadata']").attr("value");
+
+				imagesMetaData = JSON.parse(imagesMetaData);
+
+				$attachedImages.attr("data-image-list", getFileList );
+
+
+			// showing attached images on PopupOpen
+			if(getFileList && (JSON.parse(getFileList).length > 0) )
+			{
+				getFileList = JSON.parse(getFileList);
+
+				// adding css class to highlight all the uploaded files together
+				$(".leaflet-popup-content:visible").children("div.images-list").addClass("marker-popup-image-uploader");
+
+				// loop to append each attached file's name
+				$.each(getFileList, function(i, val){				
+
+				    if (imagesMetaData.length > 0)
+				    {
+				    	$.each(imagesMetaData, function(i, imageDict){ 
+
+				    		if( imagesMetaData[i].id == val )
+				    		{
+				    			var filetype = (imageDict.mimetype.trim().length)>0?imageDict.mimetype:"file";
+
+			    				$attachedImages.append("<li title='"+imageDict.name+"'><span title='Remove attached file' onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/details/"+imageDict.id+"' target='_blank' data-id='"+imageDict.id+"'>"+filetype+"</a></li>");
+				    		}
+				    	});
+				    }
+
+
+				})
+			}
+			// --END of showing attached images on PopupOpen
+
+
+			// if user is not authenticated do not give functionality of removing image
+			{% if not user.is_authenticated %}
+				$("ul.attached-images:visible").find("span").remove()
+			{% endif %}
+
+			// actual action to be taken on uploading image
+			form.onsubmit = function(event) {
+
+				event.preventDefault();
+
+				// Update button text.
+				uploadButton.innerHTML = 'Uploading...';
+
+				// Get the selected files from the input.
+				var files = fileSelect.files;
+
+				// Create a new FormData object.
+				var formData = new FormData();
+
+				// Loop through each of the selected files.
+				for (var i = 0; i < files.length; i++) {
+				  var file = files[i];
+
+				  // // Check the file type.
+				  // if (!file.type.match('image.*')) {  continue; }
+
+				  // Add the file to the request.
+				  formData.append('doc[]', file, file.name);
+				}
+
+				// appending csrfmiddlewaretoken and user-id
+				formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+				formData.append('user','{{request.user.id}}');
+				formData.append('location', JSON.stringify(tempMarker.toGeoJSON()));
+
+				// Set up the request.
+				xhr = new XMLHttpRequest();
+
+				// Open the connection.
+				xhr.open('POST', "{% url 'save_image' groupid app_id app_set_id app_set_name_slug %}", true);
+
+				// Set up a handler for when the request finishes sucessfully.
+				xhr.onload = function () {
+
+				  if (xhr.status === 200) 
+				  {
+				    // File(s) uploaded.
+				    $('#image-uploader-overlay').foundation('reveal', 'close');
+
+				    var imagesList = $attachedImages.attr("data-image-list");
+
+				    imagesList = JSON.parse(imagesList);
+
+				    // if file is not uploaded sucessfully
+				    if(xhr.responseText == "UploadError")
+				    {
+				    	$(".marker-alert-error").text("Error while uploading file. This might be because of file is currupted or invalid file format !").fadeIn(600, "swing").fadeOut(10000);
+				    }
+				    // check if image is not in the list, add it.
+				    else if(imagesList.indexOf(xhr.responseText) < 0 )
+				    {
+				    	
+				    	imagesList.push(xhr.responseText);
+
+				    	$attachedImages.attr("data-image-list", JSON.stringify(imagesList));
+
+				    	var filetype = (fileSelect.files[0].type.trim().length)>0?fileSelect.files[0].type:"file";
+
+				    	$attachedImages.append("<li title='"+fileSelect.files[0].name+"'><span title='Remove attached file' onclick='removeImage($(this).next())'>&#215;</span><a href='/{{group_id}}/file/details/"+xhr.responseText+"' target='_blank' data-id='"+xhr.responseText+"'>"+filetype+"</a></li>");
+				    	// fileSelect.files[0].type.split("/")[0]
+
+				    	$inputEl = $(".leaflet-popup-content:visible").children("input, textarea");
+						var hasDataFlag = true;
+						$inputEl.each(function(){ if(this.value.trim().length == 0) hasDataFlag = false; });
+						
+						// after attaching file change edit to save
+						if(hasDataFlag){ $(".leaflet-popup-content:visible").find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save"); }
+				    }
+
+				    if(imagesList.length > 0)
+				    {
+				    	$(".leaflet-popup-content:visible").children("div.images-list").addClass("marker-popup-image-uploader");
+					}
+
+				    uploadButton.innerHTML = 'Upload';
+
+				    // updating metadata of files, if file is uploaded sucessfully
+				    if(xhr.responseText != "UploadError")
+				    {
+				    	var imagesMetaData = $("#image-uploader-overlay > input[name='images-metadata']").attr("value");
+
+				    	imagesMetaData = JSON.parse(imagesMetaData);
+
+				    	var flagIsInList = false;
+
+				    	if (imagesMetaData.length > 0)
+				    	{
+				    		$.each(imagesMetaData, function(i, val){ 
+
+				    			if( imagesMetaData[i].id == xhr.responseText )
+				    			{
+				    				    			// console.log(imagesMetaData[i].id + "====" + xhr.responseText)
+				    				    			flagIsInList = true;
+				    				    		}
+				    				    	});
+				    	}
+
+				    	if( (imagesMetaData.length == 0) || (!flagIsInList) )
+				    	{
+				    		var tempDict = { "id": xhr.responseText, "name":fileSelect.files[0].name, "mimetype":fileSelect.files[0].type }
+
+				    		imagesMetaData.push(tempDict);
+
+				    		$("#image-uploader-overlay > input[name='images-metadata']").attr("value", JSON.stringify(imagesMetaData));
+				    	}
+				    }
+				  }
+				  else
+				  {
+				    alert('An error occurred!');
+				  }
+				};
+
+				// Send the Data.
+				xhr.send(formData);
+			}
+
+			$(document).on('open', '#image-uploader-overlay[data-reveal]', function () {
+				if(fileSelect.files.length > 0){
+					fileSelect.value = "";
+				}
+				uploadButton.disabled = true;			
+			});
+
+		}
+
+		function removeImage(imageEl)
+		{
+			// console.log(imageEl);
+			var image_id = imageEl.attr("data-id"),
+				$ul = imageEl.closest("ul.attached-images"),
+				imagesList = JSON.parse($ul.attr("data-image-list"));
+
+			imagesList.splice(imagesList.indexOf(image_id), 1);
+			$ul.attr("data-image-list", JSON.stringify(imagesList));
+
+			imageEl.parent("li").remove();
+			
+			$inputEl = $(".leaflet-popup-content:visible").children("input, textarea");
+			var hasDataFlag = true;
+			$inputEl.each(function(){ if(this.value.trim().length == 0) hasDataFlag = false; });
+			
+			if(hasDataFlag){ $(".leaflet-popup-content:visible").find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save"); }
+		}
+
+
+		function checkImageAttached(imageValue)
+		{
+			var uploadButton = document.getElementById('upload-button');
+			uploadButton.disabled = (imageValue)? false:true;
+		}
+
 
 		function updateHiddenTagContent(visitedMarker)
 	 	{
@@ -386,11 +867,7 @@
 
 			marker.feature.properties.id = marker._leaflet_id;
 
-			
-				
-				// marker.feature.properties.created_by = "{{user_name}}"
-
-			
+			// marker.feature.properties.created_by = "{{user_name}}"
 
 			// console.log(marker);
 			// console.log(JSON.stringify(marker.toGeoJSON()));
@@ -412,68 +889,76 @@
 				zoom;
 			
            	this.setLatLng(changedPos).update();	// Update the marker position
-
-           	// var lID = this._leaflet_id;		// Getting Leaflet ID of this marker
-
-           	// var tempMarkerGeoJSON = this.toGeoJSON();
            	
-           	// console.log(this);
-			// console.log( JSON.stringify(tempMarkerGeoJSON))
+           	changeEditToSaveBtn = this.getPopup();
+           	changeEditToSaveBtn = changeEditToSaveBtn.getContent();
+           	// console.log(changeEditToSaveBtn);
+           	changeEditToSaveBtn = changeEditToSaveBtn.replace('<i class="fi-page-edit"> &nbsp; edit</i>', '<i class="fi-save"> &nbsp; save</i>');
+			this.setPopupContent(changeEditToSaveBtn);
+           	// changeEditToSaveBtn = this._popup._contentNode.getElementsByClassName("fi-page-edit");
 
-			// var placename = tempMarkerGeoJSON.properties.placename,
-			// 	datetime = tempMarkerGeoJSON.properties.datetime,
-			// 	description = tempMarkerGeoJSON.properties.description,
-			// 	tags = tempMarkerGeoJSON.properties.tags ;
-
-			// // preserving and updating GeoJson of marker
-			// if(! description)
-			// {
-			// 	$.each(markerGeoJSON, function(i, val) {
-				            	
-			// 		            		var getID = $.parseJSON(val).properties.id,
-			// 		            			getDescription = $.parseJSON(val).properties.description; 
-				
-			// 		            		if(getID == lID){
-
-			// 		            			description = getDescription?getDescription:"";  
-			// 		            		}  
-			// 		           		})
-			// }
-
-			// if(description)
-			// {					
-			// 	$(".marker-obs-note:visible").val(description)
-			// }
-
-			// // console.log($(".popup-content:visible").text(description));
+           	// $(changeEditToSaveBtn).attr("class", "fi-save").text(" save");
 
 			// // tempMarkerGeoJSON.properties.description = $(this).parent().parent().find(".popup-content:visible").text();					
-
-			// tempMarkerGeoJSON.properties.id = lID;	
-			
-					
-			// var updatedGeoJSON = JSON.stringify(tempMarkerGeoJSON);
-			
-   //          $.each(markerGeoJSON, function(i, val) {
-            	
-	  //       	var getID = $.parseJSON(val).properties.id; 
-	  //       	if(getID == lID) { markerGeoJSON[i] = updatedGeoJSON; }  
-   //          })
 
             var changedMarkerLatLng = []
             changedMarkerLatLng.push(changedPos.lat);
             changedMarkerLatLng.push(changedPos.lng);
 
             updateHiddenTagContent(changedMarkerLatLng);
-
         }
 
+
+        function checkContentChange()
+        {
+				inputEl = $(this);
+				// console.log(inputEl);
+				// inputEl.val().trim().length
+				
+				// inputEl.change(function(){
+				// 	$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
+
+				// })
+
+				var inputCheckFlag = true;
+				var a = inputEl.parent()
+				var b = a.children("input, textarea")
+				b.each(function(){
+
+
+					if(($(this).val().trim().length) == 0)
+				 	{
+				 		inputCheckFlag = false; 
+				 		$(this).css("border-color", "#D84B33");
+				 		$(this).prev("label").css("color", "red")
+				 	}
+				 	else
+				 	{
+				 		$(this).css("border-color", "#CCCCCC");	
+				 		$(this).prev("label").css("color", "#4D4D4D")
+				 	}
+
+				})
+
+				if(inputCheckFlag)
+				{
+					$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");					
+				}
+				else
+				{
+					$(this).siblings().find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");					
+				}
+				
+				
+			}
 
 
 		function onPopupOpen()
 		{
 			// getting marker instance
 			tempMarker = this;
+
+			imageHandler(tempMarker);
 
 			// attaching datetimepicker after getting marker popup html
 			var popupHtmlObjDt = tempMarker._popup._contentNode.getElementsByClassName("marker-dtstamp");
@@ -485,7 +970,6 @@
 
 			// marker GeoJson
 			var tempMarkerGeoJSON = this.toGeoJSON();
-			console.log(this);
 
 			var lID = tempMarker._leaflet_id;		// Getting Leaflet ID of this marker
 
@@ -494,14 +978,94 @@
 				datetime = this.feature.properties.datetime,
 				description = this.feature.properties.description,
 				tags = this.feature.properties.tags,
-				created_by = this.feature.properties.created_by;
+				created_by = this.feature.properties.created_by,
+				edited_by = this.feature.properties.edited_by,
+			    attached_files = this.feature.properties.attached_files,
+			    ref = this.feature.properties.ref;
+
+
+
+			// Variable to store your files
+			var files;
+
+			// Add events
+			// $('input[type=file]').on('change', prepareUpload);
+			// $(popupHtmlObj).children("form input[type=file].image-upload").on('change', prepareUpload);
+
+			$(popupHtmlObj).children("form").children("input[type=file].image-upload").on('change', prepareUpload);
+
+			// Grab the files and set them to our variable
+			function prepareUpload(event)
+			{
+			  files = event.target.files;
+			}
+			// console.log(files);
 
 			$(popupHtmlObj).children("input.marker-place-name").val(placename);
 			$(popupHtmlObj).children("input.marker-dtstamp").val(datetime);
 			$(popupHtmlObj).children("textarea.marker-obs-note").val(description);
 			$(popupHtmlObj).children("input.marker-tags").val(tags);
+			$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
+			
+			{% if user.is_authenticated %}
+				$(popupHtmlObj).children("input.marker-tags").after("<div style='color:gray'> by : "+created_by+"</div><br/>");	
+			{% endif %}
+			// $(popupHtmlObj).children("div.images-list").find("ul.attached-images");
 
-				// console.log(placename + " == " + datetime + " == " + description + " == " + tags + " == " + created_by);
+			// #{#{#request.session.anonymous_added_markers}}
+
+			{% if not user.is_authenticated %}
+
+				var tempAnnM = $("input:hidden[name=anonymous_added_markers]").val();
+
+				// console.log("{{request.session.anonymous_added_markers}}");
+				// console.log(ref)
+				// console.log("{{request.session.session_key}}")
+				// console.log("{{anonymous_added_markers}}")
+				// console.log( 
+				// 	(ref == undefined) ||
+				// 	((("{{request.session.anonymous_added_markers}}").indexOf(ref) > 1) && 
+				// 	(("{{request.session.anonymous_added_markers}}").indexOf("{{request.session.session_key}}") == 0))
+				//   )
+				// makes input boxes enable for which user has created
+				if( 
+					(ref == undefined) ||
+					((("{{request.session.anonymous_added_markers}}").indexOf(ref) > 1) && 
+					(("{{request.session.anonymous_added_markers}}").indexOf("{{request.session.session_key}}") == 0)) ||
+					(((tempAnnM).indexOf(ref) > 1) && 
+					((tempAnnM).indexOf("{{request.session.session_key}}") == 0))
+				  ){
+
+					$(".leaflet-popup-content:visible input, textarea").prop("disabled", false);
+
+					$(popupHtmlObj).children("div.edit-delete-cntr").after("<hr/><a class='button tiny expand success annon-login' style='border-top: medium solid #FFFFFF; z-index: 2;' title='click to register' href='/accounts/login/' target='_blank'>Login / Register</a>")
+
+					
+				}
+				else // makes input boxes Disabled for which user has NOT created
+				{
+					$(".leaflet-popup-content:visible input, textarea").prop("disabled", true);
+					$(popupHtmlObj).children("div.edit-delete-cntr").replaceWith("<a class='button tiny expand success annon-login' style='border-top: medium solid #FFFFFF; z-index: 2;' title='click to register' href='/accounts/login/' target='_blank'>Login / Register</a>")
+					$(".leaflet-popup-content:visible label:nth-child(1)").before('<div class="ask-register-div">Please register yourself before contributing any resource<hr/><span style="font-size:0.5em; ">NOTE : You can only read but can not edit any fields</span></div>');
+					$(".leaflet-popup-content:visible div.ask-register-div").fadeOut(15000);
+				}
+
+			{% endif %}
+
+			
+			{% comment %}
+			// {% if not user.is_authenticated %}
+			// 	if(created_by.indexOf("anonymous_") == 0)
+			// 	{
+			// 		$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
+			// 	}
+			// 	else
+			// 	{
+			// 		$(popupHtmlObj).children("input.marker-creator").
+			// 	}
+
+			// {% endif %}
+			{% endcomment %}
 
 			// preserving and updating GeoJson of marker
             var MarkerLatLng = []
@@ -509,24 +1073,11 @@
             MarkerLatLng.push(tempMarker.getLatLng().lng);
             updateHiddenTagContent(MarkerLatLng);
 
-
-
-            // sometimes description exist and sometimes not
-			// if(! description)
-			// {
-			// 	$.each(markerGeoJSON, function(i, val) {
-				            	
-			// 		            		var getID = $.parseJSON(val).properties.id,
-			// 		            			getDescription = $.parseJSON(val).properties.description; 
-				
-			// 		            		if(getID == lID) { description = getDescription?getDescription:"";  }  
-			// 		           		})
-			// }
-			 			
-			if(description)
-			{					
-				$(".marker-obs-note:visible").val(description)
-			}			
+ 			
+			// if(description)
+			// {					
+			// 	$(".marker-obs-note:visible").val(description)
+			// }			
 			
 			// To remove marker on click of delete
 			$(".popup-delete-content-button:visible").click(function(){
@@ -602,24 +1153,7 @@
 			});
 
 			// check if popup form gets changed
-			$(".leaflet-popup-content:visible input, textarea").bind("keyup keypress onmouseup blur change", function(){
-
-				var inputEl = $(this);
-
-				inputEl.change(function(){
-
-				// if( tempContentText != initialPopContentText )
-				// {
-					$(this).siblings().find("i.fi-page-edit:visible").attr("class", "fi-save").text(" save");
-				// }
-				// else
-				// {
-				// 	$(this).siblings().find("i.fi-save:visible").attr("class", "fi-page-edit").text(" edit");
-				// }
-
-				})
-				
-			});
+			$(".leaflet-popup-content:visible input, textarea").bind("keyup keypress onmouseup blur change", checkContentChange);
 			
 			// To add content on click of add_content
 			$(".popup-add-content-button:visible").click(function(){
@@ -629,7 +1163,7 @@
 					thisPopupContent = $(this).parent().parent();
 					$(thisPopupContent).children("input[type=text].marker-place-name").focus();
 				}
-				else if($(this).children("i").hasClass("fi-save"))	// when click on save btn
+				else if($(this).children("i").hasClass("fi-save"))	// when click on SAVE btn
 				{
 
 					thisPopupContent = $(this).parent().parent();
@@ -641,9 +1175,16 @@
 						getDT = $(thisPopupContent).children("input[type=text].marker-dtstamp").val().trim(),	
 						getObsNote = $(thisPopupContent).children("textarea.marker-obs-note:visible").val().trim(),
 						getTags = $(thisPopupContent).children("input[type=text].marker-tags").val().trim();
+						getImagesList = $(thisPopupContent).find("ul.attached-images").attr("data-image-list");
+
+						// getImage = $(thisPopupContent).children("input[type=file].image-upload");
+						// console.log(thisPopupContent.children);
+						{% if not user.is_authenticated %}
+							getCreator = $(thisPopupContent).children("input[type=text].marker-creator").val().trim();
+						{% endif %}
 
 					// if( getPlace.length && getPlace != placename )
-					if( getPlace.length || getDT.length || getObsNote.length || getTags.length )
+					if( getPlace.length || getDT.length || getObsNote.length || getTags.length || getCreator.length )
 					{
 						tempMarker.setIcon(infoMarker);
 
@@ -656,27 +1197,77 @@
 
 					tempMarker.feature.properties.placename = getPlace;
 					tempMarker.feature.properties.datetime = getDT;
-					// tempMarker.feature.properties.created_at = getDT;
 					tempMarker.feature.properties.description = getObsNote;//.replace(/'/gm, "");	// temp fix.
 					tempMarker.feature.properties.tags = getTags;
+					tempMarker.feature.properties.attached_files = getImagesList;
+
+					{% if not user.is_authenticated %}
+						tempMarker.feature.properties.created_by = "anonymous_{{client_ip}}_" + getCreator ;
+						tempMarker.feature.properties.edited_by = [getCreator+" (Anonymous)"] ;
+					{% endif %}
 									
 					if(! tempMarker.feature.properties.id)
 					{
 						tempMarker.feature.properties.id = lID;	
 					}
 
+					// Add user name if user is authenticated.
+  					{% if user.is_authenticated%}
+
+  						var getEditedBy = tempMarker.feature.properties.edited_by;
+
+  						if(getEditedBy.indexOf("{{user_name}}") < 0 )
+  						{
+  							tempMarker.feature.properties.edited_by.push("{{user_name}}");
+  						}
+
+  					{% endif %}
+
+
 					var now = new Date(),
 						formatedDateTime = now.toLocaleDateString() + " " + now.getHours() + ":" + now.getMinutes();
 
 					var updatedGeoJSON = JSON.stringify(tempMarker.toGeoJSON());
+
+					// Create a formdata object and add the files
+					// var imageData = new FormData();
+					// $.each(files, function(key, value)
+					// {
+					// 	imageData.append(key, value);
+					// });
+										
+					// var formData = new FormData($(popupHtmlObj).children("form")[0]);
+					// // Loop through each of the selected files.
+					// for (var i = 0; i < files.length; i++) {
+					//   var file = files[i];
+
+					//   // Check the file type.
+					//   // if (!file.type.match('image.*')) {
+					//   //   continue;
+					//   // }
+
+					//   // Add the file to the request.
+					//   formData.append('doc[]', file, file.name);
+					// }
+					// console.log(formData);
+
+					$(".leaflet-popup-content:visible").children("form.popup-form:visible")
+					// console.log($(popupHtmlObj).children("form"));
+					// console.log($(popupHtmlObj).children("form")[0]);
+					// var formData = new FormData($(popupHtmlObj).children("form")[0]); // Create an arbitrary FormData instance
+					// console.log(formData);
+
 			        // saving marker data in database 
 					$.ajax({
 
 						type:'post',
 						url: "{% url 'save_observation' groupid app_id app_set_id app_set_name_slug %}",
 						dataType: 'json',
+						// processData: false, // Don't process the files
+        				// contentType: false, // Set content type to false as jQuery will tell the server its a query string request
 			  			data: {
 			  					marker_geojson:updatedGeoJSON,
+			  					// image_file: formData,
 			  					csrfmiddlewaretoken: '{{ csrf_token }}',
 			  					{% if user.is_authenticated%}
 			  						user: "authenticated",
@@ -689,7 +1280,7 @@
 			  				
 			  				var ajaxUrl = this.url,
 			  					listId = ajaxUrl.split("/")[5];
-	
+
 							if (data[2] == "create_new")
 			  				{
 			  					tempMarker.feature.properties.ref = data[1]
@@ -701,7 +1292,8 @@
 			  				}
 			  				else if(data[2] == "edit")
 			  				{
-			  					tempMarker.feature.properties.ref = data[1]
+			  					tempMarker.feature.properties.ref = data[1];
+
 			  					$(".marker-alert-success").html("You had successfully <b><u>edited</u></b> the Marker.").fadeIn(600, "swing").fadeOut(10000);
 			  				}
 			  				else
@@ -712,7 +1304,13 @@
 								tempMarker.feature.properties.datetime = datetime;
 								tempMarker.feature.properties.description = description;
 								tempMarker.feature.properties.tags = tags;
+								tempMarker.feature.properties.created_by = created_by;
+								tempMarker.feature.properties.attached_files = attached_files;
 			  				}
+
+			  				{% if not user.is_authenticated %}
+			  					$("input:hidden[name=anonymous_added_markers]").val(data[3]);
+			  				{% endif %}
 							
 				  		},// END OF success
 				  		complete: function(){
@@ -742,6 +1340,7 @@
 			}
 		}
 
+		
 	{% endif %}
 
 	</script>

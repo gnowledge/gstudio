@@ -2,11 +2,14 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from gnowsys_ndf.ndf.models import get_database
-from gnowsys_ndf.ndf.models import Group
+from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget_for_users
 from gnowsys_ndf.notification import models as notification
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
+import json
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -14,7 +17,7 @@ except ImportError:  # old pymongo
 
 
 db = get_database()
-col_Group = db[Group.collection_name]
+col_Group = db[Node.collection_name]
 sitename=Site.objects.all()[0]
 def get_user(username):
     bx=User.objects.filter(username=username)
@@ -25,7 +28,7 @@ def get_user(username):
         return 0
 
 
-# A general function used to send all kind of notifications
+# A general function used to send all kinds of notifications
 def set_notif_val(request,group_id,msg,activ,bx):
     try:
         group_obj=col_Group.Group.one({'_id':ObjectId(group_id)})
@@ -36,7 +39,7 @@ def set_notif_val(request,group_id,msg,activ,bx):
         notification.send([bx], render, {"from_user": request.user})
         return True
     except Exception as e:
-        print "Error in sending notification-",e
+        print "Error in sending notification- "+str(e)
         return False
 
 # Send invitation to any user to join or unsubscribe
@@ -49,14 +52,16 @@ def send_invitation(request,group_id):
         sending_user=User.objects.get(id=sender.id)
         list_of_users=list_of_invities.split(",")
         activ="invitation to join in group"
+
         msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+"'"
 
         ret=""
         for each in list_of_users:
             bx=User.objects.get(id=each)
             ret = set_notif_val(request,group_id,msg,activ,bx)
-            colg.author_set.append(bx.id)
-            colg.save()
+            if bx.id not in colg.author_set:
+                colg.author_set.append(bx.id)
+                colg.save()
         if ret :
             return HttpResponse("success")
         else:
@@ -64,6 +69,7 @@ def send_invitation(request,group_id):
     except Exception as e:
         print str(e)
         return HttpResponse(str(e))
+
 
 def notifyuser(request,group_id):
 #    usobj=User.objects.filter(username=usern)
@@ -97,3 +103,71 @@ def notify_remove_user(request,group_id):
         return HttpResponse("success")
     else:
         return HttpResponse("failure")
+
+def invite_users(request,group_id):
+    try:
+        sending_user=request.user
+        node=col_Group.Node.one({'_id':ObjectId(group_id)})
+        if request.method == "POST":
+            exst_users=[]
+            new_users=[]
+            users=[]
+            deleted_users=node.author_set
+            groupname=node.name
+            users_to_invite = request.POST['users']
+            not_status=request.POST['notif_status']
+            new_users_list=users_to_invite.split(",")
+            for each in new_users_list:
+                if each :
+                    users.append(int(each))
+            if users:
+                for each in users:
+                    if each in node.author_set:
+                        exst_users.append(each)
+                    else:
+                        if each not in node.author_set:
+                            new_users.append(each)
+                            node.author_set.append(each);
+                node.save()
+                
+                # Send invitations according to not_status variable
+                activ="invitation to join in group"
+                if not_status == "ON":
+                    for each in exst_users:
+                        bx=User.objects.get(id=each)
+                        msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+"'"
+                        set_notif_val(request,group_id,msg,activ,bx)
+                for each in new_users:
+                    bx=User.objects.get(id=each)
+                    msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+"'"
+                    set_notif_val(request,group_id,msg,activ,bx)
+            deleted_users=set(deleted_users)-set(users)
+            activ="Unsubscribed from group"
+            if deleted_users:
+                for each in deleted_users:
+                    bx=User.objects.get(id=each)
+                    node.author_set.remove(each)
+                    msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+"'"
+                    set_notif_val(request,group_id,msg,activ,bx)
+                node.save()
+            return HttpResponse("Success")
+        else:
+            coll_obj_list = []
+            lstusers=[]
+            owner=node.created_by
+            users=User.objects.all()
+            user_names=[]
+            st=[]
+            for each in users:
+                if each.id != owner and each.id not in node.author_set:
+                   st.append(each)
+                else:
+                    if each.id !=owner:
+                        coll_obj_list.append(each)
+
+            data_list=set_drawer_widget_for_users(st,coll_obj_list)
+            return HttpResponse(json.dumps(data_list))
+   
+    except Exception as e:
+        print "Exception in invite_users "+str(e)
+        return HttpResponse("Failure")

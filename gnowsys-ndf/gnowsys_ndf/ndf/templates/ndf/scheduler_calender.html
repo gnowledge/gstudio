@@ -1,6 +1,6 @@
 {% block head %}
 
-	<meta charset='utf-8' />
+	<!-- <meta charset='utf-8' /> -->
 
 	<link href='/static/ndf/css/fullcalendar/fullcalendar.css' rel='stylesheet' />
 	<link href='/static/ndf/css/fullcalendar/fullcalendar.print.css' rel='stylesheet' media='print' />
@@ -11,50 +11,189 @@
 	<script src='/static/ndf/js/fullcalendar/fullcalendar.min.js'></script>
 
 	<style>
-			#view-scheduler-calendar table { border: none; }
 		
+			#view-scheduler-calendar table {
+				border: none;
+				margin-bottom: 0px;
+			}
+
 			#calendar {
 
-				width: 900px;
+				width: auto;
 				margin-left: auto;
 				margin-right: auto;
+			}
+			
+			.fc-header-left, .fc-header-right {
+				padding-top: 1em !important;
+			}
+
+			.fc-week-number {
+				background-color: #DDDDDD;
+    			color: #808080;
 			}
 
 	</style>
 
-	<script>
+{% endblock %}
 
-		$('#view-scheduler-calendar').on('toggled', function (event, tab) {
-		
-			/* initialize the calendar 
-			-------------------------- */
-			
-			$('#calendar').fullCalendar({
 
-				// to call an event on day click
-				// dayClick: function() { alert('a day has been clicked!'); }
-
-				// header
-				header: { left: 'title', center: '', right: 'today prev,next' }, // prevYear,nextYear
-
-				// button Icons
-				// buttonIcons : { prev: 'prev', next: 'next' },
-
-				// theme
-				// theme: false,
-
-			});
-			
-			
-		});
-
-	</script>
+{% block body_content %}
+	
+	<div>
+		<div id='calendar' data-event-timing="{{ app_set_instance_atlist }}"></div>
+	</div>
 
 {% endblock %}
 
 
-<div>
-	
-	<div id='calendar'></div>
+{% block script %}
+	<script>
 
-</div>
+		$('#view-scheduler-calendar').on('toggled', function (event, tab) {
+
+			$('#calendar').fullCalendar({
+
+				header: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'month,agendaWeek,agendaDay'
+				},
+
+				// first day of week e.g: Monday
+				firstDay:1,
+
+				editable: false,
+
+				eventBackgroundColor:'#2980b9',
+
+				events: [
+				
+				{% for each in events_arr %}
+
+					{
+						id: '{{each.id}}',
+						title: '{{each.title}}',
+						start: '{{each.start|date:"c"}}',
+						end: '{{each.end|date:"c"}}'
+						{% if 'week' in each.start|timesince:each.end or 'weeks' in each.start|timesince:each.end or 'days' in each.start|timesince:each.end %}
+							,allDay: true
+						{% endif %}
+
+					}{% if not forloop.last %},{% endif %}
+
+				{% endfor %}
+				
+				]
+			});
+		});
+		
+			/* initialize the calendar 
+			-------------------------- */
+			
+			// $('#calendar').fullCalendar({
+
+			// 	// to call an event on day click
+			// 	// dayClick: function() { alert('a day has been clicked!'); }
+
+			// 	// header
+			// 	header: {
+			// 			left: 'prev,next today',
+			// 			center: 'title',
+			// 			right: 'month,agendaWeek,agendaDay'
+			// 		},
+
+			// 	// defaultDate: '2014-01-12',
+			// 	// editable: false,
+
+			// 	// button Icons
+			// 	// buttonIcons : { prev: 'prev', next: 'next' },
+
+			// 	// theme
+			// 	// theme: false,
+
+			// 	// number of weeks displayed in a month view ans so, week's height.
+			// 	// weekMode:'liquid',
+
+			// 	// to show week numbers
+			// 	weekNumbers:true,
+
+			// 	// first day of week e.g: Monday
+			// 	firstDay:1,
+
+			// 	// hide days e.g: Tuesdays and Thursdays 
+			// 	// hiddenDays: [ 2, 4 ]
+
+			// 	// aspectRatio: 2
+
+			// 	// for agendaWeek and agendaDay
+			//     // agenda: 'h:mm', // 5:00
+
+			//     // for all other views
+			//     // '': 'h(:mm)t',  // 7p
+
+			//     // Determines the text that will be displayed on the calendar's column headings.
+			//     // month: 'ddd',    // Mon
+			//     // week: 'ddd M/D', // Mon 9/7
+			//     // day: 'dddd',      // Monday
+
+			//     weekNumberTitle:"Week No.",
+
+			// 	events: [
+
+			//         {
+			//         	// Uniquely identifies the given event. Different instances of repeating events should all have the same id.
+			//         	// id: 1234,
+
+			//         	// The text on an event's element
+			//             title:  'My Event',
+			            
+			//             // Whether an event occurs at a specific time-of-day.
+			//             allDay: false,
+			            
+			//             // The date/time an event begins. Required.
+			//             start:  '2014-06-01T14:30:00',
+			            
+			//             // The exclusive date/time an event ends. Optional.
+			//             end:  '2014-06-01T18:30:00',
+			            
+			//             // A URL that will be visited when this event is clicked by the user.
+			//             url: 'http://www.metastudio.org',
+			            
+			//             // A CSS class (or array of classes) that will be attached to this event's element.
+			//             className: '',
+			            
+			//             // Overrides the master editable option for this single event.
+			//             // editable:false,
+			            
+			//             // Overrides the master eventStartEditable option for this single event.
+			//             // startEditable: false
+
+			//             // Overrides the master eventDurationEditable option for this single event.
+			//             // durationEditable:
+
+			//             // Automatically populated. A reference to the event source that this event came from.
+			//             // source:
+
+			//             // Sets an event's background and border color just like the calendar-wide eventColor option.
+			//             // color: 'inherit',
+
+			//             // Sets an event's background color just like the calendar-wide eventBackgroundColor option.
+			//             // backgroundColor: '#e5e5e5'
+
+			//             // Sets an event's border color
+			//             // borderColor:
+
+			//             // Sets an event's text color just like the calendar-wide
+			//             // textColor:
+
+			//         }
+			//         // other events here...
+			//     ]
+
+			// });
+		// });
+
+	</script>
+
+{% endblock %}

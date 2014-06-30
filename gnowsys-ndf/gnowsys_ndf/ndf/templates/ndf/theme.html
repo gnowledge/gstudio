@@ -1,8 +1,10 @@
+
 {% extends "ndf/base.html" %}
 {% load i18n %}
 
 {% load ndf_tags %}
 {% load pagination_tags %}
+
 
 {% block title %} {{ title }} {% endblock %}
 
@@ -17,47 +19,88 @@
   <script src="/static/ndf/js/tree.jquery.js"></script>
 
   <script type="text/javascript">
-    $(document).ready(function()
-    {
-    $(function() {
-    $('.themes').tree();
+    $(document).ready(function() {
+    	$(function() {
+
+    		$('.themes').html('<img src="/static/ndf/images/ajax-loader-trans.gif" height="100" width="100">');
+
+    		var $tree = $('.themes');
+    		var user = "{{user.is_authenticated}}";
+
+    		$tree.tree({
+    			autoOpen: false,
+
+        		onCreateLi: function(node, $li) {
+
+        			if (user == "True")
+        			{
+        				$li.find('.jqtree-element').append(
+        					{% user_access_policy groupid request.user as user_access %}
+        					{% if user_access == "allow" %}
+
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+
+                			
+                			{% endif %}
+            			);	
+        			}
+            		
+
+        		}
+    		});
+   
+    	});
     });
-    });
+
+
   </script>
+  <style>
+  	#app-set-item li { padding:0.5em }
+	#app-set-item li:hover { background-color:#e5e5e5; }
+	.selected-app-set-item { background-color:#e5e5e5; }
+
+	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
+        content: "\f07b";
+    }
+    .jqtree-tree i {
+        margin-right: 4px;
+    }
+
+  </style>
 {% endblock%}
+
 
 {% block meta_content %}
 {% if user.is_authenticated %}
 {% user_access_policy groupid request.user as user_access %}
 
-<ul class="side-nav"> 
+<ul class="no-bullet" id="app-set-item"> 
 
-  {% for each in app_collection_set %}
+    {% get_memberof_objects_count theme_GST_id groupid as count %}
   
-    {% get_memberof_objects_count each.id groupid as count %}
-  
-  
-      <li class="active"> 
+      <li class="selected-app-set-item"> 
         <div>
   		  {% if user_access == "allow" %}
-          <a href="{% url "theme_topic_create" groupid app_id each.id %}" style="float:right" title="Add {{each.name}}">
+          <a href="{% url "theme_topic_create" groupid app_id theme_GST_id %}" style="float:right" title="Add Theme">
             +&nbsp;Add
           </a>
           {% endif %}
 
-          <a href="{% url "theme_list" groupid app_id each.id %}" >
-            {{each.name}} ({{count}})
+          <a href="{% url "theme_list" groupid app_id theme_GST_id %}" >
+            Theme ({{count}})
           </a> 
 
         </div>
       </li>
   
-  {% endfor %}
-  	<br/>
+</ul>
+<hr/>
+<br/>
 
+<ul class="no-bullet">
   	<li>
       	<div>
-        	<a href="{% url 'theme_page' groupid app_id %}"> <input class="small button split" type="button" value="Themes Hierarchy" > </a>
+        	<a href="{% url 'theme_page' groupid app_id %}"> <input class="medium button split" type="button" value="Themes" > </a>
       	</div>
     </li>
 
@@ -69,16 +112,40 @@
 
 
 {% block body_content %}
-
 {% user_access_policy groupid request.user as user_access %}
 
 	{% if themes_hierarchy %}
 
-		<h3>Themes Hierarchy<h3>
+		<h2> Themes </h2> 
+		<a class="fold"><b><i class="fi-plus"></i> Fold </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
+		<a class="unfold"><b><i class="fi-minus"></i> Unfold </b></a>
+
+		{% if user.is_authenticated %}
+    		{% if user_access == "allow" %}
+    			<input class="button tiny deleteObjects right" type="button" value="Delete">
+    			<span class="right"><input class="checkedAll" type="checkbox"> Select All &nbsp;&nbsp;</span>
+
+    			<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+			        <h3>Are you sure you want to delete? All of the related items for the following themes also will be deleted:</h3> 
+			        
+			        <input class="button confirmDeleteObjects" type="button" value="Confirm">
+			        <input class="button cancelDeleteObjects" type="button" value="Cancel">
+			        <div id="deletion_results"></div>
+			        <a class="close-reveal-modal">&#215;</a>
+
+		      	</div>
+
+    		{% endif %}
+		{% endif %}
+
 		<hr/>
+
 		{% if node %}
+
 			<!-- If "Theme" node -->
-			<div class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
+			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
+			
 		{% endif %}
 
 	{% endif %}
@@ -90,7 +157,7 @@
     
       		<div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
         
-		        <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
+		        <h3>Are you sure you want to delete? All of the related items for the following themes also will be deleted:</h3> 
 		        
 		        <input class="button confirmDeleteObjects" type="button" value="Confirm">
 		        <input class="button cancelDeleteObjects" type="button" value="Cancel">
@@ -152,7 +219,12 @@
 	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
   		  		{% if user_access == "allow" %}
 	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
+
+		    <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}?trans=true" class="button medium">Translate</a></td>
+	        
 	        	{% endif %}
+     	       	       
+ 	
 	          	</tr>
 	          
 	       	{% empty %}
@@ -176,5 +248,178 @@
 		{% endif %}
 	{% endif %}
 
-{% endblock %}
+	<script type="text/javascript">
+		// script for fold themes hierarchy
+		$(".fold").click(function() {
+			$(function() {
+				
+				var user = "{{user.is_authenticated}}"
 
+				$('.themes').tree({
+					autoOpen: false,
+	        		onCreateLi: function(node, $li) {
+	        			if (user == "True")
+        				{
+        					$li.find('.jqtree-element').append(
+        						{% user_access_policy groupid request.user as user_access %}
+        						{% if user_access == "allow" %}
+
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+
+	                			{% endif %}
+	            			);	
+        				}
+
+	        		}
+				});
+
+			});
+		});
+
+		// script for unfold themes hierarchy
+	    $(".unfold").click(function() {
+	    	$(function() {
+
+	    		var user = "{{user.is_authenticated}}"
+
+	    		$('.themes').tree({
+	    			autoOpen: true,
+	    			slide: false,
+
+	    			onCreateLi: function(node, $li) {
+
+	    				if (user == "True")
+        				{
+		            		$li.find('.jqtree-element').append(
+		            			{% user_access_policy groupid request.user as user_access %}
+        						{% if user_access == "allow" %}
+
+		                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+		                			
+		                		{% endif %}
+		            		);
+		            	}
+
+	        		}
+	    			
+	    		});
+	    	});
+	    });	
+
+	    // script for delete themes
+	    $(document).on('click',".button.deleteObjects",function(){
+	    	var selectedobject = $(".objectsCheckbox input:checked")
+
+	    	if(selectedobject.length > 0)
+	    	{
+           		$('#myModal').foundation('reveal', 'open');
+
+           		var i = 0;
+             	var str = "";  
+	            $.map(selectedobject,function(each){
+	                if(i == 0)
+	                {
+	                	str = str.concat(each.parentElement.id)
+	                }
+	                else 
+	                {
+	                	str = str.concat(","+each.parentElement.id)
+	                }
+	                
+	                i= i+1
+	            })
+
+           		$.ajax({
+		            url: "{% url 'delete_themes' groupid %}",
+		            type: 'POST',
+		            data:{
+		            	deleteobjects: str,
+		            	csrfmiddlewaretoken: '{{ csrf_token }}'
+		            },
+             		success: function(result){
+
+             			$("#deletion_results").html("");
+                        for(var obj in result)
+                        {
+	                  		var li = $("<ul><li><b>"+result[obj].title+"</b></li></ul>").appendTo($("#deletion_results"));
+                        }
+
+             		},
+             	});
+
+           	}
+           	else
+           	{
+        		alert("select object to delete")
+        	}
+
+	    });
+
+		// Script for delete themes after confirm delete.
+		$(document).on('click',".button.confirmDeleteObjects",function(){
+	        var selectedobject = $(".objectsCheckbox input:checked")
+	        $('#myModal').foundation('reveal', 'open');
+
+	        if(selectedobject.length > 0)
+	        {
+	            var i = 0;
+	            var str = "";  
+
+	            $.map(selectedobject,function(each){
+	            	if(i == 0)
+	            	{
+	            		str = str.concat(each.parentElement.id)
+	            	}
+	                else 
+	                {
+	                	str = str.concat(","+each.parentElement.id)
+	                }
+
+	                i= i+1
+	            });
+
+	            $.ajax({
+	            	url: "{% url 'delete_themes' groupid %}",
+	             	type: 'POST',
+	             	data:{
+	             		deleteobjects: str,
+	             		confirm:"yes",
+	             		csrfmiddlewaretoken: '{{ csrf_token }}'
+	             	},
+	             	success: function(result){
+	             		alert("Themes deleted successfully");
+	             		location.reload(true);
+	             	},
+	             	
+	            });
+	             
+	            $('#myModal').foundation('reveal', 'close');
+	             
+	        }
+	        else{
+	        alert("select object to delete")
+	        }
+
+		});
+
+		// Script for selecting all objects 
+		$(document).on('click',".checkedAll",function(){
+			if($(this).is(":checked")==true)
+			{
+				$('.objectsCheckbox input').prop( "checked", true );
+			}
+			else
+			{
+				$('.objectsCheckbox input').prop( "checked", false );
+			}
+		});
+
+		// Script for cancel option for deleting themes
+		$(document).on('click',".button.cancelDeleteObjects",function(){
+             $('#myModal').foundation('reveal', 'close');
+		});
+
+	</script>
+
+
+{% endblock %}
