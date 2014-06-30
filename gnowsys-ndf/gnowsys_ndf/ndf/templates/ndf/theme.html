@@ -5,6 +5,8 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+{% get_group_name groupid as group_name_tag %}
+
 
 {% block title %} {{ title }} {% endblock %}
 
@@ -55,20 +57,11 @@
 			    function(event) {
 			        // The clicked node is 'event.node'
 			        var node = event.node;
-
-			        $.ajax({
-						type: "POST",
-						url: "{% url 'topic_detail_view' groupid %}",
-						datatype: "html",
-						data:{
-							node_id: node.id,
-							csrfmiddlewaretoken: '{{ csrf_token }}'
-						},
-						success: function(data) {
-							$("#detail_view").html(data);
-						}
-					});
-
+			        // If its topic node i.e no children of this node then show the detail veiw for topic
+			  		if( node.children[0] == null ){
+				        location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";
+			  		}
+			  		
 			    }
 			);
    
@@ -135,7 +128,6 @@
 
 
 {% block body_content %}
-<div id="detail_view">
 {% user_access_policy groupid request.user as user_access %}
 
 	{% if themes_hierarchy %}
@@ -447,5 +439,4 @@
 
 	</script>
 
-</div>
 {% endblock %}
