@@ -75,10 +75,23 @@
 
 
 {% block body_content %} 
+<script>
+	$(document).ready(function(){
+		var size = $(window).height();
+		$("#ifrm").css("height",0.9*size);
+	});
+
+	$(window).resize(function(){
+		var size = $(window).height();
+		alert(size);
+		$("#ifrm").css("height",0.9*size);
+	});
 
 
+</script>
 
-<iframe src="" name="Chatb" height="450em" width="100%" frameborder="1"> </iframe> 
+
+<iframe src="" name="Chatb" style="position:relative" id="ifrm" height="450em" width="100%" frameborder="1"> </iframe> 
 
 
 <script>
