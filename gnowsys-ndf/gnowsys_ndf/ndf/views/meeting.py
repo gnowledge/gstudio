@@ -49,7 +49,7 @@ sitename=Site.objects.all()[0]
 collection = get_database()[Node.collection_name]
 ##################
 
-def output(request, group_id, meetingid):
+def output(request, group_id, meetingid):                                                               #ramkarnani
 	newmeetingid = meetingid
 	ins_objectid  = ObjectId()
         if ins_objectid.is_valid(group_id) is False:
@@ -70,7 +70,7 @@ def output(request, group_id, meetingid):
 
 
 
-def dashb(request, group_id):
+def dashb(request, group_id):                                                                           #ramkarnani
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     ins_objectid  = ObjectId()
@@ -96,7 +96,7 @@ def dashb(request, group_id):
     return render_to_response("ndf/meeting.html",{'group_id': group_id,'groupid':group_id,'online_users':online_users,'meetingid':ins_objectid},context_instance=RequestContext(request))
 
 #### Ajax would be called here to get refreshed list of online members
-def get_online_users(request, group_id):
+def get_online_users(request, group_id):                                                                        #ramkarnani
 	"""Json of online users, useful f.ex. for refreshing a online users list via an ajax call or something"""
 	online_users = cache.get(CACHE_USERS)
 	#print "hey \n"
@@ -105,7 +105,7 @@ def get_online_users(request, group_id):
 	#print type(a)
 	return HttpResponse(simplejson.dumps(online_users, default=encode_json))
 
-def invite_meeting(request, group_id, meetingid):
+def invite_meeting(request, group_id, meetingid):                                                                  #ramkarnani
 	try:
             # print "here in view"
             colg=col_Group.Group.one({'_id':ObjectId(group_id)})

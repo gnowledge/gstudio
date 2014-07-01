@@ -39,7 +39,7 @@
 </div>
 <script>
 	
-	var aa={{online_users|safe}}
+	var aa={{online_users|safe}}                                               <!-- ramkarnani -->
 	k=aa.length
 	//var aa=[];
 	//var name={{request.user.username}}
@@ -74,7 +74,7 @@
 
 
 
-{% block body_content %} 
+{% block body_content %}                                                                      <!-- ramkarnani -->
 <script>
 	$(document).ready(function(){
 		var size = $(window).height();
@@ -106,7 +106,7 @@ timer = setInterval(function(){                             // Ajax call for get
 		url:"{% url 'get_online_users' group_id %}",
 		dataType:'json',		
 		//data: '',
-		success: function(data){
+		success: function(data){                                                                  <!-- ramkarnani -->
 		//console.log(JSON.stringify(data))
 		//alert("hello")
 		var aa= data;
@@ -169,7 +169,7 @@ timer = setInterval(function(){                             // Ajax call for get
 		$(nam1).click(function(){
 			// alert("check");
 			//console.log(nam1);
-			aaa = nam1;
+			aaa = nam1;                                                                            <!-- ramkarnani -->
 			$.ajax({
 				url:"{% url 'invite_meeting' group_id meetingid %}",
 				dataType:'json',
