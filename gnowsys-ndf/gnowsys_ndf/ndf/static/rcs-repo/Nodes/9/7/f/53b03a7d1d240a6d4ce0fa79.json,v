@@ -1,0 +1,74 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2014.06.29.16.10.37;	author rohan;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (rohan) is created by rohan on 29 June 2014
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "53b03a7d1d240a6d4ce0fa79"
+    },
+    "_type": "Author",
+    "access_policy": null,
+    "altnames": null,
+    "annotations": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "contributors": [
+        1
+    ],
+    "created_at": 1404078036988,
+    "created_by": 1,
+    "disclosure_policy": null,
+    "edit_policy": "NON_EDITABLE",
+    "email": null,
+    "encryption_policy": null,
+    "featured": null,
+    "group_set": [],
+    "group_type": "PUBLIC",
+    "language": null,
+    "last_update": 1404078036988,
+    "location": [],
+    "login_required": null,
+    "member_of": [
+        {
+            "$oid": "53b03a421d240a6c2f136273"
+        }
+    ],
+    "modified_by": 1,
+    "module_set": [],
+    "name": "rohan",
+    "password": "",
+    "plural": null,
+    "post_node": [],
+    "prior_node": [],
+    "property_order": [],
+    "start_publication": null,
+    "status": "DRAFT",
+    "subscription_policy": "OPEN",
+    "tags": [],
+    "type_of": [],
+    "url": null,
+    "visibility_policy": null,
+    "visited_location": []
+}@

@@ -1,0 +1,99 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2014.06.29.17.20.29;	author rohan;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (topic1 -- wiki_attr2 -- This is the value of the wiki_attr1 field) is created on 29 June 2014
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "53b04add1d240a168e0bf5c5"
+    },
+    "_type": "GAttribute",
+    "attribute_type": {
+        "_id": {
+            "$oid": "53b04add1d240a168e0bf5c4"
+        },
+        "_type": "AttributeType",
+        "access_policy": null,
+        "altnames": null,
+        "applicable_node_type": [],
+        "auto_now": null,
+        "auto_now_add": null,
+        "blank": null,
+        "collection_set": [],
+        "comment_enabled": null,
+        "complex_data_type": [],
+        "content": null,
+        "content_org": null,
+        "contributors": [],
+        "created_at": 1404082229312,
+        "created_by": 1,
+        "data_type": "unicode",
+        "decimal_places": null,
+        "default": null,
+        "editable": null,
+        "featured": null,
+        "group_set": [],
+        "help_text": null,
+        "label": null,
+        "language": null,
+        "last_update": 1404082229362,
+        "location": [],
+        "login_required": null,
+        "max_digits": null,
+        "member_of": [
+            {
+                "$oid": "53b048241d240a12fc4a8816"
+            }
+        ],
+        "min_length": null,
+        "modified_by": 1,
+        "name": "wiki_attr2",
+        "null": null,
+        "path": null,
+        "plural": null,
+        "post_node": [],
+        "prior_node": [],
+        "property_order": [],
+        "required": null,
+        "start_publication": null,
+        "status": "DRAFT",
+        "subject_type": [
+            {
+                "$oid": "53b048241d240a12fc4a8822"
+            }
+        ],
+        "tags": [],
+        "type_of": [],
+        "unique": null,
+        "upload_to": null,
+        "url": null,
+        "validators": [],
+        "verbose_name": null,
+        "verify_exist": null
+    },
+    "lang": null,
+    "name": "topic1 -- wiki_attr2 -- This is the value of the wiki_attr1 field",
+    "object_value": "This is the value of the wiki_attr1 field",
+    "status": null,
+    "subject": {
+        "$oid": "53b04add1d240a168e0bf5c0"
+    }
+}@

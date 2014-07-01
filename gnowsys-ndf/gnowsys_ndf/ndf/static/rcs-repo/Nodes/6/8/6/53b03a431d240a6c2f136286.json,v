@@ -1,0 +1,88 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2014.06.29.16.09.39;	author rohan;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (version) is created by rohan on 29 June 2014
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "53b03a431d240a6c2f136286"
+    },
+    "_type": "AttributeType",
+    "access_policy": null,
+    "altnames": null,
+    "applicable_node_type": [],
+    "auto_now": null,
+    "auto_now_add": null,
+    "blank": null,
+    "collection_set": [],
+    "comment_enabled": null,
+    "complex_data_type": [],
+    "content": null,
+    "content_org": null,
+    "contributors": [
+        1
+    ],
+    "created_at": 1404077979583,
+    "created_by": 1,
+    "data_type": "u\"\"",
+    "decimal_places": null,
+    "default": null,
+    "editable": null,
+    "featured": null,
+    "group_set": [],
+    "help_text": null,
+    "label": null,
+    "language": null,
+    "last_update": 1404077979584,
+    "location": [],
+    "login_required": null,
+    "max_digits": null,
+    "member_of": [
+        {
+            "$oid": "53b03a411d240a6c2f136264"
+        }
+    ],
+    "min_length": null,
+    "modified_by": 1,
+    "name": "version",
+    "null": null,
+    "path": null,
+    "plural": null,
+    "post_node": [],
+    "prior_node": [],
+    "property_order": [],
+    "required": null,
+    "start_publication": null,
+    "status": "DRAFT",
+    "subject_type": [
+        {
+            "$oid": "53b03a421d240a6c2f13626d"
+        }
+    ],
+    "tags": [],
+    "type_of": [],
+    "unique": null,
+    "upload_to": null,
+    "url": null,
+    "validators": [],
+    "verbose_name": null,
+    "verify_exist": null
+}@
