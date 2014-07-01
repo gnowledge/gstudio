@@ -269,7 +269,14 @@
 
       {% edit_policy groupid node request.user as status %}
       {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
-        <a href="{% url 'mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+
+        {% if app_name == "MIS" %}
+        <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
+        {% else %}
+        <a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
+        {% endif %}
+          <i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span>
+        </a>
 
         <ul id="edit-options" class="f-dropdown">
 
@@ -296,7 +303,11 @@
               - In case of Groups/Author, only to the superuser
           -->
           <li>
-            <a class="button small expand" href="{% url 'mis_app_instance_create' groupid app_id app_set_id %}">
+            {% if app_name == "MIS" %}
+            <a class="button small expand" href="{% url 'mis:mis_app_instance_create' groupid app_id app_set_id %}">
+            {% else %}
+            <a class="button small expand" href="{% url 'mis-po:mis_app_instance_create' groupid app_id app_set_id %}">
+            {% endif %}
               <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
             </a>
           </li>

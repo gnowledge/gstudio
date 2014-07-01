@@ -78,11 +78,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     property_display_order = []
     events_arr = []
 
-    template_prefix = ""
-    if app_name == "MIS":
-      template_prefix = "mis"
-    else:
-      template_prefix = "mis_po"
+    template_prefix = "mis"
 
     for eachset in app.collection_set:
       app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
@@ -333,11 +329,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     File = 'False'
     obj_id_ins = ObjectId()
 
-    template_prefix = ""
-    if app_name == "MIS":
-      template_prefix = "mis"
-    else:
-      template_prefix = "mis_po"
+    template_prefix = "mis"
 
     user_id = int(request.user.id)  # getting django user id
     user_name = unicode(request.user.username)  # getting django user name
@@ -558,9 +550,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         newrelation.relation_type = relationtype_key
                         newrelation.right_subject = right_subject._id
                         newrelation.save()
-        
 
-        return HttpResponseRedirect(reverse(template_prefix+'_app_detail', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
+        return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
     
     template = "ndf/"+template_prefix+"_create_edit.html"
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
