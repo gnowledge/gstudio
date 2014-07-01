@@ -53,10 +53,18 @@
         <tr>
       
           <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox"> </td>
-          <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name}}</a></td>
+          {% if app_name == "MIS" %}
+          <td  class="name" style="font-size:11px;"><a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name}}</a></td>
+          {% else %}
+          <td  class="name" style="font-size:11px;"><a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name}}</a></td>
+          {% endif %}
           <td  class="created_by" style="font-size:11px;">{{each.user_details_dict.created_by}}</td>
           <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
-          <td  class="name" style="font-size:11px;"><a href="{% url 'mis_app_instance_edit' groupid app_id app_set_id each.pk %}" class="button medium">Edit</a></td>
+          {% if app_name == "MIS" %}
+          <td  class="name" style="font-size:11px;"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" class="button medium">Edit</a></td>
+          {% else %}
+          <td  class="name" style="font-size:11px;"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" class="button medium">Edit</a></td>
+          {% endif %}
       
         </tr>
         
