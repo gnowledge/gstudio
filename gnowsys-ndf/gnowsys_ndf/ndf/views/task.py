@@ -140,7 +140,8 @@ def create_edit_task(request, group_name, task_id=None):
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
 	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
-		for each_watchers in watchers.split(','):
+		if watchers:
+	     	    for each_watchers in watchers.split(','):
            		 bx=User.objects.get(username=each_watchers)
 	                 task_node.author_set.append(bx.id)
 			 userlist.append(each_watchers)
