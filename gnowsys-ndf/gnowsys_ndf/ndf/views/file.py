@@ -61,6 +61,7 @@ def file(request, group_id, file_id=None):
    * Renders a list of all 'Files' available within the database.
     """
     ins_objectid  = ObjectId()
+    is_video = request.GET.get('is_video', "")
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -215,7 +216,7 @@ def file(request, group_id, file_id=None):
                                  'already_uploaded': already_uploaded,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
                                  'videoCollection': videoCollection, 'pandoraCollection': pandoraCollection,
-                                 'groupid': group_id, 'group_id':group_id
+                                 'groupid': group_id, 'group_id':group_id, 'is_video':is_video
                                 }, 
                                 context_instance=RequestContext(request)
       )
@@ -299,15 +300,13 @@ def file(request, group_id, file_id=None):
               # for each in pandora_video_id:
               #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
       
-              
-     
       return render_to_response("ndf/file.html", 
                                 {'title': title, 
                                  'already_uploaded': already_uploaded,
                                  # 'sourceid':source_id_set,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection, 'pandoraCollection':get_member_set,
-                                 'groupid': group_id, 'group_id':group_id
+                                 'groupid': group_id, 'group_id':group_id, 'is_video':is_video
                                 }, 
                                 context_instance = RequestContext(request))
     else:
@@ -377,14 +376,14 @@ def submitDoc(request, group_id):
             if mtitle:
                 if index == 0:
 
-                    f = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
+                    f, is_video = save_file(each, mtitle, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
                 else:
                     title = mtitle + "_" + str(i) #increament title        
-                    f = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
+                    f, is_video = save_file(each, title, userid, group_id, content_org, tags, img_type, language, usrname, access_policy)
                     i = i + 1
             else:
                 title = each.name
-                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
+                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
             if not obj_id_instance.is_valid(f):
                 alreadyUploadedFiles.append(f)
                 title = mtitle
@@ -396,7 +395,11 @@ def submitDoc(request, group_id):
             return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id }))
 
         else:
-            return HttpResponseRedirect(page_url+'?'+str1)
+            if str1:
+                return HttpResponseRedirect(page_url+'?'+str1)
+            else:
+                return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
+                
 
     else:
         return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
@@ -410,7 +413,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
     
     global count,first_object
-    
+    is_video = ""
     fcol = db[File.collection_name]
     fileobj = fcol.File()
     filemd5 = hashlib.md5(files.read()).hexdigest()
@@ -418,13 +421,12 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     size, unit = getFileSize(files)
     size = {'size':round(size, 2), 'unit':unicode(unit)}
     
-    print "TeSt",img_type, content_org, tags
     
     if fileobj.fs.files.exists({"md5":filemd5}):
         
         # if calling function is passing oid=True as last parameter then reply with id and name.
-        if kwargs["oid"]: 
-
+        if kwargs.has_key("oid"):
+          if kwargs["oid"]: 
             coll_oid = get_database()['fs.files']
             cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
             # returning only ObjectId (of GSystem containing file info) in dict format.
@@ -494,19 +496,24 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             code for converting video into webm and converted video assigning to varible files
             """
             if 'video' in filetype or 'video' in filetype1 or filename.endswith('.webm') == True:
+                is_video = 'True'
                 collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_VIDEO._id}})
                 collection.File.find_and_modify({'_id':fileobj._id},{'$set':{'mime_type':'video'}})
-            	webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id)
+            	# webmfiles, filetype, thumbnailvideo = convertVideo(files, userid, fileobj._id, filename)
 	       
-                '''storing thumbnail of video with duration in saved object'''
-                tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
+                # '''storing thumbnail of video with duration in saved object'''
+                # tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
        	        
-                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+                # collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
                 
-       	        if filename.endswith('.webm') == False:
-                    tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
-                    # saving webm video id into file object
-                    collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+       	        # if filename.endswith('.webm') == False:
+                #     tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+                #     # saving webm video id into file object
+                #     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+                
+                '''creating thread for converting vedio file into webm'''
+                t = threading.Thread(target=convertVideo, args=(files, userid, fileobj, filename, ))
+                t.start()
             
             '''storing thumbnail of pdf and svg files  in saved object'''        
             if 'pdf' in filetype or 'svg' in filetype:
@@ -524,11 +531,11 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                 
                 files.seek(0)
                 mid_size_img = convert_mid_size_image(files)
-                if mid_size_img:
+                if  mid_size_img:
                     mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
                     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
             count = count + 1
-            return fileobj._id
+            return fileobj._id, is_video
         except Exception as e:
             print "Some Exception:", files.name, "Execption:", e
 
@@ -595,10 +602,11 @@ def convert_mid_size_image(files):
     
     
     
-def convertVideo(files, userid, objid):
+def convertVideo(files, userid, fileobj, filename):
     """
     converting video into webm format, if video already in webm format ,then pass to create thumbnails
     """
+    objid = fileobj._id
     fileVideoName = str(objid)
     initialFileName = str(objid)
     os.system("mkdir -p "+ "/tmp"+"/"+str(userid)+"/"+fileVideoName+"/")
@@ -641,8 +649,16 @@ def convertVideo(files, userid, objid):
     draw.text((120, 100), durationTime, (255, 255, 255)) # drawing duration time on thumbnail image
     background.save("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
     thumbnailvideo = open("/tmp/"+userid+"/"+fileVideoName+"/"+initialFileName+"Time.png")
-    return files, filetype, thumbnailvideo
-
+    
+    webmfiles = files
+    '''storing thumbnail of video with duration in saved object'''
+    tobjectid = fileobj.fs.files.put(thumbnailvideo.read(), filename=filename+"-thumbnail", content_type="thumbnail-image") 
+    
+    collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+    if filename.endswith('.webm') == False:
+        tobjectid = fileobj.fs.files.put(webmfiles.read(), filename=filename+".webm", content_type=filetype)
+        # saving webm video id into file object
+        collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
 	
 def GetDoc(request, group_id):
     ins_objectid  = ObjectId()

@@ -12,6 +12,7 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from django.contrib.auth.models import User
+import json
 
 try:
     from bson import ObjectId
@@ -477,8 +478,8 @@ def switch_group(request,group_id,node_id):
   try:
     node=collection.Node.one({"_id":ObjectId(node_id)})
     exstng_grps=node.group_set
-    if request.method == "POST":
-      node.group_set=[]
+    if request.method == "POST":     
+      node.group_set=[] # Remove all existing groups and add new ones 
       new_grps = request.POST['new_grps']
       new_grps_list=new_grps.split(",")
       if new_grps_list:
@@ -536,4 +537,5 @@ def publish_group(request,group_id,node):
                                  },
                                   context_instance=RequestContext(request)
                               )
+
 
