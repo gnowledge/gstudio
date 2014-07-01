@@ -440,22 +440,6 @@ def add_topics(request, group_id):
     return HttpResponse("None")
 
 
-def topic_detail_view(request, group_id):
-
-  node_id = request.POST.get("node_id", '')
-  obj = collection.Node.one({'_id': ObjectId(node_id)})
-  app = collection.Node.one({'_id': ObjectId(obj.member_of[0])})
-  app_id = app._id
-  
-  if app.name == "Topic":
-    return render_to_response('ndf/node_ajax_view.html', 
-                                    { 'node': obj,'app_id': app_id,
-                                      'group_id': group_id,
-                                      'groupid':group_id
-                                    },
-                                    context_instance = RequestContext(request)
-    )
-
 
 def node_collection(node=None, group_id=None):
 
@@ -943,6 +927,35 @@ def get_data_for_user_drawer(request, group_id,):
     else:
         return HttpResponse("GSystemType for batch required")
 
+
+def set_drawer_widget_for_users(st,coll_obj_list):
+    '''
+    NOTE : this method is used only for user drwers (Django user class)
+    '''
+    draw2={}
+    draw1={}
+    data_list=[]
+    d1=[]
+    d2=[]
+    for each in st:
+       dic = {}
+       dic['id'] = str(each.id)
+       dic['name'] = each.username
+       d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
+    
+    for each in coll_obj_list:
+       dic = {}
+       dic['id'] = str(each.id)
+       dic['name'] = each.username
+       d2.append(dic)
+    draw2['drawer2'] = d2
+    data_list.append(draw2)
+    return data_list 
+
+
+
 def get_data_for_batch_drawer(request, group_id):
     '''
     This method will return data for batch drawer widget
@@ -985,6 +998,7 @@ def get_data_for_batch_drawer(request, group_id):
     data_list.append(draw2)
     return HttpResponse(json.dumps(data_list))
         
+
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
