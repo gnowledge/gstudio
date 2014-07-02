@@ -1332,7 +1332,8 @@ class Triple(DjangoDocument):
             is_new = True               # It's a new document, hence yet no ID!"
 
         collection = get_database()[Node.collection_name]
-        #it's me
+        
+	#it's me
 	subject_name = collection.Node.one({'_id': self.subject}).name
         subject_system_flag = False
         subject_id = self.subject
@@ -1372,6 +1373,17 @@ class Triple(DjangoDocument):
 		raise Exception("Cannot create the GAttribute as the subject that you have mentioned is not a member of a GSystemType which this AttributeType is defined")
 
 	#it's me
+	#check for data_type in GAttribute case. Object value of the GAttribute must have the same type as that of the type specified in AttributeType
+	if self._type == "GAttribute":
+		data_type_in_attribute_type = self.attribute_type['data_type']
+		data_type_of_object_value = type(self.object_value)
+		print "Attribute:: " + str(data_type_in_attribute_type)
+		print "Value:: " + str(data_type_of_object_value)
+		if data_type_in_attribute_type != data_type_of_object_value:
+			raise Exception("The DataType of the value you have entered for this attribute is not correct. Pls ener a value with type ---> " + str(data_type_in_attribute_type))
+
+	#end of data_type_check
+
         super(Triple, self).save(*args, **kwargs)
         
         history_manager = HistoryManager()

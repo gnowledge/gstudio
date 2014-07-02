@@ -58,7 +58,7 @@ def create_WikiData_Theme_Topic():
 	
 	cursor = collection.Node.one({"_type": u"GSystemType", "name": u"Theme"})
 	if (cursor!=None):
-		print "theme already exists"
+		print "Theme already exists"
 		
 	else:
 		factory = collection.Node.one({"name": u"factory_types"})
@@ -92,13 +92,13 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 	"""
 	
 	print "Creating a GSystem Topic"
-	cursor = collection.Node.one({"name": u"Topic"})
-	topic_type = cursor
+	topic_type = collection.Node.one({"name": u"Topic"})
+	
 	
 	#change - am
-	cursor2 = collection.Node.one({"name": label, "_type": u"GSystem"}) #pick the topic related to wikidata
+	cursor = collection.Node.one({"name": label, "_type": u"GSystem"}) #pick the topic related to wikidata
 	#print cursor2.count()
-	if (cursor2!=None):
+	if (cursor!=None):
 		print "Topic already exists"
 		return
 	else:
@@ -106,20 +106,20 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		topic = collection.GSystem()
 		topic.name = label
 		#topic.tags = alias_list  # tags are supposed to be info about structure , categories etc , aliases are supposed to be stored into altnames
-		topic.content_org= unicode(description) #content in being left untouched and content_org has descriptions in english
-		topic.url = unicode(wiki_base_url)+unicode(label)
+		topic.content_org = unicode(description) #content in being left untouched and content_org has descriptions in english
+		topic.url = unicode(wiki_base_url) + unicode(label)
 		#topic.altnames = unicode(topic_title)
 		topic.created_by = int(user_id)
 		topic.member_of.append(topic_type_id)
 		
 		string_alias=""
 		for alias in alias_list:
-			string_alias=string_alias+alias+"," #altnames is a comma separated list of english aliases
+			string_alias = string_alias + alias + "," #altnames is a comma separated list of english aliases
 
-		topic.altnames =unicode(string_alias)
-		topic.status=unicode('PUBLISHED') #by default status of each item is PUBLISHED
-		topic.language=unicode('en')      #by default language is english
-		topic.access_policy=unicode('PUBLIC')
+		topic.altnames = unicode(string_alias)
+		topic.status = unicode('PUBLISHED') #by default status of each item is PUBLISHED
+		topic.language = unicode('en')      #by default language is english
+		topic.access_policy = unicode('PUBLIC')
 
 		topic.save()
 		
@@ -127,7 +127,7 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		
 def create_AttributeType(name, data_type, system_name, user_id):
 	"""
-	This method creates an attribute type of given name and which will be for the given system_type(WikiData)
+	This method creates an attribute type of given name and which will be for the given system_type(Topic GSystemType)
 	The following data_types are possible:
 	DATA_TYPE_CHOICES = (
     	"None",
@@ -146,14 +146,22 @@ def create_AttributeType(name, data_type, system_name, user_id):
 	User Id will be used for filling the created_by field.
 	"""
 	print "Creating an Attribute Type"
-	cursor = collection.Node.one({"name":unicode(name)})
+	"""
+	Checking if the AttributeType already exists or not
+	Alternate Check: 
+		Check the attribute_type_set of the Topic GSystemType. But the problem is that it consists of objectId's so processing is expensive. A simple name search seems to be more efficient.
+	"""
+	
+	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
 	if (cursor != None):
 		print "The AttributeType already exists."
 	else:
 		attribute_type = collection.AttributeType()
 		attribute_type.name = unicode(name)
 		attribute_type.data_type = data_type
-		system_type = collection.Node.one({"name":u"WikiData"})
+		#changed
+		system_type = collection.Node.one({"name":u"Topic"})
+		#end of change
 		attribute_type.subject_type.append(system_type._id)
 		attribute_type.created_by = user_id
 		attribute_type.modified_by = user_id
@@ -161,24 +169,26 @@ def create_AttributeType(name, data_type, system_name, user_id):
 		attribute_type.member_of.append(factory_id)
 		attribute_type.save()
 		"""	
-		Adding the attribute type to the WikiData GSytemType attribute_set"
+		Adding the attribute type to the Topic GSytemType attribute_set"
 		"""
 		system_type.attribute_type_set.append(attribute_type._id)
 		print "Created the Attribute_Type " + str(name)
 		
 		
-def create_Attribute(name, subject_name, attribute_type_name, object_value):
+def create_Attribute(subject_name, attribute_type_name, object_value):
 	"""
-	Creating an Attribute with specified name, subject_id, attribute_type and value.
-	This will create an attribute iff the attribute is not present for the same subject
+	Creating an Attribute with specified subject_id, attribute_type and value.<Name of the GAttribute is automatically specified.>
+	This will create an attribute iff the attribute is not present for the same subject.
 	"""
 	print "Creating an attribute"
 	subject = collection.Node.one({"name":unicode(subject_name)})
 	attribute_type = collection.Node.one({"name": unicode(attribute_type_name), "_type": u"AttributeType"})
-	print attribute_type
-	cursor = collection.Node.one({"subject":subject._id, "attribute_type": attribute_type._id})
+	#print attribute_type
+	#changed
+	cursor = collection.Node.one({"_type":u"GAttribute", "subject":subject._id, "attribute_type.$id": attribute_type._id})
+	#end of change
 	if cursor!= None: #change-am
-		print "The attribute " + str(attribute_type_name) + " already exists."
+		print "The attribute " + str(attribute_type_name) + " already exists for the topic " + str(subject_name) + "."
 	else:
 		att = collection.GAttribute()
 		att.subject = subject._id
@@ -188,7 +198,7 @@ def create_Attribute(name, subject_name, attribute_type_name, object_value):
 		print type(object_value), str("------------------------------------")
 		print "Abt to create"
 		att.save()
-		print "Created attribute " + str(name)
+		print "Created attribute " + str(att.name)
 	
 	
 def create_RelationType(name, inverse_name, object_type_name, user_id):
