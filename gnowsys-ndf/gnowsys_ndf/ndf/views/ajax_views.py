@@ -492,6 +492,21 @@ def node_collection(node=None, group_id=None):
     return True
 
 
+def check_topic_node(request, group_id):
+
+  # To check topic node
+  node_id = request.POST.get("node_id","")
+  if node_id:
+    obj = collection.Node.one({'_id': ObjectId(node_id)})
+    if obj:
+      if topic_GST._id in obj.member_of:
+        return HttpResponse("True")
+      else:
+        return HttpResponse("False")
+
+
+
+
 def delete_themes(request, group_id):
   '''delete themes objects'''
   send_dict = []
