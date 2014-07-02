@@ -59,7 +59,25 @@
 			        var node = event.node;
 			        // If its topic node i.e no children of this node then show the detail veiw for topic
 			  		if( node.children[0] == null ){
-				        location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";
+
+					  	$.ajax({
+					      type: "POST",
+					      url: "{% url 'check_topic_node' groupid %}",
+					      datatype: "html",
+					      data:{
+					        node_id: node.id,
+					        csrfmiddlewaretoken: '{{ csrf_token }}'
+					      },
+					      success: function(data) {
+					        if ($.trim(data) === "True"){
+					    		location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
+					        }
+
+					      }
+					    });
+
+
+				        
 			  		}
 			  		
 			    }
