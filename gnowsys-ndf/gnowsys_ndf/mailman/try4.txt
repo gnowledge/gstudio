@@ -1,0 +1,30 @@
+From aakanksha@myStudio.org  Wed Jun 11 16:02:09 2014
+Return-Path: <aakanksha@myStudio.org>
+X-Original-To: contact@myStudio.org
+Delivered-To: aakanksha@myStudio.org
+Received: by myStudio.org (Postfix, from userid 1000)
+	id 9CCA345FC2; Wed, 11 Jun 2014 16:00:17 +0530 (IST)
+Message-Id: <20140611103209.9CCA345FC2@myStudio.org>
+Date: Wed, 11 Jun 2014 16:00:14 +0530 (IST)
+From: aakankshanaik19@gmail.com (Aakanksha)
+Subject: [Test] New thread 
+
+hello
+this is a new thread
+
+From aakanksha@myStudio.org  Wed Jun 11 16:03:24 2014
+Return-Path: <aakanksha@myStudio.org>
+X-Original-To: contact@myStudio.org
+Delivered-To: aakanksha@myStudio.org
+Received: by myStudio.org (Postfix, from userid 1000)
+	id 8865045FC1; Wed, 11 Jun 2014 16:03:24 +0530 (IST)
+Message-Id: <20140611103324.8865045FC1@myStudio.org>
+Date: Wed, 11 Jun 2014 16:03:19 +0530 (IST)
+From: wooster@example.com (Aakanksha)
+Subject: [Test] Fun!!
+
+hello
+hello
+hello
+this is fun!!!
+
