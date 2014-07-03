@@ -1,0 +1,89 @@
+	<script type="text/javascript" src = "http://d3js.org/d3.v3.min.js"></script>
+
+
+	<script type="text/javascript">
+		//var pie_pie_dataset = [5,10,20,35,6,20,10,5];
+		//var dataset = [{{docCollection.count }},{{imageCollection.count }},{{videoCollection.count }}];
+		//alert("hello");
+		var g = "{{datavisual}}";
+		//alert(g);
+		//alert(datavisual);
+		var m =g.replace(/&quot;/gi,'"');
+		//alert(m);
+		var dataset = [];
+		var system_count = [];
+		m = JSON.parse(m);
+		var i = m.length;
+		//alert(i);	
+
+		//alert(m[1].count);
+		//var dataset = [{{docCollection.count }},{{imageCollection.count }},{{videoCollection.count }}];
+		//tester . logs the dataset to the console
+		for (var i =0 ; i < m.length ; i+=1)
+		{
+			dataset.push(m[i]);
+		//	alert(m[i]);
+		}
+
+		for (var i = 0 ; i < dataset.length ; i += 1)
+		{
+			system_count.push(dataset[i].count);
+		}
+
+		var w= 270;
+		var h = 350;
+		var colorScale = d3.scale.linear()
+		.domain([0,25])
+		.range(["yellow","#238558"]);
+
+
+		var outerRadius = w/2
+		var innerRadius = 75;
+		var arc = d3.svg.arc()
+		.innerRadius(innerRadius)
+		.outerRadius(outerRadius);
+
+		var pie_svg = d3.select("#pie_visual")
+		.append("svg")
+		.attr("height",h)
+		.attr("width",w);
+
+		var pie = d3.layout.pie();
+
+		var p = pie(system_count);
+		//alert(p);
+		var arcgrp = pie_svg.selectAll("g.arc")
+		.data(p)
+		.enter()
+		.append("g")
+		.attr("class","arc")
+		.attr("transform","translate(" + outerRadius + "," + outerRadius + ")");
+
+		arcgrp.append("path")
+		.attr("d",arc)
+		.transition()
+		.ease("bounce")
+		.duration(2000)
+		.attrTween("d", tweenPie)
+		.transition()
+		.ease("elastic")
+		.delay(function(d, i) { return 2000 + i * 50; })
+		.duration(750)
+		.attrTween("d", tweenDonut);
+
+		function tweenPie(b) {
+			b.innerRadius = 0;
+			var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
+			return function(t) { return arc(i(t)); };
+		}
+
+		function tweenDonut(b) {
+			b.innerRadius = outerRadius * .6;
+			var i = d3.interpolate({innerRadius: 0}, b);
+			return function(t) { return arc(i(t)); };
+		};
+
+		arcgrp.data(system_count)
+		.attr("fill", function(d){ return colorScale(d);});
+
+</script>
