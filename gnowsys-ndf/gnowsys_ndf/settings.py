@@ -45,7 +45,7 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'django_mongokit.mongodb',
-        'NAME': 'studio-dev-test1',
+        'NAME': 'studio-dev1',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -220,7 +220,13 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 META_TYPE = [u"GAPP",u"factory_types"]
 
 #Default APPs inculde in beloow GAPPS list
+<<<<<<< HEAD
 GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData"]
+=======
+
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData"]
+
+>>>>>>> aa314071f624dec1cd30b10a50a481fe8d24854f
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True

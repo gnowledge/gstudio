@@ -31,7 +31,9 @@ import os
 import urllib2
 import json
 import pprint
-from system_script import *
+
+from system_script2 import *
+
 
 
 #relative path of file
@@ -40,8 +42,23 @@ fn = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/list_of_
 gen_url_json="http://www.wikidata.org/wiki/Special:EntityData/"
 gen_url_page="http://www.wikidata.org/wiki/"
 language ="en" #this script is scalable and can be run for any given language .All relevant extracting functions will extract info in that language only.
+
+commonsMedia_base_link="http://commons.wikimedia.org/wiki/File:"
 #url="http://www.wikidata.org/wiki/Special:EntityData"
 
+def json_parse(url_json):
+	'''
+	This function simply print out the url being passed to it as a parameter.
+	It then extracts the json availbale  at that url and prints out the json in indented form.
+	'''
+	js={}
+	try:
+		j = urllib2.urlopen(url_json)
+		js = json.load(j)
+	except (ValueError, KeyError, TypeError):
+   		print "JSON format error"
+	
+	return js
 
 
 def extract_aliases(json_obj,topic_title,language_choice):
@@ -144,22 +161,119 @@ def extract_descriptions(json_obj,topic_title,language_choice):
 	return description	
 
 
-def json_parse(url_json	):
-	'''
-	This function simply print out the url being passed to it as a parameter.
-	It then extracts the json availbale  at that url and prints out the json in indented form.
-	'''
-	js={}
-	try:
-		j = urllib2.urlopen(url_json)
-		js = json.load(j)
-	except (ValueError, KeyError, TypeError):
-   		print "JSON format error"
+
+
+		
+
+def extract_datatype_from_property(property_value_list):
+	"""
+	property_value_list is a list that has been extracted from the object's json
+	This function returns the datatype of one particular property , that property whose value has been passed to this function as a list
+	"""
+	for element in property_value_list:
+		if(type(element)) == type({}):
+			for k,v in element.items():
+				if k=="mainsnak":
+					for k1,v1 in v.items():
+						if k1=="datatype":
+							return v1
+
+def extract_from_property_value(property_value_list):
+	"""
+	property_value_list is a list that has been extracted from the object's json
+	"""
+	for element in property_value_list:
+		if(type(element)) == type({}):
+			for k,v in element.items():
+				if k=="mainsnak":
+					for k1,v1 in v.items():
+						if k1=="datatype":
+							if v1=="wikibase-item":
+								return 0  # RelationType and Relation will have to be created
+							elif v1=="globe-coordinate" :
+								return 1  # location field of the GSystemType will have to filled
+							else:
+								return 2 #all others for which AttributeType and Attributes will be created
+
+
+
+def extract_property_value(property_value_list):
+	for element in property_value_list:
+		if(type(element)) == type({}):
+			for k,v in element.items():
+				if k=="mainsnak":
+					for k1,v1 in v.items():
+						if k1=="datavalue":
+							for k2,v2 in v1.items():
+								if k2=="value":
+									return v2
+
+
+
+
+
+def property_create_AttributeType(property_id,property_data_type,json_obj):
+	"""
+	json_obj is actually the json object of that property
+	TO DO :mapping of property)_data_type is to be done so that all data types of wikidata correspond to mongodb types
+	eg -time -datetime.datetime()
+
+	"""
+	if(json_obj):
+		property_alias_list=extract_aliases(json_obj,property_id,language)
+		property_label =extract_labels(json_obj,property_id,language)
+		property_description =extract_descriptions(json_obj,property_id,language)
+		property_last_update =extract_modified(json_obj,property_id)
+		property_entity_type =extract_type(json_obj,property_id)
+		property_namespace =extract_namespace(json_obj,property_id)
+
+		create_AttributeType(property_label, property_data_type, user_id)
+
+def extract_property_json(json_obj,label,topic_title):
+	claim_dict={}
+	Result =json_obj['entities'][str(topic_title)]
 	
-	return js
+	for k,v in Result.items():	
+		if k =="claims":
+			claim_dict=v
 
 
-#list_of_urls =[]
+	for k,v in claim_dict.items():
+		property_id =k
+		property_json_url =gen_url_json+property_id+".json"
+		property_json =json_parse(property_json_url)
+		property_value_list =v
+		label = extract_labels(property_json,property_id,language)
+		flag=-1
+		flag=extract_from_property_value(property_value_list)
+		property_value =extract_property_value(property_value_list) #property_value has the value of that property fpr a particular object
+		if flag==2: #relation has to be made
+			property_data_type=extract_datatype_from_property(property_value_list)
+			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
+			print property_data_type
+			#property_create_AttributeType(property_id,property_datatype,property_json) #assuming that the name of the attribute type id the property id like say P131
+			#property_create_Attribute(label,property_id,property_value) #entire triple is being passed as a parameter
+		
+
+
+
+
+
+def create_topic_id():
+	"""
+	This function is just called once , directly from main so that the topic_id is created as a AttributeType
+	"""
+
+	attribute_type_name ="topic_id"
+	attribute_type_data_type ="unicode"
+	user_id =int(1)
+	create_AttributeType(attribute_type_name, attribute_type_data_type, user_id)
+
+
+
+
+
+>>>>>>> aa314071f624dec1cd30b10a50a481fe8d24854f
 
 def read_file():
 	with open(fn,'rb') as f:
@@ -182,9 +296,13 @@ def read_file():
 						page_id =extract_pageid(json_obj,topic_title)
 						namespace =extract_namespace(json_obj,topic_title)
 
-						if label!=None:
-							print ""
-							create_Topic(label, description, alias_list, topic_title, None, int(1))
+						
+						if label!=None :
+							#create_Topic(label, description, alias_list, topic_title, None, int(1))
+							#	create_Attribute(label, "topic_id", topic_title)
+							
+							extract_property_json(json_obj,label,topic_title)
+
 
 					else:
 						print "empty json returned"
@@ -193,9 +311,12 @@ def read_file():
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
-		create_WikiData_Theme_Topic()
+
+		#create_WikiData_Theme_Topic()
+		#create_topic_id()
+
 		read_file()		# read the file with list of items starting with Q
 		
 
 		
-							
+
