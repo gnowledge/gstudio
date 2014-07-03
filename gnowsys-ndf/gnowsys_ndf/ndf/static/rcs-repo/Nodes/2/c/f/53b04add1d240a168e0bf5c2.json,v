@@ -1,0 +1,63 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2014.06.29.17.20.29;	author rohan;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (topic3) is created by rohan on 29 June 2014
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "53b04add1d240a168e0bf5c2"
+    },
+    "_type": "GSystem",
+    "access_policy": null,
+    "altnames": null,
+    "annotations": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "contributors": [],
+    "created_at": 1404082229268,
+    "created_by": 1,
+    "featured": null,
+    "group_set": [],
+    "language": null,
+    "last_update": 1404082229268,
+    "location": [],
+    "login_required": null,
+    "member_of": [
+        {
+            "$oid": "53b04add1d240a168e0bf5bf"
+        }
+    ],
+    "modified_by": null,
+    "module_set": [],
+    "name": "topic3",
+    "plural": null,
+    "post_node": [],
+    "prior_node": [],
+    "property_order": [],
+    "start_publication": null,
+    "status": "DRAFT",
+    "tags": [],
+    "type_of": [],
+    "url": "http://www.facebook.com/"
+}@

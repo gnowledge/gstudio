@@ -1,0 +1,60 @@
+head	1.1;
+access;
+symbols;
+locks
+	rohan:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2014.07.01.09.21.13;	author rohan;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (System_Topic) is created by rohan on 01 July 2014
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "53b27d881d240a2306e8b68a"
+    },
+    "_type": "GSystem",
+    "access_policy": null,
+    "altnames": null,
+    "annotations": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "contributors": [],
+    "created_at": 1404226272827,
+    "created_by": 1,
+    "featured": null,
+    "group_set": [],
+    "language": null,
+    "last_update": 1404226272828,
+    "location": [],
+    "login_required": null,
+    "member_of": [],
+    "modified_by": null,
+    "module_set": [],
+    "name": "System_Topic",
+    "plural": null,
+    "post_node": [],
+    "prior_node": [],
+    "property_order": [],
+    "start_publication": null,
+    "status": "DRAFT",
+    "tags": [],
+    "type_of": [],
+    "url": null
+}@

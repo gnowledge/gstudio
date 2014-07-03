@@ -1,0 +1,81 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2014.06.29.17.08.53;	author rohan;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (has_batch_member) is created by rohan on 29 June 2014
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "53b048251d240a12fc4a8831"
+    },
+    "_type": "RelationType",
+    "access_policy": null,
+    "altnames": null,
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "contributors": [
+        1
+    ],
+    "created_at": 1404081533091,
+    "created_by": 1,
+    "featured": null,
+    "group_set": [],
+    "inverse_name": "batch_member_of",
+    "is_reflexive": null,
+    "is_symmetric": null,
+    "is_transitive": null,
+    "language": null,
+    "last_update": 1404081533091,
+    "location": [],
+    "login_required": null,
+    "member_of": [
+        {
+            "$oid": "53b048241d240a12fc4a8816"
+        }
+    ],
+    "modified_by": 1,
+    "name": "has_batch_member",
+    "object_applicable_nodetype": null,
+    "object_cardinality": null,
+    "object_type": [
+        {
+            "$oid": "53b048241d240a12fc4a882a"
+        }
+    ],
+    "plural": null,
+    "post_node": [],
+    "prior_node": [],
+    "property_order": [],
+    "slug": null,
+    "start_publication": null,
+    "status": "DRAFT",
+    "subject_applicable_nodetype": null,
+    "subject_cardinality": null,
+    "subject_type": [
+        {
+            "$oid": "53b048241d240a12fc4a8820"
+        }
+    ],
+    "tags": [],
+    "type_of": [],
+    "url": null
+}@

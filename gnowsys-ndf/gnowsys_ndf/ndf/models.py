@@ -1327,19 +1327,63 @@ class Triple(DjangoDocument):
     
     def save(self, *args, **kwargs):
         is_new = False
+	
 
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
 
         collection = get_database()[Node.collection_name]
-        subject_name = collection.Node.one({'_id': self.subject}).name
         
+	#it's me
+	subject_name = collection.Node.one({'_id': self.subject}).name
+        subject_system_flag = False
+        subject_id = self.subject
+        subject_document = collection.Node.one({"_id":self.subject})
+        print subject_document
+
         if self._type == "GAttribute":
             self.name = subject_name + " -- " + self.attribute_type['name'] + " -- " + unicode(self.object_value)
+	    subject_type_list = []
+	    subject_type_list = self.attribute_type['subject_type']
+ 	    subject_member_of_list = []
+	    subject_member_of_list = subject_document.member_of
+	    intersection = set(subject_member_of_list) & set(subject_type_list)
+	    if intersection:
+	    	subject_system_flag = True
+	    	
 
         elif self._type == "GRelation":
+	    right_subject_document = collection.Node.one({'_id': self.right_subject})
             right_subject_name = collection.Node.one({'_id': self.right_subject}).name
             self.name = subject_name + " -- " + self.relation_type['name'] + " -- " + right_subject_name
+	    subject_type_list = self.relation_type['subject_type']
+	    object_type_list= self.relation_type['object_type']
+	    left_subject_member_of_list = subject_document.member_of
+	    right_subject_member_of_list = right_subject_document.member_of
+	    left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
+	    right_intersection = set(object_type_list) & set(right_subject_member_of_list)
+	    if left_intersection and right_intersection:
+	    	subject_system_flag = True
+
+	if self._type =="GRelation" and subject_system_flag == False:
+		print "The 2 lists do not have any common element"
+		raise Exception("Cannot create the GRelation as the subject/object that you have mentioned is not a member of a GSytemType for which this RelationType is defined")
+	
+	if self._type =="GAttribute" and subject_system_flag == False:
+		print "The 2 lists do not have any common element"
+		raise Exception("Cannot create the GAttribute as the subject that you have mentioned is not a member of a GSystemType which this AttributeType is defined")
+
+	#it's me
+	#check for data_type in GAttribute case. Object value of the GAttribute must have the same type as that of the type specified in AttributeType
+	if self._type == "GAttribute":
+		data_type_in_attribute_type = self.attribute_type['data_type']
+		data_type_of_object_value = type(self.object_value)
+		print "Attribute:: " + str(data_type_in_attribute_type)
+		print "Value:: " + str(data_type_of_object_value)
+		if data_type_in_attribute_type != data_type_of_object_value:
+			raise Exception("The DataType of the value you have entered for this attribute is not correct. Pls ener a value with type ---> " + str(data_type_in_attribute_type))
+
+	#end of data_type_check
 
         super(Triple, self).save(*args, **kwargs)
         

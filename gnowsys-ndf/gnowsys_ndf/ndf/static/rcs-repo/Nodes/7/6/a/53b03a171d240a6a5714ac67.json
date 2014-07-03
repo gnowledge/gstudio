@@ -1,0 +1,37 @@
+{
+    "_id": {
+        "$oid": "53b03a171d240a6a5714ac67"
+    },
+    "_type": "MetaType",
+    "access_policy": null,
+    "altnames": null,
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "contributors": [
+        1
+    ],
+    "created_at": 1404077935232,
+    "created_by": 1,
+    "description": null,
+    "featured": null,
+    "group_set": [],
+    "language": null,
+    "last_update": 1404077935232,
+    "location": [],
+    "login_required": null,
+    "member_of": [],
+    "modified_by": 1,
+    "name": "GAPP",
+    "parent": null,
+    "plural": null,
+    "post_node": [],
+    "prior_node": [],
+    "property_order": [],
+    "start_publication": null,
+    "status": "DRAFT",
+    "tags": [],
+    "type_of": [],
+    "url": null
+}
