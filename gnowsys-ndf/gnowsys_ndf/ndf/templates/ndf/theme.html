@@ -171,7 +171,9 @@
 		{% if node %}
 
 			<!-- If "Theme" node -->
-			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
+			<div id="app-set-item" class="themes" style="display:block;" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
+			<div id="app-set-item" class="fold_themes" style="display:none;" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
+			<div id="app-set-item" class="unfold_themes" style="display:none;" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
 			
 		{% endif %}
 
@@ -282,24 +284,39 @@
 		$(".fold").click(function() {
 			$(function() {
 				
+				$(".themes").css({display: "none"});
+				$(".fold_themes").css({display: "block"});
+
 				var user = "{{user.is_authenticated}}"
 
-				$('.themes').tree({
+				$('.fold_themes').tree({
 					autoOpen: false,
+	        		
 	        		onCreateLi: function(node, $li) {
+						
+						if (node.node_type == "Topic"){
+							$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
+						}
+						else{
+							$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:gold"></span> &nbsp;');				        		
+						}
+
 	        			if (user == "True")
-        				{
-        					$li.find('.jqtree-element').append(
-        						{% user_access_policy groupid request.user as user_access %}
-        						{% if user_access == "allow" %}
+	        			{   
+	        				$li.find('.jqtree-element').append(
+	        					{% user_access_policy groupid request.user as user_access %}
+	        					{% if user_access == "allow" %}
 
-	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
 
+	                			
 	                			{% endif %}
 	            			);	
-        				}
+	        			}
+	            		
 
 	        		}
+
 				});
 
 			});
@@ -309,25 +326,40 @@
 	    $(".unfold").click(function() {
 	    	$(function() {
 
+	    		$('.themes').html('<img src="/static/ndf/images/ajax-loader-trans.gif" height="100" width="100">');
+
+	    		$(".themes").css({display: "none"});
+				$(".fold_themes").css({display: "none"});
+				$(".unfold_themes").css({display: "block"});
+
 	    		var user = "{{user.is_authenticated}}"
 
-	    		$('.themes').tree({
+	    		$('.unfold_themes').tree({
 	    			autoOpen: true,
-	    			slide: false,
+	    			// slide: false,
 
 	    			onCreateLi: function(node, $li) {
+						
+						if (node.node_type == "Topic"){
+							$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
+						}
+						else{
+							$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:gold"></span> &nbsp;');				        		
+						}
 
-	    				if (user == "True")
-        				{
-		            		$li.find('.jqtree-element').append(
-		            			{% user_access_policy groupid request.user as user_access %}
-        						{% if user_access == "allow" %}
+	        			if (user == "True")
+	        			{   
+	        				$li.find('.jqtree-element').append(
+	        					{% user_access_policy groupid request.user as user_access %}
+	        					{% if user_access == "allow" %}
 
-		                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
-		                			
-		                		{% endif %}
-		            		);
-		            	}
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+
+	                			
+	                			{% endif %}
+	            			);	
+	        			}
+	            		
 
 	        		}
 	    			
