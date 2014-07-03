@@ -1,0 +1,140 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+{% block style %}
+
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer { 
+border-color: #D3D3D3; border-style: solid; 
+padding: 0 !important; 
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px; 		
+background-repeat:no-repeat; background-size: 48px 48px
+}
+{% endblock %}
+
+{% block script %}
+
+$("#save-node").click(function() {
+var batch_count = parseInt('{{count}}')
+for(i=0;i<batch_count;i++)
+	    {
+	    cn_arr = []
+	    $.each($("#"+i+"_drawer2 li"),function(index,item){
+            cn_arr.push(item.id);
+            });
+	    $("#"+i+"_list").val(cn_arr)
+	    }
+	    });
+
+
+function set_drawer_value(group_id, st_batch_id)
+{
+// $('.pricing-table.drawer1').html("");
+ $('#0_drawer2').html("");
+/* $('.pricing-table.drawer1').html('<li class="price"><input type="text" placeholder="Type here to search in the resources" id="\
+collection_set_search" class="margin-0"></li>');*/
+  var _id = '{{node.pk}}'
+  if (_id != "")
+  {
+  var url = '/{{groupid}}/ajax/get_data_for_batch_drawer/?st_batch_id='+st_batch_id+'&'+'_id='+_id;
+  }
+  else
+  {
+  var url = '/{{groupid}}/ajax/get_data_for_batch_drawer/?st_batch_id='+st_batch_id;
+  }
+  $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('.pricing-table.drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#0_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+  });
+   });
+}
+
+var group_id = '{{group_id}}'
+var st_batch_id = '{{st_batch_id}}'
+//var batch_count = {{count}}
+//alert(batch_count)
+set_drawer_value(group_id, st_batch_id);
+
+
+	    
+{% endblock %}
+{% block body_content %}
+<form data-abide id="form-create-batch" method="POST" action="{% url 'save' groupid %}">{% csrf_token %}
+  <dl class="accordion" data-accordion>
+    <input type="hidden" name="batch_count" value="{{count}}"/>
+    {% for each in batch_count %}
+    {% if node %}
+    <dd class="active">
+      {% else %}
+    <dd>     
+      {% endif %}
+      <a href="#panel{{each}}">{% if node.name %}{{node.name}}{% else %}Batch{{each}}{% endif %}</a>
+      {% if node %}
+      <div id="panel{{each}}" class="content active">
+	{% else %}
+	 <div id="panel{{each}}" class="content">
+	   {% endif %}
+	   <div class="row">
+	     <div class="large-9 columns">
+	       <label>Enter Batch Name <span style="color:red"><b>*</b></span>
+	      <input type="text" placeholder="Batch Name" id="txt_batch_name_{{each}}" name="batch_name_{{each}}" value="{{node.name}}" required/>
+	      <input type="hidden" name="node_id" value="{{node.pk}}"/>
+	    </label>
+	     <small class="error">Batch name required.</small>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="large-11 columns" >
+	    <label><h3>Choose members</h3>
+	      <div id="user_drawer" >
+		{% include "ndf/drawer_widget.html" with widget_for=each %}
+	      </div>
+	    </label>
+	  </div>
+	</div>
+      </div>
+    </dd>
+    <br/>
+    {% endfor %}
+  </dl>
+<br/><br/>
+      <div class="row">
+	<div class="large-11 columns" >
+	  <input type="submit" class="button expand" id="save-node" value="Save">
+	  
+	</div>
+      </div>
+</div>
+</form>
+{% endblock %}
