@@ -1,100 +1,60 @@
-
-
 {% load ndf_tags %}
 
 <script src="/static/ndf/js/jquery-ui.js"></script>
 <link href="/static/ndf/css/jquery-ui.css" rel="stylesheet">
 
 <script type="text/javascript">
+var data_prefs="";
+var not_status="OFF";
+var inviting_users="";
 
-var items={}
-var user_list=[]
-function handle(){
-   var aa=$("#selectOfInviteUser").val();
-   var conf_delete=confirm("pressing OK will remove the entry from the list, OK?")
-   if (conf_delete==true)
-      { $("#selectOfInviteUser option[value='"+aa+"']").remove(); }
+
+
+
+$(document).on('click',"#checknotif",function() {
+
+if($('#checknotif').attr('checked')) {
+not_status="ON";
 }
-
-
-function UserInvitation()
+else
 {
+not_status="OFF";
+}
+});
 
-$.extend(items,{% get_all_users_to_invite %});
-i=0;
-for (var key in items)
+
+
+function saveinvite(){
+get_all_data();
+var inviting_users=data_prefs;
+data_prefs=""
+var surl="/{{node}}/group/notify/invite_users/"
+if (not_status=="OFF")
 {
-user_list[i]=key;
-i=i+1;
+alert("Notification mails sent to newly selected users(if any)");
 }
-
-
-user_list =JSON.parse(update_user_list())
-
-$( "#userInvite" ).autocomplete({
-   source: user_list
-});
-$(".invitation").show();
-
+else
+{
+alert("Notification mails sent to all users except group owner");
 }
-
-
-$(document).on('click',".removeList",function() {
-var $select = $('#selecctOfInviteUser');
-$('option:selected',$select).remove();
-});
-
-
-$(document).on('click',"#addToList",function() {
-      UserInvitation();
-      data = $("#userInvite").val();//attr('value');
-      if(data != ""){
-           $("#selectOfInviteUser").append(new Option(data, data));
-           $("#userInvite").val("");
-           $("#selectOfInviteUser").show();
-           $(".removeList").show()
-           $("#submitUserInvite").show();
-      }
-      else{
-$('.responseToInvite').html("select users to invite");
-$('.responseToInvite').css("color","red");
-
-          }
-});
-
-
-
-
-$(document).on('click',"#submitUserInvite",function(){
-      var listobject, listobjectLength
-      list_users=[]
-      listobject = selectOfInviteUser.options,
-      listobjectLength = listobject.length
-      for (var i = 0; i < listobjectLength; i++) {
-           list_users[i] = items[listobject[i].value];
-                    }
-       var join_list_users= list_users.join(',');
-       data = $("#userInvite").val();//attr('value');
-       var surl="/{{node}}/group/notify/send_invitation/"
-
 $.ajax({
-
         url: surl,
         type: 'POST',
-        data: {users:join_list_users,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        data: {users:inviting_users,notif_status:not_status,csrfmiddlewaretoken: '{{ csrf_token }}'},
         beforeSend: function() {
               $("#ajax_load_image").show();
               $("#content").css({"opacity":"0.1",})
                               },
        success: function(data){
-                if(data=="success")
-                    { alert("Successfully subscribed members and e-mail notification send");
-$(".invitation").hide();
-}
+                if(data=="Success")
+                    { alert("Successfully applied modifications and e-mail notifications send");
+                      $('.close-reveal-modal.group').trigger('click'); 
+
+                     }
 
                 else{
-                      $(".invitation").hide();
-	               alert("failed to subscribe");
+                      alert("failed to subscribe");
+                      $('.close-reveal-modal.group').trigger('click');
                         }
 
                              },
@@ -102,52 +62,62 @@ $(".invitation").hide();
                 $("#ajax_load_image").hide();
                 $("#content").css({"opacity":"",})
           }
-}); });
+}); 
+}
 
-function HideUserInvitation()
-{
-$(".invitation").hide();
-$("#UserInvitation").show();
-$("#hideUserInvitation").hide();
+$(document).on('click',"#subscr_users",function() {
+
+ $('#inviteusers #collection_set_drawer1').html("");
+ $('#inviteusers #collection_set_drawer2').html("");
+ $('#inviteusers #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="collection_set_search" class="margin-0"></li>');
+
+var url="/{{node}}/group/notify/invite_users/"
+ $.getJSON( url, function( data ) {
+  $.each(data ,function(index , drawer_elements){
+   if(index == 0)
+    {
+     $.each(drawer_elements.drawer1, function(index, element) {
+        $('#inviteusers #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+   }
+   if(index == 1)
+    {
+    $.each(drawer_elements.drawer2, function(index, element) {
+        $('#inviteusers #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+      });
+    }
+
+ }); //close each
+   }); //getjson
+}); //document click
+
+
+
+
+
+function get_all_data(){
+ $.each($('#inviteusers #collection_set_drawer2 li'),function(index,item){
+         data_prefs=data_prefs+String(item.id)+",";
+         });
 }
 
 
-function update_user_list()
-{
-var ajurl ="{% url 'get_filterd_user_list' groupid %}?_id={{node.pk}}";
-var users = [];
-  $.ajax({
-	url:ajurl,
-	async: false, 	
-  success: function(data){
-  users = data; },
-  });
-return users;
-}			 
 </script>
-<style type="text/css">
-#selectOfInviteUser{
-height:150px;
-}
-</style>
 
+<div id="subscr_users">
+<input type="button" class="button small" data-reveal-id="inviteusers" value="Subscribe registered users">
 
+<div id="inviteusers" class="reveal-modal " data-reveal >
+     
+     <h2>Select users</h2>
+      <div id="module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set"  %}
+      </div>
 
-<input type="button" class="button tiny" id="UserInvitation" value="Subscribe Registered Members" onclick="UserInvitation()">
-<br/>
-<input type="button" id="hideUserInvitation" Value= "Hide Invitation" onclick="HideUserInvitation()" style="display:none;">
-<div class="invitation" style="display:none">
-
-<input id="userInvite">
-
-<input type="button" id="addToList" class="button tiny" value="Add">
-
-<input type="button" class="button tiny" id="submitUserInvite" value="Subscribe" style="display:none"/>
-<p class="responseToInvite"></p>
-
-<select id="selectOfInviteUser" multiple="multiple" style="display:none" onchange="handle()">
-
-</select>
+            <label><input type="checkbox" id="checknotif" value="ON"> Send notification mails to all except the group owner</label>
+              
+      <input type="button" id="#submitUserInvite" class="button small" value="submit" onClick="saveinvite()"> 
+     <a class="close-reveal-modal group">&#215;</a>
 </div>
-
+</div>
 

@@ -1,0 +1,184 @@
+{% extends "ndf/base.html" %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+
+{% block style %}
+<!-- Style for drawer widget -->
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer {
+border-color: #D3D3D3; border-style: solid;
+padding: 0 !important;
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px;
+background-repeat:no-repeat; background-size: 48px 48px
+<!-- End -->
+{% endblock %}
+
+{% block script %}
+
+
+<!-- Ajax for getting user List  -->
+/*  jQuery(document).ready(function($) { 
+  $('.small.button.expand').on("click",function() {
+  node_id = $(this).attr("id")
+  var ajurl ="{% url 'get_author_set_users' groupid %}?_id="+node_id;
+  $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#batch_users').html(data); },
+  }); });
+  */
+<!-- End Ajax -->
+
+
+<!-- Ajax for removing user from  List  -->
+/*  $(document).on('click',".button.alert.tiny.remove",function(){
+  user_id = $(this).attr("id")
+  node_id = $('#node_id').val()
+  var ajurl ="{% url 'remove_user_from_author_set' groupid %}?_id="+node_id+"&user_id="+user_id;
+   $.ajax({
+         url:ajurl,
+  success: function(data){
+  $('#batch_users').html(data); },
+  });}); 
+
+  });
+*/
+<!-- End Ajax -->
+
+<!-- Script to validate form -->
+$("form").submit(function(event) {
+var len_user = parseInt('{{student_count}}')
+var txt_input = parseInt($("#txt_batch_count").val())
+if(txt_input > len_user)
+{
+ alert("No of batches should not be more than No of Users");
+ event.preventDefault();
+}
+if(txt_input <= 0)
+{
+ alert("No of batches should not be equalto or less than zero");
+ event.preventDefault();
+}
+});
+<!-- End -->
+
+{% endblock %}
+
+{% block meta_content %}
+  <h2>Batch</h2>
+{% endblock %}
+
+
+{% block related_content %}
+  <div class="create card">
+  <div class="page">
+    <h4><i class="fi-plus"></i> New</h4>
+      {% if user.is_authenticated %}
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user_access == "allow" %}
+      <a id ="btn_create" class="button expand" data-reveal-id="firstModal" href="">
+        Create {{title}}
+      </a>
+      {% endif %}
+      {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+
+{% block body_content %}
+{% get_group_name groupid as group_name_tag %}
+
+<header class="row">
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Batches {% if batch_coll.count %}({{ batch_coll.count }}){% endif %}</a></dd>
+  </dl>
+</header>
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+{% for node in batch_coll %}
+<li class="card">
+  <div class="page">
+    <header>
+      <div class="label-list">
+        {% for tag in node.tags %}
+        <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        {% endfor %}
+      </div>
+      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+      <h4>{{ node.name }} 
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </h4>
+    </header>
+   <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
+    <a  class="small button expand" href="{% url 'detail' groupid node %}" id="{{node.pk}}">Detail</a> 
+    {% get_user_object node.created_by as user_obj %}
+    {% ifequal user_obj.username user.username %}
+    <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
+    {% endifequal %}
+    {% comment %}
+     <a class="button  tiny" href="{% url 'edit' groupid node %}">Edit</a>
+     {% endcomment %}
+    <footer class="row">
+    </footer>
+  </div>
+</li>  
+{% endfor %}
+</ul>
+
+
+
+<!-- Reveal Modals begin -->
+
+<div id="firstModal" class="reveal-modal" data-reveal>
+<form data-abide id="form-create-batch" method="POST" action="{% url 'create_new' groupid %}">{% csrf_token %}
+<div class="row">
+  <div class="small-2 large-4 columns">
+    <b>Student Present in this group:{{student_count}}</b>
+  </div>
+</div>
+<br>
+<div class="row">
+  <div class="large-4 columns">
+    <label>Enter No Of Batches to Create
+      <input type="text" pattern="\d*" id="txt_batch_count" name="batch_count" placeholder="Enter Number Only" required>
+    </label>
+    <small class="error">Entered value should be numbers</small>
+  </div>
+</div>
+
+<div class="row">
+  <div class="large-4 columns">
+    <input type="submit" class="button"  value="Next" />
+  </div>
+</div>
+<a class="close-reveal-modal">&#215;</a>
+</form>
+</div>
+<!-- Reveal Model end -->
+
+
+{% paginate %}
+{% endblock %}

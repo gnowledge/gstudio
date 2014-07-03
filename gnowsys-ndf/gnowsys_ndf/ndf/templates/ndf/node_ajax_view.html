@@ -118,11 +118,19 @@ ul#graph-hover.f-dropdown{
 
           {% if 'Pandora_video' in node.member_of_names_list %}
           <div>
-            <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+           
+	    <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
               <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
               Your browser does not support the video tag.
-            </video>
+            </video><br/><br/>
 
+	    {% get_pandoravideo_metadata video_obj as metadata %}
+	    {% for k,v in metadata.items %} 
+            {% if k != "cuts" %}
+	    <h3>{{k}} : {{v}}<h3>
+		<br/>
+		{% endif %}
+	    {% endfor %}
             {% if user.is_authenticated %}
             <br/>
             <br/>
@@ -216,103 +224,160 @@ ul#graph-hover.f-dropdown{
      </div>
     </div>
   </section>
+
   <section class="medium-3 columns">
     <div class="panel">
-     <h3 class="subheader"></h3>
-       Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
-       <small>
-         <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
-          {% for seq_no, version_no in node.version_dict.items reversed %}
-          <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+      <!-- <h3 class="subheader"></h3> -->
+      <p>
+        {{ node.member_of_names_list.0 }} 
+        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+        <br>
+        <small>
+          <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+          {% for seq_no, version_no in node.version_dict.items|slice:"-6:" reversed %}
+          <abbr title="Version #{{version_no}}">
+            {% if forloop.last and forloop.counter > 5 %}
+            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">. . .</a>
+            
+            {% else %}
+            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
+
+            {% endif %}
+          </abbr> 
           {% endfor %}
-        </div>
-      </small>
-  
-    <!-- added button to convert collection into module-->
-    {% if node.collection_set and user.is_authenticated%}
-    {% user_access_policy groupid request.user as user_access %}
-      {% if user_access == "allow" %}
-     
-    <a href="#" class="button" id="module"></i> <span>Make Module</a>
-    {% endif %}
-    {% endif %}
+        </small>
+      </p>
 
-    {% if node %}
-     {% get_publish_policy request groupid node as group_policy %}
+      <!-- Start of Block: For listing Editing options --> 
+      {% user_access_policy groupid request.user as user_access %}
+
+      {% edit_policy groupid node request.user as status %}
+      {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+        {% get_edit_url node.pk as edit_url %}
+
         {% check_group node as is_group %}
+        {% if is_group %}
+        {% if user.is_superuser or node.created_by == user.id %}
+        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+        {% endif %}
 
-  	{% if group_policy == "allow" %}
-  	{% if is_group %} 
-   <div>
-   <a class="button small" href="{% url 'publish_group'  group_name_tag node %}"> Publish </a>
-    </a>
-   </div>
-  	{% else %}
-  	<div>
-   <a class="button small" href="{% url 'publish_page'  group_name_tag node %}"> Publish
-   </a>  
-   </div>
-	{% endif %}
-    {% endif %}
-   {% endif %}
- 
-    {% edit_policy groupid node request.user as status %}
-     
-     {% if status == "allow" %}
-	{% get_edit_url node.pk as edit_url %}
-    {% switch_group_conditions request.user group_id as switch_conditions %}
-    {% check_group node as is_group %}
+        {% else %}
+        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
 
-    {% get_user_object node.created_by as created_user %}
+        {% endif %}    
 
-         {% if is_group %}
+        <ul id="edit-options" class="f-dropdown">
 
-             {% if request.user == created_user or request.user.is_superuser %}     
-                   
-      <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a> 
-             {% endif %}
+          <!-- This button publishes the drafted resource -->
+          {% if node %}
+          {% get_publish_policy request groupid node as group_policy %}
+          {% if group_policy == "allow" %}
+            {% if is_group %}
+            {% if user.is_superuser or node.created_by == user.id %}
+            <li>
+              <a class="button small" href="{% url 'publish_group' group_name_tag node %}">Publish</a>
+            </li>
+            {% endif %}
+            
+            {% else %}
+            <li>
+              <a class="button small expand" href="{% url 'publish_page' group_name_tag node %}">Publish</a>
+            </li>
+            
+            {% endif %}
+            
+          {% endif %}
+          
+          {% endif %}
 
-         {% else %}
+          <!-- This button converts collection into module -->
+          {% if node.collection_set and user.is_authenticated %}
+            {% if user_access == "allow" %}
+            <li>
+              <a class="button small expand" href="#" id="module">Make Module</a>
+            </li>
+            {% endif %}
+          {% endif %}
 
+          <!-- This button translates given resource -->
+          <li>
+            <a class="button small expand" href="{% url 'node_translation' group_name_tag node %} ">Translate</a>
+          </li>
 
-      <a href="{% url edit_url group_name_tag node  %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+          <!--
+            * This button Adds/Uploads New resource
+            * Displayed 
+              - For Pages and Files
+              - In case of Groups/Author, only to the superuser
+          -->
+          {% get_create_url node.pk as create_url %}
 
-    {% endif %}    
-    {% endif %}
+          {% if is_group %}
+            {% if request.user.is_superuser %}
+            <li>
+              <a class="button small expand" href="{% url create_url group_name_tag %}">
+                <span class="fi-plus">&nbsp;&nbsp; New Group</span>
+              </a>
+            </li>
+            {% endif %}
 
-    <ul id="edit-options" class="f-dropdown">
-	
+          {% else %}
+            {% if node.member_of_names_list.0 == "File" %}
+            <li>
+              <a class="button small expand" href="{% url create_url group_name_tag %}?next={{request.path}}">
+                <span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+              </a>
+            </li>
 
-      <li><a href="{% url 'page_create_edit' group_name_tag %}">Create a new page</a></li>
-      <li><a href="{% url 'node_translation' group_name_tag node %} ">Translation</a></li>
-    </ul>
+            {% else %}
+              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+              
+                <li>
+                  <a class="button small expand" href="{% url create_url group_name_tag app_id %}">
+                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  </a>
+                </li>
+              {% else %}
+                <li>
+                  <a class="button small expand" href="{% url create_url group_name_tag %}">
+                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  </a>
+                </li>
+              {% endif %}
 
-  </div>
- <div>
- Languages
-<br></br>
-{% get_possible_translations node as tran %}
-{% for each in tran %}
-{% for k,v in each.items %}
- <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
-{% endfor %}
-{% endfor %}
+            {% endif %}
 
- </div>
+          {% endif %}
 
-</section>
+        </ul>
 
+      {% endif %}
+      <!-- End of Block: For listing Editing options --> 
+
+    </div>
+    
+    <div>
+      Languages
+      <br></br>
+      {% get_possible_translations node as tran %}
+      {% for each in tran %}
+        {% for k,v in each.items %}
+        <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
+        {% endfor %}
+      {% endfor %}
+
+    </div>
+  </section>
 
 </div>
 
 <footer>
   <p><small>
-      <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
+    <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>
 </footer>
 
 <script type="text/javascript">
-
 
   $(document).on('open', '#view-map-widget[data-reveal]', function () {  
     

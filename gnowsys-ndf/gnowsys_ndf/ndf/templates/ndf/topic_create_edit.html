@@ -46,21 +46,18 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <nav class="medium-12 columns">
    		<dl class="tabs" data-tab>
-	
-		<dd><h3>View:</h3></dd>
-	
-		<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
-	  	<!-- change name of collection tab overide block in your code -->
-	  		<a href="#panel-name-description">{% block page_tab %} {{title}} {% endblock %}</a>
-		</dd>
-		<dd title="Click here to add/edit Prior Node">
-	  		<a href="#panel-prior-node">Prior Node</a>
-		</dd>
-		<!-- change name of collection tab overide block in your code -->
-		<dd title="Click here to add/edit collection">
-	  		<a href="#panel-collection">{% block collection_tab %}Collection {% endblock %}</a> 
-		</dd>  
-	
+		{% if node %}
+			<dd><h3>View:</h3></dd>
+		
+			<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
+		  	<!-- change name of collection tab overide block in your code -->
+		  		<a href="#panel-name-description"> {{title}} </a>
+			</dd>
+			<dd title="Click here to add/edit collection">
+	  			<a href="#panel-collection" class="collection_tab"> Collection </a> 
+			</dd>
+						  
+		{% endif %}
      	</dl>
   	</nav>
   	</header>
@@ -68,165 +65,203 @@ background-repeat:no-repeat; background-size: 48px 48px
   	{% csrf_token %}
 
   	<div id="node-details-edit-div" class="tabs-content" > 
+  		{% if node %}
 
-    	<div class="active content row" id="panel-name-description">
-      		<div class="medium-6 columns">
-	
-			<div class="row">
-	  			<div class="medium-8 columns">
-	    			<label>{{title}} Name</label>
-	    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
-	  			</div>
+  		<!-- Block Description -->
+		<div class="active content row" id="panel-name-description">
+	  		<div class="medium-6 columns">
 
-	  			<div class="medium-4 columns">
-	    			{% if node.created_by == request.user.pk %}		    	
-						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+				<div class="row">
+		  			<div class="medium-8 columns">
+		    			<label>{{title}} Name</label>
+		    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+		    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+		  			</div>
 
-						<div class="privacy-mode switch round">
-						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
-							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-						{% else %}
-							{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
-								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-								<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-								<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-							{% endif %}
-						{% endif %}
-							<span></span>
-						</div>
-
-					{% else %}
-
-						{% if not node %}
+		  			<div class="medium-4 columns">
+		    			{% if node.created_by == request.user.pk %}		    	
 							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+
 							<div class="privacy-mode switch round">
-						
+							{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
 								<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
 
 								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
 								<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-							
+							{% else %}
+								{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
+									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
+									<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
+									<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+								{% endif %}
+							{% endif %}
 								<span></span>
 							</div>
 
-						{% endif %}
-
-					{% endif %}	    
-	  			</div>
-			</div>
-
-			<div id="message" style="display:none; color:red"></div>
-
-			<div class="row">
-	  
-	  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
-	     		</div>
-
-	  			<div class="large-6 columns" style="padding: 1.8em;">
-	  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-	  					<i class="fi-marker"></i> &nbsp; Add Location
-	  				</a>
-	  			</div>
-			</div>
-
-			<div class="row">
-	  			<div class="medium-12 columns">
-	    			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
-	  			</div>
-			</div>
-
-			<div class="row">
-	  			<div class="medium-12 columns">
-	    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
-	    			</span>
-	    			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-	  			</div>		
-			</div>
-	
-      		</div>
-  		</div>
-
-  		{% block prior_node %}
-
-	    	<div class="content" id="panel-prior-node"  style="width:95%;">
-	      	<div class="row">
-				<div class="small-12 columns">
-		  			<h5>Add or edit Prior Node : </h5>
-				</div>
-				<br/>
-		
-				<div class="small-12 columns">
-		  			<div id="prior_node_drawer">
-		    			{% edit_drawer_widget "prior_node" groupid node title %}
+						{% endif %}	    
 		  			</div>
 				</div>
-	      	</div>
-	    	</div>
-    
-	    {% endblock %}
 
+				<div id="message" style="display:none; color:red"></div>
+
+				<div class="row">
+		  
+		  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		     		</div>
+
+		  			<div class="large-6 columns" style="padding: 1.8em;">
+		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+		  					<i class="fi-marker"></i> &nbsp; Add Location
+		  				</a>
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+		    			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+		    			</span>
+		    			<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+		  			</div>		
+				</div>
+
+	  		</div>
+		</div>
+
+
+	    {% else %}
+	    	<!-- Block Description -->
+	    	<div class="active content row" id="panel-name-description">
+	      		<div class="medium-6 columns">
+		
+				<div class="row">
+		  			<div class="medium-8 columns">
+		    			<label>{{title}} Name</label>
+		    			<input id="name_id" name="name" type="text" placeholder="Enter name..." required>
+		    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+		  			</div>
+
+		  			<div class="medium-4 columns">
+		    			
+						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+						<div class="privacy-mode switch round">
+					
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+						
+							<span></span>
+						</div>
+
+		  			</div>
+				</div>
+
+				<div id="message" style="display:none; color:red"></div>
+
+				<div class="row">
+		  
+		  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		     		</div>
+
+		  			<div class="large-6 columns" style="padding: 1.8em;">
+		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+		  					<i class="fi-marker"></i> &nbsp; Add Location
+		  				</a>
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+		    			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+		  			</div>
+				</div>
+
+				<div class="row">
+		  			<div class="medium-12 columns">
+		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag</label>
+		    			</span>
+		    			<input id="tags_id" name="tags" type="text" placeholder="Separate tags with commas...">
+		  			</div>		
+				</div>
+		
+	      		</div>
+  			</div>
+
+	    {% endif %}
 
 	    {% block collection %}
 
 	    <div class="content" id="panel-collection" style="width:95%;">
-	    <div class="row">
-			<div class="small-12 columns">
-				<h5>Add or edit Collection : </h5>
-			</div>				
-			<br/><br/>
+	      <div class="row">
+		<div class="small-12 columns">
+		  <h5>Add or edit Collection : </h5>
+		</div>				
+		<br/><br/>
 		
-			<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
-		  		<div id="SelectApp" class="row">
-		    		<div class="small-2 columns line-height-2pt5">
-		      			Classify by :
-		    		</div>
-		    		<div class="small-2 columns">
-		      			<input type="radio" name="col" value="Page"/>
-		      			Page <span class="divider-line">|</span>
-		      			<span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
-		    		</div>
-		    		<div class="small-2 columns">
-		      			<input type="radio" name="col" value="File" />
-			      		File <span class="divider-line">|</span>
-			      		<span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
-		    		</div>
-				    <div class="small-2 columns">
-				    	<input type="radio" name="col" value="Image" />
-					 	Image <span class="divider-line">|</span>
-					    <span class="fontsize-x-large"><i class="step fi-photo"></i></span>
-				    </div>
-		    		<div class="small-2 columns">
-		      			<input type="radio" name="col" value="Video" />
-		      			Video <span class="divider-line">|</span>
-		      			<span class="fontsize-x-large"><i class="step fi-video"></i></span>
-		    		</div>
-		    		<div class="small-2 columns">
-		      			<input type="radio" name="col" value="QuizObj" />
-		      			Quiz <span class="divider-line">|</span>
-		      			<span class="fontsize-x-large"><i class="step fi-pencil"></i></span>
-		    		</div>
-		  		</div>
-			</div>
+		<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
+		  <div id="SelectApp" class="row">
+		    <div class="small-2 columns line-height-2pt5">
+		      Classify by:
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="Page"/>
+		      Page <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="File" />
+		      File <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="Image" />
+		      Image <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-photo"></i>
+		      </span>
+		    </div>
+		    <div class="small-2 columns">
+		      <div class="row">
+		      <input type="radio" name="col" value="Video" />
+		      Video <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-video"></i>
+		      </span>
+		      </div>
+		      <div class="row">
+		      <input type="radio" name="col" value="Pandora Video" />
+		      Pandora <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-video"></i>
+		      </span>
+		      </div>
+		    </div>
+		    <div class="small-2 columns">
+		      <input type="radio" name="col" value="QuizObj" />
+		      Quiz <span class="divider-line">|</span>
+		      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
+		      </span>
+		    </div>
+		  </div>
+		</div>
 		
-			<div class="small-12 columns">
-		  		<div id="collection_drawer" >
-		    		{% edit_drawer_widget "collection" groupid node title %}
-		  		</div>
-			</div>
-	      
-	  	</div>
-	 	</div>
+		<div class="small-12 columns">
+		  <div id="collection_drawer" >
+		    <!-- {#% edit_drawer_widget "collection" groupid node title %#} -->
+		  </div>
+		</div>
+	      </div>
+	    </div>
 
 	    {% endblock %}
-
+    	
 	</div>  
 
 	{% block add_fields %} {% endblock %}
@@ -238,14 +273,12 @@ background-repeat:no-repeat; background-size: 48px 48px
   	<!-- Overlay : Map Widget -->
     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
-      	<!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
   		<a class="close-reveal-modal" >&#215;</a>
         {% include "ndf/map_widget.html" with mode="edit" %}
-        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
-      	<!-- #{#%# endif %} -->
     </div>
 
-    <input type="hidden" id="nodes_list" value="{{nodes_list}}">						
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">	
+    <input type="hidden" id="parent_nodes_list" value="{{parent_nodes_collection}}">						
 </form>
 
 <script type="text/javascript">
@@ -255,19 +288,21 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			var name = $("#name_id").val();
 			var nodes = $("#nodes_list").val();
+			var parent_nodes = $("#parent_nodes_list").val();
 
 			if (nodes.indexOf(name) > 0)  
 			{
-				$("#message").css("display", "block");
-				$("#message").html("Name '"+ name +"' already exist .. Please choose another name");
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
 				$("#name_id").val("");
 			}
-			else
+			if (parent_nodes.indexOf(name) > 0)  
 			{
-				$("#message").css("display", "none");
+				alert("Theme name '"+ name +"' already exist .. Please choose another name");
+				$("#name_id").val("");
 			}
 
 		});
+
 	});
 
 
@@ -300,32 +335,46 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	});
 
+	$(".collection_tab").click(function() {
+
+		$("#SelectApp").css("display", "none");
+		$("#save-node").css("display", "none");
+		$('#collection_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "collection",
+				app:"{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				// alert(data);
+				$("#collection_drawer").html(data);
+				$("#SelectApp").css("display", "block");				
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+
 
 	$("#save-node").click(function() {
-
-		pn_arr = []
 		cn_arr = []
-		md_arr = [] //for adding module
 
 		$(".node_id").each(function (){
-			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
-				pn_arr.push($(this).val());
-			}
-
 			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
 				cn_arr.push($(this).val());
 			}
 
-			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
-  				md_arr.push($(this).val());
-  			}
 		});
 
-		$("#prior_node_list").val(pn_arr)
-		$("#collection_list").val(cn_arr) 
-		$("#module_list").val(md_arr)   
+		$("#collection_list").val(cn_arr); 
+		location.reload(true);
 
-		{% block base_save_on_click %}{% endblock %}
 	});
 
 

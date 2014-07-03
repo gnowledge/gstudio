@@ -20,7 +20,7 @@
     <!-- LHS Resources drawer -->
     <div class="small-6 columns resource-drawer">
       
-      <ul class="pricing-table" id="{{widget_for}}_drawer1">        
+      <ul class="pricing-table drawer1" id="{{widget_for}}_drawer1">        
 
         <!-- Searchbox as first li in the  Resources drawer -->
         {% if drawer1 != "None" %}
@@ -43,7 +43,7 @@
                   <b> {{value.name}} </b>
                 </div>                
                 <div class="small-12 columns text-left" style="padding-top:3px">
-                  <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                  <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'userDashboard' groupid value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
                 </div>     
               </div>
 
@@ -113,7 +113,7 @@
               </div>                
               <!-- <div class="small-7 columns text-right"> -->
               <div class="small-12 columns text-left" style="padding-top:3px">
-                <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a href="#" class="user" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'userDashboard' groupid value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
               </div>     
             </div>
 
@@ -144,12 +144,11 @@
 
     //To allocate space of 10 resources listing for drawers.
     liHeight = $("#{{widget_for}}_drawer1 > li").outerHeight();
-    $(".resource-drawer").height(liHeight * 15);
+    $(".resource-drawer").height(liHeight * 6);
 
     // To select the single as well as multiple items from list 
     $(document).on('click','#{{widget_for}}_drawer1 li.bullet-item',function(e){
     //$("#{{widget_for}}_drawer1 li.bullet-item").on("click", function(e) {
-
       if (e.ctrlKey)
       {        
         $(this).toggleClass('selected-resource');
@@ -180,8 +179,9 @@
     
       //For left drawer selected resources and right button click
       $("#{{widget_for}}_btnRight").click(function() { 
-        var selectedOpts = $("#{{widget_for}}_drawer1 li.selected-resource"); 
+        var selectedOpts = $("#{{widget_for}}_drawer1 li.selected-resource");
         $("#{{widget_for}}_drawer1 li.selected-resource").removeClass("selected-resource");
+        
 
         if (selectedOpts.length == 0){
           alert("Nothing to move.");
@@ -189,6 +189,8 @@
 
         $("#{{widget_for}}_drawer2").append($(selectedOpts).clone(true));
         $(selectedOpts).remove();
+        var innerhtml = $("#{{widget_for}}_drawer1").html()
+        $(".pricing-table.drawer1").html(innerhtml);
       });  
 
       //For right drawer selected resources and left button click
@@ -203,6 +205,8 @@
 
         $("#{{widget_for}}_drawer1").append($(selectedOpts).clone(true));
         $(selectedOpts).remove();
+        var innerhtml = $("#{{widget_for}}_drawer1").html()
+        $(".pricing-table.drawer1").html(innerhtml);
       });  
 
 
@@ -280,10 +284,13 @@
     $(document).on('keydown keypress keyup change', '#{{widget_for}}_search' ,function(){
     //$('#{{widget_for}}_search').bind('keydown keypress keyup change', function() {
     var search = (this.value).toLowerCase();
-    var $li = $("#{{widget_for}}_drawer1 li.bullet-item").hide()
+    //var $li = $("#{{widget_for}}_drawer1 li.bullet-item").hide()
+    var $li = $(".pricing-table.drawer1 li.bullet-item").hide()
     $li.filter(function() {
       return $(this).text().toLowerCase().indexOf(search) >= 0;
     }).show();
+   
+   
   });
 
 </script>

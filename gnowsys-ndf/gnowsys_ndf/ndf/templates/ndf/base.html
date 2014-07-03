@@ -89,13 +89,13 @@
 	    {% get_profile_pic  request.user as prof_pic %}
 
 	    {% if prof_pic %}
-	    <a href="{% url 'userDashboard' group_name_tag %}">
+	    <a href="{% url 'userDashboard' group_name_tag request.user.pk %}">
 	      <img  src="{% url 'getImageThumbnail' group_name_tag prof_pic %}" height="30" width="30"></img>
 	      {{ user.username }}
 	    </a>
 	    
 	    {% else %}
-	    <a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_name_tag %}">
+	    <a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_name_tag request.user.pk %}">
 	      {{ user.username }}
 	    </a>
 	    {% endif %}
@@ -120,11 +120,11 @@
 	  <li class="has-dropdown group">
 
 	    {% get_group_object groupid as group_object %}
-	    <a class="active-menu" href="{% url 'groupchange' group_object.name %}"><i class="fi-home"></i> {{group_object.name}}</a>
+	    <a class="active-menu" href="{% url 'groupchange' group_object.name %}"><i class="fi-home"></i> {{group_object.name|truncatechars:30}}</a>
 	    
 	    <!-- If logged in show user groups -->
 	    {% if user.is_authenticated %}
-	    {% get_user_group  request.user as groups %}
+	    {% get_user_group request.user group_object.name as groups %}
 
 	    {% else %}	
 	    {% get_existing_groups_excluded group_object.name as groups %}
@@ -138,11 +138,13 @@
 	      <li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' 'None' %}">{{gp_id}}</a></li>
 
 	      {% else %}
-	      {% for gp_id in groups %}						  		
-	        <li id="{{gp_id}}"><a class="group" href="{% url 'groupchange' gp_id %}">{{gp_id.name}}</a></li>		
+	      {% for group_node in groups|slice:":10" %}
+	        <li id="{{group_node}}"><a class="group" href="{% url 'groupchange' group_node %}">{{group_node.name|truncatechars:30}}</a></li>
 	      {% endfor %}	
 	      
 	      {% endif %}	
+
+          <li id="more_groups"><a class="group" href="{% url 'group' 'home' %}">See more groups...</a></li>
 	    </ul>
 
 	  </li>

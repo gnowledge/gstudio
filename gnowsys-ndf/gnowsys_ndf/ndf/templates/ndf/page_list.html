@@ -1,5 +1,4 @@
 {% extends "ndf/base.html" %}
-
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -44,7 +43,7 @@
     <div class="page">
       <br/>
       <a class="button medium" href="{% url 'page_create_edit' group_name_tag %}">
-      	<span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+	<span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
       </a>
     </div>
   </div>
@@ -55,12 +54,16 @@
 
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
+
 <header class="row">
   <dl class="tabs" data-tab>
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd>
-    <!--<dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>-->
+    <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
   </dl>
 </header>
+
+<div class="tabs-content">
+<div class="content active" id="panel2-1">
 
 {% if searching and page_nodes.count > 0 %}
 <div class="row">
@@ -87,7 +90,6 @@
   
     <li class="card">
       <div class="page">
-
       <header>
         <div class="label-list">
         {% for tag in node.tags|slice:":3" %}
@@ -96,13 +98,12 @@
         </div>
 
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-
         <h4>
-          {{ node.name|truncatechars:20 }}
+          {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
           <div>
             <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
             <br/>
-            by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            by <a class="user" href="{% url 'userDashboard' group_name_tag node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
             </small>
           </div>
         </h4>
@@ -147,5 +148,77 @@
 
 {% paginate %}
 
+</div>
+
+<div class="content" id="panel2-4">
+{% get_resource_collection groupid title as page_collections %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+  {% autopaginate page_collections 23 %}
+
+  <!-- Existing card list-->
+  {% for node in page_collections %}
+    <li class="card">
+      <div class="page">
+      <header>
+        <div class="label-list">
+        {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+        {% endfor %}
+        </div>
+
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+        <h4>
+          {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+          <div>
+            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            <br/>
+            by <a class="user" data-gnow="" href="{% url 'userDashboard' group_name_tag node.created_by %}">{{node.user_details_dict.created_by}}</a> 
+            </small>
+          </div>
+        </h4>
+      </header>
+      
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+  
+      <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
+
+      {% if node.created_by == request.user.id %}
+      <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+      {% endif %}
+
+      {% group_type_info groupid request.user as grouptype %}
+      {% if grouptype == "Moderated" %}
+      {% if node.status == "DRAFT" %}
+      <a class="button alert tiny" >Under Moderation</a>
+      {% endif %}
+      {% endif %} 
+
+      <footer class="row">
+        <div class="small-7 columns"><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</div>
+        <div class="small-5 columns"><div class="right"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div></div>
+      </footer>
+
+      </div>
+    </li>  
+  
+  {% empty %}
+    {% if not searching %}
+      <div class="row">
+        <div class="small-12 columns">
+          <h5>This group doesn't have any collections.</h5>
+        </div>
+      </div>
+    {% endif %}
+
+  {% endfor %}
+
+</ul>
+
+{% paginate %}
+
+</div>
+</div>
 
 {% endblock %}

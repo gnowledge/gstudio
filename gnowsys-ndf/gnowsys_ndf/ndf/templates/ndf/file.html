@@ -31,12 +31,28 @@
     <div class="file">
       <br/>
       <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-      	<span class="fi-upload">&nbsp;&nbsp;New File</span>
+        <span class="fi-upload">&nbsp;&nbsp;New File</span>
       </a>
     </div>
   </div>
   {% endif %}
   {% endif %}
+    <dl class="tabs" data-tab>
+    <dd class="tab-title"><a href="#bar_visual">Bar</a></dd>
+    <dd class="tab-title active"><a href="#pie_visual">Pie</a></dd>
+  </dl>
+  <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
+  <br/>
+  <div class="tabs-content">
+    <div class="content" id="bar_visual">
+      {% include "ndf/bar_visualization.html" %}
+  </div>
+  <div class="content active" id="pie_visual">
+
+    {% include "ndf/pie_visualization.html" %}
+    
+  </div>
+</div>
 {% endblock %}
 
 
@@ -48,7 +64,9 @@
      <dd><a href="#view-doc"><i class="fi-page-filled"></i> Documents {% if docCollection.count %}({{ docCollection.count }}){% endif %}</a></dd>
      <dd><a href="#view-image"><i class="fi-camera"></i>Images {% if imageCollection.count %}({{ imageCollection.count }}){% endif %}</a></dd>
      <dd><a href="#view-video"><i class="fi-video"></i> Videos {% if videoCollection.count %}({{ videoCollection.count }}){% endif %}</a></dd>
-     <dd><a href="#view-pandora-video"><i class="fi-pandoravideo"></i> Pandora Videos</a></dd>
+     <dd><a href="#view-pandora-video"><i class="fi-video"></i> Pandora Videos</a></dd>
+     <dd><a href="#view-collection"><i class="fi-page-multiple"></i> Collections</a></dd>
+
    </dl>
 </header>
 
@@ -110,12 +128,12 @@
             </a>
             </div>
       
-            <h4>{{file.name|truncatechars:20}}
+            <h4>{{file.name|truncatechars:20}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}
             <div>
             <small class="subheader">
               {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
               <br/>
-              by <span href="#" class="user" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+              by <a class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</a> 
             </small>
             </div>
             </h4>
@@ -127,7 +145,9 @@
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
+	  {% endcomment %}
           {% endifequal %}
 	  
           <footer class="row">
@@ -205,7 +225,7 @@
             <small class="subheader">
               {{ doc.member_of_names_list|join:', ' }} created {{doc.created_at|timesince}} ago 
               <br/>
-              by <span href="#" class="user" data-gnow="">{{doc.user_details_dict.created_by}}</span> 
+              by <a class="user" href="{% url 'userDashboard' group_name_tag doc.created_by %}" data-gnow="">{{doc.user_details_dict.created_by}}</a> 
             </small>
             </div>
           </header>
@@ -216,8 +236,10 @@
 
           {% get_user_object doc.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag doc %}?next={{request.path}}">Delete </a>
-          {% endifequal %}
+          {% endcomment %}
+	  {% endifequal %}
 	  
           <footer class="row">
             <div class="small-6 columns">{{doc.mime_type|truncatechars:15}}</div>
@@ -290,7 +312,7 @@
             <small class="subheader">
               {{ image.member_of_names_list|join:', ' }} created {{image.created_at|timesince}} ago
               <br/>
-              by <span href="#" class="user" data-gnow="">{{image.user_details_dict.created_by}}</span> 
+              by <a class="user" href="{% url 'userDashboard' group_name_tag image.created_by %}" data-gnow="">{{image.user_details_dict.created_by}}</a> 
             </small>
             </div>
             </h4>
@@ -302,8 +324,10 @@
 
           {% get_user_object image.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag image %}?next={{request.path}}">Delete </a>
-          {% endifequal %}
+          {% endcomment %}
+	  {% endifequal %}
     
           <footer class="row">
             <div class="small-6 columns">{{image.mime_type|truncatechars:15}}</div>
@@ -377,7 +401,7 @@
             <div>
               <small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago 
               <br/>
-              by <span href="#" class="user" data-gnow="">{{video.user_details_dict.created_by}}</span>
+              by <a class="user" href="{% url 'userDashboard' group_name_tag video.created_by %}" data-gnow="">{{video.user_details_dict.created_by}}</a>
               </small>
             </div>
             </h4>
@@ -389,8 +413,10 @@
 
           {% get_user_object video.created_by as user_obj %}
           {% ifequal user_obj.username user.username %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag video %}?next={{request.path}}">Delete </a>
-          {% endifequal %}
+          {% endcomment %}
+	  {% endifequal %}
 
           <footer class="row">
             <div class="small-6 columns">{{video.mime_type|truncatechars:15}}</div>
@@ -444,7 +470,7 @@
       {% for each in pandoraCollection %}
       {% get_source_id each.pk as source_id %}
       {% get_user_object each.created_by as user_obj %}
-      {% for src_id,contributor in source_id.items %}
+      {% for src_id in source_id %}
       <li class="card">
         <div class="file">
 
@@ -460,7 +486,7 @@
           <div>
             <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
               <br/>
-              by <span href="#" class="user" data-gnow="">{{contributor}}@wetube.gnowledge.org</span>
+              by <span href="#" class="user" data-gnow="">@wetube.gnowledge.org</span>
             </small>
           </div>
         </header>
@@ -471,8 +497,10 @@
 
         {% get_user_object each.created_by as user_obj %}
         {% ifequal user_obj.username user.username %}
+	{% comment %}
         <a class="button alert tiny" href="{% url 'delete_file' group_name_tag video %}?next={{request.path}}">Delete </a>
-        {% endifequal %}
+        {% endcomment %}
+	{% endifequal %}
 
         <footer class="row">
           <div class="small-6 columns">{{each.mime_type|truncatechars:15}}</div>
@@ -501,11 +529,83 @@
   {% paginate %}
 
   </div>
+  <div class="content" id="view-collection">
+    {% get_resource_collection groupid title as file_collections %}
+
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Existing card list-->
+      {% autopaginate file_collections 23 %}
+
+      {% for file in file_collections %}
+      {% get_grid_fs_object file as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+    
+          <header>
+            <div class="label-list">
+            {% for tag in file.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
+            {% endfor %}
+            </div>
+
+            <div class="th">
+            <a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
+              <!--<img src="/static/ndf/scss/metastudio/logo.svg">-->
+              <img src="{% url 'getFileThumbnail' group_name_tag file %}">
+            </a>
+            </div>
+      
+            <h4>{{file.name|truncatechars:20}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}
+            <div>
+            <small class="subheader">
+              {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
+              <br/>
+              by <a class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</a> 
+            </small>
+            </div>
+            </h4>
+          </header>
+
+          <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+          <a class="button expand" href ="{% url 'file_detail' group_name_tag file %}">View details</a>
+
+          {% get_user_object file.created_by as user_obj %}
+          {% ifequal  user_obj.username  user.username  %}
+	  {% comment %}
+          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
+          {% endcomment %} 
+	  {% endifequal %}
+    
+          <footer class="row">
+            <div class="small-6 columns">{{file.mime_type|truncatechars:15}}</div>
+            <div class="small-6 columns"><div class="right"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div></div>
+          </footer>
+    
+        </div>
+      </li>
+
+      {% empty %}
+        {% if not searching %}
+          <div class="row">
+            <div class="small-12 columns">
+              <h5>This group doesn't have any collections.</h5>
+            </div>
+          </div>
+        {% endif %}
+          
+      {% endfor %}
+
+    </ul>
+
+    {% paginate %}
+  </div>
 
 </div>
 
-
 {% endblock %}
+
 
 
 <!-- Moved from videoDashboard -->
@@ -618,4 +718,11 @@ next.hide();
 }
 });
 
+
+{% if is_video %}
+alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
+{% endif %}
 {% endblock %}
+
+
+

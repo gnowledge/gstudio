@@ -6,6 +6,9 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
+# List of Indian Languages 
+LANGUAGES = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
+
 #SMTP setting for sending mail (Using python default SMTP server)
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'localhost'
@@ -124,11 +127,16 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
+    'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
+     
+# Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
 
 ROOT_URLCONF = 'gnowsys_ndf.ndf.urls'
 
@@ -166,7 +174,9 @@ INSTALLED_APPS = (
     'django_extensions',	#textb
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
+    'online_status',                       #for online_users     
 )
+
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
 
@@ -210,7 +220,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 META_TYPE = [u"GAPP",u"factory_types"]
 
 #Default APPs inculde in beloow GAPPS list
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module"]
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task"]
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
@@ -277,3 +287,23 @@ warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
 #textb
+
+
+########################################### for online_users_ramk
+
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#        'LOCATION': 'default-cache'
+#    }
+#}
+
+#USER_ONLINE_TIMEOUT = 300
+
+#USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+
+USERS_ONLINE__TIME_IDLE = 300
+USERS_ONLINE__TIME_OFFLINE = 10
+#USERS_ONLINE__CACHE_PREFIX_USER
+#USERS_ONLINE__CACHE_USERS
+

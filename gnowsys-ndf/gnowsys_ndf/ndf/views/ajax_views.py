@@ -6,6 +6,7 @@
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.http import StreamingHttpResponse
+from django.http import Http404
 from django.core.urlresolvers import reverse
 
 from django.shortcuts import render_to_response
@@ -37,6 +38,8 @@ from bson.objectid import ObjectId
 db = get_database()
 gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
+theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 #This function is used to check (while creating a new group) group exists or not
 #This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 
@@ -458,6 +461,61 @@ def shelf(request, group_id):
       )
 
 
+def drawer_widget(request, group_id):
+  if request.is_ajax() and request.method == "POST":
+    drawers = None
+    drawer1 = None
+    drawer2 = None
+
+    node = request.POST.get("node_id", '')
+    field = request.POST.get("field", '')
+    app = request.POST.get("app", '')
+    # print "\nfield: ", field
+    # print "\n app: ", app
+
+    if node:
+      node = collection.Node.one({'_id': ObjectId(node) })
+      if field == "prior_node":
+        app = None
+
+        drawers = get_drawers(group_id, node._id, node.prior_node, app)
+      elif field == "collection":
+        if app == "Quiz":
+          app = "QuizItem"
+        elif app == "Theme":
+          app = "Theme"
+        elif app == "Topic":
+          app = "Topic"
+        elif app == "Module":
+          app = "Module"
+        else:
+          app = None
+
+        drawers = get_drawers(group_id, node._id, node.collection_set, app)
+      
+      drawer1 = drawers['1']
+      drawer2 = drawers['2']
+
+    else:
+      if field == "collection" and app == "Quiz":
+        app = "QuizItem"
+      elif field == "collection" and app == "Theme":
+        app = "Theme"
+      elif field == "collection" and app == "Course":
+        app = "Module"
+      else:
+        app = None
+
+      drawer1 = get_drawers(group_id, None, [], app)
+
+
+    return render_to_response('ndf/drawer_widget.html', 
+                                { 'widget_for': field,'drawer1': drawer1, 'drawer2': drawer2,
+                                  'group_id': group_id,'groupid': group_id
+                                },
+                                context_instance = RequestContext(request)
+    )
+
 
 def get_collection_list(collection_list, node):
   inner_list = []
@@ -467,18 +525,20 @@ def get_collection_list(collection_list, node):
     for each in node.collection_set:
       col_obj = collection.Node.one({'_id': ObjectId(each)})
       if col_obj:
-        for cl in collection_list:
-          if cl['id'] == node.pk:
-            inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
-            inner_sub_list = [inner_sub_dict]
-            inner_sub_list = get_collection_list(inner_sub_list, col_obj)
+        if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
+          for cl in collection_list:
+            if cl['id'] == node.pk:
+              node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk , 'node_type': node_type}
+              inner_sub_list = [inner_sub_dict]
+              inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
-            if inner_sub_list:
-              inner_list.append(inner_sub_list[0])
-            else:
-              inner_list.append(inner_sub_dict)
+              if inner_sub_list:
+                inner_list.append(inner_sub_list[0])
+              else:
+                inner_list.append(inner_sub_dict)
 
-            cl.update({'children': inner_list })
+              cl.update({'children': inner_list })
       else:
         error_message = "\n TreeHierarchyError: Node with given ObjectId ("+ str(each) +") not found!!!\n"
         print "\n " + error_message
@@ -506,8 +566,10 @@ def get_tree_hierarchy(request, group_id, node_id):
 
     for each in cur:
       if each._id not in themes_list:
-        collection_list.append({'name': each.name, 'id': each.pk})
-        collection_list = get_collection_list(collection_list, each)
+        if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
+          node_type = collection.Node.one({'_id': ObjectId(each.member_of[0])}).name
+          collection_list.append({'name': each.name, 'id': each.pk, 'node_type': node_type})
+          collection_list = get_collection_list(collection_list, each)
 
     data = collection_list
 
@@ -525,7 +587,6 @@ def add_sub_themes(request, group_id):
     themes_list = ast.literal_eval(themes_list)
 
     theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
     context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
     
     # Save the sub-theme first  
@@ -546,6 +607,111 @@ def add_sub_themes(request, group_id):
       return HttpResponse("failure")
 
     return HttpResponse("None")
+
+
+def add_topics(request, group_id):
+  if request.is_ajax() and request.method == "POST":    
+    print "\n Inside add_topics ajax view\n"
+    context_node_id = request.POST.get("context_node", '')
+    add_topic_name = request.POST.get("add_topic_name", '')
+    topics_list = request.POST.get("nodes_list", '')
+    topics_list = topics_list.replace("&quot;","'")
+    topics_list = ast.literal_eval(topics_list)
+
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
+
+
+    # Save the topic first  
+    if add_topic_name:
+      print "\ntopic name: ", add_topic_name
+      if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
+        node = collection.GSystem()
+        get_node_common_fields(request, node, group_id, topic_GST)
+      
+        node.save()
+        node.reload()        
+        # Add this topic into context nodes collection_set
+        collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
+        context_node.reload()
+
+        return HttpResponse("success")
+
+      return HttpResponse("failure")
+
+    return HttpResponse("None")
+
+
+
+def node_collection(node=None, group_id=None):
+
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+
+    if node.collection_set:
+      for each in node.collection_set:
+        
+        each_node = collection.Node.one({'_id': ObjectId(each)})
+        
+        if each_node.collection_set:
+          
+          node_collection(each_node, group_id)
+        else:
+          # After deleting theme instance it's should also remove from collection_set
+          cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+          for e in cur:
+            if each_node._id in e.collection_set:
+              collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
+
+
+          # print "\n node ", each_node.name ,"has been deleted \n"
+          each_node.delete()
+
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    else:
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    return True
+
+
+def delete_themes(request, group_id):
+  '''delete themes objects'''
+  send_dict = []
+  if request.is_ajax() and request.method =="POST":
+     deleteobjects = request.POST['deleteobjects']
+     confirm = request.POST.get("confirm","")
+  for each in  deleteobjects.split(","):
+      node = collection.Node.one({ '_id': ObjectId(each)})
+      # print "\n confirmed objects: ", node.name
+
+      if confirm:
+        node_collection(node, group_id)
+
+      else:
+        send_dict.append({"title":node.name})
+
+  return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
+
   
 
 @login_required
@@ -707,7 +873,7 @@ def create_version_of_module(subject_id,node_id):
         print "berfore save",attr
         attr.save()
             
-#-- under construction    
+
 def create_relation_of_module(subject_id, right_subject_id):
     rt_has_module = collection.Node.one({'_type':'RelationType', 'name':'has_module'})
     if rt_has_module and subject_id and right_subject_id:
@@ -903,10 +1069,11 @@ def get_data_for_switch_groups(request,group_id):
     return HttpResponse(json.dumps(data_list))
 
 
-'''
-designer module's drawer widget function
-'''
+
 def get_data_for_drawer(request, group_id):
+    '''
+    designer module's drawer widget function
+    '''
     coll_obj_list = []
     node_id = request.GET.get("id","")
     st = collection.Node.find({"_type":"GSystemType"})
@@ -916,7 +1083,124 @@ def get_data_for_drawer(request, group_id):
     data_list=set_drawer_widget(st,coll_obj_list)
     return HttpResponse(json.dumps(data_list))
 
+# This method is not in use
+def get_data_for_user_drawer(request, group_id,):
+    '''
+    This method will return data for user widget 
+    '''
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    drawer1 = []
+    drawer2 = []
+    data_list = []
+    all_batch_user = []
+    users = []
+    st_batch_id = request.GET.get('st_batch_id','')
+    node_id = request.GET.get('_id','')
+    if st_batch_id:
+        batch_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(st_batch_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+        group = collection.Node.one({'_id':ObjectId(group_id)})
+        if batch_coll:
+            for each in batch_coll:
+                users = users+each.author_set
+        else:
+            users = []
+        user_list = list(set(group.author_set) - set(users))
+        for each in user_list:
+            user= User.objects.get(id=each)
+            dic = {}
+            dic['id'] = user.id   
+            dic['name'] = user.username
+            d1.append(dic)
+        draw1['drawer1'] = d1
+        data_list.append(draw1)
+        if node_id:
+            for each in collection.Node.one({'_id':ObjectId(node_id)}).author_set:
+                user= User.objects.get(id=each)
+                dic = {}
+                dic['id'] = user.id   
+                dic['name'] = user.username
+                d2.append(dic)
+        draw2['drawer2'] = d2
+        data_list.append(draw2)
+        return HttpResponse(json.dumps(data_list))
+    else:
+        return HttpResponse("GSystemType for batch required")
+
+
+def set_drawer_widget_for_users(st,coll_obj_list):
+    '''
+    NOTE : this method is used only for user drwers (Django user class)
+    '''
+    draw2={}
+    draw1={}
+    data_list=[]
+    d1=[]
+    d2=[]
+    for each in st:
+       dic = {}
+       dic['id'] = str(each.id)
+       dic['name'] = each.username
+       d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
     
+    for each in coll_obj_list:
+       dic = {}
+       dic['id'] = str(each.id)
+       dic['name'] = each.username
+       d2.append(dic)
+    draw2['drawer2'] = d2
+    data_list.append(draw2)
+    return data_list 
+
+
+
+def get_data_for_batch_drawer(request, group_id):
+    '''
+    This method will return data for batch drawer widget
+    '''
+    d1 = []
+    d2 = []
+    draw1 = {}
+    draw2 = {}
+    drawer1 = []
+    drawer2 = []
+    data_list = []
+    st = collection.Node.one({'_type':'GSystemType','name':'Student'})
+    node_id = request.GET.get('_id','')
+    batch_coll = collection.GSystem.find({'member_of': {'$all': [st._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    if node_id:
+        rt_has_batch_member = collection.Node.one({'_type':'RelationType','name':'has_batch_member'})
+        relation_coll = collection.Triple.find({'_type':'GRelation','relation_type.$id':rt_has_batch_member._id,'right_subject':ObjectId(node_id)})
+        for each in relation_coll:
+            dic = {}
+            n = collection.Node.one({'_id':ObjectId(each.subject)})
+            drawer2.append(n)
+    for each in batch_coll:
+        drawer1.append(each)
+    drawer_set1 = set(drawer1) - set(drawer2)
+    print len(drawer_set1),"drawer1-count"
+    drawer_set2 = drawer2
+    for each in drawer_set1:
+        dic = {}
+        dic['id'] = str(each._id)
+        dic['name'] = each.name
+        d1.append(dic)
+    draw1['drawer1'] = d1
+    data_list.append(draw1)
+    for each in drawer_set2:
+        dic = {}
+        dic['id'] = str(each._id)
+        dic['name'] = each.name
+        d2.append(dic)
+    draw2['drawer2'] = d2
+    data_list.append(draw2)
+    return HttpResponse(json.dumps(data_list))
+        
+
 def set_drawer_widget(st,coll_obj_list):
     '''
     this method will set data for drawer widget
@@ -1113,21 +1397,58 @@ def get_author_set_users(request, group_id):
     This ajax function will give all users present in node's author_set field
     '''
     user_list = []
+    can_remove = False
     if request.is_ajax():
         _id = request.GET.get('_id',"")
         node = collection.Node.one({'_id':ObjectId(_id)})
-        if node._type == 'Group':
+        course_name = ""
+        rt_has_course = collection.Node.one({'_type':'RelationType', 'name':'has_course'})
+        if rt_has_course and node._id:
+            course = collection.Triple.one({'relation_type.$id':rt_has_course._id,'right_subject':node._id})
+            if course:
+                course_name = collection.Node.one({'_id':ObjectId(course.subject)}).name
+        if node.created_by == request.user.id:
+            can_remove = True
+        if node.author_set:
             for each in node.author_set:
                 user_list.append(User.objects.get(id = each))
             return render_to_response("ndf/refresh_subscribed_users.html", 
-                                       {"user_list":user_list}, 
+                                       {"user_list":user_list,'can_remove':can_remove,'node_id':node._id,'course_name':course_name}, 
                                        context_instance=RequestContext(request)
             )
         else:
-            return "node provide is not a Group type"
+            return StreamingHttpResponse("Empty")
     else:
-        return "Invalid ajax call"
-                
+        return StreamingHttpResponse("Invalid ajax call")
+
+@login_required
+def remove_user_from_author_set(request, group_id):
+    '''
+    This ajax function remove the user from athor_set
+    '''
+    user_list = []
+    can_remove = False
+    if request.is_ajax():
+        _id = request.GET.get('_id',"")
+        user_id = int(request.GET.get('user_id',""))
+        node = collection.Node.one({'_id':ObjectId(_id)})
+        if node.created_by == request.user.id:
+            node.author_set.remove(user_id)
+            can_remove = True
+            node.save()
+            print node.author_set,"TEst author"
+            if node.author_set:
+                for each in node.author_set:
+                    user_list.append(User.objects.get(id = each))
+            return render_to_response("ndf/refresh_subscribed_users.html", 
+                                      {"user_list":user_list,'can_remove':can_remove,'node_id':node._id}, 
+                                      context_instance=RequestContext(request)
+            )
+        else:
+            return StreamingHttpResponse("You are not authorised to remove user")
+    else:
+        return StreamingHttpResponse("Invalid Ajax call")
+    
 def get_filterd_user_list(request, group_id):
     '''
     This function will return (all user's) - (subscribed user for perticular group) 
@@ -1143,3 +1464,37 @@ def get_filterd_user_list(request, group_id):
         print all_users_list,set(user_list)
         filtered_users = list(set(all_users_list) - set(user_list))
         return HttpResponse(json.dumps(filtered_users))
+
+def search_tasks(request, group_id):
+    '''
+    This function will return (all task's) 
+    '''
+    user_list = []
+    app_id = collection.Node.find_one({'_type':"GSystemType", "name":"Task"})
+    if request.is_ajax():
+        term = request.GET.get('term',"")
+        task_nodes = collection.Node.find({
+                                          'member_of': {'$all': [app_id._id]},
+					  'name': {'$regex': term, '$options': 'i'}, 
+                                          'group_set': {'$all': [ObjectId(group_id)]},
+                                          'status': {'$nin': ['HIDDEN']}
+                                      }).sort('last_update', -1)
+	for each in task_nodes :
+		user_list.append({"label":each.name,"value":each.name,"id":str(each._id)})	
+        return HttpResponse(json.dumps(user_list))
+    else:
+	raise Http404
+
+def get_group_member_user(request, group_id):
+    '''
+    This function will return (all task's) 
+    '''
+    user_list = []
+    group = collection.Node.find_one({'_id':ObjectId(group_id)})
+    if request.is_ajax():
+        if group.author_set:
+            for each in group.author_set:
+                user_list.append(User.objects.get(id = each).username)
+        return HttpResponse(json.dumps(user_list))
+    else:
+	raise Http404
