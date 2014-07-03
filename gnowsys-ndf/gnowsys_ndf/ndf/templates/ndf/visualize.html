@@ -1,0 +1,42 @@
+{% extends "ndf/base.html" %}
+{% block meta_content %}  
+<h2>Visualize</h2>
+{% endblock %}
+
+{% block concern_information %} <br>This app helps you create various kind of visualizations. {% endblock %}
+{% block body_content %} 
+
+<form id="file-form" action="{% url 'graph_display' groupid %}" method="GET">
+				<input type="file" id="file-select" name="doc" onchange="" />
+				<input type="text" id="type_graph" name="type_graph">
+				<input type="button" id="see_value" name="see_value" onClick="put_text()">
+
+				<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4"> 
+					<li><img class="th" src="http://thumb1.shutterstock.com/display_pic_with_logo/785992/113319370/stock-photo--d-graphic-bar-chart-113319370.jpg" height="300" width="200" onclick="vis_choice(1)"/><br>Bar Chart</li> 
+					<li><img class="th" src="http://thumb1.shutterstock.com/display_pic_with_logo/785992/113319370/stock-photo--d-graphic-bar-chart-113319370.jpg" height="300" width="200" onclick="vis_choice(2)"/><br>Pie Chart</li> 
+					<li><img class="th" src="http://thumb1.shutterstock.com/display_pic_with_logo/785992/113319370/stock-photo--d-graphic-bar-chart-113319370.jpg" height="300" width="200" onclick="vis_choice(3)" /><br>Scatter Plot</li> 
+				</ul>
+
+<!-- <input type="file" id="file-select" name="doc[]" id="" /> -->
+				<input type="submit" value="submit" class="button medium" />
+
+</form>
+
+<script type="text/javascript">
+			var choice = 0;
+			form = document.getElementById('file-form');
+			var fileSelect = document.getElementById('file-select');
+
+			function put_text() {
+				alert("sfdsdf");
+
+				$("#type_graph").val(fileSelect.files[0]);
+			}
+
+			function vis_choice(a){
+				choice = a;
+				console.log(choice);
+			}
+</script>
+
+{% endblock %}
