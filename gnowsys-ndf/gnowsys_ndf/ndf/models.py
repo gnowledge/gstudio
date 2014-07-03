@@ -1308,6 +1308,7 @@ class Triple(DjangoDocument):
     structure = {
         '_type': unicode,
         'name': unicode,
+        'subject_scope': basestring,
         'subject': ObjectId,	          # ObjectId's of GSystem Class
         'lang': basestring,               # Put validation for standard language codes
         'status': STATUS_CHOICES_TU
@@ -1409,7 +1410,9 @@ class Triple(DjangoDocument):
 class GAttribute(Triple):
 
     structure = {
+        'attribute_type_scope': basestring,
         'attribute_type': AttributeType,  # DBRef of AttributeType Class
+        'object_value_scope': basestring,
         'object_value': None		  # value -- it's data-type, is determined by attribute_type field
     }
     
@@ -1422,7 +1425,9 @@ class GAttribute(Triple):
 class GRelation(Triple):
 
     structure = {
+        'relation_type_scope': basestring,
         'relation_type': RelationType,    # DBRef of RelationType Class
+        'right_subject_scope': basestring,
         'right_subject': ObjectId,	  # ObjectId's of GSystems Class
     }
     
