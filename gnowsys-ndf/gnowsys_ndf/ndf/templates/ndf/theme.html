@@ -33,9 +33,16 @@
     			autoOpen: false,
 
         		onCreateLi: function(node, $li) {
+						
+					if (node.node_type == "Topic"){
+						$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
+					}
+					else{
+						$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:gold"></span> &nbsp;');				        		
+					}
 
         			if (user == "True")
-        			{
+        			{   
         				$li.find('.jqtree-element').append(
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
@@ -60,23 +67,9 @@
 			        // If its topic node i.e no children of this node then show the detail veiw for topic
 			  		if( node.children[0] == null ){
 
-					  	$.ajax({
-					      type: "POST",
-					      url: "{% url 'check_topic_node' groupid %}",
-					      datatype: "html",
-					      data:{
-					        node_id: node.id,
-					        csrfmiddlewaretoken: '{{ csrf_token }}'
-					      },
-					      success: function(data) {
-					        if ($.trim(data) === "True"){
-					    		location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
-					        }
-
-					      }
-					    });
-
-
+			  			if (node.node_type == "Topic"){
+			  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
+			  			}
 				        
 			  		}
 			  		
