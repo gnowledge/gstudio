@@ -51,21 +51,32 @@ def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     ins_objectid  = ObjectId()
+    print group_id
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) #taking pages from a certain group
+        #why is auth extracted twice??
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) #taking pages from a certain user
+        print "inside if"
         if group_ins:
             group_id = str(group_ins._id)
+            print "inside if's if" 
+            print group_id
         else :
             auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            print "auth"
+            print "inside if's else"
+
             if auth :
                 group_id = str(auth._id)
+                print "inside else's if"
+                print group_id
     else :
         pass
-    if app_id is None:
+    if app_id is None:  
         app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Page"})
         if app_ins:
-            app_id = str(app_ins._id)
+            app_id = str(app_ins._id) #converts to string
+    print "outside all if and else"
         
     content=[]
     version=[]
@@ -75,7 +86,7 @@ def page(request, group_id, app_id=None):
     if request.method == "POST":
     	# Page search view
       title = gst_page.name
-      
+      print "request method=post"
       search_field = request.POST['search_field']
       page_nodes = collection.Node.find({
                                           'member_of': {'$all': [ObjectId(app_id)]},
@@ -102,6 +113,9 @@ def page(request, group_id, app_id=None):
                                           'group_set': {'$all': [ObjectId(group_id)]},
                                           'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
+      print page_nodes
+      for each in page_nodes:
+        print each.name
 
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
@@ -277,17 +291,20 @@ def create_edit_page(request, group_id, node_id=None):
                           'lan':LANGUAGES,
                           'groupid': group_id
                       }
-    
+    print context_variables
     available_nodes = collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id) })
-
+    print available_nodes
     nodes_list = []
     for each in available_nodes:
       nodes_list.append(each.name)
 
     if node_id:
+        print node_id
         page_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
+        print "node_id craeted"
         page_node = collection.GSystem()
+        print page_node
         
 
     if request.method == "POST":
@@ -295,7 +312,7 @@ def create_edit_page(request, group_id, node_id=None):
         get_node_common_fields(request, page_node, group_id, gst_page)
 
         page_node.save()
-
+        print "insise post_node"
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:

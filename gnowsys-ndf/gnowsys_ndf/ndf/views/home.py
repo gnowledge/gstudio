@@ -35,7 +35,7 @@ class HomeRedirectView(RedirectView):
     pattern_name = 'home'
 
     def get_redirect_url(self, *args, **kwargs):
-
+        print "in home page"
     	if self.request.user.is_authenticated():
             collection = get_database()[Node.collection_name]
             auth_obj = collection.GSystemType.one({'_type': u'GSystemType', 'name': u'Author'})

@@ -302,83 +302,83 @@ def create_sts(factory_gsystem_types,user_id):
             meta_type_id = meta_type._id
         create_gsystem_type(name, user_id, meta_type_id)
 
-# Update type_of field to list
-type_of_cursor=collection.find({'type_of':{'$exists':True}})
-for object_cur in type_of_cursor:
-    if type(object_cur['type_of']) == ObjectId or object_cur['type_of'] == None:
-	if type(object_cur['type_of']) == ObjectId :
-		collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[object_cur['type_of']]}})
-	else :
-		collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[]}})
+# # Update type_of field to list
+# type_of_cursor=collection.find({'type_of':{'$exists':True}})
+# for object_cur in type_of_cursor:
+#     if type(object_cur['type_of']) == ObjectId or object_cur['type_of'] == None:
+# 	if type(object_cur['type_of']) == ObjectId :
+# 		collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[object_cur['type_of']]}})
+# 	else :
+# 		collection.update({'_id':object_cur['_id']},{'$set':{'type_of':[]}})
 
-# ===============================================================================================
+# # ===============================================================================================
 
-# Removes n attribute if created accidently in existsing documents
-collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False, multi=True)
+# # Removes n attribute if created accidently in existsing documents
+# collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False, multi=True)
 
-# Updates wherever modified_by field is None with default value as either first contributor or the creator of the resource
-modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': None})
-if modified_by_cur.count > 0:
-    for n in modified_by_cur:
-        if n.contributors:
-            collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
-        else:
-            if n.created_by:
-                collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]}}, upsert=False, multi=False)
-            else:
-                print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")\n"
+# # Updates wherever modified_by field is None with default value as either first contributor or the creator of the resource
+# modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': None})
+# if modified_by_cur.count > 0:
+#     for n in modified_by_cur:
+#         if n.contributors:
+#             collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
+#         else:
+#             if n.created_by:
+#                 collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]}}, upsert=False, multi=False)
+#             else:
+#                 print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")\n"
 
-# Updating faulty modified_by and contributors values (in case of user-group and file documents)
-cur = collection.Node.find({'modified_by': {'$exists': True}})
-for n in cur:
-    # By faulty, it means modified_by and contributors has 1 as their values
-    # 1 stands for superuser
-    # Instead of this value should be the creator of that resource 
-    # (even this is applicable only if created_by field of that resource holds some value)
-    if not n.created_by:
-        print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")"
-    else:
-        if n.created_by not in n.contributors:
-            collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]} }, upsert=False, multi=False)
+# # Updating faulty modified_by and contributors values (in case of user-group and file documents)
+# cur = collection.Node.find({'modified_by': {'$exists': True}})
+# for n in cur:
+#     # By faulty, it means modified_by and contributors has 1 as their values
+#     # 1 stands for superuser
+#     # Instead of this value should be the creator of that resource 
+#     # (even this is applicable only if created_by field of that resource holds some value)
+#     if not n.created_by:
+#         print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")"
+#     else:
+#         if n.created_by not in n.contributors:
+#             collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]} }, upsert=False, multi=False)
 
-# For delete the profile_pic as GST 
-profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_pic'})
-if profile_pic_obj:
-    profile_pic_obj.delete()
-    print "Deleted GST document of profile_pic"
+# # For delete the profile_pic as GST 
+# profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_pic'})
+# if profile_pic_obj:
+#     profile_pic_obj.delete()
+#     print "Deleted GST document of profile_pic"
 
 
-# For adding visited_location field (default value set as []) in User Groups.
-try:
-    author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
-    if author:
-        auth_cur = collection.Node.find({'_type': 'Group', 'member_of': author._id })
+# # For adding visited_location field (default value set as []) in User Groups.
+# try:
+#     author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
+#     if author:
+#         auth_cur = collection.Node.find({'_type': 'Group', 'member_of': author._id })
 
-        if auth_cur.count() > 0:
-            for each in auth_cur:
-                collection.update({'_id': each._id}, {'$set': {'_type': "Author"} }, upsert=False, multi=False)    
-                print "Updated user group : ", each.name
+#         if auth_cur.count() > 0:
+#             for each in auth_cur:
+#                 collection.update({'_id': each._id}, {'$set': {'_type': "Author"} }, upsert=False, multi=False)    
+#                 print "Updated user group : ", each.name
             
-        cur = collection.Node.find({'_type': "Author", 'visited_location': {'$exists': False}})
+#         cur = collection.Node.find({'_type': "Author", 'visited_location': {'$exists': False}})
 
-        author_cur = collection.Node.find({'_type': 'Author'})
+#         author_cur = collection.Node.find({'_type': 'Author'})
 
-        if author_cur.count() > 0:
-            for each in author_cur:
-                if each.group_type == None:
-                    collection.update({'_id': each._id}, {'$set': {'group_type': u"PUBLIC", 'edit_policy': u"NON_EDITABLE", 'subscription_policy': u"OPEN"} }, upsert=False, multi=False)    
-                    print "Updated user group policies :", each.name
+#         if author_cur.count() > 0:
+#             for each in author_cur:
+#                 if each.group_type == None:
+#                     collection.update({'_id': each._id}, {'$set': {'group_type': u"PUBLIC", 'edit_policy': u"NON_EDITABLE", 'subscription_policy': u"OPEN"} }, upsert=False, multi=False)    
+#                     print "Updated user group policies :", each.name
 
-        if cur.count():
-            print "\n"
-            for each in cur:
-                collection.update({'_type': "Author", '_id': each._id}, {'$set': {'visited_location': []}}, upsert=False, multi=True)
-                print " 'visited_location' field added to Author group (" + each.name + ")\n"
+#         if cur.count():
+#             print "\n"
+#             for each in cur:
+#                 collection.update({'_type': "Author", '_id': each._id}, {'$set': {'visited_location': []}}, upsert=False, multi=True)
+#                 print " 'visited_location' field added to Author group (" + each.name + ")\n"
 
-    else:
-        error_message = "\n Exception while creating 'visited_location' field in Author class.\n Author GSystemType doesn't exists!!!\n"
-        raise Exception(error_message)
+#     else:
+#         error_message = "\n Exception while creating 'visited_location' field in Author class.\n Author GSystemType doesn't exists!!!\n"
+#         raise Exception(error_message)
 
-except Exception as e:
-    print str(e)
+# except Exception as e:
+#     print str(e)
 

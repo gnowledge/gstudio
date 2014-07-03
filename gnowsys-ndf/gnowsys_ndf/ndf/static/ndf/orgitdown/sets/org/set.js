@@ -28,7 +28,7 @@ var mySettings = {
 	        {separator:'---------------' },
                 {name:'Insert Embed Html', replaceWith:'\n#+BEGIN_HTML \n#+END_HTML\n' },
                 {name:'Close',call:'close' }
-
+        {name:'Cite',key:'cite',openWith:'<ref>',closeWith:'</ref>'},
 		//{name:'Clean', className:'clean', replaceWith:function(orgitdown) { return orgitdown.selection.replace(/<(.*?)>/g, "") } }		
 		//{name:'Preview', className:'preview',  call:'preview'}
 	]

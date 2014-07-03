@@ -2,7 +2,6 @@
 
 {% load pagination_tags %}
 {% load ndf_tags %}
-{% load i18n %}
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
@@ -15,7 +14,7 @@
   <h2>Task</h2>
 {% endblock %}
 
-{% block search_content %}
+ {% block search_content %}
   {% include "ndf/node_search_base.html" %}
 {% endblock %}
 
