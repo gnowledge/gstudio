@@ -1296,3 +1296,12 @@ def get_group_member_user(request, group_id):
         return HttpResponse(json.dumps(user_list))
     else:
 	raise Http404
+
+def set_user_link(request, group_id):
+  """
+  """
+  # print "\n coming in \n"
+  try:
+    return HttpResponse(json.dumps({'result': "True", 'message': "Link successfully created.", 'value': "Linked"}))
+  except Exception, e:
+    raise e

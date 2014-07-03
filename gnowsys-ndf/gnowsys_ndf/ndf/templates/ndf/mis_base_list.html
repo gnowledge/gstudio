@@ -22,20 +22,23 @@
       <p>NOTE: Please provide username of the user (i.e. student/voluntary-teacher), that he/she has registered on to the website.</p>
       </center>
 
-      <div class="row">
-        <div class="small-2 small-offset-2 columns">
-          <label for="link_to" class="inline left">Username:</label>
+      <form id="linkform" data-abide>
+        <div class="row">
+          <div class="small-2 small-offset-2 columns">
+            <label for="link_to" class="inline left">Username:</label>
+          </div>
+          <div class="small-6 columns end">
+            <input id="link_to" name="link_to" type="text" required >
+            <small class="error">Please fill username !!</small>
+          </div>
         </div>
-        <div class="small-6 columns end">
-          <input id="link_to" name="link_to" type="text" />
-        </div>
-      </div>
 
-      <div class="">
-        <div class="small-4 small-offset-4 columns end">
-          <input id="link_to_ac" name="link_to_ac" type="button" class="button small" value="Link to User A/C" />
+        <div class="row">
+          <div class="small-4 small-offset-4 columns end">
+            <input type="button" class="button small link_to_ac" value="Link to User A/C" disabled />
+          </div>
         </div>
-      </div>
+      </form>
 
       <a class="close-reveal-modal">&#215;</a>
     </div>
@@ -82,7 +85,7 @@
           {% else %}
           <td  class="name"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">Edit</a></td>
           {% endif %}
-          <td style="font-size:11px;"><input data-reveal-id="linkModal" type="button" style="font-size:14px;" class="button small" value="Link" /></td>
+          <td style="font-size:11px;"><input id="link_{{each.pk}}" data-reveal-id="linkModal" type="button" style="font-size:14px;" class="button small link" value="Link" /></td>
         </tr>
 
       {% endfor %}
@@ -210,16 +213,70 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
  $('#myModal').foundation('reveal', 'close');
 });
 
-$(document).foundation({
-  tab: {
-    callback : function (tab) {
-      console.log(tab);
+/*
+  * Code regarding Link button & its reveal-modal (linkModal)
+  + linkModal consists of 
+    - input element: link_to (name)
+    - button: link_to_ac (class)
+ */
+var link_username = ""
+var parent_link_button = ""
+$(".link").click(function() {
+  parent_link_button = $(this);
+  console.log(parent_link_button)
+});
+
+$("#link_to").bind("keyup keypress onmouseup blur change", function() {
+  link_username = $("#link_to").val()
+
+  if (link_username != "") {
+    if ($(".link_to_ac").attr("disabled")) {
+      $(".link_to_ac").removeAttr('disabled');
+    }
+  }
+  else {
+    if (!$(".link_to_ac").attr("disabled")) {
+      $(".link_to_ac").attr("disabled", "disabled")
     }
   }
 });
 
-$("#link_to_ac").click(function() {
-  alert("You clicked..." + $(this).attr('id'))
+$(".link_to_ac").click(function() {
+  // alert("You clicked..." + $(this).attr('class'))
+
+  link_username = $("#link_to").val()
+  alert("textbox value: " + link_username)
+
+  // parent_link_button = $(".link")
+  // alert("main button... " + )
+  // console.log("Object... " + parent_link_button)
+  // alert("main button... " + parent_link_button.attr('id') + " -- " + parent_link_button.val())
+
+  $.ajax({
+    url:"{% url 'set_user_link' groupid %}",
+
+    data: {
+      node_id: "node_id",
+      username: "username",
+      csrfmiddlewaretoken: "{{csrf_token}}"
+    },
+
+    type: "POST",
+
+    dataType: "json",
+
+    success: function (data) {
+      // alert(data + " -- " + data['value'])
+      alert(data["message"])
+      // parent_link_button.val("Linked");
+      parent_link_button.val(data["value"]);
+    }
+
+  });
+
+  $("#link_to").val("")
+  // alert("main button... " + parent_link_button.attr('id') + " -- " + parent_link_button.val())
+  $('#linkModal').foundation('reveal', 'close');
 });
 
 // </script>
