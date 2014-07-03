@@ -118,8 +118,6 @@ $(document).ready(function()
 {% block related_content %}
 {% check_is_user_group group_id as is_user_group %}
 
-<p> Members in this group :{{node.author_set|length}} </p>
-
 {% get_policy node request.user as policy  %}
 {% if policy %}
 <!-- Triggers the modals -->
@@ -131,6 +129,7 @@ $(document).ready(function()
 </div>
 {% endif %}
 <!-- Reveal Model end -->
+
 
 {% get_group_policy node request.user as policy %}
 {% get_prior_post_node  group_id as groupname     %}
@@ -158,6 +157,50 @@ $(document).ready(function()
 
 <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
 {% endifequal %} 
+<p> Members in this group :{{node.author_set|length}} </p>
+
+<!-- SCRIPT ADDED TO ALLOW SEARCH ON THE ITEMS IN THE GROUP -->
+<h4>Search</h4>
+<script type = "text/javascript" src = "/static/ndf/js/jquery2.js">
+</script>
+
+<form name="search_form" method="GET" action="{% url 'group_results' groupid %}">
+  {% csrf_token %}
+  <font style="font-size:0.8em">Enter the value to be searched:</font>
+  <input type="text" name="search_text" id="search_text">
+
+  <font style="font-size:0.8em">Search by:<br>
+  <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name &nbsp
+  <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags &nbsp
+  <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />Content <br>
+</font>
+  Search particular user: 
+  <select name="users">
+    <option value="all">All users</option>
+    {% for mem in authors %}    
+      <option value="hello">{{ mem }} </option>
+      {% endfor %}
+  </select>
+
+  <input type="submit" name="subButton2" id="subButton2" value="Submit" />
+</form>
+<div id="results">
+
+</div>
+<script>
+  function getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+    vars[key] = value;
+      });
+      return vars;
+  }
+
+  var search_key = getUrlVars()["search_text"];
+  $('#search_text').val(search_key);
+</script>
+
+
 
 {% endblock %}
 

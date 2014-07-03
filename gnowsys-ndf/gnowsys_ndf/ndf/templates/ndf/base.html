@@ -71,10 +71,13 @@
 	<ul class="right">
 	  
 	  <!-- Top bar search form -->
-	  <li class="has-form hide">
+	  <li ><!-- class="has-form hide" -->
 	    <div id="search-bar" class="row collapse">
 	      <div class="large-12 small-12 columns">
-		      <input type="text" placeholder="coming soon ..">
+		      <form action="{% url 'search' groupid %}" name="search_form" method="GET">
+		      <input type="text" name="search_text" placeholder="search site.." />
+		      <input type="image" src="/static/ndf/images/search.png" width="20em" alt="submit" />
+		      </form>
 	      </div>
 	    </div>
 	  </li>

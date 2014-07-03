@@ -329,6 +329,17 @@ class Node(DjangoDocument):
         return self.__unicode__()
     
     def save(self, *args, **kwargs):
+    
+    	#Whenever anything new is created or edited then this function will be called.
+    	#To test this theory let us create/edit some things
+    	
+    	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>SOMETHING IS CREATED/EDITED.THIS MESSAGE IS FROM SAVE() IN MODELS>>>>>>>>>>>>>>>>>>"
+    	
+    	#Can we know what type of file is created. I do not think so. ASK THIS IF POSSIBLE
+    	
+    	
+    	
+    	
         is_new = False
 
         if not self.has_key('_id'):
@@ -371,6 +382,39 @@ class Node(DjangoDocument):
         
         super(Node, self).save(*args, **kwargs)
         
+        print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",self._id
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    	#This is the save method of the node class.It is still not known on which objects is this save method applicable
+    	#We still do not know if this save method is called for the classes which extend the Node Class or for every class
+    	#There is a very high probability that it is called for classes which extend the Node Class only
+    	#The classes which we have i.e. the MyReduce() and ToReduce() class do not extend from the node class
+    	#Hence calling the save method on those objects should not create a recursive function
+    	
+    	#If it is a new document then
+    		#Make a new object of ToReduce class and the id of this document to that object
+    	#else
+   		#Check whether there is already an object of ToReduce() with the id of this object.
+   		#If there is an object present
+   			#pass
+   		#else add that object
+   	#I have not applied the above algorithm
+   	
+   	#Instead what I have done is that I have searched the ToReduce() collection class and searched whether the ID of this 
+   	#document is present or not.
+   	#If the id is not present then add that id.If it is present then do not add that id
+   		
+   	old_doc = collection.ToReduce.find_one({'required_for':'map_reduce_to_reduce','id_of_document_to_reduce':self._id})	
+    	if not old_doc:
+    		print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
+    		z = collection.ToReduce()
+    		z.id_of_document_to_reduce = self._id
+    		z.required_for = u'map_reduce_to_reduce'
+    		z.save()
+    		
+    	#If you create/edit anything then this code shall add it in the URL
+    	#===================================================================================================================#
+        
         history_manager = HistoryManager()
         rcs_obj = RCS()
 
@@ -400,6 +444,11 @@ class Node(DjangoDocument):
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
                 raise RuntimeError(err)
+    
+    ##########################################################################################################################
+    ##########################################################################################################################
+    ##########################################################################################################################
+    ##########################################################################################################################
                 
 
     ##########  User-Defined Functions ##########
@@ -408,7 +457,7 @@ class Node(DjangoDocument):
         """Returns user-defined attribute(s) of given node which belongs to either given single/list of GType(s).
 
         Keyword arguments:
-        gsystem_type_id_or_list -- Single/List of ObjectId(s) of GSystemTypes' to which the given node (self) belongs
+        gsystem_type_id_or_list --  Single/List of ObjectId(s) of GSystemTypes' to which the given node (self) belongs
   
         If node (self) has '_id' -- Node is created; indicating possible attributes needs to be searched under GAttribute collection & return 
         value of those attributes (previously existing) as part of the list along with attribute-data_type
@@ -890,7 +939,9 @@ class ProcessType(Node):
     }
     use_dot_notation = True
 
-
+# user should have a list of groups
+# attributeType added should automatically be added to the attribute_type_set of GSystemType
+ 
 @connection.register
 class GSystemType(Node):
     """Class to organize Systems
@@ -920,7 +971,9 @@ class GSystem(Node):
         # 'relation_set': [ObjectId],		# ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
-        'author_set': [int]                     # List of Authors
+        'author_set': [int],                     # List of Authors
+
+        'annotations' : [dict]      # List of json files for annotations on the page
     }
     
     use_dot_notation = True
@@ -1324,6 +1377,8 @@ class Triple(DjangoDocument):
     
     def save(self, *args, **kwargs):
         is_new = False
+        
+        #~ We are not editing this save() method as this is not currently required for simple keyword search
 
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
@@ -1383,4 +1438,38 @@ class GRelation(Triple):
     required_fields = ['relation_type', 'right_subject']
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
+
+
+
+####################################### Added on 19th June 2014 ##############################################################
+
+@connection.register
+class MyReduce(DjangoDocument):
+	structure = {
+		'content_org':dict,	#Map Reduced Content of the orignal document
+		'orignal_doc_id':ObjectId, #The object ID of the orignal document
+		'required_for':unicode,#This is a static field which will contain the string "map_reduce_reduced"
+					#This was created so as to make sure that we do not create any new collection
+	}
+	use_dot_notation=True
+
+@connection.register	
+class ToReduce(DjangoDocument):
+	structure = {
+		'id_of_document_to_reduce':ObjectId,
+		'required_for':unicode, #This is a static field which will contain the string "map_reduce_to_reduce"
+					#This was created so as to make sure that we do not create any new collection
+	}
+	use_dot_notation = True
+	
+
+@connection.register
+class allLinks(DjangoDocument):
+    structure = {
+	'member_of':ObjectId,
+	'link':unicode,
+	'required_for':unicode,
+    }
+    # required_fields = ['member_of', 'link']
+    use_dot_notation = True
 
