@@ -10,19 +10,19 @@ DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 LANGUAGES = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
 
 #SMTP setting for sending mail (Using python default SMTP server)
-EMAIL_USE_TLS = False
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'testing@example.com'
+#EMAIL_USE_TLS = False
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 1025
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
+#DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 #SMTP setting for sending mail (Using gmail SMTP server)
-#EMAIL_USE_TLS = True
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_PORT = 587
-#EMAIL_HOST_USER = 'yourcompletegmailaddr'
-#EMAIL_HOST_PASSWORD = 'yourpassword'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'metastudiom@gmail.com'
+EMAIL_HOST_PASSWORD = 'Sairam@85'
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
@@ -131,8 +131,10 @@ MIDDLEWARE_CLASSES = (
     'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-     
-# Uncomment the next line for simple clickjacking protection:
+
+    'gnowsys_ndf.mymiddleware.midware.Midware',
+    # Uncomment the next line for simple clickjacking protection:
+
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -157,6 +159,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 INSTALLED_APPS = (	
     'gnowsys_ndf.ndf',
+    'gnowsys_ndf.mymiddleware',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
