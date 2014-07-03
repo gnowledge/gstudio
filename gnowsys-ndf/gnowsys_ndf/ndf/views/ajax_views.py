@@ -328,7 +328,8 @@ def get_collection_list(collection_list, node):
         if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
           for cl in collection_list:
             if cl['id'] == node.pk:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
+              node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk , 'node_type': node_type}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
@@ -366,7 +367,8 @@ def get_tree_hierarchy(request, group_id, node_id):
     for each in cur:
       if each._id not in themes_list:
         if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
-          collection_list.append({'name': each.name, 'id': each.pk})
+          node_type = collection.Node.one({'_id': ObjectId(each.member_of[0])}).name
+          collection_list.append({'name': each.name, 'id': each.pk, 'node_type': node_type})
           collection_list = get_collection_list(collection_list, each)
 
     data = collection_list
@@ -490,21 +492,6 @@ def node_collection(node=None, group_id=None):
       node.delete()
 
     return True
-
-
-def check_topic_node(request, group_id):
-
-  # To check topic node
-  node_id = request.POST.get("node_id","")
-  if node_id:
-    obj = collection.Node.one({'_id': ObjectId(node_id)})
-    if obj:
-      if topic_GST._id in obj.member_of:
-        return HttpResponse("True")
-      else:
-        return HttpResponse("False")
-
-
 
 
 def delete_themes(request, group_id):
