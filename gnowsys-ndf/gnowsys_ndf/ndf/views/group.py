@@ -232,6 +232,7 @@ def create_group(request,group_id):
 
       colg.post_node.append(Mod_colg._id)
       colg.save()
+     
 
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
@@ -257,6 +258,7 @@ def create_group(request,group_id):
       else:
         shelves = []
 
+    
     return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,
                                                          'groupid':group_id,'group_id':group_id,
                                                          'shelf_list': shelf_list,'shelves': shelves
@@ -315,7 +317,7 @@ def group_dashboard(request,group_id=None):
       has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
       dbref_has_shelf = has_shelf_RT.get_dbref()
 
-      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })       
       shelf_list = {}
 
       if shelf:
@@ -338,12 +340,14 @@ def group_dashboard(request,group_id=None):
 
   if groupobj.status == u"DRAFT":
     groupobj, ver = get_page(request, groupobj)
+    print groupobj
 
   # First time breadcrumbs_list created on click of page details
   breadcrumbs_list = []
   # Appends the elements in breadcrumbs_list first time the resource which is clicked
   breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
 
+  print groupobj
   return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
                                                        'group_id':grpid, 'user':request.user, 
                                                        'shelf_list': shelf_list,

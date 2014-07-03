@@ -368,7 +368,7 @@ def add_node(request,group_id):
             return HttpResponse("failure")
     
         colrep=collection.GSystem()
-    
+        
         if node == "Twist":
             name=tw_name
             colrep.member_of.append(twist_st._id)
