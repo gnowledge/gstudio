@@ -11,7 +11,7 @@
 
 <!-- css for drawer widget -->
 <style type = "text/css">
-
+.hidden { visibility: hidden;  }
 .divider-line { font-size: xx-large; color:lightgray; }
 .line-height-2 { line-height:2; }
 .line-height-2pt5 { line-height:2.5; }
@@ -357,7 +357,25 @@ ul#graph-hover.f-dropdown{
     </div>
     
     <div>
-      Languages
+      Languages 
+      <!-- Annotation block -->
+      {% if user.is_authenticated %}
+      <br></br>
+      <div>
+        <div id = "ann" class= "hidden">
+          <input id = "annField" type= "text" placeholder = "Add annotation..">
+          <button id = "annButton" onclick = "activateReply()"> Add </button>
+        </div>
+        <div id="replies"> </div>
+        <div id = "reply" class = "hidden">
+          <input id = "replyField" type= "text" placeholder= "Add comments..">
+          <button id = "replyButton" onclick= "addComment()"> Reply </button>
+          <button id = "close" onclick="store()"> Close </button>
+        </div>
+      </div>
+      {% endif %}
+      <!-- end of annotation block -->
+
       <br></br>
       {% get_possible_translations node as tran %}
       {% for each in tran %}
@@ -444,5 +462,148 @@ ul#graph-hover.f-dropdown{
 
   });
 
+//For annotation based discussions: 
+var ann = {                                  //dummy variable at frontend
+  selectedText: "",
+  annotationText: {text: "", datetime: ""},
+  comments: [] 
+};
+
+var flag = false;
+
+if(!window.win){
+  win = {};
+}
+win.Selector = {};
+win.Selector.getSelected = function(){
+  var t = '';
+  if(window.getSelection){
+    t = window.getSelection();
+  }else if(document.getSelection){
+    t = document.getSelection();
+  }else if(document.selection){
+    t = document.selection.createRange().text;
+  }
+  return t;
+}
+
+win.Selector.mouseup = function()
+{
+  {% if user.is_authenticated %}
+  var st = win.Selector.getSelected();
+  if(st!="")
+  {
+    //st has the selected  text
+    //check if selection already exists
+    var annotations = {{ node.annotations | safe }}
+    flag = false;
+    for(var i=0; i < annotations.length; i++)
+    {
+      if(annotations[i].selectedText.toLowerCase() == st.toLowerCase())
+      {
+        flag = true;                //selection already exists in list
+        break;
+      }
+    }
+    
+    if(!flag)                       //if selection is new, add to list and generate thread    
+    { alert("New selection");
+      $("#annField").val("");
+      $("#ann").css('visibility', 'visible');
+      $("#ann").css('display', 'initial');
+      ann.selectedText = String(st);               //Requires string conversion  
+    }  
+
+    else                          
+    {
+      alert("Selection exists!");
+      ann = annotations[i];
+      //TODO display thread
+      $("#replies").html(annotations[i].annotationText['text'] + "<br> <i>" + annotations[i].annotationText['datetime'] + "</i><br>");
+      for (var i=0; i < annotations[i].comments.length; i++)
+      {
+        $("#replies").append(annotations.comments[i].text, "<i>", annotations.comments[i].datetime, "</i><br>");
+      }
+      $("#replyField").val("");
+      $("#reply").css('visibility', 'visible');     
+      $("#ann").css('display', 'none');                  //$("#ann").css('visibility', 'hidden');
+      $("#replies").css('visibility', 'visible');
+    }
+  }  
+  {% endif %}
+}
+
+$(document).ready(function()                             //detect mouseup event
+{
+  $("#view-page > div").bind("mouseup", win.Selector.mouseup);
+  //TODO highlight function
+  //highlightSearchTerms(String(st), true);
+}); 
+
+function activateReply()
+{
+  var annotationText= $("#annField").val();
+  if(annotationText != "")
+  {
+      $("#replyField").val("");
+      $("#reply").css('visibility', 'visible');     
+      $("#ann").css('display', 'none');                  //$("#ann").css('visibility', 'hidden');
+      $("#replies").css('visibility', 'visible');
+      ann.annotationText['text']=annotationText;
+      ann.annotationText['datetime']= Date();
+      //delete present comments!
+      ann.comments.length=0;
+      //add current thread to "#replies"
+      $("#replies").html(annotationText + "<br> <i>" + ann.annotationText['datetime'] + "</i><br>"); 
+  }
+}
+
+function addComment()
+{
+  var reply = $("#replyField").val();
+  if(reply != "")
+  {
+      //reset field for next comment
+      $("#replyField").val("");
+      //store comment in the annotation variable
+      ann.comments.push({ text:reply, datetime: Date()});
+      //add to replies
+      //alert(reply+ "<br><i>"+ ann.comments[ann.comments.length-1]['datetime']+ "</i><br>");
+      $("#replies").append(reply, "<br><i>", ann.comments[ann.comments.length-1]['datetime'], "</i><br>");
+  }
+}
+
+function store()
+{
+  //alert("TEXT: "+ ann.selectedText+ "ann:" + ann.annotationText['text'] + "AT " + ann.annotationText['datetime'] );
+  $("#ann").css('visibility', 'hidden');
+  $("#reply").css('visibility', 'hidden');
+  $("#replies").css('visibility', 'hidden');
+  $.ajax({
+                  type: "GET",
+                  url: "{% url 'annotation' groupid %}",
+                  datatype: "json",
+                  data: 
+                  {
+                      dummy: 'ann',
+                      flag: 'flag',
+                      annotations: '{{ node.annotations }}',
+                      csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+                  success: function(data) 
+                  {
+                    
+                  }
+            });
+  /*var current = $("#thread").html();
+  current += "<p>";
+  current +=  "<i> Selection: </i>" + ann.selectedText + "; <i> Annotation: </i>" + ann.annotationText['text'] + ";     <i> time: </i>    " + ann.annotationText['datetime'] + "<br>";
+  for (var i=0; i < ann.comments.length; i++)
+  {
+    current += "<i> comment" + (i+1) + ": </i> " + ann.comments[i].text + ";     <i> time: </i> " + ann.comments[i].datetime + "<br>";
+  }
+  current += "</p>";
+  $("#thread").html(current); */
+}
 
 </script>

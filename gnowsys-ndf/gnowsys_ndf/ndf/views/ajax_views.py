@@ -1298,3 +1298,14 @@ def get_group_member_user(request, group_id):
         return HttpResponse(json.dumps(user_list))
     else:
 	raise Http404
+
+
+
+def annotation(request, group_id):
+  '''
+  kbkj
+  '''
+  aa = "hello"
+  print "\n\n Text  :  ", aa, "\n\n"
+  print "\n\n flag :  ", flag, "\n\n"
+  return aa
