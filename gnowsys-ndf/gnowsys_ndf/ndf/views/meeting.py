@@ -89,7 +89,7 @@ def dashb(request, group_id):                                                   
     online_users = cache.get(CACHE_USERS)
     online_users = simplejson.dumps(online_users, default=encode_json)	
     #print "\n inside meeting \n"
-    print "\ngroup_id: ", group_id,"\n"
+    # print "\ngroup_id: ", group_id,"\n"
     
     
 
