@@ -10,15 +10,18 @@
 <!--External  css for tree -- >
 
 <!-- javascript file for tree -->
-<script src="/static/ndf/js/tree.jquery.js"></script>
-  <script type="text/javascript">
-    $(document).ready(function()
-    {
+<!-- <script src="/static/ndf/js/tree.jquery.js"></script> -->
+<script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+
+<script type="text/javascript">
+  $(document).ready(function()
+  {
     $(function() {
-    $('.tree').tree();
+      $('.tree').tree();
     });
-    });
-  </script>
+  });
+</script>
+
 {% endblock %}
 
 
