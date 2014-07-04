@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
 
     (r'^admin/', include(admin.site.urls)),
+   # (r'^online/', include('online_status.urls')),                     # for online_users
 
     url(r'^accounts/password/change/done/', auth_views.password_change_done),         
     url(r'^accounts/password/change/', auth_views.password_change, {'password_change_form': UserChangeform}),

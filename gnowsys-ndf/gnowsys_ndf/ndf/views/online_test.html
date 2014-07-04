@@ -1,0 +1,10 @@
+<!--                               for online_users                         -->
+{% with request.user.get_profile as profile %}
+
+ <table>
+   <tr><th>Last Seen</th><td>{% if profile.last_seen %}{{ profile.last_seen|timesince }}{% else %}awhile{% endif %} ago</td></tr>
+   <tr><th>Online</th><td>{{ profile.online }}</td></tr>
+ </table>
+{% endwith %}
+<!--                               for online_users                        -->
+
