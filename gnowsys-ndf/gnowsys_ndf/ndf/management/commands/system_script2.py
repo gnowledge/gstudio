@@ -55,7 +55,7 @@ def create_WikiData_WikiTopic():
 		wiki.save()
 		wiki_id = wiki._id
 		print "Created a GSystemType for----> WikiData \n"
-	
+	"""
 	cursor = collection.Node.one({"_type": u"GSystemType", "name": u"Theme"})
 	if (cursor!=None):
 		print "theme already exists"
@@ -70,7 +70,7 @@ def create_WikiData_WikiTopic():
 		obj.member_of.append(factory_id)
 		obj.save()
 		print "Created an object of GSystem Type --> Theme \n"
-	
+	"""
 	cursor = collection.Node.one({"_type":u"GSystemType", "name": u"WikiTopic"}) #change -am
 	if(cursor!=None):
 		print "WikiTopic already exists"
@@ -86,7 +86,7 @@ def create_WikiData_WikiTopic():
 		print "Created an object of GSystemtype"
 
 
-def create_AttributeType(name, data_type, user_id):
+def create_AttributeType(name, data_type, description, property_id, user_id):
 	"""
 	This method creates an attribute type of given name and which will be for the given system_type(WikiData)
 	The following data_types are possible:
@@ -105,9 +105,15 @@ def create_AttributeType(name, data_type, user_id):
     	"IS()"
 	)
 	User Id will be used for filling the created_by field.
+	
+	1. name - name of property i.e. label
+	2. data_type - extracted data type from JSON
+	3. description - Desc
+	4. property_id - unique code of property. PCode
+	5. User Id
 	"""
 	print "Creating an Attribute Type"
-	cursor = collection.Node.one({"name":unicode(name),"_type":"AttributeType"})
+	cursor = collection.Node.one({"label":unicode(property_id),"_type":"AttributeType"})
 	if (cursor != None):
 		print "The AttributeType already exists."
 	else:
@@ -120,6 +126,14 @@ def create_AttributeType(name, data_type, user_id):
 		attribute_type.modified_by = user_id
 		factory_id = collection.Node.one({"name":u"factory_types","_type":"MetaType"})._id
 		attribute_type.member_of.append(factory_id)
+		attribute_type.verbose_name = name
+		attribute_type.null = True
+		attribute_type.blank = True
+		attribute_type.help_text = unicode(description)
+		attribute_type.label = unicode(property_id) #Adding property_id pcode
+		attribute_type.unicode = False
+		attribute_type.default = unicode("None")
+		attribute_type.auto_now = False
 		attribute_type.save()
 		"""	
 		Adding the attribute type to the WikiData GSytemType attribute_set"
@@ -128,23 +142,26 @@ def create_AttributeType(name, data_type, user_id):
 		print "Created the Attribute_Type " + str(name)
 		
 		
-def create_Attribute(subject_name, attribute_type_name, object_value):
+def create_Attribute(subject_name, attribute_type_name, object_value, language, user_id):
 	"""
-	Creating an Attribute with specified name, subject_id, attribute_type and value.
+	Creating an Attributpe with specified name, subject_id, attribute_type and value.
 	This will create an attribute iff the attribute is not present for the same subject
 	"""
 
 	print "Creating an attribute"
 	subject = collection.Node.find_one({"name":unicode(subject_name),"_type":"GSystem"})
 	attribute_type_obj = collection.Node.find_one({"name": unicode(attribute_type_name), "_type": u"AttributeType"})
-	#print attribute_type
-	cursor = collection.Node.find_one({"_type" : "GAttribute","subject":subject._id,"attribute_type.$id":attribute_type_obj._id})
-	if cursor!= None: #change-am
+	cursor = collection.Node.find_one({"_type" : u"GAttribute","subject": ObjectId(subject._id),"attribute_type.$id":ObjectId(attribute_type_obj._id)})
+	if cursor!= None:
 		print "The attribute " + unicode(cursor.name) + " already exists."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 	else:
 		att = collection.GAttribute()
-		att.subject = subject._id
+		att.created_by = user_id
+		att.modified_by = user_id
+		att.subject = ObjectId(subject._id)
+		att.lang = language
+		att.status = u"PUBLISHED"
 		#DBref = {"$ref":Node.collection_name, "$id":attribute_type._id, "$name": attribute_type.name}
 		att.attribute_type = attribute_type_obj
 		att.object_value = unicode(object_value)
@@ -273,8 +290,9 @@ class Command(BaseCommand):
 		create_WikiData_WikiTopic()
 		create_Topic(u"topic11", u"topic1desc", [u"Alias1", u"Alias2"], "Test1", None, user_id)
 		create_Topic(u"topic21", u"topic2desc", [u"Alias1"], "Test2", None, user_id)
-		create_AttributeType("wiki_attr11", "unicode", user_id)
-		create_Attribute("topic11", "wiki_attr11", "This is the value of the wiki_attr1 field")
+		create_AttributeType("wiki_attr11", "unicode", "This is the desc.", "P<id>12", user_id)
+		create_Attribute("topic11", "wiki_attr11", "This is the value of the wiki_attr1 field", "en", user_id)
+		create_Attribute("topic21", "wiki_attr11", "This is the value of the wiki_attr2 field", "en", user_id)
 		create_RelationType("same_tag11", "-same_tag11", "WikiTopic", "WikiTopic", user_id) 
 		create_Relation("topic11", "same_tag11", "topic21", user_id)
 		create_Relation("topic21", "same_tag11", "topic11", user_id)
