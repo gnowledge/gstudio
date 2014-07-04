@@ -473,7 +473,7 @@
 
         {% get_user_object each.created_by as user_obj %}
         {% ifequal user_obj.username user.username %}
-        <a class="button alert tiny" href="{% url 'delete_file' group_name_tag video %}?next={{request.path}}">Delete </a>
+        <a class="button alert tiny" href="{% url 'delete_file' group_name_tag each %}?next={{request.path}}">Delete </a>
         {% endifequal %}
 
         <footer class="row">
