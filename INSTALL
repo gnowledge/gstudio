@@ -88,10 +88,7 @@ Use corresponding package names if you are using an RPM based distro
     (4) Installing Bower:
         npm install -g bower
 
-    (5) Now go to static folder:  
-        cd gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/
-
-    (6) To install JS/CSS dependencies:
+    (5) To install JS/CSS dependencies: (Be there at project root level)
         bower install
 
 7. Installation of MathJax (required for rendering MathML symbols)

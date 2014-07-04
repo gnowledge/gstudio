@@ -15,10 +15,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
   <!-- Scripts required for D3 graph -->
-  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
-  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
-  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
-  <script src="/static/ndf/js/tree.jquery.js"></script>
+  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+
+  <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 
   <script type="text/javascript">
     $(document).ready(function() {
@@ -33,9 +35,16 @@
     			autoOpen: false,
 
         		onCreateLi: function(node, $li) {
+						
+					if (node.node_type == "Topic"){
+						$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
+					}
+					else{
+						$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:gold"></span> &nbsp;');				        		
+					}
 
         			if (user == "True")
-        			{
+        			{   
         				$li.find('.jqtree-element').append(
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
@@ -59,7 +68,11 @@
 			        var node = event.node;
 			        // If its topic node i.e no children of this node then show the detail veiw for topic
 			  		if( node.children[0] == null ){
-				        location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";
+
+			  			if (node.node_type == "Topic"){
+			  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
+			  			}
+				        
 			  		}
 			  		
 			    }
