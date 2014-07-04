@@ -61,6 +61,7 @@ TAGS
 local/
 include/
 rcs-repo/
+bower_components/
 mathjax/
 schema_files/
 *.db

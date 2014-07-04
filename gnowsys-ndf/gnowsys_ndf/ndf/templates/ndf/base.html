@@ -6,32 +6,37 @@
 {% get_group_name groupid as group_name_tag %}
 
 <head>
+
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
+
   <title>metaStudio - {% block title %} {% endblock %}</title>	
 
-  <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png">
+  <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> <!-- checked -->
 
   <!-- Foundation 5 - Responsive CSS Framework http://foundation.zurb.com/docs/css.html-->
-  <link rel="stylesheet" href="/static/ndf/components/foundation/css/normalize.css">
-  <link rel="stylesheet" href="/static/ndf/css/foundation-skin.css">
+  <link rel="stylesheet" href="/static/ndf/bower_components/foundation/css/normalize.css"> <!-- checked -->
+  <link rel="stylesheet" href="/static/ndf/css/foundation-skin.css"> <!-- checked -->
 
   <!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
-  <link rel="stylesheet" href="/static/ndf/foundation-icons/foundation-icons.css">
+  <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> <!-- checked -->
 
   <!-- Modernizr - Browser detection JS http://modernizr.com/ -->
-  <script src="/static/ndf/components/modernizr/modernizr.js"></script>
+  <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script> <!-- checked -->
 
   <!-- jQuery -->
-  <script src="/static/ndf/components/jquery/dist/jquery.min.js"></script> 
-  <script src="/static/ndf/js/jquery.js"></script>
+  <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jquery-legacy/jquery.min.js"> </script>
+  
+  <!--  <script src="/static/ndf/js/jquery.js"></script> -->
   <!-- "jquery-migrate-1.0.0.js": It is a JQuery migrate plugin that helps in restoring changed behaviors (deprecated/removed features) in JQuery 1.9, if JQuery < 1.9 is used. -->
-  <script src="/static/ndf/js/jquery-migrate-1.0.0.js"></script>
+  <!--  <script src="/static/ndf/js/jquery-migrate-1.0.0.js"></script> -->
+  <script src="/static/ndf/bower_components/jquery-legacy/jquery-migrate.js"> </script>
 
   <!-- External library stylesheets-->
-  <link href="/static/ndf/css/jqtree.css" rel="stylesheet">
+  <link href="/static/ndf/bower_components/jqtree/jqtree.css" rel="stylesheet"> <!-- checked -->
 
   <!-- Enable HTML5 on old browsers -->
   <!--[if lte IE 8]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -261,8 +266,8 @@
   </footer>
 
   <!-- JS -->
-  <script src="/static/ndf/components/foundation/js/foundation.min.js"></script>
-  <script src="/static/ndf/components/foundation/js/foundation/foundation.topbar.js"></script>
+  <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/foundation/js/foundation/foundation.topbar.js"></script> <!-- checked -->
   
   <script type="text/javascript">
     
@@ -333,7 +338,7 @@
 
   </script>
   
-<script src="/static/ndf/js/app.js"></script>
+<script src="/static/ndf/js/app.js"></script> <!-- checked -->
 
 </body>
 
