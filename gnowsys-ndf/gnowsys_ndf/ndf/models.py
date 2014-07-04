@@ -1334,6 +1334,9 @@ class Triple(DjangoDocument):
 
         collection = get_database()[Node.collection_name]
         
+	"""
+	Check for correct GSystemType match in AttributeType and GAttribute, similarly for RelationType and GRelation
+	"""
 	#it's me
 	subject_name = collection.Node.one({'_id': self.subject}).name
         subject_system_flag = False
