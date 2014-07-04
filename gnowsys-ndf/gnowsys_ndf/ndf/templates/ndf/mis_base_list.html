@@ -1,7 +1,10 @@
 {% extends "ndf/mis_base.html" %}
 {% load pagination_tags %}
 
+{% block title %} {{ title }} {% endblock %}
+
 {% block body_content %} 
+
   {% if nodes.count %}
     {% autopaginate nodes 25 %}
   
@@ -65,7 +68,9 @@
           <th>Title</th>
           <th>Creation date</th>
           <th>Edit</th>
+          {% if is_link_needed %}
           <th>Link to User A/C</th>
+          {% endif %}
       </tr>
     </thead>
     
@@ -85,7 +90,9 @@
           {% else %}
           <td  class="name"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">Edit</a></td>
           {% endif %}
+          {% if is_link_needed %}
           <td style="font-size:11px;"><input id="link_{{each.pk}}" data-reveal-id="linkModal" type="button" style="font-size:14px;" class="button small link" value="Link" /></td>
+          {% endif %}
         </tr>
 
       {% endfor %}
