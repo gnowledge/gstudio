@@ -189,11 +189,11 @@ def extract_from_property_value(property_value_list):
 					for k1,v1 in v.items():
 						if k1=="datatype":
 							if v1=="wikibase-item":
-								return 0  # RelationType and Relation will have to be created
+								return 3  # RelationType and Relation will have to be created
 							elif v1=="globe-coordinate" :
-								return 1  # location field of the GSystemType will have to filled
+								return 2  # location field of the GSystemType will have to filled
 							else:
-								return 2 #all others for which AttributeType and Attributes will be created
+								return 1 #all others for which AttributeType and Attributes will be created
 
 
 
@@ -209,6 +209,18 @@ def extract_property_value(property_value_list):
 									return v2
 
 
+def extract_value_for_relation(property_value_list):
+	for element in property_value_list:
+		if(type(element)) == type({}):
+			for k,v in element.items():
+				if k=="mainsnak":
+					for k1,v1 in v.items():
+						if k1=="datavalue":
+							for k2,v2 in v1.items():
+								if k2=="value":
+									for k3,v3 in v2.items():
+										if k3=="numeric-id":
+											return v3
 
 
 
@@ -227,7 +239,36 @@ def property_create_AttributeType(property_id,property_data_type,json_obj):
 		property_entity_type =extract_type(json_obj,property_id)
 		property_namespace =extract_namespace(json_obj,property_id)
 
-		create_AttributeType(property_label, property_data_type, user_id)
+		create_AttributeType(property_label, property_data_type,property_description,property_id,language, user_id)
+		
+
+
+
+def property_create_Attribute(label,property_id,property_value,property_json):
+	property_label =extract_labels(property_json,property_id,language)
+	create_Attribute(label, property_label, property_value, language, user_id)
+
+
+def property_create_RelationType(property_id,property_json):
+	property_label =extract_labels(property_json,property_id,language)
+	inverse_name="-"+property_label
+	create_RelationType(property_label, inverse_name, "WikiTopic", "WikiTopic",property_id,language, user_id)
+
+
+def property_create_Relation(label,property_id,property_value,property_json):
+	property_label=extract_labels(property_json,property_id,language)
+	property_value =unicode("Q")+unicode(property_value)
+	right_json_url=gen_url_json+str(property_value)+".json"
+
+	print property_id+"%%%%%%%%%%%%%%",right_json_url
+	right_json=json_parse(right_json_url) #property_value is supposed to be the id of the right subject in case of a relation
+
+	right_subject_name=extract_labels(right_json,property_value,language)
+	print "$$$$$$$$",right_subject_name," ",property_value
+
+	intitiate_new_topic_creation(right_json,property_value,language)
+	create_Relation(label, property_label, right_subject_name, user_id)
+
 
 def extract_property_json(json_obj,label,topic_title):
 	claim_dict={}
@@ -239,26 +280,28 @@ def extract_property_json(json_obj,label,topic_title):
 
 
 	for k,v in claim_dict.items():
-		property_id =k
+		property_id = k
 		property_json_url =gen_url_json+property_id+".json"
 		property_json =json_parse(property_json_url)
 		property_value_list =v
-		label = extract_labels(property_json,property_id,language)
 		flag=-1
 		flag=extract_from_property_value(property_value_list)
 		property_value =extract_property_value(property_value_list) #property_value has the value of that property fpr a particular object
-		if flag==2: #relation has to be made
+		"""
+		if flag==1: #attribute has to be made
 			property_data_type=extract_datatype_from_property(property_value_list)
 			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
-			print property_data_type
-			#property_create_AttributeType(property_id,property_datatype,property_json) #assuming that the name of the attribute type id the property id like say P131
-			#property_create_Attribute(label,property_id,property_value) #entire triple is being passed as a parameter
+			#print property_data_type
+
+			property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
+			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
+		"""
 		
-
-
-
-
-
+		if flag==3: #relation has to be made
+			property_value_for_relation=extract_value_for_relation(property_value_list)
+			property_create_RelationType(property_id,property_json)
+			property_create_Relation(label,property_id,property_value_for_relation,property_json)
+		
 def create_topic_id():
 	"""
 	This function is just called once , directly from main so that the topic_id is created as a AttributeType
@@ -267,13 +310,28 @@ def create_topic_id():
 	attribute_type_name ="topic_id"
 	attribute_type_data_type ="unicode"
 	user_id =int(1)
-	create_AttributeType(attribute_type_name, attribute_type_data_type, user_id)
+	create_AttributeType(attribute_type_name, attribute_type_data_type,"_id referred in Wikidata","topic_id","en", user_id)
+	
+
+
+def intitiate_new_topic_creation(json_obj,topic_title,language):
+	alias_list=extract_aliases(json_obj,topic_title,language)
+	label=extract_labels(json_obj,topic_title,language)	
+	description =extract_descriptions(json_obj,topic_title,language)
+	extract_claims(json_obj,topic_title)
+	last_update =extract_modified(json_obj,topic_title)
+	entity_type =extract_type(json_obj,topic_title)
+	page_id =extract_pageid(json_obj,topic_title)
+	namespace =extract_namespace(json_obj,topic_title)
+
+	if label!=None:
+		topic_exists = create_Topic(label, description, alias_list, topic_title, None, int(1))
+		if topic_exists == False:
+			create_Attribute(label, "topic_id", topic_title, language, user_id)
+			extract_property_json(json_obj,label,topic_title)
 
 
 
-
-
->>>>>>> aa314071f624dec1cd30b10a50a481fe8d24854f
 
 def read_file():
 	with open(fn,'rb') as f:
@@ -285,10 +343,10 @@ def read_file():
 					url_page=gen_url_page+topic_title #creating url of the wikidata page itself
 					json_obj=json_parse(url_json)
 					if(json_obj):
+						intitiate_new_topic_creation(json_obj,topic_title,language)
+						"""
 						alias_list=extract_aliases(json_obj,topic_title,language)
-						#print alias_en_list
-						label=extract_labels(json_obj,topic_title,language)
-						#print label_en	
+						label=extract_labels(json_obj,topic_title,language)	
 						description =extract_descriptions(json_obj,topic_title,language)
 						extract_claims(json_obj,topic_title)
 						last_update =extract_modified(json_obj,topic_title)
@@ -298,11 +356,10 @@ def read_file():
 
 						
 						if label!=None :
-							#create_Topic(label, description, alias_list, topic_title, None, int(1))
-							#	create_Attribute(label, "topic_id", topic_title)
-							
+							create_Topic(label, description, alias_list, topic_title, None, int(1))
+							create_Attribute(label, "topic_id", topic_title,language,user_id)
 							extract_property_json(json_obj,label,topic_title)
-
+						"""		
 
 					else:
 						print "empty json returned"
@@ -312,8 +369,8 @@ def read_file():
 class Command(BaseCommand):
 	def handle(self, *args, **options):
 
-		#create_WikiData_Theme_Topic()
-		#create_topic_id()
+		create_WikiData_WikiTopic()
+		create_topic_id()
 
 		read_file()		# read the file with list of items starting with Q
 		
