@@ -36,7 +36,7 @@ import json
 import sys
 wiki_base_url="http://en.wikipedia.org/wiki/"
 
-def create_WikiData_Theme_Topic():
+def create_WikiData_WikiTopic():
 	"""
 	creates GSystemType: WikiData(a member_of GAPP), GSystemType Theme and Topic(a member_of factory_settings) 
 	"""
@@ -71,14 +71,14 @@ def create_WikiData_Theme_Topic():
 		obj.save()
 		print "Created an object of GSystem Type --> Theme \n"
 	
-	cursor = collection.Node.one({"_type":u"GSystemType", "name": u"Topic"}) #change -am
+	cursor = collection.Node.one({"_type":u"GSystemType", "name": u"WikiTopic"}) #change -am
 	if(cursor!=None):
-		print "Topic already exists"
+		print "WikiTopic already exists"
 	else:	
 		factory = collection.Node.one({"name": u"factory_types"})
                 factory_id = factory._id
 		obj1 = collection.GSystemType()
-		obj1.name = u"Topic"
+		obj1.name = u"WikiTopic"
 		obj1.created_by = int(1)
 		obj1.type_of.append(wiki_id)
 		obj1.member_of.append(factory_id)
@@ -114,7 +114,7 @@ def create_AttributeType(name, data_type, user_id):
 		attribute_type = collection.AttributeType()
 		attribute_type.name = unicode(name)
 		attribute_type.data_type = data_type
-		system_type = collection.Node.one({"name":u"Topic","_type":"GSystemType"})
+		system_type = collection.Node.one({"name":u"WikiTopic","_type":"GSystemType"})
 		attribute_type.subject_type.append(system_type._id)
 		attribute_type.created_by = user_id
 		attribute_type.modified_by = user_id
@@ -148,7 +148,6 @@ def create_Attribute(subject_name, attribute_type_name, object_value):
 		#DBref = {"$ref":Node.collection_name, "$id":attribute_type._id, "$name": attribute_type.name}
 		att.attribute_type = attribute_type_obj
 		att.object_value = unicode(object_value)
-		print type(object_value), str("------------------------------------")
 		print "About to create"
 		att.save()
 		print "Created attribute " + unicode(att.name)
@@ -161,15 +160,10 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 	"""
 	Creates a topic if it does not exist
 	"""
-	
-
 	print "Creating a GSystem Topic"
-	cursor = collection.Node.one({"name": u"Topic"})
-	topic_type = cursor
-	
-	#change - am
+	topic_type = collection.Node.one({"name": u"WikiTopic"})
 	obj = collection.Node.one({"name": unicode(label), "_type": u"GSystem"}) #pick the topic related to wikidata
-	#print cursor2.count()
+
 	if (obj!=None):
 		print "Topic already exists"
 		return
@@ -192,21 +186,22 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		topic.status=unicode('PUBLISHED') #by default status of each item is PUBLISHED
 		topic.language=unicode('en')      #by default language is english
 		topic.access_policy=unicode('PUBLIC')
-
 		topic.save()
 		
 		print "Created a topic -->" + label + "\n"
 		
 
 	
-	
-def create_RelationType(name, inverse_name, object_type_name, user_id):
+
+def create_RelationType(name, inverse_name, subject_type_name, object_type_name, user_id):
+
 	"""	
 	Creating a RelationType with the following parameters.
 	1. name - inherits Node class.
 	2. inverse_name  - This is the name of the inverse of the relation.
 	3. subject_type - Which Systemtype is the relation defined under.
 	4. object_type - which object is the relation type defined for?
+	5. User_id - the id which creates the WikiTopic RelationType.
 	"""
         print "Creating a Relation Type"
         cursor = collection.Node.one({"name":unicode(name)})
@@ -215,52 +210,55 @@ def create_RelationType(name, inverse_name, object_type_name, user_id):
         else:
      	        relation_type = collection.RelationType()
                 relation_type.name = unicode(name)
-                system_type = collection.Node.one({"name":u"WikiData"})
+                system_type = collection.Node.one({"name":u"WikiTopic"})
                 relation_type.subject_type.append(system_type._id)
                 relation_type.inverse_name = unicode(inverse_name)
 		relation_type.created_by = user_id
                 relation_type.modified_by = user_id
+		subject_type = collection.Node.one({"name":unicode(subject_type_name)})
+		relation_type.subject_type.append(ObjectId(subject_type._id))
 		object_type = collection.Node.one({"name":unicode(object_type_name)})
 		relation_type.object_type.append(ObjectId(object_type._id))
                 factory_id = collection.Node.one({"name":u"factory_types"})._id
                 relation_type.member_of.append(factory_id)
+		#relation_type.subject_applicable_nodetype('GSystem Types')
+		#relation_type.object_applicable_nodetype('GSystem Types')
                 relation_type.save()
                 """     
-                Adding the attribute type to the WikiData GSytemType attribute_set"
+                Adding the attribute type to the WikiTopic GSytemType attribute_set"
                 """
                 system_type.relation_type_set.append(ObjectId(relation_type._id))
                 print "Created the Relation_Type " + str(name)
  
 
-def create_Relation(name, subject_name, relation_type_name, right_subject_name):
+def create_Relation(subject_name, relation_type_name, right_subject_name, user_id):
 	"""
 	Creates a GRelation with following parameters:
-	1. Name: Given Name
-	2. Subject: which GSytem class object
-	3. Relation Type: The type of relation
-	4. Right Subject: The subject on the right. The object related to the current object.
+	1. Subject: which GSytem class object
+	2. Relation Type: The type of relation
+	3. Right Subject: The subject on the right. The object related to the current object.
 	"""
 	print "Creating a Relation."
-	cursor = collection.Node.find({"name":unicode(subject_name), "_type":u"GRelation"})
+	relation_type = collection.Node.one({"_type":u"RelationType", "name": unicode(relation_type_name)})
+	subject = collection.Node.one({"_type": u"GSystem", "name": unicode(subject_name)})
+	cursor = collection.Node.find({"_type":u"GRelation", "relation_type.$id":ObjectId(relation_type._id), "subject": ObjectId(subject._id)})
+>>>>>>> 2da217a01a0b8b7704c798f019ac97d67e48beec
 	if cursor.count()!=0:
 		print "The Relation Already exists"
 	else:
 		relation = collection.GRelation()
-		#relation.created_by = user_id
-		#relation.modified_by = user_id
-		#relation.name = unicode(name)
+		relation.created_by = user_id
+		relation.modified_by = user_id
 		left_system = collection.Node.one({"name":unicode(subject_name)})
 		relation.subject = ObjectId(left_system._id)
 		relation_type = collection.Node.one({"name":unicode(relation_type_name), "_type":u"RelationType"})
 		relation.relation_type = relation_type
 		right_system = collection.Node.one({"name":unicode(right_subject_name)})
 		relation.right_subject = ObjectId(right_system._id)
+		relation.lang = u"en"
+		relation.status = u"PUBLISHED"
 		relation.save()
-		print "Created a Relation " + str(name)
-
-
-
-
+		print "Created a Relation " + str(relation.name)
 
 def display_objects():
 	cursor = collection.Node.find()
@@ -270,22 +268,17 @@ def display_objects():
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
-		create_WikiData_Theme_Topic()
-		create_Topic(u"topic1", u"topic1desc", [], u"http://www.google.com", "Test", None, user_id)
-
-		create_Topic(u"topic2", u"topic2desc", [], u"http://www.google.com", "Test2", None, user_id)
-		"""
-		create_Topic(u"topic1", user_id)
-		create_Topic(u"topic2", user_id)
-		create_Topic(u"topic3", user_id)
-		create_Topic(u"topic4", user_id)
-		"""
-		create_AttributeType("wiki_attr2", "unicode", user_id)
-		create_Attribute("attr1", "topic1", "wiki_attr2", "This is the value of the wiki_attr1 field")
-		create_RelationType("same_theme1", "same_theme1", "topic1", user_id) 
-		create_Relation("theme1", "topic1", "same_theme1", "topic2")
-		#print "All objects\n"
-                #display_objects()
+		create_WikiData_WikiTopic()
+		create_Topic(u"topic11", u"topic1desc", [u"Alias1", u"Alias2"], "Test1", None, user_id)
+		create_Topic(u"topic21", u"topic2desc", [u"Alias1"], "Test2", None, user_id)
+		create_AttributeType("wiki_attr11", "unicode", user_id)
+		create_Attribute("topic11", "wiki_attr11", "This is the value of the wiki_attr1 field")
+		create_RelationType("same_tag11", "-same_tag11", "WikiTopic", "WikiTopic", user_id) 
+		create_Relation("topic11", "same_tag11", "topic21", user_id)
+		create_Relation("topic21", "same_tag11", "topic11", user_id)
+		print "All objects\n"
+                display_objects()
+beec
 
 
 

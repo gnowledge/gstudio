@@ -1363,7 +1363,7 @@ class Triple(DjangoDocument):
 	    left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
 	    right_intersection = set(object_type_list) & set(right_subject_member_of_list)
 	    if left_intersection and right_intersection:
-	    	subject_system_flag = True
+	    		subject_system_flag = True
 
 	if self._type =="GRelation" and subject_system_flag == False:
 		print "The 2 lists do not have any common element"
@@ -1375,6 +1375,7 @@ class Triple(DjangoDocument):
 
 	#it's me
 	#check for data_type in GAttribute case. Object value of the GAttribute must have the same type as that of the type specified in AttributeType
+	"""
 	if self._type == "GAttribute":
 		data_type_in_attribute_type = self.attribute_type['data_type']
 		data_type_of_object_value = type(self.object_value)
@@ -1383,6 +1384,7 @@ class Triple(DjangoDocument):
 		if data_type_in_attribute_type != data_type_of_object_value:
 			raise Exception("The DataType of the value you have entered for this attribute is not correct. Pls ener a value with type ---> " + str(data_type_in_attribute_type))
 
+	"""
 	#end of data_type_check
 
         super(Triple, self).save(*args, **kwargs)
