@@ -6,7 +6,7 @@
     "Nagarjuna G. <nagarjun@gnowledge.org>",
     "Kedar Aitawdekar <kedar2a@gmail.com>"
   ],
-  "description": "gstudio is a node description framework (NDF) to create knowledge networks and sematic web applications",
+  "description": "Gstudio is a node description framework (NDF) to create knowledge networks and sematic web applications",
   "main": "manage.py",
   "license": "GNU AGPL v3",
   "ignore": [
