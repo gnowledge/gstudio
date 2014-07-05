@@ -28,7 +28,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
@@ -1304,6 +1304,23 @@ def set_user_link(request, group_id):
   """
   # print "\n coming in \n"
   try:
-    return HttpResponse(json.dumps({'result': "True", 'message': "Link successfully created.", 'value': "Linked"}))
-  except Exception, e:
-    raise e
+    if request.is_ajax() and request.method =="POST":
+      node_id = request.POST.get("node_id", "")
+      username = request.POST.get("username", "")
+
+      author_id = collection.Node.one({'_type': "Author", 'name': unicode(username)})._id
+      rt_has_login = collection.Node.one({'_type': "RelationType", 'name': u"has_login"})
+
+      gr_node = create_grelation(node_id, rt_has_login, author_id)
+
+      return HttpResponse(json.dumps({'result': True, 'message': " Link successfully created.", 'value': "Linked"}))
+
+    else:
+      error_message = " UserLinkSetUpError: Either not an ajax call or not a POST request!!!"
+      # raise Http404(error_message)
+      return HttpResponse(json.dumps({'result': False, 'message': " Link not created!!!" + error_message, 'value': "Link"}))
+
+  except Exception as e:
+    error_message = "\n UserLinkSetUpError: " + str(e) + "!!!"
+    # raise Http404(error_message)
+    return HttpResponse(json.dumps({'result': True, 'message': " Link not created!!!" + error_message, 'value': "Link"}))

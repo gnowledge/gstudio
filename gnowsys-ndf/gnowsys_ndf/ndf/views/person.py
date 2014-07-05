@@ -66,7 +66,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   nodes = None
   node = None
   property_order_list = []
-  is_link_needed = True
+  is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
 
   template_prefix = "mis"
   context_variables = {}

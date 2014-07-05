@@ -111,7 +111,7 @@
 
       </div>
 
-      {% if user.is_authenticated %}
+      {% if user_access == "allow" %}
         <input class="button deleteObjects" type="button" value="Delete">
       {% endif %}
       
@@ -135,7 +135,10 @@
             <th width="150">Title</th>
             <th width="150">Created by</th>
             <th width="150">Creation date</th>
+
+            {% if user_access == "allow" %}
             <th width="150">Edit</th>
+            {% endif %}
       
           {% endif %}
     
@@ -155,10 +158,13 @@
 
             <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
             <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
+
+            {% if user_access == "allow" %}
             {% if app_name == "MIS" %}
             <td  class="name" style="font-size:11px;"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each.id %}" class="button medium">Edit</a></td>
             {% else %}
             <td  class="name" style="font-size:11px;"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.id %}" class="button medium">Edit</a></td>
+            {% endif %}
             {% endif %}
         
           </tr>

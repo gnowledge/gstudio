@@ -383,8 +383,6 @@ class Node(DjangoDocument):
                     # Throw an error: " Illegal access: Invalid field found!!! "
         
         super(Node, self).save(*args, **kwargs)
-        print "\n self pc: ", self.keys(), "\n -- ", type(self)
-        print "\n\n Finally coming in save...", "\n"
         
         history_manager = HistoryManager()
         rcs_obj = RCS()
