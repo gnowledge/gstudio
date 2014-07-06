@@ -1,0 +1,46 @@
+{% extends "ndf/node_details_base.html" %}
+{% load ndf_tags %}
+{% block title %} {{title}} {% endblock %}
+{% block url %}{% url 'create_edit' groupid node %}{% endblock %}
+
+
+
+<!-- overiding block from node_detail_base.html -->
+
+{% block body_content %}
+<header class="row page">
+  <section class="medium-10 columns" >
+    <h2>
+      <span class='node'>{{node.name}}</span>
+      {% user_access_policy groupid request.user as user_access %}
+
+      {% edit_policy groupid node request.user as status %}
+      {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+      {% user_access_policy groupid request.user as user_access %}
+      {% if user.is_superuser or node.created_by == user.id %}
+      <span><a class="button" href="{% url 'edit' groupid node.pk %}">Edit</a></span>
+      {% endif %}
+      {% endif %}
+    </h2>
+    <h3 class="subheader"></h3>
+      <small>
+        Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history<\
+/a>
+      </small>
+
+  </section>
+</header>
+<div class="row">
+<h3> Members of {{node.name}} :</h3>
+{% for each in student_coll %}
+<div>
+<a href ="">{{each.name}}</a><br><br>
+</div>
+{% endfor %}
+</div>
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2>Batch</h2>
+{% endblock %}
