@@ -31,12 +31,28 @@
     <div class="file">
       <br/>
       <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-      	<span class="fi-upload">&nbsp;&nbsp;New File</span>
+        <span class="fi-upload">&nbsp;&nbsp;New File</span>
       </a>
     </div>
   </div>
   {% endif %}
   {% endif %}
+    <dl class="tabs" data-tab>
+    <dd class="tab-title"><a href="#bar_visual">Bar</a></dd>
+    <dd class="tab-title active"><a href="#pie_visual">Pie</a></dd>
+  </dl>
+  <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
+  <br/>
+  <div class="tabs-content">
+    <div class="content" id="bar_visual">
+      {% include "ndf/bar_visualization.html" %}
+  </div>
+  <div class="content active" id="pie_visual">
+
+    {% include "ndf/pie_visualization.html" %}
+    
+  </div>
+</div>
 {% endblock %}
 
 

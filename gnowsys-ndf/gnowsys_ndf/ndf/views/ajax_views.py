@@ -28,7 +28,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
@@ -328,7 +328,8 @@ def get_collection_list(collection_list, node):
         if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
           for cl in collection_list:
             if cl['id'] == node.pk:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
+              node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk , 'node_type': node_type}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
@@ -366,7 +367,8 @@ def get_tree_hierarchy(request, group_id, node_id):
     for each in cur:
       if each._id not in themes_list:
         if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
-          collection_list.append({'name': each.name, 'id': each.pk})
+          node_type = collection.Node.one({'_id': ObjectId(each.member_of[0])}).name
+          collection_list.append({'name': each.name, 'id': each.pk, 'node_type': node_type})
           collection_list = get_collection_list(collection_list, each)
 
     data = collection_list
@@ -392,9 +394,9 @@ def add_sub_themes(request, group_id):
       if not sub_theme_name.upper() in (theme_name.upper() for theme_name in themes_list):
 
         node = collection.GSystem()
-        get_node_common_fields(request, node, group_id, theme_GST)
+        # get_node_common_fields(request, node, group_id, theme_GST)
       
-        node.save()
+        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_GST))
         node.reload()
         # Add this sub-theme into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -425,9 +427,9 @@ def add_topics(request, group_id):
       print "\ntopic name: ", add_topic_name
       if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
         node = collection.GSystem()
-        get_node_common_fields(request, node, group_id, topic_GST)
+        # get_node_common_fields(request, node, group_id, topic_GST)
       
-        node.save()
+        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST))
         node.reload()        
         # Add this topic into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -1299,9 +1301,34 @@ def get_group_member_user(request, group_id):
 
 def set_user_link(request, group_id):
   """
+  This view creates a relationship (has_login) between the given node (node_id) and the author node (username)
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  node_id - ObjectId of the currently selected node_id
+  username - Username of the user
+
+  Returns:
+  A dictionary consisting of following key:-
+  result - a bool variable indicating whether link is created or not
+  message - a string variable giving the status of the link (also reason if any error occurs)
   """
-  # print "\n coming in \n"
   try:
-    return HttpResponse(json.dumps({'result': "True", 'message': "Link successfully created.", 'value': "Linked"}))
-  except Exception, e:
-    raise e
+    if request.is_ajax() and request.method =="POST":
+      node_id = request.POST.get("node_id", "")
+      username = request.POST.get("username", "")
+
+      author_id = collection.Node.one({'_type': "Author", 'name': unicode(username)})._id
+      rt_has_login = collection.Node.one({'_type': "RelationType", 'name': u"has_login"})
+
+      gr_node = create_grelation(node_id, rt_has_login, author_id)
+
+      return HttpResponse(json.dumps({'result': True, 'message': " Link successfully created."}))
+
+    else:
+      error_message = " UserLinkSetUpError: Either not an ajax call or not a POST request!!!"
+      return HttpResponse(json.dumps({'result': False, 'message': " Link not created - " + error_message}))
+
+  except Exception as e:
+    error_message = "\n UserLinkSetUpError: " + str(e) + "!!!"
+    return HttpResponse(json.dumps({'result': False, 'message': " Link not created - May be invalid username entered!!!"}))

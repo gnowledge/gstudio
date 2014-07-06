@@ -151,8 +151,8 @@ def video_edit(request,group_id,_id):
     vid_node = collection.File.one({"_id": ObjectId(_id)})
     video_obj=request.GET.get("vid_id","")
     if request.method == "POST":
-        get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
-        vid_node.save()
+        # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
+        vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO))
         return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
         
     else:

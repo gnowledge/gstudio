@@ -1,7 +1,12 @@
 {% extends "ndf/mis_base.html" %}
+{% load ndf_tags %}
 {% load pagination_tags %}
 
+{% block title %} {{ title }} {% endblock %}
+
 {% block body_content %} 
+  {% user_access_policy groupid request.user as user_access %}
+
   {% if nodes.count %}
     {% autopaginate nodes 25 %}
   
@@ -43,7 +48,7 @@
       <a class="close-reveal-modal">&#215;</a>
     </div>
 
-    {% if user.is_authenticated %}
+    {% if user_access == "allow" %}
       <input class="button deleteObjects" type="button" value="Delete">
     {% endif %}
     
@@ -64,8 +69,15 @@
           <th width="20"> <input class="checkedAll" type="checkbox"></th>
           <th>Title</th>
           <th>Creation date</th>
+
+          {% if user_access == "allow" %}
           <th>Edit</th>
+
+          {% if is_link_needed %}
           <th>Link to User A/C</th>
+          {% endif %}
+
+          {% endif %}
       </tr>
     </thead>
     
@@ -80,12 +92,29 @@
           <td  class="name" style="font-size:14px;"><a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name|title}}</a></td>
           {% endif %}
           <td  class="created_at" style="font-size:14px;">{{each.created_at}}</td>
+
+          {% if user_access == "allow" %}
+          <!-- Show below Edit & Link buttons only to authorized users -->
+
           {% if app_name == "MIS" %}
           <td  class="name"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">Edit</a></td>
           {% else %}
           <td  class="name"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">Edit</a></td>
           {% endif %}
-          <td style="font-size:11px;"><input id="link_{{each.pk}}" data-reveal-id="linkModal" type="button" style="font-size:14px;" class="button small link" value="Link" /></td>
+
+          {% if is_link_needed %}
+          {% check_node_linked each.pk as is_linked %}
+          <td style="font-size:11px;">
+            <input id="link_{{each.pk}}" data-reveal-id="linkModal" type="button" style="font-size:14px;" class="button small link" 
+                {% if is_linked %}value="Linked" disabled="disabled" 
+                {% else %}value="Link"
+                {% endif %} 
+            />
+          </td>
+          {% endif %}
+
+          <!-- endif of authorized users -->
+          {% endif %}
         </tr>
 
       {% endfor %}
@@ -213,27 +242,39 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
  $('#myModal').foundation('reveal', 'close');
 });
 
+// ========================================================================================
+
 /*
-  * Code regarding Link button & its reveal-modal (linkModal)
-  + linkModal consists of 
-    - input element: link_to (name)
-    - button: link_to_ac (class)
+ *  Code regarding "Link" button & its reveal-modal (id: linkModal)
+
+    + linkModal consists of 
+      - text-box: link_to (id)
+      - button: link_to_ac (class)
  */
 var link_username = ""
 var parent_link_button = ""
+var is_linked = false
+
 $(".link").click(function() {
+  /*
+   * Stores the current clicked button object from given list of "Link" buttons
+   */
   parent_link_button = $(this);
-  console.log(parent_link_button)
 });
 
 $("#link_to").bind("keyup keypress onmouseup blur change", function() {
-  link_username = $("#link_to").val()
+  /*
+   * Changes state (disabled/enabled) of "Link to User A/C" button (class: link_to_ac) 
+   * depending on whether text-box (id: link_to) having some input or not
+   */
+  link_username = $("#link_to").val().trim()
 
   if (link_username != "") {
     if ($(".link_to_ac").attr("disabled")) {
       $(".link_to_ac").removeAttr('disabled');
     }
   }
+
   else {
     if (!$(".link_to_ac").attr("disabled")) {
       $(".link_to_ac").attr("disabled", "disabled")
@@ -242,22 +283,32 @@ $("#link_to").bind("keyup keypress onmouseup blur change", function() {
 });
 
 $(".link_to_ac").click(function() {
-  // alert("You clicked..." + $(this).attr('class'))
+  /*
+   *  On click of "Link to User A/C" button
+      + Retrieves 
+        - ObjectId of node from parent ("Link") button's id attribute 
+        - Username from text-box
 
+      + Ajax call made to "set_user_link" url
+        + Parameters passed
+          - ObjectId of group (groupid) via url
+          - ObjectId of node (node_id) via POST request
+          - Username entered (username) via POST request
+
+      + Depending on the result of the ajax call, label of parent button is modified:
+        - If successful, Linked.
+        - Else, it remains as Link only!
+   */
+
+  link_node_id = parent_link_button.attr('id').slice(5)  // remove "link_" from given id
   link_username = $("#link_to").val()
-  alert("textbox value: " + link_username)
-
-  // parent_link_button = $(".link")
-  // alert("main button... " + )
-  // console.log("Object... " + parent_link_button)
-  // alert("main button... " + parent_link_button.attr('id') + " -- " + parent_link_button.val())
 
   $.ajax({
     url:"{% url 'set_user_link' groupid %}",
 
     data: {
-      node_id: "node_id",
-      username: "username",
+      node_id: link_node_id,
+      username: link_username,
       csrfmiddlewaretoken: "{{csrf_token}}"
     },
 
@@ -265,19 +316,37 @@ $(".link_to_ac").click(function() {
 
     dataType: "json",
 
+    complete: function () {
+      $('#linkModal').foundation('reveal', 'close');
+    },
+
     success: function (data) {
-      // alert(data + " -- " + data['value'])
+      is_linked = data["result"]
       alert(data["message"])
-      // parent_link_button.val("Linked");
-      parent_link_button.val(data["value"]);
+
+      if (is_linked) {
+        parent_link_button.attr("disabled", "disabled")
+        parent_link_button.val("Linked");
+      }
+
     }
-
   });
-
-  $("#link_to").val("")
-  // alert("main button... " + parent_link_button.attr('id') + " -- " + parent_link_button.val())
-  $('#linkModal').foundation('reveal', 'close');
 });
+
+$(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+  /*
+   *  On closing of reveal-modal
+      - Clear text-box (id: link_to)
+      - Disable "Link to User A/C" button
+   */
+  $("#link_to").val("")
+
+  if (is_linked) {
+    $(".link_to_ac").attr("disabled", "disabled")
+  }
+});
+
+// ========================================================================================
 
 // </script>
 {% endblock %}  

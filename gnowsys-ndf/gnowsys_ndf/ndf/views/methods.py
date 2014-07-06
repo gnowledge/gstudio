@@ -1111,47 +1111,102 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
   return ga_node
 
 
-def create_grelation(subject_id, relation_type_node, right_subject_id):
+def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs):
   """
   Creates a GRelation document (instance).
 
   Arguments:
   subject_id -- ObjectId of the subject-node
-  relation_type_node -- DBRef of the RelationType node (Embedded document)
+  relation_type_node -- Document of the RelationType node (Embedded document)
   right_subject_id -- ObjectId of the right_subject node
 
   Returns:
   Created GRelation document.
   """
   gr_node = None
+  multi_relations = False
 
   try:
+    if kwargs.has_key("multi"):
+      multi_relations = kwargs["multi"]
+
     subject_id = ObjectId(subject_id)
     right_subject_id = ObjectId(right_subject_id)
 
-    gr_node = collection.Triple.one({'_type': "GRelation", 
-                                     'subject': subject_id, 
-                                     'relation_type': relation_type_node.get_dbref(),
-                                     'right_subject': right_subject_id
-                                 })
+    if multi_relations:
+      # For dealing with multiple relations
 
-    if gr_node is None:
-      # Code for creation
-      gr_node = collection.GRelation()
+      # Iterate and find all relationships (including DELETED ones' also)
+      nodes = collection.Triple.find({'_type': "GRelation", 
+                                      'subject': subject_id, 
+                                      'relation_type': relation_type_node.get_dbref()
+                                    })
 
-      gr_node.subject = subject_id
-      gr_node.relation_type = relation_type_node
-      gr_node.right_subject = right_subject_id
+      for n in nodes:
+        if n.right_subject in right_subject_id:
+          if n.status != u"DELETED":
+            # If match found with existing one's, then only remove that ObjectId from the given list of ObjectIds
+            right_subject_id.remove(n.right_subject)
 
-      gr_node.status = u"PUBLISHED"
-      
-      gr_node.save()
-      info_message = " GRelation ("+gr_node.name+") created successfully.\n"
-      print "\n", info_message
+      if right_subject_id:
+        # If still ObjectId list persists, it means either they are new ones' or they are from deleted ones'
+        for nid in right_subject_id:
+          gr_node = collection.Triple.one({'_type': "GRelation", 
+                                            'subject': subject_id, 
+                                            'relation_type': relation_type_node.get_dbref(),
+                                            'right_subject': nid
+                                          })
+
+          if gr_node is None:
+            # New one found so create it
+            gr_node = collection.GRelation()
+
+            gr_node.subject = subject_id
+            gr_node.relation_type = relation_type_node
+            gr_node.right_subject = right_subject_id
+
+            gr_node.status = u"PUBLISHED"
+            gr_node.save()
+
+          else:
+            # Deleted one found so change it's status back to Published
+            if gr_node.status == u'DELETED':
+              collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+
+          info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+          print "\n", info_message
 
     else:
-      info_message = " GRelation ("+gr_node.name+") already exists !\n"
-      print "\n", info_message
+      # For dealing with single relation
+      gr_node = collection.Triple.one({'_type': "GRelation", 
+                                       'subject': subject_id, 
+                                       'relation_type': relation_type_node.get_dbref()
+                                      })
+
+      if gr_node is None:
+        # Code for creation
+        gr_node = collection.GRelation()
+
+        gr_node.subject = subject_id
+        gr_node.relation_type = relation_type_node
+        gr_node.right_subject = right_subject_id
+
+        gr_node.status = u"PUBLISHED"
+        
+        gr_node.save()
+        info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+        print "\n", info_message
+
+      else:
+        if gr_node.right_subject != right_subject_id:
+          collection.update({'_id': gr_node._id}, {'$set': {'right_subject': right_subject_id}}, upsert=False, multi=False)
+
+        elif gr_node.status == u"DELETED":
+          collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+
+        else:
+          info_message = " GRelation ("+gr_node.name+") already exists !\n"
+          print "\n", info_message
 
     return gr_node
 

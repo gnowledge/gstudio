@@ -32,58 +32,63 @@ topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 #######################################################################################################################################
 
 def themes(request, group_id, app_id=None, app_set_id=None):
+    
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    if app_id is None:
+        app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'Browse Topic'})
+        if app_ins:
+            app_id = str(app_ins._id)
 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-		    group_id = str(group_ins._id)
-		else :
-		    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		    if auth :
-		        group_id = str(auth._id)
-	else :
-	    pass
-	if app_id is None:
-	    app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'Browse Topic'})
-	    if app_ins:
-	        app_id = str(app_ins._id)
 
-
-	appName = "browse topic"
-   	title = appName
-   	nodes_dict = []
-   	themes_list_items = ""
-   	themes_hierarchy = ""
-   	node = ""
-   	nodes = ""
+    appName = "browse topic"
+    title = appName
+    nodes_dict = []
+    themes_list_items = ""
+    themes_hierarchy = ""
+    node = ""
+    nodes = ""
+    unfold_tree = request.GET.get('unfold','')
+    unfold = "false"
+    
+    if unfold_tree:
+        unfold = unfold_tree
 	
-   	if app_set_id:
-		themes_list_items = True
-		app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+    if app_set_id:
+        themes_list_items = True
+        app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+        
+        if app_GST:
+            title = theme_GST.name
+            nodes = list(collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+            
+            nodes_dict = []
+            for each in nodes:
+                nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
 
-		if app_GST:
-			title = theme_GST.name
-			nodes = list(collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}}))
+    else:
+        # This will show Themes Hierarchy  
+        themes_hierarchy = True
+        ST_theme = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+        if ST_theme:
+            node = ST_theme
 
-	        nodes_dict = []
-	        for each in nodes:
-	            nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
-
-	else:
-		# This will show Themes Hierarchy  
-		themes_hierarchy = True
-		ST_theme = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-		if ST_theme:
-			node = ST_theme
-
-   	return render_to_response("ndf/theme.html",
+    return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id,
                                'group_id': group_id,'groupid': group_id,'node': node,
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,
                                'title': title,'themes_list_items': themes_list_items,
-                               'themes_hierarchy': themes_hierarchy
+                               'themes_hierarchy': themes_hierarchy, 'unfold': unfold
                                },
                              
                               context_instance = RequestContext(request)
@@ -165,12 +170,12 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                        	if translate != "true":
                             theme_topic_node = collection.GSystem()
-                            get_node_common_fields(request, theme_topic_node, group_id, app_GST)
-                            theme_topic_node.save()
+                            # get_node_common_fields(request, theme_topic_node, group_id, app_GST)
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_GST))
                         if translate == "true":
                             theme_topic_node = collection.GSystem()
-                            get_node_common_fields(request, theme_topic_node, group_id, app_obj)
-                            theme_topic_node.save()
+                            # get_node_common_fields(request, theme_topic_node, group_id, app_obj)
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_obj))
                             relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
                             grelation=collection.GRelation()
                             grelation.relation_type=relation_type
@@ -206,13 +211,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     if name:
                         if theme_topic_node._id in root_themes_id:	
                             if not name.upper() in (theme_name.upper() for theme_name in root_themes):
-                                get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save()
+                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))
                                 
                         else:						
                             if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
-                                get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save() 
+                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST)) 
                                 
 
                     if translate != "true":
@@ -257,8 +262,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     
                     if name:
                         if not name.upper() in (theme_name.upper() for theme_name in root_topics):
-                            get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
-                            theme_topic_node.save()
+                            # get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
                             
                         if collection_list:
                             # For storing and maintaning collection order
