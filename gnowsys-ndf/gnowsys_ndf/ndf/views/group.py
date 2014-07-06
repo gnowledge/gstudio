@@ -27,7 +27,6 @@ from gnowsys_ndf.ndf.models import GSystemType, GSystem, Triple
 from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_existing_groups,get_all_user_groups
-from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import *
 
 
@@ -383,7 +382,7 @@ def edit_group(request,group_id):
   page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
 
   if request.method == "POST":
-    get_node_common_fields(request, page_node, group_id, gst_group)
+    is_node_changed = get_node_common_fields(request, page_node, group_id, gst_group)
 
     if page_node.access_policy == "PUBLIC":
       page_node.group_type = "PUBLIC"
@@ -391,7 +390,7 @@ def edit_group(request,group_id):
     if page_node.access_policy == "PRIVATE":
       page_node.group_type = "PRIVATE"
 
-    page_node.save()
+    page_node.save(is_changed=is_node_changed)
     group_id=page_node._id
     return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
 

@@ -291,9 +291,9 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         
-        get_node_common_fields(request, page_node, group_id, gst_page)
+        # get_node_common_fields(request, page_node, group_id, gst_page)
 
-        page_node.save()
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 

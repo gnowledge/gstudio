@@ -165,12 +165,12 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                        	if translate != "true":
                             theme_topic_node = collection.GSystem()
-                            get_node_common_fields(request, theme_topic_node, group_id, app_GST)
-                            theme_topic_node.save()
+                            # get_node_common_fields(request, theme_topic_node, group_id, app_GST)
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_GST))
                         if translate == "true":
                             theme_topic_node = collection.GSystem()
-                            get_node_common_fields(request, theme_topic_node, group_id, app_obj)
-                            theme_topic_node.save()
+                            # get_node_common_fields(request, theme_topic_node, group_id, app_obj)
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, app_obj))
                             relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
                             grelation=collection.GRelation()
                             grelation.relation_type=relation_type
@@ -206,13 +206,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     if name:
                         if theme_topic_node._id in root_themes_id:	
                             if not name.upper() in (theme_name.upper() for theme_name in root_themes):
-                                get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save()
+                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST))
                                 
                         else:						
                             if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
-                                get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
-                                theme_topic_node.save() 
+                                # get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, theme_GST)) 
                                 
 
                     if translate != "true":
@@ -257,8 +257,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     
                     if name:
                         if not name.upper() in (theme_name.upper() for theme_name in root_topics):
-                            get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
-                            theme_topic_node.save()
+                            # get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
                             
                         if collection_list:
                             # For storing and maintaning collection order
