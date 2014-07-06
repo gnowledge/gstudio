@@ -394,9 +394,9 @@ def add_sub_themes(request, group_id):
       if not sub_theme_name.upper() in (theme_name.upper() for theme_name in themes_list):
 
         node = collection.GSystem()
-        get_node_common_fields(request, node, group_id, theme_GST)
+        # get_node_common_fields(request, node, group_id, theme_GST)
       
-        node.save()
+        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_GST))
         node.reload()
         # Add this sub-theme into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -427,9 +427,9 @@ def add_topics(request, group_id):
       print "\ntopic name: ", add_topic_name
       if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
         node = collection.GSystem()
-        get_node_common_fields(request, node, group_id, topic_GST)
+        # get_node_common_fields(request, node, group_id, topic_GST)
       
-        node.save()
+        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST))
         node.reload()        
         # Add this topic into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -1301,8 +1301,18 @@ def get_group_member_user(request, group_id):
 
 def set_user_link(request, group_id):
   """
+  This view creates a relationship (has_login) between the given node (node_id) and the author node (username)
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  node_id - ObjectId of the currently selected node_id
+  username - Username of the user
+
+  Returns:
+  A dictionary consisting of following key:-
+  result - a bool variable indicating whether link is created or not
+  message - a string variable giving the status of the link (also reason if any error occurs)
   """
-  # print "\n coming in \n"
   try:
     if request.is_ajax() and request.method =="POST":
       node_id = request.POST.get("node_id", "")
@@ -1313,14 +1323,12 @@ def set_user_link(request, group_id):
 
       gr_node = create_grelation(node_id, rt_has_login, author_id)
 
-      return HttpResponse(json.dumps({'result': True, 'message': " Link successfully created.", 'value': "Linked"}))
+      return HttpResponse(json.dumps({'result': True, 'message': " Link successfully created."}))
 
     else:
       error_message = " UserLinkSetUpError: Either not an ajax call or not a POST request!!!"
-      # raise Http404(error_message)
-      return HttpResponse(json.dumps({'result': False, 'message': " Link not created!!!" + error_message, 'value': "Link"}))
+      return HttpResponse(json.dumps({'result': False, 'message': " Link not created - " + error_message}))
 
   except Exception as e:
     error_message = "\n UserLinkSetUpError: " + str(e) + "!!!"
-    # raise Http404(error_message)
-    return HttpResponse(json.dumps({'result': True, 'message': " Link not created!!!" + error_message, 'value': "Link"}))
+    return HttpResponse(json.dumps({'result': False, 'message': " Link not created - May be invalid username entered!!!"}))

@@ -253,6 +253,8 @@ $(document).on('click',".button.cancelDeleteObjects",function(){
  */
 var link_username = ""
 var parent_link_button = ""
+var is_linked = false
+
 $(".link").click(function() {
   /*
    * Stores the current clicked button object from given list of "Link" buttons
@@ -314,22 +316,21 @@ $(".link_to_ac").click(function() {
 
     dataType: "json",
 
+    complete: function () {
+      $('#linkModal').foundation('reveal', 'close');
+    },
+
     success: function (data) {
-      if (data["result"]) {
-        alert(data["message"])
+      is_linked = data["result"]
+      alert(data["message"])
+
+      if (is_linked) {
         parent_link_button.attr("disabled", "disabled")
+        parent_link_button.val("Linked");
       }
 
-      else {
-        alert(data["message"])
-      }
-      
-      parent_link_button.val(data["value"]);
     }
-
   });
-
-  $('#linkModal').foundation('reveal', 'close');
 });
 
 $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
@@ -339,7 +340,10 @@ $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
       - Disable "Link to User A/C" button
    */
   $("#link_to").val("")
-  $(".link_to_ac").attr("disabled", "disabled")
+
+  if (is_linked) {
+    $(".link_to_ac").attr("disabled", "disabled")
+  }
 });
 
 // ========================================================================================
