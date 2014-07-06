@@ -826,8 +826,8 @@ def user_access_policy(node, user):
 
   Check is performed in given sequence as follows (sequence has importance):
   - If user is superuser, then he/she is allowed
-  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
   - Else if user is creator of the group, then he/she is allowed
+  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
   - Else if user is member of the group, then he/she is allowed
   - Else user is NOT allowed!
 
@@ -1278,3 +1278,33 @@ def html_widget(node_id, field):
     error_message = " HtmlWidgetTagError: " + str(e) + " !!!"
     raise Exception(error_message)
   
+@register.assignment_tag
+def check_node_linked(node_id):
+  """
+  Checks whether the passed node is linked with it's corresponding author node (i.e via "has_login" relationship)
+
+  Arguments:
+  node_id -- ObjectId of the node
+
+  Returns:
+  A bool value, i.e.
+  True: if linked (i.e. relationship is created for the given node)
+  False: if not linked (i.e. relationship is not created)
+  """
+
+  try:
+    node = collection.Node.one({'_id': ObjectId(node_id)}, {'_id': 1})
+
+    relation_type_node = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
+    
+    is_linked = collection.Node.one({'_type': "GRelation", 'subject': node._id, 'relation_type': relation_type_node.get_dbref()})
+
+    if is_linked:
+      return True
+
+    else:
+      return False
+
+  except Exception as e:
+    error_message = " NodeUserLinkFindError - " + str(e)
+    raise Exception(error_message)

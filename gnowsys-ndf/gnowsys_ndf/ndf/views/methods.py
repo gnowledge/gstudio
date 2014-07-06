@@ -1117,7 +1117,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id):
 
   Arguments:
   subject_id -- ObjectId of the subject-node
-  relation_type_node -- DBRef of the RelationType node (Embedded document)
+  relation_type_node -- Document of the RelationType node (Embedded document)
   right_subject_id -- ObjectId of the right_subject node
 
   Returns:

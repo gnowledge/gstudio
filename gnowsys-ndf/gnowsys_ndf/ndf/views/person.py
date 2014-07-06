@@ -63,18 +63,17 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   person_gst = None
   person_gs = None
 
+  nodes = None
+  node = None
   property_order_list = []
+  is_link_needed = True         # This is required to show Link button on interface that link's Student's/VoluntaryTeacher's node with it's corresponding Author node
 
-  template_prefix = ""
-  if app_name == "MIS":
-    template_prefix = "mis"
-  else:
-    template_prefix = "mis_po"
+  template_prefix = "mis"
+  context_variables = {}
 
   for eachset in app.collection_set:
     app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
-  nodes = None
   if app_set_id:
     person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = person_gst.name
@@ -89,7 +88,6 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     else:
       nodes = collection.Node.find({'member_of': person_gst._id, 'group_set': ObjectId(group_id)})
 
-  node = None
   if app_set_instance_id :
     template = "ndf/person_details.html"
 
@@ -103,11 +101,12 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
-                        'app_id': app_id, 'app_collection_set': app_collection_set, 
+                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'nodes': nodes, 'node': node,
-                        'property_order_list': property_order_list
+                        'property_order_list': property_order_list,
+                        'is_link_needed': is_link_needed
                       }
 
   try:
@@ -169,11 +168,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   property_order_list = []
 
-  template_prefix = ""
-  if app_name == "MIS":
-    template_prefix = "mis"
-  else:
-    template_prefix = "mis_po"
+  template_prefix = "mis"
 
   for eachset in app.collection_set:
     app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
@@ -241,12 +236,12 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
     
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
-    return HttpResponseRedirect(reverse(template_prefix+'_app_detail', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
+    return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   template = "ndf/person_create_edit.html"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
-                        'app_id': app_id, 'app_collection_set': app_collection_set, 
+                        'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
                         'property_order_list': property_order_list

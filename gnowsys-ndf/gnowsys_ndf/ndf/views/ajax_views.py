@@ -28,7 +28,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
@@ -328,7 +328,8 @@ def get_collection_list(collection_list, node):
         if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
           for cl in collection_list:
             if cl['id'] == node.pk:
-              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk }
+              node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
+              inner_sub_dict = {'name': col_obj.name, 'id': col_obj.pk , 'node_type': node_type}
               inner_sub_list = [inner_sub_dict]
               inner_sub_list = get_collection_list(inner_sub_list, col_obj)
 
@@ -366,7 +367,8 @@ def get_tree_hierarchy(request, group_id, node_id):
     for each in cur:
       if each._id not in themes_list:
         if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
-          collection_list.append({'name': each.name, 'id': each.pk})
+          node_type = collection.Node.one({'_id': ObjectId(each.member_of[0])}).name
+          collection_list.append({'name': each.name, 'id': each.pk, 'node_type': node_type})
           collection_list = get_collection_list(collection_list, each)
 
     data = collection_list
@@ -1296,3 +1298,29 @@ def get_group_member_user(request, group_id):
         return HttpResponse(json.dumps(user_list))
     else:
 	raise Http404
+
+def set_user_link(request, group_id):
+  """
+  """
+  # print "\n coming in \n"
+  try:
+    if request.is_ajax() and request.method =="POST":
+      node_id = request.POST.get("node_id", "")
+      username = request.POST.get("username", "")
+
+      author_id = collection.Node.one({'_type': "Author", 'name': unicode(username)})._id
+      rt_has_login = collection.Node.one({'_type': "RelationType", 'name': u"has_login"})
+
+      gr_node = create_grelation(node_id, rt_has_login, author_id)
+
+      return HttpResponse(json.dumps({'result': True, 'message': " Link successfully created.", 'value': "Linked"}))
+
+    else:
+      error_message = " UserLinkSetUpError: Either not an ajax call or not a POST request!!!"
+      # raise Http404(error_message)
+      return HttpResponse(json.dumps({'result': False, 'message': " Link not created!!!" + error_message, 'value': "Link"}))
+
+  except Exception as e:
+    error_message = "\n UserLinkSetUpError: " + str(e) + "!!!"
+    # raise Http404(error_message)
+    return HttpResponse(json.dumps({'result': True, 'message': " Link not created!!!" + error_message, 'value': "Link"}))
