@@ -127,6 +127,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
 
@@ -170,6 +171,7 @@ INSTALLED_APPS = (
     'django_extensions',	#textb
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
+    'online_status',                       #for online_users     
 )
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
@@ -214,7 +216,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 META_TYPE = [u"GAPP",u"factory_types"]
 
 #Default APPs inculde in beloow GAPPS list
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task",u"Meeting" ]
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"Meeting" ]
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
@@ -274,7 +276,9 @@ try:
 except:
     #print "Default settings applied"
     pass
-
+    
+USERS_ONLINE__TIME_IDLE = 300
+USERS_ONLINE__TIME_OFFLINE = 10
 #textb
 import warnings
 warnings.filterwarnings(
