@@ -158,6 +158,7 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	if cursor!= None:
 		print "The attribute " + unicode(cursor.name) + " already exists."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		return False
 	else:
 		att = collection.GAttribute()
 		att.created_by = user_id
@@ -171,7 +172,7 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 		print "About to create"
 		att.save()
 		print "Created attribute " + unicode(att.name)
-
+		return True
 
 
 

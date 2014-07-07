@@ -38,13 +38,45 @@ from system_script2 import *
 
 #relative path of file
 fn = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/list_of_objects')
-
+log_file_path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/wikidata_log.txt')
+my_log = open(log_file_path, "w")
+log_flag = 0
 gen_url_json="http://www.wikidata.org/wiki/Special:EntityData/"
 gen_url_page="http://www.wikidata.org/wiki/"
 language ="en" #this script is scalable and can be run for any given language .All relevant extracting functions will extract info in that language only.
 
 commonsMedia_base_link="http://commons.wikimedia.org/wiki/File:"
 #url="http://www.wikidata.org/wiki/Special:EntityData"
+
+
+def log_topic_created(label, log_flag):	
+	captcha = "#"
+	while log_flag != 0:
+		captcha += "#"
+		log_flag-=1
+	my_log.write(str(captcha) + str(label) + "---Topic CREATED\n")
+
+def log_topic_exists(label, log_flag):
+        captcha = "#"
+        while log_flag != 0:
+                captcha += "#"
+                log_flag-=1
+        my_log.write(str(captcha) + str(label) + "---Topic EXISTS\n")
+
+def log_attributeType_created(label, log_flag):
+        captcha = "-"
+        while log_flag != 0:
+                captcha += "-"
+                log_flag-=1
+        my_log.write(str(captcha) + str(label) + "---AttributeType CREATED\n")
+
+def log_attributeType(label, log_flag):
+        captcha = "-"
+        while log_flag != 0:
+                captcha += "-"
+                log_flag-=1
+        my_log.write(str(captcha) + str(label) + "---AttributeType EXISTS\n")
+
 
 def json_parse(url_json):
 	'''
@@ -323,10 +355,15 @@ def intitiate_new_topic_creation(json_obj,topic_title,language):
 	entity_type =extract_type(json_obj,topic_title)
 	page_id =extract_pageid(json_obj,topic_title)
 	namespace =extract_namespace(json_obj,topic_title)
+	global log_flag
+	log_flag += 1
 
 	if label!=None:
 		topic_exists = create_Topic(label, description, alias_list, topic_title, None, int(1))
+		if topic_exists== True:
+			log_topic_exists(label, log_flag)
 		if topic_exists == False:
+			log_topic_created(label, log_flag)
 			create_Attribute(label, "topic_id", topic_title, language, user_id)
 			extract_property_json(json_obj,label,topic_title)
 
@@ -343,6 +380,8 @@ def read_file():
 					url_page=gen_url_page+topic_title #creating url of the wikidata page itself
 					json_obj=json_parse(url_json)
 					if(json_obj):
+						global log_flag
+						log_flag = 0
 						intitiate_new_topic_creation(json_obj,topic_title,language)
 						"""
 						alias_list=extract_aliases(json_obj,topic_title,language)
