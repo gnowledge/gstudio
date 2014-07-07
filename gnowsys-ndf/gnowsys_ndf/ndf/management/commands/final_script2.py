@@ -259,21 +259,21 @@ def extract_namespace(json_obj,topic_title):
 		if k=="ns":
 			return v #return  namespace of the item
 
-
+"""
 def extract_claims(json_obj,topic_title):
-	
+	prop_dict={}
 	Result =json_obj['entities'][str(topic_title)]
 	for k,v in Result.items():	
 		if k =="claims":
 			prop_dict=v
 			break
 
-
-	for key,val in prop_dict.items():
+	if prop_dict!={}:
+		for key,val in prop_dict.items():
     		url_prop= gen_url_json+key+".json"
     		#print url_prop
 
-
+"""
 
 
 def extract_descriptions(json_obj,topic_title,language_choice):
@@ -357,6 +357,17 @@ def extract_value_for_relation(property_value_list):
 
 
 
+
+
+"""
+def populate_tags():
+"""
+
+
+
+
+
+
 def property_create_AttributeType(property_id,property_data_type,json_obj):
 	"""
 	json_obj is actually the json object of that property
@@ -415,15 +426,18 @@ def property_create_Relation(label,property_id,property_value,property_json):
 	right_subject_name=extract_labels(right_json,property_value,language)
 	print "$$$$$$$$",right_subject_name," ",property_value
 	log_inner_topic_start(log_flag)
-	intitiate_new_topic_creation(right_json,property_value,language)
-	log_inner_topic_end(log_flag)
-	relation_exists = create_Relation(label, property_label, right_subject_name, user_id)
-	if relation_exists:
+	if right_subject_name!=None:
+		intitiate_new_topic_creation(right_json,property_value,language)
+		log_inner_topic_end(log_flag)
+		relation_exists = create_Relation(label, property_label, right_subject_name, user_id)
+			if relation_exists:
                 log_relation_exists(property_label, log_flag)
-        else:
+        	else:
                 log_relation_created(property_label, log_flag)
 
-
+	else:
+		print "the right subject is not an item of english"
+		#create a log function
 
 def extract_property_json(json_obj,label,topic_title):
 	claim_dict={}
@@ -444,6 +458,7 @@ def extract_property_json(json_obj,label,topic_title):
 		property_value =extract_property_value(property_value_list) #property_value has the value of that property fpr a particular object
 		global log_flag
 		log_flag += 1
+
 		if flag==1: #attribute has to be made
 			property_data_type = extract_datatype_from_property(property_value_list)
 			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
@@ -460,6 +475,13 @@ def extract_property_json(json_obj,label,topic_title):
 
 		log_flag -= 1
 		
+
+			
+			"""
+			if property_id=="P31" or property_id=="P279":
+				populate_tags(label,property_value_for_relation)
+			"""
+
 def create_topic_id():
 	"""
 	This function is just called once , directly from main so that the topic_id is created as a AttributeType
@@ -472,11 +494,11 @@ def create_topic_id():
 	
 
 
-def intitiate_new_topic_creation(json_obj,topic_title,language):
+def initiate_new_topic_creation(json_obj,topic_title,language):
 	alias_list=extract_aliases(json_obj,topic_title,language)
 	label=extract_labels(json_obj,topic_title,language)	
 	description =extract_descriptions(json_obj,topic_title,language)
-	extract_claims(json_obj,topic_title)
+	#extract_claims(json_obj,topic_title)
 	last_update =extract_modified(json_obj,topic_title)
 	entity_type =extract_type(json_obj,topic_title)
 	page_id =extract_pageid(json_obj,topic_title)
@@ -508,22 +530,7 @@ def read_file():
 						log_flag = 0
 						intitiate_new_topic_creation(json_obj,topic_title,language)
 						log_outer_topic(log_flag)
-						"""
-						alias_list=extract_aliases(json_obj,topic_title,language)
-						label=extract_labels(json_obj,topic_title,language)	
-						description =extract_descriptions(json_obj,topic_title,language)
-						extract_claims(json_obj,topic_title)
-						last_update =extract_modified(json_obj,topic_title)
-						entity_type =extract_type(json_obj,topic_title)
-						page_id =extract_pageid(json_obj,topic_title)
-						namespace =extract_namespace(json_obj,topic_title)
 
-						
-						if label!=None :
-							create_Topic(label, description, alias_list, topic_title, None, int(1))
-							create_Attribute(label, "topic_id", topic_title,language,user_id)
-							extract_property_json(json_obj,label,topic_title)
-						"""		
 
 					else:
 						print "empty json returned"
