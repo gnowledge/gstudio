@@ -1,3 +1,4 @@
+
 from django.http import HttpResponseRedirect
 #from django.http import HttpResponse
 from django.shortcuts import render_to_response,render #render  uncomment when to use
@@ -12,14 +13,25 @@ from django_mongokit import get_database
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+
+''' -- imports from installed packages -- '''
+import json
+
+
+######################
+
+from django.http import HttpResponse
 from django.utils import simplejson
 from online_status.status import CACHE_USERS
 from online_status.utils import encode_json
 from gnowsys_ndf.ndf.models import Group
-from django.http import HttpResponse
+
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
+from django_mongokit import get_database
 from gnowsys_ndf.settings import GAPPS
+
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
+from gnowsys_ndf.ndf.views.notify import set_notif_val
 import datetime
 from gnowsys_ndf.ndf.org2any import org2html
 try:
@@ -30,7 +42,6 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import GSystemType, Node 
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
-from gnowsys_ndf.ndf.views.notify import set_notif_val
 
 import unicodedata
 db = get_database()
@@ -350,7 +361,31 @@ def output(request, group_id, meetingid):                                       
 
 
 
-def dashb(request, group_id):
+
+def output(request, group_id, meetingid):                                                               #ramkarnani
+	newmeetingid = meetingid
+	ins_objectid  = ObjectId()
+        if ins_objectid.is_valid(group_id) is False:
+            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if group_ins:
+                group_id = str(group_ins._id)
+            else :
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                if auth :
+                    group_id = str(auth._id)
+        else:
+            group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+            pass
+            #template = "https://chatb/#"+meetingid
+	
+	return render_to_response("ndf/newmeeting.html",{'group_id': group_id,'groupid':group_id,'newmeetingid':newmeetingid},context_instance=RequestContext(request))
+
+
+
+def dashb(request, group_id):                                                                           #ramkarnani
+    """Renders a list of all 'Page-type-GSystems' available within the database.
+    """
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False:
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -375,16 +410,16 @@ def dashb(request, group_id):
 
 #### Ajax would be called here to get refreshed list of online members
 def get_online_users(request, group_id):                                                                        #ramkarnani
-    """Json of online users, useful f.ex. for refreshing a online users list via an ajax call or something"""
-    online_users = cache.get(CACHE_USERS)
-    #print "hey \n"
-    #print json.dumps(online_users, default=encode_json), "\n\n"
-    #a = json.dumps(online_users, default=encode_json)
-    #print type(a)
-    return HttpResponse(simplejson.dumps(online_users, default=encode_json))
+	"""Json of online users, useful f.ex. for refreshing a online users list via an ajax call or something"""
+	online_users = cache.get(CACHE_USERS)
+	#print "hey \n"
+	#print json.dumps(online_users, default=encode_json), "\n\n"
+	#a = json.dumps(online_users, default=encode_json)
+	#print type(a)
+	return HttpResponse(simplejson.dumps(online_users, default=encode_json))
 
 def invite_meeting(request, group_id, meetingid):                                                                  #ramkarnani
-    try:
+	try:
             # print "here in view"
             colg=col_Group.Group.one({'_id':ObjectId(group_id)})
             groupname=colg.name
@@ -415,6 +450,6 @@ def invite_meeting(request, group_id, meetingid):                               
 
             else:
                 return HttpResponse("failure")
-    except Exception as e:
+	except Exception as e:
             print str(e)
             return HttpResponse(str(e))

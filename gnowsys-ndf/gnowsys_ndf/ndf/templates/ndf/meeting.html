@@ -1,24 +1,20 @@
 {% extends "ndf/base.html" %}
-
-{% load pagination_tags %}
 {% load ndf_tags %}
-{% load i18n %}
-{% block title %} {{title}} {% endblock %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
 
-{% block head %}
-{% endblock %}
+{% block title %} {{ title }} {% endblock %}
 
 {% block help_content %}
+  <p>
+    Lets u have video chat.
+  </p>
 {% endblock %}
+{% load i18n %}
 
 {% block meta_content %}
   <h2>Meeting</h2>
 {% endblock %}
-<!--
-{% block search_content %}
-  {% include "ndf/node_search_base.html" %}
-{% endblock %}
--->
 {% block related_content %}
   {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
@@ -41,6 +37,7 @@
 <!-- For tab2 -->
 <div class="content" id="panel2-2">                      <!--ramk-->
 <br/>
+  <br/>
   <div class="create card">
     <div class="chat">
       <br/>
@@ -85,7 +82,6 @@
 
 </div>
 </div>
-
   {% endif %}
   {% endif %}
 {% endblock %}
@@ -187,6 +183,10 @@
 
 
                                                               <!-- ramkarnani -->
+
+
+
+
 <script>
 	$(document).ready(function(){
 		var size = $(window).height();
@@ -314,4 +314,5 @@ $("#node_search_form").parent().hide();
 
 
 {% endblock %}
+
 
