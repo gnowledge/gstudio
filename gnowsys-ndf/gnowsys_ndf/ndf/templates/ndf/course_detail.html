@@ -5,34 +5,40 @@
 
 <!-- overide head block from base.html -->
 {% block head %}
-<script src="/static/ndf/js/tree.jquery.js"></script>
+
+<!-- <script src="/static/ndf/js/tree.jquery.js"></script> -->
+<script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
+
 <script type="text/javascript">
+
   $(document).ready(function()
   {
-  $(function() {
-  $('.tree').tree({
-   autoOpen: 0
-  });
-  });
+    $(function() {
+      $('.tree').tree({
+       autoOpen: 0
+     });
+    });
 
-$('.tree').bind(
-    'tree.click',
-    function(event) {
+    $('.tree').bind(
+      'tree.click',
+      function(event) {
         // The clicked node is 'event.node'
         var node = event.node;
         alert(node.id);
-    }
-);
+      }
+      );
   });
 
-
 </script>
+
 {% endblock %}
+
 
 <!-- overiding block from node_detail_base.html -->
 {% block meta_content %}
 
 {% endblock %}
+
 
 <!-- overiding block_related content -->
 {% block related_content %}
