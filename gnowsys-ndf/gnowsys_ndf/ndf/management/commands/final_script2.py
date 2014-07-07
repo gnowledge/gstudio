@@ -287,7 +287,7 @@ def extract_property_json(json_obj,label,topic_title):
 		flag=-1
 		flag=extract_from_property_value(property_value_list)
 		property_value =extract_property_value(property_value_list) #property_value has the value of that property fpr a particular object
-		"""
+		
 		if flag==1: #attribute has to be made
 			property_data_type=extract_datatype_from_property(property_value_list)
 			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
@@ -295,7 +295,7 @@ def extract_property_json(json_obj,label,topic_title):
 
 			property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
 			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
-		"""
+		
 		
 		if flag==3: #relation has to be made
 			property_value_for_relation=extract_value_for_relation(property_value_list)
