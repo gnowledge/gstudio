@@ -85,13 +85,13 @@ Use corresponding package names if you are using an RPM based distro
     (3) Appending nodeenv settings to virtualenv: (This takes time .. wait till it complete)
         nodeenv --python-virtualenv
 
-        If this step gives an error, install NodeJS at root level:  
+        If above step gives an error, install NodeJS at root level with following commands:  
           (a) sudo add-apt-repository ppa:chris-lea/node.js
           (b) sudo apt-get update
           (c) sudo apt-get install python-software-properties python g++ make nodejs
 
     (4) Installing Bower:
-        npm install -g bower
+        sudo npm install -g bower
 
     (5) To install JS/CSS dependencies: (Be there at project root level)
         bower install
