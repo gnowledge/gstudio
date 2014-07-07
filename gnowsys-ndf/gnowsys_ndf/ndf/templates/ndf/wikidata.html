@@ -7,9 +7,8 @@
  {% include "ndf/node_search_base.html" %}
 {% endblock %}
 
-{% block related_content %}
+{% block related_content %}	
 	{% for topic in topic_coll %}
-		
     		{% if selected_topic.name == topic.name %}
 		<br/>
 		<div class="create card">
@@ -24,9 +23,11 @@
 		{{ topic.name }}
      		 </a>
 		</div>
+
 		{% endif %}
 
-	{% endfor %}  
+	{% endfor %} 
+{{ count }} 
 {% endblock %}
 
 
@@ -68,6 +69,12 @@
 		</strong>
 		{{ selected_topic.altnames }}
 		<br><br>
+		<strong>
+		Tags:
+		<br><br>
+		</strong>
+		{{ selected_topic.tags }}
+		<br>
 		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>
 		<br>
 		<hr align = "center" size = "10%">

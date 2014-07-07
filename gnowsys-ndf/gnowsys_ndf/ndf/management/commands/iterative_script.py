@@ -68,7 +68,7 @@ def log_topic_created(label, log_flag):
 		captcha += "#"
 		log_flag-=1
 	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-	my_log.write(str(captcha) + unicode(mylabel) + "---Topic CREATED\n")
+	my_log.write(str(captcha) + (mylabel) + "---Topic CREATED\n")
 
 def log_topic_exists(label, log_flag):
         captcha = "#"
@@ -415,16 +415,23 @@ def property_create_Relation(label,property_id,property_value,property_json):
 	print "$$$$$$$$",right_subject_name," ",property_value
 	log_inner_topic_start(log_flag)
 	if right_subject_name!=None:
-		intitiate_new_topic_creation(right_json,property_value,language)
-		log_inner_topic_end(log_flag)
-		relation_exists = create_Relation(label, property_label, right_subject_name, user_id)
-			if relation_exists:
-                log_relation_exists(property_label, log_flag)
+		#initiate_new_topic_creation(right_json,property_value,language)
+		if item_exists(right_subject_name):
+			log_inner_topic_end(log_flag)
+			relation_exists = create_Relation(label, property_label, right_subject_name, user_id)
+		
+			if relation_exists :
+        			log_relation_exists(property_label, log_flag)
+        
+        
+        		else:
+	        		log_relation_created(property_label, log_flag)
+
         	else:
-                log_relation_created(property_label, log_flag)
+			print "The right subject does not exist at all"
 
 	else:
-		print "the right subject is not an item of english, is not supposed to be created"
+		print "*****the right subject is not an item of english, is not supposed to be created*****"
 		#create a log function
 
 
@@ -432,9 +439,7 @@ def property_create_Relation(label,property_id,property_value,property_json):
 
 
 
-
-
-def extract_property_json(json_obj,label,topic_title):
+def extract_property_json(json_obj,label,topic_title,call_flag):
 	claim_dict={}
 	Result =json_obj['entities'][str(topic_title)]
 
@@ -454,7 +459,7 @@ def extract_property_json(json_obj,label,topic_title):
 		global log_flag
 		log_flag += 1
 
-		if flag==1: #attribute has to be made
+		if flag==1 and call_flag==1: #attribute has to be made
 			property_data_type = extract_datatype_from_property(property_value_list)
 			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
 			#print property_data_type
@@ -463,15 +468,19 @@ def extract_property_json(json_obj,label,topic_title):
 			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
 		
 		
-		if flag==3: #relation has to be made
+		if flag==3 and call_flag==2: #relation has to be made
+			
 			property_value_for_relation=extract_value_for_relation(property_value_list)
+			
 			property_create_RelationType(property_id,property_json)
 			property_create_Relation(label,property_id,property_value_for_relation,property_json)
-
-		log_flag -= 1
+			
+			log_flag -= 1
 		
 			if property_id=="P31" or property_id=="P279":
+				print "^^entering tags^^ ",label, " - ",property_value_for_relation				
 				populate_tags(label,property_value_for_relation)
+			
 			
 
 def create_topic_id():
@@ -505,10 +514,11 @@ def initiate_new_topic_creation(json_obj,topic_title,language):
 		if topic_exists == False:
 			log_topic_created(label, log_flag)
 			create_Attribute(label, "topic_id", topic_title, language, user_id)
-			extract_property_json(json_obj,label,topic_title)
+			extract_property_json(json_obj,label,topic_title,1)
 
 
-def read_file():
+def read_file(flag):
+
 	with open(fn,'rb') as f:
 		r = csv.reader(f,delimiter ='\n')
 		for row in r:
@@ -520,9 +530,12 @@ def read_file():
 					if(json_obj):
 						global log_flag
 						log_flag = 0
-						intitiate_new_topic_creation(json_obj,topic_title,language)
-						log_outer_topic(log_flag)
-
+						if flag==1:
+							initiate_new_topic_creation(json_obj,topic_title,language)
+							log_outer_topic(log_flag)
+						else:
+							label=extract_labels(json_obj,topic_title,language)
+							extract_property_json(json_obj,label,topic_title,flag)
 
 					else:
 						print "empty json returned"
@@ -535,8 +548,8 @@ class Command(BaseCommand):
 		create_WikiData_WikiTopic()
 		create_topic_id()
 
-		read_file()		# read the file with list of items starting with Q
-		
+		read_file(int(1))		# read the file with list of items starting with Q
+		read_file(int(2))		
 
 		
 

@@ -143,7 +143,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 		Adding the attribute type to the WikiData GSytemType attribute_set"
 		"""
 		system_type.attribute_type_set.append(attribute_type._id)
-		print "Created the Attribute_Type " + str(name)
+		print "Created the Attribute_Type " + unicode(name)
 		return False
 
 		
@@ -195,7 +195,6 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		topic_type_id = topic_type._id
 		topic = collection.GSystem()
 		topic.name = label
-		#topic.tags = alias_list  # tags are supposed to be info about structure , categories etc , aliases are supposed to be stored into altnames
 		topic.content_org= unicode(description) #content in being left untouched and content_org has descriptions in english
 		topic.url = unicode(wiki_base_url)+unicode(label)
 		#topic.altnames = unicode(topic_title)
@@ -292,6 +291,28 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		relation.save()
 		print "Created a Relation " + str(relation.name)
 		return False
+
+def populate_tags(label,property_value_for_relation):
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	if obj:
+		obj.tags.append(unicode(property_value_for_relation))
+		obj.modified_by=int(1)
+		obj.save()
+
+
+def item_exists(label):
+	"""	
+	Returns boolean value to indicate if a GSystem with the given name exists or not"
+
+
+	"""	
+
+	object = collection.Node.find_one({"type":u"GSystem","name":unicode(label)})
+	if object !=None:
+		return True
+	else:
+		return False
+
 
 def display_objects():
 	cursor = collection.Node.find()
