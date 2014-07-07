@@ -1,0 +1,264 @@
+{% extends "ndf/base.html" %}
+
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{title}} {% endblock %}
+
+
+{% block head %}
+<script src="/static/ndf/js/jquery-ui.js"></script>
+<script src="/static/ndf/js/foundation-datepicker.js"></script>
+<link href="/static/ndf/css/foundation-datepicker.css" rel="stylesheet" />
+<link href="/static/ndf/css/jquery-ui.css" rel="stylesheet" />
+<script src="/static/ndf/js/jquery-ui-timepicker-addon.js"></script>
+<link href="/static/ndf/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript">
+</script>
+{% include "ndf/invite_users_head.html"  %}
+<style type="text/css">
+.watchers{
+    max-height: 210px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-left: 10px;
+    width: 300px;
+}
+#selectOfInviteUser{
+height:150px;
+}
+</style>
+{% endblock %}
+
+{% block script %}
+$( "#parent" ).autocomplete({
+  source:"{% url 'search_tasks' groupid %}"+$("#parent").val(),
+  select: function( event, ui ) {
+	$('#hidden_parent').val(ui.item.id);console.log(ui.item.id);} 
+});
+
+$('.start_date').fdatepicker();
+$('.start_time').timepicker();
+user_list =JSON.parse(update_user_list())
+function update_user_list()
+{
+var ajurl ="{% url 'get_group_member_user' groupid %}";
+var users = [];
+  $.ajax({
+	url:ajurl,
+	async: false, 	
+  success: function(data){
+  users = data; },
+  });
+return users;
+}
+$.each(user_list, function(key,value) {   
+     $('#customDropdown2')
+         .append($("<option></option>")
+         .attr("value",value)
+         .text(value)
+	 .attr("id",value)); 
+     var div = $("<div>"+"</div>")
+		.attr("class","row")
+		.appendTo($(".watchers"));
+     var input = $("<input> "+value)
+		 .attr("type","checkbox")
+		 .attr("id",value) 
+		 .appendTo(div);
+});
+
+
+{% if Priority %}
+var edit_Priority  = document.getElementById("customDropdown1")
+edit_Priority.selectedIndex = edit_Priority.options.{{Priority}}.index
+{% endif %}
+{% if Convener %}
+var edit_Convener  = document.getElementById("customDropdown2")
+edit_Convener.selectedIndex = edit_Convener.options.{{Convener}}.index
+{% endif %}
+
+var selected = new Array();
+$(document).on('click',"#save-node",function(){
+$('input:checkbox:checked').each(function() {     selected.push(this.id);});
+$('#hidden_watchers').val(selected);
+});
+
+
+<!-- Invite Users -->
+
+{% endblock %}
+
+{% block help_content %}
+{% endblock %}
+
+
+{% block meta_content %}
+  <h2>Meeting </h2>
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+     <div class="meeting">
+      <br/>
+      <a class="button medium" href="{% url 'meeting_create_edit' group_name %}">
+      	<span class="fi-plus">&nbsp;&nbsp;New Meeting</span>
+      </a>
+    </div>
+
+  {% endif %}
+  {% endif %}
+{% endblock %}
+  
+{% block body_content %}
+
+<form data-abide id="form-edit-node" method="POST" action="">
+{% csrf_token %}
+    <h2 class="medium-12 columns">
+      {% if node %}
+      Editing {{title}}: {{node.name}}
+      {% else %}
+      Create a New {{title}}
+      {% endif %}
+    </h2>
+    <br/><br/><br/><br/>
+    <div class="medium-6 columns">
+	{% if not meeting_id %}
+	<div class="row">
+	  <div class="medium-12 columns">
+	    <label>{{title}} Name <font color="red">*</font></label>
+	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+	    <small class="error">Please give your Meeting a descriptive name. It's helpful for others and for yourself.</small>
+	  </div>
+	</div>
+	{% endif %}
+	<div class="row">
+	  <div class="medium-12 columns">
+	    <label>Parent meeting</label>
+	    <input id="parent" value="{{parent}}">
+	    <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
+	  </div>
+	</div>
+	    <!--
+	<div class="row">
+	  <div class="medium-6 columns">
+	     <label>Status <font color="red">*</font> </label>
+		<select required="" class="medium" id="customDropdown" name="Status" data-invalid="">
+			<option selected="selected" value="New" id="New">New</option>
+			<option value="In Progress" id="In Progress">In Progress</option>
+			<option value="Resolved" id="Resolved">Resolved</option>
+			<option value="Feedback" id="Feedback">Feedback</option>
+			<option value="Closed" id="Closed">Closed</option>
+			<option value="Rejected" id="Rejected">Rejected</option></select>
+		</select>
+		<small class="error">Broke.</small>
+	  </div>
+	  <div class="medium-6 columns">
+	    <label>Start date</label>
+	    <input class="start_date" name="start_time" type="text" placeholder="select date..." value="{{start_time}}">
+	  </div>
+	</div>
+	  -->
+	<div class="row">
+	  <div class="medium-6 columns">
+	    <label>Start date<font color="red">*</font></label>
+	    <input class="start_date" name="start_time" type="text" placeholder="select date..." value="{{start_time}}">
+	  </div>
+	  <div class="medium-6 columns">
+	    <label>Start Time<font color="red">*</font></label>
+	    <input class="start_time" name="start_time_2" type="text" placeholder="select time..." value="{{start_time}}" required>
+	    <small class="error">Enter in HH:MM format</small>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="medium-6 columns">
+	    <label>Priority <font color="red">*</font></label>
+	    <select required="" class="medium" id="customDropdown1" name="Priority" data-invalid="">
+		<option value="Low" id="Low">Low</option>
+		<option selected="selected" value="Normal" id="Normal">Normal</option>
+		<option value="High" id="High">High</option>
+		<option value="Urgent" id="Urgent">Urgent</option>
+		<option value="Immediate" id="Immediate">Immediate</option></select>
+	    </select>
+	  </div>
+	</div>	
+	<div class="row">
+	  <div class="medium-6 columns">
+	    <label>Convener<font color="red">*</font></label>
+	   	<select name="Convener" class="medium" id="customDropdown2" data-invalid="">
+			<option value="" selected="selected" ></option>
+		</select>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>Estimated time
+	    <input id="Estimated time" name="Estimated_time" type="text" value="{{Estimated_time}}" placeholder="Enter Hours..."/>
+	    <small class="error">Please give Time in HH:MM:SS</small>
+	    </label>
+	  </div>
+	  <div class="medium-3 columns">
+
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="medium-12 columns">
+	    <label>Description</label>
+	    <div id="contentlist" class="content">
+		<div class="">
+		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+		</div>
+	    </div>
+	  </div>
+	</div>
+
+	
+
+
+
+
+<input type="button" class="button small" id="UserInvitation" value="Subscribe Registered Members" onclick="UserInvitation()">
+<br/>
+<input type="button" id="hideUserInvitation" Value= "Hide Invitation" onclick="HideUserInvitation()" style="display:none;">
+<div class="invitation" style="display:none">
+
+<input id="userInvite">
+
+<input type="button" id="addToList" class="button small" value="Add">
+
+<input type="button" class="button small" id="submitUserInvite" value="Subscribe" style="display:none"/>
+<p class="responseToInvite"></p>
+
+<select id="selectOfInviteUser" multiple="multiple" style="display:none" onchange="handle()">
+
+</select>
+</div>
+
+	
+	{% if not meeting_id %}
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label>Watchers</label>
+	  </div>
+	  <div class="medium-6 columns">
+		<div class="watchers"></div>
+	  </div>
+          <div class="medium-3 columns">
+		<input type="hidden" name="watchers" id="hidden_watchers" value="">
+          </div>
+	{% endif %}
+      <div class="row" >
+	<div class="medium-6 columns">
+	    <input type="submit" id="save-node" value="Save" class="button"/>
+	</div>
+      </div>
+    </div>
+</form>
+
+{% endblock %}
+

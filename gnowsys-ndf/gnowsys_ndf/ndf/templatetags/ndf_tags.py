@@ -175,7 +175,17 @@ def get_all_users_to_invite():
 		return str(inv_users)
 	except Exception as e:
 		print str(e)
- 
+
+@register.simple_tag
+def get_all_registered_users():
+        try:
+	        user_list=[]
+		users=User.objects.all()
+		for each in users:
+			user_list.append(each.username)
+		return HttpResponse(json.dumps(user_list)) 
+	except Exception as e:
+		print str(e)
 
 @register.inclusion_tag('ndf/twist_replies.html')
 def get_reply(thread,parent,forum,token,user,group_id):

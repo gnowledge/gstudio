@@ -1191,7 +1191,43 @@ def get_online_editing_user(request, group_id):
     else :
         userslist.append("No users")
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
-        
+
+@login_required
+def set_meeting_status(request , group_id):
+    '''
+    sets meeting_status true(i.e. 1)  if Convener has started the meeting or false(i.e. 0)(default) if Convener has left the meeting 
+    '''
+    if request.is_ajax() and request.method=="POST":
+    	status = request.POST.get('meetingStatus',"")
+    	node_id = request.POST.get('_id',"")
+	meeting_node=collection.Node.one({'_id':ObjectId(node_id)})#'_type':u'GSystem','_id':node_id})#ObjectId(node_id)})
+	attr_type_key=collection.Node.find_one({'_type':'AttributeType','name':'meeting_status'})
+	attr = collection.Node.find_one({'_type':'GAttribute','subject':meeting_node._id,'attribute_type.$id':attr_type_key._id})
+	attr.object_value = status
+	#print '----------- AAAA-------->>',bb
+	attr.save()
+	return HttpResponse(json.dumps(attr.object_value))
+
+@login_required
+def get_meeting_status(request , group_id):
+    '''
+    returns true if Convener has started the meeting 
+    invited members can join meeting only if this value is true
+    '''
+    if request.is_ajax() :
+    	#meetingStatus = request.POST.get('meetingStatus',"")
+        #node_id = request.POST.get('_id',"")
+	#attr = collection.Node.one({'_type':u'GAtribute','name':'meeting_status'})
+	#status = collection.Node.one({'_id':ObjectId(node_id)}).meeting_status
+	#aa = collection.GSystem.one({'_id':ObjectId(node_id)})
+	#print '--------------->',aa
+	node_id = request.POST.get('_id',"")
+	meeting_node=collection.Node.one({'_id':ObjectId(node_id)})#'_type':u'GSystem','_id':node_id})#ObjectId(node_id)})
+	attr_type_key=collection.Node.find_one({'_type':'AttributeType','name':'meeting_status'})
+	attr = collection.Node.find_one({'_type':'GAttribute','subject':meeting_node._id,'attribute_type.$id':attr_type_key._id})
+	return HttpResponse(json.dumps(attr.object_value))
+		
+
 def get_author_set_users(request, group_id):
     '''
     This ajax function will give all users present in node's author_set field

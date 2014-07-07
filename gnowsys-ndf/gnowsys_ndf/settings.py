@@ -2,7 +2,7 @@
 
 import os
 
-DEBUG = True
+DEBUG = True 
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
@@ -127,12 +127,13 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
+
     'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-     
-# Uncomment the next line for simple clickjacking protection:
+
+    # Uncomment the next line for simple clickjacking protection:
+
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -220,7 +221,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 META_TYPE = [u"GAPP",u"factory_types"]
 
 #Default APPs inculde in beloow GAPPS list
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task"]
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"Meeting" ]
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
@@ -280,7 +281,9 @@ try:
 except:
     #print "Default settings applied"
     pass
-
+    
+USERS_ONLINE__TIME_IDLE = 300
+USERS_ONLINE__TIME_OFFLINE = 10
 #textb
 import warnings
 warnings.filterwarnings(

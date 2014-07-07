@@ -1,0 +1,326 @@
+{% extends "ndf/base.html" %}
+
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+{% block title %} {{title}} {% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block help_content %}
+{% endblock %}
+
+{% block meta_content %}
+  <h2>Meeting</h2>
+{% endblock %}
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
+{% block related_content %}
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+  <br/>
+     <div class="meeting">
+      <br/>
+      <a class="button medium" href="{% url 'meeting_create_edit' group_name %}">
+      	<span class="fi-plus">&nbsp;&nbsp;New Meeting</span>
+      </a>
+    </div>
+
+  {% endif %}
+  {% endif %}
+{% endblock %}
+  
+{% block body_content %}
+<div class="row">
+
+  <section class="medium-9 columns">
+<h2>
+<span class='node'>{{node.name}}</span> 
+</h2>
+    <div style="display:table; border:1px; border-spacing:6px; " class="medium-12 columns">
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Parent meeting:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if parent %}{{parent}}{% else %} -- {% endif %}</label>
+	  </div>
+	  <div class="medium-6 columns">
+	  </div>		
+	<!</div>
+	<!<div class="row">
+	</div>
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Start date:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if start_time %}{{start_time}}{% else %} -- {% endif %}</label>
+	  </div>
+	<!</div>	
+	<!<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Priority:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if Priority %}{{Priority}}{% else %} -- {% endif %}</label>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Start Time:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if start_time_2 %}{{start_time_2}}{% else %} -- {% endif %}</label>
+	  </div>
+	<!</div>	
+	<!<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Convener:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if Convener %}{{Convener}}{% else %} -- {% endif %}</label>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="medium-3 columns">
+	    <label><b>Estimated time:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label>{% if Estimated_time %}{{Estimated_time}}{% else %} -- {% endif %}</label>
+	  </div>
+	  <div class="medium-3 columns">
+	    <label><b>Meeting status:</b></label>
+	  </div>
+	  <div  id="update_using_ajax_meeting_status" class="medium-3 columns">
+	  	<label>--</label>
+	  </div>
+	 <!--  <div class="medium-6 columns">
+	  </div>-->		
+	</div>
+	{% if submeeting %}
+	<div class="row">
+	  <div class="medium-3 columns">
+	      <label><b>Sub Meeting:</b></label>
+	  </div>
+	  <div class="medium-3 columns">
+		{% for each_submeeting in subtask %}
+	    <a class="" href="{% url 'meeting_details' group_name each_subtask.id %}">{{each_subtask.name}}</a>
+		{% if not forloop.last %},{% endif %}
+		{% endfor %}
+	  </div>
+	  <div class="medium-6 columns">
+	  </div>
+	</div>
+	{% endif %}
+	
+	<div class="row">
+		  <div class="medium-12 columns">
+		    <label><b>Members:</b></label>
+		    <div id="memberslist"  style="padding-left:20px;">
+		    <label>{% if invited %}
+			{{invited}} , 
+		    {% else %}
+		    ---
+		    {% endif %}
+		    </label>
+		    </div>
+		  </div>
+		</div>	
+
+		<hr>
+		<div class="row">
+		  <div class="medium-12 columns">
+		    <label><b>Description:</b></label>
+		    <div id="contentlist" class="content" style="padding-left:20px;">
+		{% with node.html_content|safe as description %}
+		{% if description != "None" %}
+		{{ description }}
+		{% else %} -- {% endif %}
+		{% endwith %}
+		    </div>
+		  </div>
+		</div>	
+	       <hr>
+	       <style type="text/css">
+	       @keyframes blink{
+	           0% {
+		   opacity: 1;
+		       }
+		   50% {
+			   opacity: 0;
+		       }
+		   100% {
+			   opacity: 1;
+		       }
+	       }
+	       
+	       .blinking_img{
+		   animation: blink 1s;
+		   animation-iteration-count: infinite;
+	       }
+	       </style>
+		  {% if user.is_authenticated %}
+		  {% user_access_policy groupid request.user as user_access %}
+		  {% if user_access == "allow" %}
+		  {% if request.user.username in Convener or request.user.username in invited %}
+		 
+			<script type="text/javascript">
+				var MeetingStarted;
+				function setMeetingStatus(MeetingStatus){	
+					var seturl = "{% url 'set_meeting_status' groupid %}";
+					$.ajax({
+						url:seturl,
+						data:({
+							meetingStatus : MeetingStatus,
+							_id: '{{node.pk}}',
+							csrfmiddlewaretoken : '{{csrf_token}}',
+							}) ,
+						type:"POST",
+						async:false,
+						success:function(data){
+							//alert("set : "+data);
+						},
+					});//end of ajax
+				
+				}
+				
+				var getMeetingStatus = function(){
+					geturl = "{% url 'get_meeting_status' groupid %}";
+					$.ajax({
+						url : geturl,
+						data:({
+							_id:'{{node.pk}}',
+							csrfmiddlewaretoken : '{{csrf_token}}',
+							}),
+						type:"POST",
+						async:"false",
+						success : function(data){
+							MeetingStarted=data;
+							if(data.indexOf("1")==1){
+							$('#update_using_ajax_meeting_status').html("<label class='medium-3 columns'>Online</label>&nbsp;&nbsp;<img class='blinking_img' src='/static/ndf/user-online-2.ico' alt='online' />");
+							}
+							else{
+							$('#update_using_ajax_meeting_status').html("<label class='medium-3 columns'>Offline</label>&nbsp;&nbsp;<img src='/static/ndf/user-busy-2.ico' alt='offline' />");
+							}
+							//$('#getstatusDiv').html("<p>get : "+MeetingStarted+"</p>")
+						},
+					});//end of ajax getMeetingStatus
+				}
+				setInterval(getMeetingStatus,5000);
+
+				function leave_meeting_convener(){
+				$("#frameDiv").html("<input id='start_now_button' type='button' value='Start Now' onclick='start_meeting_convener()'/>");	
+				setMeetingStatus("0");
+				}
+				function start_meeting_convener(){
+				$("#frameDiv").html("<input type='button' value='Leave' class='afterStart' onclick='leave_meeting_convener()'/><br><iframe class='afterStart' width='100%' height = '500px' src='http://chatb.org/#GSTUDIO"+'{{ node.pk }}'+"'></iframe>");	
+				setMeetingStatus("1");
+				}
+				function leave_meeting(){
+				$("#frameDiv").html("<input id='join_now_button' type='button' value='Join Now' onclick='join_meeting()'/>");	
+				}
+				function join_meeting(){
+					var aa = MeetingStarted;
+					//console.log(aa);
+					//console.log(typeof aa);
+					var bb=aa.indexOf("1");
+					//console.log(bb);
+					//console.log(typeof bb);
+					//console.log(bb == 1);
+					if(bb == 1){
+					$("#frameDiv").html("<input type='button' value='Leave' class='afterJoin' onclick='leave_meeting()'/><br><iframe class='afterJoin' width='100%' height = '500px' src='http://chatb.org/#GSTUDIO"+'{{ node.pk }}'+"'></iframe>");	
+					}
+					else{
+					alert("The meeting has not yet started ... please wait for the convener to begin.");
+
+					}
+				}
+				</script>
+			{% if request.user.username in Convener %}
+				<script type='text/javascript'>
+				$(document).ready(function(){
+					leave_meeting_convener();
+					}
+				);	
+				</script>
+			{% else %}
+				{% if request.user.username in invited  %}
+					<script type='text/javascript'>
+					$(document).ready(function(){
+						leave_meeting();
+						}
+					);
+					</script>
+				{% endif %}
+			{% endif %}
+			<div class="row">
+				 <div class="medium-12 columns">
+				    <label><b>Live meeting:</b></label>
+					<br>
+				    <div id="frameDiv" style="padding-left:20px;">
+				    </div>
+				    <!--
+				    <div id="setstatusDiv" style="padding-left:20px;">
+				    </div>
+				    <div id="getstatusDiv" style="padding-left:20px;">
+				    </div>
+				    -->
+				  </div>
+			</div>
+	
+		{% endif %}
+		
+		{% endif %}
+		{% endif %}
+	       <hr>
+		<div class="row">
+		  <div class="medium-12 columns">
+		    <label><b>History:</b></label>
+		  </div>
+		</div>
+		<div class="history_meeting" style="padding-left:20px;">
+	{% for each_history in history %}
+		<div class="panel">
+			{% if each_history.content %}
+					{% with each_history.content|safe as history_description %}
+					{{ history_description }}
+					{% endwith %}
+			{% endif %}
+			{% for each_altnames in each_history.altnames %}		
+				<p style="color:#999999">{{each_altnames}}</p>
+			{% endfor %}
+			<div align="right">
+				<label>- Updated by <em>{{ each_history.created_by }}  {{ each_history.created_at|timesince }}</em> ago</label>
+			</div>
+		</div>
+	{% empty %}
+	--
+	{% endfor %}	
+		</div>
+	    </div>
+	  </section>
+	  <section class="medium-3 columns">
+	    <div class="panel">
+	     <h3 class="subheader"></h3>
+	       Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
+	       <small>
+		 <div><a href="#view-changes"><i class="fi-clock"></i> Versions </a>
+		  {% for seq_no, version_no in node.version_dict.items reversed %}
+		  <abbr title={{version_no}}><a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">+</a></abbr> 
+		  {% endfor %}
+		</div>
+	      </small>
+	     <a href="{% url 'meeting_edit' group_name node %}" class="small button split edit"><i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span></a> 
+
+	    </div>
+
+	  </section>
+
+	{% endblock %}
+

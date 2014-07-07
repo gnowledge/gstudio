@@ -10,8 +10,21 @@ var inviting_users="";
 
 
 
+function UserInvitation(){
+$.extend(items,{% get_all_users_to_invite %});
+i=0;
+for (var key in items)
+{
+user_list[i]=key;
+i=i+1;
+}
 
-$(document).on('click',"#checknotif",function() {
+user_list =JSON.parse(update_user_list())
+
+$( "#userInvite" ).autocomplete({
+   source: user_list
+});
+$(".invitation").show();
 
 if($('#checknotif').attr('checked')) {
 not_status="ON";
