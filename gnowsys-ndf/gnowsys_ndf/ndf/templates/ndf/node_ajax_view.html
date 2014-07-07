@@ -9,6 +9,10 @@
   <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
   <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
   <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script>
+  <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.css"></script>
+  <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/themes/default-theme"></script>
+
 
 {% endblock %}
 
@@ -98,7 +102,8 @@ ul#graph-hover.f-dropdown{
     <div class="tabs-content">
 
       <!-- Tab content -->
-      <div class="content active" id="view-page">
+      <div id="commentable-area">
+      <div class="content active commentable-section" id="view-page" data-section-id="1">
 
         {% if node.prior_node|length > 0 %}
         <div class="panel">
@@ -201,7 +206,8 @@ ul#graph-hover.f-dropdown{
       	{% endwith %}
 
       </div>
-      
+      </div>
+
       <!-- Content for Concept Graph -->
       <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
         <a class="close-reveal-modal">&#215;</a>
@@ -468,28 +474,6 @@ ul#graph-hover.f-dropdown{
 //For annotation based discussions:
 
 var annotations = []; 
-function getAnn()
-{
- //alert("inside getAnn");
- $.ajax({
-          type: "GET",
-          url: "{% url 'getAnnotations' groupid %}",
-          datatype: "JSON",
-          data: 
-          {
-            node_id : '{{ node }}',
-            csrfmiddlewaretoken : '{{ csrf_token }}'
-          },
-          success: function (data)
-          {
-              //alert(test1['tex']);
-              test1['tex']='xyz';
-              //alert(test1['tex']);
-              annotations = jQuery.parseJSON(data);
-             // alert(annotations[0].selectedText + typeof(annotations));
-          }
-      });
-}
 
 var ann = {                                  //dummy variable at frontend
   selectedText: "",
@@ -518,7 +502,7 @@ win.Selector.getSelected = function(){
 
 var test1= {'tex': 'abc'};
 
-//annotations = [];
+annotations = {{ annotations | safe}};
 
 win.Selector.mouseup = function()
 {
@@ -534,10 +518,10 @@ win.Selector.mouseup = function()
     //annotations= ast.literal_eval(annotations);
     //alert("Before fn call" + annotations);
     //getAnn();
-    //alert(test1['tex']);
-    annotations = '{{ node.annotations }}';
-    annotations.replace(/&#39;/g, '"');
-    jQuery.parseJSON(annotations);
+    alert(test1['tex']);
+    //annotations = json.stringify({{ node.annotations | safe}});
+    //annotations.replace(/&#39;/g, '"');
+    //jQuery.parseJSON(annotations);
     alert("DID this help!!! " + annotations[0].selectedText);
     //var str ='{{ node.annotations}}';
     //str.replace(/&quot;/g,'"');
