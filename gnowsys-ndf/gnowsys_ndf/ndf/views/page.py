@@ -246,6 +246,7 @@ def page(request, group_id, app_id=None):
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'shelf_list': shelf_list,
+                                    'annotations': json.dumps(page_node.annotations),
                                     'shelves': shelves,
                                     'groupid':group_id,
                                     'breadcrumbs_list': breadcrumbs_list

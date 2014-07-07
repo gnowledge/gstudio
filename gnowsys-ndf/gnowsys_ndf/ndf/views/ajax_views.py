@@ -1303,35 +1303,44 @@ def get_group_member_user(request, group_id):
 
 def annotation(request, group_id):
   '''
+  Stores the annotation-based discussion thread on the database
   '''
   exists_flag = request.POST["exists_flag"] 
+  exists_pos  = int(request.POST["exists_pos"])
   obj_id = str(request.POST["node_id"])
   col = get_database()[Node.collection_name]
   ann = request.POST["ann_present"]
-  print "ann rcvd", ann
-  print "type ann rcvd", type(ann)
   
+  #print "ann rcvd", ann
+  #print "type ann rcvd", type(ann)
   #ann = ann.replace("&quot;","'")
   #print "ann replaced", ann
   #print "type ann replaced", type(ann)
-  
   ann = json.loads(ann)
   print "ann after eval", ann['selectedText']
   print "type ann after eval", type(ann)
-
-  print "flag rcvd", exists_flag
+  print "pos rcvd", exists_pos, type(exists_pos)
   print "id received: ", ObjectId(request.POST["node_id"])
-  #print "ann rcvd", ann.selectedText
-  
   #ann2=json.dumps(ann)
   #print "parsed", ann2
   sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
-  #print sg_obj
+  
   if(exists_flag == "false"):
-    sg_obj.annotations.append(ann);
-  # = [{u'annotationText': {u'datetime': u'29 July 2014', u'text': u'pika pika'}, u'comments': [], u'selectedText': u'Spoofing'}]
- 
-  sg_obj.save()
+    sg_obj.annotations.append(ann)
+  else:
+    sg_obj.annotations[exists_pos] = ann
 
+  sg_obj.save()
+  print type(sg_obj.annotations)
   #print "\n\n Text  :  ", aa, "\n\n"
-  return HttpResponse("hello")
+  return HttpResponse(json.dumps(sg_obj.annotations))
+
+
+def getAnnotations(request, group_id):
+  '''
+  returns annotations field
+  '''
+  col = get_database()[Node.collection_name]
+  sg_obj = col.Node.one({"_id":ObjectId(request.GET["node_id"])})
+  return HttpResponse(json.dumps(sg_obj.annotations))
+

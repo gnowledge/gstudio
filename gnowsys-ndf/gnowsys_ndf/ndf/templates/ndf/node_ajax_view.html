@@ -465,7 +465,32 @@ ul#graph-hover.f-dropdown{
 
   });
 
-//For annotation based discussions: 
+//For annotation based discussions:
+
+var annotations = []; 
+function getAnn()
+{
+ //alert("inside getAnn");
+ $.ajax({
+          type: "GET",
+          url: "{% url 'getAnnotations' groupid %}",
+          datatype: "JSON",
+          data: 
+          {
+            node_id : '{{ node }}',
+            csrfmiddlewaretoken : '{{ csrf_token }}'
+          },
+          success: function (data)
+          {
+              //alert(test1['tex']);
+              test1['tex']='xyz';
+              //alert(test1['tex']);
+              annotations = jQuery.parseJSON(data);
+             // alert(annotations[0].selectedText + typeof(annotations));
+          }
+      });
+}
+
 var ann = {                                  //dummy variable at frontend
   selectedText: "",
   annotationText: {text: "", datetime: ""},
@@ -473,6 +498,7 @@ var ann = {                                  //dummy variable at frontend
 };
 
 var flag = false;
+var pos=-1;
 
 if(!window.win){
   win = {};
@@ -490,6 +516,10 @@ win.Selector.getSelected = function(){
   return t;
 }
 
+var test1= {'tex': 'abc'};
+
+//annotations = [];
+
 win.Selector.mouseup = function()
 {
   {% if user.is_authenticated %}
@@ -499,7 +529,20 @@ win.Selector.mouseup = function()
     //st has the selected  text
     //check if selection already exists
    
-    var annotations = []; 
+     
+    //annotations = annotations.replace("&#39;","'");
+    //annotations= ast.literal_eval(annotations);
+    //alert("Before fn call" + annotations);
+    //getAnn();
+    //alert(test1['tex']);
+    annotations = '{{ node.annotations }}';
+    annotations.replace(/&#39;/g, '"');
+    jQuery.parseJSON(annotations);
+    alert("DID this help!!! " + annotations[0].selectedText);
+    //var str ='{{ node.annotations}}';
+    //str.replace(/&quot;/g,'"');
+    //var test = jQuery.parseJSON(str);
+
     //annotations.replace(/&quot;/g, '"');
     //annotations = jQuery.parseJSON(annotations);
     //annotations.replace('quot;', '"');      
@@ -507,10 +550,10 @@ win.Selector.mouseup = function()
     //console.log(annotations);
 
     flag = false;
-    var i = 0;
-    for(i=0; i < annotations.length; i++)
+    for(pos=0; pos < annotations.length; pos++)
     {
-      if(annotations[i].selectedText.toLowerCase() == st.toLowerCase())
+      //alert("hows life?");
+      if(annotations[pos].selectedText.toLowerCase() == String(st).toLowerCase())
       {
         flag = true;                //selection already exists in list
         break;
@@ -528,12 +571,13 @@ win.Selector.mouseup = function()
     else                          
     {
       alert("Selection exists!");
-      ann = annotations[i];
+      ann = annotations[pos];
+
       //TODO display thread
-      $("#replies").html(annotations[i].annotationText['text'] + "<br> <i>" + annotations[i].annotationText['datetime'] + "</i><br>");
-      for (var j = 0; j < annotations[i].comments.length; j++)
+      $("#replies").html(annotations[pos].annotationText['text'] + "<br> <i>" + annotations[pos].annotationText['datetime'] + "</i><br>");
+      for (var j = 0; j < annotations[pos].comments.length; j++)
       {
-        $("#replies").append(annotations.comments[j].text, "<i>", annotations.comments[j].datetime, "</i><br>");
+        $("#replies").append(annotations[pos].comments[j].text, "<i>", annotations[pos].comments[j].datetime, "</i><br>");
       }
       $("#replyField").val("");
       $("#reply").css('visibility', 'visible');     
@@ -598,16 +642,20 @@ function store()
           datatype: "JSON",
           data: 
           {
-              ann_present: JSON.stringify(ann),  
-              exists_flag: flag, 
-              node_id: '{{ node }}', 
+              ann_present  : JSON.stringify(ann),  
+              exists_flag  : flag, 
+              exists_pos   : pos,
+              node_id      : '{{ node }}', 
               csrfmiddlewaretoken: '{{ csrf_token }}'
           },
           success: function(data) 
           {
             alert(data + " inside success");
-            //shuchu = jQuery.parseJSON(data);
-            //alert(shuchu[0].selectedText);
+            //$.each(data, function() { 
+              //alert("TYPE AFTER AJAX CALL" + typeof data);
+            //});
+            shuchu = jQuery.parseJSON(data);
+            alert(shuchu[0].selectedText);
           }
     });
   /*var current = $("#thread").html();
