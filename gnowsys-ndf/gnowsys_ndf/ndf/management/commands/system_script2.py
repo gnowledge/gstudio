@@ -117,6 +117,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 	cursor = collection.Node.one({"label":unicode(property_id),"_type":"AttributeType"})
 	if (cursor != None):
 		print "The AttributeType already exists."
+		return True
 	else:
 		attribute_type = collection.AttributeType()
 		attribute_type.name = unicode(name)
@@ -143,6 +144,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 		"""
 		system_type.attribute_type_set.append(attribute_type._id)
 		print "Created the Attribute_Type " + str(name)
+		return False
 		
 		
 def create_Attribute(subject_name, attribute_type_name, object_value, language, user_id):
@@ -158,6 +160,7 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	if cursor!= None:
 		print "The attribute " + unicode(cursor.name) + " already exists."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		return False
 	else:
 		att = collection.GAttribute()
 		att.created_by = user_id
@@ -171,7 +174,7 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 		print "About to create"
 		att.save()
 		print "Created attribute " + unicode(att.name)
-
+		return True
 
 
 
@@ -228,6 +231,7 @@ def create_RelationType(name, inverse_name, subject_type_name, object_type_name,
         cursor = collection.Node.one({"name":unicode(name),"_type":u"RelationType"})
         if cursor!=None:
                 print "The RelationType already exists."
+		return True
         else:
      	        relation_type = collection.RelationType()
                 relation_type.name = unicode(name)
@@ -254,6 +258,7 @@ def create_RelationType(name, inverse_name, subject_type_name, object_type_name,
                 """
                 system_type.relation_type_set.append(ObjectId(relation_type._id))
                 print "Created the Relation_Type " + str(name)
+		return False
  
 
 def create_Relation(subject_name, relation_type_name, right_subject_name, user_id):
@@ -269,6 +274,7 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 	cursor = collection.Node.find({"_type":u"GRelation", "relation_type.$id":ObjectId(relation_type._id), "subject": ObjectId(subject._id)})
 	if cursor.count()!=0:
 		print "The Relation Already exists"
+		return True
 	else:
 		relation = collection.GRelation()
 		relation.created_by = user_id
@@ -283,6 +289,7 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		relation.status = u"PUBLISHED"
 		relation.save()
 		print "Created a Relation " + str(relation.name)
+		return False
 
 def display_objects():
 	cursor = collection.Node.find()
@@ -298,7 +305,7 @@ class Command(BaseCommand):
 		create_AttributeType("wiki_attr11", "unicode", "This is the desc.", "P<id>12","en", user_id)
 		create_Attribute("topic11", "wiki_attr11", "This is the value of the wiki_attr1 field", "en", user_id)
 		create_Attribute("topic21", "wiki_attr11", "This is the value of the wiki_attr2 field", "en", user_id)
-		create_RelationType("same_tag11", "-same_tag11", "WikiTopic", "WikiTopic", user_id) 
+		create_RelationType("same_tag11", "-same_tag11", "WikiTopic", "WikiTopic", "P<id>1", "en", user_id) 
 		create_Relation("topic11", "same_tag11", "topic21", user_id)
 		create_Relation("topic21", "same_tag11", "topic11", user_id)
 		print "All objects\n"
