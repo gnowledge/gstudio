@@ -54,29 +54,117 @@ def log_topic_created(label, log_flag):
 	while log_flag != 0:
 		captcha += "#"
 		log_flag-=1
-	my_log.write(str(captcha) + str(label) + "---Topic CREATED\n")
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+	my_log.write(str(captcha) + unicode(mylabel) + "---Topic CREATED\n")
 
 def log_topic_exists(label, log_flag):
         captcha = "#"
         while log_flag != 0:
                 captcha += "#"
                 log_flag-=1
-        my_log.write(str(captcha) + str(label) + "---Topic EXISTS\n")
+        mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+	my_log.write(str(captcha) + unicode(mylabel) + "---Topic EXISTS\n")
 
 def log_attributeType_created(label, log_flag):
+        captcha = " "
+        while log_flag != 1:
+                captcha += " "
+                log_flag-=1
+	captcha += "-"
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+        my_log.write(str(captcha) + unicode(mylabel) + "---AttributeType CREATED\n")
+
+def log_attributeType_exists(label, log_flag):
+        captcha = " "
+        while log_flag != 1:
+                captcha += " "
+                log_flag-=1
+	captcha += "-"
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+        my_log.write(str(captcha) + unicode(mylabel) + "---AttributeType EXISTS\n")
+
+def log_attribute_created(label, log_flag):
+        captcha = " "
+        while log_flag != 1:
+                captcha += " "
+                log_flag-=1
+        captcha += "@"
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+        my_log.write(str(captcha) + unicode(mylabel) + "---Attribute CREATED\n")
+
+def log_attribute_exists(label, log_flag):
+        captcha = " "
+        while log_flag != 1:
+                captcha += " "
+                log_flag-=1
+        captcha += "@"
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+        my_log.write(str(captcha) + unicode(mylabel) + "---Attribute EXISTS\n")
+
+
+def log_relationType_created(label, log_flag):
+        captcha = " "
+        while log_flag != 1:
+                captcha += " "
+                log_flag-=1
+        captcha += "$"
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+        my_log.write(str(captcha) + unicode(mylabel) + "---RelationType CREATED\n")
+
+def log_relationType_exists(label, log_flag):
+        captcha = " "
+        while log_flag != 1:
+                captcha += " "
+                log_flag-=1
+        captcha += "$"
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+        my_log.write(str(captcha) + unicode(mylabel) + "---RelationType EXISTS\n")
+
+def log_relation_created(label, log_flag):
+        captcha = " "
+        while log_flag != 1:
+                captcha += " "
+                log_flag-=1
+        captcha += "*"
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+        my_log.write(str(captcha) + unicode(mylabel) + "---Relation CREATED\n")
+
+def log_relation_exists(label, log_flag):
+        captcha = " "
+        while log_flag != 1:
+                captcha += " "
+                log_flag-=1
+        captcha += "*"
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+        my_log.write(str(captcha) + unicode(mylabel) + "---Relation EXISTS\n")
+
+
+def log_inner_topic_start(log_flag):
         captcha = "-"
+        my_log.write("\n")
         while log_flag != 0:
                 captcha += "-"
                 log_flag-=1
-        my_log.write(str(captcha) + str(label) + "---AttributeType CREATED\n")
+        my_log.write(str(captcha) + "-----------------------------------------------------------------------\n")
 
-def log_attributeType(label, log_flag):
+def log_inner_topic_end(log_flag):
         captcha = "-"
+        my_log.write("\n")
         while log_flag != 0:
                 captcha += "-"
                 log_flag-=1
-        my_log.write(str(captcha) + str(label) + "---AttributeType EXISTS\n")
+        my_log.write(str(captcha) + "_______________________________________________________________________\n")
 
+
+
+def log_outer_topic(log_flag):
+        captcha = "-"
+        my_log.write("\n")
+        while log_flag != 0:
+                captcha += "-"
+                log_flag-=1
+        my_log.write(str(captcha) + "-----------------------------------------------------------------------\n")
+	my_log.write(str(captcha) + "-----------------------------------------------------------------------\n")
 
 def json_parse(url_json):
 	'''
@@ -270,21 +358,36 @@ def property_create_AttributeType(property_id,property_data_type,json_obj):
 		property_last_update =extract_modified(json_obj,property_id)
 		property_entity_type =extract_type(json_obj,property_id)
 		property_namespace =extract_namespace(json_obj,property_id)
-
-		create_AttributeType(property_label, property_data_type,property_description,property_id,language, user_id)
+		
+		attribute_type_exists = create_AttributeType(property_label, property_data_type,property_description,property_id,language, user_id)
+		if attribute_type_exists:
+			log_attributeType_exists(property_label, log_flag)
+		else:
+			log_attributeType_created(property_label, log_flag)
 		
 
 
 
 def property_create_Attribute(label,property_id,property_value,property_json):
 	property_label =extract_labels(property_json,property_id,language)
-	create_Attribute(label, property_label, property_value, language, user_id)
+	attribute_exists = create_Attribute(label, property_label, property_value, language, user_id)
+	if attribute_exists:
+        	log_attribute_exists(property_label, log_flag)
+        else:
+                log_attribute_created(property_label, log_flag)
+
 
 
 def property_create_RelationType(property_id,property_json):
-	property_label =extract_labels(property_json,property_id,language)
+	property_label = extract_labels(property_json,property_id,language)
 	inverse_name="-"+property_label
-	create_RelationType(property_label, inverse_name, "WikiTopic", "WikiTopic",property_id,language, user_id)
+	relation_type_exists = create_RelationType(property_label, inverse_name, "WikiTopic", "WikiTopic",property_id,language, user_id)
+	if relation_type_exists:
+        	log_relationType_exists(property_label, log_flag)
+       	else:
+        	log_relationType_created(property_label, log_flag)
+
+
 
 
 def property_create_Relation(label,property_id,property_value,property_json):
@@ -298,8 +401,15 @@ def property_create_Relation(label,property_id,property_value,property_json):
 	right_subject_name=extract_labels(right_json,property_value,language)
 	print "$$$$$$$$",right_subject_name," ",property_value
 
+	log_inner_topic_start(log_flag)
 	intitiate_new_topic_creation(right_json,property_value,language)
-	create_Relation(label, property_label, right_subject_name, user_id)
+	log_inner_topic_end(log_flag)
+	relation_exists = create_Relation(label, property_label, right_subject_name, user_id)
+	if relation_exists:
+                log_relation_exists(property_label, log_flag)
+        else:
+                log_relation_created(property_label, log_flag)
+
 
 
 def extract_property_json(json_obj,label,topic_title):
@@ -319,9 +429,10 @@ def extract_property_json(json_obj,label,topic_title):
 		flag=-1
 		flag=extract_from_property_value(property_value_list)
 		property_value =extract_property_value(property_value_list) #property_value has the value of that property fpr a particular object
-		
+		global log_flag
+		log_flag += 1
 		if flag==1: #attribute has to be made
-			property_data_type=extract_datatype_from_property(property_value_list)
+			property_data_type = extract_datatype_from_property(property_value_list)
 			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
 			#print property_data_type
 
@@ -333,6 +444,8 @@ def extract_property_json(json_obj,label,topic_title):
 			property_value_for_relation=extract_value_for_relation(property_value_list)
 			property_create_RelationType(property_id,property_json)
 			property_create_Relation(label,property_id,property_value_for_relation,property_json)
+
+		log_flag -= 1
 		
 def create_topic_id():
 	"""
@@ -383,6 +496,7 @@ def read_file():
 						global log_flag
 						log_flag = 0
 						intitiate_new_topic_creation(json_obj,topic_title,language)
+						log_outer_topic(log_flag)
 						"""
 						alias_list=extract_aliases(json_obj,topic_title,language)
 						label=extract_labels(json_obj,topic_title,language)	
