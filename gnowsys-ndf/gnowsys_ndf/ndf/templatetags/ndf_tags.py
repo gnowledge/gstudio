@@ -1174,13 +1174,15 @@ def html_widget(node_id, field):
   is_list_of = False
   LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
               "[<type 'unicode'>]", "[<type 'basestring'>]",
-              "[<type 'int'>]", "[<type 'float'>]", "[<type 'long'>]"
+              "[<type 'int'>]", "[<type 'float'>]", "[<type 'long'>]",
+              "[<type 'datetime.datetime'>]"
             ]
 
   is_special_field = False
   included_template_name = ""
   SPECIAL_FIELDS = {"location": "ndf/location_widget.html",
                     "content_org": "ndf/add_editor.html"
+                    # "attendees": "ndf/attendees_widget.html"  # Uncomment this to make attendance-widget working
                     }
 
   is_required_field = False
@@ -1230,7 +1232,8 @@ def html_widget(node_id, field):
     else:
       field_type = field_type.__str__()
 
-    # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
+    # if field['name'] == "tot_when":
+    #   print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type), "\n"
     is_list_of = (field_type in LIST_OF)
 
     is_special_field = (field['name'] in SPECIAL_FIELDS.keys())

@@ -4,6 +4,7 @@
 
 {% block body_content %} 
   <form data-abide id="form-edit-node" method="POST" action="">
+    {% csrf_token %}
 
     <header class="row">
       <h2 class="medium-12 columns">
@@ -35,7 +36,6 @@
       </nav>
     </header>
 
-    {% csrf_token %}
     <div id="event-details-edit-div" class="tabs-content" >
       {% for tab_name, tab_fields_list in property_order_list %}
       <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
@@ -51,26 +51,6 @@
           </div>
         </div>
         {% endfor %}
-        
-        <!-- attendance -->
-        <div class="row" >
-          <div class="small-2 columns"> 
-            <label class="left inline" for="Attendance"> Attendance </label>
-            <!-- attendance -->
-          </div>
-          <div class="small-5 end columns">          
-            <a href="#attendance" data-reveal-id="attendance">
-                <h1></h1>
-                Add Attendance
-            </a>
-            <div id="attendance" class="reveal-modal" data-reveal>
-              <a class="close-reveal-modal">&#215;</a>
-              {% include "ndf/attendance.html" %}
-            </div>
-          </div>
-        </div>
-        <!-- end of attendance -->
-
       </div>
       {% endfor %}
 
@@ -93,14 +73,6 @@
 
 {% block script %}
   // <script type="text/javascript">
-
-  $(document).foundation({
-    tab: {
-      callback : function (tab) {
-        console.log(tab);
-      }
-    }
-  });
 
   var startDtInput = $("#start_time")
   // alert(startDtInput)
@@ -155,42 +127,5 @@
     });
   }
 
-  // totWhen ---------------
-  var totWhen = $("font:contains('tot_when')").parent().next().find("input");
-
-  if(totWhen.length > 0) {
-    totWhen.datetimepicker();
-    $(totWhen).after('&nbsp;<input class="button tiny" type="button" value="Add Date"><br/>')
-    $("input.tiny").after("<div id='tot-when-date-list'></div>")
-  }
-
-  $(totWhen).change(function() { 
-
-    if($(totWhen).val().length > 0){
-
-      $("input.tiny").removeClass("disabled");
-    }
-
-    else{
-
-      $("input.tiny").addClass("disabled");
-    }
-  });
-
-  $("input.tiny").click(function() {
-    if(!$(this).hasClass("disabled")) {
-      $("#tot-when-date-list").append('<span class="secondary label" style="margin-right:5px;"><span class="date-item">'+$(totWhen).val()+' </span><span style="font-size:large; cursor:pointer;" onclick="$(this).parent().remove();">&times;</span></span>');
-      $(totWhen).val("");
-      $("input.tiny").addClass("disabled");
-    }
-  });
-
-  function getTotWhen() {
-    var datesList = []
-    dts = $("#tot-when-date-list .date-item");
-    $.each(dts, function(i, val){datesList.push($(val).text().trim())});
-
-    return datesList;
-  }
   // </script>
 {% endblock %}	
