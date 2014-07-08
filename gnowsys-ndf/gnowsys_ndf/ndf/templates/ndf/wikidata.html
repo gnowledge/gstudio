@@ -103,8 +103,7 @@
 
   	<div>
 		<br>
-		<br>
-		<h2><strong>Topic Name:: {{ selected_topic.name }}</h2></strong>
+		<h2><strong><center>Topic Name: {{ selected_topic.name }}</h2></strong></center>
 		<br>
 		<strong>
 		Created By: (User Id)</strong> - {{ selected_topic.created_by }}
@@ -128,13 +127,14 @@
 			{{ tag }} {{" "}}		
 
 		{% endfor %}
+		<br><br><strong>
+		Wikipedia Page Link:</strong>
+		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>		
 		<br><br>
-		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>
-		<br>
 		<p>
 		<ul>
 		<strong>Dynamic Attributes:</strong>
-		<br>
+		<br><br>
 		{% for gattribute in attribute_set %}
 			{% if 'image' in gattribute.attribute_type.name %}
 			<li>{{ gattribute.attribute_type.name }} : <a href ={{ gattribute.object_value }}>{{ gattribute.object_value }}</a></li>		
@@ -151,6 +151,8 @@
 			<li>{{ grelation.relation_type.name }} :{{ grelation.right_subject.name }}</li>
 		{% endfor %}
 		</ul>
+		<br><hr>
+		<strong>Wikipedia Page:</strong>
 		<hr align = "center" size = "10%" />
 		<iframe src="{{ selected_topic.url }}" width="95%" height="600" align = "middle" frameborder = 0>
  		 <p>Your browser does not support iframes.</p>
