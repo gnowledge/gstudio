@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+import mongokit 
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
@@ -950,7 +951,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
         field_value = unicode(field_value)
 
       elif field_data_type == "basestring":
-        field_value = str(field_value)
+        field_value = field_value
 
       elif field_data_type == "int":
         field_value = int(field_value)
@@ -993,24 +994,33 @@ def parse_template_data(field_data_type, field_value, **kwargs):
       # print "\n parsed field_value: ", field_value
 
     elif type(field_data_type) == list:
-      # Write code...
-      if not field_value:
-        return []
 
-      if kwargs["field_instance"]["_type"] == RelationType or kwargs["field_instance"]["_type"] == "RelationType":
-        # Write RT related code 
+      if kwargs.has_key("field_instance"):
+        if kwargs["field_instance"]["_type"] == RelationType or kwargs["field_instance"]["_type"] == "RelationType":
+          # Write RT related code 
+          if not field_value:
+            return None
+
+          # print "\n field_value (going herre): ", field_value
+          field_value = collection.Node.one({'_id': ObjectId(field_value), 'member_of': {'$in': kwargs["field_instance"]["object_type"]}}, {'_id': 1})
+          if field_value:
+            field_value = field_value._id
+            # print "\n field_value (innerobjectid): ", field_value, " -- ", type(field_value)
+          else:
+            error_message = "This ObjectId("+field_type+") doesn't exists"
+            raise Exception(error_message)
+
+      else:
+        # Write code...
         if not field_value:
-          return None
+          return []
 
-        # print "\n field_value (going herre): ", field_value
-        field_value = collection.Node.one({'_id': ObjectId(field_value), 'member_of': {'$in': kwargs["field_instance"]["object_type"]}}, {'_id': 1})
-        if field_value:
-          field_value = field_value._id
-          # print "\n field_value (innerobjectid): ", field_value, " -- ", type(field_value)
-        else:
-          error_message = "This ObjectId("+field_type+") doesn't exists"
-          raise Exception(error_message)
-      
+        lr = field_value.replace(" ,", ",")
+        rr = lr.replace(", ", ",")
+        field_value = rr.split(",")
+
+        return field_value
+        
     elif type(field_data_type) == dict:
       # Write code...
       if not field_value:
@@ -1201,7 +1211,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
         if gr_node.right_subject != right_subject_id:
           collection.update({'_id': gr_node._id}, {'$set': {'right_subject': right_subject_id}}, upsert=False, multi=False)
 
-        elif gr_node.status == u"DELETED":
+        elif gr_node.right_subject == right_subject_id and gr_node.status == u"DELETED":
           collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
 
         else:

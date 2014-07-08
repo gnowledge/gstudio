@@ -221,15 +221,17 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
               field_instance_type = "GAttribute"
               field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
               # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
-              event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
-              print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
+              if field_value:
+                event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
+                print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
             else:
               field_instance_type = "GRelation"
               field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
               # print "\n ", type(collection.RelationType(field_instance)), " -- \n", collection.RelationType(field_instance)
-              event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value)
-              print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
+              if field_value:
+                event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value)
+                print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
     
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))

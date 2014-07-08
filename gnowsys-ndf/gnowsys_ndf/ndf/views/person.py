@@ -210,30 +210,36 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
           if field_instance_type in [AttributeType, RelationType]:
             
-            if field_instance["name"] == "attendees":
+            if field_instance["name"] == "attendees" or field_instance["name"] == "12_passing_certificate":
               continue
 
             # Fetch corresponding AT/RT-fields value from request object
             field_value = request.POST[field_instance["name"]]
-            # print " ", field_instance["name"], " -- ", field_value
 
             field_data_type = field_set['data_type']
             # print " --> ", type(field_data_type)
 
             # 2) Parse fetched-value depending upon AT/RT--fields' data-type
             if field_instance_type == AttributeType:
+              print " ", field_instance["name"], " -- ", field_value
               field_instance_type = "GAttribute"
-              field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+              if field_instance["name"] == "12_passing_year" or field_instance["name"] == "degree_passing_year":
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
+              else:
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+
               # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
-              person_gs_triple_instance = create_gattribute(person_gs._id, collection.AttributeType(field_instance), field_value)
-              print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
+              if field_value:
+                person_gs_triple_instance = create_gattribute(person_gs._id, collection.AttributeType(field_instance), field_value)
+                print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
 
             else:
               field_instance_type = "GRelation"
               field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
               # print "\n ", type(collection.RelationType(field_instance)), " -- \n", collection.RelationType(field_instance)
-              person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value)
-              print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
+              if field_value:
+                person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value)
+                print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
     
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
