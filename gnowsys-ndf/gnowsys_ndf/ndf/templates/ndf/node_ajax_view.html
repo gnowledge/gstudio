@@ -483,7 +483,7 @@ existingComments = null;
   currentUser=
   {
       id: {{ user.id }},
-      avatarUrl: "http://f.cl.ly/items/0s1a0q1y2Z2k2I193k1y/default-user.png",
+      avatarUrl: "/static/ndf/images/user.png",
       name: '{{ user.username }}'
   };
 {% endif %}
@@ -496,7 +496,7 @@ sideComments = new SideComments('#commentable-area', currentUser, existingCommen
 sideComments.on('commentPosted', function( comment ) 
 {
     $.ajax({
-            url: "{% url 'annotation' groupid %}",
+            url: "{% url 'annotationlib' groupid %}",
             type: 'POST',
             data: 
             {
@@ -582,29 +582,36 @@ win.Selector.mouseup = function()
   {% if user.is_authenticated %}
   var st = win.Selector.getSelected();
   if(st!="")
-  { //highlightSearchTerms(String(st));
+  { 
+    var annotations = {{ annotations | safe}};
+    //highlightSearchTerms(String(st));
     //st has the selected  text
     //check if selection already exists
-   
-     
-    //annotations = annotations.replace("&#39;","'");
-    //annotations= ast.literal_eval(annotations);
-    //alert("Before fn call" + annotations);
-    //getAnn();
-    //annotations = json.stringify({{ node.annotations | safe}});
-    //annotations.replace(/&#39;/g, '"');
-    //jQuery.parseJSON(annotations);
-    alert("DID this help!!! " + annotations[0].selectedText);
-    //var str ='{{ node.annotations}}';
-    //str.replace(/&quot;/g,'"');
-    //var test = jQuery.parseJSON(str);
-
-    //annotations.replace(/&quot;/g, '"');
-    //annotations = jQuery.parseJSON(annotations);
-    //annotations.replace('quot;', '"');      
-    //alert(annotations); 
-    //console.log(annotations);
-
+/*    sideComments.on('commentPosted', function( comment ) 
+    {
+    $.ajax({
+            url: "{% url 'annotationlibInSelText' groupid %}",
+            type: 'POST',
+            data: 
+            {
+                comment      : JSON.stringify(comment),
+                selected     : st, 
+                ann_present  : JSON.stringify(ann),  
+                exists_flag  : flag, 
+                exists_pos   : pos,
+                node_id      : '{{ node }}', 
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( savedComment ) 
+            {
+              // Once the comment is saved, you can insert the comment into the comment stream with "insertComment(comment)".
+              alert("Inside success");
+              sideComments.insertComment(comment);
+            }
+          });
+    });
+*/
+    alert("DID this help!!! " + annotations);
     flag = false;
     for(pos=0; pos < annotations.length; pos++)
     {

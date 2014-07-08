@@ -67,6 +67,8 @@ urlpatterns = patterns('',
     url(r'^(?P<group_id>[^/]+)/$', 'gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),    
     #(r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.group')),
     url(r'^(?P<group_id>[^/]+)/annotation$', 'gnowsys_ndf.ndf.views.ajax_views.annotation', name='annotation'),
+    url(r'^(?P<group_id>[^/]+)/annotationlib$', 'gnowsys_ndf.ndf.views.ajax_views.annotationlib', name='annotationlib'),
+    url(r'^(?P<group_id>[^/]+)/annotationlibInSelText$', 'gnowsys_ndf.ndf.views.ajax_views.annotationlibInSelText', name='annotationlibInSelText'),
     url(r'^(?P<group_id>[^/]+)/getAnnotations$', 'gnowsys_ndf.ndf.views.ajax_views.getAnnotations', name='getAnnotations'),
     url(r'^(?P<group_id>[^/]+)/tags/(?P<tagname>[^/]+)$','gnowsys_ndf.ndf.views.methods.tag_info', name='tag_info'),
 

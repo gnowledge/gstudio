@@ -1305,7 +1305,6 @@ def annotation(request, group_id):
   '''
   Stores the annotation-based discussion thread on the database
   '''
-  comment = request.POST ["comment"]
   exists_flag = request.POST["exists_flag"] 
   exists_pos  = int(request.POST["exists_pos"])
   obj_id = str(request.POST["node_id"])
@@ -1318,10 +1317,7 @@ def annotation(request, group_id):
   #print "ann replaced", ann
   #print "type ann replaced", type(ann)
   ann = json.loads(ann)
-  comment = json.loads(comment)
   print "hello"
-  print "comment in py", comment['comment']
-  print "comment in py", comment['authorName']
   print "ann after eval", ann['selectedText']
   print "type ann after eval", type(ann)
   print "pos rcvd", exists_pos, type(exists_pos)
@@ -1348,4 +1344,42 @@ def getAnnotations(request, group_id):
   col = get_database()[Node.collection_name]
   sg_obj = col.Node.one({"_id":ObjectId(request.GET["node_id"])})
   return HttpResponse(json.dumps(sg_obj.annotations))
+
+def annotationlib(request, group_id):
+  '''
+  Stores the annotation-based discussion thread on the database
+  '''
+  obj_id = str(request.POST["node_id"])
+  col = get_database()[Node.collection_name]
+  comment = request.POST ["comment"]
+  comment = json.loads(comment)
+  print "comment: ", comment
+  print "comment in py", comment['comment']
+  print "comment in py", comment['authorName']
+  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
+  sg_obj.annotations.append(comment)
+  sg_obj.save()
+
+  return HttpResponse("Hello")
+
+def annotationlibInSelText(request, group_id):
+  '''
+  trigger post when text is selected
+  '''
+  obj_id = str(request.POST["node_id"])
+  col = get_database()[Node.collection_name]
+  comment = request.POST ["comment"]
+  comment = json.loads(comment)
+  selectedText= request.POST['selected']
+  ann = {
+          'selectedText' : selectedText,
+          'comments'     : comment
+  }
+  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
+  sg_obj.annotations.append(ann)
+  sg_obj.save()
+
+  return HttpResponse("Hello")
+
+
 
