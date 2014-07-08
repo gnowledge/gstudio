@@ -4,62 +4,137 @@
 {% if is_base_field or is_attribute_field %}
   {% if is_special_field %}
   <!-- Intentionally put this field at the top, as below because of it's data-type different widget may come -->
-  {% include included_template_name with var_name=field.name var_placeholder="Enter the content here" var_value=field_value|default_if_none:"" node_id=node_id %}
+  <div class="row" > 
+    <div class="small-1 columns">
+      {% if is_required_field %}
+      <i style="color:red">*</i>
+      {% endif %}
+    </div>
+    <div class="small-11 columns">
+      {% include included_template_name with var_name=field.name var_placeholder="Enter the content here" var_value=field_value|default_if_none:"" node_id=node_id %}
+      {% if is_required_field %}
+      <small class="error">Please select {{field.altnames}}!!!</small>
+      {% endif %}
+    </div>
+  </div>
 
   {% elif is_mongokit_is_radio %}
-  {% for value in field_value_choices %}
-  {% if forloop.counter != 1 %}
-  &nbsp;&nbsp;&nbsp;
-  {% endif %}
-  <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
-  {% endfor %}
-  {% if is_required_field %}
-  <small class="error">Please select {{field.altnames}}!!!</small>
-  {% endif %}
+  <div class="row" > 
+    <div class="small-1 columns">
+      {% if is_required_field %}
+      <i style="color:red">*</i>
+      {% endif %}
+    </div>
+    <div class="small-11 columns">
+      {% for value in field_value_choices %}
+      {% if forloop.counter != 1 %}
+      &nbsp;&nbsp;&nbsp;
+      {% endif %}
+      <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
+      {% endfor %}
+      {% if is_required_field %}
+      <small class="error">Please select {{field.altnames}}!!!</small>
+      {% endif %}
+    </div>
+  </div>
 
   {% elif field_type == "unicode" or field_type == "basestring" %}
-  <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} />
-  {% if is_required_field %}
-  <small class="error">Please fill {{field.altnames}}!!!</small>
-  {% endif %}
+  <div class="row" > 
+    <div class="small-1 columns">
+      {% if is_required_field %}
+      <i style="color:red">*</i>
+      {% endif %}
+    </div>
+    <div class="small-11 columns">
+      <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} />
+      {% if is_required_field %}
+      <small class="error">Please fill {{field.altnames}}!!!</small>
+      {% endif %}
+    </div>
+  </div>
 
   {% elif field_type == "long" %}
-  <input type="number" maxlength="{{field.maxlength}}" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} />
-  {% if is_required_field %}
-  <small class="error">Please fill valid {{field.altnames}}!!!</small>
-  {% endif %}
+  <div class="row" > 
+    <div class="small-1 columns">
+      {% if is_required_field %}
+      <i style="color:red">*</i>
+      {% endif %}
+    </div>
+    <div class="small-11 columns">
+      <input type="number" maxlength="{{field.maxlength}}" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} />
+      {% if is_required_field %}
+      <small class="error">Please fill valid {{field.altnames}}!!!</small>
+      {% endif %}
+    </div>
+  </div>
 
   {% elif field_type == "datetime" %}
-  <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:'m/d/Y H:i'}}" {% if is_required_field %}required{% endif %} />
-  {% if is_required_field %}
-  <small class="error">Please set {{field.altnames}}!!!</small>
-  {% endif %}
+  <div class="row" > 
+    <div class="small-1 columns">
+      {% if is_required_field %}
+      <i style="color:red">*</i>
+      {% endif %}
+    </div>
+    <div class="small-11 columns">
+      <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:'m/d/Y H:i'}}" {% if is_required_field %}required{% endif %} />
+      {% if is_required_field %}
+      <small class="error">Please set {{field.altnames}}!!!</small>
+      {% endif %}
+    </div>
+  </div>
 
   {% elif field_type == "bool" %}
-  {% for value in field_value_choices %}
-  {% if forloop.counter != 1 %}
-  &nbsp;&nbsp;&nbsp;
-  {% endif %}
-  <input type="radio" name="{{field.name}}" value="{{value|yesno:'Yes,No'}}" id="{{field.name}}{{value|yesno:'Yes,No'}}" {% if value|yesno:'Yes,No' == field_value|yesno:'Yes,No' %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value|yesno:'Yes,No'}}">{{value|yesno:'Yes,No'}}</label>
-  {% endfor %}
-  {% if is_required_field %}
-  <small class="error">Please select {{field.altnames}}!!!</small>
-  {% endif %}
+  <div class="row" > 
+    <div class="small-1 columns">
+      {% if is_required_field %}
+      <i style="color:red">*</i>
+      {% endif %}
+    </div>
+    <div class="small-11 columns">
+      {% for value in field_value_choices %}
+      {% if forloop.counter != 1 %}
+      &nbsp;&nbsp;&nbsp;
+      {% endif %}
+      <input type="radio" name="{{field.name}}" value="{{value|yesno:'Yes,No'}}" id="{{field.name}}{{value|yesno:'Yes,No'}}" {% if value|yesno:'Yes,No' == field_value|yesno:'Yes,No' %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value|yesno:'Yes,No'}}">{{value|yesno:'Yes,No'}}</label>
+      {% endfor %}
+      {% if is_required_field %}
+      <small class="error">Please select {{field.altnames}}!!!</small>
+      {% endif %}
+    </div>
+  </div>
 
   {% elif is_list_of %}
-  <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|join:', '|default_if_none:''}}" placeholder="Separate {{field.altnames|lower}} by commas..." >
+  <div class="row" > 
+    <div class="small-1 columns">
+      {% if is_required_field %}
+      <i style="color:red">*</i>
+      {% endif %}
+    </div>
+    <div class="small-11 columns">
+      <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|join:', '|default_if_none:''}}" placeholder="Separate {{field.altnames|lower}} by commas..." >
+    </div>
+  </div>
 
   {% endif %}
 
 
 <!-- RelationType fields -->
 {% elif is_relation_field %}
-  <select id="{{field.name}}" class="medium" name="{{field.name}}" required="">
-    <option value="">- - - Select {{field.altnames|lower}} - - -</option>
-    {% for choice in field_value_choices %}
-      <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{{choice.name}}</option>
-    {% endfor %}
-  </select>
-  <small class="error">Please select {{field.altnames}}!!!</small>
+  <div class="row" > 
+    <div class="small-1 columns">
+      {% if is_required_field %}
+      <i style="color:red">*</i>
+      {% endif %}
+    </div>
+    <div class="small-11 columns">
+      <select id="{{field.name}}" class="medium" name="{{field.name}}" required="">
+        <option value="">- - - Select {{field.altnames|lower}} - - -</option>
+        {% for choice in field_value_choices %}
+          <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{{choice.name}}</option>
+        {% endfor %}
+      </select>
+      <small class="error">Please select {{field.altnames}}!!!</small>
+    </div>
+  </div>
 
 {% endif %}
