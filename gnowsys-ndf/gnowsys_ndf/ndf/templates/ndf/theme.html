@@ -30,9 +30,17 @@
 
     		var $tree = $('.themes');
     		var user = "{{user.is_authenticated}}";
+    		var unfold = "{{unfold}}";
 
-    		$tree.tree({
-    			autoOpen: false,
+    		if(unfold == "true"){
+    			unfold = true
+    		}
+    		else{
+    			unfold = false
+    		}
+
+			$tree.tree({
+    			autoOpen: unfold,
 
         		onCreateLi: function(node, $li) {
 						
@@ -40,7 +48,7 @@
 						$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
 					}
 					else{
-						$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:gold"></span> &nbsp;');				        		
+						$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:orange"></span> &nbsp;');				        		
 					}
 
         			if (user == "True")
@@ -54,8 +62,7 @@
                 			
                 			{% endif %}
             			);	
-        			}
-            		
+        			}           		
 
         		}
     		});
@@ -171,10 +178,8 @@
 		<hr/>
 
 		{% if node %}
-
 			<!-- If "Theme" node -->
-			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
-			
+			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>			
 		{% endif %}
 
 	{% endif %}
@@ -282,58 +287,15 @@
 	<script type="text/javascript">
 		// script for fold themes hierarchy
 		$(".fold").click(function() {
-			$(function() {
-				
-				var user = "{{user.is_authenticated}}"
-
-				$('.themes').tree({
-					autoOpen: false,
-	        		onCreateLi: function(node, $li) {
-	        			if (user == "True")
-        				{
-        					$li.find('.jqtree-element').append(
-        						{% user_access_policy groupid request.user as user_access %}
-        						{% if user_access == "allow" %}
-
-	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
-
-	                			{% endif %}
-	            			);	
-        				}
-
-	        		}
-				});
-
+			$(function() {				
+				location.href = "{% url 'theme_page' group_name_tag %}";
 			});
 		});
 
 		// script for unfold themes hierarchy
 	    $(".unfold").click(function() {
 	    	$(function() {
-
-	    		var user = "{{user.is_authenticated}}"
-
-	    		$('.themes').tree({
-	    			autoOpen: true,
-	    			slide: false,
-
-	    			onCreateLi: function(node, $li) {
-
-	    				if (user == "True")
-        				{
-		            		$li.find('.jqtree-element').append(
-		            			{% user_access_policy groupid request.user as user_access %}
-        						{% if user_access == "allow" %}
-
-		                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
-		                			
-		                		{% endif %}
-		            		);
-		            	}
-
-	        		}
-	    			
-	    		});
+	    		location.href = "{% url 'theme_page' group_name_tag %}?unfold=true";	
 	    	});
 	    });	
 

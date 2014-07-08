@@ -954,7 +954,9 @@ class Group(GSystem):
         'subscription_policy': basestring,   # Subscription policy to this group - open, by invitation, by request
         'visibility_policy': basestring,     # Existance of the group - announced or not announced
         'disclosure_policy': basestring,    # Members of this group - disclosed or not 
-        'encryption_policy': basestring            # Encryption - yes or no
+        'encryption_policy': basestring,            # Encryption - yes or no
+
+        'group_admin': [ObjectId]				# ObjectId of Author class
     }
 
     use_dot_notation = True
