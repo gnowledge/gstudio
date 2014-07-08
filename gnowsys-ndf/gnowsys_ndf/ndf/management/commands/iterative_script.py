@@ -478,8 +478,12 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 			log_flag -= 1
 		
 			if property_id=="P31" or property_id=="P279":
-				print "^^entering tags^^ ",label, " - ",property_value_for_relation				
-				populate_tags(label,property_value_for_relation)
+				print "^^entering tags^^ ",label, " - ",property_value_for_relation	
+				property_value_for_relation=unicode("Q")+unicode(property_value_for_relation)
+				property_value_json=gen_url_json+str(property_value_for_relation)+".json"
+				property_value_json=json_parse(property_value_json) #property_value is supposed to be the id of the right subject in case of a relation
+				property_value_name=extract_labels(property_value_json,property_value_for_relation,language)			
+				populate_tags(label,property_value_name)
 			
 			
 

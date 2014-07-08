@@ -73,8 +73,11 @@
 		Tags:
 		<br><br>
 		</strong>
-		{{ selected_topic.tags }}
-		<br>
+		{% for tag in selected_topic.tags %}
+			{{ tag }} {{" "}}		
+
+		{% endfor %}
+		<br><br>
 		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>
 		<br>
 		<hr align = "center" size = "10%">
