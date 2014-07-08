@@ -587,7 +587,7 @@ win.Selector.mouseup = function()
     //highlightSearchTerms(String(st));
     //st has the selected  text
     //check if selection already exists
-/*    sideComments.on('commentPosted', function( comment ) 
+    sideComments.on('commentPosted', function( comment ) 
     {
     $.ajax({
             url: "{% url 'annotationlibInSelText' groupid %}",
@@ -610,7 +610,7 @@ win.Selector.mouseup = function()
             }
           });
     });
-*/
+
     alert("DID this help!!! " + annotations);
     flag = false;
     for(pos=0; pos < annotations.length; pos++)
