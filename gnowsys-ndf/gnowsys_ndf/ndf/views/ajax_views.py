@@ -1366,11 +1366,13 @@ def annotationlibInSelText(request, group_id):
   '''
   trigger post when text is selected
   '''
+  print "Inside annotationlibInSelText "
   obj_id = str(request.POST["node_id"])
   col = get_database()[Node.collection_name]
   comment = request.POST ["comment"]
   comment = json.loads(comment)
-  selectedText= request.POST['selected']
+  selectedText= request.POST['selectedText']
+  print "check for selected text", selectedText
   ann = {
           'selectedText' : selectedText,
           'comments'     : comment

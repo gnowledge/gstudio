@@ -477,7 +477,89 @@ For annotation based discussions:
 
 var annotations = {{ annotations | safe}};
 var currentUser = null;
-existingComments = null;
+var  existingComments = [
+{
+"sectionId": "1",
+"comments": [
+{
+"authorAvatarUrl": "http://f.cl.ly/items/1W303Y360b260u3v1P0T/jon_snow_small.png",
+"authorName": "Jon Sno",
+"comment": "I'm Ned Stark's bastard. Related: I know nothing."
+},
+{
+"authorAvatarUrl": "http://f.cl.ly/items/2o1a3d2f051L0V0q1p19/donald_draper.png",
+"authorName": "Donald Draper",
+"comment": "I need a scotch."
+}
+]
+},
+{
+"sectionId": "3",
+"comments": [
+{
+"authorAvatarUrl": "http://f.cl.ly/items/0l1j230k080S0N1P0M3e/clay-davis.png",
+"authorName": "Senator Clay Davis",
+"comment": "These Side Comments are incredible. Sssshhhiiiiieeeee."
+}
+]
+}
+];
+var ann = {                                  //dummy variable at frontend
+  selectedText: "",
+  annotationText: {text: "", datetime: ""},
+  comments: [] 
+};
+
+var flag = false; 
+var pos=-1;
+var st = null;
+
+if(!window.win){
+  win = {};
+}
+win.Selector = {};
+win.Selector.getSelected = function()
+{
+  var t = '';
+  if(window.getSelection){
+    t = window.getSelection();
+  }else if(document.getSelection){
+    t = document.getSelection();
+  }else if(document.selection){
+    t = document.selection.createRange().text;
+  }
+  return t;
+}
+var st1;
+win.Selector.mouseup = function()
+{
+  //{% if user.is_authenticated %}    User authentication required for viewing already existing comments?
+  st1 = win.Selector.getSelected();
+  console.log("st1: " + st1);
+  if(st1 != "")
+  {
+    st = st1;
+    console.log("st: " + st);
+    alert("inside mouseup" +st);
+  }//{% endif %}
+    console.log("stout: " + st);
+
+}
+
+
+$(document).ready(function()                             //detect mouseup event
+{
+  $("#content").bind("click", win.Selector.mouseup);
+ /*$("#content").mouseup(function() 
+  {
+    st = window.getSelection();
+    alert("scooby doo" + st);
+    //TODO highlight function
+  });*/
+}); 
+
+//console.log(st);
+
 
 {% if user.is_authenticated %}
   currentUser=
@@ -490,17 +572,21 @@ existingComments = null;
 
 // Require new SideComments object
 var SideComments = require('side-comments');
-// Then, create a new SideComments instance, passing in the wrapper element and the optional the current user and any existing comments.
+// Create a new SideComments instance, passing in the wrapper element and the optional the current user and any existing comments.
 sideComments = new SideComments('#commentable-area', currentUser, existingComments);
-
+//Listen to 'commentPosted'
 sideComments.on('commentPosted', function( comment ) 
 {
+   //if(st != "")
+    {
+    
     $.ajax({
-            url: "{% url 'annotationlib' groupid %}",
+            url: "{% url 'annotationlibInSelText' groupid %}",
             type: 'POST',
             data: 
             {
                 comment      : JSON.stringify(comment),
+                selectedText : st,
                 ann_present  : JSON.stringify(ann),  
                 exists_flag  : flag, 
                 exists_pos   : pos,
@@ -514,8 +600,9 @@ sideComments.on('commentPosted', function( comment )
               sideComments.insertComment(comment);
             }
           });
-});
-
+    }
+}); 
+  
 // Listen to "commentDeleted" and send a request to your backend to delete the comment.
 // More about this event in the "docs" section.
 /*sideComments.on('commentDeleted', function( commentId ) {
@@ -528,136 +615,9 @@ success: function( success ) {
 });
 });*/
 
-function getAnn()
-{
- //alert("inside getAnn");
- $.ajax({
-          type: "GET",
-          url: "{% url 'getAnnotations' groupid %}",
-          datatype: "JSON",
-          data: 
-          {
-            node_id : '{{ node }}',
-            csrfmiddlewaretoken : '{{ csrf_token }}'
-          },
-          success: function (data)
-          {
-              //alert(test1['tex']);
-              test1['tex']='xyz';
-              //alert(test1['tex']);
-              annotations = jQuery.parseJSON(data);
-             // alert(annotations[0].selectedText + typeof(annotations));
-          }
-      });
-}
 
 
-var ann = {                                  //dummy variable at frontend
-  selectedText: "",
-  annotationText: {text: "", datetime: ""},
-  comments: [] 
-};
 
-var flag = false;
-var pos=-1;
-
-if(!window.win){
-  win = {};
-}
-win.Selector = {};
-win.Selector.getSelected = function(){
-  var t = '';
-  if(window.getSelection){
-    t = window.getSelection();
-  }else if(document.getSelection){
-    t = document.getSelection();
-  }else if(document.selection){
-    t = document.selection.createRange().text;
-  }
-  return t;
-}
-
-win.Selector.mouseup = function()
-{
-  {% if user.is_authenticated %}
-  var st = win.Selector.getSelected();
-  if(st!="")
-  { 
-    var annotations = {{ annotations | safe}};
-    //highlightSearchTerms(String(st));
-    //st has the selected  text
-    //check if selection already exists
-    sideComments.on('commentPosted', function( comment ) 
-    {
-    $.ajax({
-            url: "{% url 'annotationlibInSelText' groupid %}",
-            type: 'POST',
-            data: 
-            {
-                comment      : JSON.stringify(comment),
-                selected     : st, 
-                ann_present  : JSON.stringify(ann),  
-                exists_flag  : flag, 
-                exists_pos   : pos,
-                node_id      : '{{ node }}', 
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            success: function( savedComment ) 
-            {
-              // Once the comment is saved, you can insert the comment into the comment stream with "insertComment(comment)".
-              alert("Inside success");
-              sideComments.insertComment(comment);
-            }
-          });
-    });
-
-    alert("DID this help!!! " + annotations);
-    flag = false;
-    for(pos=0; pos < annotations.length; pos++)
-    {
-      //alert("hows life?");
-      if(annotations[pos].selectedText.toLowerCase() == String(st).toLowerCase())
-      {
-        flag = true;                //selection already exists in list
-        break;
-      }
-    }
-    
-    if(!flag)                       //if selection is new, add to list and generate thread    
-    { alert("New selection");
-      $("#annField").val("");
-      $("#ann").css('visibility', 'visible');
-      $("#ann").css('display', 'initial');
-      ann.selectedText = String(st);               //Requires string conversion  
-    }  
-
-    else                          
-    {
-      alert("Selection exists!");
-      ann = annotations[pos];
-
-      //TODO display thread
-      $("#replies").html(annotations[pos].annotationText['text'] + "<br> <i>" + annotations[pos].annotationText['datetime'] + "</i><br>");
-      for (var j = 0; j < annotations[pos].comments.length; j++)
-      {
-        $("#replies").append(annotations[pos].comments[j].text, "<i>", annotations[pos].comments[j].datetime, "</i><br>");
-      }
-      $("#replyField").val("");
-      $("#reply").css('visibility', 'visible');     
-      $("#ann").css('display', 'none');                  //$("#ann").css('visibility', 'hidden');
-      $("#replies").css('visibility', 'visible');
-    }
-  }  
-  {% endif %}
-}
-
-$(document).ready(function()                             //detect mouseup event
-{
-  $("#view-page > div").bind("mouseup", win.Selector.mouseup);
-  //TODO highlight function
-  
-  
-}); 
 
 function activateReply()
 {
