@@ -1305,6 +1305,7 @@ def annotation(request, group_id):
   '''
   Stores the annotation-based discussion thread on the database
   '''
+  comment = request.POST ["comment"]
   exists_flag = request.POST["exists_flag"] 
   exists_pos  = int(request.POST["exists_pos"])
   obj_id = str(request.POST["node_id"])
@@ -1317,6 +1318,10 @@ def annotation(request, group_id):
   #print "ann replaced", ann
   #print "type ann replaced", type(ann)
   ann = json.loads(ann)
+  comment = json.loads(comment)
+  print "hello"
+  print "comment in py", comment['comment']
+  print "comment in py", comment['authorName']
   print "ann after eval", ann['selectedText']
   print "type ann after eval", type(ann)
   print "pos rcvd", exists_pos, type(exists_pos)

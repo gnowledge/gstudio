@@ -9,11 +9,11 @@
   <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
   <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
   <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+  
+  <!-- Scripts and stylesheets for SideComments -->
   <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script>
-  <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.css"></script>
-  <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/themes/default-theme"></script>
-
-
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css">
+  <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css">
 {% endblock %}
 
 <!-- css for drawer widget -->
@@ -471,9 +471,86 @@ ul#graph-hover.f-dropdown{
 
   });
 
-//For annotation based discussions:
+/*
+For annotation based discussions:
+*/
 
-var annotations = []; 
+var annotations = {{ annotations | safe}};
+var currentUser = null;
+existingComments = null;
+
+{% if user.is_authenticated %}
+  currentUser=
+  {
+      id: {{ user.id }},
+      avatarUrl: "http://f.cl.ly/items/0s1a0q1y2Z2k2I193k1y/default-user.png",
+      name: '{{ user.username }}'
+  };
+{% endif %}
+
+// Require new SideComments object
+var SideComments = require('side-comments');
+// Then, create a new SideComments instance, passing in the wrapper element and the optional the current user and any existing comments.
+sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+
+sideComments.on('commentPosted', function( comment ) 
+{
+    $.ajax({
+            url: "{% url 'annotation' groupid %}",
+            type: 'POST',
+            data: 
+            {
+                comment      : JSON.stringify(comment),
+                ann_present  : JSON.stringify(ann),  
+                exists_flag  : flag, 
+                exists_pos   : pos,
+                node_id      : '{{ node }}', 
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function( savedComment ) 
+            {
+              // Once the comment is saved, you can insert the comment into the comment stream with "insertComment(comment)".
+              alert("Inside success");
+              sideComments.insertComment(comment);
+            }
+          });
+});
+
+// Listen to "commentDeleted" and send a request to your backend to delete the comment.
+// More about this event in the "docs" section.
+/*sideComments.on('commentDeleted', function( commentId ) {
+$.ajax({
+url: '/comments/' + commentId,
+type: 'DELETE',
+success: function( success ) {
+// Do something.
+}
+});
+});*/
+
+function getAnn()
+{
+ //alert("inside getAnn");
+ $.ajax({
+          type: "GET",
+          url: "{% url 'getAnnotations' groupid %}",
+          datatype: "JSON",
+          data: 
+          {
+            node_id : '{{ node }}',
+            csrfmiddlewaretoken : '{{ csrf_token }}'
+          },
+          success: function (data)
+          {
+              //alert(test1['tex']);
+              test1['tex']='xyz';
+              //alert(test1['tex']);
+              annotations = jQuery.parseJSON(data);
+             // alert(annotations[0].selectedText + typeof(annotations));
+          }
+      });
+}
+
 
 var ann = {                                  //dummy variable at frontend
   selectedText: "",
@@ -500,10 +577,6 @@ win.Selector.getSelected = function(){
   return t;
 }
 
-var test1= {'tex': 'abc'};
-
-annotations = {{ annotations | safe}};
-
 win.Selector.mouseup = function()
 {
   {% if user.is_authenticated %}
@@ -518,7 +591,6 @@ win.Selector.mouseup = function()
     //annotations= ast.literal_eval(annotations);
     //alert("Before fn call" + annotations);
     //getAnn();
-    alert(test1['tex']);
     //annotations = json.stringify({{ node.annotations | safe}});
     //annotations.replace(/&#39;/g, '"');
     //jQuery.parseJSON(annotations);

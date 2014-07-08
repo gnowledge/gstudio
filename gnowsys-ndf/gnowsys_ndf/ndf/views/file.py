@@ -809,10 +809,13 @@ def file_detail(request, group_id, _id):
         else:
             shelves = []
 
+    annotations = json.dumps(file_node.annotations)
+
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
                                 'groupid':group_id,
+                                'annotations' : annotations,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
                                 'breadcrumbs_list': breadcrumbs_list
