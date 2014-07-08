@@ -22,6 +22,13 @@ class Command(BaseCommand):
     # Keep latest fields to be added at top
     
     # Adds 'subject_scope', 'attribute_type_scope', 'object_value_scope' field (with default value as "") to all documents which belongs to GAttribute
+    res = collection.update({'_type': {'$in': ["Group", "Author"]}, 'group_admin': {'$exists': False}}, 
+                            {'$set': {'group_admin': []}}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'group_admin' field added to following no. of documents: ", res['n']
+
+    # Adds 'subject_scope', 'attribute_type_scope', 'object_value_scope' field (with default value as "") to all documents which belongs to GAttribute
     res = collection.update({'_type': "GAttribute", 'subject_scope': {'$exists': False}, 'attribute_type_scope': {'$exists': False}, 'object_value_scope': {'$exists': False}}, 
                             {'$set': {'subject_scope':"", 'attribute_type_scope':"", 'object_value_scope': ""}}, 
                             upsert=False, multi=True
