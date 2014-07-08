@@ -38,7 +38,9 @@ wiki_base_url="http://en.wikipedia.org/wiki/"
 
 def create_WikiData_WikiTopic():
 	"""
-	creates GSystemType: WikiData(a member_of GAPP), GSystemType Theme and Topic(a member_of factory_settings) 
+	creates GSystemType: WikiData(a member_of GAPP)
+	All items hence harvested will be GSystems whose member_of field will have the ObjectId of
+	GSystemType WikiTopic.
 	"""
 	GAPP = collection.Node.one({"name": u"GAPP"})
 	cursor = collection.Node.one({"_type":u"GSystemType", "name":u"WikiData"}) #change -am
@@ -111,7 +113,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 	3. description - Desc
 	4. property_id - unique code of property. PCode
 	5. language - language being used
-	6. User Id
+	6. User Id -by default int(1),used in created_by and modified_by
 	"""
 	print "Creating an Attribute Type"
 	cursor = collection.Node.one({"label":unicode(property_id),"_type":"AttributeType"})
@@ -151,7 +153,17 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 def create_Attribute(subject_name, attribute_type_name, object_value, language, user_id):
 	"""
 	Creating an Attributpe with specified name, subject_id, attribute_type and value.
-	This will create an attribute iff the attribute is not present for the same subject
+	This will create an attribute iff the attribute is not present for the same subject.
+	Returns -
+		False :  as the topic already existed. 
+		True:If the topic created during the function call.
+	parameters passed to the function -
+	1)subject_name -name of item that is subject_name
+	2)attribute_type_name - name of attribute type
+	3) object_value -3rd part of triplet , object value
+	4) language -choice of language
+	5) user_id - by default int(1),used in created_by and modified_by
+
 	"""
 
 	print "Creating an attribute"
@@ -182,7 +194,19 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	
 def create_Topic(label, description, alias_list, topic_title, last_update_datetime, user_id):
 	"""
-	Creates a topic if it does not exist
+	Creates a topic if it does not exist and returns boolean value.
+	Returns -
+		True : false as the topic already existed. 
+		False:If the topic created during the function call.
+
+	Paramaters passed to the function -
+	1) label -name of item/topic_title
+	2) description -description of the topic_title
+	3) alias_list - list of aliases
+	4) topic_title - id of item used in wikidata
+	5) last_update_datetime - date time of last update
+	6)user_id -by default int(1) , used in created_by and modified_by
+
 	"""
 	print "Creating a GSystem Topic"
 	topic_type = collection.Node.one({"name": u"WikiTopic","_type":u"GSystemType"})
@@ -267,7 +291,8 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 	Creates a GRelation with following parameters:
 	1. Subject: which GSytem class object
 	2. Relation Type: The type of relation
-	3. Right Subject: The subject on the right. The object related to the current object.
+	3. Right Subject: The subject on the right. The object related to the current object.The name is provided
+	to the function as right_subject_name.
 	"""
 	print "Creating a Relation."
 	relation_type = collection.Node.one({"_type":u"RelationType", "name": unicode(relation_type_name)})
@@ -293,6 +318,14 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		return False
 
 def populate_tags(label,property_value_for_relation):
+	"""
+	To populate tags of the object given by label.tags is a list field and the values will be appended
+	in the list.(actually the right_subject_name of P31 and P279 are being appended as tags to give a sense 
+	of theme, category hierarchy etc.)
+	Parameter passed to the function -
+	1)label - name of item for which tag is to eb appended.
+	2)property_value_for_relation - value to be appended in tag.It is a human readable english value.
+	"""
 	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
 	if obj:
 		obj.tags.append(unicode(property_value_for_relation))
@@ -303,8 +336,6 @@ def populate_tags(label,property_value_for_relation):
 def item_exists(label):
 	"""	
 	Returns boolean value to indicate if a GSystem with the given name exists or not"
-
-
 	"""	
 
 	object = collection.Node.find_one({"type":u"GSystem","name":unicode(label)})
@@ -315,6 +346,9 @@ def item_exists(label):
 
 
 def display_objects():
+	"""
+	Simple display function to display all Objects in the mongodb database.
+	"""
 	cursor = collection.Node.find()
 	for a in cursor:
 		print a.name
@@ -322,6 +356,9 @@ def display_objects():
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
+		"""
+		Some test cases that are not a part of the main harvesting script
+		"""
 		create_WikiData_WikiTopic()
 		create_Topic(u"topic11", u"topic1desc", [u"Alias1", u"Alias2"], "Test1", None, user_id)
 		create_Topic(u"topic21", u"topic2desc", [u"Alias1"], "Test2", None, user_id)
