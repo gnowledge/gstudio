@@ -36,7 +36,6 @@
     </header>
 
     {% csrf_token %}
-
     <div id="event-details-edit-div" class="tabs-content" >
       {% for tab_name, tab_fields_list in property_order_list %}
       <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
@@ -52,16 +51,36 @@
           </div>
         </div>
         {% endfor %}
+        
+        <!-- attendance -->
+        <div class="row" >
+          <div class="small-2 columns"> 
+            <label class="left inline" for="Attendance"> Attendance </label>
+            <!-- attendance -->
+          </div>
+          <div class="small-5 end columns">          
+            <a href="#attendance" data-reveal-id="attendance">
+                <h1></h1>
+                Add Attendance
+            </a>
+            <div id="attendance" class="reveal-modal" data-reveal>
+              <a class="close-reveal-modal">&#215;</a>
+              {% include "ndf/attendance.html" %}
+            </div>
+          </div>
+        </div>
+        <!-- end of attendance -->
+
       </div>
       {% endfor %}
+
 
       <!-- Additional panels if required
       <div class="" id="panel_?">
       </div>
       -->
     </div>
-
-    <br>
+    
     <div class="row">
       <div class="small-4 small-offset-2 end columns">
         <input type="submit" class="small button expand" value="Save" />

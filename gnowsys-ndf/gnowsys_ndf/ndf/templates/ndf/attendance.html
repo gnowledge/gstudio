@@ -1,0 +1,126 @@
+<style type="text/css">
+
+	.all-stud-table li.title {
+		/*background-color: #2980b9;*/
+	}
+	
+	.present-table li.title {
+		background-color: #27ae60;
+	}
+
+	.absent-table li.title {
+		background-color: #e74c3c;
+	}
+
+	.margin-0 {
+		margin: 0 !important;
+	}
+
+</style>
+
+
+<h2 class="text-center">Attendance</h2>
+<br/><br/>
+
+<div class="row">
+
+	<div class="small-2 columns"> 
+		<label class="left inline" for="Batch"> Batch </label>
+	</div>
+
+	<div class="small-5 end columns">
+		<select required="" name="Batch" class="medium" id="Batch">
+			<option value=""> Select the Batch </option>
+		</select>
+	</div>
+
+</div>
+
+<div class="row">
+
+	<div class="small-2 columns"> 
+		<label class="left inline" for="Majority"> Majority </label>
+	</div>
+
+	<div class="small-5 end columns">
+		<br/>
+		<div class="row">
+			<div class="small-6 end columns">
+				<input type="radio" name="majority" value="Present" id="present">
+				<label for="present">Present</label>
+			</div>
+		
+			<div class="small-6 columns">
+				<input type="radio" name="majority" value="Absent" id="absent">
+				<label for="absent">Absent</label>
+			</div>
+		</div>
+		
+	</div>
+</div>
+<br/>
+
+
+<div class="row">
+	
+	<!-- all students -->
+	<div class="small-6 columns">
+	
+		<!-- <h3>All students | </h3> -->
+		<ul class="pricing-table all-stud-table">
+		  <li class="title">All Students - Mark the attendance</li>
+		  <li class="price">
+		  	<input type="text" class="margin-0" id="" placeholder="Type here to search in the resources"/>
+		  </li>
+		  <li class="description">
+		  	<div class="row">
+			   <div class="small-8 columns">Students Name</div>
+			   <div class="small-4 columns">
+			   		<div class="row">
+				   		<div class="small-6 columns">Present</div>
+				   		<div class="small-6 columns">Absent</div>
+				   	</div>
+			   </div>
+			</div>
+		  </li>
+		  <li class="bullet-item text-left">
+		  	<div class="row">
+			   <div class="small-8 columns">sdf</div>
+			   <div class="small-4 columns">
+			   		<div class="row">
+				   		<div class="small-6 columns">
+				   			<input type="radio" name="majority" value="present">
+				   		</div>
+						<div class="small-6 columns">
+							<input type="radio" name="majority" value="absent">
+						</div>
+					</div>
+			   </div>
+			</div>
+		  </li>
+		  <li class="bullet-item text-left">Student ##</li>
+		  <li class="bullet-item text-left">....</li>
+		  <li class="cta-button"><a class="button" href="#">Done</a></li>
+		</ul>
+	</div>
+
+	<!-- present and absent students -->
+	<div class="small-6 columns">
+		
+		<!-- <h3>All students | </h3> -->
+		<ul class="pricing-table present-table">
+		  <li class="title">Present Students</li>
+		  <li class="bullet-item text-left">Student ##</li>
+		  <li class="bullet-item text-left">....</li>
+		  <!-- <li class="cta-button"><a class="button" href="#">Done</a></li> -->
+		</ul>
+
+		<!-- <h3>All students | </h3> -->
+		<ul class="pricing-table absent-table">
+		  <li class="title">Absent Students</li>
+		  <li class="bullet-item text-left">Student ##</li>
+		  <!-- <li class="cta-button"><a class="button" href="#">Done</a></li> -->
+		</ul>
+	</div>
+
+</div>
