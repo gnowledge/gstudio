@@ -1,7 +1,6 @@
-{% extends "ndf/base.html" %}
+{% extends "ndf/node_details_base.html" %}
 
 {% block title %} {{title}} {% endblock %}
-
 
 {% block search_content %}
  {% include "ndf/node_search_base.html" %}
@@ -50,6 +49,58 @@
 	<hr align = "center" size = "10%">
 {% else %}
 	
+
+
+
+<header class="row page">
+
+  <section class="medium-12 columns" >
+  
+  <dl class="row tabs" data-tab>
+	
+  <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+
+    <dd>
+        <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+            <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+                <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+                <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+                <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+            </ul>
+    </dd>
+
+
+    <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+
+    <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+     </section>
+
+</header>
+
+	    <!-- Content for Concept Graph -->
+      <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
+        <a class="close-reveal-modal">&#215;</a>
+        {% include "ndf/graph_concept.html" %}
+      </div>
+      <!-- Content for Collection Graph -->
+      <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+      	<a class="close-reveal-modal">&#215;</a>
+      	{% include "ndf/graph_collection.html" %}
+      </div>
+      <!-- Content for dependency Graph -->
+     <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+       <a class="close-reveal-modal">&#215;</a>
+       {% include "ndf/graph_dependency.html" %}
+     </div>
+     <!-- Tab View Map Widget -->
+     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
+       <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+       <a class="close-reveal-modal" >&#215;</a>
+       {% include "ndf/map_widget.html" with mode="read" %}
+       <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+       <!-- #{#%# endif %} -->
+     </div>
+
   	<div>
 		<br>
 		<br>
@@ -80,12 +131,19 @@
 		<br><br>
 		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>
 		<br>
-		<hr align = "center" size = "10%">
-		
+		<p>
+		<ul>
+		<strong>Dynamic Attributes:</strong>
+		<br />
+		{% for gattribute in attribute_set %}
+			<li>{{ gattribute.attribute_type.name }} : {{ gattribute.object_value }}</li>
+		{% endfor %}
+		</ul>
+		<hr align = "center" size = "10%" />
 		<iframe src="{{ selected_topic.url }}" width="95%" height="600" align = "middle" frameborder = 0>
  		 <p>Your browser does not support iframes.</p>
 		</iframe>
-
+		
   	</div>
  
 
