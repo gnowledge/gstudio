@@ -134,9 +134,21 @@
 		<p>
 		<ul>
 		<strong>Dynamic Attributes:</strong>
-		<br />
+		<br>
 		{% for gattribute in attribute_set %}
-			<li>{{ gattribute.attribute_type.name }} : {{ gattribute.object_value }}</li>
+			{% if 'image' in gattribute.attribute_type.name %}
+			<li>{{ gattribute.attribute_type.name }} : <a href ={{ gattribute.object_value }}>{{ gattribute.object_value }}</a></li>		
+			{% else %}
+			<li>{{ gattribute.attribute_type.name }} :{{ gattribute.object_value }}</li>
+		
+		{% endif %}
+		{% endfor %}
+		</ul>
+		<ul>
+		<strong>Dynamic Relations:</strong>
+		<br>
+		{% for grelation in relation_set %}
+			<li>{{ grelation.relation_type.name }} :{{ grelation.right_subject.name }}</li>
 		{% endfor %}
 		</ul>
 		<hr align = "center" size = "10%" />

@@ -57,7 +57,8 @@ def details(request, group_id, topic_id):
 	context_variables = {'title': "WikiData Topics"}
 	context_instance = RequestContext(request, {'title': "WikiData Topics", 'groupid':group_id, 'group_id':group_id})
 	attribute_set = collection.Node.find({"_type":u"GAttribute", "subject":ObjectId(topic_id)})
+	relation_set = collection.Node.find({"_type":u"GRelation", "subject":ObjectId(topic_id)})	
 	print attribute_set
-      	return render(request, template, {'title': "WikiData Topics", 'topic_coll': topic_coll, 'selected_topic': selected_topic, 'attribute_set': attribute_set, 'groupid':group_id, 'group_id':group_id})
+      	return render(request, template, {'title': "WikiData Topics", 'topic_coll': topic_coll, 'selected_topic': selected_topic, 'attribute_set': attribute_set,'relation_set':relation_set, 'groupid':group_id, 'group_id':group_id})
 
 

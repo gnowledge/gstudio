@@ -46,6 +46,8 @@ gen_url_page="http://www.wikidata.org/wiki/"
 language ="en" #this script is scalable and can be run for any given language .All relevant extracting functions will extract info in that language only.
 
 commonsMedia_base_link="http://commons.wikimedia.org/wiki/File:"
+
+
 #url="http://www.wikidata.org/wiki/Special:EntityData"
 
 def json_parse(url_json):
@@ -382,6 +384,10 @@ def property_create_AttributeType(property_id,property_data_type,json_obj):
 
 def property_create_Attribute(label,property_id,property_value,property_json):
 	property_label =extract_labels(property_json,property_id,language)
+	if 'image' in property_label:
+		property_value=	commonsMedia_base_link+property_value
+		property_value=property_value.replace(" ","_")
+
 	attribute_exists = create_Attribute(label, property_label, property_value, language, user_id)
 	if attribute_exists:
         	log_attribute_exists(property_label, log_flag)
