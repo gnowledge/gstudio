@@ -296,6 +296,34 @@ def display_objects():
 	for a in cursor:
 		print a.name
 		
+def item_exists(label):
+	"""	
+	Returns boolean value to indicate if a GSystem with the given name exists or not"
+	"""	
+
+	object = collection.Node.find_one({"type":u"GSystem","name":unicode(label)})
+	if object !=None:
+		return True
+	else:
+		return False
+
+
+def populate_tags(label,property_value_for_relation):
+	"""
+	To populate tags of the object given by label.tags is a list field and the values will be appended
+	in the list.(actually the right_subject_name of P31 and P279 are being appended as tags to give a sense 
+	of theme, category hierarchy etc.)
+	Parameter passed to the function -
+	1)label - name of item for which tag is to eb appended.
+	2)property_value_for_relation - value to be appended in tag.It is a human readable english value.
+	"""
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	if obj:
+		obj.tags.append(unicode(property_value_for_relation))
+		obj.modified_by=int(1)
+		obj.save()
+
+
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
