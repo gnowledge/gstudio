@@ -7,13 +7,13 @@
 <form name="search_form" method="GET" action="{% url 'results' groupid %}">
 	{% csrf_token %}
 	Enter the value to be searched:
-	<input type="text" name="search_text" id="search_text">
-	<h5> Search by:</h5>
-	<input type="checkbox" name="search_fields" id="chk_name" value="name" />Name
-	<input type="checkbox" name="search_fields" id="chk_tags" value="tags" />Tags 
-	<input type="checkbox" name="search_fields" id="chk_content" value="contents" />Content <br>
+	<input type="text" name="search_text" id="search_text" required>
+	<h5> Search by: </h5>
+	<input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name
+	<input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags 
+	<input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />Content <br>
 	Search particular user:	
-	<select name="users">
+	<select name="users" required>
 		<option value="all">All users</option>
 		{% for mem in authors %}		
 			<option value="hello">{{ mem }} </option>
@@ -22,7 +22,7 @@
 
 	<input type="submit" name="subButton2" id="subButton2" value="Submit" />
 </form>
-<div id="results" class="content active">
+<div id="results" width="100%" style="position:relative">
 
 </div>
 <div id="pages">
@@ -38,40 +38,38 @@
 	}
 
 	var search_key = String(getUrlVars()["search_text"]);
-	search_key.replace('+', ' ')
+	search_key = search_key.split('+').join(' ');
 	$('#search_text').val(search_key);
 </script>
+
 <script type="text/javascript">
 	var html_div = [];
 	var group = "{{ groupid }}";
 	var base_url = location.host+"/"+group+"/";
 	var page_no = 0;
-	var results_per_page = 10;
+	var results_per_page = 12;
 	var results_in_current_page = 0;
 	var cur_page = 0;
 
 	$(document).ready(function() {
 
 		sData = "{{ search_results }}";
-		sData = sData.replace(/&quot;/g, '"'); 
-		//alert(sData);		
+		sData = sData.replace(/&quot;/g, '"'); 	
 		sData = jQuery.parseJSON(sData);
 		parse_data(sData);
 		
 		function parse_data(sData) {
 
-			// -------------------- SEARCH BY NAME ------------------------------------------- //
+			// -------------------------------- SEARCH BY NAME ------------------------------------------- //
 			var a = sData.exact.name.length;
 				html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';			
 				for (i=0; i<a; i++) {
 					
 					// ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-					type = String(sData.exact.name[i].link).toLowerCase();
-					if (type=="quiz/details") {
-						type = "Quiz / Quiz Item";
-					}
+					type = alterType(sData.exact.name[i].link);
+					console.log(type);
 
-					GSystem_link = "http://" + base_url + sData.exact.name[i].link.toLowerCase() + "/" + sData.exact.name[i]._id;
+					GSystem_link = assignLink(type, sData.exact.name[i].link.toLowerCase(), sData.exact.name[i]._id);
 					html_div[cur_page] += generateCard(sData.exact.name[i].name, type, sData.exact.name[i].created_by, sData.exact.name[i].last_update, GSystem_link);
 
 					results_in_current_page += 1;
@@ -83,50 +81,43 @@
 					}										
 			}
 								
-
 			a = sData.stemmed.name.length;
 			for (i=0; i<a; i++) {
 
 				// ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-				type = String(sData.stemmed.name[i].link).toLowerCase();
-				if (type=="quiz/details") {
-					type = "Quiz / Quiz Item";
-				}
+				type = alterType(sData.stemmed.name[i].link);
 
-				GSystem_link = "http://" + base_url + sData.stemmed.name[i].link.toLowerCase() + "/" + sData.stemmed.name[i]._id;
+				GSystem_link = assignLink(type, sData.stemmed.name[i].link.toLowerCase(), sData.stemmed.name[i]._id);
 				html_div[cur_page] += generateCard(sData.stemmed.name[i].name, type, sData.stemmed.name[i].created_by, sData.stemmed.name[i].last_update, GSystem_link);
 
 				results_in_current_page += 1;
 				if (results_in_current_page >= results_per_page) {
+					html_div[cur_page] += "</ul>";
 					cur_page += 1;
 					results_in_current_page = 0;
-					html_div[cur_page] = "";
+					html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
 				}										
 			}
-			html_div[cur_page] += "<br>";
 		
 			// -------------------------------------------------------------------------------- //
 
 			
 			// -------------------- SEARCH BY TAGS ------------------------------------------- //
-			
 			a = sData.exact.tags.length;
 			for (i=0; i<a; i++) {
 				
 				// ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-				type = String(sData.exact.tags[i].link).toLowerCase();
-				if (type=="quiz/details") {
-					type = "Quiz / Quiz Item";
-				}
+				type = alterType(sData.exact.tags[i].link);
 
-				GSystem_link = "http://" + base_url + sData.exact.tags[i].link.toLowerCase() + "/" + sData.exact.tags[i]._id;
-				html_div[cur_page] += generateCard(sData.exact.tags[i].name, type, sData.exact.name[i].created_by, sData.exact.tags[i].last_update, GSystem_link);
+				GSystem_link = assignLink(type, sData.exact.tags[i].link.toLowerCase(), sData.exact.tags[i]._id);
+				html_div[cur_page] += generateCard(sData.exact.tags[i].name, type, sData.exact.tags[i].created_by, sData.exact.tags[i].last_update, GSystem_link);
 
 				results_in_current_page += 1;
 				if (results_in_current_page >= results_per_page) {
+					html_div[cur_page] += "</ul>";
 					cur_page += 1;
 					results_in_current_page = 0;
-					html_div[cur_page] = "";
+					html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
 				}																			
 			}
 			
@@ -135,22 +126,19 @@
 			for (i=0; i<a; i++) {
 				
 				// ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-				type = String(sData.stemmed.tags[i].link).toLowerCase();
-				if (type=="quiz/details") {
-					type = "Quiz / Quiz Item";
-				}
+				type = alterType(sData.stemmed.tags[i].link);
 
-				GSystem_link = "http://" + base_url + sData.stemmed.tags[i].link.toLowerCase() + "/" + sData.stemmed.tags[i]._id;
+				GSystem_link = assignLink(type, sData.stemmed.tags[i].link.toLowerCase(), sData.stemmed.tags[i]._id);
 				html_div[cur_page] += generateCard(sData.stemmed.tags[i].name, type, sData.stemmed.tags[i].created_by, sData.stemmed.tags[i].last_update, GSystem_link);
 
 				results_in_current_page += 1;
 				if (results_in_current_page >= results_per_page) {
+					html_div[cur_page] += "</ul>";
 					cur_page += 1;
 					results_in_current_page = 0;
-					html_div[cur_page] = "";
+					html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
 				}							
 			}
-			html_div[cur_page] += "<br>";
 		
 
 			// -------------------- SEARCH BY CONTENTS ------------------------------------------- //
@@ -158,19 +146,17 @@
 			for (i=0; i<a; i++) {
 				
 				// ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-				type = String(sData.exact.content[i].link).toLowerCase();
-				if (type=="quiz/details") {
-					type = "Quiz / Quiz Item";
-				}
+				type = alterType(sData.exact.content[i].link);
 
-				GSystem_link = "http://" + base_url + sData.exact.content[i].link.toLowerCase() + "/" + sData.exact.content[i]._id;
+				GSystem_link = assignLink(type, sData.exact.content[i].link.toLowerCase(), sData.exact.content[i]._id);
 				html_div[cur_page] += generateCard(sData.exact.content[i].name, type, sData.exact.content[i].created_by, sData.exact.content[i].last_update, GSystem_link);
 
 				results_in_current_page += 1;
 				if (results_in_current_page >= results_per_page) {
+					html_div[cur_page] += "</ul>";
 					cur_page += 1;
 					results_in_current_page = 0;
-					html_div[cur_page] = "";
+					html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
 				}			
 			}			
 
@@ -178,22 +164,19 @@
 			for (i=0; i<a; i++) {
 				
 				// ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-				type = String(sData.stemmed.content[i].link).toLowerCase();
-				if (type=="quiz/details") {
-					type = "Quiz / Quiz Item";
-				}
+				type = alterType(sData.stemmed.content[i].link);
 
-				GSystem_link = "http://" + base_url + sData.stemmed.content[i].link.toLowerCase() + "/" + sData.stemmed.content[i]._id;
+				GSystem_link = assignLink(type, sData.stemmed.content[i].link.toLowerCase(), sData.stemmed.content[i]._id);
 				html_div[cur_page] += generateCard(sData.stemmed.content[i].name, type, sData.stemmed.content[i].created_by, sData.stemmed.content[i].last_update, GSystem_link);
 
 				results_in_current_page += 1;
 				if (results_in_current_page >= results_per_page) {
+					html_div[cur_page] += "</ul>";
 					cur_page += 1;
 					results_in_current_page = 0;
-					html_div[cur_page] = "";
+					html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
 				}
 			}
-			html_div[cur_page] += "<br>";
 			
 			$("#results").html(html_div[page_no]);
 
@@ -207,41 +190,66 @@
 		};
 	});
 
-function changePage(p) {
-	$("#results").html(html_div[p]);
-}
+	function changePage(p) {
+		$("#results").html(html_div[p]);
+	}
+
+	function alterType(type) {
+		type = type.toLowerCase();
+		if (type=="quiz/details") {
+			type = "Quiz / Quiz Item";
+		}
+		else if (type=="forum/thread") {
+			type = "thread";
+		}
+		return type;
+	}
+
+	function assignLink(type, link_url, gs_id) {
+		var group = "{{ groupid }}";
+		var base_url = location.host+"/"+group+"/";
+		GSystem_link = "";
+		
+		if (type != "none") {
+			GSystem_link = "http://" + base_url + link_url + "/" + gs_id;
+		}
+		else {
+			GSystem_link = "http://" + base_url + "search/node_info2/" + gs_id;
+		}
+
+		return GSystem_link;
+	}
 
 
-function generateCard(name, GSystem_type, created_by, last_modified, GSystem_link) {
-	var card_html = "";
+	function generateCard(name, GSystem_type, created_by, last_modified, GSystem_link) {
+		var card_html = "";
 
-	card_html += "<ul class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
-	card_html += '<li class="card">';
-		card_html += '<div class="file">';
-	  
-	        card_html +=  '<header>';
-	            card_html += '<div class="label-list">';
-	            
-	            card_html += '</div>';
-	      
-	            card_html += '<h4>'+name;
-		            card_html += '<div>';
-			            card_html += '<small class="subheader">';
-			            	card_html += GSystem_type + ", last modified: " + last_modified;
-			            	card_html += '<br>';
-			            	card_html += 'by <span data-gnow="" class="user" href="#"><i style="background-color:" class="fi-torso"></i>' + created_by + '</span>'; 
-			            card_html += '</small>';
+		card_html += '<li class="card">';
+			card_html += '<div class="file">';
+		  
+		        card_html +=  '<header>';
+		            card_html += '<div class="label-list">';
+		            
 		            card_html += '</div>';
-	            card_html += '</h4>';
-	        card_html += '</header>';
+		      
+		            card_html += '<h4>'+name;
+			            card_html += '<div>';
+				            card_html += '<small class="subheader">';
+				            	card_html += GSystem_type + ", last modified: " + last_modified;
+				            	card_html += '<br>';
+				            	card_html += 'by <span data-gnow="" class="user" href="#"><i style="background-color:" class="fi-torso"></i>' + created_by + '</span>'; 
+				            card_html += '</small>';
+			            card_html += '</div>';
+		            card_html += '</h4>';
+		        card_html += '</header>';
 
-	        card_html += '<a href=' + GSystem_link + ' class="button expand">View details</a>';
-	  
-        card_html += '</div>';
-      card_html += '</li>';
+		        card_html += '<a href=' + GSystem_link + ' class="button expand" target="_blank">View details</a>';
+		  
+	        card_html += '</div>';
+	      card_html += '</li>';
 
-    return card_html;  
-}
+	    return card_html;  
+	}
 </script>
 
 {% endblock %}

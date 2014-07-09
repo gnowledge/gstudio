@@ -8,13 +8,13 @@
 <form name="search_form" method="GET" action="{% url 'results' groupid %}">
 	{% csrf_token %}
 	Enter the value to be searched:
-	<input type="text" name="search_text" id="search_text">
+	<input type="text" name="search_text" id="search_text" required>
 	<h5> Search by: </h5>
-	<input type="checkbox" name="search_fields" id="chk_name" value="name" />Name
-	<input type="checkbox" name="search_fields" id="chk_tags" value="tags" />Tags 
-	<input type="checkbox" name="search_fields" id="chk_content" value="contents" />Content <br>
+	<input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />Name
+	<input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />Tags 
+	<input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />Content <br>
 	Search particular user:	
-	<select name="users">
+	<select name="users" required>
 		<option value="all">All users</option>
 		{% for mem in authors %}		
 			<option value="hello">{{ mem }} </option>

@@ -107,6 +107,13 @@ DATA_TYPE_CHOICES = (
 )
 
 #######################################################################################################################################
+my_doc_requirement = u'storing_orignal_doc'
+reduced_doc_requirement = u'storing_reduced_doc'
+to_reduce_doc_requirement = u'storing_to_be_reduced_doc'
+indexed_word_list_requirement = u'storing_indexed_words'
+#######################################################################################################################################
+
+#######################################################################################################################################
 # CUSTOM DATA-TYPE DEFINITIONS
 #######################################################################################################################################
 
@@ -404,12 +411,12 @@ class Node(DjangoDocument):
    	#document is present or not.
    	#If the id is not present then add that id.If it is present then do not add that id
    		
-   	old_doc = collection.ToReduce.find_one({'required_for':'map_reduce_to_reduce','id_of_document_to_reduce':self._id})	
+   	old_doc = collection.ToReduce.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})	
     	if not old_doc:
     		print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
-    		z = collection.ToReduce()
-    		z.id_of_document_to_reduce = self._id
-    		z.required_for = u'map_reduce_to_reduce'
+    		z = collection.ToReduceDocs()
+    		z.doc_id = self._id
+    		z.required_for = to_reduce_doc_requirement
     		z.save()
     		
     	#If you create/edit anything then this code shall add it in the URL
@@ -1448,24 +1455,36 @@ class GRelation(Triple):
 
 ####################################### Added on 19th June 2014 ##############################################################
 
-@connection.register
-class MyReduce(DjangoDocument):
-	structure = {
-		'content_org':dict,	#Map Reduced Content of the orignal document
-		'orignal_doc_id':ObjectId, #The object ID of the orignal document
-		'required_for':unicode,#This is a static field which will contain the string "map_reduce_reduced"
-					#This was created so as to make sure that we do not create any new collection
-	}
-	use_dot_notation=True
 
-@connection.register	
-class ToReduce(DjangoDocument):
-	structure = {
-		'id_of_document_to_reduce':ObjectId,
-		'required_for':unicode, #This is a static field which will contain the string "map_reduce_to_reduce"
-					#This was created so as to make sure that we do not create any new collection
+@connection.register
+class ReducedDocs(DjangoDocument):
+	structure={
+		'content':dict, #This contains the content in the dictionary format
+		'orignal_id':ObjectId,#The object ID of the orignal document
+		'required_for':unicode,
+		'is_indexed':bool, #This will be true if the map reduced document has been indexed.If it is not then it will be false
 	}
 	use_dot_notation = True
+
+@connection.register
+class ToReduceDocs(DjangoDocument):
+	structure={
+		'doc_id':ObjectId,
+		'required_for':unicode,
+	}
+	use_dot_notation = True
+
+@connection.register
+class IndexedWordList(DjangoDocument):
+	structure={
+		'word_start_id':float,
+		'words':dict,
+		'required_for':unicode,
+	}
+	use_dot_notation = True
+	#word_start_id = 0 --- a ,1---b,2---c .... 25---z,26--misc.
+
+
 	
 
 @connection.register

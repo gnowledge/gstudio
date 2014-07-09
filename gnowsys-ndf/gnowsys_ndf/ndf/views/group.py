@@ -391,7 +391,6 @@ def group_dashboard(request,group_id=None):
                                                        'breadcrumbs_list': breadcrumbs_list
                                                       },context_instance=RequestContext(request)
                           )
->>>>>>> 3731590c445b3ca46a7b0e973d3912dbe56c1fee
 
 
 @login_required

@@ -10,23 +10,48 @@
 <form name="search_form" method="GET" action="{% url 'advanced_search_results' groupid %}">
 	{% csrf_token %}
 	Enter the value to be searched:
-	<input type="text" name="search_text" id="search_text">
-	<h5> Search by: </h5>
-	<select multiple id="GSystems" >
-		{% for gs in allGSystems %}
-		<option value='{{ gs }}'> {{ gs }} </option>
-		{% endfor %}
-	</select>
+	<input type="text" name="search_text" id="search_text" required>
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+		<li>
+			<h5> Select groups: </h5>
+			<select multiple id="Groups" name="Groups" style="height:100px" >
+				<option value='all' selected='true'>All Groups</option>
+				{% for gr in allGroups %}
+				<option value='{{ gr }}'> {{ gr }} </option>
+				{% endfor %}
+			</select>
+		</li>
 
-	<select multiple id="attribs" name="attribs">
+		<li>
+			<h5> Select authors: </h5>
+			<select multiple id="Users" name="Users" style="height:100px" >
+				<option value='all' selected='true'>All Authors</option>
+				{% for us in allUsers %}
+				<option value='{{ us }}'> {{ us }} </option>
+				{% endfor %}
+			</select>
+		</li>
 
-	</select>
+		<li>
+			<h5> Select categories: </h5>
+			<select multiple id="GSystems" name="GSystems" style="height:100px" required>
+				{% for gs in allGSystems %}
+				<option value='{{ gs }}'> {{ gs }} </option>
+				{% endfor %}
+			</select>
+		</li>
+		<li>
+			<h5> Select attributes: <img src="/static/ndf/images/refresh.png" style="cursor:pointer" height="20px" width="20px" id="refreshAttr" alt="refresh"></img></h5>
+			<select multiple id="attribs" name="attribs" style="height:100px" required>
 
+			</select>
+		</li>
+	</ul>
 	<input type="submit" name="subButton2" id="subButton2" value="Submit" />
 </form>
 
-<div id="results">
-skjhfsdkjhfksjfhksjdfhskjdfhksdjfh
+<div id="results" class="tabs-content gallery">
+
 </div>
 <div id="pages">
 	
@@ -78,39 +103,18 @@ skjhfsdkjhfksjfhksjdfhskjdfhksdjfh
 		sData = "{{ search_results }}";
 		sData = sData.replace(/&quot;/g, '"'); 
 		sData = jQuery.parseJSON(sData);
-		//alert(sData);
 		parse_data(sData);
 		
 		function parse_data(sData) {
 
 			var a = sData.length;
-			//alert(a);
 
 			html_div[cur_page] = "<ul class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";			
 			for (i=0; i<a; i++) {
-				console.log(sData[i].link);
-				if (String(sData[i].link) != "none") {
-					// ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-					type = String(sData[i].link).toLowerCase();
-					if (type=="quiz/details") {
-						type = "Quiz / Quiz Item";
-					}
+				type = alterType(sData[i].link);
+				GSystem_link = assignLink(type, sData[i].link.toLowerCase(), sData[i]._id);
 
-					GSystem_link = "http://" + base_url + sData[i].link.toLowerCase() + "/" + sData[i]._id;
-					html_div[cur_page] += generateCard(sData[i].name, type, sData[i].created_by, sData[i].last_update, GSystem_link);
-
-					//html_div[cur_page] += "<p><a href='http://" + base_url + sData[i].link.toLowerCase() + "/" + sData[i].name._id+"' target='_blank'>"+ sData[i].name;
-					//alert(html_div[cur_page]);
-				}
-				else {
-					alert("case 2");
-					GSystem_link = 'http://' + base_url + "search/node_info/" + sData[i].name + "/";
-
-					//"http://" + base_url + sData[i].link.toLowerCase() + "/" + sData[i]._id;
-					html_div[cur_page] += generateCard(sData[i].name, "Entity", sData[i].created_by, sData[i].last_update, GSystem_link);
-
-					//html_div[cur_page] += "<p><a href='http://" + base_url + "search/node_info/" + sData[i].name +  "/' target='_blank'>"+ sData[i].name;
-				}
+				html_div[cur_page] += generateCard(sData[i].name, type, sData[i].created_by, sData[i].last_update, GSystem_link);
 
 				results_in_current_page += 1;
 				if (results_in_current_page >= results_per_page) {
@@ -120,8 +124,6 @@ skjhfsdkjhfksjfhksjdfhskjdfhksdjfh
 					html_div[cur_page] = "<ul class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
 				}										
 			}
-			alert(html_div[page_no]);
-			//alert(html_div);
 			$("#results").html(html_div[page_no]);
 
 			pages = "<h6>Pages:</h6><hr>";
@@ -138,13 +140,62 @@ skjhfsdkjhfksjfhksjdfhskjdfhksdjfh
 	function changePage(p) {
 		$("#results").html(html_div[p]);
 	}
+
+	function alterType(type) {
+		type = type.toLowerCase();
+		if (type=="quiz/details") {
+			type = "Quiz / Quiz Item";
+		}
+		else if (type=="forum/thread") {
+			type = "thread";
+		}
+		return type;
+	}
+	
+	$('#GSystems').change(function() {
+
+			temp = String($("#GSystems").val());
+
+			$.ajax({
+			      type: "GET",
+			      url: "{% url 'get_attributes' groupid %}",
+			      datatype: "json",
+			      data: {
+			      	GSystem: temp,
+			      	csrfmiddlewaretoken: '{{ csrf_token }}',
+			      },
+			      success: function(data) {
+					parsed = $.parseJSON(data);
+					options_to_add = "<option value='all'>All attributes</option>";
+					for (i=0; i<parsed.length; i++) {
+						options_to_add += "<option value='" + parsed[i] + "'>" + parsed[i] + "</option>";
+					}
+					$("#attribs").html(options_to_add);
+				  }
+			});
+	});
+
+	function assignLink(type, link_url, gs_id) {
+		var group = "{{ groupid }}";
+		var base_url = location.host+"/"+group+"/";
+		GSystem_link = "";
+		
+		if (type != "none") {
+			GSystem_link = "http://" + base_url + link_url + "/" + gs_id;
+		}
+		else {
+			GSystem_link = "http://" + base_url + "search/node_info2/" + gs_id;
+		}
+
+		return GSystem_link;
+	}
+
 </script>
 
 <script type="text/javascript">
 function generateCard(name, GSystem_type, created_by, last_modified, GSystem_link) {
 	var card_html = "";
 
-	card_html += "<ul class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
 	card_html += '<li class="card">';
 		card_html += '<div class="file">';
 	  

@@ -54,6 +54,7 @@
     
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
+
     <nav class="top-bar drop-shadow" data-topbar>
 
       <ul class="title-area">
@@ -70,17 +71,69 @@
 	<!-- Right Nav Section -->
 	<ul class="right">
 	  
+	  	  <li class="has-dropdown group">
+
+	    {% get_group_object groupid as group_object %}
+	    <a class="active-menu" ><i class="fi-page-search"></i> Search</a>
+	    
+	    <!-- If logged in show user groups -->
+
+	    <ul class="dropdown" style="width:250%">
+	      <!-- Create dropdown item for each group -->
+	      	<li style="display:block;background:#000;color:#fff;">
+	      		{% if groupid %}
+	      		<form action="{% url 'results' groupid %}" name="search_form" method="GET" >
+	      		{% else %}
+	      		<form action="" name="search_form" method="GET" >
+	      		{% endif %}
+		      		<input type="text" name="search_text" id="search_text" placeholder="search site.."/>
+ 					<br>
+		      		Search by:<br>
+		      		<input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
+		      		<label style="background:#000;color:#fff" for="chk_name">Name</label><br>
+					<input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
+					<label style="background:#000;color:#fff" for="chk_tags">Tags</label><br>
+					<input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
+					<label style="background:#000;color:#fff" for="chk_content">Contents</label><br>
+					<input type="submit" class="button" style="width:100%" value="Submit" />
+
+				</form>
+			</li>
+			<li >
+				<a href="{% url 'search_page' groupid %}">Search Options</a>
+			</li>
+	      
+	    </ul>
+
+	  </li>
 	  <!-- Top bar search form -->
-	  <li ><!-- class="has-form hide" -->
-	    <div id="search-bar" class="row collapse">
+	  <!--<div id="search-bar" class="row collapse">
 	      <div class="large-12 small-12 columns">
-		      <form action="{% url 'search' groupid %}" name="search_form" method="GET">
-		      <input type="text" name="search_text" placeholder="search site.." />
-		      <input type="image" src="/static/ndf/images/search.png" width="20em" alt="submit" />
-		      </form>
+	  <li class="has-dropdown" style="color:#fff;background:#000;padding:10px">
+	      Search
+	      <ul class="dropdown" style="width:300%">
+			      	<li style="display:block;background:#000;color:#fff;padding:5px;">
+			      		<form action="" name="search_form" method="GET" >
+				      		<input type="text" name="search_text" id="search_text" placeholder="search site.." style="width:80%;float:left"/>
+				      		<input type="image" src="/static/ndf/images/search.png" style="float:right;position:absolute;top:2px" width="35em" alt="submit" />
+				      		<br><br>
+				      		Search by:<br>
+				      		<input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
+				      		<label style="background:#000;color:#fff" for="chk_name">Name</label><br>
+							<input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
+							<label style="background:#000;color:#fff" for="chk_tags">Tags</label><br>
+							<input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
+							<label style="background:#000;color:#fff" for="chk_content">Contents</label><br>
+						</form>
+					</li>
+					<li >
+						<a href="">Search Options</a>
+					</li>
+		    </ul>
 	      </div>
 	    </div>
-	  </li>
+	    
+	  </li>-->
 
 	  <!-- If logged in show user options -->
 	  {% if user.is_authenticated %}
@@ -337,6 +390,13 @@
   </script>
   
 <script src="/static/ndf/js/app.js"></script>
+<script type="text/javascript">
+	$("#search_text").focus(function() {
+		//alert("clicked");
+		$("#checkBoxes").css('display','block');
+
+	});
+</script>
 
 </body>
 
