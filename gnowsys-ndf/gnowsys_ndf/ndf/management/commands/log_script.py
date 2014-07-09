@@ -16,9 +16,40 @@ class Command(BaseCommand):
 		start_writing()
 """
 import os
-log_file_path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/wikidata_log.txt')
+log_file_path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/iteration_1.txt')
 my_log = open(log_file_path, "w")
 
+
+
+def log_class_created(label, log_flag):	
+	"""
+	Function to write message in log file when topic is created.
+	Parameters being passed -
+	1)label- name of the item
+	2)log_flag - controls indentation to make the log file readable
+
+	"""
+	captcha = "#"
+	while log_flag != 0:
+		captcha += "#"
+		log_flag-=1
+	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+	my_log.write(str(captcha) + (mylabel) + "---Class CREATED\n")
+
+def log_class_exists(label, log_flag):
+	"""
+	Function to write message in log file if topic already exists.
+	Parameters being passed -
+	1)label- name of the item
+	2)log_flag - controls indentation to make the log file readable
+
+	"""
+        captcha = "#"
+        while log_flag != 0:
+                captcha += "#"
+                log_flag-=1
+        mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
+	my_log.write(str(captcha) + unicode(mylabel) + "---Class EXISTS\n")
 
 
 def log_topic_created(label, log_flag):	
@@ -220,3 +251,57 @@ def log_outer_topic(log_flag):
                 log_flag-=1
         my_log.write(str(captcha) + "-----------------------------------------------------------------------\n")
 	my_log.write(str(captcha) + "-----------------------------------------------------------------------\n")
+
+
+def log_iteration_1_file_start():
+	"""
+	Start Iteration 1
+	"""
+        
+        my_log.write("Iteration 1. Creating the GSystemType Classes\n\n")
+        
+	
+
+def log_iteration_1_file_complete():
+	"""
+	Finish Iteration file 1.
+	"""
+        captcha = "\nEnd of file\n"
+      	my_log.write(str(captcha))
+	my_log.close()
+	
+def log_iteration_2_file_start():
+	"""
+	Start Iteration 1
+	"""
+        	
+        my_log.write("Iteration 1. Creating the GSystemType Classes\n\n")
+        
+	
+
+def log_iteration_2_file_complete():
+	"""
+	Finish Iteration file 1.
+	"""
+        captcha = "\nEnd of file\n"
+      	my_log.write(str(captcha))
+	my_log.close()
+	
+def log_iteration_3_file_start():
+	"""
+	Start Iteration 1
+	"""
+        path = os.path.join(log_file_path, 'iteration_1.txt')
+	my_log = open(path, "w")
+        my_log.write("Iteration 1. Creating the GSystemType Classes\n\n")
+        
+	
+
+def log_iteration_3_file_complete():
+	"""
+	Finish Iteration file 1.
+	"""
+        captcha = "\nEnd of file\n"
+      	my_log.write(str(captcha))
+	my_log.close()
+	

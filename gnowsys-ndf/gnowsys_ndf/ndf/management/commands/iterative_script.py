@@ -227,10 +227,6 @@ def extract_descriptions(json_obj,topic_title,language_choice):
 						description+=" - "+val1
 	
 	return description	
-
-
-
-
 		
 
 def extract_datatype_from_property(property_value_list):
@@ -254,6 +250,7 @@ def extract_from_property_value(property_value_list):
 	2-Showing that the property is a globe-coordinate and hence the geo-json needs to be populated inside the
 	 location filed."datatype" is "globe-coordinate". 
 	3-Showing that the property is to be created as an attribute.
+
 	"""
 	for element in property_value_list:
 		if(type(element)) == type({}):
@@ -428,10 +425,31 @@ def property_create_Relation(label,property_id,property_value,property_json):
 
 
 
+def class_create(class_id, class_json):
+	label = extract_labels(class_json, class_id, language)
+	alias_list = extract_aliases(class_json, class_id, language)
+	description = extract_descriptions(class_json, class_id, language)
+	last_update = extract_modified(class_json, class_id)
+	entity_type = extract_type(class_json, class_id)
+	page_id =extract_pageid(class_json, class_id)
+	namespace =extract_namespace(class_json, class_id)
+	
+	if label!= None:
+		global log_flag
+		class_exists = create_Class(label, description, alias_list, class_id, None, int(1))
+		if class_exists:	
+			log_class_exists(label, log_flag)
+		else:
+			log_class_created(label, log_flag)
+			#Creating all the Attributes for 
+			extract_property_json(class_json, label, class_id, int(1))
+			"""
+			DFS code
+
+			"""
 
 
-
-def extract_property_json(json_obj,label,topic_title,call_flag):
+def initiate_class_creation(json_obj,label,topic_title,call_flag):
 	"""	
 	This function receives the following parameters-
 	1)json_obj -The json of the item for which attributes and relations are to be created.
@@ -460,6 +478,84 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 		property_json_url =gen_url_json+property_id+".json"
 		property_json =json_parse(property_json_url)
 		property_value_list =v
+		flag=-1
+		flag=extract_from_property_value(property_value_list)
+		property_value =extract_property_value(property_value_list) #property_value has the value of that property for a particular object
+		print str(property_value) + "----------------------------------------------------------<"
+		print str(property_id) + "id<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+		global log_flag
+		log_flag += 1
+		
+		if property_id == "P31":
+			print "yes!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------------------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111"
+			print "Property Value" + str("!!!!!!!!!!!!!!!!!!!--------------------!!!!!!!!!!!!!") + str(property_value)
+			for key, val in property_value.items():
+				if key == u'numeric-id':
+					class_id = "Q" + str(val)
+					class_url = gen_url_json+class_id+".json"
+					class_json =json_parse(class_url)
+					print class_url + str("this is the class iD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------=====================================")
+					class_create(class_id, class_json)	
+	
+		log_flag -= 1
+		"""	
+		if flag==1 and call_flag==1: #attribute has to be made
+			property_data_type = extract_datatype_from_property(property_value_list)
+			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
+			#print property_data_type
+
+			property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
+			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
+		
+		
+		if flag==3 and call_flag==2: #relation has to be made
+			
+			property_value_for_relation=extract_value_for_relation(property_value_list)
+			
+			property_create_RelationType(property_id,property_json)
+			property_create_Relation(label,property_id,property_value_for_relation,property_json)
+			
+			
+		
+			if property_id=="P31" or property_id=="P279":
+				print "^^entering tags^^ ",label, " - ",property_value_for_relation	
+				property_value_for_relation=unicode("Q")+unicode(property_value_for_relation)
+				property_value_json=gen_url_json+str(property_value_for_relation)+".json"
+				property_value_json=json_parse(property_value_json) #property_value is supposed to be the id of the right subject in case of a relation
+				property_value_name=extract_labels(property_value_json,property_value_for_relation,language)			
+				populate_tags(label,property_value_name)
+			
+		"""
+		
+def extract_property_json(json_obj,label,topic_title,call_flag):
+	"""	
+	This function receives the following parameters-
+	1)json_obj -The json of the item for which attributes and relations are to be created.
+	2)label -The label of the item for which claims will be parsed and attributes and relations will be made. 
+	3)topic_title - The topic_title of the item . eg - Q17 stands for Japan.
+	4)call_flag - shows wether the function is being called first time or second time for a particular object.
+		-In the first iteration the call_flag=1 and only the topic,attributetypes and attributes must be created.
+		-In the second iteration the call_flag=2 and the relationtypes and relations must be created.
+
+	The function is responsible for parsing the json of any item and then creating attributes and relations 
+	depending on the value of flag and call_flag.
+	The tags are also being populated as and when the property_id is either P279 or P31.
+	P31 - instance of
+	P279 - subclass of
+	"""
+	claim_dict={}
+	Result =json_obj['entities'][str(topic_title)]
+
+	for k,v in Result.items():	
+		if k =="claims":
+			claim_dict=v
+
+
+	for k,v in claim_dict.items():
+		property_id = k
+		property_json_url =gen_url_json+property_id+".json"
+		property_json =json_parse(property_json_url)
+		property_value_list = v
 		flag=-1
 		flag=extract_from_property_value(property_value_list)
 		property_value =extract_property_value(property_value_list) #property_value has the value of that property fpr a particular object
@@ -534,7 +630,7 @@ def initiate_new_topic_creation(json_obj,topic_title,language_choice):
 			extract_property_json(json_obj,label,topic_title,1)
 
 
-def iteration_1(flag):
+def iteration_1():
 	"""
 	Parameter passed to the function is flag.
 	If -
@@ -560,12 +656,10 @@ def iteration_1(flag):
 					if(json_obj):
 						global log_flag
 						log_flag = 0
-						if flag==1:
-							initiate_new_topic_creation(json_obj,topic_title,language)
-							log_outer_topic(log_flag)
-						else:
-							label=extract_labels(json_obj,topic_title,language)
-							extract_property_json(json_obj,label,topic_title,flag)
+						
+						label = extract_labels(json_obj,topic_title,language)
+						initiate_class_creation(json_obj,label,topic_title,int(1))
+						
 
 					else:
 						print "empty json returned"
@@ -603,7 +697,7 @@ def read_file(flag):
 							log_outer_topic(log_flag)
 						else:
 							label=extract_labels(json_obj,topic_title,language)
-							extract_property_json(json_obj,label,topic_title,flag)
+							extract_property_json(json_obj,label,topic_title,int(1))
 
 					else:
 						print "empty json returned"
@@ -621,11 +715,13 @@ class Command(BaseCommand):
 		create_WikiData_WikiTopic()
 		
 		create_topic_id()
-		#iteration_1()
+		log_iteration_1_file_start()
+		iteration_1()	
+		log_iteration_1_file_complete()
 		#iteration_2()
 		#iteration_3()
-		read_file(int(1))		# read the file with list of items starting with Q
-		read_file(int(2))		
+		#read_file(int(1))		# read the file with list of items starting with Q
+		#read_file(int(2))		
 
 		
 

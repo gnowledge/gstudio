@@ -154,7 +154,10 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	"""
 
 	print "Creating an attribute"
-	subject = collection.Node.find_one({"name":unicode(subject_name),"_type":"GSystem"})
+	#subject = collection.Node.find_one({"name":unicode(subject_name),"_type":"GSystem"})
+	#it's me
+	subject = collection.Node.find_one({"name":unicode(subject_name)})
+	#it's me
 	attribute_type_obj = collection.Node.find_one({"name": unicode(attribute_type_name), "_type": u"AttributeType"})
 	cursor = collection.Node.find_one({"_type" : u"GAttribute","subject": ObjectId(subject._id),"attribute_type.$id":ObjectId(attribute_type_obj._id)})
 	if cursor!= None:
@@ -212,6 +215,43 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		topic.save()
 		
 		print "Created a topic -->" + label + "\n"
+		return False
+		
+def create_Class(label, description, alias_list, class_id, last_update_datetime, user_id):
+	"""
+	Creates a topic if it does not exist
+	"""
+	print "Creating a GSystemType Class"
+	topic_type = collection.Node.one({"name": u"WikiData","_type":u"GSystemType"})
+	topic_type_id = topic_type._id
+	obj = collection.Node.find_one({"name": unicode(label), "_type": u"GSystemType"}) #pick a class which is a member of wikidata
+
+	if (obj!=None):
+		print "Class already exists"
+		return True
+	else:		
+		class_obj = collection.GSystemType()
+		class_obj.name = unicode(label)
+		class_obj.content_org= unicode(description) #content in being left untouched and content_org has descriptions in english
+		class_obj.created_by = int(user_id)
+		class_obj.modified_by = int(user_id)
+		class_obj.url = unicode(wiki_base_url)+unicode(label)
+		class_obj.status=unicode('PUBLISHED') #by default status of each item is PUBLISHED
+		class_obj.language=unicode('en')      #by default language is english
+		string_alias=""
+		for alias in alias_list:
+			string_alias=string_alias+alias+"," #altnames is a comma separated list of english aliases
+
+		class_obj.altnames = unicode(string_alias)
+		class_obj.type_of.append(topic_type_id) #The GSystemType of class that I am creating should be a part of the WikiData GApp.
+		class_obj.access_policy=unicode('PUBLIC')
+		factory = collection.Node.one({"name": u"factory_types"})
+                factory_id = factory._id
+		class_obj.member_of.append(factory_id)
+		class_obj.last_update = last_update_datetime
+		class_obj.save()
+		
+		print "Created a class -->" + label + "\n"
 		return False
 		
 
