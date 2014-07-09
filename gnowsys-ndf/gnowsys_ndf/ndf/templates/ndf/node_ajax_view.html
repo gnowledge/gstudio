@@ -477,33 +477,7 @@ For annotation based discussions:
 
 var annotations = {{ annotations | safe}};
 var currentUser = null;
-var  existingComments = [
-{
-"sectionId": "1",
-"comments": [
-{
-"authorAvatarUrl": "http://f.cl.ly/items/1W303Y360b260u3v1P0T/jon_snow_small.png",
-"authorName": "Jon Sno",
-"comment": "I'm Ned Stark's bastard. Related: I know nothing."
-},
-{
-"authorAvatarUrl": "http://f.cl.ly/items/2o1a3d2f051L0V0q1p19/donald_draper.png",
-"authorName": "Donald Draper",
-"comment": "I need a scotch."
-}
-]
-},
-{
-"sectionId": "3",
-"comments": [
-{
-"authorAvatarUrl": "http://f.cl.ly/items/0l1j230k080S0N1P0M3e/clay-davis.png",
-"authorName": "Senator Clay Davis",
-"comment": "These Side Comments are incredible. Sssshhhiiiiieeeee."
-}
-]
-}
-];
+var  existingComments = [];
 var ann = {                                  //dummy variable at frontend
   selectedText: "",
   annotationText: {text: "", datetime: ""},
@@ -513,6 +487,8 @@ var ann = {                                  //dummy variable at frontend
 var flag = false; 
 var pos=-1;
 var st = null;
+//DEBUGGING
+st = "Sniffing";
 
 if(!window.win){
   win = {};
@@ -546,21 +522,6 @@ win.Selector.mouseup = function()
 
 }
 
-
-$(document).ready(function()                             //detect mouseup event
-{
-  $("#content").bind("click", win.Selector.mouseup);
- /*$("#content").mouseup(function() 
-  {
-    st = window.getSelection();
-    alert("scooby doo" + st);
-    //TODO highlight function
-  });*/
-}); 
-
-//console.log(st);
-
-
 {% if user.is_authenticated %}
   currentUser=
   {
@@ -572,24 +533,66 @@ $(document).ready(function()                             //detect mouseup event
 
 // Require new SideComments object
 var SideComments = require('side-comments');
+
+//trigger the following on hover over annotated text, check with st for now
+//initialise existing comments
+
+$(document).ready (function(){
+/*
+script for marking up the annotated text
+*/
+  for (i = 0; i < annotations.length; i++)
+  {
+     text = annotations[i].selectedText;
+     alert(text);
+     highlightSearchTerms(text);
+  }
+
+});
+
+//$(document).ready(function()                             //detect mouseup event
+//{
+ // $("#content").bind("mouseup", win.Selector.mouseup);
+ /*$("#content").mouseup(function() 
+  {
+    st = window.getSelection();
+    alert("scooby doo" + st);
+    //TODO highlight function
+  });*/
+//}); 
+
+
+/*
+bind the below initialisation of sideComments object on hover over that area
+*/
+
+for (i = 0; i < annotations.length; i++)
+{
+    if(st.toLowerCase() == annotations[i].selectedText.toLowerCase())
+    {
+      existingComments.push(annotations[i]);
+      console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
+      //alert(existingComments);
+      sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+      
+
 // Create a new SideComments instance, passing in the wrapper element and the optional the current user and any existing comments.
-sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+//sideComments = new SideComments('#commentable-area', currentUser, existingComments);
 //Listen to 'commentPosted'
 sideComments.on('commentPosted', function( comment ) 
 {
-   //if(st != "")
+    if(st != "")
     {
-    
-    $.ajax({
+     $.ajax({
             url: "{% url 'annotationlibInSelText' groupid %}",
             type: 'POST',
             data: 
             {
                 comment      : JSON.stringify(comment),
                 selectedText : st,
-                ann_present  : JSON.stringify(ann),  
-                exists_flag  : flag, 
-                exists_pos   : pos,
+                //ann_present  : JSON.stringify(annotations),  
+                //exists_flag  : flag, 
+                //exists_pos   : pos,
                 node_id      : '{{ node }}', 
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             },
@@ -598,6 +601,7 @@ sideComments.on('commentPosted', function( comment )
               // Once the comment is saved, you can insert the comment into the comment stream with "insertComment(comment)".
               alert("Inside success");
               sideComments.insertComment(comment);
+              //sideComments = new SideComments('#commentable-area', currentUser, existingComments);
             }
           });
     }
@@ -614,7 +618,9 @@ success: function( success ) {
 }
 });
 });*/
-
+break;
+ }
+}
 
 
 
@@ -750,9 +756,9 @@ function highlightSearchTerms(searchText)
 {
   // search string so that each word is searched for and highlighted individually
     
-  var bodyText = $("#view-page > div").html();
+  var bodyText = $("#content").html();
   bodyText = doHighlight(bodyText, searchText);
-  $("#view-page > div").html(bodyText);
+  $("#content").html(bodyText);
   
   return true;
 }

@@ -1369,16 +1369,39 @@ def annotationlibInSelText(request, group_id):
   print "Inside annotationlibInSelText "
   obj_id = str(request.POST["node_id"])
   col = get_database()[Node.collection_name]
+  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
+  
   comment = request.POST ["comment"]
   comment = json.loads(comment)
-  selectedText= request.POST['selectedText']
-  print "check for selected text", selectedText
-  ann = {
-          'selectedText' : selectedText,
-          'comments'     : comment
+  print comment
+  comment_modified = {
+                        'authorAvatarUrl' : comment['authorAvatarUrl'],
+                        'authorName'      : comment['authorName'],
+                        'comment'         : comment['comment']
   }
-  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
-  sg_obj.annotations.append(ann)
+  print comment_modified
+  selectedText = request.POST['selectedText']
+  print "check for selected text", selectedText
+    
+  # check if annotations for this text already exist!
+  flag = False
+  
+  for entry in sg_obj.annotations:
+    if (entry['selectedText'].lower() == selectedText.lower()):
+      entry['comments'].append(comment_modified)
+      flag = True
+      break
+
+  if(not(flag)):
+    comment_list = []
+    comment_list.append(comment_modified)
+    ann = {
+          'selectedText' : selectedText,
+          'sectionId'    : str(comment['sectionId']),
+          'comments'     : comment_list
+    }
+    sg_obj.annotations.append(ann)
+  
   sg_obj.save()
 
   return HttpResponse("Hello")
