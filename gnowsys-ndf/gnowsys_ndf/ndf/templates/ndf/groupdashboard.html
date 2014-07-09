@@ -170,6 +170,7 @@ $(document).ready(function()
   {% get_user_object node.created_by as user_obj %}
   {% ifequal user_obj.username user.username %}
     {% include "ndf/invite_users.html" %}
+    {% include "ndf/invite_admins.html" %}
     <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
   {% endifequal %} 
  {% endif %}
