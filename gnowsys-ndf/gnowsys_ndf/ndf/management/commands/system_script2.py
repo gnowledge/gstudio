@@ -167,7 +167,10 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	"""
 
 	print "Creating an attribute"
-	subject = collection.Node.find_one({"name":unicode(subject_name),"_type":"GSystem"})
+	#subject = collection.Node.find_one({"name":unicode(subject_name),"_type":"GSystem"})
+	#it's me
+	subject = collection.Node.find_one({"name":unicode(subject_name)})
+	#it's me
 	attribute_type_obj = collection.Node.find_one({"name": unicode(attribute_type_name), "_type": u"AttributeType"})
 	cursor = collection.Node.find_one({"_type" : u"GAttribute","subject": ObjectId(subject._id),"attribute_type.$id":ObjectId(attribute_type_obj._id)})
 	if cursor!= None:
@@ -236,6 +239,43 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		topic.save()
 		
 		print "Created a topic -->" + label + "\n"
+		return False
+		
+def create_Class(label, description, alias_list, class_id, last_update_datetime, user_id):
+	"""
+	Creates a topic if it does not exist
+	"""
+	print "Creating a GSystemType Class"
+	topic_type = collection.Node.one({"name": u"WikiData","_type":u"GSystemType"})
+	topic_type_id = topic_type._id
+	obj = collection.Node.find_one({"name": unicode(label), "_type": u"GSystemType"}) #pick a class which is a member of wikidata
+
+	if (obj!=None):
+		print "Class already exists"
+		return True
+	else:		
+		class_obj = collection.GSystemType()
+		class_obj.name = unicode(label)
+		class_obj.content_org= unicode(description) #content in being left untouched and content_org has descriptions in english
+		class_obj.created_by = int(user_id)
+		class_obj.modified_by = int(user_id)
+		class_obj.url = unicode(wiki_base_url)+unicode(label)
+		class_obj.status=unicode('PUBLISHED') #by default status of each item is PUBLISHED
+		class_obj.language=unicode('en')      #by default language is english
+		string_alias=""
+		for alias in alias_list:
+			string_alias=string_alias+alias+"," #altnames is a comma separated list of english aliases
+
+		class_obj.altnames = unicode(string_alias)
+		class_obj.type_of.append(topic_type_id) #The GSystemType of class that I am creating should be a part of the WikiData GApp.
+		class_obj.access_policy=unicode('PUBLIC')
+		factory = collection.Node.one({"name": u"factory_types"})
+                factory_id = factory._id
+		class_obj.member_of.append(factory_id)
+		class_obj.last_update = last_update_datetime
+		class_obj.save()
+		
+		print "Created a class -->" + label + "\n"
 		return False
 		
 
@@ -333,6 +373,40 @@ def populate_tags(label,property_value_for_relation):
 		obj.save()
 
 
+
+def populate_location(label,property_id,property_value,user_id):
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	geo_json=[
+    	{
+        	"geometry": 
+        	{
+            	"type": "Point",
+            	"coordinates": []
+       		},
+        	"type": "Feature",
+        	"properties": 
+        	{
+            	"description":"",
+            	"id": ""
+        	}
+    	}
+	]
+
+	geo_json[0]["geometry"]["coordinates"].append(property_value["latitude"])
+	geo_json[0]["geometry"]["coordinates"].append(property_value["longitude"])
+	geo_json[0]["properties"]["description"]=(property_value["globe"])		
+	geo_json[0]["properties"]["id"]=property_id
+	obj.location =location
+	obj.modified_by =user_id
+	obj.save()
+
+
+
+
+
+
+
+
 def item_exists(label):
 	"""	
 	Returns boolean value to indicate if a GSystem with the given name exists or not"
@@ -353,6 +427,34 @@ def display_objects():
 	for a in cursor:
 		print a.name
 		
+def item_exists(label):
+	"""	
+	Returns boolean value to indicate if a GSystem with the given name exists or not"
+	"""	
+
+	object = collection.Node.find_one({"type":u"GSystem","name":unicode(label)})
+	if object !=None:
+		return True
+	else:
+		return False
+
+
+def populate_tags(label,property_value_for_relation):
+	"""
+	To populate tags of the object given by label.tags is a list field and the values will be appended
+	in the list.(actually the right_subject_name of P31 and P279 are being appended as tags to give a sense 
+	of theme, category hierarchy etc.)
+	Parameter passed to the function -
+	1)label - name of item for which tag is to eb appended.
+	2)property_value_for_relation - value to be appended in tag.It is a human readable english value.
+	"""
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	if obj:
+		obj.tags.append(unicode(property_value_for_relation))
+		obj.modified_by=int(1)
+		obj.save()
+
+
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):

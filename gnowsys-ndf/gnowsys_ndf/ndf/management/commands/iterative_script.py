@@ -33,13 +33,12 @@ import json
 import pprint
 
 from system_script2 import *
+from log_script import *
 
 
 
 #relative path of file
 fn = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/list_of_objects')
-log_file_path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/wikidata_log.txt')
-my_log = open(log_file_path, "w")
 log_flag = 0
 gen_url_json="http://www.wikidata.org/wiki/Special:EntityData/"
 gen_url_page="http://www.wikidata.org/wiki/"
@@ -65,205 +64,7 @@ def json_parse(url_json):
 	return js
 """
 
-def log_topic_created(label, log_flag):	
-	"""
-	Function to write message in log file when topic is created.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
 
-	"""
-	captcha = "#"
-	while log_flag != 0:
-		captcha += "#"
-		log_flag-=1
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-	my_log.write(str(captcha) + (mylabel) + "---Topic CREATED\n")
-
-def log_topic_exists(label, log_flag):
-	"""
-	Function to write message in log file if topic already exists.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""
-        captcha = "#"
-        while log_flag != 0:
-                captcha += "#"
-                log_flag-=1
-        mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-	my_log.write(str(captcha) + unicode(mylabel) + "---Topic EXISTS\n")
-
-def log_attributeType_created(label, log_flag):
-	"""
-	Function to write message in log file when attributeType is created.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""
-        captcha = " "
-        while log_flag != 1:
-                captcha += " "
-                log_flag-=1
-	captcha += "-"
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-        my_log.write(str(captcha) + unicode(mylabel) + "---AttributeType CREATED\n")
-
-def log_attributeType_exists(label, log_flag):
-	"""
-	Function to write message in log file if attributeType already exists.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""
-
-        captcha = " "
-        while log_flag != 1:
-                captcha += " "
-                log_flag-=1
-	captcha += "-"
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-        my_log.write(str(captcha) + unicode(mylabel) + "---AttributeType EXISTS\n")
-
-def log_attribute_created(label, log_flag):
-    	"""
-	Function to write message in log file when attribute is created.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""  
-        captcha = " "
-        while log_flag != 1:
-                captcha += " "
-                log_flag-=1
-        captcha += "@"
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-        my_log.write(str(captcha) + unicode(mylabel) + "---Attribute CREATED\n")
-
-def log_attribute_exists(label, log_flag):
-	"""
-	Function to write message in log file if attribute already exists.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""
-        captcha = " "
-        while log_flag != 1:
-                captcha += " "
-                log_flag-=1
-        captcha += "@"
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-        my_log.write(str(captcha) + unicode(mylabel) + "---Attribute EXISTS\n")
-
-
-def log_relationType_created(label, log_flag):
-	"""
-	Function to write message in log file when relationType is created.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""
-        captcha = " "
-        while log_flag != 1:
-                captcha += " "
-                log_flag-=1
-        captcha += "$"
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-        my_log.write(str(captcha) + unicode(mylabel) + "---RelationType CREATED\n")
-
-def log_relationType_exists(label, log_flag):
-	"""
-	Function to write message in log file if relationType already exists.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""
-        captcha = " "
-        while log_flag != 1:
-                captcha += " "
-                log_flag-=1
-        captcha += "$"
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-        my_log.write(str(captcha) + unicode(mylabel) + "---RelationType EXISTS\n")
-
-def log_relation_created(label, log_flag):
-	"""
-	Function to write message in log file when relation is created.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""
-        captcha = " "
-        while log_flag != 1:
-                captcha += " "
-                log_flag-=1
-        captcha += "*"
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-        my_log.write(str(captcha) + unicode(mylabel) + "---Relation CREATED\n")
-
-def log_relation_exists(label, log_flag):
-	"""
-	Function to write message in log file if relation already exists.
-	Parameters being passed -
-	1)label- name of the item
-	2)log_flag - controls indentation to make the log file readable
-
-	"""
-        captcha = " "
-        while log_flag != 1:
-                captcha += " "
-                log_flag-=1
-        captcha += "*"
-	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
-        my_log.write(str(captcha) + unicode(mylabel) + "---Relation EXISTS\n")
-
-
-def log_inner_topic_start(log_flag):
-	"""
-	Helper log function that print messages to help in debugging
-
-	"""
-        captcha = "-"
-        my_log.write("\n")
-        while log_flag != 0:
-                captcha += "-"
-                log_flag-=1
-        my_log.write(str(captcha) + "-----------------------------------------------------------------------\n")
-
-def log_inner_topic_end(log_flag):
-	"""
-	Helper log function that print messages to help in debugging
-
-	"""
-        captcha = "-"
-        my_log.write("\n")
-        while log_flag != 0:
-                captcha += "-"
-                log_flag-=1
-        my_log.write(str(captcha) + "_______________________________________________________________________\n")
-
-
-
-def log_outer_topic(log_flag):
-	"""
-	Helper log function that print messages to help in debugging
-
-	"""
-        captcha = "-"
-        my_log.write("\n")
-        while log_flag != 0:
-                captcha += "-"
-                log_flag-=1
-        my_log.write(str(captcha) + "-----------------------------------------------------------------------\n")
-	my_log.write(str(captcha) + "-----------------------------------------------------------------------\n")
 
 def json_parse(url_json):
 	"""
@@ -428,11 +229,7 @@ def extract_descriptions(json_obj,topic_title,language_choice):
 	
 	return description	
 
-
-
-
 		
-
 def extract_datatype_from_property(property_value_list):
 	"""
 	property_value_list is a list that has been extracted from the object's json
@@ -454,6 +251,7 @@ def extract_from_property_value(property_value_list):
 	2-Showing that the property is a globe-coordinate and hence the geo-json needs to be populated inside the
 	 location filed."datatype" is "globe-coordinate". 
 	3-Showing that the property is to be created as an attribute.
+
 	"""
 	for element in property_value_list:
 		if(type(element)) == type({}):
@@ -627,11 +425,31 @@ def property_create_Relation(label,property_id,property_value,property_json):
 		#create a log function
 
 
+def class_create(class_id, class_json):
+	label = extract_labels(class_json, class_id, language)
+	alias_list = extract_aliases(class_json, class_id, language)
+	description = extract_descriptions(class_json, class_id, language)
+	last_update = extract_modified(class_json, class_id)
+	entity_type = extract_type(class_json, class_id)
+	page_id =extract_pageid(class_json, class_id)
+	namespace =extract_namespace(class_json, class_id)
+	
+	if label!= None:
+		global log_flag
+		class_exists = create_Class(label, description, alias_list, class_id, None, int(1))
+		if class_exists:	
+			log_class_exists(label, log_flag)
+		else:
+			log_class_created(label, log_flag)
+			#Creating all the Attributes for 
+			extract_property_json(class_json, label, class_id, int(1))
+			"""
+			DFS code
+
+			"""
 
 
-
-
-def extract_property_json(json_obj,label,topic_title,call_flag):
+def initiate_class_creation(json_obj,label,topic_title,call_flag):
 	"""	
 	This function receives the following parameters-
 	1)json_obj -The json of the item for which attributes and relations are to be created.
@@ -662,6 +480,84 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 		property_value_list =v
 		flag=-1
 		flag=extract_from_property_value(property_value_list)
+		property_value =extract_property_value(property_value_list) #property_value has the value of that property for a particular object
+		print str(property_value) + "----------------------------------------------------------<"
+		print str(property_id) + "id<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+		global log_flag
+		log_flag += 1
+		
+		if property_id == "P31":
+			print "yes!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------------------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111"
+			print "Property Value" + str("!!!!!!!!!!!!!!!!!!!--------------------!!!!!!!!!!!!!") + str(property_value)
+			for key, val in property_value.items():
+				if key == u'numeric-id':
+					class_id = "Q" + str(val)
+					class_url = gen_url_json+class_id+".json"
+					class_json =json_parse(class_url)
+					print class_url + str("this is the class iD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------=====================================")
+					class_create(class_id, class_json)	
+	
+		log_flag -= 1
+		"""	
+		if flag==1 and call_flag==1: #attribute has to be made
+			property_data_type = extract_datatype_from_property(property_value_list)
+			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
+			#print property_data_type
+
+			property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
+			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
+		
+		
+		if flag==3 and call_flag==2: #relation has to be made
+			
+			property_value_for_relation=extract_value_for_relation(property_value_list)
+			
+			property_create_RelationType(property_id,property_json)
+			property_create_Relation(label,property_id,property_value_for_relation,property_json)
+			
+			
+		
+			if property_id=="P31" or property_id=="P279":
+				print "^^entering tags^^ ",label, " - ",property_value_for_relation	
+				property_value_for_relation=unicode("Q")+unicode(property_value_for_relation)
+				property_value_json=gen_url_json+str(property_value_for_relation)+".json"
+				property_value_json=json_parse(property_value_json) #property_value is supposed to be the id of the right subject in case of a relation
+				property_value_name=extract_labels(property_value_json,property_value_for_relation,language)			
+				populate_tags(label,property_value_name)
+			
+		"""
+		
+def extract_property_json(json_obj,label,topic_title,call_flag):
+	"""	
+	This function receives the following parameters-
+	1)json_obj -The json of the item for which attributes and relations are to be created.
+	2)label -The label of the item for which claims will be parsed and attributes and relations will be made. 
+	3)topic_title - The topic_title of the item . eg - Q17 stands for Japan.
+	4)call_flag - shows wether the function is being called first time or second time for a particular object.
+		-In the first iteration the call_flag=1 and only the topic,attributetypes and attributes must be created.
+		-In the second iteration the call_flag=2 and the relationtypes and relations must be created.
+
+	The function is responsible for parsing the json of any item and then creating attributes and relations 
+	depending on the value of flag and call_flag.
+	The tags are also being populated as and when the property_id is either P279 or P31.
+	P31 - instance of
+	P279 - subclass of
+	"""
+	claim_dict={}
+	Result =json_obj['entities'][str(topic_title)]
+
+	for k,v in Result.items():	
+		if k =="claims":
+			claim_dict=v
+
+
+	for k,v in claim_dict.items():
+		property_id = k
+		property_json_url =gen_url_json+property_id+".json"
+		property_json =json_parse(property_json_url)
+		property_value_list = v
+		flag=-1
+		flag=extract_from_property_value(property_value_list)
 		property_value =extract_property_value(property_value_list) #property_value has the value of that property fpr a particular object
 		global log_flag
 		log_flag += 1
@@ -674,8 +570,23 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 			property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
 			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
 		
+
+		elif flag==2:
+			if property_id=="P625":
+				populate_location(label,property_id,property_value,user_id)
+
+			
+
+			else:
+				property_data_type = extract_datatype_from_property(property_value_list)
+				#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
+				#print property_data_type
+
+				property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
+				property_create_Attribute(label,property_id,property_value,property_json)
+
 		
-		if flag==3 and call_flag==2: #relation has to be made
+		elif flag==3 and call_flag==2: #relation has to be made
 			
 			property_value_for_relation=extract_value_for_relation(property_value_list)
 			
@@ -734,6 +645,42 @@ def initiate_new_topic_creation(json_obj,topic_title,language_choice):
 			extract_property_json(json_obj,label,topic_title,1)
 
 
+def iteration_1():
+	"""
+	Parameter passed to the function is flag.
+	If -
+		flag=1 -The first iteration.Only the topic and its attributetyeps and attributes are supposed to be created.
+		flag=2 -The second iteration.The topic and its attributes already exist , now its relationTypes 
+		and relations are to be created.
+
+	Function called directly from main.This function starts reading a file with name of items .Now depending on 
+	the value of flag it knows wether the script is in first iteration or second iteration.
+	In the first iteration.Only the topic and its attributetyeps and attributes are supposed to be created.
+	In the second iteration.The topic and its attributes already exist , now its relationTypes 
+		and relations are to be created.
+
+	"""
+	with open(fn,'rb') as f:
+		r = csv.reader(f,delimiter ='\n')
+		for row in r:
+			for topic_title in row:
+				if topic_title.startswith('Q')==True: #first line of wiki file has some metadata
+					url_json = gen_url_json+topic_title+".json"	#creating url of json by appending words to it to make a proper link
+					url_page = gen_url_page+topic_title #creating url of the wikidata page itself
+					json_obj = json_parse(url_json)
+					if(json_obj):
+						global log_flag
+						log_flag = 0
+						
+						label = extract_labels(json_obj,topic_title,language)
+						initiate_class_creation(json_obj,label,topic_title,int(1))
+						
+
+					else:
+						print "empty json returned"
+						continue
+
+
 def read_file(flag):
 	"""
 	Parameter passed to the function is flag.
@@ -765,7 +712,9 @@ def read_file(flag):
 							log_outer_topic(log_flag)
 						else:
 							label=extract_labels(json_obj,topic_title,language)
-							extract_property_json(json_obj,label,topic_title,flag)
+
+							extract_property_json(json_obj,label,topic_title,int(1))
+
 
 					else:
 						print "empty json returned"
@@ -782,9 +731,14 @@ class Command(BaseCommand):
 		"""
 		create_WikiData_WikiTopic()
 		create_topic_id()
+		log_iteration_1_file_start()
+		iteration_1()	
+		log_iteration_1_file_complete()
+		#iteration_2()
+		#iteration_3()
+		#read_file(int(1))		# read the file with list of items starting with Q
+		#read_file(int(2))		
 
-		read_file(int(1))		# read the file with list of items starting with Q
-		read_file(int(2))		
 
 		
 
