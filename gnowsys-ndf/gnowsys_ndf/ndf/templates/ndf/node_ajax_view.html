@@ -18,7 +18,7 @@
 
 <!-- css for drawer widget -->
 <style type = "text/css">
-.hidden { visibility: hidden;  }
+.hidden { visibility: hidden; }
 .divider-line { font-size: xx-large; color:lightgray; }
 .line-height-2 { line-height:2; }
 .line-height-2pt5 { line-height:2.5; }
@@ -367,13 +367,14 @@ ul#graph-hover.f-dropdown{
     
     <div>
       Languages 
+      <button onclick = "attempt()"> Discuss </button>
       <!-- Annotation block -->
       {% if user.is_authenticated %}
       <br></br>
       <div>
-        <div id = "ann" class= "hidden">
+        <div id = "ann" class = "hidden">
           <input id = "annField" type= "text" placeholder = "Add annotation..">
-          <button id = "annButton" onclick = "activateReply()"> Add </button>
+          <button id = "annButton" onclick = "attempt()"> Add </button>
         </div>
         <div id="replies"> </div>
         <div id = "reply" class = "hidden">
@@ -483,7 +484,8 @@ var sideComments;
 var flag = false; 
 var pos=-1;
 var st = null;
-
+var initialText;
+var finalText;
 if(!window.win){
   win = {};
 }
@@ -509,9 +511,10 @@ win.Selector.mouseup = function()
 }
 
 $(document).ready (function(){
-  highlightAll();
-  $("#content").bind("mouseup", win.Selector.mouseup);
-}); 
+  initialText = $("#content").html();
+/*  highlightAll();
+  $("#content").bind("mouseup", win.Selector.mouseup);*/
+});
 
 {% if user.is_authenticated %}
   currentUser=
@@ -602,11 +605,9 @@ function doHighlight(bodyText, searchTerm)
     highlightStartTag = "<span style='background-color : #e0ffff;font-weight:bold' onclick = 'showThread(this)'>";
     highlightEndTag = "</span>";
     
-  // find all occurences of the search term in the given text,
-  // and add some "highlight" tags to them (we're not using a
-  // regular expression search, because we want to filter out
-  // matches that occur within HTML tags and script blocks, so
-  // we have to do a little extra validation)
+  // find all occurences of the search term in the given text, and add some "highlight" tags to them 
+  //(we're not using a regular expression search, because we want to filter out matches that occur within HTML tags and script blocks, 
+  //so we do a little extra validation)
   var newText = "";
   var i = -1;
   var lcSearchTerm = searchTerm.toLowerCase();
@@ -666,10 +667,30 @@ function highlightAll()
   for (i = 0; i < annotations.length; i++)
   {
      text = annotations[i].selectedText;
-     alert("i inside first for" + i+ "  " +text);
      highlightSearchTerms(text);
   }
 
+}
+var toggleValue = 1;
+function attempt()
+{
+  alert("toggleValue" + toggleValue);
+  if(toggleValue < 0)
+   {
+     //finalText = $("#content").html();
+     $(".side-comment").hide();
+     $("#content").html(initialText);
+     $("#content").unbind("mouseup");
+   } 
+  else
+  {
+    $(".side-comment").show();
+    highlightAll(); 
+    $("#content").bind("mouseup", win.Selector.mouseup);
+    //$("#content").html(finalText);
+  }
+
+  toggleValue *= -1;
 }
 
 </script>
