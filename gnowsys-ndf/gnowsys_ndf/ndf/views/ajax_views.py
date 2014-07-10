@@ -726,14 +726,14 @@ def graph_nodes(request, group_id):
 
   collection = db[Node.collection_name]
   page_node = collection.Node.one({'_id':ObjectId(request.GET.get("id"))})
-  
+  page_node.get_neighbourhood(page_node.member_of)
+  # print page_node.keys()
   coll_relation = { 'relation_name':'has_collection', 'inverse_name':'member_of_collection' }
 
   prior_relation = { 'relation_name':'prerequisite', 'inverse_name':'is_required_for' }
 
   def _get_node_info(node_id):
     node = collection.Node.one( {'_id':node_id}  )
-    node
     # mime_type = "true"  if node.structure.has_key('mime_type') else 'false'
 
     return node.name
@@ -741,33 +741,33 @@ def graph_nodes(request, group_id):
   # def _get_username(id_int):
     # return User.objects.get(id=id_int).username
 
-  def _get_node_url(node_id):
+  # def _get_node_url(node_id):
 
-    node_url = '/' + str(group_id)
-    node = collection.Node.one({'_id':node_id})
+  #   node_url = '/' + str(group_id)
+  #   node = collection.Node.one({'_id':node_id})
 
-    if len(node.member_of) > 1:
-      if node.mime_type == 'image/jpeg':
-        node_url += '/image/image_detail/' + str(node_id)
-      elif node.mime_type == 'video':
-        node_url += '/video/video_detail/' + str(node_id)
+  #   if len(node.member_of) > 1:
+  #     if node.mime_type == 'image/jpeg':
+  #       node_url += '/image/image_detail/' + str(node_id)
+  #     elif node.mime_type == 'video':
+  #       node_url += '/video/video_detail/' + str(node_id)
 
-    elif len(node.member_of) == 1:
-      gapp_name = (collection.Node.one({'_id':node.member_of[0]}).name).lower()
+  #   elif len(node.member_of) == 1:
+  #     gapp_name = (collection.Node.one({'_id':node.member_of[0]}).name).lower()
 
-      if gapp_name == 'forum':
-        node_url += '/forum/show/' + str(node_id)
+  #     if gapp_name == 'forum':
+  #       node_url += '/forum/show/' + str(node_id)
 
-      elif gapp_name == 'file':
-        node_url += '/image/image_detail/' + str(node_id)
+  #     elif gapp_name == 'file':
+  #       node_url += '/image/image_detail/' + str(node_id)
 
-      elif gapp_name == 'page':
-        node_url += '/page/details/' + str(node_id)
+  #     elif gapp_name == 'page':
+  #       node_url += '/page/details/' + str(node_id)
 
-      elif gapp_name == 'quiz' or 'quizitem':
-        node_url += '/quiz/details/' + str(node_id)
+  #     elif gapp_name == 'quiz' or 'quizitem':
+  #       node_url += '/quiz/details/' + str(node_id)
       
-    return node_url
+  #   return node_url
 
 
   # page_node_id = str(id(page_node._id))
@@ -808,6 +808,7 @@ def graph_nodes(request, group_id):
         # else:
 
         for each in value:
+
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)
             if key == "collection_set":
@@ -827,8 +828,10 @@ def graph_nodes(request, group_id):
             i += 1
     
     else:
+      # possibly gives GAttribute
       node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
       node_relations += '{"type":"'+ key +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
+
       # key_id = str(i)     
       key_id = str(abs(hash(key+str(page_node._id))))
 
@@ -841,9 +844,39 @@ def graph_nodes(request, group_id):
       else:
         node_metadata += '{"screen_name":"' + value + '", "_id":"'+ str(i) +'_n"},'
         node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
-        i += 1 
+        
+        i += 1
     # End of if - else
   # End of for loop
+
+
+  # # getting all the relations of current node
+  # node_rel = page_node.get_possible_relations(page_node.member_of)
+  # # print "\n\n", node_rel
+  # for keyy, vall in node_rel.iteritems():
+
+  #   if vall['subject_or_right_subject_list']:
+
+  #     for eachnode in vall['subject_or_right_subject_list']:
+    
+    # if keyy == "event_organised_by":
+    #   pass
+    #   # node_metadata +='{"screen_name":"' + keyy + '", "_id":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
+    #   # node_relations += '{"type":"'+ keyy +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
+
+    #   # node_metadata += '{"screen_name":"' + str(vall) + '", "_id":"'+ str(i) +'_n"},'
+    #   # node_relations += '{"type":"'+ keyy +'", "from":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
+    
+    # else:
+
+    #   node_metadata +='{"screen_name":"' + keyy + '", "_id":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
+    #   node_relations += '{"type":"'+ keyy +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(keyy+str(page_node._id)))) +'_r"},'
+      
+    #   vall = vall.altnames if ( len(vall['altnames'])) else _get_node_info(vall['subject_or_right_subject_list'][0])
+    #   node_metadata += '{"screen_name":"' + str(vall) + '", "_id":"'+ str(i) +'_n"},'
+    #   node_relations += '{"type":"'+ keyy +'", "from":"'+ str(abs(hash(keyy+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
+    # print "\nkey : ", key, "=====", val
+
 
   node_metadata = node_metadata[:-1]
   node_relations = node_relations[:-1]
