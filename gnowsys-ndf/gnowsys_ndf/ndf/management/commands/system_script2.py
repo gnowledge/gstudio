@@ -86,6 +86,69 @@ def create_WikiData_WikiTopic():
 		print "Created an object of GSystemtype"
 
 
+
+def create_AttributeType_for_class(name, data_type, description, property_id, language, user_id):
+	"""
+	This method creates an attribute type of given name and which will be for the given system_type(WikiData)
+	The following data_types are possible:
+	DATA_TYPE_CHOICES = (
+    	"None",
+    	"bool",
+    	"basestring",
+    	"unicode",
+    	"int",
+    	"float",
+    	"long",
+    	"datetime.datetime",
+    	"list",
+    	"dict",
+    	"ObjectId",
+    	"IS()"
+	)
+	User Id will be used for filling the created_by field.
+	
+	1. name - name of property i.e. label
+	2. data_type - extracted data type from JSON
+	3. description - Desc
+	4. property_id - unique code of property. PCode
+	5. language - language being used
+	6. User Id
+	"""
+	print "Creating an Attribute Type"
+	cursor = collection.Node.one({"label":unicode(property_id),"_type":"AttributeType"})
+	if (cursor != None):
+		print "The AttributeType already exists."
+		return True
+	else:
+		attribute_type = collection.AttributeType()
+		attribute_type.name = unicode(name)
+		attribute_type.data_type = data_type
+		system_type = collection.Node.one({"name":u"WikiData","_type":"GSystemType"})
+		attribute_type.subject_type.append(system_type._id)
+		attribute_type.created_by = user_id
+		attribute_type.modified_by = user_id
+		factory_id = collection.Node.one({"name":u"factory_types","_type":"MetaType"})._id
+		attribute_type.member_of.append(factory_id)
+		attribute_type.verbose_name = name
+		attribute_type.altnames = unicode(property_id)
+		attribute_type.null = True
+		attribute_type.blank = True
+		attribute_type.help_text = unicode(description)
+		attribute_type.label = unicode(property_id) #Adding property_id pcode
+		attribute_type.unicode = False
+		attribute_type.default = unicode("None")
+		attribute_type.auto_now = False
+		attribute_type.language=unicode(language)
+		attribute_type.save()
+		"""	
+		Adding the attribute type to the WikiData GSytemType attribute_set"
+		"""
+		system_type.attribute_type_set.append(attribute_type._id)
+		print "Created the Attribute_Type " + str(name)
+		return False
+		
+
+
 def create_AttributeType(name, data_type, description, property_id,language, user_id):
 	"""
 	This method creates an attribute type of given name and which will be for the given system_type(WikiData)
@@ -158,12 +221,15 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	#it's me
 	subject = collection.Node.find_one({"name":unicode(subject_name)})
 	#it's me
+	print "Subject::\n" + str(subject)
 	attribute_type_obj = collection.Node.find_one({"name": unicode(attribute_type_name), "_type": u"AttributeType"})
+	
+	print "Attribute_type::\n" + str(attribute_type_obj)	
 	cursor = collection.Node.find_one({"_type" : u"GAttribute","subject": ObjectId(subject._id),"attribute_type.$id":ObjectId(attribute_type_obj._id)})
 	if cursor!= None:
 		print "The attribute " + unicode(cursor.name) + " already exists."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
-		return False
+		return True
 	else:
 		att = collection.GAttribute()
 		att.created_by = user_id
@@ -175,9 +241,18 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 		att.attribute_type = attribute_type_obj
 		att.object_value = unicode(object_value)
 		print "About to create"
-		att.save()
-		print "Created attribute " + unicode(att.name)
-		return True
+		#it's me	
+		try:
+			att.save()
+			print "Created attribute " + unicode(att.name)
+		except e:
+			print "Could not create a attribute" + unicode(att.name)
+			print e
+			#call log file method
+			return True
+
+		return False
+		#it's me
 
 
 
@@ -247,7 +322,10 @@ def create_Class(label, description, alias_list, class_id, last_update_datetime,
 		class_obj.access_policy=unicode('PUBLIC')
 		factory = collection.Node.one({"name": u"factory_types"})
                 factory_id = factory._id
-		class_obj.member_of.append(factory_id)
+		wikidata = collection.Node.one({"name":u"WikiData", "_type":"GSystemType"})
+		class_obj.member_of.append(ObjectId(wikidata._id))
+		class_obj.member_of.append(ObjectId(factory_id))	
+		#Adding the WikiData GSystemType as a member of the class resolves the problem of creating attributes for a GSystemType(i.e. the class))
 		class_obj.last_update = last_update_datetime
 		class_obj.save()
 		
@@ -255,7 +333,8 @@ def create_Class(label, description, alias_list, class_id, last_update_datetime,
 		return False
 		
 
-	
+
+
 
 def create_RelationType(name, inverse_name, subject_type_name, object_type_name,property_id,language, user_id):
 
@@ -308,6 +387,9 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 	2. Relation Type: The type of relation
 	3. Right Subject: The subject on the right. The object related to the current object.
 	"""
+	"""
+	The same method s used to cerate relations between 2 GSystemTypes or a GSystemType and a GSystem.
+	"""
 	print "Creating a Relation."
 	relation_type = collection.Node.one({"_type":u"RelationType", "name": unicode(relation_type_name)})
 	subject = collection.Node.one({"_type": u"GSystem", "name": unicode(subject_name)})
@@ -327,9 +409,19 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		relation.right_subject = ObjectId(right_system._id)
 		relation.lang = u"en"
 		relation.status = u"PUBLISHED"
-		relation.save()
-		print "Created a Relation " + str(relation.name)
+		#it's me
+		try:
+			relation.save()
+			print "Created a Relation " + str(relation.name)
+		except e:
+			print "Could not create a relation-->" + str(relation.name)
+	
+			print e
+			#call log file method
+			return True
+
 		return False
+		#it's me
 
 def display_objects():
 	cursor = collection.Node.find()
@@ -341,11 +433,16 @@ def item_exists(label):
 	Returns boolean value to indicate if a GSystem with the given name exists or not"
 	"""	
 
-	object = collection.Node.find_one({"type":u"GSystem","name":unicode(label)})
-	if object !=None:
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	if obj !=None:
 		return True
 	else:
-		return False
+		#It may be the case that a class is the item
+		obj = collection.Node.find_one({"_type": u"GSystemType", "name": unicode(label)})
+		if obj != None:
+			return True
+		else:
+			return False
 
 
 def populate_tags(label,property_value_for_relation):
