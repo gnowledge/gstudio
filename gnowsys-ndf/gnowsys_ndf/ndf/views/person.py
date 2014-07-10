@@ -193,7 +193,13 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     # print "\n person_gs: \n", person_gs.keys()
     # for k, v in person_gs.items():
     #   print "\n ", k, " -- ", v
-    person_gs.save(is_changed=get_node_common_fields(request, person_gs, group_id, person_gst))
+    is_changed = get_node_common_fields(request, person_gs, group_id, person_gst)
+
+    if is_changed:
+      # Remove this when publish button is setup on interface
+      person_gs.status = u"PUBLISHED"
+
+    person_gs.save(is_changed=is_changed)
     # print "\n person: ", person_gs._id, " -- ", person_gs.name, "\n"
   
     # [B] Store AT and/or RT field(s) of given person-node (i.e., person_gs)

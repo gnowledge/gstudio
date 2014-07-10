@@ -158,6 +158,7 @@
         <ul id="edit-options" class="f-dropdown">
 
           <!-- This button publishes the drafted resource -->
+          <!-- {% comment %}
           {% if node %}
           {% get_publish_policy request groupid node as group_policy %}
           {% if group_policy == "allow" %}
@@ -167,11 +168,14 @@
           {% endif %}
           
           {% endif %}
+          {% endcomment %} -->
 
           <!-- This button translates given resource -->
-          <li>
+          <!-- <li>
+            {% comment %}
             <a class="button small expand" href="{% url 'node_translation' group_name_tag node %} ">Translate</a>
-          </li>
+            {% endcomment %}
+          </li> -->
 
           <!--
             * This button Adds/Uploads New resource
@@ -194,17 +198,19 @@
       {% endif %}
       <!-- End of Block: For listing Editing options --> 
 
-      <div>
+      <!-- <div>
         Languages
         <br></br>
+        {% comment %}
         {% get_possible_translations node as tran %}
         {% for each in tran %}
           {% for k,v in each.items %}
           <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
           {% endfor %}
         {% endfor %}
+        {% endcomment %}
 
-      </div>
+      </div> -->
     </section>
 
   </div>

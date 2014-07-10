@@ -189,7 +189,13 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
     # print "\n event_gs: \n", event_gs.keys()
     # for k, v in event_gs.items():
     #   print "\n ", k, " -- ", v
-    event_gs.save(is_changed=get_node_common_fields(request, event_gs, group_id, event_gst))
+    is_changed = get_node_common_fields(request, event_gs, group_id, event_gst)
+
+    if is_changed:
+      # Remove this when publish button is setup on interface
+      event_gs.status = u"PUBLISHED"
+
+    event_gs.save(is_changed=is_changed)
     # print "\n Event: ", event_gs._id, " -- ", event_gs.name, "\n"
   
     # [B] Store AT and/or RT field(s) of given event-node (i.e., event_gs)
