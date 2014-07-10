@@ -634,7 +634,21 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
 			log_flag -= 1
 		
+		if flag==2:
+			if property_id=="P625":
+				populate_location(label,property_id,property_value,user_id)
+
+
+			else:
+				#if it is not P625, then strictly create an attribute type for it and an attribute.
+				property_data_type = extract_datatype_from_property(property_value_list)
+				#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
+				#print property_data_type
+
+				property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
+				property_create_Attribute(label,property_id,property_value,property_json)
 		
+
 		if flag==3 and call_flag==3: #relation has to be made
 			log_flag += 1
 			property_value_for_relation=extract_value_for_relation(property_value_list)
@@ -782,7 +796,7 @@ class Command(BaseCommand):
 		
 		create_topic_id()
 		log_iteration_1_file_start()
-		#iteration_1()	
+		iteration_1()	
 		log_iteration_1_file_complete()
 		log_iteration_2_file_start()
 		#iteration_2()		

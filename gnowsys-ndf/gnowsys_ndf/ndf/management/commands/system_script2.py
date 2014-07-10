@@ -457,6 +457,7 @@ def item_exists(label):
 			return False
 
 
+
 def populate_tags(label,property_value_for_relation):
 	"""
 	To populate tags of the object given by label.tags is a list field and the values will be appended
@@ -471,6 +472,36 @@ def populate_tags(label,property_value_for_relation):
 		obj.tags.append(unicode(property_value_for_relation))
 		obj.modified_by=int(1)
 		obj.save()
+
+
+
+def populate_location(label,property_id,property_value,user_id):
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	geo_json=[
+    	{
+        	"geometry": 
+        	{
+            	"type": "Point",
+            	"coordinates": []
+       		},
+        	"type": "Feature",
+        	"properties": 
+        	{
+            	"description":"",
+            	"id": ""
+        	}
+    	}
+	]
+
+	geo_json[0]["geometry"]["coordinates"].append(property_value["latitude"])
+	geo_json[0]["geometry"]["coordinates"].append(property_value["longitude"])
+	geo_json[0]["properties"]["description"]=(property_value["globe"])		
+	geo_json[0]["properties"]["id"]=property_id
+	obj.location =location
+	obj.modified_by =user_id
+	obj.save()
+
+
 
 
 

@@ -117,7 +117,7 @@ def log_attributeType_exists(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""
-
+	global my_log
         captcha = " "
         while log_flag != 1:
                 captcha += " "
@@ -134,6 +134,7 @@ def log_attribute_created(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""  
+	global my_log
         captcha = " "
         while log_flag != 1:
                 captcha += " "
@@ -150,6 +151,7 @@ def log_attribute_exists(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""
+	global my_log
         captcha = " "
         while log_flag != 1:
                 captcha += " "
@@ -167,6 +169,7 @@ def log_relationType_created(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""
+	global my_log
         captcha = " "
         while log_flag != 1:
                 captcha += " "
@@ -183,6 +186,7 @@ def log_relationType_exists(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""
+	global my_log
         captcha = " "
         while log_flag != 1:
                 captcha += " "
@@ -199,6 +203,7 @@ def log_relation_created(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""
+	global my_log
         captcha = " "
         while log_flag != 1:
                 captcha += " "
@@ -215,6 +220,7 @@ def log_relation_exists(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""
+	global my_log
         captcha = " "
         while log_flag != 1:
                 captcha += " "
@@ -229,6 +235,7 @@ def log_inner_topic_start(log_flag):
 	Helper log function that print messages to help in debugging
 
 	"""
+	global my_log
         captcha = "-"
         my_log.write("\n")
         while log_flag != 0:
@@ -241,6 +248,7 @@ def log_inner_topic_end(log_flag):
 	Helper log function that print messages to help in debugging
 
 	"""
+	global my_log
         captcha = "-"
         my_log.write("\n")
         while log_flag != 0:
@@ -253,6 +261,7 @@ def log_class_done(log_flag):
 	Helper log function that print messages to help in debugging
 
 	"""
+	global my_log
         captcha = "_"
         my_log.write("\n")
         while log_flag != 0:
