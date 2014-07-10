@@ -258,7 +258,7 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 			att.save()
 			print "Created attribute " + unicode(att.name)
 		except Exception as e:
-			print "Could not create a attribute" + unicode(att.name)
+			print "Could not create an attribute" + unicode(att.name)
 			print e
 			#call log file method
 			return True
