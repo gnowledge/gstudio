@@ -8,6 +8,8 @@ from gnowsys_ndf.notification import models as notification
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
+from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
+
 import json
 
 try:
@@ -163,6 +165,78 @@ def invite_users(request,group_id):
                    st.append(each)
                 else:
                     if each.id !=owner:
+                        coll_obj_list.append(each)
+
+            data_list=set_drawer_widget_for_users(st,coll_obj_list)
+            return HttpResponse(json.dumps(data_list))
+   
+    except Exception as e:
+        print "Exception in invite_users "+str(e)
+        return HttpResponse("Failure")
+
+def invite_admins(request,group_id):
+    try:
+        sending_user=request.user
+        node=col_Group.Node.one({'_id':ObjectId(group_id)})
+        if request.method == "POST":
+            exst_users=[]
+            new_users=[]
+            users=[]
+            deleted_users=node.group_admin
+            groupname=node.name
+            users_to_invite = request.POST['users']
+            not_status=request.POST['notif_status']
+            new_users_list=users_to_invite.split(",")
+            for each in new_users_list:
+                if each :
+                    users.append(int(each))
+            if users:
+                for each in users:
+                    if each in node.group_admin:
+                        exst_users.append(each)
+                    else:
+                        if each not in node.group_admin:
+                            new_users.append(each)
+                            node.group_admin.append(each);
+                node.save()
+                
+                # Send invitations according to not_status variable
+                activ="invitation to join in group"
+                if not_status == "ON":
+                    for each in exst_users:
+                        bx=User.objects.get(id=each)
+                        msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+" as admin'"
+                        set_notif_val(request,group_id,msg,activ,bx)
+                for each in new_users:
+                    bx=User.objects.get(id=each)
+                    msg="'This is to inform you that " +sending_user.username+ " has subscribed you to the group " +groupname+" as admin'"
+                    set_notif_val(request,group_id,msg,activ,bx)
+            deleted_users=set(deleted_users)-set(users)
+            activ="Unsubscribed from group"
+            if deleted_users:
+                for each in deleted_users:
+                    bx=User.objects.get(id=each)
+                    node.author_set.remove(each)
+                    msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+" as admin'"
+                    set_notif_val(request,group_id,msg,activ,bx)
+                node.save()
+            return HttpResponse("Success")
+        else:
+            coll_obj_list = []
+            lstusers=[]
+            owner=node.created_by
+            users=User.objects.all()
+            user_names=[]
+            st=[]
+            user_grps=get_all_user_groups()
+            usergrps=[]
+            for each in user_grps:
+                usergrps.append(each.created_by)
+            for each in users:
+                if each.id != owner and each.id not in node.group_admin and each.id in usergrps:
+                   st.append(each)
+                else:
+                    if each.id !=owner and each.id in usergrps:
                         coll_obj_list.append(each)
 
             data_list=set_drawer_widget_for_users(st,coll_obj_list)

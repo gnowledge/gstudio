@@ -34,5 +34,8 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
 
                        url(r'^set_user_link/', 'set_user_link', name='set_user_link'),
+
+                       url(r'^edit_task_title/', 'edit_task_title', name='edit_task_title'),
+                       url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
                        
 )

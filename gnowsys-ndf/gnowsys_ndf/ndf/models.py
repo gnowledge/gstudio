@@ -14,7 +14,7 @@ from django.contrib.auth.models import check_password
 from django.core.validators import RegexValidator
 from django.db import models
 
-from djangoratings.fields import RatingField
+
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -37,6 +37,8 @@ from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 
 from gnowsys_ndf.ndf.rcslib import RCS
+
+
 
 #######################################################################################################################################
 
@@ -116,28 +118,17 @@ STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 
-class RatingField(CustomType):
-    mongo_type = unicode
-    python_type = int
-    def to_bson(self, value):
-        """convert type to a mongodb type"""
-        return unicode(value)
 
-    def to_python(self, value):
-        """convert type to a python object"""
-        if value is not None:
-            return value
-        # else:
-        #     return "value must be between 0 and 5"
 
 
 #######################################################################################################################################
 # FRAME CLASS DEFINITIONS
 #######################################################################################################################################
 
+
+
 @connection.register
 class Node(DjangoDocument):
-
     objects = models.Manager()
 
     collection_name = 'Nodes'
@@ -163,8 +154,6 @@ class Node(DjangoDocument):
 
         'contributors': [int],		            # List of Primary Keys of User(django's) Class
 
-        # 'rating': RatingField(),
-
         'location': [dict],
 
         'content': unicode,
@@ -182,7 +171,10 @@ class Node(DjangoDocument):
       	'login_required': bool,
       	# 'password': basestring,
 
-        'status': STATUS_CHOICES_TU
+        'status': STATUS_CHOICES_TU,
+        'rating':[{'score':int,
+                  'user_id':int,
+                  'ip_address':basestring}]
     }
     
     required_fields = ['name']
@@ -976,7 +968,9 @@ class Group(GSystem):
         'subscription_policy': basestring,   # Subscription policy to this group - open, by invitation, by request
         'visibility_policy': basestring,     # Existance of the group - announced or not announced
         'disclosure_policy': basestring,    # Members of this group - disclosed or not 
-        'encryption_policy': basestring            # Encryption - yes or no
+        'encryption_policy': basestring,            # Encryption - yes or no
+
+        'group_admin': [int]				# ObjectId of Author class
     }
 
     use_dot_notation = True
