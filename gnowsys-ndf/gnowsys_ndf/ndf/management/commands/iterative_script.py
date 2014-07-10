@@ -592,6 +592,27 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 				Code to call DFS.
 				"""
 				print "DFS Will be starting here"
+			
+				print "Property Value" + str("!!!!!!!!!!!!!!!!!!!--------------------!!!!!!!!!!!!!") + str(property_value)
+				for key, val in property_value.items():
+					if key == u'numeric-id':
+						class_id = "Q" + str(val)
+						class_url = gen_url_json+class_id+".json"
+						class_json =json_parse(class_url)
+
+				url_json = gen_url_json+class_id+".json"	#creating url of json by appending words to it to make a proper link
+				url_page = gen_url_page+class_id #creating url of the wikidata page itself
+				json_obj = json_parse(url_json)
+				if(json_obj):
+					global log_flag
+					log_flag += 1
+					label = extract_labels(json_obj,class_id,language)
+					initiate_class_creation(json_obj,label,class_id,int(1))
+					log_class_done(log_flag)
+					log_flag -= 1
+
+				
+				
 			else:
 				property_value_for_relation=extract_value_for_relation(property_value_list)
 			
