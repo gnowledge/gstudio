@@ -56,7 +56,19 @@ background-repeat:no-repeat; background-size: 48px 48px
 			<dd title="Click here to add/edit collection">
 	  			<a href="#panel-collection" class="collection_tab"> Collection </a> 
 			</dd>
-						  
+			<!-- change name of metadata tab overide block in your code -->
+			<dd title="Click here to add/edit metadata">
+	 			<a href="#panel-metadata" > Metadata </a> 
+			</dd> 
+			<dd title="Click here to add/edit requires">
+	 			<a href="#panel-prior-node" class="prior_node_tab" >Requires </a> 
+			</dd>
+			<dd title="Click here to add/edit assesses">
+	 			<a href="#panel-assesses" >Assesses </a> 
+			</dd>
+			<dd title="Click here to add/edit teaches">
+	 			<a href="#panel-teaches" class="teaches_tab" >Teaches </a> 
+			</dd>			  
 		{% endif %}
      	</dl>
   	</nav>
@@ -261,11 +273,41 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    </div>
 
 	    {% endblock %}
-    	
-	</div>  
+    	  <!-- this is for requires -->
+          <div class="content" id="panel-teaches"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Teaches : </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="teaches_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    	</div>
+	
+	 <div class="content" id="panel-prior-node"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Requires : </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="prior_node_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    	</div>
+
+    </div>  
 
 	{% block add_fields %} {% endblock %}
-  
+  		
   	<div class="row" >
     	<input type="submit" id="save-node" value="Save as Draft And Preview" class="button medium-6 columns"/>
   	</div>
@@ -361,19 +403,78 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	});
 
+	$(".prior_node_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#prior_node_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "prior_node",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#prior_node_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+
+	$(".teaches_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "teaches",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#teaches_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
 
 	$("#save-node").click(function() {
 		cn_arr = []
-
+		pn_arr = []
+		tch_arr = []
 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
 				cn_arr.push($(this).val());
 			}
-
+			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+				pn_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
 		});
-
-		$("#collection_list").val(cn_arr); 
+		alert(tch_arr)
+		$("#collection_list").val(cn_arr);
+		$("#prior_node_list").val(pn_arr);
+		$("#teaches_list").val(tch_arr);
 		location.reload(true);
+
+		
 
 	});
 

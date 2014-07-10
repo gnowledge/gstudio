@@ -51,6 +51,7 @@ mis_group = collection.Node.one({'_type': "Group",
 group_id = mis_group._id
 user_id = mis_group.created_by  # User who created the above private group
 
+
 class Command(BaseCommand):
     help = "Based on "
 

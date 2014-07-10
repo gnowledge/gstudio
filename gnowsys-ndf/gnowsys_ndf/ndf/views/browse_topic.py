@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 
 from gnowsys_ndf.ndf.models import Node, Triple
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list
 
 #######################################################################################################################################
 db = get_database()
@@ -145,6 +145,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
             root_themes_id = []
             name = request.POST.get('name')
             collection_list = request.POST.get('collection_list','')
+	    prior_node_list = request.POST.get('prior_node_list','')
+	    teaches_list = request.POST.get('teaches_list','')
+	   
             
             # To find the root nodes to maintain the uniquness while creating and editing themes
             nodes = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
@@ -183,7 +186,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             grelation.right_subject=theme_topic_node._id
                             grelation.name=u""
                             grelation.save()
-                        
+          
                         
                 # This will return to Themes Hierarchy  
                 if theme_GST:
@@ -198,7 +201,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 
                 # For edititng themes 
                 if theme_GST._id in app_GST.member_of and translate != "true":
-                    
+                    print 'aaaaaaaaaaaaaaaaaaaaaa'
                     # To find themes uniqueness within the context of its parent Theme collection, while editing theme name
                     prior_theme_collection = [] 
                     nodes = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
@@ -236,7 +239,22 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             i = i+1
                         theme_topic_node.save() 
                         # End of storing collection
+			 #ash                                 
+			
+			theme_topic_node.prior_node = []
+  			if prior_node_list != '':
+    				prior_node_list = prior_node_list.split(",")
 
+  			i = 0
+  			while (i < len(prior_node_list)):
+	    			node_id = ObjectId(prior_node_list[i])
+	    			if collection.Node.one({"_id": node_id}):
+      					theme_topic_node.prior_node.append(node_id)
+    
+    				i = i+1
+			theme_topic_node.save()
+			 #ash   
+                       
                     title = theme_GST.name
                     # This will return to Themes Hierarchy  
                     if theme_GST:
@@ -270,7 +288,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             theme_topic_node.collection_set = []
                             if collection_list != '':
                                 collection_list = collection_list.split(",")
-                                
+            
                             i = 0
                             while (i < len(collection_list)):
                                 node_id = ObjectId(collection_list[i])
@@ -282,17 +300,40 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             theme_topic_node.save()
                             
                         title = topic_GST.name 
-                        
+                        #ash #currently working #prior,teaching
+			if prior_node_list:
+				theme_topic_node.prior_node = []
+  				if prior_node_list != '':
+    					prior_node_list = prior_node_list.split(",")
+
+  				i = 0
+  				while (i < len(prior_node_list)):
+	    				node_id = ObjectId(prior_node_list[i])
+	    				if collection.Node.one({"_id": node_id}):
+      						theme_topic_node.prior_node.append(node_id)
+    
+    					i = i+1
+				theme_topic_node.save()
+			if teaches_list:
+				if teaches_list !='':
+					teaches_list=teaches_list.split(",")
+					
+				create_grelation_list(theme_topic_node._id,"teaches",teaches_list)
+					
+
+				
                         # This will return to Themes Hierarchy  
                         if theme_GST:
                             node = theme_GST
-                            
-
+                           
+    	
     else:
         app_node = None
         nodes_list = []
         
         app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+
+	
         
         if app_GST:
             # For adding new Theme & Topic

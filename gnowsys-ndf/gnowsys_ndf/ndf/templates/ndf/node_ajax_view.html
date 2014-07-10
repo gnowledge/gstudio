@@ -56,6 +56,11 @@ ul#graph-hover.f-dropdown{
 {% endif %}
 
 
+
+{% g1 node as schema %} 
+{% g2 node as schema_AT %}
+
+
 <header class="row page">
 
   <section class="medium-12 columns" >
@@ -90,6 +95,27 @@ ul#graph-hover.f-dropdown{
      </section>
 
 </header>
+
+
+
+{% if schema.0 %}
+<meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">
+<meta itemprop="{{schema.1.DM}}" content="{{node.last_update}}" >
+<meta itemprop="{{schema.1.creator}}" content="{{node.user_details_dict.created_by}}">
+<meta itemprop="{{schema.1.editor}}" content="{{node.user_details_dict.modified_by}}">
+<meta itemprop="{{schema.1.lang}}" content="{{node.language}}">
+<meta itemprop="{{schema.1.agerange}}" content="{{schema_AT.agerange}}">
+<meta itemprop="{{schema.1.timerequired}}" content="{{schema_AT.timerequired}}">
+{% for contributor_name in node.user_details.contributors %}
+<meta itemprop="{{schema.1.contributor}}" content="{{contributor_name}}">
+{% endfor %}                                                             <!--if g2 -->
+{% if schema.1.sid == 3 or schema.1.sid == 2 or schema.1.sid == 4 %}     	<!--schema_AT.alignmentobject.1.alignmenttype-->	
+<meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " > 	<!-- schema_AT.alignmenttype.0 -->
+<meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >     	<!-- schema_AT.targeturl.0 -->
+{% endif %}                     					  <!--else -->
+{% endif %} 									<!-- node.alignobject(AT).1.alignmenttype-->
+										<!-- node.alignmenttype.o -->
+
 
 <div class="row">
 

@@ -649,3 +649,84 @@ def update_mobwrite_content_org(node_system):
     textobj = TextObj(filename=filename,text=content_org)
     textobj.save()
   return textobj
+
+
+def get_node_metadata_fields(request, node, node_type):
+	if(node.has_key('_id')):
+  		for at in node_type.attribute_type_set:
+		    if(at.name != 'alignment_object'):
+			field_value=(request.POST.get(at.name,""))
+			create_gattribute(node._id,at,field_value)
+		    else:
+			list_alignobject=[]
+			for i in [1,2,3]:
+				prop1 = (request.POST.get("aligntype"+i,""))
+				prop2 = (request.POST.get("eduframework"+i,""))
+				prop3 = (request.POST.get("tname"+i,""))
+				prop4 = (request.POST.get("turl"+i,""))
+				prop5 = (request.POST.get("tdescription"+i,""))
+				list_alignobject.append({"aligntype":prop1,"educationalframework":prop2,"targetname":prop3,"targeturl":prop4,"targetdescription":prop5})
+		    #create_gattribute(node._id,at,list_alignobject)
+
+def create_AttributeType(name, data_type, system_name, user_id):
+
+	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
+	if (cursor != None):
+		print "The AttributeType already exists."
+	else:
+		attribute_type = collection.AttributeType()
+		attribute_type.name = unicode(name)
+		attribute_type.data_type = data_type
+		system_type = collection.Node.one({"name":system_name})
+		attribute_type.subject_type.append(system_type._id)
+		attribute_type.created_by = user_id
+		attribute_type.modified_by = user_id
+	        attribute_type.status=u"PUBLISHED"
+		#factory_id = collection.Node.one({"name":u"factory_types"})._id
+		#attribute_type.member_of.append(factory_id)
+		attribute_type.save()
+		system_type.attribute_type_set.append(attribute_type)
+		system_type.save()
+
+def create_RelationType(name,inverse_name,subject_type_name,object_type_name,user_id):
+
+	cursor = collection.Node.one({"name":unicode(name)})
+        if cursor!=None:
+		print "The RelationType already exists."
+	else:
+		relation_type = collection.RelationType()
+                relation_type.name = unicode(name)
+                system_type = collection.Node.one({"name":unicode(subject_type_name)})
+                relation_type.subject_type.append(system_type._id)
+                relation_type.inverse_name = unicode(inverse_name)
+		relation_type.created_by = user_id
+                relation_type.modified_by = user_id
+		relation_type.status=u"PUBLISHED"
+		object_type = collection.Node.one({"name":unicode(object_type_name)})
+		relation_type.object_type.append(ObjectId(object_type._id))
+                relation_type.save()
+		system_type.relation_type_set.append(relation_type)
+		system_type.save()
+
+def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
+# function to create grelations for new ones and delete old ones.
+	relationtype = collection.Node.one({"_type":"RelationType","name":unicode(relation_type_name)})
+	
+	#list_current_grelations = collection.Node.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
+	collection.remove({"_type":"GRelation","subject":subject_id,"relation_type":relationtype.get_dbref()})
+	
+	#for relation in list_current_grelations:
+		#collection.remove({"_type":"GRelation","subject":subject_id,"right_subject":relation.right_subject})
+	
+	
+	
+	for relation_id in right_subject_id_list:
+	    
+	    gr_node = collection.GRelation()
+            gr_node.subject = ObjectId(subject_id)
+            gr_node.relation_type = relationtype
+            gr_node.right_subject = ObjectId(relation_id)
+	    gr_node.status = u"PUBLISHED"
+            gr_node.save()
+		
+

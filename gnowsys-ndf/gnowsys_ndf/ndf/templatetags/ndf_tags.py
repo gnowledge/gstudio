@@ -19,6 +19,104 @@ from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
 
+
+
+               
+s_dict={
+	"Page":{   
+                  "sid":1,
+		  "type":"http://schema.org/Article",
+		  "name":"name",
+		  "tags":"keywords",
+		  "DM":"dateModified",	
+		  "editor":"editor",   # An embedded object
+                  "contributor":"contributor",   # An embedded object
+                  "lang":"inLanguage",
+                  "DC":"dateCreated",
+ 		  "source":"sourceOrganization",  # An embedded object
+ 		  "content":"text",
+ 		  "agerange":"typicalAgeRange",
+                  "version":"version",
+	   	  "creator":"creator",
+		  "audience":"audience",
+                  "interactivitytype":"interactivityType",
+		  "basedonurl":"isBasedonUrl",
+		  "timerequired":"timeRequired"
+		  
+	       },
+	"Document":{  
+                     "sid":2,
+		     "type":"http://schema.org/MediaObject",
+		     "name":"name",
+		     "tags":"keywords",
+		     "DM":"dateModified",	
+		     "editor":"editor",         # An embedded object
+		     "contributor":"contributor", #An embedded object
+                     "lang":"inLanguage",      
+                     "DC":"dateCreated",           
+ 		     "source":"sourceOrganization", #An embedded object
+ 		     "content":"text",
+ 		     "age":"typicalAgeRange",
+                     "version":"version",
+                     "size":"contentSize",
+ 	 	     "format":"encodingFormat",
+		     "url":"contentUrl",
+                     "creator":"creator"     
+		   },
+	"Image":{
+                  "sid":3,
+		  "type":"http://schema.org/ImageObject",
+		  "name":"name",
+		  "tags":"keywords",
+		  "DM":"dateModified",	
+		  "editor":"editor",   # An embedded object
+                  "contributor":"contributor",   # An embedded object
+                  "lang":"inLanguage",
+                  "DC":"dateCreated",
+ 		  "source":"sourceOrganization",  # An embedded object
+ 		  "content":"text",
+	          "description":"description",
+ 		  "age":"typicalAgeRange",
+                  "version":"version",
+		  "size":"contentSize",
+ 	 	  "format":"encodingFormat",
+		  "url":"contentUrl",
+		  "creator":"creator"
+		  
+		},
+        "Video":{
+                  "sid":4,
+		  "type":"http://schema.org/VideoObject",
+		  "name":"name",
+		  "tags":"keywords",
+		  "DM":"dateModified",	
+		  "editor":"editor",   # An embedded object
+                  "contributor":"contributor",   # An embedded object
+                  "lang":"inLanguage",
+                  "DC":"dateCreated",
+ 		  "source":"sourceOrganization",  # An embedded object
+ 		  "content":"text",
+	          "description":"description",
+ 		  "age":"typicalAgeRange",
+                  "version":"version",
+		  "size":"contentSize",
+ 	 	  "format":"encodingFormat",
+		  "url":"contentUrl",
+		  "duration":"duration",
+		  "quality":"videoQuality",
+                  "frame":"videoFrameSize",		
+                  "creator":"creator"
+		}
+       }	
+
+schema_lrmi={
+	        "audience":"",
+		"agerange":"",		
+		"timerequired":"",
+		"interactivitytype":"",
+		"basedonurl":""
+	    }
+
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
@@ -26,6 +124,46 @@ at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'}, {'name':'ap
 translation_set=[]
 check=[]
 import json,ox
+
+
+
+
+@register.assignment_tag
+def g1(node):
+   obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
+   nam=node.member_of_names_list[0]
+   if(nam=='Page'):
+	#print s_dict[nam]
+        return [1,s_dict[nam]]
+   elif(nam=='File'):
+	if( 'image' in node.mime_type):
+		return [1,s_dict['Image']]
+        elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+        	return [1,s_dict['Video']]
+	else:
+		return [1,s_dict['Document']]	
+   else:
+	return [0,""]
+
+@register.assignment_tag
+def g2(node):
+     	node.get_neighbourhood(node.member_of)
+  #if(node.has_key('basedonurl')):
+	#schema_lrmi["basedonurl"] = node.basedonurl
+	#schema_lrmi["timerequired"] = node.timerequired
+	#schema_lrmi["agerange"]=node.age_range
+	#schema_lrmi["audience"]=node.audience
+	#schema_lrmi["interactivitytype"]=node.interactivitytype
+        return schema_lrmi 
+
+@register.filter
+def is_Page(node):
+	Page = collection.Node.one({"_type":"GSystemType","name":"Page"})
+	if(Page._id in node.member_of):
+		return 1
+	else:
+		return 0
+		
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):

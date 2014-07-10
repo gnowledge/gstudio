@@ -296,6 +296,11 @@ def create_edit_page(request, group_id, node_id=None):
 
         page_node.save()
 
+
+
+	get_node_metadata_fields(request,page_node,gst_page)
+
+
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:
