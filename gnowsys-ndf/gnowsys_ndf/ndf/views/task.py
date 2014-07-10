@@ -188,7 +188,7 @@ def create_edit_task(request, group_name, task_id=None):
 	    userlist.append(request.user.username)
 	    for eachuser in list(set(userlist)):
 		activ="task reported"
-		msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
+		msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
 		bx=User.objects.get(username =eachuser)
 	        set_notif_val(request,group_id,msg,activ,bx)
 	else: #update
@@ -219,7 +219,7 @@ def create_edit_task(request, group_name, task_id=None):
 		userlist.append(User.objects.get(id=each_author).username)
        	    for eachuser in list(set(userlist)):
 		activ="task updated"
-		msg="Task '"+task_node.name+"' has been updated by "+request.user.username+"\n     - Changes: "+ str(change_list).strip('[]')+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.encode('utf8')+"/task/"+str(task_node._id)+"/"
+		msg="Task '"+task_node.name+"' has been updated by "+request.user.username+"\n     - Changes: "+ str(change_list).strip('[]')+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.domain+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
 		bx=User.objects.get(username =eachuser)
 	        set_notif_val(request,group_id,msg,activ,bx)
 
