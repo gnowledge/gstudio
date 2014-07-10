@@ -80,7 +80,7 @@
 
     </dd>
     <dd class="accordion-navigation">
-      <a href="#panel3">Relations Search</a>
+      <a href="#panel3">Graph Search</a>
       <div id="panel3" class="content">
 
             <form name="search_form" action="{% url 'ra_search_results' groupid %}" method="GET" >
@@ -96,6 +96,7 @@
     <dd class="accordion-navigation">
       <a href="#panel4">Semantic Search</a>
       <div id="panel4" class="content">
+        <h6><i>(Under Construction)</i></h6>
 
           <form name="search_form" method="GET" action="{% url 'get_nearby_words' groupid %}">
             {% csrf_token %}
@@ -542,6 +543,13 @@
   function changed_val() {
     $("#search_text").val($("#autocomplete").val().trim());
     console.log("click 2");
+  }
+
+  $(document).ready(function(){
+      scrollTo("results");
+  });
+  function scrollTo(hash) {
+    location.hash = "#" + hash;
   }
 
 </script>
