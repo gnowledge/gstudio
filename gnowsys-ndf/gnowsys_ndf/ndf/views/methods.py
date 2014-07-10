@@ -815,7 +815,6 @@ def get_property_order_with_value(node):
             elif type_of_set:
               # If current node's GST is not in subject_type
               # Search for that GST's type_of field value in subject_type
-              print "\n Coming here...\n"
               for each in type_of_set:
                 if each in field.subject_type:
                   data_type = demo.structure[field.name]
