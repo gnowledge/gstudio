@@ -247,10 +247,10 @@ def extract_from_property_value(property_value_list):
 	"""
 	property_value_list is a list that has been extracted from the object's json for any particular property.
 	This function returns a flag value between 1,2 and 3.
-	1-Showing that the property is to be created as a relation because "datatype" is "wikibase-item"
+	3-Showing that the property is to be created as a relation because "datatype" is "wikibase-item"
 	2-Showing that the property is a globe-coordinate and hence the geo-json needs to be populated inside the
 	 location filed."datatype" is "globe-coordinate". 
-	3-Showing that the property is to be created as an attribute.
+	1-Showing that the property is to be created as an attribute.
 
 	"""
 	for element in property_value_list:
@@ -304,7 +304,7 @@ def extract_value_for_relation(property_value_list):
 											return v3
 
 
-def property_create_AttributeType(property_id,property_data_type,json_obj):
+def property_create_AttributeType(property_id, property_data_type, json_obj, call_flag):
 	"""
 	This function receives the following parameters-
 	1)property_id -The id by which this property is referred in wikidata.eg - P31 -instance of etc
@@ -312,6 +312,9 @@ def property_create_AttributeType(property_id,property_data_type,json_obj):
 	3)json_obj - actually the json of the property.
 	This function extracts useful information from the property_json like label ,description etc and then calls the create_AttributeType function of system_script2.
 	Meanwhile the suitable entries are being made into the log file as well.
+
+	Call flag - Decides which iteration it is and which method of system_script2 needs to be called.
+		1 - iteration 1
 	"""
 	if(json_obj):
 		property_alias_list=extract_aliases(json_obj,property_id,language)
@@ -320,7 +323,12 @@ def property_create_AttributeType(property_id,property_data_type,json_obj):
 		property_last_update =extract_modified(json_obj,property_id)
 		property_entity_type =extract_type(json_obj,property_id)
 		property_namespace =extract_namespace(json_obj,property_id)
-		attribute_type_exists = create_AttributeType(property_label, property_data_type,property_description,property_id,language, user_id)
+		attribute_type_exists = False
+		if call_flag == int(1):
+			attribute_type_exists = create_AttributeType_for_class(property_label, property_data_type,property_description,property_id,language, user_id)
+		else:
+			attribute_type_exists = create_AttributeType(property_label, property_data_type,property_description,property_id,language, user_id)		
+		
 		if attribute_type_exists:
 			log_attributeType_exists(property_label, log_flag)
 		else:
@@ -358,7 +366,7 @@ def property_create_Attribute(label,property_id,property_value,property_json):
 
 
 
-def property_create_RelationType(property_id,property_json):
+def property_create_RelationType(property_id,property_json, call_flag):
 	"""	
 	This function receives the following parameters-
 	1)property_id -The id by which this property is referred in wikidata.eg - P31 -instance of etc
@@ -368,7 +376,14 @@ def property_create_RelationType(property_id,property_json):
 	"""
 	property_label = extract_labels(property_json,property_id,language)
 	inverse_name="-"+property_label
-	relation_type_exists = create_RelationType(property_label, inverse_name, "WikiTopic", "WikiTopic",property_id,language, user_id)
+	
+	if call_flag == int(1):
+		#Iteration 1 - creating classes
+		relation_type_exists = create_RelationType(property_label, inverse_name, "WikiData", "WikiData",property_id,language, user_id)
+	else:
+		#Iteration 3 - creating acual relations between topics.
+		relation_type_exists = create_RelationType(property_label, inverse_name, "WikiTopic", "WikiTopic",property_id,language, user_id)
+
 	if relation_type_exists:
         	log_relationType_exists(property_label, log_flag)
        	else:
@@ -386,7 +401,7 @@ def property_create_Relation(label,property_id,property_value,property_json):
 	3)property_value - The value of that attribute that is the third part of any triplet.
 	4)property_json - The json of the property for which the attribute is being made.This json too is extracted 
 	from its wikidata url.
-	Function checks that the right subject name must exist as a GSystem i.e. it only creates a relation if there
+	Function checks that the right subject name must exist as a GSystem or a GsystemType i.e. it only creates a relation if there
 	exists an object with name as right_subject_name.
 	Function calls create_Relation function of system_script2 appropriately.
 
@@ -441,12 +456,9 @@ def class_create(class_id, class_json):
 			log_class_exists(label, log_flag)
 		else:
 			log_class_created(label, log_flag)
-			#Creating all the Attributes for 
+			#Creating all the Attributes for class
 			extract_property_json(class_json, label, class_id, int(1))
-			"""
-			DFS code
-
-			"""
+			
 
 
 def initiate_class_creation(json_obj,label,topic_title,call_flag):
@@ -481,13 +493,13 @@ def initiate_class_creation(json_obj,label,topic_title,call_flag):
 		flag=-1
 		flag=extract_from_property_value(property_value_list)
 		property_value =extract_property_value(property_value_list) #property_value has the value of that property for a particular object
-		print str(property_value) + "----------------------------------------------------------<"
-		print str(property_id) + "id<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+		print "Property Id: " + str(property_id)		
+		print "Property Value: " + unicode(property_value) 
+		
 		global log_flag
 		log_flag += 1
 		
 		if property_id == "P31":
-			print "yes!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------------------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111"
 			print "Property Value" + str("!!!!!!!!!!!!!!!!!!!--------------------!!!!!!!!!!!!!") + str(property_value)
 			for key, val in property_value.items():
 				if key == u'numeric-id':
@@ -526,6 +538,8 @@ def initiate_class_creation(json_obj,label,topic_title,call_flag):
 				populate_tags(label,property_value_name)
 			
 		"""
+
+
 		
 def extract_property_json(json_obj,label,topic_title,call_flag):
 	"""	
@@ -563,13 +577,14 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 		log_flag += 1
 
 		if flag==1 and call_flag==1: #attribute has to be made
+			print "Attempting to create an Attribute for Iteration1"			
 			property_data_type = extract_datatype_from_property(property_value_list)
 			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
 			#print property_data_type
-
-			property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
+			property_create_AttributeType(property_id,property_data_type,property_json, call_flag) #assuming that the name of the attribute type id the property id like say P131
 			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
 		
+
 
 		elif flag==2:
 			if property_id=="P625":
@@ -584,6 +599,21 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 
 				property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
 				property_create_Attribute(label,property_id,property_value,property_json)
+
+
+		if flag==3 and call_flag==1: #attribute has to be made
+			print "Attempting to create an Relation for Iteration1"
+			if property_id == "P279":
+				"""
+				Code to call DFS.
+				"""
+				print "DFS Will be starting here"
+			else:
+				property_value_for_relation=extract_value_for_relation(property_value_list)
+			
+				property_create_RelationType(property_id,property_json, call_flag)
+				property_create_Relation(label,property_id,property_value_for_relation,property_json)
+		
 
 		
 		elif flag==3 and call_flag==2: #relation has to be made
@@ -671,7 +701,6 @@ def iteration_1():
 					if(json_obj):
 						global log_flag
 						log_flag = 0
-						
 						label = extract_labels(json_obj,topic_title,language)
 						initiate_class_creation(json_obj,label,topic_title,int(1))
 						
