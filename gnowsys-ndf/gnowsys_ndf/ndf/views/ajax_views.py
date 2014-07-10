@@ -1404,7 +1404,7 @@ def annotationlibInSelText(request, group_id):
   
   sg_obj.save()
 
-  return HttpResponse("Hello")
+  return HttpResponse(json.dumps(sg_obj.annotations))
 
 
 

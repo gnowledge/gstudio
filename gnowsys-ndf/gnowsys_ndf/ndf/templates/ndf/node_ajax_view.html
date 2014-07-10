@@ -488,7 +488,7 @@ var flag = false;
 var pos=-1;
 var st = null;
 //DEBUGGING
-st = "Sniffing";
+st = "active attack";
 
 if(!window.win){
   win = {};
@@ -533,21 +533,10 @@ win.Selector.mouseup = function()
 
 // Require new SideComments object
 var SideComments = require('side-comments');
-
-//trigger the following on hover over annotated text, check with st for now
-//initialise existing comments
+var sideComments;
 
 $(document).ready (function(){
-/*
-script for marking up the annotated text
-*/
-  for (i = 0; i < annotations.length; i++)
-  {
-     text = annotations[i].selectedText;
-     alert(text);
-     highlightSearchTerms(text);
-  }
-
+  highlightAll();
 });
 
 //$(document).ready(function()                             //detect mouseup event
@@ -565,19 +554,25 @@ script for marking up the annotated text
 /*
 bind the below initialisation of sideComments object on hover over that area
 */
-
-for (i = 0; i < annotations.length; i++)
+function showThread(elem)
 {
-    if(st.toLowerCase() == annotations[i].selectedText.toLowerCase())
-    {
-      existingComments.push(annotations[i]);
-      console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
-      //alert(existingComments);
-      sideComments = new SideComments('#commentable-area', currentUser, existingComments);
-      
-
+  text = elem.innerHTML;
+  existingComments = [];
+  st = text;
+  alert(text);
+  for (i = 0; i < annotations.length; i++)
+  {
+      if(String(text).toLowerCase() == annotations[i].selectedText.toLowerCase())
+      {
+        existingComments.push(annotations[i]);
+        console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
+        sideComments = new SideComments('#commentable-area', currentUser, existingComments);        
+        break;
+      }
+  }
+}
 // Create a new SideComments instance, passing in the wrapper element and the optional the current user and any existing comments.
-//sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+sideComments = new SideComments('#commentable-area', currentUser, existingComments);
 //Listen to 'commentPosted'
 sideComments.on('commentPosted', function( comment ) 
 {
@@ -586,22 +581,21 @@ sideComments.on('commentPosted', function( comment )
      $.ajax({
             url: "{% url 'annotationlibInSelText' groupid %}",
             type: 'POST',
+            datatype : "JSON",
             data: 
             {
                 comment      : JSON.stringify(comment),
                 selectedText : st,
-                //ann_present  : JSON.stringify(annotations),  
-                //exists_flag  : flag, 
-                //exists_pos   : pos,
                 node_id      : '{{ node }}', 
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             },
-            success: function( savedComment ) 
+            success: function( updatedAnnotationsField ) 
             {
-              // Once the comment is saved, you can insert the comment into the comment stream with "insertComment(comment)".
+              // Once the comment is saved, insert the comment into the comment stream with "insertComment(comment)".
               alert("Inside success");
               sideComments.insertComment(comment);
-              //sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+              highlightSearchTerms(st);
+              annotations = jQuery.parseJSON(updatedAnnotationsField);
             }
           });
     }
@@ -618,86 +612,6 @@ success: function( success ) {
 }
 });
 });*/
-break;
- }
-}
-
-
-
-
-function activateReply()
-{
-  var annotationText= $("#annField").val();
-  if(annotationText != "")
-  { 
-      $("#replyField").val("");
-      $("#reply").css('visibility', 'visible');     
-      $("#ann").css('display', 'none');                  //$("#ann").css('visibility', 'hidden');
-      $("#replies").css('visibility', 'visible');
-      ann.annotationText['text']=annotationText;
-      ann.annotationText['datetime']= Date();
-      //delete present comments!
-      ann.comments.length=0;
-      //add current thread to "#replies"
-      $("#replies").html(annotationText + "<br> <i>" + ann.annotationText['datetime'] + "</i><br>"); 
-  }
-}
-
-function addComment()
-{
-  var reply = $("#replyField").val();
-  if(reply != "")
-  {
-      //reset field for next comment
-      $("#replyField").val("");
-      //store comment in the annotation variable
-      ann.comments.push({ text:reply, datetime: Date()});
-      //add to replies
-      //alert(reply+ "<br><i>"+ ann.comments[ann.comments.length-1]['datetime']+ "</i><br>");
-      $("#replies").append(reply, "<br><i>", ann.comments[ann.comments.length-1]['datetime'], "</i><br>");
-  }
-}
-
-function store()
-{
-  //alert("TEXT: "+ ann.selectedText+ "ann:" + ann.annotationText['text'] + "AT " + ann.annotationText['datetime'] );
-  $("#ann").css('visibility', 'hidden');
-  $("#reply").css('visibility', 'hidden');
-  $("#replies").css('visibility', 'hidden');
-  //alert("ann " + ann);
-  $.ajax({
-          type: "POST",
-          url: "{% url 'annotation' groupid %}",
-          datatype: "JSON",
-          data: 
-          {
-              ann_present  : JSON.stringify(ann),  
-              exists_flag  : flag, 
-              exists_pos   : pos,
-              node_id      : '{{ node }}', 
-              csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
-          success: function(data) 
-          {
-            alert(data + " inside success");
-            //$.each(data, function() { 
-              //alert("TYPE AFTER AJAX CALL" + typeof data);
-            //});
-            shuchu = jQuery.parseJSON(data);
-            alert(shuchu[0].selectedText);
-          }
-    });
-  /*var current = $("#thread").html();
-  current += "<p>";
-  current +=  "<i> Selection: </i>" + ann.selectedText + "; <i> Annotation: </i>" + ann.annotationText['text'] + ";     <i> time: </i>    " + ann.annotationText['datetime'] + "<br>";
-  for (var i=0; i < ann.comments.length; i++)
-  {
-    current += "<i> comment" + (i+1) + ": </i> " + ann.comments[i].text + ";     <i> time: </i> " + ann.comments[i].datetime + "<br>";
-  }
-  current += "</p>";
-  $("#thread").html(current); */
-}
-
 
 /*
  * This is the function that highlights a text string by
@@ -706,8 +620,9 @@ function store()
  */
 function doHighlight(bodyText, searchTerm) 
 {
-    highlightStartTag = "<font style = 'color : black; background-color : #F7BE81;'>";
-    highlightEndTag = "</font>";
+    //highlightStartTag = "<font style = 'color : black; background-color : #F5BCA9;'>";
+    highlightStartTag = "<span style='color:darkolivegreen;font-weight:bold' onclick = 'showThread(this)'>";
+    highlightEndTag = "</span>";
     
   // find all occurences of the search term in the given text,
   // and add some "highlight" tags to them (we're not using a
@@ -739,6 +654,7 @@ function doHighlight(bodyText, searchTerm)
           bodyText = bodyText.substr(i + searchTerm.length);
           lcBodyText = bodyText.toLowerCase();
           i = -1;
+          highlightStartTag = "<span style = 'color : #0B610B;' onclick = 'showThread(this)'>";
         }
       }
     }
@@ -761,6 +677,20 @@ function highlightSearchTerms(searchText)
   $("#content").html(bodyText);
   
   return true;
+}
+
+/*
+script for marking up the annotated text
+*/
+function highlightAll()
+{
+
+  for (i = 0; i < annotations.length; i++)
+  {
+     text = annotations[i].selectedText;
+     highlightSearchTerms(text);
+  }
+
 }
 
 </script>
