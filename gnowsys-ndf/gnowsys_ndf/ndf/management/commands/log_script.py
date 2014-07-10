@@ -237,6 +237,18 @@ def log_inner_topic_end(log_flag):
                 log_flag-=1
         my_log.write(str(captcha) + "_______________________________________________________________________\n")
 
+def log_class_done(log_flag):
+	"""
+	Helper log function that print messages to help in debugging
+
+	"""
+        captcha = " "
+        my_log.write("\n")
+        while log_flag != 0:
+                captcha += " "
+                log_flag-=1
+        my_log.write(str(captcha) + "_______________________________________________________________________\n")
+
 
 
 def log_outer_topic(log_flag):

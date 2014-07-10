@@ -508,6 +508,7 @@ def initiate_class_creation(json_obj,label,topic_title,call_flag):
 					class_json =json_parse(class_url)
 					print class_url + str("this is the class iD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------=====================================")
 					class_create(class_id, class_json)	
+					
 	
 		log_flag -= 1
 		"""	
@@ -685,7 +686,7 @@ def iteration_1():
 						log_flag = 0
 						label = extract_labels(json_obj,topic_title,language)
 						initiate_class_creation(json_obj,label,topic_title,int(1))
-						
+						log_class_done(log_flag)
 
 					else:
 						print "empty json returned"
