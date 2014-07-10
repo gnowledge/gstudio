@@ -1406,5 +1406,10 @@ def annotationlibInSelText(request, group_id):
 
   return HttpResponse(json.dumps(sg_obj.annotations))
 
-
+def delComment(request, group_id):
+  '''
+  Delete comment from thread
+  '''
+  print "Inside del comments"
+  return HttpResponse("Hey there")
 

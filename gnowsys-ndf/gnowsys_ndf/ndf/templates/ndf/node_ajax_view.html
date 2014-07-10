@@ -478,17 +478,11 @@ For annotation based discussions:
 var annotations = {{ annotations | safe}};
 var currentUser = null;
 var  existingComments = [];
-var ann = {                                  //dummy variable at frontend
-  selectedText: "",
-  annotationText: {text: "", datetime: ""},
-  comments: [] 
-};
-
+var SideComments = require('side-comments');
+var sideComments;
 var flag = false; 
 var pos=-1;
 var st = null;
-//DEBUGGING
-st = "active attack";
 
 if(!window.win){
   win = {};
@@ -506,21 +500,18 @@ win.Selector.getSelected = function()
   }
   return t;
 }
-var st1;
+
 win.Selector.mouseup = function()
 {
-  //{% if user.is_authenticated %}    User authentication required for viewing already existing comments?
-  st1 = win.Selector.getSelected();
-  console.log("st1: " + st1);
-  if(st1 != "")
-  {
-    st = st1;
-    console.log("st: " + st);
-    alert("inside mouseup" +st);
-  }//{% endif %}
-    console.log("stout: " + st);
-
+  st = String(win.Selector.getSelected());
+  console.log("stout: " + st);
+  sideComments = new SideComments('#commentable-area', currentUser, existingComments);
 }
+
+$(document).ready (function(){
+  highlightAll();
+  $("#content").bind("mouseup", win.Selector.mouseup);
+}); 
 
 {% if user.is_authenticated %}
   currentUser=
@@ -531,52 +522,12 @@ win.Selector.mouseup = function()
   };
 {% endif %}
 
-// Require new SideComments object
-var SideComments = require('side-comments');
-var sideComments;
-
-$(document).ready (function(){
-  highlightAll();
-});
-
-//$(document).ready(function()                             //detect mouseup event
-//{
- // $("#content").bind("mouseup", win.Selector.mouseup);
- /*$("#content").mouseup(function() 
-  {
-    st = window.getSelection();
-    alert("scooby doo" + st);
-    //TODO highlight function
-  });*/
-//}); 
-
-
-/*
-bind the below initialisation of sideComments object on hover over that area
-*/
-function showThread(elem)
-{
-  text = elem.innerHTML;
-  existingComments = [];
-  st = text;
-  alert(text);
-  for (i = 0; i < annotations.length; i++)
-  {
-      if(String(text).toLowerCase() == annotations[i].selectedText.toLowerCase())
-      {
-        existingComments.push(annotations[i]);
-        console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
-        sideComments = new SideComments('#commentable-area', currentUser, existingComments);        
-        break;
-      }
-  }
-}
 // Create a new SideComments instance, passing in the wrapper element and the optional the current user and any existing comments.
 sideComments = new SideComments('#commentable-area', currentUser, existingComments);
 //Listen to 'commentPosted'
 sideComments.on('commentPosted', function( comment ) 
 {
-    if(st != "")
+    if(st)
     {
      $.ajax({
             url: "{% url 'annotationlibInSelText' groupid %}",
@@ -599,19 +550,45 @@ sideComments.on('commentPosted', function( comment )
             }
           });
     }
+    else
+    {
+      //TODO tell user to select text
+      alert("Please select some text first");
+    }
 }); 
   
-// Listen to "commentDeleted" and send a request to your backend to delete the comment.
-// More about this event in the "docs" section.
-/*sideComments.on('commentDeleted', function( commentId ) {
-$.ajax({
-url: '/comments/' + commentId,
-type: 'DELETE',
-success: function( success ) {
-// Do something.
-}
-});
+//Listen to "commentDeleted" and send a request to backend to delete the comment.
+/*sideComments.on('commentDeleted', function( commentId ) 
+{
+    console.log("entered del func")
+    $.ajax({
+            url: "{% url 'delComment' groupid %}",
+            success: function( success ) {
+            alert(commentId);
+            }
+           });
 });*/
+
+/*
+bind the below initialisation of sideComments object on hover over that area
+*/
+function showThread(elem)
+{
+  text = elem.innerHTML;
+  existingComments = [];
+  st = text;
+  alert(text);
+  for (i = 0; i < annotations.length; i++)
+  {
+      if(String(text).toLowerCase() == annotations[i].selectedText.toLowerCase())
+      {
+        existingComments.push(annotations[i]);
+        console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
+        sideComments = new SideComments('#commentable-area', currentUser, existingComments);        
+        break;
+      }
+  }
+}
 
 /*
  * This is the function that highlights a text string by
@@ -621,7 +598,8 @@ success: function( success ) {
 function doHighlight(bodyText, searchTerm) 
 {
     //highlightStartTag = "<font style = 'color : black; background-color : #F5BCA9;'>";
-    highlightStartTag = "<span style='color:darkolivegreen;font-weight:bold' onclick = 'showThread(this)'>";
+    //highlightStartTag = "<span style='color:darkblue;font-weight:bold' onclick = 'showThread(this)'>";
+    highlightStartTag = "<span style='background-color : #e0ffff;font-weight:bold' onclick = 'showThread(this)'>";
     highlightEndTag = "</span>";
     
   // find all occurences of the search term in the given text,
@@ -633,7 +611,7 @@ function doHighlight(bodyText, searchTerm)
   var i = -1;
   var lcSearchTerm = searchTerm.toLowerCase();
   var lcBodyText = bodyText.toLowerCase();
-    
+  console.log("lcSearchTerm" + lcSearchTerm);  
   while (bodyText.length > 0) 
   {
     i = lcBodyText.indexOf(lcSearchTerm, i+1);
@@ -643,7 +621,7 @@ function doHighlight(bodyText, searchTerm)
       bodyText = "";
     } 
     else 
-    {
+    { console.log("i value: " + i + "           " + lcSearchTerm);
       // skip anything inside an HTML tag
       if (bodyText.lastIndexOf(">", i) >= bodyText.lastIndexOf("<", i)) 
       {
@@ -654,7 +632,7 @@ function doHighlight(bodyText, searchTerm)
           bodyText = bodyText.substr(i + searchTerm.length);
           lcBodyText = bodyText.toLowerCase();
           i = -1;
-          highlightStartTag = "<span style = 'color : #0B610B;' onclick = 'showThread(this)'>";
+          highlightStartTag = "<span style = 'background-color : #e0ffff;' onclick = 'showThread(this)'>";
         }
       }
     }
@@ -674,8 +652,8 @@ function highlightSearchTerms(searchText)
     
   var bodyText = $("#content").html();
   bodyText = doHighlight(bodyText, searchText);
+  //console.log("inside highlightSearchTerms" + searchText);
   $("#content").html(bodyText);
-  
   return true;
 }
 
@@ -688,6 +666,7 @@ function highlightAll()
   for (i = 0; i < annotations.length; i++)
   {
      text = annotations[i].selectedText;
+     alert("i inside first for" + i+ "  " +text);
      highlightSearchTerms(text);
   }
 
