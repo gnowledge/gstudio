@@ -29,9 +29,9 @@ def log_class_created(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""
-	captcha = "#"
+	captcha = "="
 	while log_flag != 0:
-		captcha += "#"
+		captcha += "="
 		log_flag-=1
 	mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
 	my_log.write(str(captcha) + (mylabel) + "---Class CREATED\n")
@@ -44,9 +44,9 @@ def log_class_exists(label, log_flag):
 	2)log_flag - controls indentation to make the log file readable
 
 	"""
-        captcha = "#"
+        captcha = "="
         while log_flag != 0:
-                captcha += "#"
+                captcha += "="
                 log_flag-=1
         mylabel = u' '.join((label, ' ')).encode('utf-8').strip()
 	my_log.write(str(captcha) + unicode(mylabel) + "---Class EXISTS\n")
@@ -242,10 +242,10 @@ def log_class_done(log_flag):
 	Helper log function that print messages to help in debugging
 
 	"""
-        captcha = " "
+        captcha = "_"
         my_log.write("\n")
         while log_flag != 0:
-                captcha += " "
+                captcha += "_"
                 log_flag-=1
         my_log.write(str(captcha) + "_______________________________________________________________________\n")
 

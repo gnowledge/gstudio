@@ -223,13 +223,25 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	#it's me
 	print "Subject::\n" + str(subject)
 	attribute_type_obj = collection.Node.find_one({"name": unicode(attribute_type_name), "_type": u"AttributeType"})
-	
 	print "Attribute_type::\n" + str(attribute_type_obj)	
+	if subject is None:
+		print "The attribute " + unicode(subject_name) + "--" + unicode(attribute_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		return True
+	
+	elif attribute_type_obj is None:
+		print "The attribute " + unicode(subject_name) + "--" + unicode(attribute_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		return True
+
+	
 	cursor = collection.Node.find_one({"_type" : u"GAttribute","subject": ObjectId(subject._id),"attribute_type.$id":ObjectId(attribute_type_obj._id)})
 	if cursor!= None:
 		print "The attribute " + unicode(cursor.name) + " already exists."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
+	
+	
 	else:
 		att = collection.GAttribute()
 		att.created_by = user_id
@@ -245,7 +257,7 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 		try:
 			att.save()
 			print "Created attribute " + unicode(att.name)
-		except e:
+		except Exception as e:
 			print "Could not create a attribute" + unicode(att.name)
 			print e
 			#call log file method
@@ -413,7 +425,7 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		try:
 			relation.save()
 			print "Created a Relation " + str(relation.name)
-		except e:
+		except Exception as e:
 			print "Could not create a relation-->" + str(relation.name)
 	
 			print e

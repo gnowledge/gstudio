@@ -75,7 +75,7 @@ def json_parse(url_json):
 	try:
 		j = urllib2.urlopen(url_json)
 		js = json.load(j)
-	except (ValueError, KeyError, TypeError):
+	except (ValueError, KeyError, TypeError, Exception):
    		print "JSON format error"
 	
 	return js
@@ -575,15 +575,17 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 		flag=extract_from_property_value(property_value_list)
 		property_value =extract_property_value(property_value_list) #property_value has the value of that property fpr a particular object
 		global log_flag
-		log_flag += 1
+		
 
 		if flag==1 and call_flag==1: #attribute has to be made
+			log_flag += 1			
 			print "Attempting to create an Attribute for Iteration1"			
 			property_data_type = extract_datatype_from_property(property_value_list)
 			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
 			#print property_data_type
 			property_create_AttributeType(property_id,property_data_type,property_json, call_flag) #assuming that the name of the attribute type id the property id like say P131
 			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
+			log_flag -= 1
 		
 		if flag==3 and call_flag==1: #attribute has to be made
 			print "Attempting to create an Relation for Iteration1"
@@ -605,11 +607,12 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 				json_obj = json_parse(url_json)
 				if(json_obj):
 					global log_flag
-					log_flag += 1
+					log_flag += 2
 					label = extract_labels(json_obj,class_id,language)
-					initiate_class_creation(json_obj,label,class_id,int(1))
+					class_create(class_id, json_obj)
+					#initiate_class_creation(json_obj,label,class_id,int(1))
 					log_class_done(log_flag)
-					log_flag -= 1
+					log_flag -= 2
 
 				
 				
@@ -627,7 +630,7 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 			property_create_RelationType(property_id,property_json)
 			property_create_Relation(label,property_id,property_value_for_relation,property_json)
 			
-			log_flag -= 1
+			#log_flag -= 1
 		
 			if property_id=="P31" or property_id=="P279":
 				print "^^entering tags^^ ",label, " - ",property_value_for_relation	
