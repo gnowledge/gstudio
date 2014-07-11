@@ -431,6 +431,18 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 	print "Creating a Relation."
 	relation_type = collection.Node.one({"_type":u"RelationType", "name": unicode(relation_type_name)})
 	subject = collection.Node.one({"_type": u"GSystem", "name": unicode(subject_name)})
+	
+	if subject is None:
+		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		return True
+	
+	elif relation_type is None:
+		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		return True
+
+
 	cursor = collection.Node.find({"_type":u"GRelation", "relation_type.$id":ObjectId(relation_type._id), "subject": ObjectId(subject._id)})
 	if cursor.count()!=0:
 		print "The Relation Already exists"
@@ -588,7 +600,8 @@ def populate_location(label,property_id,property_value,user_id):
 	geo_json[0]["geometry"]["coordinates"].append(property_value["longitude"])
 	geo_json[0]["properties"]["description"]=(property_value["globe"])		
 	geo_json[0]["properties"]["id"]=property_id
-	obj.location =geo_json
+	obj.location = geo_json
+
 	obj.modified_by =user_id
 	obj.save()
 

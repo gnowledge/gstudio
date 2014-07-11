@@ -105,7 +105,9 @@
 		<br>
 		<hr>
 		{% for tag in selected_topic.tags %}
-			{{ tag }} {{"  "}}
+			<a class="button medium" href="{% url 'tag_topic_display' group_id tag %}" style="text-decoration:underline;font-weight:bold;text-color:red;font-size:20px;"> 
+		{{ tag }} {{"  "}}
+     		 </a>
 		{% endfor %}
 		<br>
 		<hr>
@@ -133,7 +135,7 @@
 			{{ tag }} {{" "}}		
 
 		{% endfor %}
-		<br><br><strong>
+		<b r><br><strong>
 		Wikipedia Page Link:</strong>
 		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>		
 		<br><br>

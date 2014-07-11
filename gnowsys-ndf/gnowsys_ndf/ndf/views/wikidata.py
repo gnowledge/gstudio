@@ -22,7 +22,7 @@ def index(request, group_id):
         	pass
 
 	selected_topic = None
-	topic_coll = collection.Node.find({"_type": u"GSystem"})
+	topic_coll = collection.Node.find({"_type": u"GSystemType"})
 	print "here: " + str(topic_coll)	
 	context = RequestContext(request, {'title': "WikiData Topics", 'topic_coll': topic_coll})
 	template = "ndf/wikidata.html"
@@ -48,8 +48,8 @@ def details(request, group_id, topic_id):
     	else :
         	pass
 
-	selected_topic = collection.Node.one({"_type":u"GSystem", "_id":ObjectId(topic_id)})
-	topic_coll = collection.Node.find({"_type": u"GSystem"})
+	selected_topic = collection.Node.one({"_type":u"GSystemType", "_id":ObjectId(topic_id)})
+	topic_coll = collection.Node.find({"_type": u"GSystemType"})
 	print "here: " + str(topic_coll)	
 	context = RequestContext(request, {'title': "WikiData Topics", 'topic_coll': topic_coll})
 	template = "ndf/wikidata.html"
