@@ -488,7 +488,7 @@ def populate_tags(label,property_value_for_relation):
 	1)label - name of item for which tag is to eb appended.
 	2)property_value_for_relation - value to be appended in tag.It is a human readable english value.
 	"""
-	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	obj = collection.Node.find_one({"name":unicode(label)})
 	if obj:
 		obj.tags.append(unicode(property_value_for_relation))
 		obj.modified_by=int(1)

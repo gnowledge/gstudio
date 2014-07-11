@@ -129,6 +129,15 @@
 				<li>{{ parent_class }}</li>
 			{% endfor %}
 		</ul>
+		 <br>
+                <br>
+                
+                <ul>
+                <strong>Tags:</strong>
+                        {% for tag in selected_topic.tags %}
+                                <li>{{ tag }}</li>
+                        {% endfor %}
+                </ul>
 		<br>
 		<br>
 		<ul>

@@ -718,8 +718,19 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 				property_create_RelationType(property_id,property_json, call_flag)
 				property_create_Relation(label,property_id,property_value_for_relation,property_json)
 			
+				"""Populate Tags"""
+				category_string_uppercase = "Category"
+				category_string_lowercase = "category"
+				print "\n\n^^entering tags^^ ", unicode(label), " - ",unicode(property_value_for_relation)	+ "\n\n"
+				property_value_for_relation=unicode("Q")+unicode(property_value_for_relation)
+				property_value_json=gen_url_json+str(property_value_for_relation)+".json"
+				property_value_json=json_parse(property_value_json) #property_value is supposed to be the id of the right subject in case of a relation
+				property_value_name=extract_labels(property_value_json,property_value_for_relation,language)			
 			
+				if category_string_uppercase in property_value_name or category_string_lowercase in property_value_name:
+					populate_tags(label,property_value_name)
 		
+				"""
 				if property_id=="P31" or property_id=="P279":
 					print "^^entering tags^^ ",label, " - ",property_value_for_relation	
 					property_value_for_relation=unicode("Q")+unicode(property_value_for_relation)
@@ -729,6 +740,7 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 					populate_tags(label,property_value_name)
 		
 				log_flag -= 1
+				"""
 			
 	return type_of_list
 
