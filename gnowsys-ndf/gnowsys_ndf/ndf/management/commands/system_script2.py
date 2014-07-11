@@ -223,19 +223,19 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	print "Attribute_type::\n" + str(attribute_type_obj)	
 	if subject is None:
 		print "The attribute " + unicode(subject_name) + "--" + unicode(attribute_type_name) + "--" + unicode(object_value) + " could not be created."
-		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		#print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 	
 	elif attribute_type_obj is None:
 		print "The attribute " + unicode(subject_name) + "--" + unicode(attribute_type_name) + "--" + unicode(object_value) + " could not be created."
-		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		#print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 
 	
 	cursor = collection.Node.find_one({"_type" : u"GAttribute","subject": ObjectId(subject._id),"attribute_type.$id":ObjectId(attribute_type_obj._id)})
 	if cursor!= None:
 		print "The attribute " + unicode(cursor.name) + " already exists."
-		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		#print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 	
 	
@@ -249,7 +249,7 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 		#DBref = {"$ref":Node.collection_name, "$id":attribute_type._id, "$name": attribute_type.name}
 		att.attribute_type = attribute_type_obj
 		att.object_value = unicode(object_value)
-		print "About to create"
+		#print "About to create"
 		#it's me	
 		try:
 			att.save()
@@ -389,7 +389,7 @@ def create_RelationType(name, inverse_name, subject_type_name, object_type_name,
 		subject_type = collection.Node.one({"name":unicode(subject_type_name),"_type":u"GSystemType"})
 		relation_type.subject_type.append(ObjectId(subject_type._id))
 		object_type = collection.Node.one({"name":unicode(object_type_name),"_type":u"GSystemType"})
-		print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"+ str(object_type._id) +" ,",object_type.name
+		#print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"+ str(object_type._id) +" ,",object_type.name
 		relation_type.object_type.append(ObjectId(object_type._id))
                 factory_id = collection.Node.one({"name":u"factory_types","_type":u"MetaType"})._id
                 relation_type.member_of.append(factory_id)
@@ -424,12 +424,12 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 	
 	if subject is None:
 		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(right_subject_name) + " could not be created."
-		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		#print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 	
 	elif relation_type is None:
 		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(right_subject_name) + " could not be created."
-		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		#print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 
 
