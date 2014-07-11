@@ -29,7 +29,9 @@ from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata
 
 
 #######################################################################################################################################
@@ -220,7 +222,12 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         if quiz_node:
             quiz_node.collection_set.append(quiz_item_node._id)
             quiz_node.save()
-        
+	
+        assesses_list = request.POST.get('assesses_list','') 	
+	if assesses_list !='':
+			assesses_list=assesses_list.split(",")
+	create_grelation_list(quiz_item_node._id,"assesses",assesses_list)
+
         return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id, 'app_id': quiz_item_node._id}))
         
     else:
@@ -263,9 +270,24 @@ def create_edit_quiz(request, group_id, node_id=None):
     if request.method == "POST":
         get_node_common_fields(request, quiz_node, group_id, gst_quiz)
         quiz_node.save()
-        
-        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'app_id': quiz_node._id}))
+	get_node_metadata(request,quiz_node,gst_quiz)
+	
+        """
+	teaches_list = request.POST.get('teaches_list','') # get the teaches list
+	#if teaches is required
+	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+	if teaches_list !='':
+			teaches_list=teaches_list.split(",")
+	create_grelation_list(quiz_node._id,"teaches",teaches_list)
+        """
+	assesses_list = request.POST.get('assesses_list','') # get the assesses list 	
+	if assesses_list !='':
+			assesses_list=assesses_list.split(",")
+	create_grelation_list(quiz_node._id,"assesses",assesses_list)
 
+	
+        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'app_id': quiz_node._id}))
+	
     else:
         if node_id:
             context_variables['node'] = quiz_node

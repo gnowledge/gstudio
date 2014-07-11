@@ -64,7 +64,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	 			<a href="#panel-prior-node" class="prior_node_tab" >Requires </a> 
 			</dd>
 			<dd title="Click here to add/edit assesses">
-	 			<a href="#panel-assesses" >Assesses </a> 
+	 			<a href="#panel-assesses " class="assesses_tab" >Assesses </a> 
 			</dd>
 			<dd title="Click here to add/edit teaches">
 	 			<a href="#panel-teaches" class="teaches_tab" >Teaches </a> 
@@ -303,8 +303,52 @@ background-repeat:no-repeat; background-size: 48px 48px
 			</div>
       		</div>
     	</div>
+	<div class="content" id="panel-assesses"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Assesses : </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="assesses_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+       </div>
 
+	 <div class="content" id="panel-metadata" style="width:95%;" >
+      
+      <div class="row">
+	  <h3>Add or edit Metadata - Please spend a few minutes </h3>
+        
+
+        <div class="small-5 columns">
+         <h5>Age Range:</h5>  <input id="age_range" name="age_range" type="text" value="" placeholder="Eg 10-20 " >
+        
+         <h5>Target Audience: </h5> <input name="audience" type="text" value="" placeholder="Eg student,children,All" >
+         <label><h5>Time Required :</h5> <select name="timerequired"><option>0-2M</option><option>2-5M</option><option>5-15M</option><option>15-45M</option></select></label>
+         <label><h5>Interactivity Type :</h5> <select name="interactivitytype"><option>Active</option><option>Mixed</option><option>Expositive</option></select></label>
+         <label><h5>Based on Url: </h5> <input name="basedonurl" type="text" value="" placeholder="eg wikipedia" ></label>
+         <label><h5>Educational Use: </h5> <input name="educationaluse" type="text" value="" placeholder="" ></label>
+        </div>		
+	
+	 <div class="small-5 columns">
+	  <h5>Text Complexity</h5>  <input  name="textcomplexity" type="text" value="" placeholder="" >
+        
+         <h5>Reading Level: </h5> <input name="readinglevel" type="text" value="" placeholder="" >
+         
+         <h5>Educational Subject: </h5> <input name="educationalsubject" type="text" value="" placeholder="" >
+         <h5>Educational Level: </h5> <input name="educationallevel" type="text" value="" placeholder="" >
+        </div>
+        
+      </div>
+        
+	
     </div>  
+
+    </div>  <!--final div -->
 
 	{% block add_fields %} {% endblock %}
   		
@@ -452,11 +496,36 @@ background-repeat:no-repeat; background-size: 48px 48px
 		});
 
 	});
+	
+	$(".assesses_tab").click(function() {
 
+		
+		$("#save-node").css("display", "none");
+		$('#assesses_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "assesses",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#assesses_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
 	$("#save-node").click(function() {
 		cn_arr = []
 		pn_arr = []
 		tch_arr = []
+		assess_arr=[]
 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
 				cn_arr.push($(this).val());
@@ -467,11 +536,15 @@ background-repeat:no-repeat; background-size: 48px 48px
 			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
 				tch_arr.push($(this).val());
 			}
+			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				assess_arr.push($(this).val());
+			}
 		});
-		alert(tch_arr)
+		//alert(assess_arr)
 		$("#collection_list").val(cn_arr);
 		$("#prior_node_list").val(pn_arr);
 		$("#teaches_list").val(tch_arr);
+		$("#assesses_list").val(assess_arr);
 		location.reload(true);
 
 		

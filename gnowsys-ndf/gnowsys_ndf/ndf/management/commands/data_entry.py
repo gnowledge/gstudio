@@ -48,8 +48,8 @@ mis_group = collection.Node.one({'_type': "Group",
                                 }, 
                                 {'created_by': 1}
                             )
-group_id = mis_group._id
-user_id = mis_group.created_by  # User who created the above private group
+group_id = 1 #mis_group._id
+user_id = 1 #mis_group.created_by  # User who created the above private group
 
 
 class Command(BaseCommand):

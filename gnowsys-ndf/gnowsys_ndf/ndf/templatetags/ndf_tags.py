@@ -163,7 +163,21 @@ def is_Page(node):
 		return 1
 	else:
 		return 0
+@register.filter
+def is_Quiz(node):
+	Quiz = collection.Node.one({"_type":"GSystemType","name":"Quiz"})
+	if(Quiz._id in node.member_of):
+		return 1
+	else:
+		return 0
 		
+@register.filter
+def is_File(node):
+	File = collection.Node.one({"_type":"GSystemType","name":"File"})
+	if(File._id in node.member_of):
+		return 1
+	else:
+		return 0
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):

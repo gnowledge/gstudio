@@ -13,6 +13,8 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+
 import subprocess
 import re
 import ast
@@ -651,24 +653,23 @@ def update_mobwrite_content_org(node_system):
     textobj.save()
   return textobj
 
+                      
 
 def get_node_metadata_fields(request, node, node_type):
 	if(node.has_key('_id')):
   		for at in node_type.attribute_type_set:
-		    if(at.name != 'alignment_object'):
 			field_value=(request.POST.get(at.name,""))
+	
 			create_gattribute(node._id,at,field_value)
-		    else:
-			list_alignobject=[]
-			for i in [1,2,3]:
-				prop1 = (request.POST.get("aligntype"+i,""))
-				prop2 = (request.POST.get("eduframework"+i,""))
-				prop3 = (request.POST.get("tname"+i,""))
-				prop4 = (request.POST.get("turl"+i,""))
-				prop5 = (request.POST.get("tdescription"+i,""))
-				list_alignobject.append({"aligntype":prop1,"educationalframework":prop2,"targetname":prop3,"targeturl":prop4,"targetdescription":prop5})
-		    #create_gattribute(node._id,at,list_alignobject)
 
+def get_node_metadata(request,node,node_type):
+	attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
+	if(node.has_key('_id')):
+		for atname in attribute_type_list:
+			field_value=(request.POST.get(atname,""))
+			at=collection.Node.one({"_type":"AttributeType","name":atname})	
+			create_gattribute(node._id,at,field_value)		
+			
 def create_AttributeType(name, data_type, system_name, user_id):
 
 	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
@@ -708,6 +709,7 @@ def create_RelationType(name,inverse_name,subject_type_name,object_type_name,use
                 relation_type.save()
 		system_type.relation_type_set.append(relation_type)
 		system_type.save()
+
 
 def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
 # function to create grelations for new ones and delete old ones.
