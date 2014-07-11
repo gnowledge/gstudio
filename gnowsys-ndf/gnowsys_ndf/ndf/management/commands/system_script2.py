@@ -125,6 +125,8 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
 		attribute_type.data_type = data_type
 		system_type = collection.Node.one({"name":u"WikiData","_type":"GSystemType"})
 		attribute_type.subject_type.append(system_type._id)
+		system_type_2 = collection.Node.one({"name":u"WikiTopic","_type":"GSystemType"})
+		attribute_type.subject_type.append(system_type_2._id)
 		attribute_type.created_by = user_id
 		attribute_type.modified_by = user_id
 		factory_id = collection.Node.one({"name":u"factory_types","_type":"MetaType"})._id
@@ -144,6 +146,7 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
 		Adding the attribute type to the WikiData GSytemType attribute_set"
 		"""
 		system_type.attribute_type_set.append(attribute_type._id)
+		system_type_2.attribute_type_set.append(attribute_type._id)
 		print "Created the Attribute_Type " + str(name)
 		return False
 		
@@ -185,8 +188,10 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 		attribute_type = collection.AttributeType()
 		attribute_type.name = unicode(name)
 		attribute_type.data_type = data_type
-		system_type = collection.Node.one({"name":u"WikiTopic","_type":"GSystemType"})
+		system_type = collection.Node.one({"name":u"WikiData","_type":"GSystemType"})
 		attribute_type.subject_type.append(system_type._id)
+		system_type_2 = collection.Node.one({"name":u"WikiTopic","_type":"GSystemType"})
+		attribute_type.subject_type.append(system_type_2._id)
 		attribute_type.created_by = user_id
 		attribute_type.modified_by = user_id
 		factory_id = collection.Node.one({"name":u"factory_types","_type":"MetaType"})._id
@@ -206,6 +211,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 		Adding the attribute type to the WikiData GSytemType attribute_set"
 		"""
 		system_type.attribute_type_set.append(attribute_type._id)
+		system_type_2.attribute_type_set.append(attribute_type._id)
 		print "Created the Attribute_Type " + str(name)
 		return False
 		
@@ -368,6 +374,8 @@ def create_RelationType(name, inverse_name, subject_type_name, object_type_name,
                 relation_type.name = unicode(name)
                 system_type = collection.Node.one({"name":u"WikiTopic","_type":u"GSystemType"})
                 relation_type.subject_type.append(system_type._id)
+		system_type_2 = collection.Node.one({"name":u"WikiData","_type":u"GSystemType"})
+                relation_type.subject_type.append(system_type_2._id)
                 relation_type.inverse_name = unicode(inverse_name)
 		relation_type.created_by = user_id
                 relation_type.modified_by = user_id
@@ -388,6 +396,7 @@ def create_RelationType(name, inverse_name, subject_type_name, object_type_name,
                 Adding the attribute type to the WikiTopic GSytemType attribute_set"
                 """
                 system_type.relation_type_set.append(ObjectId(relation_type._id))
+		system_type_2.relation_type_set.append(ObjectId(relation_type._id))
                 print "Created the Relation_Type " + str(name)
 		return False
  
