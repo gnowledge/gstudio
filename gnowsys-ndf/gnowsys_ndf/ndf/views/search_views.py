@@ -600,7 +600,7 @@ def results_search_group(request, group_id):
 	context_to_return['processed'] = 1
 	context_to_return['search_type'] = KEYWORD_SEARCH
 
-	return render(request, 'ndf/search_results.html', context_to_return)
+	return render(request, 'ndf/search_page.html', context_to_return)
 
 
 
