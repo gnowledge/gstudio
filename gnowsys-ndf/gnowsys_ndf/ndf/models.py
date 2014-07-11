@@ -1486,7 +1486,7 @@ class IndexedWordList(DjangoDocument):
 
 
 	
-
+"""
 @connection.register
 class allLinks(DjangoDocument):
     structure = {
@@ -1496,4 +1496,4 @@ class allLinks(DjangoDocument):
     }
     # required_fields = ['member_of', 'link']
     use_dot_notation = True
-
+"""

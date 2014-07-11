@@ -886,7 +886,9 @@ def stemWords(words, search_str_user):
 	#print stemmed
 	return stemmed	
 
-
+"""
+This function returns a list of all authors.
+"""
 def populate_list_of_members():
 	members = User.objects.all()
 	memList = []
@@ -894,18 +896,18 @@ def populate_list_of_members():
 		memList.append(mem.username)	
 	return memList
 
-
 def populate_list_of_group_members(group_ids):
+	"""
+	This function returns a list of users in a given list of groups.
+	Groups should be given as a list of group ids.
+	"""
 	col = get_database()[Node.collection_name]
 	memList = []
-	#print group_ids
 
 	try:
 		for gr in group_ids:
 			# THIS CODE WILL CAUSE PROBLEMS IF THERE ARE MANY GROUPS WITH THE SAME NAME
-			#print "sg_group: ", gr
 			group_id = col.Node.find_one({"_type":"Group", "name":gr}, {"_id":1})
-			#print group_id
 			author_list = col.Node.one({"_type":"Group", "_id":group_id._id}, {"author_set":1, "_id":0})
 
 			for author in author_list.author_set:
@@ -915,7 +917,6 @@ def populate_list_of_group_members(group_ids):
 	except:
 		pass
 
-	#print "members in group: ", memList
 	return memList
 
 
@@ -944,8 +945,6 @@ def get_node_info(request, group_id, node_name):
 	is_list = False
 	col = get_database()[Node.collection_name]
 
-	##print "Node name: ", node_name
-
 	list_of_nodes = col.Node.find({"name":node_name}, {"_id":1})
 
 	if list_of_nodes.count() > 1:
@@ -960,10 +959,8 @@ def get_node_info(request, group_id, node_name):
 		return render(request, 'ndf/node_details.html', {'is_list':1, 'list_nodes':list_nodes, 'all_fields':'', 'groupid':group_id})
 	else:
 		sg_node = col.Node.one({"name":node_name})
-		##print "Node data: \n", sg_node
 		GSTypes = sg_node.member_of
 
-		##print "member of: ", GSTypes, "\n"
 		attrs = []
 		results = {}
 		results['name'] = sg_node.name
@@ -989,7 +986,10 @@ def get_node_info(request, group_id, node_name):
 
 
 def get_node_info2(request, group_id, node_id):
-
+	"""
+	This view displays the info about a node - the basic fields - name, created_by, last_update as well as all the GAttributes.
+	Useful for GSystems that dont have an output .html template
+	"""
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -1003,7 +1003,6 @@ def get_node_info2(request, group_id, node_id):
 	else:
 		pass
 
-	#print "ID is: ", node_id
 	col = get_database()[Node.collection_name]
 	sg_node = col.Node.one({"_id":ObjectId(node_id)})
 	GSTypes = sg_node.member_of
@@ -1032,11 +1031,16 @@ def get_node_info2(request, group_id, node_id):
 
 
 def get_relations_for_autoSuggest(request, group_id):
-	#APPLY IGNORE CASE
-	x = request.GET['sVal']
-	prefix = request.GET['prefix']
-	ins = []
+	"""
+	This function returns a list of names of RelationsTypes, GSystemTypes and GSYstems in the database according to the search query already typed by the user.
+	This function is repeatedly called by an ajax call as the user types.
+	"""
 	col = get_database()[Node.collection_name]
+	x = request.GET['sVal']						# CURRENT WORD BEING TYPED
+	prefix = request.GET['prefix']				# ALREADY TYPED WORDS
+	ins = []									# HOLDS LIST OF SUGGESTIONS TO RETURN
+
+	# FIND NAMES OF ALL GSYSTEMTYPES OR RELATIONTYPES THAT START WITH WHAT HAS BEEN TYPED BY THE USER
 	instances = col.Node.find({ "$or": [{ "_type": "RelationType"}, {"_type": "GSystemType"}], "name":{'$regex':"^"+x, "$options":"i"}}, {"name":1})
 	for inst in instances:
 		ins.append(prefix + ' ' + inst.name)
@@ -1045,10 +1049,11 @@ def get_relations_for_autoSuggest(request, group_id):
 	for inst in instances:
 		ins.append(prefix + ' ' + inst.name)
 
-	#print ins
+	# NOTE: RESULTS FOR AUTO SUGGEST HAVE THE USER TYPED QUERY APPENDED AS PREFIX
 	return HttpResponse(json.dumps(ins))
 
 
+"""
 def ra_search(request, group_id):
 	# GET VALUE FROM TEXT BOX
 	ins_objectid  = ObjectId()
@@ -1065,15 +1070,31 @@ def ra_search(request, group_id):
 		pass
 
 	return render(request, 'ndf/ra_search.html', {"groupid":group_id})
-
+"""
 
 def ra_search_results(request, group_id):
-	
-	sq = str(request.GET['search_text']).strip()
-	col = get_database()[Node.collection_name]
-	relations = col.Node.find({ "_type": "RelationType"}, {"name":1})
+	"""
+	This function implements the graph search.
+	We have implemented the search in two cases:
 
-	CASE_TWO_THRESHOLD = 0.8
+	Case 1: <relation_type> <GSystem>
+	In this case we look for a matching "relation type" from the left of the search query.
+	Then the rest of the search query is matched with the GSystem names.
+	In effect this case looks for GRelations with the matched Relation type and having the matched GSystem as either left or right subject.
+
+	Case 2a: <GSystem_type> <Relation_Type> <GSystem>
+	Case 2b: <GSystem> <Relation_Type> <GSystem_Type>
+	In this case we look for a matching "GSystem type" from the left of the search query.
+	Then all GSystems which are "member_of" the matched "GSystemType" are fetched.
+	Then the rest of the search query is matched with the "GSystem" names.
+	In effect this case looks for GRelations with the matched "GSystem" as one subject and any of the GSystems which are "member_of" the matched "GSystemType" as the other subject.
+	"""
+	
+	sq = str(request.GET['search_text']).strip()						# SEARCH QUERY
+	col = get_database()[Node.collection_name]							
+	relations = col.Node.find({ "_type": "RelationType"}, {"name":1})	
+
+	CASE_TWO_THRESHOLD = 0.6
 	GSYSTEM_MIN_THRESHOLD_CASE1 = 0.69
 	
 	result_members = []
@@ -1091,9 +1112,6 @@ def ra_search_results(request, group_id):
 			max_length = length
 
 	split_word = sq.split()
-
-	#print sorted_rel
-	#print "max: ", max_length
 
 	c = 0
 	max_match = 0
@@ -1119,14 +1137,11 @@ def ra_search_results(request, group_id):
 	while c < len(split_word):
 		GSystem_name += split_word[c] + " "
 		c += 1
-	#print "GSystem 1 name:", GSystem_name
 
 	try:
 		relationType_obj = col.Node.one({"_type":"RelationType", "name":max_match_rel}, {"_id":1, "name":1})
-		#print "rel type name: ", relationType_obj.name, relationType_obj._id
 
 		GRelation_objs = col.Node.find({"_type":"GRelation", "relation_type.$id":relationType_obj._id})
-		#print "count: ", GRelation_objs.count()
 
 		#subjects = []
 		#right_subjects = []
@@ -1135,7 +1150,6 @@ def ra_search_results(request, group_id):
 			name_Grel = gr_obj.name
 			left_sub = name_Grel[:name_Grel.index('--')-1]
 			right_sub = name_Grel[name_Grel.rfind('--')+3:] 
-			#print left_sub, " : ", right_sub
 
 			if difflib.SequenceMatcher(None, GSystem_name, left_sub).ratio() > GSYSTEM_MIN_THRESHOLD_CASE1: 
 				reqd_obj = col.Node.one({"_id":gr_obj.right_subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
@@ -1153,20 +1167,10 @@ def ra_search_results(request, group_id):
 				#print "match %: ", difflib.SequenceMatcher(None, GSystem_name, right_sub).ratio()
 	except Exception:
 		pass
-
-	##print "max_match: ", max_match	
-	##print "max_match_rel: ", max_match_rel
-	##print "word count: ", rel_word_count
-	##print "GSystem_name: ", GSystem_name
-
-	##print "subjects: ", subjects
-	##print "right subjects: ", right_subjects
-
  
+
 	##############################################   CASE - 2 - A  ##########################################
 	if max_match < CASE_TWO_THRESHOLD:
-		#result_members = []
-		#print "No match found IN CASE 1"
 
 		# LOOK FOR GSYSTEM_TYPE IN SEARCH QUERY
 		GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"name":1})
@@ -1201,15 +1205,12 @@ def ra_search_results(request, group_id):
 					cur_word = split_word[i]
 				i += 1
 			
-			#print "word sent:", cur_word
 			(max_m, max_m_rel, rel_w_count) = get_max_match(sorted_gst, cur_word, max_length)	
 			if max_m > max_match_gst:
 				max_match_gst = max_m
 				max_match_rel_gst = max_m_rel
 				rel_word_count_gst = rel_w_count
-				#print "values: ", max_match_gst, max_match_rel_gst
 			c += 1
-		#print "out of gstype loop values: ", max_match_gst, max_match_rel_gst
 
 		# LOOK FOR GSYSTEM IN THE SEARCH QUERY
 		sorted_gs = {}
@@ -1234,7 +1235,6 @@ def ra_search_results(request, group_id):
 		max_match_rel_gs = ""
 		rel_word_count_gs = 0
 
-		#print "look from: ", rel_word_count_gst
 		while c >= rel_word_count_gst:
 			cur_word = ""
 			i = len(split_word)-1
@@ -1242,19 +1242,13 @@ def ra_search_results(request, group_id):
 				cur_word = split_word[i] + ' ' + cur_word
 				i -= 1
 			
-			#print "word sent gsystem:", cur_word
 			(max_m, max_m_rel, rel_w_count) = get_max_match(sorted_gs, cur_word, max_length)	
 			if max_m > max_match_gs:
 				max_match_gs = max_m
 				max_match_rel_gs = max_m_rel
 				rel_word_count_gs = rel_w_count
-				#print "values: ", max_match_gs, max_match_rel_gs
 			c -= 1
-		#print "out of gsystem loop values: ", max_match_gs, max_match_rel_gs
-
-		#print "sorted gst: ", sorted_gst
-		#print "sorted gs: ", sorted_gs
-		#print "max match gst: ", max_match_rel_gst, "max match gs: ", max_match_rel_gs
+		
 		try:
 			GStype = col.Node.one({"name":max_match_rel_gst}, {"_id":1})
 			GS_sq = col.Node.find_one({"name":"GSystem", "name":max_match_rel_gs}, {"_id":1})
@@ -1263,17 +1257,12 @@ def ra_search_results(request, group_id):
 			
 			# LOOK FOR GRELATIONS WITH BOTH GSYSTEMS ON EITHER SIDE
 			relations = col.Node.find({"_type":"GRelation", "right_subject":GS_sq._id}, {"subject":1})
-			#print "all relations: \n"
-			#for rel in relations:
-				#print rel
 
 			relations.rewind()
 			for rel in relations:
 				allMembers.rewind()
 				for member in allMembers:
-					#print "member: ", member
 					if rel.subject == member._id:
-						#print "member inside", member.name, member._id
 						member = addType(member)
 						result_members.append(member)	
 
@@ -1287,10 +1276,7 @@ def ra_search_results(request, group_id):
 		except Exception:
 			pass
 
-		#print "Case 2-a results: ", result_members
 		######################################## CASE 2 - B ######################################
-
-		#print "Matching IN CASE 2 - b"
 
 		# LOOK FOR GSYSTEM IN THE SEARCH QUERY
 		sorted_gs = {}
@@ -1315,7 +1301,6 @@ def ra_search_results(request, group_id):
 		max_match_rel_gs = ""
 		rel_word_count_gs = 0
 
-		#print "look from: ", rel_word_count_gst
 		while c < len(split_word):
 			cur_word = ""
 			i = 0
@@ -1323,16 +1308,12 @@ def ra_search_results(request, group_id):
 				cur_word += split_word[i]
 				i += 1
 			
-			#print "word sent gsystem:", cur_word
 			(max_m, max_m_rel, rel_w_count) = get_max_match(sorted_gs, cur_word, max_length)	
 			if max_m > max_match_gs:
 				max_match_gs = max_m
 				max_match_rel_gs = max_m_rel
 				rel_word_count_gs = rel_w_count
-				#print "values: ", max_match_gs, max_match_rel_gs
 			c += 1
-		#print "out of gsystem loop values: ", max_match_gs, max_match_rel_gs
-		
 
 		# LOOK FOR GSYSTEM_TYPE IN SEARCH QUERY
 		GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"name":1})
@@ -1352,13 +1333,11 @@ def ra_search_results(request, group_id):
 
 		split_word = sq.split()
 
-
 		c = len(split_word)-1
 		max_match_gst = 0
 		max_match_rel_gst = ""
 		rel_word_count_gst = 0
 
-		#print "look from: ", rel_word_count_gs
 		while c >= rel_word_count_gs:
 			cur_word = ""
 			i = len(split_word)-1
@@ -1366,40 +1345,28 @@ def ra_search_results(request, group_id):
 				cur_word = split_word[i] + ' ' + cur_word
 				i -= 1
 			
-			#print "word sent:", cur_word
 			(max_m, max_m_rel, rel_w_count) = get_max_match(sorted_gst, cur_word, max_length)	
 			if max_m > max_match_gst:
 				max_match_gst = max_m
 				max_match_rel_gst = max_m_rel
 				rel_word_count_gst = rel_w_count
-				#print "values: ", max_match_gst, max_match_rel_gst
 			c -= 1
-		#print "out of gstype loop values: ", max_match_gst, max_match_rel_gst
 
-		#print "sorted gst: ", sorted_gst
-		#print "sorted gs: ", sorted_gs
-		#print "max match gst: ", max_match_rel_gst, "max match gs: ", max_match_rel_gs
 		try:
 			GStype = col.Node.one({"name":max_match_rel_gst}, {"_id":1})
 			GS_sq = col.Node.find_one({"name":"GSystem", "name":max_match_rel_gs}, {"_id":1})
 
 			allMembers = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GStype._id}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
 			
-
 			# LOOK FOR GRELATIONS WITH BOTH GSYSTEMS ON EITHER SIDE
 			relations = col.Node.find({"_type":"GRelation", "right_subject":GS_sq._id}, {"subject":1})
-			#print "all relations: \n"
-			#for rel in relations:
-				#print rel
 
 			relations.rewind()
 			for rel in relations:
 				allMembers.rewind()
 				for member in allMembers:
-					#print "member: ", member
 					if rel.subject == member._id:
 						member = addType(member)
-						##print "member inside", member.name, member._id
 						result_members.append(member)	
 
 			relations = col.Node.find({"_type":"GRelation", "subject":GS_sq._id}, {"right_subject":1})
@@ -1412,22 +1379,21 @@ def ra_search_results(request, group_id):
 		except Exception:
 			pass
 
-		#print "Case 2-b results: ", result_members
-
 	result_members = json.dumps(result_members, cls=Encoder)
-	##print "results: ", result_members
 	
-	context_to_return = getRenderableContext(group_id)
-	context_to_return['search_results'] = result_members
-	context_to_return['search_type'] = RELATION_SEARCH
+	context_to_return = getRenderableContext(group_id)				# BASIC CONTEXT
+	context_to_return['search_results'] = result_members			# ADD SEARCH RESULTS TO CONTEXT
+	context_to_return['search_type'] = RELATION_SEARCH				# ADD SEARCH TYPE TO CONTEXT
 
 	return render(request, 'ndf/search_page.html', context_to_return)
 
 
-	#return render(request, 'ndf/ra_search_results.html', {'search_type':RELATION_SEARCH, "groupid":group_id, "search_results":result_members})		
-
-
 def get_max_match(sorted_rel, word_reqd, max_length):
+	"""
+	Helper function for the graph search function.
+	It takes as input a dictionary having names grouped by their lengths.
+	It returns the maximum matching word from the list to a required word.
+	"""
 	i = 1
 	max_match = 0
 	max_match_rel = ""
@@ -1449,7 +1415,6 @@ def get_max_match(sorted_rel, word_reqd, max_length):
 		i += 1
 
 	return (max_match, max_match_rel, rel_word_count)			
-
 
 
 
@@ -1648,7 +1613,6 @@ def td_doc():
 		
 		for pmrd in mrdl:
 			#particular_map_reduced_document
-			##print pmrd
 			if not pmrd.is_indexed:
 				wd = pmrd.content
 				
@@ -1659,7 +1623,6 @@ def td_doc():
 							wod[i] = {}
 						wod[i][str(pmrd.orignal_id)]=wd[i]
 		pwdl.words = wod
-		##print "WORD OBJECT DICTIONARY AFTER  ---->",wod
 		pwdl.save()
 	
 	for pmrd in mrdl:
@@ -1767,7 +1730,6 @@ def recommend(prefs,term,similarity = sim_distance):
 			continue
 		else:
 			sim = similarity(prefs,term,other)
-			##print "similarity :):P>>>>>",sim,term,other
 			
 		if sim==0:
 			continue
@@ -1781,8 +1743,7 @@ def recommend(prefs,term,similarity = sim_distance):
 				if single_ObjectId not in similarity_total_for_each_item:
 					similarity_total_for_each_item[single_ObjectId] = 0
 				similarity_total_for_each_item[single_ObjectId] += sim
-		
-	
+
 	rankings = []
 	
 	for single_ObjectId,total_value in each_item_total.items():
@@ -1797,7 +1758,6 @@ def recommend(prefs,term,similarity = sim_distance):
 
 def generate_term_document_matrix(request,group_id):
 	td_doc()
-	#return render(request,'cf/thankYou.html',{})
 	return HttpResponse("Thank You")
 
 def cf_search(request, group_id):
@@ -1830,40 +1790,26 @@ def get_nearby_words(request,group_id):
 	stemmer = nltk.stem.porter.PorterStemmer()
 		
 	for i in search_text_l:
-		#print i
 		score = topMatches(prefs,stemmer.stem_word(i.lower()),n=30,similarity=sim_distance)
-		##print "SCORE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n",score	
 		for _,word in score:
 			word_set.add(word)
-		##print word_set
 		
-		
-		##print "NOW I AM #printING RECOMMENDATIONS ____________________________________________________________________________"	
 		rankings = recommend(prefs,stemmer.stem_word(i.lower()),similarity = sim_distance)
 		ranking_list.extend(rankings[0:5])
 		# "5" -- It is the maximum number of documents which will be returned per word in search query
 		# Change this number to that number which you want i.e. the number of documents per word you want
-	
-	
-	
-	##print "THE WORD SET IS #printED AS FOLLOWS -------------->>>>>>>>>>>>>\n",word_set	
-	
-	##print "THE RANKING LIST IS #printED AS FOLLOWS ------------->>>>>>>>>>>>>>\n",ranking_list
-	
+		
 	final_ranking_list = sort_n_avg(ranking_list)
 	final_ranking_list.sort()
 	final_ranking_list.reverse()
 	
-
-	#{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}
-	##print "THE FINAL RANKING LIST IS #printED AS FOLLOWS ------------->>>>>>>>>>>>>>\n",final_ranking_list
 	result_array = []
 	for (relevance,each_id) in final_ranking_list:
 		obj = collection.Node.find_one({"_id":ObjectId(each_id)},{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 		obj = addType(obj)
 		obj["relevance"]=relevance
 		result_array.append(obj)
-	#return HttpResponse("DONE.")
+
 	result_array = json.dumps(result_array, cls=Encoder)
 	
 	context_to_return = getRenderableContext(group_id)
@@ -1871,7 +1817,6 @@ def get_nearby_words(request,group_id):
 	context_to_return['search_type'] = SEMANTIC_SEARCH
 
 	return render(request, 'ndf/search_page.html', context_to_return)
-	#return render(request,'ndf/cf_search_results.html',{"groupid":group_id, 'search_type':SEMANTIC_SEARCH, "search_results":result_array})	
 	
 def sort_n_avg(l):
 	"""
