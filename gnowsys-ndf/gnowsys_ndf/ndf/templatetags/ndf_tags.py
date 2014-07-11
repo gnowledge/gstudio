@@ -318,10 +318,11 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(group_id, selectedGapp):
+def get_gapps_menubar(request, group_id):
 	"""Get Gapps menu-bar
 	"""
 	try:
+		selectedGapp = request.META["PATH_INFO"]
 		group_name = ""
 		collection = db[Node.collection_name]
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -356,11 +357,11 @@ def get_gapps_menubar(group_id, selectedGapp):
 		else :
 			group_name = group_obj.name
 
-		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
+		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
 	except invalid_id:
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		group_id=gpid._id
-		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
@@ -1297,9 +1298,7 @@ def check_node_linked(node_id):
 
   try:
     node = collection.Node.one({'_id': ObjectId(node_id)}, {'_id': 1})
-
     relation_type_node = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
-    
     is_linked = collection.Node.one({'_type': "GRelation", 'subject': node._id, 'relation_type': relation_type_node.get_dbref()})
 
     if is_linked:
@@ -1311,3 +1310,44 @@ def check_node_linked(node_id):
   except Exception as e:
     error_message = " NodeUserLinkFindError - " + str(e)
     raise Exception(error_message)
+
+@register.assignment_tag
+def check_group_admin(groupid, app_dict, user):
+  """
+  This restricts view of MIS & MIS-PO GApps to only superuser, creator & admins of the group. 
+  That is, other members of the group can't see these GApps.
+
+  Arguments:
+  groupid -- ObjectId of the currently selected group
+  app_dict -- A dictionary consisting of following key-value pair
+              - 'id': ObjectId of the GApp
+              - 'name': name of the GApp
+  user - User object taken from request object
+
+  Returns:
+  A bool value indicating:-
+  True: if user is superuser, creator or admin of the group
+  False: otherwise, user is just a member of the group
+  """
+
+  try:
+    if app_dict["name"] in ["MIS", "MIS-PO"]:
+      group_node = collection.Node.one({'_id': ObjectId(groupid)}, {'group_admin': 1, 'created_by': 1})
+
+      if group_node:
+        if (user.is_superuser) or (user.id == group_node.created_by) or (user.id in group_node.group_admin):
+          return True
+
+        else:
+          return False
+
+      else:
+        error_message = "No group exists with this id ("+str(groupid)+") !!!"
+        raise Exception(error_message)
+
+    else:
+      return True
+
+  except Exception as e:
+    error_message = "\n GroupAdminCheckError (For MIS & MIS-PO): " + str(e) + " \n"
+    raise Http404(error_message)
