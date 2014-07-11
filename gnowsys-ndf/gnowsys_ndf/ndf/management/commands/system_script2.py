@@ -42,7 +42,7 @@ def create_WikiData_WikiTopic():
 	All items hence harvested will be GSystems whose member_of field will have the ObjectId of
 	GSystemType WikiTopic.
 	"""
-	GAPP = collection.Node.one({"name": u"GAPP"})
+	GAPP = collection.Node.one({"name": u"GAPP","_type":u"MetaType"})
 	cursor = collection.Node.one({"_type":u"GSystemType", "name":u"WikiData"}) #change -am
 	if (cursor!=None):
 		print "Wikidata already exists"
@@ -77,7 +77,7 @@ def create_WikiData_WikiTopic():
 	if(cursor!=None):
 		print "WikiTopic already exists"
 	else:	
-		factory = collection.Node.one({"name": u"factory_types"})
+		factory = collection.Node.one({"name": u"factory_types","_type":u"MetaType"})
                 factory_id = factory._id
 		obj1 = collection.GSystemType()
 		obj1.name = u"WikiTopic"
@@ -125,11 +125,11 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
 		attribute_type = collection.AttributeType()
 		attribute_type.name = unicode(name)
 		attribute_type.data_type = data_type
-		system_type = collection.Node.one({"name":u"WikiData","_type":"GSystemType"})
+		system_type = collection.Node.one({"name":u"WikiData","_type":u"GSystemType"})
 		attribute_type.subject_type.append(system_type._id)
 		attribute_type.created_by = user_id
 		attribute_type.modified_by = user_id
-		factory_id = collection.Node.one({"name":u"factory_types","_type":"MetaType"})._id
+		factory_id = collection.Node.one({"name":u"factory_types","_type":u"MetaType"})._id
 		attribute_type.member_of.append(factory_id)
 		attribute_type.verbose_name = name
 		attribute_type.altnames = unicode(property_id)
@@ -236,13 +236,25 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	#it's me
 	print "Subject::\n" + str(subject)
 	attribute_type_obj = collection.Node.find_one({"name": unicode(attribute_type_name), "_type": u"AttributeType"})
-	
 	print "Attribute_type::\n" + str(attribute_type_obj)	
+	if subject is None:
+		print "The attribute " + unicode(subject_name) + "--" + unicode(attribute_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		return True
+	
+	elif attribute_type_obj is None:
+		print "The attribute " + unicode(subject_name) + "--" + unicode(attribute_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
+		return True
+
+	
 	cursor = collection.Node.find_one({"_type" : u"GAttribute","subject": ObjectId(subject._id),"attribute_type.$id":ObjectId(attribute_type_obj._id)})
 	if cursor!= None:
 		print "The attribute " + unicode(cursor.name) + " already exists."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
+	
+	
 	else:
 		att = collection.GAttribute()
 		att.created_by = user_id
@@ -258,8 +270,8 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 		try:
 			att.save()
 			print "Created attribute " + unicode(att.name)
-		except e:
-			print "Could not create a attribute" + unicode(att.name)
+		except Exception as e:
+			print "Could not create an attribute" + unicode(att.name)
 			print e
 			#call log file method
 			return True
@@ -288,7 +300,7 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 	"""
 	print "Creating a GSystem Topic"
 	topic_type = collection.Node.one({"name": u"WikiTopic","_type":u"GSystemType"})
-	obj = collection.Node.one({"name": unicode(label), "_type": u"GSystem"}) #pick the topic related to wikidata
+	obj = collection.Node.one({"name": unicode(label)}) #pick the topic related to wikidata
 
 	if (obj!=None):
 		print "Topic already exists"
@@ -342,7 +354,7 @@ def create_Class(label, description, alias_list, class_id, last_update_datetime,
 			string_alias=string_alias+alias+"," #altnames is a comma separated list of english aliases
 
 		class_obj.altnames = unicode(string_alias)
-		class_obj.type_of.append(topic_type_id) #The GSystemType of class that I am creating should be a part of the WikiData GApp.
+		class_obj.type_of.append(topic_type_id) #The GSystemType of class that is being created should be a part of the WikiData GApp.
 		class_obj.access_policy=unicode('PUBLIC')
 		factory = collection.Node.one({"name": u"factory_types"})
                 factory_id = factory._id
@@ -439,7 +451,7 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		try:
 			relation.save()
 			print "Created a Relation " + str(relation.name)
-		except e:
+		except Exception as e:
 			print "Could not create a relation-->" + str(relation.name)
 	
 			print e
@@ -458,7 +470,7 @@ def populate_tags(label,property_value_for_relation):
 	1)label - name of item for which tag is to eb appended.
 	2)property_value_for_relation - value to be appended in tag.It is a human readable english value.
 	"""
-	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	obj = collection.Node.find_one({"name":unicode(label)})
 	if obj:
 		obj.tags.append(unicode(property_value_for_relation))
 		obj.modified_by=int(1)
@@ -488,7 +500,7 @@ def populate_location(label,property_id,property_value,user_id):
 	geo_json[0]["geometry"]["coordinates"].append(property_value["longitude"])
 	geo_json[0]["properties"]["description"]=(property_value["globe"])		
 	geo_json[0]["properties"]["id"]=property_id
-	obj.location =location
+	obj.location =geo_json
 	obj.modified_by =user_id
 	obj.save()
 
@@ -536,6 +548,7 @@ def item_exists(label):
 			return False
 
 
+
 def populate_tags(label,property_value_for_relation):
 	"""
 	To populate tags of the object given by label.tags is a list field and the values will be appended
@@ -550,6 +563,36 @@ def populate_tags(label,property_value_for_relation):
 		obj.tags.append(unicode(property_value_for_relation))
 		obj.modified_by=int(1)
 		obj.save()
+
+
+
+def populate_location(label,property_id,property_value,user_id):
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	geo_json=[
+    	{
+        	"geometry": 
+        	{
+            	"type": "Point",
+            	"coordinates": []
+       		},
+        	"type": "Feature",
+        	"properties": 
+        	{
+            	"description":"",
+            	"id": ""
+        	}
+    	}
+	]
+
+	geo_json[0]["geometry"]["coordinates"].append(property_value["latitude"])
+	geo_json[0]["geometry"]["coordinates"].append(property_value["longitude"])
+	geo_json[0]["properties"]["description"]=(property_value["globe"])		
+	geo_json[0]["properties"]["id"]=property_id
+	obj.location =geo_json
+	obj.modified_by =user_id
+	obj.save()
+
+
 
 
 

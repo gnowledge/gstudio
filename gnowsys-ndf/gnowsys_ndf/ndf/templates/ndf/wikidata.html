@@ -103,6 +103,12 @@
 
   	<div>
 		<br>
+		<hr>
+		{% for tag in selected_topic.tags %}
+			{{ tag }} {{"  "}}
+		{% endfor %}
+		<br>
+		<hr>
 		<h2><strong><center>Topic Name: {{ selected_topic.name }}</h2></strong></center>
 		<br>
 		<strong>
