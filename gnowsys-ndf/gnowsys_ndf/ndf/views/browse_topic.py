@@ -11,7 +11,7 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 
 from django_mongokit import get_database
-from gnowsys_ndf.settings import LANGUAGES
+from gnowsys_ndf.settings import LANG
 
 try:
     from bson import ObjectId
@@ -344,7 +344,7 @@ def theme_topic_create_edit(request, group_id, app_id=None, app_set_id=None):
 					# End of finding unique theme names for editing name
         if trans:
             return render_to_response("ndf/translation_page.html",
-	                           {'group_id': group_id,'groupid': group_id,'title': title,'node': node1,'app_id':app_id,'theme_GST_id': theme_GST._id,'lan':LANGUAGES,'translate':translate
+	                           {'group_id': group_id,'groupid': group_id,'title': title,'node': node1,'app_id':app_id,'theme_GST_id': theme_GST._id,'lan':LANG,'translate':translate
 	                           },context_instance = RequestContext(request)
             )
         else :				

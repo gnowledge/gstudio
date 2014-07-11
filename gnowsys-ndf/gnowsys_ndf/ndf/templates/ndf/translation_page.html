@@ -1,6 +1,6 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
-
+{% load i18n %}
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block title %} {{ node.name }} {% endblock %}
@@ -8,6 +8,7 @@
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 
 {% block body_content %}
+
 {% if title %}
 <form data-abide id="form-edit-node" method="POST" action="{% url "theme_topic_create" groupid app_id node %}?translate=true&appid={{theme_GST_id}}">
 {% else %}
@@ -42,6 +43,7 @@ $("#lan option[value={{v}}]").remove();
 <hr style="height:5px;background-color: #0B6580;" />
 </div>
 </table></div>
+
 	<div class="large-6 columns">
 
 <div class="row">
@@ -69,7 +71,7 @@ Tags  : </br></br>
 
 <div class="row">
 <div class="medium-8 columns">
-<label>Page Name</label>
+<label>{% trans "Page Name" %} </label>
 <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 </div>
@@ -77,7 +79,7 @@ Tags  : </br></br>
 
 	<div class="row">
 <div class="large-12 columns">
-<label>Description</label>
+<label>{% trans "Description" %}</label>
  
 {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
 </div>
@@ -100,7 +102,5 @@ Tags  : </br></br>
       
 </div>
 
-
 {% endblock%}
-
 
