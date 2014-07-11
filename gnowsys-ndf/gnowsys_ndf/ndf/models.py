@@ -1256,6 +1256,18 @@ class HistoryManager():
             json_data = version_file.read()
 
         collection = get_database()[Node.collection_name]
+	
+	# assigning None value to key, which is not present in json_data compare to Node class keys
+	null = 0
+	import json
+	json_dict = eval(json_data)
+	json_node_keys = collection.Node.keys()
+	json_dict_keys = json_dict.keys()
+	diff_keys = list(set(json_node_keys)-set(json_dict_keys))
+	if diff_keys:
+		for each in diff_keys:
+			json_dict[each]=None
+	json_data = json.dumps(json_dict)
 
         # Converts the json-formatted data into python-specific format
         doc_obj = collection.Node.from_json(json_data)
