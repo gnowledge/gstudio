@@ -38,7 +38,8 @@ wiki_base_url="http://en.wikipedia.org/wiki/"
 
 def create_WikiData_WikiTopic():
 	"""
-	creates GSystemType: WikiData(a member_of GAPP), GSystemType Theme and Topic(a member_of factory_settings) 
+	creates GSystemType: WikiData(a member_of GAPP), GSystemType WikiTopic(a member_of factory_settings and type_of WikiData) 
+	Helper method to create the WikiData GAPP and WikiTopic GSystemType.
 	"""
 	GAPP = collection.Node.one({"name": u"GAPP"})
 	cursor = collection.Node.one({"_type":u"GSystemType", "name":u"WikiData"}) #change -am
@@ -55,22 +56,7 @@ def create_WikiData_WikiTopic():
 		wiki.save()
 		wiki_id = wiki._id
 		print "Created a GSystemType for----> WikiData \n"
-	"""
-	cursor = collection.Node.one({"_type": u"GSystemType", "name": u"Theme"})
-	if (cursor!=None):
-		print "theme already exists"
-		
-	else:
-		factory = collection.Node.one({"name": u"factory_types"})
-		factory_id = factory._id
-		obj = collection.GSystemType()
-		obj.name = u"Theme"
-		obj.created_by = int(1)
-		obj.type_of.append(wiki_id)
-		obj.member_of.append(factory_id)
-		obj.save()
-		print "Created an object of GSystem Type --> Theme \n"
-	"""
+	
 	cursor = collection.Node.one({"_type":u"GSystemType", "name": u"WikiTopic"}) #change -am
 	if(cursor!=None):
 		print "WikiTopic already exists"
@@ -89,6 +75,7 @@ def create_WikiData_WikiTopic():
 
 def create_AttributeType_for_class(name, data_type, description, property_id, language, user_id):
 	"""
+	FOR CLASS - GSYSTEMTYPEs
 	This method creates an attribute type of given name and which will be for the given system_type(WikiData)
 	The following data_types are possible:
 	DATA_TYPE_CHOICES = (
@@ -105,14 +92,13 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
     	"ObjectId",
     	"IS()"
 	)
-	User Id will be used for filling the created_by field.
-	
-	1. name - name of property i.e. label
-	2. data_type - extracted data type from JSON
-	3. description - Desc
-	4. property_id - unique code of property. PCode
-	5. language - language being used
-	6. User Id
+	Parameters:
+		1. name - The name of the AttributeType that the user wants to create.
+		2. data_type - The data_type of the attribute type is given here.
+		3. description - The descriptive content of the AttributeType - like help_text.
+		4. property_id - The unique id to refer to this attribute_type.
+		5. language - What is the language that the user wants to harvest.
+		6. User Id: Which user is creating the topic.
 	"""
 	print "Creating an Attribute Type"
 	cursor = collection.Node.one({"label":unicode(property_id),"_type":"AttributeType"})
@@ -154,6 +140,7 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
 
 def create_AttributeType(name, data_type, description, property_id,language, user_id):
 	"""
+	FOR TOPIC - GSYSTEMs
 	This method creates an attribute type of given name and which will be for the given system_type(WikiData)
 	The following data_types are possible:
 	DATA_TYPE_CHOICES = (
@@ -170,14 +157,13 @@ def create_AttributeType(name, data_type, description, property_id,language, use
     	"ObjectId",
     	"IS()"
 	)
-	User Id will be used for filling the created_by field.
-	
-	1. name - name of property i.e. label
-	2. data_type - extracted data type from JSON
-	3. description - Desc
-	4. property_id - unique code of property. PCode
-	5. language - language being used
-	6. User Id
+	Parameters:
+		1. name - The name of the AttributeType that the user wants to create.
+		2. data_type - The data_type of the attribute type is given here.
+		3. description - The descriptive content of the AttributeType - like help_text.
+		4. property_id - The unique id to refer to this attribute_type.
+		5. language - What is the language that the user wants to harvest.
+		6. User Id: Which user is creating the topic.
 	"""
 	print "Creating an Attribute Type"
 	cursor = collection.Node.one({"label":unicode(property_id),"_type":"AttributeType"})
@@ -220,6 +206,11 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	"""
 	Creating an Attributpe with specified name, subject_id, attribute_type and value.
 	This will create an attribute iff the attribute is not present for the same subject
+		1. subject_name - The name of the topic for which the user wants to create the attribute.
+		2. attribute_type_name - The name of the attribute_type for which the user wants to create the attribute value.
+		3. object_value - The Value of the object.
+		4. language - What is the language that the user wants to harvest.
+		5. User Id: Which user is creating the topic.
 	"""
 
 	print "Creating an attribute"
@@ -278,6 +269,13 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 def create_Topic(label, description, alias_list, topic_title, last_update_datetime, user_id):
 	"""
 	Creates a topic if it does not exist
+	Parameters:
+		1. label - The name of the topic which the user wants to create.
+		2. description - The descriptive content of the topic.
+		3. alias_list - The Aliases or the Alternate names of the topic.
+		4. class_id - The unique Q id of the topic.
+		5. last_update_datetime - can be used to identify whether the object was existing previously. Helpful in incremental dumps. This makes this script an incremental script.
+		6. User Id: Which user is creating the topic.
 	"""
 	print "Creating a GSystem Topic"
 	topic_type = collection.Node.one({"name": u"WikiTopic","_type":u"GSystemType"})
@@ -312,7 +310,14 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		
 def create_Class(label, description, alias_list, class_id, last_update_datetime, user_id):
 	"""
-	Creates a topic if it does not exist
+	Creates a Class if it does not exist
+	Parameters:
+		1. label - The name of the class which the user wants to create.
+		2. description - The descriptive content of the class.
+		3. alias_list - The Aliases or the Alternate names of the class
+		4. class_id - The unique Q id of the class.
+		5. last_update_datetime - can be used to identify whether the object was existing previously. Helpful in incremental dumps. This makes this script an incremental script.
+		6. User Id: Which user is creating the Class.
 	"""
 	print "Creating a GSystemType Class"
 	topic_type = collection.Node.one({"name": u"WikiData","_type":u"GSystemType"})
@@ -360,9 +365,11 @@ def create_RelationType(name, inverse_name, subject_type_name, object_type_name,
 	Creating a RelationType with the following parameters.
 	1. name - inherits Node class.
 	2. inverse_name  - This is the name of the inverse of the relation.
-	3. subject_type - Which Systemtype is the relation defined under.
-	4. object_type - which object is the relation type defined for?
-	5. User_id - the id which creates the WikiTopic RelationType.
+	3. subject_type_name - Which Systemtype is the relation defined under.
+	4. object_type_name - which object is the relation type defined for?
+	5. property_id - The uniques Id of the attribute
+	6. language - What is the language that the user wants to harvest.
+	7. User_id - the id which creates the WikiTopic RelationType.
 	"""
         print "Creating a Relation Type"
         cursor = collection.Node.one({"name":unicode(name),"_type":u"RelationType"})
@@ -407,9 +414,9 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 	1. Subject: which GSytem class object
 	2. Relation Type: The type of relation
 	3. Right Subject: The subject on the right. The object related to the current object.
-	"""
-	"""
-	The same method s used to cerate relations between 2 GSystemTypes or a GSystemType and a GSystem.
+	4. User Id: Which user is creating the Relation.
+	
+	IMPORTANT: The same method s used to cerate relations between 2 GSystemTypes or a GSystemType and a GSystem.
 	"""
 	print "Creating a Relation."
 	relation_type = collection.Node.one({"_type":u"RelationType", "name": unicode(relation_type_name)})
@@ -457,13 +464,16 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		#it's me
 
 def display_objects():
+	"""
+	This is a helper method for debugging the code. This displays all the objects existing in the database so that the user does not have to use the shell to debug.
+	"""
 	cursor = collection.Node.find()
 	for a in cursor:
 		print a.name
 		
 def item_exists(label):
 	"""	
-	Returns boolean value to indicate if a GSystem with the given name exists or not"
+	Returns boolean value to indicate if a GSystem with the given name exists or not
 	"""	
 
 	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
@@ -484,9 +494,10 @@ def populate_tags(label,property_value_for_relation):
 	To populate tags of the object given by label.tags is a list field and the values will be appended
 	in the list.(actually the right_subject_name of P31 and P279 are being appended as tags to give a sense 
 	of theme, category hierarchy etc.)
-	Parameter passed to the function -
-	1)label - name of item for which tag is to eb appended.
-	2)property_value_for_relation - value to be appended in tag.It is a human readable english value.
+	Parameter passed to the function 
+	
+		1)label - name of item for which tag is to eb appended.
+		2)property_value_for_relation - value to be appended in tag.It is a human readable english value.
 	"""
 	obj = collection.Node.find_one({"name":unicode(label)})
 	if obj:
@@ -497,6 +508,15 @@ def populate_tags(label,property_value_for_relation):
 
 
 def populate_location(label,property_id,property_value,user_id):
+	"""
+	This method helps populate the Location in the Topic in the specific GeoJSON format used in the MongoDB database of the GSystem structure.
+	Parameters:
+		1. label - label/name of the topic
+		2. property_id - What is the id of the Location property
+		3. property_value - The actual longitude, latitude values
+		4. User Id - Which user is running the script and creating the topic.
+
+	"""
 	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
 	geo_json=[
     	{
@@ -524,11 +544,17 @@ def populate_location(label,property_id,property_value,user_id):
 
 
 def get_class(label, class_id):
+	"""
+	Helper function to return the class with the specified name/label
+	"""
 	obj = collection.Node.find_one({"_type":u"GSystemType","name":unicode(label)})
 	if obj:
 		return obj
 
 def get_topic(label):
+	"""
+	Helper function to return the Topic with the specified name/label
+	"""
 	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
 	if obj:
 		return obj
@@ -536,10 +562,15 @@ def get_topic(label):
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
+		"""
+		This is the default method required to make this file run as a script in Django.
+		"""
 		create_WikiData_WikiTopic()
 		create_Topic(u"topic11", u"topic1desc", [u"Alias1", u"Alias2"], "Test1", None, user_id)
 		create_Topic(u"topic21", u"topic2desc", [u"Alias1"], "Test2", None, user_id)
+		create_Class(u"class1", u"Description for class1", [u"ClassAlias1"], "Test-Q0", None, user_id)
 		create_AttributeType("wiki_attr11", "unicode", "This is the desc.", "P<id>12","en", user_id)
+		create_AttributeType_for_class("class_wiki_attr1", "unicode", "This is the desc for wiki_attr1.", "P<id>1","en", user_id)
 		create_Attribute("topic11", "wiki_attr11", "This is the value of the wiki_attr1 field", "en", user_id)
 		create_Attribute("topic21", "wiki_attr11", "This is the value of the wiki_attr2 field", "en", user_id)
 		create_RelationType("same_tag11", "-same_tag11", "WikiTopic", "WikiTopic", "P<id>1", "en", user_id) 
