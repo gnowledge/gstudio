@@ -1,20 +1,7 @@
-"""
 from django.core.management.base import BaseCommand, CommandError
 
 
-file_path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/wikidata_log.txt')
 
-def start_writing():
-	my_log = open(file_path, "w")
-	my_log.write("HelloWorld!\n")
-	my_log.write(":P")
-	my_log.close()
-
-
-class Command(BaseCommand):
-        def handle(self, *args, **options):
-		start_writing()
-"""
 import os
 log_file_path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/iteration_1.txt')
 my_log = open(log_file_path, "w")
@@ -233,6 +220,7 @@ def log_relation_exists(label, log_flag):
 def log_inner_topic_start(log_flag):
 	"""
 	Helper log function that print messages to help in debugging
+	1)log_flag - controls indentation to make the log file readable
 
 	"""
 	global my_log
@@ -246,7 +234,7 @@ def log_inner_topic_start(log_flag):
 def log_inner_topic_end(log_flag):
 	"""
 	Helper log function that print messages to help in debugging
-
+	1)log_flag - controls indentation to make the log file readable
 	"""
 	global my_log
         captcha = "-"
@@ -259,7 +247,7 @@ def log_inner_topic_end(log_flag):
 def log_class_done(log_flag):
 	"""
 	Helper log function that print messages to help in debugging
-
+	1)log_flag - controls indentation to make the log file readable
 	"""
 	global my_log
         captcha = "_"
@@ -274,7 +262,7 @@ def log_class_done(log_flag):
 def log_outer_topic(log_flag):
 	"""
 	Helper log function that print messages to help in debugging
-
+	1)log_flag - controls indentation to make the log file readable
 	"""
 	global my_log
         captcha = "-"
@@ -289,6 +277,7 @@ def log_outer_topic(log_flag):
 def log_iteration_1_file_start():
 	"""
 	Start Iteration 1
+	opens file static/ndf/wikidata/iteration_1.txt to start the log.
 	"""
         global my_log
 	my_log.close()
@@ -301,6 +290,7 @@ def log_iteration_1_file_start():
 def log_iteration_1_file_complete():
 	"""
 	Finish Iteration file 1.
+	Closes the file to end log of Iteration 1.
 	"""
         captcha = "\nEnd of file\n"
       	my_log.write(str(captcha))
@@ -309,6 +299,7 @@ def log_iteration_1_file_complete():
 def log_iteration_2_file_start():
 	"""
 	Start Iteration 2
+	opens file static/ndf/wikidata/iteration_2.txt to start the log.
 	"""
 	global my_log
 	my_log.close()
@@ -321,6 +312,7 @@ def log_iteration_2_file_start():
 def log_iteration_2_file_complete():
 	"""
 	Finish Iteration file 2.
+	Closes the file to end log of Iteration 2.
 	"""
 	global my_log
         captcha = "\nEnd of file\n"
@@ -329,7 +321,8 @@ def log_iteration_2_file_complete():
 	
 def log_iteration_3_file_start():
 	"""
-	Start Iteration 1
+	Start Iteration 3
+	opens file static/ndf/wikidata/iteration_3.txt to start the log.
 	"""
 	global my_log
 	my_log.close()
@@ -341,10 +334,21 @@ def log_iteration_3_file_start():
 
 def log_iteration_3_file_complete():
 	"""
-	Finish Iteration file 1.
+	Finish Iteration file 3.
+	Closes the file to end log of Iteration 3.
 	"""
 	global my_log	
         captcha = "\nEnd of file\n"
       	my_log.write(str(captcha))
 	my_log.close()
+
+
+
+class Command(BaseCommand):
+        def handle(self, *args, **options):
+		"""
+		This is the default method required to make this file run as a script in Django.
+		"""
+		print "\n Yeah the log_script is working. \n"
+
 	
