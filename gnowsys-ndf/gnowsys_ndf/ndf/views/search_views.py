@@ -645,7 +645,7 @@ def get_attributes(request, group_id):
 	##print request.GET['GSystem']
 	#print "names: ", request.GET.get('GSystem',"")
 	##print "testing !: ", request.GET['tex']
-	list_of_keys = ['name', 'created_by', 'last_update', 'tags', 'content_org']
+	list_of_keys = ['name', 'last_update', 'tags']
 	
 	#try:
 	GSystem_names = request.GET['GSystem']

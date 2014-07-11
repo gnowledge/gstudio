@@ -394,7 +394,7 @@
             },
             success: function(data) {
           parsed = $.parseJSON(data);
-          options_to_add = "<option value='all'>All attributes</option>";
+          //options_to_add = "<option value='all'>All attributes</option>";
           for (i=0; i<parsed.length; i++) {
             options_to_add += "<option value='" + parsed[i] + "'>" + parsed[i] + "</option>";
           }
@@ -418,7 +418,7 @@
             },
             success: function(data) {
               parsed = $.parseJSON(data);
-              options_to_add = "<option value='all'>All attributes</option>";
+              options_to_add = "";//<option value='all'>All attributes</option>";
               for (i=0; i<parsed.length; i++) {
                 options_to_add += "<option value='" + parsed[i] + "'>" + parsed[i] + "</option>";
               }
