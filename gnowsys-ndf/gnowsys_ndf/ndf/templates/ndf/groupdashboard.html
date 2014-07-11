@@ -148,7 +148,7 @@ $(document).ready(function()
   {% check_user_join request groupid as user_is_joined %}
 
   <input type="hidden" id="groupname" value="{{node}}">
-
+  {% if user.is_authenticated %}
   {% if user_is_joined == "joined" %}
     {% if is_user_group and node.created_by != request.user %}
     <input class="button small" type="submit" id="notify" value="Stop following" class="button" align="center" style="visibility:visible" >
@@ -170,9 +170,10 @@ $(document).ready(function()
   {% get_user_object node.created_by as user_obj %}
   {% ifequal user_obj.username user.username %}
     {% include "ndf/invite_users.html" %}
+    {% include "ndf/invite_admins.html" %}
     <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
   {% endifequal %} 
-
+ {% endif %}
 {% endblock %}
 
 

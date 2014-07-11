@@ -32,6 +32,7 @@ from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
+from gnowsys_ndf.ndf.org2any import org2html
 import json
  
 db = get_database()
@@ -1309,5 +1310,38 @@ def get_group_member_user(request, group_id):
             for each in group.author_set:
                 user_list.append(User.objects.get(id = each).username)
         return HttpResponse(json.dumps(user_list))
+    else:
+	raise Http404
+
+def edit_task_title(request, group_id):
+    '''
+    This function will edit task's title 
+    '''
+    if request.is_ajax() and request.method =="POST":
+        taskid = request.POST.get('taskid',"")
+        title = request.POST.get('title',"")
+	task = collection.Node.find_one({'_id':ObjectId(taskid)})
+        task.name = title
+	task.save()
+        return HttpResponse(task.name)
+    else:
+	raise Http404
+
+def edit_task_content(request, group_id):
+    '''
+    This function will edit task's title 
+    '''
+    if request.is_ajax() and request.method =="POST":
+        taskid = request.POST.get('taskid',"")
+        content_org = request.POST.get('content_org',"")
+	task = collection.Node.find_one({'_id':ObjectId(taskid)})
+        task.content_org = unicode(content_org)
+    
+  	# Required to link temporary files with the current user who is modifying this document
+    	usrname = request.user.username
+    	filename = slugify(task.name) + "-" + usrname + "-"
+    	task.content = org2html(content_org, file_prefix=filename)
+	task.save()
+        return HttpResponse(task.content)
     else:
 	raise Http404
