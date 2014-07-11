@@ -340,7 +340,7 @@ class Node(DjangoDocument):
     	#Whenever anything new is created or edited then this function will be called.
     	#To test this theory let us create/edit some things
     	
-    	print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>SOMETHING IS CREATED/EDITED.THIS MESSAGE IS FROM SAVE() IN MODELS>>>>>>>>>>>>>>>>>>"
+    	#print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>SOMETHING IS CREATED/EDITED.THIS MESSAGE IS FROM SAVE() IN MODELS>>>>>>>>>>>>>>>>>>"
     	
     	#Can we know what type of file is created. I do not think so. ASK THIS IF POSSIBLE
     	
@@ -389,7 +389,7 @@ class Node(DjangoDocument):
         
         super(Node, self).save(*args, **kwargs)
         
-        print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",self._id
+        #print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",self._id
         
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     	#This is the save method of the node class.It is still not known on which objects is this save method applicable
@@ -413,7 +413,7 @@ class Node(DjangoDocument):
    		
    	old_doc = collection.ToReduce.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})	
     	if not old_doc:
-    		print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
+    		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
     		z = collection.ToReduceDocs()
     		z.doc_id = self._id
     		z.required_for = to_reduce_doc_requirement

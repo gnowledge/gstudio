@@ -3,14 +3,12 @@ from django.http import HttpResponse
 from gnowsys_ndf.ndf.models import *
 from django.template import RequestContext
 from stemming.porter2 import stem
-# from bson.json_util import dumps
 import json
 from collections import OrderedDict
 import difflib
 import string
 import datetime
 import itertools
-
 import nltk
 
 my_doc_requirement = u'storing_orignal_doc'
@@ -27,6 +25,8 @@ POSSIBLE_SEARCH_TYPES = ["GSystem", "File"]
 collection = get_database()[Node.collection_name]
 #############
 
+
+# CLASS FOR ENCODING INTO JSON - OBJECTID TO STRING CONVERSION
 class Encoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, ObjectId):
@@ -34,6 +34,8 @@ class Encoder(json.JSONEncoder):
 		else:
 			return obj
 
+
+# DISPLAYS THE SEARCH PAGE - USEFUL ONLY IF COMING TO THE SEARCH PAGE FROM THE OUTSIDE
 def search_page(request, group_id):
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
@@ -52,6 +54,7 @@ def search_page(request, group_id):
 	return render(request, 'ndf/search_page.html', context_to_return)
 
 
+# FUNCTION THAT RETURNS A MINIMUM COMMON CONTEXT THAT ALL SEARCH RESULTS RETURN
 def getRenderableContext(group_id):
 	col = get_database()[Node.collection_name]
 	temp = col.Node.find({"_type":"GSystemType"}, {"name":1, "_id":0})
@@ -60,44 +63,18 @@ def getRenderableContext(group_id):
 	for gs in temp:
 		allGSystems.append(gs.name)
 
-	allGroups = get_public_groups()
-	print "groups: ", allGroups
-
-	allUsers = populate_list_of_group_members(allGroups)
-	print "members: ", allUsers
-	#print allGSystems
-	
-	memList = populate_list_of_members()
+	allGroups = get_public_groups()								# LIST OF ALL PUBLIC GROUPS
+	allUsers = populate_list_of_group_members(allGroups)		# LIST OF ALL USERS IN PUBLIC GROUPS
+	memList = populate_list_of_members()						# LIST OF ALL USERS
 
 	return {"allGSystems":allGSystems, "groupid":group_id, "allGroups":allGroups, "authors":memList, "allUsers":allUsers, "group_id":group_id}
 	
 
-"""
-def insert_all_links():
-    col = get_database()[Node.collection_name] 	
-	all_GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"name":1, "_id":1})
-
-	for GSystem in all_GSystemTypes:
-		instance = col.allLinks()
-		instance.link = GSystem.name
-		instance.member_of = ObjectId(GSystem._id)
-		instance.required_for = u"Links"
-		instance.save()
-"""
-
+# VIEW FOR KEYWORD SEARCH
 def search_query(request, group_id):
-	"""Renders a list of all 'Page-type-GSystems' available within the database.
-	"""
-	# Check if no link objects are added and add them if required	
 	col = get_database()[Node.collection_name]
-	"""
-	link_instances = col.Node.find({"required_for":"Links"}, {"name":1})
-	
-	if (link_instances.count() == 0):
-		print "Adding links\n"
-		insert_all_links()
-	"""
 
+	# SCRIPT FOR CONVERTING GROUP NAME RECEIVED TO OBJECTID 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -111,23 +88,15 @@ def search_query(request, group_id):
 	else:
 		pass
 
-	# print "In search form the request " + request.GET['search_text']
-	memList = populate_list_of_members()
-	print "list: ", memList
+	memList = populate_list_of_members()						# memList holds the list of all authors 
 	return render(request, 'ndf/search_home.html', {"groupid":group_id, "authors":memList}, context_instance=RequestContext(request))
 
 
+# View for returning the search results according to group search
 def search_query_group(request, group_id):
-	"""Renders a list of all 'Page-type-GSystems' available within the database.
-	"""
-	# Check if no link objects are added and add them if required	
 	col = get_database()[Node.collection_name]
-	link_instances = col.Node.find({"required_for":"Links"}, {"name":1})
-	
-	if (link_instances.count() == 0):
-		print "Adding links\n"
-		insert_all_links()
 
+	# SCRIPT FOR CONVERTING GROUP NAME RECEIVED TO OBJECTID 
 	ins_objectid  = ObjectId()
 	if ins_objectid.is_valid(group_id) is False :
 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -141,22 +110,22 @@ def search_query_group(request, group_id):
 	else:
 		pass
 
-	memList = populate_list_of_members()
-	print "list: ", memList
+	# CHANGE THIS TO GROUP SPECIFIC MEMBERS
+	memList = populate_list_of_members()						# memList holds the list of all authors
 	return render(request, 'ndf/search_home.html', {"groupid":group_id, "authors":memList}, context_instance=RequestContext(request))
 
 
 
 def results_search(request, group_id):
 	
-	# DECLARE THE VARIABLES
-	search_by_name = 0
-	search_by_tags = 0
-	search_by_contents = 0
-	user = ""
-	user_reqd = -1
+	# INTIALISE THE FLAGS FOR SEARCHING BY NAME / TAGS / CONTENTS
+	search_by_name = False
+	search_by_tags = False
+	search_by_contents = False
+	user = ""								# stores username
+	user_reqd = -1 							# user_reqd = -1 => search all users else user_reqd = pk of the user in user table
 
-	# FORMAT OF THE RESULTS RETURNED
+	# FORMAT OF THE RESULTS TO BE RETURNED
 	search_results_ex = {'name':[], 'tags':[], 'content':[], 'user':[]}
 	search_results_st = {'name':[], 'tags':[], 'content':[], 'user':[]}
 	search_results_li = {'name':[], 'tags':[], 'content':[], 'user':[]}
@@ -169,75 +138,67 @@ def results_search(request, group_id):
 
 	try:
 		if request.method == "GET":
-			# PRINT THE VALUES TO SEE IF STEMMING, ARTICLE REMOVAL IS RIGHT
 			try:
-				print "all users: ", str(request.GET['users'])		
 				user_reqd_name = str(request.GET['users'])
 			except Exception:
-				user_reqd_name = "all"
+				user_reqd_name = "all"						
+				# IF USERNAME IS NOT RECEIVED OR ANY INCORRECT USERNAME IS RECEIVED SEARCH ALL USERS
 
+			# CONVERT USERNAME TO INTEGER
 			if user_reqd_name != "all":
 				user_reqd = int(User.objects.get(username = user_reqd_name).pk)
 	 		
-			search_str_user = str(request.GET['search_text'])
-			print "\noriginal search string:", search_str_user, "\n"
-			search_str_user = search_str_user.lower()
-
-			search_str_noArticles = list(removeArticles(str(search_str_user)))
-			print "\narticles removed:",search_str_noArticles,"\n"
-
-			search_str_stemmed = list(stemWords(search_str_noArticles, search_str_user))
-			print "\nwords stemmed:",search_str_stemmed,"\n\n\n"
-
-			# -------------------------------------------------------
-			print "Search string lowercase:", search_str_user
+			search_str_user = str(request.GET['search_text']).strip()							# REMOVE LEADING / TRAILING SPACES
+			search_str_user = search_str_user.lower()											# CONVERT TO LOWERCASE
+			search_str_noArticles = list(removeArticles(str(search_str_user)))					# REMOVES ARTICLES
+			search_str_stemmed = list(stemWords(search_str_noArticles, search_str_user))		# STEMS THE WORDS
 
 			# GET THE LIST OF CHECKBOXES TICKED AND SET CORR. FLAGS
 			checked_fields = request.GET.getlist('search_fields')
 			nam = "name"
-		
-			print "\n\nfields: ", checked_fields, "\n\n"	
 			if (nam in checked_fields):
-				print "by_name"
-				search_by_name = 1
-
+				search_by_name = True
 			nam = "tags"
 			if (nam in checked_fields):
-				print "by_tags"
-				search_by_tags = 1
-			
+				search_by_tags = True
 			nam = "contents"
 			if (nam in checked_fields):
-				print "by_contents"
-				search_by_contents = 1
-
-			#user = str(request.GET['author'])				# GET THE VALUE OF AUTHOR FROM THE FORM
+				search_by_contents = True
 
 			col = get_database()[Node.collection_name]			# COLLECTION NAME
 
 			# GET A CURSOR ON ALL THE GSYSTEM TYPES 
 			all_GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"_id":1})
-			len1 = all_GSystemTypes.count()
 			
-			public_groups = get_public_groups()
-			public_groups = group_name_to_id(public_groups)
+			public_groups = get_public_groups()					# GET LIST OF PUBLIC GROUPS
+			public_groups = group_name_to_id(public_groups)		# CONVERT GROUP NAMES TO OBJECTIDS
 
-			if (search_by_name == 1):					# IF 1, THEN SEARCH BY NAME
+			if (search_by_name == True):						# IF TRUE, THEN SEARCH BY NAME
 				all_GSystemTypes.rewind()
 				count = 0
+			if (search_by_name == True):						# IF TRUE, THEN SEARCH BY NAME
+				all_GSystemTypes
 
-				for GSType in all_GSystemTypes:
+				"""
+					Following lines search for all GSystemTypes and then all GSystems in those GSystem types created by the selected user
+					of public access policy in case insensitive regex match. If no user is specified, then it searches for GSystems created
+					by any user
+				"""
+				for GSType in all_GSystemTypes:					# Search in all GSystem types
 
 					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
-					if user_reqd != -1:				
+					if user_reqd != -1:				# 
 						exact_match = col.Node.find({"member_of":GSType._id, "created_by":user_reqd, "access_policy":"PUBLIC", "name":{"$regex":search_str_user, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 					else:
 						exact_match = col.Node.find({"member_of":GSType._id, "access_policy":"PUBLIC", "name":{"$regex":search_str_user, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})					
 
 					# SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
 					exact_match = list(exact_match)				
-					#exact_match = sort_names_by_similarity(exact_match, search_str_user)
-
+					
+					"""
+					For each matching GSystem, see if the GSystem has already been added to the list of ids and add if not added.
+					result is added only if belongs to the list of public groups
+					"""
 					for j in exact_match:
 						if j._id not in all_ids:
 							grps = j.group_set
@@ -248,53 +209,54 @@ def results_search(request, group_id):
 									all_ids.append(j['_id'])
 									break
 
+					# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY
 					search_results_ex['name'] = sort_names_by_similarity(search_results_ex['name'], search_str_user)
 					
 					# split stemmed match
-					split_stem_match = []
-					len_stemmed = len(search_str_stemmed)
-					c = 0								# GEN. COUNTER 
+					split_stem_match = []					# will hold all the split stem match results
+					len_stemmed = len(search_str_stemmed)	
+					c = 0									# GEN. COUNTER 
 
-					while c < len_stemmed:
+					while c < len_stemmed:	
 						word = search_str_stemmed[c]
-						if user_reqd != -1:
+						if user_reqd != -1:					# user_reqd = -1  =>  search all users, else user_reqd = pk of user
 							temp = col.Node.find({"member_of":GSType._id, "created_by":user_reqd, "access_policy":"PUBLIC", "name":{"$regex":word, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-						else:
+						else:								# search all users in created by 
 							temp = col.Node.find({"member_of":GSType._id, "access_policy":"PUBLIC", "name":{"$regex":word, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-						#temp_sorted = sort_names_by_similarity(temp, search_str_user)
-						split_stem_match.append(temp)#temp_sorted)
+						split_stem_match.append(temp)
 						c += 1
 					
+					"""
+					For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
+					Result is added only if belongs to the list of public groups and has public access policy
+					"""
 					for j in split_stem_match:
 						c = 0
 						for k in j:
-							if (k._id not in all_ids):
-								grps = k.group_set
-								for gr in public_groups:
-									if gr in grps:
-										k = addType(k)
+							if (k._id not in all_ids):				# check if this GSYstem has already been added to search results
+								grps = k.group_set					# group_set holds all the groups that the current GSystem is published in
+								for gr in public_groups:			# for each public group
+									if gr in grps:					# check that the GSystem should belong to at least one public group
+										k = addType(k)				# adds the link and datetime to the 
 										search_results_st['name'].append(k)
-										all_ids.append(k['_id'])
+										all_ids.append(k['_id'])	# append to the list of all ids of GSYstems in the results
 										c += 1
 										break
-								
+
+					# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY			
 					search_results_st['name'] = sort_names_by_similarity(search_results_st['name'], search_str_user)
 
-
-			if (search_by_tags == 1):						# IF 1, THEN SEARCH BY TAGS
-
-				all_GSystemTypes.rewind()
+			if (search_by_tags == True):						# IF True, THEN SEARCH BY TAGS
+				all_GSystemTypes.rewind()						# Rewinds the cursor to first result
 				count = 0
 
 				for GSType in all_GSystemTypes:
-
 					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
 					if user_reqd != -1:				
 						exact_match = col.Node.find({"member_of":GSType._id, "created_by":user_reqd, "access_policy":"PUBLIC", "tags":search_str_user}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 					else:
 						exact_match = col.Node.find({"member_of":GSType._id, "access_policy":"PUBLIC", "tags":search_str_user}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-					#exact_match = sort_names_by_similarity(exact_match, search_str_user)
-					
+										
 					for j in exact_match:
 						if j._id not in all_ids:
 							grps = j.group_set
@@ -318,12 +280,15 @@ def results_search(request, group_id):
 							temp = col.Node.find({"member_of":GSType._id, "tags":word, "created_by":user_reqd, "access_policy":"PUBLIC"}, {"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
 						else:
 							temp = col.Node.find({"member_of":GSType._id, "tags":word, "access_policy":"PUBLIC"}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-						#temp_sorted = sort_names_by_similarity(temp, search_str_user)
 						
-						split_stem_match.append(temp)#_sorted)
+						split_stem_match.append(temp)
 						c += 1
 					search_results_st['tags'] = sort_names_by_similarity(search_results_st['tags'], search_str_user)
 					
+					"""
+					For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
+					Result is added only if belongs to the list of public groups and has public access policy
+					"""
 					for j in split_stem_match:
 						c = 0
 						for k in j:
@@ -337,41 +302,48 @@ def results_search(request, group_id):
 										c += 1
 										break
 
+			"""
+			The following lines implement search over the contents of all GSystems.
+			It uses the Map Reduce algorithm to keep track of which GSystems contain which words and how many times.
+			The more the count of matches, the more relevant the search result is for the user.
+			"""
 			content_docs = []
-			content_match_pairs = []
-			sorted_content_match_pairs = []
+			content_match_pairs = []					# STORES A DICTIONARY OF MATCHING DOCUMENTS AND NO_OF_WORDS THAT MATCH SEARCH QUERY
+			sorted_content_match_pairs = []				# STORES THE ABOVE DICTIONARY IN A SORTED MANNER
 
-			if (search_by_contents == 1):
+			if (search_by_contents == True):
+				# FETCH ALL THE GSYSTEMS THAT HAVE BEEN MAP REDUCED.
 				all_Reduced_documents = collection.Node.find({"required_for":reduced_doc_requirement}, {"content":1, "_id":0, "orignal_id":1})
-				
+				# ABOVE LINE DOES NOT RETURN ALL GSYSTEMS. IT RETURNS OBJECTS OF "ToReduceDocs" class. 
+
 				for singleDoc in all_Reduced_documents:
-					if singleDoc.orignal_id not in all_ids:
+					if singleDoc.orignal_id not in all_ids:			# IF THE GSYSTEM HAS NOT ALREADY BEEN ADDED TO SEARCH RESULTS
 						content = singleDoc.content
-						print "Content: ", content, "\n"
-					
-						match_count = 0
+						match_count = 0								# KEEPS A CUMMULATIVE COUNT OF MATCHES OF ALL SEARCH QUERY WORDS IN THE CURRENT GSYSTEM CONTENTS
 						for word in search_str_stemmed:
-							if word in content.keys():
-								match_count += content[word]
+							if word in content.keys():				# IF THE WORD EXISTS IN THE CURRENT DOCUMENT
+								match_count += content[word]		# ADD IT TO THE MATCHES COUNT
 
 						if match_count > 0:
 							all_ids.append(singleDoc.orignal_id)
 							content_match_pairs.append({'doc_id':singleDoc.orignal_id, 'matches':match_count})	
 		
-				match_counts = []
+				match_counts = []									# KEEPS A SORTED LIST OF COUNT OF MATCHES IN RESULT DOCUMENTS
 				for pair in content_match_pairs:	
 					c = 0
-					while ((c < len(match_counts)) and (pair['matches'] < match_counts[c])):
+					while ((c < len(match_counts)) and (pair['matches'] < match_counts[c])):	# INSERT IN SORTED ORDER BY INCREASING ORDER
 						c += 1
 					match_counts.insert(c, pair['matches'])
-					sorted_content_match_pairs.insert(c, pair)
-					
-
-				print "sorted pairs: ", sorted_content_match_pairs
+					sorted_content_match_pairs.insert(c, pair)		# SORTED INSERT (INCREASING ORDER)
 
 				for docId in sorted_content_match_pairs:
 					doc = col.Node.find_one({"_id":docId['doc_id'], "access_policy":"PUBLIC"}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 					grps = doc.group_set
+					
+					"""
+					For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
+					Result is added only if belongs to the list of public groups and has public access policy
+					"""
 					for gr in public_groups:
 						if gr in grps:
 							doc = addType(doc)
@@ -381,20 +353,20 @@ def results_search(request, group_id):
 							else:
 								search_results_st['content'].append(doc)
 
-
 			search_results = json.dumps(search_results, cls=Encoder)
-			print "final results: ", search_results
 			memList = populate_list_of_members()
 	except Exception:
 		pass
-	context_to_return = getRenderableContext(group_id)
-	context_to_return['search_results'] = search_results
-	context_to_return['processed'] = 1
-	context_to_return['search_type'] = KEYWORD_SEARCH
+
+	context_to_return = getRenderableContext(group_id)			# RETURNS BASIC CONTEXT
+	context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
+	context_to_return['processed'] = 1 							
+	context_to_return['search_type'] = KEYWORD_SEARCH			# TYPE OF SEARCH IS KEYWORD SEARCH
 
 	return render(request, 'ndf/search_page.html', context_to_return)
 
 
+# KEYWORD SEARCH FOR A SPECIFIC GROUP
 def results_search_group(request, group_id):
 
 	group_ins = {}
@@ -405,7 +377,6 @@ def results_search_group(request, group_id):
 	else:
 		pass
 	group_id = ObjectId(group_id)
-	print "group: ", group_id
 	
 	# DECLARE THE VARIABLES
 	search_by_name = 0
@@ -416,9 +387,7 @@ def results_search_group(request, group_id):
 
 	try:
 		if request.method == "GET":
-			# PRINT THE VALUES TO SEE IF STEMMING, ARTICLE REMOVAL IS RIGHT
 			try:
-				print "all users: ", str(request.GET['users'])		
 				user_reqd_name = str(request.GET['users'])
 			except Exception:
 				user_reqd_name = "all"
@@ -426,36 +395,36 @@ def results_search_group(request, group_id):
 			if user_reqd_name != "all":
 				user_reqd = int(User.objects.get(username = user_reqd_name).pk)
 		 		
-			search_str_user = str(request.GET['search_text'])
-			print "\noriginal search string:", search_str_user, "\n"
+			search_str_user = str(request.GET['search_text']).strip()
+			##print "\noriginal search string:", search_str_user, "\n"
 			search_str_user = search_str_user.lower()
 
 			search_str_noArticles = list(removeArticles(str(search_str_user)))
-			print "\narticles removed:",search_str_noArticles,"\n"
+			##print "\narticles removed:",search_str_noArticles,"\n"
 
 			search_str_stemmed = list(stemWords(search_str_noArticles, search_str_user))
-			print "\nwords stemmed:",search_str_stemmed,"\n\n\n"
+			##print "\nwords stemmed:",search_str_stemmed,"\n\n\n"
 
 			# -------------------------------------------------------
-			print "Search string lowercase:", search_str_user
+			##print "Search string lowercase:", search_str_user
 
 			# GET THE LIST OF CHECKBOXES TICKED AND SET CORR. FLAGS
 			checked_fields = request.GET.getlist('search_fields')
 			nam = "name"
 		
-			print "\n\nfields: ", checked_fields, "\n\n"	
+			##print "\n\nfields: ", checked_fields, "\n\n"	
 			if (nam in checked_fields):
-				print "by_name"
+				##print "by_name"
 				search_by_name = 1
 
 			nam = "tags"
 			if (nam in checked_fields):
-				print "by_tags"
+				##print "by_tags"
 				search_by_tags = 1
 			
 			nam = "contents"
 			if (nam in checked_fields):
-				print "by_contents"
+				##print "by_contents"
 				search_by_contents = 1
 
 			#user = str(request.GET['author'])				# GET THE VALUE OF AUTHOR FROM THE FORM
@@ -580,12 +549,12 @@ def results_search_group(request, group_id):
 
 			if (search_by_contents == 1):
 				all_Reduced_documents = collection.Node.find({"required_for":reduced_doc_requirement}, {"content":1, "_id":0, "orignal_id":1})
-				#print "cursor: ", all_Reduced_documents, all_Reduced_documents.count()
+				##print "cursor: ", all_Reduced_documents, all_Reduced_documents.count()
 				
 				for singleDoc in all_Reduced_documents:
 					if singleDoc.orignal_id not in all_ids:
 						content = singleDoc.content
-						print "Content: ", content, "\n\n"
+						#print "Content: ", content, "\n\n"
 					
 						match_count = 0
 						for word in search_str_stemmed:
@@ -605,23 +574,23 @@ def results_search_group(request, group_id):
 					sorted_content_match_pairs.insert(c, pair)
 					
 				#sorted_content_match_pairs = OrderedDict(sorted(content_match_pairs.items(), key=lambda t: t[1]))
-				print "sorted pairs: ", sorted_content_match_pairs
+				#print "sorted pairs: ", sorted_content_match_pairs
 
 				for docId in sorted_content_match_pairs:
 					doc = col.Node.find_one({"_id":docId['doc_id'], "group_set":group_id, "access_policy":"PUBLIC"}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 					if (doc != None):
 						doc = addType(doc)
-						print "type added  ", doc['created_by'], "value: ", User.objects.get(username=doc['created_by']).pk == 1
+						#print "type added  ", doc['created_by'], "value: ", User.objects.get(username=doc['created_by']).pk == 1
 						if user_reqd != -1:
 							if User.objects.get(username=doc['created_by']).pk == user_reqd:
 								search_results_st['content'].append(doc)
 						else:
 							search_results_st['content'].append(doc)
 
-				#print "stemmed results: ", search_results_st
+				##print "stemmed results: ", search_results_st
 
 			search_results = json.dumps(search_results, cls=Encoder)
-			print "final results: ", search_results
+			#print "final results: ", search_results
 			memList = populate_list_of_members()
 	except Exception:
 		pass
@@ -650,7 +619,7 @@ def advanced_search(request, group_id):
 	else:
 		pass
 
-	print "Group id is: ", group_id
+	#print "Group id is: ", group_id
 	col = get_database()[Node.collection_name]
 	temp = col.Node.find({"_type":"GSystemType"}, {"name":1, "_id":0})
 
@@ -659,11 +628,11 @@ def advanced_search(request, group_id):
 		allGSystems.append(gs.name)
 
 	allGroups = get_public_groups()
-	print "groups: ", allGroups
+	#print "groups: ", allGroups
 
 	allUsers = populate_list_of_group_members(allGroups)
-	print "members: ", allUsers
-	#print allGSystems
+	#print "members: ", allUsers
+	##print allGSystems
 
 	return render(request, 'ndf/advanced_search2.html', {"allGSystems":allGSystems, "groupid":group_id, "allGroups":allGroups, "allUsers":allUsers, "group_id":group_id})
 
@@ -673,36 +642,36 @@ def get_attributes(request, group_id):
 	col = get_database()[Node.collection_name]
 	attributes = []
 
-	#print request.GET['GSystem']
-	print "names: ", request.GET.get('GSystem',"")
-	#print "testing !: ", request.GET['tex']
+	##print request.GET['GSystem']
+	#print "names: ", request.GET.get('GSystem',"")
+	##print "testing !: ", request.GET['tex']
 	list_of_keys = ['name', 'created_by', 'last_update', 'tags', 'content_org']
 	
 	#try:
 	GSystem_names = request.GET['GSystem']
 	GSystem_names = GSystem_names.split(',')
-	print "name of GSystem", GSystem_names
+	#print "name of GSystem", GSystem_names
 
 	for GSystem_name in GSystem_names:
-		print GSystem_name
+		#print GSystem_name
 		test_obj = col.Node.find_one({"_type":"GSystemType", "name":GSystem_name})
-		#print test_obj.keys()
+		##print test_obj.keys()
 		for sg_key in list_of_keys:
 			if sg_key in test_obj.keys():
 				if sg_key not in attributes:
 					attributes.append(sg_key)
 
-		print "\n\nattr: ", attributes, "\n\n"
+		#print "\n\nattr: ", attributes, "\n\n"
 		temp = col.Node.one({"_type":"GSystemType", "name":GSystem_name})
 		
 		for attr in temp.attribute_type_set:
 			attributes.append(attr.name)
 
 	#except Exception:
-	#	print "Exception occurred"
+	#	#print "Exception occurred"
 	#	pass
 	
-	print attributes
+	#print attributes
 	return HttpResponse(json.dumps(attributes, cls=Encoder))
 
 
@@ -731,7 +700,7 @@ def advanced_search_results(request, group_id):
 	col = get_database()[Node.collection_name]
 
 	# READ THE GET VALUES
-	search_str_user = request.GET['search_text']
+	search_str_user = str(request.GET['search_text']).strip()
 	search_groups = request.GET.getlist('Groups')
 	search_users = request.GET.getlist('Users')
 	GSystem_names = request.GET.getlist('GSystems')
@@ -739,9 +708,10 @@ def advanced_search_results(request, group_id):
 	all_groups = []
 	all_users = []
 
-	print "name of GSystems: ", GSystem_names
-	print "name of Groups: ", search_groups
-	print "name of Authors: ", search_users
+	split_query = search_str_user.split()
+	#print "name of GSystems: ", GSystem_names
+	#print "name of Groups: ", search_groups
+	#print "name of Authors: ", search_users
 	
 	all_users = 0		
 	if search_users[0] != "all":
@@ -749,7 +719,7 @@ def advanced_search_results(request, group_id):
 	else:
 		temp1 = get_public_groups()
 		temp2 = populate_list_of_group_members(temp1)
-		print "publics: ", temp1, temp2
+		#print "publics: ", temp1, temp2
 		all_users = user_name_to_id(temp2)
 	
 	if search_groups[0] != "all":
@@ -758,67 +728,69 @@ def advanced_search_results(request, group_id):
 		all_groups = group_name_to_id(get_public_groups())
 
 
-	print "name of Authors: ", all_users
-	print "name of Groups: ", all_groups
+	#print "name of Authors: ", all_users
+	#print "name of Groups: ", all_groups
 
 	search_results = []
 	all_ids = []
 
-	for at_name in attr_name:
-		print "attr: ", at_name
-		# CASE 1 -- SEARCH IN THE STRUCTURE OF THE GSYSTEM
-		for GSystem_name in GSystem_names:
-			GSystem_obj = col.Node.one({"_type":"GSystemType", "name":GSystem_name})
-			#print GSystem_obj
+	for word in split_query:
+		for at_name in attr_name:
+			#print "attr: ", at_name
+			# CASE 1 -- SEARCH IN THE STRUCTURE OF THE GSYSTEM
+			for GSystem_name in GSystem_names:
+				GSystem_obj = col.Node.one({"_type":"GSystemType", "name":GSystem_name})
+				##print GSystem_obj
 
-			if GSystem_obj.has_key(at_name):
-				if all_users != 0:
-					res = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GSystem_obj._id, at_name:{"$regex":search_str_user, "$options":"i" }}, {"name":1, "created_by":1, "last_update":1, "member_of":1 , "group_set":1, "url":1})
-				else:
-					res = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "created_by":{"$in":all_users}, "member_of":GSystem_obj._id, at_name:{"$regex":search_str_user, "$options":"i" }}, {"name":1, "created_by":1, "last_update":1, "member_of":1, "group_set":1, "url":1})	
-				for obj in res:
-					flag = False
-					print obj.name
-					if obj._id not in all_ids:
-						GSystem_groups = obj.group_set
-						print "groups: ", GSystem_groups
+				if GSystem_obj.has_key(at_name):
+					if all_users != 0:
+						res = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GSystem_obj._id, at_name:{"$regex":word, "$options":"i" }}, {"name":1, "created_by":1, "last_update":1, "member_of":1 , "group_set":1, "url":1})
+					else:
+						res = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "created_by":{"$in":all_users}, "member_of":GSystem_obj._id, at_name:{"$regex":word, "$options":"i" }}, {"name":1, "created_by":1, "last_update":1, "member_of":1, "group_set":1, "url":1})	
+					for obj in res:
+						flag = False
+						#print obj.name
+						if obj._id not in all_ids:
+							GSystem_groups = obj.group_set
+							#print "groups: ", GSystem_groups
+							
+							for gr_id in all_groups:
+								if gr_id in GSystem_groups:
+									link_obj = addType(obj)
+									search_results.append({'name':obj.name, 'link':link_obj['link'], 'created_by':link_obj['created_by'], 'last_update':link_obj['last_update'], '_id':link_obj['_id']})
+									all_ids.append(obj._id)
+									break
+				continue			
+
+			# CASE 2 -- SEARCH THE GATTRIBUTES
+			try:
+				attr_id = col.Node.one({"_type":"AttributeType", "name":at_name}, {"_id":1})
+				res = col.Node.find({"_type":"GAttribute", "attribute_type.$id":ObjectId(attr_id._id), "object_value":{"$regex":word, "$options":"i"}}, {"name":1, "object_value":1, "subject":1})
+				#print "Sttr type: ", attr_id
+				for obj in res: 
+					if all_users == 0:
+						GSystem = col.Node.one({"_id":obj.subject}, {"name":1, "created_by":1, "last_update":1, "member_of":1 , "group_set":1, "url":1})
+					else:
+						GSystem = col.Node.one({"_id":obj.subject, "created_by":{"$in":all_users}}, {"name":1, "created_by":1, "last_update":1, "member_of":1, "group_set":1, "url":1})
+
+					if GSystem._id not in all_ids:
+						#print "adding: ", GSystem._id
+						# THE FOLLOWING CODE MAY BE WRONG IF THE RETURNED NODE IS A MEMBER OF MORE THAN ONE GSYSTEM_TYPE
+						#link_obj = collection.Node.one({"member_of":GSystem.member_of[0], "required_for":"Links"}, {"link":1})
+						#print "731"
+						GSystem_groups = GSystem.group_set
+						#print "groups: ", GSystem_groups
 						
 						for gr_id in all_groups:
 							if gr_id in GSystem_groups:
-								link_obj = addType(obj)
-								search_results.append({'name':obj.name, 'link':link_obj['link'], 'created_by':link_obj['created_by'], 'last_update':link_obj['last_update'], '_id':link_obj['_id']})
-								all_ids.append(obj._id)
+								link_obj = addType(GSystem)
+								search_results.append({'name':GSystem.name, 'link':link_obj['link'], 'created_by':link_obj['created_by'], 'last_update':link_obj['last_update'], '_id':link_obj['_id']})
+								all_ids.append(GSystem._id)
 								break
-			continue			
+			except:
+				continue
 
-		# CASE 2 -- SEARCH THE GATTRIBUTES
-		try:
-			attr_id = col.Node.one({"_type":"AttributeType", "name":at_name}, {"_id":1})
-			res = col.Node.find({"_type":"GAttribute", "attribute_type.$id":ObjectId(attr_id._id), "object_value":{"$regex":search_str_user, "$options":"i"}}, {"name":1, "object_value":1, "subject":1})
-			print "Sttr type: ", attr_id
-			for obj in res: 
-				if all_users == 0:
-					GSystem = col.Node.one({"_id":obj.subject}, {"name":1, "created_by":1, "last_update":1, "member_of":1 , "group_set":1, "url":1})
-				else:
-					GSystem = col.Node.one({"_id":obj.subject, "created_by":{"$in":all_users}}, {"name":1, "created_by":1, "last_update":1, "member_of":1, "group_set":1, "url":1})
-
-				if GSystem._id not in all_ids:
-					print "adding: ", GSystem._id
-					# THE FOLLOWING CODE MAY BE WRONG IF THE RETURNED NODE IS A MEMBER OF MORE THAN ONE GSYSTEM_TYPE
-					#link_obj = collection.Node.one({"member_of":GSystem.member_of[0], "required_for":"Links"}, {"link":1})
-					print "731"
-					GSystem_groups = GSystem.group_set
-					print "groups: ", GSystem_groups
-					
-					for gr_id in all_groups:
-						if gr_id in GSystem_groups:
-							link_obj = addType(GSystem)
-							search_results.append({'name':GSystem.name, 'link':link_obj['link'], 'created_by':link_obj['created_by'], 'last_update':link_obj['last_update'], '_id':link_obj['_id']})
-							all_ids.append(GSystem._id)
-							break
-		except:
-			continue
-
+	search_results = sort_names_by_similarity(search_results, search_str_user)
 	search_results = json.dumps(search_results, cls=Encoder)
 
 	context_to_return = getRenderableContext(group_id)
@@ -840,10 +812,10 @@ def get_public_groups():
 
 
 def addType(obj):
-	#print "received: ", obj.member_of[0]
+	##print "received: ", obj.member_of[0]
 	#i = ObjectId(obj.member_of[0])
 	#links = collection.Node.find({"member_of":i, "required_for":"Links"}, {"link":1})
-	#print "links count", links.count(), "\n"
+	##print "links count", links.count(), "\n"
 
 	#for ob in links:
 	obj2 = {}
@@ -852,10 +824,10 @@ def addType(obj):
 	obj2['name'] = obj.name
 	obj2['link'] = obj.url
 	obj2['created_by'] = User.objects.get(pk=obj.created_by).username
-	#print "lst update: ", type(obj.last_update)
+	##print "lst update: ", type(obj.last_update)
 	obj2['last_update'] = str(obj.last_update.date())
 	#datetime.datetime.strptime(obj.last_update, "%Y-%m-%dT%H:%M:%S.%fZ").date()
-	print "obj", obj2
+	#print "obj", obj2
 	return obj2
 
 
@@ -863,12 +835,12 @@ def sort_names_by_similarity(exact_match, search_str_user):
 	matches = []					# TO STORE A LIST OF SORTED MATCH PERCENTAGE
 	final_list = []					# FINAL LIST OF SORTED OBJECTS
 
-	print exact_match
+	#print exact_match
 	for obj in exact_match:
-		#print obj
+		##print obj
 		match = difflib.SequenceMatcher(None, obj['name'], search_str_user)
 		per_match = match.ratio()
-		#print "sorting", obj['name'], ": ", per_match, "\n"
+		##print "sorting", obj['name'], ": ", per_match, "\n"
 
 		if len(matches) == 0:
 			matches.append(per_match)
@@ -885,7 +857,7 @@ def sort_names_by_similarity(exact_match, search_str_user):
 
 def removeArticles(text):
 	words = text.split()
-	articles=['a', 'an', 'and', 'the', 'i', 'is', 'this', 'that', 'there', 'here', 'am', 'on', 'at', 'of']
+	articles=['a', 'an', 'and', 'the', 'i', 'is', 'this', 'that', 'there', 'here', 'am', 'on', 'at', 'of', 'where']
 	for w in articles:
 		if w in words:
 			words.remove(w)
@@ -901,14 +873,17 @@ def stemWords(words, search_str_user):
 	stemmed = []
 	l = len(words)
 	c = 0	
-	
+	stemmer = nltk.stem.porter.PorterStemmer()
+
 	while (c < l):
-		temp = stem(words[c])
-		#if (temp != search_str_user):
+		temp = words[c].lower() 			#THE WORD IS CONVERTED INTO LOWER CASE IN THIS STEP
+		temp = stemmer.stem_word(temp)
 		stemmed.append(temp)
 		c+=1
+		#temp = stem(words[c])
+		#if (temp != search_str_user):
 	
-	print stemmed
+	#print stemmed
 	return stemmed	
 
 
@@ -923,14 +898,14 @@ def populate_list_of_members():
 def populate_list_of_group_members(group_ids):
 	col = get_database()[Node.collection_name]
 	memList = []
-	print group_ids
+	#print group_ids
 
 	try:
 		for gr in group_ids:
 			# THIS CODE WILL CAUSE PROBLEMS IF THERE ARE MANY GROUPS WITH THE SAME NAME
-			print "sg_group: ", gr
+			#print "sg_group: ", gr
 			group_id = col.Node.find_one({"_type":"Group", "name":gr}, {"_id":1})
-			print group_id
+			#print group_id
 			author_list = col.Node.one({"_type":"Group", "_id":group_id._id}, {"author_set":1, "_id":0})
 
 			for author in author_list.author_set:
@@ -940,7 +915,7 @@ def populate_list_of_group_members(group_ids):
 	except:
 		pass
 
-	print "members in group: ", memList
+	#print "members in group: ", memList
 	return memList
 
 
@@ -969,7 +944,7 @@ def get_node_info(request, group_id, node_name):
 	is_list = False
 	col = get_database()[Node.collection_name]
 
-	#print "Node name: ", node_name
+	##print "Node name: ", node_name
 
 	list_of_nodes = col.Node.find({"name":node_name}, {"_id":1})
 
@@ -985,10 +960,10 @@ def get_node_info(request, group_id, node_name):
 		return render(request, 'ndf/node_details.html', {'is_list':1, 'list_nodes':list_nodes, 'all_fields':'', 'groupid':group_id})
 	else:
 		sg_node = col.Node.one({"name":node_name})
-		#print "Node data: \n", sg_node
+		##print "Node data: \n", sg_node
 		GSTypes = sg_node.member_of
 
-		#print "member of: ", GSTypes, "\n"
+		##print "member of: ", GSTypes, "\n"
 		attrs = []
 		results = {}
 		results['name'] = sg_node.name
@@ -1028,7 +1003,7 @@ def get_node_info2(request, group_id, node_id):
 	else:
 		pass
 
-	print "ID is: ", node_id
+	#print "ID is: ", node_id
 	col = get_database()[Node.collection_name]
 	sg_node = col.Node.one({"_id":ObjectId(node_id)})
 	GSTypes = sg_node.member_of
@@ -1070,7 +1045,7 @@ def get_relations_for_autoSuggest(request, group_id):
 	for inst in instances:
 		ins.append(prefix + ' ' + inst.name)
 
-	print ins
+	#print ins
 	return HttpResponse(json.dumps(ins))
 
 
@@ -1094,13 +1069,14 @@ def ra_search(request, group_id):
 
 def ra_search_results(request, group_id):
 	
-	sq = request.GET['search_text']
+	sq = str(request.GET['search_text']).strip()
 	col = get_database()[Node.collection_name]
 	relations = col.Node.find({ "_type": "RelationType"}, {"name":1})
 
 	CASE_TWO_THRESHOLD = 0.8
 	GSYSTEM_MIN_THRESHOLD_CASE1 = 0.69
-
+	
+	result_members = []
 	sorted_rel = {}
 	max_length = 0
 
@@ -1116,8 +1092,8 @@ def ra_search_results(request, group_id):
 
 	split_word = sq.split()
 
-	print sorted_rel
-	print "max: ", max_length
+	#print sorted_rel
+	#print "max: ", max_length
 
 	c = 0
 	max_match = 0
@@ -1143,52 +1119,54 @@ def ra_search_results(request, group_id):
 	while c < len(split_word):
 		GSystem_name += split_word[c] + " "
 		c += 1
-	print "GSystem 1 name:", GSystem_name
+	#print "GSystem 1 name:", GSystem_name
 
-	relationType_obj = col.Node.one({"_type":"RelationType", "name":max_match_rel}, {"_id":1, "name":1})
-	print "rel type name: ", relationType_obj.name, relationType_obj._id
+	try:
+		relationType_obj = col.Node.one({"_type":"RelationType", "name":max_match_rel}, {"_id":1, "name":1})
+		#print "rel type name: ", relationType_obj.name, relationType_obj._id
 
-	GRelation_objs = col.Node.find({"_type":"GRelation", "relation_type.$id":relationType_obj._id})
-	print "count: ", GRelation_objs.count()
+		GRelation_objs = col.Node.find({"_type":"GRelation", "relation_type.$id":relationType_obj._id})
+		#print "count: ", GRelation_objs.count()
 
-	result_members = []
-	#subjects = []
-	#right_subjects = []
+		#subjects = []
+		#right_subjects = []
 
-	for gr_obj in GRelation_objs:
-		name_Grel = gr_obj.name
-		left_sub = name_Grel[:name_Grel.index('--')-1]
-		right_sub = name_Grel[name_Grel.rfind('--')+3:] 
-		print left_sub, " : ", right_sub
+		for gr_obj in GRelation_objs:
+			name_Grel = gr_obj.name
+			left_sub = name_Grel[:name_Grel.index('--')-1]
+			right_sub = name_Grel[name_Grel.rfind('--')+3:] 
+			#print left_sub, " : ", right_sub
 
-		if difflib.SequenceMatcher(None, GSystem_name, left_sub).ratio() > GSYSTEM_MIN_THRESHOLD_CASE1: 
-			reqd_obj = col.Node.one({"_id":gr_obj.right_subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
-			#subjects.append(gr_obj.subject)
-			#right_subjects.append(gr_obj.name)
-			reqd_obj = addType(reqd_obj)
-			result_members.append(reqd_obj)
-			print "match %: ", difflib.SequenceMatcher(None, GSystem_name, left_sub).ratio()
-		elif difflib.SequenceMatcher(None, GSystem_name, right_sub).ratio() > GSYSTEM_MIN_THRESHOLD_CASE1: 
-			reqd_obj = col.Node.one({"_id":gr_obj.subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
-			#subjects.append(gr_obj.subject)
-			#right_subjects.append(gr_obj.name)
-			reqd_obj = addType(reqd_obj)
-			result_members.append(reqd_obj)	
-			print "match %: ", difflib.SequenceMatcher(None, GSystem_name, right_sub).ratio()
+			if difflib.SequenceMatcher(None, GSystem_name, left_sub).ratio() > GSYSTEM_MIN_THRESHOLD_CASE1: 
+				reqd_obj = col.Node.one({"_id":gr_obj.right_subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
+				#subjects.append(gr_obj.subject)
+				#right_subjects.append(gr_obj.name)
+				reqd_obj = addType(reqd_obj)
+				result_members.append(reqd_obj)
+				#print "match %: ", difflib.SequenceMatcher(None, GSystem_name, left_sub).ratio()
+			elif difflib.SequenceMatcher(None, GSystem_name, right_sub).ratio() > GSYSTEM_MIN_THRESHOLD_CASE1: 
+				reqd_obj = col.Node.one({"_id":gr_obj.subject, "access_policy":"PUBLIC"}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
+				#subjects.append(gr_obj.subject)
+				#right_subjects.append(gr_obj.name)
+				reqd_obj = addType(reqd_obj)
+				result_members.append(reqd_obj)	
+				#print "match %: ", difflib.SequenceMatcher(None, GSystem_name, right_sub).ratio()
+	except Exception:
+		pass
 
-	#print "max_match: ", max_match	
-	#print "max_match_rel: ", max_match_rel
-	#print "word count: ", rel_word_count
-	#print "GSystem_name: ", GSystem_name
+	##print "max_match: ", max_match	
+	##print "max_match_rel: ", max_match_rel
+	##print "word count: ", rel_word_count
+	##print "GSystem_name: ", GSystem_name
 
-	#print "subjects: ", subjects
-	#print "right subjects: ", right_subjects
+	##print "subjects: ", subjects
+	##print "right subjects: ", right_subjects
 
  
 	##############################################   CASE - 2 - A  ##########################################
 	if max_match < CASE_TWO_THRESHOLD:
 		#result_members = []
-		print "No match found IN CASE 1"
+		#print "No match found IN CASE 1"
 
 		# LOOK FOR GSYSTEM_TYPE IN SEARCH QUERY
 		GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"name":1})
@@ -1223,15 +1201,15 @@ def ra_search_results(request, group_id):
 					cur_word = split_word[i]
 				i += 1
 			
-			print "word sent:", cur_word
+			#print "word sent:", cur_word
 			(max_m, max_m_rel, rel_w_count) = get_max_match(sorted_gst, cur_word, max_length)	
 			if max_m > max_match_gst:
 				max_match_gst = max_m
 				max_match_rel_gst = max_m_rel
 				rel_word_count_gst = rel_w_count
-				print "values: ", max_match_gst, max_match_rel_gst
+				#print "values: ", max_match_gst, max_match_rel_gst
 			c += 1
-		print "out of gstype loop values: ", max_match_gst, max_match_rel_gst
+		#print "out of gstype loop values: ", max_match_gst, max_match_rel_gst
 
 		# LOOK FOR GSYSTEM IN THE SEARCH QUERY
 		sorted_gs = {}
@@ -1256,7 +1234,7 @@ def ra_search_results(request, group_id):
 		max_match_rel_gs = ""
 		rel_word_count_gs = 0
 
-		print "look from: ", rel_word_count_gst
+		#print "look from: ", rel_word_count_gst
 		while c >= rel_word_count_gst:
 			cur_word = ""
 			i = len(split_word)-1
@@ -1264,52 +1242,55 @@ def ra_search_results(request, group_id):
 				cur_word = split_word[i] + ' ' + cur_word
 				i -= 1
 			
-			print "word sent gsystem:", cur_word
+			#print "word sent gsystem:", cur_word
 			(max_m, max_m_rel, rel_w_count) = get_max_match(sorted_gs, cur_word, max_length)	
 			if max_m > max_match_gs:
 				max_match_gs = max_m
 				max_match_rel_gs = max_m_rel
 				rel_word_count_gs = rel_w_count
-				print "values: ", max_match_gs, max_match_rel_gs
+				#print "values: ", max_match_gs, max_match_rel_gs
 			c -= 1
-		print "out of gsystem loop values: ", max_match_gs, max_match_rel_gs
+		#print "out of gsystem loop values: ", max_match_gs, max_match_rel_gs
 
-		print "sorted gst: ", sorted_gst
-		print "sorted gs: ", sorted_gs
-		print "max match gst: ", max_match_rel_gst, "max match gs: ", max_match_rel_gs
-		GStype = col.Node.one({"name":max_match_rel_gst}, {"_id":1})
-		GS_sq = col.Node.find_one({"name":"GSystem", "name":max_match_rel_gs}, {"_id":1})
+		#print "sorted gst: ", sorted_gst
+		#print "sorted gs: ", sorted_gs
+		#print "max match gst: ", max_match_rel_gst, "max match gs: ", max_match_rel_gs
+		try:
+			GStype = col.Node.one({"name":max_match_rel_gst}, {"_id":1})
+			GS_sq = col.Node.find_one({"name":"GSystem", "name":max_match_rel_gs}, {"_id":1})
 
-		allMembers = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GStype._id}, {"_id":1, "name":1})
-		
-		# LOOK FOR GRELATIONS WITH BOTH GSYSTEMS ON EITHER SIDE
-		relations = col.Node.find({"_type":"GRelation", "right_subject":GS_sq._id}, {"subject":1})
-		print "all relations: \n"
-		for rel in relations:
-			print rel
+			allMembers = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GStype._id}, {"_id":1, "name":1})
+			
+			# LOOK FOR GRELATIONS WITH BOTH GSYSTEMS ON EITHER SIDE
+			relations = col.Node.find({"_type":"GRelation", "right_subject":GS_sq._id}, {"subject":1})
+			#print "all relations: \n"
+			#for rel in relations:
+				#print rel
 
-		relations.rewind()
-		for rel in relations:
+			relations.rewind()
+			for rel in relations:
+				allMembers.rewind()
+				for member in allMembers:
+					#print "member: ", member
+					if rel.subject == member._id:
+						#print "member inside", member.name, member._id
+						member = addType(member)
+						result_members.append(member)	
+
 			allMembers.rewind()
-			for member in allMembers:
-				print "member: ", member
-				if rel.subject == member._id:
-					print "member inside", member.name, member._id
-					member = addType(member)
-					result_members.append(member)	
+			relations = col.Node.find({"_type":"GRelation", "subject":GS_sq._id}, {"right_subject":1})
+			for rel in relations:
+				for member in allMembers:
+					if rel.right_subject == member._id:
+						member = addType(member)
+						result_members.append(member)
+		except Exception:
+			pass
 
-		allMembers.rewind()
-		relations = col.Node.find({"_type":"GRelation", "subject":GS_sq._id}, {"right_subject":1})
-		for rel in relations:
-			for member in allMembers:
-				if rel.right_subject == member._id:
-					member = addType(member)
-					result_members.append(member)
-		
-		print "Case 2-a results: ", result_members
+		#print "Case 2-a results: ", result_members
 		######################################## CASE 2 - B ######################################
 
-		print "Matching IN CASE 2 - b"
+		#print "Matching IN CASE 2 - b"
 
 		# LOOK FOR GSYSTEM IN THE SEARCH QUERY
 		sorted_gs = {}
@@ -1334,7 +1315,7 @@ def ra_search_results(request, group_id):
 		max_match_rel_gs = ""
 		rel_word_count_gs = 0
 
-		print "look from: ", rel_word_count_gst
+		#print "look from: ", rel_word_count_gst
 		while c < len(split_word):
 			cur_word = ""
 			i = 0
@@ -1342,15 +1323,15 @@ def ra_search_results(request, group_id):
 				cur_word += split_word[i]
 				i += 1
 			
-			print "word sent gsystem:", cur_word
+			#print "word sent gsystem:", cur_word
 			(max_m, max_m_rel, rel_w_count) = get_max_match(sorted_gs, cur_word, max_length)	
 			if max_m > max_match_gs:
 				max_match_gs = max_m
 				max_match_rel_gs = max_m_rel
 				rel_word_count_gs = rel_w_count
-				print "values: ", max_match_gs, max_match_rel_gs
+				#print "values: ", max_match_gs, max_match_rel_gs
 			c += 1
-		print "out of gsystem loop values: ", max_match_gs, max_match_rel_gs
+		#print "out of gsystem loop values: ", max_match_gs, max_match_rel_gs
 		
 
 		# LOOK FOR GSYSTEM_TYPE IN SEARCH QUERY
@@ -1377,7 +1358,7 @@ def ra_search_results(request, group_id):
 		max_match_rel_gst = ""
 		rel_word_count_gst = 0
 
-		print "look from: ", rel_word_count_gs
+		#print "look from: ", rel_word_count_gs
 		while c >= rel_word_count_gs:
 			cur_word = ""
 			i = len(split_word)-1
@@ -1385,54 +1366,56 @@ def ra_search_results(request, group_id):
 				cur_word = split_word[i] + ' ' + cur_word
 				i -= 1
 			
-			print "word sent:", cur_word
+			#print "word sent:", cur_word
 			(max_m, max_m_rel, rel_w_count) = get_max_match(sorted_gst, cur_word, max_length)	
 			if max_m > max_match_gst:
 				max_match_gst = max_m
 				max_match_rel_gst = max_m_rel
 				rel_word_count_gst = rel_w_count
-				print "values: ", max_match_gst, max_match_rel_gst
+				#print "values: ", max_match_gst, max_match_rel_gst
 			c -= 1
-		print "out of gstype loop values: ", max_match_gst, max_match_rel_gst
+		#print "out of gstype loop values: ", max_match_gst, max_match_rel_gst
 
-		print "sorted gst: ", sorted_gst
-		print "sorted gs: ", sorted_gs
-		print "max match gst: ", max_match_rel_gst, "max match gs: ", max_match_rel_gs
-		GStype = col.Node.one({"name":max_match_rel_gst}, {"_id":1})
-		GS_sq = col.Node.find_one({"name":"GSystem", "name":max_match_rel_gs}, {"_id":1})
+		#print "sorted gst: ", sorted_gst
+		#print "sorted gs: ", sorted_gs
+		#print "max match gst: ", max_match_rel_gst, "max match gs: ", max_match_rel_gs
+		try:
+			GStype = col.Node.one({"name":max_match_rel_gst}, {"_id":1})
+			GS_sq = col.Node.find_one({"name":"GSystem", "name":max_match_rel_gs}, {"_id":1})
 
-		allMembers = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GStype._id}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
-		
+			allMembers = col.Node.find({"_type":{"$in":POSSIBLE_SEARCH_TYPES}, "member_of":GStype._id}, {"_id":1, "name":1, "created_by":1, "last_update":1, "url":1})
+			
 
-		# LOOK FOR GRELATIONS WITH BOTH GSYSTEMS ON EITHER SIDE
-		relations = col.Node.find({"_type":"GRelation", "right_subject":GS_sq._id}, {"subject":1})
-		print "all relations: \n"
-		for rel in relations:
-			print rel
+			# LOOK FOR GRELATIONS WITH BOTH GSYSTEMS ON EITHER SIDE
+			relations = col.Node.find({"_type":"GRelation", "right_subject":GS_sq._id}, {"subject":1})
+			#print "all relations: \n"
+			#for rel in relations:
+				#print rel
 
-		relations.rewind()
-		for rel in relations:
-			allMembers.rewind()
-			for member in allMembers:
-				print "member: ", member
-				if rel.subject == member._id:
-					member = addType(member)
-					#print "member inside", member.name, member._id
-					result_members.append(member)	
+			relations.rewind()
+			for rel in relations:
+				allMembers.rewind()
+				for member in allMembers:
+					#print "member: ", member
+					if rel.subject == member._id:
+						member = addType(member)
+						##print "member inside", member.name, member._id
+						result_members.append(member)	
 
-		relations = col.Node.find({"_type":"GRelation", "subject":GS_sq._id}, {"right_subject":1})
-		for rel in relations:
-			allMembers.rewind()
-			for member in allMembers:
-				if rel.right_subject == member._id:
-					member = addType(member)
-					result_members.append(member)
+			relations = col.Node.find({"_type":"GRelation", "subject":GS_sq._id}, {"right_subject":1})
+			for rel in relations:
+				allMembers.rewind()
+				for member in allMembers:
+					if rel.right_subject == member._id:
+						member = addType(member)
+						result_members.append(member)
+		except Exception:
+			pass
 
-
-		print "Case 2-b results: ", result_members
+		#print "Case 2-b results: ", result_members
 
 	result_members = json.dumps(result_members, cls=Encoder)
-	#print "results: ", result_members
+	##print "results: ", result_members
 	
 	context_to_return = getRenderableContext(group_id)
 	context_to_return['search_results'] = result_members
@@ -1570,7 +1553,7 @@ def perform_map_reduce(request,group_id):
 	#This function shall perform map reduce on all the objects which are present in the ToReduce() class Collection
 	all_instances = list(collection.ToReduce.find({'required_for':'map_reduce_to_reduce'}))
 	for particular_instance in all_instances:
-		print particular_instance._id,'\n'
+		#print particular_instance._id,'\n'
 		particular_instance_id  = particular_instance.id_of_document_to_reduce
 		#Now Pick up a node from the Node Collection class
 		orignal_node = collection.Node.find_one({"_id":particular_instance_id})		
@@ -1598,10 +1581,10 @@ def perform_map_reduce(request,group_id):
 	
 	for doc in dltr:
 		doc_id = doc.doc_id
-		print "DOC ID LN 1504::",doc_id
+		#print "DOC ID LN 1504::",doc_id
 		#orignal_doc = collection.MyDocs.find_one({"_id":doc_id,'required_for':my_doc_requirement})
 		orignal_doc = collection.Node.find_one({"_id":doc_id})
-		content_dict = dict(map_reduce(orignal_doc.content,mapper,reducer))
+		content_dict = dict(map_reduce(orignal_doc.content_org,mapper,reducer))
 		
 		dord = collection.ReducedDocs.find_one({"orignal_id":doc_id,'required_for':reduced_doc_requirement}) #doc of reduced docs
 		if dord:
@@ -1665,7 +1648,7 @@ def td_doc():
 		
 		for pmrd in mrdl:
 			#particular_map_reduced_document
-			#print pmrd
+			##print pmrd
 			if not pmrd.is_indexed:
 				wd = pmrd.content
 				
@@ -1676,7 +1659,7 @@ def td_doc():
 							wod[i] = {}
 						wod[i][str(pmrd.orignal_id)]=wd[i]
 		pwdl.words = wod
-		#print "WORD OBJECT DICTIONARY AFTER  ---->",wod
+		##print "WORD OBJECT DICTIONARY AFTER  ---->",wod
 		pwdl.save()
 	
 	for pmrd in mrdl:
@@ -1695,7 +1678,7 @@ def generate_big_dict():
 	for x in lodl:
 		if x.words:
 			prefs.update(x.words)		
-	#print prefs
+	##print prefs
 	return prefs	
 	
 ####
@@ -1710,7 +1693,7 @@ def sim_distance(prefs,d1,d2):
 		return 0	#NO RESULTS HAVE BEEN YET FOUND
 
 	for item in prefs[d1]:	#This item is a dictionary containing book id and rating of that book for a user
-		#print prefs[person1]
+		##print prefs[person1]
 		if item in prefs[d2]:
 			si[item] = 1
 			
@@ -1721,21 +1704,19 @@ def sim_distance(prefs,d1,d2):
 	sum_of_squares = 0
 	
 	for item in prefs[d1]:
-		#print prefs[person1]
+		##print prefs[person1]
 		if item in prefs[d2]:
-			#print prefs[person2]
-			#print "PERSON1 ITEM",item,prefs[d1][item]
-			#print "PERSON2 ITEM",item,prefs[d2][item]	
-			#print "SUBTRACT",prefs[d1][item] - prefs[d2][item]		
+			##print prefs[person2]
+			##print "PERSON1 ITEM",item,prefs[d1][item]
+			##print "PERSON2 ITEM",item,prefs[d2][item]	
+			##print "SUBTRACT",prefs[d1][item] - prefs[d2][item]		
 			sum_of_squares += pow(prefs[d1][item] - prefs[d2][item],2)
-			#print sum_of_squares
-	
-	#print "SUM OF SQUARES :):)",sum_of_squares,(1.0/(1+sum_of_squares))
+			##print sum_of_squares
+	Tags
+	##print "SUM OF SQUARES :):)",sum_of_squares,(1.0/(1+sum_of_squares))
 	return (1.0/(1+sum_of_squares))	
 
 	
-
-
 def sim_pearson(prefs,d1,d2):
 	#Theoretically --- The results of pearson similarity should be better, but practically the results are much worse
 	#Get the list of mutually rated items
@@ -1751,10 +1732,8 @@ def sim_pearson(prefs,d1,d2):
 	n = len(si)
 	
 	#sum of all preferences
-	sum1 = sum([prefs[d1][it] for it in si])
-	
+	sum1 = sum([prefs[d1][it] for it in si])	
 	sum2 = sum([prefs[d2][it] for it in si])
-	
 
 	#Sum of the squares
 	sum1Sq = sum([pow(prefs[d1][it],2) for it in si])
@@ -1762,17 +1741,13 @@ def sim_pearson(prefs,d1,d2):
 
 	#Sum of the products
 	pSum = sum([prefs[d1][it] * prefs[d2][it] for it in si])
-	
-
-	
 	num = pSum - (sum1 * sum2/n)
 	den = sqrt((sum1Sq - pow(sum1,2)/n) * (sum2Sq - pow(sum2,2)/n))
 	
 	if den == 0:
 		return 0
 
-	r = num/den
-		
+	r = num/den		
 	return r
 
 def topMatches(prefs,document,n=5,similarity=sim_distance):
@@ -1792,7 +1767,7 @@ def recommend(prefs,term,similarity = sim_distance):
 			continue
 		else:
 			sim = similarity(prefs,term,other)
-			#print "similarity :):P>>>>>",sim,term,other
+			##print "similarity :):P>>>>>",sim,term,other
 			
 		if sim==0:
 			continue
@@ -1846,24 +1821,24 @@ def get_nearby_words(request,group_id):
 	td_doc()
 	prefs = generate_big_dict()
 	
-	search_text = request.GET['search_text']
+	search_text = str(request.GET['search_text']).strip()
 	search_text_l = search_text.split()
-	#print search_text_l
+	##print search_text_l
 	word_set = set()
 	ranking_list = []
 	
 	stemmer = nltk.stem.porter.PorterStemmer()
 		
 	for i in search_text_l:
-		print i
+		#print i
 		score = topMatches(prefs,stemmer.stem_word(i.lower()),n=30,similarity=sim_distance)
-		#print "SCORE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n",score	
+		##print "SCORE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n",score	
 		for _,word in score:
 			word_set.add(word)
-		#print word_set
+		##print word_set
 		
 		
-		#print "NOW I AM PRINTING RECOMMENDATIONS ____________________________________________________________________________"	
+		##print "NOW I AM #printING RECOMMENDATIONS ____________________________________________________________________________"	
 		rankings = recommend(prefs,stemmer.stem_word(i.lower()),similarity = sim_distance)
 		ranking_list.extend(rankings[0:5])
 		# "5" -- It is the maximum number of documents which will be returned per word in search query
@@ -1871,9 +1846,9 @@ def get_nearby_words(request,group_id):
 	
 	
 	
-	#print "THE WORD SET IS PRINTED AS FOLLOWS -------------->>>>>>>>>>>>>\n",word_set	
+	##print "THE WORD SET IS #printED AS FOLLOWS -------------->>>>>>>>>>>>>\n",word_set	
 	
-	#print "THE RANKING LIST IS PRINTED AS FOLLOWS ------------->>>>>>>>>>>>>>\n",ranking_list
+	##print "THE RANKING LIST IS #printED AS FOLLOWS ------------->>>>>>>>>>>>>>\n",ranking_list
 	
 	final_ranking_list = sort_n_avg(ranking_list)
 	final_ranking_list.sort()
@@ -1881,7 +1856,7 @@ def get_nearby_words(request,group_id):
 	
 
 	#{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1}
-	#print "THE FINAL RANKING LIST IS PRINTED AS FOLLOWS ------------->>>>>>>>>>>>>>\n",final_ranking_list
+	##print "THE FINAL RANKING LIST IS #printED AS FOLLOWS ------------->>>>>>>>>>>>>>\n",final_ranking_list
 	result_array = []
 	for (relevance,each_id) in final_ranking_list:
 		obj = collection.Node.find_one({"_id":ObjectId(each_id)},{"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})

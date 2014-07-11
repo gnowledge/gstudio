@@ -280,7 +280,7 @@
       pages = "<h6>Pages:</h6><hr>";
       pages += "<ul style='float:left; list-style-type:none;'>";
       for (i=0; i < cur_page+1; i++) {
-        pages+= "<li onClick='changePage(" + i + ")' style='cursor:pointer'>" + (i+1) + "</li>";
+        pages+= "<span onClick='changePage(" + i + ")' style='cursor:pointer;font-weight:bold;padding-left:10px'>" + (i+1) + "</span>";
       }
       pages+="</ul>";
       $("#pages").html(pages);
@@ -372,11 +372,10 @@
       $("#results").html(html_div[page_no]);
 
       pages = "<h6>Pages:</h6><hr>";
-      pages += "<ul style='float:left; list-style-type:none;'>";
       for (i=0; i < cur_page+1; i++) {
-        pages+= "<li onClick='changePage(" + i + ")' style='cursor:pointer'>" + (i+1) + "</li>";
+        pages+= "<span onClick='changePage(" + i + ")' style='cursor:pointer;font-weight:bold'>" + (i+1) + "</span>";
       }
-      pages+="</ul>";
+      //pages+="</ul>";
       $("#pages").html(pages);
     }
 
