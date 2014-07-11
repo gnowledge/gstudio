@@ -460,7 +460,8 @@ def get_versioned_page(node):
        if line.find('status')!=-1:
           up_ind=line.find('status')
           if line.find(('PUBLISHED'),up_ind) !=-1:
-               rev_no=rev_no.strip(' ')
+              # rev_no=rev_no.strip(' ')
+	       rev_no=rev_no.split()[0]
                node=history_manager.get_version_document(node,rev_no)
                proc1.kill()
                return (node,rev_no)    
