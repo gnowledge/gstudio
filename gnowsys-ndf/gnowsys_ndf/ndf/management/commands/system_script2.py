@@ -407,12 +407,12 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 	subject = collection.Node.one({"_type": u"GSystem", "name": unicode(subject_name)})
 	
 	if subject is None:
-		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(right_subject_name) + " could not be created."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 	
 	elif relation_type is None:
-		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(right_subject_name) + " could not be created."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 
@@ -514,7 +514,15 @@ def populate_location(label,property_id,property_value,user_id):
 	obj.save()
 
 
+def get_class(label, class_id):
+	obj = collection.Node.find_one({"_type":u"GSystemType","name":unicode(label)})
+	if obj:
+		return obj
 
+def get_topic(label):
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	if obj:
+		return obj
 
 
 class Command(BaseCommand):

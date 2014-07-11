@@ -121,7 +121,16 @@
 		<br><br>
 		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>
 		<br>
+		<br>
 		<p>
+		<ul>
+		<strong>Sub_Class_of</strong>
+			{% for parent_class in selected_topic.member_of %}
+				<li>{{ parent_class }}</li>
+			{% endfor %}
+		</ul>
+		<br>
+		<br>
 		<ul>
 		<strong>Dynamic Attributes:</strong>
 		<br />
