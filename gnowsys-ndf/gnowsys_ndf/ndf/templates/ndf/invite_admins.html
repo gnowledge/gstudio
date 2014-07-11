@@ -28,7 +28,7 @@ function saveinvite(){
 get_all_data();
 var inviting_users=data_prefs;
 data_prefs=""
-var surl="/{{node}}/group/notify/invite_users/"
+var surl="/{{node}}/group/notify/invite_admins/"
 if (not_status=="OFF")
 {
 alert("Notification mails sent to newly selected users(if any)");
@@ -65,25 +65,25 @@ $.ajax({
 }); 
 }
 
-$(document).on('click',"#subscr_users",function() {
+$(document).on('click',"#subscr_admins",function() {
 
- $('#inviteusers #collection_set_drawer1').html("");
- $('#inviteusers #collection_set_drawer2').html("");
- $('#inviteusers #collection_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="collection_set_search" class="margin-0"></li>');
+ $('#inviteadmins #colln_set_drawer1').html("");
+ $('#inviteadmins #colln_set_drawer2').html("");
+ $('#inviteadmins #colln_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="colln_set_search" class="margin-0"></li>');
 
-var url="/{{node}}/group/notify/invite_users/"
+var url="/{{node}}/group/notify/invite_admins/"
  $.getJSON( url, function( data ) {
   $.each(data ,function(index , drawer_elements){
    if(index == 0)
     {
      $.each(drawer_elements.drawer1, function(index, element) {
-        $('#inviteusers #collection_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#inviteadmins #colln_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
    }
    if(index == 1)
     {
     $.each(drawer_elements.drawer2, function(index, element) {
-        $('#inviteusers #collection_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#inviteadmins #colln_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
     }
 
@@ -96,7 +96,7 @@ var url="/{{node}}/group/notify/invite_users/"
 
 
 function get_all_data(){
- $.each($('#inviteusers #collection_set_drawer2 li'),function(index,item){
+ $.each($('#inviteadmins #colln_set_drawer2 li'),function(index,item){
          data_prefs=data_prefs+String(item.id)+",";
          });
 }
@@ -104,14 +104,14 @@ function get_all_data(){
 
 </script>
 
-<div id="subscr_users">
-<input type="button" class="button small" data-reveal-id="inviteusers" value="Subscribe registered users">
+<div id="subscr_admins">
+<input type="button" class="button small" data-reveal-id="inviteadmins" value="Subscribe users as admins">
 
-<div id="inviteusers" class="reveal-modal " data-reveal >
+<div id="inviteadmins" class="reveal-modal " data-reveal >
      
      <h2>Select users</h2>
       <div id="module_drawer" >
-        {% include "ndf/drawer_widget.html" with widget_for="collection_set"  %}
+        {% include "ndf/drawer_widget.html" with widget_for="colln_set"  %}
       </div>
 
             <label><input type="checkbox" id="checknotif" value="ON"> Send notification mails to all except the group owner</label>
