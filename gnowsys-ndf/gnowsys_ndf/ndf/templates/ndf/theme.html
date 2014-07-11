@@ -5,6 +5,8 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+{% get_group_name groupid as group_name_tag %}
+
 
 {% block title %} {{ title }} {% endblock %}
 
@@ -13,10 +15,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
   <!-- Scripts required for D3 graph -->
-  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
-  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
-  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
-  <script src="/static/ndf/js/tree.jquery.js"></script>
+  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+
+  <script src="/static/ndf/bower_components/jquery/dist/jquery.min.js"></script> <!-- checked -->
+  <script src="/static/ndf/bower_components/jqtree/tree.jquery.js"></script> <!-- checked -->
 
   <script type="text/javascript">
     $(document).ready(function() {
@@ -26,28 +30,60 @@
 
     		var $tree = $('.themes');
     		var user = "{{user.is_authenticated}}";
+    		var unfold = "{{unfold}}";
 
-    		$tree.tree({
-    			autoOpen: false,
+    		if(unfold == "true"){
+    			unfold = true
+    		}
+    		else{
+    			unfold = false
+    		}
+
+			$tree.tree({
+    			autoOpen: unfold,
 
         		onCreateLi: function(node, $li) {
+						
+					if (node.node_type == "Topic"){
+						$li.find('.jqtree-title').before('&nbsp <span class="fi-page"></span> &nbsp;');				        	
+					}
+					else{
+						$li.find('.jqtree-title').before('&nbsp <span class="fi-folder" style="color:orange"></span> &nbsp;');				        		
+					}
 
         			if (user == "True")
-        			{
+        			{   
         				$li.find('.jqtree-element').append(
         					{% user_access_policy groupid request.user as user_access %}
         					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
 
                 			
                 			{% endif %}
             			);	
-        			}
-            		
+        			}           		
 
         		}
     		});
+
+    		// bind 'tree.click' event
+			$tree.bind(
+			    'tree.dblclick',
+			    function(event) {
+			        // The clicked node is 'event.node'
+			        var node = event.node;
+			        // If its topic node i.e no children of this node then show the detail veiw for topic
+			  		if( node.children[0] == null ){
+
+			  			if (node.node_type == "Topic"){
+			  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
+			  			}
+				        
+			  		}
+			  		
+			    }
+			);
    
     	});
     });
@@ -81,7 +117,7 @@
       <li class="selected-app-set-item"> 
         <div>
   		  {% if user_access == "allow" %}
-          <a href="{% url "theme_topic_create" groupid app_id theme_GST_id %}" style="float:right" title="Add Theme">
+          <a href="{% url "theme_topic_create" groupid theme_GST_id %}" style="float:right" title="Add Theme">
             +&nbsp;Add
           </a>
           {% endif %}
@@ -142,10 +178,8 @@
 		<hr/>
 
 		{% if node %}
-
 			<!-- If "Theme" node -->
-			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>
-			
+			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>			
 		{% endif %}
 
 	{% endif %}
@@ -218,10 +252,10 @@
 	            <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
 	            <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
   		  		{% if user_access == "allow" %}
-	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid app_id each.id %}" class="button medium">Edit</a></td>
+	            <td  class="name" style="font-size:11px;"><a href="{% url "theme_topic_create" groupid each.id %}" class="button medium">Edit</a></td>
 
 		    	<td  class="name" style="font-size:11px;">
-			    	<a href="{% url "theme_topic_create" groupid app_id each.id %}?trans=true" class="button medium">Translate</a>
+			    	<a href="{% url "theme_topic_create" groupid each.id %}?translate=true" class="button medium">Translate</a>
 			    	<!-- <a href="#" class="button medium" disabled>Translate</a> -->
 		    	</td>	        
 	        	{% endif %}     	       	       
@@ -253,58 +287,15 @@
 	<script type="text/javascript">
 		// script for fold themes hierarchy
 		$(".fold").click(function() {
-			$(function() {
-				
-				var user = "{{user.is_authenticated}}"
-
-				$('.themes').tree({
-					autoOpen: false,
-	        		onCreateLi: function(node, $li) {
-	        			if (user == "True")
-        				{
-        					$li.find('.jqtree-element').append(
-        						{% user_access_policy groupid request.user as user_access %}
-        						{% if user_access == "allow" %}
-
-	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
-
-	                			{% endif %}
-	            			);	
-        				}
-
-	        		}
-				});
-
+			$(function() {				
+				location.href = "{% url 'theme_page' group_name_tag %}";
 			});
 		});
 
 		// script for unfold themes hierarchy
 	    $(".unfold").click(function() {
 	    	$(function() {
-
-	    		var user = "{{user.is_authenticated}}"
-
-	    		$('.themes').tree({
-	    			autoOpen: true,
-	    			slide: false,
-
-	    			onCreateLi: function(node, $li) {
-
-	    				if (user == "True")
-        				{
-		            		$li.find('.jqtree-element').append(
-		            			{% user_access_policy groupid request.user as user_access %}
-        						{% if user_access == "allow" %}
-
-		                			'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/{{app_id}}/'+node.id+'/"> <i class="fi-pencil edit"></i> </a>'
-		                			
-		                		{% endif %}
-		            		);
-		            	}
-
-	        		}
-	    			
-	    		});
+	    		location.href = "{% url 'theme_page' group_name_tag %}?unfold=true";	
 	    	});
 	    });	
 
@@ -422,6 +413,5 @@
 		});
 
 	</script>
-
 
 {% endblock %}

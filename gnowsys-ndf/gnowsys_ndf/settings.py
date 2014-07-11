@@ -137,11 +137,16 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users
+    'online_status.middleware.OnlineStatusMiddleware',                              #for online_users
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
+     
+# Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+AUTH_PROFILE_MODULE = 'gnowsys_ndf.ndf.models.UserProfile'
 
 ROOT_URLCONF = 'gnowsys_ndf.ndf.urls'
 
@@ -179,7 +184,9 @@ INSTALLED_APPS = (
     'django_extensions',	#textb
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
+    'online_status',                       #for online_users     
 )
+
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
 
@@ -290,3 +297,23 @@ warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
 #textb
+
+
+########################################### for online_users_ramk
+
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#        'LOCATION': 'default-cache'
+#    }
+#}
+
+#USER_ONLINE_TIMEOUT = 300
+
+#USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
+
+USERS_ONLINE__TIME_IDLE = 300
+USERS_ONLINE__TIME_OFFLINE = 10
+#USERS_ONLINE__CACHE_PREFIX_USER
+#USERS_ONLINE__CACHE_USERS
+

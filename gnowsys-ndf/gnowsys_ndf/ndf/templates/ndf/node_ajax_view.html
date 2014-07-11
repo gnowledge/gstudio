@@ -2,11 +2,14 @@
 {% get_group_name groupid as group_name_tag %}
 
 {% block head %}
+
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  
   <!-- Scripts required for D3 graph -->
-  <script type="text/javascript" src="/static/ndf/js/d3.v3.min.js"></script>
-  <script type="text/javascript" src="/static/ndf/js/underscore-1.2.3.js"></script>
-  <script sync="text/javascript" src="/static/ndf/js/FileSaver.js" ></script>
+  <script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+  <script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+  <script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+
 {% endblock %}
 
 <!-- css for drawer widget -->
@@ -330,11 +333,20 @@ ul#graph-hover.f-dropdown{
             </li>
 
             {% else %}
-            <li>
-              <a class="button small expand" href="{% url create_url group_name_tag %}">
-                <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
-              </a>
-            </li>
+              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+              
+                <li>
+                  <a class="button small expand" href="{% url create_url group_name_tag app_id %}">
+                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  </a>
+                </li>
+              {% else %}
+                <li>
+                  <a class="button small expand" href="{% url create_url group_name_tag %}">
+                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  </a>
+                </li>
+              {% endif %}
 
             {% endif %}
 
