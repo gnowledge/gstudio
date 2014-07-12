@@ -79,8 +79,12 @@ ul#graph-hover.f-dropdown{
         <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
         <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
           <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+          {% if node.collection_set %}
           <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+          {% endif %}
+          {% if node.prior_node %}
           <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+          {% endif %}
         </ul>
       </dd>
 
@@ -234,16 +238,26 @@ ul#graph-hover.f-dropdown{
         <a class="close-reveal-modal">&#215;</a>
         {% include "ndf/graph_concept.html" %}
       </div>
+      
       <!-- Content for Collection Graph -->
-      <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-      	<a class="close-reveal-modal">&#215;</a>
-      	{% include "ndf/graph_collection.html" %}
-      </div>
+      
+      {% if node.collection_set %}
+        <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+        	<a class="close-reveal-modal">&#215;</a>
+        	{% include "ndf/graph_collection.html" %}
+        </div>
+      {% endif %}
+
       <!-- Content for dependency Graph -->
-     <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
-       <a class="close-reveal-modal">&#215;</a>
-       {% include "ndf/graph_dependency.html" %}
-     </div>
+      
+      {% if node.prior_node %}
+      
+        <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+         <a class="close-reveal-modal">&#215;</a>
+         {% include "ndf/graph_dependency.html" %}
+        </div>
+      {% endif %}
+     
      <!-- Tab View Map Widget -->
      <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
        <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
