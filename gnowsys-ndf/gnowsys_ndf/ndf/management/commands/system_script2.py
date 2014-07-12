@@ -218,9 +218,9 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	#it's me
 	subject = collection.Node.find_one({"name":unicode(subject_name)})
 	#it's me
-	print "Subject::\n" + str(subject)
+	#print "Subject::\n" + str(subject)
 	attribute_type_obj = collection.Node.find_one({"name": unicode(attribute_type_name), "_type": u"AttributeType"})
-	print "Attribute_type::\n" + str(attribute_type_obj)	
+	#print "Attribute_type::\n" + str(attribute_type_obj)	
 	if subject is None:
 		print "The attribute " + unicode(subject_name) + "--" + unicode(attribute_type_name) + "--" + unicode(object_value) + " could not be created."
 		#print "-----------------------!!!!!!!!!!!!!--------------------------next---------"

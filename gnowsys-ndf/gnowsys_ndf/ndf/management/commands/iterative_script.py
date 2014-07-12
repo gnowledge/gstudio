@@ -493,8 +493,9 @@ def class_create(class_id, class_json):
 			#print "\n\nCurrent Object\n" + str(current_class) + "\n\n"
 			if current_class and type_of_list:
 				for parent_class_obj_id in type_of_list:		
-					current_class.type_of.append(ObjectId(parent_class_obj_id))
-					current_class.modified_by = int(1)
+					if parent_class_obj_id not in current_class.type_of:
+						current_class.type_of.append(ObjectId(parent_class_obj_id))
+						current_class.modified_by = int(1)
 					
 				current_class.save()
 				return current_class
@@ -562,7 +563,8 @@ def initiate_class_creation(json_obj,label,topic_title,call_flag):
 						if topic and class_obj:
 							topic.member_of.append(ObjectId(class_obj._id))
 							for types_id in class_obj.type_of:
-								topic.member_of.append(ObjectId(types_id))
+								if types_id not in topic.member_of:
+									topic.member_of.append(ObjectId(types_id))
 							topic.modified_by = int(1)
 							topic.save()
 							
@@ -652,7 +654,8 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 						if parent_class_obj:
 							type_of_list.append(parent_class_obj._id)
 							for parent_class_parents_id in parent_class_obj.type_of:
-								type_of_list.append(ObjectId(parent_class_parents_id))
+								if parent_class_parents_id not in type_of_list:
+									type_of_list.append(ObjectId(parent_class_parents_id))
 						
 						log_class_done(log_flag)
 						log_flag -= 2
