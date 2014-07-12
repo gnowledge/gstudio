@@ -87,7 +87,7 @@
 	      <!-- Create dropdown item for each group -->
 	      	<li style="display:block;background:#000;color:#fff;">
 	      		{% if groupid %}
-	      		<form action="{% url 'search_page' group_id %}" name="search_form" method="GET" >
+	      		<form action="{% url 'results' groupid %}" name="search_form" method="GET" >
 	      		{% else %}
 	      		<form action="" name="search_form" method="GET" >
 	      		{% endif %}
@@ -106,7 +106,7 @@
 			</li>
 			<li >
 				{% if groupid %}
-				<a href="{% url 'search_page' group_id %}">Search Options</a>
+				<a href="{% url 'search_page' groupid %}">Search Options</a>
 				{% endif %}
 			</li>
 	      

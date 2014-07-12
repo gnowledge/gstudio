@@ -117,7 +117,23 @@ def search_query_group(request, group_id):
 
 
 def results_search(request, group_id):
-	
+	"""
+	This view returns the results for global search on all GSystems by name, tags and contents.
+	Only publicly accessible GSystems are returned in results.
+	"""
+	ins_objectid  = ObjectId()
+	if ins_objectid.is_valid(group_id) is False :
+		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		if group_ins:
+			group_id = str(group_ins._id)
+		else:
+	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+	    		if auth :
+				group_id = str(auth._id)
+	else:
+		pass
+
 	# INTIALISE THE FLAGS FOR SEARCHING BY NAME / TAGS / CONTENTS
 	search_by_name = False
 	search_by_tags = False
@@ -358,6 +374,7 @@ def results_search(request, group_id):
 	except Exception:
 		pass
 
+	#print "search_results:", search_results
 	context_to_return = getRenderableContext(group_id)			# RETURNS BASIC CONTEXT
 	context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
 	context_to_return['processed'] = 1 							
@@ -368,6 +385,10 @@ def results_search(request, group_id):
 
 # KEYWORD SEARCH FOR A SPECIFIC GROUP
 def results_search_group(request, group_id):
+	"""
+	This view returns the results for search on all GSystems by name, tags and contents in the group currently chosen.
+	Only publicly accessible GSystems are returned in results.
+	"""
 
 	group_ins = {}
 	ins_objectid  = ObjectId()
@@ -1379,6 +1400,7 @@ def ra_search_results(request, group_id):
 		except Exception:
 			pass
 
+	print result_members
 	result_members = json.dumps(result_members, cls=Encoder)
 	
 	context_to_return = getRenderableContext(group_id)				# BASIC CONTEXT

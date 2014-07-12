@@ -1,5 +1,31 @@
 {% extends "ndf/base.html" %}
 
+{% block concern_information %}
+    <div id="search_help" align="justify">
+      <h3><strong>Search Help</strong></h3>
+      <ul>
+          <li><strong>Keyword search </strong>
+              <ul>
+                    <li>It searches all the public resources for the keywords provided.</li>
+                    <li>Search by name, tags, contents and on specific users. </li>
+              </ul><br>
+          <li> <strong>Advanced Search </strong><br> 
+              <ul>
+                    <li>It allows you to apply a lot more filters on the data than simple keyword search.</li>
+                    <li>You can search over any attributes.</li>
+              </ul><br>
+          <li> <strong>Graph Search</strong>
+                <ul>
+                    <li> Built for natural language queries like <br><i>"Students of teacher X"</i></li>
+                    <li> As you enter search query you are provided <i>auto-suggestions.</i></li>
+                    <li> Click the suggestion for auto-fill </li> 
+                </ul>
+          </li>
+      </ul>
+
+    </div>
+{% endblock %}
+
 {% block body_content %} 
 
 <dl class="accordion" data-accordion>
@@ -518,7 +544,7 @@
           //var str = "<select size='5' id='autocomplete' onChange='changed_val()'>";
           var str = "<datalist style='color:#fff' id='datalist1'>";
           for(i=0;i<data.length;i++){
-            str += "<option value='" + data[i].split('_').join(' ') + "'>"; 
+            str += "<option value='" + data[i].split('_').join(' ').trim() + "'>"; 
           }
           str += "</datalist>";     
           console.log(data.length);

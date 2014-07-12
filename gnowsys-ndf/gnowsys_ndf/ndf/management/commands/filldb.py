@@ -11,7 +11,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
-from gnowsys_ndf.ndf.models import Node, GSystemType
+from gnowsys_ndf.ndf.models import Node, GSystemType, ToReduceDocs, ReducedDocs, IndexedWordList
 from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES, QUIZ_TYPE_CHOICES_TU
 from gnowsys_ndf.settings import GAPPS
@@ -320,13 +320,15 @@ collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False,
 modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': None})
 if modified_by_cur.count > 0:
     for n in modified_by_cur:
-        if n.contributors:
-            collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
-        else:
-            if n.created_by:
-                collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]}}, upsert=False, multi=False)
-            else:
-                print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")\n"
+	print n, "\n"
+	if u'required_for' not in n.keys():
+		if n.contributors:
+		    collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
+		else:
+		    if n.created_by:
+		        collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]}}, upsert=False, multi=False)
+		    else:
+		        print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")\n"
 
 # Updating faulty modified_by and contributors values (in case of user-group and file documents)
 cur = collection.Node.find({'modified_by': {'$exists': True}})
@@ -335,11 +337,12 @@ for n in cur:
     # 1 stands for superuser
     # Instead of this value should be the creator of that resource 
     # (even this is applicable only if created_by field of that resource holds some value)
-    if not n.created_by:
-        print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")"
-    else:
-        if n.created_by not in n.contributors:
-            collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]} }, upsert=False, multi=False)
+    if u'required_for' not in n.keys():
+	if not n.created_by:
+	    print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")"
+	else:
+	    if n.created_by not in n.contributors:
+                collection.update({'_id': n._id}, {'$set': {'modified_by': n.created_by, 'contributors': [n.created_by]} }, upsert=False, multi=False)
 
 # For delete the profile_pic as GST 
 profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_pic'})
