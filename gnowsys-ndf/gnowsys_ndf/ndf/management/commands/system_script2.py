@@ -133,7 +133,7 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
 		"""
 		system_type.attribute_type_set.append(attribute_type._id)
 		system_type_2.attribute_type_set.append(attribute_type._id)
-		print "Created the Attribute_Type " + str(name)
+		print "Created the Attribute_Type " + unicode(name)
 		return False
 		
 
@@ -198,7 +198,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 		"""
 		system_type.attribute_type_set.append(attribute_type._id)
 		system_type_2.attribute_type_set.append(attribute_type._id)
-		print "Created the Attribute_Type " + str(name)
+		print "Created the Attribute_Type " + unicode(name)
 		return False
 		
 		
@@ -404,7 +404,7 @@ def create_RelationType(name, inverse_name, subject_type_name, object_type_name,
                 """
                 system_type.relation_type_set.append(ObjectId(relation_type._id))
 		system_type_2.relation_type_set.append(ObjectId(relation_type._id))
-                print "Created the Relation_Type " + str(name)
+                print "Created the Relation_Type " + unicode(name)
 		return False
  
 
@@ -441,20 +441,20 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		relation = collection.GRelation()
 		relation.created_by = user_id
 		relation.modified_by = user_id
-		left_system = collection.Node.one({"name":unicode(subject_name)})
+		left_system = collection.Node.find_one({"name":unicode(subject_name)})
 		relation.subject = ObjectId(left_system._id)
 		relation_type = collection.Node.one({"name":unicode(relation_type_name), "_type":u"RelationType"})
 		relation.relation_type = relation_type
-		right_system = collection.Node.one({"name":unicode(right_subject_name)})
+		right_system = collection.Node.find_one({"name":unicode(right_subject_name)})
 		relation.right_subject = ObjectId(right_system._id)
 		relation.lang = u"en"
 		relation.status = u"PUBLISHED"
 		#it's me
 		try:
 			relation.save()
-			print "Created a Relation " + str(relation.name)
+			print "Created a Relation " + unicode(relation.name)
 		except Exception as e:
-			print "Could not create a relation-->" + str(relation.name)
+			print "Could not create a relation-->" + unicode(relation.name)
 	
 			print e
 			#call log file method

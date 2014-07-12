@@ -544,13 +544,13 @@ def initiate_class_creation(json_obj,label,topic_title,call_flag):
 		
 	
 		for property_value in property_list_values:
-			print "Property Id: " + str(property_id)		
+			print "Property Id: " + unicode(property_id)		
 			print "Property Value: " + unicode(property_value) 
 			log_flag += 1
 			if property_id == "P31":
 				#getting the entire list for P31. As a topic may belong to many classes.
 				
-				print "Property Value for class creation found -- " + str(property_value)
+				print "Property Value for class creation found -- " + unicode(property_value)
 				for key, val in property_value.items():
 					if key == u'numeric-id':
 						class_id = "Q" + str(val)
@@ -714,9 +714,9 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 				property_value_json=gen_url_json+str(property_value_for_relation)+".json"
 				property_value_json=json_parse(property_value_json) #property_value is supposed to be the id of the right subject in case of a relation
 				property_value_name=extract_labels(property_value_json,property_value_for_relation,language)			
-			
-				if category_string_uppercase in property_value_name or category_string_lowercase in property_value_name:
-					populate_tags(label,property_value_name)
+				if property_value_name:
+					if category_string_uppercase in property_value_name or category_string_lowercase in property_value_name:
+						populate_tags(label,property_value_name)
 		
 				
 			
