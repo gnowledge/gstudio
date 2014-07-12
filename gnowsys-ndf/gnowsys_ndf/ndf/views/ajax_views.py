@@ -779,7 +779,8 @@ def graph_nodes(request, group_id):
                       "member_of", "status", "comment_enabled", "start_publication",
                       "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
-                      "fs_file_ids", "file_size", "mime_type", "location", "language"
+                      "fs_file_ids", "file_size", "mime_type", "location", "language",
+                      "property_order", "rating", "apps_list", "annotations"
                     ]
 
   # username = User.objects.get(id=page_node.created_by).username
@@ -793,6 +794,7 @@ def graph_nodes(request, group_id):
     elif isinstance(value, list):
 
       if len(value):
+
         # node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(i) +'_r"}, '
         node_metadata +='{"screen_name":"' + key + '", "_id":"'+ str(abs(hash(key+str(page_node._id)))) +'_r"}, '
         node_relations += '{"type":"'+ key +'", "from":"'+ str(page_node._id) +'", "to": "'+ str(abs(hash(key+str(page_node._id)))) +'_r"},'
@@ -809,6 +811,7 @@ def graph_nodes(request, group_id):
         # else:
 
         for each in value:
+          # print "\n====", key, "------", type(each)
 
           if isinstance(each, ObjectId):
             node_name = _get_node_info(each)
@@ -819,11 +822,19 @@ def graph_nodes(request, group_id):
             else:
               inverse = ""
 
-            node_metadata += '{"screen_name":"' + node_name + '", "title":"' + page_node.name + '", "_id":"'+ str(each) +'", "url":"'+ _get_node_url(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1"},'
+            node_metadata += '{"screen_name":"' + node_name + '", "title":"' + page_node.name + '", "_id":"'+ str(each) +'", "refType":"Relation", "inverse":"' + inverse + '", "flag":"1"},'
             # node_metadata += '{"screen_name":"' + node_name + '", "_id":"'+ str(each) +'", "refType":"relation"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'"},'
             i += 1
+
+          # if "each" is Object of GSystem
+          elif isinstance(each, GSystem):           
+            
+            node_metadata += '{"screen_name":"' + each.name + '", "title":"' + page_node.name + '", "_id":"'+ str(each._id) + '", "refType":"Relation"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each._id) +'"},'            
+
           else:
+
             node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
             node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
             i += 1
@@ -843,7 +854,7 @@ def graph_nodes(request, group_id):
           i += 1 
       
       else:
-        node_metadata += '{"screen_name":"' + value + '", "_id":"'+ str(i) +'_n"},'
+        node_metadata += '{"screen_name":"' + str(value) + '", "_id":"'+ str(i) +'_n"},'
         node_relations += '{"type":"'+ key +'", "from":"'+ str(abs(hash(key+str(page_node._id)))) +'_r", "to": "'+ str(i) +'_n"},'
         
         i += 1
