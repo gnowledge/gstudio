@@ -59,7 +59,11 @@ ul#graph-hover.f-dropdown{
 <a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
 {% endif %}
 
-
+<!-- Menu for adding annotations -->
+<span id="moving_div" style="display:none; position:absolute; z-index:15">
+      <button onclick = 'toggle($("#toggleContainer"))'><i class ="fi-clipboard-pencil" /></button>
+</span>
+<!-- End menu -->
 <header class="row page">
 
   <section class="medium-12 columns" >
@@ -75,23 +79,38 @@ ul#graph-hover.f-dropdown{
       {% endfor %}
     </small>      
   </h2>
+  <div class="row">
+      <div class="small-10 columns">  
+          <dl class="row tabs" data-tab>
+                <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
-  <dl class="row tabs" data-tab>
-    <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+                <dd>
+                    <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+                        <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+                            <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+                            <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+                            <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+                        </ul>
+                </dd>
 
-    <dd>
-        <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
-            <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-                <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
-                <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
-                <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
-            </ul>
-    </dd>
+                <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
-    <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
-
-    <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-     </section>
+                <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+          </dl>
+      </div>
+      <div class="small-2 columns">          
+          <div id = "toggleContainer" style="cursor:pointer" onClick="toggle(this);">
+            <i class="fi-comments"></i> Annotate
+          </div>
+          <!-- <dl class="row tabs" data-tab>
+            <dd> <a onclick() = "attempt()" class="off" style="cursor:pointer">
+              <img src="/static/ndf/images/off.png" class="off" style="cursor:pointer" onClick="toggle(this);"/> 
+              <i class="fi-comments"></i> Annotate </a>
+            </dd> 
+          </dl> -->
+      </div>
+  </div>
+  </section>
 
 </header>
 
@@ -485,7 +504,7 @@ var flag = false;
 var pos=-1;
 var st = null;
 var initialText;
-var toggleValue = -1;
+var toggleValue = 1;
 
 if(!window.win){
   win = {};
@@ -574,7 +593,7 @@ sideComments.on('commentPosted', function( comment )
            });
 });*/
 
-attempt();
+toggle($("#toggleContainer"));
 
 /*
 bind the below initialisation of sideComments object on hover over that area
@@ -616,7 +635,7 @@ function doHighlight(bodyText, searchTerm)
   var i = -1;
   var lcSearchTerm = searchTerm.toLowerCase();
   var lcBodyText = bodyText.toLowerCase();
-  console.log("lcSearchTerm" + lcSearchTerm);  
+  //console.log("lcSearchTerm" + lcSearchTerm);  
   while (bodyText.length > 0) 
   {
     i = lcBodyText.indexOf(lcSearchTerm, i+1);
@@ -626,7 +645,7 @@ function doHighlight(bodyText, searchTerm)
       bodyText = "";
     } 
     else 
-    { console.log("i value: " + i + "           " + lcSearchTerm);
+    { //console.log("i value: " + i + "           " + lcSearchTerm);
       // skip anything inside an HTML tag
       if (bodyText.lastIndexOf(">", i) >= bodyText.lastIndexOf("<", i)) 
       {
@@ -676,27 +695,34 @@ function highlightAll()
 
 }
 
-function attempt()
+function toggle(el)
 {
-  console.log("toggleValue at beginning: " + toggleValue);
-  if(toggleValue < 0)
+  console.log("toggleClass at beginning: " + toggleValue);
+  if (toggleValue == 1)
    {
-     //finalText = $("#content").html();
-     $(".side-comment").hide();
-     $("#content").html(initialText);
-     $("#content").unbind("mouseup");
-   } 
-  else
+         //Disable annotations
+         //finalText = $("#content").html();
+         $(".side-comment").hide();
+         $("#content").html(initialText);
+         $("#content").unbind("mouseup");
+         //el.className = "";
+         el.innerHTML = '<i class="fi-comments"></i> Annotate';
+         
+   }  
+  else if (toggleValue == -1)
   {
-    st = null;
-    $(".side-comment").show();
-    highlightAll(); 
-    $("#content").bind("mouseup", win.Selector.mouseup);
-    //$("#content").html(finalText);
+        //enable annotations
+        st = null;
+        $(".side-comment").show();
+        highlightAll(); 
+        $("#content").bind("mouseup", win.Selector.mouseup);
+        //el.className = "active";
+        el.innerHTML = '<i class="fi-clipboard-pencil"></i> Annotate';
+        //$("#content").html(finalText);
   }
 
   toggleValue *= -1;
-  console.log("toggleValue at end: " + toggleValue);
+  console.log("toggleClass at end: " + toggleValue);
 }
 
 </script>
