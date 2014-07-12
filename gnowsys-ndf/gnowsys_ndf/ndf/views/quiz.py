@@ -75,7 +75,7 @@ def quiz(request, group_id, app_id=None):
         quiz_item_nodes = collection.Node.find({'member_of': {'$all': [gst_quiz_item_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
         quiz_item_nodes.sort('last_update', -1)
         quiz_item_nodes_count = quiz_item_nodes.count()
-
+	#quiz_node.get_neighbourhood(quiz_node.member_of)
         return render_to_response("ndf/quiz_list.html",
                                   {'title': title, 
                                    'quiz_nodes': quiz_nodes, 'quiz_nodes_count': quiz_nodes_count,
@@ -97,13 +97,14 @@ def quiz(request, group_id, app_id=None):
                               'group_id': group_id,
                               'groupid':group_id
                           }
-        
+        node.get_neighbourhood(node.member_of)
         if gst_quiz._id in node.member_of:
+	    
             template_name = "ndf/quiz_details.html"
 
         else:
             template_name = "ndf/quiz_item_details.html"
-
+	
         return render_to_response(template_name, 
                                   context_variables,                          
                                   context_instance = RequestContext(request)
@@ -273,14 +274,14 @@ def create_edit_quiz(request, group_id, node_id=None):
         quiz_node.save(is_changed=get_node_common_fields(request, quiz_node, group_id, gst_quiz))
 	get_node_metadata(request,quiz_node,gst_quiz)
 	
-        """
-	teaches_list = request.POST.get('teaches_list','') # get the teaches list
+       
+	
 	#if teaches is required
 	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
 	if teaches_list !='':
 			teaches_list=teaches_list.split(",")
 	create_grelation_list(quiz_node._id,"teaches",teaches_list)
-        """
+        
 	assesses_list = request.POST.get('assesses_list','') # get the assesses list 	
 	if assesses_list !='':
 			assesses_list=assesses_list.split(",")
@@ -294,7 +295,7 @@ def create_edit_quiz(request, group_id, node_id=None):
             context_variables['node'] = quiz_node
             context_variables['groupid'] = group_id
             context_variables['group_id']=group_id
-            
+        quiz_node.get_neighbourhood(quiz_node.member_of)    
         return render_to_response("ndf/quiz_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)

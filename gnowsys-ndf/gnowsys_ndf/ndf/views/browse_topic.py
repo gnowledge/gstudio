@@ -290,31 +290,31 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 			
 			get_node_metadata(request,theme_topic_node,topic_GST)
 			
-			if prior_node_list:
-				theme_topic_node.prior_node = []
-  				if prior_node_list != '':
-    					prior_node_list = prior_node_list.split(",")
+			
+			theme_topic_node.prior_node = []
+  			if prior_node_list != '':
+    				prior_node_list = prior_node_list.split(",")
 
-  				i = 0
-  				while (i < len(prior_node_list)):
-	    				node_id = ObjectId(prior_node_list[i])
-	    				if collection.Node.one({"_id": node_id}):
-      						theme_topic_node.prior_node.append(node_id)
+  			i = 0
+  			while (i < len(prior_node_list)):
+	    			node_id = ObjectId(prior_node_list[i])
+	    			if collection.Node.one({"_id": node_id}):
+      					theme_topic_node.prior_node.append(node_id)
     
-    					i = i+1
-				theme_topic_node.save()
-			if teaches_list:
-				if teaches_list !='':
+    				i = i+1
+			theme_topic_node.save()
+		
+			if teaches_list !='':
 					teaches_list=teaches_list.split(",")
 					
-				create_grelation_list(theme_topic_node._id,"teaches",teaches_list)
+			create_grelation_list(theme_topic_node._id,"teaches",teaches_list)
 					
 
-			if assesses_list:
-				if assesses_list !='':
+			
+			if assesses_list !='':
 					assesses_list=assesses_list.split(",")
 					
-				create_grelation_list(theme_topic_node._id,"assesses",assesses_list)
+			create_grelation_list(theme_topic_node._id,"assesses",assesses_list)
 
 				
                         # This will return to Themes Hierarchy  

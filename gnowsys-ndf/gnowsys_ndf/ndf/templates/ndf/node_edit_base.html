@@ -1,7 +1,7 @@
 {% extends "ndf/base.html" %}
 
 {% load ndf_tags %}
-
+{% get_neighbours1 node as node %}
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
 
 {% block style %}
@@ -288,13 +288,13 @@ background-repeat:no-repeat; background-size: 48px 48px
         
 
         <div class="small-5 columns">
-         <h5>Age Range:</h5>  <input id="age_range" name="age_range" type="text" value="" placeholder="Eg 10-20 " >
+         <h5>Age Range:</h5>  <input id="age_range" name="age_range" type="text" value="{{node.age_range}}"  >
         
-         <h5>Target Audience: </h5> <input name="audience" type="text" value="" placeholder="Eg student,children,All" >
-         <label><h5>Time Required :</h5> <select name="timerequired"><option>0-2M</option><option>2-5M</option><option>5-15M</option><option>15-45M</option></select></label>
-         <label><h5>Interactivity Type :</h5> <select name="interactivitytype"><option>Active</option><option>Mixed</option><option>Expositive</option></select></label>
-         <label><h5>Based on Url: </h5> <input name="basedonurl" type="text" value="" placeholder="eg wikipedia" ></label>
-         <label><h5>Educational Use: </h5> <input name="educationaluse" type="text" value="" placeholder="" ></label>
+         <h5>Target Audience: </h5> <input name="audience" type="text" value="{{node.audience}}"  >
+         <label><h5>Time Required :</h5> <select name="timerequired" value="{{node.timerequired}}"><option>0-2M</option><option>2-5M</option><option>5-15M</option><option>15-45M</option></select></label>
+         <label><h5>Interactivity Type :</h5> <select name="interactivitytype "><option>Active</option><option>Mixed</option><option>Expositive</option></select></label>
+         <label><h5>Based on Url: </h5> <input name="basedonurl" type="text" value="{{node.basedonurl}}"  ></label>
+         <label><h5>Educational Use: </h5> <input name="educationaluse" type="text" value="{{node.educationaluse}}" placeholder="" ></label>
         </div>
         
         
@@ -337,12 +337,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 </dl>  -->         
 
         <div class="small-5 columns">
-	  <h5>Text Complexity</h5>  <input  name="textcomplexity" type="text" value="" placeholder="" >
+	  <h5>Text Complexity</h5>  <input  name="textcomplexity" type="text" value="{{node.textcomplexity}}" placeholder="" >
         
-         <h5>Reading Level: </h5> <input name="readinglevel" type="text" value="" placeholder="" >
+         <h5>Reading Level: </h5> <input name="readinglevel" type="text" value="{{node.readinglevel}}" placeholder="" >
          
-         <h5>Educational Subject: </h5> <input name="educationalsubject" type="text" value="" placeholder="" >
-         <h5>Educational Level: </h5> <input name="educationallevel" type="text" value="" placeholder="" >
+         <h5>Educational Subject: </h5> <input name="educationalsubject" type="text" value="{{node.educationalsubject}}" placeholder="" >
+         <h5>Educational Level: </h5> <input name="educationallevel" type="text" value="{{node.educationallevel}}" placeholder="" >
         </div>
         
       </div>
@@ -653,7 +653,8 @@ $("#name_id").change(function(){
 				assess_arr.push($(this).val());
 			}
 		});
-		//alert(assess_arr)
+		alert(pn_arr + 'prior')
+		alert(assess_arr + 'assess')
 		$("#prior_node_list").val(pn_arr);
 		$("#collection_list").val(cn_arr) ;
 		$("#module_list").val(md_arr);

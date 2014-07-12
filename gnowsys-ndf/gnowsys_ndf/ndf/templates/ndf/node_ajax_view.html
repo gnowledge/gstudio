@@ -58,9 +58,9 @@ ul#graph-hover.f-dropdown{
 
 
 {% g1 node as schema %} 
-{% g2 node as schema_AT %}
 
 
+<div itemscope itemtype="{{schema.1.type}}">
 <header class="row page">
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
@@ -69,10 +69,13 @@ ul#graph-hover.f-dropdown{
     </ul>
 
     <h2>
-      <span class='node'>{{node.name}}</span>      
+
+      <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>     
       <small class="label-list"> 
+
       {% for tag in node.tags %}
       <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+       <span itemprop="{{schema.1.tags}}" content="{{tag}}">
       {% endfor %}
       </small>      
     </h2>
@@ -99,7 +102,7 @@ ul#graph-hover.f-dropdown{
 
 
 {% if schema.0 %}
-<meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">
+<meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">r
 <meta itemprop="{{schema.1.DM}}" content="{{node.last_update}}" >
 <meta itemprop="{{schema.1.creator}}" content="{{node.user_details_dict.created_by}}">
 <meta itemprop="{{schema.1.editor}}" content="{{node.user_details_dict.modified_by}}">
@@ -108,24 +111,43 @@ ul#graph-hover.f-dropdown{
 <meta itemprop="{{schema.1.timerequired}}" content="{{schema_AT.timerequired}}">
 {% for contributor_name in node.user_details.contributors %}
 <meta itemprop="{{schema.1.contributor}}" content="{{contributor_name}}">
-{% endfor %}                                                             <!--if g2 -->
-{% if schema.1.sid == 3 or schema.1.sid == 2 or schema.1.sid == 4 %}     	<!--schema_AT.alignmentobject.1.alignmenttype-->	
-<meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " > 	<!-- schema_AT.alignmenttype.0 -->
-<meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >     	<!-- schema_AT.targeturl.0 -->
-{% endif %}                     					  <!--else -->
-{% endif %} 									<!-- node.alignobject(AT).1.alignmenttype-->
-										<!-- node.alignmenttype.o -->
+{% endfor %}                                                             
+{% if schema.1.sid == 3 or schema.1.sid == 2 or schema.1.sid == 4 %}     		
+<meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " > 	
+<meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >     	
+{% endif %}                     					  
+{% endif %} 	
+
+{% for neighbour in node.teaches %} 																
+<div itemprop="educationalalignment" itemscope itemtype="alignmentObject">
+	<meta itemprop="educationalframework" content="Metastudio">
+	<meta itemprop="alignmenttype" content="teaches">	
+	<meta itemprop="targeturl" content="{{neighbour.url}}"> 
+	<meta itemprop ="targetname" content ="{{neighbour.name}}">
+	<meta itemprop ="targetdescription" content ="{{neighbour.html_content}}"> 
+</div>
+{% endfor %}
 
 
+{% for neighbour in node.assesses %} 																
+<div itemprop="educationalalignment" itemscope itemtype="alignmentObject">
+	<meta itemprop="educationalframework" content="Metastudio">
+	<meta itemprop="alignmenttype" content="assesses">	
+	<meta itemprop="targeturl" content="{{neighbour.url}}"> 
+	<meta itemprop ="targetname" content ="{{neighbour.name}}">
+	<!--<meta itemprop ="targetdescription" content ="{{neighbour.html_content|safe}}"> -->
+</div>
+{% endfor %}
 <div class="row">
-
+	
   <section class="medium-9 columns">
 
     <div class="tabs-content">
 
       <!-- Tab content -->
       <div class="content active" id="view-page">
-
+	<div class="row">
+	<div class="small-4 columns">
         {% if node.prior_node|length > 0 %}
         <div class="panel">
           <h6>You may want to read these first:</h6>
@@ -139,7 +161,40 @@ ul#graph-hover.f-dropdown{
           {% endfor %}
         </div>
         {% endif %}
-
+	</div>
+	<div class="small-4 columns">
+	{% if node.teaches %}
+	<div class="panel">
+		<h6>This resource teaches you these</h6>
+		
+	 {% for  each_node in node.teaches %}
+	 {% get_grid_fs_object each_node as grid_fs_obj %}
+          {% if each_node.mime_type %}
+          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          {% else %}
+          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          {% endif %}
+          {% endfor %}
+	</div>
+	{% endif %}
+	</div>
+	<div class="small-4 columns">
+	{% if node.assesses %}
+	<div class="panel">
+		<h6>This resource assesses these</h6>
+	 {% for  each_node in node.assesses %}
+	 {% get_grid_fs_object each_node as grid_fs_obj %}
+          {% if each_node.mime_type %}
+          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          {% else %}
+          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          {% endif %}
+          {% endfor %}
+	</div>
+	{% endif %}
+	</div>
+	</div>
+	
         <!-- Code for showing media details -->
         {% if node.mime_type %}
 
@@ -249,7 +304,7 @@ ul#graph-hover.f-dropdown{
         
       	{% with node.html_content|safe as description %}
       	{% if description != "None" %}
-      	{{ description }}
+      	<span itemprop="{{schema.1.description}}">{{ description }}</span>
       	{% endif %}
       	{% endwith %}
 
@@ -427,12 +482,13 @@ ul#graph-hover.f-dropdown{
 
 </div>
 
+
 <footer>
   <p><small>
     <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>
 </footer>
-
+</div> <!-- schema ends here -->
 <script type="text/javascript">
 
   $(document).on('open', '#view-map-widget[data-reveal]', function () {  

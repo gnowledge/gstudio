@@ -752,21 +752,23 @@ def update_mobwrite_content_org(node_system):
 
 
                       
-
+"""
 def get_node_metadata_fields(request, node, node_type):
 	if(node.has_key('_id')):
   		for at in node_type.attribute_type_set:
 			field_value=(request.POST.get(at.name,""))
 	
 			create_gattribute(node._id,at,field_value)
+"""
 
 def get_node_metadata(request,node,node_type):
 	attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
 	if(node.has_key('_id')):
 		for atname in attribute_type_list:
-			field_value=(request.POST.get(atname,""))
+			field_value=unicode(request.POST.get(atname,""))
 			at=collection.Node.one({"_type":"AttributeType","name":atname})	
-			create_gattribute(node._id,at,field_value)		
+			if(at!=None):
+				create_gattribute(node._id,at,field_value)		
 			
 def create_AttributeType(name, data_type, system_name, user_id):
 

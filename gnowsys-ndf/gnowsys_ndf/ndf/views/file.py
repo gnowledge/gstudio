@@ -769,6 +769,7 @@ def file_detail(request, group_id, _id):
 
 
     file_node = collection.File.one({"_id": ObjectId(_id)})
+    file_node.get_neighbourhood(file_node.member_of)
     if file_node._type == "GSystemType":
 	return file(request, group_id, _id)
 
@@ -908,25 +909,25 @@ def file_edit(request,group_id,_id):
 	get_node_metadata(request,file_node,GST_FILE)
 	
 	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+
 	if teaches_list !='':
 			teaches_list=teaches_list.split(",")
 	
 	create_grelation_list(file_node._id,"teaches",teaches_list)
 
-	"""
+	
 	assesses_list = request.POST.get('assesses_list','')
-	if assesses_list:
-				if assesses_list !='':
-					assesses_list=assesses_list.split(",")
+	
+	if assesses_list !='':
+		assesses_list=assesses_list.split(",")
 					
-				create_grelation_list(file_node._id,"assesses",assesses_list)
-	"""
-
-        
+	create_grelation_list(file_node._id,"assesses",assesses_list)
+	
 
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:
+	file_node.get_neighbourhood(file_node.member_of)
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,
                                     'group_id': group_id,

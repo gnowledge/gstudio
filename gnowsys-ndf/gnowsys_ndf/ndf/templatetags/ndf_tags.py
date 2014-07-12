@@ -146,7 +146,7 @@ def g1(node):
 		return [1,s_dict['Document']]	
    else:
 	return [0,""]
-
+"""
 @register.assignment_tag
 def g2(node):
      	node.get_neighbourhood(node.member_of)
@@ -157,7 +157,7 @@ def g2(node):
 	#schema_lrmi["audience"]=node.audience
 	#schema_lrmi["interactivitytype"]=node.interactivitytype
         return schema_lrmi 
-
+"""
 @register.filter
 def is_Page(node):
 	Page = collection.Node.one({"_type":"GSystemType","name":"Page"})
@@ -180,6 +180,11 @@ def is_File(node):
 		return 1
 	else:
 		return 0
+
+@register.assignment_tag
+def get_neighbours1(node):
+	node.get_neighbourhood(node.member_of)
+	return node
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
