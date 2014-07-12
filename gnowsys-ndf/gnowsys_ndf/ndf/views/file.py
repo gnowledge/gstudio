@@ -902,8 +902,9 @@ def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if request.method == "POST":
-        get_node_common_fields(request, file_node, group_id, GST_FILE)
-        file_node.save()
+
+        # get_node_common_fields(request, file_node, group_id, GST_FILE)
+        file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
 	get_node_metadata(request,file_node,GST_FILE)
 	
 	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
@@ -920,6 +921,9 @@ def file_edit(request,group_id,_id):
 					
 				create_grelation_list(file_node._id,"assesses",assesses_list)
 	"""
+
+        
+
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:

@@ -268,8 +268,9 @@ def create_edit_quiz(request, group_id, node_id=None):
         quiz_node = collection.GSystem()
 
     if request.method == "POST":
-        get_node_common_fields(request, quiz_node, group_id, gst_quiz)
-        quiz_node.save()
+
+        # get_node_common_fields(request, quiz_node, group_id, gst_quiz)
+        quiz_node.save(is_changed=get_node_common_fields(request, quiz_node, group_id, gst_quiz))
 	get_node_metadata(request,quiz_node,gst_quiz)
 	
         """

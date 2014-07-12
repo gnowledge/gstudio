@@ -28,7 +28,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
@@ -416,9 +416,9 @@ def add_sub_themes(request, group_id):
       if not sub_theme_name.upper() in (theme_name.upper() for theme_name in themes_list):
 
         node = collection.GSystem()
-        get_node_common_fields(request, node, group_id, theme_GST)
+        # get_node_common_fields(request, node, group_id, theme_GST)
       
-        node.save()
+        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_GST))
         node.reload()
         # Add this sub-theme into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -449,9 +449,9 @@ def add_topics(request, group_id):
       print "\ntopic name: ", add_topic_name
       if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
         node = collection.GSystem()
-        get_node_common_fields(request, node, group_id, topic_GST)
+        # get_node_common_fields(request, node, group_id, topic_GST)
       
-        node.save()
+        node.save(is_changed=get_node_common_fields(request, node, group_id, topic_GST))
         node.reload()        
         # Add this topic into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -1320,6 +1320,83 @@ def get_group_member_user(request, group_id):
         return HttpResponse(json.dumps(user_list))
     else:
 	raise Http404
+
+def set_user_link(request, group_id):
+  """
+  This view creates a relationship (has_login) between the given node (node_id) and the author node (username);
+  and also subscribes the user to his/her respective college group
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  node_id - ObjectId of the currently selected node_id
+  username - Username of the user
+
+  Returns:
+  A dictionary consisting of following key:-
+  result - a bool variable indicating whether link is created or not and subscribed to group or not
+  message - a string variable giving the status of the link (also reason if any error occurs)
+  """
+  gr_node = None
+
+  try:
+    if request.is_ajax() and request.method =="POST":
+      node_id = request.POST.get("node_id", "")
+      username = request.POST.get("username", "")
+
+      # Creating link between user-node and it's login credentials
+      author = collection.Node.one({'_type': "Author", 'name': unicode(username)}, {'created_by': 1})
+      rt_has_login = collection.Node.one({'_type': "RelationType", 'name': u"has_login"})
+
+      gr_node = create_grelation(node_id, rt_has_login, author._id)
+
+      if gr_node:
+        # Assigning the userid to respective private college groups's author_set,
+        # i.e. making user, member of college group to which he/she belongs
+        # Only after the given user's link (i.e., has_login relation) gets created
+        node = collection.Node.one({'_id': ObjectId(node_id)}, {'member_of': 1})
+        node_type = node.member_of_names_list
+
+        has_group = collection.Node.one({'_type': "RelationType", 'name': "has_group"}, {'_id': 1})
+
+        if "Student" in node_type:
+          student_belonds_to_college = collection.Node.one({'_type': "RelationType", 'name': "student_belongs_to_college"}, {'_id': 1})
+
+          colleges = collection.Node.find({'_type': "GRelation", 'subject': node._id, 'relation_type.$id': student_belonds_to_college._id})
+
+          for each in colleges:
+            g = collection.Node.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
+            collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
+
+        elif "Voluntary Teacher" in node_type:
+          trainer_of_college = collection.Node.one({'_type': "RelationType", 'name': "trainer_of_college"}, {'_id': 1})
+
+          colleges = collection.Node.find({'_type': "GRelation", 'subject': node._id, 'relation_type.$id': trainer_of_college._id})
+
+          for each in colleges:
+            g = collection.Node.one({'_type': "GRelation", 'subject': each.right_subject, 'relation_type.$id': has_group._id})
+            collection.update({'_id': g.right_subject}, {'$addToSet': {'author_set': author.created_by}}, upsert=False, multi=False)
+
+
+      return HttpResponse(json.dumps({'result': True, 'message': " Link successfully created. \n\n Also subscribed to respective college group(s)."}))
+
+    else:
+      error_message = " UserLinkSetUpError: Either not an ajax call or not a POST request!!!"
+      return HttpResponse(json.dumps({'result': False, 'message': " Link not created - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+  except Exception as e:
+    error_message = "\n UserLinkSetUpError: " + str(e) + "!!!"
+    result = False
+
+    if gr_node:
+      # collection.remove({'_id': gr_node._id})
+      result = True
+      error_message = " Link created successfully. \n\n But facing problem(s) in subscribing to respective college group(s)!!!\n Please use group's 'Subscribe members' button to do so !!!"
+
+    else:
+      result = False
+      error_message = " Link not created - May be invalid username entered !!!"
+      
+    return HttpResponse(json.dumps({'result': result, 'message': error_message}))
 
 def edit_task_title(request, group_id):
     '''

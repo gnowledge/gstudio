@@ -1,11 +1,9 @@
-''' -- imports from python libraries -- '''
-# import os -- Keep such imports here
-
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
+import mongokit 
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS
@@ -13,12 +11,17 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
+
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+
+''' -- imports from python libraries -- '''
+# import os -- Keep such imports here
 
 import subprocess
 import re
 import ast
 import string
+from datetime import datetime
 ######################################################################################################################################
 
 db = get_database()
@@ -275,14 +278,16 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
 
 def get_node_common_fields(request, node, group_id, node_type):
   """Updates the retrieved values of common fields from request into the given node."""
-  
+  # print "\n Coming here...\n\n"
+
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
+  is_changed = False
 
-  name = request.POST.get('name')
-  sub_theme_name = request.POST.get("sub_theme_name", '')
-  add_topic_name = request.POST.get("add_topic_name", '')
+  name = unicode(request.POST.get('name', ""))
+  sub_theme_name = unicode(request.POST.get("sub_theme_name", ''))
+  add_topic_name = unicode(request.POST.get("add_topic_name", ''))
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
@@ -291,7 +296,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   prior_node_list = request.POST.get('prior_node_list','')
   collection_list = request.POST.get('collection_list','')
   module_list = request.POST.get('module_list','')
-  content_org = request.POST.get('content_org')
+  content_org = unicode(request.POST.get('content_org'))
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
 
@@ -305,7 +310,9 @@ def get_node_common_fields(request, node, group_id, node_type):
   if not node.has_key('_id'):
     
     node.created_by = usrid
-    node.member_of.append(node_type._id)
+    
+    if node_type._id not in node.member_of:
+      node.member_of.append(node_type._id)
 
     if group_obj._id not in node.group_set:
       node.group_set.append(group_obj._id)
@@ -314,37 +321,57 @@ def get_node_common_fields(request, node, group_id, node_type):
       node.access_policy = unicode(access_policy)
     else:
       node.access_policy = unicode(access_policy)
+
+    node.status = "PUBLISHED"
+
+    is_changed = True
           
     # End of if
 
   # --------------------------------------------------------------------------- For create/edit
-  node.name = unicode(name)
-  if sub_theme_name:
-    node.name = unicode(sub_theme_name) 
-  if add_topic_name:
-    node.name = unicode(add_topic_name)
 
-  node.status = unicode("DRAFT")
+  # -------------------------------------------------------------------------------- name
+ 
+  if name:
+    if node.name != name:
+      node.name = name
+      print "\n Changed: name"
+      is_changed = True
+  
+  if sub_theme_name:
+    if node.name != sub_theme_name:
+      node.name = sub_theme_name
+      print "\n Changed: sub-theme"
+      is_changed = True
+  
+  if add_topic_name:
+    if node.name != add_topic_name:
+      node.name = add_topic_name
+      print "\n Changed: topic"
+      is_changed = True
+
+  # -------------------------------------------------------------------------------- language
+
   if language:
     node.language = unicode(language) 
   else:
     node.language = u"en"
-  node.location = map_geojson_data # Storing location data
+
+  # -------------------------------------------------------------------------------- access_policy
 
   if access_policy:
     # Policy will be changed only by the creator of the resource
     # via access_policy(public/private) option on the template which is visible only to the creator
-    if access_policy == "PUBLIC":
+    if access_policy == "PUBLIC" and node.access_policy != access_policy:
       node.access_policy = u"PUBLIC"
-    else:
+      print "\n Changed: access_policy (pu 2 pr)"
+      is_changed = True
+    elif access_policy == "PRIVATE" and node.access_policy != access_policy:
       node.access_policy = u"PRIVATE"
+      print "\n Changed: access_policy (pr 2 pu)"
+      is_changed = True
   else:
     node.access_policy = u"PUBLIC"
-
-  node.modified_by = usrid
-
-  if usrid not in node.contributors:
-    node.contributors.append(usrid)
 
   # For displaying nodes in home group as well as in creator group.
   user_group_obj=gcollection.Node.one({'$and':[{'_type':ObjectId(group_id)},{'name':usrname}]})
@@ -356,6 +383,8 @@ def get_node_common_fields(request, node, group_id, node_type):
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
 
+  # -------------------------------------------------------------------------------- tags
+
   if tags:
     tags_list = []
 
@@ -365,80 +394,148 @@ def get_node_common_fields(request, node, group_id, node_type):
       if tag:
         tags_list.append(tag)
 
-    node.tags = tags_list
+    if set(node.tags) != set(tags_list):
+      node.tags = tags_list
+      print "\n Changed: tags"
+      is_changed = True
 
   # -------------------------------------------------------------------------------- prior_node
 
-  node.prior_node = []
-  if prior_node_list != '':
-    prior_node_list = prior_node_list.split(",")
+  # node.prior_node = []
+  # if prior_node_list != '':
+  #   prior_node_list = prior_node_list.split(",")
 
-  i = 0
-  while (i < len(prior_node_list)):
-    node_id = ObjectId(prior_node_list[i])
-    if gcollection.Node.one({"_id": node_id}):
-      node.prior_node.append(node_id)
+  # i = 0
+  # while (i < len(prior_node_list)):
+  #   node_id = ObjectId(prior_node_list[i])
+  #   if gcollection.Node.one({"_id": node_id}):
+  #     node.prior_node.append(node_id)
     
-    i = i+1
+  #   i = i+1
  
+  if prior_node_list != '':
+    prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
 
+    if set(node.prior_node) != set(prior_node_list):
+      i = 0
+      while (i < len(prior_node_list)):
+        node_id = ObjectId(prior_node_list[i])
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.prior_node:
+            node.prior_node.append(node_id)
+        
+        i = i+1
+      print "\n Changed: prior_node"
+      is_changed = True
+ 
   # -------------------------------------------------------------------------------- collection
 
-  node.collection_set = []
-  if collection_list != '':
-      collection_list = collection_list.split(",")
+  # node.collection_set = []
+  # if collection_list != '':
+  #     collection_list = collection_list.split(",")
 
-  i = 0
-  while (i < len(collection_list)):
-    node_id = ObjectId(collection_list[i])
+  # i = 0
+  # while (i < len(collection_list)):
+  #   node_id = ObjectId(collection_list[i])
     
-    if gcollection.Node.one({"_id": node_id}):
-      node.collection_set.append(node_id)
+  #   if gcollection.Node.one({"_id": node_id}):
+  #     node.collection_set.append(node_id)
     
-    i = i+1
- 
+  #   i = i+1
+
+  if collection_list != '':
+    collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
+
+    if set(node.collection_set) != set(collection_list):
+      i = 0
+      while (i < len(collection_list)):
+        node_id = ObjectId(collection_list[i])
+        
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.collection_set:
+            node.collection_set.append(node_id)
+        
+        i = i+1
+      print "\n Changed: collection_list"
+      is_changed = True
+     
   # -------------------------------------------------------------------------------- Module
 
-  node.collection_set = []
-  if module_list != '':
-      collection_list = module_list.split(",")
+  # node.collection_set = []
+  # if module_list != '':
+  #     collection_list = module_list.split(",")
 
-  i = 0
-  while (i < len(collection_list)):
-    node_id = ObjectId(collection_list[i])
+  # i = 0
+  # while (i < len(collection_list)):
+  #   node_id = ObjectId(collection_list[i])
     
-    if gcollection.Node.one({"_id": node_id}):
-      node.collection_set.append(node_id)
+  #   if gcollection.Node.one({"_id": node_id}):
+  #     node.collection_set.append(node_id)
     
-    i = i+1
- 
+  #   i = i+1
+
+  if module_list != '':
+    collection_list = [ObjectId(each.strip()) for each in module_list.split(",")]
+
+    if set(node.collection_set) != set(collection_list):
+      i = 0
+      while (i < len(collection_list)):
+        node_id = ObjectId(collection_list[i])
+        
+        if gcollection.Node.one({"_id": node_id}):
+          if node_id not in node.collection_set:
+            node.collection_set.append(node_id)
+        
+        i = i+1
+      print "\n Changed: module_list"
+      is_changed = True
     
   # ------------------------------------------------------------------------------- org-content
+  
   if content_org:
-    node.content_org = unicode(content_org)
-    
-    # Required to link temporary files with the current user who is modifying this document
-    usrname = request.user.username
-    filename = slugify(name) + "-" + usrname + "-"
-    node.content = org2html(content_org, file_prefix=filename)
+    if node.content_org != content_org:
+      node.content_org = content_org
+      
+      # Required to link temporary files with the current user who is modifying this document
+      usrname = request.user.username
+      filename = slugify(name) + "-" + usrname + "-"
+      node.content = org2html(content_org, file_prefix=filename)
+      print "\n Changed: content_org"
+      is_changed = True
 
   # ----------------------------------------------------------------------------- visited_location in author class
+  if node.location != map_geojson_data:
+    node.location = map_geojson_data # Storing location data
+    print "\n Changed: map"
+    is_changed = True
+  
   if user_last_visited_location:
-    
     user_last_visited_location = list(ast.literal_eval(user_last_visited_location))
 
     author = gcollection.Node.one({'_type': "GSystemType", 'name': "Author"})
     user_group_location = gcollection.Node.one({'_type': "Author", 'member_of': author._id, 'created_by': usrid, 'name': usrname})
 
     if user_group_location:
-
       if node._type == "Author" and user_group_location._id == node._id:
-        node['visited_location'] = user_last_visited_location
+        if node['visited_location'] != user_last_visited_location:
+          node['visited_location'] = user_last_visited_location
+          print "\n Changed: user location"
+          is_changed = True
 
       else:
         user_group_location['visited_location'] = user_last_visited_location
         user_group_location.save()
 
+  if is_changed:
+    node.status = unicode("DRAFT")
+
+    node.modified_by = usrid
+
+    if usrid not in node.contributors:
+      node.contributors.append(usrid)
+
+  # print "\n Reached here ...\n\n"
+  return is_changed
 # ============= END of def get_node_common_fields() ==============
   
   
@@ -448,10 +545,10 @@ def get_versioned_page(node):
     rcs = RCS()
     fp = history_manager.get_file_path(node)
     cmd= 'rlog  %s' % \
-	(fp)
+  (fp)
     rev_no =""
     proc1=subprocess.Popen(cmd,shell=True,
-				stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE)
     for line in iter(proc1.stdout.readline,b''):
        
        if line.find('revision')!=-1 and line.find('selected') == -1:
@@ -653,6 +750,7 @@ def update_mobwrite_content_org(node_system):
     textobj.save()
   return textobj
 
+
                       
 
 def get_node_metadata_fields(request, node, node_type):
@@ -732,4 +830,482 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
 	    gr_node.status = u"PUBLISHED"
             gr_node.save()
 		
+
+
+def get_property_order_with_value(node):
+  new_property_order = []
+  demo = None
+
+  if node.has_key('_id'):
+    demo = collection.Node.one({'_id': node._id})
+
+  else:
+    demo = eval("collection"+"."+node['_type'])()
+    demo["member_of"] = node["member_of"]
+
+  if demo["_type"] not in ["MetaType", "GSystemType", "AttributeType", "RelationType"]:
+    # If GSystems found, then only perform following statements
+    
+    demo["property_order"] = []
+    type_of_set = []
+    gst_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["member_of"]}}, {'type_of': 1, 'property_order': 1})
+    for gst in gst_nodes:
+      for type_of in gst["type_of"]:
+        if type_of not in type_of_set:
+          type_of_set.append(type_of)
+
+      for po in gst["property_order"]:
+        if po not in demo["property_order"]:
+          demo["property_order"].append(po)
+
+    demo.get_neighbourhood(node["member_of"])
+
+    for tab_name, list_field_id in demo['property_order']:
+      list_field_set = []
+      for field_id_or_name in list_field_id:
+        if type(field_id_or_name) == ObjectId: #ObjectId.is_valid(field_id_or_name):
+          # For attribute-field(s) and/or relation-field(s)
+          
+          field = collection.Node.one({'_id': ObjectId(field_id_or_name)}, {'_type': 1, 'subject_type': 1, 'object_type': 1, 'name': 1, 'altnames': 1, 'inverse_name': 1})
+          # list_field_set.append([demo['member_of'], field, demo[field.name]])
+          altnames = u""
+          value = None
+          data_type = None
+          if field._type == RelationType or field._type == "RelationType":
+            # For RelationTypes
+            # print "\n field.altnames: ", field.altnames, "\n"
+            # print "\n ", demo["member_of"], " === ", field.subject_type, "\n"
+            if set(demo["member_of"]).issubset(field.subject_type):
+              # It means we are dealing with normal relation & 
+              data_type = demo.structure[field.name]
+              value = demo[field.name]
+              # print "\n field.altnames(inner 1 if): ", field.altnames, "\n"
+              if field.altnames:
+                if ";" in field.altnames:
+                  # print "\n altnames: ", field.altnames
+                  altnames = field.altnames.split(";")[0]
+                else:
+                  altnames = field.altnames
+
+            elif set(demo["member_of"]).issubset(field.object_type):
+              # It means we are dealing with inverse relation
+              data_type = demo.structure[field.inverse_name]
+              # print "\n field.altnames(else`): ", field.altnames, "\n"
+              value = demo[field.inverse_name]
+              if field.altnames:
+                if ";" in field.altnames:
+                  altnames = field.altnames.split(";")[1]
+                else:
+                  altnames = field.altnames
+
+            elif type_of_set:
+              # If current node's GST is not in subject_type
+              # Search for that GST's type_of field value in subject_type
+              for each in type_of_set:
+                if each in field.subject_type:
+                  data_type = demo.structure[field.name]
+                  # print "\n field.altnames(inner 2 if): ", field.altnames, "\n"
+                  value = demo[field.name]
+                  if field.altnames:
+                    if ";" in field.altnames:
+                      altnames = field.altnames.split(";")[0]
+                    else:
+                      altnames = field.altnames
+
+                elif each in field.object_type:
+                  data_type = demo.structure[field.inverse_name]
+                  # print "\n field.altnames(inner 2_2 if): ", field.altnames, "\n"
+                  value = demo[field.inverse_name]
+                  if field.altnames:
+                    if ";" in field.altnames:
+                      altnames = field.altnames.split(";")[0]
+                    else:
+                      altnames = field.altnames
+
+
+          else:
+            # For AttributeTypes
+            altnames = field.altnames
+            data_type = demo.structure[field.name]
+            value = demo[field.name]
+
+
+          # print " field._id: ", field._id, " --  field.altnames: ", altnames
+
+          list_field_set.append({ 'type': field._type, # It's only use on details-view template; overridden in ndf_tags html_widget()
+                                  '_id': field._id, 
+                                  'data_type': data_type,
+                                  'name': field.name, 'altnames': altnames,
+                                  'value': value
+                                })
+
+        else:
+          # For node's base-field(s)
+
+          base_field = {
+            'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
+            'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Content", 'required': False},
+            # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
+            'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
+            # 'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
+            'tags': {'name': "tags", '_type': "BaseField", 'altnames': "Tags", 'required': False}
+          }
+          # list_field_set.append([demo['member_of'], base_field[field_id_or_name], demo[field_id_or_name]])
+          list_field_set.append({ '_type': base_field[field_id_or_name]['_type'],
+                                  'data_type': demo.structure[field_id_or_name],
+                                  'name': field_id_or_name, 'altnames': base_field[field_id_or_name]['altnames'],
+                                  'value': demo[field_id_or_name],
+                                  'required': base_field[field_id_or_name]['required']
+                                })
+
+      new_property_order.append([tab_name, list_field_set])
+
+    demo["property_order"] = new_property_order
+  
+  else:
+    # Otherwise (if GSystemType found) depending upon whether type_of exists or not returns property_order.
+    if not demo["property_order"] and demo.has_key("_id"):
+      type_of_nodes = collection.Node.find({'_type': "GSystemType", '_id': {'$in': demo["type_of"]}}, {'property_order': 1})
+      
+      if type_of_nodes.count():
+        demo["property_order"] = []
+        for to in type_of_nodes:
+          for po in to["property_order"]:
+            demo["property_order"].append(po)
+
+      collection.update({'_id': demo._id}, {'$set': {'property_order': demo["property_order"]}}, upsert=False, multi=False)
+
+  new_property_order = demo['property_order']
+
+  if demo.has_key('_id'):
+    node = collection.Node.one({'_id': demo._id})
+
+  else:
+    node = eval("collection"+"."+demo['_type'])()
+    node["member_of"] = demo["member_of"]
+  
+  node['property_order'] = new_property_order
+
+  return node['property_order']
+
+
+def parse_template_data(field_data_type, field_value, **kwargs):
+  """
+  Parses the value fetched from request (GET/POST) object based on the data-type of the given field.
+
+  Arguments:
+  field_data_type -- data-type of the field
+  field_value -- value of the field retrieved from GET/POST object
+
+  Returns:
+  Parsed value based on the data-type of the field
+  """
+  
+  '''
+  kwargs_keys_list = [
+                      "date_format_string",     # date-format in string representation
+                      "field_instance"          # dict-object reperesenting AT/RT node
+                    ]
+  '''
+  DATA_TYPE_STR_CHOICES = [
+                            "unicode", "basestring",
+                            "int", "float", "long",
+                            "list", "dict",
+                            "datetime",
+                            "bool",
+                            "ObjectId"
+                          ]
+
+  try:
+
+    if type(field_data_type) == type:
+      field_data_type = field_data_type.__name__
+      # print " (if)--> ", field_data_type, (field_data_type == "datetime"), "\n"
+
+      if not field_value:
+        if field_data_type == "dict":
+          return {}
+
+        elif field_data_type == "list":
+          return []
+
+        else:
+          return None
+
+      if field_data_type == "unicode":
+        field_value = unicode(field_value)
+
+      elif field_data_type == "basestring":
+        field_value = field_value
+
+      elif field_data_type == "int":
+        field_value = int(field_value)
+
+      elif field_data_type == "float":
+        field_value = float(field_value)
+
+      elif field_data_type == "long":
+        field_value = long(field_value)
+
+      elif field_data_type == "list":
+        field_value = "???"
+
+      elif field_data_type == "dict":
+        field_value = "???"
+
+      elif field_data_type == "datetime":
+        field_value = datetime.strptime(field_value, kwargs["date_format_string"])
+
+      elif field_data_type == "bool":
+        if field_value == "Yes" or field_value == "yes" or field_value == "1":
+          if field_value == "1":
+            field_value = bool(int(field_value))
+          else:
+            field_value = True
+        
+        elif field_value == "No" or field_value == "no" or field_value == "0":
+          if field_value == "0":
+            field_value = bool(int(field_value))
+          else:
+            field_value = False
+
+      elif field_data_type == "ObjectId":
+        field_value = ObjectId(field_value)
+
+      else:
+        error_message = "Unknown data-type ("+field_data_type+") found"
+        raise Exception(error_message)
+
+      # print "\n parsed field_value: ", field_value
+
+    elif type(field_data_type) == list:
+
+      if kwargs.has_key("field_instance"):
+        if kwargs["field_instance"]["_type"] == RelationType or kwargs["field_instance"]["_type"] == "RelationType":
+          # Write RT related code 
+          if not field_value:
+            return None
+
+          # print "\n field_value (going herre): ", field_value
+          field_value = collection.Node.one({'_id': ObjectId(field_value), 'member_of': {'$in': kwargs["field_instance"]["object_type"]}}, {'_id': 1})
+          if field_value:
+            field_value = field_value._id
+            # print "\n field_value (innerobjectid): ", field_value, " -- ", type(field_value)
+          else:
+            error_message = "This ObjectId("+field_type+") doesn't exists"
+            raise Exception(error_message)
+
+      else:
+        # Write code...
+        if not field_value:
+          return []
+
+        lr = field_value.replace(" ,", ",")
+        rr = lr.replace(", ", ",")
+        field_value = rr.split(",")
+
+        return field_value
+        
+    elif type(field_data_type) == dict:
+      # Write code...
+      if not field_value:
+        return {}
+
+    elif type(field_data_type) == mongokit.operators.IS:
+      # Write code...
+      if not field_value:
+        return None
+
+      field_value = unicode(field_value) if type(field_value) != unicode else field_value
+
+    elif type(field_data_type) == mongokit.document.R:
+      # Write code...
+      if kwargs["field_instance"]["_type"] == AttributeType or kwargs["field_instance"]["_type"] == "AttributeType":
+        # Write AT related code 
+        if not field_value:
+          if field_data_type == "dict":
+            return {}
+
+          elif field_data_type == "list":
+            return []
+
+          else:
+            return None
+
+      else:
+        error_message = "Neither AttributeType nor RelationType found"
+        raise Exception(error_message)
+
+    else:
+      error_message = "Unknown data-type found"
+      raise Exception(error_message)
+
+    return field_value
+
+  except Exception as e:
+    error_message = "\n TemplateDataParsingError: "+str(e)+" !!!\n"
+    raise Exception(error_message)
+
+def create_gattribute(subject_id, attribute_type_node, object_value):
+  ga_node = None
+
+  ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
+
+  if ga_node is None:
+    # Code for creation
+    try:
+      ga_node = collection.GAttribute()
+
+      ga_node.subject = subject_id
+      ga_node.attribute_type = attribute_type_node
+      ga_node.object_value = object_value
+      
+      ga_node.status = u"PUBLISHED"
+      ga_node.save()
+      info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+      print "\n ", info_message
+
+    except Exception as e:
+      error_message = "\n GAttributeCreateError: " + str(e) + "\n"
+      raise Exception(error_message)
+
+  else:
+    # Code for updation
+    is_ga_node_changed = False
+
+    try:
+      if type(ga_node.object_value) == list:
+        if set(ga_node.object_value) != set(object_value):
+          ga_node.object_value = object_value
+          is_ga_node_changed = True
+
+      elif type(ga_node.object_value) == dict:
+        if cmp(ga_node.object_value, object_value) != 0:
+          ga_node.object_value = object_value
+          is_ga_node_changed = True
+
+      else:
+        if ga_node.object_value != object_value:
+          ga_node.object_value = object_value
+          is_ga_node_changed = True
+
+      if is_ga_node_changed:
+        ga_node.status = u"PUBLISHED"
+        ga_node.save()
+        info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+        print "\n", info_message
+
+      else:
+        info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+        print "\n", info_message
+
+    except Exception as e:
+      error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
+      raise Exception(error_message)
+
+  return ga_node
+
+
+def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs):
+  """
+  Creates a GRelation document (instance).
+
+  Arguments:
+  subject_id -- ObjectId of the subject-node
+  relation_type_node -- Document of the RelationType node (Embedded document)
+  right_subject_id -- ObjectId of the right_subject node
+
+  Returns:
+  Created GRelation document.
+  """
+  gr_node = None
+  multi_relations = False
+
+  try:
+    if kwargs.has_key("multi"):
+      multi_relations = kwargs["multi"]
+
+    subject_id = ObjectId(subject_id)
+    right_subject_id = ObjectId(right_subject_id)
+
+    if multi_relations:
+      # For dealing with multiple relations
+
+      # Iterate and find all relationships (including DELETED ones' also)
+      nodes = collection.Triple.find({'_type': "GRelation", 
+                                      'subject': subject_id, 
+                                      'relation_type': relation_type_node.get_dbref()
+                                    })
+
+      for n in nodes:
+        if n.right_subject in right_subject_id:
+          if n.status != u"DELETED":
+            # If match found with existing one's, then only remove that ObjectId from the given list of ObjectIds
+            right_subject_id.remove(n.right_subject)
+
+      if right_subject_id:
+        # If still ObjectId list persists, it means either they are new ones' or they are from deleted ones'
+        for nid in right_subject_id:
+          gr_node = collection.Triple.one({'_type': "GRelation", 
+                                            'subject': subject_id, 
+                                            'relation_type': relation_type_node.get_dbref(),
+                                            'right_subject': nid
+                                          })
+
+          if gr_node is None:
+            # New one found so create it
+            gr_node = collection.GRelation()
+
+            gr_node.subject = subject_id
+            gr_node.relation_type = relation_type_node
+            gr_node.right_subject = right_subject_id
+
+            gr_node.status = u"PUBLISHED"
+            gr_node.save()
+
+          else:
+            # Deleted one found so change it's status back to Published
+            if gr_node.status == u'DELETED':
+              collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+
+          info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+          print "\n", info_message
+
+    else:
+      # For dealing with single relation
+      gr_node = collection.Triple.one({'_type': "GRelation", 
+                                       'subject': subject_id, 
+                                       'relation_type': relation_type_node.get_dbref()
+                                      })
+
+      if gr_node is None:
+        # Code for creation
+        gr_node = collection.GRelation()
+
+        gr_node.subject = subject_id
+        gr_node.relation_type = relation_type_node
+        gr_node.right_subject = right_subject_id
+
+        gr_node.status = u"PUBLISHED"
+        
+        gr_node.save()
+        info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+        print "\n", info_message
+
+      else:
+        if gr_node.right_subject != right_subject_id:
+          collection.update({'_id': gr_node._id}, {'$set': {'right_subject': right_subject_id}}, upsert=False, multi=False)
+
+        elif gr_node.right_subject == right_subject_id and gr_node.status == u"DELETED":
+          collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+
+        else:
+          info_message = " GRelation ("+gr_node.name+") already exists !\n"
+          print "\n", info_message
+
+    return gr_node
+
+  except Exception as e:
+      error_message = "\n GRelationCreateError: " + str(e) + "\n"
+      raise Exception(error_message)
 
