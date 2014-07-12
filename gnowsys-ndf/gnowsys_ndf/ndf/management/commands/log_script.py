@@ -291,6 +291,9 @@ def log_iteration_1_file_start():
 	Start Iteration 1
 	"""
         global my_log
+	my_log.close()
+        path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/iteration_1.txt')
+	my_log = open(path, "w")	
         my_log.write("Iteration 1. Creating the GSystemType Classes\n\n")
         
 	
@@ -308,6 +311,7 @@ def log_iteration_2_file_start():
 	Start Iteration 2
 	"""
 	global my_log
+	my_log.close()
         path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/iteration_2.txt')
 	my_log = open(path, "w")	
         my_log.write("Iteration 2. Creating the GSystem Topics - WikiTopics and their attributes\n\n")
@@ -328,6 +332,7 @@ def log_iteration_3_file_start():
 	Start Iteration 1
 	"""
 	global my_log
+	my_log.close()
        	path = os.path.join(os.path.dirname(__file__), '../../static/ndf/wikidata/iteration_3.txt')
 	my_log = open(path, "w")	
         my_log.write("Iteration 3. Creating the Relationtypes and GRelations. The Topics have already been created.\n\n")

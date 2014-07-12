@@ -1,4 +1,7 @@
+	
 {% extends "ndf/node_details_base.html" %}
+
+
 
 {% block title %} {{title}} {% endblock %}
 
@@ -7,9 +10,10 @@
 {% endblock %}
 
 {% block related_content %}	
+	<center>{{ topic_count }} items found </center>	
 	{% for topic in topic_coll %}
     		{% if selected_topic.name == topic.name %}
-		<br/>
+		<br/> 
 		<div class="create card">
 		<a class="button medium" href="{% url 'wikidata_topic_display' group_id topic %}" style="text-decoration:underline;font-weight:bold;text-color:red;font-size:20px;"> 
 		{{ topic.name }}
@@ -26,7 +30,11 @@
 		{% endif %}
 
 	{% endfor %} 
-{{ count }} 
+
+
+ 	
+
+
 {% endblock %}
 
 
@@ -38,15 +46,34 @@
 
 {% block body_content %}
 
-{% if selected_topic == None %}
+
+{% if  flag %}
+	<br>
+	<br>
+	<h2>
+	<strong><center>
+	Tags Topic Display
+	</h2><h5>Following are the topics with the tag <strong>"{{tag}}"</strong></center><br><br>
+	
+	Select the topic from the panel on the left to view the details about that topic. The knowledge graph for that particular topic is also available on the same page.
+	</strong>
+	</h5>
+	
+	
+	<hr align = "center" size = "10%">
+
+
+
+{% elif selected_topic == None %}
 	<br>
 	<br>
 	<h3>
-	<strong>
+	<strong><center>
 	Select the topic from the panel on the left to view the details about that topic. The knowledge graph for that particular topic is also available on the same page.
-	</strong>
+	</strong></center>
 	</h3>
 	<hr align = "center" size = "10%">
+
 {% else %}
 	
 
@@ -85,7 +112,7 @@
       <!-- Content for Collection Graph -->
       <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
       	<a class="close-reveal-modal">&#215;</a>
-      	{% include "ndf/graph_collection.html" %}
+      	{% include "ndf/graph_collection.html" %}c
       </div>
       <!-- Content for dependency Graph -->
      <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
@@ -101,16 +128,14 @@
        <!-- #{#%# endif %} -->
      </div>
 
-  	<div>
-		<br>
-		<hr>
-		{% for tag in selected_topic.tags %}
-			<a class="button medium" href="{% url 'tag_topic_display' group_id tag %}" style="text-decoration:underline;font-weight:bold;text-color:red;font-size:20px;"> 
+  	
+		<h5><strong>Tags for this item</strong></h5>
+	<div >		
+	{% for tag in selected_topic.tags %}
+		<a class="[success alert secondary] [round radius] label" href="{% url 'tag_topic_display' group_id selected_topic tag %}" style="text-decoration:none;font-weight:bold;text-color:red;font-size:17px;"> 
 		{{ tag }} {{"  "}}
-     		 </a>
+     		</a>
 		{% endfor %}
-		<br>
-		<hr>
 		<h2><strong><center>Topic Name: {{ selected_topic.name }}</h2></strong></center>
 		<br>
 		<strong>
@@ -135,11 +160,20 @@
 			{{ tag }} {{" "}}		
 
 		{% endfor %}
-		<b r><br><strong>
+		<br><br><strong>
 		Wikipedia Page Link:</strong>
 		<a href = "{{ selected_topic.url }}">{{ selected_topic.url }}</a>		
 		<br><br>
+
 		<p>
+		<ul>
+		<strong>Sub_Class_of</strong>
+			{% for parent_class in selected_topic.member_of %}
+				<li>{{ parent_class }}</li>
+			{% endfor %}
+		</ul>
+		<br>
+		<br>
 		<ul>
 		<strong>Dynamic Attributes:</strong>
 		<br><br>

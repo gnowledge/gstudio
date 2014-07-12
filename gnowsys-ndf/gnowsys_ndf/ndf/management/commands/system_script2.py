@@ -300,7 +300,7 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 	"""
 	print "Creating a GSystem Topic"
 	topic_type = collection.Node.one({"name": u"WikiTopic","_type":u"GSystemType"})
-	obj = collection.Node.one({"name": unicode(label)}) #pick the topic related to wikidata
+	obj = collection.Node.find_one({"name": unicode(label)}) #pick the topic related to wikidata
 
 	if (obj!=None):
 		print "Topic already exists"
@@ -356,7 +356,7 @@ def create_Class(label, description, alias_list, class_id, last_update_datetime,
 		class_obj.altnames = unicode(string_alias)
 		class_obj.type_of.append(topic_type_id) #The GSystemType of class that is being created should be a part of the WikiData GApp.
 		class_obj.access_policy=unicode('PUBLIC')
-		factory = collection.Node.one({"name": u"factory_types"})
+		factory = collection.Node.one({"name": u"factory_types","type":u"MetaType"})
                 factory_id = factory._id
 		wikidata = collection.Node.one({"name":u"WikiData", "_type":"GSystemType"})
 		class_obj.member_of.append(ObjectId(wikidata._id))
@@ -433,12 +433,12 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 	subject = collection.Node.one({"_type": u"GSystem", "name": unicode(subject_name)})
 	
 	if subject is None:
-		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(right_subject_name) + " could not be created."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 	
 	elif relation_type is None:
-		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(object_value) + " could not be created."
+		print "The relation " + unicode(subject_name) + "--" + unicode(relation_type_name) + "--" + unicode(right_subject_name) + " could not be created."
 		print "-----------------------!!!!!!!!!!!!!--------------------------next---------"
 		return True
 
@@ -455,7 +455,7 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		relation.subject = ObjectId(left_system._id)
 		relation_type = collection.Node.find_one({"name":unicode(relation_type_name), "_type":u"RelationType"})
 		relation.relation_type = relation_type
-		right_system = collection.Node.find_one({"name":unicode(right_subject_name),"_type":u"GSystem"})
+		right_system = collection.Node.find_one({"name":unicode(right_subject_name)})
 		relation.right_subject = ObjectId(right_system._id)
 		relation.lang = u"en"
 		relation.status = u"PUBLISHED"
@@ -606,7 +606,15 @@ def populate_location(label,property_id,property_value,user_id):
 	obj.save()
 
 
+def get_class(label, class_id):
+	obj = collection.Node.find_one({"_type":u"GSystemType","name":unicode(label)})
+	if obj:
+		return obj
 
+def get_topic(label):
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	if obj:
+		return obj
 
 
 class Command(BaseCommand):
