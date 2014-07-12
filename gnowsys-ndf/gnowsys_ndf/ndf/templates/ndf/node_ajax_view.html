@@ -485,7 +485,8 @@ var flag = false;
 var pos=-1;
 var st = null;
 var initialText;
-var finalText;
+var toggleValue = -1;
+
 if(!window.win){
   win = {};
 }
@@ -507,6 +508,7 @@ win.Selector.mouseup = function()
 {
   st = String(win.Selector.getSelected());
   console.log("stout: " + st);
+  existingComments = [];
   sideComments = new SideComments('#commentable-area', currentUser, existingComments);
 }
 
@@ -546,7 +548,7 @@ sideComments.on('commentPosted', function( comment )
             success: function( updatedAnnotationsField ) 
             {
               // Once the comment is saved, insert the comment into the comment stream with "insertComment(comment)".
-              alert("Inside success");
+              console.log("Inside success: Comment added!");
               sideComments.insertComment(comment);
               highlightSearchTerms(st);
               annotations = jQuery.parseJSON(updatedAnnotationsField);
@@ -556,7 +558,7 @@ sideComments.on('commentPosted', function( comment )
     else
     {
       //TODO tell user to select text
-      alert("Please select some text first");
+      alert("Please select some text to add annotations!");
     }
 }); 
   
@@ -572,6 +574,8 @@ sideComments.on('commentPosted', function( comment )
            });
 });*/
 
+attempt();
+
 /*
 bind the below initialisation of sideComments object on hover over that area
 */
@@ -579,8 +583,8 @@ function showThread(elem)
 {
   text = elem.innerHTML;
   existingComments = [];
-  st = text;
-  alert(text);
+  st = String(text);
+  console.log("You clicked on: " + st);
   for (i = 0; i < annotations.length; i++)
   {
       if(String(text).toLowerCase() == annotations[i].selectedText.toLowerCase())
@@ -671,10 +675,10 @@ function highlightAll()
   }
 
 }
-var toggleValue = 1;
+
 function attempt()
 {
-  alert("toggleValue" + toggleValue);
+  console.log("toggleValue at beginning: " + toggleValue);
   if(toggleValue < 0)
    {
      //finalText = $("#content").html();
@@ -684,6 +688,7 @@ function attempt()
    } 
   else
   {
+    st = null;
     $(".side-comment").show();
     highlightAll(); 
     $("#content").bind("mouseup", win.Selector.mouseup);
@@ -691,6 +696,7 @@ function attempt()
   }
 
   toggleValue *= -1;
+  console.log("toggleValue at end: " + toggleValue);
 }
 
 </script>
