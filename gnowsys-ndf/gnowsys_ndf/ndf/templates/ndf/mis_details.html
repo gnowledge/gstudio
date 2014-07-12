@@ -125,8 +125,12 @@
           <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
             <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+            {% if node.collection_set %}
             <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+            {% endif %}
+            {% if node.prior_node %}
             <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+            {% endif %}
           </ul>
         </dd>
         <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
@@ -348,21 +352,25 @@
       	</div>
 
       	<!-- Content for Collection Graph -->
-      	<div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-      	  
-          <a class="close-reveal-modal">&#215;</a>
-      	  {% include "ndf/graph_collection.html" %}
+        {% if node.collection_set %}
+        	<div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+        	  
+            <a class="close-reveal-modal">&#215;</a>
+        	  {% include "ndf/graph_collection.html" %}
 
-      	</div>
-
+        	</div>
+        {% endif%}
+        
       	<!-- Content for dependency Graph -->
-      	<div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
-      	  
-          <a class="close-reveal-modal">&#215;</a>
-      	  {% include "ndf/graph_dependency.html" %}
+        {% if node.prior_node %}
+        	<div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+        	  
+            <a class="close-reveal-modal">&#215;</a>
+        	  {% include "ndf/graph_dependency.html" %}
 
-      	</div>
-            
+        	</div>
+        {% endif %}
+
       	<!-- Tab View Map Widget -->
       	<div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>    
       	  
