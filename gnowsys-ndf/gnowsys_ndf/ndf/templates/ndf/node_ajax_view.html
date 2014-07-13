@@ -60,9 +60,9 @@ ul#graph-hover.f-dropdown{
 {% endif %}
 
 <!-- Menu for adding annotations -->
-<span id="moving_div" style="display:none; position:absolute; z-index:15">
-      <button onclick = 'toggle($("#toggleContainer"))'><i class ="fi-clipboard-pencil" /></button>
-</span>
+<div id="moving_div" style="display:block; position:absolute; z-index:45" >
+      <i class ="fi-clipboard-pencil" onclick = 'alert("Clov")'></i>
+</div>
 <!-- End menu -->
 <header class="row page">
 
@@ -527,14 +527,25 @@ win.Selector.mouseup = function()
 {
   st = String(win.Selector.getSelected());
   console.log("stout: " + st);
-  existingComments = [];
-  sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+  if (st)
+  {
+      if (toggleValue == 1)
+      {
+         existingComments = [];
+         sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+      }
+      else if (toggleValue == -1)
+      {
+        toggle(document.getElementById("toggleContainer"));
+        existingComments = [];
+        sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+      }
+  }
 }
 
 $(document).ready (function(){
   initialText = $("#content").html();
-/*  highlightAll();
-  $("#content").bind("mouseup", win.Selector.mouseup);*/
+  $("#content").bind("mouseup", win.Selector.mouseup);
 });
 
 {% if user.is_authenticated %}
@@ -593,14 +604,17 @@ sideComments.on('commentPosted', function( comment )
            });
 });*/
 
-toggle($("#toggleContainer"));
+toggle(document.getElementById("toggleContainer"));
 
 /*
 bind the below initialisation of sideComments object on hover over that area
 */
 function showThread(elem)
 {
-  text = elem.innerHTML;
+  text = $(elem).text();
+  text1 = elem.innerHTML;
+  alert("sel text with jquery " + text);
+  alert("text with innerHTML: " + text1);
   existingComments = [];
   st = String(text);
   console.log("You clicked on: " + st);
@@ -621,6 +635,109 @@ function showThread(elem)
  * adding HTML tags before and after all occurrences of the search
  * term. 
  */
+function high(bodyText, searchText)
+{
+  highlightStartTag = "<span style='background-color : #e0ffff;font-weight:bold' onclick = 'showThread(this)'>";
+  highlightEndTag = "</span>";
+  var newText = "";
+  i = -1;
+  var charCheck = /[a-z]/;
+  var lcSearchTerm = searchText.toLowerCase();
+  var lcBodyText = bodyText.toLowerCase();
+  var cur;
+  var next;
+  var inter;
+  lcBodyTextLength = lcBodyText.length;
+  oneWord = false;
+  console.log("lcSearchTerm: " + lcSearchTerm);
+ // console.log("lcBodyText: " + lcBodyText);
+  arr = lcSearchTerm.split(" ");
+  noOfWords = arr.length;
+  
+
+  if (noOfWords == 1)
+  {
+    oneWord = true;
+  }
+
+  while (bodyText.length > 0) 
+  {
+    
+   
+            if (oneWord)
+            {
+                i = lcBodyText.indexOf(arr[0], i+1);
+            }
+            else
+            {
+                i = lcBodyText.indexOf(arr[0] + " ", i+1);
+            }
+            
+            //validation for i
+            if(i>0 && charCheck.test(lcBodyText.charAt(i-1)))
+            {
+                continue;
+            }
+
+            if(i>=0 && (!oneWord || (i+arr[0].length < lcBodyTextLength)) && charCheck.test(lcBodyText.charAt(i+arr[0].length)))
+            {
+                continue;
+            }
+
+  
+    start = i;
+    console.log("start value:   " + start);
+    if (i < 0) 
+    {
+      newText += bodyText;
+      bodyText = "";
+    } 
+    else 
+    { 
+          if(bodyText.lastIndexOf(">", i) >= bodyText.lastIndexOf("<", i))
+          {
+            //exclude everything inside HTML tags
+                  if(lcBodyText.lastIndexOf("/script>", i) >= lcBodyText.lastIndexOf("<script", i) )
+                  {
+                        //exclude everything inside script tags
+                        next = i;
+                        cur = next;
+                        for (k = 0; k < noOfWords -1; k++)
+                        {
+                          next = lcBodyText.indexOf(arr[k+1], cur+1);
+                          //validation for next
+                          if (next+arr[k+1].length < lcBodyTextLength &&  charCheck.test(lcBodyText.charAt(next+arr[k+1].length)))
+                          {
+                            break;
+                          }
+                          inter = lcBodyText.substring(cur+arr[k].length, next);
+                          inter = inter.trim();
+                          if(inter == "" || (inter[0] == '<' && inter[inter.length-1] == '>'))
+                          {
+                            cur = next;
+                            continue;
+                          }
+                          break;
+                        }
+
+                        if (k == noOfWords -1)
+                        {
+                          //all words matched
+                          newText += bodyText.substring(0, start) + highlightStartTag + bodyText.substring(start, next+arr[noOfWords-1].length ) + highlightEndTag;
+                          bodyText = bodyText.substr( next+arr[noOfWords-1].length );
+                          lcBodyText = bodyText.toLowerCase();
+                          i = -1;
+                          highlightStartTag = "<span style = 'background-color : #e0ffff;' onclick = 'showThread(this)'>";
+                        }
+                   }
+           }
+    }
+  }
+
+  return newText;
+}
+
+
 function doHighlight(bodyText, searchTerm) 
 {
     //highlightStartTag = "<font style = 'color : black; background-color : #F5BCA9;'>";
@@ -675,8 +792,8 @@ function highlightSearchTerms(searchText)
   // search string so that each word is searched for and highlighted individually
     
   var bodyText = $("#content").html();
-  bodyText = doHighlight(bodyText, searchText);
-  //console.log("inside highlightSearchTerms" + searchText);
+  //alert("inside highlightSearchTerms" + searchText);
+  bodyText = high(bodyText, searchText);
   $("#content").html(bodyText);
   return true;
 }
@@ -687,10 +804,11 @@ script for marking up the annotated text
 function highlightAll()
 {
 
-  for (i = 0; i < annotations.length; i++)
+  for (p = 0; p < annotations.length; p++)
   {
-     text = annotations[i].selectedText;
-     highlightSearchTerms(text);
+     t = annotations[p].selectedText;
+     highlightSearchTerms(t);
+     //alert("inside highlightAll: " + t);
   }
 
 }
@@ -700,23 +818,28 @@ function toggle(el)
   console.log("toggleClass at beginning: " + toggleValue);
   if (toggleValue == 1)
    {
+         alert("disabling..");
          //Disable annotations
          //finalText = $("#content").html();
          $(".side-comment").hide();
          $("#content").html(initialText);
-         $("#content").unbind("mouseup");
+         //$("#content").unbind("mouseup");
          //el.className = "";
+        // alert(el.innerHTML);
          el.innerHTML = '<i class="fi-comments"></i> Annotate';
          
    }  
   else if (toggleValue == -1)
-  {
+  {     
+         alert("enabling..");
+        
         //enable annotations
         st = null;
         $(".side-comment").show();
         highlightAll(); 
-        $("#content").bind("mouseup", win.Selector.mouseup);
+        //$("#content").bind("mouseup", win.Selector.mouseup);
         //el.className = "active";
+        alert(el.innerHTML);
         el.innerHTML = '<i class="fi-clipboard-pencil"></i> Annotate';
         //$("#content").html(finalText);
   }
