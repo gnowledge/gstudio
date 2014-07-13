@@ -320,7 +320,7 @@ collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False,
 modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': None})
 if modified_by_cur.count > 0:
     for n in modified_by_cur:
-	print n, "\n"
+	#print n, "\n"
 	if u'required_for' not in n.keys():
 		if n.contributors:
 		    collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
@@ -385,3 +385,15 @@ try:
 except Exception as e:
     print str(e)
 
+## INSERTED FOR MAP_REDUCE
+allIndexed = collection.IndexedWordList.find({"required_for" : "storing_indexed_words"})
+if allIndexed.count() == 0:
+	print "Inserting indexes"
+	j=1
+	while j<=27:
+		obj = collection.IndexedWordList()
+		obj.word_start_id = float(j)
+		obj.words = {}
+		obj.required_for = u'storing_indexed_words'
+		obj.save()
+		j+=1

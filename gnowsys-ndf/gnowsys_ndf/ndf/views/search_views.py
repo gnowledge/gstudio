@@ -612,7 +612,7 @@ def results_search_group(request, group_id):
 
 			search_results = json.dumps(search_results, cls=Encoder)
 			#print "final results: ", search_results
-			memList = populate_list_of_members()
+			#memList = populate_list_of_members()
 	except Exception:
 		pass
 
@@ -1113,7 +1113,7 @@ def ra_search_results(request, group_id):
 	
 	sq = str(request.GET['search_text']).strip()						# SEARCH QUERY
 	col = get_database()[Node.collection_name]							
-	relations = col.Node.find({ "_type": "RelationType"}, {"name":1})	
+	relations = col.Node.find({ "_type": "RelationType"}, {"name":1, "inverse_name":1})	
 
 	CASE_TWO_THRESHOLD = 0.6
 	GSYSTEM_MIN_THRESHOLD_CASE1 = 0.69
@@ -1128,6 +1128,12 @@ def ra_search_results(request, group_id):
 			sorted_rel[str(length)].append(rel.name)
 		else:
 			sorted_rel[str(length)] = [rel.name]
+		
+		length = len(rel.inverse_name.split('_'))
+		if str(length) in sorted_rel.keys():
+			sorted_rel[str(length)].append(rel.inverse_name)
+		else:
+			sorted_rel[str(length)] = [rel.inverse_name]
 
 		if length > max_length:
 			max_length = length
@@ -1160,7 +1166,7 @@ def ra_search_results(request, group_id):
 		c += 1
 
 	try:
-		relationType_obj = col.Node.one({"_type":"RelationType", "name":max_match_rel}, {"_id":1, "name":1})
+		relationType_obj = col.Node.one({"_type":"RelationType", "$or": [ {"name":max_match_rel}, {"inverse_name":max_match_rel} ] }, {"_id":1, "name":1})
 
 		GRelation_objs = col.Node.find({"_type":"GRelation", "relation_type.$id":relationType_obj._id})
 
@@ -1697,7 +1703,7 @@ def sim_distance(prefs,d1,d2):
 			##print "SUBTRACT",prefs[d1][item] - prefs[d2][item]		
 			sum_of_squares += pow(prefs[d1][item] - prefs[d2][item],2)
 			##print sum_of_squares
-	Tags
+	#Tags
 	##print "SUM OF SQUARES :):)",sum_of_squares,(1.0/(1+sum_of_squares))
 	return (1.0/(1+sum_of_squares))	
 
