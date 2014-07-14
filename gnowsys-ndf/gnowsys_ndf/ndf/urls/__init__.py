@@ -57,6 +57,7 @@ urlpatterns = patterns('',
 
     (r'^(?P<group_id>[^/]+)/browse resource', include('gnowsys_ndf.ndf.urls.browse_resource')),
     
+
     (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis'), {'app_name': "MIS"}),
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis_po'), {'app_name': "MIS-PO"}),
 

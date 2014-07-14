@@ -34,5 +34,10 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.ajax_views',
                        url(r'^get_data_for_batch_drawer/', 'get_data_for_batch_drawer', name='get_data_for_batch_drawer'),
                        url(r'^get_meeting_status/', 'get_meeting_status', name="get_meeting_status"),
                        url(r'^set_meeting_status/', 'set_meeting_status', name="set_meeting_status"),
+
+                       url(r'^set_user_link/', 'set_user_link', name='set_user_link'),
+
+                       url(r'^edit_task_title/', 'edit_task_title', name='edit_task_title'),
+                       url(r'^edit_task_content/', 'edit_task_content', name='edit_task_content'),
                        
 )

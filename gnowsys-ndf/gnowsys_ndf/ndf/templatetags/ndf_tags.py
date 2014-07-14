@@ -10,6 +10,8 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
+from mongokit import IS
+
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS as setting_gapps, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
@@ -326,10 +328,11 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(group_id, selectedGapp):
+def get_gapps_menubar(request, group_id):
 	"""Get Gapps menu-bar
 	"""
 	try:
+		selectedGapp = request.META["PATH_INFO"]
 		group_name = ""
 		collection = db[Node.collection_name]
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -364,11 +367,11 @@ def get_gapps_menubar(group_id, selectedGapp):
 		else :
 			group_name = group_obj.name
 
-		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
+		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
 	except invalid_id:
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		group_id=gpid._id
-		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
@@ -834,8 +837,8 @@ def user_access_policy(node, user):
 
   Check is performed in given sequence as follows (sequence has importance):
   - If user is superuser, then he/she is allowed
-  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
   - Else if user is creator of the group, then he/she is allowed
+  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
   - Else if user is member of the group, then he/she is allowed
   - Else user is NOT allowed!
 
@@ -1160,3 +1163,201 @@ def get_group_name(groupid):
 	else :
 		pass
 	return group_name 
+
+@register.filter
+def get_field_type(node_structure, field_name):
+  """Returns data-type value associated with given field_name.
+  """
+  return node_structure.get(field_name)
+
+
+@register.inclusion_tag('ndf/html_field_widget.html')
+# def html_widget(node_id, field, field_type, field_value):
+# def html_widget(node_id, node_member_of, field, field_value):
+def html_widget(node_id, field):
+  """
+  Returns html-widget for given attribute-field; that is, passed in form of
+  field_name (as attribute's name) and field_type (as attribute's data-type)
+  """
+  # gs = None
+  field_value_choices = []
+
+  is_list_of = False
+  LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
+              "[<type 'unicode'>]", "[<type 'basestring'>]",
+              "[<type 'int'>]", "[<type 'float'>]", "[<type 'long'>]",
+              "[<type 'datetime.datetime'>]"
+            ]
+
+  is_special_field = False
+  included_template_name = ""
+  SPECIAL_FIELDS = {"location": "ndf/location_widget.html",
+                    "content_org": "ndf/add_editor.html"
+                    # "attendees": "ndf/attendees_widget.html"  # Uncomment this to make attendance-widget working
+                    }
+
+  is_required_field = False
+
+  is_mongokit_is_radio = False # False for drop-down True for radio buttons
+
+  try:
+    if node_id:
+      node_id = ObjectId(node_id)
+
+    # if node_member_of:
+    #   gs = collection.GSystem()
+    #   gs.get_neighbourhood(node_member_of)
+
+    # field_type = gs.structure[field['name']]
+    field_type = field['data_type']
+    field_altnames = field['altnames']
+    field_value = field['value']
+    # print "\n IS: ", IS
+    if type(field_type) == IS:
+      field_value_choices = field_type._operands
+      # print "\n operands: ", field_value
+
+      if len(field_value_choices) == 2:
+        is_mongokit_is_radio = True
+
+    elif field_type == bool:
+      # print "\n ", field['name'], " -- ", field_type, " -- ", field_value
+      # field_value_choices = ["True", "False"]
+      # field_value = str(field_value)
+      field_value_choices = [True, False]
+      # print " ", type(field_value), " -- ", type(field_value_choices[0])
+
+    # print "\n ", field['name'], " -- ", field['value'], " -- ", type(field_value)
+    # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
+
+    if field.has_key('_id'):
+      field = collection.Node.one({'_id': field['_id']})
+
+    field['altnames'] = field_altnames
+
+    if not field_value:
+      field_value = ""
+
+    if type(field_type) == type:
+      field_type = field_type.__name__
+    else:
+      field_type = field_type.__str__()
+
+    # if field['name'] == "tot_when":
+    #   print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type), "\n"
+    is_list_of = (field_type in LIST_OF)
+
+    is_special_field = (field['name'] in SPECIAL_FIELDS.keys())
+    if is_special_field:
+      included_template_name = SPECIAL_FIELDS[field['name']]
+
+    is_AT_RT_base = field["_type"]
+
+    is_attribute_field = False
+    is_relation_field = False
+    is_base_field = False
+    if is_AT_RT_base == "BaseField":
+      is_base_field = True
+      is_required_field = field["required"]
+
+    elif is_AT_RT_base == "AttributeType":
+      is_attribute_field = True
+      is_required_field = field["required"]
+
+    elif is_AT_RT_base == "RelationType":
+      is_relation_field = True
+      is_required_field = True
+      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}},
+                                                            {'_id': 1, 'name': 1}
+                                                          )
+                                      )
+                                )
+      field_value = [str(each._id) for each in field_value]
+
+    return {'template': 'ndf/html_field_widget.html',
+            'field': field, 'field_type': field_type, 'field_value': field_value,
+            'node_id': node_id,
+            'field_value_choices': field_value_choices,
+            'is_base_field': is_base_field,
+            'is_attribute_field': is_attribute_field,
+            'is_relation_field': is_relation_field,
+            'is_list_of': is_list_of,
+            'is_mongokit_is_radio': is_mongokit_is_radio,
+            'is_special_field': is_special_field, 'included_template_name': included_template_name,
+            'is_required_field': is_required_field
+            # 'is_special_tab_field': is_special_tab_field
+    }
+
+  except Exception as e:
+    error_message = " HtmlWidgetTagError: " + str(e) + " !!!"
+    raise Exception(error_message)
+  
+@register.assignment_tag
+def check_node_linked(node_id):
+  """
+  Checks whether the passed node is linked with it's corresponding author node (i.e via "has_login" relationship)
+
+  Arguments:
+  node_id -- ObjectId of the node
+
+  Returns:
+  A bool value, i.e.
+  True: if linked (i.e. relationship is created for the given node)
+  False: if not linked (i.e. relationship is not created)
+  """
+
+  try:
+    node = collection.Node.one({'_id': ObjectId(node_id)}, {'_id': 1})
+    relation_type_node = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
+    is_linked = collection.Node.one({'_type': "GRelation", 'subject': node._id, 'relation_type': relation_type_node.get_dbref()})
+
+    if is_linked:
+      return True
+
+    else:
+      return False
+
+  except Exception as e:
+    error_message = " NodeUserLinkFindError - " + str(e)
+    raise Exception(error_message)
+
+@register.assignment_tag
+def check_group_admin(groupid, app_dict, user):
+  """
+  This restricts view of MIS & MIS-PO GApps to only superuser, creator & admins of the group. 
+  That is, other members of the group can't see these GApps.
+
+  Arguments:
+  groupid -- ObjectId of the currently selected group
+  app_dict -- A dictionary consisting of following key-value pair
+              - 'id': ObjectId of the GApp
+              - 'name': name of the GApp
+  user - User object taken from request object
+
+  Returns:
+  A bool value indicating:-
+  True: if user is superuser, creator or admin of the group
+  False: otherwise, user is just a member of the group
+  """
+
+  try:
+    if app_dict["name"] in ["MIS", "MIS-PO"]:
+      group_node = collection.Node.one({'_id': ObjectId(groupid)}, {'group_admin': 1, 'created_by': 1})
+
+      if group_node:
+        if (user.is_superuser) or (user.id == group_node.created_by) or (user.id in group_node.group_admin):
+          return True
+
+        else:
+          return False
+
+      else:
+        error_message = "No group exists with this id ("+str(groupid)+") !!!"
+        raise Exception(error_message)
+
+    else:
+      return True
+
+  except Exception as e:
+    error_message = "\n GroupAdminCheckError (For MIS & MIS-PO): " + str(e) + " \n"
+    raise Http404(error_message)

@@ -6,12 +6,21 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
-<script src="/static/ndf/js/jquery-ui.js"></script>
-<script src="/static/ndf/js/foundation-datepicker.js"></script>
-<link href="/static/ndf/css/foundation-datepicker.css" rel="stylesheet" />
-<link href="/static/ndf/css/jquery-ui.css" rel="stylesheet" />
+	<!-- 
+	<script src="/static/ndf/js/jquery-ui.js"></script>
+	<script src="/static/ndf/js/foundation-datepicker.js"></script>
+	<link href="/static/ndf/css/foundation-datepicker.css" rel="stylesheet" />
+	<link href="/static/ndf/css/jquery-ui.css" rel="stylesheet" />
+	-->
+
+	<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+
 <script type="text/javascript">
 </script>
+
 <style type="text/css">
 .watchers{
     max-height: 210px;

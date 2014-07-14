@@ -466,11 +466,25 @@ input.node-title{
 }
 
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal{
-  z-index:1; background-color: captiontext; padding: 5px 15px 10px; color:white !important; opacity:0.8; font-size: 2rem; box-shadow: 0 1px 10px 2px #A9A9A9;
+	
+	z-index:1;
+	background-color: captiontext;
+	padding: 5px 15px 10px;
+	color:white !important;
+	opacity:0.8;
+	font-size: 2rem;
+	box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover{
-background-color: white; border-radius: 30px; padding: 5px 15px 10px; transition:2s; opacity:1; color:black !important; font-size: 2rem;
+	
+	background-color: white;
+	border-radius: 30px;
+	padding: 5px 15px 10px;
+	transition:2s;
+	opacity:1;
+	color:black !important;
+	font-size: 2rem;
 }
 
 /* Splash Page */

@@ -31,12 +31,28 @@
     <div class="file">
       <br/>
       <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-      	<span class="fi-upload">&nbsp;&nbsp;New File</span>
+        <span class="fi-upload">&nbsp;&nbsp;New File</span>
       </a>
     </div>
   </div>
   {% endif %}
   {% endif %}
+    <dl class="tabs" data-tab>
+    <dd class="tab-title"><a href="#bar_visual">Bar</a></dd>
+    <dd class="tab-title active"><a href="#pie_visual">Pie</a></dd>
+  </dl>
+  <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
+  <br/>
+  <div class="tabs-content">
+    <div class="content" id="bar_visual">
+      {% include "ndf/bar_visualization.html" %}
+  </div>
+  <div class="content active" id="pie_visual">
+
+    {% include "ndf/pie_visualization.html" %}
+    
+  </div>
+</div>
 {% endblock %}
 
 
@@ -129,7 +145,9 @@
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
+	  {% endcomment %}
           {% endifequal %}
 	  
           <footer class="row">
@@ -218,8 +236,10 @@
 
           {% get_user_object doc.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag doc %}?next={{request.path}}">Delete </a>
-          {% endifequal %}
+          {% endcomment %}
+	  {% endifequal %}
 	  
           <footer class="row">
             <div class="small-6 columns">{{doc.mime_type|truncatechars:15}}</div>
@@ -304,8 +324,10 @@
 
           {% get_user_object image.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag image %}?next={{request.path}}">Delete </a>
-          {% endifequal %}
+          {% endcomment %}
+	  {% endifequal %}
     
           <footer class="row">
             <div class="small-6 columns">{{image.mime_type|truncatechars:15}}</div>
@@ -391,8 +413,10 @@
 
           {% get_user_object video.created_by as user_obj %}
           {% ifequal user_obj.username user.username %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag video %}?next={{request.path}}">Delete </a>
-          {% endifequal %}
+          {% endcomment %}
+	  {% endifequal %}
 
           <footer class="row">
             <div class="small-6 columns">{{video.mime_type|truncatechars:15}}</div>
@@ -473,8 +497,10 @@
 
         {% get_user_object each.created_by as user_obj %}
         {% ifequal user_obj.username user.username %}
-        <a class="button alert tiny" href="{% url 'delete_file' group_name_tag video %}?next={{request.path}}">Delete </a>
-        {% endifequal %}
+	{% comment %}
+        <a class="button alert tiny" href="{% url 'delete_file' group_name_tag each %}?next={{request.path}}">Delete </a>
+        {% endcomment %}
+	{% endifequal %}
 
         <footer class="row">
           <div class="small-6 columns">{{each.mime_type|truncatechars:15}}</div>
@@ -547,8 +573,10 @@
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
+	  {% comment %}
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
-          {% endifequal %}
+          {% endcomment %} 
+	  {% endifequal %}
     
           <footer class="row">
             <div class="small-6 columns">{{file.mime_type|truncatechars:15}}</div>
@@ -577,6 +605,7 @@
 </div>
 
 {% endblock %}
+
 
 
 <!-- Moved from videoDashboard -->
@@ -689,4 +718,11 @@ next.hide();
 }
 });
 
+
+{% if is_video %}
+alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
+{% endif %}
 {% endblock %}
+
+
+
