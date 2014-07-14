@@ -1,7 +1,7 @@
 {% extends "ndf/base.html" %}
 
 {% load ndf_tags %}
-{% get_neighbours1 node as node %}
+
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
 
 {% block style %}
@@ -653,8 +653,8 @@ $("#name_id").change(function(){
 				assess_arr.push($(this).val());
 			}
 		});
-		alert(pn_arr + 'prior')
-		alert(assess_arr + 'assess')
+		//alert(pn_arr + 'prior')
+		//alert(assess_arr + 'assess')
 		$("#prior_node_list").val(pn_arr);
 		$("#collection_list").val(cn_arr) ;
 		$("#module_list").val(md_arr);

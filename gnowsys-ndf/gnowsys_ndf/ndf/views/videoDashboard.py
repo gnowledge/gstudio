@@ -159,8 +159,12 @@ def video_edit(request,group_id,_id):
 	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
 	if teaches_list !='':
 			teaches_list=teaches_list.split(",")
-	create_grelation_list(img_node._id,"teaches",teaches_list)
-
+	create_grelation_list(vid_node._id,"teaches",teaches_list)
+	
+	if assesses_list !='':
+		assesses_list=assesses_list.split(",")
+					
+	create_grelation_list(vid_node._id,"assesses",assesses_list)
         
 
         return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))

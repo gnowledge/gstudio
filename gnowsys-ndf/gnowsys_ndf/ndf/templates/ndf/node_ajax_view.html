@@ -57,7 +57,7 @@ ul#graph-hover.f-dropdown{
 
 
 
-{% g1 node as schema %} 
+{% get_schema node as schema %} 
 
 
 <div itemscope itemtype="{{schema.1.type}}">
@@ -106,42 +106,42 @@ ul#graph-hover.f-dropdown{
 
 
 {% if schema.0 %}
-<meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">r
+<meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">
 <meta itemprop="{{schema.1.DM}}" content="{{node.last_update}}" >
 <meta itemprop="{{schema.1.creator}}" content="{{node.user_details_dict.created_by}}">
 <meta itemprop="{{schema.1.editor}}" content="{{node.user_details_dict.modified_by}}">
 <meta itemprop="{{schema.1.lang}}" content="{{node.language}}">
-<meta itemprop="{{schema.1.agerange}}" content="{{schema_AT.agerange}}">
-<meta itemprop="{{schema.1.timerequired}}" content="{{schema_AT.timerequired}}">
+<meta itemprop="{{schema.1.agerange}}" content="{{node.age_range}}">
+<meta itemprop="{{schema.1.timerequired}}" content="{{node.timerequired}}">
 {% for contributor_name in node.user_details.contributors %}
 <meta itemprop="{{schema.1.contributor}}" content="{{contributor_name}}">
 {% endfor %}                                                             
-{% if schema.1.sid == 3 or schema.1.sid == 2 or schema.1.sid == 4 %}     		
+{% if node|is_File %}     		
 <meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " > 	
 <meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >     	
 {% endif %}                     					  
 {% endif %} 	
 
 {% for neighbour in node.teaches %} 																
-<div itemprop="educationalalignment" itemscope itemtype="alignmentObject">
-	<meta itemprop="educationalframework" content="Metastudio">
-	<meta itemprop="alignmenttype" content="teaches">	
-	<meta itemprop="targeturl" content="{{neighbour.url}}"> 
-	<meta itemprop ="targetname" content ="{{neighbour.name}}">
-	<meta itemprop ="targetdescription" content ="{{neighbour.html_content}}"> 
+<div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
+	<meta itemprop="{{schema.1.educationalframework}}" content="">
+	<meta itemprop="{{schema.1.alignmenttype}}" content="teaches">	
+	<meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+	<meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
+	<meta itemprop ="{{Schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
 </div>
 {% endfor %}
-
 
 {% for neighbour in node.assesses %} 																
-<div itemprop="educationalalignment" itemscope itemtype="alignmentObject">
-	<meta itemprop="educationalframework" content="Metastudio">
-	<meta itemprop="alignmenttype" content="assesses">	
-	<meta itemprop="targeturl" content="{{neighbour.url}}"> 
-	<meta itemprop ="targetname" content ="{{neighbour.name}}">
-	<!--<meta itemprop ="targetdescription" content ="{{neighbour.html_content|safe}}"> -->
+<div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
+	<meta itemprop="{{schema.1.educationalframework}}" content="">
+	<meta itemprop="{{schema.1.alignmenttype}}" content="assesses">	
+	<meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+	<meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
+	<meta itemprop ="{{schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
 </div>
 {% endfor %}
+
 <div class="row">
 	
   <section class="medium-9 columns">

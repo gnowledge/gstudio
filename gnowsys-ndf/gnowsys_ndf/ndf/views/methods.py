@@ -401,7 +401,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # -------------------------------------------------------------------------------- prior_node
 
-  # node.prior_node = []
+   
   # if prior_node_list != '':
   #   prior_node_list = prior_node_list.split(",")
 
@@ -412,7 +412,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   #     node.prior_node.append(node_id)
     
   #   i = i+1
- 
+  #node.prior_node = []
   if prior_node_list != '':
     prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
 
@@ -765,11 +765,11 @@ def get_node_metadata(request,node,node_type):
 	attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
 	if(node.has_key('_id')):
 		for atname in attribute_type_list:
-			field_value=unicode(request.POST.get(atname,""))
+			field_value=(request.POST.get(atname,""))
 			at=collection.Node.one({"_type":"AttributeType","name":atname})	
 			if(at!=None):
 				create_gattribute(node._id,at,field_value)		
-			
+"""			
 def create_AttributeType(name, data_type, system_name, user_id):
 
 	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
@@ -809,17 +809,15 @@ def create_RelationType(name,inverse_name,subject_type_name,object_type_name,use
                 relation_type.save()
 		system_type.relation_type_set.append(relation_type)
 		system_type.save()
-
+"""
 
 def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
 # function to create grelations for new ones and delete old ones.
 	relationtype = collection.Node.one({"_type":"RelationType","name":unicode(relation_type_name)})
 	
 	#list_current_grelations = collection.Node.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
+	#removes all existing relations given subject and relation type and then creates again.
 	collection.remove({"_type":"GRelation","subject":subject_id,"relation_type":relationtype.get_dbref()})
-	
-	#for relation in list_current_grelations:
-		#collection.remove({"_type":"GRelation","subject":subject_id,"right_subject":relation.right_subject})
 	
 	
 	

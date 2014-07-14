@@ -154,6 +154,7 @@ def image_detail(request, group_id, _id):
     img_node = collection.File.one({"_id": ObjectId(_id)})
     if img_node._type == "GSystemType":
 	return imageDashboard(request, group_id, _id)
+    img_node.get_neighbourhood(img_node.member_of)
     return render_to_response("ndf/image_detail.html",
                                   { 'node': img_node,
                                     'group_id': group_id,
@@ -184,13 +185,19 @@ def image_edit(request,group_id,_id):
 	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
 	if teaches_list !='':
 			teaches_list=teaches_list.split(",")
+	
 	create_grelation_list(img_node._id,"teaches",teaches_list)
-
+	assesses_list = request.POST.get('assesses_list','')	
+	if assesses_list !='':
+		assesses_list=assesses_list.split(",")
+					
+	create_grelation_list(img_node._id,"assesses",assesses_list)
         
-
+	
         return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))
         
     else:
+	img_node.get_neighbourhood(img_node.member_of)
         return render_to_response("ndf/image_edit.html",
                                   { 'node': img_node,
                                     'group_id': group_id,
