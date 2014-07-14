@@ -444,9 +444,11 @@
 
 					new_g.filter(function(d){ return (d._id).slice(-2) =="_n"; })
 						.append("svg:rect")
-                		.attr("x", function(d) {var ttx=d.screen_name ;  return (-ttx.length*2/1.75)} )
+                		// calculation for x-position : based on length of screen name
+                		.attr("x", function(d) {var ttx=d.screen_name ;  return (-ttx.length/6 -(ttx.length>12?ttx.length/25:''))+"em" } )
                 		.attr("y", 10)	
-                		.attr("width", function(d) {var ttx=d.screen_name ;  return (ttx.length+22+40)})
+                		// .attr("width", function(d) {var ttx=d.screen_name ;  return (ttx.length+62)})
+                		.attr("width", function(d) {var ttx=d.screen_name ;  return (((ttx.length/2)+1.5) +"em")})
                 		.attr("height", 20)
                 		.call(drag)
                 		.style("fill-opacity", ".1")
@@ -490,6 +492,7 @@
                 				 	else if((d._id).slice(-2)=="_r")
                 				 		{ return "#404040"}
                 				 })
+                				 .attr("title", function(d){return d.screen_name;})
                 				 .on("dblclick", conceptg_dblclick)
                 				 .attr("class","nodeText");
 
