@@ -11,19 +11,25 @@ DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 LANGUAGES = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
 
 #SMTP setting for sending mail (Using python default SMTP server)
-#EMAIL_USE_TLS = False
-#EMAIL_HOST = 'localhost'
-#EMAIL_PORT = 1025
-#EMAIL_HOST_USER = ''
-#EMAIL_HOST_PASSWORD = ''
-#DEFAULT_FROM_EMAIL = 'testing@example.com'
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = 'testing@example.com'
+
+#To use views/forum.py or mm_middleware, the following SMTP setting has to be used
 
 #SMTP setting for sending mail (Using gmail SMTP server)
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'metastudiom@gmail.com'
-EMAIL_HOST_PASSWORD = 'Sairam@85'
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_PORT = 587
+#EMAIL_HOST_USER = 'your_email_id'
+#EMAIL_HOST_PASSWORD = 'your_password'
+
+#Following is the email-address of the mailman server.
+
+#LOCAL_MAILMAN_USER = 'mailman_server_address'
 
 # strength of a password
 PASSWORD_MIN_LENGTH = 8
@@ -133,7 +139,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
 
-    'gnowsys_ndf.mymiddleware.midware.Midware',
+    'gnowsys_ndf.mm_middleware.midware.Midware',
     # Uncomment the next line for simple clickjacking protection:
 
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -160,7 +166,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 INSTALLED_APPS = (	
     'gnowsys_ndf.ndf',
-    'gnowsys_ndf.mymiddleware',
+    'gnowsys_ndf.mm_middleware',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
