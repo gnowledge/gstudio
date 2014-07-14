@@ -291,15 +291,19 @@ def populate_list_of_members():
 def populate_list_of_group_members(group_id):
     col = get_database()[Node.collection_name]
     try :
+      try:
         author_list = col.Node.one({"_type":"Group", "_id":ObjectId(group_id)}, {"author_set":1, "_id":0})
-        memList = []
+      except:
+        author_list = col.Node.find_one({"_type":"Group", "name":group_id}, {"author_set":1, "_id":0})
+      
+      memList = []
 
-        for author in author_list.author_set:
-            name_author = User.objects.get(pk=author)
-            memList.append(name_author)
-        
-        print "members in group: ", memList
-        return memList
+      for author in author_list.author_set:
+          name_author = User.objects.get(pk=author)
+          memList.append(name_author)
+      
+      print "members in group: ", memList
+      return memList
     except:
         return []
 

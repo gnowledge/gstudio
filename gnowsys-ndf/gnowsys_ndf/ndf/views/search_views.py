@@ -945,8 +945,16 @@ def populate_list_of_group_members(group_ids):
 
 
 def get_users(request, group_id):
-	group_ids = request.GET['Groups']
-	allUsers = populate_list_of_group_members([group_ids])
+	group_ids = str(request.GET['Groups'])
+	group_ids = group_ids.split(",")
+	print group_ids
+
+	if group_ids[0] == "all":
+		print "hi there"
+		allGroups = get_public_groups()
+		allUsers = populate_list_of_group_members(allGroups)
+	else:
+		allUsers = populate_list_of_group_members(group_ids)
 	return HttpResponse(json.dumps(allUsers, cls=Encoder))
 
 
@@ -1510,9 +1518,9 @@ def acceptable_word(word):
 def get_terms(tree):
     result = []	
     ALLOWED_LIST = ['CD','FW','JJ','JJR','JJS','NN','NNS','NNP','NNPS','VB','VBD','VBG','VBN','VBP','VBZ']	
-    print tree.leaves()
+    #print tree.leaves()
     for leaf in tree.leaves():
-	print leaf	
+	#print leaf	
     	#for (w,t) in leaf:
 	w = leaf[0]
 	t = leaf[1]
