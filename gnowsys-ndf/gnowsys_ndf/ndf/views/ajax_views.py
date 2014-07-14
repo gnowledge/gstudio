@@ -1346,25 +1346,32 @@ def get_group_member_user(request, group_id):
 
 
 def annotationlibInSelText(request, group_id):
-  '''
-  trigger post when text is selected
-  '''
-  print "Inside annotationlibInSelText "
+  """
+  This view parses the annotations field of the currently selected node_id and evaluates if entry corresponding this selectedText already exists.
+  If it does, it appends the comment to this entry else creates a new one.   
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  obj_id - ObjectId of the currently selected node_id
+  comment - The comment added by user
+  selectedText - text for which comment was added
+
+ Returns:
+  The updated annoatations field
+  """
+  
   obj_id = str(request.POST["node_id"])
   col = get_database()[Node.collection_name]
   sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
   
   comment = request.POST ["comment"]
   comment = json.loads(comment)
-  print comment
   comment_modified = {
                         'authorAvatarUrl' : comment['authorAvatarUrl'],
                         'authorName'      : comment['authorName'],
                         'comment'         : comment['comment']
   }
-  print comment_modified
   selectedText = request.POST['selectedText']
-  print "check for selected text", selectedText
     
   # check if annotations for this text already exist!
   flag = False
