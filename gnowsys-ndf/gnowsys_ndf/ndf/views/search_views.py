@@ -323,6 +323,7 @@ def results_search(request, group_id):
 			It uses the Map Reduce algorithm to keep track of which GSystems contain which words and how many times.
 			The more the count of matches, the more relevant the search result is for the user.
 			"""
+			print "stemmed query: ", search_str_stemmed			
 			content_docs = []
 			content_match_pairs = []					# STORES A DICTIONARY OF MATCHING DOCUMENTS AND NO_OF_WORDS THAT MATCH SEARCH QUERY
 			sorted_content_match_pairs = []				# STORES THE ABOVE DICTIONARY IN A SORTED MANNER
@@ -374,10 +375,10 @@ def results_search(request, group_id):
 	except Exception:
 		pass
 
-	#print "search_results:", search_results
+	print "search_results:", search_results
 	context_to_return = getRenderableContext(group_id)			# RETURNS BASIC CONTEXT
 	context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
-	context_to_return['processed'] = 1 							
+	context_to_return['processed'] = "1" 							
 	context_to_return['search_type'] = KEYWORD_SEARCH			# TYPE OF SEARCH IS KEYWORD SEARCH
 
 	return render(request, 'ndf/search_page.html', context_to_return)
@@ -1473,7 +1474,8 @@ def pre_process_for_map_reduce(text):
 
 def leaves(tree):
     """Finds NP (nounphrase) leaf nodes of a chunk tree."""
-    for subtree in tree.subtrees(filter = lambda t: t.node=='NP'):
+    for subtree in tree.subtrees(filter = lambda t: t.node == 'NP'):
+	print "SUBTREE:",subtree
         yield subtree.leaves()
 
 def normalise(word):
@@ -1505,11 +1507,16 @@ def acceptable_word(word):
     
 def get_terms(tree):
     result = []	
-    for leaf in leaves(tree):
-    	for w,t in leaf:
-    		if acceptable_word(w):
-    			term = normalise(w)
-    			result.append(term)        
+    ALLOWED_LIST = ['CD','FW','JJ','JJR','JJS','NN','NNS','NNP','NNPS','VB','VBD','VBG','VBN','VBP','VBZ']	
+    print tree.leaves()
+    for leaf in tree.leaves():
+	print leaf	
+    	#for (w,t) in leaf:
+	w = leaf[0]
+	t = leaf[1]
+	if acceptable_word(w) and t in ALLOWED_LIST:
+		term = normalise(w)
+		result.append(term)        
     return result
 ############################################################################################################################
 
