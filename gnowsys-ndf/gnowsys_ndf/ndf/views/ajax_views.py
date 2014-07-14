@@ -17,6 +17,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 import ast
 
+#from stemming.porter2 import stem
+
 
 from django_mongokit import get_database
 
@@ -34,6 +36,7 @@ from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.org2any import org2html
 import json
+from bson.objectid import ObjectId
  
 db = get_database()
 gs_collection = db[GSystem.collection_name]
@@ -42,6 +45,14 @@ theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 #This function is used to check (while creating a new group) group exists or not
 #This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
+
+class Encoder(json.JSONEncoder):
+	def default(self, obj):
+		if isinstance(obj, ObjectId):
+			return str(obj)
+		else:
+			return obj
+
 def checkgroup(request,group_name):
     titl=request.GET.get("gname","")
     retfl=check_existing_group(titl)
