@@ -105,6 +105,7 @@
 
 
     <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+	
 
     <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
      </section>
@@ -137,7 +138,17 @@
 
   	
 		<h5><strong>Tags for this item</strong></h5>
-	<div >		
+	<div >	
+	<script>
+$(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+  });
+
+
+</script>
+	
 	{% for tag in selected_topic.tags %}
 
 		<a class="[success alert secondary] [round radius] label" href="{% url 'tag_topic_display' group_id selected_topic.pk tag %}" style="text-decoration:none;font-weight:bold;text-color:red;font-size:17px;"> 
