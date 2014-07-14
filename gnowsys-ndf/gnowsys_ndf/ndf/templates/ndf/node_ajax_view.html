@@ -28,7 +28,7 @@
   box-shadow: 0px 0px 5px #888888; 
 }
 .annotatedElement{
-background-color : rgba(255,0,0,0.2);
+background-color : rgba(255,0,0,0.25);
 font-weight:bold;
 } 
 .movingDivIcon{
@@ -769,6 +769,11 @@ function showThread(elem)
         console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
         sideComments = new SideComments('#commentable-area', currentUser, existingComments); 
         break;
+      }
+      else 
+      {
+        existingComments = [];          
+        sideComments = new SideComments('#commentable-area', currentUser, existingComments); 
       }
   }
   //trigger clicks so that discussions are visible as soon as an annotated text is clicked on
