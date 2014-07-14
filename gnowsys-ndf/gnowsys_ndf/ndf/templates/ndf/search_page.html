@@ -456,14 +456,15 @@
   });
 
   $('#Groups').change(function(){
-    Group_names = $("#Groups").val();
+    var Group_names = String($("#Groups").val());
+    console.log(Group_names);
 
     $.ajax({
           type: "GET",
           url: "{% url 'get_users' groupid %}",
           datatype: "json",
           data: {
-            Groups:Group_names,
+            Groups: Group_names,
             csrfmiddlewaretoken: '{{ csrf_token }}'
           },
           success: function(data) {

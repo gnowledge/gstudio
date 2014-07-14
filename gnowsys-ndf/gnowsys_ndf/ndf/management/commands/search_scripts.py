@@ -24,7 +24,7 @@ for gs in allGSystems:
     elif factory_obj._id in gsType_obj.member_of:
 	if gsType_obj.name == u"QuizItem":
 	    gs.url = u"quiz/details"
-        elif gsType_obj.name == u"Twist":
+        if gsType_obj.name == u"Twist":
             gs.url = u"forum/thread"
         else:
             gs.url = gsType_obj.name.lower()
@@ -35,7 +35,6 @@ for gs in allGSystems:
 allGSystems = col.Node.find({"$or": [ {"_type":"GSystem"}, {"_type":"File"} ] })
 for gs in allGSystems:
 	gs.save()
-
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):

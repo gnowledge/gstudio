@@ -1,9 +1,7 @@
-#map_reduce.py
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.search_views import *
 from django.core.management.base import BaseCommand, CommandError
 
-collection = get_database()[Node.collection_name]
 dltr=list(collection.ToReduceDocs.find({'required_for':to_reduce_doc_requirement}))
 
 for doc in dltr:
@@ -23,8 +21,9 @@ for doc in dltr:
 		new_doc.required_for = reduced_doc_requirement
 		new_doc.is_indexed = False
 		new_doc.save()
-	doc.delete()	
+	doc.delete()
+	
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
-		print "Documents have been Map Reduced.It's Done!"
+		print "search script executed."	
