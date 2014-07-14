@@ -340,7 +340,10 @@ def delete_meeting(request, group_name, _id):
         print "Exception:", e
     return HttpResponseRedirect(pageurl) 
 
-def output(request, group_id, meetingid):                                                               #ramkarnani
+def output(request, group_id, meetingid):          
+	'''
+	It redirects the user to newmeeting.html template and give a card to accept the invite
+	'''                                                     
     newmeetingid = meetingid
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False:
