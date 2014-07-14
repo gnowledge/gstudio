@@ -354,7 +354,7 @@ def group_dashboard(request,group_id=None):
   breadcrumbs_list = []
   # Appends the elements in breadcrumbs_list first time the resource which is clicked
   breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
-
+  print "\n ", groupobj.keys()
   annotations = json.dumps(groupobj.annotations)
 
   return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
