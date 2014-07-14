@@ -37,6 +37,12 @@ font-weight:bold;
   padding-left: 5px;
   padding-right: 5px;
 }
+.annotateIcon{
+  font-size: 35px;
+  color: green;
+  padding-left: 5px;
+  padding-right: 5px;
+}
 .divider-line { font-size: xx-large; color:lightgray; }
 .line-height-2 { line-height:2; }
 .line-height-2pt5 { line-height:2.5; }
@@ -137,8 +143,8 @@ ul#graph-hover.f-dropdown{
       </div>
       <!-- Container for enabling/disabling annotation mode -->
       <div class="small-2 columns">          
-          <div id = "toggleContainer" style="cursor:pointer" onClick="toggle(this);">
-            <i class="fi-comments"></i> Annotate
+          <div id = "toggleContainer" style="cursor: pointer; color: green;" onClick="toggle(this);">
+            <i class="fi-comments annotateIcon"></i> Annotate
           </div>
       </div>
       <!--End container-->
@@ -925,7 +931,7 @@ function toggle(el)
          //Disable annotations
          $(".side-comment").hide();
          $("#content").html(initialText);
-         el.innerHTML = '<i class="fi-comments"></i> Annotate';
+         el.innerHTML = '<i class="fi-comments annotateIcon"></i> Annotate';
    }  
   
   else if (toggleValue == -1)
@@ -933,7 +939,7 @@ function toggle(el)
         //enable annotations
         $(".side-comment").show();
         highlightAll(); 
-        el.innerHTML = '<i class="fi-clipboard-pencil"></i> Annotate';
+        el.innerHTML = '<i class="fi-clipboard-pencil annotateIcon"></i> Annotate';
         console.log("hide menu");
         $('#moving_div').css({
              display: "none"
