@@ -1,18 +1,29 @@
+''' -- imports from python libraries -- '''
+import os
+import ast
+# from datetime import datetime
+import datetime
+
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from datetime import datetime
 
-import ast
+try:
+    from bson import ObjectId
+except ImportError:  # old pymongo
+    from pymongo.objectid import ObjectId
 
-from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import *
-
-from gnowsys_ndf.ndf.views.file import *
+''' -- imports from application folders/files -- '''
+# from gnowsys_ndf.ndf.views.methods import *
+# from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.views.event import *
+from gnowsys_ndf.ndf.views.person import *
 
 collection = get_database()[Node.collection_name]
 
@@ -67,11 +78,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     property_display_order = []
     events_arr = []
 
-    template_prefix = ""
-    if app_name == "MIS":
-      template_prefix = "mis"
-    else:
-      template_prefix = "mis_po"
+    template_prefix = "mis"
 
     for eachset in app.collection_set:
       app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
@@ -79,6 +86,33 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
       # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
+      app_set = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+      
+      view_file_extension = ".py"
+      app_set_view_file_name = ""
+      app_set_view_file_path = ""
+
+      if app_set.type_of:
+        app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
+
+        app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
+        print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
+
+      else:
+        app_set_view_file_name = app_set.name.lower().replace(" ", "_")
+        print "\n app_set_view_file_name: ", app_set_view_file_name, "\n"
+
+      app_set_view_file_path = os.path.join(os.path.dirname(__file__), app_set_view_file_name + view_file_extension)
+      print "\n app_set_view_file_path: ", app_set_view_file_path, "\n"
+
+      if os.path.exists(app_set_view_file_path):
+        print "\n Call this function...\n"
+        return eval(app_set_view_file_name + "_detail")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
+
+      else:
+        print "\n Perform fallback code...\n"
+
+      print "\n Going herer...\n\n"
       classtype = ""
       app_set_template = "yes"
       template = "ndf/"+template_prefix+"_list.html"
@@ -130,7 +164,6 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         property_order = system.property_order
         system.get_neighbourhood(systemtype._id)
 
-
         # array of dict for events ---------------------
                 
         if system.has_key('organiser_of_event') and len(system.organiser_of_event): # gives list of events
@@ -141,11 +174,15 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                 tempdict = {}
                 tempdict['title'] = event.name
                 
-                if event.start_time and len(event.start_time) == 16:
-                    dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
+                if event.start_time:# and len(event.start_time) == 16:
+                    print "\n start_time: ", event.start_time, " -- ", event.start_time.strftime('%m/%d/%Y %H:%M')
+                    # dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
+                    dt = event.start_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['start'] = dt
-                if event.end_time and len(event.end_time) == 16:
-                    dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
+                if event.end_time:# and len(event.end_time) == 16:
+                    print "\n end_time: ", event.end_time, " -- ", event.end_time.strftime('%m/%d/%Y %H:%M')
+                    # dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
+                    dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
                 tempdict['id'] = str(event._id)
                 events_arr.append(tempdict)
@@ -158,11 +195,13 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                 tempdict = {}
                 tempdict['title'] = host.name
 
-                if system.start_time and len(system.start_time) == 16:
-                    dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
+                if system.start_time:# and len(system.start_time) == 16:
+                    # dt = datetime.datetime.strptime(system.start_time , '%m/%d/%Y %H:%M')
+                    dt = event.start_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['start'] = dt
-                if system.end_time and len(system.start_time) == 16:
-                    dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
+                if system.end_time:# and len(system.start_time) == 16:
+                    # dt = datetime.datetime.strptime(system.end_time , '%m/%d/%Y %H:%M')
+                    dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
                 
                 tempdict['id'] = str(host._id)
@@ -171,7 +210,6 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         # print json.dumps(events_arr)
 
         # END --- array of dict for events ---------------------
-
 
         for tab_name, fields_order in property_order:
             display_fields = []
@@ -215,6 +253,9 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         system_id = system._id
         system_type = system._type
 
+        print "\n app_set_instance_name: ", app_set_instance_name
+        print "\n app_set_name: ", app_set_name
+
         if system_type == 'File':
             system_mime_type = system.mime_type
 
@@ -235,6 +276,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                                         })
 
     return render_to_response(template, variable)
+      
       
 @login_required
 def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
@@ -287,11 +329,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     File = 'False'
     obj_id_ins = ObjectId()
 
-    template_prefix = ""
-    if app_name == "MIS":
-      template_prefix = "mis"
-    else:
-      template_prefix = "mis_po"
+    template_prefix = "mis"
 
     user_id = int(request.user.id)  # getting django user id
     user_name = unicode(request.user.username)  # getting django user name
@@ -302,11 +340,39 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
       # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
     if app_set_id:
+        app_set = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+
+        view_file_extension = ".py"
+        app_set_view_file_name = ""
+        app_set_view_file_path = ""
+
+        if app_set.type_of:
+            app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
+
+            app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
+            print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
+
+        else:
+            app_set_view_file_name = app_set.name.lower().replace(" ", "_")
+            print "\n app_set_view_file_name: ", app_set_view_file_name, "\n"
+
+        app_set_view_file_path = os.path.join(os.path.dirname(__file__), app_set_view_file_name + view_file_extension)
+        print "\n app_set_view_file_path: ", app_set_view_file_path, "\n"
+
+        if os.path.exists(app_set_view_file_path):
+            print "\n Call this function...\n"
+            return eval(app_set_view_file_name + "_create_edit")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
+
+        else:
+            print "\n Perform fallback code...\n"
+
+        print "\n Going herer...\n\n"
+
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
         title = systemtype_name + " - new"
         for each in systemtype.attribute_type_set:
-            systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type})
+            systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type, 'altnames': each.altnames})
 
         for eachrt in systemtype.relation_type_set:
             # object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in collection.Node.find({'member_of': {'$all': [ collection.Node.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
@@ -484,9 +550,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                         newrelation.relation_type = relationtype_key
                         newrelation.right_subject = right_subject._id
                         newrelation.save()
-        
 
-        return HttpResponseRedirect(reverse(template_prefix+'_app_detail', kwargs={'group_id': group_id, 'app_name': app_name, "app_id":app_id, "app_set_id":app_set_id}))
+        return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
     
     template = "ndf/"+template_prefix+"_create_edit.html"
     variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})

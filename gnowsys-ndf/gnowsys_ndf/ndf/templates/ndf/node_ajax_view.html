@@ -57,7 +57,6 @@ ul#graph-hover.f-dropdown{
 
 
 <header class="row page">
-
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
@@ -65,30 +64,35 @@ ul#graph-hover.f-dropdown{
     </ul>
 
     <h2>
-      <span class='node'>{{node.name}}</span>      <small class="label-list"> 
+      <span class='node'>{{node.name}}</span>      
+      <small class="label-list"> 
       {% for tag in node.tags %}
       <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
       {% endfor %}
-    </small>      
-  </h2>
+      </small>      
+    </h2>
 
-  <dl class="row tabs" data-tab>
-    <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+    <dl class="row tabs" data-tab>
+      <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
-    <dd>
+      <dd>
         <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
-            <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-                <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
-                <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
-                <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
-            </ul>
-    </dd>
+        <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+          <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+          {% if node.collection_set %}
+          <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+          {% endif %}
+          {% if node.prior_node %}
+          <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+          {% endif %}
+        </ul>
+      </dd>
 
-    <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+      <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
-    <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-     </section>
-
+      <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+    </dl>
+  </section>
 </header>
 
 <div class="row">
@@ -194,6 +198,33 @@ ul#graph-hover.f-dropdown{
         {% endif %}
         </ul>
 
+        {% for tab_name, tab_fields_list in property_order_list %}
+          {% for field in tab_fields_list %}
+          <div class="row">
+            <div class="small-3 columns"> 
+              <label>{{field.altnames}}</label>
+            </div>
+            <div class="small-7 end columns">
+              {% if field.type == "RelationType" %}
+                {% if field.value|length > 5 %}
+                  <a href="#">{{field.value|length}}</a>
+
+                {% else %}
+                {% for n in field.value %}
+                  <a href="#">{{n.name|default_if_none:"--"|title}}</a><br/>
+                {% endfor %}
+
+                {% endif %}
+              {% else %}
+                <label>{{field.value|default_if_none:"--"|title}}</label>
+              {% endif %}
+            </div>
+          </div>
+          <br>
+          {% endfor %}
+        {% endfor %}
+
+        
       	{% with node.html_content|safe as description %}
       	{% if description != "None" %}
       	{{ description }}
@@ -207,16 +238,26 @@ ul#graph-hover.f-dropdown{
         <a class="close-reveal-modal">&#215;</a>
         {% include "ndf/graph_concept.html" %}
       </div>
+      
       <!-- Content for Collection Graph -->
-      <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-      	<a class="close-reveal-modal">&#215;</a>
-      	{% include "ndf/graph_collection.html" %}
-      </div>
+      
+      {% if node.collection_set %}
+        <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+        	<a class="close-reveal-modal">&#215;</a>
+        	{% include "ndf/graph_collection.html" %}
+        </div>
+      {% endif %}
+
       <!-- Content for dependency Graph -->
-     <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
-       <a class="close-reveal-modal">&#215;</a>
-       {% include "ndf/graph_dependency.html" %}
-     </div>
+      
+      {% if node.prior_node %}
+      
+        <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+         <a class="close-reveal-modal">&#215;</a>
+         {% include "ndf/graph_dependency.html" %}
+        </div>
+      {% endif %}
+     
      <!-- Tab View Map Widget -->
      <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
        <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
