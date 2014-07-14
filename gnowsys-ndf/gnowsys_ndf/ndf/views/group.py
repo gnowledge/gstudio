@@ -281,6 +281,28 @@ def create_group(request,group_id):
 #     return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'user':request.user,'curgroup':groupobj},context_instance=RequestContext(request))
 
 
+def populate_list_of_members():
+	members = User.objects.all()
+	memList = []
+	for mem in members:
+		memList.append(mem.username)	
+	return memList
+
+def populate_list_of_group_members(group_id):
+    col = get_database()[Node.collection_name]
+    try :
+        author_list = col.Node.one({"_type":"Group", "_id":ObjectId(group_id)}, {"author_set":1, "_id":0})
+        memList = []
+
+        for author in author_list.author_set:
+            name_author = User.objects.get(pk=author)
+            memList.append(name_author)
+        
+        print "members in group: ", memList
+        return memList
+    except:
+        return []
+
 
 def group_dashboard(request,group_id=None):
 
@@ -338,6 +360,24 @@ def group_dashboard(request,group_id=None):
 
   if groupobj.status == u"DRAFT":
     groupobj, ver = get_page(request, groupobj)
+    
+    groupobj,ver=get_page(request,groupobj)    
+    # First time breadcrumbs_list created on click of page details
+    breadcrumbs_list = []
+    # Appends the elements in breadcrumbs_list first time the resource which is clicked
+    breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
+    memList = []
+    if (group_id != None):
+        memList = populate_list_of_group_members(group_id)
+
+    return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
+                                                         'group_id':grpid, 'user':request.user, 
+                                                         'shelf_list': shelf_list,
+                                                         'shelves': shelves, 
+                                                         'breadcrumbs_list': breadcrumbs_list,
+							 'authors':memList,
+                                                        },context_instance=RequestContext(request)
+                            )
 
   groupobj.get_neighbourhood(groupobj.member_of)
   # print "\n groupobj.keys: ", groupobj.keys()
@@ -362,6 +402,7 @@ def group_dashboard(request,group_id=None):
                                                        'property_order_list': property_order_list
                                                       },context_instance=RequestContext(request)
                           )
+
 
 @login_required
 def edit_group(request,group_id):

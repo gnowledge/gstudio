@@ -1,0 +1,101 @@
+{% extends "ndf/base.html" %}
+
+<script type = "text/javascript" src = "/static/ndf/js/jquery2.js">
+</script>
+
+{% block body_content %} 
+
+<h3>Advanced Search</h3>
+
+<form name="search_form" method="GET" action="{% url 'advanced_search_results' groupid %}">
+	{% csrf_token %}
+	Enter the value to be searched:
+	<input type="text" name="search_text" id="search_text" required>
+	<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+		<li>
+			<h5> Select groups: </h5>
+			<select multiple id="Groups" name="Groups" style="height:100px" >
+				<option value='all' selected='true'>All Groups</option>
+				{% for gr in allGroups %}
+				<option value='{{ gr }}'> {{ gr }} </option>
+				{% endfor %}
+			</select>
+		</li>
+
+		<li>
+			<h5> Select authors: </h5>
+			<select multiple id="Users" name="Users" style="height:100px" >
+				<option value='all' selected='true'>All Authors</option>
+				{% for us in allUsers %}
+				<option value='{{ us }}'> {{ us }} </option>
+				{% endfor %}
+			</select>
+		</li>
+
+		<li>
+			<h5> Select categories: </h5>
+			<select multiple id="GSystems" name="GSystems" style="height:100px" required>
+				{% for gs in allGSystems %}
+				<option value='{{ gs }}'> {{ gs }} </option>
+				{% endfor %}
+			</select>
+		</li>
+		<li>
+			<h5> Select attributes: <img src="/static/ndf/images/refresh.png" style="cursor:pointer" height="20px" width="20px" id="refreshAttr" alt="refresh"></img></h5>
+			<select multiple id="attribs" name="attribs" style="height:100px" required>
+
+			</select>
+		</li>
+	</ul>
+	<input type="submit" name="subButton2" id="subButton2" value="Submit" />
+</form>
+
+<script type="text/javascript">
+	var GSystem_name = [];
+	$('#GSystems').change(function() {
+
+			temp = String($("#GSystems").val());
+
+			$.ajax({
+			      type: "GET",
+			      url: "{% url 'get_attributes' groupid %}",
+			      datatype: "json",
+			      data: {
+			      	GSystem: temp,
+			      	csrfmiddlewaretoken: '{{ csrf_token }}',
+			      },
+			      success: function(data) {
+					parsed = $.parseJSON(data);
+					options_to_add = "<option value='all'>All attributes</option>";
+					for (i=0; i<parsed.length; i++) {
+						options_to_add += "<option value='" + parsed[i] + "'>" + parsed[i] + "</option>";
+					}
+					$("#attribs").html(options_to_add);
+				  }
+			});
+	});
+
+	$('#Groups').change(function(){
+		Group_names = $("#Groups").val();
+
+		$.ajax({
+		      type: "GET",
+		      url: "{% url 'get_users' groupid %}",
+		      datatype: "json",
+		      data: {
+		      	Groups:Group_names,
+		      	csrfmiddlewaretoken: '{{ csrf_token }}'
+		      },
+		      success: function(data) {
+				parsed = $.parseJSON(data);
+				options_to_add = "<option value='all' selected='true'>All authors</option>";
+				for (i=0; i<parsed.length; i++) {
+					options_to_add += "<option value='" + parsed[i] + "'>" + parsed[i] + "</option>";
+				}
+				$("#Users").html(options_to_add);
+			  }
+		});
+	});
+</script>
+
+{% endblock %}
