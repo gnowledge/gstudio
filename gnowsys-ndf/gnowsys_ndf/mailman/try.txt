@@ -1,0 +1,500 @@
+From kelleynnn at gmail.com  Wed Jul  2 08:02:16 2014
+From: kelleynnn at gmail.com (Kelley Nielsen)
+To: Baypiggies@python.org
+Date: Tue, 1 Jul 2014 23:02:16 -0700
+Subject: [baypiggies] Baypiggies Digest, Vol 104, Issue 17
+In-Reply-To: <mailman.39.1404122402.17451.baypiggies@python.org>
+References: <mailman.39.1404122402.17451.baypiggies@python.org>
+Message-ID: <CADoage2uzi1Ji-oq-u_dYfyM=F5gFuq02WxbPZPUZvE-QaO9Mg@mail.gmail.com>
+
+I could give it a try if there are no other takers. I'd have to learn, but
+I'm doing PR for one of my Toastmasters clubs now, so I need to learn
+anyway.
+
+
+On Mon, Jun 30, 2014 at 3:00 AM, <baypiggies-request at python.org> wrote:
+
+> Send Baypiggies mailing list submissions to
+>         baypiggies at python.org
+>
+> To subscribe or unsubscribe via the World Wide Web, visit
+>         https://mail.python.org/mailman/listinfo/baypiggies
+> or, via email, send a message with subject or body 'help' to
+>         baypiggies-request at python.org
+>
+> You can reach the person managing the list at
+>         baypiggies-owner at python.org
+>
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of Baypiggies digest..."
+>
+>
+> Today's Topics:
+>
+>    1.  BayPiggies AV (audio/video) Person (James Nicholson)
+>
+>
+> ----------------------------------------------------------------------
+>
+> Message: 1
+> Date: Sun, 29 Jun 2014 18:36:11 -0700
+> From: James Nicholson <nicholsonjf at gmail.com>
+> To: Baypiggies <baypiggies at python.org>
+> Subject: [Baypiggies] BayPiggies AV (audio/video) Person
+> Message-ID:
+>         <CAObTp17cULt-snBPYHNZieH7Z=-gGgHu_=
+> oco9_k7TE-nnGPBw at mail.gmail.com>
+> Content-Type: text/plain; charset="utf-8"
+>
+> Hey everyone,
+>
+> I brought this up at our meeting on Thursday, but wanted to get a
+> conversation started here as well.
+>
+> I'm working in San Francisco now and won't be able to consistently be at
+> LinkedIn in Mountain View by 7:30pm to record our talks.
+>
+> Here are a few of the perks of being the BayPiggies AV person:
+>
+> - Increased exposure at meetings (good for networking)
+> - Interaction with our speakers
+> - Learning a marketable skill (recording and archiving tech talks)
+> - Resume builder and good discussion topic for interviews
+>
+>
+> There are two methods I've used to record/archive our talks these past nine
+> months:
+>
+> 1. Record video/audio with the group's camcorder (I have it currently),
+> transfer the file to my laptop, then upload it to our YouTube channel
+> <https://www.youtube.com/channel/UCBJV1sd5XcVhijm13pWfBCg>.
+>
+> 2. Using a Google Hangout on Air
+> <https://support.google.com/plus/answer/2553119?hl=en> to record the
+> screen
+> and voice of the presenting laptop (which automatically uploads to our
+> YouTube channel).
+>
+> Method two is much easier, and allows us to live stream the talks.
+>
+> Can anyone volunteer to help out with this moving forward?
+>
+>
+> -James
+> -------------- next part --------------
+> An HTML attachment was scrubbed...
+> URL: <
+> http://mail.python.org/pipermail/baypiggies/attachments/20140629/1ad31c92/attachment-0001.html
+> >
+>
+> ------------------------------
+>
+> Subject: Digest Footer
+>
+> _______________________________________________
+> Baypiggies mailing list
+> Baypiggies at python.org
+> To change your subscription options or unsubscribe:
+> https://mail.python.org/mailman/listinfo/baypiggies
+>
+> ------------------------------
+>
+> End of Baypiggies Digest, Vol 104, Issue 17
+> *******************************************
+>
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <http://mail.python.org/pipermail/baypiggies/attachments/20140701/077f9e62/attachment.html>
+
+From jjinux at gmail.com  Fri Jul  4 03:10:57 2014
+From: jjinux at gmail.com (Shannon -jj Behrens)
+To: Baypiggies@python.org
+Date: Thu, 3 Jul 2014 18:10:57 -0700
+Subject: [baypiggies] Fwd: jobs listing link on
+ https://mail.python.org/mailman/listinfo/baypiggies should point to
+ http://baypiggies.net/job-listings
+In-Reply-To: <CAFxeyQSY4uYCM4pWsuHc56VKAGNGt2jBi4KpK-HLiJ+RsSQBCA@mail.gmail.com>
+References: <CAFxeyQSY4uYCM4pWsuHc56VKAGNGt2jBi4KpK-HLiJ+RsSQBCA@mail.gmail.com>
+Message-ID: <CAB0XCvZbcc7mNiTtcsvi1LodE7nwucpVrJkjBmH-MH62edhnDg@mail.gmail.com>
+
+---------- Forwarded message ----------
+From: Hunter Blanks <hunter at napofearth.com>
+Date: Thu, Jul 3, 2014 at 11:33 AM
+Subject: jobs listing link on
+https://mail.python.org/mailman/listinfo/baypiggies should point to
+http://baypiggies.net/job-listings
+To: baypiggies-owner at python.org
+
+
+Hi,
+
+I was just getting ready to post a job posting to the BayPiggies list when
+I realized that the policy link on the mailing list page, as viewed at:
+
+https://mail.python.org/mailman/listinfo/baypiggies
+
+
+includes an extraneous index_html segment:
+
+http://baypiggies.net/index_html/job-listings
+
+
+It seems like the right link is:
+
+http://baypiggies.net/job-listings
+
+
+Thanks much!
+
+-HJB
+
+
+
+-- 
+In this life we cannot do great things. We can only do small things with
+great love. -- Mother Teresa
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <http://mail.python.org/pipermail/baypiggies/attachments/20140703/d75a54d8/attachment.html>
+
+From nicholsonjf at gmail.com  Fri Jul  4 03:25:37 2014
+From: nicholsonjf at gmail.com (James Nicholson)
+To: Baypiggies@python.org
+Date: Thu, 3 Jul 2014 18:25:37 -0700
+Subject: [baypiggies] Baypiggies Digest, Vol 104, Issue 17
+In-Reply-To: <CADoage2uzi1Ji-oq-u_dYfyM=F5gFuq02WxbPZPUZvE-QaO9Mg@mail.gmail.com>
+References: <mailman.39.1404122402.17451.baypiggies@python.org>
+ <CADoage2uzi1Ji-oq-u_dYfyM=F5gFuq02WxbPZPUZvE-QaO9Mg@mail.gmail.com>
+Message-ID: <CAObTp1581zPgTad+hLKx5=rFr980K5hTyVFHbe+EStPyus7AHQ@mail.gmail.com>
+
+Cool! Are you free to meet sometime over the next couple weeks in Mountain
+View, and do you have a laptop you can use for this? I can show you how to
+setup a Hangout and start a broadcast.
+
+James Nicholson
+nicholsonjf.com
+
+
+On Tue, Jul 1, 2014 at 11:02 PM, Kelley Nielsen <kelleynnn at gmail.com> wrote:
+
+> I could give it a try if there are no other takers. I'd have to learn, but
+> I'm doing PR for one of my Toastmasters clubs now, so I need to learn
+> anyway.
+>
+>
+> On Mon, Jun 30, 2014 at 3:00 AM, <baypiggies-request at python.org> wrote:
+>
+>> Send Baypiggies mailing list submissions to
+>>         baypiggies at python.org
+>>
+>> To subscribe or unsubscribe via the World Wide Web, visit
+>>         https://mail.python.org/mailman/listinfo/baypiggies
+>> or, via email, send a message with subject or body 'help' to
+>>         baypiggies-request at python.org
+>>
+>> You can reach the person managing the list at
+>>         baypiggies-owner at python.org
+>>
+>> When replying, please edit your Subject line so it is more specific
+>> than "Re: Contents of Baypiggies digest..."
+>>
+>>
+>> Today's Topics:
+>>
+>>    1.  BayPiggies AV (audio/video) Person (James Nicholson)
+>>
+>>
+>> ----------------------------------------------------------------------
+>>
+>> Message: 1
+>> Date: Sun, 29 Jun 2014 18:36:11 -0700
+>> From: James Nicholson <nicholsonjf at gmail.com>
+>> To: Baypiggies <baypiggies at python.org>
+>> Subject: [Baypiggies] BayPiggies AV (audio/video) Person
+>> Message-ID:
+>>         <CAObTp17cULt-snBPYHNZieH7Z=-gGgHu_=
+>> oco9_k7TE-nnGPBw at mail.gmail.com>
+>> Content-Type: text/plain; charset="utf-8"
+>>
+>> Hey everyone,
+>>
+>> I brought this up at our meeting on Thursday, but wanted to get a
+>> conversation started here as well.
+>>
+>> I'm working in San Francisco now and won't be able to consistently be at
+>> LinkedIn in Mountain View by 7:30pm to record our talks.
+>>
+>> Here are a few of the perks of being the BayPiggies AV person:
+>>
+>> - Increased exposure at meetings (good for networking)
+>> - Interaction with our speakers
+>> - Learning a marketable skill (recording and archiving tech talks)
+>> - Resume builder and good discussion topic for interviews
+>>
+>>
+>> There are two methods I've used to record/archive our talks these past
+>> nine
+>> months:
+>>
+>> 1. Record video/audio with the group's camcorder (I have it currently),
+>> transfer the file to my laptop, then upload it to our YouTube channel
+>> <https://www.youtube.com/channel/UCBJV1sd5XcVhijm13pWfBCg>.
+>>
+>> 2. Using a Google Hangout on Air
+>> <https://support.google.com/plus/answer/2553119?hl=en> to record the
+>> screen
+>> and voice of the presenting laptop (which automatically uploads to our
+>> YouTube channel).
+>>
+>> Method two is much easier, and allows us to live stream the talks.
+>>
+>> Can anyone volunteer to help out with this moving forward?
+>>
+>>
+>> -James
+>> -------------- next part --------------
+>> An HTML attachment was scrubbed...
+>> URL: <
+>> http://mail.python.org/pipermail/baypiggies/attachments/20140629/1ad31c92/attachment-0001.html
+>> >
+>>
+>> ------------------------------
+>>
+>> Subject: Digest Footer
+>>
+>> _______________________________________________
+>> Baypiggies mailing list
+>> Baypiggies at python.org
+>> To change your subscription options or unsubscribe:
+>> https://mail.python.org/mailman/listinfo/baypiggies
+>>
+>> ------------------------------
+>>
+>> End of Baypiggies Digest, Vol 104, Issue 17
+>> *******************************************
+>>
+>
+>
+> _______________________________________________
+> Baypiggies mailing list
+> Baypiggies at python.org
+> To change your subscription options or unsubscribe:
+> https://mail.python.org/mailman/listinfo/baypiggies
+>
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <http://mail.python.org/pipermail/baypiggies/attachments/20140703/de01482a/attachment.html>
+
+From hunter at napofearth.com  Thu Jul  3 20:55:11 2014
+From: aakankshanaik19 at gmail.com (Hunter Blanks)
+To: Baypiggies@python.org
+Date: Thu, 3 Jul 2014 11:55:11 -0700
+Subject: [baypiggies] Backend Software Engineer - Berkeley
+Message-ID: <CAFxeyQSGdyOFYtpZBY-uAdbop1mHAo54hi-SaM_Bm6eX6CGQ3w@mail.gmail.com>
+
+Hi all,
+
+I work as the backend engineer for an offshoot of Will Wright's Stupid Fun
+Club in Berkeley, and I'm looking for a second backend engineer.
+
+Details can be found here:
+
+http://stupidfunclub.com/jobs.html
+
+
+So far as numbers go, our business is just over a dozen employees right
+now, with a consumer beta starting near summer's end. The two frontends are
+implemented against WebGL & iOS. All of our backend and operations
+automation is in Python.
+
+If you're interested or have any questions, please feel free to write me at
+hunter at napofearth.com.
+
+HJB
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <http://mail.python.org/pipermail/baypiggies/attachments/20140703/ca637ab8/attachment.html>
+
+From mdavis2 at ucsc.edu  Sat Jul  5 20:15:01 2014
+From: mailmantrial at gmail.com (Marilyn Davis)
+To: Baypiggies@python.org
+Date: Sat, 5 Jul 2014 11:15:01 -0700
+Subject: [baypiggies] Saturday Python Class and more
+Message-ID: <CAMDjdqwRdvTdzjzu10-=Ze-1Cx_G6XXphRNO5Onka_wcn-XJkg@mail.gmail.com>
+
+Hello Python People,
+
+We are starting a Saturday Python class for programmers (experienced in
+any other language) at UCSC-Extension Silicon Valley's labs in Santa
+Clara, right across 101 from the Great America sign.
+http://course.ucsc-extension.edu/modules/shop/index.html?action=section&OfferingID=1531625&SectionID=5275735
+
+It will be 5 Saturdays and give students experience in all core concepts of
+Python.
+
+The course is low-pressure, but fast-paced, where students learn and
+practice core concepts and Pythonic thinking.  To join this class, you
+should be well-practiced at programming in some other language.
+
+No beginning programmers please, but you can certainly be new to Python.
+If you are beginner, please find your class below under "NOVICES".
+
+ONLINE CLASS:
+
+If you would prefer an online class, you will enjoy:
+http://course.ucsc-extension.edu/modules/shop/index.html?action=section&OfferingID=1531625&SectionID=5274871
+
+The online site for this course is open now and new enrollments will be
+accepted until July 15.
+
+If you would prefer more time with the online materials, and with me and
+our online assistant instructor, Casey The, then you might like to wait and
+join the class that opens August 5:
+http://course.ucsc-extension.edu/modules/shop/index.html?action=section&OfferingID=1531625&SectionID=5274872
+
+FOR NOVICES
+
+For 6 Thursday evenings, starting July 10, we will hold the "Introduction
+To Programming For Beginners, Using Python" class which prepares
+programming novices to take the Python For Programmers' class:
+http://course.ucsc-extension.edu/modules/shop/index.html?action=section&OfferingID=3576274&SectionID=5274926
+
+which is 6 nights of acquiring basic programming skills in python and
+prepares you for the next programmers class
+
+If you have programming experience in any language skip the Beginners
+class listed above and join a Programmers' class.
+
+----
+All our Python courses are hands-on with short lectures, and lots of
+exercises where we study the solutions after some lab time.
+
+Questions are always welcome; discussion and pair-programming are encouraged.
+
+Please come, and send students!
+
+---
+
+And, the first quarter of the professional course is available for $20 at
+Udemy.Com!  I'm so busy that I can't say when the rest of the course will
+be there, but I'm working on it.
+https://www.udemy.com/pythonic-python-part-i-the-basics/
+
+I hope you find one of these classes useful to your schedule and your taste.
+
+Marilyn Davis
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <http://mail.python.org/pipermail/baypiggies/attachments/20140705/c928c73a/attachment.html>
+
+From aahz at pythoncraft.com  Tue Jul  8 21:55:30 2014
+From: wooster at example.com (Aahz)
+To: Baypiggies@python.org
+Date: Tue, 8 Jul 2014 12:55:30 -0700
+Subject: [baypiggies] FWD: We're number one!
+Message-ID: <20140708195530.GA14749@panix.com>
+
+Python is now the most popular introductory teaching language at top U.S.
+universities:
+
+http://m.cacm.acm.org/blogs/blog-cacm/176450-python-is-now-the-most-popular-introductory-teaching-language-at-top-us-universities/fulltext
+-- 
+Aahz (aahz at pythoncraft.com)           <*>         http://www.pythoncraft.com/
+
+Question authority: ask me anything!
+
+From guido at python.org  Tue Jul  8 21:57:53 2014
+From: guido at python.org (Guido van Rossum)
+To: Baypiggies@python.org
+Date: Tue, 8 Jul 2014 12:57:53 -0700
+Subject: [baypiggies] FWD: We're number one!
+In-Reply-To: <20140708195530.GA14749@panix.com>
+References: <20140708195530.GA14749@panix.com>
+Message-ID: <CAP7+vJLiYbi9mpe3RxjvZLWw=WupPS9zB3Zvi21Da3sXgcjuvg@mail.gmail.com>
+
+Also check out the author's pythontutor.com!
+
+
+On Tue, Jul 8, 2014 at 12:55 PM, Aahz <aahz at pythoncraft.com> wrote:
+
+> Python is now the most popular introductory teaching language at top U.S.
+> universities:
+>
+>
+> http://m.cacm.acm.org/blogs/blog-cacm/176450-python-is-now-the-most-popular-introductory-teaching-language-at-top-us-universities/fulltext
+> --
+> Aahz (aahz at pythoncraft.com)           <*>
+> http://www.pythoncraft.com/
+>
+> Question authority: ask me anything!
+> _______________________________________________
+> Baypiggies mailing list
+> Baypiggies at python.org
+> To change your subscription options or unsubscribe:
+> https://mail.python.org/mailman/listinfo/baypiggies
+>
+
+
+
+-- 
+--Guido van Rossum (python.org/~guido)
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <http://mail.python.org/pipermail/baypiggies/attachments/20140708/a74947b8/attachment.html>
+
+From yousuffauzan at gmail.com  Tue Jul  8 22:19:43 2014
+From: yousuffauzan at gmail.com (Yousuf Fauzan)
+To: Baypiggies@python.org
+Date: Tue, 8 Jul 2014 13:19:43 -0700
+Subject: [baypiggies] FWD: We're number one!
+In-Reply-To: <CAP7+vJLiYbi9mpe3RxjvZLWw=WupPS9zB3Zvi21Da3sXgcjuvg@mail.gmail.com>
+References: <20140708195530.GA14749@panix.com>
+ <CAP7+vJLiYbi9mpe3RxjvZLWw=WupPS9zB3Zvi21Da3sXgcjuvg@mail.gmail.com>
+Message-ID: <CAKkeR+bUsERMbdz8z2Q-W8FFunE3PW_ercvdk+mKtM6MWgQb2g@mail.gmail.com>
+
++1 for pythontutor.com
+
+--
+Yousuf
+CodeBunk
+
+
+On Tue, Jul 8, 2014 at 12:57 PM, Guido van Rossum <guido at python.org> wrote:
+
+> Also check out the author's pythontutor.com!
+>
+>
+> On Tue, Jul 8, 2014 at 12:55 PM, Aahz <aahz at pythoncraft.com> wrote:
+>
+>> Python is now the most popular introductory teaching language at top U.S.
+>> universities:
+>>
+>>
+>> http://m.cacm.acm.org/blogs/blog-cacm/176450-python-is-now-the-most-popular-introductory-teaching-language-at-top-us-universities/fulltext
+>> --
+>> Aahz (aahz at pythoncraft.com)           <*>
+>> http://www.pythoncraft.com/
+>>
+>> Question authority: ask me anything!
+>> _______________________________________________
+>> Baypiggies mailing list
+>> Baypiggies at python.org
+>> To change your subscription options or unsubscribe:
+>> https://mail.python.org/mailman/listinfo/baypiggies
+>>
+>
+>
+>
+> --
+> --Guido van Rossum (python.org/~guido)
+>
+> _______________________________________________
+> Baypiggies mailing list
+> Baypiggies at python.org
+> To change your subscription options or unsubscribe:
+> https://mail.python.org/mailman/listinfo/baypiggies
+>
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <http://mail.python.org/pipermail/baypiggies/attachments/20140708/fe3c59c6/attachment.html>
+
