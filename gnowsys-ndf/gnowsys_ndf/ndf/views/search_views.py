@@ -376,7 +376,7 @@ def results_search(request, group_id):
 		pass
 
 	search_results = json.dumps(search_results, cls=Encoder)
-	print "search_results:", search_results
+	#print "search_results:", search_results
 	context_to_return = getRenderableContext(group_id)			# RETURNS BASIC CONTEXT
 	context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
 	context_to_return['processed'] = "1" 							
@@ -612,12 +612,13 @@ def results_search_group(request, group_id):
 
 				##print "stemmed results: ", search_results_st
 
-			search_results = json.dumps(search_results, cls=Encoder)
+			#search_results = json.dumps(search_results, cls=Encoder)
 			#print "final results: ", search_results
 			#memList = populate_list_of_members()
 	except Exception:
 		pass
 
+	search_results = json.dumps(search_results, cls=Encoder)
 	context_to_return = getRenderableContext(group_id)
 	context_to_return['search_results'] = search_results
 	context_to_return['processed'] = 1
@@ -1602,6 +1603,7 @@ def perform_map_reduce(request,group_id):
 		doc.delete()	
 	#return render(request,'cf/thankYou.html',{})
 	return HttpResponse("Map Reduce was performed successfully")
+
 
 ############################################################################################################################
 
