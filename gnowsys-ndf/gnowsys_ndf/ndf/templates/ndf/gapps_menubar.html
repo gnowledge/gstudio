@@ -16,6 +16,9 @@
 
 {% for index_key, app_dict in gapps.items %}
 
+{% check_group_admin groupid app_dict request.user as is_group_admin %}
+
+{% if is_group_admin %}
 <li class="
 
 	{% comment %} Sets active-menu class on active app{% endcomment %}
@@ -49,6 +52,7 @@
 	{{app_dict.name|title}}</a>
 
 </li>
+{% endif %}
 
 {% endfor %}
 

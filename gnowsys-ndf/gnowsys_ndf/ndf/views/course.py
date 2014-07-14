@@ -125,8 +125,8 @@ def create_edit(request, group_id, node_id = None):
         course_node = collection.GSystem()
 
     if request.method == "POST":
-        get_node_common_fields(request, course_node, group_id, GST_COURSE)
-        course_node.save()
+        # get_node_common_fields(request, course_node, group_id, GST_COURSE)
+        course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE))
         return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id}))
         
     else:
