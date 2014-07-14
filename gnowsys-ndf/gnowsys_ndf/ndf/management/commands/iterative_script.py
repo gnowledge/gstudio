@@ -433,11 +433,11 @@ def property_create_Relation(label,property_id,property_value,property_json):
 	property_value =unicode("Q")+unicode(property_value)
 	right_json_url=gen_url_json+str(property_value)+".json"
 
-	print property_id+"%%%%%%%%%%%%%%",right_json_url
+	#print property_id+"%%%%%%%%%%%%%%",right_json_url
 	right_json=json_parse(right_json_url) #property_value is supposed to be the id of the right subject in case of a relation
 
 	right_subject_name=extract_labels(right_json,property_value,language)
-	print "$$$$$$$$",right_subject_name," ",property_value
+	#print "$$$$$$$$",right_subject_name," ",property_value
 	log_inner_topic_start(log_flag)
 	if right_subject_name!=None:
 		#initiate_new_topic_creation(right_json,property_value,language)
@@ -461,6 +461,16 @@ def property_create_Relation(label,property_id,property_value,property_json):
 
 
 def class_create(class_id, class_json):
+	"""
+	This function receives the following parameters-
+	1)class_id-The topic_title of the class. eg - Q17 stands for Japan.
+	2)class_json -The json of the class which is to be created.
+	2)label -The label of the item for which claims will be parsed and classes will be made. Traversal for classes: DFS(Depth First Search)
+	
+	calls the system_script2 method create_Class() to actually create the class.
+
+	At the end the instance_of field of the topic is populated with the list of it's parent classes.
+	"""
 	label = extract_labels(class_json, class_id, language)
 	alias_list = extract_aliases(class_json, class_id, language)
 	description = extract_descriptions(class_json, class_id, language)
@@ -479,12 +489,13 @@ def class_create(class_id, class_json):
 			#Creating all the Attributes for class
 			type_of_list = extract_property_json(class_json, label, class_id, int(1))
 			current_class = get_class(label, class_id)
-			print "\n\nList:\n" + str(type_of_list) + "\n\n"
-			print "\n\nCurrent Object\n" + str(current_class) + "\n\n"
+			#print "\n\nList:\n" + str(type_of_list) + "\n\n"
+			#print "\n\nCurrent Object\n" + str(current_class) + "\n\n"
 			if current_class and type_of_list:
 				for parent_class_obj_id in type_of_list:		
-					current_class.type_of.append(ObjectId(parent_class_obj_id))
-					current_class.modified_by = int(1)
+					if parent_class_obj_id not in current_class.type_of:
+						current_class.type_of.append(ObjectId(parent_class_obj_id))
+						current_class.modified_by = int(1)
 					
 				current_class.save()
 				return current_class
@@ -495,18 +506,20 @@ def class_create(class_id, class_json):
 def initiate_class_creation(json_obj,label,topic_title,call_flag):
 	"""	
 	This function receives the following parameters-
-	1)json_obj -The json of the item for which attributes and relations are to be created.
-	2)label -The label of the item for which claims will be parsed and attributes and relations will be made. 
+	1)json_obj -The json of the item for which the class is to be created.
+	2)label -The label of the item for which claims will be parsed and classes will be made. Traversal for classes: DFS(Depth First Search)
 	3)topic_title - The topic_title of the item . eg - Q17 stands for Japan.
 	4)call_flag - shows wether the function is being called first time or second time for a particular object.
 		-In the first iteration the call_flag=1 and only the topic,attributetypes and attributes must be created.
 		-In the second iteration the call_flag=2 and the relationtypes and relations must be created.
 
-	The function is responsible for parsing the json of any item and then creating attributes and relations 
-	depending on the value of flag and call_flag.
-	The tags are also being populated as and when the property_id is either P279 or P31.
+	The function is responsible for parsing the json of any item and then creating classes
+	depending on the value of property_id
+	If the property Id is:
 	P31 - instance of
-	P279 - subclass of
+	then class_create() is called.
+
+	At the end the instance_of field of the topic is populated with the list of it's parent classes.
 	"""
 	claim_dict={}
 	Result =json_obj['entities'][str(topic_title)]
@@ -531,26 +544,27 @@ def initiate_class_creation(json_obj,label,topic_title,call_flag):
 		
 	
 		for property_value in property_list_values:
-			print "Property Id: " + str(property_id)		
+			print "Property Id: " + unicode(property_id)		
 			print "Property Value: " + unicode(property_value) 
 			log_flag += 1
 			if property_id == "P31":
 				#getting the entire list for P31. As a topic may belong to many classes.
 				
-				print "Property Value" + str("!!!!!!!!!!!!!!!!!!!--------------------!!!!!!!!!!!!!") + str(property_value)
+				print "Property Value for class creation found -- " + unicode(property_value)
 				for key, val in property_value.items():
 					if key == u'numeric-id':
 						class_id = "Q" + str(val)
 						class_url = gen_url_json+class_id+".json"
 						class_json =json_parse(class_url)
-						print class_url + str("this is the class iD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------=====================================")
+						#print class_url + str("this is the class iD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------=====================================")
 						class_obj = class_create(class_id, class_json)	
-						print "\nClass::\n" + str(class_obj)
+						#print "\nClass::\n" + str(class_obj)
 						topic = get_topic(label)
 						if topic and class_obj:
 							topic.member_of.append(ObjectId(class_obj._id))
 							for types_id in class_obj.type_of:
-								topic.member_of.append(ObjectId(types_id))
+								if types_id not in topic.member_of:
+									topic.member_of.append(ObjectId(types_id))
 							topic.modified_by = int(1)
 							topic.save()
 							
@@ -559,34 +573,7 @@ def initiate_class_creation(json_obj,label,topic_title,call_flag):
 					
 	
 			log_flag -= 1
-		"""	
-		if flag==1 and call_flag==1: #attribute has to be made
-			property_data_type = extract_datatype_from_property(property_value_list)
-			#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
-			#print property_data_type
-
-			property_create_AttributeType(property_id,property_data_type,property_json) #assuming that the name of the attribute type id the property id like say P131
-			property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
 		
-		
-		if flag==3 and call_flag==2: #relation has to be made
-			
-			property_value_for_relation=extract_value_for_relation(property_value_list)
-			
-			property_create_RelationType(property_id,property_json)
-			property_create_Relation(label,property_id,property_value_for_relation,property_json)
-			
-			
-		
-			if property_id=="P31" or property_id=="P279":
-				print "^^entering tags^^ ",label, " - ",property_value_for_relation	
-				property_value_for_relation=unicode("Q")+unicode(property_value_for_relation)
-				property_value_json=gen_url_json+str(property_value_for_relation)+".json"
-				property_value_json=json_parse(property_value_json) #property_value is supposed to be the id of the right subject in case of a relation
-				property_value_name=extract_labels(property_value_json,property_value_for_relation,language)			
-				populate_tags(label,property_value_name)
-			
-		"""
 
 
 def extract_property_json(json_obj,label,topic_title,call_flag):
@@ -596,15 +583,16 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 	2)label -The label of the item for which claims will be parsed and attributes and relations will be made. 
 	3)topic_title - The topic_title of the item . eg - Q17 stands for Japan.
 	4)call_flag - shows wether the function is being called first time or second time for a particular object.
-		1-In the first iteration call_flag = 1 and hence only classes will be created.
+		1-In the first iteration call_flag = 1 and hence only classes will be created. - DFS call also present.
 		2-Attributes - In the first iteration the call_flag=2 and only the topic,attributetypes and attributes must be created.
 		3-Relations - In the second iteration the call_flag=3 and the relationtypes and relations must be created.
 
 	The function is responsible for parsing the json of any item and then creating attributes and relations 
 	depending on the value of flag and call_flag.
-	The tags are also being populated as and when the property_id is either P279 or P31.
-	P31 - instance of
-	P279 - subclass of
+	
+	The tags are also being populated as and when the property_id is such that the value of the object is a Category. 
+	Logic applied: Simple substring matching - "category"/"Category" present in the label.
+	
 	"""
 	claim_dict={}
 	Result =json_obj['entities'][str(topic_title)]
@@ -632,8 +620,7 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 				log_flag += 1			
 				print "Attempting to create an Attribute for Iteration1"			
 				property_data_type = extract_datatype_from_property(property_value_list)
-				#print topic_title," ",property_id," ",label," - ",property_data_type ," :",property_value
-				#print property_data_type
+				
 				property_create_AttributeType(property_id,property_data_type,property_json, call_flag) #assuming that the name of the attribute type id the property id like say P131
 				property_create_Attribute(label,property_id,property_value,property_json) #entire triple is being passed as a parameter
 				log_flag -= 1
@@ -646,7 +633,7 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 					"""
 					print "DFS Will be starting here"
 			
-					print "Property Value" + str("!!!!!!!!!!!!!!!!!!!--------------------!!!!!!!!!!!!!") + str(property_value)
+					#print "Property Value" + str("!!!!!!!!!!!!!!!!!!!--------------------!!!!!!!!!!!!!") + str(property_value)
 					for key, val in property_value.items():
 						if key == u'numeric-id':
 							class_id = "Q" + str(val)
@@ -666,12 +653,13 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 						if parent_class_obj:
 							type_of_list.append(parent_class_obj._id)
 							for parent_class_parents_id in parent_class_obj.type_of:
-								type_of_list.append(ObjectId(parent_class_parents_id))
+								if parent_class_parents_id not in type_of_list:
+									type_of_list.append(ObjectId(parent_class_parents_id))
 						
 						log_class_done(log_flag)
 						log_flag -= 2
-						print "\n\nParent Class Object::\n" + str(parent_class_obj) + "\n\n"
-						print "\n\nParent Class List::\n" + str(type_of_list) + "\n\n"
+						#print "\n\nParent Class Object::\n" + str(parent_class_obj) + "\n\n"
+						#print "\n\nParent Class List::\n" + str(type_of_list) + "\n\n"
 
 				
 				
@@ -717,17 +705,19 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 				property_create_RelationType(property_id,property_json, call_flag)
 				property_create_Relation(label,property_id,property_value_for_relation,property_json)
 			
-			
+				"""Populate Tags"""
+				category_string_uppercase = "Category"
+				category_string_lowercase = "category"
+				print "\n^^Entering Tags^^ ", unicode(label), " - ",unicode(property_value_for_relation) + "\n"
+				property_value_for_relation=unicode("Q")+unicode(property_value_for_relation)
+				property_value_json=gen_url_json+str(property_value_for_relation)+".json"
+				property_value_json=json_parse(property_value_json) #property_value is supposed to be the id of the right subject in case of a relation
+				property_value_name=extract_labels(property_value_json,property_value_for_relation,language)			
+				if property_value_name:
+					if category_string_uppercase in property_value_name or category_string_lowercase in property_value_name:
+						populate_tags(label,property_value_name)
 		
-				if property_id=="P31" or property_id=="P279":
-					print "^^entering tags^^ ",label, " - ",property_value_for_relation	
-					property_value_for_relation=unicode("Q")+unicode(property_value_for_relation)
-					property_value_json=gen_url_json+str(property_value_for_relation)+".json"
-					property_value_json=json_parse(property_value_json) #property_value is supposed to be the id of the right subject in case of a relation
-					property_value_name=extract_labels(property_value_json,property_value_for_relation,language)			
-					populate_tags(label,property_value_name)
-		
-				log_flag -= 1
+				
 			
 	return type_of_list
 
@@ -771,20 +761,10 @@ def initiate_new_topic_creation(json_obj,topic_title,language_choice):
 			extract_property_json(json_obj,label,topic_title,int(2))
 
 
-def iteration_1():
+def iteration_2():
 	"""
-	Parameter passed to the function is flag.
-	If -
-		flag=1 -The first iteration.Only the topic and its attributetyeps and attributes are supposed to be created.
-		flag=2 -The second iteration.The topic and its attributes already exist , now its relationTypes 
-		and relations are to be created.
-
-	Function called directly from main.This function starts reading a file with name of items .Now depending on 
-	the value of flag it knows wether the script is in first iteration or second iteration.
-	In the first iteration.Only the topic and its attributetyeps and attributes are supposed to be created.
-	In the second iteration.The topic and its attributes already exist , now its relationTypes 
-		and relations are to be created.
-
+	Function called directly from main.This function starts reading a file with name of items. It For each topic, calls the initiate_class_creation() method passing reqd parameters.
+	This is essentially to create the classes begining from the P-id relation b/w Topic and Attribute.
 	"""
 	with open(fn,'rb') as f:
 		r = csv.reader(f,delimiter ='\n')
@@ -848,9 +828,9 @@ def read_file(flag):
 class Command(BaseCommand):
 	def handle(self, *args, **options):
 		"""
-		First create the GSystemType WikiTopic.
-		Then  create the GAttributeType topic_id.
-		read_file(int(1)) - starts the first iteration.
+		First create the Topic and their attributeTypes / attributes.(including the GAttributeType topic_id.)
+		read_file(int(1)) - starts the first iteration.		
+		iteration_2() - starts the class creation		
 		Then read_file(int(2)) -starts the second iteration.
 		"""
 		create_WikiData_WikiTopic()
@@ -862,7 +842,7 @@ class Command(BaseCommand):
 		log_iteration_2_file_complete()
 
 		log_iteration_1_file_start()
-		iteration_1()	
+		iteration_2()	
 		log_iteration_1_file_complete()
 
 		log_iteration_3_file_start()

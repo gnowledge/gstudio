@@ -172,6 +172,15 @@
 				<li>{{ parent_class }}</li>
 			{% endfor %}
 		</ul>
+		 <br>
+                <br>
+                
+                <ul>
+                <strong>Tags:</strong>
+                        {% for tag in selected_topic.tags %}
+                                <li>{{ tag }}</li>
+                        {% endfor %}
+                </ul>
 		<br>
 		<br>
 		<ul>
@@ -201,8 +210,9 @@
 		</iframe>
 		
   	</div>
- 
-
+	<br>
+ 	<p><h5><small>This data has been harvested from Wikidata project url <a href="http://www.wikidata.org/wiki/Wikidata:Main_Page">http://www.wikidata.org/wiki/Wikidata:Main_Page</a></h5></small>
+	<h5><small>All structured data from the main and property namespace is available under the Creative Commons CC0 License; text in the other namespaces is available under the Creative Commons Attribution-ShareAlike License; additional terms may apply. By using this site, you agree to the Terms of Use and Privacy Policy.</small><//p></h5>
 
 {% endif %}
 {% endblock %}
