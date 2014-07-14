@@ -31,11 +31,11 @@
 			}
 
 		</style>
-	<script src="http://d3js.org/d3.v3.min.js"></script>
-	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-
+	<script src="/static/ndf/bower_components/d3/d3.js"></script>
+	<script src="/static/ndf/bower_components/d3-tip/index.js"></script>
+	<script src="/static/ndf/bower_components/jquery/dist/jquery.js"></script>
+<!-- 	// <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+ -->
 	<script type="text/javascript">
 		
 		var g = "{{datavisual}}";
@@ -56,7 +56,7 @@
 		var h = 200;
 		var barPadding = 1; 
 		//defining a custom color scale
-		var colorScale = d3.scale.category10();
+		var color = d3.scale.category10();
 
 		//creating an svg canvas to draw our visualizaions
 		var svg = d3.select("#bar_visual").append("svg")
@@ -77,20 +77,20 @@
 		.attr("y",function(d){ return h;})
 		.attr("height", function(d){ return (d.count * 4);})
 		.attr("width", function(d){ return w/dataset.length - barPadding;})
-		.attr("fill", function(d,i){ return colorScale(i);})
+		.attr("fill", function(d,i){ return color(i);})
 		.attr("title",function(d){return d.name + "s : " + d.count})
 		.on("mouseover", function(d) {
 
 					//Get this bar's x/y values, then augment for the tooltip
-					var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.rangeBand() / 2;
+					var xPosition = parseFloat(d3.select(this).attr("x")) ;// xScale.rangeBand() / 2;
 					var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
 
 					//Update the tooltip position and value
 					d3.select("#tooltip")
 						.style("left", xPosition + "px")
 						.style("top", yPosition + "px")						
-						.select("#value")
-						.text( d.x +" : "+d.y);
+						.select("#tip-value")
+						.text( d.name +" : "+d.count);
 			   
 					//Show the tooltip
 					d3.select("#tooltip").classed("hidden", false);
@@ -99,12 +99,12 @@
 						.attr("fill","orange");
 
 			   })
-			   .on("mouseout", function(d) {
+			   .on("mouseout", function(d,i) {
 			   
 			   		d3.select(this)
 				   		.transition()
 				   		.duration(250)
-						.attr("fill", function(d,i){ return colorScale(i);});
+						.attr("fill", color(i));
 					//Hide the tooltip
 
 					d3.select("#tooltip").classed("hidden", true);

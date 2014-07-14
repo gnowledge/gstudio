@@ -59,16 +59,16 @@ def graphs(request,group_id):
 
 	return render_to_response("ndf/visualize.html", {'group_id': group_id, 'groupid': group_id }, context_instance=RequestContext(request))
 
-def graph_display(request, group_id):
-	ns_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-	    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    if group_ins:
-	        group_id = str(group_ins._id)
-	    else :
-	        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	        if auth :
-	            group_id = str(auth._id)
+# def graph_display(request, group_id):
+# 	ns_objectid  = ObjectId()
+# 	if ins_objectid.is_valid(group_id) is False :
+# 	    group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+# 	    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    if group_ins:
+# 	        group_id = str(group_ins._id)
+# 	    else :
+# 	        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	        if auth :
+# 	            group_id = str(auth._id)
 
-	return render(request, 'ndf/graph_display.html', {"groupid":group_id})
+# 	return render(request, 'ndf/graph_display.html', {"groupid":group_id})

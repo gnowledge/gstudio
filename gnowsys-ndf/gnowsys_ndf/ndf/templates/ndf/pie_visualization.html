@@ -2,23 +2,16 @@
 
 
 	<script type="text/javascript">
-		//var pie_pie_dataset = [5,10,20,35,6,20,10,5];
-		//var dataset = [{{docCollection.count }},{{imageCollection.count }},{{videoCollection.count }}];
-		//alert("hello");
+		
 		var g = "{{datavisual}}";
-		//alert(g);
-		//alert(datavisual);
+
 		var m =g.replace(/&quot;/gi,'"');
-		//alert(m);
+
 		var dataset = [];
 		var system_count = [];
 		m = JSON.parse(m);
 		var i = m.length;
-		//alert(i);	
-
-		//alert(m[1].count);
-		//var dataset = [{{docCollection.count }},{{imageCollection.count }},{{videoCollection.count }}];
-		//tester . logs the dataset to the console
+		
 		for (var i =0 ; i < m.length ; i+=1)
 		{
 			dataset.push(m[i]);
@@ -46,7 +39,7 @@
 		.attr("height",h)
 		.attr("width",w);
 
-		var pie = d3.layout.pie();
+		var pie = d3.layout.pie().sort(null);
 
 		var p = pie(system_count);
 		//alert(p);
@@ -59,6 +52,38 @@
 
 		arcgrp.append("path")
 		.attr("d",arc)
+		.on("mouseover", function(d,i) {
+
+					//Get this bar's x/y values, then augment for the tooltip
+					var xPosition = arc.centroid(d)[0] + 85 ;//+ xScale.rangeBand() / 2;
+					var yPosition = arc.centroid(d)[1] + 225 ;// 2 + h / 2;
+
+					//Update the tooltip position and value
+					tips = d3.select("#tooltip")
+					.style("left", xPosition + "px")
+					.style("top", yPosition + "px")						
+					.select("#tip-value")
+					.text(dataset[i].name+ " : " + system_count[i]);
+					
+
+					//Show the tooltip
+					d3.select("#tooltip").classed("hidden", false);
+
+					d3.select(this)
+					.attr("fill","yellow");
+
+				})
+			.on("mouseout", function(d,i) {
+
+				d3.select(this)
+				.transition()
+				.duration(250)
+				.attr("fill", color(i));
+					//Hide the tooltip
+
+					d3.select("#tooltip").classed("hidden", true);
+					
+				})
 		.transition()
 		.ease("bounce")
 		.duration(2000)
