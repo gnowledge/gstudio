@@ -60,9 +60,9 @@ ul#graph-hover.f-dropdown{
 {% endif %}
 
 <!-- Icon to add annotations -->
-<div id="moving_div" style="display:none; position:absolute; z-index:40" >
-      <i class ="fi-clipboard-pencil" onclick = 'switchMode()'></i>
-    <!--  <img src = "/static/ndf/images/chat-icon.png" onclick = 'switchMode()'/> --> 
+<div id="moving_div" style="display:none; position:absolute; z-index:40; background-color:white; box-shadow: 0px 0px 5px #888888; opacity: 0.8" >
+      <i class ="fi-clipboard-notes" style = "font-size: 25px" onclick = 'if(event.stopPropagation){event.stopPropagation();}else if(window.event){event.cancelBubble=true;} switchMode();'></i>
+     <!-- <img src = "/static/ndf/images/chat-icon.png" width = 20%, height = 20% onclick = 'switchMode()'/>  -->
 </div>
 <!-- End menu -->
 <!-- Reveal dialog for alerting user to select text to add annotations-->
@@ -104,6 +104,7 @@ ul#graph-hover.f-dropdown{
                 <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
                 <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+                <!-- <dd id = "toggleContainer" onClick="toggle(this);"><a href="#"><i class="fi-comments" ></i> Annotate</a></dd> -->
           </dl>
       </div>
       <div class="small-2 columns">          
@@ -583,10 +584,18 @@ win.Selector.mouseup = function(e)
   }
 }
 
+/*$(document).on('click', function(){
+  if($('#moving_div').css('display') == 'block')
+  {
+    $('#moving_div').css('display') == 'none';
+  }
+});
+*/
 function switchMode()
 {
     toggle(document.getElementById("toggleContainer"));
-    highlightSearchTerms(st);
+    console.log("st inside switchMode: " + st);
+    //highlightSearchTerms(st);
     existingComments = [];
     sideComments = new SideComments('#commentable-area', currentUser, existingComments);
 }
@@ -690,13 +699,14 @@ function showThread(elem)
       {
         existingComments.push(annotations[i]);
         console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
-        alert('before sideComments');
+        //alert('before sideComments');
         sideComments = new SideComments('#commentable-area', currentUser, existingComments); 
         //alert( $('.marker').text() );
         break;
       }
   }
-  alert($('.marker').text());
+  //alert($('.marker').text());
+  $('.marker').trigger('click');   
   $('.marker').trigger('click');       
 
 }
@@ -914,6 +924,10 @@ function toggle(el)
         //alert(el.innerHTML);
         el.innerHTML = '<i class="fi-clipboard-pencil"></i> Annotate';
         //$("#content").html(finalText);
+        console.log("hide menu");
+        $('#moving_div').css({
+             display: "none"
+        });
   }
 
   toggleValue *= -1;
