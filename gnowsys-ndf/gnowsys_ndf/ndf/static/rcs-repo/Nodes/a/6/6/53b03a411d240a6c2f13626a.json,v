@@ -1,0 +1,66 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2014.06.29.16.09.38;	author rohan;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (Forum) is created by rohan on 29 June 2014
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "53b03a411d240a6c2f13626a"
+    },
+    "_type": "GSystemType",
+    "access_policy": null,
+    "altnames": null,
+    "attribute_type_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": null,
+    "contributors": [
+        1
+    ],
+    "created_at": 1404077977992,
+    "created_by": 1,
+    "featured": null,
+    "group_set": [],
+    "language": null,
+    "last_update": 1404077977992,
+    "location": [],
+    "login_required": null,
+    "member_of": [
+        {
+            "$oid": "53b03a411d240a6c2f136263"
+        }
+    ],
+    "meta_type_set": [],
+    "modified_by": 1,
+    "name": "Forum",
+    "plural": null,
+    "post_node": [],
+    "prior_node": [],
+    "process_type_set": [],
+    "property_order": [],
+    "relation_type_set": [],
+    "start_publication": null,
+    "status": "DRAFT",
+    "tags": [],
+    "type_of": [],
+    "url": null
+}@

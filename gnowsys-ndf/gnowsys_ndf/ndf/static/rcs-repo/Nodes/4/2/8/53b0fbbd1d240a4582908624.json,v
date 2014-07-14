@@ -1,0 +1,63 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2014.06.30.05.55.09;	author rohan;	state Exp;
+branches;
+next	;
+
+
+desc
+@This document (Boston) is created by rohan on 30 June 2014
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@{
+    "_id": {
+        "$oid": "53b0fbbd1d240a4582908624"
+    },
+    "_type": "GSystem",
+    "access_policy": "PUBLIC",
+    "altnames": "Beantown,The Cradle of Liberty,The Hub,The Cradle of Modern America,The Athens of America,The Walking City,Boston, Massachusetts,Boston, MA,",
+    "annotations": [],
+    "author_set": [],
+    "collection_set": [],
+    "comment_enabled": null,
+    "content": null,
+    "content_org": " - city in Massachusetts, United States of America - city in Massachusetts, USA - city in Massachusetts, USA",
+    "contributors": [],
+    "created_at": 1404127509089,
+    "created_by": 1,
+    "featured": null,
+    "group_set": [],
+    "language": "en",
+    "last_update": 1404127509089,
+    "location": [],
+    "login_required": null,
+    "member_of": [
+        {
+            "$oid": "53b04add1d240a168e0bf5bf"
+        }
+    ],
+    "modified_by": null,
+    "module_set": [],
+    "name": "Boston",
+    "plural": null,
+    "post_node": [],
+    "prior_node": [],
+    "property_order": [],
+    "start_publication": null,
+    "status": "PUBLISHED",
+    "tags": [],
+    "type_of": [],
+    "url": "http://en.wikipedia.org/wiki/Boston"
+}@
