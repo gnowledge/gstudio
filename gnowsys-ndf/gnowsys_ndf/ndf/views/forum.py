@@ -27,7 +27,8 @@ try:
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
-
+from django.core.mail import send_mail
+from gnowsys_ndf.settings import *
 
 ###########################################################################
 
@@ -315,6 +316,18 @@ def create_thread(request, group_id, forum_id):
                                         'forum_threads': json.dumps(forum_threads),
                                         'forum_created_by':User.objects.get(id=forum.created_by).username
                                     })
+###############################################################################
+#Sending the ObjectId of the thread created to the mailman server.
+	body = "post to list\n"
+	body += "Username:"+request.user.email+"\n" 		      
+	body +="Group:"+colg.name+"\n"
+	body += "Forum:"+forum.name+"\n"
+	body += "Thread:"+request.POST.get('thread_name','')+"\n" 
+	body += str(colrep._id)+"\n"
+	body += request.POST.get('content_org','')
+	send_mail("creating a thread", body, EMAIL_HOST_USER, [LOCAL_MAILMAN_USER], fail_silently=False)
+
+###############################################################################
 
         return render_to_response("ndf/thread_details.html",variables)
 
@@ -396,7 +409,22 @@ def add_node(request,group_id):
         colrep.group_set.append(colg._id)
         colrep.save()
         groupname=colg.name
-        
+##############################################################        
+#Sending the ObjectId of the reply and the mailman message id of the prior node to the mailman server.
+	mmid_node = collection.Triple.one({"_type":"GAttribute", "subject":ObjectId(sup._id)})
+	mmid = mmid_node.object_value
+	body = "reply to post\n" 
+	body += "Username:"+request.user.email+"\n"
+	body +="Group:"+colg.name+"\n"
+	body += "Forum:"+forumobj.name+"\n"
+	body += "Thread:"+collection.Node.one({'_id': ObjectId(thread)}).name+"\n"
+	body += str(colrep._id) + "\n"
+	body += mmid + "\n"
+	body += request.POST.get('reply','')
+	
+	send_mail("reply to a thread", body, EMAIL_HOST_USER, [LOCAL_MAILMAN_USER], fail_silently=False)
+
+##############################################################
         if node == "Twist" :  
             url="http://"+sitename+"/"+str(group_id)+"/forum/thread/"+str(colrep._id)
             activity=str(request.user.username)+" -added a thread '"
