@@ -337,6 +337,7 @@ class Node(DjangoDocument):
     def save(self, *args, **kwargs):
 
 
+
         if kwargs.has_key("is_changed"):
           if not kwargs["is_changed"]:
             print "\n ", self.name, "(", self._id, ") -- Nothing has changed !\n\n"
@@ -354,6 +355,7 @@ class Node(DjangoDocument):
     	
     	
     	
+
 
         is_new = False
 
@@ -404,6 +406,8 @@ class Node(DjangoDocument):
         
         
         #print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",self._id
+
+
         
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     	#This is the save method of the node class.It is still not known on which objects is this save method applicable
@@ -425,7 +429,8 @@ class Node(DjangoDocument):
    	#document is present or not.
    	#If the id is not present then add that id.If it is present then do not add that id
    		
-   	old_doc = collection.ToReduce.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})	
+
+   	old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})	
     	if not old_doc:
     		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
     		z = collection.ToReduceDocs()
@@ -435,9 +440,6 @@ class Node(DjangoDocument):
     		
     	#If you create/edit anything then this code shall add it in the URL
     	#===================================================================================================================#
-    	
-
-    	
         
         history_manager = HistoryManager()
         rcs_obj = RCS()
@@ -1488,6 +1490,7 @@ class GRelation(Triple):
 ####################################### Added on 19th June 2014 ##############################################################
 
 
+
 @connection.register
 class ReducedDocs(DjangoDocument):
 	structure={
@@ -1516,16 +1519,4 @@ class IndexedWordList(DjangoDocument):
 	use_dot_notation = True
 	#word_start_id = 0 --- a ,1---b,2---c .... 25---z,26--misc.
 
-
 	
-"""
-@connection.register
-class allLinks(DjangoDocument):
-    structure = {
-	'member_of':ObjectId,
-	'link':unicode,
-	'required_for':unicode,
-    }
-    # required_fields = ['member_of', 'link']
-    use_dot_notation = True
-"""
