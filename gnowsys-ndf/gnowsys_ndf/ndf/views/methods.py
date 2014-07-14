@@ -324,8 +324,12 @@ def get_node_common_fields(request, node, group_id, node_type):
     is_changed = True
           
     # End of if
+    specific_url = set_all_urls(node.member_of)
+    node.url = specific_url
 
   # --------------------------------------------------------------------------- For create/edit
+  
+
 
   # -------------------------------------------------------------------------------- name
  
@@ -1223,3 +1227,32 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
   except Exception as e:
       error_message = "\n GRelationCreateError: " + str(e) + "\n"
       raise Exception(error_message)
+      
+
+      
+###############################################      ###############################################
+def set_all_urls(member_of):
+	print "INSIDE SET ALL URLS"
+	Gapp_obj = collection.Node.one({"_type":"MetaType", "name":"GAPP"})
+	factory_obj = collection.Node.one({"_type":"MetaType", "name":"factory_types"})
+
+	url = ""	
+	gsType = member_of[0]
+	gsType_obj = collection.Node.one({"_id":ObjectId(gsType)})
+	
+	if Gapp_obj._id in gsType_obj.member_of:
+		if gsType_obj.name == u"Quiz":
+		    url = u"quiz/details"
+		else:
+		    url = gsType_obj.name.lower()
+	elif factory_obj._id in gsType_obj.member_of:
+		if gsType_obj.name == u"QuizItem":
+		    url = u"quiz/details"
+		elif gsType_obj.name == u"Twist":
+		    url = u"forum/thread"
+		else:
+		    url = gsType_obj.name.lower()
+	else:
+		url = u"None"
+	return url
+###############################################	###############################################    

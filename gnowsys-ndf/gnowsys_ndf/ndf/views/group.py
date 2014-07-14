@@ -281,6 +281,32 @@ def create_group(request,group_id):
 #     return render_to_response("ndf/groupdashboard.html",{'groupobj':groupobj,'user':request.user,'curgroup':groupobj},context_instance=RequestContext(request))
 
 
+def populate_list_of_members():
+	members = User.objects.all()
+	memList = []
+	for mem in members:
+		memList.append(mem.username)	
+	return memList
+
+def populate_list_of_group_members(group_id):
+    col = get_database()[Node.collection_name]
+    try :
+      try:
+        author_list = col.Node.one({"_type":"Group", "_id":ObjectId(group_id)}, {"author_set":1, "_id":0})
+      except:
+        author_list = col.Node.find_one({"_type":"Group", "name":group_id}, {"author_set":1, "_id":0})
+      
+      memList = []
+
+      for author in author_list.author_set:
+          name_author = User.objects.get(pk=author)
+          memList.append(name_author)
+      
+      print "members in group: ", memList
+      return memList
+    except:
+        return []
+
 
 def group_dashboard(request,group_id=None):
 
@@ -338,16 +364,24 @@ def group_dashboard(request,group_id=None):
 
   if groupobj.status == u"DRAFT":
     groupobj, ver = get_page(request, groupobj)
+    
+    groupobj,ver=get_page(request,groupobj)    
+    # First time breadcrumbs_list created on click of page details
+    breadcrumbs_list = []
+    # Appends the elements in breadcrumbs_list first time the resource which is clicked
+    breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
+    memList = []
+    if (group_id != None):
+        memList = populate_list_of_group_members(group_id)
 
-  groupobj.get_neighbourhood(groupobj.member_of)
-  # print "\n groupobj.keys: ", groupobj.keys()
-
-  property_order_list = []
-  if groupobj.has_key("group_of"):
-    # print "\n Found groupobj['group_of']: ", groupobj['group_of'], "\n"
-    if groupobj['group_of']:
-      property_order_list = get_property_order_with_value(groupobj['group_of'][0])
-      print "\n ", type(property_order_list), " -- ", "\n", property_order_list  
+    return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
+                                                         'group_id':grpid, 'user':request.user, 
+                                                         'shelf_list': shelf_list,
+                                                         'shelves': shelves, 
+                                                         'breadcrumbs_list': breadcrumbs_list,
+							 'authors':memList,
+                                                        },context_instance=RequestContext(request)
+                            )
 
   # First time breadcrumbs_list created on click of page details
   breadcrumbs_list = []
@@ -358,10 +392,10 @@ def group_dashboard(request,group_id=None):
                                                        'group_id':grpid, 'user':request.user, 
                                                        'shelf_list': shelf_list,
                                                        'shelves': shelves, 
-                                                       'breadcrumbs_list': breadcrumbs_list,
-                                                       'property_order_list': property_order_list
+                                                       'breadcrumbs_list': breadcrumbs_list
                                                       },context_instance=RequestContext(request)
                           )
+
 
 @login_required
 def edit_group(request,group_id):
@@ -382,7 +416,7 @@ def edit_group(request,group_id):
   page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
 
   if request.method == "POST":
-    is_node_changed = get_node_common_fields(request, page_node, group_id, gst_group)
+    get_node_common_fields(request, page_node, group_id, gst_group)
 
     if page_node.access_policy == "PUBLIC":
       page_node.group_type = "PUBLIC"
@@ -390,7 +424,7 @@ def edit_group(request,group_id):
     if page_node.access_policy == "PRIVATE":
       page_node.group_type = "PRIVATE"
 
-    page_node.save(is_changed=is_node_changed)
+    page_node.save()
     group_id=page_node._id
     return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
 
