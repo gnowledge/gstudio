@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     (r'^t/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.text'),
     (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
     (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
+
     (r'^csms/', include('gnowsys_ndf.csms.urls')),
     #(r'^chatb/plus/(\d+)/$','gnowsys_ndf.chatb.views.chatb_view'), #chatb
     #(r'^online/',include('gnowsys_ndf.online_status.urls')),#chatb
@@ -35,12 +36,6 @@ urlpatterns = patterns('',
                       ########## meeting app
     url(r'^(?P<group_id>[^/]+)/online','gnowsys_ndf.ndf.views.meeting.get_online_users', name='get_online_users'), 
     url(r'^(?P<group_id>[^/]+)/meeting/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.output', name='newmeeting'),
-
-
-
-
-
-
 
     (r'^(?P<group_id>[^/]+)/file', include('gnowsys_ndf.ndf.urls.file')),
     (r'^(?P<group_id>[^/]+)/image', include('gnowsys_ndf.ndf.urls.image')),
@@ -64,18 +59,13 @@ urlpatterns = patterns('',
     
     (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis'), {'app_name': "MIS"}),
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis_po'), {'app_name': "MIS-PO"}),
-    
 
-    #ramkarnani
+
     url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
 	url(r'^(?P<group_id>[^/]+)/meeting/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.output', name='newmeeting'), 
     url(r'^(?P<group_id>[^/]+)/meeting','gnowsys_ndf.ndf.views.meeting.dashb', name='Meeting'),                  ########## meeting app
     url(r'^(?P<group_id>[^/]+)/online','gnowsys_ndf.ndf.views.meeting.get_online_users', name='get_online_users'),                  ########## meeting app
     
-    
-    
-    
-   #url(r'^(?P<group_id>[^/]+)/online','gnowsys_ndf.ndf.views.online.tests', name='Online'),                     ########## online app  
     (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
     # (r'^(?P<group_id>[^/]+)/Observation', include('gnowsys_ndf.ndf.urls.observation')),
     (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
