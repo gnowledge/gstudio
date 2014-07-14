@@ -369,6 +369,8 @@ class Node(DjangoDocument):
         # whether do they exists in their GSystemType's "attribute_type_set";
         #    If exists, add them to the document
         #    Otherwise, throw an error -- " Illegal access: Invalid field found!!! "
+        
+	
         collection = get_database()[Node.collection_name]
         for key, value in self.iteritems():
             if key == '_id':
@@ -394,8 +396,12 @@ class Node(DjangoDocument):
                 if not field_found:
                     print "\n Invalid field(", key, ") found!!!\n"
                     # Throw an error: " Illegal access: Invalid field found!!! "
+                    
+        
         
         super(Node, self).save(*args, **kwargs)
+        
+        
         
         #print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",self._id
         
@@ -429,6 +435,9 @@ class Node(DjangoDocument):
     		
     	#If you create/edit anything then this code shall add it in the URL
     	#===================================================================================================================#
+    	
+
+    	
         
         history_manager = HistoryManager()
         rcs_obj = RCS()

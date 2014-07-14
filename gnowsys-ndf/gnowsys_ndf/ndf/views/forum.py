@@ -285,6 +285,7 @@ def create_thread(request, group_id, forum_id):
     
         colrep.member_of.append(twist_st._id)
         
+        
         colrep.prior_node.append(forum._id)
         colrep.name = name
 

@@ -376,7 +376,7 @@ def results_search(request, group_id):
 		pass
 
 	search_results = json.dumps(search_results, cls=Encoder)
-	#print "search_results:", search_results
+	print "search_results:", search_results
 	context_to_return = getRenderableContext(group_id)			# RETURNS BASIC CONTEXT
 	context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
 	context_to_return['processed'] = "1" 							
