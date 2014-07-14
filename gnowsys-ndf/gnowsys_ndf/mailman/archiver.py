@@ -134,7 +134,7 @@ def process(message):
 						parent_ga_node = collection.Triple.one({'_type':'GAttribute','object_value':message['In-Reply-To']})
 						parent_thread_id = parent_ga_node.subject
 						parent_thread = collection.Node.one({'_id':ObjectId(parent_thread_id)})
-						print parent_thread
+#						print parent_thread
 	
 						new_reply = collection.GSystem()
 						new_reply.prior_node.append(parent_thread._id)
@@ -157,7 +157,7 @@ def process(message):
 						new_reply.group_set.append(group._id)
 
 						date_string = message['Date'][:message['Date'].index("+")]
-						time = datetime.datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
+						time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
 						new_thread.created_at = time
 
 		
@@ -224,7 +224,7 @@ def process(message):
 						new_thread.group_set.append(group._id)
 
 						date_string = message['Date'][:message['Date'].index("+")]
-						time = datetime.datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
+						time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
 						new_thread.created_at = time
 
 	
