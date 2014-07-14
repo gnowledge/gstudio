@@ -16,6 +16,7 @@ from django.contrib.sites.models import Site
 
 from django_mongokit import get_database
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
+from gnowsys_ndf.ndf.views.methods import set_all_urls
 from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
@@ -146,6 +147,9 @@ def create_forum(request,group_id):
                 colf.group_set.append(user_group_obj._id)     
 
         colf.member_of.append(forum_st._id)
+        ################# ADDED 14th July.Its done!
+        colf.access_policy = u"PUBLIC"
+        colf.url = set_all_urls(colf.member_of)
 
         sdate=request.POST.get('sdate',"")
         shrs= request.POST.get('shrs',"") 
@@ -284,6 +288,9 @@ def create_thread(request, group_id, forum_id):
         colrep = collection.GSystem()
     
         colrep.member_of.append(twist_st._id)
+        #### ADDED ON 14th July
+        colrep.access_policy = u"PUBLIC"
+        colrep.url = set_all_urls(colrep.member_of)
         
         
         colrep.prior_node.append(forum._id)

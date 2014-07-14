@@ -815,6 +815,7 @@ def advanced_search_results(request, group_id):
 				continue
 
 	search_results = sort_names_by_similarity(search_results, search_str_user)
+	print search_results
 	search_results = json.dumps(search_results, cls=Encoder)
 
 	context_to_return = getRenderableContext(group_id)
