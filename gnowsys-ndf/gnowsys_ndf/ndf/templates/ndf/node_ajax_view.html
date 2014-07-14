@@ -20,16 +20,23 @@
 <style type = "text/css">
 .movingDiv{
   display:none; 
-  position:absolute; 
+  position:absolute;
+  color: green;
+  font-size: 10px; 
   z-index:40; 
   background-color:white; 
   box-shadow: 0px 0px 5px #888888; 
-  opacity: 0.8;
 }
 .annotatedElement{
 background-color : rgba(255,0,0,0.2);
 font-weight:bold;
 } 
+.movingDivIcon{
+  font-size: 35px;
+  color: green;
+  padding-left: 5px;
+  padding-right: 5px;
+}
 .divider-line { font-size: xx-large; color:lightgray; }
 .line-height-2 { line-height:2; }
 .line-height-2pt5 { line-height:2.5; }
@@ -72,7 +79,8 @@ ul#graph-hover.f-dropdown{
 
 <!-- Icon to add annotations -->
 <div id="moving_div" class = "movingDiv" >
-      <i class ="fi-clipboard-notes" style = "font-size: 25px" onclick = 'switchMode();'></i>
+      <i title="Annotate" class ="fi-comment-quotes movingDivIcon" onclick = 'switchMode();'></i>
+      
 </div>
 <!-- End menu -->
 
@@ -606,6 +614,7 @@ win.Selector.mouseup = function(e)
              highlightSearchTerms(st);
              existingComments = [];
              sideComments = new SideComments('#commentable-area', currentUser, existingComments);
+             $('.marker').trigger('click');   
       }
       
       else if (toggleValue == -1)
@@ -616,9 +625,9 @@ win.Selector.mouseup = function(e)
                 console.log("show menu");
                 $('#moving_div').css({
                    left:  e.pageX - 320,
-                   top:   e.pageY - 70,
+                   top:   e.pageY - 60,
                    display: "block"
-                });
+                }).delay(5000).fadeOut(4000);
             }
             else 
             {
@@ -649,7 +658,7 @@ function switchMode()
     existingComments = [];
     sideComments = new SideComments('#commentable-area', currentUser, existingComments);
     $('.marker').trigger('click');   
- //   $('.marker').trigger('click');   
+    $('.marker').trigger('click');   
 }
 
 function expand(range) 
