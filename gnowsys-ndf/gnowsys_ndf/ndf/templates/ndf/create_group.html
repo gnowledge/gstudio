@@ -171,7 +171,7 @@ $(document).ready(function()
 
   $("#group_name").change(function(){
 
-    var name = $("#group_name").val();
+    var name = $("#group_name").val().trim();
     var nodes = $("#nodes_list").val();
 
     if (nodes.indexOf(name) > 0)  
