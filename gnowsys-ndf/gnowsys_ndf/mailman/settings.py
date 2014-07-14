@@ -8,4 +8,4 @@ MAIL_SPOOL_FILE_PATH = './gnowsys_ndf/mailman/try3.txt'
 
 #Replace this with the address of the metastudio server
 
-METASTUDIO_SERVER_ADDRESS = 'mailmantrial@gmail.com'
+METASTUDIO_SERVER_ADDRESS = ''
