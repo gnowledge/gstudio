@@ -1603,6 +1603,7 @@ def perform_map_reduce(request,group_id):
 	#return render(request,'cf/thankYou.html',{})
 	return HttpResponse("Map Reduce was performed successfully")
 
+
 ############################################################################################################################
 
 
