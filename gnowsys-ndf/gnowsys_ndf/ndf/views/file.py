@@ -39,6 +39,7 @@ from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import set_all_urls
 
 #######################################################################################################################################
 
@@ -486,6 +487,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                         fileobj.group_set.append(user_group_object._id)
 
             fileobj.member_of.append(GST_FILE._id)
+            #### ADDED ON 14th July.IT's DONE
+            fileobj.url = set_all_urls(fileobj.member_of)
             fileobj.mime_type = filetype
             if img_type == "" or img_type == None:
                 if content_org:

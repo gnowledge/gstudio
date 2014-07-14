@@ -30,6 +30,7 @@ from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import set_all_urls
 
 
 #######################################################################################################################################
@@ -159,7 +160,9 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         if not quiz_item_node.has_key('_id'):
             quiz_item_node.created_by = usrid
             quiz_item_node.member_of.append(gst_quiz_item._id)
-
+            ###################### ADDED ON 14th JULY.IT'S DONE
+	    quiz_item_node.url = set_all_urls(quiz_item_node.member_of)
+	    quiz_item_node.access_policy = u"PUBLIC"	
         quiz_item_node.modified_by = usrid
 
         if usrid not in quiz_item_node.contributors:
