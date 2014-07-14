@@ -10,6 +10,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^$', include('gnowsys_ndf.ndf.urls')),
     (r'^ndf/', include('gnowsys_ndf.ndf.urls')),
+    (r'^csms/', include('gnowsys_ndf.csms.urls')),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
 
     (r'^admin/', include(admin.site.urls)),

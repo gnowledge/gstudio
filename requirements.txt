@@ -1,4 +1,10 @@
-django
+
+# deps for Rapidsms
+Django>=1.5,<1.6
+RapidSMS==0.16.0
+#South==0.7.6
+
+#other deps
 django-mongokit
 django-registration
 django-ratings

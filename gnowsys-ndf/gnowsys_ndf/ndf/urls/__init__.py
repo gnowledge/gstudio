@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     (r'^t/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.text'),
     (r'^new/$', 'gnowsys_ndf.mobwrite.views.new'),
     (r'^mobwrite/', 'gnowsys_ndf.mobwrite.views.mobwrite'),
+    (r'^csms/', include('gnowsys_ndf.csms.urls')),
     #(r'^chatb/plus/(\d+)/$','gnowsys_ndf.chatb.views.chatb_view'), #chatb
     #(r'^online/',include('gnowsys_ndf.online_status.urls')),#chatb
     (r'^admin/', include(admin.site.urls)),

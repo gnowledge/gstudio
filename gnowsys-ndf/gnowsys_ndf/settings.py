@@ -175,8 +175,35 @@ INSTALLED_APPS = (
     'django_extensions',	#textb
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
-    'online_status',                       #for online_users     
+    'online_status',                       #for online_users   
+    "django_nose",
+    "django_tables2",
+    "selectable",
+    "south",
+    "rapidsms",
+    "rapidsms.backends.database",
+    "rapidsms.contrib.handlers",
+    "rapidsms.contrib.httptester",
+    "rapidsms.contrib.messagelog",
+    "rapidsms.contrib.messaging",
+    "rapidsms.contrib.registration",
+    "rapidsms.contrib.echo",
+    "rapidsms.contrib.default",  # Must be last
+  
 )
+
+INSTALLED_BACKENDS = {
+    "message_tester": {
+        "ENGINE": "rapidsms.backends.database.DatabaseBackend",
+    },
+}
+
+
+RAPIDSMS_HANDLERS = (
+    'rapidsms.contrib.echo.handlers.echo.EchoHandler',
+    'rapidsms.contrib.echo.handlers.ping.PingHandler',
+)
+
 
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
@@ -186,6 +213,7 @@ ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -210,6 +238,53 @@ LOGGING = {
     }
 }
 
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'filters': {
+#         'require_debug_false': {
+#             '()': 'django.utils.log.RequireDebugFalse'
+#         }
+#     },
+#     'formatters': {
+#         'basic': {
+#             'format': '%(asctime)s %(name)-20s %(levelname)-8s %(message)s',
+#         },
+#     },
+#     'handlers': {
+#         'mail_admins': {
+#             'level': 'ERROR',
+#             'filters': ['require_debug_false'],
+#             'class': 'django.utils.log.AdminEmailHandler'
+#         },
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'basic',
+#         },
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'formatter': 'basic',
+#             'filename': os.path.join(PROJECT_PATH, 'rapidsms.log'),
+#         },
+#     },
+#     'loggers': {
+#         'django.request': {
+#             'handlers': ['mail_admins'],
+#             'level': 'ERROR',
+#             'propagate': True,
+#         },
+#         'rapidsms': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     }
+# }
+
+
 LOGIN_REDIRECT_URL = "/"
 
 # Absolute filesystem path to the project's base directory, 
@@ -221,7 +296,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 META_TYPE = [u"GAPP",u"factory_types"]
 
 #Default APPs inculde in beloow GAPPS list
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"Meeting" ]
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task" ]
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
