@@ -93,26 +93,26 @@ def search_query(request, group_id):
 
 
 # View for returning the search results according to group search
-def search_query_group(request, group_id):
-	col = get_database()[Node.collection_name]
+# def search_query_group(request, group_id):
+# 	col = get_database()[Node.collection_name]
 
-	# SCRIPT FOR CONVERTING GROUP NAME RECEIVED TO OBJECTID 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+# 	# SCRIPT FOR CONVERTING GROUP NAME RECEIVED TO OBJECTID 
+# 	ins_objectid  = ObjectId()
+# 	if ins_objectid.is_valid(group_id) is False :
+# 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		if group_ins:
+# 			group_id = str(group_ins._id)
+# 		else:
+# 	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    		if auth :
+# 				group_id = str(auth._id)
+# 	else:
+# 		pass
 
-	# CHANGE THIS TO GROUP SPECIFIC MEMBERS
-	memList = populate_list_of_members()						# memList holds the list of all authors
-	return render(request, 'ndf/search_home.html', {"groupid":group_id, "authors":memList}, context_instance=RequestContext(request))
+# 	# CHANGE THIS TO GROUP SPECIFIC MEMBERS
+# 	memList = populate_list_of_members()						# memList holds the list of all authors
+# 	return render(request, 'ndf/search_home.html', {"groupid":group_id, "authors":memList}, context_instance=RequestContext(request))
 
 
 
@@ -142,12 +142,12 @@ def results_search(request, group_id):
 	user_reqd = -1 							# user_reqd = -1 => search all users else user_reqd = pk of the user in user table
 
 	# FORMAT OF THE RESULTS TO BE RETURNED
-	search_results_ex = {'name':[], 'tags':[], 'content':[], 'user':[]}
-	search_results_st = {'name':[], 'tags':[], 'content':[], 'user':[]}
-	search_results_li = {'name':[], 'tags':[], 'content':[], 'user':[]}
+	search_results_ex = {'name':[], 'tags':[], 'content':[]}
+	search_results_st = {'name':[], 'tags':[], 'content':[]}
+	#search_results_li = {'name':[], 'tags':[], 'content':[], 'user':[]}
 
 	# ALL SORTED SEARCH RESULTS
-	search_results = {'exact':search_results_ex, 'stemmed':search_results_st, 'like':search_results_li}
+	search_results = {'exact':search_results_ex, 'stemmed':search_results_st}
 
 	# STORES OBJECTID OF EVERY SEARCH RESULT TO CHECK FOR DUPLICATES
 	all_ids = []
@@ -370,11 +370,12 @@ def results_search(request, group_id):
 							else:
 								search_results_st['content'].append(doc)
 
-			search_results = json.dumps(search_results, cls=Encoder)
+			#search_results = json.dumps(search_results, cls=Encoder)
 			memList = populate_list_of_members()
 	except Exception:
 		pass
 
+	search_results = json.dumps(search_results, cls=Encoder)
 	print "search_results:", search_results
 	context_to_return = getRenderableContext(group_id)			# RETURNS BASIC CONTEXT
 	context_to_return['search_results'] = search_results 		# ADD SEARCH RESULTS TO CONTEXT
@@ -626,37 +627,37 @@ def results_search_group(request, group_id):
 
 
 
-def advanced_search(request, group_id):
+# def advanced_search(request, group_id):
 
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+# 	ins_objectid  = ObjectId()
+# 	if ins_objectid.is_valid(group_id) is False :
+# 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		if group_ins:
+# 			group_id = str(group_ins._id)
+# 		else:
+# 	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    		if auth :
+# 				group_id = str(auth._id)
+# 	else:
+# 		pass
 
-	#print "Group id is: ", group_id
-	col = get_database()[Node.collection_name]
-	temp = col.Node.find({"_type":"GSystemType"}, {"name":1, "_id":0})
+# 	#print "Group id is: ", group_id
+# 	col = get_database()[Node.collection_name]
+# 	temp = col.Node.find({"_type":"GSystemType"}, {"name":1, "_id":0})
 
-	allGSystems = []
-	for gs in temp:
-		allGSystems.append(gs.name)
+# 	allGSystems = []
+# 	for gs in temp:
+# 		allGSystems.append(gs.name)
 
-	allGroups = get_public_groups()
-	#print "groups: ", allGroups
+# 	allGroups = get_public_groups()
+# 	#print "groups: ", allGroups
 
-	allUsers = populate_list_of_group_members(allGroups)
-	#print "members: ", allUsers
-	##print allGSystems
+# 	allUsers = populate_list_of_group_members(allGroups)
+# 	#print "members: ", allUsers
+# 	##print allGSystems
 
-	return render(request, 'ndf/advanced_search2.html', {"allGSystems":allGSystems, "groupid":group_id, "allGroups":allGroups, "allUsers":allUsers, "group_id":group_id})
+# 	return render(request, 'ndf/advanced_search2.html', {"allGSystems":allGSystems, "groupid":group_id, "allGroups":allGroups, "allUsers":allUsers, "group_id":group_id})
 
 
 
@@ -1075,24 +1076,24 @@ def get_relations_for_autoSuggest(request, group_id):
 	return HttpResponse(json.dumps(ins))
 
 
-"""
-def ra_search(request, group_id):
-	# GET VALUE FROM TEXT BOX
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
-				group_id = str(auth._id)
-	else:
-		pass
 
-	return render(request, 'ndf/ra_search.html', {"groupid":group_id})
-"""
+# def ra_search(request, group_id):
+# 	# GET VALUE FROM TEXT BOX
+# 	ins_objectid  = ObjectId()
+# 	if ins_objectid.is_valid(group_id) is False :
+# 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		if group_ins:
+# 			group_id = str(group_ins._id)
+# 		else:
+# 	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    		if auth :
+# 				group_id = str(auth._id)
+# 	else:
+# 		pass
+
+# 	return render(request, 'ndf/ra_search.html', {"groupid":group_id})
+
 
 def ra_search_results(request, group_id):
 	"""
@@ -1791,26 +1792,26 @@ def recommend(prefs,term,similarity = sim_distance):
 
 ################## FUNCTIONS FOR CALLING/TESTING SEMANTIC SEARCH ########################################
 
-def generate_term_document_matrix(request,group_id):
-	td_doc()
-	return HttpResponse("Thank You")
+# def generate_term_document_matrix(request,group_id):
+# 	td_doc()
+# 	return HttpResponse("Thank You")
 
-def cf_search(request, group_id):
-	ins_objectid  = ObjectId()
-	if ins_objectid.is_valid(group_id) is False :
-		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-		if group_ins:
-			group_id = str(group_ins._id)
-		else:
-	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-	    		if auth :
-				group_id = str(auth._id)
-	else:
-		pass
+# def cf_search(request, group_id):
+# 	ins_objectid  = ObjectId()
+# 	if ins_objectid.is_valid(group_id) is False :
+# 		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+# 		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 		if group_ins:
+# 			group_id = str(group_ins._id)
+# 		else:
+# 	    		auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+# 	    		if auth :
+# 				group_id = str(auth._id)
+# 	else:
+# 		pass
 
 	
-	return render(request,'ndf/semantic_search.html',{"groupid":group_id})
+# 	return render(request,'ndf/semantic_search.html',{"groupid":group_id})
 
 def get_nearby_words(request,group_id):
 	td_doc()

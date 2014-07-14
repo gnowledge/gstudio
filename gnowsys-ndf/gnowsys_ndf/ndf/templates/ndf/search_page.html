@@ -174,7 +174,8 @@
 
     sData = "{{ search_results }}";
     sData = sData.replace(/&quot;/g, '"');  
-    sData = sData.replace(/&\#39;/g, '"');
+    //sData = sData.replace(/&#39;/g, "'");
+    //sData = sData.replace(/u'/g, "'");
     sData = jQuery.parseJSON(sData);
 
     if ('{{search_type}}' == "KEYWORD_SEARCH") {
