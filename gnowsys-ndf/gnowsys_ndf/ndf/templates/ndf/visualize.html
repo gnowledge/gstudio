@@ -115,13 +115,6 @@ width:200px;
     	r.onload = function(e) { 
     		contents = e.target.result;
     		console.log(contents);
-        // $("#file_con").html(contents);
-        // alert( "Got the file.n" 
-        //       +"name: " + f.name + "n"
-        //       +"type: " + f.type + "n"
-        //       +"size: " + f.size + " bytesn"
-        //       + "starts with: " + contents.substr(1, contents.indexOf("n"))
-        // );  
 }
 r.readAsText(f);
 } else { 
@@ -473,7 +466,7 @@ document.getElementById('fileinput').addEventListener('change', readSingleFile, 
 			.ticks(5);
 
 			//Create SVG element
-			var svg = d3.select("#itsme")
+			var svg = d3.select("#itsme2")
 			.append("svg")
 			.attr("width", scat_w)
 			.attr("height", scat_h);
@@ -581,7 +574,7 @@ document.getElementById('fileinput').addEventListener('change', readSingleFile, 
 			.font("Impact")
 			.fontSize(function(d) { return d.size; })
 				.on("end", function (words) {
-				d3.select("#itsme").append("svg")
+				d3.select("#itsme2").append("svg")
 				.attr("width", 900)
 				.attr("height", 300)
 				.append("g")
