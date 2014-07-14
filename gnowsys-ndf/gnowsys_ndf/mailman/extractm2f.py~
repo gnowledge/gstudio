@@ -7,6 +7,7 @@ import re
 import os
 import subprocess
 
+
 #Imports from django packages
 
 from django.core.mail import send_mail
@@ -162,9 +163,10 @@ def process(message):
 				
 						new_reply.group_set.append(group._id)
 
+						
 						date_string = message['Date'][:message['Date'].index("+")]
-						time = datetime.datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
-						new_thread.created_at = time
+						reply_time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
+						new_reply.created_at = reply_time
 
 
 		        			create_gattribute(new_reply._id, mm_id_node, unicode(message['Message-Id']))
@@ -226,9 +228,11 @@ def process(message):
 						new_thread.member_of.append(twist_st._id)
 						new_thread.group_set.append(group._id)
 
+						
 						date_string = message['Date'][:message['Date'].index("+")]
-						time = datetime.datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
-						new_thread.created_at = time
+						thread_time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
+						print thread_time
+						new_thread.created_at = thread_time
 
 #						print new_thread.created_at
 	

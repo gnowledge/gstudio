@@ -340,6 +340,8 @@ class Node(DjangoDocument):
             is_new = True               # It's a new document, hence yet no ID!"
 
             # On save, set "created_at" to current date
+        if  not self.created_at:
+
             self.created_at = datetime.datetime.today()
 
         self.last_update = datetime.datetime.today()
