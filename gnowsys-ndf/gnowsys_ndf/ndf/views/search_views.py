@@ -323,7 +323,7 @@ def results_search(request, group_id):
 			It uses the Map Reduce algorithm to keep track of which GSystems contain which words and how many times.
 			The more the count of matches, the more relevant the search result is for the user.
 			"""
-			print "stemmed query: ", search_str_stemmed			
+			#print "stemmed query: ", search_str_stemmed			
 			content_docs = []
 			content_match_pairs = []					# STORES A DICTIONARY OF MATCHING DOCUMENTS AND NO_OF_WORDS THAT MATCH SEARCH QUERY
 			sorted_content_match_pairs = []				# STORES THE ABOVE DICTIONARY IN A SORTED MANNER
@@ -815,7 +815,7 @@ def advanced_search_results(request, group_id):
 				continue
 
 	search_results = sort_names_by_similarity(search_results, search_str_user)
-	print search_results
+	#print search_results
 	search_results = json.dumps(search_results, cls=Encoder)
 
 	context_to_return = getRenderableContext(group_id)
@@ -948,10 +948,10 @@ def populate_list_of_group_members(group_ids):
 def get_users(request, group_id):
 	group_ids = str(request.GET['Groups'])
 	group_ids = group_ids.split(",")
-	print group_ids
+	#print group_ids
 
 	if group_ids[0] == "all":
-		print "hi there"
+		#print "hi there"
 		allGroups = get_public_groups()
 		allUsers = populate_list_of_group_members(allGroups)
 	else:
@@ -1418,7 +1418,7 @@ def ra_search_results(request, group_id):
 		except Exception:
 			pass
 
-	print result_members
+	#print result_members
 	result_members = json.dumps(result_members, cls=Encoder)
 	
 	context_to_return = getRenderableContext(group_id)				# BASIC CONTEXT
@@ -1486,7 +1486,7 @@ def pre_process_for_map_reduce(text):
 def leaves(tree):
     """Finds NP (nounphrase) leaf nodes of a chunk tree."""
     for subtree in tree.subtrees(filter = lambda t: t.node == 'NP'):
-	print "SUBTREE:",subtree
+	#print "SUBTREE:",subtree
         yield subtree.leaves()
 
 def normalise(word):
