@@ -1344,66 +1344,6 @@ def get_group_member_user(request, group_id):
     else:
 	raise Http404
 
-def annotation(request, group_id):
-  '''
-  Stores the annotation-based discussion thread on the database
-  '''
-  exists_flag = request.POST["exists_flag"] 
-  exists_pos  = int(request.POST["exists_pos"])
-  obj_id = str(request.POST["node_id"])
-  col = get_database()[Node.collection_name]
-  ann = request.POST["ann_present"]
-  
-  #print "ann rcvd", ann
-  #print "type ann rcvd", type(ann)
-  #ann = ann.replace("&quot;","'")
-  #print "ann replaced", ann
-  #print "type ann replaced", type(ann)
-  ann = json.loads(ann)
-  print "hello"
-  print "ann after eval", ann['selectedText']
-  print "type ann after eval", type(ann)
-  print "pos rcvd", exists_pos, type(exists_pos)
-  print "id received: ", ObjectId(request.POST["node_id"])
-  #ann2=json.dumps(ann)
-  #print "parsed", ann2
-  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
-  
-  if(exists_flag == "false"):
-    sg_obj.annotations.append(ann)
-  else:
-    sg_obj.annotations[exists_pos] = ann
-
-  sg_obj.save()
-  print type(sg_obj.annotations)
-  #print "\n\n Text  :  ", aa, "\n\n"
-  return HttpResponse(json.dumps(sg_obj.annotations))
-
-
-def getAnnotations(request, group_id):
-  '''
-  returns annotations field
-  '''
-  col = get_database()[Node.collection_name]
-  sg_obj = col.Node.one({"_id":ObjectId(request.GET["node_id"])})
-  return HttpResponse(json.dumps(sg_obj.annotations))
-
-def annotationlib(request, group_id):
-  '''
-  Stores the annotation-based discussion thread on the database
-  '''
-  obj_id = str(request.POST["node_id"])
-  col = get_database()[Node.collection_name]
-  comment = request.POST ["comment"]
-  comment = json.loads(comment)
-  print "comment: ", comment
-  print "comment in py", comment['comment']
-  print "comment in py", comment['authorName']
-  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
-  sg_obj.annotations.append(comment)
-  sg_obj.save()
-
-  return HttpResponse("Hello")
 
 def annotationlibInSelText(request, group_id):
   '''
