@@ -101,6 +101,7 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
 		6. User Id: Which user is creating the topic.
 	"""
 	print "Creating an Attribute Type"
+	data_type_list = ["None","bool","basestring","unicode",	"int", "float", "long",	"datetime.datetime", "list", "dict", "ObjectId", "IS()"]
 	cursor = collection.Node.one({"label":unicode(property_id),"_type":"AttributeType"})
 	if (cursor != None):
 		print "The AttributeType already exists."
@@ -108,8 +109,11 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
 	else:
 		attribute_type = collection.AttributeType()
 		attribute_type.name = unicode(name)
-		attribute_type.data_type = data_type
-		system_type = collection.Node.one({"name":u"WikiData","_type":u"GSystemType"})
+		if data_type in data_type_list: 
+			attribute_type.data_type = data_type
+		else:
+			attribute_type.data_type = "unicode"
+		system_type = collection.Node.one({"name":u"WikiData","_type":"GSystemType"})
 		attribute_type.subject_type.append(system_type._id)
 		system_type_2 = collection.Node.one({"name":u"WikiTopic","_type":"GSystemType"})
 		attribute_type.subject_type.append(system_type_2._id)
@@ -167,6 +171,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 		6. User Id: Which user is creating the topic.
 	"""
 	print "Creating an Attribute Type"
+	data_type_list = ["None","bool","basestring","unicode",	"int", "float", "long",	"datetime.datetime", "list", "dict", "ObjectId", "IS()"]
 	cursor = collection.Node.one({"label":unicode(property_id),"_type":"AttributeType"})
 	if (cursor != None):
 		print "The AttributeType already exists."
@@ -174,7 +179,10 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 	else:
 		attribute_type = collection.AttributeType()
 		attribute_type.name = unicode(name)
-		attribute_type.data_type = data_type
+		if data_type in data_type_list:
+			attribute_type.data_type = data_type
+		else:
+			attribute_type.data_type = "unicode"
 		system_type = collection.Node.one({"name":u"WikiData","_type":"GSystemType"})
 		attribute_type.subject_type.append(system_type._id)
 		system_type_2 = collection.Node.one({"name":u"WikiTopic","_type":"GSystemType"})
@@ -607,7 +615,7 @@ def populate_location(label,property_id,property_value,user_id):
 
 	geo_json[0]["geometry"]["coordinates"].append(property_value["longitude"])
 	geo_json[0]["geometry"]["coordinates"].append(property_value["latitude"])
-	geo_json[0]["properties"]["description"]=label
+	geo_json[0]["properties"]["description"]=label		
 	geo_json[0]["properties"]["id"]=property_id
 	obj.location = geo_json
 
