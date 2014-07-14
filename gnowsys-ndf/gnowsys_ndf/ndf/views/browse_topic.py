@@ -391,7 +391,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     node = app_GST
                     prior_theme_collection = [] 
                     parent_nodes_collection = ""
-                    
+                    node.get_neighbourhood(node.member_of)
                     # To find topics uniqueness within the context of its parent Theme collection, while editing topic name
                     nodes = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
                     for each in nodes:

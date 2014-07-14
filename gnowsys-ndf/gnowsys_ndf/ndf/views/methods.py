@@ -765,7 +765,7 @@ def get_node_metadata(request,node,node_type):
 	attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
 	if(node.has_key('_id')):
 		for atname in attribute_type_list:
-			field_value=(request.POST.get(atname,""))
+			field_value=unicode(request.POST.get(atname,""))
 			at=collection.Node.one({"_type":"AttributeType","name":atname})	
 			if(at!=None):
 				create_gattribute(node._id,at,field_value)		
