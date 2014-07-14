@@ -65,9 +65,15 @@ ul#graph-hover.f-dropdown{
      <!-- <img src = "/static/ndf/images/chat-icon.png" width = 20%, height = 20% onclick = 'switchMode()'/>  -->
 </div>
 <!-- End menu -->
+
 <!-- Reveal dialog for alerting user to select text to add annotations-->
 <div id="alertSelText" style="display:none" class = "reveal-modal tiny" data-reveal >
   <p> "Please select some text first! " </p>
+  <a class = "close-reveal-modal">&#215;</a>
+</div>
+
+<div id="alertSignIn" style="display:none" class = "reveal-modal tiny" data-reveal >
+  <p> "Please sign in to add comments! " </p>
   <a class = "close-reveal-modal">&#215;</a>
 </div>
 <!-- end dialog -->
@@ -667,6 +673,10 @@ sideComments.on('commentPosted', function( comment )
     }
 }); 
   
+sideComments.on('addCommentAttempted', function() 
+{  
+    $("#alertSignIn").foundation('reveal', 'open');
+});
 //Listen to "commentDeleted" and send a request to backend to delete the comment.
 /*sideComments.on('commentDeleted', function( commentId ) 
 {
