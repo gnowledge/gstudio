@@ -507,8 +507,8 @@ def populate_location(label,property_id,property_value,user_id):
     	}
 	]
 
-	geo_json[0]["geometry"]["coordinates"].append(property_value["latitude"])
 	geo_json[0]["geometry"]["coordinates"].append(property_value["longitude"])
+	geo_json[0]["geometry"]["coordinates"].append(property_value["latitude"])
 	geo_json[0]["properties"]["description"]=(property_value["globe"])		
 	geo_json[0]["properties"]["id"]=property_id
 	obj.location =geo_json
