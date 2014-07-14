@@ -4,8 +4,6 @@ from gnowsys_ndf.ndf.models import *
 from django.template import RequestContext
 
 #from stemming.porter2 import stem
-
-from stemming.porter2 import stem
 # from bson.json_util import dumps
 
 import json
