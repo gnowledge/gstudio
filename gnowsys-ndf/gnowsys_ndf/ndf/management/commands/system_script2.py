@@ -351,7 +351,7 @@ def create_Class(label, description, alias_list, class_id, last_update_datetime,
 		class_obj.altnames = unicode(string_alias)
 		class_obj.type_of.append(topic_type_id) #The GSystemType of class that is being created should be a part of the WikiData GApp.
 		class_obj.access_policy=unicode('PUBLIC')
-		factory = collection.Node.one({"name": u"factory_types","type":u"MetaType"})
+		factory = collection.Node.one({"name": u"factory_types","_type":u"MetaType"})
                 factory_id = factory._id
 		wikidata = collection.Node.one({"name":u"WikiData", "_type":"GSystemType"})
 		class_obj.member_of.append(ObjectId(wikidata._id))
