@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from gnowsys_ndf.ndf.models import *
 from django.template import RequestContext
-from stemming.porter2 import stem
+#from stemming.porter2 import stem
 import json
 from collections import OrderedDict
 import difflib
