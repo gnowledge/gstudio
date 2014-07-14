@@ -1,0 +1,24 @@
+1. Add the list of all objects (wikidata items - the Q id's) to the file gnowsys_ndf/gnowsys_ndf/ndf/static/ndf/wikidata/list_of_objects. A sample list of objects has already been added. You can find the wikidata dump at http://dumps.wikimedia.org/wikidatawiki/
+
+2. Run the filldb command:
+	
+	python manage.py filldb
+	
+	This helps create the WikiData App on the metastudio website.
+
+3. Run the script iterative_script.(iterative_script.py uses methods defined in the system_script2.py)
+	
+	python manage.py iterative_script
+	
+	It takes 3 iterations to complete. 
+
+4. [Debugging] In case of any errors/exceptions, the log of all the 3 iterations will be available after this in the directory - gnowsys_ndf/gnowsys_ndf/ndf/static/ndf/wikidata/
+	
+	Three files iteration_1.txt, iteration_2.txt, iteration_3.txt will be available for debugging if any errors occur.(iterative_script.py uses log_script.py to create these log files.)
+
+5. [Future Scope]
+	a) Add the dependency graph and instance/subclass graph.
+	b) Tag Clould
+	c) Theme-Topic Hierarchy
+	d) Prior Nodes of a particular topic - Take the inputs from the users and prepare prior_nodes of any node. (Research Topic)
+	e) Define inverse relationships. We could not define inverse relationship names. As discussed with GN, we have added -in front of <actual-relation-name> as the inverse-name. 

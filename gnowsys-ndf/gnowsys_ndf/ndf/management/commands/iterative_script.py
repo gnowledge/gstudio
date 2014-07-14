@@ -372,22 +372,26 @@ def property_create_AttributeType(property_id, property_data_type, json_obj, cal
 		2 - iteration 2
 	"""
 	if(json_obj):
-		property_alias_list=extract_aliases(json_obj,property_id,language)
-		property_label =extract_labels(json_obj,property_id,language)
-		property_description =extract_descriptions(json_obj,property_id,language)
-		property_last_update =extract_modified(json_obj,property_id)
-		property_entity_type =extract_type(json_obj,property_id)
-		property_namespace =extract_namespace(json_obj,property_id)
-		attribute_type_exists = False
-		if call_flag == int(1):
-			attribute_type_exists = create_AttributeType_for_class(property_label, property_data_type,property_description,property_id,language, user_id)
-		else:
-			attribute_type_exists = create_AttributeType(property_label, property_data_type,property_description,property_id,language, user_id)		
+		try:
+			property_alias_list=extract_aliases(json_obj,property_id,language)
+			property_label =extract_labels(json_obj,property_id,language)
+			property_description =extract_descriptions(json_obj,property_id,language)
+			property_last_update =extract_modified(json_obj,property_id)
+			property_entity_type =extract_type(json_obj,property_id)
+			property_namespace =extract_namespace(json_obj,property_id)
+			attribute_type_exists = False
+			if call_flag == int(1):
+				attribute_type_exists = create_AttributeType_for_class(property_label, property_data_type,property_description,property_id,language, user_id)
+			else:
+				attribute_type_exists = create_AttributeType(property_label, property_data_type,property_description,property_id,language, user_id)		
 		
-		if attribute_type_exists:
-			log_attributeType_exists(property_label, log_flag)
-		else:
-			log_attributeType_created(property_label, log_flag)
+			if attribute_type_exists:
+				log_attributeType_exists(property_label, log_flag)
+			else:
+				log_attributeType_created(property_label, log_flag)
+		except Exception as e:
+			print "Extract Issue: " 
+			print e
 
 		
 
@@ -408,16 +412,20 @@ def property_create_Attribute(label,property_id,property_value,property_json):
 	 before hand or not.
 
 	"""	
-	property_label =extract_labels(property_json,property_id,language)
-	if 'image' in property_label:
-		property_value=	commonsMedia_base_link+property_value
-		property_value=property_value.replace(" ","_")
+	try:
+		property_label =extract_labels(property_json,property_id,language)
+		if 'image' in property_label:
+			property_value=	commonsMedia_base_link+property_value
+			property_value=property_value.replace(" ","_")
 
-	attribute_exists = create_Attribute(label, property_label, property_value, language, user_id)
-	if attribute_exists:
-        	log_attribute_exists(property_label, log_flag)
-        else:
-                log_attribute_created(property_label, log_flag)
+		attribute_exists = create_Attribute(label, property_label, property_value, language, user_id)
+		if attribute_exists:
+			log_attribute_exists(property_label, log_flag)
+		else:
+		        log_attribute_created(property_label, log_flag)
+	except Exception as e:
+		print "Extract Issue: " 
+		print e
 
 
 
@@ -429,20 +437,25 @@ def property_create_RelationType(property_id,property_json, call_flag):
 	This function extracts useful information from the property_json like label and then calls  the create_RelationType function of system_script2.
 	Meanwhile the suitable entries are being made into the log file as well.
 	"""
-	property_label = extract_labels(property_json,property_id,language)
-	inverse_name="-"+property_label
+	try:
+		property_label = extract_labels(property_json,property_id,language)
+		inverse_name="-"+property_label
 	
-	if call_flag == int(1):
-		#Iteration 1 - creating classes
-		relation_type_exists = create_RelationType(property_label, inverse_name, "WikiData", "WikiData",property_id,language, user_id)
-	else:
-		#Iteration 3 - creating acual relations between topics.
-		relation_type_exists = create_RelationType(property_label, inverse_name, "WikiTopic", "WikiTopic",property_id,language, user_id)
+		if call_flag == int(1):
+			#Iteration 1 - creating classes
+			relation_type_exists = create_RelationType(property_label, inverse_name, "WikiData", "WikiData",property_id,language, user_id)
+		else:
+			#Iteration 3 - creating acual relations between topics.
+			relation_type_exists = create_RelationType(property_label, inverse_name, "WikiTopic", "WikiTopic",property_id,language, user_id)
 
-	if relation_type_exists:
-        	log_relationType_exists(property_label, log_flag)
-       	else:
-        	log_relationType_created(property_label, log_flag)
+		if relation_type_exists:
+			log_relationType_exists(property_label, log_flag)
+	       	else:
+			log_relationType_created(property_label, log_flag)
+	except Exception as e:
+		print "Extract Issue: " 
+		print e
+
 
 
 
@@ -463,36 +476,42 @@ def property_create_Relation(label,property_id,property_value,property_json):
 	Meanwhile suitable messages are being written in the log files as well depending on wether the relation exists
 	 before hand or not.
 
-	"""	
-	property_label=extract_labels(property_json,property_id,language)
-	property_value =unicode("Q")+unicode(property_value)
-	right_json_url=gen_url_json+str(property_value)+".json"
-
-	#print property_id+"%%%%%%%%%%%%%%",right_json_url
-	right_json=json_parse(right_json_url) #property_value is supposed to be the id of the right subject in case of a relation
-
-	right_subject_name=extract_labels(right_json,property_value,language)
-	#print "$$$$$$$$",right_subject_name," ",property_value
-	log_inner_topic_start(log_flag)
-	if right_subject_name!=None:
-		#initiate_new_topic_creation(right_json,property_value,language)
-		if item_exists(right_subject_name):
-			log_inner_topic_end(log_flag)
-			relation_exists = create_Relation(label, property_label, right_subject_name, user_id)
+	"""
+	try:
 		
-			if relation_exists :
-        			log_relation_exists(property_label, log_flag)
-        
-        
-        		else:
-	        		log_relation_created(property_label, log_flag)
+		property_label=extract_labels(property_json,property_id,language)
+		property_value =unicode("Q")+unicode(property_value)
+		right_json_url=gen_url_json+str(property_value)+".json"
 
-        	else:
-			print "The right subject does not exist at all"
+		#print property_id+"%%%%%%%%%%%%%%",right_json_url
+		right_json=json_parse(right_json_url) #property_value is supposed to be the id of the right subject in case of a relation
 
-	else:
-		print "*****the right subject is not an item of english, is not supposed to be created*****"
-		#create a log function
+		right_subject_name=extract_labels(right_json,property_value,language)
+		#print "$$$$$$$$",right_subject_name," ",property_value
+		log_inner_topic_start(log_flag)
+		if right_subject_name!=None:
+			#initiate_new_topic_creation(right_json,property_value,language)
+			if item_exists(right_subject_name):
+				log_inner_topic_end(log_flag)
+				relation_exists = create_Relation(label, property_label, right_subject_name, user_id)
+		
+				if relation_exists :
+					log_relation_exists(property_label, log_flag)
+		
+		
+				else:
+					log_relation_created(property_label, log_flag)
+
+			else:
+				print "The right subject does not exist at all"
+
+		else:
+			print "*****the right subject is not an item of english, is not supposed to be created*****"
+			#create a log function
+	except Exception as e:
+		print "Extract Issue: " 
+		print e
+
 
 
 
@@ -507,34 +526,39 @@ def class_create(class_id, class_json):
 
 	At the end the instance_of field of the topic is populated with the list of it's parent classes.
 	"""
-	label = extract_labels(class_json, class_id, language)
-	alias_list = extract_aliases(class_json, class_id, language)
-	description = extract_descriptions(class_json, class_id, language)
-	last_update = extract_modified(class_json, class_id)
-	entity_type = extract_type(class_json, class_id)
-	page_id =extract_pageid(class_json, class_id)
-	namespace =extract_namespace(class_json, class_id)
+	try:
+		label = extract_labels(class_json, class_id, language)
+		alias_list = extract_aliases(class_json, class_id, language)
+		description = extract_descriptions(class_json, class_id, language)
+		last_update = extract_modified(class_json, class_id)
+		entity_type = extract_type(class_json, class_id)
+		page_id =extract_pageid(class_json, class_id)
+		namespace =extract_namespace(class_json, class_id)
 	
-	if label!= None:
-		global log_flag
-		class_exists = create_Class(label, description, alias_list, class_id, None, int(1))
-		if class_exists:	
-			log_class_exists(label, log_flag)
-		else:
-			log_class_created(label, log_flag)
-			#Creating all the Attributes for class
-			type_of_list = extract_property_json(class_json, label, class_id, int(1))
-			current_class = get_class(label, class_id)
-			#print "\n\nList:\n" + str(type_of_list) + "\n\n"
-			#print "\n\nCurrent Object\n" + str(current_class) + "\n\n"
-			if current_class and type_of_list:
-				for parent_class_obj_id in type_of_list:		
-					if parent_class_obj_id not in current_class.type_of:
-						current_class.type_of.append(ObjectId(parent_class_obj_id))
-						current_class.modified_by = int(1)
+		if label!= None:
+			global log_flag
+			class_exists = create_Class(label, description, alias_list, class_id, None, int(1))
+			if class_exists:	
+				log_class_exists(label, log_flag)
+			else:
+				log_class_created(label, log_flag)
+				#Creating all the Attributes for class
+				type_of_list = extract_property_json(class_json, label, class_id, int(1))
+				current_class = get_class(label, class_id)
+				#print "\n\nList:\n" + str(type_of_list) + "\n\n"
+				#print "\n\nCurrent Object\n" + str(current_class) + "\n\n"
+				if current_class and type_of_list:
+					for parent_class_obj_id in type_of_list:		
+						if parent_class_obj_id not in current_class.type_of:
+							current_class.type_of.append(ObjectId(parent_class_obj_id))
+							current_class.modified_by = int(1)
 					
-				current_class.save()
-				return current_class
+					current_class.save()
+					return current_class
+	except Exception as e:
+		print "Extract Issue: " 
+		print e
+
 
 	
 
@@ -764,7 +788,7 @@ def extract_property_json(json_obj,label,topic_title,call_flag):
 				
 			
 		return type_of_list
-	except KeyError as e:
+	except Exception as e:
 		print "Could not Extract: ENTITY Problem"
 		print e
 
@@ -790,24 +814,29 @@ def initiate_new_topic_creation(json_obj,topic_title,language_choice):
 	3)language_choice - choice of language .
 
 	"""
-	alias_list=extract_aliases(json_obj,topic_title,language_choice)
-	label=extract_labels(json_obj,topic_title,language_choice)	
-	description =extract_descriptions(json_obj,topic_title,language_choice)
-	last_update =extract_modified(json_obj,topic_title)
-	entity_type =extract_type(json_obj,topic_title)
-	page_id =extract_pageid(json_obj,topic_title)
-	namespace =extract_namespace(json_obj,topic_title)
-	global log_flag
-	log_flag += 1
+	try:
+		alias_list=extract_aliases(json_obj,topic_title,language_choice)
+		label=extract_labels(json_obj,topic_title,language_choice)	
+		description =extract_descriptions(json_obj,topic_title,language_choice)
+		last_update =extract_modified(json_obj,topic_title)
+		entity_type =extract_type(json_obj,topic_title)
+		page_id =extract_pageid(json_obj,topic_title)
+		namespace =extract_namespace(json_obj,topic_title)
+		global log_flag
+		log_flag += 1
 
-	if label!=None:
-		topic_exists = create_Topic(label, description, alias_list, topic_title, None, int(1))
-		if topic_exists== True:
-			log_topic_exists(label, log_flag)
-		if topic_exists == False:
-			log_topic_created(label, log_flag)
-			create_Attribute(label, "topic_id", topic_title, language, user_id)
-			extract_property_json(json_obj,label,topic_title,int(2))
+		if label!=None:
+			topic_exists = create_Topic(label, description, alias_list, topic_title, None, int(1))
+			if topic_exists== True:
+				log_topic_exists(label, log_flag)
+			if topic_exists == False:
+				log_topic_created(label, log_flag)
+				create_Attribute(label, "topic_id", topic_title, language, user_id)
+				extract_property_json(json_obj,label,topic_title,int(2))
+	except Exception as e:
+		print "Extract Issue: " 
+		print e
+
 
 
 def iteration_2():
@@ -824,11 +853,16 @@ def iteration_2():
 					url_page = gen_url_page+topic_title #creating url of the wikidata page itself
 					json_obj = json_parse(url_json)
 					if(json_obj):
-						global log_flag
-						log_flag = 0
-						label = extract_labels(json_obj,topic_title,language)
-						initiate_class_creation(json_obj,label,topic_title,int(1))
-						log_class_done(log_flag)
+						try:						
+							global log_flag
+							log_flag = 0
+							label = extract_labels(json_obj,topic_title,language)
+							initiate_class_creation(json_obj,label,topic_title,int(1))
+							log_class_done(log_flag)
+						except Exception as e:
+							print "Extract Issue: " 
+							print e
+
 
 					else:
 						print "empty json returned"
@@ -866,8 +900,13 @@ def read_file(flag):
 							log_outer_topic(log_flag)
 						else:			
 							#Case of creating relations
-							label=extract_labels(json_obj,topic_title,language)
-							extract_property_json(json_obj,label,topic_title,int(3))
+							try:
+								label=extract_labels(json_obj,topic_title,language)
+								extract_property_json(json_obj,label,topic_title,int(3))
+							except Exception as e:
+								print "Extract Issue: " 
+								print e
+
 
 					else:
 						print "empty json returned"
