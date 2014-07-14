@@ -231,7 +231,6 @@ def process(message):
 						
 						date_string = message['Date'][:message['Date'].index("+")]
 						thread_time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
-						print thread_time
 						new_thread.created_at = thread_time
 
 #						print new_thread.created_at
