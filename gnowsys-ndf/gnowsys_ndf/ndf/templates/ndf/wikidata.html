@@ -5,6 +5,9 @@
 
 {% block title %} {{title}} {% endblock %}
 
+
+
+
 {% block search_content %}
  {% include "ndf/node_search_base.html" %}
 {% endblock %}
@@ -28,13 +31,23 @@
 		</div>
 
 		{% endif %}
-
+	{% empty %}
+   		<h5>Sorry, no topics are available.</h5>
 	{% endfor %} 
 
 
  	
 
 
+<<<<<<< HEAD
+	{% endfor %} 
+
+
+ 	
+
+
+=======
+>>>>>>> 045bde9a4d6bc31fa97c08ebb38280c5b86ce0ca
 {% endblock %}
 
 
@@ -46,6 +59,13 @@
 
 {% block body_content %}
 
+<<<<<<< HEAD
+=======
+	<!-- Scripts required for D3 graph -->
+	<script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
+	<script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
+	<script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+>>>>>>> 045bde9a4d6bc31fa97c08ebb38280c5b86ce0ca
 
 {% if  flag %}
 	<br>
@@ -132,10 +152,18 @@
 		<h5><strong>Tags for this item</strong></h5>
 	<div >		
 	{% for tag in selected_topic.tags %}
+<<<<<<< HEAD
 		<a class="[success alert secondary] [round radius] label" href="{% url 'tag_topic_display' group_id selected_topic tag %}" style="text-decoration:none;font-weight:bold;text-color:red;font-size:17px;"> 
 		{{ tag }} {{"  "}}
      		</a>
 		{% endfor %}
+=======
+		<a class="[success alert secondary] [round radius] label" href="{% url 'tag_topic_display' group_id selected_topic.pk tag %}" style="text-decoration:none;font-weight:bold;text-color:red;font-size:17px;"> 
+		{{ tag }} {{"  "}}
+     		</a>
+		{% endfor %}
+		
+>>>>>>> 045bde9a4d6bc31fa97c08ebb38280c5b86ce0ca
 		<h2><strong><center>Topic Name: {{ selected_topic.name }}</h2></strong></center>
 		<br>
 		<strong>
@@ -168,19 +196,10 @@
 		<p>
 		<ul>
 		<strong>Sub_Class_of</strong>
-			{% for parent_class in selected_topic.member_of %}
+			{% for parent_class in selected_topic.member_of_names_list %}
 				<li>{{ parent_class }}</li>
 			{% endfor %}
 		</ul>
-		 <br>
-                <br>
-                
-                <ul>
-                <strong>Tags:</strong>
-                        {% for tag in selected_topic.tags %}
-                                <li>{{ tag }}</li>
-                        {% endfor %}
-                </ul>
 		<br>
 		<br>
 		<ul>
@@ -193,6 +212,7 @@
 			<li>{{ gattribute.attribute_type.name }} :{{ gattribute.object_value }}</li>
 		
 		{% endif %}
+<<<<<<< HEAD
 		{% endfor %}
 		</ul>
 		<ul>
@@ -202,6 +222,19 @@
 			<li>{{ grelation.relation_type.name }} :{{ grelation.right_subject.name }}</li>
 		{% endfor %}
 		</ul>
+=======
+		{% endfor %}
+		</ul>
+		<ul>
+		<strong>Dynamic Relations:</strong>
+		<br>
+		{% for relation_name, relation_value in relation_set.items %}
+			<li>{{ relation_name }}: {{ relation_value }}</li>
+		{% empty %}
+   			<li>Sorry, no relations in this list.</li>
+		{% endfor %}
+		</ul>
+>>>>>>> 045bde9a4d6bc31fa97c08ebb38280c5b86ce0ca
 		<br><hr>
 		<strong>Wikipedia Page:</strong>
 		<hr align = "center" size = "10%" />

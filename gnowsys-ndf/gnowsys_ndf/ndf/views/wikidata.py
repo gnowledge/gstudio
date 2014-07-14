@@ -59,9 +59,19 @@ def details(request, group_id, topic_id):
 	context_variables = {'title': "WikiData Topics"}
 	context_instance = RequestContext(request, {'title': "WikiData Topics", 'groupid':group_id, 'group_id':group_id})
 	attribute_set = collection.Node.find({"_type":u"GAttribute", "subject":ObjectId(topic_id)})
-	relation_set = collection.Node.find({"_type":u"GRelation", "subject":ObjectId(topic_id)})	
+	#relation_set = collection.Node.find({"_type":u"GRelation", "subject":ObjectId(topic_id)})
+	relation_set = selected_topic.get_possible_relations(selected_topic.member_of)
+	relation_set_dict = {}
+	
+	for rk, rv in relation_set.iteritems():
+		if rv["subject_or_right_subject_list"]:
+			print "\n val perse : ", rk
+			for v in rv["subject_or_right_subject_list"]:
+				print "\t", v["name"]
+				relation_set_dict[rk] = v["name"]
 	flag=0==1
-      	return render(request, template, {'title': "WikiData Topics", 'topic_coll': topic_coll, 'selected_topic': selected_topic, 'attribute_set': attribute_set,'relation_set':relation_set, 'groupid':group_id, 'group_id':group_id,'flag':flag,'topic_count':topic_count})
+      	return render(request, template, {'title': "WikiData Topics", 'topic_coll': topic_coll, 'selected_topic': selected_topic, 'attribute_set': attribute_set,'relation_set':relation_set_dict, 'groupid':group_id, 'group_id':group_id,'flag':flag,'topic_count':topic_count, 'node':selected_topic})
+
 
 
 

@@ -43,7 +43,6 @@ urlpatterns = patterns('',
     url(r'^(?P<group_id>[^/]+)$','gnowsys_ndf.ndf.views.group.group_dashboard', name='groupchange'),
     (r'^(?P<group_id>[^/]+)/browse topic', include('gnowsys_ndf.ndf.urls.browse_topic')),
     (r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.browse_topic.topic_detail_view'),
-
     (r'^(?P<group_id>[^/]+)/browse resource', include('gnowsys_ndf.ndf.urls.browse_resource')),
     (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis', namespace='mis'), {'app_name': "MIS"}),
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis', namespace='mis-po'), {'app_name': "MIS-PO"}),
