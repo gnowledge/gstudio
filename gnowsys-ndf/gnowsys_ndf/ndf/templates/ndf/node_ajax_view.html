@@ -18,7 +18,18 @@
 
 <!-- css for drawer widget -->
 <style type = "text/css">
-.hidden { visibility: hidden; }
+.movingDiv{
+  display:none; 
+  position:absolute; 
+  z-index:40; 
+  background-color:white; 
+  box-shadow: 0px 0px 5px #888888; 
+  opacity: 0.8;
+}
+.annotatedElement{
+background-color : rgba(255,0,0,0.2);
+font-weight:bold;
+} 
 .divider-line { font-size: xx-large; color:lightgray; }
 .line-height-2 { line-height:2; }
 .line-height-2pt5 { line-height:2.5; }
@@ -60,8 +71,8 @@ ul#graph-hover.f-dropdown{
 {% endif %}
 
 <!-- Icon to add annotations -->
-<div id="moving_div" style="display:none; position:absolute; z-index:40; background-color:white; box-shadow: 0px 0px 5px #888888; opacity: 0.8" >
-      <i class ="fi-clipboard-notes" style = "font-size: 25px" onclick = 'if(event.stopPropagation){event.stopPropagation();}else if(window.event){event.cancelBubble=true;} switchMode();'></i>
+<div id="moving_div" class = "movingDiv" >
+      <i class ="fi-clipboard-notes" style = "font-size: 25px" onclick = 'switchMode();'></i>
      <!-- <img src = "/static/ndf/images/chat-icon.png" width = 20%, height = 20% onclick = 'switchMode()'/>  -->
 </div>
 <!-- End menu -->
@@ -771,7 +782,7 @@ function showThread(elem)
 function high(bodyText, searchText)
 {
   /*highlightStartTag = "<span style='background-color : #e0ffff;font-weight:bold' onclick = 'if(event.stopPropagation){event.stopPropagation();}else if(window.event){event.cancelBubble=true;} showThread(this);  '>";*/
-  highlightStartTag = "<span style='background-color : rgba(255,0,0,0.2);font-weight:bold' onclick = 'if(event.stopPropagation){event.stopPropagation();}else if(window.event){event.cancelBubble=true;} showThread(this);  '>";
+  highlightStartTag = "<span class = 'annotatedElement' onclick = 'if(event.stopPropagation){event.stopPropagation();}else if(window.event){event.cancelBubble=true;} showThread(this);  '>";
   highlightEndTag = "</span>";
   var newText = "";
   i = -1;
