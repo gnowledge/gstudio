@@ -26,4 +26,4 @@ for doc in dltr:
 
 class Command(BaseCommand):
 	def handle(self, *args, **options):
-		print "search script executed."	
+		print "Documents have been Map Reduced. It's Done!"	
