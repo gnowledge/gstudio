@@ -23,7 +23,8 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
  {'name':'phdthesis','meta_type':'factory_types'},
  {'name':'proceedings','meta_type':'factory_types'},
  {'name':'techreport','meta_type':'factory_types'},
- {'name':'unpublished_entry','meta_type':'factory_types'}]
+ {'name':'unpublished_entry','meta_type':'factory_types'},
+ {'name':'booklet','meta_type':'factory_types'}]
 
 #fill attribute name,data_type,gsystem_type name in bellow dict to create factory Attribute Type
 factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'], 'data_type':'str(QUIZ_TYPE_CHOICES_TU)', 'meta_type':'factory_types'}},
@@ -40,7 +41,9 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'], 'dat
 {'Priority':{'gsystem_names_list':['Task'], 'data_type':'basestring', 'meta_type':'factory_types'}},
 {'Assignee':{'gsystem_names_list':['Task'], 'data_type':'list','meta_type':'factory_types'}}, 
 {'Estimated_time':{'gsystem_names_list':['Task'], 'data_type':'float','meta_type':'factory_types'}},
-{'BibTex_entry':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],'data_type':'basestring','meta_type':'factory_types'}}]
+{'BibTex_entry':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],'data_type':'basestring','meta_type':'factory_types'}},
+{'Citation':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],'data_type':'basestring','meta_type':'factory_types'}},
+{'entry_list':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],'data_type':'basestring','meta_type':'factory_types'}}]
 '''
 {'author':{'gsystem_names_list':['book'], 'data_type':'basestring','meta_type':'factory_types'}},
 {'title':{'gsystem_names_list':['book'], 'data_type':'basestring','meta_type':'factory_types'}},

@@ -92,12 +92,12 @@
 
 	    {% if prof_pic %}
 	    <a href="{% url 'userDashboard' group_name_tag request.user.pk %}">
-	      <img  src="{% url 'getImageThumbnail' group_name_tag prof_pic %}" height="30" width="30"></img>
+	      <img  src="{% url 'getImageThumbnail' group_id prof_pic %}" height="30" width="30"></img>
 	      {{ user.username }}
 	    </a>
 	    
 	    {% else %}
-	    <a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_name_tag request.user.pk %}">
+	    <a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_id request.user.pk %}">
 	      {{ user.username }}
 	    </a>
 	    {% endif %}

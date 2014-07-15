@@ -341,7 +341,6 @@ def delete_page(request, group_id, node_id):
                 group_id = str(auth._id)
     else :
         pass
-
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))

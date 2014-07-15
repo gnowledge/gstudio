@@ -157,6 +157,8 @@
 						i++;
 						for (j = levels.length -1; j >= 0; j--) {
 							t += levels[j]+"-";
+							//print levels[j];
+							//print t;
 						}
 						li = $('<li class="orgitdownButton orgitdownButton'+t+(i)+' '+(button.className||'')+'"><a href="" '+key+' title="'+title+'">'+(button.name||'')+'</a></li>')
 						.bind("contextmenu.orgitdown", function() { // prevent contextmenu on mac and allow ctrl+click

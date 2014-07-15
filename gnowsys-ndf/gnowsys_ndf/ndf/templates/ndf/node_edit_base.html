@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+from gnowsys_ndf.ndf.views.methods import *
 {% load ndf_tags %}
 
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
@@ -143,24 +143,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	<div class="row">
 	  <div class="medium-12 columns">
-	  	
-	  	
 	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
-	    
-	    
 	  </div>
-
-	
-
-
-	  <div class="medium-12 columns">
-	  	
-	  	
-	  {% include "ndf/add_editor.html" with var_name="content" var_placeholder="@article{title={}                                                                              publisher={}}" var_value=node.content_org|default_if_none:"" node_id=node.pk%}  
-	    
-	    
-	  </div>
-  </div>	
+	</div>
 	
 	<div class="row">
 	  <div class="medium-12 columns">
@@ -169,7 +154,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
 	  </div>		
 	</div>
-
 
 {% switch_group_conditions request.user group_id as switch_conditions %}
 	{% if node %}
@@ -301,6 +285,10 @@ background-repeat:no-repeat; background-size: 48px 48px
     <input type="hidden" id="nodes_list" value="{{nodes_list}}">						
 </form>
 
+
+
+
+<!-- Reveal Modals begin -->
 
 <script type="text/javascript">
 var data_list = ""

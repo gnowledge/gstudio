@@ -363,6 +363,7 @@ def group_dashboard(request,group_id=None):
                                                       },context_instance=RequestContext(request)
                           )
 
+
 @login_required
 def edit_group(request,group_id):
   ins_objectid  = ObjectId()
