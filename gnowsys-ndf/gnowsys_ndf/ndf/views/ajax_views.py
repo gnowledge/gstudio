@@ -1238,23 +1238,7 @@ def get_online_editing_user(request, group_id):
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
 def view_articles(request, group_id):
   if request.is_ajax():
-    # list_article =[]
-    # list_book=[]
-    # list_booklet=[]
-    # list_conference=[]
-    # list_inbook=[]
-    # list_incollection=[]
-    # list_inproceedings=[]
-    # list_manual=[]
-    # list_masterthesis=[]
-    # list_misc=[]
-    # list_phdthesis=[]
-    # list_techreport=[]
-    # list_unpublished=[]
-    # list_proceedings=[]
-    # gst_list=[]
-
-    ## extracting all the bibtex entries from database
+    # extracting all the bibtex entries from database
     GST_one=collection.Node.one({'_type':'AttributeType','name':'Citation'})
     list_item=['article','book','booklet','conference','inbook','incollection','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry']
     response_dict=[]
@@ -1262,12 +1246,9 @@ def view_articles(request, group_id):
     for each in list_item:
       dict2={}
       ref=collection.Node.one({'_type':'GSystemType','name':each})
-      # print "refid:"+str(ref._id)
+  
       ref_entry=collection.GSystem.find({'member_of':{'$all':[ref._id]},'group_set':{'$all':[ObjectId(group_id)]},'status':u'PUBLISHED'})
-      # print ref_entry
-      # for each in ref_entry:
-      #   print each.name
-      # print "3333333333333333333333333333333333333333333333333333"
+      
       list_entry=[]
       for every in ref_entry:
         
@@ -1280,68 +1261,7 @@ def view_articles(request, group_id):
       response_dict.append(dict2)
     print response_dict
 
-# response_dict=[{'article':[{'name':'sdssds','cite':'sdsfdsfsd'}]},{'book':[{'name':'dasdsa','cite':'wadsaqwq'}]},{'booklet':[{'name':'sdsdfs','cite':'dfdsfdsf'}]},{'conference':[{'name':'safdfdds','cite':'sdfdsfdsfds'}]}]
-#     list1=[{"name": "dsfsdfds", "cite": "cite"}, {"name": "dsfdsfwqeqwe", "cite": "cite"}]
-#     list2= [{"name": "bsdnsdfj hfdjsfh","cite":"cite"}, {"name": "bsdnsdfj hfdjsfh","cite":"cite"}]
-#     list3= [{"name": "bsdnsdfj hfdjsfh","cite":"cite"}, {"name": "bsdnsdfj hfdjsfh","cite":"cite"}]
-#     response_dict=[{"article": list1}, {"book":list2}, {"booklet":list3}]  
   
-    # gst_article=collection.Node.one({'_type':'GSystemType','name':'article'})
-    # gst_book=collection.Node.one({'_type':'GSystemType','name':'book'})
-    # gst_booklet=collection.Node.one({'_type':'GSystemType','name':'booklet'})
-    # gst_conference=collection.Node.one({'_type':'GSystemType','name':'conference'})
-    # gst_inbook=collection.Node.one({'_type':'GSystemType','name':'inbook'})
-    # gst_incollection=collection.Node.one({'_type':'GSystemType','name':'incollection'})
-    # gst_inproceedings=collection.Node.one({'_type':'GSystemType','name':'inproceedings'})
-    # gst_manual=collection.Node.one({'_type':'GSystemType','name':'manual'})
-    # gst_masterthesis=collection.Node.one({'_type':'GSystemType','name':'masterthesis'})
-    # gst_misc=collection.Node.one({'_type':'GSystemType','name':'misc'})
-    # gst_phdthesis=collection.Node.one({'_type':'GSystemType','name':'phdthesis'})
-    # gst_proceedings=collection.Node.one({'_type':'GSystemType','name':'proceedings'})
-    # gst_techreport=collection.Node.one({'_type':'GSystemType','name':'techreport'})
-    # gst_unpublished=collection.Node.one({'_type':'GSystemType','name':'unpublished'})
-    # 
-    # entry_article=collection.GSystem.find({'member_of':{'$all':[gst_article._id]},'group_set':{'$all':[ObjectId(group_id)]},'status':u'PUBLISHED'})
-    # response_dict=[]
-    # for each in entry_article:
-    #   id=each._id
-    #   gst_attribute=collection.Node.one({'subject':ObjectId(each._id),'attribute_type.$id':ObjectId(GST_one._id)})
-    #   cite=gst_attribute.object_value
-    #   dict1 = {'name': each.name,'cite':cite}
-
-
-    
-  #   entry_book=collection.GSystem.find({'member_of':{'$all':[gst_book._id]},'group_set':{'$all':[ObjectId(group_id)]},'status':u'PUBLISHED'})
-  #   for each in entry_book:
-  #     print each._id
-  #     print each.name
-  #     gst_attribute=collection.Node.one({'subject':ObjectId(each._id),'attribute_type.$id':ObjectId(GST_one._id)})
-      
-  #     #cite=gst_attribute.object_value
-       
-  #     dict2 = {'name': each.name}
-      
-  #     list_book.append(dict2)
-
-  #   entry_booklet=collection.GSystem.find({'member_of':{'$all':[gst_booklet._id]},'group_set':{'$all':[ObjectId(group_id)]},'status':u'PUBLISHED'})
-  #   for each in entry_booklet:
-      
-  #     gst_attribute=collection.Node.one({'subject':ObjectId(each._id),'attribute_type.$id':ObjectId(GST_one._id)})
-      
-  #     cite=gst_attribute.object_value
-        
-  #     dict2 = {'name': each.name,'cite':cite}
-      
-  #     list_booklet.append(dict2)
-    
-    
-  # response_dict=[{'article': list_article},{'book': list_book},{'booklet':list_booklet}]  
-  # print list_article
-  #response_dict=[{'article':[{'name':'sdssds','cite':'sdsfdsfsd'}]},{'book':[{'name':'dasdsa','cite':'wadsaqwq'}]},{'booklet':[{'name':'sdsdfs','cite':'dfdsfdsf'}]},{'conference':[{'name':'safdfdds','cite':'sdfdsfdsfds'}]}]
-    # list1=[{"name": "dsfsdfds", "cite": "cite"}, {"name": "dsfdsfwqeqwe", "cite": "cite"}]
-    # list2= [{"name": "bsdnsdfj hfdjsfh","cite":"cite"}, {"name": "bsdnsdfj hfdjsfh","cite":"cite"}]
-    # list3= [{"name": "bsdnsdfj hfdjsfh","cite":"cite"}, {"name": "bsdnsdfj hfdjsfh","cite":"cite"}]
-    # response_dict=[{"article": list1}, {"book":list2}, {"booklet":list3}]  
   return StreamingHttpResponse(json.dumps(response_dict))      
 
 def get_author_set_users(request, group_id):
