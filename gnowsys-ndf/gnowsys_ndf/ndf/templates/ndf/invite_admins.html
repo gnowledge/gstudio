@@ -67,9 +67,9 @@ $.ajax({
 
 $(document).on('click',"#subscr_admins",function() {
 
- $('#inviteadmins #colln_set_drawer1').html("");
- $('#inviteadmins #colln_set_drawer2').html("");
- $('#inviteadmins #colln_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="colln_set_search" class="margin-0"></li>');
+ $('#inviteadmins #admin_colln_set_drawer1').html("");
+ $('#inviteadmins #admin_colln_set_drawer2').html("");
+ $('#inviteadmins #admin_colln_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="admin_colln_set_search" class="margin-0"></li>');
 
 var url="/{{node}}/group/notify/invite_admins/"
  $.getJSON( url, function( data ) {
@@ -77,13 +77,13 @@ var url="/{{node}}/group/notify/invite_admins/"
    if(index == 0)
     {
      $.each(drawer_elements.drawer1, function(index, element) {
-        $('#inviteadmins #colln_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#inviteadmins #admin_colln_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
    }
    if(index == 1)
     {
     $.each(drawer_elements.drawer2, function(index, element) {
-        $('#inviteadmins #colln_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#inviteadmins #admin_colln_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
     }
 
@@ -96,8 +96,8 @@ var url="/{{node}}/group/notify/invite_admins/"
 
 
 function adget_all_data(){
- $.each($('#inviteadmins #colln_set_drawer2 li'),function(index,item){
-         data_prefs=data_prefs+String(item.id)+",";
+ $.each($('#inviteadmins #admin_colln_set_drawer2 li'),function(index,item){
+         addata_prefs=addata_prefs+String(item.id)+",";
          });
 }
 
@@ -110,8 +110,8 @@ function adget_all_data(){
 <div id="inviteadmins" class="reveal-modal " data-reveal >
      
      <h2>Select users</h2>
-      <div id="module_drawer" >
-        {% include "ndf/drawer_widget.html" with widget_for="colln_set"  %}
+      <div id="admin_module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="admin_colln_set"  %}
       </div>
 
             <label><input type="checkbox" id="adminchecknotif" value="ON"> Send notification mails to all except the group owner</label>
