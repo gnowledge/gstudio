@@ -20,14 +20,13 @@ from gnowsys_ndf.ndf.models import *
 ''' import ElementTree to parse xml files '''
 import xml.etree.ElementTree as et
 
+import time
+
 #############################################################################################################
 
  # global variables
 db = get_database()
 collection = db[Node.collection_name]
-hm_obj = HistoryManager()
-
-path = "/home/stuti/Downloads/edx_demo_course"      # path where course is located
 
 page_fetch = collection.Node.one({'_type':'GSystemType', 'name': 'Page'})
 page_id = page_fetch._id            # id of GSystemType page
@@ -35,16 +34,29 @@ page_id = page_fetch._id            # id of GSystemType page
 module_fetch = collection.Node.one({'_type':'GSystemType', 'name': 'Module'})
 module_id = module_fetch._id         # id of GSystemType module
 
-# TODO: Modify to get user_id and group_id of user creating course
-user_id = '53bf88df8006dd229610bd7c'            # id of user stuti
-group_id = '53bf88df8006dd229610bd7c'
-
-
 class Command(BaseCommand):
 
     help = "This script will parse the course xml and create pages and modules accordingly."
     
     def handle(self, *args, **options):
+
+        # user input for manually downloaded course location
+        path = raw_input("Enter the path of downloaded course (eg: /home/username/Downloads/edx_demo_course/): ")
+
+        # user input for the group where the pages will be created
+        group_name = raw_input("Enter group name to create pages in: ")
+
+        group = collection.Node.find({'_type' : 'Group', 'name' : unicode(group_name)})
+        if group.count() == 0:
+            print "No such group exists, using default home group..."
+            time.sleep(2)
+            group = collection.Node.one({'_type' : 'Group', 'name' : 'home'})
+        else:
+            print "Group exists. Creating pages..."
+            time.sleep(2)
+            group = collection.Node.one({'_type' : 'Group', 'name' : unicode(group_name)})
+
+        group_id = group._id
 
         course_xml_path = path + "/course.xml"
         course_xml = et.parse(course_xml_path)
@@ -89,7 +101,7 @@ class Command(BaseCommand):
                     content_org_start = "\r\n#+BEGIN_HTML \r\n"
                     content_org_end = "\r\n#+END_HTML\r\n"
                     
-                    # A vertical can consist of html, problems, videos etc.
+                    # A vertical can consist of html, problems, videos, discussions, etc.
                     # Each of these is a different element.
 
                     # We create one page for each vertical and append content to it
@@ -103,6 +115,7 @@ class Command(BaseCommand):
                     page.content_org = unicode(content_org_start + content + content_org_end)
                     page.group_set.append(ObjectId(group_id))
                     page.author_set.append(1)
+                    page.access_policy = u"PUBLIC"
                     page.status = u"PUBLISHED"
 
                    
