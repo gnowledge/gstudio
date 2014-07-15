@@ -20,7 +20,21 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
+
+    # Adding "rating" field with no default value
+    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'rating': {'$exists': False}}, 
+                            {'$set': {'rating': [{'score':0,'user_id':0,'ip_address':''}]}}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'rating' field added to following no. of documents: ", res['n']
     
+    # Adds 'subject_scope', 'attribute_type_scope', 'object_value_scope' field (with default value as "") to all documents which belongs to GAttribute
+    res = collection.update({'_type': {'$in': ["Group", "Author"]}, 'group_admin': {'$exists': False}}, 
+                            {'$set': {'group_admin': []}}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'group_admin' field added to following no. of documents: ", res['n']
+
     # Adds 'subject_scope', 'attribute_type_scope', 'object_value_scope' field (with default value as "") to all documents which belongs to GAttribute
     res = collection.update({'_type': "GAttribute", 'subject_scope': {'$exists': False}, 'attribute_type_scope': {'$exists': False}, 'object_value_scope': {'$exists': False}}, 
                             {'$set': {'subject_scope':"", 'attribute_type_scope':"", 'object_value_scope': ""}}, 
