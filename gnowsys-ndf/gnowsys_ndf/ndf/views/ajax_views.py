@@ -1403,6 +1403,8 @@ def delComment(request, group_id):
   print "Inside del comments"
   return HttpResponse("comment deleted")
 
+# Views related to MIS-GAPP =======================================================================================
+
 def set_user_link(request, group_id):
   """
   This view creates a relationship (has_login) between the given node (node_id) and the author node (username);
@@ -1479,6 +1481,19 @@ def set_user_link(request, group_id):
       error_message = " Link not created - May be invalid username entered !!!"
       
     return HttpResponse(json.dumps({'result': result, 'message': error_message}))
+
+def set_enrollment_code(request, group_id):
+  """
+  """
+  if request.is_ajax() and request.method == "POST":
+    print "\n From set_enrollment_code... \n"
+    return HttpResponse("Five digit code")
+
+  else:
+    error_message = " EnrollementCodeError: Either not an ajax call or not a POST request!!!"
+    raise Exception(error_message)
+
+# ====================================================================================================
 
 def edit_task_title(request, group_id):
     '''
