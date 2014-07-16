@@ -1,7 +1,7 @@
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-
+import json  
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -1372,6 +1372,65 @@ def get_group_member_user(request, group_id):
     else:
 	raise Http404
 
+
+def annotationlibInSelText(request, group_id):
+  """
+  This view parses the annotations field of the currently selected node_id and evaluates if entry corresponding this selectedText already exists.
+  If it does, it appends the comment to this entry else creates a new one.   
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  obj_id - ObjectId of the currently selected node_id
+  comment - The comment added by user
+  selectedText - text for which comment was added
+
+ Returns:
+  The updated annoatations field
+  """
+  
+  obj_id = str(request.POST["node_id"])
+  col = get_database()[Node.collection_name]
+  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
+  
+  comment = request.POST ["comment"]
+  comment = json.loads(comment)
+  comment_modified = {
+                        'authorAvatarUrl' : comment['authorAvatarUrl'],
+                        'authorName'      : comment['authorName'],
+                        'comment'         : comment['comment']
+  }
+  selectedText = request.POST['selectedText']
+    
+  # check if annotations for this text already exist!
+  flag = False
+  
+  for entry in sg_obj.annotations:
+    if (entry['selectedText'].lower() == selectedText.lower()):
+      entry['comments'].append(comment_modified)
+      flag = True
+      break
+
+  if(not(flag)):
+    comment_list = []
+    comment_list.append(comment_modified)
+    ann = {
+          'selectedText' : selectedText,
+          'sectionId'    : str(comment['sectionId']),
+          'comments'     : comment_list
+    }
+    sg_obj.annotations.append(ann)
+  
+  sg_obj.save()
+
+  return HttpResponse(json.dumps(sg_obj.annotations))
+
+def delComment(request, group_id):
+  '''
+  Delete comment from thread
+  '''
+  print "Inside del comments"
+  return HttpResponse("comment deleted")
+
 def set_user_link(request, group_id):
   """
   This view creates a relationship (has_login) between the given node (node_id) and the author node (username);
@@ -1481,3 +1540,4 @@ def edit_task_content(request, group_id):
         return HttpResponse(task.content)
     else:
 	raise Http404
+

@@ -4,32 +4,32 @@
 <link href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css" rel="stylesheet"> <!-- checked -->
 
 <script type="text/javascript">
-var data_prefs="";
-var not_status="OFF";
-var inviting_users="";
+var addata_prefs="";
+var adnot_status="OFF";
+var adinviting_users="";
 
 
 
 
-$(document).on('click',"#checknotif",function() {
+$(document).on('click',"#adminchecknotif",function() {
 
-if($('#checknotif').attr('checked')) {
-not_status="ON";
+if($('#adminchecknotif').attr('checked')) {
+adnot_status="ON";
 }
 else
 {
-not_status="OFF";
+adnot_status="OFF";
 }
 });
 
 
 
-function saveinvite(){
-get_all_data();
-var inviting_users=data_prefs;
-data_prefs=""
+function admininvite(){
+adget_all_data();
+var adinviting_users=addata_prefs;
+addata_prefs=""
 var surl="/{{node}}/group/notify/invite_admins/"
-if (not_status=="OFF")
+if (adnot_status=="OFF")
 {
 alert("Notification mails sent to newly selected users(if any)");
 }
@@ -40,7 +40,7 @@ alert("Notification mails sent to all users except group owner");
 $.ajax({
         url: surl,
         type: 'POST',
-        data: {users:inviting_users,notif_status:not_status,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        data: {users:adinviting_users,notif_status:adnot_status,csrfmiddlewaretoken: '{{ csrf_token }}'},
         beforeSend: function() {
               $("#ajax_load_image").show();
               $("#content").css({"opacity":"0.1",})
@@ -67,9 +67,9 @@ $.ajax({
 
 $(document).on('click',"#subscr_admins",function() {
 
- $('#inviteadmins #colln_set_drawer1').html("");
- $('#inviteadmins #colln_set_drawer2').html("");
- $('#inviteadmins #colln_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="colln_set_search" class="margin-0"></li>');
+ $('#inviteadmins #admin_colln_set_drawer1').html("");
+ $('#inviteadmins #admin_colln_set_drawer2').html("");
+ $('#inviteadmins #admin_colln_set_drawer1').html('<li class="price"><input type="text" placeholder="Type here to search users" id="admin_colln_set_search" class="margin-0"></li>');
 
 var url="/{{node}}/group/notify/invite_admins/"
  $.getJSON( url, function( data ) {
@@ -77,13 +77,13 @@ var url="/{{node}}/group/notify/invite_admins/"
    if(index == 0)
     {
      $.each(drawer_elements.drawer1, function(index, element) {
-        $('#inviteadmins #colln_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#inviteadmins #admin_colln_set_drawer1').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
    }
    if(index == 1)
     {
     $.each(drawer_elements.drawer2, function(index, element) {
-        $('#inviteadmins #colln_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
+        $('#inviteadmins #admin_colln_set_drawer2').append("<li id='"+element.id+"' class='bullet-item text-left'>"+element.name+"</li>");
       });
     }
 
@@ -95,9 +95,9 @@ var url="/{{node}}/group/notify/invite_admins/"
 
 
 
-function get_all_data(){
- $.each($('#inviteadmins #colln_set_drawer2 li'),function(index,item){
-         data_prefs=data_prefs+String(item.id)+",";
+function adget_all_data(){
+ $.each($('#inviteadmins #admin_colln_set_drawer2 li'),function(index,item){
+         addata_prefs=addata_prefs+String(item.id)+",";
          });
 }
 
@@ -110,13 +110,13 @@ function get_all_data(){
 <div id="inviteadmins" class="reveal-modal " data-reveal >
      
      <h2>Select users</h2>
-      <div id="module_drawer" >
-        {% include "ndf/drawer_widget.html" with widget_for="colln_set"  %}
+      <div id="admin_module_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="admin_colln_set"  %}
       </div>
 
-            <label><input type="checkbox" id="checknotif" value="ON"> Send notification mails to all except the group owner</label>
+            <label><input type="checkbox" id="adminchecknotif" value="ON"> Send notification mails to all except the group owner</label>
               
-      <input type="button" id="#submitUserInvite" class="button small" value="submit" onClick="saveinvite()"> 
+      <input type="button" id="#submitUserInvite" class="button small" value="submit" onClick="admininvite()"> 
      <a class="close-reveal-modal group">&#215;</a>
 </div>
 </div>

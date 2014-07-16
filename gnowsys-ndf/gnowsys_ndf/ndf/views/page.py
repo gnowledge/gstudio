@@ -241,16 +241,19 @@ def page(request, group_id, app_id=None):
 
                 shelf_list[shelf_name.name] = []         
                 for ID in shelf_name.collection_set:
-                	shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-                	shelf_list[shelf_name.name].append(shelf_item.name)
+                  shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                  shelf_list[shelf_name.name].append(shelf_item.name)
 
           else:
             shelves = []
+
+        annotations = json.dumps(page_node.annotations)
 
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'shelf_list': shelf_list,
+                                    'annotations': annotations,
                                     'shelves': shelves,
                                     'groupid':group_id,
                                     'breadcrumbs_list': breadcrumbs_list
