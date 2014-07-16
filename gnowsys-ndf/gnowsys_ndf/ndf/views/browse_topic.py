@@ -261,11 +261,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     # End of finding the root nodes
                     
                     if name:
-                        # if not name.upper() in (theme_name.upper() for theme_name in root_topics):
-                        # get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
-                        theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
-                        # theme_topic_node.save()
-                            
+                        if theme_topic_node.name == name:
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
+                        else:
+                            if not name.upper() in (theme_name.upper() for theme_name in root_topics):
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
+
+
                         if collection_list:
                             # For storing and maintaning collection order
                             theme_topic_node.collection_set = []
