@@ -125,7 +125,7 @@ def process(message):
 						reply_content = ''
 						lines = body.split('\n')
 						for i in lines:
-							if i.startswith('>') or re.search(r"^On\s[\w]{3},\s[\w]{3}\s[0-9]{1,2},\s[0-9]{4}\sat\s[0-9]{2}:[0-9]{2}\sPM", i):
+							if i.startswith('>') or re.search(r"^On\s[\w]{3},\s[\w]{3}\s[0-9]{1,2},\s[0-9]{4}\sat\s[0-9]{1,2}:[0-9]{2}\s[AP]M,\s<[^>]+>\swrote\:$", i):
 								pass
 							else:
 								reply_content += i+" "

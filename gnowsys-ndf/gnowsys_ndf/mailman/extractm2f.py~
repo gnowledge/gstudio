@@ -268,7 +268,7 @@ def process(message):
 					subject = 'Metastudio intimation'
 					from_email = settings.METASTUDIO_SERVER_ADDRESS
 					to = user_address
-					text_content = 'You have posted to '+list_name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
+					text_content = 'You have posted to '+name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
 					send_mail(subject,text_content,from_email,[to])
 
 #			print new_thread
