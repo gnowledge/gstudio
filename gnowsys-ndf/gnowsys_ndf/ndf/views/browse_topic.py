@@ -261,10 +261,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     # End of finding the root nodes
                     
                     if name:
-                        if not name.upper() in (theme_name.upper() for theme_name in root_topics):
-                            # get_node_common_fields(request, theme_topic_node, group_id, topic_GST)
+                        if theme_topic_node.name == name:
                             theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
-                            
+                        else:
+                            if not name.upper() in (theme_name.upper() for theme_name in root_topics):
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
+
+
                         if collection_list:
                             # For storing and maintaning collection order
                             theme_topic_node.collection_set = []
@@ -406,6 +409,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   obj = collection.Node.one({'_id': ObjectId(app_Id)})
   app = collection.Node.one({'_id': ObjectId(obj.member_of[0])})
   app_id = app._id
+  topic = "Topic"
 
   ##breadcrumbs##
   # First time breadcrumbs_list created on click of page details
@@ -439,7 +443,7 @@ def topic_detail_view(request, group_id, app_Id=None):
   
   return render_to_response('ndf/topic_details.html', 
 	                                { 'node': obj,'app_id': app_id,'breadcrumbs_list': breadcrumbs_list,
-	                                  'group_id': group_id,'shelves': shelves,
+	                                  'group_id': group_id,'shelves': shelves,'topic': topic,
 	                                  'groupid':group_id,'shelf_list': shelf_list
 	                                },
 	                                context_instance = RequestContext(request)

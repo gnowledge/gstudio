@@ -37,17 +37,24 @@
   </div>
   {% endif %}
   {% endif %}
+  <br>
+  <p style="font-size:20px"><strong>File Statistics</strong></p>
+  <br>
     <dl class="tabs" data-tab>
-    <dd class="tab-title"><a href="#bar_visual">Bar</a></dd>
-    <dd class="tab-title active"><a href="#pie_visual">Pie</a></dd>
+    <dd class="tab-title active"><a href="#bar_visual">Bar</a></dd>
+    <dd class="tab-title"><a href="#pie_visual">Pie</a></dd>
   </dl>
   <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
   <br/>
   <div class="tabs-content">
-    <div class="content" id="bar_visual">
+  <div id="tooltip" class="hidden">
+      <p><strong>Details</strong></p>
+      <p><span id="tip-value">100</span></p>
+    </div>
+    <div class="content active" id="bar_visual">
       {% include "ndf/bar_visualization.html" %}
   </div>
-  <div class="content active" id="pie_visual">
+  <div class="content" id="pie_visual">
 
     {% include "ndf/pie_visualization.html" %}
     
