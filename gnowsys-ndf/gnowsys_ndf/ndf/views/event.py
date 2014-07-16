@@ -30,7 +30,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
   """
   custom view for custom GAPPS
   """
-  print "\n Found event_detail n gone inn this...\n\n"
+  # print "\n Found event_detail n gone inn this...\n\n"
 
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
@@ -54,7 +54,7 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
   app_name = app.name 
 
-  print "\n coming in event detail... \n"
+  # print "\n coming in event detail... \n"
   # app_name = "mis"
   app_set = ""
   app_collection_set = []
@@ -131,7 +131,7 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
   """
   Creates/Modifies document of given event-type.
   """
-  print "\n Found event_create_edit n gone inn this...\n\n"
+  # print "\n Found event_create_edit n gone inn this...\n\n"
 
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
