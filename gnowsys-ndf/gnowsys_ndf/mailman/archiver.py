@@ -19,7 +19,7 @@ from gnowsys_ndf.ndf.models import GSystem, Triple, Node
 from gnowsys_ndf.ndf.models import Group
 from gnowsys_ndf.ndf.views.methods import *
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.mailman import settings
+from gnowsys_ndf.mailman import arch_settings
 
 try:
     from bson import ObjectId
@@ -29,7 +29,7 @@ except ImportError:  # old pymongo
 
 #Open the input file containing all emails. Input file can be provided by changing the INPUT_FILE setting in the configuration file.
 
-inputfile = open(settings.MAIL_SPOOL_FILE_PATH,'r+')
+inputfile = open(arch_settings.MAIL_SPOOL_FILE_PATH,'r+')
 line = inputfile.readline()
 
 #Create an email parser to parse messages from the plain text file and convert them into message objects.
@@ -77,15 +77,15 @@ def process(message):
 #1. If the value of the to-address field is an email address of the type list@domainname.com, then a new thread/reply must be created.
 #2. If the value of the to-address field is an email address of the type list-owner@domainname.com, then a person must be added/removed from the forum.
 
-	to_address = message['X-Original-To']
-	name = to_address[:to_address.index('@')]
+	name = arch_settings.GROUP_NAME
 	from_address = message['From']
-	user_address = message['From'][:from_address.index('(')].replace(" ","")
+	from_address = from_address.replace(" at ","@")
+	user_address = from_address[:from_address.index('(')].replace(" ","")
 	body = message.get_payload().rstrip("\n")
 	subject = message['Subject']
 
 	
-	if re.search(r"^[A-Za-z0-9_.]+$",name):
+	if not name.endswith("-owner"):
 
 		thread = subject[subject.index("]")+2:]
 		topic = subject[subject.rindex("[")+1:subject.rindex("]")]
@@ -156,7 +156,11 @@ def process(message):
 				
 						new_reply.group_set.append(group._id)
 
-						date_string = message['Date'][:message['Date'].index("+")]
+						if '+' in message['Date']:
+							date_string = message['Date'][:message['Date'].index("+")]
+						if '-' in message['Date']:
+							date_string = message['Date'][:message['Date'].index("-")]
+
 						time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
 						new_thread.created_at = time
 
@@ -170,7 +174,7 @@ def process(message):
 
 					else:
 						subject = 'Metastudio intimation'
-						from_email = settings.METASTUDIO_SERVER_ADDRESS
+						from_email = arch_settings.METASTUDIO_SERVER_ADDRESS
 						to = user_address
 						text_content = 'You have replied to a mail in the '+name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are not added to the group on metastudio. Please visit the following link if you wish to join the group:\nhttp://www.metastudio.org/'+group.name+'/'
 						send_mail(subject,text_content,from_email,[to])
@@ -178,9 +182,9 @@ def process(message):
 	
 				except User.DoesNotExist:
 					subject = 'Metastudio intimation'
-					from_email = settings.METASTUDIO_SERVER_ADDRESS
+					from_email = arch_settings.METASTUDIO_SERVER_ADDRESS
 					to = user_address
-					text_content = 'You have replied to a mail in the '+list_name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
+					text_content = 'You have replied to a mail in the '+name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
 					send_mail(subject,text_content,from_email,[to])
 				
 #				print(user_address+" posted to list "+group.name+" replied to thread: "+thread+" in forum "+forum.name+" message: "+body )
@@ -223,7 +227,11 @@ def process(message):
 						new_thread.member_of.append(twist_st._id)
 						new_thread.group_set.append(group._id)
 
-						date_string = message['Date'][:message['Date'].index("+")]
+						if '+' in message['Date']:
+							date_string = message['Date'][:message['Date'].index("+")]
+						if '-' in message['Date']:
+							date_string = message['Date'][:message['Date'].index("-")]
+
 						time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
 						new_thread.created_at = time
 
@@ -241,7 +249,7 @@ def process(message):
 
 					else:
 						subject = 'Metastudio intimation'
-						from_email = settings.METASTUDIO_SERVER_ADDRESS
+						from_email = arch_settings.METASTUDIO_SERVER_ADDRESS
 						to = user_address
 						text_content = 'You have posted to '+name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are not added to the group on metastudio. Please visit the following link if you wish to join the group:\nhttp://www.metastudio.org/'+group.name+'/'
 						send_mail(subject,text_content,from_email,[to])
@@ -249,9 +257,9 @@ def process(message):
 	
 				except User.DoesNotExist:
 					subject = 'Metastudio intimation'
-					from_email = settings.METASTUDIO_SERVER_ADDRESS
+					from_email = arch_settings.METASTUDIO_SERVER_ADDRESS
 					to = user_address
-					text_content = 'You have posted to '+list_name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
+					text_content = 'You have posted to '+name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
 					send_mail(subject,text_content,from_email,[to])
 
 #			print new_thread
@@ -263,7 +271,7 @@ def process(message):
 #This extracts each message from input file as a string, parses it into a message object and passes it to the process() function
 
 for next in inputfile:
-	end = re.search(r"^From\s[A-Za-z0-9_.]+@[A-Za-z0-9.]+.[A-Za-z]{1,4}\s\s[A-Za-z]{3}\s[A-Za-z]{3}\s[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s[0-9]{4}$",next)
+	end = re.search(r"^From\s[A-Za-z0-9_.]+ at [A-Za-z0-9.]+.[A-Za-z]{1,4}[\s]{1,2}[A-Za-z]{3}\s[A-Za-z]{3}[\s]{1,2}[0-9]{1,2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s[0-9]{4}$",next)
 	if end:
 		messages.append(mailparser.parsestr(line))
 		process(messages[i])
@@ -276,4 +284,4 @@ messages.append(mailparser.parsestr(line))
 process(messages[i])
 
 inputfile.close()
-subprocess.call(["sudo","rm",settings.MAIL_SPOOL_FILE_PATH])
+#subprocess.call(["sudo","rm",arch_settings.MAIL_SPOOL_FILE_PATH])

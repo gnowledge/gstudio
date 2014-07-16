@@ -92,7 +92,7 @@ def process(message):
 	subject = message['Subject']
 
 	
-	if re.search(r"^[A-Za-z0-9_.]+$",name):
+	if not name.endswith("-owner"):
 
 		thread = subject[subject.index("]")+2:]
 		topic = subject[subject.rindex("[")+1:subject.rindex("]")]
@@ -163,8 +163,11 @@ def process(message):
 				
 						new_reply.group_set.append(group._id)
 
-						
-						date_string = message['Date'][:message['Date'].index("+")]
+						if '+' in message['Date']:
+							date_string = message['Date'][:message['Date'].index("+")]
+						if '-' in message['Date']:
+							date_string = message['Date'][:message['Date'].index("-")]
+				
 						reply_time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
 						new_reply.created_at = reply_time
 
@@ -185,7 +188,7 @@ def process(message):
 					subject = 'Metastudio intimation'
 					from_email = settings.METASTUDIO_SERVER_ADDRESS
 					to = user_address
-					text_content = 'You have replied to a mail in the '+list_name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
+					text_content = 'You have replied to a mail in the '+name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
 					send_mail(subject,text_content,from_email,[to])
 				
 #				print(user_address+" posted to list "+group.name+" replied to thread: "+thread+" in forum "+forum.name+" message: "+body )
@@ -229,7 +232,11 @@ def process(message):
 						new_thread.group_set.append(group._id)
 
 						
-						date_string = message['Date'][:message['Date'].index("+")]
+						if '+' in message['Date']:
+							date_string = message['Date'][:message['Date'].index("+")]
+						if '-' in message['Date']:
+							date_string = message['Date'][:message['Date'].index("-")]
+
 						thread_time = datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S ")
 						new_thread.created_at = thread_time
 
@@ -261,14 +268,14 @@ def process(message):
 					subject = 'Metastudio intimation'
 					from_email = settings.METASTUDIO_SERVER_ADDRESS
 					to = user_address
-					text_content = 'You have posted to '+list_name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
+					text_content = 'You have posted to '+name+' mailing list on mailman. This list also has a discussion forum on the metastudio website, but it seems that you are registered on the metastudio website. Please visit the following link if you wish to create a Metastudio account:\nhttp://www.metastudio.org/accounts/register/'
 					send_mail(subject,text_content,from_email,[to])
 
 #			print new_thread
 
 
 	
-	if re.search(r"^[A-Za-z0-9_.]+-owner$",name):
+	if name.endswith("-owner"):
 
 		user_address = body.split(" ")[0]
 		list_name = body.split(" ")[6]
@@ -325,7 +332,7 @@ def process(message):
 #This extracts each message from input file as a string, parses it into a message object and passes it to the process() function
 
 for next in inputfile:
-	end = re.search(r"^From\s[A-Za-z0-9_.]+@[A-Za-z0-9.]+.[A-Za-z]{1,4}\s\s[A-Za-z]{3}\s[A-Za-z]{3}\s[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s[0-9]{4}$",next)
+	end = re.search(r"^From\s[A-Za-z0-9_.]+@[A-Za-z0-9.]+.[A-Za-z]{1,4}[\s]{1,2}[A-Za-z]{3}\s[A-Za-z]{3}[\s]{1,2}[0-9]{1,2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s[0-9]{4}$",next)
 	if end:
 		messages.append(mailparser.parsestr(line))
 		process(messages[i])
