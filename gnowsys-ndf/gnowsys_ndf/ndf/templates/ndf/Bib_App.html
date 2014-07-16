@@ -25,10 +25,14 @@
 
 
 {% block meta_content %}
-  <h2>Bibliographic Entries</h2>
+  </br>
+</br>
 {% endblock %}
-
-
+{% comment %}
+{% block body_content %}
+<p>This app allows users to store bibliographic data.You can cite that data while creating pages in MetaStudio.</p>
+{% endblock %}
+{% endcomment %}
 {% block search_content %}
   {% include "ndf/node_search_base.html" %}
 
@@ -38,71 +42,72 @@
   {% user_access_policy groupid request.user as user_access %}
   {% if user_access == "allow" %}
 
- <a href="{% url 'create_entries' group_id %}?num=0"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
+ <a href="{% url 'create_entries' group_id %}?num=0" class="fi-plus"/> &nbsp&nbsp</a> 
 
 
- <a href ="{% url 'view_entries' group_id  %}?num=0">Article</a>
+ <a href ="{% url 'view_entries' group_id %}?num=0">Article</a>
  
 <br/>
  <br/>
-  <a href="{% url 'create_entries' group_id %}?num=1"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
+
+  <a href="{% url 'create_entries' group_id %}?num=1" class="fi-plus"> &nbsp&nbsp</a> 
  
   
- <a href ="{% url 'view_entries' group_id  %}?num=1">Book</a>
+ <a href ="{% url 'view_entries' group_id %}?num=1">Book</a>
  </t>
 
 <br/> <br/>
- <a href="{% url 'create_entries' group_id %}?num=2"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=2">Booklet</a>
+ <a href="{% url 'create_entries' group_id %}?num=2" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=2">Booklet</a>
  </t></br></br>
-  <a href="{% url 'create_entries' group_id %}?num=3"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
+  <a href="{% url 'create_entries' group_id %}?num=3" class="fi-plus"> &nbsp&nbsp</a> 
 
- <a href ="{% url 'view_entries' group_id  %}?num=3">Conference</a>
+ <a href ="{% url 'view_entries' group_id %}?num=3">Conference</a>
  </t></br></br>
-  <a href="{% url 'create_entries' group_id %}?num=4"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=4">Inbook</a> 
+  <a href="{% url 'create_entries' group_id %}?num=4" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id  %}?num=4 ">Inbook</a> 
  </t>
  <br/> <br/>
-  <a href="{% url 'create_entries' group_id %}?num=5"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=5">Incollection</a> 
- </t>creat
+  <a href="{% url 'create_entries' group_id %}?num=5" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=5">Incollection</a> 
+ </t>
   <br/> <br/>
-   <a href="{% url 'create_entries' group_id %}?num=6"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=6">Inproceedings</a> 
+   <a href="{% url 'create_entries' group_id %}?num=6" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=6">Inproceedings</a> 
  </t>
  
  <br/> <br/>
-  <a href="{% url 'create_entries' group_id %}?num=7"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=7">Manual</a> 
+  <a href="{% url 'create_entries' group_id %}?num=7" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=7">Manual</a> 
  </t>
  
  <br/> <br/>
- <a href="{% url 'create_entries' group_id %}?num=8"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=8">Masterthesis</a> 
+ <a href="{% url 'create_entries' group_id %}?num=8" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=8">Masterthesis</a> 
  </t>
 
  <br/> <br/>
- <a href="{% url 'create_entries' group_id %}?num=9"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=9">Misc</a> 
+ <a href="{% url 'create_entries' group_id %}?num=9" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=9">Misc</a> 
  </t>
 
  <br/> <br/>
- <a href="{% url 'create_entries' group_id %}?num=10"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=10">Phdthesis</a> 
+ <a href="{% url 'create_entries' group_id %}?num=10" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=10">Phdthesis</a> 
  </t>
  <br/> <br/>
- <a href="{% url 'create_entries' group_id %}?num=11"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
+ <a href="{% url 'create_entries' group_id %}?num=11" class="fi-plus"> &nbsp&nbsp</a> 
  <a href ="{% url 'view_entries' group_id  %}?num=11">Proceedings</a> 
  </t>
 
  <br/> <br/>
- <a href="{% url 'create_entries' group_id %}?num=12"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=12">Techreport</a>
+ <a href="{% url 'create_entries' group_id %}?num=12" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=12">Techreport</a>
  </t>
 
  <br/> </br>
- <a href="{% url 'create_entries' group_id %}?num=13"><img src="/home/somya/gstudio/gnowsys-ndf/gnowsys_ndf/ndf/static/ndf/images.jpg"/> &nbsp&nbsp</a> 
- <a href ="{% url 'view_entries' group_id  %}?num=13">unpublished_entry</a>
+ <a href="{% url 'create_entries' group_id %}?num=13" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=13">unpublished_entry</a>
  </t>
 
  <br/>  
@@ -113,66 +118,3 @@
 
 
 
-{% comment %}
-{% block related_content %}
- {% elif %}
- <h>you must be logged in to create a html entry</h>
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-  
- 
-
-    </div>
-</div>
-  {% endif %}
-  {% endif %}
-{% endblock %} 
-
-{% block body_content %}
-
-
-<header class="row">
-  <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Entries {% if entry.count %}({{ ARTICLE_inst.count }}){% endif %}</a></dd>
-  </dl>
-</header>
-
-{% if searching and ARTICLE_inst.count > 0 %}
-<div class="row">
-  <div class="small-12 columns end">
-    <p>Search Results: <span class="label success round">Found {{ARTICLE_inst.count}} {{title|lower}}{{ARTICLE_inst.count|pluralize}}.</span></p>
-  </div>
-</div>
-
-{% elif searching and ARTICLE_inst.count == 0 %}
-<div class="row">
-  <div class="small-12 columns">
-    <p>Search Results: <span class="label alert">No {{title|lower}}{{ARTICLE_inst.count|pluralize}} matched your search criteria!!!</span></p>
-  </div>  
-</div>  
-
-{% endif %}
-{% endblock %}
-
-{% for each in ARTICLE_inst %}
-<div>
-  <h2><a href="/articles/get/{{each._id}}/">{{each.name}}</a></h2>
-{% endfor %}
-
-<html>
-  <head>
-    <title>
-    <b>BIBLIOGRAPHY ENTRIES</b>
-    </title>
-  </head>
-  <body>Click the add button to add new entries</body>
-  <div align="left">
-    
-      <li>article</li>
-      <li>book</li>
-      <li>booklet></li>
-    </ul>
-  </div>
-</html>
-{% endcomment %} 

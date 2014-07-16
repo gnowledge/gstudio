@@ -1259,9 +1259,6 @@ def view_articles(request, group_id):
         list_entry.append(dict1)
       dict2[each]=list_entry
       response_dict.append(dict2)
-    print response_dict
-
-  
   return StreamingHttpResponse(json.dumps(response_dict))      
 
 def get_author_set_users(request, group_id):

@@ -267,7 +267,7 @@ def page(request, group_id, app_id=None):
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid  = ObjectId()
+    ins_objectid = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -285,29 +285,25 @@ def create_edit_page(request, group_id, node_id=None):
                           'lan':LANGUAGES,
                           'groupid': group_id
                       }
-    print context_variables
+    
     available_nodes = collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(gst_page._id) })
-    print available_nodes
+
     nodes_list = []
     for each in available_nodes:
       nodes_list.append(each.name)
 
     if node_id:
-        print node_id
         page_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(node_id)})
     else:
-        print "node_id craeted"
         page_node = collection.GSystem()
-        print page_node
         
 
     if request.method == "POST":
         
         # get_node_common_fields(request, page_node, group_id, gst_page)
 
-
-        page_node.save()
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:
@@ -325,6 +321,7 @@ def create_edit_page(request, group_id, node_id=None):
                                   context_variables,
                                   context_instance=RequestContext(request)
                               )
+
 
 @login_required    
 def delete_page(request, group_id, node_id):
