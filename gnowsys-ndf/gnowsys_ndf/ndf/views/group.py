@@ -340,15 +340,13 @@ def group_dashboard(request,group_id=None):
   if groupobj.status == u"DRAFT":
     groupobj, ver = get_page(request, groupobj)
 
+  # Call to get_neighbourhood() is required for setting-up property_order_list
   groupobj.get_neighbourhood(groupobj.member_of)
-  # print "\n groupobj.keys: ", groupobj.keys()
 
   property_order_list = []
   if groupobj.has_key("group_of"):
-    # print "\n Found groupobj['group_of']: ", groupobj['group_of'], "\n"
     if groupobj['group_of']:
       property_order_list = get_property_order_with_value(groupobj['group_of'][0])
-      # print "\n ", type(property_order_list), " -- ", "\n", property_order_list  
 
   # First time breadcrumbs_list created on click of page details
   breadcrumbs_list = []
