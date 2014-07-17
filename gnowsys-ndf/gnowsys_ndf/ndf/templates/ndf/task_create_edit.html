@@ -38,8 +38,11 @@ $( "#parent" ).autocomplete({
   select: function( event, ui ) {
 	$('#hidden_parent').val(ui.item.id);console.log(ui.item.id);} 
 });
-
+{% if node %}
 $('.start_date').fdatepicker();
+{% else %}
+$('.start_date').fdatepicker('update','06/14/2014');
+{% endif %}
 user_list =JSON.parse(update_user_list())
 function update_user_list()
 {
@@ -178,7 +181,7 @@ $('#hidden_watchers').val(selected);
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Due date</label>
-	    <input class="start_date" name="end_time" type="text" placeholder="select date..." value="{{end_time}}">
+	    <input class="due_date" name="end_time" type="text" placeholder="select date..." value="{{end_time}}">
 	  </div>
 	</div>	
 	<div class="row">

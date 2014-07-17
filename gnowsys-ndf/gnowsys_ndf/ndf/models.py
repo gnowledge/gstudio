@@ -1275,7 +1275,7 @@ class HistoryManager():
 	null = 0
 	import json
 	json_dict = eval(json_data)
-	json_node_keys = collection.Node.keys()
+	json_node_keys = document_object.keys()
 	json_dict_keys = json_dict.keys()
 	diff_keys = list(set(json_node_keys)-set(json_dict_keys))
 	if diff_keys:

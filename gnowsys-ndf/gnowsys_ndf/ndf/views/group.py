@@ -166,6 +166,7 @@ def group(request, group_id, app_id=None):
       
       group_count = cur_public.count()
 
+    
     return render_to_response("ndf/group.html", 
                               {'group_nodes': group_nodes, 
                                'group_nodes_count': group_count,
@@ -347,16 +348,18 @@ def group_dashboard(request,group_id=None):
     # print "\n Found groupobj['group_of']: ", groupobj['group_of'], "\n"
     if groupobj['group_of']:
       property_order_list = get_property_order_with_value(groupobj['group_of'][0])
-      print "\n ", type(property_order_list), " -- ", "\n", property_order_list  
+      # print "\n ", type(property_order_list), " -- ", "\n", property_order_list  
 
   # First time breadcrumbs_list created on click of page details
   breadcrumbs_list = []
   # Appends the elements in breadcrumbs_list first time the resource which is clicked
   breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
+  annotations = json.dumps(groupobj.annotations)
 
   return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
                                                        'group_id':grpid, 'user':request.user, 
                                                        'shelf_list': shelf_list,
+                                                       'annotations' : annotations,
                                                        'shelves': shelves, 
                                                        'breadcrumbs_list': breadcrumbs_list,
                                                        'property_order_list': property_order_list
