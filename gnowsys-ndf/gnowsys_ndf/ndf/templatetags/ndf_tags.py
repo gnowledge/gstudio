@@ -33,6 +33,21 @@ import json,ox
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
 
+@register.assignment_tag
+def get_node_ratings(node):
+        try:
+                tot_ratng=len(node.rating)-1
+                sum=0
+                dic={}
+                for each in node.rating:
+                     sum=sum+each['score']
+                avg_ratng=float(sum)/tot_ratng
+                dic['avg']=avg_ratng
+                dic['tot']=tot_ratng
+                print "dic=",dic
+                return dic
+        except Exception as e:
+                print "Error in get_node_ratings "+str(e)
 
 @register.assignment_tag
 def get_group_resources(group):
