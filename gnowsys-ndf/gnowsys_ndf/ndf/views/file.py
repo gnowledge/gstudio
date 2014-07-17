@@ -809,10 +809,13 @@ def file_detail(request, group_id, _id):
         else:
             shelves = []
 
+    annotations = json.dumps(file_node.annotations)
+
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
                                 'groupid':group_id,
+                                'annotations' : annotations,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
                                 'breadcrumbs_list': breadcrumbs_list
@@ -901,8 +904,8 @@ def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if request.method == "POST":
-        get_node_common_fields(request, file_node, group_id, GST_FILE)
-        file_node.save()
+        # get_node_common_fields(request, file_node, group_id, GST_FILE)
+        file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:
