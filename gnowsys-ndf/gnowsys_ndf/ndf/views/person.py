@@ -30,7 +30,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
   """
   custom view for custom GAPPS
   """
-  print "\n Found person_detail n gone inn this...\n\n"
+  # print "\n Found person_detail n gone inn this...\n\n"
 
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
@@ -54,7 +54,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
 
   app_name = app.name 
 
-  print "\n coming in person detail... \n"
+  # print "\n coming in person detail... \n"
   # app_name = "mis"
   app_set = ""
   app_collection_set = []
@@ -134,7 +134,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   """
   Creates/Modifies document of given person-type.
   """
-  print "\n Found person_create_edit n gone inn this...\n\n"
+  # print "\n Found person_create_edit n gone inn this...\n\n"
 
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
@@ -227,7 +227,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
             # 2) Parse fetched-value depending upon AT/RT--fields' data-type
             if field_instance_type == AttributeType:
-              print " ", field_instance["name"], " -- ", field_value
+              # print " ", field_instance["name"], " -- ", field_value
               field_instance_type = "GAttribute"
               if field_instance["name"] == "12_passing_year" or field_instance["name"] == "degree_passing_year":
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
