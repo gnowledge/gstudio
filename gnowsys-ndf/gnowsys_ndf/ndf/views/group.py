@@ -348,13 +348,12 @@ def group_dashboard(request,group_id=None):
     # print "\n Found groupobj['group_of']: ", groupobj['group_of'], "\n"
     if groupobj['group_of']:
       property_order_list = get_property_order_with_value(groupobj['group_of'][0])
-      print "\n ", type(property_order_list), " -- ", "\n", property_order_list  
+      # print "\n ", type(property_order_list), " -- ", "\n", property_order_list  
 
   # First time breadcrumbs_list created on click of page details
   breadcrumbs_list = []
   # Appends the elements in breadcrumbs_list first time the resource which is clicked
   breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
-  print "\n ", groupobj.keys()
   annotations = json.dumps(groupobj.annotations)
 
   return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
