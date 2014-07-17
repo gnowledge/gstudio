@@ -36,9 +36,6 @@
 	{% endfor %} 
 
 
- 	
-
-
 {% endblock %}
 
 
@@ -50,10 +47,12 @@
 
 {% block body_content %}
 
+
 	<!-- Scripts required for D3 graph -->
 	<script type="text/javascript" src="/static/ndf/bower_components/d3/d3.min.js"></script> <!-- checked -->
 	<script type="text/javascript" src="/static/ndf/bower_components/underscore/underscore.js"></script> <!-- checked -->
 	<script sync="text/javascript" src="/static/ndf/bower_components/FileSaver/FileSaver.js" ></script> <!-- checked -->
+
 
 {% if  flag %}
 	<br>
@@ -110,6 +109,7 @@
 
 
     <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+	
 
     <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
      </section>
@@ -121,6 +121,7 @@
         <a class="close-reveal-modal">&#215;</a>
         {% include "ndf/graph_concept.html" %}
       </div>
+
      <!-- Content for Collection Graph -->
       
       {% if node.collection_set %}
@@ -129,6 +130,7 @@
         	{% include "ndf/graph_collection.html" %}
         </div>
       {% endif %}
+
 
       <!-- Content for dependency Graph -->
       
@@ -157,13 +159,24 @@ $(document).on('opened', '#view-map-widget[data-reveal]', function () {
 
   	
 		<h5><strong>Tags for this item</strong></h5>
-	<div >		
+	<div >	
+	<script>
+$(document).on('opened', '#view-map-widget[data-reveal]', function () {  
+      
+    map.invalidateSize();  
+
+  });
+
+
+</script>
+	
 	{% for tag in selected_topic.tags %}
+
 		<a class="[success alert secondary] [round radius] label" href="{% url 'tag_topic_display' group_id selected_topic.pk tag %}" style="text-decoration:none;font-weight:bold;text-color:red;font-size:17px;"> 
 		{{ tag }} {{"  "}}
      		</a>
 		{% endfor %}
-		
+
 		<h2><strong><center>Topic Name: {{ selected_topic.name }}</h2></strong></center>
 		<br>
 		<strong>
@@ -232,11 +245,11 @@ $(document).on('opened', '#view-map-widget[data-reveal]', function () {
 		
   	</div>
 	<br>
+
  	<p><h5><small>This data has been harvested from <a href="http://www.wikidata.org/wiki/Wikidata:Main_Page">Wikidata Project</a></h5></small>
 	<h5><small>All structured data from the main and property namespace is available under the Creative Commons CC0 License. Text in the other namespaces is available under the Creative Commons Attribution-ShareAlike License. Additional terms may apply. By using this site, you agree to the Terms of Use and Privacy Policy.</small><//p></h5>
 
  
-
 
 {% endif %}
 {% endblock %}
