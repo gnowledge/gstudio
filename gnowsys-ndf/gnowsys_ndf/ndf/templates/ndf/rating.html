@@ -14,8 +14,6 @@ selected=$('input[name=rating]:checked').val();
 $(document).on('click',"#rate_submit",function() {
 surl="/{{node}}/ratings/add_ratings/"
 var nodeid=$("#noderate").val();
-alert(nodeid);
-alert(selected);
 $.ajax({
         url: surl,
         type: 'POST',
