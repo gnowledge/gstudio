@@ -232,6 +232,7 @@ def create_edit_task(request, group_name, task_id=None):
 		else :
 			update_node.altnames = unicode('[]')
 		update_node.prior_node = [task_node._id]		
+		update_node.name = unicode(task_node.name+"-update_history")
 		update_node.save()
 		update_node.name = unicode(task_node.name+"-update_history-"+str(update_node._id))
 		update_node.save()
