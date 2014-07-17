@@ -153,7 +153,6 @@ ul#graph-hover.f-dropdown{
     <!--End container-->
   </div>
 </section>
-
 </header>
 
 <div class="row">
@@ -480,6 +479,7 @@ ul#graph-hover.f-dropdown{
 </div>
 
 <footer>
+{% include "ndf/rating.html" %} 
   <p><small>
     <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>
