@@ -107,19 +107,18 @@
               <a href="{% url 'page_details' group_name_tag node %}">
       <header>
         <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
-        <h4>
+        <h6>
           {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-        </h4>
+        </h6>
       </header>
       
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
   
       <footer>
           <div class="age">
-            <small>{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
             <br/>
             by <span class="user" href="{% url 'userDashboard' group_name_tag node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-            </small>
           </div>
         <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
         <span class="right"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</span>

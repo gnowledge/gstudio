@@ -158,7 +158,7 @@ a#toggle-shelf i{
 	border: 1px dashed $secondary-color;
 	display: block;
 	color:inherit!important;
-	opacity:0.8;
+	opacity:0.9;
     
     a{
         color:inherit;
@@ -178,17 +178,16 @@ a#toggle-shelf i{
     &:hover{
 	border-color:#ddd;
 	opacity:1;
-    overflow: hidden;
         footer .age{
             display: block;
         }
 }
     &>i{
 	position: absolute;
-	top: -12px;
-	right: 20px;
-	font-size: 4rem;
-	color:#eee;
+	top: -10px;
+	right: 10px;
+	font-size: 3rem;
+	color:#ddd;
 	opacity: 0.4;
 }
     
@@ -198,12 +197,8 @@ a#toggle-shelf i{
         .label{
         opacity:0.5;
     }
-    h4{
-        font-weight: bold;
-        font-size: 1rem;
-    }
     p{
-        font-size: 0.9rem;
+        color: #555;
     }
     .th{
         margin:20px auto;
@@ -227,12 +222,14 @@ a#toggle-shelf i{
 }
     
     footer{
+        font-size: 70%;
+        opacity:0.5;
             .age{
                 display: none;
                 position: absolute;
                 background: white;
                 z-index: 100;
-                bottom: 0;
+                bottom: 2px;
                 width: 100%;
             }
         }
@@ -367,7 +364,7 @@ article{
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 1rem!important;
 }
-    footer{
+    &>footer{
 	border-top: 1px dotted #ddd;
 }
     .breadcrumbs{
