@@ -33,7 +33,7 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.org2any import org2html
-import json
+
  
 db = get_database()
 gs_collection = db[GSystem.collection_name]
