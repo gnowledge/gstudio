@@ -3,6 +3,7 @@
 *
 *   Use this stylesheet for placements, positioning and sizing of elements
 */
+
 @import url("css.css");
 
 
@@ -28,6 +29,7 @@
 			-webkit-box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
+            background: url($theme-path+$page-background) no-repeat 0 bottom;
             
             &:after{
             //Hack for setting div height to the height of the browser window
@@ -44,6 +46,8 @@
 			position: relative;
             margin: 0 2rem;
             color:#888;
+            min-height: 100px;
+            background-color: rgba(255,255,255,0.5);
             
             a{
 			color: #777;
