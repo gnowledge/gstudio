@@ -1740,9 +1740,9 @@ select {
 }
 /* line 122, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.info {
-  background-color: #a0d3e8;
-  border-color: #74bfdd;
-  color: #405947;
+  background-color: #ba3e27;
+  border-color: #a03522;
+  color: white;
 }
 /* line 123, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.alert-close {
@@ -4240,7 +4240,7 @@ kbd {
 }
 
 /* line 91, ../bower_components/foundation/scss/foundation/components/_labels.scss */
-.label {
+.label, .label-list:empty:before {
   font-weight: normal;
   font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
   text-align: center;
@@ -4253,28 +4253,28 @@ kbd {
   padding: 0.25rem 0.5rem 0.375rem;
   font-size: 0.6875rem;
   background-color: #3b8050;
-  color: white;
+  color: #ba3e27;
 }
 /* line 96, ../bower_components/foundation/scss/foundation/components/_labels.scss */
-.label.radius {
+.label.radius, .radius.label-list:empty:before {
   border-radius: 3px;
 }
 /* line 97, ../bower_components/foundation/scss/foundation/components/_labels.scss */
-.label.round {
+.label.round, .round.label-list:empty:before {
   border-radius: 1000px;
 }
 /* line 99, ../bower_components/foundation/scss/foundation/components/_labels.scss */
-.label.alert {
+.label.alert, .alert.label-list:empty:before {
   background-color: #f04124;
-  color: white;
+  color: #ba3e27;
 }
 /* line 100, ../bower_components/foundation/scss/foundation/components/_labels.scss */
-.label.success {
+.label.success, .success.label-list:empty:before {
   background-color: #43ac6a;
-  color: white;
+  color: #ba3e27;
 }
 /* line 101, ../bower_components/foundation/scss/foundation/components/_labels.scss */
-.label.secondary {
+.label.secondary, .secondary.label-list:empty:before {
   background-color: #dce6df;
   color: #333333;
 }
@@ -8233,25 +8233,39 @@ a#toggle-shelf i {
 .card > * {
   position: relative;
   background-color: white;
-  margin: 2px;
-  padding: 10px;
-  border: 1px solid #eaeaea;
+  padding: 0 7px;
+  border: 1px dashed #dce6df;
   display: block;
   color: inherit !important;
-  -webkit-box-shadow: 2px 2px 4px 1px #ddd;
-  box-shadow: 2px 2px 4px 1px #ddd;
   opacity: 0.8;
-  transition: opacity .5s ease-in ease-in;
-  -moz-transition: opacity .5s ease-in;
-  -webkit-transition: opacity .5s ease-in;
-  -o-transition: opacity .5s ease-in;
 }
-/* line 170, ../scss/_styles.scss */
-.card > *:hover {
-  border: 1px solid #ddd;
+/* line 163, ../scss/_styles.scss */
+.card > * a {
+  color: inherit;
+}
+/* line 167, ../scss/_styles.scss */
+.card > *.published {
   opacity: 1;
+  border-style: solid;
+  border-color: #3b8050;
 }
-/* line 174, ../scss/_styles.scss */
+/* line 172, ../scss/_styles.scss */
+.card > *.unapproved {
+  opacity: 1;
+  border-style: solid;
+  border-color: #f04124;
+}
+/* line 178, ../scss/_styles.scss */
+.card > *:hover {
+  border-color: #ddd;
+  opacity: 1;
+  overflow: hidden;
+}
+/* line 182, ../scss/_styles.scss */
+.card > *:hover footer .age {
+  display: block;
+}
+/* line 186, ../scss/_styles.scss */
 .card > * > i {
   position: absolute;
   top: -12px;
@@ -8260,120 +8274,128 @@ a#toggle-shelf i {
   color: #eee;
   opacity: 0.4;
 }
-
-/* Create card */
-/* line 185, ../scss/_styles.scss */
-.create.card > * {
-  background-color: #999;
-  opacity: 1;
-}
-/* line 189, ../scss/_styles.scss */
-.create.card > *:hover {
-  background-color: #008759;
-}
-
 /* line 195, ../scss/_styles.scss */
-.create.card h4 {
-  color: white;
-}
-/* line 198, ../scss/_styles.scss */
-.create.card .button {
-  border: 1px solid #00ba7b;
-  opacity: 0.5;
-}
-/* line 202, ../scss/_styles.scss */
-.create.card label {
-  color: white;
-}
-/* line 205, ../scss/_styles.scss */
-.create.card .switch label {
-  color: inherit;
-}
-
-/* Content Tabs */
-/* line 213, ../scss/_styles.scss */
-article .tabs i {
-  margin-right: 5px;
-  font-size: 1.3rem;
-}
-/* line 217, ../scss/_styles.scss */
-article .tabs dd.active a {
-  color: #222;
-  background-color: inherit;
-}
-/* line 221, ../scss/_styles.scss */
-article .tabs dd a {
-  color: #aaa;
-  background-color: inherit;
-  padding: 0.5rem;
-  padding-left: 1rem;
-}
-/* line 226, ../scss/_styles.scss */
-article .tabs dd a:hover {
-  background-color: inherit;
-  color: #999;
-}
-
-/* line 233, ../scss/_styles.scss */
-.tabs-content > .content {
-  padding-top: 0;
-}
-
-/* Default card */
-/* line 238, ../scss/_styles.scss */
-.card > :hover .label {
-  opacity: 1;
-}
-
-/* line 243, ../scss/_styles.scss */
-.card header {
+.card > * header {
   margin-bottom: 0;
 }
-/* line 246, ../scss/_styles.scss */
-.card .label {
+/* line 198, ../scss/_styles.scss */
+.card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 249, ../scss/_styles.scss */
-.card h4 {
+/* line 201, ../scss/_styles.scss */
+.card > * h4 {
   font-weight: bold;
   font-size: 1rem;
 }
-/* line 253, ../scss/_styles.scss */
-.card p {
+/* line 205, ../scss/_styles.scss */
+.card > * p {
   font-size: 0.9rem;
 }
-/* line 256, ../scss/_styles.scss */
-.card .th {
+/* line 208, ../scss/_styles.scss */
+.card > * .th {
   margin: 20px auto;
   width: 80px;
   height: 80px;
   overflow: hidden;
   display: none;
 }
-/* line 262, ../scss/_styles.scss */
-.card .th:hover {
+/* line 214, ../scss/_styles.scss */
+.card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 266, ../scss/_styles.scss */
-.card .th img {
+/* line 218, ../scss/_styles.scss */
+.card > * .th img {
   width: 100%;
 }
-/* line 270, ../scss/_styles.scss */
-.card section {
+/* line 222, ../scss/_styles.scss */
+.card > * section {
   background-color: #ddd;
 }
-/* line 273, ../scss/_styles.scss */
-.card .button {
+/* line 225, ../scss/_styles.scss */
+.card > * .button {
   opacity: 0.1;
 }
+/* line 230, ../scss/_styles.scss */
+.card > * footer .age {
+  display: none;
+  position: absolute;
+  background: white;
+  z-index: 100;
+  bottom: 0;
+  width: 100%;
+}
 
-/* line 279, ../scss/_styles.scss */
+/* Create card */
+/* line 242, ../scss/_styles.scss */
+.create.card > * {
+  background-color: #999;
+  opacity: 1;
+}
+/* line 246, ../scss/_styles.scss */
+.create.card > *:hover {
+  background-color: #008759;
+}
+
+/* line 252, ../scss/_styles.scss */
+.create.card h4 {
+  color: white;
+}
+/* line 255, ../scss/_styles.scss */
+.create.card .button {
+  border: 1px solid #00ba7b;
+  opacity: 0.5;
+}
+/* line 259, ../scss/_styles.scss */
+.create.card label {
+  color: white;
+}
+/* line 262, ../scss/_styles.scss */
+.create.card .switch label {
+  color: inherit;
+}
+
+/* Content Tabs */
+/* line 270, ../scss/_styles.scss */
+article .tabs i {
+  margin-right: 5px;
+  font-size: 1.3rem;
+}
+/* line 274, ../scss/_styles.scss */
+article .tabs dd.active a {
+  color: #222;
+  background-color: inherit;
+}
+/* line 278, ../scss/_styles.scss */
+article .tabs dd a {
+  color: #aaa;
+  background-color: inherit;
+  padding: 0.5rem;
+  padding-left: 1rem;
+}
+/* line 283, ../scss/_styles.scss */
+article .tabs dd a:hover {
+  background-color: inherit;
+  color: #999;
+}
+
+/* line 290, ../scss/_styles.scss */
+.tabs-content > .content {
+  padding-top: 0;
+}
+
+/* Default card */
+/* line 295, ../scss/_styles.scss */
+.card > :hover .label, .card > :hover .label-list:empty:before {
+  opacity: 1;
+}
+
+/* line 300, ../scss/_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
-/* line 283, ../scss/_styles.scss */
+/* line 304, ../scss/_styles.scss */
 .card > *:hover .button {
   opacity: 1;
   transition: opacity .5s ease-in ease-in;
@@ -8383,80 +8405,80 @@ article .tabs dd a:hover {
 }
 
 /* Inline label list */
-/* line 292, ../scss/_styles.scss */
-.label {
-  font-weight: bold;
-  color: orange;
-  background-color: inherit;
-  border: 1px dotted orange;
-  display: inline-block;
-}
-/* line 297, ../scss/_styles.scss */
-.label:hover {
-  background-color: orange;
-  color: white;
+/* line 313, ../scss/_styles.scss */
+span.label, span.label-list:empty:before {
+  text-transform: uppercase;
+  background-color: white;
+  padding: 0;
 }
 
-/* line 304, ../scss/_styles.scss */
+/* line 320, ../scss/_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
 }
+/* line 323, ../scss/_styles.scss */
+.label-list:empty:before {
+  content: "UNTAGGED";
+  background-color: white;
+  opacity: 0.2 !important;
+  padding: 0;
+}
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 314, ../scss/_styles.scss */
+/* line 337, ../scss/_styles.scss */
 main aside {
   padding-top: 1rem;
 }
-/* line 316, ../scss/_styles.scss */
+/* line 339, ../scss/_styles.scss */
 main aside.fade {
   opacity: 0.8;
 }
 
-/* line 322, ../scss/_styles.scss */
+/* line 345, ../scss/_styles.scss */
 aside > section {
   margin: inherit !important;
   margin-bottom: 5px;
   padding-bottom: 3rem;
 }
-/* line 326, ../scss/_styles.scss */
+/* line 349, ../scss/_styles.scss */
 aside > section > div {
   padding: 15px;
 }
 
-/* line 332, ../scss/_styles.scss */
+/* line 355, ../scss/_styles.scss */
 aside .meta i {
   color: #ccc;
 }
 
-/* line 333, ../scss/_styles.scss */
+/* line 356, ../scss/_styles.scss */
 aside:hover .meta i {
   color: black;
 }
 
 /* Content area */
-/* line 339, ../scss/_styles.scss */
+/* line 362, ../scss/_styles.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
   background-color: white;
 }
-/* line 343, ../scss/_styles.scss */
-article header {
+/* line 366, ../scss/_styles.scss */
+article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 347, ../scss/_styles.scss */
+/* line 370, ../scss/_styles.scss */
 article footer {
   border-top: 1px dotted #ddd;
 }
-/* line 350, ../scss/_styles.scss */
+/* line 373, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 359, ../scss/_styles.scss */
+/* line 382, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8477,22 +8499,22 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 379, ../scss/_styles.scss */
+/* line 402, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 384, ../scss/_styles.scss */
+/* line 407, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 387, ../scss/_styles.scss */
+/* line 410, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 390, ../scss/_styles.scss */
+/* line 413, ../scss/_styles.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -8501,65 +8523,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 397, ../scss/_styles.scss */
+/* line 420, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 401, ../scss/_styles.scss */
+/* line 424, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 405, ../scss/_styles.scss */
+/* line 428, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 408, ../scss/_styles.scss */
+/* line 431, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 413, ../scss/_styles.scss */
+/* line 436, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 418, ../scss/_styles.scss */
+/* line 441, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 421, ../scss/_styles.scss */
+/* line 444, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 424, ../scss/_styles.scss */
+/* line 447, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 431, ../scss/_styles.scss */
+/* line 454, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 436, ../scss/_styles.scss */
+/* line 459, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 443, ../scss/_styles.scss */
+/* line 466, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8567,13 +8589,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 450, ../scss/_styles.scss */
+/* line 473, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 455, ../scss/_styles.scss */
+/* line 478, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8587,13 +8609,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 465, ../scss/_styles.scss */
+/* line 488, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 470, ../scss/_styles.scss */
+/* line 493, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8604,7 +8626,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 481, ../scss/_styles.scss */
+/* line 504, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8616,12 +8638,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 493, ../scss/_styles.scss */
+/* line 516, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 496, ../scss/_styles.scss */
+/* line 519, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }

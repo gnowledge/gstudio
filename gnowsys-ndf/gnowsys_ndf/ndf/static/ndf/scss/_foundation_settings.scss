@@ -22,7 +22,7 @@ $secondary-color: rgb(220, 230, 223);
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
  $warning-color: #f2bf8a;
-// $info-color: #a0d3e8;
+ $info-color: #ba3e27;
 
 
 
@@ -646,7 +646,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $label-font-sizing: rem-calc(11);
 // $label-font-weight: normal;
 // $label-font-color: #333;
-// $label-font-color-alt: #fff;
+ $label-font-color-alt: $info-color;
 // $label-font-family: $body-font-family;
 
 // Magellan
