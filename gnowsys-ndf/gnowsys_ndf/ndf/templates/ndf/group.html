@@ -52,22 +52,20 @@
   </dl>
 </header>
 
+<div class="content row">
+    
 {% if searching and group_nodes_count > 0 %}
-<div class="row">
+
   <div class="small-12 columns end">
     <p>Search Results: <span class="label success round">Found {{group_nodes_count}} {{title|lower}}{{group_nodes_count|pluralize}}.</span></p>
   </div>
-</div>
 
 {% elif searching and group_nodes_count == 0 %}
-<div class="row">
   <div class="small-12 columns">
     <p>Search Results: <span class="label alert">No {{title|lower}}{{group_nodes_count|pluralize}} matched your search criteria!!!</span></p>
   </div>  
-</div>  
 
 {% endif %}
-
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
@@ -82,32 +80,27 @@
   <li class="card">
     <div class="group">
       
-      <header>
-        <div class="label-list">
-          {% for tag in node.tags|slice:":3" %}
+        <div class="label-list">{% for tag in node.tags|slice:":3" %}
           <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-          {% endfor %}
-        </div>
-
+          {% endfor %}</div>
+        
+        <a  href="/{{node.pk}}">
+      <header>
         <div class="th"><img src="/static/ndf/scss/themes/metastudio/logo.svg"></div>
-        <h4>{{ node.name|truncatechars:20 }}
-      	<div>
-            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</a> 
-            </small>
-        </div>
-        </h4>
+        <h6>{{ node.name|truncatechars:20 }}</h6>
       </header>
       
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-
-      <a class="button expand"  href="/{{node.pk}}">View Group</a>
       
-      <footer class="row">
-        <div class="small-6 columns"><strong>{{node.author_set|length}}</strong> Members</div>
+      <footer>
+          <div class="age">
+            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span class="user" href="{% url 'userDashboard' group_name_tag node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span>
+        </div>
+        <span><strong>{{node.author_set|length}}</strong> Members</span>
         {% get_group_resources node as obj_count %}
-        <div class="small-6 columns"><div class="right"><strong>{{obj_count}}</strong> Objects</div></div>
+        <span class="right"><strong>{{obj_count}}</strong> Objects</span>
       </footer>
-      
+      </a>
     </div>
   </li>
   {% endif %}

@@ -8257,7 +8257,7 @@ a#toggle-shelf i {
 }
 /* line 178, ../scss/_styles.scss */
 .card > *:hover {
-  border-color: #ddd;
+  border-style: solid;
   opacity: 1;
 }
 /* line 181, ../scss/_styles.scss */
