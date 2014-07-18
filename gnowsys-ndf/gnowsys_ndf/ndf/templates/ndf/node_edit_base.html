@@ -1,5 +1,4 @@
 {% extends "ndf/base.html" %}
-from gnowsys_ndf.ndf.views.methods import *
 {% load ndf_tags %}
 
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
