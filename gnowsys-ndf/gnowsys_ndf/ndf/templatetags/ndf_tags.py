@@ -33,6 +33,21 @@ import json,ox
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
 
+@register.assignment_tag
+def get_node_ratings(node):
+        try:
+                tot_ratng=len(node.rating)-1
+                sum=0
+                dic={}
+                for each in node.rating:
+                     sum=sum+each['score']
+                avg_ratng=float(sum)/tot_ratng
+                dic['avg']=avg_ratng
+                dic['tot']=tot_ratng
+                print "dic=",dic
+                return dic
+        except Exception as e:
+                print "Error in get_node_ratings "+str(e)
 
 @register.assignment_tag
 def get_group_resources(group):
@@ -965,6 +980,70 @@ def Group_Editing_policy(groupid,node,user):
 	elif node.edit_policy is None:
 		return "allow"      
 	
+@register.assignment_tag
+def check_is_gstaff(groupid, user):
+  """
+  Checks whether given user belongs to GStaff.
+  GStaff includes only those members which belongs to following criteria:
+    1) User should be a super-user (Django's superuser)
+    2) User should be a creator of the group (created_by field)
+    3) User should be an admin-user of the group (group_admin field)
+  
+  Other memebrs (author_set field) doesn't belongs to GStaff.
+
+  Arguments:
+  groupid -- ObjectId of the currently selected group
+  user -- User object taken from request object
+
+  Returns:
+  True -- If user is one of them, from the above specified list of categories.
+  False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
+  """
+
+  try:
+    group_node = collection.Node.one({'_id': ObjectId(groupid)})
+
+    if group_node:
+      return group_node.is_gstaff(user)
+
+    else:
+      error_message = "No group exists with this id ("+str(groupid)+") !!!"
+      raise Exception(error_message)
+
+  except Exception as e:
+    error_message = "\n IsGStaffCheckError: " + str(e) + " \n"
+    raise Http404(error_message)
+
+
+@register.assignment_tag
+def check_is_gstaff_for_gapp(groupid, app_dict, user):
+  """
+  This restricts view of MIS & MIS-PO GApps to only GStaff members (super-user, creator, admin-user) of the group. 
+  That is, other subscribed-members of the group can't even see these GApps.
+
+  Arguments:
+  groupid -- ObjectId of the currently selected group
+  app_dict -- A dictionary consisting of following key-value pair
+              - 'id': ObjectId of the GApp
+              - 'name': name of the GApp
+  user - User object taken from request object
+
+  Returns:
+  A bool value indicating:-
+  True --  if user is superuser, creator or admin of the group
+  False -- if user is just a subscribed-member of the group
+  """
+
+  try:
+    if app_dict["name"].lower() in ["mis", "mis-po"]:
+      return check_is_gstaff(groupid, user)
+
+    else:
+      return True
+
+  except Exception as e:
+    error_message = "\n GroupAdminCheckError (For MIS & MIS-PO): " + str(e) + " \n"
+    raise Http404(error_message)
 
 
 @register.assignment_tag
@@ -1310,44 +1389,3 @@ def check_node_linked(node_id):
   except Exception as e:
     error_message = " NodeUserLinkFindError - " + str(e)
     raise Exception(error_message)
-
-@register.assignment_tag
-def check_group_admin(groupid, app_dict, user):
-  """
-  This restricts view of MIS & MIS-PO GApps to only superuser, creator & admins of the group. 
-  That is, other members of the group can't see these GApps.
-
-  Arguments:
-  groupid -- ObjectId of the currently selected group
-  app_dict -- A dictionary consisting of following key-value pair
-              - 'id': ObjectId of the GApp
-              - 'name': name of the GApp
-  user - User object taken from request object
-
-  Returns:
-  A bool value indicating:-
-  True: if user is superuser, creator or admin of the group
-  False: otherwise, user is just a member of the group
-  """
-
-  try:
-    if app_dict["name"] in ["MIS", "MIS-PO"]:
-      group_node = collection.Node.one({'_id': ObjectId(groupid)}, {'group_admin': 1, 'created_by': 1})
-
-      if group_node:
-        if (user.is_superuser) or (user.id == group_node.created_by) or (user.id in group_node.group_admin):
-          return True
-
-        else:
-          return False
-
-      else:
-        error_message = "No group exists with this id ("+str(groupid)+") !!!"
-        raise Exception(error_message)
-
-    else:
-      return True
-
-  except Exception as e:
-    error_message = "\n GroupAdminCheckError (For MIS & MIS-PO): " + str(e) + " \n"
-    raise Http404(error_message)
