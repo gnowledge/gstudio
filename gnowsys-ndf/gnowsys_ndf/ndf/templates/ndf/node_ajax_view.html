@@ -410,6 +410,11 @@ ul#graph-hover.f-dropdown{
           <li>
             <a href="{% url 'node_translation' group_name_tag node %} ">Translate</a>
           </li>
+            
+            <!-- Delete button if page created by user -->
+            {% if node.created_by == request.user.id %}
+      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+      {% endif %}
 
           <!--
             * This button Adds/Uploads New resource

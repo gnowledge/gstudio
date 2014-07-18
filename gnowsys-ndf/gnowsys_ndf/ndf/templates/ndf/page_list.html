@@ -113,10 +113,6 @@
   
       <a class="small button expand" href="{% url 'page_details' group_name_tag node %}">Page Details</a>
 
-      {% if node.created_by == request.user.id %}
-      <a class="button alert tiny" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
-      {% endif %}
-
       {% group_type_info groupid request.user as grouptype %}
       {% if grouptype == "Moderated" %}
       {% if node.status == "DRAFT" %}
