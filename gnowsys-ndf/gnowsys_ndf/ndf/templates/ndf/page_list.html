@@ -106,9 +106,8 @@
              
               <a href="{% url 'page_details' group_name_tag node %}">
       <header>
-        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
         <h6>
-          {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+          {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
         </h6>
       </header>
       

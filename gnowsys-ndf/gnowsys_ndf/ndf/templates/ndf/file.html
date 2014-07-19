@@ -118,50 +118,34 @@
 
       {% for file in files %}      
       {% get_grid_fs_object file as grid_fs_obj %}
+        
       <li class="card">
-        <div class="file">
+        <div class="file" style="background-image:url('{% url 'getFileThumbnail' group_name_tag file %}');">
 	  
-          <header>
-            <div class="label-list">
-            {% for tag in file.tags|slice:":3" %}
+            <div class="label-list">{% for tag in file.tags|slice:":3" %}
               <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-            {% endfor %}
-            </div>
-
-            <div class="th">
-            <a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
-              <!--<img src="/static/ndf/scss/themes/metastudio/logo.svg">-->
-              <img src="{% url 'getFileThumbnail' group_name_tag file %}">
-            </a>
-            </div>
-      
-            <h4>{{file.name|truncatechars:20}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}
-            <div>
-            <small class="subheader">
-              {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
-              <br/>
-              by <a class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</a> 
-            </small>
-            </div>
-            </h4>
+            {% endfor %}</div>
+            
+            <a href ="{% url 'file_detail' group_name_tag file %}">
+          <header>
+            
+            <h6>{{file.name}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}
+           
+            </h6>
           </header>
 
           <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-          <a class="button expand" href ="{% url 'file_detail' group_name_tag file %}">View details</a>
-
-          {% get_user_object file.created_by as user_obj %}
-          {% ifequal  user_obj.username  user.username  %}
-	  {% comment %}
-          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
-	  {% endcomment %}
-          {% endifequal %}
-	  
-          <footer class="row">
-            <div class="small-6 columns">{{file.mime_type|truncatechars:15}}</div>
-            <div class="small-6 columns"><div class="right"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div></div>
+          <footer>
+               <div class="age">
+              {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
+              <br/>
+              by <span class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+            </div>
+            <span>{{file.mime_type|truncatechars:15}}</span>
+            <span class="right"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</span>
           </footer>
-	  
+	  </a>
         </div>
       </li>
 
