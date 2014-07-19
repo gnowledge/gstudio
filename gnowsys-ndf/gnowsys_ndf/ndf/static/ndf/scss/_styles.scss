@@ -178,6 +178,9 @@ a#toggle-shelf i{
     &:hover{
 	border-style:solid;
 	opacity:1;
+        i{
+            opacity:1;
+        }
         footer .age{
             display: block;
         }
@@ -199,6 +202,7 @@ a#toggle-shelf i{
     }
     p{
         color: #555;
+        height: 50px;
     }
     .th{
         margin:20px auto;
@@ -224,12 +228,13 @@ a#toggle-shelf i{
     footer{
         font-size: 70%;
         opacity:0.5;
+        margin-bottom: 5px;
             .age{
                 display: none;
                 position: absolute;
                 background: white;
                 z-index: 100;
-                bottom: 2px;
+                bottom: 5px;
                 width: 100%;
             }
         }
