@@ -1,0 +1,75 @@
+{% load ndf_tags %}
+
+
+<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> 
+<link href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css" rel="stylesheet">
+
+
+<script type="text/javascript">
+var selected=""
+$(document).on('click','.rate',function(){
+selected=$('input[name=rating]:checked').val();
+});
+
+$(document).on('click',"#rate_submit",function() {
+surl="/{{node}}/ratings/add_ratings/"
+var nodeid=$("#noderate").val();
+$.ajax({
+        url: surl,
+        type: 'POST',
+        data: {rating:selected,node:nodeid,csrfmiddlewaretoken: '{{ csrf_token }}'},
+        beforeSend: function() {
+              $("#ajax_load_image").show();
+              $("#content").css({"opacity":"0.1",})
+                              },
+       success: function(data){
+                          
+                       $("#ratings_div").html(data)          
+                             },
+        complete: function(){
+                $("#ajax_load_image").hide();
+                $("#content").css({"opacity":"",})
+          }
+}); 
+});
+
+
+</script>
+
+<div id="ratings_div">
+{% get_node_ratings node as ratings %}
+{% if ratings %}
+{% for key,val in ratings.items %}
+{% ifequal key 'avg' %}
+Average rating :{{val}} 
+{% else %}
+<br/>
+<br/>
+Total Number of votes:{{val}}  
+{% endifequal %}
+{% endfor %}
+{% else %}
+No ratings yet !!
+{% endif %}
+{% if user.is_authenticated %}
+<br/><br/>
+<!-- <img class="rate {split:2}" title="bad" alt="1" src="/static/ndf/images/star-off.png"> -->
+<!-- <img class="rate {split:2}" title="bad" alt="2" src="/static/ndf/images/star-off.png"> -->
+<!-- <img class="rate {split:2}" title="bad" alt="3" src="/static/ndf/images/star-off.png"> -->
+<!-- <img class="rate {split:2}" title="bad" alt="4" src="/static/ndf/images/star-off.png"> -->
+<!-- <img class="rate {split:2}" title="bad" alt="5" src="/static/ndf/images/star-off.png"> -->
+<input name="rating" class="rate" type="radio" value="1">
+&nbsp;
+<input name="rating" class="rate" type="radio" value="2">
+&nbsp;
+<input name="rating" class="rate" type="radio" value="3">
+&nbsp;
+<input name="rating" class="rate" type="radio" value="4">
+&nbsp;
+<input name="rating" class="rate" type="radio" value="5">
+
+</br>
+<input type="hidden" id="noderate" value="{{node}}">
+<input class="button tiny" id="rate_submit" type="submit" value="Rate it!!!">
+{% endif %}
+</div>

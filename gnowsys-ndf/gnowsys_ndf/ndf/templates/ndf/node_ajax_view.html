@@ -153,7 +153,6 @@ ul#graph-hover.f-dropdown{
     <!--End container-->
   </div>
 </section>
-
 </header>
 
 <div class="row">
@@ -366,15 +365,15 @@ ul#graph-hover.f-dropdown{
         {% check_group node as is_group %}
         {% if is_group %}
         {% if user.is_superuser or node.created_by == user.id %}
-        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
         {% endif %}
 
         {% else %}
-        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now <span data-dropdown="edit-options"></span></a>
+        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
 
         {% endif %}    
 
-        <ul id="edit-options" class="f-dropdown">
+        <ul id="edit-options" data-dropdown-content class="f-dropdown">
 
           <!-- This button publishes the drafted resource -->
           {% if node %}
@@ -383,13 +382,13 @@ ul#graph-hover.f-dropdown{
             {% if is_group %}
             {% if user.is_superuser or node.created_by == user.id %}
             <li>
-              <a class="button small" href="{% url 'publish_group' group_name_tag node %}">Publish</a>
+              <a href="{% url 'publish_group' group_name_tag node %}">Publish</a>
             </li>
             {% endif %}
             
             {% else %}
             <li>
-              <a class="button small expand" href="{% url 'publish_page' group_name_tag node %}">Publish</a>
+              <a href="{% url 'publish_page' group_name_tag node %}">Publish</a>
             </li>
             
             {% endif %}
@@ -402,15 +401,20 @@ ul#graph-hover.f-dropdown{
           {% if node.collection_set and user.is_authenticated %}
             {% if user_access == "allow" %}
             <li>
-              <a class="button small expand" href="#" id="module">Make Module</a>
+              <a href="#" id="module">Make Module</a>
             </li>
             {% endif %}
           {% endif %}
 
           <!-- This button translates given resource -->
           <li>
-            <a class="button small expand" href="{% url 'node_translation' group_name_tag node %} ">Translate</a>
+            <a href="{% url 'node_translation' group_name_tag node %} ">Translate</a>
           </li>
+            
+            <!-- Delete button if page created by user -->
+            {% if node.created_by == request.user.id %}
+      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+      {% endif %}
 
           <!--
             * This button Adds/Uploads New resource
@@ -423,7 +427,7 @@ ul#graph-hover.f-dropdown{
           {% if is_group %}
             {% if request.user.is_superuser %}
             <li>
-              <a class="button small expand" href="{% url create_url group_name_tag %}">
+              <a href="{% url create_url group_name_tag %}">
                 <span class="fi-plus">&nbsp;&nbsp; New Group</span>
               </a>
             </li>
@@ -432,7 +436,7 @@ ul#graph-hover.f-dropdown{
           {% else %}
             {% if node.member_of_names_list.0 == "File" %}
             <li>
-              <a class="button small expand" href="{% url create_url group_name_tag %}?next={{request.path}}">
+              <a href="{% url create_url group_name_tag %}?next={{request.path}}">
                 <span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
               </a>
             </li>
@@ -441,13 +445,13 @@ ul#graph-hover.f-dropdown{
               {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
               
                 <li>
-                  <a class="button small expand" href="{% url create_url group_name_tag app_id %}">
+                  <a href="{% url create_url group_name_tag app_id %}">
                     <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
                   </a>
                 </li>
               {% else %}
                 <li>
-                  <a class="button small expand" href="{% url create_url group_name_tag %}">
+                  <a href="{% url create_url group_name_tag %}">
                     <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
                   </a>
                 </li>
@@ -480,6 +484,7 @@ ul#graph-hover.f-dropdown{
 </div>
 
 <footer>
+{% include "ndf/rating.html" %} 
   <p><small>
     <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>

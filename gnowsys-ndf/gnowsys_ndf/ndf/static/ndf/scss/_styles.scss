@@ -3,6 +3,7 @@
 *
 *   Use this stylesheet for placements, positioning and sizing of elements
 */
+
 @import url("css.css");
 
 
@@ -28,6 +29,7 @@
 			-webkit-box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
+            background: url($theme-path+$page-background) no-repeat 0 bottom;
             
             &:after{
             //Hack for setting div height to the height of the browser window
@@ -44,6 +46,8 @@
 			position: relative;
             margin: 0 2rem;
             color:#888;
+            min-height: 100px;
+            background-color: rgba(255,255,255,0.5);
             
             a{
 			color: #777;
@@ -87,9 +91,7 @@ main>aside a:hover{
 }
 
 h2:not(.subheader){
-	color: #222;
 	font-family: "Georgia Serif", Serif;
-	margin: 0;
 }
 h3{
 	font-size: 1.4rem;
@@ -129,8 +131,8 @@ a#toggle-shelf i{
 
 /* Effects */
 .drop-shadow{
-	-webkit-box-shadow: 2px 2px 4px 1px #333;
-	box-shadow: 2px 2px 4px 1px #333;
+	-webkit-box-shadow: 0px 0px 5px 1px #333;
+	box-shadow: 0px 0px 5px 1px #333;
 }
 .rounded{
 	border-radius: 2px;
@@ -152,31 +154,108 @@ a#toggle-shelf i{
 .card>*{
 	position: relative;
 	background-color: white;
-	margin:2px;
-	padding:10px;
-	border: 1px solid #eaeaea;
+	padding:7px;
+	border: 1px dashed $secondary-color;
 	display: block;
 	color:inherit!important;
-	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
-	box-shadow: 2px 2px 4px 1px #ddd;
-	opacity:0.8;
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
+	opacity:0.9;
+    
+    >a{
+        color:inherit;
+        display: block;
+        position: relative;
+        z-index: 200;
+    }
+    
+     &.published{
+        opacity: 1;
+        border-style: solid;
+        border-color: $primary-color;
+    }
+    &.unapproved{
+        opacity: 1;
+        border-style: solid;
+        border-color: $alert-color;
+    }
 
     &:hover{
-	border: 1px solid #ddd;
+	border-style:solid;
 	opacity:1;
+        >a{
+            background-color: rgba(255,255,255,0.5);
+        }
+        i{
+            opacity:1;
+        }
+        footer .age{
+            display: block;
+        }
 }
     &>i{
 	position: absolute;
-	top: -12px;
-	right: 20px;
-	font-size: 4rem;
-	color:#eee;
+	top: -10px;
+	right: 10px;
+	font-size: 3rem;
+	color:#ddd;
 	opacity: 0.4;
 }
+    .preview{
+        float: left;
+        padding-right: 5px;
+        padding-top: 4px;
+    }
+    header{
+        overflow: hidden;
+    }
+    h6{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-bottom: 0;
+    }
+        .label{
+        opacity:0.5;
+    }
+    p{
+        color: #555;
+        height: 50px;
+        background-repeat: no-repeat;
+    }
+    .th{
+        margin:20px auto;
+        width:80px;
+        height: 80px;
+        overflow: hidden;
+        display: none;
+        &:hover{
+        width: 150px;
+        height: 150px;
+    }
+        img{
+        width: 100%;
+    }
+}
+    section{
+	background-color: #ddd;
+}
+    .button{
+	opacity:0.1;
+}
+    
+    footer{
+        margin-top: 1rem;
+        font-size: 70%;
+        opacity:0.8;
+        margin-bottom: 5px;
+        clear: both;
+            .age{
+                display: none;
+                position: absolute;
+                background-color: white;
+                z-index: 100;
+                bottom: 0;
+                width: 100%;
+            }
+        }
 }
 
 /* Create card */
@@ -236,43 +315,7 @@ dd a{
 .card>:hover .label{
 	opacity:1;
 }
-.card{
-    
-    header{
-        margin-bottom: 0;
-    }
-        .label{
-        opacity:0.5;
-    }
-    h4{
-        font-weight: bold;
-        font-size: 1rem;
-    }
-    p{
-        font-size: 0.9rem;
-    }
-    .th{
-        margin:20px auto;
-        width:80px;
-        height: 80px;
-        overflow: hidden;
-        display: none;
-        &:hover{
-        width: 150px;
-        height: 150px;
-    }
-        img{
-        width: 100%;
-    }
-}
-    section{
-	background-color: #ddd;
-}
-    .button{
-	opacity:0.1;
-}
-    
-}
+
 
 .gallery .card .th{
 	display: block;
@@ -287,21 +330,25 @@ dd a{
 }
 
 /* Inline label list */
-.label{
-	font-weight: bold;
-	color: orange;
-	background-color: inherit;border: 1px dotted orange;
-	display: inline-block;
-    &:hover{
-	background-color: orange;
-	color:white;
-}
-
-}
 
 .label-list{
 	display: inline-block;
 	text-align: left;
+    margin-bottom: 0.1rem;
+    &:empty:before{
+        content:"UNTAGGED";
+        @extend .label;
+        opacity:0.2!important;
+    padding: 2px;
+    }
+    
+    .label{
+    text-transform: uppercase;
+    //background-color: $info-color;
+    padding: 2px;
+
+}
+    
 }
 
 
@@ -338,11 +385,11 @@ article{
 	margin-top: 0.5rem;
 	padding-bottom: 4rem; 
 	background-color: white;
-    header{
+    &>header{
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 1rem!important;
 }
-    footer{
+    &>footer{
 	border-top: 1px dotted #ddd;
 }
     .breadcrumbs{

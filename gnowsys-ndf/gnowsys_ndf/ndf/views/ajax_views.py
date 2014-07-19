@@ -33,7 +33,7 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.org2any import org2html
-import json
+
  
 db = get_database()
 gs_collection = db[GSystem.collection_name]
@@ -780,7 +780,7 @@ def graph_nodes(request, group_id):
                       "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
-                      "property_order", "rating", "apps_list", "annotations"
+                      "property_order", "rating", "apps_list", "annotations", "instance of"
                     ]
 
   # username = User.objects.get(id=page_node.created_by).username
@@ -835,8 +835,8 @@ def graph_nodes(request, group_id):
 
           else:
 
-            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + unicode(each) + '", "_id":"'+ unicode(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ unicode(each) +'_n"},'
             i += 1
     
     else:
