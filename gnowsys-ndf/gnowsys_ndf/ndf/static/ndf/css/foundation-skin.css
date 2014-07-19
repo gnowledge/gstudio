@@ -8451,59 +8451,59 @@ article .tabs dd a:hover {
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 359, ../scss/_styles.scss */
+/* line 358, ../scss/_styles.scss */
 main aside {
   padding-top: 1rem;
 }
-/* line 361, ../scss/_styles.scss */
+/* line 360, ../scss/_styles.scss */
 main aside.fade {
   opacity: 0.8;
 }
 
-/* line 367, ../scss/_styles.scss */
+/* line 366, ../scss/_styles.scss */
 aside > section {
   margin: inherit !important;
   margin-bottom: 5px;
   padding-bottom: 3rem;
 }
-/* line 371, ../scss/_styles.scss */
+/* line 370, ../scss/_styles.scss */
 aside > section > div {
   padding: 15px;
 }
 
-/* line 377, ../scss/_styles.scss */
+/* line 376, ../scss/_styles.scss */
 aside .meta i {
   color: #ccc;
 }
 
-/* line 378, ../scss/_styles.scss */
+/* line 377, ../scss/_styles.scss */
 aside:hover .meta i {
   color: black;
 }
 
 /* Content area */
-/* line 384, ../scss/_styles.scss */
+/* line 383, ../scss/_styles.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
   background-color: white;
 }
-/* line 388, ../scss/_styles.scss */
+/* line 387, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 392, ../scss/_styles.scss */
+/* line 391, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 395, ../scss/_styles.scss */
+/* line 394, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 404, ../scss/_styles.scss */
+/* line 403, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8524,22 +8524,22 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 424, ../scss/_styles.scss */
+/* line 423, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 429, ../scss/_styles.scss */
+/* line 428, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 432, ../scss/_styles.scss */
+/* line 431, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 435, ../scss/_styles.scss */
+/* line 434, ../scss/_styles.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -8548,65 +8548,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 442, ../scss/_styles.scss */
+/* line 441, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 446, ../scss/_styles.scss */
+/* line 445, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 450, ../scss/_styles.scss */
+/* line 449, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 453, ../scss/_styles.scss */
+/* line 452, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 458, ../scss/_styles.scss */
+/* line 457, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 463, ../scss/_styles.scss */
+/* line 462, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 466, ../scss/_styles.scss */
+/* line 465, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 469, ../scss/_styles.scss */
+/* line 468, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 476, ../scss/_styles.scss */
+/* line 475, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 481, ../scss/_styles.scss */
+/* line 480, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 488, ../scss/_styles.scss */
+/* line 487, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8614,13 +8614,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 495, ../scss/_styles.scss */
+/* line 494, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 500, ../scss/_styles.scss */
+/* line 499, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8634,13 +8634,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 510, ../scss/_styles.scss */
+/* line 509, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 515, ../scss/_styles.scss */
+/* line 514, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8651,7 +8651,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 526, ../scss/_styles.scss */
+/* line 525, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8663,12 +8663,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 538, ../scss/_styles.scss */
+/* line 537, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 541, ../scss/_styles.scss */
+/* line 540, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }
