@@ -154,14 +154,18 @@ a#toggle-shelf i{
 .card>*{
 	position: relative;
 	background-color: white;
-	padding:0 7px;
+	padding:7px;
 	border: 1px dashed $secondary-color;
 	display: block;
 	color:inherit!important;
 	opacity:0.9;
+    background-position: center center;
     
-    a{
+    >a{
         color:inherit;
+        display: block;
+        position: relative;
+        z-index: 200;
     }
     
      &.published{
@@ -178,6 +182,12 @@ a#toggle-shelf i{
     &:hover{
 	border-style:solid;
 	opacity:1;
+        >a{
+            background-color: rgba(255,255,255,0.5);
+        }
+        i{
+            opacity:1;
+        }
         footer .age{
             display: block;
         }
@@ -192,13 +202,14 @@ a#toggle-shelf i{
 }
     
     header{
-        margin-bottom: 0;
+        margin-top: 0.5rem;
     }
         .label{
         opacity:0.5;
     }
     p{
         color: #555;
+        height: 50px;
     }
     .th{
         margin:20px auto;
@@ -224,12 +235,13 @@ a#toggle-shelf i{
     footer{
         font-size: 70%;
         opacity:0.5;
+        margin-bottom: 5px;
             .age{
                 display: none;
-                position: absolute;
+                position: relative;
                 background: white;
                 z-index: 100;
-                bottom: 2px;
+                bottom: 0;
                 width: 100%;
             }
         }
@@ -307,12 +319,6 @@ dd a{
 }
 
 /* Inline label list */
-span.label{
-    text-transform: uppercase;
-    background-color: white;
-    padding: 0;
-
-}
 
 .label-list{
 	display: inline-block;
@@ -320,10 +326,17 @@ span.label{
     &:empty:before{
         content:"UNTAGGED";
         @extend .label;
-        background-color: white;
         opacity:0.2!important;
-    padding: 0;
+    padding: 2px;
     }
+    
+    .label{
+    text-transform: uppercase;
+    //background-color: $info-color;
+    padding: 2px;
+
+}
+    
 }
 
 
