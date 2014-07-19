@@ -203,6 +203,11 @@ a#toggle-shelf i{
     
     header{
         margin-top: 0.5rem;
+        overflow: hidden;
+    }
+    h6{
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
         .label{
         opacity:0.5;

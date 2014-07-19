@@ -8288,17 +8288,23 @@ a#toggle-shelf i {
 /* line 204, ../scss/_styles.scss */
 .card > * header {
   margin-top: 0.5rem;
+  overflow: hidden;
 }
-/* line 207, ../scss/_styles.scss */
+/* line 208, ../scss/_styles.scss */
+.card > * h6 {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* line 212, ../scss/_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 210, ../scss/_styles.scss */
+/* line 215, ../scss/_styles.scss */
 .card > * p {
   color: #555;
   height: 50px;
 }
-/* line 214, ../scss/_styles.scss */
+/* line 219, ../scss/_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -8306,30 +8312,30 @@ a#toggle-shelf i {
   overflow: hidden;
   display: none;
 }
-/* line 220, ../scss/_styles.scss */
+/* line 225, ../scss/_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 224, ../scss/_styles.scss */
+/* line 229, ../scss/_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 228, ../scss/_styles.scss */
+/* line 233, ../scss/_styles.scss */
 .card > * section {
   background-color: #ddd;
 }
-/* line 231, ../scss/_styles.scss */
+/* line 236, ../scss/_styles.scss */
 .card > * .button {
   opacity: 0.1;
 }
-/* line 235, ../scss/_styles.scss */
+/* line 240, ../scss/_styles.scss */
 .card > * footer {
   font-size: 70%;
   opacity: 0.5;
   margin-bottom: 5px;
 }
-/* line 239, ../scss/_styles.scss */
+/* line 244, ../scss/_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -8340,75 +8346,75 @@ a#toggle-shelf i {
 }
 
 /* Create card */
-/* line 251, ../scss/_styles.scss */
+/* line 256, ../scss/_styles.scss */
 .create.card > * {
   background-color: #999;
   opacity: 1;
 }
-/* line 255, ../scss/_styles.scss */
+/* line 260, ../scss/_styles.scss */
 .create.card > *:hover {
   background-color: #008759;
 }
 
-/* line 261, ../scss/_styles.scss */
+/* line 266, ../scss/_styles.scss */
 .create.card h4 {
   color: white;
 }
-/* line 264, ../scss/_styles.scss */
+/* line 269, ../scss/_styles.scss */
 .create.card .button {
   border: 1px solid #00ba7b;
   opacity: 0.5;
 }
-/* line 268, ../scss/_styles.scss */
+/* line 273, ../scss/_styles.scss */
 .create.card label {
   color: white;
 }
-/* line 271, ../scss/_styles.scss */
+/* line 276, ../scss/_styles.scss */
 .create.card .switch label {
   color: inherit;
 }
 
 /* Content Tabs */
-/* line 279, ../scss/_styles.scss */
+/* line 284, ../scss/_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
-/* line 283, ../scss/_styles.scss */
+/* line 288, ../scss/_styles.scss */
 article .tabs dd.active a {
   color: #222;
   background-color: inherit;
 }
-/* line 287, ../scss/_styles.scss */
+/* line 292, ../scss/_styles.scss */
 article .tabs dd a {
   color: #aaa;
   background-color: inherit;
   padding: 0.5rem;
   padding-left: 1rem;
 }
-/* line 292, ../scss/_styles.scss */
+/* line 297, ../scss/_styles.scss */
 article .tabs dd a:hover {
   background-color: inherit;
   color: #999;
 }
 
-/* line 299, ../scss/_styles.scss */
+/* line 304, ../scss/_styles.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
 /* Default card */
-/* line 304, ../scss/_styles.scss */
+/* line 309, ../scss/_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 309, ../scss/_styles.scss */
+/* line 314, ../scss/_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
-/* line 313, ../scss/_styles.scss */
+/* line 318, ../scss/_styles.scss */
 .card > *:hover .button {
   opacity: 1;
   transition: opacity .5s ease-in ease-in;
@@ -8418,77 +8424,77 @@ article .tabs dd a:hover {
 }
 
 /* Inline label list */
-/* line 323, ../scss/_styles.scss */
+/* line 328, ../scss/_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
 }
-/* line 326, ../scss/_styles.scss */
+/* line 331, ../scss/_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
 }
-/* line 333, ../scss/_styles.scss */
+/* line 338, ../scss/_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   padding: 2px;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 347, ../scss/_styles.scss */
+/* line 352, ../scss/_styles.scss */
 main aside {
   padding-top: 1rem;
 }
-/* line 349, ../scss/_styles.scss */
+/* line 354, ../scss/_styles.scss */
 main aside.fade {
   opacity: 0.8;
 }
 
-/* line 355, ../scss/_styles.scss */
+/* line 360, ../scss/_styles.scss */
 aside > section {
   margin: inherit !important;
   margin-bottom: 5px;
   padding-bottom: 3rem;
 }
-/* line 359, ../scss/_styles.scss */
+/* line 364, ../scss/_styles.scss */
 aside > section > div {
   padding: 15px;
 }
 
-/* line 365, ../scss/_styles.scss */
+/* line 370, ../scss/_styles.scss */
 aside .meta i {
   color: #ccc;
 }
 
-/* line 366, ../scss/_styles.scss */
+/* line 371, ../scss/_styles.scss */
 aside:hover .meta i {
   color: black;
 }
 
 /* Content area */
-/* line 372, ../scss/_styles.scss */
+/* line 377, ../scss/_styles.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
   background-color: white;
 }
-/* line 376, ../scss/_styles.scss */
+/* line 381, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 380, ../scss/_styles.scss */
+/* line 385, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 383, ../scss/_styles.scss */
+/* line 388, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 392, ../scss/_styles.scss */
+/* line 397, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8509,22 +8515,22 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 412, ../scss/_styles.scss */
+/* line 417, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 417, ../scss/_styles.scss */
+/* line 422, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 420, ../scss/_styles.scss */
+/* line 425, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 423, ../scss/_styles.scss */
+/* line 428, ../scss/_styles.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -8533,65 +8539,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 430, ../scss/_styles.scss */
+/* line 435, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 434, ../scss/_styles.scss */
+/* line 439, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 438, ../scss/_styles.scss */
+/* line 443, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 441, ../scss/_styles.scss */
+/* line 446, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 446, ../scss/_styles.scss */
+/* line 451, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 451, ../scss/_styles.scss */
+/* line 456, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 454, ../scss/_styles.scss */
+/* line 459, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 457, ../scss/_styles.scss */
+/* line 462, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 464, ../scss/_styles.scss */
+/* line 469, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 469, ../scss/_styles.scss */
+/* line 474, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 476, ../scss/_styles.scss */
+/* line 481, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8599,13 +8605,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 483, ../scss/_styles.scss */
+/* line 488, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 488, ../scss/_styles.scss */
+/* line 493, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8619,13 +8625,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 498, ../scss/_styles.scss */
+/* line 503, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 503, ../scss/_styles.scss */
+/* line 508, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8636,7 +8642,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 514, ../scss/_styles.scss */
+/* line 519, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8648,12 +8654,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 526, ../scss/_styles.scss */
+/* line 531, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 529, ../scss/_styles.scss */
+/* line 534, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }
