@@ -1,6 +1,4 @@
 from django.conf.urls import patterns, url
-print "\ninside Bib_App url"
-
 urlpatterns = patterns('gnowsys_ndf.ndf.views.Bib_App',
                        url(r'^$', 'Bib_App', name='Bib_App'),
                        url(r'^/create_entries$','create_entries',name='create_entries'),
