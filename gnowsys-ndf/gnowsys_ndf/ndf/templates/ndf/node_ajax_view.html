@@ -160,8 +160,7 @@ ul#graph-hover.f-dropdown{
     <div class="tabs-content">
 
       <!-- Tab content -->
-      <div id="commentable-area">
-      <div class="content active commentable-section" id="view-page" data-section-id="1">
+      <div class="content active" id="view-page">
 
         {% if node.prior_node|length > 0 %}
         <div class="panel">
@@ -283,14 +282,15 @@ ul#graph-hover.f-dropdown{
           {% endfor %}
         {% endfor %}
 
-        
-      	{% with node.html_content|safe as description %}
-      	{% if description != "None" %}
-      	{{ description }}
-      	{% endif %}
-      	{% endwith %}
-
-      </div>
+        <div id = "commentable-area">
+          <div class = "commentable-section"  data-section-id="1">        
+          	{% with node.html_content|safe as description %}
+          	{% if description != "None" %}
+          	{{ description }}
+          	{% endif %}
+          	{% endwith %}
+          </div>    
+        </div>
       </div>
 
       <!-- Content for Concept Graph -->
