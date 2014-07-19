@@ -118,41 +118,38 @@ ul#graph-hover.f-dropdown{
 
     </small>      
   </h2>
-
   <div class="row">
-    <div class="small-10 columns"> 
-      <dl class="row tabs" data-tab>
-        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+      <div class="small-10 columns">  
+          <dl class="row tabs" data-tab>
+                <dd class="active"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
-        <dd class="{% if topic %}active{% endif %}">
-            <a href="#view-graph" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
-                <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-                    <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>
-                    {% if node.collection_set %}
-                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
-                    {% endif %}
-          
-                    {% if node.prior_node %}
-                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
-                    {% endif %}
-                </ul>
-        </dd>
+                <dd>
+                    <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+                        <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
+                            <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
+                            {% if node.collection_set %}
+                            <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+                            {% endif %}
+                            {% if node.prior_node %}
+                            <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+                            {% endif %}
+                        </ul>
+                </dd>
 
-        <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+                <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
-        <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
-      </dl>
-    </div>
-    
-    <!-- Container for enabling/disabling annotation mode -->
-    <div class="small-2 columns">          
-      <div id = "toggleContainer" style="cursor: pointer; color: green;" onClick="toggle(this);">
-        <i class="fi-comments annotateIcon"></i> Annotate
+                <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+          </dl>
       </div>
-    </div>
-    <!--End container-->
+      <!-- Container for enabling/disabling annotation mode -->
+      <div class="small-2 columns">          
+          <div id = "toggleContainer" style="cursor: pointer; color: green;" onClick="toggle(this);">
+            <i class="fi-comments annotateIcon"></i> Annotate
+          </div>
+      </div>
+      <!--End container-->
   </div>
-</section>
+  </section>
 
 </header>
 
@@ -163,7 +160,9 @@ ul#graph-hover.f-dropdown{
     <div class="tabs-content">
 
       <!-- Tab content -->
-      <div class="content {% if not topic %}active commentable-section {% endif %}" id="view-page" data-section-id="1">
+      <div id="commentable-area">
+      <div class="content active commentable-section" id="view-page" data-section-id="1">
+
         {% if node.prior_node|length > 0 %}
         <div class="panel">
           <h6>You may want to read these first:</h6>
@@ -186,18 +185,18 @@ ul#graph-hover.f-dropdown{
           {% if 'Pandora_video' in node.member_of_names_list %}
           <div>
            
-      <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+	    <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
               <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
               Your browser does not support the video tag.
             </video><br/><br/>
 
-      {% get_pandoravideo_metadata video_obj as metadata %}
-      {% for k,v in metadata.items %} 
+	    {% get_pandoravideo_metadata video_obj as metadata %}
+	    {% for k,v in metadata.items %} 
             {% if k != "cuts" %}
-      <h3>{{k}} : {{v}}<h3>
-    <br/>
-    {% endif %}
-      {% endfor %}
+	    <h3>{{k}} : {{v}}<h3>
+		<br/>
+		{% endif %}
+	    {% endfor %}
             {% if user.is_authenticated %}
             <br/>
             <br/>
@@ -223,8 +222,8 @@ ul#graph-hover.f-dropdown{
             </a>
             {% endif %}
           </div>
-    
-          {% else %}    
+	  
+          {% else %}		
           <div>
             {% if 'image' in node.mime_type %}
             <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
@@ -245,9 +244,9 @@ ul#graph-hover.f-dropdown{
             </a>
             {% endif %}
           </div>
-    
+	  
           {% endif %}
-    
+	  
         {% endif %}
         
         {% block add_fields %} {% endblock %}
@@ -283,30 +282,25 @@ ul#graph-hover.f-dropdown{
           <br>
           {% endfor %}
         {% endfor %}
-       
-      <div id="commentable-area">
-        {% with node.html_content|safe as description %}
-        {% if description != "None" %}
-        {{ description }}
-        {% endif %}
-        {% endwith %}
-      </div>
+
+        
+      	{% with node.html_content|safe as description %}
+      	{% if description != "None" %}
+      	{{ description }}
+      	{% endif %}
+      	{% endwith %}
 
       </div>
-
-      <!-- Div included for setting default landing page for topic as an concept graph -->
-      {% if topic %}
-        <div class="content active" id="view-graph">
-        </div>
-      {% endif %}
+      </div>
 
       <!-- Content for Concept Graph -->
       <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
-        <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
+        <a class="close-reveal-modal">&#215;</a>
         {% include "ndf/graph_concept.html" %}
       </div>
       
       <!-- Content for Collection Graph -->
+      
       {% if node.collection_set %}
         <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
         	<a class="close-reveal-modal">&#215;</a>
@@ -315,7 +309,9 @@ ul#graph-hover.f-dropdown{
       {% endif %}
 
       <!-- Content for dependency Graph -->
+      
       {% if node.prior_node %}
+      
         <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
          <a class="close-reveal-modal">&#215;</a>
          {% include "ndf/graph_dependency.html" %}
@@ -487,27 +483,6 @@ ul#graph-hover.f-dropdown{
 
 <script type="text/javascript">
 
-  // Taken value of svg data of that node globally
-  var svgdata;
-  $(document).ready(function() {
-      $(function() {
-        // For topic node landing page concept svg graph
-        svgdata = $('#chart-concept svg');
-        $('#view-graph').append(svgdata);
-      });
-  });
-
-  // on click of concept 
-  $(document).on('click','#clickConceptGraph',function(){
-    $('#view-concept-graph #chart-concept').append(svgdata); 
-    $('#view-concept-graph').foundation('reveal', 'open'); 
-  });
-
-  $(document).on('close', '#view-concept-graph[data-reveal]', function () {
-    $('#view-graph').append(svgdata);
-  })
-  
-
   $(document).on('open', '#view-map-widget[data-reveal]', function () {  
     
     $.ajax({
@@ -576,7 +551,9 @@ ul#graph-hover.f-dropdown{
 /*
 For annotation based discussions:
 */
-var annotations = "{{ annotations | safe}}";
+
+var annotations = '{{ annotations | safe }}';
+annotations = jQuery.parseJSON(annotations);
 var currentUser = null;
 var  existingComments = [];
 var SideComments = require('side-comments');
@@ -633,7 +610,7 @@ win.Selector.mouseup = function(e)
       st = st.trim();
   } 
   
-  console.log("stout: " + st)
+  //console.log("stout: " + st)
   st = st.trim();
   if (st)
   {
@@ -652,7 +629,7 @@ win.Selector.mouseup = function(e)
             //if discussion mode is not enabled, show annotate icon. 
             if (st != prevSel) 
             {
-                console.log("show menu");
+                //console.log("show menu");
                 $('#moving_div').css({
                    left:  e.pageX - 320,
                    top:   e.pageY - 60,
@@ -661,7 +638,7 @@ win.Selector.mouseup = function(e)
             }
             else 
             {
-                console.log("hide menu");
+                //console.log("hide menu");
                 $('#moving_div').css({
                      display: "none"
                 });
@@ -671,7 +648,7 @@ win.Selector.mouseup = function(e)
   }
   else
   {
-            console.log("hide menu");
+            //console.log("hide menu");
             $('#moving_div').css({
                  display: "none"
             });
@@ -683,7 +660,7 @@ function switchMode()
 {
     /*To switch to annotate mode when some text is selected*/
     toggle(document.getElementById("toggleContainer"));
-    console.log("st inside switchMode: " + st);
+    //console.log("st inside switchMode: " + st);
     highlightSearchTerms(st);
     existingComments = [];
     sideComments = new SideComments('#commentable-area', currentUser, existingComments);
@@ -707,15 +684,10 @@ function expand(range)
     }
 }
 
-// $(document).ready(function(){
-//   initialText = $("#content").html();
-//   $("#content").bind("mouseup", win.Selector.mouseup);
-
-//   // For topic node landing page concept svg graph
-//   svgdata = $('#chart-concept svg');
-//   alert(svgdata)
-//   $('#view-graph').append(svgdata);
-// });
+$(document).ready (function(){
+  initialText = $("#content").html();
+  $("#content").bind("mouseup", win.Selector.mouseup);
+});
 
 {% if user.is_authenticated %}
   currentUser=
@@ -749,7 +721,7 @@ sideComments.on('commentPosted', function( comment )
               // Once the comment is saved, insert the comment into the comment stream with "insertComment(comment)".
               //highlight this selection
               //update the local annotations variable
-              console.log("Inside success: Comment added!");
+              //console.log("Inside success: Comment added!");
               sideComments.insertComment(comment);
               highlightSearchTerms(st);
               annotations = jQuery.parseJSON(updatedAnnotationsField);
@@ -789,13 +761,13 @@ function showThread(elem)
   text = $(elem).text();
   existingComments = [];
   st = String(text);
-  console.log("You clicked on: " + st);
+ // console.log("You clicked on: " + st);
   for (i = 0; i < annotations.length; i++)
   {
       if(String(text).toLowerCase() == annotations[i].selectedText.toLowerCase())
       {
         existingComments.push(annotations[i]);
-        console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
+        //console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
         sideComments = new SideComments('#commentable-area', currentUser, existingComments); 
         break;
       }
@@ -821,7 +793,7 @@ function showThread(elem)
  */
 function high(bodyText, searchText)
 {
-  highlightStartTag = "<span class = 'annotatedElement' onclick = 'if(event.stopPropagation){event.stopPropagation();}else if(window.event){event.cancelBubble=true;} showThread(this);  '>";
+  highlightStartTag = "<span class = 'annotatedElement' onclick = 'if(event.stopPropagation){event.stopPropagation();} else if(window.event) {event.cancelBubble=true;} showThread(this);  '>";
   highlightEndTag = "</span>";
   var newText = "";
   i = -1;
@@ -959,7 +931,7 @@ function highlightAll()
 */
 function toggle(el)
 {
-  console.log("toggleClass at beginning: " + toggleValue);
+  //console.log("toggleClass at beginning: " + toggleValue);
   if (toggleValue == 1)
    {
          //Disable annotations
@@ -974,14 +946,14 @@ function toggle(el)
         $(".side-comment").show();
         highlightAll(); 
         el.innerHTML = '<i class="fi-clipboard-pencil annotateIcon"></i> Annotate';
-        console.log("hide menu");
+        //console.log("hide menu");
         $('#moving_div').css({
              display: "none"
         });
   }
 
   toggleValue *= -1;
-  console.log("toggleClass at end: " + toggleValue);
+ // console.log("toggleClass at end: " + toggleValue);
 }
 
 function getPosition(element) {
