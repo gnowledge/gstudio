@@ -8332,7 +8332,7 @@ a#toggle-shelf i {
 /* line 239, ../scss/_styles.scss */
 .card > * footer .age {
   display: none;
-  position: relative;
+  position: absolute;
   background: white;
   z-index: 100;
   bottom: 0;
