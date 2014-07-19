@@ -85,8 +85,9 @@ def group(request, group_id, app_id=None):
                                             {'name': {'$regex': search_field, '$options': 'i'}},
                                             {'$or': [
                                               {'created_by': request.user.id}, 
-                                              {'group_type': 'PUBLIC'}, 
-                                              {'author_set': request.user.id}
+                                              {'group_admin': request.user.id},
+                                              {'author_set': request.user.id},
+                                              {'group_type': 'PUBLIC'} 
                                               ]
                                             }                                  
                                           ]
@@ -95,8 +96,9 @@ def group(request, group_id, app_id=None):
                                             {'tags': {'$regex':search_field, '$options': 'i'}},
                                             {'$or': [
                                               {'created_by': request.user.id}, 
-                                              {'group_type': 'PUBLIC'}, 
-                                              {'author_set': request.user.id}
+                                              {'group_admin': request.user.id},
+                                              {'author_set': request.user.id},
+                                              {'group_type': 'PUBLIC'} 
                                               ]
                                             }                                  
                                           ]
@@ -144,7 +146,7 @@ def group(request, group_id, app_id=None):
       cur_groups_user = collection.Node.find({'_type': "Group", 
                                               '_id': {'$nin': [ObjectId(group_id), auth._id]},
                                               'name': {'$nin': ["home"]},
-                                              '$or': [{'created_by': request.user.id}, {'group_type': 'PUBLIC'}, {'author_set': request.user.id}]
+                                              '$or': [{'created_by': request.user.id}, {'author_set': request.user.id}, {'group_admin': request.user.id}, {'group_type': 'PUBLIC'}]
                                           }).sort('last_update', -1)
       if cur_groups_user.count():
         for group in cur_groups_user:

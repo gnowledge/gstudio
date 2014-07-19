@@ -561,7 +561,9 @@ def get_user_group(user, selected_group_name):
   group_list = []
   auth_group = None
 
-  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(9)
+  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 
+  									'$or': [{'group_admin': user.id}, {'author_set': user.id}],
+  								}).sort('last_update', -1).limit(9)
 
   auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
@@ -691,18 +693,29 @@ def get_create_url(groupid):
 def get_group_type(group_id, user):
 
 	try:
-		col_Group = db[Group.collection_name]
+		col_Group = db[Node.collection_name]
 
 		if group_id == '/home/':
-			colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+
 		else:  
-			gid = group_id.replace("/", "")
+			gid = ""
+			split_content = group_id.strip().split("/")
+
+			if split_content[0] != "":
+				gid = split_content[0]
+
+			else:
+				gid = split_content[1]
+
+			# gid = group_id.replace("/", "").strip()
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
 			else:
 				colg = col_Group.Group.find_one({'_type': 'Group', 'name': gid})
 				if colg :
 					pass
+
 				else:		
 					colg = None
   		
@@ -712,22 +725,24 @@ def get_group_type(group_id, user):
 			# Check is user is logged in
 			if  user.id:
 				# condition for group accesseble to logged user
-				if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
+				if colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
 					return "allowed"
 				else:
-					raise Http404	
+					error_message = "Access denied: You are not an authorized user!!!"
+					raise Http404(error_message)
 
 			else:
 				#condition for groups, accessible to not logged users
 				if colg.group_type == "PUBLIC":
 					return "allowed"
 				else:
-					raise Http404
+					error_message = "Access denied: You are not an authorized user!!!"
+					raise Http404(error_message)
 		else:
 			return "pass"
 
-	except Http404:
-		raise Http404
+	except Http404 as e:
+		raise Http404(e)
 		
 	except Exception as e:
 		print "Error in group_type_tag "+str(e)
@@ -1035,7 +1050,7 @@ def check_is_gstaff_for_gapp(groupid, app_dict, user):
   """
 
   try:
-    if app_dict["name"].lower() in ["mis", "mis-po"]:
+    if app_dict["name"].lower() in ["mis", "mis-po", "batch", "task"]:
       return check_is_gstaff(groupid, user)
 
     else:

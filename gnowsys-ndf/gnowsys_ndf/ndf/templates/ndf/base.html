@@ -63,7 +63,7 @@
 
       <ul class="title-area">
       	<li class="name">
-      	  <h1><a href="/home" accesskey="q"><img src="/static/ndf/scss/metastudio/logo.svg"> meta<b>Studio</b></a></h1>
+      	  <h1><a href="/home" accesskey="q"><img src="/static/ndf/scss/themes/metastudio/logo.svg"> meta<b>Studio</b></a></h1>
       	</li>
       	<li class="toggle-topbar menu-icon">
       	  <a href="#">Menu</a>
@@ -107,7 +107,7 @@
 
 	    <ul class="dropdown">
 	      <li class="text-center"><a href="{% url 'auth_password_change' %}">Change password</a></li>
-	      <li class="has-form"><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
+	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
 	    </ul>
 	  </li>
 
@@ -263,7 +263,7 @@
         </p>
         
         <p><small>
-        <a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio">File a bug</a>
+        <a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio/issues?state=open">Report an issue</a>
         </small></p>
       </div>
   </footer>
@@ -305,10 +305,6 @@
 		$(".card .page").prepend(function(){
 			/* Attaches icon for node type */
 			return "<i class='fi-page'></i>"
-		});
-		$(".card .file").prepend(function(){
-			/* Attaches icon for node type */
-			return "<i class='fi-play-video'></i>"
 		});
 
 		$("aside.page").prepend(function(){

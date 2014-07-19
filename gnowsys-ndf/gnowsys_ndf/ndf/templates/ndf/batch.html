@@ -124,7 +124,7 @@ if(txt_input <= 0)
         <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
         {% endfor %}
       </div>
-      <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+      <div class="th"><img src="/static/ndf/scss/themes/metastudio/logo.svg"></div>
       <h4>{{ node.name }} 
         <div>
           <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
