@@ -120,8 +120,7 @@
       {% get_grid_fs_object file as grid_fs_obj %}
         
       <li class="card">
-          http://b.thumbs.redditmedia.com/poo0kDTytLeSlE8c.jpg
-          {% url 'getFileThumbnail' group_name_tag file %}
+          
         <div class="file">
 	  
             <div class="label-list">{% for tag in file.tags|slice:":3" %}
@@ -134,7 +133,7 @@
             <h6>{{file.name}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h6>
               
           </header>
-<img class="preview" src='http://b.thumbs.redditmedia.com/poo0kDTytLeSlE8c.jpg') />
+<img class="preview" src="{% url 'getFileThumbnail' group_name_tag file %}" />
           <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
           <footer>
