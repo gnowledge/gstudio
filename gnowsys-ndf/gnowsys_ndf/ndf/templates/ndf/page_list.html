@@ -106,9 +106,9 @@
              
               <a href="{% url 'page_details' group_name_tag node %}">
       <header>
-        <h6>
+        <h5>
           {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-        </h6>
+        </h5>
       </header>
       
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>

@@ -9,7 +9,7 @@
 
 // Color Pallette
 $theme-color:#33C284 !default;
-$theme-color-invert:scale-color($theme-color, $lightness: -90%);
+$theme-color-invert:scale-color($theme-color, $lightness: -50%);
 
 
 //
@@ -18,11 +18,18 @@ $theme-color-invert:scale-color($theme-color, $lightness: -90%);
 
 // We use these as default colors throughout
 $primary-color: $theme-color;
-$secondary-color: rgb(220, 230, 223);
+$secondary-color: $color5;
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
- $warning-color: #f2bf8a;
- $info-color: #f5f5f5;
+ //$warning-color: #f2bf8a;
+ $info-color: #cc2a41;
+
+
+$base-color: #e7caa4;
+$aside-color:#524549;
+
+
+$meta-color:$secondary-color;
 
 
 
@@ -64,7 +71,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $total-columns: 5;
 
 // We use these to control various global styles
-// $body-bg: #fff;
+ //$body-bg: $base-color;
 // $body-font-color: #222;
  $body-font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
@@ -144,7 +151,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $header-font-family: $body-font-family;
 // $header-font-weight: 300;
 // $header-font-style: normal;
-// $header-font-color: #222;
+ $header-font-color: $primary-color;
 // $header-line-height: 1.4;
 // $header-top-margin: .2rem;
 // $header-bottom-margin: .5rem;

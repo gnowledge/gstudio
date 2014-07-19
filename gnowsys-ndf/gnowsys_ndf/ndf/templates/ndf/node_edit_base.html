@@ -34,6 +34,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 {% endblock %}
 
+{% block meta_content %}
+Test
+{% endblock %}
+
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">
@@ -86,7 +90,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
 
 			
-				<div class="privacy-mode switch round">
+				<div class="privacy-mode ">
 						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
 							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>

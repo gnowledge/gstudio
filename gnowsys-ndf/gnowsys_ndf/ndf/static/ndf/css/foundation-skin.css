@@ -7,7 +7,7 @@
 *   Metstudio Default Skin File
 */
 /*  Colors  */
-/*$theme-color:#33c284;*/
+/*$theme-color:#3b8050;*/
 /*
 *   _settings.scss - Metstudio style variables settings file
 */
@@ -1728,21 +1728,21 @@ select {
 }
 /* line 120, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.secondary {
-  background-color: #dce6df;
-  border-color: #b7ccbd;
-  color: #405947;
+  background-color: #468966;
+  border-color: #3c7658;
+  color: white;
 }
 /* line 121, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.warning {
-  background-color: #f2bf8a;
-  border-color: #eda55a;
-  color: #405947;
+  background-color: #f08a24;
+  border-color: #de770f;
+  color: white;
 }
 /* line 122, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.info {
-  background-color: whitesmoke;
-  border-color: lightgrey;
-  color: #405947;
+  background-color: #cc2a41;
+  border-color: #af2438;
+  color: white;
 }
 /* line 123, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.alert-close {
@@ -2288,8 +2288,8 @@ select {
   list-style: none;
   border-style: solid;
   border-width: 1px;
-  background-color: #eff4f1;
-  border-color: #d3e0d7;
+  background-color: #a5d1ba;
+  border-color: #8cc4a7;
   border-radius: 3px;
 }
 /* line 122, ../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
@@ -2387,17 +2387,17 @@ button:hover, button:focus, .button:hover, .button:focus {
 }
 /* line 193, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary, .button.secondary {
-  background-color: #dce6df;
-  border-color: #a8c1af;
-  color: #333333;
+  background-color: #468966;
+  border-color: #386e52;
+  color: white;
 }
 /* line 134, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
-  background-color: #a8c1af;
+  background-color: #386e52;
 }
-/* line 140, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
+/* line 145, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
-  color: #333333;
+  color: white;
 }
 /* line 194, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.success, .button.success {
@@ -2498,24 +2498,24 @@ button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[dis
 }
 /* line 209, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary, button[disabled].secondary, .button.disabled.secondary, .button[disabled].secondary {
-  background-color: #dce6df;
-  border-color: #a8c1af;
-  color: #333333;
+  background-color: #468966;
+  border-color: #386e52;
+  color: white;
   cursor: default;
   opacity: 0.7;
   box-shadow: none;
 }
 /* line 134, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  background-color: #a8c1af;
+  background-color: #386e52;
 }
-/* line 140, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
+/* line 145, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  color: #333333;
+  color: white;
 }
 /* line 155, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  background-color: #dce6df;
+  background-color: #468966;
 }
 /* line 210, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.success, button[disabled].success, .button.disabled.success, .button[disabled].success {
@@ -4253,7 +4253,7 @@ kbd {
   padding: 0.25rem 0.5rem 0.375rem;
   font-size: 0.6875rem;
   background-color: #3b8050;
-  color: whitesmoke;
+  color: #cc2a41;
 }
 /* line 96, ../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.radius, .radius.label-list:empty:before {
@@ -4266,17 +4266,17 @@ kbd {
 /* line 99, ../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.alert, .alert.label-list:empty:before {
   background-color: #f04124;
-  color: whitesmoke;
+  color: #cc2a41;
 }
 /* line 100, ../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.success, .success.label-list:empty:before {
   background-color: #43ac6a;
-  color: whitesmoke;
+  color: #cc2a41;
 }
 /* line 101, ../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.secondary, .secondary.label-list:empty:before {
-  background-color: #dce6df;
-  color: #333333;
+  background-color: #468966;
+  color: #cc2a41;
 }
 
 /* line 18, ../bower_components/foundation/scss/foundation/components/_magellan.scss */
@@ -4864,7 +4864,7 @@ ul.pagination li {
 }
 /* line 64, ../bower_components/foundation/scss/foundation/components/_progress-bars.scss */
 .progress.secondary .meter {
-  background: #dce6df;
+  background: #468966;
   height: 100%;
   display: block;
 }
@@ -4986,7 +4986,7 @@ ul.pagination li {
   display: inline-block;
   position: absolute;
   height: 0.875rem;
-  background: #d9e4dd;
+  background: #458865;
 }
 
 /* line 158, ../bower_components/foundation/scss/foundation/components/_range-slider.scss */
@@ -5894,7 +5894,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
-  color: #222222;
+  color: #3b8050;
   text-rendering: optimizeLegibility;
   margin-top: 0.2rem;
   margin-bottom: 0.5rem;
@@ -5903,7 +5903,7 @@ h1, h2, h3, h4, h5, h6 {
 /* line 257, ../bower_components/foundation/scss/foundation/components/_type.scss */
 h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
   font-size: 60%;
-  color: #6f6f6f;
+  color: #6fbd87;
   line-height: 0;
 }
 
@@ -5940,7 +5940,7 @@ h6 {
 /* line 271, ../bower_components/foundation/scss/foundation/components/_type.scss */
 .subheader {
   line-height: 1.4;
-  color: #6f6f6f;
+  color: #6fbd87;
   font-weight: normal;
   margin-top: 0.2rem;
   margin-bottom: 0.5rem;
@@ -6092,7 +6092,7 @@ blockquote {
 blockquote cite {
   display: block;
   font-size: 0.8125rem;
-  color: #555555;
+  color: #55b171;
 }
 /* line 396, ../bower_components/foundation/scss/foundation/components/_type.scss */
 blockquote cite:before {
@@ -6101,14 +6101,14 @@ blockquote cite:before {
 /* line 401, ../bower_components/foundation/scss/foundation/components/_type.scss */
 blockquote cite a,
 blockquote cite a:visited {
-  color: #555555;
+  color: #55b171;
 }
 
 /* line 407, ../bower_components/foundation/scss/foundation/components/_type.scss */
 blockquote,
 blockquote p {
   line-height: 1.6;
-  color: #6f6f6f;
+  color: #6fbd87;
 }
 
 /* Microformats */
@@ -6539,7 +6539,7 @@ meta.foundation-mq-topbar {
 /* line 110, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .contain-to-grid {
   width: 100%;
-  background: #060d08;
+  background: #1e4028;
 }
 /* line 114, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .contain-to-grid .top-bar {
@@ -6579,7 +6579,7 @@ meta.foundation-mq-topbar {
   height: 45px;
   line-height: 45px;
   position: relative;
-  background: #060d08;
+  background: #1e4028;
   margin-bottom: 0;
 }
 /* line 153, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -6689,7 +6689,7 @@ meta.foundation-mq-topbar {
 }
 /* line 256, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar.expanded .title-area {
-  background: #060d08;
+  background: #1e4028;
 }
 /* line 259, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar.expanded .toggle-topbar a {
@@ -6719,7 +6719,7 @@ meta.foundation-mq-topbar {
 /* line 291, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .divider,
 .top-bar-section [role="separator"] {
-  border-top: solid 1px #030604;
+  border-top: solid 1px #0f2014;
   clear: both;
   height: 1px;
   width: 100%;
@@ -6759,17 +6759,17 @@ meta.foundation-mq-topbar {
 }
 /* line 318, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > a.button.secondary {
-  background-color: #dce6df;
-  border-color: #a8c1af;
-  color: #333333;
+  background-color: #468966;
+  border-color: #386e52;
+  color: white;
 }
 /* line 134, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button.secondary:hover, .top-bar-section ul li > a.button.secondary:focus {
-  background-color: #a8c1af;
+  background-color: #386e52;
 }
-/* line 140, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
+/* line 145, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button.secondary:hover, .top-bar-section ul li > a.button.secondary:focus {
-  color: #333333;
+  color: white;
 }
 /* line 319, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > a.button.success {
@@ -6818,17 +6818,17 @@ meta.foundation-mq-topbar {
 }
 /* line 329, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > button.secondary {
-  background-color: #dce6df;
-  border-color: #a8c1af;
-  color: #333333;
+  background-color: #468966;
+  border-color: #386e52;
+  color: white;
 }
 /* line 134, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button.secondary:hover, .top-bar-section ul li > button.secondary:focus {
-  background-color: #a8c1af;
+  background-color: #386e52;
 }
-/* line 140, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
+/* line 145, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button.secondary:hover, .top-bar-section ul li > button.secondary:focus {
-  color: #333333;
+  color: white;
 }
 /* line 330, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > button.success {
@@ -6861,7 +6861,7 @@ meta.foundation-mq-topbar {
 /* line 335, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li:hover:not(.has-form) > a {
   background-color: #555555;
-  background: #255032;
+  background: #38794c;
   color: white;
 }
 /* line 345, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -6981,7 +6981,7 @@ meta.foundation-mq-topbar {
 @media only screen and (min-width: 40.063em) {
   /* line 436, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar {
-    background: #060d08;
+    background: #1e4028;
     overflow: visible;
   }
   /* line 181, ../bower_components/foundation/scss/foundation/components/_global.scss */
@@ -7015,7 +7015,7 @@ meta.foundation-mq-topbar {
   }
   /* line 454, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar.expanded {
-    background: #060d08;
+    background: #1e4028;
   }
 
   /* line 457, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7047,19 +7047,19 @@ meta.foundation-mq-topbar {
   /* line 480, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.hover > a:not(.button) {
     background-color: #555555;
-    background: #255032;
+    background: #38794c;
     color: white;
   }
   /* line 489, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li:not(.has-form) a:not(.button) {
     padding: 0 15px;
     line-height: 45px;
-    background: #060d08;
+    background: #1e4028;
   }
   /* line 493, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li:not(.has-form) a:not(.button):hover {
     background-color: #555555;
-    background: #255032;
+    background: #38794c;
   }
   /* line 502, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.active:not(.has-form) a:not(.button) {
@@ -7144,7 +7144,7 @@ meta.foundation-mq-topbar {
   .top-bar-section .dropdown li:not(.has-form):hover > a:not(.button) {
     color: white;
     background-color: #555555;
-    background: #255032;
+    background: #38794c;
   }
   /* line 581, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .dropdown li label {
@@ -7160,14 +7160,14 @@ meta.foundation-mq-topbar {
   .top-bar-section > ul > .divider, .top-bar-section > ul > [role="separator"] {
     border-bottom: none;
     border-top: none;
-    border-right: solid 1px #1a3923;
+    border-right: solid 1px #2f653f;
     clear: none;
     height: 45px;
     width: 0;
   }
   /* line 604, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .has-form {
-    background: #060d08;
+    background: #1e4028;
     padding: 0 15px;
     height: 45px;
   }
@@ -7193,7 +7193,7 @@ meta.foundation-mq-topbar {
   /* line 634, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .no-js .top-bar-section ul li:hover > a {
     background-color: #555555;
-    background: #255032;
+    background: #38794c;
     color: white;
   }
   /* line 643, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -8223,7 +8223,7 @@ a#toggle-shelf i {
   position: relative;
   background-color: white;
   padding: 7px;
-  border: 1px dashed #dce6df;
+  border: 1px dashed #468966;
   display: block;
   color: inherit !important;
   opacity: 0.9;
@@ -8285,7 +8285,7 @@ a#toggle-shelf i {
   overflow: hidden;
 }
 /* line 203, ../scss/_styles.scss */
-.card > * h6 {
+.card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
@@ -8330,11 +8330,10 @@ a#toggle-shelf i {
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
-  opacity: 0.8;
-  margin-bottom: 5px;
   clear: both;
+  color: #468966;
 }
-/* line 244, ../scss/_styles.scss */
+/* line 243, ../scss/_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -8345,75 +8344,75 @@ a#toggle-shelf i {
 }
 
 /* Create card */
-/* line 256, ../scss/_styles.scss */
+/* line 255, ../scss/_styles.scss */
 .create.card > * {
   background-color: #999;
   opacity: 1;
 }
-/* line 260, ../scss/_styles.scss */
+/* line 259, ../scss/_styles.scss */
 .create.card > *:hover {
   background-color: #008759;
 }
 
-/* line 266, ../scss/_styles.scss */
+/* line 265, ../scss/_styles.scss */
 .create.card h4 {
   color: white;
 }
-/* line 269, ../scss/_styles.scss */
+/* line 268, ../scss/_styles.scss */
 .create.card .button {
   border: 1px solid #00ba7b;
   opacity: 0.5;
 }
-/* line 273, ../scss/_styles.scss */
+/* line 272, ../scss/_styles.scss */
 .create.card label {
   color: white;
 }
-/* line 276, ../scss/_styles.scss */
+/* line 275, ../scss/_styles.scss */
 .create.card .switch label {
   color: inherit;
 }
 
 /* Content Tabs */
-/* line 284, ../scss/_styles.scss */
+/* line 283, ../scss/_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
-/* line 288, ../scss/_styles.scss */
+/* line 287, ../scss/_styles.scss */
 article .tabs dd.active a {
   color: #222;
   background-color: inherit;
 }
-/* line 292, ../scss/_styles.scss */
+/* line 291, ../scss/_styles.scss */
 article .tabs dd a {
   color: #aaa;
   background-color: inherit;
   padding: 0.5rem;
   padding-left: 1rem;
 }
-/* line 297, ../scss/_styles.scss */
+/* line 296, ../scss/_styles.scss */
 article .tabs dd a:hover {
   background-color: inherit;
   color: #999;
 }
 
-/* line 304, ../scss/_styles.scss */
+/* line 303, ../scss/_styles.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
 /* Default card */
-/* line 309, ../scss/_styles.scss */
+/* line 308, ../scss/_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 314, ../scss/_styles.scss */
+/* line 313, ../scss/_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
-/* line 318, ../scss/_styles.scss */
+/* line 317, ../scss/_styles.scss */
 .card > *:hover .button {
   opacity: 1;
   transition: opacity .5s ease-in ease-in;
@@ -8423,78 +8422,78 @@ article .tabs dd a:hover {
 }
 
 /* Inline label list */
-/* line 328, ../scss/_styles.scss */
+/* line 327, ../scss/_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 332, ../scss/_styles.scss */
+/* line 331, ../scss/_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
 }
-/* line 339, ../scss/_styles.scss */
+/* line 338, ../scss/_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   padding: 2px;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 352, ../scss/_styles.scss */
+/* line 351, ../scss/_styles.scss */
 main aside {
   padding-top: 1rem;
 }
-/* line 354, ../scss/_styles.scss */
+/* line 353, ../scss/_styles.scss */
 main aside.fade {
   opacity: 0.8;
 }
 
-/* line 360, ../scss/_styles.scss */
+/* line 359, ../scss/_styles.scss */
 aside > section {
   margin: inherit !important;
   margin-bottom: 5px;
   padding-bottom: 3rem;
 }
-/* line 364, ../scss/_styles.scss */
+/* line 363, ../scss/_styles.scss */
 aside > section > div {
   padding: 15px;
 }
 
-/* line 370, ../scss/_styles.scss */
+/* line 369, ../scss/_styles.scss */
 aside .meta i {
   color: #ccc;
 }
 
-/* line 371, ../scss/_styles.scss */
+/* line 370, ../scss/_styles.scss */
 aside:hover .meta i {
   color: black;
 }
 
 /* Content area */
-/* line 377, ../scss/_styles.scss */
+/* line 376, ../scss/_styles.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
   background-color: white;
 }
-/* line 381, ../scss/_styles.scss */
+/* line 380, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 385, ../scss/_styles.scss */
+/* line 384, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 388, ../scss/_styles.scss */
+/* line 387, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 397, ../scss/_styles.scss */
+/* line 396, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8515,22 +8514,22 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 417, ../scss/_styles.scss */
+/* line 416, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 422, ../scss/_styles.scss */
+/* line 421, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 425, ../scss/_styles.scss */
+/* line 424, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 428, ../scss/_styles.scss */
+/* line 427, ../scss/_styles.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -8539,65 +8538,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 435, ../scss/_styles.scss */
+/* line 434, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 439, ../scss/_styles.scss */
+/* line 438, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 443, ../scss/_styles.scss */
+/* line 442, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 446, ../scss/_styles.scss */
+/* line 445, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 451, ../scss/_styles.scss */
+/* line 450, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 456, ../scss/_styles.scss */
+/* line 455, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 459, ../scss/_styles.scss */
+/* line 458, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 462, ../scss/_styles.scss */
+/* line 461, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 469, ../scss/_styles.scss */
+/* line 468, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 474, ../scss/_styles.scss */
+/* line 473, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 481, ../scss/_styles.scss */
+/* line 480, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8605,13 +8604,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 488, ../scss/_styles.scss */
+/* line 487, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 493, ../scss/_styles.scss */
+/* line 492, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8625,13 +8624,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 503, ../scss/_styles.scss */
+/* line 502, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 508, ../scss/_styles.scss */
+/* line 507, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8642,7 +8641,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 519, ../scss/_styles.scss */
+/* line 518, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8654,12 +8653,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 531, ../scss/_styles.scss */
+/* line 530, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 534, ../scss/_styles.scss */
+/* line 533, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }
