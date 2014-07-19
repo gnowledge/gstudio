@@ -145,11 +145,11 @@ a#toggle-shelf i{
 }
 .card>*{
 	position: relative;
-	background-color: white;
+	background-color: $bg-color;
 	padding:7px;
-	border: 1px dashed $secondary-color;
+	border: 1px dashed darken($bg-color,10%);
 	display: block;
-	color:inherit!important;
+	//color:$bg-color;
 	opacity:0.9;
     overflow: hidden;
     
@@ -175,10 +175,10 @@ a#toggle-shelf i{
 	border-style:solid;
 	opacity:1;
         >a{
-            background-color: rgba(255,255,255,0.5);
+           
         }
         i{
-            opacity:1;
+            opacity:0.3;
         }
         footer .age{
             display: block;
@@ -189,8 +189,8 @@ a#toggle-shelf i{
 	top: -10px;
 	right: 10px;
 	font-size: 3rem;
-	color:#ddd;
-	opacity: 0.4;
+	color:$theme-color;
+	opacity: 0.1;
 }
     .preview{
         float: left;
@@ -339,8 +339,7 @@ dd a{
     text-transform: uppercase;
     //background-color: $info-color;
     padding: 2px;
-}
-    
+}  
 }
 
 
@@ -376,7 +375,7 @@ aside:hover .meta i{color: black;}
 article{
 	margin-top: 0.5rem;
 	padding-bottom: 4rem; 
-	background-color: white;
+	
     &>header{
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 1rem!important;

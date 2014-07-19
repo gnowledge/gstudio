@@ -1728,8 +1728,8 @@ select {
 }
 /* line 120, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.secondary {
-  background-color: #468966;
-  border-color: #3c7658;
+  background-color: #ffb03b;
+  border-color: #ff9e0f;
   color: white;
 }
 /* line 121, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
@@ -1740,9 +1740,9 @@ select {
 }
 /* line 122, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.info {
-  background-color: #cc2a41;
-  border-color: #af2438;
-  color: white;
+  background-color: #fff0a5;
+  border-color: #ffe66a;
+  color: #6b4000;
 }
 /* line 123, ../bower_components/foundation/scss/foundation/components/_alert-boxes.scss */
 .alert-box.alert-close {
@@ -2288,8 +2288,8 @@ select {
   list-style: none;
   border-style: solid;
   border-width: 1px;
-  background-color: #a5d1ba;
-  border-color: #8cc4a7;
+  background-color: #ffdba7;
+  border-color: #ffca7d;
   border-radius: 3px;
 }
 /* line 122, ../bower_components/foundation/scss/foundation/components/_breadcrumbs.scss */
@@ -2387,13 +2387,13 @@ button:hover, button:focus, .button:hover, .button:focus {
 }
 /* line 193, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary, .button.secondary {
-  background-color: #468966;
-  border-color: #386e52;
+  background-color: #ffb03b;
+  border-color: #fb9600;
   color: white;
 }
 /* line 134, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
-  background-color: #386e52;
+  background-color: #fb9600;
 }
 /* line 145, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
@@ -2498,8 +2498,8 @@ button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[dis
 }
 /* line 209, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary, button[disabled].secondary, .button.disabled.secondary, .button[disabled].secondary {
-  background-color: #468966;
-  border-color: #386e52;
+  background-color: #ffb03b;
+  border-color: #fb9600;
   color: white;
   cursor: default;
   opacity: 0.7;
@@ -2507,7 +2507,7 @@ button.disabled.secondary, button[disabled].secondary, .button.disabled.secondar
 }
 /* line 134, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  background-color: #386e52;
+  background-color: #fb9600;
 }
 /* line 145, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
@@ -2515,7 +2515,7 @@ button.disabled.secondary:hover, button.disabled.secondary:focus, button[disable
 }
 /* line 155, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
-  background-color: #468966;
+  background-color: #ffb03b;
 }
 /* line 210, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 button.disabled.success, button[disabled].success, .button.disabled.success, .button[disabled].success {
@@ -4253,7 +4253,7 @@ kbd {
   padding: 0.25rem 0.5rem 0.375rem;
   font-size: 0.6875rem;
   background-color: #3b8050;
-  color: #cc2a41;
+  color: white;
 }
 /* line 96, ../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.radius, .radius.label-list:empty:before {
@@ -4266,17 +4266,17 @@ kbd {
 /* line 99, ../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.alert, .alert.label-list:empty:before {
   background-color: #f04124;
-  color: #cc2a41;
+  color: white;
 }
 /* line 100, ../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.success, .success.label-list:empty:before {
   background-color: #43ac6a;
-  color: #cc2a41;
+  color: white;
 }
 /* line 101, ../bower_components/foundation/scss/foundation/components/_labels.scss */
 .label.secondary, .secondary.label-list:empty:before {
-  background-color: #468966;
-  color: #cc2a41;
+  background-color: #ffb03b;
+  color: white;
 }
 
 /* line 18, ../bower_components/foundation/scss/foundation/components/_magellan.scss */
@@ -4864,7 +4864,7 @@ ul.pagination li {
 }
 /* line 64, ../bower_components/foundation/scss/foundation/components/_progress-bars.scss */
 .progress.secondary .meter {
-  background: #468966;
+  background: #ffb03b;
   height: 100%;
   display: block;
 }
@@ -4986,7 +4986,7 @@ ul.pagination li {
   display: inline-block;
   position: absolute;
   height: 0.875rem;
-  background: #458865;
+  background: #ffaf38;
 }
 
 /* line 158, ../bower_components/foundation/scss/foundation/components/_range-slider.scss */
@@ -5894,7 +5894,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
-  color: #3b8050;
+  color: #222222;
   text-rendering: optimizeLegibility;
   margin-top: 0.2rem;
   margin-bottom: 0.5rem;
@@ -5903,7 +5903,7 @@ h1, h2, h3, h4, h5, h6 {
 /* line 257, ../bower_components/foundation/scss/foundation/components/_type.scss */
 h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
   font-size: 60%;
-  color: #6fbd87;
+  color: #6f6f6f;
   line-height: 0;
 }
 
@@ -5940,7 +5940,7 @@ h6 {
 /* line 271, ../bower_components/foundation/scss/foundation/components/_type.scss */
 .subheader {
   line-height: 1.4;
-  color: #6fbd87;
+  color: #6f6f6f;
   font-weight: normal;
   margin-top: 0.2rem;
   margin-bottom: 0.5rem;
@@ -6092,7 +6092,7 @@ blockquote {
 blockquote cite {
   display: block;
   font-size: 0.8125rem;
-  color: #55b171;
+  color: #555555;
 }
 /* line 396, ../bower_components/foundation/scss/foundation/components/_type.scss */
 blockquote cite:before {
@@ -6101,14 +6101,14 @@ blockquote cite:before {
 /* line 401, ../bower_components/foundation/scss/foundation/components/_type.scss */
 blockquote cite a,
 blockquote cite a:visited {
-  color: #55b171;
+  color: #555555;
 }
 
 /* line 407, ../bower_components/foundation/scss/foundation/components/_type.scss */
 blockquote,
 blockquote p {
   line-height: 1.6;
-  color: #6fbd87;
+  color: #6f6f6f;
 }
 
 /* Microformats */
@@ -6759,13 +6759,13 @@ meta.foundation-mq-topbar {
 }
 /* line 318, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > a.button.secondary {
-  background-color: #468966;
-  border-color: #386e52;
+  background-color: #ffb03b;
+  border-color: #fb9600;
   color: white;
 }
 /* line 134, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button.secondary:hover, .top-bar-section ul li > a.button.secondary:focus {
-  background-color: #386e52;
+  background-color: #fb9600;
 }
 /* line 145, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > a.button.secondary:hover, .top-bar-section ul li > a.button.secondary:focus {
@@ -6818,13 +6818,13 @@ meta.foundation-mq-topbar {
 }
 /* line 329, ../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > button.secondary {
-  background-color: #468966;
-  border-color: #386e52;
+  background-color: #ffb03b;
+  border-color: #fb9600;
   color: white;
 }
 /* line 134, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button.secondary:hover, .top-bar-section ul li > button.secondary:focus {
-  background-color: #386e52;
+  background-color: #fb9600;
 }
 /* line 145, ../bower_components/foundation/scss/foundation/components/_buttons.scss */
 .top-bar-section ul li > button.secondary:hover, .top-bar-section ul li > button.secondary:focus {
@@ -8221,11 +8221,10 @@ a#toggle-shelf i {
 /* line 146, ../scss/_styles.scss */
 .card > * {
   position: relative;
-  background-color: white;
+  background-color: #eef7eb;
   padding: 7px;
-  border: 1px dashed #468966;
+  border: 1px dashed #cfe8c7;
   display: block;
-  color: inherit !important;
   opacity: 0.9;
   overflow: hidden;
 }
@@ -8253,13 +8252,9 @@ a#toggle-shelf i {
   border-style: solid;
   opacity: 1;
 }
-/* line 177, ../scss/_styles.scss */
-.card > *:hover > a {
-  background-color: rgba(255, 255, 255, 0.5);
-}
 /* line 180, ../scss/_styles.scss */
 .card > *:hover i {
-  opacity: 1;
+  opacity: 0.3;
 }
 /* line 183, ../scss/_styles.scss */
 .card > *:hover footer .age {
@@ -8271,8 +8266,8 @@ a#toggle-shelf i {
   top: -10px;
   right: 10px;
   font-size: 3rem;
-  color: #ddd;
-  opacity: 0.4;
+  color: #3b8050;
+  opacity: 0.1;
 }
 /* line 195, ../scss/_styles.scss */
 .card > * .preview {
@@ -8331,7 +8326,7 @@ a#toggle-shelf i {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
-  color: #468966;
+  color: #aaaaaa;
 }
 /* line 243, ../scss/_styles.scss */
 .card > * footer .age {
@@ -8441,59 +8436,58 @@ article .tabs dd a:hover {
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 351, ../scss/_styles.scss */
+/* line 350, ../scss/_styles.scss */
 main aside {
   padding-top: 1rem;
 }
-/* line 353, ../scss/_styles.scss */
+/* line 352, ../scss/_styles.scss */
 main aside.fade {
   opacity: 0.8;
 }
 
-/* line 359, ../scss/_styles.scss */
+/* line 358, ../scss/_styles.scss */
 aside > section {
   margin: inherit !important;
   margin-bottom: 5px;
   padding-bottom: 3rem;
 }
-/* line 363, ../scss/_styles.scss */
+/* line 362, ../scss/_styles.scss */
 aside > section > div {
   padding: 15px;
 }
 
-/* line 369, ../scss/_styles.scss */
+/* line 368, ../scss/_styles.scss */
 aside .meta i {
   color: #ccc;
 }
 
-/* line 370, ../scss/_styles.scss */
+/* line 369, ../scss/_styles.scss */
 aside:hover .meta i {
   color: black;
 }
 
 /* Content area */
-/* line 376, ../scss/_styles.scss */
+/* line 375, ../scss/_styles.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
-  background-color: white;
 }
-/* line 380, ../scss/_styles.scss */
+/* line 379, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 384, ../scss/_styles.scss */
+/* line 383, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 387, ../scss/_styles.scss */
+/* line 386, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 396, ../scss/_styles.scss */
+/* line 395, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8514,22 +8508,22 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 416, ../scss/_styles.scss */
+/* line 415, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 421, ../scss/_styles.scss */
+/* line 420, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 424, ../scss/_styles.scss */
+/* line 423, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 427, ../scss/_styles.scss */
+/* line 426, ../scss/_styles.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -8538,65 +8532,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 434, ../scss/_styles.scss */
+/* line 433, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 438, ../scss/_styles.scss */
+/* line 437, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 442, ../scss/_styles.scss */
+/* line 441, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 445, ../scss/_styles.scss */
+/* line 444, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 450, ../scss/_styles.scss */
+/* line 449, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 455, ../scss/_styles.scss */
+/* line 454, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 458, ../scss/_styles.scss */
+/* line 457, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 461, ../scss/_styles.scss */
+/* line 460, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 468, ../scss/_styles.scss */
+/* line 467, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 473, ../scss/_styles.scss */
+/* line 472, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 480, ../scss/_styles.scss */
+/* line 479, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8604,13 +8598,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 487, ../scss/_styles.scss */
+/* line 486, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 492, ../scss/_styles.scss */
+/* line 491, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8624,13 +8618,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 502, ../scss/_styles.scss */
+/* line 501, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 507, ../scss/_styles.scss */
+/* line 506, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8641,7 +8635,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 518, ../scss/_styles.scss */
+/* line 517, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8653,12 +8647,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 530, ../scss/_styles.scss */
+/* line 529, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 533, ../scss/_styles.scss */
+/* line 532, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }
