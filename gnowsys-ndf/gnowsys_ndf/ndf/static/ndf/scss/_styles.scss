@@ -159,7 +159,6 @@ a#toggle-shelf i{
 	display: block;
 	color:inherit!important;
 	opacity:0.9;
-    background-position: center center;
     
     >a{
         color:inherit;
@@ -200,9 +199,18 @@ a#toggle-shelf i{
 	color:#ddd;
 	opacity: 0.4;
 }
-    
+    .preview{
+        float: left;
+        padding-right: 5px;
+        padding-top: 4px;
+    }
     header{
-        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+    h6{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-bottom: 0;
     }
         .label{
         opacity:0.5;
@@ -210,6 +218,7 @@ a#toggle-shelf i{
     p{
         color: #555;
         height: 50px;
+        background-repeat: no-repeat;
     }
     .th{
         margin:20px auto;
@@ -233,13 +242,15 @@ a#toggle-shelf i{
 }
     
     footer{
+        margin-top: 1rem;
         font-size: 70%;
-        opacity:0.5;
+        opacity:0.8;
         margin-bottom: 5px;
+        clear: both;
             .age{
                 display: none;
                 position: absolute;
-                background: white;
+                background-color: white;
                 z-index: 100;
                 bottom: 0;
                 width: 100%;
@@ -323,6 +334,7 @@ dd a{
 .label-list{
 	display: inline-block;
 	text-align: left;
+    margin-bottom: 0.1rem;
     &:empty:before{
         content:"UNTAGGED";
         @extend .label;
