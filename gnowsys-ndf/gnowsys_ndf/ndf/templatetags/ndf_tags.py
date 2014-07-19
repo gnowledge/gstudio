@@ -1050,7 +1050,7 @@ def check_is_gstaff_for_gapp(groupid, app_dict, user):
   """
 
   try:
-    if app_dict["name"].lower() in ["mis", "mis-po"]:
+    if app_dict["name"].lower() in ["mis", "mis-po", "batch", "task"]:
       return check_is_gstaff(groupid, user)
 
     else:
