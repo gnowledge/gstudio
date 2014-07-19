@@ -86,8 +86,7 @@
         
         <a  href="/{{node.pk}}">
       <header>
-        <div class="th"><img src="/static/ndf/scss/themes/metastudio/logo.svg"></div>
-        <h6>{{ node.name|truncatechars:20 }}</h6>
+        <h5>{{ node.name }}</h5>
       </header>
       
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>

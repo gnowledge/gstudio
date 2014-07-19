@@ -130,7 +130,7 @@
             <a href ="{% url 'file_detail' group_name_tag file %}">
           <header>
              
-            <h6>{{file.name}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h6>
+            <h5>{{file.name}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h5>
               
           </header>
 <img class="preview" src="{% url 'getFileThumbnail' group_name_tag file %}" />
