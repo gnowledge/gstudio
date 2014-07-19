@@ -151,6 +151,7 @@ a#toggle-shelf i{
 	display: block;
 	color:inherit!important;
 	opacity:0.9;
+    overflow: hidden;
     
     >a{
         color:inherit;
@@ -209,8 +210,9 @@ a#toggle-shelf i{
     }
     p{
         color: #555;
-        height: 50px;
+        height: 80px;
         background-repeat: no-repeat;
+        font-size: 80%;
     }
     .th{
         margin:20px auto;
