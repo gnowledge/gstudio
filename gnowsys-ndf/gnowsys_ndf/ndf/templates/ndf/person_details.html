@@ -67,7 +67,7 @@
         <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
           {% for field in tab_fields_list %}
           <div class="row">
-            <div class="small-3 columns"> 
+            <div class="small-4 columns"> 
               <label>{{field.altnames}}</label>
             </div>
             <div class="small-7 end columns">
@@ -142,10 +142,10 @@
       </div>
 
       <!-- Start of Block: For listing Editing options --> 
-      {% user_access_policy groupid request.user as user_access %}
+      {% check_is_gstaff groupid request.user as gstaff_access %}
 
       {% edit_policy groupid node request.user as status %}
-      {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+      {% if user.is_authenticated and status == "allow" and gstaff_access %}
 
         {% if app_name == "MIS" %}
         <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id node %}" class="small button split edit">
