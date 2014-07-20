@@ -41,23 +41,24 @@ Test
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">
-
-  <header class="row">
-
-    <h2 class="medium-12 columns">
+    
+ <h2>
       {% if node %}
-      Editing {{title}}: {{node.name}}
+      Editing {{title}}: 
+     <div>
+	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+	  </div>
       {% else %}
       Create a New {{title}}
-      {% endif %}
-    </h2>
-    
-    <nav class="medium-12 columns">
+      {% endif %}  
+      </h2>
+
+     <nav>
       <dl class="tabs" data-tab>
-	<dd><h3>View:</h3></dd>
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
-	  <a href="#panel-name-description">{% block page_tab %} Page {% endblock %}</a>
+	  <a href="#panel-name-description">{% block page_tab %} Node {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
 	  <a href="#panel-prior-node" class="prior_node_tab">Prior Node</a>
@@ -69,6 +70,17 @@ Test
 	
      </dl>
     </nav>
+     
+   
+
+
+
+
+<div class="edit-card">
+    
+  <header class="row">
+    
+    
   </header>
 
   {% csrf_token %}
@@ -78,14 +90,57 @@ Test
     <div class="active content row" id="panel-name-description">
       <div class="medium-8 columns">
 	
-	<div class="row">
-	  <div class="medium-8 columns">
-	    <label>{{title}} Name</label>
-	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
-	  </div>
+	<div id="message" style="display:none; color:red"></div>
+		
 
-	  <div class="medium-4 columns">
+	<div class="row">
+	  <div class="medium-12 columns">
+	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+	  </div>
+	</div>
+	
+	<div class="row">
+	  <div class="medium-12 columns">
+	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+	    </span>
+	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+	  </div>		
+	</div>
+
+{% switch_group_conditions request.user group_id as switch_conditions %}
+	{% if node %}
+    	{% check_group node as is_group %}
+    {% endif %}
+
+{% if not is_group %}
+<dl class="accordion" data-accordion>
+
+  <dd>
+
+    <a id="switch_group" href="#switchgrp">Click here to publish {{node.name}} in group/s</a>
+
+       <div id="switchgrp" class="content">
+         <h4>Select Groups</h4>
+	 <div id="group_drawer" >
+        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
+      </div>
+        <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
+      </div>
+
+  </dd>
+</dl>
+{% endif %}
+      </div>
+        
+        <div class="large-4 columns">
+            <div class="panel">
+                
+            <div class="row">
+                <h5>Toolbox</h5>
+	  <label>Language<select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select></label>
+	     </div>
+                
+                 <div class="row">
 	    {% if node.created_by == request.user.pk %}		    	
 			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
 
@@ -128,61 +183,20 @@ Test
 			{% endif %}
 		{% endif %}	    
 	  </div>
-	</div>
-
-	<div id="message" style="display:none; color:red"></div>
-					
-
-	<div class="row">
-	  
-	  <div class="large-6 columns"><label>Language<select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select></label>
-	     </div>
-
-	  <div class="large-6 columns" style="padding: 1.8em;">
-	  	<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+                
+                 <div class="row">
+	  	<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="small secondary button expand">
 	  		<i class="fi-marker"></i> &nbsp; Add Location
 	  	</a>
 	  </div>
+                
+                </div>
+             <input type="submit" id="save-node" value="Save as Draft And Preview" class="button expand"/>
+              
+            
 	</div>
-
-	<div class="row">
-	  <div class="medium-12 columns">
-	    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
-	  </div>
-	</div>
-	
-	<div class="row">
-	  <div class="medium-12 columns">
-	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
-	    </span>
-	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-	  </div>		
-	</div>
-
-{% switch_group_conditions request.user group_id as switch_conditions %}
-	{% if node %}
-    	{% check_group node as is_group %}
-    {% endif %}
-
-{% if not is_group %}
-<dl class="accordion" data-accordion>
-
-  <dd>
-
-    <a id="switch_group" href="#switchgrp">Click here to publish {{node.name}} in group/s</a>
-
-       <div id="switchgrp" class="content">
-         <h4>Select Groups</h4>
-	 <div id="group_drawer" >
-        {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
-      </div>
-        <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
-      </div>
-
-  </dd>
-</dl>
-{% endif %}
-      </div>
+        
+      
     </div>
     
     {% block prior_node %}
@@ -271,9 +285,7 @@ Test
   
   {% block add_fields %} {% endblock %}
   
-  <div class="row" >
-    <input type="submit" id="save-node" value="Save as Draft And Preview" class="button medium-6 columns"/>
-  </div>
+ 
   
   
  <!-- Overlay : Map Widget -->
@@ -286,7 +298,9 @@ Test
       <!-- #{#%# endif %} -->
     </div>
 
-    <input type="hidden" id="nodes_list" value="{{nodes_list}}">						
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">
+    
+    </div>
 </form>
 
 

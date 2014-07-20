@@ -251,6 +251,15 @@ a#toggle-shelf i{
         }
 }
 
+.edit-card{
+    position: relative;
+	background-color: $bg-color;
+	padding:10px;
+	border: 1px dashed darken($bg-color,10%);
+	display: block;
+    
+}
+
 /* Create card */
 .create.card>*{
 	background-color: #999;
