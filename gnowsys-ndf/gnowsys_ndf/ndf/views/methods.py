@@ -291,7 +291,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   language= request.POST.get('lan')
   tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
-  collection_list = request.POST.get('collection_list','')
+  collection_list = request.POST.get('collection_set_list','')
   module_list = request.POST.get('module_list','')
   content_org = unicode(request.POST.get('content_org'))
   map_geojson_data = request.POST.get('map-geojson-data')
@@ -445,6 +445,9 @@ def get_node_common_fields(request, node, group_id, node_type):
 
     if set(node.collection_set) != set(collection_list):
       i = 0
+      node.collection_set = []
+
+      # checking if each _id in collection_list is valid or not
       while (i < len(collection_list)):
         node_id = ObjectId(collection_list[i])
         
@@ -455,6 +458,7 @@ def get_node_common_fields(request, node, group_id, node_type):
         i = i+1
       # print "\n Changed: collection_list"
       is_changed = True
+
      
   # -------------------------------------------------------------------------------- Module
 
