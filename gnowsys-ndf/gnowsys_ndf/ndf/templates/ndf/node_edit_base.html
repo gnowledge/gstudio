@@ -50,7 +50,11 @@ Test
 	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 	  </div>
       {% else %}
-      Create a New {{title}}
+      Create a New {{title}}:
+     <div>
+	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+	  </div>
       {% endif %}  
       </h2>
 
