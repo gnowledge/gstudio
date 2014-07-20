@@ -100,10 +100,11 @@ h2:not(.subheader){
         position: relative;
         input{
             @extend h2;
-            background-color: $bg-color;
+            
             height: 3rem;
             box-shadow: none;
             border: none;
+            border-bottom: 2px dotted darken($theme-color,50%);
         }
     }
 }
@@ -326,6 +327,10 @@ dd a{
 
 .tabs-content>.content{
 	padding-top: 0;
+}
+
+.content.row{
+    margin: 0;
 }
 
 /* Default card */
