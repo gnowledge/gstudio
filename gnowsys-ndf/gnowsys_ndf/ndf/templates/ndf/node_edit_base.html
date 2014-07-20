@@ -135,16 +135,26 @@ Test
         <div class="large-4 columns">
             <div class="panel">
                 
-            <div class="row">
                 <h5>Toolbox</h5>
-	  <label>Language<select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select></label>
+                
+            <div class="row">
+                
+                <div class="large-4 columns">
+                <label class="inline">Language</label>
+                    </div>
+                <div class="large-8 columns">
+               <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
+                    </div>
+	   
 	     </div>
                 
                  <div class="row">
-	    {% if node.created_by == request.user.pk %}		    	
-			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+	    {% if node.created_by == request.user.pk %}	
+                     <div class="large-4 columns">
+			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span></div>
+                     
 
-			
+			<div class="large-8 columns">
 				<div class="privacy-mode ">
 						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
@@ -163,12 +173,16 @@ Test
 						{% endif %}
 							<span></span>
 				</div>
-
+</div>
 		{% else %}
 						
 			{% if not node %}
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
-						<div class="privacy-mode switch round">
+                     <div class="large-4 columns">
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">Privacy</label></span>
+                         </div>
+                     
+                     <div class="large-8 columns">
+						<div class="privacy-mode">
 						
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
 							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
@@ -178,17 +192,25 @@ Test
 						
 							<span></span>
 						</div>
-
+</div>
 
 			{% endif %}
 		{% endif %}	    
 	  </div>
                 
                  <div class="row">
-	  	<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="small secondary button expand">
+                
+                <div class="large-4 columns">
+                <label class="inline">Location:</label>
+                    </div>
+                <div class="large-8 columns">
+              <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny round secondary button expand">
 	  		<i class="fi-marker"></i> &nbsp; Add Location
 	  	</a>
-	  </div>
+                    </div>
+	   
+	     </div>
+                
                 
                 </div>
              <input type="submit" id="save-node" value="Save as Draft And Preview" class="button expand"/>

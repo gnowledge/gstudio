@@ -79,20 +79,35 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 
 main>aside{
 	margin-bottom: 0.5rem;
-}
-main>aside header{
+
+header{
 	margin-top: 1rem;
 }
-main>aside a{
+a{
 	color: #008759;
-}
-main>aside a:hover{
+    &:hover{
 	color: inherit;
+}
+}
+
 }
 
 h2:not(.subheader){
 	font-family: "Georgia Serif", Serif;
+    
+    div{
+        display:inline-block;
+        position: relative;
+        input{
+            @extend h2;
+            background-color: $bg-color;
+            height: 3rem;
+            box-shadow: none;
+            border: none;
+        }
+    }
 }
+
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
 	background-color: #222;
@@ -378,7 +393,9 @@ aside .meta i{color: #ccc;}
 aside:hover .meta i{color: black;}
 
 
-
+.panel{
+    background-color: darken($bg-color,10%);
+}
 
 /* Content area */
 article{
