@@ -18,7 +18,7 @@ $theme-color-invert:scale-color($theme-color, $lightness: -60%);
 
 // We use these as default colors throughout
 $primary-color: $theme-color;
-$secondary-color: $color1;
+$secondary-color: lighten(desaturate($primary-color,20%),20%);
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
  //$warning-color: #f2bf8a;
