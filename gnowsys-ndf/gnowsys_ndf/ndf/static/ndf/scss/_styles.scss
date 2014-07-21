@@ -79,20 +79,36 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 
 main>aside{
 	margin-bottom: 0.5rem;
-}
-main>aside header{
+
+header{
 	margin-top: 1rem;
 }
-main>aside a{
+a{
 	color: #008759;
-}
-main>aside a:hover{
+    &:hover{
 	color: inherit;
+}
+}
+
 }
 
 h2:not(.subheader){
 	font-family: "Georgia Serif", Serif;
+    
+    div{
+        display:inline-block;
+        position: relative;
+        input{
+            @extend h2;
+            
+            height: 3rem;
+            box-shadow: none;
+            border: none;
+            border-bottom: 2px dotted darken($theme-color,50%);
+        }
+    }
 }
+
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
 	background-color: #222;
@@ -251,6 +267,15 @@ a#toggle-shelf i{
         }
 }
 
+.edit-card{
+    position: relative;
+	background-color: $bg-color;
+	padding:10px;
+	border: 1px dashed darken($bg-color,10%);
+	display: block;
+    
+}
+
 /* Create card */
 .create.card>*{
 	background-color: #999;
@@ -302,6 +327,10 @@ dd a{
 
 .tabs-content>.content{
 	padding-top: 0;
+}
+
+.content.row{
+    margin: 0;
 }
 
 /* Default card */
@@ -369,7 +398,9 @@ aside .meta i{color: #ccc;}
 aside:hover .meta i{color: black;}
 
 
-
+.panel{
+    background-color: darken($bg-color,10%);
+}
 
 /* Content area */
 article{
