@@ -166,11 +166,10 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "Topic":
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id, topic_GST_id]},'group_set': {'$all': [ObjectId(group_id)]}})   
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})   
 
     else:
       # For heterogeneous collection      
-      
       if theme_GST_id or topic_GST_id:
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
       else:
