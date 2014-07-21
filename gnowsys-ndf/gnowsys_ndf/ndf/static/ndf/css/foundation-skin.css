@@ -8694,19 +8694,14 @@ input.node-title {
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
 /* line 21, ../scss/foundation-skin.scss */
-nav.top-bar {
-  height: inherit;
-}
-
-/* line 26, ../scss/foundation-skin.scss */
-.top-bar-section ul li > a.button {
+.top-bar .dropdown a.button {
   padding: 0;
 }
 
 /*
 *   Foundation extensions
 */
-/* line 34, ../scss/foundation-skin.scss */
+/* line 29, ../scss/foundation-skin.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -8720,16 +8715,16 @@ pre {
   font-family: monospace;
 }
 
-/* line 48, ../scss/foundation-skin.scss */
+/* line 43, ../scss/foundation-skin.scss */
 .fixme {
   opacity: 0.5;
 }
-/* line 51, ../scss/foundation-skin.scss */
+/* line 46, ../scss/foundation-skin.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 54, ../scss/foundation-skin.scss */
+/* line 49, ../scss/foundation-skin.scss */
 .fixme:hover:after {
   content: " fixme";
   color: orange;
