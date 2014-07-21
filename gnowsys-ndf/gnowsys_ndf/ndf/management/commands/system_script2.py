@@ -41,7 +41,7 @@ def create_WikiData_WikiTopic():
 	creates GSystemType: WikiData(a member_of GAPP), GSystemType WikiTopic(a member_of factory_settings and type_of WikiData) 
 	Helper method to create the WikiData GAPP and WikiTopic GSystemType.
 	"""
-	GAPP = collection.Node.one({"name": u"GAPP"})
+	GAPP = collection.Node.one({"name": u"GAPP","_type":u"MetaType"})
 	cursor = collection.Node.one({"_type":u"GSystemType", "name":u"WikiData"}) #change -am
 	if (cursor!=None):
 		print "Wikidata already exists"
@@ -61,7 +61,7 @@ def create_WikiData_WikiTopic():
 	if(cursor!=None):
 		print "WikiTopic already exists"
 	else:	
-		factory = collection.Node.one({"name": u"factory_types"})
+		factory = collection.Node.one({"name": u"factory_types","_type":u"MetaType"})
                 factory_id = factory._id
 		obj1 = collection.GSystemType()
 		obj1.name = u"WikiTopic"
@@ -119,7 +119,7 @@ def create_AttributeType_for_class(name, data_type, description, property_id, la
 		attribute_type.subject_type.append(system_type_2._id)
 		attribute_type.created_by = user_id
 		attribute_type.modified_by = user_id
-		factory_id = collection.Node.one({"name":u"factory_types","_type":"MetaType"})._id
+		factory_id = collection.Node.one({"name":u"factory_types","_type":u"MetaType"})._id
 		attribute_type.member_of.append(factory_id)
 		attribute_type.verbose_name = name
 		attribute_type.altnames = unicode(property_id)
@@ -161,6 +161,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
     	"ObjectId",
     	"IS()"
 	)
+
 	Parameters:
 		1. name - The name of the AttributeType that the user wants to create.
 		2. data_type - The data_type of the attribute type is given here.
@@ -208,6 +209,7 @@ def create_AttributeType(name, data_type, description, property_id,language, use
 		system_type_2.attribute_type_set.append(attribute_type._id)
 		print "Created the Attribute_Type " + unicode(name)
 		return False
+
 		
 		
 def create_Attribute(subject_name, attribute_type_name, object_value, language, user_id):
@@ -219,6 +221,9 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 		3. object_value - The Value of the object.
 		4. language - What is the language that the user wants to harvest.
 		5. User Id: Which user is creating the topic.
+		Returns -
+		False :  as the topic already existed. 
+		True:If the topic created during the function call.
 	"""
 
 	print "Creating an attribute"
@@ -276,7 +281,11 @@ def create_Attribute(subject_name, attribute_type_name, object_value, language, 
 	
 def create_Topic(label, description, alias_list, topic_title, last_update_datetime, user_id):
 	"""
-	Creates a topic if it does not exist
+
+	Creates a topic if it does not exist.
+		Returns -
+		True : false as the topic already existed. 
+		False:If the topic created during the function call.
 	Parameters:
 		1. label - The name of the topic which the user wants to create.
 		2. description - The descriptive content of the topic.
@@ -287,7 +296,7 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 	"""
 	print "Creating a GSystem Topic"
 	topic_type = collection.Node.one({"name": u"WikiTopic","_type":u"GSystemType"})
-	obj = collection.Node.one({"name": unicode(label), "_type": u"GSystem"}) #pick the topic related to wikidata
+	obj = collection.Node.find_one({"name": unicode(label)}) #pick the topic related to wikidata
 
 	if (obj!=None):
 		print "Topic already exists"
@@ -296,7 +305,6 @@ def create_Topic(label, description, alias_list, topic_title, last_update_dateti
 		topic_type_id = topic_type._id
 		topic = collection.GSystem()
 		topic.name = label
-		#topic.tags = alias_list  # tags are supposed to be info about structure , categories etc , aliases are supposed to be stored into altnames
 		topic.content_org= unicode(description) #content in being left untouched and content_org has descriptions in english
 		topic.url = unicode(wiki_base_url)+unicode(label)
 		#topic.altnames = unicode(topic_title)
@@ -349,9 +357,9 @@ def create_Class(label, description, alias_list, class_id, last_update_datetime,
 			string_alias=string_alias+alias+"," #altnames is a comma separated list of english aliases
 
 		class_obj.altnames = unicode(string_alias)
-		class_obj.type_of.append(topic_type_id) #The GSystemType of class that I am creating should be a part of the WikiData GApp.
+		class_obj.type_of.append(topic_type_id) #The GSystemType of class that is being created should be a part of the WikiData GApp.
 		class_obj.access_policy=unicode('PUBLIC')
-		factory = collection.Node.one({"name": u"factory_types"})
+		factory = collection.Node.one({"name": u"factory_types","_type":u"MetaType"})
                 factory_id = factory._id
 		wikidata = collection.Node.one({"name":u"WikiData", "_type":"GSystemType"})
 		class_obj.member_of.append(ObjectId(wikidata._id))
@@ -414,6 +422,7 @@ def create_RelationType(name, inverse_name, subject_type_name, object_type_name,
 		system_type_2.relation_type_set.append(ObjectId(relation_type._id))
                 print "Created the Relation_Type " + unicode(name)
 		return False
+
  
 
 def create_Relation(subject_name, relation_type_name, right_subject_name, user_id):
@@ -451,7 +460,7 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 		relation.modified_by = user_id
 		left_system = collection.Node.find_one({"name":unicode(subject_name)})
 		relation.subject = ObjectId(left_system._id)
-		relation_type = collection.Node.one({"name":unicode(relation_type_name), "_type":u"RelationType"})
+		relation_type = collection.Node.find_one({"name":unicode(relation_type_name), "_type":u"RelationType"})
 		relation.relation_type = relation_type
 		right_system = collection.Node.find_one({"name":unicode(right_subject_name)})
 		relation.right_subject = ObjectId(right_system._id)
@@ -470,6 +479,68 @@ def create_Relation(subject_name, relation_type_name, right_subject_name, user_i
 
 		return False
 		#it's me
+
+def populate_tags(label,property_value_for_relation):
+	"""
+	To populate tags of the object given by label.tags is a list field and the values will be appended
+	in the list.(actually the right_subject_name of P31 and P279 are being appended as tags to give a sense 
+	of theme, category hierarchy etc.)
+	Parameter passed to the function -
+	1)label - name of item for which tag is to eb appended.
+	2)property_value_for_relation - value to be appended in tag.It is a human readable english value.
+	"""
+	obj = collection.Node.find_one({"name":unicode(label)})
+	if obj:
+		obj.tags.append(unicode(property_value_for_relation))
+		obj.modified_by=int(1)
+		obj.save()
+
+
+
+def populate_location(label,property_id,property_value,user_id):
+	obj = collection.Node.find_one({"_type":u"GSystem","name":unicode(label)})
+	geo_json=[
+    	{
+        	"geometry": 
+        	{
+            	"type": "Point",
+            	"coordinates": []
+       		},
+        	"type": "Feature",
+        	"properties": 
+        	{
+            	"description":"",
+            	"id": ""
+        	}
+    	}
+	]
+
+	geo_json[0]["geometry"]["coordinates"].append(property_value["longitude"])
+	geo_json[0]["geometry"]["coordinates"].append(property_value["latitude"])
+	geo_json[0]["properties"]["description"]=label	
+	geo_json[0]["properties"]["id"]=property_id
+	obj.location =geo_json
+	obj.modified_by =user_id
+	obj.save()
+
+
+
+
+
+
+
+
+def item_exists(label):
+	"""	
+	Returns boolean value to indicate if a GSystem with the given name exists or not"
+	"""	
+
+	object = collection.Node.find_one({"type":u"GSystem","name":unicode(label)})
+	if object !=None:
+		return True
+	else:
+		return False
+
 
 def display_objects():
 	"""
@@ -547,6 +618,7 @@ def populate_location(label,property_id,property_value,user_id):
 	geo_json[0]["properties"]["description"]=label		
 	geo_json[0]["properties"]["id"]=property_id
 	obj.location = geo_json
+
 	obj.modified_by =user_id
 	obj.save()
 
@@ -571,7 +643,8 @@ def get_topic(label):
 class Command(BaseCommand):
 	def handle(self, *args, **options):
 		"""
-		This is the default method required to make this file run as a script in Django.
+		Some test cases that are not a part of the main harvesting script
+
 		"""
 		create_WikiData_WikiTopic()
 		create_Topic(u"topic11", u"topic1desc", [u"Alias1", u"Alias2"], "Test1", None, user_id)

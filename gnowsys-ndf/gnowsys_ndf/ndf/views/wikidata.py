@@ -86,6 +86,7 @@ def details(request, group_id, topic_id):
 
 
 
+
 def tag_view_list(request, group_id, topic_id, tag):
 	ins_objectid  = ObjectId()
 	group_ins = None

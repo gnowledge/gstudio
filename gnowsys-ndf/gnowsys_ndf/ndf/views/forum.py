@@ -1,6 +1,9 @@
 ''' -- imports from installed packages -- '''
 import json
+import datetime
 
+
+''' -- imports from django -- '''
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template import Context
@@ -13,15 +16,17 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 
-
+''' -- imports from django_mongokit -- '''
 from django_mongokit import get_database
+
+
+''' -- imports from gstudio -- '''
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
 from gnowsys_ndf.settings import GAPPS
-
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-import datetime
 from gnowsys_ndf.ndf.org2any import org2html
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo

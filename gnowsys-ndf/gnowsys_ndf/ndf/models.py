@@ -984,6 +984,32 @@ class Group(GSystem):
         'encryption_policy':lambda x: x in ENCRYPTION_POLICY
     } 
 
+    def is_gstaff(self, user):
+      """
+      Checks whether given user belongs to GStaff.
+      GStaff includes only the following users of a group:
+        1) Super-user (Django's superuser)
+        2) Creator of the group (created_by field)
+        3) Admin-user of the group (group_admin field)
+      Other memebrs (author_set field) doesn't belongs to GStaff.
+
+      Arguments:
+      self -- Node of the currently selected group
+      user -- User object taken from request object
+
+      Returns:
+      True -- If user is one of them, from the above specified list of categories.
+      False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
+      """
+
+      if (user.is_superuser) or (user.id == self.created_by) or (user.id in self.group_admin):
+        return True
+
+      else:
+        return False
+
+
+
 
 @connection.register
 class Author(Group):
