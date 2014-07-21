@@ -286,8 +286,10 @@ def file(request, group_id, file_id=None):
                                             }).sort("last_update", -1)
       
       already_uploaded = request.GET.getlist('var', "")
-  
-      
+      new_list = []  
+      for each in already_uploaded:
+          new_list.append(eval(each))
+      already_uploaded = new_list
       # source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
 
       # pandora_video_id = []
@@ -403,7 +405,7 @@ def submitDoc(request, group_id):
                 alreadyUploadedFiles.append(f)
                 title = mtitle
         for each in alreadyUploadedFiles:
-            str1 = str1 + 'var=' + each + '&'
+            str1 = str1 + 'var={"Newname":"' + each[0] + '",' + '"Oldname":"' + each[1] +'"}'+ '&'
 
         if img_type != "": 
             
@@ -411,6 +413,7 @@ def submitDoc(request, group_id):
 
         else:
             if str1:
+		print str1
                 return HttpResponseRedirect(page_url+'?'+str1)
             else:
                 return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
@@ -438,7 +441,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     
     
     if fileobj.fs.files.exists({"md5":filemd5}):
-        
+        coll_oid = get_database()['fs.files']
+	cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
+	coll_new = get_database()['Nodes']
+	new_name = collection.Node.find_one({'_id':ObjectId(str(cur_oid["docid"]))})     
         # if calling function is passing oid=True as last parameter then reply with id and name.
         if kwargs.has_key("oid"):
           if kwargs["oid"]: 
@@ -448,7 +454,7 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
             return cur_oid["docid"], 'True'
         else:
-            return files.name, 'True'
+            return [files.name, new_name.name],'True'
 
     else:
         try:
