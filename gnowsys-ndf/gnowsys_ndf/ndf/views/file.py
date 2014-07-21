@@ -413,7 +413,6 @@ def submitDoc(request, group_id):
 
         else:
             if str1:
-		print str1
                 return HttpResponseRedirect(page_url+'?'+str1)
             else:
                 return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
