@@ -8339,7 +8339,7 @@ a#toggle-shelf i {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
-  color: #aaaaaa;
+  color: #666666;
 }
 /* line 259, ../scss/_styles.scss */
 .card > * footer .age {

@@ -33,10 +33,10 @@
           error: function(request){
 		$("#plistOnlineUser").html("error"); },
           success: function(data) {
-		$("#userVisible").show();
+		$(".orgitdownLive").show();
 		$("#plistOnlineUser").html("");
 		$("#listOnlineUser").html("");
-		if(data[0] == "No users"){$("#plistOnlineUser").html("No Users");}
+		if(data[0] == "No users"){$("#plistOnlineUser").html("No other users editing this resource");}
 		else{
 			for(var item in data)
 			{
@@ -66,15 +66,13 @@
 <!-- end of mobwrite -->
 
 {% if node_id %}
+
 <input type="hidden" value="{% check_existence_textObj_mobwrite node_id %}">
-<div id="userVisible" style="display:none">
-<h3>Other users currently editing this resource</h3>
-<p id="plistOnlineUser"></p>
-<ul style="color: green; max-height: 100px; overflow: auto;" id="listOnlineUser"></ul>
-</div>
 <textarea id="{{node_id|mongo_id}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}" value="{{var_value}}">{{var_value}}</textarea>
+
 {% else %}
 <textarea id="orgitdown_{{var_name}}" class="small-12 columns" name="{{var_name}}" placeholder="{{var_placeholder}}" value="{{var_value}}">{{var_value}}</textarea>
+
 {% endif %}
 <script>
 {% if node_id %}
