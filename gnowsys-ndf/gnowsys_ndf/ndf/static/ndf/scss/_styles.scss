@@ -6,15 +6,20 @@
 
 @import url("css.css");
 
-
-		nav h1 img{
+//Logo
+.top-bar{
+    h1{
+        img{
             /* Logo */
 			height: 1.8rem;
 			margin-right: 5px;
 		}
-		nav h1 a{
+        a{
 			color:white!important;
 		}
+    }
+}
+
 
 		body>header{
             //Site header
@@ -92,6 +97,9 @@ a{
 
 }
 
+//    Article styles
+    article{
+    
 h1:not(.subheader){
 	font-family: "Georgia Serif", Serif;
     
@@ -108,6 +116,7 @@ h1:not(.subheader){
         }
     }
 }
+    }
 
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
@@ -309,22 +318,25 @@ article .tabs{
 	margin-right: 5px;
 	font-size: 1.3rem;
 }
-    dd.active a{
-	color:#222;
-	background-color: inherit;
-}
-dd a{
-	color:#aaa;
-	background-color: inherit;
-	padding: 0.5rem;
-	padding-left: 1rem;
-    &:hover{
-	background-color: inherit;
-	color:#999;
-}
-}
+   
 }
 
+article{
+    header{
+        position: relative;
+        nav{
+           position: absolute!important;
+        bottom: 0;
+            right: 0;
+        }
+    }
+.tabs {
+    border-bottom: 1px solid darken($bg-color,50%);
+    dd.active a,dd:hover a{
+        color:$theme-color;
+    }
+}
+}
 .tabs-content>.content{
 	padding-top: 0;
 }

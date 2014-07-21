@@ -39,8 +39,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">
-    <div class="edit-card">
- <h1>
+    
+        <header class="row">
+ <h1 class="large-8 columns">
       {% if node %}
       <span class="subheader">Editing: </span>
      <div>
@@ -54,13 +55,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 	  </div>
       {% endif %}  
-     
-     <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button right"/>
       </h1>
 
     
-        
-     <nav>
+ <nav class="large-4 columns">
       <dl class="tabs" data-tab>
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
@@ -77,15 +75,13 @@ background-repeat:no-repeat; background-size: 48px 48px
      </dl>
      
    </nav>
-
-
-
-    
-  <header class="row">
-    
-    
+            
   </header>
 
+    <div class="edit-card">
+        
+       
+        
   {% csrf_token %}
   
   <div id="node-details-edit-div" class="tabs-content" > 
@@ -134,6 +130,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 </dl>
 {% endif %}
       </div>
+        
+         <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button large-4 columns"/>
         
         <div class="large-4 columns">
             <div class="panel">
