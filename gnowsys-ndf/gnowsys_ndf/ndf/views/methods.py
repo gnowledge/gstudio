@@ -171,7 +171,9 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     else:
       # For heterogeneous collection      
-      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
+      topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
+      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id, topic_GST_id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
            
     
     if (nid is None) and (not nlist):
