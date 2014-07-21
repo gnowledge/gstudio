@@ -446,9 +446,9 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
             # returning only ObjectId (of GSystem containing file info) in dict format.
             # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
-            return cur_oid["docid"]
+            return cur_oid["docid"], 'True'
         else:
-            return files.name
+            return files.name, 'True'
 
     else:
         try:
