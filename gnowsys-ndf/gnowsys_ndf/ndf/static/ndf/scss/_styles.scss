@@ -92,14 +92,14 @@ a{
 
 }
 
-h2:not(.subheader){
+h1:not(.subheader){
 	font-family: "Georgia Serif", Serif;
     
     div{
         display:inline-block;
         position: relative;
         input{
-            @extend h2;
+            @extend h1;
             
             height: 3rem;
             box-shadow: none;

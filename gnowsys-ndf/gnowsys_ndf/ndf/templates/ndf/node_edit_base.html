@@ -40,9 +40,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 <form data-abide id="form-edit-node" method="POST" action="">
     <div class="edit-card">
- <h2>
+ <h1>
       {% if node %}
-      Editing {{title}}: 
+      <span class="subheader">Editing: </span>
      <div>
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
@@ -55,8 +55,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  </div>
       {% endif %}  
      
-     <input type="submit" id="save-node" value="Save as Draft And Preview" class="button right"/>
-      </h2>
+     <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button right"/>
+      </h1>
 
     
         
@@ -207,7 +207,7 @@ background-repeat:no-repeat; background-size: 48px 48px
                 <label class="inline">Location:</label>
                     </div>
                 <div class="large-8 columns">
-              <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny round secondary button expand">
+              <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand">
 	  		<i class="fi-marker"></i> &nbsp; Add Location
 	  	</a>
                     </div>
