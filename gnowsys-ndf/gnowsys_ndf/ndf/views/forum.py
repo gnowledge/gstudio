@@ -42,6 +42,7 @@ start_time = collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'sta
 end_time = collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'end_time'}]})
 reply_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Reply'}]})
 twist_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Twist'}]})
+sitename=Site.objects.all()[0].name.__str__()
 
 
 def forum(request, group_id, node_id=None):
@@ -183,6 +184,17 @@ def create_forum(request,group_id):
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
         colf.save()
+        '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
+        link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
+        for each in colg.author_set:
+            bx=User.objects.get(id=each)
+            activity="Added forum"
+            msg=usrname+" has added a forum in the group -'"+str(colg.name)+"'\n"+"Please visit "+link+" to see the forum."
+            if bx:
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(bx.username) })
+                no_check=forum_notification_status(colg._id,auth._id)
+                if no_check:
+                    ret = set_notif_val(request,colg._id,msg,activity,bx)
         return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id }))
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
@@ -311,7 +323,7 @@ def create_thread(request, group_id, forum_id):
         colrep.save()
 
         variables = RequestContext(request,
-                                    {   'forum':forum,
+                                     {   'forum':forum,
                                         'thread':colrep,
                                         'eachrep':colrep,
                                         'groupid':group_id,
@@ -352,7 +364,6 @@ def add_node(request,group_id):
 
     try:
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        sitename=Site.objects.all()[0].name.__str__()
         content_org=request.POST.get("reply","")
         node=request.POST.get("node","")
         thread=request.POST.get("thread","")
@@ -432,7 +443,7 @@ def add_node(request,group_id):
             no_check=forum_notification_status(group_id,auth._id)
             if no_check:
                 ret = set_notif_val(request,group_id,msg,activity,bx)
-        
+        print "in add_node"        
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]
@@ -446,6 +457,7 @@ def add_node(request,group_id):
             templ=get_template('ndf/refreshthread.html')
             html = templ.render(Context({'forum':forumobj,'user':request.user,'groupid':group_id,'group_id':group_id}))
             return HttpResponse(html)
+
 
 
     except Exception as e:
