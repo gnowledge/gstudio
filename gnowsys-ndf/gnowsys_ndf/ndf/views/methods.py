@@ -2,6 +2,7 @@
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
+from django.http import HttpResponse
 from django.template import RequestContext
 import mongokit 
 
@@ -1238,25 +1239,35 @@ def create_discussion(request, group_id, node_id, node_name=None):
   Method to create discussion thread for File and Page.
   '''
 
-  twist_st = collection.Node.one({'_type':'GSystemType', 'name':'Twist'})
+  try:
 
-  node = collection.Node.one({'_id': ObjectId(node_id)})
+    twist_st = collection.Node.one({'_type':'GSystemType', 'name':'Twist'})
 
-  group = collection.Group.one({'_id':ObjectId(group_id)})
+    node = collection.Node.one({'_id': ObjectId(node_id)})
 
-  # retriving RelationType
-  relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
-  
-  # Creating thread with the name of node
-  thread_obj = collection.GSystem()
+    group = collection.Group.one({'_id':ObjectId(group_id)})
 
-  thread_obj.name = node.name
+    # retriving RelationType
+    relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
+    
+    # Creating thread with the name of node
+    thread_obj = collection.GSystem()
 
-  thread_obj.member_of.append(twist_st._id)
-  thread_obj.prior_node.append(node_id)
-  
-  thread_obj.save()
+    thread_obj.name = node.name
 
-  # creating GRelation
-  # create_grelation(node_id, relation_type, twist_st)
+    thread_obj.member_of.append(twist_st._id)
+    thread_obj.prior_node.append(ObjectId(node_id))
+    
+    # thread_obj.save()
+
+    # print "\n\n------------\n\n", thread_obj
+
+    # creating GRelation
+    # create_grelation(node_id, relation_type, twist_st)
+
+    return HttpResponse("true")
+
+  except Exception:
+    return HttpResponse("false")
+
 
