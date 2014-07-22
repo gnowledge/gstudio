@@ -34,17 +34,17 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 {% endblock %}
 
-{% block meta_content %}
-Test
-{% endblock %}
+
 
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">
     
- <h2>
+        <header>
+            <div class="row">
+ <h1 class="large-8 columns">
       {% if node %}
-      Editing {{title}}: 
+      <span class="subheader">Editing: </span>
      <div>
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
@@ -56,9 +56,21 @@ Test
 	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 	  </div>
       {% endif %}  
-      </h2>
+      </h1>
+                
+             <div class="large-4 columns">
+	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+	    </span>
+	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+	  </div>		
+ 
+           </div> 
+  </header>
 
-     <nav>
+    <div class="edit-card">
+        
+        <div class="row">
+       <nav class="large-8 columns">
       <dl class="tabs" data-tab>
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
@@ -73,20 +85,12 @@ Test
 	</dd>  
 	
      </dl>
-    </nav>
      
-   
-
-
-
-
-<div class="edit-card">
-    
-  <header class="row">
-    
-    
-  </header>
-
+   </nav>
+            
+            
+            </div>
+        
   {% csrf_token %}
   
   <div id="node-details-edit-div" class="tabs-content" > 
@@ -103,13 +107,6 @@ Test
 	  </div>
 	</div>
 	
-	<div class="row">
-	  <div class="medium-12 columns">
-	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
-	    </span>
-	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-	  </div>		
-	</div>
 
 {% switch_group_conditions request.user group_id as switch_conditions %}
 	{% if node %}
@@ -136,23 +133,13 @@ Test
 {% endif %}
       </div>
         
+        
         <div class="large-4 columns">
             <div class="panel">
                 
-                <h5>Toolbox</h5>
-                
+                <h5>Settings</h5>
+           
             <div class="row">
-                
-                <div class="large-4 columns">
-                <label class="inline">Language</label>
-                    </div>
-                <div class="large-8 columns">
-               <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
-                    </div>
-	   
-	     </div>
-                
-                 <div class="row">
 	    {% if node.created_by == request.user.pk %}	
                      <div class="large-4 columns">
 			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span></div>
@@ -200,24 +187,32 @@ Test
 
 			{% endif %}
 		{% endif %}	    
-	  </div>
-                
-                 <div class="row">
                 
                 <div class="large-4 columns">
-                <label class="inline">Location:</label>
+                <label class="inline">Language</label>
                     </div>
                 <div class="large-8 columns">
-              <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny round secondary button expand">
-	  		<i class="fi-marker"></i> &nbsp; Add Location
-	  	</a>
+               <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
                     </div>
 	   
 	     </div>
                 
+                 
+                
+                 <div class="row">
+                <div class="large-4 columns">
+                <label class="inline">Location:</label>
+                    </div>
+                <div class="large-8 columns">
+              <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand">
+	  		<i class="fi-marker"></i> &nbsp; Add Location
+	  	</a>
+                    </div>
+	     </div>
                 
                 </div>
-             <input type="submit" id="save-node" value="Save as Draft And Preview" class="button expand"/>
+            
+            <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
               
             
 	</div>
