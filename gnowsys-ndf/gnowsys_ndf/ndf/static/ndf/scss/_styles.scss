@@ -82,19 +82,80 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 /* Sections */
 
 
+
+//Main sidebar
 main>aside{
-	margin-bottom: 0.5rem;
-
-header{
-	margin-top: 1rem;
-}
-a{
-	color: #008759;
-    &:hover{
-	color: inherit;
-}
-}
-
+    &>div{
+        background-color: $theme-color-invert;
+        
+        h2,h3{
+            color:white;
+            margin: 0;
+        }
+        
+        h2{
+            font-size: 1.4rem;
+            font-weight: bold;
+            
+        }
+        h3{
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+        h4{
+            font-size: 1rem;
+            color: #eee;
+            span{
+                display: none;
+            }
+            &:hover span{
+                display: inline;
+            }
+        }
+        h5,h6{
+            margin: 0;
+        }
+            
+        
+        header{
+            min-height: 8rem;
+            border-bottom: 1px solid black;
+            padding: 15px;
+        }
+        
+        footer{
+            background-color: #222;
+            min-height: 1rem;
+            label{
+                font-size: 0.7rem;
+            }
+        }
+        
+        
+        // Aside link styles
+        a,p{
+                color: white;
+            &:hover{
+                color:white;
+            }
+            }
+        .side-nav{
+            background-color: #444;
+            padding: 0;
+            border-bottom: 2px solid $active-color;
+        margin: 0;
+            li{
+                border-bottom: 1px solid #555;
+                a{
+                    border-left: 2px solid black;
+                }
+                a:hover{
+                    border-left: 2px solid $active-color;
+                }
+            }
+        }
+        
+    }
 }
 
 //    Article styles
@@ -132,29 +193,7 @@ h1:not(.subheader){
 }
     }
 
-/* Off canvas navigation */
-aside.left-off-canvas-menu{
-	background-color: #222;
-	color:white;
-}
-a#toggle-shelf{
-	position: absolute;
-	top:1rem;
-	right: 1rem;
-	color: black;
-	z-index: 10;
-}
-a#toggle-shelf:hover{
-	color: black;
-}
-a#toggle-shelf i{
-	font-size: 30px;
-}
 
-.inner-wrap>aside h4{
-	color: white;
-	padding:10px;
-}
 
 
 
@@ -299,32 +338,6 @@ a#toggle-shelf i{
     
 }
 
-/* Create card */
-.create.card>*{
-	background-color: #999;
-	opacity:1;
-    
-    &:hover{
-	background-color: #008759;
-    }
-}
-
-.create.card{
-    h4{
-	color:white;
-}
-    .button{
-	border:1px solid #00ba7b;
-        opacity:0.5;
-}
-    label{
-	color:white;
-}
-    .switch label{
-	color:inherit;
-}
-   
-}
 
 /* Content Tabs */
 article .tabs{
@@ -361,13 +374,7 @@ article{
 	display: block;
 }
 
-.card>*:hover .button{
-	opacity:1;
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
-}
+
 
 /* Inline label list */
 
@@ -394,26 +401,6 @@ article{
 
 /*************************** 2. Custom CSS overrides ***********************/
 
-main aside{
-	padding-top: 1rem;
-    &.fade{
-	opacity:0.8;
-}
-}
-
-
-aside>section{
-	margin:inherit!important;
-	margin-bottom:5px;
-	padding-bottom: 3rem;
-    &>div{
-	padding: 15px;
-}
-}
-
-
-aside .meta i{color: #ccc;}
-aside:hover .meta i{color: black;}
 
 
 .panel{
@@ -473,11 +460,7 @@ textarea{
 	color: inherit;
 }
 .user i{
-	padding: 0.2em 0.5em;
-	margin-right:0.4em;
-	color:white;
-	background-color:#ddd;
-	opacity:0.8;
+margin-right: 3px;
 }
 .user:hover i{
 	opacity:1;
