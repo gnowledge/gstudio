@@ -46,7 +46,7 @@
 
 		body>footer{
             //Site footer
-            border-top: 2px dotted #ccc;
+            border-top: 2px dotted #aaa;
 			padding:20px 0;
 			position: relative;
             margin: 0 2rem;
@@ -57,6 +57,14 @@
             a{
 			color: #777;
 		}
+            .gnu-badge{
+                padding: 6px 9px 6px 80px;
+                border: 1px dashed #ddd;
+                margin-bottom: 3px;
+                margin-right: 3px;
+                display: inline-block;
+                background: #fafafa url("../images/gnu-head.png") no-repeat -35px -19px;
+            }
 		}
 
 
@@ -161,7 +169,7 @@ main>aside{
 //    Article styles
     article{
         
-        &>header{
+        &>header,form>header{
             background-color: $bg-color;
             padding: 15px;
             margin-bottom: 0.5rem;
@@ -221,6 +229,8 @@ h1:not(.subheader){
     // First card
     //width: 100%;
 }
+
+
 .card>*{
 	position: relative;
 	background-color: $bg-color;
@@ -306,13 +316,6 @@ h1:not(.subheader){
         width: 100%;
     }
 }
-    section{
-	background-color: #ddd;
-}
-    .button{
-	opacity:0.1;
-}
-    
     footer{
         margin-top: 1rem;
         font-size: 70%;
@@ -409,7 +412,7 @@ article{
 
 /* Content area */
 article{
-	margin-top: 0.5rem;
+    
 	padding-bottom: 4rem; 
 	
     &>header{
