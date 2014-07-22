@@ -105,7 +105,10 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
     collection = db[Node.collection_name]
-        
+    
+    theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
+
     drawer = None    
     
     if checked:     
@@ -160,18 +163,17 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
 
       elif checked == "Theme":
-        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
-        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id, topic_GST_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "Topic":
-        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
-        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id, topic_GST_id]},'group_set': {'$all': [ObjectId(group_id)]}})   
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})   
 
     else:
       # For heterogeneous collection      
-      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      if theme_GST_id or topic_GST_id:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      else:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})           
            
     
     if (nid is None) and (not nlist):
@@ -291,7 +293,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   language= request.POST.get('lan')
   tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
-  collection_list = request.POST.get('collection_list','')
+  collection_list = request.POST.get('collection_set_list','')
   module_list = request.POST.get('module_list','')
   content_org = unicode(request.POST.get('content_org'))
   map_geojson_data = request.POST.get('map-geojson-data')
@@ -445,6 +447,9 @@ def get_node_common_fields(request, node, group_id, node_type):
 
     if set(node.collection_set) != set(collection_list):
       i = 0
+      node.collection_set = []
+
+      # checking if each _id in collection_list is valid or not
       while (i < len(collection_list)):
         node_id = ObjectId(collection_list[i])
         
@@ -455,6 +460,7 @@ def get_node_common_fields(request, node, group_id, node_type):
         i = i+1
       # print "\n Changed: collection_list"
       is_changed = True
+
      
   # -------------------------------------------------------------------------------- Module
 
@@ -1223,3 +1229,34 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
   except Exception as e:
       error_message = "\n GRelationCreateError: " + str(e) + "\n"
       raise Exception(error_message)
+
+
+
+# Method to create discussion thread for File and Page.
+def create_discussion(request, group_id, node_id, node_name=None):
+  '''
+  Method to create discussion thread for File and Page.
+  '''
+
+  twist_st = collection.Node.one({'_type':'GSystemType', 'name':'Twist'})
+
+  node = collection.Node.one({'_id': ObjectId(node_id)})
+
+  group = collection.Group.one({'_id':ObjectId(group_id)})
+
+  # retriving RelationType
+  relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
+  
+  # Creating thread with the name of node
+  thread_obj = collection.GSystem()
+
+  thread_obj.name = node.name
+
+  thread_obj.member_of.append(twist_st._id)
+  thread_obj.prior_node.append(node_id)
+  
+  thread_obj.save()
+
+  # creating GRelation
+  # create_grelation(node_id, relation_type, twist_st)
+

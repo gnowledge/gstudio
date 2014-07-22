@@ -42,6 +42,7 @@ start_time = collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'sta
 end_time = collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'end_time'}]})
 reply_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Reply'}]})
 twist_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Twist'}]})
+sitename=Site.objects.all()[0].name.__str__()
 
 
 def forum(request, group_id, node_id=None):
@@ -112,7 +113,7 @@ def forum(request, group_id, node_id=None):
         
         forum_detail_list.append(temp_forum)
 
-      variables=RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
+      variables = RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
       return render_to_response("ndf/forum.html",variables)
 
 
@@ -205,6 +206,18 @@ def create_forum(request,group_id):
        # colf.attribute_set.append(end_dt)
         colf.save()
 
+        '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
+        link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
+        for each in colg.author_set:
+            bx=User.objects.get(id=each)
+            activity="Added forum"
+            msg=usrname+" has added a forum in the group -'"+str(colg.name)+"'\n"+"Please visit "+link+" to see the forum."
+            if bx:
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(bx.username) })
+                no_check=forum_notification_status(colg._id,auth._id)
+                if no_check:
+                    ret = set_notif_val(request,colg._id,msg,activity,bx)
+
         # returning response to ndf/forumdetails.html
         return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id }))
 
@@ -252,11 +265,16 @@ def display_forum(request,group_id,forum_id):
     return render_to_response("ndf/forumdetails.html",variables)
 
 
+
 def display_thread(request,group_id, thread_id, forum_id=None):
+    '''
+    Method to display thread and it's content
+    '''
+    
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
@@ -265,11 +283,14 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                 group_id = str(auth._id)
     else :
         pass
+
     try:
         thread = collection.Node.one({'_id': ObjectId(thread_id)})
-        forum=""
+        forum = ""
+        
         for each in thread.prior_node:
             forum=collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
+        
             if forum:
                 usrname = User.objects.get(id=forum.created_by).username
                 variables = RequestContext(request,
@@ -288,14 +309,19 @@ def display_thread(request,group_id, thread_id, forum_id=None):
 
 
 def create_thread(request, group_id, forum_id):
+    ''' 
+    Method to create thread
+    '''
 
     forum = collection.Node.one({'_id': ObjectId(forum_id)})
-    forum_data = {  
-                    'name':forum.name,
-                    'content':forum.content,
-                    'created_by':User.objects.get(id=forum.created_by).username
-                }
+    
+    # forum_data = {  
+    #                 'name':forum.name,
+    #                 'content':forum.content,
+    #                 'created_by':User.objects.get(id=forum.created_by).username
+    #             }
     # print forum_data
+
     forum_threads = []
     exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
     exstng_reply.sort('created_at')
@@ -337,7 +363,7 @@ def create_thread(request, group_id, forum_id):
         colrep.save()
 
         variables = RequestContext(request,
-                                    {   'forum':forum,
+                                     {   'forum':forum,
                                         'thread':colrep,
                                         'eachrep':colrep,
                                         'groupid':group_id,
@@ -378,7 +404,6 @@ def add_node(request,group_id):
 
     try:
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        sitename=Site.objects.all()[0].name.__str__()
         content_org=request.POST.get("reply","")
         node=request.POST.get("node","")
         thread=request.POST.get("thread","")
@@ -458,7 +483,7 @@ def add_node(request,group_id):
             no_check=forum_notification_status(group_id,auth._id)
             if no_check:
                 ret = set_notif_val(request,group_id,msg,activity,bx)
-        
+        print "in add_node"        
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]
@@ -472,6 +497,7 @@ def add_node(request,group_id):
             templ=get_template('ndf/refreshthread.html')
             html = templ.render(Context({'forum':forumobj,'user':request.user,'groupid':group_id,'group_id':group_id}))
             return HttpResponse(html)
+
 
 
     except Exception as e:

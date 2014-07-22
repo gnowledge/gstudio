@@ -9,7 +9,7 @@
 
 // Color Pallette
 $theme-color:#33C284 !default;
-$theme-color-invert:scale-color($theme-color, $lightness: -90%);
+$theme-color-invert:scale-color($theme-color, $lightness: -60%);
 
 
 //
@@ -18,11 +18,26 @@ $theme-color-invert:scale-color($theme-color, $lightness: -90%);
 
 // We use these as default colors throughout
 $primary-color: $theme-color;
-$secondary-color: rgb(220, 230, 223);
+$secondary-color: lighten(desaturate($primary-color,20%),20%);
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
- $warning-color: #f2bf8a;
-// $info-color: #a0d3e8;
+ //$warning-color: #f2bf8a;
+ $info-color: $color0;
+
+$header-font-color: #222;
+$body-bg: white;
+
+$bg-color: #eef7eb;
+$meta-color:#aaa;
+
+//$label-font-color: #333;
+ $label-font-color-alt: $body-bg;
+
+$base-color: #e7caa4;
+$aside-color:#524549;
+
+
+
 
 
 
@@ -64,7 +79,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $total-columns: 5;
 
 // We use these to control various global styles
-// $body-bg: #fff;
+ //
 // $body-font-color: #222;
  $body-font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
@@ -144,7 +159,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $header-font-family: $body-font-family;
 // $header-font-weight: 300;
 // $header-font-style: normal;
-// $header-font-color: #222;
+ 
 // $header-line-height: 1.4;
 // $header-top-margin: .2rem;
 // $header-bottom-margin: .5rem;
@@ -646,7 +661,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $label-font-sizing: rem-calc(11);
 // $label-font-weight: normal;
 // $label-font-color: #333;
-// $label-font-color-alt: #fff;
+ //$label-font-color-alt: $info-color;
 // $label-font-family: $body-font-family;
 
 // Magellan
