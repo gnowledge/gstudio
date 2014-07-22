@@ -1,15 +1,12 @@
 {% load ndf_tags %}
 
-{% block search_content %}
-<h4><input id="name_id" name="name" type="text" value="" placeholder="Search" required=""></h4>
-{% endblock %}
 
- <nav class="breadcrumbs">
+<ul class="side-nav">
+     <nav class="breadcrumbs">
     {% for key,value in breadcrumbs_list %}
        <a name="{{key}}">{{ value }}</a>
     {% endfor %}
   </nav>
-<ul class="side-nav">
   <!-- Breadcrumbs List on top of collections on resource page   -->
 
   {% if node.collection_dict|length > 0 %}

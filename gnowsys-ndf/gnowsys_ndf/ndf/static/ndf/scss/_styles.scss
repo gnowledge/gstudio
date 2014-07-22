@@ -124,7 +124,13 @@ main>aside{
             padding: 10px;
         }
         
-        a{
+        footer{
+            min-height: 1rem;
+        }
+        
+        
+        // Aside link styles
+        a,p{
                 color: white;
             &:hover{
                 color:white;
@@ -450,11 +456,7 @@ textarea{
 	color: inherit;
 }
 .user i{
-	padding: 0.2em 0.5em;
-	margin-right:0.4em;
-	color:white;
-	background-color:#ddd;
-	opacity:0.8;
+
 }
 .user:hover i{
 	opacity:1;

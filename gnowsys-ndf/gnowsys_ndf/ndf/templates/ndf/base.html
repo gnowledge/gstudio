@@ -92,7 +92,7 @@
 
 	    {% if prof_pic %}
 	    <a href="{% url 'userDashboard' groupid request.user.pk %}">
-	      <img  src="{% url 'getImageThumbnail' groupid prof_pic %}" height="30" width="30"></img>
+	      <img  src="{% url 'getImageThumbnail' groupid prof_pic %}" height="30" width="30">
 	      {{ user.username }}
 	    </a>
 	    
@@ -191,21 +191,44 @@
               <a class="left-off-canvas-toggle meta" >{% block meta_content %}  {% endblock %}</a> 
               
                {% block concern_information %} {% endblock %}
-              {% block search_content %}  {% endblock %}
+              
               
           </header>
           
 	      
 	      <!-- Meta content in the (main aside header)-->
 
-
-	      <section>
-		{% block collection_content %}  {% endblock %}
+ <section>
+    
+		{% block search_content %}
+<h4 class="hide"><input id="name_id" name="name" type="text" value="" placeholder="Search" required=""></h4>
+{% endblock %}
               </section>
           
-          <section>
-    {% block related_content %}  {% endblock %}
-	      </section>
+	      <section>
+              
+        
+              <div>
+		{% block collection_content %}  {% endblock %}
+                  </div>
+              <div>
+		 {% block related_content %}  {% endblock %}
+                  </div>
+              
+              </section>
+          
+          <footer>
+              
+              <div class="icon-bar four-up">
+  <a class="item user" href="{% url 'userDashboard' groupid request.user.pk %}">
+    <label>My profile</label>
+  </a>
+  <a class="item">
+    <img src="../assets/img/icons/footer-foundation-retina.png">
+    <label>Two</label>
+  </a>
+</div>
+          </footer>
 	      
 	    </div>
 
