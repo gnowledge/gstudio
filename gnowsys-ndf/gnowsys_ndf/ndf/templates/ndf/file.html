@@ -129,8 +129,10 @@
             <h5>{{file.name}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h5>
               
           </header>
+                <section>
 <img class="preview" src="{% url 'getFileThumbnail' group_name_tag file %}" />
      <!--     <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>-->
+                    </section>
           <footer>
 	{% get_user_object file.created_by as user_obj %}
           {% if user_obj.username = user.username or request.user.is_superuser %}

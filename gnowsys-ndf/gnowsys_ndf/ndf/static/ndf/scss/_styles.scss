@@ -169,7 +169,7 @@ main>aside{
 //    Article styles
     article{
         
-        header{
+        &>header,form>header{
             background-color: $bg-color;
             padding: 15px;
             margin-bottom: 0.5rem;
@@ -229,6 +229,8 @@ h1:not(.subheader){
     // First card
     //width: 100%;
 }
+
+
 .card>*{
 	position: relative;
 	background-color: $bg-color;
@@ -314,13 +316,6 @@ h1:not(.subheader){
         width: 100%;
     }
 }
-    section{
-	background-color: #ddd;
-}
-    .button{
-	opacity:0.1;
-}
-    
     footer{
         margin-top: 1rem;
         font-size: 70%;
