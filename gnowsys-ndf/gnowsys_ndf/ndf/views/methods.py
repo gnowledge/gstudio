@@ -19,6 +19,7 @@ import subprocess
 import re
 import ast
 import string
+import json
 from datetime import datetime
 ######################################################################################################################################
 
@@ -1245,29 +1246,42 @@ def create_discussion(request, group_id, node_id, node_name=None):
 
     node = collection.Node.one({'_id': ObjectId(node_id)})
 
-    group = collection.Group.one({'_id':ObjectId(group_id)})
+    # group = collection.Group.one({'_id':ObjectId(group_id)})
 
-    # retriving RelationType
-    relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
-    
-    # Creating thread with the name of node
-    thread_obj = collection.GSystem()
+    thread = collection.Node.one({ "_type": "GSystem", "name": node_name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
 
-    thread_obj.name = node.name
+    if not thread:
+      
+      # retriving RelationType
+      # relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
+      
+      # Creating thread with the name of node
+      thread_obj = collection.GSystem()
 
-    thread_obj.member_of.append(twist_st._id)
-    thread_obj.prior_node.append(ObjectId(node_id))
-    
-    # thread_obj.save()
+      thread_obj.name = unicode(node.name)
+      thread_obj.status = u"PUBLISHED"
 
-    # print "\n\n------------\n\n", thread_obj
+      thread_obj.created_by = int(request.user.id)
+      thread_obj.modified_by = int(request.user.id)
+      thread_obj.contributors.append(int(request.user.id))
 
-    # creating GRelation
-    # create_grelation(node_id, relation_type, twist_st)
+      thread_obj.member_of.append(ObjectId(twist_st._id))
+      thread_obj.prior_node.append(ObjectId(node_id))
+      thread_obj.group_set.append(ObjectId(group_id))
+      
+      thread_obj.save()
 
-    return HttpResponse("true")
+      # creating GRelation
+      # create_grelation(node_id, relation_type, twist_st)
+      response_data = [ "thread-created", str(thread_obj._id) ]
 
+      return HttpResponse(json.dumps(response_data))
+
+    else:
+      response_data =  [ "Thread-exist", str(thread._id) ]
+      return HttpResponse(json.dumps(response_data))
+  
   except Exception:
-    return HttpResponse("false")
+    return HttpResponse("server-error")
 
 

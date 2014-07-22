@@ -449,18 +449,18 @@
      <!-- discussion content area -->
      <div id="view-discussion" class="content">
 
-       <div onclick="createDiscussion()" class="button">Start discussion</div>
+       <div onclick="createDiscussion()" id="create-discussion" class="button">Start discussion</div>
      
       <!-- orgitdown container   -->
-       <div id="org" style="margin-left:1em;" class="try">
+       <div id="org" style="display:none; margin-left:1em;" class="try">
           <!-- Reply : -->
 
           <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
 
-          <input id="savereply" type="button" value="Post Reply"  class="button tiny reply-button">
+          <input id="save-reply" type="button" value="Post Reply"  class="button tiny reply-button">
 
-          <input type="hidden" id="rep" style="visibility:hidden" value="">
-          <input type="hidden" id="thd" style="visibility:hidden" value="">
+          <input type="hidden" id="prior-node" style="visibility:hidden" value="">
+          <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
 
       </div>
       <!-- end of orgit down container -->
@@ -636,20 +636,42 @@
 
   function createDiscussion()
   {
+    
+    // ajax to create thread for first time.
     $.ajax({
       
       url: "{% url 'create_discussion' group_id node.pk node.name %}",
 
       success: function(data){
           
-          if(data)
-          {
-            alert(data)
+          data = JSON.parse(data);
+          if( data[0] == "thread-created" ){
+            
+            // alert(data)
+            $("#create-discussion").hide();
+            $("#prior-node").val(data[1]) // _id
+            $("#org").show();
+
           }
+          else if( data[0] == "Thread-exist" ){
+            // alert(data)
+            $("#create-discussion").hide();
+            $("#prior-node").val(data[1]) // _id
+            $("#org").show();
+          }
+          else{ alert(data) }
+
         }
     });
+    // --- END create thread for first time.
   }
+  // --- END of createDiscussion()
 
+
+  function addReply()
+  {
+
+  }
 
 
   // Taken value of svg data of that node globally
