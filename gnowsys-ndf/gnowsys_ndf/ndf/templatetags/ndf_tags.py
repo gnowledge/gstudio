@@ -814,6 +814,21 @@ def get_memberof_objects_count(key,group_id):
 		return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
 	except:
 		return 'null'
+
+
+'''Pass the ObjectId and get the name of it's first member_of element'''
+@register.assignment_tag
+def get_memberof_name(node_id):
+	try:
+		node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+		member_of_name = ""
+		if node_obj.member_of:
+			member_of_name = collection.Node.one({'_id': ObjectId(node_obj.member_of[0]) }).name
+		return member_of_name
+	except:
+		return 'null'
+
+
 	
 @register.filter
 def get_dict_item(dictionary, key):

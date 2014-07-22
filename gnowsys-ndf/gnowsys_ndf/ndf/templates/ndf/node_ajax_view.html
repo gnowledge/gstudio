@@ -125,7 +125,7 @@ ul#graph-hover.f-dropdown{
         <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
         <dd class="{% if topic %}active{% endif %}">
-            <a href="#view-graph" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+            <a href="#view-graph" data-dropdown="graph-hover" data-options="is_hover:true; active_class:open"><i class="fi-share"></i>Graph</a>
                 <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
                     <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>
                     {% if node.collection_set %}

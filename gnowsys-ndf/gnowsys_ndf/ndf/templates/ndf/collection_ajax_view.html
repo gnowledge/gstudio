@@ -57,38 +57,46 @@
 
 <ul class="no-bullet">
 
+    <a class="bc" name="{{key}}">{{ value }}</a>
+
   <!-- current page title -->
-  <li>
-    <div class="row">
-      <div class="small-2 columns">l</div>
-      {% for key,value in breadcrumbs_list %}
-        <div class="small-10 columns" name="{{key}}">{{ value }}</div>
-      {% endfor %}
+  {% for key,value in breadcrumbs_list %}
+  {% get_memberof_name key as member_of_name %}
+  <li id="{{key}}" class="loadSelectedResource">
+    <div class="row" title="{{member_of_name}}">
+      <div class="small-2 columns">
+        <i class="fi-page-filled"></i>
+      </div>
+      <div class="small-10 columns" name="{{key}}">{{ value }}</div>
     </div>
   </li>
+  {% endfor %}
 
   {% if node.collection_dict|length > 0 %}
 
     {% for index_key, each_node in node.collection_dict.items %}
-    {% get_grid_fs_object each_node as grid_fs_obj %}
+    {% get_memberof_name each_node.pk as member_of_name %}
 
-      <li>
-        <div class="row" name="{{each_node.pk}}" title="{{each_node.mime_type}}">
-          <div class="small-2 columns" >
-          {% if "/zip" in each_node.mime_type %}
-            <i class="fi-archive"></i>
-          {% elif "image" in each_node.mime_type %}
-            <!-- <i class="fi-camera"></i> -->
-            <img src="{% url 'getImageThumbnail' groupid each_node.pk %}">
-          {% elif "/pdf" in each_node.mime_type %}
-            <!-- <i class="fi-page-pdf"></i> -->
-            <img src="{% url 'getFileThumbnail' group_id each_node.pk %}">
-          {% elif "ogg" in each_node.mime_type or "video" in each_node.mime_type %}
-            <i class="fi-video"></i>
-            <!-- <img src="#{#% url 'getvideoThumbnail' group_id each_node.pk %}"> -->
-          {% else %}
-            <i class="fi-page-filled"></i>
-          {% endif %}
+      <li id="{{each_node.pk}}" class="loadSelectedResource">
+        <div class="row" name="{{each_node.pk}}" title="{{member_of_name}} - {{each_node.mime_type}}">
+          <div class="small-2 columns">
+
+            {% if "/zip" in each_node.mime_type %}
+              <i class="fi-archive"></i>
+            {% elif "image" in each_node.mime_type %}
+              <!-- <i class="fi-camera"></i> -->
+              <img src="{% url 'getImageThumbnail' groupid each_node.pk %}">
+            {% elif "/pdf" in each_node.mime_type %}
+              <!-- <i class="fi-page-pdf"></i> -->
+              <img src="{% url 'getFileThumbnail' group_id each_node.pk %}">
+            {% elif "ogg" in each_node.mime_type or "video" in each_node.mime_type %}
+              <i class="fi-video"></i>
+              <!-- <img src="#{#% url 'getvideoThumbnail' group_id each_node.pk %}"> -->
+              <!-- <div style="background:url#(#url 'getvideoThumbnail' group_id each_node.pk)"></div> -->
+            {% else %}
+              <i class="fi-page-filled"></i>
+            {% endif %}
+          
           </div>
           <div class="small-10 columns" >
             {{ each_node.name }}
@@ -103,6 +111,33 @@
 
 
 <script>
+
+$(document).on('click', 'li.loadSelectedResource', function (e) {
+    $.ajax({
+
+      type: "POST",
+      url: "{% url 'collection_nav' groupid %}",
+      datatype: "html",
+      data:{
+        node_id: this.id,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      
+      success: function(data) {
+        // console.trace()
+        // var prevHTML = $(document).children();
+        $("#view_page").html(data);
+        // $("#view_page").foundation({bindings:'events'});
+        $("#view-map-widget, a[data-reveal-id='view-map-widget'], a[href='#view-graph']").foundation();
+        // $("#graph-hover").foundation({dropdown:{is_hover:false,active_class:'open'});        
+        // window.history.pushState(“object or string”, “Title”, “/new-url”);
+        // window.history.pushState({"html":prevHTML, "pageTitle":"try"},"", "#try");
+        // window.location.hash = this.id;
+      }
+
+    });
+  });
+
   $(".select").click(function() {
 
   	$.ajax({
