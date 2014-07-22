@@ -100,13 +100,13 @@ a{
 //    Article styles
     article{
         
-        header{
+        &>header{
             background-color: $bg-color;
             padding: 15px;
-            border-bottom: 2px solid #222;
+            margin-bottom: 0.5rem;
         }
         
-        footer{
+        &>footer{
         }
     
 h1:not(.subheader){
@@ -117,6 +117,7 @@ h1:not(.subheader){
         display:inline-block;
         position: relative;
         input{
+            height:4rem;
             font-style: italic;
             @extend h1;
             padding-left:5px; 

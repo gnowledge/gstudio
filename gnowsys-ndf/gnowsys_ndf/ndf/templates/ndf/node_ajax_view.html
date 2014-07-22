@@ -102,22 +102,24 @@ ul#graph-hover.f-dropdown{
 </div>
 <!-- end dialog -->
 
-<header class="row page">
+<header class="page">
+    <div class="row">
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
       <li><a href="#">Collection Name</a></li>
     </ul>
 
-    <h2>
-      <span class='node'>{{node.name}}</span>      
-      <small class="label-list"> 
+      <div class="label-list"> 
       {% for tag in node.tags %}
       <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
       {% endfor %}
 
-    </small>      
-  </h2>
+    </div> 
+      
+    <h1>
+      <span class='node'>{{node.name}}</span>           
+  </h1>
 
   <div class="row">
     <div class="small-10 columns"> 
@@ -158,6 +160,7 @@ ul#graph-hover.f-dropdown{
     <!--End container-->
   </div>
 </section>
+        </div>
 </header>
 
 <div class="row">
