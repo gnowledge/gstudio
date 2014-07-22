@@ -323,7 +323,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $include-html-nav-classes: $include-html-classes;
 
 // We use this to set the background color for the breadcrumb container.
-// $crumb-bg: scale-color($secondary-color, $lightness: 55%);
+ $crumb-bg: black;
 
 // We use these to set the padding around the breadcrumbs.
 // $crumb-padding: rem-calc(9 14 9);
@@ -338,14 +338,14 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 
 // We use these to set various text styles for breadcrumbs.
 // $crumb-font-size: rem-calc(11);
-// $crumb-font-color: $primary-color;
-// $crumb-font-color-current: #333;
+ $crumb-font-color: white;
+ $crumb-font-color-current: white;
 // $crumb-font-color-unavailable: #999;
 // $crumb-font-transform: uppercase;
 // $crumb-link-decor: underline;
 
 // We use these to control the slash between breadcrumbs
-// $crumb-slash-color: #aaa;
+ $crumb-slash-color: $active-color;
 // $crumb-slash: "/";
 
 //
@@ -940,12 +940,12 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // We use these to control list styles.
 // $side-nav-list-type: none;
 // $side-nav-list-position: inside;
-// $side-nav-list-margin: rem-calc(0 0 7 0);
+ $side-nav-list-margin: 0;
 
 // We use these to control link styles.
-// $side-nav-link-color: $primary-color;
-// $side-nav-link-color-active: scale-color($side-nav-link-color, $lightness: 30%);
-// $side-nav-link-color-hover: scale-color($side-nav-link-color, $lightness: 30%);
+ $side-nav-link-color: #888;
+ $side-nav-link-color-active: white;
+ $side-nav-link-color-hover: white;
 // $side-nav-font-size: rem-calc(14);
 // $side-nav-font-weight: normal;
 // $side-nav-font-family: $body-font-family;
