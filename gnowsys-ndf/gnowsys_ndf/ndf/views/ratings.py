@@ -23,13 +23,11 @@ sitename=Site.objects.all()[0]
 def ratings(request,group_id):
     rating=request.POST['rating']
     node=col_Group.Node.one({'_id':ObjectId(group_id)})
-    print node.name
     ratedict={}
     ratedict['score']=int(rating)
     ratedict['user_id']=request.user.id
     ratedict['ip_address']=request.META['REMOTE_ADDR']
     fl=0
-    print ratedict
     for each in node.rating:
         if each['user_id'] == request.user.id:
             each['score']=int(rating)

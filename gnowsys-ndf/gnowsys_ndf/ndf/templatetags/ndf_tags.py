@@ -36,15 +36,22 @@ def get_user_preferences(group,user):
 @register.assignment_tag
 def get_node_ratings(node):
         try:
-                tot_ratng=len(node.rating)-1
+                node=collection.Node.one({'_id':ObjectId(node._id)})
                 sum=0
                 dic={}
+                cnt=0
                 for each in node.rating:
+                     if each['user_id']==0:
+                             cnt=cnt+1
                      sum=sum+each['score']
-                avg_ratng=float(sum)/tot_ratng
+                if len(node.rating)==1 and cnt==1:
+                        tot_ratng=0
+                        avg_ratng=0.0
+                else:
+                        tot_ratng=len(node.rating)-cnt
+                        avg_ratng=float(sum)/tot_ratng
                 dic['avg']=avg_ratng
                 dic['tot']=tot_ratng
-                print "dic=",dic
                 return dic
         except Exception as e:
                 print "Error in get_node_ratings "+str(e)
@@ -687,6 +694,56 @@ def get_create_url(groupid):
   elif node._type == 'File':
     return 'uploadDoc'
 	
+
+@register.assignment_tag
+def get_contents(node_id):
+
+	contents = {}
+	image_contents = []
+	video_contents = []
+	document_contents = []
+	page_contents = []
+
+	page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'}) 
+
+	obj = collection.Node.one({'_id': ObjectId(node_id) })
+	if obj.collection_set:
+		for each in obj.collection_set:
+			coll_obj = collection.Node.one({'_id': ObjectId(each) })
+
+			if coll_obj.has_key("mime_type"):
+				if 'image' in coll_obj.mime_type:
+					image_contents.append((coll_obj.name, coll_obj._id))
+				elif 'video' in coll_obj.mime_type:
+					video_contents.append((coll_obj.name, coll_obj._id))
+				else:
+					if coll_obj._type == "File":
+						document_contents.append((coll_obj.name, coll_obj._id))
+			else: 
+				if page_GST._id in coll_obj.member_of:
+					page_contents.append((coll_obj.name, coll_obj._id))
+
+
+		if not image_contents:
+			image_contents.append("None")
+		elif image_contents:
+			contents['image_contents'] = image_contents
+
+		if not video_contents:
+			video_contents.append("None")
+		elif video_contents:
+			contents['video_contents'] = video_contents
+
+		if not document_contents:
+			document_contents.append("None")
+		elif document_contents:
+			contents['document_contents'] = document_contents
+		
+		if page_contents:
+			contents['page_contents'] = page_contents		
+
+	# print "\n",document_contents,"\n"
+	return contents
 
 
 @register.assignment_tag

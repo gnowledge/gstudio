@@ -122,9 +122,14 @@ ul#graph-hover.f-dropdown{
   <div class="row">
     <div class="small-10 columns"> 
       <dl class="row tabs" data-tab>
+
+        {% if topic %}
+        <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> Contents </a></dd>
+        {% endif %}
+
         <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
-        <dd class="{% if topic %}active{% endif %}">
+        <dd>
             <a href="#view-graph" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
                 <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
                     <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>
@@ -295,7 +300,58 @@ ul#graph-hover.f-dropdown{
 
       <!-- Div included for setting default landing page for topic as an concept graph -->
       {% if topic %}
-        <div class="content active" id="view-graph">
+        <div class="content" id="view-graph">  </div>
+
+        <div class="content active" id="contents"> 
+          
+          {% get_contents node.pk as contents %}
+          <fieldset id="image_contents">
+            <legend>Images</legend>
+
+            {% for k,v in contents.items %}
+              {% if k == "image_contents" %}
+                {% for e in v %}
+                  <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
+                    <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
+                    <br/><div>{{e.0}}</div>
+                  </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+
+          </fieldset>
+
+          <fieldset id="video_contents">
+            <legend>Videos</legend>
+            {% for k,v in contents.items %}
+              {% if k == "video_contents" %}
+                {% for e in v %}
+                  <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
+                    <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
+                    <br/><div>{{e.0}}</div>
+                  </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+
+          </fieldset>
+
+          <fieldset id="document_contents">
+            <legend>Documents</legend>
+            {% for k,v in contents.items %}
+              {% for e in v %}
+
+                {% if k == "page_contents" %}
+                  <a href="{% url 'page_details' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
+                {% elif k == "document_contents" %}
+                  <a href ="{% url 'file_detail' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
+                {% endif %}              
+
+              {% endfor %}
+            {% endfor %}
+
+          </fieldset>
+
         </div>
       {% endif %}
 
@@ -499,6 +555,7 @@ ul#graph-hover.f-dropdown{
         // For topic node landing page concept svg graph
         svgdata = $('#chart-concept svg');
         $('#view-graph').append(svgdata);
+
       });
   });
 

@@ -79,28 +79,36 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 
 main>aside{
 	margin-bottom: 0.5rem;
-}
-main>aside header{
+
+header{
 	margin-top: 1rem;
 }
-main>aside a{
+a{
 	color: #008759;
-}
-main>aside a:hover{
+    &:hover{
 	color: inherit;
+}
+}
+
 }
 
 h2:not(.subheader){
 	font-family: "Georgia Serif", Serif;
-}
-h3{
-	font-size: 1.4rem;
+    
+    div{
+        display:inline-block;
+        position: relative;
+        input{
+            @extend h2;
+            
+            height: 3rem;
+            box-shadow: none;
+            border: none;
+            border-bottom: 2px dotted darken($theme-color,50%);
+        }
+    }
 }
 
-p{
-	font-size: 0.9rem;
-	line-height: 1.5;
-}
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
 	background-color: #222;
@@ -153,12 +161,13 @@ a#toggle-shelf i{
 }
 .card>*{
 	position: relative;
-	background-color: white;
+	background-color: $bg-color;
 	padding:7px;
-	border: 1px dashed $secondary-color;
+	border: 1px dashed darken($bg-color,10%);
 	display: block;
-	color:inherit!important;
+	//color:$bg-color;
 	opacity:0.9;
+    overflow: hidden;
     
     >a{
         color:inherit;
@@ -182,10 +191,10 @@ a#toggle-shelf i{
 	border-style:solid;
 	opacity:1;
         >a{
-            background-color: rgba(255,255,255,0.5);
+           
         }
         i{
-            opacity:1;
+            opacity:0.3;
         }
         footer .age{
             display: block;
@@ -196,8 +205,8 @@ a#toggle-shelf i{
 	top: -10px;
 	right: 10px;
 	font-size: 3rem;
-	color:#ddd;
-	opacity: 0.4;
+	color:$theme-color;
+	opacity: 0.1;
 }
     .preview{
         float: left;
@@ -207,7 +216,7 @@ a#toggle-shelf i{
     header{
         overflow: hidden;
     }
-    h6{
+    h5{
         white-space: nowrap;
         text-overflow: ellipsis;
         margin-bottom: 0;
@@ -217,8 +226,9 @@ a#toggle-shelf i{
     }
     p{
         color: #555;
-        height: 50px;
+        height: 80px;
         background-repeat: no-repeat;
+        font-size: 80%;
     }
     .th{
         margin:20px auto;
@@ -244,9 +254,8 @@ a#toggle-shelf i{
     footer{
         margin-top: 1rem;
         font-size: 70%;
-        opacity:0.8;
-        margin-bottom: 5px;
         clear: both;
+        color: $meta-color;
             .age{
                 display: none;
                 position: absolute;
@@ -256,6 +265,15 @@ a#toggle-shelf i{
                 width: 100%;
             }
         }
+}
+
+.edit-card{
+    position: relative;
+	background-color: $bg-color;
+	padding:10px;
+	border: 1px dashed darken($bg-color,10%);
+	display: block;
+    
 }
 
 /* Create card */
@@ -311,6 +329,10 @@ dd a{
 	padding-top: 0;
 }
 
+.content.row{
+    margin: 0;
+}
+
 /* Default card */
 .card>:hover .label{
 	opacity:1;
@@ -346,9 +368,7 @@ dd a{
     text-transform: uppercase;
     //background-color: $info-color;
     padding: 2px;
-
-}
-    
+}  
 }
 
 
@@ -378,13 +398,15 @@ aside .meta i{color: #ccc;}
 aside:hover .meta i{color: black;}
 
 
-
+.panel{
+    background-color: darken($bg-color,10%);
+}
 
 /* Content area */
 article{
 	margin-top: 0.5rem;
 	padding-bottom: 4rem; 
-	background-color: white;
+	
     &>header{
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 1rem!important;

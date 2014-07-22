@@ -84,7 +84,7 @@
     <span style="color:red">Listed below files are already uploaded please choose different files</span>
     <ul>
       {% for each in already_uploaded %}
-      <li>{{each}}</li>
+      <li>{{each.Newname}} this file is already uploaded as {{each.Oldname}}</li>
       {% endfor %}
     </ul>
   </div>
@@ -130,7 +130,7 @@
             <a href ="{% url 'file_detail' group_name_tag file %}">
           <header>
              
-            <h6>{{file.name}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h6>
+            <h5>{{file.name}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h5>
               
           </header>
 <img class="preview" src="{% url 'getFileThumbnail' group_name_tag file %}" />
