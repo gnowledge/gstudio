@@ -5,7 +5,7 @@
 {% block title %} {{ title }} {% endblock %}
 
 {% block body_content %} 
-  {% user_access_policy groupid request.user as user_access %}
+  {% check_is_gstaff groupid request.user as gstaff_access %}
 
   {% if nodes.count %}
     {% autopaginate nodes 25 %}
@@ -48,7 +48,7 @@
       <a class="close-reveal-modal">&#215;</a>
     </div>
 
-    {% if user_access == "allow" %}
+    {% if gstaff_access %}
       <input class="button deleteObjects" type="button" value="Delete">
     {% endif %}
     
@@ -68,9 +68,8 @@
       <tr>
           <th width="20"> <input class="checkedAll" type="checkbox"></th>
           <th>Title</th>
-          <th>Creation date</th>
 
-          {% if user_access == "allow" %}
+          {% if gstaff_access %}
           <th>Edit</th>
 
           {% if is_link_needed %}
@@ -91,9 +90,8 @@
           {% else %}
           <td  class="name" style="font-size:14px;"><a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name|title}}</a></td>
           {% endif %}
-          <td  class="created_at" style="font-size:14px;">{{each.created_at}}</td>
 
-          {% if user_access == "allow" %}
+          {% if gstaff_access %}
           <!-- Show below Edit & Link buttons only to authorized users -->
 
           {% if app_name == "MIS" %}

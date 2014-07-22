@@ -63,9 +63,13 @@ def getImageThumbnail(request, group_id, _id):
     else :
         pass
     img_obj = collection.File.one({"_type": u"File", "_id": ObjectId(_id)})
+    
     if img_obj is not None:
-        if (img_obj.fs.files.exists(img_obj.fs_file_ids[1])):
-            f = img_obj.fs.files.get(ObjectId(img_obj.fs_file_ids[1]))
+        # getting latest uploaded pic's _id
+        img_fs = img_obj.fs_file_ids[ len(img_obj.fs_file_ids) - 1 ]
+        
+        if (img_obj.fs.files.exists(img_fs)):
+            f = img_obj.fs.files.get(ObjectId(img_fs))
             return HttpResponse(f.read(),content_type=f.content_type)
     else:
         return HttpResponse("")

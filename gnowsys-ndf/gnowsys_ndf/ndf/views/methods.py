@@ -105,7 +105,10 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
     collection = db[Node.collection_name]
-        
+    
+    theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
+
     drawer = None    
     
     if checked:     
@@ -160,18 +163,17 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
 
       elif checked == "Theme":
-        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
-        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id, topic_GST_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "Topic":
-        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
-        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id, topic_GST_id]},'group_set': {'$all': [ObjectId(group_id)]}})   
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})   
 
     else:
       # For heterogeneous collection      
-      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      if theme_GST_id or topic_GST_id:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      else:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})           
            
     
     if (nid is None) and (not nlist):
@@ -291,7 +293,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   language= request.POST.get('lan')
   tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
-  collection_list = request.POST.get('collection_list','')
+  collection_list = request.POST.get('collection_set_list','')
   module_list = request.POST.get('module_list','')
   content_org = unicode(request.POST.get('content_org'))
   map_geojson_data = request.POST.get('map-geojson-data')
@@ -332,19 +334,19 @@ def get_node_common_fields(request, node, group_id, node_type):
   if name:
     if node.name != name:
       node.name = name
-      print "\n Changed: name"
+      # print "\n Changed: name"
       is_changed = True
   
   if sub_theme_name:
     if node.name != sub_theme_name:
       node.name = sub_theme_name
-      print "\n Changed: sub-theme"
+      # print "\n Changed: sub-theme"
       is_changed = True
   
   if add_topic_name:
     if node.name != add_topic_name:
       node.name = add_topic_name
-      print "\n Changed: topic"
+      # print "\n Changed: topic"
       is_changed = True
 
   # -------------------------------------------------------------------------------- language
@@ -361,11 +363,11 @@ def get_node_common_fields(request, node, group_id, node_type):
     # via access_policy(public/private) option on the template which is visible only to the creator
     if access_policy == "PUBLIC" and node.access_policy != access_policy:
       node.access_policy = u"PUBLIC"
-      print "\n Changed: access_policy (pu 2 pr)"
+      # print "\n Changed: access_policy (pu 2 pr)"
       is_changed = True
     elif access_policy == "PRIVATE" and node.access_policy != access_policy:
       node.access_policy = u"PRIVATE"
-      print "\n Changed: access_policy (pr 2 pu)"
+      # print "\n Changed: access_policy (pr 2 pu)"
       is_changed = True
   else:
     node.access_policy = u"PUBLIC"
@@ -393,7 +395,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
     if set(node.tags) != set(tags_list):
       node.tags = tags_list
-      print "\n Changed: tags"
+      # print "\n Changed: tags"
       is_changed = True
 
   # -------------------------------------------------------------------------------- prior_node
@@ -422,7 +424,7 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.prior_node.append(node_id)
         
         i = i+1
-      print "\n Changed: prior_node"
+      # print "\n Changed: prior_node"
       is_changed = True
  
   # -------------------------------------------------------------------------------- collection
@@ -445,6 +447,9 @@ def get_node_common_fields(request, node, group_id, node_type):
 
     if set(node.collection_set) != set(collection_list):
       i = 0
+      node.collection_set = []
+
+      # checking if each _id in collection_list is valid or not
       while (i < len(collection_list)):
         node_id = ObjectId(collection_list[i])
         
@@ -453,8 +458,9 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.collection_set.append(node_id)
         
         i = i+1
-      print "\n Changed: collection_list"
+      # print "\n Changed: collection_list"
       is_changed = True
+
      
   # -------------------------------------------------------------------------------- Module
 
@@ -484,7 +490,7 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.collection_set.append(node_id)
         
         i = i+1
-      print "\n Changed: module_list"
+      # print "\n Changed: module_list"
       is_changed = True
     
   # ------------------------------------------------------------------------------- org-content
@@ -497,13 +503,13 @@ def get_node_common_fields(request, node, group_id, node_type):
       usrname = request.user.username
       filename = slugify(name) + "-" + usrname + "-"
       node.content = org2html(content_org, file_prefix=filename)
-      print "\n Changed: content_org"
+      # print "\n Changed: content_org"
       is_changed = True
 
   # ----------------------------------------------------------------------------- visited_location in author class
   if node.location != map_geojson_data:
     node.location = map_geojson_data # Storing location data
-    print "\n Changed: map"
+    # print "\n Changed: map"
     is_changed = True
   
   if user_last_visited_location:
@@ -516,7 +522,7 @@ def get_node_common_fields(request, node, group_id, node_type):
       if node._type == "Author" and user_group_location._id == node._id:
         if node['visited_location'] != user_last_visited_location:
           node['visited_location'] = user_last_visited_location
-          print "\n Changed: user location"
+          # print "\n Changed: user location"
           is_changed = True
 
       else:

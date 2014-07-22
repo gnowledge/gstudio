@@ -3,6 +3,7 @@
 *
 *   Use this stylesheet for placements, positioning and sizing of elements
 */
+
 @import url("css.css");
 
 
@@ -28,6 +29,7 @@
 			-webkit-box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
+            background: url($theme-path+$page-background) no-repeat 0 bottom;
             
             &:after{
             //Hack for setting div height to the height of the browser window
@@ -44,6 +46,8 @@
 			position: relative;
             margin: 0 2rem;
             color:#888;
+            min-height: 100px;
+            background-color: rgba(255,255,255,0.5);
             
             a{
 			color: #777;
@@ -75,30 +79,36 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 
 main>aside{
 	margin-bottom: 0.5rem;
-}
-main>aside header{
+
+header{
 	margin-top: 1rem;
 }
-main>aside a{
+a{
 	color: #008759;
-}
-main>aside a:hover{
+    &:hover{
 	color: inherit;
+}
+}
+
 }
 
 h2:not(.subheader){
-	color: #222;
 	font-family: "Georgia Serif", Serif;
-	margin: 0;
-}
-h3{
-	font-size: 1.4rem;
+    
+    div{
+        display:inline-block;
+        position: relative;
+        input{
+            @extend h2;
+            
+            height: 3rem;
+            box-shadow: none;
+            border: none;
+            border-bottom: 2px dotted darken($theme-color,50%);
+        }
+    }
 }
 
-p{
-	font-size: 0.9rem;
-	line-height: 1.5;
-}
 /* Off canvas navigation */
 aside.left-off-canvas-menu{
 	background-color: #222;
@@ -129,8 +139,8 @@ a#toggle-shelf i{
 
 /* Effects */
 .drop-shadow{
-	-webkit-box-shadow: 2px 2px 4px 1px #333;
-	box-shadow: 2px 2px 4px 1px #333;
+	-webkit-box-shadow: 0px 0px 5px 1px #333;
+	box-shadow: 0px 0px 5px 1px #333;
 }
 .rounded{
 	border-radius: 2px;
@@ -151,32 +161,119 @@ a#toggle-shelf i{
 }
 .card>*{
 	position: relative;
-	background-color: white;
-	margin:2px;
-	padding:10px;
-	border: 1px solid #eaeaea;
+	background-color: $bg-color;
+	padding:7px;
+	border: 1px dashed darken($bg-color,10%);
 	display: block;
-	color:inherit!important;
-	-webkit-box-shadow: 2px 2px 4px 1px #ddd;
-	box-shadow: 2px 2px 4px 1px #ddd;
-	opacity:0.8;
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
+	//color:$bg-color;
+	opacity:0.9;
+    overflow: hidden;
+    
+    >a{
+        color:inherit;
+        display: block;
+        position: relative;
+        z-index: 200;
+    }
+    
+     &.published{
+        opacity: 1;
+        border-style: solid;
+        border-color: $primary-color;
+    }
+    &.unapproved{
+        opacity: 1;
+        border-style: solid;
+        border-color: $alert-color;
+    }
 
     &:hover{
-	border: 1px solid #ddd;
+	border-style:solid;
 	opacity:1;
+        >a{
+           
+        }
+        i{
+            opacity:0.3;
+        }
+        footer .age{
+            display: block;
+        }
 }
     &>i{
 	position: absolute;
-	top: -12px;
-	right: 20px;
-	font-size: 4rem;
-	color:#eee;
-	opacity: 0.4;
+	top: -10px;
+	right: 10px;
+	font-size: 3rem;
+	color:$theme-color;
+	opacity: 0.1;
 }
+    .preview{
+        float: left;
+        padding-right: 5px;
+        padding-top: 4px;
+    }
+    header{
+        overflow: hidden;
+    }
+    h5{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-bottom: 0;
+    }
+        .label{
+        opacity:0.5;
+    }
+    p{
+        color: #555;
+        height: 80px;
+        background-repeat: no-repeat;
+        font-size: 80%;
+    }
+    .th{
+        margin:20px auto;
+        width:80px;
+        height: 80px;
+        overflow: hidden;
+        display: none;
+        &:hover{
+        width: 150px;
+        height: 150px;
+    }
+        img{
+        width: 100%;
+    }
+}
+    section{
+	background-color: #ddd;
+}
+    .button{
+	opacity:0.1;
+}
+    
+    footer{
+        margin-top: 1rem;
+        font-size: 70%;
+        clear: both;
+        color: $meta-color;
+            .age{
+                display: none;
+                position: absolute;
+                background-color: white;
+                z-index: 100;
+                bottom: 0;
+                width: 100%;
+            }
+        }
+}
+
+.edit-card{
+    position: relative;
+	background-color: $bg-color;
+	padding:10px;
+	border: 1px dashed darken($bg-color,10%);
+	display: block;
+    
 }
 
 /* Create card */
@@ -232,47 +329,15 @@ dd a{
 	padding-top: 0;
 }
 
+.content.row{
+    margin: 0;
+}
+
 /* Default card */
 .card>:hover .label{
 	opacity:1;
 }
-.card{
-    
-    header{
-        margin-bottom: 0;
-    }
-        .label{
-        opacity:0.5;
-    }
-    h4{
-        font-weight: bold;
-        font-size: 1rem;
-    }
-    p{
-        font-size: 0.9rem;
-    }
-    .th{
-        margin:20px auto;
-        width:80px;
-        height: 80px;
-        overflow: hidden;
-        display: none;
-        &:hover{
-        width: 150px;
-        height: 150px;
-    }
-        img{
-        width: 100%;
-    }
-}
-    section{
-	background-color: #ddd;
-}
-    .button{
-	opacity:0.1;
-}
-    
-}
+
 
 .gallery .card .th{
 	display: block;
@@ -287,21 +352,23 @@ dd a{
 }
 
 /* Inline label list */
-.label{
-	font-weight: bold;
-	color: orange;
-	background-color: inherit;border: 1px dotted orange;
-	display: inline-block;
-    &:hover{
-	background-color: orange;
-	color:white;
-}
-
-}
 
 .label-list{
 	display: inline-block;
 	text-align: left;
+    margin-bottom: 0.1rem;
+    &:empty:before{
+        content:"UNTAGGED";
+        @extend .label;
+        opacity:0.2!important;
+    padding: 2px;
+    }
+    
+    .label{
+    text-transform: uppercase;
+    //background-color: $info-color;
+    padding: 2px;
+}  
 }
 
 
@@ -331,18 +398,20 @@ aside .meta i{color: #ccc;}
 aside:hover .meta i{color: black;}
 
 
-
+.panel{
+    background-color: darken($bg-color,10%);
+}
 
 /* Content area */
 article{
 	margin-top: 0.5rem;
 	padding-bottom: 4rem; 
-	background-color: white;
-    header{
+	
+    &>header{
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 1rem!important;
 }
-    footer{
+    &>footer{
 	border-top: 1px dotted #ddd;
 }
     .breadcrumbs{
