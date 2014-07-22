@@ -1229,3 +1229,34 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
   except Exception as e:
       error_message = "\n GRelationCreateError: " + str(e) + "\n"
       raise Exception(error_message)
+
+
+
+# Method to create discussion thread for File and Page.
+def create_discussion(request, group_id, node_id, node_name=None):
+  '''
+  Method to create discussion thread for File and Page.
+  '''
+
+  twist_st = collection.Node.one({'_type':'GSystemType', 'name':'Twist'})
+
+  node = collection.Node.one({'_id': ObjectId(node_id)})
+
+  group = collection.Group.one({'_id':ObjectId(group_id)})
+
+  # retriving RelationType
+  relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
+  
+  # Creating thread with the name of node
+  thread_obj = collection.GSystem()
+
+  thread_obj.name = node.name
+
+  thread_obj.member_of.append(twist_st._id)
+  thread_obj.prior_node.append(node_id)
+  
+  thread_obj.save()
+
+  # creating GRelation
+  # create_grelation(node_id, relation_type, twist_st)
+

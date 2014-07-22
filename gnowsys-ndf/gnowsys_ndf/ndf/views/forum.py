@@ -104,8 +104,10 @@ def forum(request, group_id, node_id=None):
         
         forum_detail_list.append(temp_forum)
 
-      variables=RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
+      variables = RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
       return render_to_response("ndf/forum.html",variables)
+
+
 
 def create_forum(request,group_id):
     ins_objectid  = ObjectId()
@@ -208,6 +210,8 @@ def create_forum(request,group_id):
 
     return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
+
+
 def display_forum(request,group_id,forum_id):
     
     forum = collection.Node.one({'_id': ObjectId(forum_id)})
@@ -238,11 +242,17 @@ def display_forum(request,group_id,forum_id):
 
     return render_to_response("ndf/forumdetails.html",variables)
 
+
+
 def display_thread(request,group_id, thread_id, forum_id=None):
+    '''
+    Method to display thread and it's content
+    '''
+    
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
@@ -251,11 +261,14 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                 group_id = str(auth._id)
     else :
         pass
+
     try:
         thread = collection.Node.one({'_id': ObjectId(thread_id)})
-        forum=""
+        forum = ""
+        
         for each in thread.prior_node:
             forum=collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
+        
             if forum:
                 usrname = User.objects.get(id=forum.created_by).username
                 variables = RequestContext(request,
@@ -274,14 +287,19 @@ def display_thread(request,group_id, thread_id, forum_id=None):
 
 
 def create_thread(request, group_id, forum_id):
+    ''' 
+    Method to create thread
+    '''
 
     forum = collection.Node.one({'_id': ObjectId(forum_id)})
-    forum_data = {  
-                    'name':forum.name,
-                    'content':forum.content,
-                    'created_by':User.objects.get(id=forum.created_by).username
-                }
+    
+    # forum_data = {  
+    #                 'name':forum.name,
+    #                 'content':forum.content,
+    #                 'created_by':User.objects.get(id=forum.created_by).username
+    #             }
     # print forum_data
+
     forum_threads = []
     exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
     exstng_reply.sort('created_at')
