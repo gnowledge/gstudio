@@ -8162,37 +8162,50 @@ main > aside > div h3 {
   font-size: 1.2rem;
   font-weight: normal;
 }
-/* line 111, ../scss/_styles.scss */
-main > aside > div header {
-  height: 8rem;
-  border-bottom: 5px solid #47b079;
+/* line 110, ../scss/_styles.scss */
+main > aside > div h4 {
+  font-size: 1rem;
+  color: #eee;
+}
+/* line 113, ../scss/_styles.scss */
+main > aside > div h4 span {
+  display: none;
 }
 /* line 116, ../scss/_styles.scss */
+main > aside > div h4:hover span {
+  display: inline;
+}
+/* line 122, ../scss/_styles.scss */
+main > aside > div header {
+  min-height: 8rem;
+  border-bottom: 5px solid #47b079;
+}
+/* line 127, ../scss/_styles.scss */
 main > aside > div a {
   color: white;
 }
-/* line 118, ../scss/_styles.scss */
+/* line 129, ../scss/_styles.scss */
 main > aside > div a:hover {
   color: white;
 }
 
-/* line 129, ../scss/_styles.scss */
+/* line 140, ../scss/_styles.scss */
 article > header {
   background-color: #eef7eb;
   padding: 15px;
   margin-bottom: 0.5rem;
 }
-/* line 138, ../scss/_styles.scss */
+/* line 149, ../scss/_styles.scss */
 article h1:not(.subheader), article h1:not(.subheader) div input:not(.subheader) {
   font-family: "Georgia Serif", Serif;
   font-style: italic;
 }
-/* line 142, ../scss/_styles.scss */
+/* line 153, ../scss/_styles.scss */
 article h1:not(.subheader) div, article h1:not(.subheader) div input:not(.subheader) div {
   display: inline-block;
   position: relative;
 }
-/* line 145, ../scss/_styles.scss */
+/* line 156, ../scss/_styles.scss */
 article h1:not(.subheader) div input {
   height: 4rem;
   font-style: italic;
@@ -8201,19 +8214,19 @@ article h1:not(.subheader) div input {
   box-shadow: none;
   border: none;
 }
-/* line 153, ../scss/_styles.scss */
+/* line 164, ../scss/_styles.scss */
 article h1:not(.subheader) div input:hover {
   border-bottom: 2px dotted #47b079;
 }
 
 /* Off canvas navigation */
-/* line 162, ../scss/_styles.scss */
+/* line 173, ../scss/_styles.scss */
 aside.left-off-canvas-menu {
   background-color: #222;
   color: white;
 }
 
-/* line 166, ../scss/_styles.scss */
+/* line 177, ../scss/_styles.scss */
 a#toggle-shelf {
   position: absolute;
   top: 1rem;
@@ -8222,17 +8235,17 @@ a#toggle-shelf {
   z-index: 10;
 }
 
-/* line 173, ../scss/_styles.scss */
+/* line 184, ../scss/_styles.scss */
 a#toggle-shelf:hover {
   color: black;
 }
 
-/* line 176, ../scss/_styles.scss */
+/* line 187, ../scss/_styles.scss */
 a#toggle-shelf i {
   font-size: 30px;
 }
 
-/* line 180, ../scss/_styles.scss */
+/* line 191, ../scss/_styles.scss */
 .inner-wrap > aside h4 {
   color: white;
   padding: 10px;
@@ -8240,19 +8253,19 @@ a#toggle-shelf i {
 
 /* Should be in Foundation */
 /* Effects */
-/* line 190, ../scss/_styles.scss */
+/* line 201, ../scss/_styles.scss */
 .drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px #333;
   box-shadow: 0px 0px 5px 1px #333;
 }
 
-/* line 194, ../scss/_styles.scss */
+/* line 205, ../scss/_styles.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 198, ../scss/_styles.scss */
+/* line 209, ../scss/_styles.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -8261,7 +8274,7 @@ a#toggle-shelf i {
 }
 
 /* Card block */
-/* line 211, ../scss/_styles.scss */
+/* line 222, ../scss/_styles.scss */
 .card > * {
   position: relative;
   background-color: #eef7eb;
@@ -8271,39 +8284,39 @@ a#toggle-shelf i {
   opacity: 0.9;
   overflow: hidden;
 }
-/* line 221, ../scss/_styles.scss */
+/* line 232, ../scss/_styles.scss */
 .card > * > a {
   color: inherit;
   display: block;
   position: relative;
   z-index: 200;
 }
-/* line 228, ../scss/_styles.scss */
+/* line 239, ../scss/_styles.scss */
 .card > *.published {
   opacity: 1;
   border-style: solid;
   border-color: #1b432e;
 }
-/* line 233, ../scss/_styles.scss */
+/* line 244, ../scss/_styles.scss */
 .card > *.unapproved {
   opacity: 1;
   border-style: solid;
   border-color: #f04124;
 }
-/* line 239, ../scss/_styles.scss */
+/* line 250, ../scss/_styles.scss */
 .card > *:hover {
   border-style: solid;
   opacity: 1;
 }
-/* line 245, ../scss/_styles.scss */
+/* line 256, ../scss/_styles.scss */
 .card > *:hover i {
   opacity: 0.3;
 }
-/* line 248, ../scss/_styles.scss */
+/* line 259, ../scss/_styles.scss */
 .card > *:hover footer .age {
   display: block;
 }
-/* line 252, ../scss/_styles.scss */
+/* line 263, ../scss/_styles.scss */
 .card > * > i {
   position: absolute;
   top: -10px;
@@ -8312,34 +8325,34 @@ a#toggle-shelf i {
   color: #1b432e;
   opacity: 0.1;
 }
-/* line 260, ../scss/_styles.scss */
+/* line 271, ../scss/_styles.scss */
 .card > * .preview {
   float: left;
   padding-right: 5px;
   padding-top: 4px;
 }
-/* line 265, ../scss/_styles.scss */
+/* line 276, ../scss/_styles.scss */
 .card > * header {
   overflow: hidden;
 }
-/* line 268, ../scss/_styles.scss */
+/* line 279, ../scss/_styles.scss */
 .card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
 }
-/* line 273, ../scss/_styles.scss */
+/* line 284, ../scss/_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 276, ../scss/_styles.scss */
+/* line 287, ../scss/_styles.scss */
 .card > * p {
   color: #555;
   height: 80px;
   background-repeat: no-repeat;
   font-size: 80%;
 }
-/* line 282, ../scss/_styles.scss */
+/* line 293, ../scss/_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -8347,31 +8360,31 @@ a#toggle-shelf i {
   overflow: hidden;
   display: none;
 }
-/* line 288, ../scss/_styles.scss */
+/* line 299, ../scss/_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 292, ../scss/_styles.scss */
+/* line 303, ../scss/_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 296, ../scss/_styles.scss */
+/* line 307, ../scss/_styles.scss */
 .card > * section {
   background-color: #ddd;
 }
-/* line 299, ../scss/_styles.scss */
+/* line 310, ../scss/_styles.scss */
 .card > * .button {
   opacity: 0.1;
 }
-/* line 303, ../scss/_styles.scss */
+/* line 314, ../scss/_styles.scss */
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
   color: #666666;
 }
-/* line 308, ../scss/_styles.scss */
+/* line 319, ../scss/_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -8381,7 +8394,7 @@ a#toggle-shelf i {
   width: 100%;
 }
 
-/* line 319, ../scss/_styles.scss */
+/* line 330, ../scss/_styles.scss */
 .edit-card {
   position: relative;
   background-color: #eef7eb;
@@ -8390,69 +8403,69 @@ a#toggle-shelf i {
 }
 
 /* Create card */
-/* line 329, ../scss/_styles.scss */
+/* line 340, ../scss/_styles.scss */
 .create.card > * {
   background-color: #999;
   opacity: 1;
 }
-/* line 333, ../scss/_styles.scss */
+/* line 344, ../scss/_styles.scss */
 .create.card > *:hover {
   background-color: #008759;
 }
 
-/* line 339, ../scss/_styles.scss */
+/* line 350, ../scss/_styles.scss */
 .create.card h4 {
   color: white;
 }
-/* line 342, ../scss/_styles.scss */
+/* line 353, ../scss/_styles.scss */
 .create.card .button {
   border: 1px solid #00ba7b;
   opacity: 0.5;
 }
-/* line 346, ../scss/_styles.scss */
+/* line 357, ../scss/_styles.scss */
 .create.card label {
   color: white;
 }
-/* line 349, ../scss/_styles.scss */
+/* line 360, ../scss/_styles.scss */
 .create.card .switch label {
   color: inherit;
 }
 
 /* Content Tabs */
-/* line 357, ../scss/_styles.scss */
+/* line 368, ../scss/_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
 
-/* line 366, ../scss/_styles.scss */
+/* line 377, ../scss/_styles.scss */
 article .tabs dd.active a, article .tabs dd:hover a {
   color: #1b432e;
   border-bottom: 2px solid #59a241;
 }
 
-/* line 372, ../scss/_styles.scss */
+/* line 383, ../scss/_styles.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
-/* line 376, ../scss/_styles.scss */
+/* line 387, ../scss/_styles.scss */
 .content.row {
   margin: 0;
 }
 
 /* Default card */
-/* line 381, ../scss/_styles.scss */
+/* line 392, ../scss/_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 386, ../scss/_styles.scss */
+/* line 397, ../scss/_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
-/* line 390, ../scss/_styles.scss */
+/* line 401, ../scss/_styles.scss */
 .card > *:hover .button {
   opacity: 1;
   transition: opacity .5s ease-in ease-in;
@@ -8462,52 +8475,52 @@ article .tabs dd.active a, article .tabs dd:hover a {
 }
 
 /* Inline label list */
-/* line 400, ../scss/_styles.scss */
+/* line 411, ../scss/_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 404, ../scss/_styles.scss */
+/* line 415, ../scss/_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
 }
-/* line 411, ../scss/_styles.scss */
+/* line 422, ../scss/_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   padding: 2px;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 425, ../scss/_styles.scss */
+/* line 436, ../scss/_styles.scss */
 .panel {
   background-color: #cfe8c7;
 }
 
 /* Content area */
-/* line 430, ../scss/_styles.scss */
+/* line 441, ../scss/_styles.scss */
 article {
   margin-top: 0.5rem;
   padding-bottom: 4rem;
 }
-/* line 434, ../scss/_styles.scss */
+/* line 445, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 438, ../scss/_styles.scss */
+/* line 449, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 441, ../scss/_styles.scss */
+/* line 452, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 450, ../scss/_styles.scss */
+/* line 461, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8528,22 +8541,22 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 470, ../scss/_styles.scss */
+/* line 481, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 475, ../scss/_styles.scss */
+/* line 486, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 478, ../scss/_styles.scss */
+/* line 489, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 481, ../scss/_styles.scss */
+/* line 492, ../scss/_styles.scss */
 .user i {
   padding: 0.2em 0.5em;
   margin-right: 0.4em;
@@ -8552,65 +8565,65 @@ textarea {
   opacity: 0.8;
 }
 
-/* line 488, ../scss/_styles.scss */
+/* line 499, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 492, ../scss/_styles.scss */
+/* line 503, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 496, ../scss/_styles.scss */
+/* line 507, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 499, ../scss/_styles.scss */
+/* line 510, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 504, ../scss/_styles.scss */
+/* line 515, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 509, ../scss/_styles.scss */
+/* line 520, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 512, ../scss/_styles.scss */
+/* line 523, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 515, ../scss/_styles.scss */
+/* line 526, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 522, ../scss/_styles.scss */
+/* line 533, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 527, ../scss/_styles.scss */
+/* line 538, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 534, ../scss/_styles.scss */
+/* line 545, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8618,13 +8631,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 541, ../scss/_styles.scss */
+/* line 552, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 546, ../scss/_styles.scss */
+/* line 557, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8638,13 +8651,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 556, ../scss/_styles.scss */
+/* line 567, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 561, ../scss/_styles.scss */
+/* line 572, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8655,7 +8668,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 572, ../scss/_styles.scss */
+/* line 583, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8667,12 +8680,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 584, ../scss/_styles.scss */
+/* line 595, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 587, ../scss/_styles.scss */
+/* line 598, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }

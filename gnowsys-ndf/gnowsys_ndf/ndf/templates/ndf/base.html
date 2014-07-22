@@ -189,15 +189,14 @@
           <header>
           <a class="active-menu" href="{% url 'groupchange' group_object.name %}"><h2>{{group_object.name}}</h2></a>
               <a class="left-off-canvas-toggle meta" >{% block meta_content %}  {% endblock %}</a> 
+              
+               {% block concern_information %} {% endblock %}
+              
           </header>
           
 	      
 	      <!-- Meta content in the (main aside header)-->
-	      <section class="row">
-		
-    {% block concern_information %} {% endblock %}
-	      </section>
-	      
+
 	      <section class="row">
 		{% block search_content %}  {% endblock %}
 	      </section>

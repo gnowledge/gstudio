@@ -107,9 +107,20 @@ main>aside{
             font-size: 1.2rem;
             font-weight: normal;
         }
+        h4{
+            font-size: 1rem;
+            color: #eee;
+            span{
+                display: none;
+            }
+            &:hover span{
+                display: inline;
+            }
+        }
+            
         
         header{
-            height: 8rem;
+            min-height: 8rem;
             border-bottom: 5px solid $active-color;
         }
         
