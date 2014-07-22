@@ -8660,7 +8660,13 @@ input.node-title {
 /*
 *   Foundation extensions
 */
-/* line 29, ../scss/foundation-skin.scss */
+/* Protects reflowing elements on error */
+/* line 30, ../scss/foundation-skin.scss */
+[data-abide] span.error, [data-abide] small.error {
+  position: absolute;
+}
+
+/* line 34, ../scss/foundation-skin.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -8674,16 +8680,16 @@ pre {
   font-family: monospace;
 }
 
-/* line 43, ../scss/foundation-skin.scss */
+/* line 48, ../scss/foundation-skin.scss */
 .fixme {
   opacity: 0.5;
 }
-/* line 46, ../scss/foundation-skin.scss */
+/* line 51, ../scss/foundation-skin.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 49, ../scss/foundation-skin.scss */
+/* line 54, ../scss/foundation-skin.scss */
 .fixme:hover:after {
   content: " fixme";
   color: orange;
