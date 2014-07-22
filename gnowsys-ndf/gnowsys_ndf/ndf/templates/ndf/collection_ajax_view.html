@@ -27,14 +27,14 @@
    
       <h5>
   
-      <a class="select" class="collection" name="{{each_node.pk}}" style="padding-left:10px;"><i class="fi-page-multiple"></i> {{ each_node.name }}</a>
+      <a class="select" class="collection" name="{{each_node.pk}}"><i class="fi-page-multiple"></i> {{ each_node.name }}</a>
 </h5>
   </li>
 
   {% else %}
   <li>
       <h6 class="{{ each_node.type }}">
-      <a class="select" name="{{each_node.pk}}" style="padding-left:12px;">{{ each_node.name }}</a>
+      <a class="select" name="{{each_node.pk}}">{{ each_node.name }}</a>
 </h6>
   </li>
   {% endif %}
