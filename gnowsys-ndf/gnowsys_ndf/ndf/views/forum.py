@@ -392,7 +392,7 @@ def add_node(request,group_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
@@ -404,14 +404,16 @@ def add_node(request,group_id):
 
     try:
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        content_org=request.POST.get("reply","")
-        node=request.POST.get("node","")
-        thread=request.POST.get("thread","")
-        forumid=request.POST.get("forumid","")
-        sup_id=request.POST.get("supnode","")
-        tw_name=request.POST.get("twistname","")
-        forumobj=""
-        groupobj=""
+        content_org = request.POST.get("reply","")
+        node = request.POST.get("node","")
+        thread = request.POST.get("thread","") # getting thread _id
+        forumid = request.POST.get("forumid","") # getting forum _id
+        sup_id = request.POST.get("supnode","") #getting _id of it's parent node
+        tw_name = request.POST.get("twistname","")
+        forumobj = ""
+        groupobj = ""
+
+        print "\n node:", node, "\n thread: ", thread, "\n forumid: ", forumid, "\n supnode: ", sup_id, "\n twistname: ", tw_name
     
         colg = collection.Group.one({'_id':ObjectId(group_id)})
 
