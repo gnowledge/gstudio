@@ -739,7 +739,7 @@ def delete_file(request, group_id, _id):
   else :
       pass
   file_collection = db[File.collection_name]
-  auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
+  auth = collection.Node.one({'_type': u'Author', 'name': unicode(request.user.username) })
   pageurl = request.GET.get("next", "")
   try:
     cur = file_collection.File.one({'_id':ObjectId(_id)})
