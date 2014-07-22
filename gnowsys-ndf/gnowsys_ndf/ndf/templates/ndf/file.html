@@ -152,9 +152,9 @@
 
           {% get_user_object file.created_by as user_obj %}
           {% ifequal  user_obj.username  user.username  %}
-	  {% comment %}
+
           <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">Delete </a>
-	  {% endcomment %}
+
           {% endifequal %}
 	  
           <footer class="row">
