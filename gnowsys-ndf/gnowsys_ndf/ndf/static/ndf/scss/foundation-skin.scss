@@ -26,6 +26,11 @@
 *   Foundation extensions
 */
 
+/* Protects reflowing elements on error */
+[data-abide] span.error, [data-abide] small.error{
+    position: absolute;
+}
+
 pre{
     width:92%;
 	overflow: auto;

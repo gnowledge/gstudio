@@ -25,7 +25,19 @@
 
 
 {% block meta_content %}
-  <h2>Pages</h2>
+  <h3>Pages</h3>
+
+{% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+
+      <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
+	<span class="fi-plus">&nbsp;&nbsp;Create {{title}}</span>
+      </a>
+  
+  {% endif %}
+  {% endif %}
+
 {% endblock %}
 
 
@@ -35,20 +47,31 @@
 
 
 {% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-  <br/>
-  <div class="create card">
-    <div class="page">
-      <br/>
-      <a class="button medium" href="{% url 'page_create_edit' group_name_tag %}">
-	<span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
-      </a>
-    </div>
-  </div>
-  {% endif %}
-  {% endif %}
+
+{% get_resource_collection groupid title as page_collections %}
+
+
+<ul class="side-nav">
+
+  {% autopaginate page_collections 23 %}
+
+  <!-- Existing card list-->
+  {% for node in page_collections %}
+    <li>
+     
+      <h5>
+      <a class="select" class="collection" href="{% url 'page_details' group_name_tag node %}"><i class="fi-page-multiple"></i>  {{ node.name|truncatechars:20 }}        
+    </a>
+</h5>
+    
+          
+    </li>  
+  
+
+  {% endfor %}
+
+</ul>
+  
 {% endblock %}
 
 
