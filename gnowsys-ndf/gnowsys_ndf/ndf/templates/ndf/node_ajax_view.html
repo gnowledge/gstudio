@@ -14,68 +14,125 @@
   <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css">
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css">
+
+  <!-- orgitdown! -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
 {% endblock %}
 
 <!-- css for drawer widget -->
 <style type = "text/css">
-.movingDiv{
-  display:none; 
-  position:absolute;
-  color: green;
-  font-size: 10px; 
-  z-index:40; 
-  background-color:white; 
-  box-shadow: 0px 0px 5px #888888; 
-}
-.annotatedElement{
-background-color : rgba(255,0,0,0.2);
-font-weight:bold;
-} 
-.movingDivIcon{
-  font-size: 35px;
-  color: green;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-.annotateIcon{
-  font-size: 35px;
-  color: green;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-.divider-line { font-size: xx-large; color:lightgray; }
-.line-height-2 { line-height:2; }
-.line-height-2pt5 { line-height:2.5; }
-.fontsize-x-large { font-size: x-large; }
 
-.margin-0 { margin: 0 !important ;}
+  .movingDiv{
+    display:none; 
+    position:absolute;
+    color: green;
+    font-size: 10px; 
+    z-index:40; 
+    background-color:white; 
+    box-shadow: 0px 0px 5px #888888; 
+  }
+  .annotatedElement{
+  background-color : rgba(255,0,0,0.2);
+  font-weight:bold;
+  } 
+  .movingDivIcon{
+    font-size: 35px;
+    color: green;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .annotateIcon{
+    font-size: 35px;
+    color: green;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
 
-.resource-drawer {
-border-color: #D3D3D3; border-style: solid;
-padding: 0 !important;
-overflow-y: auto;
-}
+  .margin-0 { margin: 0 !important ;}
 
-.resource-drawer li.bullet-item:hover{
-background-color: #ecf0f1; cursor:pointer;
-}
+  .resource-drawer {
+  border-color: #D3D3D3; border-style: solid;
+  padding: 0 !important;
+  overflow-y: auto;
+  }
 
-.posted-by{ color: #808080; font-size: small; }
+  .resource-drawer li.bullet-item:hover{
+  background-color: #ecf0f1; cursor:pointer;
+  }
 
-.selected-resource { background-color:lightgray !important ; }
+  .posted-by{ color: #808080; font-size: small; }
 
-.resource-type-image {
-height:40px;
-background-repeat:no-repeat; background-size: 48px 48px
-}
+  .selected-resource { background-color:lightgray !important ; }
 
-ul#graph-hover.f-dropdown{
-  width: inherit !important;
-}
+  .resource-type-image {
+  height:40px;
+  background-repeat:no-repeat; background-size: 48px 48px
+  }
 
-#graph-hover > li > a:hover {
-  color: #555555;
-}
+  ul#graph-hover.f-dropdown{
+    width: inherit !important;
+  }
+
+  #graph-hover > li > a:hover {
+    color: #555555;
+  }
+
+
+  /*orgitdown style*/
+
+  .orgitdown{
+    /*height:100px;*/
+    width: 20em !important;
+  }
+  
+  .row.orgitdownContainer{
+    /*height:100px;*/
+    background-color: #EEEEEE;
+    padding: 0 1em;
+  }
+
+  .row.orgitdownContainer > ul
+  {
+    margin-bottom: 0 !important; 
+  }
+  /*.orgitdownEditor{
+    height:60px;
+  */}
+
+  .orgitdownContainer::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px; 
+  
+  }
+
+  .reply-button{
+    margin-left: -1.3em;
+    margin-top: -1em;
+    position: relative;
+    width: 21.87rem;
+  }
+
 
 </style>
 
@@ -147,7 +204,7 @@ ul#graph-hover.f-dropdown{
 
         <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
 
-        <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+        <dd><a href="#view-discussion"><i class="fi-comment"></i> Discuss</a></dd>
       </dl>
     </div>
     
@@ -388,7 +445,29 @@ ul#graph-hover.f-dropdown{
        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
        <!-- #{#%# endif %} -->
      </div>
-    </div>
+
+     <!-- discussion content area -->
+     <div id="view-discussion" class="content">
+
+       <div onclick="createDiscussion()" class="button">Start discussion</div>
+     
+      <!-- orgitdown container   -->
+       <div id="org" style="margin-left:1em;" class="try">
+          <!-- Reply : -->
+
+          <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
+
+          <input id="savereply" type="button" value="Post Reply"  class="button tiny reply-button">
+
+          <input type="hidden" id="rep" style="visibility:hidden" value="">
+          <input type="hidden" id="thd" style="visibility:hidden" value="">
+
+      </div>
+      <!-- end of orgit down container -->
+
+     </div>
+
+    </div><!-- end of tab's content -->
   </section>
 
   <section class="medium-3 columns">
@@ -550,6 +629,28 @@ ul#graph-hover.f-dropdown{
 </footer>
 
 <script type="text/javascript">
+
+  
+  // for discussion tab
+  $("#orgitdownreps").orgitdown(mySettings);
+
+  function createDiscussion()
+  {
+    $.ajax({
+      
+      url: "{% url 'create_discussion' group_id node.pk node.name %}",
+
+      success: function(data){
+          
+          if(data)
+          {
+            alert(data)
+          }
+        }
+    });
+  }
+
+
 
   // Taken value of svg data of that node globally
   var svgdata;
