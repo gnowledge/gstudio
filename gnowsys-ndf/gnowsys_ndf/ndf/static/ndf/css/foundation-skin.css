@@ -8188,20 +8188,20 @@ main > aside > div header {
 main > aside > div footer {
   background-color: #222;
   min-height: 1rem;
-  border-top: 1px solid #47b079;
 }
-/* line 134, ../scss/_styles.scss */
+/* line 133, ../scss/_styles.scss */
 main > aside > div a, main > aside > div p {
   color: white;
 }
-/* line 136, ../scss/_styles.scss */
+/* line 135, ../scss/_styles.scss */
 main > aside > div a:hover, main > aside > div p:hover {
   color: white;
 }
-/* line 140, ../scss/_styles.scss */
+/* line 139, ../scss/_styles.scss */
 main > aside > div .side-nav {
   background-color: #444;
   padding: 0;
+  border-bottom: 2px solid #47b079;
   margin: 0;
 }
 /* line 144, ../scss/_styles.scss */

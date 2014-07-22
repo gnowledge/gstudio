@@ -126,7 +126,6 @@ main>aside{
         footer{
             background-color: #222;
             min-height: 1rem;
-            border-top: 1px solid $active-color;
         }
         
         
@@ -140,6 +139,7 @@ main>aside{
         .side-nav{
             background-color: #444;
             padding: 0;
+            border-bottom: 2px solid $active-color;
         margin: 0;
             li{
                 border-bottom: 1px solid #555;
