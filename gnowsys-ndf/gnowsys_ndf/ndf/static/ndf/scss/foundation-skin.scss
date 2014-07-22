@@ -18,12 +18,7 @@
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
 
-nav.top-bar{
-    // Icons in the top-bar links caused heights of the li to vary by a few pixels and broke the layout of content below in firefox browser
-    height:inherit;
-}
-
-.top-bar-section ul li > a.button{
+.top-bar .dropdown a.button{
     padding: 0;
 }
 
