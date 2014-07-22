@@ -1528,3 +1528,104 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
+def get_students_assignments(request, group_id):
+  """
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  """
+  gr_node = None
+
+  try:
+    if request.is_ajax() and request.method =="GET":
+      user_id = 0
+
+      if request.GET.has_key("user_id"):
+        user_id = int(request.GET.get("user_id", ""))
+
+      college_group = collection.Node.one({'_id': ObjectId(group_id)}, {'name': 1, 'tags': 1, 'author_set': 1})
+      page = collection.Node.one({'_type': "GSystemType", 'name': "Page"}, {'_id': 1})
+      # print "\n page: ", page._id
+      image = collection.Node.one({'_type': "GSystemType", 'name': "Image"}, {'_id': 1})
+      # print " image: ", image._id
+      video = collection.Node.one({'_type': "GSystemType", 'name': "Video"}, {'_id': 1})
+      # print " video: ", video._id
+
+      student_list = []
+      # print " college_group (author_set): ", college_group.author_set, "\n"
+
+      if user_id:
+        student_dict = {}
+
+        num_pages = collection.Node.find({'member_of': page._id, 'created_by': user_id}, {'name': 1, '_id': 0})
+        num_images = collection.Node.find({'member_of': image._id, 'created_by': user_id}, {'name': 1, '_id': 0})
+        num_videos = collection.Node.find({'member_of': video._id, 'created_by': user_id}, {'name': 1, '_id': 0})
+        
+        # print "\n num_pages: ", num_pages.count()
+        student_dict["Pages"] = list(num_pages)
+        print "\n student_dict['Pages']: ", student_dict["Pages"], "\n"
+        # print " num_images: ", num_images.count()
+        student_dict["Images"] = list(num_images)
+        # print " num_videos: ", num_videos.count()
+        student_dict["Videos"] = list(num_videos)
+
+        # Student's Author node
+        student_author_node = collection.Node.one({'_type': "Author", 'created_by': user_id})
+        # print "\n student_author_node: ", student_author_node.name
+        # Student's node 
+        student_has_login = collection.Node.one({'_type': "GRelation", 'right_subject': student_author_node._id})
+        student_node = collection.Node.one({'_id': student_has_login.subject}, {'name': 1})
+        # print " student_node: ", student_node.name
+        student_dict["Name"] = student_node.name
+        student_dict["user_id"] = user_id
+
+        return HttpResponse(json.dumps(student_dict))
+
+      else:
+        for user_id in college_group.author_set:
+          student_dict = {}
+
+          num_pages = collection.Node.find({'member_of': page._id, 'created_by': user_id})
+          num_images = collection.Node.find({'member_of': image._id, 'created_by': user_id})
+          num_videos = collection.Node.find({'member_of': video._id, 'created_by': user_id})
+          
+          # print "\n num_pages: ", num_pages.count()
+          student_dict["Pages"] = num_pages.count()
+          # print " num_images: ", num_images.count()
+          student_dict["Images"] = num_images.count()
+          # print " num_videos: ", num_videos.count()
+          student_dict["Videos"] = num_videos.count()
+          student_dict["Total"] = num_pages.count() + num_images.count() + num_videos.count()
+
+          # Student's Author node
+          student_author_node = collection.Node.one({'_type': "Author", 'created_by': user_id})
+          # print "\n student_author_node: ", student_author_node.name
+          # Student's node 
+          student_has_login = collection.Node.one({'_type': "GRelation", 'right_subject': student_author_node._id})
+          student_node = collection.Node.one({'_id': student_has_login.subject}, {'name': 1})
+          # print " student_node: ", student_node.name
+          student_dict["Name"] = student_node.name
+          student_dict["user_id"] = user_id
+
+          # print "\n student_dict: ", student_dict
+          student_list.append(student_dict)
+
+        # print "\n student_list: ", student_list, "\n"
+        # print "\n group_id: ", group_id
+        # print " college_group_id: ", college_group_id
+
+        return render_to_response("ndf/student_statistics.html",
+                                  {'node': college_group,'student_list': student_list},
+                                  context_instance = RequestContext(request)
+                                )
+    
+    else:
+      error_message = "StudentDataGetError: Invalid ajax call!!!"
+      # raise Exception(error_message)
+      return StreamingHttpResponse(error_message)
+
+  except Exception as e:
+    print "\n StudentDataGetError: " + str(e)
+    raise Http404(e)

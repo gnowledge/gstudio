@@ -1,0 +1,108 @@
+<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
+
+<header class="row page">
+  <section class="medium-12 columns">
+    <h2>
+      <span class='node'>{{node.name}}</span>      
+      <small class="label-list"> 
+      {% for tag in node.tags %}
+      <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+      {% endfor %}
+      </small>      
+    </h2>
+
+  </section>
+</header>
+
+
+{% for each in student_list %}
+
+{% if forloop.first %}
+<section>
+<div class="rows">
+  <div class="small-3 columns">
+    <th>Student Name</th>
+  </div>
+  <div class="small-9 columns">
+    <th>Contributions/Assignments</th>
+  </div>
+</div>
+</section>
+{% endif %}
+  
+
+<div class="rows">
+  <div class="small-3 columns">
+    <a href="#all_content_{{each.user_id}}" id="{{each.user_id}}" class="student">{{each.Name|title}}</a>
+  </div>
+  <div class="small-9 columns">
+    {{each.Total}} (Pages: {{each.Pages}}, Images: {{each.Images}}, Videos: {{each.Videos}})
+  </div>
+</div>
+
+<div id="all_content_{{each.user_id}}" style="display: none">
+  <dl class="accordion" data-accordion="accordion_{{each.user_id}}">
+    <dd class="accordion-navigation">
+      <a href="#panel_pages_{{each.user_id}}">Pages</a>
+      <div id="panel_pages_{{each.user_id}}" class="content active">
+        Panel containing all pages.
+      </div>
+    </dd>
+    <dd class="accordion-navigation">
+      <a href="#panel_images_{{each.user_id}}">Images</a>
+      <div id="panel_images_{{each.user_id}}" class="content">
+        Panel containing all images.
+      </div>
+    </dd>
+    <dd class="accordion-navigation">
+      <a href="#panel_videos_{{each.user_id}}">Videos</a>
+      <div id="panel_videos_{{each.user_id}}" class="content">
+        Panel containing all videos.
+      </div>
+    </dd>
+  </dl>
+</div>
+{% empty %}
+
+  <h5><b>No students</b> have <b>registered</b> yet!!!</h5>
+
+{% endfor %}
+
+<script type="text/javascript">
+  $(document).foundation();
+
+  var selected_student = "";
+  $(document).on('click', '.student', function (){
+    selected_student = $(this)
+    selected_student_id = parseInt(selected_student.attr("id"))
+    console.log("selected_student id: " + selected_student_id)
+
+    // alert("node: {{node.pk}}")
+    $.ajax({
+      url: "{% url 'get_students_assignments' node.pk %}?user_id=" + selected_student_id,
+
+      type: "GET",
+
+      dataType: "json",
+
+      beforeSend: function(){
+
+      },
+
+      success: function(data){
+        $.each(data["Pages"], function(i, val){
+          $.each(val, function(k, v){
+            alert(k + " -- " + v)
+          });
+        });
+
+      },
+
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+        // Toggles the div consisting of Accordions of Pages, Images and Videos for corresponding student
+        $("#all_content_" + selected_student_id).toggle()
+      }
+    });
+  });
+</script>
