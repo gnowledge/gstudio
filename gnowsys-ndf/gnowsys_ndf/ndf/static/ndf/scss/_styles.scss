@@ -120,12 +120,15 @@ main>aside{
         header{
             min-height: 8rem;
             border-bottom: 1px solid black;
-            padding: 10px;
+            padding: 15px;
         }
         
         footer{
             background-color: #222;
             min-height: 1rem;
+            label{
+                font-size: 0.7rem;
+            }
         }
         
         
@@ -457,7 +460,7 @@ textarea{
 	color: inherit;
 }
 .user i{
-
+margin-right: 3px;
 }
 .user:hover i{
 	opacity:1;
