@@ -40,7 +40,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 <form data-abide id="form-edit-node" method="POST" action="">
     
-        <header class="row">
+        <header>
+            <div class="row">
  <h1 class="large-8 columns">
       {% if node %}
       <span class="subheader">Editing: </span>
@@ -56,9 +57,18 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  </div>
       {% endif %}  
       </h1>
+                
+            <div class=" large-4 columns">
+            <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
+                </div>
+ 
+           </div> 
+  </header>
 
-    
- <nav class="large-4 columns">
+    <div class="edit-card">
+        
+        <div class="row">
+       <nav class="large-8 columns">
       <dl class="tabs" data-tab>
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
@@ -76,11 +86,8 @@ background-repeat:no-repeat; background-size: 48px 48px
      
    </nav>
             
-  </header>
-
-    <div class="edit-card">
-        
-       
+            
+            </div>
         
   {% csrf_token %}
   
@@ -131,25 +138,13 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% endif %}
       </div>
         
-         <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button large-4 columns"/>
         
         <div class="large-4 columns">
             <div class="panel">
                 
-                <h5>Metadata</h5>
-                
+                <h5>Settings</h5>
+           
             <div class="row">
-                
-                <div class="large-4 columns">
-                <label class="inline">Language</label>
-                    </div>
-                <div class="large-8 columns">
-               <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
-                    </div>
-	   
-	     </div>
-                
-                 <div class="row">
 	    {% if node.created_by == request.user.pk %}	
                      <div class="large-4 columns">
 			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span></div>
@@ -197,10 +192,19 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			{% endif %}
 		{% endif %}	    
-	  </div>
+                
+                <div class="large-4 columns">
+                <label class="inline">Language</label>
+                    </div>
+                <div class="large-8 columns">
+               <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
+                    </div>
+	   
+	     </div>
+                
+                 
                 
                  <div class="row">
-                
                 <div class="large-4 columns">
                 <label class="inline">Location:</label>
                     </div>
@@ -209,9 +213,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  		<i class="fi-marker"></i> &nbsp; Add Location
 	  	</a>
                     </div>
-	   
 	     </div>
-                
                 
                 </div>
               
