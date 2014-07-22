@@ -314,11 +314,11 @@ ul#graph-hover.f-dropdown{
             {% for k,v in contents.items %}
               {% if k == "image_contents" %}
                 {% for e in v %}
-                  <a href ="{% url 'image_detail' group_name_tag e.1 %}">
+                  <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
                     <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
+                    <br/><div>{{e.0}}</div>
                   </a>&nbsp;&nbsp;&nbsp;&nbsp;
                 {% endfor %}
-                <!-- <a href ="{#% url 'image_detail' group_name_tag v.0.1 %#}"> {{v.0.0}} </a>&nbsp;&nbsp;  -->
               {% endif %}
             {% endfor %}
 
@@ -329,8 +329,9 @@ ul#graph-hover.f-dropdown{
             {% for k,v in contents.items %}
               {% if k == "video_contents" %}
                 {% for e in v %}
-                  <a href ="{% url 'video_detail' group_name_tag e.1 %}">
+                  <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
                     <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
+                    <br/><div>{{e.0}}</div>
                   </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {% endfor %}
               {% endif %}
