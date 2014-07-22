@@ -82,19 +82,26 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 /* Sections */
 
 
+
+//Main sidebar
 main>aside{
-	margin-bottom: 0.5rem;
-
-header{
-	margin-top: 1rem;
-}
-a{
-	color: #008759;
-    &:hover{
-	color: inherit;
-}
-}
-
+    &>div{
+        background-color: darken($bg-color,20%);
+        padding: 10px;
+        padding-bottom: 30px;
+        
+        header{
+            height: 5rem;
+        }
+        
+        a{
+                color: white;
+            &:hover{
+                color:white;
+            }
+            }
+        
+    }
 }
 
 //    Article styles
@@ -394,26 +401,6 @@ article{
 
 /*************************** 2. Custom CSS overrides ***********************/
 
-main aside{
-	padding-top: 1rem;
-    &.fade{
-	opacity:0.8;
-}
-}
-
-
-aside>section{
-	margin:inherit!important;
-	margin-bottom:5px;
-	padding-bottom: 3rem;
-    &>div{
-	padding: 15px;
-}
-}
-
-
-aside .meta i{color: #ccc;}
-aside:hover .meta i{color: black;}
 
 
 .panel{

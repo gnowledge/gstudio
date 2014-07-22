@@ -184,28 +184,32 @@
 	<main class="row">  
 	  
 	  <!-- Start of sidebar section (main aside) -->
-	  <aside  class="medium-12 large-3 columns transition-opacity hide-for-small">
-	    
-	    <section class="row">
+        <aside class="medium-12 large-3 columns">
+	  <div>
+          <header class="row">
+          <h2 class="large-12 columns"><a class="active-menu" href="{% url 'groupchange' group_object.name %}">{{group_object.name}}</a></h2>
+          </header>
+          
 	      
 	      <!-- Meta content in the (main aside header)-->
-	      <header class="medium-6 large-12 columns">
+	      <section class="row">
 		<a class="left-off-canvas-toggle meta" >{% block meta_content %}  {% endblock %}</a> 
     {% block concern_information %} {% endblock %}
-	      </header>
+	      </section>
 	      
-	      <section class="medium-6 large-12 columns">
+	      <section class="row">
 		{% block search_content %}  {% endblock %}
 	      </section>
 
-	      <section class="medium-6 large-12 columns">
+	      <section class="row">
 		{% block collection_content %}  {% endblock %}
     {% block related_content %}  {% endblock %}
 	      </section>
 	      
-	    </section>
+	    </div>
 
-	  </aside>
+	
+          </aside>
 	  <!-- End of related content -->	
 
 	  
@@ -309,18 +313,7 @@
 			return "<i class='fi-page'></i>"
 		});
 
-		/* Fade sidebar when not in use */
-		$("aside").delay(3000).queue(function(){
-			$(this).addClass("fade");
-			$(this).dequeue();
-		});
-		$("aside").hover(function(){
-			$(this).removeClass("fade");
-		},
-		function(){
-			$(this).addClass("fade");
-		});
-
+		
 		/* Expand create card on hover */
 		$(".create.card").find(">div>div").slideUp()
 		$(".create.card").hover(function(){
