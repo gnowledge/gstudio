@@ -6,7 +6,7 @@
 
  <nav class="breadcrumbs">
     {% for key,value in breadcrumbs_list %}
-       <a class="bc" name="{{key}}">{{ value }}</a>
+       <a name="{{key}}">{{ value }}</a>
     {% endfor %}
   </nav>
 <ul class="side-nav">
@@ -19,15 +19,15 @@
   
   {% if each_node.collection_set %}
   <li>
-   {% if 'image' in each_node.mime_type %}<i class="fi-camera"></i>  {% endif %}
+   
+      <h5>
+      <a class="select" class="collection" name="{{each_node.pk}}"><i class="fi-page-multiple"></i>
+          {% if 'image' in each_node.mime_type %}<i class="fi-camera"></i>  {% endif %}
     
      {% if 'video' in each_node.mime_type %}<i class="fi-video"></i>  {% endif %}
    
      {% if 'Pandora_video' in each_node.member_of_names_list %}<i class="fi-video"></i>  {% endif %}
-   
-      <h5>
-  
-      <a class="select" class="collection" name="{{each_node.pk}}"><i class="fi-page-multiple"></i> {{ each_node.name }}</a>
+          {{ each_node.name }}</a>
 </h5>
   </li>
 
@@ -75,7 +75,7 @@
 
   });
 
-  $(".bc").click(function() {
+  $("aside .breadcrumbs a").click(function() {
 
     $.ajax({
       type: "POST",

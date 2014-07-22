@@ -89,10 +89,6 @@ main>aside{
         background-color: $theme-color-invert;
         padding-bottom: 30px;
         
-        &>*{
-            padding: 10px;
-        }
-        
         h2,h3{
             color:white;
             margin: 0;
@@ -117,7 +113,7 @@ main>aside{
                 display: inline;
             }
         }
-        h6{
+        h5,h6{
             margin: 0;
         }
             
@@ -125,6 +121,7 @@ main>aside{
         header{
             min-height: 8rem;
             border-bottom: 5px solid $active-color;
+            padding: 10px;
         }
         
         a{
@@ -139,6 +136,12 @@ main>aside{
         margin: 0;
             li{
                 border-bottom: 1px solid #555;
+                a{
+                    border-left: 2px solid black;
+                }
+                a:hover{
+                    border-left: 2px solid $active-color;
+                }
             }
         }
         
@@ -180,29 +183,7 @@ h1:not(.subheader){
 }
     }
 
-/* Off canvas navigation */
-aside.left-off-canvas-menu{
-	background-color: #222;
-	color:white;
-}
-a#toggle-shelf{
-	position: absolute;
-	top:1rem;
-	right: 1rem;
-	color: black;
-	z-index: 10;
-}
-a#toggle-shelf:hover{
-	color: black;
-}
-a#toggle-shelf i{
-	font-size: 30px;
-}
 
-.inner-wrap>aside h4{
-	color: white;
-	padding:10px;
-}
 
 
 
@@ -347,32 +328,6 @@ a#toggle-shelf i{
     
 }
 
-/* Create card */
-.create.card>*{
-	background-color: #999;
-	opacity:1;
-    
-    &:hover{
-	background-color: #008759;
-    }
-}
-
-.create.card{
-    h4{
-	color:white;
-}
-    .button{
-	border:1px solid #00ba7b;
-        opacity:0.5;
-}
-    label{
-	color:white;
-}
-    .switch label{
-	color:inherit;
-}
-   
-}
 
 /* Content Tabs */
 article .tabs{
@@ -409,13 +364,7 @@ article{
 	display: block;
 }
 
-.card>*:hover .button{
-	opacity:1;
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
-}
+
 
 /* Inline label list */
 
