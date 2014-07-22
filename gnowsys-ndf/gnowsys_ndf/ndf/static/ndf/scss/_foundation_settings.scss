@@ -324,10 +324,10 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 
 // We use these to style the icon-bar and items
 $icon-bar-bg: inherit ;
-$icon-bar-font-color: $active-color ;
+$icon-bar-font-color: white ;
 $icon-bar-font-size: 0.5rem;
-$icon-bar-hover-color: $primary-color ;
-$icon-bar-icon-color: $active-color  ;
+$icon-bar-hover-color: #333 ;
+$icon-bar-icon-color: white ;
 $icon-bar-icon-size: 1.875rem ;
 $icon-bar-image-width: 1.875rem ;
 $icon-bar-image-height: 1.875rem ;
@@ -339,7 +339,7 @@ $icon-bar-item-padding: 0.5rem;
 // $include-html-nav-classes: $include-html-classes;
 
 // We use this to set the background color for the breadcrumb container.
- $crumb-bg: black;
+ $crumb-bg: $active-color;
 
 // We use these to set the padding around the breadcrumbs.
 // $crumb-padding: rem-calc(9 14 9);
@@ -361,7 +361,7 @@ $icon-bar-item-padding: 0.5rem;
 // $crumb-link-decor: underline;
 
 // We use these to control the slash between breadcrumbs
- $crumb-slash-color: $active-color;
+ $crumb-slash-color: #555;
 // $crumb-slash: "/";
 
 //

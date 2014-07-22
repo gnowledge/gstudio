@@ -87,7 +87,6 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 main>aside{
     &>div{
         background-color: $theme-color-invert;
-        padding-bottom: 30px;
         
         h2,h3{
             color:white;
@@ -120,12 +119,14 @@ main>aside{
         
         header{
             min-height: 8rem;
-            border-bottom: 5px solid $active-color;
+            border-bottom: 1px solid black;
             padding: 10px;
         }
         
         footer{
+            background-color: #222;
             min-height: 1rem;
+            border-top: 1px solid $active-color;
         }
         
         
