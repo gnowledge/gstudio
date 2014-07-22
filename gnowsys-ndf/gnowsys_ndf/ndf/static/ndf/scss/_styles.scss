@@ -86,12 +86,31 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 //Main sidebar
 main>aside{
     &>div{
-        background-color: darken($bg-color,20%);
-        padding: 10px;
+        background-color: $theme-color-invert;
         padding-bottom: 30px;
         
+        &>*{
+            padding: 10px;
+        }
+        
+        h2,h3{
+            color:white;
+            margin: 0;
+        }
+        
+        h2{
+            font-size: 1.4rem;
+            font-weight: bold;
+            
+        }
+        h3{
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+        
         header{
-            height: 5rem;
+            height: 8rem;
+            border-bottom: 5px solid $active-color;
         }
         
         a{
