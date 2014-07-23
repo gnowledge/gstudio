@@ -17,7 +17,19 @@
 
 
 {% block meta_content %}
-  <h2>Quizzes</h2>
+  <h3>Quizzes</h3>
+
+ {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+   {% if user_access == "allow" %}
+
+      <a class="small button" href="{% url 'quiz_create' group_name_tag %}">
+	       <span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+      </a>
+   
+  {% endif %}
+  {% endif %}
+
 {% endblock %}
 
 
@@ -27,20 +39,7 @@
 
 
 {% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-   {% if user_access == "allow" %}
-  <br/>
-  <div class="create card">
-    <div class="quiz">
-      <br/>
-      <a class="button medium" href="{% url 'quiz_create' group_name_tag %}">
-	       <span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
-      </a>
-    </div>
-  </div>
-  {% endif %}
-  {% endif %}
+ 
 {% endblock %}
 
 

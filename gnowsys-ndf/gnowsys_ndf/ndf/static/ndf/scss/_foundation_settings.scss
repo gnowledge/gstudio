@@ -82,7 +82,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // We use these to control various global styles
  //
 // $body-font-color: #222;
- $body-font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+ $body-font-family: "Ubuntu", "FreeSans","Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
 // $body-font-style: normal;
 
@@ -167,7 +167,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $header-text-rendering: optimizeLegibility;
 
 // We use these to control header font sizes
-// $h1-font-size: rem-calc(44);
+// $h1-font-size: 4rem;
 // $h2-font-size: rem-calc(37);
 // $h3-font-size: rem-calc(27);
 // $h4-font-size: rem-calc(23);
@@ -318,12 +318,28 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // Enables media queries for block-grid classes. Set to false if writing semantic HTML.
 // $block-grid-media-queries: true;
 
+//Icon Bar
+
+//$include-html-icon-bar-classes: $include-html-classes;
+
+// We use these to style the icon-bar and items
+$icon-bar-bg: inherit ;
+$icon-bar-font-color: white ;
+$icon-bar-font-size: 0.5rem;
+$icon-bar-hover-color: #333 ;
+$icon-bar-icon-color: white ;
+$icon-bar-icon-size: 1.875rem ;
+$icon-bar-image-width: 1.875rem ;
+$icon-bar-image-height: 1.875rem ;
+$icon-bar-active-color: white ;
+$icon-bar-item-padding: 0.5rem;
+    
 // Breadcrumbs
 
 // $include-html-nav-classes: $include-html-classes;
 
 // We use this to set the background color for the breadcrumb container.
-// $crumb-bg: scale-color($secondary-color, $lightness: 55%);
+ $crumb-bg: $active-color;
 
 // We use these to set the padding around the breadcrumbs.
 // $crumb-padding: rem-calc(9 14 9);
@@ -338,14 +354,14 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 
 // We use these to set various text styles for breadcrumbs.
 // $crumb-font-size: rem-calc(11);
-// $crumb-font-color: $primary-color;
-// $crumb-font-color-current: #333;
+ $crumb-font-color: white;
+ $crumb-font-color-current: white;
 // $crumb-font-color-unavailable: #999;
 // $crumb-font-transform: uppercase;
 // $crumb-link-decor: underline;
 
 // We use these to control the slash between breadcrumbs
-// $crumb-slash-color: #aaa;
+ $crumb-slash-color: #555;
 // $crumb-slash: "/";
 
 //
@@ -940,12 +956,12 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // We use these to control list styles.
 // $side-nav-list-type: none;
 // $side-nav-list-position: inside;
-// $side-nav-list-margin: rem-calc(0 0 7 0);
+ $side-nav-list-margin: 0;
 
 // We use these to control link styles.
-// $side-nav-link-color: $primary-color;
-// $side-nav-link-color-active: scale-color($side-nav-link-color, $lightness: 30%);
-// $side-nav-link-color-hover: scale-color($side-nav-link-color, $lightness: 30%);
+ $side-nav-link-color: #888;
+ $side-nav-link-color-active: white;
+ $side-nav-link-color-hover: white;
 // $side-nav-font-size: rem-calc(14);
 // $side-nav-font-weight: normal;
 // $side-nav-font-family: $body-font-family;

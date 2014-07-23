@@ -13,7 +13,17 @@
 
 
 {% block meta_content %}
-  <h2>Media</h2>
+  <h3>Files</h3>
+ {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+
+      <a class="small button" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+        <span class="fi-upload">&nbsp;&nbsp;Upload File</span>
+      </a>
+ 
+  {% endif %}
+  {% endif %}
 {% endblock %}
 
 
@@ -23,22 +33,8 @@
 
 
 {% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-  <br/>
-  <div class="create card">
-    <div class="file">
-      <br/>
-      <a class="button medium" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-        <span class="fi-upload">&nbsp;&nbsp;New File</span>
-      </a>
-    </div>
-  </div>
-  {% endif %}
-  {% endif %}
-  <br>
-  <p style="font-size:20px"><strong>File Statistics</strong></p>
+ 
+  <h4>File Statistics</h4>
   <br>
     <dl class="tabs" data-tab>
     <dd class="tab-title active"><a href="#bar_visual">Bar</a></dd>
@@ -133,8 +129,10 @@
             <h5>{{file.name}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}</h5>
               
           </header>
+                <section>
 <img class="preview" src="{% url 'getFileThumbnail' group_name_tag file %}" />
      <!--     <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>-->
+                    </section>
           <footer>
 	{% get_user_object file.created_by as user_obj %}
           {% if user_obj.username = user.username or request.user.is_superuser %}

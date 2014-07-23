@@ -92,7 +92,7 @@
 
 	    {% if prof_pic %}
 	    <a href="{% url 'userDashboard' groupid request.user.pk %}">
-	      <img  src="{% url 'getImageThumbnail' groupid prof_pic %}" height="30" width="30"></img>
+	      <img  src="{% url 'getImageThumbnail' groupid prof_pic %}" height="30" width="30">
 	      {{ user.username }}
 	    </a>
 	    
@@ -184,28 +184,52 @@
 	<main class="row">  
 	  
 	  <!-- Start of sidebar section (main aside) -->
-	  <aside  class="medium-12 large-3 columns transition-opacity hide-for-small">
-	    
-	    <section class="row">
+        <aside class="medium-12 large-3 columns">
+	  <div>
+          <header>
+          <a class="active-menu" href="{% url 'groupchange' group_object.name %}"><h2>{{group_object.name}}</h2></a>
+              <a class="left-off-canvas-toggle meta" >{% block meta_content %}  {% endblock %}</a> 
+              
+               {% block concern_information %} {% endblock %}
+              
+              
+          </header>
+          
 	      
 	      <!-- Meta content in the (main aside header)-->
-	      <header class="medium-6 large-12 columns">
-		<a class="left-off-canvas-toggle meta" >{% block meta_content %}  {% endblock %}</a> 
-    {% block concern_information %} {% endblock %}
-	      </header>
-	      
-	      <section class="medium-6 large-12 columns">
-		{% block search_content %}  {% endblock %}
-	      </section>
 
-	      <section class="medium-6 large-12 columns">
+ <section>
+    
+		{% block search_content %}
+<h4 class="hide"><input id="name_id" name="name" type="text" value="" placeholder="Search" required=""></h4>
+{% endblock %}
+              </section>
+          
+	      <section>
+              
+        
+              <div>
 		{% block collection_content %}  {% endblock %}
-    {% block related_content %}  {% endblock %}
-	      </section>
+                  </div>
+              <div>
+		 {% block related_content %}  {% endblock %}
+                  </div>
+              
+              </section>
+          
+          <footer>
+              
+              <div class="icon-bar four-up">
+  <a class="item user" href="{% url 'userDashboard' groupid request.user.pk %}">
+    <label>My profile</label>
+  </a>
+</div>
+          </footer>
 	      
-	    </section>
+	    </div>
 
-	  </aside>
+	
+          </aside>
 	  <!-- End of related content -->	
 
 	  
@@ -247,21 +271,26 @@
 
   <footer>
       <div class="medium-3 columns">
-    	<small><p>
-        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a>
-
-        &nbsp;&nbsp;&nbsp;All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
-    	</p></small>
+    	<p>
+             <small>
+        A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR), India</a>.
+       </small>
+        </p>
       </div>
 
       <div class="medium-9 columns">
-        <p>
-        A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR)</a>.
-        </p>
-        
-        <p><small>
+         
+           <p>
+                <span class="gnu-badge">100% स्वतंत्रता</span>
         <a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio/issues?state=open">Report an issue</a>
-        </small></p>
+        <br>
+        
+          <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a>
+<small>
+        &nbsp;&nbsp;&nbsp;All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
+    	</small>
+          </p>
+        
       </div>
   </footer>
 
@@ -276,7 +305,7 @@
 
 		$(".user").prepend(function(){
 			/* Attaches user icon with gnow level color for every user link */
-			return "<i class='fi-torso' style='background-color:"+$(this).attr("data-gnow")+"'></i>"
+			return "<i class='fi-torso'></i>"
 		});
 
 		$(".card .course").prepend(function(){
@@ -309,18 +338,7 @@
 			return "<i class='fi-page'></i>"
 		});
 
-		/* Fade sidebar when not in use */
-		$("aside").delay(3000).queue(function(){
-			$(this).addClass("fade");
-			$(this).dequeue();
-		});
-		$("aside").hover(function(){
-			$(this).removeClass("fade");
-		},
-		function(){
-			$(this).addClass("fade");
-		});
-
+		
 		/* Expand create card on hover */
 		$(".create.card").find(">div>div").slideUp()
 		$(".create.card").hover(function(){
