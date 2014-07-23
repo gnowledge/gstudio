@@ -353,9 +353,13 @@ article .tabs{
 
 article{
 .tabs {
-    dd.active a,dd:hover a{
-        color:$theme-color;
-        border-bottom: 2px solid darken($bg-color,50%);
+    dd.active a{
+        color:$active-color;
+        border-bottom: 2px solid $active-color;
+        font-weight: bold;
+    }
+    dd:hover a{
+        color:$active-color;
     }
 }
 }

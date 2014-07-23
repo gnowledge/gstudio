@@ -6326,7 +6326,7 @@ blockquote p {
 }
 /* line 49, ../bower_components/foundation/scss/foundation/components/_tabs.scss */
 .tabs dd.active a, .tabs .tab-title.active a {
-  background: #eef7eb;
+  background: inherit;
   color: #666666;
 }
 /* line 53, ../bower_components/foundation/scss/foundation/components/_tabs.scss */
@@ -8411,78 +8411,83 @@ article .tabs i {
 }
 
 /* line 356, ../scss/_styles.scss */
-article .tabs dd.active a, article .tabs dd:hover a {
-  color: #1b432e;
-  border-bottom: 2px solid #59a241;
+article .tabs dd.active a {
+  color: #47b079;
+  border-bottom: 2px solid #47b079;
+  font-weight: bold;
+}
+/* line 361, ../scss/_styles.scss */
+article .tabs dd:hover a {
+  color: #47b079;
 }
 
-/* line 362, ../scss/_styles.scss */
+/* line 366, ../scss/_styles.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
-/* line 366, ../scss/_styles.scss */
+/* line 370, ../scss/_styles.scss */
 .content.row {
   margin: 0;
 }
 
 /* Default card */
-/* line 371, ../scss/_styles.scss */
+/* line 375, ../scss/_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 376, ../scss/_styles.scss */
+/* line 380, ../scss/_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 384, ../scss/_styles.scss */
+/* line 388, ../scss/_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 388, ../scss/_styles.scss */
+/* line 392, ../scss/_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
 }
-/* line 395, ../scss/_styles.scss */
+/* line 399, ../scss/_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   padding: 2px;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 409, ../scss/_styles.scss */
+/* line 413, ../scss/_styles.scss */
 .panel {
   background-color: #cfe8c7;
 }
 
 /* Content area */
-/* line 414, ../scss/_styles.scss */
+/* line 418, ../scss/_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 418, ../scss/_styles.scss */
+/* line 422, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 422, ../scss/_styles.scss */
+/* line 426, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 425, ../scss/_styles.scss */
+/* line 429, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 434, ../scss/_styles.scss */
+/* line 438, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8503,85 +8508,85 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 454, ../scss/_styles.scss */
+/* line 458, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 459, ../scss/_styles.scss */
+/* line 463, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 462, ../scss/_styles.scss */
+/* line 466, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 465, ../scss/_styles.scss */
+/* line 469, ../scss/_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 468, ../scss/_styles.scss */
+/* line 472, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 472, ../scss/_styles.scss */
+/* line 476, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 476, ../scss/_styles.scss */
+/* line 480, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 479, ../scss/_styles.scss */
+/* line 483, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 484, ../scss/_styles.scss */
+/* line 488, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 489, ../scss/_styles.scss */
+/* line 493, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 492, ../scss/_styles.scss */
+/* line 496, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 495, ../scss/_styles.scss */
+/* line 499, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 502, ../scss/_styles.scss */
+/* line 506, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 507, ../scss/_styles.scss */
+/* line 511, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 514, ../scss/_styles.scss */
+/* line 518, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8589,13 +8594,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 521, ../scss/_styles.scss */
+/* line 525, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 526, ../scss/_styles.scss */
+/* line 530, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8609,13 +8614,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 536, ../scss/_styles.scss */
+/* line 540, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 541, ../scss/_styles.scss */
+/* line 545, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8626,7 +8631,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 552, ../scss/_styles.scss */
+/* line 556, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8638,12 +8643,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 564, ../scss/_styles.scss */
+/* line 568, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 567, ../scss/_styles.scss */
+/* line 571, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }
