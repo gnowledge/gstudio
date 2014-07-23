@@ -640,7 +640,7 @@
     // ajax to create thread for first time.
     $.ajax({
       
-      url: "{% url 'create_discussion' group_id node.pk node.name %}",
+      url: "{% url 'create_discussion' group_id node.pk %}",
 
       success: function(data){
           
@@ -657,7 +657,7 @@
             // alert(data)
             $("#create-discussion").hide();
             $("#prior-node").val(data[1]) // _id
-            $("#org").show();
+            $("#org").fadeIn();
           }
           else{ alert(data) }
 

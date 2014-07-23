@@ -1235,7 +1235,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
 
 
 # Method to create discussion thread for File and Page.
-def create_discussion(request, group_id, node_id, node_name=None):
+def create_discussion(request, group_id, node_id):
   '''
   Method to create discussion thread for File and Page.
   '''
@@ -1248,7 +1248,7 @@ def create_discussion(request, group_id, node_id, node_name=None):
 
     # group = collection.Group.one({'_id':ObjectId(group_id)})
 
-    thread = collection.Node.one({ "_type": "GSystem", "name": node_name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
+    thread = collection.Node.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
 
     if not thread:
       
