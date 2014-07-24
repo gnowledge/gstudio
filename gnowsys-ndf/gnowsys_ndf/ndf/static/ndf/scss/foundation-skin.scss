@@ -22,14 +22,21 @@
     padding: 0;
 }
 
-/*
-*   Foundation extensions
-*/
+
+input[type="checkbox"] + label, input[type="radio"] + label{
+	margin: inherit!important;
+}
+
 
 /* Protects reflowing elements on error */
 [data-abide] span.error, [data-abide] small.error{
     position: absolute;
 }
+
+
+/*
+*   Foundation extensions
+*/
 
 pre{
     width:92%;
@@ -72,4 +79,67 @@ pre{
 	-moz-transition: opacity .3s ease;
 	-webkit-transition: opacity .3s ease;
 	-o-transition: opacity .3s ease;
+}
+
+/*Ratings bar*/
+
+.star-cb-group {
+  /* remove inline-block whitespace */
+  font-size: 0;
+  * {
+    font-size: 32px;
+  }
+  /* flip the order so we can use the + and ~ combinators */
+  unicode-bidi: bidi-override;
+  direction: rtl;
+  & > [type*="radio"] {
+    display: none;
+    & + label {
+      /* only enough room for the star */
+      display: inline-block;
+      overflow: hidden;
+      text-indent: 9999px;
+      width: 1em;
+      height: 1.4em;
+      white-space: nowrap;
+      &:before {
+        display: inline-block;
+        text-indent: -9999px;
+        content: '\2606'; /* WHITE STAR */
+        color: #888;
+      }
+    }
+    &:checked ~ label:before,
+      & + label:hover ~ label:before,
+      & + label:hover:before {
+      content: '\2605'; /* BLACK STAR */
+      color: #e52;
+      text-shadow: 0 0 1px #333;
+    }
+  }
+  
+  /* the hidden clearer */
+  & > .star-cb-clear[type*="radio"] + label {
+    text-indent: -9999px;
+    width: .5em;
+    margin-left: -.5em;
+  }
+  & > .star-cb-clear[type*="radio"] + label:before {
+    width: .5em;
+    height: 1.4em;
+  }
+  
+  /* this is gross, I threw this in to override the starred
+     buttons when hovering. */
+  &:hover > [type*="radio"] + label:before {
+    content: '\2606'; /* WHITE STAR */
+    color: #888;
+    text-shadow: none;
+  }
+  &:hover > [type*="radio"] + label:hover ~ label:before,
+  &:hover > [type*="radio"] + label:hover:before {
+    content: '\2605'; /* BLACK STAR */
+    color: #e52;
+    text-shadow: 0 0 1px #333;
+  }
 }

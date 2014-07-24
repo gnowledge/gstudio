@@ -8667,16 +8667,21 @@ input.node-title {
   padding: 0;
 }
 
-/*
-*   Foundation extensions
-*/
+/* line 26, ../scss/foundation-skin.scss */
+input[type="checkbox"] + label, input[type="radio"] + label {
+  margin: inherit !important;
+}
+
 /* Protects reflowing elements on error */
-/* line 30, ../scss/foundation-skin.scss */
+/* line 32, ../scss/foundation-skin.scss */
 [data-abide] span.error, [data-abide] small.error {
   position: absolute;
 }
 
-/* line 34, ../scss/foundation-skin.scss */
+/*
+*   Foundation extensions
+*/
+/* line 41, ../scss/foundation-skin.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -8690,38 +8695,109 @@ pre {
   font-family: monospace;
 }
 
-/* line 48, ../scss/foundation-skin.scss */
+/* line 55, ../scss/foundation-skin.scss */
 .fixme {
   opacity: 0.5;
 }
-/* line 51, ../scss/foundation-skin.scss */
+/* line 58, ../scss/foundation-skin.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 54, ../scss/foundation-skin.scss */
+/* line 61, ../scss/foundation-skin.scss */
 .fixme:hover:after {
   content: " fixme";
   color: orange;
 }
 
 /* Effects */
-/* line 62, ../scss/foundation-skin.scss */
+/* line 69, ../scss/foundation-skin.scss */
 .drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px #333;
   box-shadow: 0px 0px 5px 1px #333;
 }
 
-/* line 66, ../scss/foundation-skin.scss */
+/* line 73, ../scss/foundation-skin.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 70, ../scss/foundation-skin.scss */
+/* line 77, ../scss/foundation-skin.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
   -webkit-transition: opacity .3s ease;
   -o-transition: opacity .3s ease;
+}
+
+/*Ratings bar*/
+/* line 86, ../scss/foundation-skin.scss */
+.star-cb-group {
+  /* remove inline-block whitespace */
+  font-size: 0;
+  /* flip the order so we can use the + and ~ combinators */
+  unicode-bidi: bidi-override;
+  direction: rtl;
+  /* the hidden clearer */
+  /* this is gross, I threw this in to override the starred
+     buttons when hovering. */
+}
+/* line 89, ../scss/foundation-skin.scss */
+.star-cb-group * {
+  font-size: 32px;
+}
+/* line 95, ../scss/foundation-skin.scss */
+.star-cb-group > [type*="radio"] {
+  display: none;
+}
+/* line 97, ../scss/foundation-skin.scss */
+.star-cb-group > [type*="radio"] + label {
+  /* only enough room for the star */
+  display: inline-block;
+  overflow: hidden;
+  text-indent: 9999px;
+  width: 1em;
+  height: 1.4em;
+  white-space: nowrap;
+}
+/* line 105, ../scss/foundation-skin.scss */
+.star-cb-group > [type*="radio"] + label:before {
+  display: inline-block;
+  text-indent: -9999px;
+  content: '\2606';
+  /* WHITE STAR */
+  color: #888;
+}
+/* line 114, ../scss/foundation-skin.scss */
+.star-cb-group > [type*="radio"]:checked ~ label:before, .star-cb-group > [type*="radio"] + label:hover ~ label:before, .star-cb-group > [type*="radio"] + label:hover:before {
+  content: '\2605';
+  /* BLACK STAR */
+  color: #e52;
+  text-shadow: 0 0 1px #333;
+}
+/* line 122, ../scss/foundation-skin.scss */
+.star-cb-group > .star-cb-clear[type*="radio"] + label {
+  text-indent: -9999px;
+  width: .5em;
+  margin-left: -.5em;
+}
+/* line 127, ../scss/foundation-skin.scss */
+.star-cb-group > .star-cb-clear[type*="radio"] + label:before {
+  width: .5em;
+  height: 1.4em;
+}
+/* line 134, ../scss/foundation-skin.scss */
+.star-cb-group:hover > [type*="radio"] + label:before {
+  content: '\2606';
+  /* WHITE STAR */
+  color: #888;
+  text-shadow: none;
+}
+/* line 140, ../scss/foundation-skin.scss */
+.star-cb-group:hover > [type*="radio"] + label:hover ~ label:before, .star-cb-group:hover > [type*="radio"] + label:hover:before {
+  content: '\2605';
+  /* BLACK STAR */
+  color: #e52;
+  text-shadow: 0 0 1px #333;
 }
