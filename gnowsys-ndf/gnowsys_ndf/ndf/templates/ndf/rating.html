@@ -1,13 +1,6 @@
 {% load ndf_tags %}
 
-    
-    <form>
-  <fieldset>
-    <legend>Rating</legend>
-     
-       <div class="rating-bar" data-node="{{node}}" >
-           
-           <!-- Rating script only if user is logged in -->
+  <!-- Rating script only if user is logged in -->
 {% if user.is_authenticated %}
 <script type="text/javascript">
 
@@ -17,7 +10,6 @@ $(document).on('click',"input[name=rating]",function() {
 surl="/{{node}}/ratings/add_ratings/";
 userRating = $('input[name=rating]:checked').val();
 nodeId=$(".rating-bar").attr("data-node");
-
     
     $.ajax({
             url: surl,
@@ -27,7 +19,7 @@ nodeId=$(".rating-bar").attr("data-node");
             },
         
            success: function(data){
-                           $(".rating-bar").html(data);          
+                           $("#rating-bar").html(data);          
                                  }
         
     }); 
@@ -36,6 +28,18 @@ nodeId=$(".rating-bar").attr("data-node");
 
 </script>
 {% endif %}
+    
+<div id="rating-bar">
+    <form>
+  <fieldset>
+    <legend>Rating</legend>
+     
+       {% get_node_ratings request node as ratings %}
+{% if ratings %}
+      
+       <div class="rating-bar" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-user-rating="{{ratings.user_rating}}">
+           
+           
            
           <span>
       <input type="radio" id="rating-5" name="rating" value="5" /><label for="rating-5">5</label>
@@ -46,31 +50,20 @@ nodeId=$(".rating-bar").attr("data-node");
 <input type="radio" id="rating-0" name="rating" value="0" class="last" /><label for="rating-0">0</label>
            </span>
            
-           <div class="rating">
+           <div class="rating"><span>{{ratings.tot}} votes</span></div>
                
-    {% get_node_ratings request node as ratings %}
-{% if ratings %}
-               
- {% if ratings.user_rating %}
-         Your rating : {{ratings.user_rating}}
-     {% else %}
-         Your rating : Nil 
-     {% endif %}
-     <br/><br/>
-     Average rating :{{ratings.avg}} 
-     <br/><br/>
-     Total Number of votes:{{ratings.tot}}  
-{% else %}
-     No ratings yet !
+   
+
 {% endif %}
                
-               </div>
+        
           
     </div>
          
   </fieldset>
 </form>
-    
+    </div>
+
 <!-- Render rating bar from value -->
 <script type="text/javascript">
     var stars = Math.round($(".rating-bar").attr("data-value"));

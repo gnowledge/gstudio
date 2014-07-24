@@ -5858,13 +5858,13 @@ td {
 /* Default Link Styles */
 /* line 212, ../bower_components/foundation/scss/foundation/components/_type.scss */
 a {
-  color: #1b432e;
+  color: #388c60;
   text-decoration: none;
   line-height: inherit;
 }
 /* line 218, ../bower_components/foundation/scss/foundation/components/_type.scss */
 a:hover, a:focus {
-  color: #173a28;
+  color: #307852;
 }
 /* line 225, ../bower_components/foundation/scss/foundation/components/_type.scss */
 a img {
