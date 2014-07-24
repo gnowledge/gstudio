@@ -3,7 +3,7 @@
 <script type="text/javascript">
 
 // Send the user's rating to the server on submit
-$(document).on('click',"#rate_submit",function() {
+$(document).on('click',"input[name=rating]",function() {
     
 surl="/{{node}}/ratings/add_ratings/";
 userRating = $('input[name=rating]:checked').val();
@@ -68,9 +68,3 @@ No ratings yet !!
   </fieldset>
 </form>
     
-
-
-<br>
-<input class="button tiny" id="rate_submit" data-node="{{node}}" type="submit" value="Rate it!!!">
-{% endif %}
-</div>
