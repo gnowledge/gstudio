@@ -92,11 +92,10 @@ pre{
          /* flip the order so we can use the + and ~ combinators */
   unicode-bidi: bidi-override;
   direction: rtl;
-      opacity:0.5;
+      opacity:1;
       
       &.rated{
           opacity:1;
-          pointer-events: non;
       }
   }
 
@@ -122,7 +121,7 @@ pre{
       & + label:hover ~ label:before,
       & + label:hover:before {
       content: '\2605'; /* BLACK STAR */
-      color: $primary-color;
+      color: $active-color;
       text-shadow: 0 0 1px #333;
     }
   }
@@ -150,7 +149,7 @@ pre{
   [type*="radio"] + label:hover ~ label:before,
   [type*="radio"] + label:hover:before {
     content: '\2605'; /* BLACK STAR */
-    color: $primary-color;
+    color: $active-color;
     text-shadow: 0 0 1px #333;
   }
   }
