@@ -63,7 +63,10 @@
                 margin-bottom: 3px;
                 margin-right: 3px;
                 display: inline-block;
-                background: #fafafa url("../images/gnu-head.png") no-repeat -35px -19px;
+                background: #fafafa url("../images/gnu-head.png") no-repeat -35px -9px;
+                &:hover{
+                    background-position: -35px -19px;
+                }
             }
 		}
 
@@ -196,7 +199,7 @@ h1:not(.subheader){
             background-color: inherit;
             
             &:hover{
-            background-color: #eee;
+            background-color: white;
             }
         }
     }
