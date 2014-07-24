@@ -23,13 +23,14 @@ except ImportError:  # old pymongo
 
 from gnowsys_ndf.ndf.models import Node, Triple
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers
-
 #######################################################################################################################################
 db = get_database()
 collection = db[Node.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 #######################################################################################################################################
+list_trans_coll = []
+coll_set_dict={}
 
 def themes(request, group_id, app_id=None, app_set_id=None):
     
@@ -63,7 +64,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     
     if unfold_tree:
         unfold = unfold_tree
-        
+	
     if app_set_id:
         themes_list_items = True
         app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
@@ -128,13 +129,13 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
     
     app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
     if app_GST._id != theme_GST._id:
-        app_obj = collection.Node.one({'_id': ObjectId(app_GST.member_of[0])})
+    	app_obj = collection.Node.one({'_id': ObjectId(app_GST.member_of[0])})
     else:
-        app_obj = theme_GST
+    	app_obj = theme_GST
 
     if app_obj:
         app_id = app_obj._id
-        
+	
     if request.method == "POST":
  
         if app_GST:
@@ -162,35 +163,55 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
             
             if app_GST.name == "Theme" or app_GST.name == "Topic" or translate == "true":
                 # For creating new themes & Topics
-    themes_list_items = False
+                themes_list_items = False				
                 create_edit = False
                 themes_hierarchy = True
 
-                if name:
-                    if not name.upper() in (theme_name.upper() for theme_name in root_themes):
-                        if translate != "true":
+                if name or translate == "true":
+                    if not name.upper() in (theme_name.upper() for theme_name in root_themes) or translate == "true":
+                      	if translate != "true":
                             theme_topic_node = collection.GSystem()
                             get_node_common_fields(request, theme_topic_node, group_id, app_GST)
                             theme_topic_node.save()
                         if translate == "true":
-                            theme_topic_node = collection.GSystem()
-                            get_node_common_fields(request, theme_topic_node, group_id, app_obj)
-                            theme_topic_node.save()
-                            relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
-                            grelation=collection.GRelation()
-                            grelation.relation_type=relation_type
-                            grelation.subject=app_GST._id
-                            grelation.right_subject=theme_topic_node._id
-                            grelation.name=u""
-                            grelation.save()
-                        
+                            global list_trans_coll
+                            list_trans_coll = []
+                            coll_set1=get_coll_set(app_GST._id)
+                            for each in coll_set1:
+                                theme_topic_node = collection.GSystem()
+                            
+                                if "Theme" in each.member_of_names_list:
+                                    app_obj = theme_GST
+                                else:
+                                    app_obj = topic_GST
+                                   
+                                get_node_common_fields(request, theme_topic_node, group_id, app_obj, each)
+                                theme_topic_node.save()
+                                coll_set_dict[each._id]=theme_topic_node._id
+                                relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
+                                grelation=collection.GRelation()
+                                grelation.relation_type=relation_type
+                                grelation.subject=each._id
+                                grelation.right_subject=theme_topic_node._id
+                                grelation.name=u""
+                                grelation.save()
+                            
+                            for each in coll_set1:
+                                if each.collection_set:
+                                    for collset in each.collection_set:
+                                        p=coll_set_dict[each._id]
+                                        parent_node=collection.Node.one({'_id':ObjectId(str(p))})
+                                        n= coll_set_dict[collset]
+                                        sub_node=collection.Node.one({'_id':ObjectId(str(n))})
+                                        parent_node.collection_set.append(sub_node._id)
+                                        parent_node.save()
                         
                 # This will return to Themes Hierarchy  
                 if theme_GST:
                     node = theme_GST
-        
+				
             else:
-    themes_list_items = False
+                themes_list_items = False				
                 create_edit = False
                 themes_hierarchy = True
                 
@@ -209,12 +230,12 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 prior_theme_collection.append(prior_theme.name)
                                 
                     if name:
-                        if theme_topic_node._id in root_themes_id:
+                        if theme_topic_node._id in root_themes_id:	
                             if not name.upper() in (theme_name.upper() for theme_name in root_themes):
                                 get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
                                 theme_topic_node.save()
                                 
-        else:
+                        else:						
                             if not name.upper() in (theme_name.upper() for theme_name in prior_theme_collection): 
                                 get_node_common_fields(request, theme_topic_node, group_id, theme_GST)
                                 theme_topic_node.save() 
@@ -339,7 +360,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 prior_theme = collection.Node.one({'_id': ObjectId(k) })
                                 prior_theme_collection.append(prior_theme.name)
                                 
-                                parent_nodes_collection = json.dumps(prior_theme_collection)
+                    parent_nodes_collection = json.dumps(prior_theme_collection)	
                     # End of finding unique theme names for editing name
                     
                     # For adding a sub-themes and maintianing their uniqueness within their context
@@ -367,11 +388,14 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     parent_nodes_collection = json.dumps(prior_theme_collection)
                     # End of finding unique theme names for editing name
 
-                        if translate:
-                                    return render_to_response("ndf/translation_page.html",
-                                                                                         {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LANGUAGES
-                                                                                                                     },context_instance = RequestContext(request)
-                                                                      )
+	    if translate:
+                global list_trans_coll
+                list_trans_coll = []
+                trans_coll_list = get_coll_set(str(app_GST._id))
+                return render_to_response("ndf/translation_page.html",
+	                                  {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LANGUAGES, 'list1':trans_coll_list
+	                           },context_instance = RequestContext(request)
+	        )
         
         
     return render_to_response("ndf/theme.html",
@@ -384,6 +408,21 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                               
     )
 
+def get_coll_set(node):
+  obj=collection.Node.one({'_id':ObjectId(node)})
+  if  obj.collection_set:
+    if obj not in list_trans_coll:
+      list_trans_coll.append(obj)
+    for each in obj.collection_set:
+        n=collection.Node.one({'_id':each})
+        if n not in list_trans_coll:
+            list_trans_coll.append(n)
+            if n.collection_set:
+                get_coll_set(n._id)
+                  
+  #new_list=list_trans_coll
+  #list_trans_coll = []
+  return list_trans_coll
 
 def topic_detail_view(request, group_id, app_Id=None):
 
@@ -419,30 +458,31 @@ def topic_detail_view(request, group_id, app_Id=None):
   auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
 
   if auth:
-        has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-          dbref_has_shelf = has_shelf_RT.get_dbref()
-            shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-              shelf_list = {}
+	  has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+	  dbref_has_shelf = has_shelf_RT.get_dbref()
+	  shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+	  shelf_list = {}
 
-                if shelf:
-                        for each in shelf:
-                                    shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
-                                            shelves.append(shelf_name)
+	  if shelf:
+	    for each in shelf:
+	        shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+	        shelves.append(shelf_name)
 
-                                                    shelf_list[shelf_name.name] = []         
-                                                            for ID in shelf_name.collection_set:
-                                                                shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-                                                                shelf_list[shelf_name.name].append(shelf_item.name)
+	        shelf_list[shelf_name.name] = []         
+	        for ID in shelf_name.collection_set:
+	        	shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+	        	shelf_list[shelf_name.name].append(shelf_item.name)
 
-                                                                  else:
-                                                                          shelves = []
+	  else:
+	    shelves = []
   
   return render_to_response('ndf/topic_details.html', 
-                                                            { 'node': obj,'app_id': app_id,'breadcrumbs_list': breadcrumbs_list,
-                                                                                                'group_id': group_id,'shelves': shelves,
-                                                                                                'groupid':group_id,'shelf_list': shelf_list
-                                                                                              },
-                                                            context_instance = RequestContext(request)
+	                                { 'node': obj,'app_id': app_id,'breadcrumbs_list': breadcrumbs_list,
+	                                  'group_id': group_id,'shelves': shelves,
+	                                  'groupid':group_id,'shelf_list': shelf_list
+	                                },
+	                                context_instance = RequestContext(request)
   )
+
 
 

@@ -17,12 +17,16 @@ import subprocess
 import re
 import ast
 import string
+import sys
 ######################################################################################################################################
 
 db = get_database()
 collection = db[Node.collection_name]
 
 history_manager = HistoryManager()
+theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
@@ -209,8 +213,7 @@ def get_resource_type(request,node_id):
   get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
   get_type=get_resource_type._type
   return get_type 
-   
-
+                          
 def get_translate_common_fields(request,get_type,node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
@@ -269,27 +272,39 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
 
-  
 
-def get_node_common_fields(request, node, group_id, node_type):
+
+def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   """Updates the retrieved values of common fields from request into the given node."""
   
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
-
-  name = request.POST.get('name')
+  language= request.POST.get('lan')
+ 
+  if coll_set:
+      if "Theme" in coll_set.member_of_names_list:
+        node_type = theme_GST
+      else:
+        node_type = topic_GST
+                                
+      name = request.POST.get('name_'+ str(coll_set._id),"")
+      content_org = request.POST.get(str(coll_set._id),"")
+      tags = request.POST.get('tags'+ str(coll_set._id),"")
+     
+  else:    
+    name =request.POST.get('name','')
+    content_org = request.POST.get('content_org')
+    tags = request.POST.get('tags')
+    
   sub_theme_name = request.POST.get("sub_theme_name", '')
   add_topic_name = request.POST.get("add_topic_name", '')
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
-  language= request.POST.get('lan')
-  tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
   collection_list = request.POST.get('collection_list','')
   module_list = request.POST.get('module_list','')
-  content_org = request.POST.get('content_org')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
 
@@ -353,7 +368,7 @@ def get_node_common_fields(request, node, group_id, node_type):
     if user_group_obj:
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
-
+  
   if tags:
     tags_list = []
 
@@ -442,7 +457,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   
 def get_versioned_page(node):
             
-       
+          
     rcs = RCS()
     fp = history_manager.get_file_path(node)
     cmd= 'rlog  %s' % \
@@ -452,12 +467,13 @@ def get_versioned_page(node):
 				stdout=subprocess.PIPE)
     for line in iter(proc1.stdout.readline,b''):
        
-       if line.find('revision')!=-1 and line.find('selected') == -1:
-
+      if line.find('revision')!=-1 and line.find('selected') == -1:
           rev_no=string.split(line,'revision')
           rev_no=rev_no[1].strip( '\t\n\r')
-          rev_no=rev_no.strip(' ')
-       if line.find('status')!=-1:
+          rev_no=rev_no.split()[0]
+                         
+          #rev_no=rev_no.strip(' ')
+      if line.find('status')!=-1:
           up_ind=line.find('status')
           if line.find(('PUBLISHED'),up_ind) !=-1:
               # rev_no=rev_no.strip(' ')
@@ -465,7 +481,8 @@ def get_versioned_page(node):
                node=history_manager.get_version_document(node,rev_no)
                proc1.kill()
                return (node,rev_no)    
-       if rev_no == '1.1':
+      if rev_no == '1.1':
+          
            node=history_manager.get_version_document(node,'1.1')
            proc1.kill()
            return(node,'1.1')
@@ -510,6 +527,7 @@ and if he has published his contents then he would be shown the current publishe
 
 '''
      username =request.user
+     print node,"nodeeee"
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      

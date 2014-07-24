@@ -18,6 +18,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
 $("#lan option[value={{node.language}}]").remove();
+{% comment %}
 {% if node %}
 {% get_possible_translations node as translations %}
 {% for each in translations %}
@@ -27,6 +28,7 @@ $("#lan option[value={{v}}]").remove();
 {% endfor %}
 {% endfor %}
 {% endif %}
+{% endcomment %}
 });
 
 </script>
@@ -43,24 +45,25 @@ $("#lan option[value={{v}}]").remove();
 <hr style="height:5px;background-color: #0B6580;" />
 </div>
 </table></div>
+{% if not list1 %}
 
-	<div class="large-6 columns">
+<div class="large-6 columns">
 
 <div class="row">
 <div class="medium-8 columns">
- Page Name  :  {{node.name}}</br></br>
+ Page Name : {{node.name}}</br></br>
 
               </div>
    </div>
 </br>
 <div class="row">
 <div class="medium-8 columns">
- Description  :</br></br>
+ Description :</br></br>
 <textarea name="content" class="field left">{{node.content_org|default_if_none:""}}</textarea>
           </div></div>
 <div class="row">
 <div class="medium-8 columns">
-Tags  : </br></br>
+Tags : </br></br>
 {{node.tags|join:', '|default_if_none:""}}
               </div></div>
   
@@ -71,15 +74,15 @@ Tags  : </br></br>
 
 <div class="row">
 <div class="medium-8 columns">
-<label>{% trans "Page Name" %} </label>
+<label>Page Name</label>
 <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 </div>
            </div>
 
-	<div class="row">
+<div class="row">
 <div class="large-12 columns">
-<label>{% trans "Description" %}</label>
+<label>Description</label>
  
 {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
 </div>
@@ -90,13 +93,95 @@ Tags  : </br></br>
 <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
 </span>
 <input id="tags_id" name="tags" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-</div>	
+</div>
 </div>
 
 
 <div class="row" >
 <div class="large-6 columns">
 <input type="submit" id="save-node" value="Save" class="button medium-6 columns"/>
+</div></div></div>
+</form>
+      
+</div>
+
+
+
+{% endif %}
+
+      
+       <div class="large-6 columns">
+{% if list1 %}
+{% for each in list1 %}
+
+<div class="row">
+<div class="medium-8 columns">
+{% if "Theme" in each.member_of_names_list %}
+ Theme Name  :  {{each.name}}</br></br>
+{% else %}
+Topic Name  :  {{each.name}}</br></br>
+{% endif %}     
+         </div>
+   </div>
+</br>
+<div class="row">
+{% if "Theme" not in each.member_of_names_list %}
+
+<div class="medium-8 columns">
+ Description  :</br></br>
+<textarea name="content" class="field left">{{each.content_org|default_if_none:""}}</textarea>
+          </div>
+{% endif %}
+</div>
+<div class="row">
+<div class="medium-8 columns">
+Tags  : </br></br>
+{{each.tags|join:', '|default_if_none:""}}
+              </div></div>
+  
+{% endfor %}
+  
+          </div>
+<div class="large-6 columns">
+{% for each in list1 %}
+<div class="row">
+<div class="medium-8 columns">
+<label>{% trans "Page Name" %} </label>
+<input type="hidden" id="name_id" name="name" value="{{node.name}}">
+<input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
+<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+</div>
+           </div>
+
+	<div class="row">
+{% if "Theme" not in each.member_of_names_list %}
+<div class="large-12 columns">
+<label>{% trans "Description" %}</label>
+{% with each as nodeobj %}
+{% include "ndf/add_editor.html" with var_name=each  var_placeholder="Enter the content here" var_value=each.content_org|default_if_none:"" %}
+{% endwith %}
+</div>
+{% endif %}
+
+</div>
+
+<div class="row">
+<div class="large-6 columns">
+<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{each.tags|pluralize|default_if_none:"s"}}</label>
+</span>
+<input id="tags_id" name="tags_{{each}}" type="text" value="{{each.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+</div>	
+{% endfor %}
+{% endif %}
+</div>
+
+<div class="row">
+<div class="large-6 columns">
+{% if not list1 %}
+<input type="hidden" id="save-node" value="Save" class="button medium-6 columns"/>
+{% else%}
+<input type="submit" id="save-node" value="Save"  class="button medium-6 columns"/>
+{% endif %}
 </div></div></div>
 </form>
       
