@@ -186,15 +186,17 @@ h1:not(.subheader){
         display:inline-block;
         position: relative;
         input{
-            height:4rem;
+            height:200%;
             font-style: italic;
             @extend h1;
             padding-left:5px; 
-            height: 3rem;
             box-shadow: none;
-            border: none;
+            border-width: 0 0 2px 0;
+            border-bottom: 2px dotted #222;
+            background-color: inherit;
+            
             &:hover{
-            border-bottom: 2px dotted $active-color;
+            background-color: #eee;
             }
         }
     }

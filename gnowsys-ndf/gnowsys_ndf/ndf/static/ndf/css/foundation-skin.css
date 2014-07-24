@@ -8248,33 +8248,34 @@ article h1:not(.subheader) div, article h1:not(.subheader) div input:not(.subhea
 }
 /* line 188, ../scss/_styles.scss */
 article h1:not(.subheader) div input {
-  height: 4rem;
+  height: 200%;
   font-style: italic;
   padding-left: 5px;
-  height: 3rem;
   box-shadow: none;
-  border: none;
+  border-width: 0 0 2px 0;
+  border-bottom: 2px dotted #222;
+  background-color: inherit;
 }
-/* line 196, ../scss/_styles.scss */
+/* line 198, ../scss/_styles.scss */
 article h1:not(.subheader) div input:hover {
-  border-bottom: 2px dotted #47b079;
+  background-color: #eee;
 }
 
 /* Should be in Foundation */
 /* Effects */
-/* line 211, ../scss/_styles.scss */
+/* line 213, ../scss/_styles.scss */
 .drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px #333;
   box-shadow: 0px 0px 5px 1px #333;
 }
 
-/* line 215, ../scss/_styles.scss */
+/* line 217, ../scss/_styles.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 219, ../scss/_styles.scss */
+/* line 221, ../scss/_styles.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -8283,7 +8284,7 @@ article h1:not(.subheader) div input:hover {
 }
 
 /* Card block */
-/* line 234, ../scss/_styles.scss */
+/* line 236, ../scss/_styles.scss */
 .card > * {
   position: relative;
   background-color: #eef7eb;
@@ -8293,39 +8294,39 @@ article h1:not(.subheader) div input:hover {
   opacity: 0.9;
   overflow: hidden;
 }
-/* line 244, ../scss/_styles.scss */
+/* line 246, ../scss/_styles.scss */
 .card > * > a {
   color: inherit;
   display: block;
   position: relative;
   z-index: 200;
 }
-/* line 251, ../scss/_styles.scss */
+/* line 253, ../scss/_styles.scss */
 .card > *.published {
   opacity: 1;
   border-style: solid;
   border-color: #1b432e;
 }
-/* line 256, ../scss/_styles.scss */
+/* line 258, ../scss/_styles.scss */
 .card > *.unapproved {
   opacity: 1;
   border-style: solid;
   border-color: #f04124;
 }
-/* line 262, ../scss/_styles.scss */
+/* line 264, ../scss/_styles.scss */
 .card > *:hover {
   border-style: solid;
   opacity: 1;
 }
-/* line 268, ../scss/_styles.scss */
+/* line 270, ../scss/_styles.scss */
 .card > *:hover i {
   opacity: 0.3;
 }
-/* line 271, ../scss/_styles.scss */
+/* line 273, ../scss/_styles.scss */
 .card > *:hover footer .age {
   display: block;
 }
-/* line 275, ../scss/_styles.scss */
+/* line 277, ../scss/_styles.scss */
 .card > * > i {
   position: absolute;
   top: -10px;
@@ -8334,34 +8335,34 @@ article h1:not(.subheader) div input:hover {
   color: #1b432e;
   opacity: 0.1;
 }
-/* line 283, ../scss/_styles.scss */
+/* line 285, ../scss/_styles.scss */
 .card > * .preview {
   float: left;
   padding-right: 5px;
   padding-top: 4px;
 }
-/* line 288, ../scss/_styles.scss */
+/* line 290, ../scss/_styles.scss */
 .card > * header {
   overflow: hidden;
 }
-/* line 291, ../scss/_styles.scss */
+/* line 293, ../scss/_styles.scss */
 .card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
 }
-/* line 296, ../scss/_styles.scss */
+/* line 298, ../scss/_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 299, ../scss/_styles.scss */
+/* line 301, ../scss/_styles.scss */
 .card > * p {
   color: #555;
   height: 80px;
   background-repeat: no-repeat;
   font-size: 80%;
 }
-/* line 305, ../scss/_styles.scss */
+/* line 307, ../scss/_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -8369,23 +8370,23 @@ article h1:not(.subheader) div input:hover {
   overflow: hidden;
   display: none;
 }
-/* line 311, ../scss/_styles.scss */
+/* line 313, ../scss/_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 315, ../scss/_styles.scss */
+/* line 317, ../scss/_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 319, ../scss/_styles.scss */
+/* line 321, ../scss/_styles.scss */
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
   color: #666666;
 }
-/* line 324, ../scss/_styles.scss */
+/* line 326, ../scss/_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -8395,7 +8396,7 @@ article h1:not(.subheader) div input:hover {
   width: 100%;
 }
 
-/* line 335, ../scss/_styles.scss */
+/* line 337, ../scss/_styles.scss */
 .edit-card {
   position: relative;
   background-color: #eef7eb;
@@ -8404,90 +8405,90 @@ article h1:not(.subheader) div input:hover {
 }
 
 /* Content Tabs */
-/* line 347, ../scss/_styles.scss */
+/* line 349, ../scss/_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
 
-/* line 356, ../scss/_styles.scss */
+/* line 358, ../scss/_styles.scss */
 article .tabs dd.active a {
   color: #47b079;
   border-bottom: 2px solid #47b079;
   font-weight: bold;
 }
-/* line 361, ../scss/_styles.scss */
+/* line 363, ../scss/_styles.scss */
 article .tabs dd:hover a {
   color: #47b079;
 }
 
-/* line 366, ../scss/_styles.scss */
+/* line 368, ../scss/_styles.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
-/* line 370, ../scss/_styles.scss */
+/* line 372, ../scss/_styles.scss */
 .content.row {
   margin: 0;
 }
 
 /* Default card */
-/* line 375, ../scss/_styles.scss */
+/* line 377, ../scss/_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 380, ../scss/_styles.scss */
+/* line 382, ../scss/_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 388, ../scss/_styles.scss */
+/* line 390, ../scss/_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 392, ../scss/_styles.scss */
+/* line 394, ../scss/_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
 }
-/* line 399, ../scss/_styles.scss */
+/* line 401, ../scss/_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   padding: 2px;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 413, ../scss/_styles.scss */
+/* line 415, ../scss/_styles.scss */
 .panel {
   background-color: #cfe8c7;
 }
 
 /* Content area */
-/* line 418, ../scss/_styles.scss */
+/* line 420, ../scss/_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 422, ../scss/_styles.scss */
+/* line 424, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 426, ../scss/_styles.scss */
+/* line 428, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 429, ../scss/_styles.scss */
+/* line 431, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 438, ../scss/_styles.scss */
+/* line 440, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8508,85 +8509,85 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 458, ../scss/_styles.scss */
+/* line 460, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 463, ../scss/_styles.scss */
+/* line 465, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 466, ../scss/_styles.scss */
+/* line 468, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 469, ../scss/_styles.scss */
+/* line 471, ../scss/_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 472, ../scss/_styles.scss */
+/* line 474, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 476, ../scss/_styles.scss */
+/* line 478, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 480, ../scss/_styles.scss */
+/* line 482, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 483, ../scss/_styles.scss */
+/* line 485, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 488, ../scss/_styles.scss */
+/* line 490, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /* Sidebar Search Results */
-/* line 493, ../scss/_styles.scss */
+/* line 495, ../scss/_styles.scss */
 main .search {
   margin: 0;
 }
 
-/* line 496, ../scss/_styles.scss */
+/* line 498, ../scss/_styles.scss */
 main .search div > * {
   margin: 0;
 }
 
-/* line 499, ../scss/_styles.scss */
+/* line 501, ../scss/_styles.scss */
 #search-results {
   list-style: none;
   margin: 0;
 }
 
-/* line 506, ../scss/_styles.scss */
+/* line 508, ../scss/_styles.scss */
 #search-results a {
   background-color: black;
   padding: 0.5rem;
   display: block;
 }
 
-/* line 511, ../scss/_styles.scss */
+/* line 513, ../scss/_styles.scss */
 #search-results a:hover {
   background-color: #444;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 518, ../scss/_styles.scss */
+/* line 520, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8594,13 +8595,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 525, ../scss/_styles.scss */
+/* line 527, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 530, ../scss/_styles.scss */
+/* line 532, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8614,13 +8615,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 540, ../scss/_styles.scss */
+/* line 542, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 545, ../scss/_styles.scss */
+/* line 547, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8631,7 +8632,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 556, ../scss/_styles.scss */
+/* line 558, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8643,12 +8644,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 568, ../scss/_styles.scss */
+/* line 570, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 571, ../scss/_styles.scss */
+/* line 573, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }
