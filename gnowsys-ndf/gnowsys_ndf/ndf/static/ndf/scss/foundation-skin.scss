@@ -92,10 +92,12 @@ pre{
          /* flip the order so we can use the + and ~ combinators */
   unicode-bidi: bidi-override;
   direction: rtl;
-      opacity:1;
       
-      &.rated{
-          opacity:1;
+      &.unrated{
+          opacity:0.5;
+          &:hover{
+              opacity:1;
+          }
       }
   }
 

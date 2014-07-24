@@ -8687,17 +8687,20 @@ pre {
   /* flip the order so we can use the + and ~ combinators */
   unicode-bidi: bidi-override;
   direction: rtl;
+}
+/* line 96, ../scss/foundation-skin.scss */
+.rating-bar > span.unrated {
+  opacity: 0.5;
+}
+/* line 98, ../scss/foundation-skin.scss */
+.rating-bar > span.unrated:hover {
   opacity: 1;
 }
-/* line 97, ../scss/foundation-skin.scss */
-.rating-bar > span.rated {
-  opacity: 1;
-}
-/* line 102, ../scss/foundation-skin.scss */
+/* line 104, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 104, ../scss/foundation-skin.scss */
+/* line 106, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -8708,7 +8711,7 @@ pre {
   white-space: nowrap;
   font-size: 1.5rem;
 }
-/* line 113, ../scss/foundation-skin.scss */
+/* line 115, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -8716,32 +8719,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 122, ../scss/foundation-skin.scss */
+/* line 124, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #47b079;
   text-shadow: 0 0 1px #333;
 }
-/* line 131, ../scss/foundation-skin.scss */
+/* line 133, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 136, ../scss/foundation-skin.scss */
+/* line 138, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 144, ../scss/foundation-skin.scss */
+/* line 146, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 150, ../scss/foundation-skin.scss */
+/* line 152, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
