@@ -92,14 +92,15 @@ pre{
          /* flip the order so we can use the + and ~ combinators */
   unicode-bidi: bidi-override;
   direction: rtl;
-      
-      &.unrated{
-          opacity:0.5;
-          &:hover{
-              opacity:1;
-          }
-      }
   }
+    
+    &.unrated{
+        /* If the user has not rated yet */
+        &:checked ~ label:before{
+      color: $secondary-color;
+    }
+  }
+        
 
   [type*="radio"] {
     display: none;

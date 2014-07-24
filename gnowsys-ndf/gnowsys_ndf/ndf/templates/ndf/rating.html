@@ -1,6 +1,4 @@
 {% load ndf_tags %}
-
-
     
 <div id="rating-bar">
     <form>
@@ -9,6 +7,7 @@
      
        {% get_node_ratings request node as ratings %}
       
+    <!-- Sets the rating values as data attributes -->
        <div class="rating-bar" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
 
           <span>
@@ -21,7 +20,6 @@
            </span>
            
            <div class="rating">Average: <span>{{ratings.tot|default:"unrated"}}</span></div>        
-          
     </div>
          
   </fieldset>
@@ -31,10 +29,8 @@
 
 <script type="text/javascript">
     
-    var avgRating,userRating,userVotes,points;
-    
+    //Ajax to post the user rating and fetch the new average
     function updateRating() {
-    
 surl="/{{node}}/ratings/add_ratings/";
 userRating = $('input[name=rating]:checked').val();
 nodeId=$(".rating-bar").attr("data-node");
@@ -47,18 +43,18 @@ nodeId=$(".rating-bar").attr("data-node");
             },
         
            success: function(data){
-               $('input[name=rating]').off("click");
+               //Replace rating bar with new values
                            $("#rating-bar").html(data);   
                setRating();
                                  }
-        
     }); 
     
 }
-    
+    //Sets the stars in the rating bar based on loaded values
     function setRating(){
         userRating = parseInt($(".rating-bar").attr("data-user-rating"));
-        avgRating = parseInt($(".rating-bar").attr("data-avg-rating"));
+        avgRating = parseFloat($(".rating-bar").attr("data-avg-rating"));
+        //If the user has already rated, set the stars to the user rating, else set to the average value
         if( userRating ){
             setStars( userRating );
         }
@@ -66,15 +62,15 @@ nodeId=$(".rating-bar").attr("data-node");
             setStars( avgRating );
             $(".rating-bar").addClass("unrated");
         }
+        //Update the average value text
         $(".rating-bar .rating span").html(avgRating);
     }
     setRating();
 
-    
+    //Sets the number of stars in the rating bar
     function setStars(stars){
         $(".rating-bar input[value="+stars+"]").attr("checked","checked");
     }
-    setStars();
     
 </script>
 
