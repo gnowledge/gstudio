@@ -286,8 +286,10 @@ def file(request, group_id, file_id=None):
                                             }).sort("last_update", -1)
       
       already_uploaded = request.GET.getlist('var', "")
-  
-      
+      new_list = []  
+      for each in already_uploaded:
+          new_list.append(eval(each))
+      already_uploaded = new_list
       # source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
 
       # pandora_video_id = []
@@ -403,7 +405,7 @@ def submitDoc(request, group_id):
                 alreadyUploadedFiles.append(f)
                 title = mtitle
         for each in alreadyUploadedFiles:
-            str1 = str1 + 'var=' + each + '&'
+            str1 = str1 + 'var={"Newname":"' + each[0] + '",' + '"Oldname":"' + each[1] +'"}'+ '&'
 
         if img_type != "": 
             
@@ -438,7 +440,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     
     
     if fileobj.fs.files.exists({"md5":filemd5}):
-        
+        coll_oid = get_database()['fs.files']
+	cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
+	coll_new = get_database()['Nodes']
+	new_name = collection.Node.find_one({'_id':ObjectId(str(cur_oid["docid"]))})     
         # if calling function is passing oid=True as last parameter then reply with id and name.
         if kwargs.has_key("oid"):
           if kwargs["oid"]: 
@@ -446,9 +451,9 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
             # returning only ObjectId (of GSystem containing file info) in dict format.
             # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
-            return cur_oid["docid"]
+            return cur_oid["docid"], 'True'
         else:
-            return files.name
+            return [files.name, new_name.name],'True'
 
     else:
         try:
@@ -734,7 +739,7 @@ def delete_file(request, group_id, _id):
   else :
       pass
   file_collection = db[File.collection_name]
-  auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
+  auth = collection.Node.one({'_type': u'Author', 'name': unicode(request.user.username) })
   pageurl = request.GET.get("next", "")
   try:
     cur = file_collection.File.one({'_id':ObjectId(_id)})
@@ -809,10 +814,13 @@ def file_detail(request, group_id, _id):
         else:
             shelves = []
 
+    annotations = json.dumps(file_node.annotations)
+
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
                                 'groupid':group_id,
+                                'annotations' : annotations,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
                                 'breadcrumbs_list': breadcrumbs_list
@@ -901,8 +909,8 @@ def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if request.method == "POST":
-        get_node_common_fields(request, file_node, group_id, GST_FILE)
-        file_node.save()
+        # get_node_common_fields(request, file_node, group_id, GST_FILE)
+        file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:

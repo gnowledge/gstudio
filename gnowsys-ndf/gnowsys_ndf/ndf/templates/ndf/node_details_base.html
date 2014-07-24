@@ -8,7 +8,6 @@
 {% block title %} {{ node.member_of_names_list|join:", " }} - {{ node.name }}  {% endblock %}
 {% block head %}
 
-<!-- MathJax-File-Based-Configuration: Loading MathJax with given file -->
 <!-- <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
 <script type="text/javascript" src="/static/ndf/bower_components/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> <!-- checked -->
 
@@ -58,7 +57,6 @@
 
 
 {% block collection_content %}
-  <br/>
   <div id="view_collection">
     {% include "ndf/collection_ajax_view.html" %}  
   </div>

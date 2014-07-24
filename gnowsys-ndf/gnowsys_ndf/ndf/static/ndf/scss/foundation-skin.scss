@@ -7,8 +7,8 @@
 //Imports
 //The order of files allows the sass variables to be set first and then foundation is built using these variables
 
-@import "metastudio/theme";     //Skin settings
-@import "settings";             //Foundation settings
+@import "themes/metastudio/theme_settings";     //Skin settings
+@import "foundation_settings";             //Foundation settings
 
 @import "foundation";           //Foundation grid framework
 @import "styles";          //Application styles
@@ -18,14 +18,18 @@
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
 
-nav.top-bar{
-    // Icons in the top-bar links caused heights of the li to vary by a few pixels and broke the layout of content below in firefox browser
-    height:inherit;
+.top-bar .dropdown a.button{
+    padding: 0;
 }
 
 /*
 *   Foundation extensions
 */
+
+/* Protects reflowing elements on error */
+[data-abide] span.error, [data-abide] small.error{
+    position: absolute;
+}
 
 pre{
     width:92%;

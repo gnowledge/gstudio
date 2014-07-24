@@ -1,4 +1,3 @@
-
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json
@@ -14,27 +13,27 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 
-from gnowsys_ndf.ndf.views.methods import get_versioned_page, update_mobwrite_content_org
-from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
-from gnowsys_ndf.mobwrite.diff_match_patch import diff_match_patch
 from django_mongokit import get_database
 from gnowsys_ndf.settings import LANG
 from django.utils.translation import ugettext as _  
 
 try:
-    from bson import ObjectId
+  from bson import ObjectId
 except ImportError:  # old pymongo
-    from pymongo.objectid import ObjectId
-
+  from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS, LANGUAGES
 
 from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields, update_mobwrite_content_org
+from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
+from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
+
+from gnowsys_ndf.mobwrite.diff_match_patch import diff_match_patch
 
 #######################################################################################################################################
 
@@ -238,16 +237,19 @@ def page(request, group_id, app_id=None):
 
                 shelf_list[shelf_name.name] = []         
                 for ID in shelf_name.collection_set:
-                	shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-                	shelf_list[shelf_name.name].append(shelf_item.name)
+                  shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                  shelf_list[shelf_name.name].append(shelf_item.name)
 
           else:
             shelves = []
+
+        annotations = json.dumps(page_node.annotations)
 
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'shelf_list': shelf_list,
+                                    'annotations': annotations,
                                     'shelves': shelves,
                                     'groupid':group_id,
                                     'breadcrumbs_list': breadcrumbs_list
@@ -294,9 +296,9 @@ def create_edit_page(request, group_id, node_id=None):
 
     if request.method == "POST":
         
-        get_node_common_fields(request, page_node, group_id, gst_page)
+        # get_node_common_fields(request, page_node, group_id, gst_page)
 
-        page_node.save()
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 

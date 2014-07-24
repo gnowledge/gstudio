@@ -216,7 +216,7 @@ def invite_admins(request,group_id):
             if deleted_users:
                 for each in deleted_users:
                     bx=User.objects.get(id=each)
-                    node.author_set.remove(each)
+                    node.group_admin.remove(each)
                     msg="'This is to inform you that " +sending_user.username+ " has unsubscribed you from the group " +groupname+" as admin'"
                     set_notif_val(request,group_id,msg,activ,bx)
                 node.save()
@@ -243,5 +243,5 @@ def invite_admins(request,group_id):
             return HttpResponse(json.dumps(data_list))
    
     except Exception as e:
-        print "Exception in invite_users "+str(e)
+        print "Exception in invite_admins in notify view "+str(e)
         return HttpResponse("Failure")

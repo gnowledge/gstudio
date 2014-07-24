@@ -63,3 +63,4 @@ bower_components/
 mathjax/
 schema_files/
 *.db
+wikidata/

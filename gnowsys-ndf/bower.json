@@ -29,6 +29,9 @@
     "MathJax": "~2.4.0",
     "d3": "~3.4.8",
     "FileSaver": "*",
-    "underscore": "~1.6.0"
+    "underscore": "~1.6.0",
+    "d3-cloud": "~1.0.5",
+    "d3-tip": "~0.6.4",
+    "side-comments": "aroc/side-comments#~0.0.3"
   }
 }

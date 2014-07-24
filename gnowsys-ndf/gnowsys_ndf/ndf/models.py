@@ -185,142 +185,155 @@ class Node(DjangoDocument):
 
     @property
     def user_details_dict(self):
-        """Retrieves names of created-by & modified-by users from the given node, 
-        and appends those to 'user_details' dict-variable
-        """
-        user_details = {}
-        if self.created_by:
-            user_details['created_by'] = User.objects.get(pk=self.created_by).username
+      """Retrieves names of created-by & modified-by users from the given node, 
+      and appends those to 'user_details' dict-variable
+      """
+      user_details = {}
+      if self.created_by:
+        user_details['created_by'] = User.objects.get(pk=self.created_by).username
 
-        contributor_names = []
-        for each_pk in self.contributors:
-            contributor_names.append(User.objects.get(pk=each_pk).username)
-        # user_details['modified_by'] = contributor_names
-        user_details['contributors'] = contributor_names
+      contributor_names = []
+      for each_pk in self.contributors:
+        contributor_names.append(User.objects.get(pk=each_pk).username)
 
-        if self.modified_by:
-            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
+      # user_details['modified_by'] = contributor_names
+      user_details['contributors'] = contributor_names
 
-        return user_details
+      if self.modified_by:
+        user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
+
+      return user_details
 
     @property
     def member_of_names_list(self):
-        """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
-        built from 'member_of' field (list of ObjectIds)
-        """
-        member_of_names = []
+      """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
+      built from 'member_of' field (list of ObjectIds)
+      """
+      member_of_names = []
 
-        collection = get_database()[Node.collection_name]
-        if self.member_of:
-            for each_member_id in self.member_of:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem=collection.Node.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        else:
-            for each_member_id in self.gsystem_type:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem=collection.Node.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
-        return member_of_names
+      collection = get_database()[Node.collection_name]
+      if self.member_of:
+        for each_member_id in self.member_of:
+          if type(each_member_id) == ObjectId:
+            _id = each_member_id
+
+          else:
+            _id = each_member_id['$oid']
+
+          if _id:
+            mem=collection.Node.one({'_id': ObjectId(_id)})
+            if mem:
+              member_of_names.append(mem.name)
+
+      else:
+        for each_member_id in self.gsystem_type:
+          if type(each_member_id) == ObjectId:
+            _id = each_member_id
+
+          else:
+            _id = each_member_id['$oid']
+
+          if _id:
+            mem=collection.Node.one({'_id': ObjectId(_id)})
+            if mem:
+              member_of_names.append(mem.name)
+
+      return member_of_names
 
     @property        
     def prior_node_dict(self):
-        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-        pair respectively for prior_node objects of the given node.
-        """
-        
-        collection = get_database()[Node.collection_name]
-        
-        obj_dict = {}
+      """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+      pair respectively for prior_node objects of the given node.
+      """
+      collection = get_database()[Node.collection_name]
+      obj_dict = {}
 
-        i = 0
-        for each_id in self.prior_node:
-            i = i + 1
+      i = 0
+      for each_id in self.prior_node:
+        i = i + 1
 
-            if each_id != self._id:
-                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
-                dict_key = i
-                dict_value = node_collection_object
-                
-                obj_dict[dict_key] = dict_value
+        if each_id != self._id:
+          node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
+          dict_key = i
+          dict_value = node_collection_object
+          
+          obj_dict[dict_key] = dict_value
 
-        return obj_dict
+      return obj_dict
 
     @property
     def collection_dict(self):
-        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-        pair respectively for collection_set objects of the given node.
-        """
+      """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+      pair respectively for collection_set objects of the given node.
+      """
 
-        collection = get_database()[Node.collection_name]
-        
-        obj_dict = {}
+      collection = get_database()[Node.collection_name]
+      obj_dict = {}
 
-        i = 0;
-        for each_id in self.collection_set:
-            i = i + 1
+      i = 0;
+      for each_id in self.collection_set:
+        i = i + 1
 
-            if each_id != self._id:
-                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
-                dict_key = i
-                dict_value = node_collection_object
-                
-                obj_dict[dict_key] = dict_value
+        if each_id != self._id:
+          node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
+          dict_key = i
+          dict_value = node_collection_object
+          
+          obj_dict[dict_key] = dict_value
 
-        return obj_dict
+      return obj_dict
 
     @property
     def html_content(self):
-        """Returns the content in proper html-format.
-        """
-        if MARKUP_LANGUAGE == 'markdown':
-            return markdown(self.content, MARKDOWN_EXTENSIONS)
-        elif MARKUP_LANGUAGE == 'textile':
-            return textile(self.content)
-        elif MARKUP_LANGUAGE == 'restructuredtext':
-            return restructuredtext(self.content)
-        return self.content
+      """Returns the content in proper html-format.
+      """
+      if MARKUP_LANGUAGE == 'markdown':
+        return markdown(self.content, MARKDOWN_EXTENSIONS)
+
+      elif MARKUP_LANGUAGE == 'textile':
+        return textile(self.content)
+
+      elif MARKUP_LANGUAGE == 'restructuredtext':
+        return restructuredtext(self.content)
+
+      return self.content
         
     @property
     def current_version(self):
-        history_manager= HistoryManager()
-        return history_manager.get_current_version(self)    
+      history_manager= HistoryManager()
+      return history_manager.get_current_version(self)    
 
     @property
     def version_dict(self):
-        """Returns a dictionary containing list of revision numbers of
-        the given node.
-        
-        Example:
-        {
-         "1": "1.1",
-         "2": "1.2",
-         "3": "1.3",
-        }
-        """
-        history_manager = HistoryManager()
-        return history_manager.get_version_dict(self)
+      """Returns a dictionary containing list of revision numbers of
+      the given node.
+      
+      Example:
+      {
+       "1": "1.1",
+       "2": "1.2",
+       "3": "1.3",
+      }
+      """
+      history_manager = HistoryManager()
+      return history_manager.get_version_dict(self)
 
 
     ########## Built-in Functions (Overridden) ##########
     
     def __unicode__(self):
-        return self._id
+      return self._id
     
     def identity(self):
-        return self.__unicode__()
+      return self.__unicode__()
     
     def save(self, *args, **kwargs):
+
+        if kwargs.has_key("is_changed"):
+          if not kwargs["is_changed"]:
+            print "\n ", self.name, "(", self._id, ") -- Nothing has changed !\n\n"
+            return
+
         is_new = False
 
         if not self.has_key('_id'):
@@ -385,6 +398,7 @@ class Node(DjangoDocument):
             rcs_obj.checkout(fp)
 
             try:
+                # print "\n Updating...", self._id, " -- ", self.name
                 if history_manager.create_or_replace_json_file(self):
                     user = User.objects.get(pk=self.modified_by).username
                     message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
@@ -970,6 +984,32 @@ class Group(GSystem):
         'encryption_policy':lambda x: x in ENCRYPTION_POLICY
     } 
 
+    def is_gstaff(self, user):
+      """
+      Checks whether given user belongs to GStaff.
+      GStaff includes only the following users of a group:
+        1) Super-user (Django's superuser)
+        2) Creator of the group (created_by field)
+        3) Admin-user of the group (group_admin field)
+      Other memebrs (author_set field) doesn't belongs to GStaff.
+
+      Arguments:
+      self -- Node of the currently selected group
+      user -- User object taken from request object
+
+      Returns:
+      True -- If user is one of them, from the above specified list of categories.
+      False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
+      """
+
+      if (user.is_superuser) or (user.id == self.created_by) or (user.id in self.group_admin):
+        return True
+
+      else:
+        return False
+
+
+
 
 @connection.register
 class Author(Group):
@@ -1261,7 +1301,7 @@ class HistoryManager():
 	null = 0
 	import json
 	json_dict = eval(json_data)
-	json_node_keys = collection.Node.keys()
+	json_node_keys = document_object.keys()
 	json_dict_keys = json_dict.keys()
 	diff_keys = list(set(json_node_keys)-set(json_dict_keys))
 	if diff_keys:
@@ -1333,19 +1373,68 @@ class Triple(DjangoDocument):
     
     def save(self, *args, **kwargs):
         is_new = False
+	
 
         if not self.has_key('_id'):
             is_new = True               # It's a new document, hence yet no ID!"
 
         collection = get_database()[Node.collection_name]
-        subject_name = collection.Node.one({'_id': self.subject}).name
         
+	"""
+	Check for correct GSystemType match in AttributeType and GAttribute, similarly for RelationType and GRelation
+	"""
+	#it's me
+	subject_name = collection.Node.one({'_id': self.subject}).name
+        subject_system_flag = False
+        subject_id = self.subject
+        subject_document = collection.Node.one({"_id":self.subject})
+        print subject_document
+
         if self._type == "GAttribute":
             self.name = subject_name + " -- " + self.attribute_type['name'] + " -- " + unicode(self.object_value)
+	    subject_type_list = []
+	    subject_type_list = self.attribute_type['subject_type']
+ 	    subject_member_of_list = []
+	    subject_member_of_list = subject_document.member_of
+	    intersection = set(subject_member_of_list) & set(subject_type_list)
+	    if intersection:
+	    	subject_system_flag = True
+	    	
 
         elif self._type == "GRelation":
+	    right_subject_document = collection.Node.one({'_id': self.right_subject})
             right_subject_name = collection.Node.one({'_id': self.right_subject}).name
             self.name = subject_name + " -- " + self.relation_type['name'] + " -- " + right_subject_name
+	    subject_type_list = self.relation_type['subject_type']
+	    object_type_list= self.relation_type['object_type']
+	    left_subject_member_of_list = subject_document.member_of
+	    right_subject_member_of_list = right_subject_document.member_of
+	    left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
+	    right_intersection = set(object_type_list) & set(right_subject_member_of_list)
+	    if left_intersection and right_intersection:
+	    		subject_system_flag = True
+
+	if self._type =="GRelation" and subject_system_flag == False:
+		print "The 2 lists do not have any common element"
+		raise Exception("Cannot create the GRelation as the subject/object that you have mentioned is not a member of a GSytemType for which this RelationType is defined")
+	
+	if self._type =="GAttribute" and subject_system_flag == False:
+		print "The 2 lists do not have any common element"
+		raise Exception("Cannot create the GAttribute as the subject that you have mentioned is not a member of a GSystemType which this AttributeType is defined")
+
+	#it's me
+	#check for data_type in GAttribute case. Object value of the GAttribute must have the same type as that of the type specified in AttributeType
+	"""
+	if self._type == "GAttribute":
+		data_type_in_attribute_type = self.attribute_type['data_type']
+		data_type_of_object_value = type(self.object_value)
+		print "Attribute:: " + str(data_type_in_attribute_type)
+		print "Value:: " + str(data_type_of_object_value)
+		if data_type_in_attribute_type != data_type_of_object_value:
+			raise Exception("The DataType of the value you have entered for this attribute is not correct. Pls ener a value with type ---> " + str(data_type_in_attribute_type))
+
+	"""
+	#end of data_type_check
 
         super(Triple, self).save(*args, **kwargs)
         

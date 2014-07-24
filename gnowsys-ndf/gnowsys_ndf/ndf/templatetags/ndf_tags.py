@@ -10,6 +10,8 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
+from mongokit import IS
+
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS as setting_gapps, META_TYPE,CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.ndf.models import *
@@ -31,6 +33,28 @@ import json,ox
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
 
+@register.assignment_tag
+def get_node_ratings(node):
+        try:
+                node=collection.Node.one({'_id':ObjectId(node._id)})
+                sum=0
+                dic={}
+                cnt=0
+                for each in node.rating:
+                     if each['user_id']==0:
+                             cnt=cnt+1
+                     sum=sum+each['score']
+                if len(node.rating)==1 and cnt==1:
+                        tot_ratng=0
+                        avg_ratng=0.0
+                else:
+                        tot_ratng=len(node.rating)-cnt
+                        avg_ratng=float(sum)/tot_ratng
+                dic['avg']=avg_ratng
+                dic['tot']=tot_ratng
+                return dic
+        except Exception as e:
+                print "Error in get_node_ratings "+str(e)
 
 @register.assignment_tag
 def get_group_resources(group):
@@ -316,10 +340,11 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 
 
 @register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(group_id, selectedGapp):
+def get_gapps_menubar(request, group_id):
 	"""Get Gapps menu-bar
 	"""
 	try:
+		selectedGapp = request.META["PATH_INFO"]
 		group_name = ""
 		collection = db[Node.collection_name]
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -354,11 +379,11 @@ def get_gapps_menubar(group_id, selectedGapp):
 		else :
 			group_name = group_obj.name
 
-		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
+		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
 	except invalid_id:
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		group_id=gpid._id
-		return {'template': 'ndf/gapps_menubar.html', 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
@@ -543,7 +568,9 @@ def get_user_group(user, selected_group_name):
   group_list = []
   auth_group = None
 
-  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(9)
+  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 
+  									'$or': [{'group_admin': user.id}, {'author_set': user.id}],
+  								}).sort('last_update', -1).limit(9)
 
   auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
@@ -668,23 +695,84 @@ def get_create_url(groupid):
     return 'uploadDoc'
 	
 
+@register.assignment_tag
+def get_contents(node_id):
+
+	contents = {}
+	image_contents = []
+	video_contents = []
+	document_contents = []
+	page_contents = []
+
+	page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'}) 
+
+	obj = collection.Node.one({'_id': ObjectId(node_id) })
+	if obj.collection_set:
+		for each in obj.collection_set:
+			coll_obj = collection.Node.one({'_id': ObjectId(each) })
+
+			if coll_obj.has_key("mime_type"):
+				if 'image' in coll_obj.mime_type:
+					image_contents.append((coll_obj.name, coll_obj._id))
+				elif 'video' in coll_obj.mime_type:
+					video_contents.append((coll_obj.name, coll_obj._id))
+				else:
+					if coll_obj._type == "File":
+						document_contents.append((coll_obj.name, coll_obj._id))
+			else: 
+				if page_GST._id in coll_obj.member_of:
+					page_contents.append((coll_obj.name, coll_obj._id))
+
+
+		if not image_contents:
+			image_contents.append("None")
+		elif image_contents:
+			contents['image_contents'] = image_contents
+
+		if not video_contents:
+			video_contents.append("None")
+		elif video_contents:
+			contents['video_contents'] = video_contents
+
+		if not document_contents:
+			document_contents.append("None")
+		elif document_contents:
+			contents['document_contents'] = document_contents
+		
+		if page_contents:
+			contents['page_contents'] = page_contents		
+
+	# print "\n",document_contents,"\n"
+	return contents
+
 
 @register.assignment_tag
 def get_group_type(group_id, user):
 
 	try:
-		col_Group = db[Group.collection_name]
+		col_Group = db[Node.collection_name]
 
 		if group_id == '/home/':
-			colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+
 		else:  
-			gid = group_id.replace("/", "")
+			gid = ""
+			split_content = group_id.strip().split("/")
+
+			if split_content[0] != "":
+				gid = split_content[0]
+
+			else:
+				gid = split_content[1]
+
+			# gid = group_id.replace("/", "").strip()
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
 			else:
 				colg = col_Group.Group.find_one({'_type': 'Group', 'name': gid})
 				if colg :
 					pass
+
 				else:		
 					colg = None
   		
@@ -694,22 +782,24 @@ def get_group_type(group_id, user):
 			# Check is user is logged in
 			if  user.id:
 				# condition for group accesseble to logged user
-				if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
+				if colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
 					return "allowed"
 				else:
-					raise Http404	
+					error_message = "Access denied: You are not an authorized user!!!"
+					raise Http404(error_message)
 
 			else:
 				#condition for groups, accessible to not logged users
 				if colg.group_type == "PUBLIC":
 					return "allowed"
 				else:
-					raise Http404
+					error_message = "Access denied: You are not an authorized user!!!"
+					raise Http404(error_message)
 		else:
 			return "pass"
 
-	except Http404:
-		raise Http404
+	except Http404 as e:
+		raise Http404(e)
 		
 	except Exception as e:
 		print "Error in group_type_tag "+str(e)
@@ -824,8 +914,8 @@ def user_access_policy(node, user):
 
   Check is performed in given sequence as follows (sequence has importance):
   - If user is superuser, then he/she is allowed
-  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
   - Else if user is creator of the group, then he/she is allowed
+  - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
   - Else if user is member of the group, then he/she is allowed
   - Else user is NOT allowed!
 
@@ -962,6 +1052,70 @@ def Group_Editing_policy(groupid,node,user):
 	elif node.edit_policy is None:
 		return "allow"      
 	
+@register.assignment_tag
+def check_is_gstaff(groupid, user):
+  """
+  Checks whether given user belongs to GStaff.
+  GStaff includes only those members which belongs to following criteria:
+    1) User should be a super-user (Django's superuser)
+    2) User should be a creator of the group (created_by field)
+    3) User should be an admin-user of the group (group_admin field)
+  
+  Other memebrs (author_set field) doesn't belongs to GStaff.
+
+  Arguments:
+  groupid -- ObjectId of the currently selected group
+  user -- User object taken from request object
+
+  Returns:
+  True -- If user is one of them, from the above specified list of categories.
+  False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
+  """
+
+  try:
+    group_node = collection.Node.one({'_id': ObjectId(groupid)})
+
+    if group_node:
+      return group_node.is_gstaff(user)
+
+    else:
+      error_message = "No group exists with this id ("+str(groupid)+") !!!"
+      raise Exception(error_message)
+
+  except Exception as e:
+    error_message = "\n IsGStaffCheckError: " + str(e) + " \n"
+    raise Http404(error_message)
+
+
+@register.assignment_tag
+def check_is_gstaff_for_gapp(groupid, app_dict, user):
+  """
+  This restricts view of MIS & MIS-PO GApps to only GStaff members (super-user, creator, admin-user) of the group. 
+  That is, other subscribed-members of the group can't even see these GApps.
+
+  Arguments:
+  groupid -- ObjectId of the currently selected group
+  app_dict -- A dictionary consisting of following key-value pair
+              - 'id': ObjectId of the GApp
+              - 'name': name of the GApp
+  user - User object taken from request object
+
+  Returns:
+  A bool value indicating:-
+  True --  if user is superuser, creator or admin of the group
+  False -- if user is just a subscribed-member of the group
+  """
+
+  try:
+    if app_dict["name"].lower() in ["mis", "mis-po", "batch", "task"]:
+      return check_is_gstaff(groupid, user)
+
+    else:
+      return True
+
+  except Exception as e:
+    error_message = "\n GroupAdminCheckError (For MIS & MIS-PO): " + str(e) + " \n"
+    raise Http404(error_message)
 
 
 @register.assignment_tag
@@ -1150,3 +1304,160 @@ def get_group_name(groupid):
 	else :
 		pass
 	return group_name 
+
+@register.filter
+def get_field_type(node_structure, field_name):
+  """Returns data-type value associated with given field_name.
+  """
+  return node_structure.get(field_name)
+
+
+@register.inclusion_tag('ndf/html_field_widget.html')
+# def html_widget(node_id, field, field_type, field_value):
+# def html_widget(node_id, node_member_of, field, field_value):
+def html_widget(node_id, field):
+  """
+  Returns html-widget for given attribute-field; that is, passed in form of
+  field_name (as attribute's name) and field_type (as attribute's data-type)
+  """
+  # gs = None
+  field_value_choices = []
+
+  is_list_of = False
+  LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
+              "[<type 'unicode'>]", "[<type 'basestring'>]",
+              "[<type 'int'>]", "[<type 'float'>]", "[<type 'long'>]",
+              "[<type 'datetime.datetime'>]"
+            ]
+
+  is_special_field = False
+  included_template_name = ""
+  SPECIAL_FIELDS = {"location": "ndf/location_widget.html",
+                    "content_org": "ndf/add_editor.html"
+                    # "attendees": "ndf/attendees_widget.html"  # Uncomment this to make attendance-widget working
+                    }
+
+  is_required_field = False
+
+  is_mongokit_is_radio = False # False for drop-down True for radio buttons
+
+  try:
+    if node_id:
+      node_id = ObjectId(node_id)
+
+    # if node_member_of:
+    #   gs = collection.GSystem()
+    #   gs.get_neighbourhood(node_member_of)
+
+    # field_type = gs.structure[field['name']]
+    field_type = field['data_type']
+    field_altnames = field['altnames']
+    field_value = field['value']
+    # print "\n IS: ", IS
+    if type(field_type) == IS:
+      field_value_choices = field_type._operands
+      # print "\n operands: ", field_value
+
+      if len(field_value_choices) == 2:
+        is_mongokit_is_radio = True
+
+    elif field_type == bool:
+      # print "\n ", field['name'], " -- ", field_type, " -- ", field_value
+      # field_value_choices = ["True", "False"]
+      # field_value = str(field_value)
+      field_value_choices = [True, False]
+      # print " ", type(field_value), " -- ", type(field_value_choices[0])
+
+    # print "\n ", field['name'], " -- ", field['value'], " -- ", type(field_value)
+    # print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type)
+
+    if field.has_key('_id'):
+      field = collection.Node.one({'_id': field['_id']})
+
+    field['altnames'] = field_altnames
+
+    if not field_value:
+      field_value = ""
+
+    if type(field_type) == type:
+      field_type = field_type.__name__
+    else:
+      field_type = field_type.__str__()
+
+    # if field['name'] == "tot_when":
+    #   print "\n ", field['name'], " -- ", field_type, " -- ", type(field_type), "\n"
+    is_list_of = (field_type in LIST_OF)
+
+    is_special_field = (field['name'] in SPECIAL_FIELDS.keys())
+    if is_special_field:
+      included_template_name = SPECIAL_FIELDS[field['name']]
+
+    is_AT_RT_base = field["_type"]
+
+    is_attribute_field = False
+    is_relation_field = False
+    is_base_field = False
+    if is_AT_RT_base == "BaseField":
+      is_base_field = True
+      is_required_field = field["required"]
+
+    elif is_AT_RT_base == "AttributeType":
+      is_attribute_field = True
+      is_required_field = field["required"]
+
+    elif is_AT_RT_base == "RelationType":
+      is_relation_field = True
+      is_required_field = True
+      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}},
+                                                            {'_id': 1, 'name': 1}
+                                                          )
+                                      )
+                                )
+      field_value = [str(each._id) for each in field_value]
+
+    return {'template': 'ndf/html_field_widget.html',
+            'field': field, 'field_type': field_type, 'field_value': field_value,
+            'node_id': node_id,
+            'field_value_choices': field_value_choices,
+            'is_base_field': is_base_field,
+            'is_attribute_field': is_attribute_field,
+            'is_relation_field': is_relation_field,
+            'is_list_of': is_list_of,
+            'is_mongokit_is_radio': is_mongokit_is_radio,
+            'is_special_field': is_special_field, 'included_template_name': included_template_name,
+            'is_required_field': is_required_field
+            # 'is_special_tab_field': is_special_tab_field
+    }
+
+  except Exception as e:
+    error_message = " HtmlWidgetTagError: " + str(e) + " !!!"
+    raise Exception(error_message)
+  
+@register.assignment_tag
+def check_node_linked(node_id):
+  """
+  Checks whether the passed node is linked with it's corresponding author node (i.e via "has_login" relationship)
+
+  Arguments:
+  node_id -- ObjectId of the node
+
+  Returns:
+  A bool value, i.e.
+  True: if linked (i.e. relationship is created for the given node)
+  False: if not linked (i.e. relationship is not created)
+  """
+
+  try:
+    node = collection.Node.one({'_id': ObjectId(node_id)}, {'_id': 1})
+    relation_type_node = collection.Node.one({'_type': "RelationType", 'name': "has_login"})
+    is_linked = collection.Node.one({'_type': "GRelation", 'subject': node._id, 'relation_type': relation_type_node.get_dbref()})
+
+    if is_linked:
+      return True
+
+    else:
+      return False
+
+  except Exception as e:
+    error_message = " NodeUserLinkFindError - " + str(e)
+    raise Exception(error_message)
