@@ -36,7 +36,7 @@ def ratings(request,group_id):
         node.rating.append(ratedict)
     node.save()
     vars=RequestContext(request,{'node':node})
-    template="ndf/ratings_refresh.html"
+    template="ndf/rating.html"
     return render_to_response(template, vars)
     
     
