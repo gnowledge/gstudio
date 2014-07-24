@@ -30,12 +30,15 @@ nodeId=$(".rating-bar").attr("data-node");
 </script>
 {% endif %}
 
+
     
     <form>
   <fieldset>
     <legend>Rating</legend>
      
-       <div class="rating-bar" data-node="{{node}}">
+      
+      
+       <div class="rating-bar" data-node="{{node}}" data-value="{{val}}">
            
           <span>
       <input type="radio" id="rating-5" name="rating" value="5" /><label for="rating-5">5</label>
@@ -47,19 +50,25 @@ nodeId=$(".rating-bar").attr("data-node");
            </span>
            
            <div class="rating">
-            {% get_node_ratings node as ratings %}
+               
+    {% get_node_ratings node as ratings %}
 {% if ratings %}
+               
 {% for key,val in ratings.items %}
+         
+               
 {% ifequal key 'avg' %}
-Average rating :<span class>{{val}}</span>
+Average rating :<span class="value">{{val}}</span>
 
 {% else %}
 {{val}} vote
 {% endifequal %}
 {% endfor %}
+               
 {% else %}
 No ratings yet !!
 {% endif %}
+               
                </div>
           
     </div>
@@ -67,4 +76,9 @@ No ratings yet !!
   </fieldset>
 </form>
     
-
+<!-- Render rating bar from value -->
+<script type="text/javascript">
+    var stars = Math.round($(".rating-bar").attr("data-value"));
+    console.log(stars);
+    
+</script>

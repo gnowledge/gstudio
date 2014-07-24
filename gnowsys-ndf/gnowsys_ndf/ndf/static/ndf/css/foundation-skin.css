@@ -8687,13 +8687,18 @@ pre {
   /* flip the order so we can use the + and ~ combinators */
   unicode-bidi: bidi-override;
   direction: rtl;
+  opacity: 0.5;
 }
 /* line 97, ../scss/foundation-skin.scss */
+.rating-bar > span.rated {
+  opacity: 1;
+  pointer-events: non;
+}
+/* line 103, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] {
-  font-size: 32px;
   display: none;
 }
-/* line 100, ../scss/foundation-skin.scss */
+/* line 105, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -8702,8 +8707,9 @@ pre {
   width: 1em;
   height: 1.4em;
   white-space: nowrap;
+  font-size: 1.5rem;
 }
-/* line 108, ../scss/foundation-skin.scss */
+/* line 114, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -8711,32 +8717,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 117, ../scss/foundation-skin.scss */
+/* line 123, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #1b432e;
   text-shadow: 0 0 1px #333;
 }
-/* line 126, ../scss/foundation-skin.scss */
+/* line 132, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 131, ../scss/foundation-skin.scss */
+/* line 137, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 139, ../scss/foundation-skin.scss */
+/* line 145, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 145, ../scss/foundation-skin.scss */
+/* line 151, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
