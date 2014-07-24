@@ -57,3 +57,19 @@ pre{
         }
     }
 }
+
+/* Effects */
+.drop-shadow{
+	-webkit-box-shadow: 0px 0px 5px 1px #333;
+	box-shadow: 0px 0px 5px 1px #333;
+}
+.rounded{
+	border-radius: 2px;
+	-webkit-border-radius:2px;
+}
+.transition-opacity{
+	transition: opacity .3s ease;
+	-moz-transition: opacity .3s ease;
+	-webkit-transition: opacity .3s ease;
+	-o-transition: opacity .3s ease;
+}
