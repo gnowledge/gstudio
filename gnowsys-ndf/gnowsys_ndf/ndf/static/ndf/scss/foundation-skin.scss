@@ -84,15 +84,18 @@ pre{
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
 
 .rating-bar {
-  /* remove inline-block whitespace */
-  font-size: 0;
-  * {
-    font-size: 32px;
-  }
-  /* flip the order so we can use the + and ~ combinators */
+ 
+
+  &>span {
+      /* remove inline-block whitespace */
+      font-size: 0;
+         /* flip the order so we can use the + and ~ combinators */
   unicode-bidi: bidi-override;
   direction: rtl;
+  }
+
   [type*="radio"] {
+      font-size: 32px;
     display: none;
     & + label {
       /* only enough room for the star */
