@@ -9,24 +9,18 @@ surl="/{{node}}/ratings/add_ratings/";
 userRating = $('input[name=rating]:checked').val();
 nodeId=$(this).attr("data-node");
 
+    
     $.ajax({
             url: surl,
             type: 'POST',
             data: {
                 rating: userRating, node: nodeId, csrfmiddlewaretoken: '{{ csrf_token }}'
             },
-            beforeSend: function() {
-                  $("#ajax_load_image").show();
-                  $("#content").css({"opacity":"0.1",})
-                                  },
+        
            success: function(data){
-
                            $("#ratings_div").html(data);          
-                                 },
-            complete: function(){
-                    $("#ajax_load_image").hide();
-                    $("#content").css({"opacity":"",})
-              }
+                                 }
+        
     }); 
     
 });
@@ -35,27 +29,8 @@ nodeId=$(this).attr("data-node");
 </script>
 
 <div id="ratings_div">
-{% get_node_ratings node as ratings %}
-{% if ratings %}
-{% for key,val in ratings.items %}
-{% ifequal key 'avg' %}
-Average rating :{{val}} 
-{% else %}
-<br/>
-<br/>
-Total Number of votes:{{val}}  
-{% endifequal %}
-{% endfor %}
-{% else %}
-No ratings yet !!
-{% endif %}
-{% if user.is_authenticated %}
-<br/><br/>
-<!-- <img class="rate {split:2}" title="bad" alt="1" src="/static/ndf/images/star-off.png"> -->
-<!-- <img class="rate {split:2}" title="bad" alt="2" src="/static/ndf/images/star-off.png"> -->
-<!-- <img class="rate {split:2}" title="bad" alt="3" src="/static/ndf/images/star-off.png"> -->
-<!-- <img class="rate {split:2}" title="bad" alt="4" src="/static/ndf/images/star-off.png"> -->
-<!-- <img class="rate {split:2}" title="bad" alt="5" src="/static/ndf/images/star-off.png"> -->
+
+    
     
     <form>
   <fieldset>
@@ -68,6 +43,23 @@ No ratings yet !!
 <input type="radio" id="rating-1" name="rating" value="1" /><label for="rating-1">1</label>
 <input type="radio" id="rating-0" name="rating" value="0" class="star-cb-clear" /><label for="rating-0">0</label>
     </span>
+      
+      <span>
+      {% get_node_ratings node as ratings %}
+{% if ratings %}
+{% for key,val in ratings.items %}
+{% ifequal key 'avg' %}
+Average rating :{{val}} 
+{% else %}
+{{val}} vote
+{% endifequal %}
+{% endfor %}
+{% else %}
+No ratings yet !!
+{% endif %}
+{% if user.is_authenticated %}
+      </span>
+      
   </fieldset>
 </form>
     

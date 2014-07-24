@@ -303,6 +303,17 @@
     
 		// Initialize Foundation CSS
 		$(document).foundation();
+      
+      //Register global ajax start and complete events to show ajax loader when request is in process
+        $( document )
+    .ajaxStart(function() {
+  $( "#ajax_load_image" ).show();
+         $("#content").css({"opacity":"0.1",})
+})
+    .ajaxComplete(function() {
+   $("#ajax_load_image").hide();
+                    $("#content").css({"opacity":"",})
+});;
 
 		$(".user").prepend(function(){
 			/* Attaches user icon with gnow level color for every user link */
