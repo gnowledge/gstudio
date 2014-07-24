@@ -91,7 +91,7 @@
 
   .orgitdown{
     /*height:100px;*/
-    width: 20em !important;
+    width: 100% !important;
   }
   
   .row.orgitdownContainer{
@@ -127,10 +127,19 @@
   }
 
   .reply-button{
-    margin-left: -1.3em;
+    /*margin-left: -1.3em;
     margin-top: -1em;
     position: relative;
-    width: 21.87rem;
+    width: 21.87rem;*/
+  }
+
+  .disc-replies { 
+    
+    padding:10px;
+    background-color:gray;
+    width:20em;
+    margin-left: 48px; 
+    margin-top: 10px;
   }
 
 
@@ -449,18 +458,23 @@
      <!-- discussion content area -->
      <div id="view-discussion" class="content">
 
-       <div onclick="createDiscussion()" id="create-discussion" class="button">Start discussion</div>
-     
+      <br/>
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org">Start discussion</div>
+
+      <div id="replies-area">
+        
+      </div>
+
       <!-- orgitdown container   -->
-       <div id="org" style="display:none; margin-left:1em;" class="try">
-          <!-- Reply : -->
+      <div id="org" style="" class="reveal-modal small" data-reveal>
+        <!-- Reply : -->
 
-          <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
+        <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
 
-          <input id="save-reply" type="button" value="Post Reply"  class="button tiny reply-button">
+        <input data-id="{{ node.pk }}" type="button" value="Post Reply"  class="button expand reply-button" onclick="addReply($(this))">
 
-          <input type="hidden" id="prior-node" style="visibility:hidden" value="">
-          <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
+        <input type="hidden" id="prior-node" style="visibility:hidden" value="">
+        <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
 
       </div>
       <!-- end of orgit down container -->
@@ -645,33 +659,166 @@
       success: function(data){
           
           data = JSON.parse(data);
-          if( data[0] == "thread-created" ){
-            
-            // alert(data)
-            $("#create-discussion").hide();
-            $("#prior-node").val(data[1]) // _id
-            $("#org").show();
 
+          if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
+          {
+            
+            // $("#create-discussion").hide();
+
+            // changing method to behave same as sub-reply button
+            $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+
+            $("#prior-node").val("{{ node.pk }}") // _id
+            // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
+            
+            $("#create-discussion").trigger("click");
           }
-          else if( data[0] == "Thread-exist" ){
-            // alert(data)
-            $("#create-discussion").hide();
-            $("#prior-node").val(data[1]) // _id
-            $("#org").fadeIn();
-          }
+          // else if( data[0] == "Thread-exist" ){
+          //   // alert(data)
+          //   $("#create-discussion").hide();
+          //   $("#prior-node").val("{{ node.pk }}") // _id         
+          //   // changing method to behave same as sub-reply button   
+          //   $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+          //   $("create-discussion").trigger("click");
+          // }
           else{ alert(data) }
 
-        }
+        },
+      complete: function(){
+        // $("#prior-node").val("") // removing _id
+      }
+
     });
     // --- END create thread for first time.
   }
   // --- END of createDiscussion()
 
 
-  function addReply()
+  // function called by "Add Reply" and "Reply" buttons to open editor
+  function openOrgEditor(sourceObj)
   {
 
+    var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
+    $("#prior-node").val(sourceObjDataId);
+    
+    // tempOrgObj = $("#org").clone(true, true);
+    // console.log($(sourceObj));
+    
+    // $("#org").detach();
+    
+    // if( sourceObjDataId == "{{ node.pk }}")
+    // {
+    //   $('div[data-id="'+ sourceObjDataId +'"]').after(tempOrgObj);
+    // }
+    // else
+    // {
+    //   $tempPrior = $('div[data-id="'+ sourceObjDataId +'"]').parent();
+    //   calcMargLeft = $tempPrior.css("margin-left");
+    //   calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+
+    //   $('div[data-id="'+ sourceObjDataId +'"]').parent().after(tempOrgObj);
+    // }
+    
+    // $("#org").fadeIn();
+    if( sourceObjDataId != "{{ node.pk }}")
+    {
+      $('#org').foundation('reveal', 'open');
+    }
   }
+
+
+  function addReply(sourceObj)
+  {
+    $('#org').foundation('reveal', 'close');
+    // aaa = sourceObj;
+    // var sourceObjDataId = $(sourceObj).attr("data-id");
+    // console.log(sourceObjDataId);
+
+    // setting "#prior-node" value
+    // if( sourceObjDataId == "{{ node.pk }}" )
+    // {
+    //   $("#prior-node").val("{{ node.pk }}");
+    // }
+    // else
+    // {
+    //   $("#prior-node").val(sourceObjDataId);
+    // }
+
+    // $("#org").fadeIn();
+
+    var priorNodeId = $("#prior-node").val(),
+        replyContent = $("#orgitdownreps").val().trim();
+        // console.log(priorNodeId, "\n", replyContent)
+    // If reply is non empty - make ajax to save reply.
+    if( (replyContent.length > 0) && (priorNodeId.length == 24) )
+    {
+
+      $.ajax({
+        
+        type: "POST",
+
+        url: "{% url 'discussion_reply' group_id %}",
+
+        data: { 
+
+          "csrfmiddlewaretoken": "{{ csrf_token }}",
+          "prior_node_id": priorNodeId,
+          "reply_text_content": replyContent
+        },
+
+        success: function(data){
+            
+            data = JSON.parse(data);
+
+            if( data[0] == "reply_saved" ){
+              
+              $("#org").fadeOut();          // hide editor
+              $("#orgitdownreps").val("");  // make textarea empty
+
+              if(priorNodeId == "{{ node.pk }}")  // main reply
+              {
+                // change the text of Start discussion and make it visible
+                $("#create-discussion").html("Add Reply");                
+                // $("#create-discussion").fadeIn();
+
+                // add reply text content after #replies-area
+                $("#replies-area").prepend(
+                  "<div style='' class='disc-replies'>"
+                  + data[2] 
+                  + "</br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div></br>")
+                .fadeIn(8000);
+
+              }
+              else  // sub-reply
+              {
+                $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent();
+                calcMargLeft = $tempPrior.css("margin-left");
+                calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+
+                // add reply text content after #replies-area
+                $($tempPrior).after(
+                  "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
+                  + data[2]
+                  + "</br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div></br>")
+                .fadeIn(8000);
+              }
+            }
+            else if( data[0] == "no_content" ){
+              
+              alert("Please provide the reply content.")
+            }
+            else { alert(data) }
+          }
+      });// --- END of ajax to save reply    
+    }
+    else // content is not provided
+    {
+      alert("Please provide the reply content.")
+    }
+    // --- END of IF-ELSE
+  
+  }
+  // --- END of addReply()
 
 
   // Taken value of svg data of that node globally
@@ -1142,7 +1289,7 @@ function highlightAll()
 */
 function toggle(el)
 {
-  console.log("toggleClass at beginning: " + toggleValue);
+  // console.log("toggleClass at beginning: " + toggleValue);
   if (toggleValue == 1)
    {
          //Disable annotations
@@ -1164,7 +1311,7 @@ function toggle(el)
   }
 
   toggleValue *= -1;
-  console.log("toggleClass at end: " + toggleValue);
+  // console.log("toggleClass at end: " + toggleValue);
 }
 
 function getPosition(element) {

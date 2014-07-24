@@ -413,7 +413,7 @@ def add_node(request,group_id):
         forumobj = ""
         groupobj = ""
 
-        print "\n node:", node, "\n thread: ", thread, "\n forumid: ", forumid, "\n supnode: ", sup_id, "\n twistname: ", tw_name
+        # print "\n node:", node, "\n thread: ", thread, "\n forumid: ", forumid, "\n supnode: ", sup_id, "\n twistname: ", tw_name
     
         colg = collection.Group.one({'_id':ObjectId(group_id)})
 
@@ -435,7 +435,7 @@ def add_node(request,group_id):
             colrep.member_of.append(reply_st._id)
     
         colrep.prior_node.append(sup._id)
-        colrep.name=name
+        colrep.name = name
 
         if content_org:
             colrep.content_org = unicode(content_org)
@@ -468,7 +468,7 @@ def add_node(request,group_id):
             prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
             nodename=""
         
-        link=url
+        link = url
         
         for each in colg.author_set:
             bx=User.objects.get(id=each)

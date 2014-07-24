@@ -1249,7 +1249,7 @@ def create_discussion(request, group_id, node_id):
     # group = collection.Group.one({'_id':ObjectId(group_id)})
 
     thread = collection.Node.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
-
+    
     if not thread:
       
       # retriving RelationType
@@ -1285,3 +1285,53 @@ def create_discussion(request, group_id, node_id):
     return HttpResponse("server-error")
 
 
+# to add discussion replies
+def discussion_reply(request, group_id):
+
+  try:
+
+    prior_node = request.POST.get("prior_node_id", "")
+    content_org = request.POST.get("reply_text_content", "") # reply content
+
+    # process and save node if it reply has content  
+    if content_org:
+  
+      user_id = int(request.user.id)
+      user_name = unicode(request.user.username)
+
+      # auth = collection.Node.one({'_type': 'Author', 'name': user_name })
+      reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+      
+      # creating empty GST and saving it
+      reply_obj = collection.GSystem()
+
+      reply_obj.name = unicode("Reply of:" + str(prior_node))
+      reply_obj.status = u"PUBLISHED"
+
+      reply_obj.created_by = user_id
+      reply_obj.modified_by = user_id
+      reply_obj.contributors.append(user_id)
+
+      reply_obj.member_of.append(ObjectId(reply_st._id))
+      reply_obj.prior_node.append(ObjectId(prior_node))
+      reply_obj.group_set.append(ObjectId(group_id))
+  
+      reply_obj.content_org = unicode(content_org)
+      filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+      reply_obj.content = org2html(content_org, file_prefix=filename)
+  
+      # saving the reply obj
+      # reply_obj.save()
+
+      reply = json.dumps([ "reply_saved", str("533aadd71d41c8438fffd577")])
+      print reply
+      reply.append(reply_obj.content)
+      print reply
+      return HttpResponse( reply )
+
+    else: # no reply content
+
+      return HttpResponse(json.dumps(["no_content"]))      
+
+  except Exception as e:
+    return HttpResponse(json.dumps(["Server Error"]))
