@@ -82,13 +82,6 @@
 		}
 
 
-/*************************** 1. Foundation CSS overrides ***********************/
-
-/* Foundation hacks */
-
-input[type="checkbox"] + label, input[type="radio"] + label{
-	margin: inherit!important;
-}
 
 /* Sections */
 
@@ -210,30 +203,9 @@ h1:not(.subheader){
 
 
 
-/* Should be in Foundation */
-
-/* Effects */
-.drop-shadow{
-	-webkit-box-shadow: 0px 0px 5px 1px #333;
-	box-shadow: 0px 0px 5px 1px #333;
-}
-.rounded{
-	border-radius: 2px;
-	-webkit-border-radius:2px;
-}
-.transition-opacity{
-	transition: opacity .3s ease;
-	-moz-transition: opacity .3s ease;
-	-webkit-transition: opacity .3s ease;
-	-o-transition: opacity .3s ease;
-}
 
 /* Card block */
 
-.medium-block-grid-2 > .card:first-child{
-    // First card
-    //width: 100%;
-}
 
 
 .card>*{
@@ -494,28 +466,6 @@ a.app i{
 	margin-bottom: 0;
 }
 
-/* Sidebar Search Results */
-main .search{
-	margin:0;
-}
-main .search div>*{
-	margin: 0;
-}
-#search-results{
-	list-style: none;
-	margin:0;
-}
-#search-results li{
-
-}
-#search-results a{
-	background-color: black;
-	padding: 0.5rem;
-	display: block;
-}
-#search-results a:hover{
-	background-color: #444;
-}
 
 /************ Forms **************/
 

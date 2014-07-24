@@ -83,7 +83,7 @@ pre{
 
 /*Ratings bar*/
 
-.star-cb-group {
+.rating-bar {
   /* remove inline-block whitespace */
   font-size: 0;
   * {
@@ -92,7 +92,7 @@ pre{
   /* flip the order so we can use the + and ~ combinators */
   unicode-bidi: bidi-override;
   direction: rtl;
-  & > [type*="radio"] {
+  [type*="radio"] {
     display: none;
     & + label {
       /* only enough room for the star */
@@ -113,33 +113,36 @@ pre{
       & + label:hover ~ label:before,
       & + label:hover:before {
       content: '\2605'; /* BLACK STAR */
-      color: #e52;
+      color: $primary-color;
       text-shadow: 0 0 1px #333;
     }
   }
   
   /* the hidden clearer */
-  & > .star-cb-clear[type*="radio"] + label {
+    
+  .last[type*="radio"] + label {
     text-indent: -9999px;
     width: .5em;
     margin-left: -.5em;
   }
-  & > .star-cb-clear[type*="radio"] + label:before {
+  .last[type*="radio"] + label:before {
     width: .5em;
     height: 1.4em;
   }
   
   /* this is gross, I threw this in to override the starred
      buttons when hovering. */
-  &:hover > [type*="radio"] + label:before {
+  &:hover{
+     [type*="radio"] + label:before {
     content: '\2606'; /* WHITE STAR */
     color: #888;
     text-shadow: none;
   }
-  &:hover > [type*="radio"] + label:hover ~ label:before,
-  &:hover > [type*="radio"] + label:hover:before {
+  [type*="radio"] + label:hover ~ label:before,
+  [type*="radio"] + label:hover:before {
     content: '\2605'; /* BLACK STAR */
-    color: #e52;
+    color: $primary-color;
     text-shadow: 0 0 1px #333;
+  }
   }
 }
