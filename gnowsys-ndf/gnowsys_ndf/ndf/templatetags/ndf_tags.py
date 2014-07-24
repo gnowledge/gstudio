@@ -34,13 +34,17 @@ def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
 
 @register.assignment_tag
-def get_node_ratings(node):
+def get_node_ratings(request,node):
         try:
+                user=request.user
                 node=collection.Node.one({'_id':ObjectId(node._id)})
                 sum=0
                 dic={}
                 cnt=0
+                userratng=0
                 for each in node.rating:
+                     if each['user_id'] == user.id:
+                             userratng=each['score']
                      if each['user_id']==0:
                              cnt=cnt+1
                      sum=sum+each['score']
@@ -52,6 +56,7 @@ def get_node_ratings(node):
                         avg_ratng=float(sum)/tot_ratng
                 dic['avg']=avg_ratng
                 dic['tot']=tot_ratng
+                dic['user_rating']=userratng
                 return dic
         except Exception as e:
                 print "Error in get_node_ratings "+str(e)
