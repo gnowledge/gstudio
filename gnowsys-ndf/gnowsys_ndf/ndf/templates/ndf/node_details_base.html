@@ -1,11 +1,11 @@
 {% extends "ndf/base.html" %}
 
 {% load ndf_tags %}
+{% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 {% get_group_type request.path request.user as group_type %}
 
 {% block title %} {{ node.member_of_names_list|join:", " }} - {{ node.name }}  {% endblock %}
-
 {% block head %}
 
 <!-- <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
@@ -73,7 +73,6 @@
   {% include "ndf/node_ajax_view.html" %}  
 </div>
 {% endblock %}
-
 
 {% block script%}
 
