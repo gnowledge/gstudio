@@ -1,6 +1,13 @@
 {% load ndf_tags %}
 
-<!-- Rating script only if user is logged in -->
+    
+    <form>
+  <fieldset>
+    <legend>Rating</legend>
+     
+       <div class="rating-bar" data-node="{{node}}" >
+           
+           <!-- Rating script only if user is logged in -->
 {% if user.is_authenticated %}
 <script type="text/javascript">
 
@@ -20,7 +27,7 @@ nodeId=$(".rating-bar").attr("data-node");
             },
         
            success: function(data){
-                           $(".rating-bar .rating").html(data);          
+                           $(".rating-bar").html(data);          
                                  }
         
     }); 
@@ -29,16 +36,6 @@ nodeId=$(".rating-bar").attr("data-node");
 
 </script>
 {% endif %}
-
-
-    
-    <form>
-  <fieldset>
-    <legend>Rating</legend>
-     
-      
-      
-       <div class="rating-bar" data-node="{{node}}" data-value="{{val}}">
            
           <span>
       <input type="radio" id="rating-5" name="rating" value="5" /><label for="rating-5">5</label>
@@ -51,22 +48,20 @@ nodeId=$(".rating-bar").attr("data-node");
            
            <div class="rating">
                
-    {% get_node_ratings node as ratings %}
+    {% get_node_ratings request node as ratings %}
 {% if ratings %}
                
-{% for key,val in ratings.items %}
-         
-               
-{% ifequal key 'avg' %}
-Average rating :<span class="value">{{val}}</span>
-
+ {% if ratings.user_rating %}
+         Your rating : {{ratings.user_rating}}
+     {% else %}
+         Your rating : Nil 
+     {% endif %}
+     <br/><br/>
+     Average rating :{{ratings.avg}} 
+     <br/><br/>
+     Total Number of votes:{{ratings.tot}}  
 {% else %}
-{{val}} vote
-{% endifequal %}
-{% endfor %}
-               
-{% else %}
-No ratings yet !!
+     No ratings yet !
 {% endif %}
                
                </div>
