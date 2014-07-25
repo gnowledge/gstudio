@@ -8603,24 +8603,30 @@ input.node-title {
 /*
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
-/* line 21, ../scss/foundation-skin.scss */
+/* Too many apps cause breakage */
+/* line 22, ../scss/foundation-skin.scss */
+.top-bar {
+  height: auto !important;
+}
+
+/* line 25, ../scss/foundation-skin.scss */
 .top-bar .dropdown a.button {
   padding: 0;
 }
 
-/* line 26, ../scss/foundation-skin.scss */
+/* line 30, ../scss/foundation-skin.scss */
 input[type="checkbox"] + label, input[type="radio"] + label {
   margin: inherit !important;
 }
 
 /* Protects reflowing elements on error */
-/* line 32, ../scss/foundation-skin.scss */
+/* line 36, ../scss/foundation-skin.scss */
 [data-abide] span.error, [data-abide] small.error {
   position: absolute;
 }
 
 /*active color for side-nav links*/
-/* line 37, ../scss/foundation-skin.scss */
+/* line 41, ../scss/foundation-skin.scss */
 .side-nav li.active a:not(.button) {
   color: white;
 }
@@ -8628,7 +8634,7 @@ input[type="checkbox"] + label, input[type="radio"] + label {
 /*
 *   Foundation extensions
 */
-/* line 46, ../scss/foundation-skin.scss */
+/* line 50, ../scss/foundation-skin.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -8642,35 +8648,35 @@ pre {
   font-family: monospace;
 }
 
-/* line 60, ../scss/foundation-skin.scss */
+/* line 64, ../scss/foundation-skin.scss */
 .fixme {
   opacity: 0.5;
 }
-/* line 63, ../scss/foundation-skin.scss */
+/* line 67, ../scss/foundation-skin.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 66, ../scss/foundation-skin.scss */
+/* line 70, ../scss/foundation-skin.scss */
 .fixme:hover:after {
   content: " fixme";
   color: orange;
 }
 
 /* Effects */
-/* line 74, ../scss/foundation-skin.scss */
+/* line 78, ../scss/foundation-skin.scss */
 .drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px #333;
   box-shadow: 0px 0px 5px 1px #333;
 }
 
-/* line 78, ../scss/foundation-skin.scss */
+/* line 82, ../scss/foundation-skin.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 82, ../scss/foundation-skin.scss */
+/* line 86, ../scss/foundation-skin.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -8679,13 +8685,13 @@ pre {
 }
 
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
-/* line 91, ../scss/foundation-skin.scss */
+/* line 95, ../scss/foundation-skin.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
      buttons when hovering. */
 }
-/* line 94, ../scss/foundation-skin.scss */
+/* line 98, ../scss/foundation-skin.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -8693,19 +8699,19 @@ pre {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 102, ../scss/foundation-skin.scss */
+/* line 106, ../scss/foundation-skin.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 104, ../scss/foundation-skin.scss */
+/* line 108, ../scss/foundation-skin.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #4c7861;
 }
-/* line 110, ../scss/foundation-skin.scss */
+/* line 114, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 112, ../scss/foundation-skin.scss */
+/* line 116, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -8716,7 +8722,7 @@ pre {
   white-space: nowrap;
   font-size: 1.5rem;
 }
-/* line 121, ../scss/foundation-skin.scss */
+/* line 125, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -8724,32 +8730,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 130, ../scss/foundation-skin.scss */
+/* line 134, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #47b079;
   text-shadow: 0 0 1px #333;
 }
-/* line 139, ../scss/foundation-skin.scss */
+/* line 143, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 144, ../scss/foundation-skin.scss */
+/* line 148, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 152, ../scss/foundation-skin.scss */
+/* line 156, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 158, ../scss/foundation-skin.scss */
+/* line 162, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
