@@ -21,7 +21,7 @@
 		{% for each in app_collection_set %}
 				
 			{% if app_set_name_slug == each.name|slugify %}
-				<li class="{{each.name|slugify}} selected-app-set-item" id="{{each.id}}">
+				<li class="{{each.name|slugify}} active" id="{{each.id}}">
 			{% else %}
 				<li class="{{each.name|slugify}}" id="{{each.id}}">
 			{% endif %}
