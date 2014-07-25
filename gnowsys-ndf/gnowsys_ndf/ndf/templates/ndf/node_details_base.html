@@ -63,6 +63,109 @@
 {% endblock %}
 
 
+{% block add_resource_content %}  
+
+{% if topic %}
+  <br/>
+  <dl class="accordion" data-accordion>
+    <dd>
+      <a href="#add_resources"> <b>Add resources in this topic</b> </a>
+      <div id="add_resources" class="content">
+        <div> 
+
+            <a class="tiny button" data-reveal-id="view_add_page"> 
+              <span class="fi-plus">&nbsp;&nbsp;Add Page </span>&nbsp;&nbsp; <i class="fi-page"></i>  
+            </a>
+            <div id="view_add_page" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+
+              <h3>Add New Page:</h3>
+              <!-- To enter name of the page -->
+              <div>
+                <input class="name_id" name="name" type="text" placeholder="Enter name...">
+              </div>              
+              <!-- To enter tags -->
+              <div>
+                <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+                </span>
+                <input class="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+              </div>  
+              <!-- To enter description(org content) -->
+              <div class="row">
+                <div class="medium-12 columns">
+                  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+                </div>
+              </div>
+
+              <input type="submit" id="add_page" value="Save as Draft And Preview" class="medium round button"/>
+
+              <a class="close-reveal-modal">&#215;</a>
+
+            </div>          
+
+        </div>
+
+        <div> 
+          <a class="tiny button" data-reveal-id="view_add_file"> 
+            <span class="fi-plus">&nbsp;&nbsp;Add File </span>&nbsp;&nbsp; <i class="fi-play"></i>  
+          </a>
+
+          <div id="view_add_file" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+            Welcome in reveal area
+
+            <a class="close-reveal-modal">&#215;</a>
+          </div>
+
+        </div>
+
+        <div> 
+          <a class="tiny button" data-reveal-id="view_add_event"> 
+            <span class="fi-plus">&nbsp;&nbsp;Add Events </span>&nbsp;&nbsp; <i class=""></i>  
+          </a>
+
+          <div id="view_add_event" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+            Welcome in reveal area
+
+            <a class="close-reveal-modal">&#215;</a>
+          </div>
+
+        </div>
+      </div>
+    </dd>
+  </dl>
+
+<script type="text/javascript">
+
+$("#add_page").click(function() {
+
+      $.ajax({
+        type: "POST",
+        url: "{% url 'add_page' groupid %}",
+        datatype: "html",
+        data:{
+          context_node: "{{node.pk}}",
+          name: $(".name_id").val(),
+          tags: $(".tags_id").val(),
+          // content_org: $(".orgitd").val()
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(data) {
+
+          if ($.trim(data) === "success") {
+            location.reload(true);
+          }
+          
+        }
+      });
+
+});
+
+</script>
+{% endif %}
+
+{% endblock %}
+
 {% block shelf_content %}
   {% include "ndf/shelf.html" %}  
 {% endblock %}
