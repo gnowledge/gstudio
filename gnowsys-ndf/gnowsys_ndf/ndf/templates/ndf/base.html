@@ -218,14 +218,15 @@
               </section>
           
           <footer>
-              
-              <div class="icon-bar four-up">
-  <a class="item user" href="{% url 'userDashboard' groupid request.user.pk %}">
-    <label>My profile</label>
-  </a>
-</div>
-          </footer>
-	      
+            {% if user.is_authenticated %}
+	            <div class="icon-bar four-up">
+	            	<!-- Here we are using "group_name_tag" since groupid value is overwrites in above section for different perspective -->
+	  				<a class="item user" href="{% url 'userDashboard' group_name_tag request.user.pk %}">
+	    				<label>My profile</label>
+	  				</a>
+				</div>
+			{% endif %}
+          </footer>	      
 	    </div>
 
 	
