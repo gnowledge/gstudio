@@ -33,6 +33,11 @@ input[type="checkbox"] + label, input[type="radio"] + label{
     position: absolute;
 }
 
+/*active color for side-nav links*/
+.side-nav li.active a:not(.button){
+    color:$side-nav-link-color-active;
+}
+
 
 /*
 *   Foundation extensions
