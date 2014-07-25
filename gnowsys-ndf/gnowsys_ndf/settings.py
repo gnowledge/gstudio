@@ -1,15 +1,18 @@
  # Django settings for gnowsys-ndf project.
 
 import os
-
+ugettext = lambda s: s
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
 # List of Indian Languages 
-LANGUAGES = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
+LANG = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
 
+LANGUAGES = (
+  ('de', ugettext('German')),
+  )
 #SMTP setting for sending mail (Using python default SMTP server)
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'localhost'
@@ -63,7 +66,7 @@ TIME_ZONE = 'Asia/Kolkata'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'de'
 
 SITE_ID = 1
 
@@ -98,6 +101,12 @@ STATIC_ROOT = '/static'
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
+LOCALE_PATHS = (
+    '/home/supriya/Desktop/gstudio/gstudio/gnowsys-ndf/conf/locale/',
+)
+
+#LOCALE_PATHS= "/home/supriya/Desktop/gstudio"
+
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -124,8 +133,9 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'django.middleware.activeuser_middleware.ActiveUserMiddleware',                 #for online_users

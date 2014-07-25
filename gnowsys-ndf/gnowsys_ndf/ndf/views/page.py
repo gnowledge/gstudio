@@ -14,6 +14,8 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 
 from django_mongokit import get_database
+from gnowsys_ndf.settings import LANG
+from django.utils.translation import ugettext as _  
 
 try:
   from bson import ObjectId
@@ -276,7 +278,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
-                          'lan':LANGUAGES,
+                          'lan':LANG,
                           'groupid': group_id
                       }
     
@@ -521,7 +523,7 @@ def translate_node(request,group_id,node_id=None):
         node_details=[]
         for k,v in content.items():
             
-            node_name=content['name']
+            node_name = content['name']
             node_content_org=content['content_org']
             node_tags=content['tags']
             
@@ -531,7 +533,7 @@ def translate_node(request,group_id,node_id=None):
                                 'node_name':node_name,
                                 'groupid':group_id,
                                 'group_id':group_id,
-                                'lan':LANGUAGES
+                                'lan':LANG
                                },
                              
                               context_instance = RequestContext(request)

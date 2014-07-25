@@ -63,7 +63,10 @@
                 margin-bottom: 3px;
                 margin-right: 3px;
                 display: inline-block;
-                background: #fafafa url("../images/gnu-head.png") no-repeat -35px -19px;
+                background: #fafafa url("../images/gnu-head.png") no-repeat -35px -9px;
+                &:hover{
+                    background-position: -35px -19px;
+                }
             }
 		}
 
@@ -79,13 +82,6 @@
 		}
 
 
-/*************************** 1. Foundation CSS overrides ***********************/
-
-/* Foundation hacks */
-
-input[type="checkbox"] + label, input[type="radio"] + label{
-	margin: inherit!important;
-}
 
 /* Sections */
 
@@ -186,15 +182,17 @@ h1:not(.subheader){
         display:inline-block;
         position: relative;
         input{
-            height:4rem;
+            height:200%;
             font-style: italic;
             @extend h1;
             padding-left:5px; 
-            height: 3rem;
             box-shadow: none;
-            border: none;
+            border-width: 0 0 2px 0;
+            border-bottom: 2px dotted #222;
+            background-color: inherit;
+            
             &:hover{
-            border-bottom: 2px dotted $active-color;
+            background-color: white;
             }
         }
     }
@@ -205,30 +203,9 @@ h1:not(.subheader){
 
 
 
-/* Should be in Foundation */
-
-/* Effects */
-.drop-shadow{
-	-webkit-box-shadow: 0px 0px 5px 1px #333;
-	box-shadow: 0px 0px 5px 1px #333;
-}
-.rounded{
-	border-radius: 2px;
-	-webkit-border-radius:2px;
-}
-.transition-opacity{
-	transition: opacity .3s ease;
-	-moz-transition: opacity .3s ease;
-	-webkit-transition: opacity .3s ease;
-	-o-transition: opacity .3s ease;
-}
 
 /* Card block */
 
-.medium-block-grid-2 > .card:first-child{
-    // First card
-    //width: 100%;
-}
 
 
 .card>*{
@@ -353,9 +330,13 @@ article .tabs{
 
 article{
 .tabs {
-    dd.active a,dd:hover a{
-        color:$theme-color;
-        border-bottom: 2px solid darken($bg-color,50%);
+    dd.active a{
+        color:$active-color;
+        border-bottom: 2px solid $active-color;
+        font-weight: bold;
+    }
+    dd:hover a{
+        color:$active-color;
     }
 }
 }
@@ -485,28 +466,6 @@ a.app i{
 	margin-bottom: 0;
 }
 
-/* Sidebar Search Results */
-main .search{
-	margin:0;
-}
-main .search div>*{
-	margin: 0;
-}
-#search-results{
-	list-style: none;
-	margin:0;
-}
-#search-results li{
-
-}
-#search-results a{
-	background-color: black;
-	padding: 0.5rem;
-	display: block;
-}
-#search-results a:hover{
-	background-color: #444;
-}
 
 /************ Forms **************/
 
