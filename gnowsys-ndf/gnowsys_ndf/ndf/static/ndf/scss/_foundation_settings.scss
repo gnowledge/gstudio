@@ -202,8 +202,8 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 
 // We use these to style anchors
 // $anchor-text-decoration: none;
-// $anchor-font-color: $primary-color;
-// $anchor-font-color-hover: scale-color($primary-color, $lightness: -14%);
+ $anchor-font-color: darken($active-color,10%);
+ $anchor-font-color-hover: scale-color( $anchor-font-color, $lightness: -14%);
 
 // We use these to style the <hr> element
 // $hr-border-width: 1px;
@@ -1120,7 +1120,7 @@ $icon-bar-item-padding: 0.5rem;
 
  $tabs-navigation-padding: 0.6rem;
  $tabs-navigation-bg-color: inherit  ;
- $tabs-navigation-active-bg-color: $bg-color;
+ $tabs-navigation-active-bg-color: inherit;
  $tabs-navigation-hover-bg-color: inherit;
  $tabs-navigation-font-color: $meta-color;
 // $tabs-navigation-font-size: rem-calc(16);
