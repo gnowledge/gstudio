@@ -448,18 +448,29 @@ def add_page(request, group_id):
 
     context_node_id = request.POST.get("context_node", '')
     gst_page = collection.Node.one({'_type': "GSystemType", 'name': "Page"})
+    context_node = collection.Node.one({'_id': ObjectId(context_node_id)})
+    name =request.POST.get('name','')
 
-    page_node = collection.GSystem()
-    page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+    collection_list = []
+    if context_node:
+      for each in context_node.collection_set:
+        obj = collection.Node.one({'_id': ObjectId(each), 'group_set': ObjectId(group_id)})
+        collection_list.append(obj.name)
 
-    if context_node_id:
-      context_node = collection.Node.one({'_id': ObjectId(context_node_id)})
-      context_node.collection_set.append(page_node._id)
-      context_node.save()
+      if name not in collection_list:
 
-      return HttpResponse("success")
+        page_node = collection.GSystem()
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
 
-    return HttpResponse("failure")
+        context_node.collection_set.append(page_node._id)
+        context_node.save()
+
+        return HttpResponse("success")
+        
+      else:
+        return HttpResponse("failure")
+
+    return HttpResponse("None")
 
 
 def node_collection(node=None, group_id=None):

@@ -147,15 +147,22 @@ $("#add_page").click(function() {
           context_node: "{{node.pk}}",
           name: $(".name_id").val(),
           tags: $(".tags_id").val(),
-          // content_org: $(".orgitd").val()
+          content_org: $(".orgedit").val(),
           csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function(data) {
 
+          var page = $(".name_id").val();
+
+          if ($.trim(data) === "failure") {
+            alert("Page name "+ page +" already available, Please choose different name");
+          }
+
           if ($.trim(data) === "success") {
             location.reload(true);
           }
-          
+
+          $(".name_id").val("");
         }
       });
 
