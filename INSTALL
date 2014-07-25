@@ -80,6 +80,7 @@ Use corresponding package names if you are using an RPM based distro
 
     (2) A tool to create isolated node.js environment which is integrated 
         with environment built by python virtualenv: 
+        sudo apt-get install curl
         pip install nodeenv
 
     (3) Appending nodeenv settings to virtualenv: (This takes time .. wait till it complete)
