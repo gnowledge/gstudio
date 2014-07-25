@@ -4,6 +4,7 @@ from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
 from django.template import RequestContext
+from django.core.serializers.json import DjangoJSONEncoder
 import mongokit 
 
 ''' -- imports from application folders/files -- '''
@@ -1293,8 +1294,11 @@ def create_discussion(request, group_id, node_id):
       response_data =  [ "Thread-exist", str(thread._id) ]
       return HttpResponse(json.dumps(response_data))
   
-  except Exception:
-    return HttpResponse("server-error")
+  except Exception as e:
+    
+    error_message = "\n DiscussionThreadCreateError: " + str(e) + "\n"
+    raise Exception(error_message)
+    # return HttpResponse("server-error")
 
 
 # to add discussion replies
@@ -1333,12 +1337,11 @@ def discussion_reply(request, group_id):
       reply_obj.content = org2html(content_org, file_prefix=filename)
   
       # saving the reply obj
-      # reply_obj.save()
+      reply_obj.save()
 
-      reply = json.dumps([ "reply_saved", str("533aadd71d41c8438fffd577")])
-      print reply
-      reply.append(reply_obj.content)
-      print reply
+      reply = json.dumps( [ "reply_saved", str(reply_obj._id), reply_obj.content, reply_obj.created_by, reply_obj.created_at], cls=DjangoJSONEncoder )
+      print "\n\n====", reply
+
       return HttpResponse( reply )
 
     else: # no reply content
@@ -1346,4 +1349,8 @@ def discussion_reply(request, group_id):
       return HttpResponse(json.dumps(["no_content"]))      
 
   except Exception as e:
+    
+    error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
+    raise Exception(error_message)
+
     return HttpResponse(json.dumps(["Server Error"]))

@@ -455,13 +455,25 @@
        <!-- #{#%# endif %} -->
      </div>
 
-     <!-- discussion content area -->
-     <div id="view-discussion" class="content">
+
+    <!-- discussion content area -->
+    <div id="view-discussion" class="content">
+    {% get_disc_replies node.pk as all_replies %}
 
       <br/>
       <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org">Start discussion</div>
 
       <div id="replies-area">
+
+        
+        <!-- populating replies -->
+        {% for each in all_replies %}
+
+          <div class="disc-replies" data-id="{{ each.prior_node }}">{{each.content | safe }}
+          <div class='reply-btn' data-id='{{ each.oid }}' onclick='openOrgEditor($(this))'>reply</div></div>
+
+        {% endfor %}
+        <!-- END of populating replies -->
         
       </div>
 
@@ -479,7 +491,8 @@
       </div>
       <!-- end of orgit down container -->
 
-     </div>
+    </div>
+    <!-- END of discussion content area -->     
 
     </div><!-- end of tab's content -->
   </section>
@@ -647,13 +660,44 @@
 
 <script type="text/javascript">
 
+{% comment %}
+  {% for each in all_replies %}
+
+    var htmlContent = '<div class="disc-replies">' + '{{each.content | safe | linebreaksbr }}' + '<br><div class="reply-btn" data-id=' + '{{ each.oid }}' + ' onclick="openOrgEditor($(this))" >reply</div> {{ each.last_update|date }} </div><br>'
+    console.log(htmlContent)
+    $("#replies-area").append(htmlContent)
+    
+  {% endfor %}
+{% endcomment %}
   
   // for discussion tab
+
+  {% if all_replies %}
+              $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent();
+              calcMargLeft = $tempPrior.css("margin-left");
+              calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+
+              // add reply text content after #replies-area
+              $($tempPrior).after(
+                "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
+                + data[2]
+                + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div><br>")
+              .fadeIn(8000);
+
+    var $allReplies = $("#replies-area .disc-replies")
+
+    $.each()
+
+  {% endif %}
+
+
   $("#orgitdownreps").orgitdown(mySettings);
 
   function createDiscussion()
   {
-    
+
+    {% if user.is_authenticated %}
+
     // ajax to create thread for first time.
     $.ajax({
       
@@ -692,7 +736,14 @@
       }
 
     });
-    // --- END create thread for first time.
+    // --- END ajax and create thread for first time.
+    
+    {% else %}
+
+      alert("To start discussion you need to login first.");
+
+    {% endif %}
+
   }
   // --- END of createDiscussion()
 
@@ -733,25 +784,10 @@
   function addReply(sourceObj)
   {
     $('#org').foundation('reveal', 'close');
-    // aaa = sourceObj;
-    // var sourceObjDataId = $(sourceObj).attr("data-id");
-    // console.log(sourceObjDataId);
-
-    // setting "#prior-node" value
-    // if( sourceObjDataId == "{{ node.pk }}" )
-    // {
-    //   $("#prior-node").val("{{ node.pk }}");
-    // }
-    // else
-    // {
-    //   $("#prior-node").val(sourceObjDataId);
-    // }
-
-    // $("#org").fadeIn();
 
     var priorNodeId = $("#prior-node").val(),
         replyContent = $("#orgitdownreps").val().trim();
-        // console.log(priorNodeId, "\n", replyContent)
+
     // If reply is non empty - make ajax to save reply.
     if( (replyContent.length > 0) && (priorNodeId.length == 24) )
     {
@@ -772,8 +808,10 @@
         success: function(data){
             
             data = JSON.parse(data);
+            aaa = data;
 
-            if( data[0] == "reply_saved" ){
+            if( data[0] == "reply_saved" )
+            {
               
               $("#org").fadeOut();          // hide editor
               $("#orgitdownreps").val("");  // make textarea empty
@@ -788,7 +826,7 @@
                 $("#replies-area").prepend(
                   "<div style='' class='disc-replies'>"
                   + data[2] 
-                  + "</br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div></br>")
+                  + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div>")
                 .fadeIn(8000);
 
               }
@@ -802,7 +840,7 @@
                 $($tempPrior).after(
                   "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
                   + data[2]
-                  + "</br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div></br>")
+                  + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div><br>")
                 .fadeIn(8000);
               }
             }
