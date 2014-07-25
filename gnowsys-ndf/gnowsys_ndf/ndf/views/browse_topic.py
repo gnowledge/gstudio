@@ -11,7 +11,7 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 
 from django_mongokit import get_database
-from gnowsys_ndf.settings import LANGUAGES
+from gnowsys_ndf.settings import LOCAL_LANG
 
 try:
     from bson import ObjectId
@@ -396,7 +396,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 list_trans_coll = []
                 trans_coll_list = get_coll_set(str(app_GST._id))
                 return render_to_response("ndf/translation_page.html",
-	                                  {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LANGUAGES, 'list1':trans_coll_list
+	                                  {'group_id': group_id,'groupid': group_id,'title': title, 'node': app_GST, 'lan':LOCAL_LANG, 'list1':trans_coll_list
 	                           },context_instance = RequestContext(request)
 	        )
         

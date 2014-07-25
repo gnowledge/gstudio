@@ -8,11 +8,11 @@ TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
 # List of Indian Languages 
-LANG = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
+LOCAL_LANG = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
 
-LANGUAGES = (
-  ('de', ugettext('German')),
-  )
+# LANGUAGES = (
+#   ('de', ugettext('German')),
+#   )
 #SMTP setting for sending mail (Using python default SMTP server)
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'localhost'
