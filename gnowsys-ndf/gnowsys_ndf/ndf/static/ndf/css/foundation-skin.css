@@ -8262,7 +8262,7 @@ article h1:not(.subheader) div input:hover {
 /* line 211, ../scss/_styles.scss */
 .card > * {
   position: relative;
-  background-color: #eef7eb;
+  background-color: inherit;
   padding: 7px;
   border: 1px dashed #cfe8c7;
   display: block;

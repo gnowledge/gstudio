@@ -210,7 +210,7 @@ h1:not(.subheader){
 
 .card>*{
 	position: relative;
-	background-color: $bg-color;
+	background-color: inherit;
 	padding:7px;
 	border: 1px dashed darken($bg-color,10%);
 	display: block;
