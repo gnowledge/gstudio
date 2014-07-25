@@ -443,6 +443,24 @@ def add_topics(request, group_id):
     return HttpResponse("None")
 
 
+def add_page(request, group_id):
+  if request.is_ajax() and request.method == "POST":    
+
+    context_node_id = request.POST.get("context_node", '')
+    gst_page = collection.Node.one({'_type': "GSystemType", 'name': "Page"})
+
+    page_node = collection.GSystem()
+    page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+    if context_node_id:
+      context_node = collection.Node.one({'_id': ObjectId(context_node_id)})
+      context_node.collection_set.append(page_node._id)
+      context_node.save()
+
+      return HttpResponse("success")
+
+    return HttpResponse("failure")
+
 
 def node_collection(node=None, group_id=None):
 
