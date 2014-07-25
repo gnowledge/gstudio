@@ -43,19 +43,20 @@ background-repeat:no-repeat; background-size: 48px 48px
         <header>
             <div class="row">
  <h1 class="large-8 columns">
+     
+     <span class="subheader">
       {% if node %}
-      <span class="subheader">Editing: </span>
-     <div>
-	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
-	  </div>
-      {% else %}
+      Editing: 
+     {% else %}
       Create a New {{title}}:
+     {% endif %} 
+     </span>
+     
      <div>
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 	  </div>
-      {% endif %}  
+     
       </h1>
                 
              <div class="large-4 columns">
