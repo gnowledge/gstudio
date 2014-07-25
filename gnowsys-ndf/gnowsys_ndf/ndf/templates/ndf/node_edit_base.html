@@ -48,12 +48,12 @@ background-repeat:no-repeat; background-size: 48px 48px
       {% if node %}
       Editing: 
      {% else %}
-      Create a New {{title}}:
+      Create:
      {% endif %} 
      </span>
      
      <div>
-	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
+	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
 	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
 	  </div>
      
@@ -224,11 +224,6 @@ background-repeat:no-repeat; background-size: 48px 48px
     <div class="content" id="panel-prior-node">
       <div class="row">
 	<div class="small-12 columns">
-	  <h5>Add or edit Prior Node : </h5>
-	</div>
-	<br/>
-	
-	<div class="small-12 columns">
 	  <div id="prior_node_drawer">
 	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
 	  </div>
@@ -242,11 +237,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <div class="content" id="panel-collection">
       <div class="row">
-	<div class="small-12 columns">
-	  <h5>Add or edit Collection : </h5>
-	</div>				
-	<br/><br/>
-	
 	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 	  <div id="SelectApp" class="row">
 	    <div class="small-2 columns line-height-2pt5">
