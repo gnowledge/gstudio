@@ -227,8 +227,7 @@ h1:not(.subheader){
     
      &.published{
         opacity: 1;
-        border-style: solid;
-        border-color: $primary-color;
+        background-color: darken($bg-color,5%);
     }
     &.unapproved{
         opacity: 1;
