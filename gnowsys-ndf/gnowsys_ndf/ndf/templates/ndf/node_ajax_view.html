@@ -142,7 +142,8 @@
     
     padding:10px;
     background-color:#cfe8c7;
-    width:20em;
+    width:25em;
+    max-width: 40em;
     margin-left: 48px; 
     margin-top: 10px;
   }
@@ -467,7 +468,7 @@
 
     <!-- discussion content area -->
     <div id="view-discussion" class="content">
-    {% get_disc_replies node.pk as all_replies %}
+    {% get_disc_replies node.pk group_id as all_replies %}
 
       <br/>
       <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org" style="margin-bottom:0;">
