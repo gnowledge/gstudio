@@ -427,7 +427,7 @@ global_disc_rep_counter = 0
 global_disc_all_replies = []
 reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
 @register.assignment_tag
-def get_disc_replies( oid ):
+def get_disc_replies( oid, level=0 ):
 	'''
 	Method to count total replies for the disc.
 	'''
@@ -444,19 +444,21 @@ def get_disc_replies( oid ):
 			global_disc_rep_counter += 1
 			temp_disc_reply = {"content":"", "last_update":"", "user":"", "oid":"", "prior_node":""}
 
-			temp_disc_reply["content"] = each.content
+			temp_disc_reply["HTMLcontent"] = each.content
+			temp_disc_reply["ORGcontent"] = each.content_org
 			temp_disc_reply["last_update"] = each.last_update
 			temp_disc_reply["user"] = User.objects.get(pk=each.created_by).username
 			temp_disc_reply["oid"] = str(each._id)
 			temp_disc_reply["prior_node"] = str(each.prior_node[0])
+			temp_disc_reply["level"] = level
 
 			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
 			if not any( d['oid'] == str(each._id) for d in global_disc_all_replies ):
 				global_disc_all_replies.append(temp_disc_reply)
 
 					
-			print "\n\n---- : \n", temp_disc_reply
-			get_disc_replies(each._id)
+			# print "\n\n---- : ", level, " : ", each.content_org, temp_disc_reply
+			get_disc_replies(each._id, (level+1))
 	
 	# print global_disc_all_replies
 	return global_disc_all_replies

@@ -464,13 +464,19 @@
       <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org">Start discussion</div>
 
       <div id="replies-area">
-
         
         <!-- populating replies -->
         {% for each in all_replies %}
 
-          <div class="disc-replies" data-id="{{ each.prior_node }}">{{each.content | safe }}
-          <div class='reply-btn' data-id='{{ each.oid }}' onclick='openOrgEditor($(this))'>reply</div></div>
+          <div style="margin-left:calc({{each.level}} * 48px);" class="disc-replies" data-id="{{ each.prior_node }}">
+            
+            {% spaceless %}
+              {{each.HTMLcontent | safe }}
+            {% endspaceless %}
+            
+            <div class='reply-btn' data-id='{{ each.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each.ORGcontent }}'>reply</div>
+
+          </div>
 
         {% endfor %}
         <!-- END of populating replies -->
@@ -673,20 +679,20 @@
   // for discussion tab
 
   {% if all_replies %}
-              $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent();
-              calcMargLeft = $tempPrior.css("margin-left");
-              calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+              // $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent();
+              // calcMargLeft = $tempPrior.css("margin-left");
+              // calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
 
-              // add reply text content after #replies-area
-              $($tempPrior).after(
-                "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
-                + data[2]
-                + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div><br>")
-              .fadeIn(8000);
+              // // add reply text content after #replies-area
+              // $($tempPrior).after(
+              //   "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
+              //   + data[2]
+              //   + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div><br>")
+              // .fadeIn(8000);
 
-    var $allReplies = $("#replies-area .disc-replies")
+    // var $allReplies = $("#replies-area .disc-replies")
 
-    $.each()
+    // $.each()
 
   {% endif %}
 
@@ -855,11 +861,11 @@
     else // content is not provided
     {
       alert("Please provide the reply content.")
-    }
-    // --- END of IF-ELSE
+    } // --- END of IF-ELSE
   
-  }
-  // --- END of addReply()
+  } // --- END of addReply()
+
+  // --- END of discussion code ----
 
 
   // Taken value of svg data of that node globally
