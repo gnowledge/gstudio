@@ -79,8 +79,8 @@
   <div id="message">
     <span style="color:red">Listed below files are already uploaded please choose different files</span>
     <ul>
-      {% for each in already_uploaded %}
-      <li>{{each.Newname}} this file is already uploaded as {{each.Oldname}}</li>
+      {% for each in already_uploaded %} 
+        <li><b>"{{each}}"</b> this file is already uploaded please choose different file </li>
       {% endfor %}
     </ul>
   </div>
