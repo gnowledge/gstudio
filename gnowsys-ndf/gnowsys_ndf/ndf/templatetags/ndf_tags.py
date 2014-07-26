@@ -454,7 +454,8 @@ def get_disc_replies( oid, level=1 ):
 			temp_disc_reply["HTMLcontent"] = each.content
 			temp_disc_reply["ORGcontent"] = each.content_org
 			temp_disc_reply["last_update"] = each.last_update
-			temp_disc_reply["user"] = User.objects.get(pk=each.created_by).username
+			temp_disc_reply["username"] = User.objects.get(pk=each.created_by).username
+			temp_disc_reply["userid"] = int(each.created_by)
 			temp_disc_reply["oid"] = str(each._id)
 			temp_disc_reply["prior_node"] = str(each.prior_node[0])
 			temp_disc_reply["level"] = level

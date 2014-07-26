@@ -126,22 +126,31 @@
   
   }
 
-  .reply-button{
+  .reply-btn{
+    cursor: pointer;
     /*margin-left: -1.3em;
     margin-top: -1em;
     position: relative;
     width: 21.87rem;*/
   }
 
+  .reply-button:hover {
+    font-weight: bold;
+  }
+
   .disc-replies { 
     
     padding:10px;
-    background-color:gray;
+    background-color:#cfe8c7;
     width:20em;
     margin-left: 48px; 
     margin-top: 10px;
   }
 
+  .align-center {
+    margin: 0 auto;
+    display: block;
+  }
 
 </style>
 
@@ -461,20 +470,41 @@
     {% get_disc_replies node.pk as all_replies %}
 
       <br/>
-      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org">Start discussion</div>
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org" style="margin-bottom:0;">
+      {% if all_replies %}
+        Add Reply
+      {% else %}
+        Start discussion
+      {% endif %}
+      </div>
 
       <div id="replies-area">
         
         <!-- populating replies -->
         {% for each in all_replies %}
 
-          <div style="margin-left:calc({{each.level}} * 48px);" class="disc-replies" data-id="{{ each.prior_node }}">
+          <div style="margin-left:calc({{each.level}} * 48px); {% if each.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-id="{{ each.prior_node }}">
             
-            {% spaceless %}
-              {{each.HTMLcontent | safe }}
-            {% endspaceless %}
+            <div class="row"> 
+              <div class="small-3 columns">
+                <a class="text-center" href="/home/{{each.userid}}/userDashboard">
+                  <span class="align-center"><i class="fi-torso"></i></span>
+                  <label>{{ each.username }}</label>
+                </a>
+              </div>
+              <div class="small-9 columns">
+                {% spaceless %}
+                  {{each.HTMLcontent | safe }}
+                {% endspaceless %}
+              </div>
+            </div>
             
-            <div class='reply-btn' data-id='{{ each.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each.ORGcontent }}'>reply</div>
+            <div class="row">
+              <div class="small-9 columns"> <small>{{ each.last_update }}</small> </div>
+              <div class='reply-btn text-right small-3 columns' data-id='{{ each.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each.ORGcontent }}'>
+                reply
+              </div>
+            </div>
 
           </div>
 
@@ -830,7 +860,7 @@
 
                 // add reply text content after #replies-area
                 $("#replies-area").prepend(
-                  "<div style='' class='disc-replies'>"
+                  "<div style='margin-top:20px;' class='disc-replies'>"
                   + data[2] 
                   + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div>")
                 .fadeIn(8000);
@@ -846,7 +876,7 @@
                 $($tempPrior).after(
                   "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
                   + data[2]
-                  + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div><br>")
+                  + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div>")
                 .fadeIn(8000);
               }
             }
