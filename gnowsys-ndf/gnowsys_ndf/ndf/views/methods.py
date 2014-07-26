@@ -626,13 +626,13 @@ and if he has published his contents then he would be shown the current publishe
 
 '''
      username =request.user
-     print node,"nodeeee"
+     # print node,"nodeeee"
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
      if  ver2 != '1.1':                           
 	    if node2 is not None:
-		print "direct"
+		# print "direct"
                 if node2.status == 'PUBLISHED':
                   
 			if float(ver2) > float(ver1):			

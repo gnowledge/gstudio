@@ -210,7 +210,7 @@ h1:not(.subheader){
 
 .card>*{
 	position: relative;
-	background-color: $bg-color;
+	background-color: inherit;
 	padding:7px;
 	border: 1px dashed darken($bg-color,10%);
 	display: block;
@@ -227,8 +227,7 @@ h1:not(.subheader){
     
      &.published{
         opacity: 1;
-        border-style: solid;
-        border-color: $primary-color;
+        background-color: darken($bg-color,5%);
     }
     &.unapproved{
         opacity: 1;
