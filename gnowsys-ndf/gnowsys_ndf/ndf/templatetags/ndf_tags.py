@@ -427,19 +427,24 @@ global_disc_rep_counter = 0
 global_disc_all_replies = []
 reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
 @register.assignment_tag
-def get_disc_replies( oid, level=0 ):
+def get_disc_replies( oid, level=1, temp_list=[] ):
 	'''
 	Method to count total replies for the disc.
 	'''
 
-	thr_rep = collection.GSystem.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})
+	thr_rep = collection.GSystem.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})#.sort({'created_at': -1})
 
 	# to acces global_disc_rep_counter as global and not as local
 	global global_disc_rep_counter 
 	global global_disc_all_replies
 
 	if thr_rep and (thr_rep.count() > 0):
+
 		for each in thr_rep:
+
+			if level == 1:
+				global_disc_all_replies = temp_list + global_disc_all_replies
+				temp_list = []
 
 			global_disc_rep_counter += 1
 			temp_disc_reply = {"content":"", "last_update":"", "user":"", "oid":"", "prior_node":""}
@@ -454,11 +459,13 @@ def get_disc_replies( oid, level=0 ):
 
 			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
 			if not any( d['oid'] == str(each._id) for d in global_disc_all_replies ):
-				global_disc_all_replies.append(temp_disc_reply)
-
-					
+				# global_disc_all_replies.append(temp_disc_reply)
+				# global_disc_all_replies.insert(0, temp_disc_reply)
+				temp_list.append(temp_disc_reply)
+				print "\n\n", temp_list
+								
 			# print "\n\n---- : ", level, " : ", each.content_org, temp_disc_reply
-			get_disc_replies(each._id, (level+1))
+			get_disc_replies(each._id, (level+1), temp_list)
 	
 	# print global_disc_all_replies
 	return global_disc_all_replies
