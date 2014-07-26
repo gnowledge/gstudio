@@ -28,6 +28,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
@@ -466,11 +467,48 @@ def add_page(request, group_id):
         context_node.save()
 
         return HttpResponse("success")
-        
+
       else:
         return HttpResponse("failure")
 
     return HttpResponse("None")
+
+
+def add_file(request, group_id):
+  # this is context node getting from the url get request
+  context_node_id=request.GET.get('context_node','')
+
+  if request.method == "POST":   
+
+    new_list = []
+    # For checking the node is already available in gridfs or not
+    for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+      fcol = get_database()[File.collection_name]
+      fileobj = fcol.File()
+      filemd5 = hashlib.md5(each.read()).hexdigest()
+      if not fileobj.fs.files.exists({"md5":filemd5}):
+        # If not available append to the list for making the collection for topic bellow
+        new_list.append(each)
+      else:
+        # If availbale ,then return to the topic page
+        var1 = "/"+group_id+"/topic_details/"+context_node_id+""
+        return HttpResponseRedirect(var1)
+
+    # After taking new_lst[] , now go for saving the files 
+    submitDoc(request, group_id)
+
+  # After file gets saved , that file's id should be saved in collection_set of context topic node
+  context_node = collection.Node.one({'_id': ObjectId(context_node_id)})
+  for k in new_list:
+    file_obj = collection.Node.one({'_type': 'File', 'name': unicode(k) })
+
+    context_node.collection_set.append(file_obj._id)
+    context_node.save()
+
+  var1 = "/"+group_id+"/topic_details/"+context_node_id+""
+
+  return HttpResponseRedirect(var1)
+
 
 
 def node_collection(node=None, group_id=None):
