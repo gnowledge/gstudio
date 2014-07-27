@@ -80,6 +80,7 @@ Use corresponding package names if you are using an RPM based distro
 
     (2) A tool to create isolated node.js environment which is integrated 
         with environment built by python virtualenv: 
+        sudo apt-get install curl
         pip install nodeenv
 
     (3) Appending nodeenv settings to virtualenv: (This takes time .. wait till it complete)
@@ -90,7 +91,8 @@ Use corresponding package names if you are using an RPM based distro
           (b) sudo apt-get update
           (c) sudo apt-get install python-software-properties python g++ make nodejs
 
-    (4) Installing Bower:
+    (4) Installing Bower (try any one of following):
+        npm install -g bower
         sudo npm install -g bower
 
     (5) To install JS/CSS dependencies: (Be there at project root level)
