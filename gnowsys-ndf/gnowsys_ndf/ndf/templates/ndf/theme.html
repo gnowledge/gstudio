@@ -351,7 +351,6 @@
 		// Script for delete themes after confirm delete.
 		$(document).on('click',".button.confirmDeleteObjects",function(){
 	        var selectedobject = $(".objectsCheckbox input:checked")
-	        $('#myModal').foundation('reveal', 'open');
 
 	        if(selectedobject.length > 0)
 	        {
@@ -381,12 +380,11 @@
 	             	},
 	             	success: function(result){
 	             		alert("Themes deleted successfully");
+	             		$('#myModal').foundation('reveal', 'close');
 	             		location.reload(true);
 	             	},
 	             	
 	            });
-	             
-	            $('#myModal').foundation('reveal', 'close');
 	             
 	        }
 	        else{
