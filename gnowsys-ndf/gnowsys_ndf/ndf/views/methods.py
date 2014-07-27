@@ -1339,8 +1339,11 @@ def discussion_reply(request, group_id):
       # saving the reply obj
       reply_obj.save()
 
-      reply = json.dumps( [ "reply_saved", str(reply_obj._id), reply_obj.content, reply_obj.created_by, reply_obj.created_at], cls=DjangoJSONEncoder )
-      print "\n\n====", reply
+      formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
+      
+      # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
+      reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
+      # print "\n\n====", reply
 
       return HttpResponse( reply )
 

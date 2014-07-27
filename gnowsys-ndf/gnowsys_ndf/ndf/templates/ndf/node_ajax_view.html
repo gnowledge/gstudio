@@ -468,7 +468,7 @@
 
     <!-- discussion content area -->
     <div id="view-discussion" class="content">
-    {% get_disc_replies node.pk group_id as all_replies %}
+    {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
 
       <br/>
       <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org" style="margin-bottom:0;">
@@ -482,27 +482,27 @@
       <div id="replies-area">
         
         <!-- populating replies -->
-        {% for each in all_replies %}
+        {% for each_reply in all_replies %}
 
-          <div style="margin-left:calc({{each.level}} * 48px); {% if each.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-id="{{ each.prior_node }}">
+          <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-priornode-id="{{ each_reply.prior_node }}">
             
             <div class="row"> 
               <div class="small-3 columns">
-                <a class="text-center" href="/home/{{each.userid}}/userDashboard">
+                <a class="text-center" href="/home/{{each_reply.userid}}/userDashboard">
                   <span class="align-center"><i class="fi-torso"></i></span>
-                  <label>{{ each.username }}</label>
+                  <label>{{ each_reply.username }}</label>
                 </a>
               </div>
               <div class="small-9 columns">
                 {% spaceless %}
-                  {{each.HTMLcontent | safe }}
+                  {{each_reply.HTMLcontent | safe }}
                 {% endspaceless %}
               </div>
             </div>
             
             <div class="row">
-              <div class="small-9 columns"> <small>{{ each.last_update }}</small> </div>
-              <div class='reply-btn text-right small-3 columns' data-id='{{ each.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each.ORGcontent }}'>
+              <div class="small-9 columns"> <small>{{ each_reply.last_update }}</small> </div>
+              <div class='reply-btn text-right small-3 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
                 reply
               </div>
             </div>
@@ -859,26 +859,42 @@
                 $("#create-discussion").html("Add Reply");                
                 // $("#create-discussion").fadeIn();
 
+                // [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
+
                 // add reply text content after #replies-area
                 $("#replies-area").prepend(
-                  "<div style='margin-top:20px;' class='disc-replies'>"
-                  + data[2] 
-                  + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div>")
-                .fadeIn(8000);
+                  "<div style='margin-top:20px;' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
+                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/userDashboard' class='text-center'>"
+                  + "<span class='align-center'><i class='fi-torso'></i></span>"
+                  + "<label>" + data[6] + "</label></a></div>"
+                  + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
+
+                  + "<div class='row'><div class='small-9 columns'><small>"
+                  + data[7] + "</small></div> <div data-org-content='"
+                  + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
+                  + data[1] + "' class='reply-btn text-right small-3 columns'> reply </div></div></div>"
+                  ).fadeIn(8000);
 
               }
               else  // sub-reply
               {
-                $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent();
+                $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent().parent();
                 calcMargLeft = $tempPrior.css("margin-left");
                 calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
 
-                // add reply text content after #replies-area
+                // add reply text content as sub-reply
                 $($tempPrior).after(
-                  "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
-                  + data[2]
-                  + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div>")
-                .fadeIn(8000);
+                "<div style='margin-left:"+ calcMargLeft +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
+                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/userDashboard' class='text-center'>"
+                  + "<span class='align-center'><i class='fi-torso'></i></span>"
+                  + "<label>" + data[6] + "</label></a></div>"
+                  + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
+
+                  + "<div class='row'><div class='small-9 columns'><small>"
+                  + data[7] + "</small></div> <div data-org-content='"
+                  + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
+                  + data[1] + "' class='reply-btn text-right small-3 columns'> reply </div></div></div>"
+                  ).fadeIn(8000);
               }
             }
             else if( data[0] == "no_content" ){
