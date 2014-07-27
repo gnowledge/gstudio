@@ -12,7 +12,6 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import Node
 ###################################################################################################################################################################################
 collection = get_database()[Node.collection_name]
-theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})    
 
 class Command(BaseCommand):
 
