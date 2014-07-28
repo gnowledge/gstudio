@@ -385,6 +385,7 @@ try:
 except Exception as e:
     print str(e)
 
+
 ## INSERTED FOR MAP_REDUCE
 allIndexed = collection.IndexedWordList.find({"required_for" : "storing_indexed_words"})
 if allIndexed.count() == 0:
@@ -397,3 +398,16 @@ if allIndexed.count() == 0:
 		obj.required_for = u'storing_indexed_words'
 		obj.save()
 		j+=1
+
+# adding Task GST into start_time and end_time ATs subject_type
+start_time = collection.Node.one({'_type': u'AttributeType', 'name': u'start_time'})
+end_time = collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'})
+task = collection.Node.find_one({'_type':u'GSystemType', 'name':u'Task'})
+if task:
+	if not task._id in start_time.subject_type :
+		start_time.subject_type.append(task._id)
+		start_time.save()
+	if not task._id in end_time.subject_type :
+		end_time.subject_type.append(task._id)
+		end_time.save()
+

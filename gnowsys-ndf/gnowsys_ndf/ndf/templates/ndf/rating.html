@@ -1,0 +1,85 @@
+{% load ndf_tags %}
+    
+<div id="rating-bar">
+    <form>
+  <fieldset>
+    <legend>Rating</legend>
+     
+       {% get_node_ratings request node as ratings %}
+      
+    <!-- Sets the rating values as data attributes -->
+       <div class="rating-bar" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
+
+          <span>
+      <input type="radio" id="rating-5" name="rating" value="5" /><label for="rating-5">5</label>
+      <input type="radio" id="rating-4" name="rating" value="4" /><label for="rating-4">4</label>
+    <input type="radio" id="rating-3" name="rating" value="3" /><label for="rating-3">3</label>
+  <input type="radio" id="rating-2" name="rating" value="2" /><label for="rating-2">2</label>
+<input type="radio" id="rating-1" name="rating" value="1" /><label for="rating-1">1</label>
+<input type="radio" id="rating-0" name="rating" value="0" class="last" /><label for="rating-0">0</label>
+           </span>
+           
+           <div class="rating">Average: <span>{{ratings.tot|default:"unrated"}}</span></div>        
+    </div>
+         
+  </fieldset>
+</form>
+    </div>
+
+
+<script type="text/javascript">
+    
+    //Ajax to post the user rating and fetch the new average
+    function updateRating() {
+surl="/{{node}}/ratings/add_ratings/";
+userRating = $('input[name=rating]:checked').val();
+nodeId=$(".rating-bar").attr("data-node");
+    
+    $.ajax({
+            url: surl,
+            type: 'POST',
+            data: {
+                rating: userRating, node: nodeId, csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+        
+           success: function(data){
+               //Replace rating bar with new values
+                           $("#rating-bar").html(data);   
+               setRating();
+                                 }
+    }); 
+    
+}
+    //Sets the stars in the rating bar based on loaded values
+    function setRating(){
+        userRating = parseInt($(".rating-bar").attr("data-user-rating"));
+        avgRating = parseFloat($(".rating-bar").attr("data-avg-rating"));
+        //If the user has already rated, set the stars to the user rating, else set to the average value
+        if( userRating ){
+            setStars( userRating );
+        }
+        else{
+            setStars( avgRating );
+            $(".rating-bar").addClass("unrated");
+        }
+        //Update the average value text
+        $(".rating-bar .rating span").html(avgRating);
+    }
+    setRating();
+
+    //Sets the number of stars in the rating bar
+    function setStars(stars){
+        $(".rating-bar input[value="+stars+"]").attr("checked","checked");
+    }
+    
+</script>
+
+  <!-- Rating script only if user is logged in -->
+{% if user.is_authenticated %}
+<script type="text/javascript">
+
+// Send the user's rating to the server on submit
+$("input[name=rating]").on('click',updateRating);
+
+</script>
+{% endif %}

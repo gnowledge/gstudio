@@ -14,6 +14,8 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 
 from django_mongokit import get_database
+from gnowsys_ndf.settings import LOCAL_LANG
+from django.utils.translation import ugettext as _  
 
 try:
   from bson import ObjectId
@@ -21,7 +23,7 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, LANGUAGES
+from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
@@ -235,16 +237,19 @@ def page(request, group_id, app_id=None):
 
                 shelf_list[shelf_name.name] = []         
                 for ID in shelf_name.collection_set:
-                	shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-                	shelf_list[shelf_name.name].append(shelf_item.name)
+                  shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                  shelf_list[shelf_name.name].append(shelf_item.name)
 
           else:
             shelves = []
+
+        annotations = json.dumps(page_node.annotations)
 
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
                                     'shelf_list': shelf_list,
+                                    'annotations': annotations,
                                     'shelves': shelves,
                                     'groupid':group_id,
                                     'breadcrumbs_list': breadcrumbs_list
@@ -273,7 +278,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
-                          'lan':LANGUAGES,
+                          'lan':LOCAL_LANG,
                           'groupid': group_id
                       }
     
@@ -518,7 +523,7 @@ def translate_node(request,group_id,node_id=None):
         node_details=[]
         for k,v in content.items():
             
-            node_name=content['name']
+            node_name = content['name']
             node_content_org=content['content_org']
             node_tags=content['tags']
             
@@ -528,7 +533,7 @@ def translate_node(request,group_id,node_id=None):
                                 'node_name':node_name,
                                 'groupid':group_id,
                                 'group_id':group_id,
-                                'lan':LANGUAGES
+                                'lan':LOCAL_LANG
                                },
                              
                               context_instance = RequestContext(request)

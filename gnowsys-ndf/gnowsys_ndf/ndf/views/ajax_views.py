@@ -1,7 +1,7 @@
 
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
-
+import json  
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -30,13 +30,18 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.org2any import org2html
+
 import json
 from bson.objectid import ObjectId
+
+
+
  
 db = get_database()
 gs_collection = db[GSystem.collection_name]
@@ -454,6 +459,72 @@ def add_topics(request, group_id):
     return HttpResponse("None")
 
 
+def add_page(request, group_id):
+  if request.is_ajax() and request.method == "POST":    
+
+    context_node_id = request.POST.get("context_node", '')
+    gst_page = collection.Node.one({'_type': "GSystemType", 'name': "Page"})
+    context_node = collection.Node.one({'_id': ObjectId(context_node_id)})
+    name =request.POST.get('name','')
+
+    collection_list = []
+    if context_node:
+      for each in context_node.collection_set:
+        obj = collection.Node.one({'_id': ObjectId(each), 'group_set': ObjectId(group_id)})
+        collection_list.append(obj.name)
+
+      if name not in collection_list:
+
+        page_node = collection.GSystem()
+        page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+        context_node.collection_set.append(page_node._id)
+        context_node.save()
+
+        return HttpResponse("success")
+
+      else:
+        return HttpResponse("failure")
+
+    return HttpResponse("None")
+
+
+def add_file(request, group_id):
+  # this is context node getting from the url get request
+  context_node_id=request.GET.get('context_node','')
+
+  if request.method == "POST":   
+
+    new_list = []
+    # For checking the node is already available in gridfs or not
+    for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+      fcol = get_database()[File.collection_name]
+      fileobj = fcol.File()
+      filemd5 = hashlib.md5(each.read()).hexdigest()
+      if not fileobj.fs.files.exists({"md5":filemd5}):
+        # If not available append to the list for making the collection for topic bellow
+        new_list.append(each)
+      else:
+        # If availbale ,then return to the topic page
+        var1 = "/"+group_id+"/topic_details/"+context_node_id+""
+        return HttpResponseRedirect(var1)
+
+    # After taking new_lst[] , now go for saving the files 
+    submitDoc(request, group_id)
+
+  # After file gets saved , that file's id should be saved in collection_set of context topic node
+  context_node = collection.Node.one({'_id': ObjectId(context_node_id)})
+  for k in new_list:
+    file_obj = collection.Node.one({'_type': 'File', 'name': unicode(k) })
+
+    context_node.collection_set.append(file_obj._id)
+    context_node.save()
+
+  var1 = "/"+group_id+"/topic_details/"+context_node_id+""
+
+  return HttpResponseRedirect(var1)
+
+
 
 def node_collection(node=None, group_id=None):
 
@@ -791,7 +862,7 @@ def graph_nodes(request, group_id):
                       "_type", "contributors", "created_by", "modified_by", "last_update", "url", "featured",
                       "created_at", "group_set", "type_of", "content_org", "author_set",
                       "fs_file_ids", "file_size", "mime_type", "location", "language",
-                      "property_order", "rating", "apps_list", "annotations"
+                      "property_order", "rating", "apps_list", "annotations", "instance of"
                     ]
 
   # username = User.objects.get(id=page_node.created_by).username
@@ -846,8 +917,8 @@ def graph_nodes(request, group_id):
 
           else:
 
-            node_metadata += '{"screen_name":"' + str(each) + '", "_id":"'+ str(each) +'_n"},'
-            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ str(each) +'_n"},'
+            node_metadata += '{"screen_name":"' + unicode(each) + '", "_id":"'+ unicode(each) +'_n"},'
+            node_relations += '{"type":"'+ key +'", "from":"'+ key_id +'_r", "to": "'+ unicode(each) +'_n"},'
             i += 1
     
     else:
@@ -1355,6 +1426,65 @@ def get_group_member_user(request, group_id):
     else:
 	raise Http404
 
+
+def annotationlibInSelText(request, group_id):
+  """
+  This view parses the annotations field of the currently selected node_id and evaluates if entry corresponding this selectedText already exists.
+  If it does, it appends the comment to this entry else creates a new one.   
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  obj_id - ObjectId of the currently selected node_id
+  comment - The comment added by user
+  selectedText - text for which comment was added
+
+ Returns:
+  The updated annoatations field
+  """
+  
+  obj_id = str(request.POST["node_id"])
+  col = get_database()[Node.collection_name]
+  sg_obj = col.Node.one({"_id":ObjectId(obj_id)})
+  
+  comment = request.POST ["comment"]
+  comment = json.loads(comment)
+  comment_modified = {
+                        'authorAvatarUrl' : comment['authorAvatarUrl'],
+                        'authorName'      : comment['authorName'],
+                        'comment'         : comment['comment']
+  }
+  selectedText = request.POST['selectedText']
+    
+  # check if annotations for this text already exist!
+  flag = False
+  
+  for entry in sg_obj.annotations:
+    if (entry['selectedText'].lower() == selectedText.lower()):
+      entry['comments'].append(comment_modified)
+      flag = True
+      break
+
+  if(not(flag)):
+    comment_list = []
+    comment_list.append(comment_modified)
+    ann = {
+          'selectedText' : selectedText,
+          'sectionId'    : str(comment['sectionId']),
+          'comments'     : comment_list
+    }
+    sg_obj.annotations.append(ann)
+  
+  sg_obj.save()
+
+  return HttpResponse(json.dumps(sg_obj.annotations))
+
+def delComment(request, group_id):
+  '''
+  Delete comment from thread
+  '''
+  print "Inside del comments"
+  return HttpResponse("comment deleted")
+
 def set_user_link(request, group_id):
   """
   This view creates a relationship (has_login) between the given node (node_id) and the author node (username);
@@ -1464,3 +1594,4 @@ def edit_task_content(request, group_id):
         return HttpResponse(task.content)
     else:
 	raise Http404
+

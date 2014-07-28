@@ -286,9 +286,17 @@ def file(request, group_id, file_id=None):
                                               ]
                                             }).sort("last_update", -1)
       
-      already_uploaded = request.GET.getlist('var', "")
-  
-      
+      already_uploaded = request.GET.getlist('var', "")     
+
+      new_list = []  
+      for each in already_uploaded:
+        for name in eval(each):
+          for k in name:
+            if type(k) is list:
+              new_list.append(k[0])
+
+      already_uploaded = new_list
+
       # source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
 
       # pandora_video_id = []
@@ -375,12 +383,16 @@ def submitDoc(request, group_id):
     alreadyUploadedFiles = []
     str1 = ''
     img_type=""
+    topic_file = ""
+    is_video = ""
     obj_id_instance = ObjectId()
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
         language = request.POST.get("lan", "")
         img_type = request.POST.get("type", "")
+        topic_file = request.POST.get("type", "")
+        doc = request.POST.get("doc", "")
         usrname = request.user.username
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
@@ -388,7 +400,8 @@ def submitDoc(request, group_id):
         tags = request.POST.get('tags', "")
 
         i = 1
-	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+
+        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
 
@@ -399,22 +412,30 @@ def submitDoc(request, group_id):
                     i = i + 1
             else:
                 title = each.name
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
-            if not obj_id_instance.is_valid(f):
-                alreadyUploadedFiles.append(f)
-                title = mtitle
-        for each in alreadyUploadedFiles:
-            str1 = str1 + 'var=' + each + '&'
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
 
+            if not obj_id_instance.is_valid(f):
+              alreadyUploadedFiles.append(f)
+              title = mtitle
+        
+        str1 = str(alreadyUploadedFiles)
+       
         if img_type != "": 
             
-            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id }))
+            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id , 'usrid': userid}))
+
+        elif topic_file != "": 
+            
+            return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
         else:
             if str1:
-                return HttpResponseRedirect(page_url+'?'+str1)
+                return HttpResponseRedirect(page_url+'?var='+str1)
             else:
+              if is_video == "True":
                 return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
+              else:
+                return HttpResponseRedirect(page_url)
                 
 
     else:
@@ -427,7 +448,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
       this will create file object and save files in gridfs collection
     """
-    
     global count,first_object
     is_video = ""
     fcol = db[File.collection_name]
@@ -439,7 +459,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     
     
     if fileobj.fs.files.exists({"md5":filemd5}):
-        
+        coll_oid = get_database()['fs.files']
+	cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
+	coll_new = get_database()['Nodes']
+	new_name = collection.Node.find_one({'_id':ObjectId(str(cur_oid["docid"]))})     
         # if calling function is passing oid=True as last parameter then reply with id and name.
         if kwargs.has_key("oid"):
           if kwargs["oid"]: 
@@ -447,9 +470,9 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
             cur_oid = coll_oid.find_one({"md5":filemd5}, {'docid':1, '_id':0})
             # returning only ObjectId (of GSystem containing file info) in dict format.
             # e.g : {u'docid': ObjectId('539a999275daa21eb7c048af')}
-            return cur_oid["docid"]
+            return cur_oid["docid"], 'True'
         else:
-            return files.name
+            return [files.name, new_name.name],'True'
 
     else:
         try:
@@ -737,7 +760,7 @@ def delete_file(request, group_id, _id):
   else :
       pass
   file_collection = db[File.collection_name]
-  auth = collection.Node.one({'_type': u'Group', 'name': unicode(request.user.username) })
+  auth = collection.Node.one({'_type': u'Author', 'name': unicode(request.user.username) })
   pageurl = request.GET.get("next", "")
   try:
     cur = file_collection.File.one({'_id':ObjectId(_id)})
@@ -812,10 +835,13 @@ def file_detail(request, group_id, _id):
         else:
             shelves = []
 
+    annotations = json.dumps(file_node.annotations)
+
     return render_to_response(file_template,
                               { 'node': file_node,
                                 'group_id': group_id,
                                 'groupid':group_id,
+                                'annotations' : annotations,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
                                 'breadcrumbs_list': breadcrumbs_list

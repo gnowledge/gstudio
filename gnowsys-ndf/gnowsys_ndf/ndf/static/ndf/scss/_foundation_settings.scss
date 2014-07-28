@@ -9,7 +9,7 @@
 
 // Color Pallette
 $theme-color:#33C284 !default;
-$theme-color-invert:scale-color($theme-color, $lightness: -90%);
+$theme-color-invert:scale-color($theme-color, $lightness: -60%);
 
 
 //
@@ -18,11 +18,27 @@ $theme-color-invert:scale-color($theme-color, $lightness: -90%);
 
 // We use these as default colors throughout
 $primary-color: $theme-color;
-$secondary-color: rgb(220, 230, 223);
+$secondary-color: lighten(desaturate($primary-color,20%),20%);
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
- $warning-color: #f2bf8a;
-// $info-color: #a0d3e8;
+ //$warning-color: #f2bf8a;
+ $info-color: $color0;
+
+$header-font-color: #222;
+$body-bg: white;
+
+$bg-color: #eef7eb;
+$meta-color:#666;
+$active-color:lighten($theme-color,30%);
+
+//$label-font-color: #333;
+ $label-font-color-alt: $body-bg;
+
+$base-color: #e7caa4;
+$aside-color:#524549;
+
+
+
 
 
 
@@ -64,9 +80,9 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $total-columns: 5;
 
 // We use these to control various global styles
-// $body-bg: #fff;
+ //
 // $body-font-color: #222;
- $body-font-family: "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+ $body-font-family: "Ubuntu", "FreeSans","Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
 // $body-font-style: normal;
 
@@ -144,14 +160,14 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $header-font-family: $body-font-family;
 // $header-font-weight: 300;
 // $header-font-style: normal;
-// $header-font-color: #222;
+ 
 // $header-line-height: 1.4;
 // $header-top-margin: .2rem;
 // $header-bottom-margin: .5rem;
 // $header-text-rendering: optimizeLegibility;
 
 // We use these to control header font sizes
-// $h1-font-size: rem-calc(44);
+// $h1-font-size: 4rem;
 // $h2-font-size: rem-calc(37);
 // $h3-font-size: rem-calc(27);
 // $h4-font-size: rem-calc(23);
@@ -186,8 +202,8 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 
 // We use these to style anchors
 // $anchor-text-decoration: none;
-// $anchor-font-color: $primary-color;
-// $anchor-font-color-hover: scale-color($primary-color, $lightness: -14%);
+ $anchor-font-color: darken($active-color,10%);
+ $anchor-font-color-hover: scale-color( $anchor-font-color, $lightness: -14%);
 
 // We use these to style the <hr> element
 // $hr-border-width: 1px;
@@ -302,12 +318,28 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // Enables media queries for block-grid classes. Set to false if writing semantic HTML.
 // $block-grid-media-queries: true;
 
+//Icon Bar
+
+//$include-html-icon-bar-classes: $include-html-classes;
+
+// We use these to style the icon-bar and items
+$icon-bar-bg: inherit ;
+$icon-bar-font-color: white ;
+$icon-bar-font-size: 0.5rem;
+$icon-bar-hover-color: #333 ;
+$icon-bar-icon-color: white ;
+$icon-bar-icon-size: 1.875rem ;
+$icon-bar-image-width: 1.875rem ;
+$icon-bar-image-height: 1.875rem ;
+$icon-bar-active-color: white ;
+$icon-bar-item-padding: 0.5rem;
+    
 // Breadcrumbs
 
 // $include-html-nav-classes: $include-html-classes;
 
 // We use this to set the background color for the breadcrumb container.
-// $crumb-bg: scale-color($secondary-color, $lightness: 55%);
+ $crumb-bg: $active-color;
 
 // We use these to set the padding around the breadcrumbs.
 // $crumb-padding: rem-calc(9 14 9);
@@ -322,14 +354,14 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 
 // We use these to set various text styles for breadcrumbs.
 // $crumb-font-size: rem-calc(11);
-// $crumb-font-color: $primary-color;
-// $crumb-font-color-current: #333;
+ $crumb-font-color: white;
+ $crumb-font-color-current: white;
 // $crumb-font-color-unavailable: #999;
 // $crumb-font-transform: uppercase;
 // $crumb-link-decor: underline;
 
 // We use these to control the slash between breadcrumbs
-// $crumb-slash-color: #aaa;
+ $crumb-slash-color: #555;
 // $crumb-slash: "/";
 
 //
@@ -646,7 +678,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $label-font-sizing: rem-calc(11);
 // $label-font-weight: normal;
 // $label-font-color: #333;
-// $label-font-color-alt: #fff;
+ //$label-font-color-alt: $info-color;
 // $label-font-family: $body-font-family;
 
 // Magellan
@@ -924,12 +956,12 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // We use these to control list styles.
 // $side-nav-list-type: none;
 // $side-nav-list-position: inside;
-// $side-nav-list-margin: rem-calc(0 0 7 0);
+ $side-nav-list-margin: 0;
 
 // We use these to control link styles.
-// $side-nav-link-color: $primary-color;
-// $side-nav-link-color-active: scale-color($side-nav-link-color, $lightness: 30%);
-// $side-nav-link-color-hover: scale-color($side-nav-link-color, $lightness: 30%);
+ $side-nav-link-color: #888;
+ $side-nav-link-color-active: white;
+ $side-nav-link-color-hover: white;
 // $side-nav-font-size: rem-calc(14);
 // $side-nav-font-weight: normal;
 // $side-nav-font-family: $body-font-family;
@@ -1086,11 +1118,11 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 
 // $include-html-tabs-classes: $include-html-classes;
 
-// $tabs-navigation-padding: rem-calc(16);
-// $tabs-navigation-bg-color: #efefef  ;
-// $tabs-navigation-active-bg-color: #fff;
-// $tabs-navigation-hover-bg-color: scale-color($tabs-navigation-bg-color, $lightness: -6%);
-// $tabs-navigation-font-color: #222;
+ $tabs-navigation-padding: 0.6rem;
+ $tabs-navigation-bg-color: inherit  ;
+ $tabs-navigation-active-bg-color: inherit;
+ $tabs-navigation-hover-bg-color: inherit;
+ $tabs-navigation-font-color: $meta-color;
 // $tabs-navigation-font-size: rem-calc(16);
 // $tabs-navigation-font-family: $body-font-family;
 

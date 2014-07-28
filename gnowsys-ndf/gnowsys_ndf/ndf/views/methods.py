@@ -2,7 +2,9 @@
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
+from django.http import HttpResponse
 from django.template import RequestContext
+from django.core.serializers.json import DjangoJSONEncoder
 import mongokit 
 
 ''' -- imports from application folders/files -- '''
@@ -18,6 +20,7 @@ import subprocess
 import re
 import ast
 import string
+import json
 from datetime import datetime
 ######################################################################################################################################
 
@@ -25,6 +28,9 @@ db = get_database()
 collection = db[Node.collection_name]
 
 history_manager = HistoryManager()
+theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
@@ -105,7 +111,10 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     dict2 = []  # Changed from dictionary to list so that it's content are reflected in a sequential-order
 
     collection = db[Node.collection_name]
-        
+    
+    theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
+
     drawer = None    
     
     if checked:     
@@ -160,18 +169,17 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         drawer = collection.Node.find({'_type': u"File", 'member_of': {'$all':[gst_pandora_video_id]}}).limit(50)
 
       elif checked == "Theme":
-        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
-        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id, topic_GST_id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
       elif checked == "Topic":
-        theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})._id
-        topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})._id
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id, topic_GST_id]},'group_set': {'$all': [ObjectId(group_id)]}})   
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})   
 
     else:
       # For heterogeneous collection      
-      drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      if theme_GST_id or topic_GST_id:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      else:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})           
            
     
     if (nid is None) and (not nlist):
@@ -211,8 +219,7 @@ def get_resource_type(request,node_id):
   get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
   get_type=get_resource_type._type
   return get_type 
-   
-
+                          
 def get_translate_common_fields(request,get_type,node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
@@ -271,29 +278,41 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
 
-  
 
-def get_node_common_fields(request, node, group_id, node_type):
+
+def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   """Updates the retrieved values of common fields from request into the given node."""
   # print "\n Coming here...\n\n"
 
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
+  if coll_set:
+      if "Theme" in coll_set.member_of_names_list:
+        node_type = theme_GST
+      else:
+        node_type = topic_GST
+                                
+      name = request.POST.get('name_'+ str(coll_set._id),"")
+      content_org = request.POST.get(str(coll_set._id),"")
+      tags = request.POST.get('tags'+ str(coll_set._id),"")
+     
+  else:    
+    name =request.POST.get('name','')
+    content_org = request.POST.get('content_org')
+    tags = request.POST.get('tags')
+  language= request.POST.get('lan')
+  sub_theme_name = request.POST.get("sub_theme_name", '')
+  add_topic_name = request.POST.get("add_topic_name", '')
   is_changed = False
-
-  name = unicode(request.POST.get('name', ""))
   sub_theme_name = unicode(request.POST.get("sub_theme_name", ''))
   add_topic_name = unicode(request.POST.get("add_topic_name", ''))
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
-  language= request.POST.get('lan')
-  tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
-  collection_list = request.POST.get('collection_list','')
+  collection_list = request.POST.get('collection_set_list','')
   module_list = request.POST.get('module_list','')
-  content_org = unicode(request.POST.get('content_org'))
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
 
@@ -336,19 +355,19 @@ def get_node_common_fields(request, node, group_id, node_type):
   if name:
     if node.name != name:
       node.name = name
-      print "\n Changed: name"
+      # print "\n Changed: name"
       is_changed = True
   
   if sub_theme_name:
     if node.name != sub_theme_name:
       node.name = sub_theme_name
-      print "\n Changed: sub-theme"
+      # print "\n Changed: sub-theme"
       is_changed = True
   
   if add_topic_name:
     if node.name != add_topic_name:
       node.name = add_topic_name
-      print "\n Changed: topic"
+      # print "\n Changed: topic"
       is_changed = True
 
   # -------------------------------------------------------------------------------- language
@@ -365,11 +384,11 @@ def get_node_common_fields(request, node, group_id, node_type):
     # via access_policy(public/private) option on the template which is visible only to the creator
     if access_policy == "PUBLIC" and node.access_policy != access_policy:
       node.access_policy = u"PUBLIC"
-      print "\n Changed: access_policy (pu 2 pr)"
+      # print "\n Changed: access_policy (pu 2 pr)"
       is_changed = True
     elif access_policy == "PRIVATE" and node.access_policy != access_policy:
       node.access_policy = u"PRIVATE"
-      print "\n Changed: access_policy (pr 2 pu)"
+      # print "\n Changed: access_policy (pr 2 pu)"
       is_changed = True
   else:
     node.access_policy = u"PUBLIC"
@@ -383,9 +402,7 @@ def get_node_common_fields(request, node, group_id, node_type):
     if user_group_obj:
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
-
   # -------------------------------------------------------------------------------- tags
-
   if tags:
     tags_list = []
 
@@ -397,7 +414,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
     if set(node.tags) != set(tags_list):
       node.tags = tags_list
-      print "\n Changed: tags"
+      # print "\n Changed: tags"
       is_changed = True
 
   # -------------------------------------------------------------------------------- prior_node
@@ -426,7 +443,7 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.prior_node.append(node_id)
         
         i = i+1
-      print "\n Changed: prior_node"
+      # print "\n Changed: prior_node"
       is_changed = True
  
   # -------------------------------------------------------------------------------- collection
@@ -449,6 +466,9 @@ def get_node_common_fields(request, node, group_id, node_type):
 
     if set(node.collection_set) != set(collection_list):
       i = 0
+      node.collection_set = []
+
+      # checking if each _id in collection_list is valid or not
       while (i < len(collection_list)):
         node_id = ObjectId(collection_list[i])
         
@@ -457,8 +477,9 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.collection_set.append(node_id)
         
         i = i+1
-      print "\n Changed: collection_list"
+      # print "\n Changed: collection_list"
       is_changed = True
+
      
   # -------------------------------------------------------------------------------- Module
 
@@ -488,7 +509,7 @@ def get_node_common_fields(request, node, group_id, node_type):
             node.collection_set.append(node_id)
         
         i = i+1
-      print "\n Changed: module_list"
+      # print "\n Changed: module_list"
       is_changed = True
     
   # ------------------------------------------------------------------------------- org-content
@@ -501,13 +522,13 @@ def get_node_common_fields(request, node, group_id, node_type):
       usrname = request.user.username
       filename = slugify(name) + "-" + usrname + "-"
       node.content = org2html(content_org, file_prefix=filename)
-      print "\n Changed: content_org"
+      # print "\n Changed: content_org"
       is_changed = True
 
   # ----------------------------------------------------------------------------- visited_location in author class
   if node.location != map_geojson_data:
     node.location = map_geojson_data # Storing location data
-    print "\n Changed: map"
+    # print "\n Changed: map"
     is_changed = True
   
   if user_last_visited_location:
@@ -520,7 +541,7 @@ def get_node_common_fields(request, node, group_id, node_type):
       if node._type == "Author" and user_group_location._id == node._id:
         if node['visited_location'] != user_last_visited_location:
           node['visited_location'] = user_last_visited_location
-          print "\n Changed: user location"
+          # print "\n Changed: user location"
           is_changed = True
 
       else:
@@ -542,7 +563,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   
 def get_versioned_page(node):
             
-       
+          
     rcs = RCS()
     fp = history_manager.get_file_path(node)
     cmd= 'rlog  %s' % \
@@ -552,20 +573,19 @@ def get_versioned_page(node):
         stdout=subprocess.PIPE)
     for line in iter(proc1.stdout.readline,b''):
        
-       if line.find('revision')!=-1 and line.find('selected') == -1:
-
+      if line.find('revision')!=-1 and line.find('selected') == -1:
           rev_no=string.split(line,'revision')
           rev_no=rev_no[1].strip( '\t\n\r')
-          rev_no=rev_no.strip(' ')
-       if line.find('status')!=-1:
+          rev_no=rev_no.split()[0]
+      if line.find('status')!=-1:
           up_ind=line.find('status')
           if line.find(('PUBLISHED'),up_ind) !=-1:
-              # rev_no=rev_no.strip(' ')
 	       rev_no=rev_no.split()[0]
                node=history_manager.get_version_document(node,rev_no)
                proc1.kill()
                return (node,rev_no)    
-       if rev_no == '1.1':
+      if rev_no == '1.1':
+          
            node=history_manager.get_version_document(node,'1.1')
            proc1.kill()
            return(node,'1.1')
@@ -610,12 +630,13 @@ and if he has published his contents then he would be shown the current publishe
 
 '''
      username =request.user
+     # print node,"nodeeee"
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
      if  ver2 != '1.1':                           
 	    if node2 is not None:
-		print "direct"
+		# print "direct"
                 if node2.status == 'PUBLISHED':
                   
 			if float(ver2) > float(ver1):			
@@ -1227,6 +1248,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
   except Exception as e:
       error_message = "\n GRelationCreateError: " + str(e) + "\n"
       raise Exception(error_message)
+
       
 
       
@@ -1256,3 +1278,118 @@ def set_all_urls(member_of):
 		url = u"None"
 	return url
 ###############################################	###############################################    
+
+
+
+
+# Method to create discussion thread for File and Page.
+def create_discussion(request, group_id, node_id):
+  '''
+  Method to create discussion thread for File and Page.
+  '''
+
+  try:
+
+    twist_st = collection.Node.one({'_type':'GSystemType', 'name':'Twist'})
+
+    node = collection.Node.one({'_id': ObjectId(node_id)})
+
+    # group = collection.Group.one({'_id':ObjectId(group_id)})
+
+    thread = collection.Node.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
+    
+    if not thread:
+      
+      # retriving RelationType
+      # relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
+      
+      # Creating thread with the name of node
+      thread_obj = collection.GSystem()
+
+      thread_obj.name = unicode(node.name)
+      thread_obj.status = u"PUBLISHED"
+
+      thread_obj.created_by = int(request.user.id)
+      thread_obj.modified_by = int(request.user.id)
+      thread_obj.contributors.append(int(request.user.id))
+
+      thread_obj.member_of.append(ObjectId(twist_st._id))
+      thread_obj.prior_node.append(ObjectId(node_id))
+      thread_obj.group_set.append(ObjectId(group_id))
+      
+      thread_obj.save()
+
+      # creating GRelation
+      # create_grelation(node_id, relation_type, twist_st)
+      response_data = [ "thread-created", str(thread_obj._id) ]
+
+      return HttpResponse(json.dumps(response_data))
+
+    else:
+      response_data =  [ "Thread-exist", str(thread._id) ]
+      return HttpResponse(json.dumps(response_data))
+  
+  except Exception as e:
+    
+    error_message = "\n DiscussionThreadCreateError: " + str(e) + "\n"
+    raise Exception(error_message)
+    # return HttpResponse("server-error")
+
+
+# to add discussion replies
+def discussion_reply(request, group_id):
+
+  try:
+
+    prior_node = request.POST.get("prior_node_id", "")
+    content_org = request.POST.get("reply_text_content", "") # reply content
+
+    # process and save node if it reply has content  
+    if content_org:
+  
+      user_id = int(request.user.id)
+      user_name = unicode(request.user.username)
+
+      # auth = collection.Node.one({'_type': 'Author', 'name': user_name })
+      reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+      
+      # creating empty GST and saving it
+      reply_obj = collection.GSystem()
+
+      reply_obj.name = unicode("Reply of:" + str(prior_node))
+      reply_obj.status = u"PUBLISHED"
+
+      reply_obj.created_by = user_id
+      reply_obj.modified_by = user_id
+      reply_obj.contributors.append(user_id)
+
+      reply_obj.member_of.append(ObjectId(reply_st._id))
+      reply_obj.prior_node.append(ObjectId(prior_node))
+      reply_obj.group_set.append(ObjectId(group_id))
+  
+      reply_obj.content_org = unicode(content_org)
+      filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+      reply_obj.content = org2html(content_org, file_prefix=filename)
+  
+      # saving the reply obj
+      reply_obj.save()
+
+      formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
+      
+      # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
+      reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
+      # print "\n\n====", reply
+
+      return HttpResponse( reply )
+
+    else: # no reply content
+
+      return HttpResponse(json.dumps(["no_content"]))      
+
+  except Exception as e:
+    
+    error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
+    raise Exception(error_message)
+
+    return HttpResponse(json.dumps(["Server Error"]))
+

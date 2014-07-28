@@ -125,11 +125,13 @@ $(document).ready(function()
 
 <!-- overide meta_content block from base.html -->
 {% block meta_content %}
-  <h2>Group</h2>
+  <h3>Dashboard</h3>
+
+<h4><i class="fi-torsos"></i>{{node.author_set|length}} <span>Group members</span></h4>
 {% endblock %}
 
 {% block concern_information %}
-  <h5> Members in this group: {{node.author_set|length}}</h5>
+
   {% check_is_user_group group_id as is_user_group %}
   {% get_policy node request.user as policy  %}
 

@@ -1,4 +1,4 @@
-* INSTALLATION Procedure for for gstudio-mongokit
+* INSTALLATION Procedure for for gstudio
 
 If you are on a debian or Ubuntu PC install the following packages.
 Use corresponding package names if you are using an RPM based distro
@@ -37,21 +37,21 @@ Use corresponding package names if you are using an RPM based distro
    NOTE: How to get org-version?
 	 (1) Open emacs editor
 	 (2) Press Alt + "X"
-	 (3) Enter following command - org-version [Then Press Enter]
+	 (3) Enter following command: org-version [Then Press Enter]
 
    (a) For org-version < 8.0: Copy following lines of code in above specified file and save it
-	(custom-set-variables
-	  '(inhibit-startup-screen t)
-	  '(org-export-html-preamble nil)
-	  '(org-export-html-postamble nil)
-	)
+      	(custom-set-variables
+      	  '(inhibit-startup-screen t)
+      	  '(org-export-html-preamble nil)
+      	  '(org-export-html-postamble nil)
+      	)
 
    (b) For org-version >= 8.0: : Copy following lines of code in above specified file and save it
-	(custom-set-variables
-	  '(inhibit-startup-screen t)
-	  '(org-html-preamble nil)
-	  '(org-html-postamble nil)
-	)
+      	(custom-set-variables
+      	  '(inhibit-startup-screen t)
+      	  '(org-html-preamble nil)
+      	  '(org-html-postamble nil)
+      	)
 
 5. SMTP configuration for notifications
  
@@ -80,6 +80,7 @@ Use corresponding package names if you are using an RPM based distro
 
     (2) A tool to create isolated node.js environment which is integrated 
         with environment built by python virtualenv: 
+        sudo apt-get install curl
         pip install nodeenv
 
     (3) Appending nodeenv settings to virtualenv: (This takes time .. wait till it complete)
@@ -90,24 +91,14 @@ Use corresponding package names if you are using an RPM based distro
           (b) sudo apt-get update
           (c) sudo apt-get install python-software-properties python g++ make nodejs
 
-    (4) Installing Bower:
+    (4) Installing Bower (try any one of following):
+        npm install -g bower
         sudo npm install -g bower
 
     (5) To install JS/CSS dependencies: (Be there at project root level)
         bower install
 
-7. Installation of MathJax (required for rendering MathML symbols)
-   
-    (1) To install MathJax on your own server, download the
-        distribution from the following link:
-        "http://www.mathjax.org/download/" 
-
-    (2) Simply unzip the downloaded archive, rename it to 'mathjax'
-        (all in smallcaps) and put it under django-application's
-        "static" directory.
-
-
-8. To run "gstudio-mongokit" project, perform following steps: 
+7. To run "gstudio" project, perform following steps: 
 
     (1) Make sure you are in the virtualenv-folder and it's activated
         (source bin/activate).  
@@ -118,20 +109,18 @@ Use corresponding package names if you are using an RPM based distro
 
     (4) Run the following commands: 
 
-        (a) python manage.py initrcsrepo 
+        (a) python manage.py syncdb
 
-        (b) python manage.py syncdb
+        (b) python manage.py filldb 
 
-        (c) python manage.py filldb 
-
-        (d) python manage.py runserver 
+        (c) python manage.py runserver 
 
 
-* After running (d) point your browser to http://localhost:8000 to see
+* After running (c) point your browser to http://localhost:8000 to see
   gstudio on your browser.  Enjoy.  
 
 * Since gstudio is frequently updated, please obtain the latest code
-  from git repo. After each update run (b) & (c) commands before running (d).
+  from git repo. After each update run (a) & (b) commands before running (c).
 
 * Any issues with this procedure or you need any further help, or to
   file bugs etc. visit ask us in the mailing list:

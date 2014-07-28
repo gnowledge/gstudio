@@ -33,6 +33,33 @@ import json,ox
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
 
+@register.assignment_tag
+def get_node_ratings(request,node):
+        try:
+                user=request.user
+                node=collection.Node.one({'_id':ObjectId(node._id)})
+                sum=0
+                dic={}
+                cnt=0
+                userratng=0
+                for each in node.rating:
+                     if each['user_id'] == user.id:
+                             userratng=each['score']
+                     if each['user_id']==0:
+                             cnt=cnt+1
+                     sum=sum+each['score']
+                if len(node.rating)==1 and cnt==1:
+                        tot_ratng=0
+                        avg_ratng=0.0
+                else:
+                        tot_ratng=len(node.rating)-cnt
+                        avg_ratng=float(sum)/tot_ratng
+                dic['avg']=avg_ratng
+                dic['tot']=tot_ratng
+                dic['user_rating']=userratng
+                return dic
+        except Exception as e:
+                print "Error in get_node_ratings "+str(e)
 
 @register.assignment_tag
 def get_group_resources(group):
@@ -392,6 +419,76 @@ def thread_reply_count( oid ):
 			thread_reply_count(each._id)
 	
 	return global_thread_rep_counter
+
+
+# To get all the discussion replies
+# global variable to count thread's total reply
+# global_disc_rep_counter = 0	
+# global_disc_all_replies = []
+reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+@register.assignment_tag
+def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
+	'''
+	Method to count total replies for the disc.
+	'''
+
+	ins_objectid  = ObjectId()
+	if ins_objectid.is_valid(group_id) is False:
+		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		if group_ins:
+			group_id = str(group_ins._id)
+		else:
+			auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+			if auth :
+				group_id = str(auth._id)
+	else:
+		pass
+
+	# thr_rep = collection.GSystem.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})#.sort({'created_at': -1})
+	thr_rep = collection.Node.find({'_type':'GSystem', 'group_set':ObjectId(group_id), 'prior_node':ObjectId(oid), 'member_of':ObjectId(reply_st._id)}).sort('created_at', -1)
+
+	# to acces global_disc_rep_counter as global and not as local
+	# global global_disc_rep_counter 
+	# global global_disc_all_replies
+
+	if thr_rep and (thr_rep.count() > 0):
+
+		for each in thr_rep:
+
+			# print "\n\n",each.created_at
+			# if level == 1:
+			# 	global_disc_all_replies = temp_list + global_disc_all_replies
+			# 	temp_list = []
+
+			# global_disc_rep_counter += 1
+			temp_disc_reply = {"content":"", "last_update":"", "user":"", "oid":"", "prior_node":""}
+
+			temp_disc_reply["HTMLcontent"] = each.content
+			temp_disc_reply["ORGcontent"] = each.content_org
+			temp_disc_reply["last_update"] = each.last_update
+			temp_disc_reply["username"] = User.objects.get(pk=each.created_by).username
+			temp_disc_reply["userid"] = int(each.created_by)
+			temp_disc_reply["oid"] = str(each._id)
+			temp_disc_reply["prior_node"] = str(each.prior_node[0])
+			temp_disc_reply["level"] = level
+
+			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
+			if not any( d['oid'] == str(each._id) for d in global_disc_all_replies ):
+				if type(global_disc_all_replies) == str:
+					global_disc_all_replies = list(global_disc_all_replies)
+				global_disc_all_replies.append(temp_disc_reply)
+				# global_disc_all_replies.insert(0, temp_disc_reply)
+				# temp_list.append(temp_disc_reply)
+				# print "\n\n", temp_list
+								
+			# print "\n\n---- : ", level, " : ", each.content_org, temp_disc_reply
+			# get_disc_replies(each._id, (level+1), temp_list)
+			get_disc_replies(each._id, group_id, global_disc_all_replies, (level+1) )
+	
+	# print global_disc_all_replies
+	return global_disc_all_replies
+# global_disc_all_replies = []
 	
 
 @register.assignment_tag
@@ -546,7 +643,9 @@ def get_user_group(user, selected_group_name):
   group_list = []
   auth_group = None
 
-  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 'author_set': user.id}).sort('last_update', -1).limit(9)
+  group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 
+  									'$or': [{'group_admin': user.id}, {'author_set': user.id}],
+  								}).sort('last_update', -1).limit(9)
 
   auth_group = collection.Node.one({'_type': "Author", '$and': [{'name': unicode(user.username)}, {'name': {'$ne': selected_group_name}}]})
 
@@ -671,23 +770,84 @@ def get_create_url(groupid):
     return 'uploadDoc'
 	
 
+@register.assignment_tag
+def get_contents(node_id):
+
+	contents = {}
+	image_contents = []
+	video_contents = []
+	document_contents = []
+	page_contents = []
+
+	page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'}) 
+
+	obj = collection.Node.one({'_id': ObjectId(node_id) })
+	if obj.collection_set:
+		for each in obj.collection_set:
+			coll_obj = collection.Node.one({'_id': ObjectId(each) })
+
+			if coll_obj.has_key("mime_type"):
+				if 'image' in coll_obj.mime_type:
+					image_contents.append((coll_obj.name, coll_obj._id))
+				elif 'video' in coll_obj.mime_type:
+					video_contents.append((coll_obj.name, coll_obj._id))
+				else:
+					if coll_obj._type == "File":
+						document_contents.append((coll_obj.name, coll_obj._id))
+			else: 
+				if page_GST._id in coll_obj.member_of:
+					page_contents.append((coll_obj.name, coll_obj._id))
+
+
+		if not image_contents:
+			image_contents.append("None")
+		elif image_contents:
+			contents['image_contents'] = image_contents
+
+		if not video_contents:
+			video_contents.append("None")
+		elif video_contents:
+			contents['video_contents'] = video_contents
+
+		if not document_contents:
+			document_contents.append("None")
+		elif document_contents:
+			contents['document_contents'] = document_contents
+		
+		if page_contents:
+			contents['page_contents'] = page_contents		
+
+	# print "\n",document_contents,"\n"
+	return contents
+
 
 @register.assignment_tag
 def get_group_type(group_id, user):
 
 	try:
-		col_Group = db[Group.collection_name]
+		col_Group = db[Node.collection_name]
 
 		if group_id == '/home/':
-			colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+
 		else:  
-			gid = group_id.replace("/", "")
+			gid = ""
+			split_content = group_id.strip().split("/")
+
+			if split_content[0] != "":
+				gid = split_content[0]
+
+			else:
+				gid = split_content[1]
+
+			# gid = group_id.replace("/", "").strip()
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
 			else:
 				colg = col_Group.Group.find_one({'_type': 'Group', 'name': gid})
 				if colg :
 					pass
+
 				else:		
 					colg = None
   		
@@ -697,22 +857,24 @@ def get_group_type(group_id, user):
 			# Check is user is logged in
 			if  user.id:
 				# condition for group accesseble to logged user
-				if colg.group_type=="PUBLIC" or colg.created_by==user.id or user.id in colg.author_set:
+				if colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
 					return "allowed"
 				else:
-					raise Http404	
+					error_message = "Access denied: You are not an authorized user!!!"
+					raise Http404(error_message)
 
 			else:
 				#condition for groups, accessible to not logged users
 				if colg.group_type == "PUBLIC":
 					return "allowed"
 				else:
-					raise Http404
+					error_message = "Access denied: You are not an authorized user!!!"
+					raise Http404(error_message)
 		else:
 			return "pass"
 
-	except Http404:
-		raise Http404
+	except Http404 as e:
+		raise Http404(e)
 		
 	except Exception as e:
 		print "Error in group_type_tag "+str(e)
@@ -965,6 +1127,70 @@ def Group_Editing_policy(groupid,node,user):
 	elif node.edit_policy is None:
 		return "allow"      
 	
+@register.assignment_tag
+def check_is_gstaff(groupid, user):
+  """
+  Checks whether given user belongs to GStaff.
+  GStaff includes only those members which belongs to following criteria:
+    1) User should be a super-user (Django's superuser)
+    2) User should be a creator of the group (created_by field)
+    3) User should be an admin-user of the group (group_admin field)
+  
+  Other memebrs (author_set field) doesn't belongs to GStaff.
+
+  Arguments:
+  groupid -- ObjectId of the currently selected group
+  user -- User object taken from request object
+
+  Returns:
+  True -- If user is one of them, from the above specified list of categories.
+  False -- If above criteria is not met (doesn't belongs to any of the category, mentioned above)!
+  """
+
+  try:
+    group_node = collection.Node.one({'_id': ObjectId(groupid)})
+
+    if group_node:
+      return group_node.is_gstaff(user)
+
+    else:
+      error_message = "No group exists with this id ("+str(groupid)+") !!!"
+      raise Exception(error_message)
+
+  except Exception as e:
+    error_message = "\n IsGStaffCheckError: " + str(e) + " \n"
+    raise Http404(error_message)
+
+
+@register.assignment_tag
+def check_is_gstaff_for_gapp(groupid, app_dict, user):
+  """
+  This restricts view of MIS & MIS-PO GApps to only GStaff members (super-user, creator, admin-user) of the group. 
+  That is, other subscribed-members of the group can't even see these GApps.
+
+  Arguments:
+  groupid -- ObjectId of the currently selected group
+  app_dict -- A dictionary consisting of following key-value pair
+              - 'id': ObjectId of the GApp
+              - 'name': name of the GApp
+  user - User object taken from request object
+
+  Returns:
+  A bool value indicating:-
+  True --  if user is superuser, creator or admin of the group
+  False -- if user is just a subscribed-member of the group
+  """
+
+  try:
+    if app_dict["name"].lower() in ["mis", "mis-po", "batch", "task"]:
+      return check_is_gstaff(groupid, user)
+
+    else:
+      return True
+
+  except Exception as e:
+    error_message = "\n GroupAdminCheckError (For MIS & MIS-PO): " + str(e) + " \n"
+    raise Http404(error_message)
 
 
 @register.assignment_tag
@@ -1310,44 +1536,3 @@ def check_node_linked(node_id):
   except Exception as e:
     error_message = " NodeUserLinkFindError - " + str(e)
     raise Exception(error_message)
-
-@register.assignment_tag
-def check_group_admin(groupid, app_dict, user):
-  """
-  This restricts view of MIS & MIS-PO GApps to only superuser, creator & admins of the group. 
-  That is, other members of the group can't see these GApps.
-
-  Arguments:
-  groupid -- ObjectId of the currently selected group
-  app_dict -- A dictionary consisting of following key-value pair
-              - 'id': ObjectId of the GApp
-              - 'name': name of the GApp
-  user - User object taken from request object
-
-  Returns:
-  A bool value indicating:-
-  True: if user is superuser, creator or admin of the group
-  False: otherwise, user is just a member of the group
-  """
-
-  try:
-    if app_dict["name"] in ["MIS", "MIS-PO"]:
-      group_node = collection.Node.one({'_id': ObjectId(groupid)}, {'group_admin': 1, 'created_by': 1})
-
-      if group_node:
-        if (user.is_superuser) or (user.id == group_node.created_by) or (user.id in group_node.group_admin):
-          return True
-
-        else:
-          return False
-
-      else:
-        error_message = "No group exists with this id ("+str(groupid)+") !!!"
-        raise Exception(error_message)
-
-    else:
-      return True
-
-  except Exception as e:
-    error_message = "\n GroupAdminCheckError (For MIS & MIS-PO): " + str(e) + " \n"
-    raise Http404(error_message)

@@ -1,4 +1,4 @@
-THis is the static asset folder for front end components. The application stylesheets, javascript libraries and media assets should be placed in the relevant folders here
+This is the static asset folder for front end components. The application stylesheets, javascript libraries and media assets should be placed in the relevant folders here
 
 # Folder structure for static components
 

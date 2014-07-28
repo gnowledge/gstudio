@@ -34,26 +34,48 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 {% endblock %}
 
+
+
 {% block body_content %}
 
 <form data-abide id="form-edit-node" method="POST" action="">
-
-  <header class="row">
-
-    <h2 class="medium-12 columns">
-      {% if node %}
-      Editing {{title}}: {{node.name}}
-      {% else %}
-      Create a New {{title}}
-      {% endif %}
-    </h2>
     
-    <nav class="medium-12 columns">
+        <header>
+            <div class="row">
+ <h1 class="large-8 columns">
+     
+     <span class="subheader">
+      {% if node %}
+      Editing: 
+     {% else %}
+      Create:
+     {% endif %} 
+     </span>
+     
+     <div>
+	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
+	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+	  </div>
+     
+      </h1>
+                
+             <div class="large-4 columns">
+	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+	    </span>
+	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
+	  </div>		
+ 
+           </div> 
+  </header>
+
+    <div class="edit-card">
+        
+        <div class="row">
+       <nav class="large-8 columns">
       <dl class="tabs" data-tab>
-	<dd><h3>View:</h3></dd>
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
-	  <a href="#panel-name-description">{% block page_tab %} Page {% endblock %}</a>
+	  <a href="#panel-name-description">{% block page_tab %} Node {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
 	  <a href="#panel-prior-node" class="prior_node_tab">Prior Node</a>
@@ -64,82 +86,21 @@ background-repeat:no-repeat; background-size: 48px 48px
 	</dd>  
 	
      </dl>
-    </nav>
-  </header>
-
+     
+   </nav>
+            
+            
+            </div>
+        
   {% csrf_token %}
   
   <div id="node-details-edit-div" class="tabs-content" > 
 
     <div class="active content row" id="panel-name-description">
-      <div class="medium-6 columns">
+      <div class="medium-8 columns">
 	
-	<div class="row">
-	  <div class="medium-8 columns">
-	    <label>{{title}} Name</label>
-	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
-	  </div>
-
-	  <div class="medium-4 columns">
-	    {% if node.created_by == request.user.pk %}		    	
-			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
-
-			
-				<div class="privacy-mode switch round">
-						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
-							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-						{% else %}
-							{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
-								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-								<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-								<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-							{% endif %}
-						{% endif %}
-							<span></span>
-				</div>
-
-		{% else %}
-						
-			{% if not node %}
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
-						<div class="privacy-mode switch round">
-						
-							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
-
-							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
-						
-							<span></span>
-						</div>
-
-
-			{% endif %}
-		{% endif %}	    
-	  </div>
-	</div>
-
 	<div id="message" style="display:none; color:red"></div>
-					
-
-	<div class="row">
-	  
-	  <div class="large-6 columns"><label>Language<select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select></label>
-	     </div>
-
-	  <div class="large-6 columns" style="padding: 1.8em;">
-	  	<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-	  		<i class="fi-marker"></i> &nbsp; Add Location
-	  	</a>
-	  </div>
-	</div>
+		
 
 	<div class="row">
 	  <div class="medium-12 columns">
@@ -147,13 +108,6 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  </div>
 	</div>
 	
-	<div class="row">
-	  <div class="medium-12 columns">
-	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
-	    </span>
-	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-	  </div>		
-	</div>
 
 {% switch_group_conditions request.user group_id as switch_conditions %}
 	{% if node %}
@@ -179,17 +133,99 @@ background-repeat:no-repeat; background-size: 48px 48px
 </dl>
 {% endif %}
       </div>
+        
+        
+        <div class="large-4 columns">
+            <div class="panel">
+                
+                <h5>Settings</h5>
+           
+            <div class="row">
+	    {% if node.created_by == request.user.pk %}	
+                     <div class="large-4 columns">
+			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Visibility</label></span></div>
+                     
+
+			<div class="large-8 columns">
+				<div class="privacy-mode ">
+						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">Visible <i class="fi-eye"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">Hidden <i class="fi-key"></i></label>
+						{% else %}
+							{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
+								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
+								<label for="PUBLIC" onclick="">Visible <i class="fi-eye"></i></label>
+
+								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
+								<label for="PRIVATE" onclick="">Hidden <i class="fi-key"></i></label>
+							{% endif %}
+						{% endif %}
+							<span></span>
+				</div>
+</div>
+		{% else %}
+						
+			{% if not node %}
+                     <div class="large-4 columns">
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">Visibility</label></span>
+                         </div>
+                     
+                     <div class="large-8 columns">
+						<div class="privacy-mode">
+						
+							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
+							<label for="PUBLIC" onclick="">Visible <i class="fi-eye"></i></label>
+
+							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
+							<label for="PRIVATE" onclick="">Hidden <i class="fi-key"></i></label>
+						
+							<span></span>
+						</div>
+</div>
+
+			{% endif %}
+		{% endif %}	    
+            </div>
+                
+                <div class="row">
+                <div class="large-4 columns">
+                <label class="inline">Language</label>
+                    </div>
+                <div class="large-8 columns">
+               <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
+                    </div>
+                    </div>
+	   
+	     
+                
+                 
+                
+                 <div class="row">
+                <div class="large-4 columns">
+                <label class="inline">Location:</label>
+                    </div>
+                <div class="large-8 columns">
+              <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand">
+	  		<i class="fi-marker"></i> &nbsp; Add Location
+	  	</a>
+                    </div>
+	     </div>
+                
+                </div>
+                  
+            
+	</div>
+        
+      
     </div>
     
     {% block prior_node %}
 
-    <div class="content" id="panel-prior-node"  style="width:95%;">
+    <div class="content" id="panel-prior-node">
       <div class="row">
-	<div class="small-12 columns">
-	  <h5>Add or edit Prior Node : </h5>
-	</div>
-	<br/>
-	
 	<div class="small-12 columns">
 	  <div id="prior_node_drawer">
 	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
@@ -202,13 +238,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     {% block collection %}
 
-    <div class="content" id="panel-collection" style="width:95%;">
+    <div class="content" id="panel-collection">
       <div class="row">
-	<div class="small-12 columns">
-	  <h5>Add or edit Collection : </h5>
-	</div>				
-	<br/><br/>
-	
 	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 	  <div id="SelectApp" class="row">
 	    <div class="small-2 columns line-height-2pt5">
@@ -261,15 +292,15 @@ background-repeat:no-repeat; background-size: 48px 48px
       </div>
     </div>
 
+      <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
+      
     {% endblock %}
     
   </div>  
   
   {% block add_fields %} {% endblock %}
   
-  <div class="row" >
-    <input type="submit" id="save-node" value="Save as Draft And Preview" class="button medium-6 columns"/>
-  </div>
+ 
   
   
  <!-- Overlay : Map Widget -->
@@ -282,7 +313,9 @@ background-repeat:no-repeat; background-size: 48px 48px
       <!-- #{#%# endif %} -->
     </div>
 
-    <input type="hidden" id="nodes_list" value="{{nodes_list}}">						
+    <input type="hidden" id="nodes_list" value="{{nodes_list}}">
+    
+    </div>
 </form>
 
 
@@ -480,7 +513,7 @@ $("#name_id").change(function(){
 		});
 
 		$("#prior_node_list").val(pn_arr)
-		$("#collection_list").val(cn_arr) 
+		$("#collection_set_list").val(cn_arr) 
 		$("#module_list").val(md_arr)   
 
 		{% block base_save_on_click %}{% endblock %}

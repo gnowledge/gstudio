@@ -1,6 +1,9 @@
 ''' -- imports from installed packages -- '''
 import json
+import datetime
 
+
+''' -- imports from django -- '''
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template import Context
@@ -13,16 +16,18 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 
-
+''' -- imports from django_mongokit -- '''
 from django_mongokit import get_database
+
+
+''' -- imports from gstudio -- '''
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
 from gnowsys_ndf.ndf.views.methods import set_all_urls
 from gnowsys_ndf.settings import GAPPS
-
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
-import datetime
 from gnowsys_ndf.ndf.org2any import org2html
+
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -38,9 +43,15 @@ start_time = collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'sta
 end_time = collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'end_time'}]})
 reply_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Reply'}]})
 twist_st = collection.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Twist'}]})
+sitename=Site.objects.all()[0].name.__str__()
 
 
 def forum(request, group_id, node_id=None):
+    '''
+    Method to list all the available forums and to return forum-search-query result.
+    '''
+
+    # method to convert group_id to ObjectId if it is groupname
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -53,11 +64,15 @@ def forum(request, group_id, node_id=None):
                 group_id = str(auth._id)
     else :
         pass
+
+
+    # getting Forum GSystem's ObjectId
     if node_id is None:
         node_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Forum"})
         if node_ins:
             node_id = str(node_ins._id)
     
+
     if request.method == "POST":
       # Forum search view
       title = forum_st.name
@@ -99,10 +114,16 @@ def forum(request, group_id, node_id=None):
         
         forum_detail_list.append(temp_forum)
 
-      variables=RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
+      variables = RequestContext(request,{'existing_forums': forum_detail_list, 'groupid': group_id, 'group_id': group_id})
       return render_to_response("ndf/forum.html",variables)
 
-def create_forum(request,group_id):
+
+def create_forum(request,group_id):    
+    '''
+    Method to create forum and Retrieve all the forums
+    '''
+
+    # method to convert group_id to ObjectId if it is groupname
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -115,32 +136,37 @@ def create_forum(request,group_id):
                 group_id = str(auth._id)
     else :
         pass
+    
+
+    # getting all the values from submitted form
     if request.method == "POST":
 
-        colg = collection.Group.one({'_id':ObjectId(group_id)})
+        colg = collection.Group.one({'_id':ObjectId(group_id)}) # getting group ObjectId
 
-        colf = collection.GSystem()
+        colf = collection.GSystem() # creating new/empty GSystem object
 
-        name = unicode(request.POST.get('forum_name',""))
+        name = unicode(request.POST.get('forum_name',"")) # forum name
         colf.name = name
         
-        content_org = request.POST.get('content_org',"")
+        content_org = request.POST.get('content_org',"") # forum content
         if content_org:
             colf.content_org = unicode(content_org)
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
             colf.content = org2html(content_org, file_prefix=filename)
         
-        usrid=int(request.user.id)
+        usrid = int(request.user.id)
         usrname = unicode(request.user.username)
         
         colf.created_by=usrid
         colf.modified_by = usrid
+
         if usrid not in colf.contributors:
             colf.contributors.append(usrid)
         
         colf.group_set.append(colg._id)
 
+        # appending user group's ObjectId in group_set
         user_group_obj = collection.Group.one({'$and':[{'_type':u'Group'},{'name':usrname}]})
         if user_group_obj:
             if user_group_obj._id not in colf.group_set:
@@ -151,42 +177,58 @@ def create_forum(request,group_id):
         colf.access_policy = u"PUBLIC"
         colf.url = set_all_urls(colf.member_of)
 
-        sdate=request.POST.get('sdate',"")
-        shrs= request.POST.get('shrs',"") 
-        smts= request.POST.get('smts',"")
+        ### currently timed forum feature is not in use ###
+        # sdate=request.POST.get('sdate',"")
+        # shrs= request.POST.get('shrs',"") 
+        # smts= request.POST.get('smts',"")
         
-        edate= request.POST.get('edate',"")
-        ehrs= request.POST.get('ehrs',"")
-        emts=request.POST.get('emts',"")
+        # edate= request.POST.get('edate',"")
+        # ehrs= request.POST.get('ehrs',"")
+        # emts=request.POST.get('emts',"")
         
-        start_dt={}
-        end_dt={}
+        # start_dt={}
+        # end_dt={}
         
-        if not shrs:
-            shrs=0
-        if not smts:
-            smts=0
-        if sdate:
-            sdate1=sdate.split("/") 
-            st_date = datetime.datetime(int(sdate1[2]),int(sdate1[0]),int(sdate1[1]),int(shrs),int(smts))
-            start_dt[start_time.name]=st_date
+        # if not shrs:
+        #     shrs=0
+        # if not smts:
+        #     smts=0
+        # if sdate:
+        #     sdate1=sdate.split("/") 
+        #     st_date = datetime.datetime(int(sdate1[2]),int(sdate1[0]),int(sdate1[1]),int(shrs),int(smts))
+        #     start_dt[start_time.name]=st_date
         
-        if not ehrs:
-            ehrs=0
-        if not emts:
-            emts=0
-        if edate:
-            edate1=edate.split("/")
-            en_date= datetime.datetime(int(edate1[2]),int(edate1[0]),int(edate1[1]),int(ehrs),int(emts))
-            end_dt[end_time.name]=en_date
+        # if not ehrs:
+        #     ehrs=0
+        # if not emts:
+        #     emts=0
+        # if edate:
+        #     edate1=edate.split("/")
+        #     en_date= datetime.datetime(int(edate1[2]),int(edate1[0]),int(edate1[1]),int(ehrs),int(emts))
+        #     end_dt[end_time.name]=en_date
        # colf.attribute_set.append(start_dt)
        # colf.attribute_set.append(end_dt)
         colf.save()
+
+        '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
+        link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
+        for each in colg.author_set:
+            bx=User.objects.get(id=each)
+            activity="Added forum"
+            msg=usrname+" has added a forum in the group -'"+str(colg.name)+"'\n"+"Please visit "+link+" to see the forum."
+            if bx:
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(bx.username) })
+                no_check=forum_notification_status(colg._id,auth._id)
+                if no_check:
+                    ret = set_notif_val(request,colg._id,msg,activity,bx)
+
+        # returning response to ndf/forumdetails.html
         return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id }))
+
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
 
-
+    # getting all the GSystem of forum to provide autocomplete/intellisence of forum names
     available_nodes = collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
 
     nodes_list = []
@@ -194,6 +236,7 @@ def create_forum(request,group_id):
       nodes_list.append(each.name)
 
     return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
+
 
 def display_forum(request,group_id,forum_id):
     
@@ -225,11 +268,17 @@ def display_forum(request,group_id,forum_id):
 
     return render_to_response("ndf/forumdetails.html",variables)
 
+
+
 def display_thread(request,group_id, thread_id, forum_id=None):
+    '''
+    Method to display thread and it's content
+    '''
+    
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
@@ -238,11 +287,14 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                 group_id = str(auth._id)
     else :
         pass
+
     try:
         thread = collection.Node.one({'_id': ObjectId(thread_id)})
-        forum=""
+        forum = ""
+        
         for each in thread.prior_node:
             forum=collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
+        
             if forum:
                 usrname = User.objects.get(id=forum.created_by).username
                 variables = RequestContext(request,
@@ -261,14 +313,19 @@ def display_thread(request,group_id, thread_id, forum_id=None):
 
 
 def create_thread(request, group_id, forum_id):
+    ''' 
+    Method to create thread
+    '''
 
     forum = collection.Node.one({'_id': ObjectId(forum_id)})
-    forum_data = {  
-                    'name':forum.name,
-                    'content':forum.content,
-                    'created_by':User.objects.get(id=forum.created_by).username
-                }
+    
+    # forum_data = {  
+    #                 'name':forum.name,
+    #                 'content':forum.content,
+    #                 'created_by':User.objects.get(id=forum.created_by).username
+    #             }
     # print forum_data
+
     forum_threads = []
     exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
     exstng_reply.sort('created_at')
@@ -314,7 +371,7 @@ def create_thread(request, group_id, forum_id):
         colrep.save()
 
         variables = RequestContext(request,
-                                    {   'forum':forum,
+                                     {   'forum':forum,
                                         'thread':colrep,
                                         'eachrep':colrep,
                                         'groupid':group_id,
@@ -343,7 +400,7 @@ def add_node(request,group_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if group_ins:
             group_id = str(group_ins._id)
         else :
@@ -355,15 +412,16 @@ def add_node(request,group_id):
 
     try:
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        sitename=Site.objects.all()[0].name.__str__()
-        content_org=request.POST.get("reply","")
-        node=request.POST.get("node","")
-        thread=request.POST.get("thread","")
-        forumid=request.POST.get("forumid","")
-        sup_id=request.POST.get("supnode","")
-        tw_name=request.POST.get("twistname","")
-        forumobj=""
-        groupobj=""
+        content_org = request.POST.get("reply","")
+        node = request.POST.get("node","")
+        thread = request.POST.get("thread","") # getting thread _id
+        forumid = request.POST.get("forumid","") # getting forum _id
+        sup_id = request.POST.get("supnode","") #getting _id of it's parent node
+        tw_name = request.POST.get("twistname","")
+        forumobj = ""
+        groupobj = ""
+
+        # print "\n node:", node, "\n thread: ", thread, "\n forumid: ", forumid, "\n supnode: ", sup_id, "\n twistname: ", tw_name
     
         colg = collection.Group.one({'_id':ObjectId(group_id)})
 
@@ -385,7 +443,7 @@ def add_node(request,group_id):
             colrep.member_of.append(reply_st._id)
     
         colrep.prior_node.append(sup._id)
-        colrep.name=name
+        colrep.name = name
 
         if content_org:
             colrep.content_org = unicode(content_org)
@@ -418,7 +476,7 @@ def add_node(request,group_id):
             prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
             nodename=""
         
-        link=url
+        link = url
         
         for each in colg.author_set:
             bx=User.objects.get(id=each)
@@ -435,7 +493,7 @@ def add_node(request,group_id):
             no_check=forum_notification_status(group_id,auth._id)
             if no_check:
                 ret = set_notif_val(request,group_id,msg,activity,bx)
-        
+        print "in add_node"        
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]
@@ -449,6 +507,7 @@ def add_node(request,group_id):
             templ=get_template('ndf/refreshthread.html')
             html = templ.render(Context({'forum':forumobj,'user':request.user,'groupid':group_id,'group_id':group_id}))
             return HttpResponse(html)
+
 
 
     except Exception as e:
