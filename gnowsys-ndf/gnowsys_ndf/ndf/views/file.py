@@ -285,11 +285,17 @@ def file(request, group_id, file_id=None):
                                               ]
                                             }).sort("last_update", -1)
       
-      already_uploaded = request.GET.getlist('var', "")
+      already_uploaded = request.GET.getlist('var', "")     
+
       new_list = []  
       for each in already_uploaded:
-          new_list.append(eval(each))
+        for name in eval(each):
+          for k in name:
+            if type(k) is list:
+              new_list.append(k[0])
+
       already_uploaded = new_list
+
       # source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
 
       # pandora_video_id = []
@@ -376,12 +382,16 @@ def submitDoc(request, group_id):
     alreadyUploadedFiles = []
     str1 = ''
     img_type=""
+    topic_file = ""
+    is_video = ""
     obj_id_instance = ObjectId()
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
         language = request.POST.get("lan", "")
         img_type = request.POST.get("type", "")
+        topic_file = request.POST.get("type", "")
+        doc = request.POST.get("doc", "")
         usrname = request.user.username
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
@@ -389,7 +399,8 @@ def submitDoc(request, group_id):
         tags = request.POST.get('tags', "")
 
         i = 1
-	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+
+        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
 
@@ -400,22 +411,30 @@ def submitDoc(request, group_id):
                     i = i + 1
             else:
                 title = each.name
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
-            if not obj_id_instance.is_valid(f):
-                alreadyUploadedFiles.append(f)
-                title = mtitle
-        for each in alreadyUploadedFiles:
-            str1 = str1 + 'var={"Newname":"' + each[0] + '",' + '"Oldname":"' + each[1] +'"}'+ '&'
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
 
+            if not obj_id_instance.is_valid(f):
+              alreadyUploadedFiles.append(f)
+              title = mtitle
+        
+        str1 = str(alreadyUploadedFiles)
+       
         if img_type != "": 
             
-            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id }))
+            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id , 'usrid': userid}))
+
+        elif topic_file != "": 
+            
+            return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
         else:
             if str1:
-                return HttpResponseRedirect(page_url+'?'+str1)
+                return HttpResponseRedirect(page_url+'?var='+str1)
             else:
+              if is_video == "True":
                 return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
+              else:
+                return HttpResponseRedirect(page_url)
                 
 
     else:
@@ -428,7 +447,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
       this will create file object and save files in gridfs collection
     """
-    
     global count,first_object
     is_video = ""
     fcol = db[File.collection_name]

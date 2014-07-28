@@ -18,6 +18,10 @@
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
 
+/* Too many apps cause breakage */
+.top-bar{
+    height: auto!important;
+}
 .top-bar .dropdown a.button{
     padding: 0;
 }
@@ -31,6 +35,11 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 /* Protects reflowing elements on error */
 [data-abide] span.error, [data-abide] small.error{
     position: absolute;
+}
+
+/*active color for side-nav links*/
+.side-nav li.active a:not(.button){
+    color:$side-nav-link-color-active;
 }
 
 

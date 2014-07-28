@@ -2,7 +2,9 @@
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
+from django.http import HttpResponse
 from django.template import RequestContext
+from django.core.serializers.json import DjangoJSONEncoder
 import mongokit 
 
 ''' -- imports from application folders/files -- '''
@@ -18,6 +20,7 @@ import subprocess
 import re
 import ast
 import string
+import json
 from datetime import datetime
 ######################################################################################################################################
 
@@ -623,13 +626,13 @@ and if he has published his contents then he would be shown the current publishe
 
 '''
      username =request.user
-     print node,"nodeeee"
+     # print node,"nodeeee"
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
      if  ver2 != '1.1':                           
 	    if node2 is not None:
-		print "direct"
+		# print "direct"
                 if node2.status == 'PUBLISHED':
                   
 			if float(ver2) > float(ver1):			
@@ -1241,3 +1244,116 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
   except Exception as e:
       error_message = "\n GRelationCreateError: " + str(e) + "\n"
       raise Exception(error_message)
+
+
+
+# Method to create discussion thread for File and Page.
+def create_discussion(request, group_id, node_id):
+  '''
+  Method to create discussion thread for File and Page.
+  '''
+
+  try:
+
+    twist_st = collection.Node.one({'_type':'GSystemType', 'name':'Twist'})
+
+    node = collection.Node.one({'_id': ObjectId(node_id)})
+
+    # group = collection.Group.one({'_id':ObjectId(group_id)})
+
+    thread = collection.Node.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
+    
+    if not thread:
+      
+      # retriving RelationType
+      # relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
+      
+      # Creating thread with the name of node
+      thread_obj = collection.GSystem()
+
+      thread_obj.name = unicode(node.name)
+      thread_obj.status = u"PUBLISHED"
+
+      thread_obj.created_by = int(request.user.id)
+      thread_obj.modified_by = int(request.user.id)
+      thread_obj.contributors.append(int(request.user.id))
+
+      thread_obj.member_of.append(ObjectId(twist_st._id))
+      thread_obj.prior_node.append(ObjectId(node_id))
+      thread_obj.group_set.append(ObjectId(group_id))
+      
+      thread_obj.save()
+
+      # creating GRelation
+      # create_grelation(node_id, relation_type, twist_st)
+      response_data = [ "thread-created", str(thread_obj._id) ]
+
+      return HttpResponse(json.dumps(response_data))
+
+    else:
+      response_data =  [ "Thread-exist", str(thread._id) ]
+      return HttpResponse(json.dumps(response_data))
+  
+  except Exception as e:
+    
+    error_message = "\n DiscussionThreadCreateError: " + str(e) + "\n"
+    raise Exception(error_message)
+    # return HttpResponse("server-error")
+
+
+# to add discussion replies
+def discussion_reply(request, group_id):
+
+  try:
+
+    prior_node = request.POST.get("prior_node_id", "")
+    content_org = request.POST.get("reply_text_content", "") # reply content
+
+    # process and save node if it reply has content  
+    if content_org:
+  
+      user_id = int(request.user.id)
+      user_name = unicode(request.user.username)
+
+      # auth = collection.Node.one({'_type': 'Author', 'name': user_name })
+      reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+      
+      # creating empty GST and saving it
+      reply_obj = collection.GSystem()
+
+      reply_obj.name = unicode("Reply of:" + str(prior_node))
+      reply_obj.status = u"PUBLISHED"
+
+      reply_obj.created_by = user_id
+      reply_obj.modified_by = user_id
+      reply_obj.contributors.append(user_id)
+
+      reply_obj.member_of.append(ObjectId(reply_st._id))
+      reply_obj.prior_node.append(ObjectId(prior_node))
+      reply_obj.group_set.append(ObjectId(group_id))
+  
+      reply_obj.content_org = unicode(content_org)
+      filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+      reply_obj.content = org2html(content_org, file_prefix=filename)
+  
+      # saving the reply obj
+      reply_obj.save()
+
+      formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
+      
+      # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
+      reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
+      # print "\n\n====", reply
+
+      return HttpResponse( reply )
+
+    else: # no reply content
+
+      return HttpResponse(json.dumps(["no_content"]))      
+
+  except Exception as e:
+    
+    error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
+    raise Exception(error_message)
+
+    return HttpResponse(json.dumps(["Server Error"]))

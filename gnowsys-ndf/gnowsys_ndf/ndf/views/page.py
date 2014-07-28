@@ -14,7 +14,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 
 from django_mongokit import get_database
-from gnowsys_ndf.settings import LANG
+from gnowsys_ndf.settings import LOCAL_LANG
 from django.utils.translation import ugettext as _  
 
 try:
@@ -23,7 +23,7 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS, LANGUAGES
+from gnowsys_ndf.settings import GAPPS
 
 from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
@@ -278,7 +278,7 @@ def create_edit_page(request, group_id, node_id=None):
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
-                          'lan':LANG,
+                          'lan':LOCAL_LANG,
                           'groupid': group_id
                       }
     
@@ -533,7 +533,7 @@ def translate_node(request,group_id,node_id=None):
                                 'node_name':node_name,
                                 'groupid':group_id,
                                 'group_id':group_id,
-                                'lan':LANG
+                                'lan':LOCAL_LANG
                                },
                              
                               context_instance = RequestContext(request)
