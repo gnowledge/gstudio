@@ -186,12 +186,13 @@
 	  <!-- Start of sidebar section (main aside) -->
         <aside class="medium-12 large-3 columns">
 	  <div>
-          <header>
-          <a class="active-menu" href="{% url 'groupchange' group_object.name %}"><h2>{{group_object.name}}</h2></a>
+          
+        
+          <h2><a class="active-menu" href="{% url 'groupchange' group_object.name %}">{{group_object.name}}</a></h2>
               
                <nav>
           <div class="icon-bar four-up">
-  <a class="item">
+  <a class="active item">
     <i class='fi-page'></i>
     <label>Pages</label>
   </a>
@@ -234,16 +235,17 @@
   </a>
 </div>    
 </div>       
- 
-
               </nav>
+                
+          
+          <header>
               
               <a class="left-off-canvas-toggle meta" >{% block meta_content %}  {% endblock %}</a> 
               
                {% block concern_information %} {% endblock %}
               
-              
-          </header>
+              </header>
+        
          
           
 	      

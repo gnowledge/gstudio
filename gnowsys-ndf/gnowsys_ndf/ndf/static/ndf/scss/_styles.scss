@@ -92,16 +92,20 @@ main>aside{
     &>div{
         background-color: $theme-color-invert;
         
-        h2,h3{
-            color:white;
+        h2{
+            border: 1px solid #555;
+            border-bottom: 8px solid $active-color;
+            padding: 15px;
+            background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
             margin: 0;
+            a{
+            color: $active-color;
+                &:hover{
+                    color:black;
+                }
+            }
         }
         
-        h2{
-            font-size: 1.4rem;
-            font-weight: bold;
-            
-        }
         h3{
             font-size: 1.2rem;
             font-weight: normal;
@@ -122,9 +126,7 @@ main>aside{
             
         
         header{
-            min-height: 8rem;
-            border-bottom: 1px solid black;
-            padding: 15px;
+           
         }
         
         footer{
