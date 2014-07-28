@@ -94,12 +94,12 @@ main>aside{
         
         h2{
             border: 1px solid #555;
-            border-bottom: 8px solid $active-color;
+            border-bottom: 8px solid $highlight-color;
             padding: 15px;
             background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
             margin: 0;
             a{
-            color: $active-color;
+            color: $highlight-color;
                 &:hover{
                     color:black;
                 }

@@ -31,6 +31,16 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
 }
 
+/* Styles icon-bar */
+.icon-bar .item{
+    border:1px solid #222;
+    &.active{
+        background-color: $active-color;
+        i,label{
+        
+        }
+    }
+}
 
 /* Protects reflowing elements on error */
 [data-abide] span.error, [data-abide] small.error{
