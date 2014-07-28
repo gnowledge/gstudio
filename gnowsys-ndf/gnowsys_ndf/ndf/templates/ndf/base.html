@@ -188,12 +188,36 @@
 	  <div>
           <header>
           <a class="active-menu" href="{% url 'groupchange' group_object.name %}"><h2>{{group_object.name}}</h2></a>
+              
+               <nav>
+          <div class="icon-bar four-up">
+  <a class="item">
+    <img src="../assets/img/icons/footer-foundation-retina.png">
+    <label>One</label>
+  </a>
+  <a class="item">
+    <img src="../assets/img/icons/footer-foundation-retina.png">
+    <label>Two</label>
+  </a>
+  <a class="item">
+    <img src="../assets/img/icons/footer-foundation-retina.png">
+    <label>Three</label>
+  </a>
+  <a class="item">
+    <img src="../assets/img/icons/footer-foundation-retina.png">
+    <label>Four</label>
+  </a>
+ 
+</div>
+              </nav>
+              
               <a class="left-off-canvas-toggle meta" >{% block meta_content %}  {% endblock %}</a> 
               
                {% block concern_information %} {% endblock %}
               
               
           </header>
+         
           
 	      
 	      <!-- Meta content in the (main aside header)-->
