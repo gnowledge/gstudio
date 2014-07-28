@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
@@ -44,16 +44,16 @@ background-repeat:no-repeat; background-size: 48px 48px
             <div class="row">
  <h1 class="large-8 columns">
       {% if node %}
-      <span class="subheader">Editing: </span>
+     {% blocktrans %} <span class="subheader">Editing: </span>{% endblocktrans %}
      <div>
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+	    {% blocktrans %}<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>{% endblocktrans %}
 	  </div>
       {% else %}
-      Create a New {{title}}:
+      {% blocktrans %}Create a New {{title}}:{% endblocktrans %}
      <div>
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+	    {% blocktrans %}<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>{% endblocktrans %}
 	  </div>
       {% endif %}  
       </h1>
@@ -74,14 +74,14 @@ background-repeat:no-repeat; background-size: 48px 48px
       <dl class="tabs" data-tab>
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
-	  <a href="#panel-name-description">{% block page_tab %} Node {% endblock %}</a>
+	  <a href="#panel-name-description">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
-	  <a href="#panel-prior-node" class="prior_node_tab">Prior Node</a>
+	  {% blocktrans %}<a href="#panel-prior-node" class="prior_node_tab">Prior Node</a>{% endblocktrans %}
 	</dd>
 	<!-- change name of collection tab overide block in your code -->
 	<dd title="Click here to add/edit collection">
-	  <a href="#panel-collection" class="collection_tab">{% block collection_tab %}Collection {% endblock %}</a> 
+	  <a href="#panel-collection" class="collection_tab">{% block collection_tab %}{% trans "Collection" %} {% endblock %}</a> 
 	</dd>  
 	
      </dl>
@@ -118,10 +118,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   <dd>
 
-    <a id="switch_group" href="#switchgrp">Click here to publish {{node.name}} in group/s</a>
+    {% blocktrans %}<a id="switch_group" href="#switchgrp">Click here to publish {{node.name}} in group/s</a>{% endblocktrans %}
 
        <div id="switchgrp" class="content">
-         <h4>Select Groups</h4>
+         {% blocktrans %}<h4>Select Groups</h4>{% endblocktrans %}
 	 <div id="group_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       </div>
@@ -137,7 +137,7 @@ background-repeat:no-repeat; background-size: 48px 48px
         <div class="large-4 columns">
             <div class="panel">
                 
-                <h5>Settings</h5>
+               {% blocktrans %} <h5>Settings</h5>{% endblocktrans %}
            
             <div class="row">
 	    {% if node.created_by == request.user.pk %}	
@@ -149,17 +149,17 @@ background-repeat:no-repeat; background-size: 48px 48px
 				<div class="privacy-mode ">
 						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+							{% blocktrans %}<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>{% endblocktrans %}
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+							{% blocktrans %}<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>{% endblocktrans %}
 						{% else %}
 							{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
 								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-								<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+								{% blocktrans %}<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>{% endblocktrans %}
 
 								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-								<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+								{% blocktrans %}<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>{% endblocktrans %}
 							{% endif %}
 						{% endif %}
 							<span></span>
@@ -169,17 +169,17 @@ background-repeat:no-repeat; background-size: 48px 48px
 						
 			{% if not node %}
                      <div class="large-4 columns">
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">Privacy</label></span>
+							{% blocktrans %}<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">Privacy</label></span>{% endblocktrans %}
                          </div>
                      
                      <div class="large-8 columns">
 						<div class="privacy-mode">
 						
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+							{% blocktrans %}<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>{% endblocktrans %}
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+							{% blocktrans %}<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>{% endblocktrans %}
 						
 							<span></span>
 						</div>
@@ -189,10 +189,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% endif %}	    
                 
                 <div class="large-4 columns">
-                <label class="inline">Language</label>
+                {% blocktrans %}<label class="inline">Language</label>{% endblocktrans %}
                     </div>
                 <div class="large-8 columns">
-               <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
+               <select name="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
                     </div>
 	   
 	     </div>
@@ -201,11 +201,11 @@ background-repeat:no-repeat; background-size: 48px 48px
                 
                  <div class="row">
                 <div class="large-4 columns">
-                <label class="inline">Location:</label>
+                {% blocktrans %}<label class="inline">Location:</label>{% endblocktrans %}
                     </div>
                 <div class="large-8 columns">
               <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand">
-	  		<i class="fi-marker"></i> &nbsp; Add Location
+	  		{% blocktrans %}<i class="fi-marker"></i> &nbsp; Add Location {% endblocktrans %}
 	  	</a>
                     </div>
 	     </div>
@@ -244,35 +244,35 @@ background-repeat:no-repeat; background-size: 48px 48px
     <div class="content" id="panel-collection" style="width:95%;">
       <div class="row">
 	<div class="small-12 columns">
-	  <h5>Add or edit Collection : </h5>
+	  {% blocktrans %}<h5>Add or edit Collection : </h5> {% endblocktrans %}
 	</div>				
 	<br/><br/>
 	
 	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 	  <div id="SelectApp" class="row">
 	    <div class="small-2 columns line-height-2pt5">
-	      Classify by:
+	      {% trans "Classify by:" %}
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="Page"/>
-	      Page <span class="divider-line">|</span>
+	     {% trans "Page" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="File" />
-	      File <span class="divider-line">|</span>
+	      {% trans "File" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="Image" />
-	      Image <span class="divider-line">|</span>
+	     {% trans "Image" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-photo"></i>
 	      </span>
 	    </div>
 	    <div class="small-2 columns">
 	      <div class="row">
 	      <input type="radio" name="col" value="Video" />
-	      Video <span class="divider-line">|</span>
+	      {% trans "Video" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-video"></i>
 	      </span>
 	      </div>
@@ -285,7 +285,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="QuizObj" />
-	      Quiz <span class="divider-line">|</span>
+	      {% trans "Quiz" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
 	      </span>
 	    </div>
@@ -313,7 +313,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
       <!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
-        <a class="close-reveal-modal" >&#215;</a>
+        <a class="close-reveal-modal" >{% trans "&#215" %};</a>
         {% include "ndf/map_widget.html" with mode="edit" %}
         <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
       <!-- #{#%# endif %} -->

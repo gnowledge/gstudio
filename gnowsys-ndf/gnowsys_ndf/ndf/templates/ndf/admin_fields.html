@@ -1,5 +1,5 @@
 {% load ndf_tags %}
-
+{% load i18n %}
 <style type = "text/css">
   .divider-line { font-size: xx-large; color:lightgray; }
   .line-height-2 { line-height:2; }
@@ -44,9 +44,9 @@
 
 {% elif fields_type == "bool" %}
 <select id="id_auto_now_add" name="{{fields_name}}" style="width:50%">
-  <option value="0">Unknown</option>
-  <option value="1" {% if fields_value == 1 %}selected{% endif %} >Yes</option>
-  <option value="2" {% if fields_value == 2 %}selected{% endif %} >No</option>
+  <option value="0">{% trans "Unknown" %}</option>
+  <option value="1" {% if fields_value == 1 %}selected{% endif %} >{% trans "Yes" %}</option>
+  <option value="2" {% if fields_value == 2 %}selected{% endif %} >{% trans "No" %}</option>
 </select>
 
 {% elif fields_type == "datetime" %}
@@ -54,9 +54,9 @@
 
 {% elif fields_type == "status" %}
 <select id="id_auto_now_add" name="{{fields_name}}" style="width:60%">
-  <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >PUBLISHED</option>
-  <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >DRAFT</option>
-  <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >HIDDEN</option>
+  <option value="PUBLISHED" {% if fields_value == "PUBLISHED" %}selected{% endif %} >{% trans "PUBLISHED" %}</option>
+  <option value="DRAFT" {% if fields_value == "DRAFT" %}selected{% endif %} >{% trans "DRAFT" %}</option>
+  <option value="HIDDEN" {% if fields_value == "HIDDEN" %}selected{% endif %} >{% trans "HIDDEN" %}</option>
 </select>
 
 {% elif fields_type == "list" %}

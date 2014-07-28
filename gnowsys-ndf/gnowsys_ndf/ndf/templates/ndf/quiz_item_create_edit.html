@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
@@ -14,6 +14,7 @@
 
 {% block meta_content %}
 {% get_group_name groupid as group_name_tag %}
+{% blocktrans %}
     <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
 
     <p class="text-justify">You can build a quiz in two ways:
@@ -22,14 +23,16 @@
 	<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
       </ol>
     </p>
-
+{% endblocktrans %}
 
 
     <!-- Add button -->
     {% if user.is_authenticated %}
-    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">+ Add Quiz</a>
-    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">+ Add {{title}}</a>
-    {% endif %}
+
+    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">{% trans "+ Add Quiz" %}</a>
+    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">{% blocktrans %}   
++ Add {{title}}</a>{% endblocktrans %}    
+{% endif %}
 
 {% endblock %}
 
@@ -41,10 +44,10 @@
 <div class="row">
   <div class="small-12 large-12 columns">
   <fieldset id="type_tag">
-    <legend>Quiz Item</legend>
+   {% blocktrans %} <legend>Quiz Item</legend>{% endblocktrans %}
     <div class="row">
       <div class="small-4 large-2 columns">
-	<label for="quiz_type" class="right inline">Type of Quiz</label>
+	{% blocktrans %}<label for="quiz_type" class="right inline">Type of Quiz</label>{% endblocktrans %}
       </div>
       <div class="small-8 large-10 columns">
 	<select id="quiz_type" name="quiz_type" autofocus {% if node.quiz_type %}disabled{% endif %}>
@@ -57,7 +60,7 @@
     </div>
     <div class="row">
       <div class="small-4 large-2 columns">
-	<label for="quiz_type" class="right inline">Tags</label>
+	{% blocktrans %}<label for="quiz_type" class="right inline">Tags</label>{% endblocktrans %}
       </div>
       <div class="small-8 large-10 columns">
 	<input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas..." />
@@ -70,7 +73,7 @@
 <div class="row">
   <div class="small-12 large-12 columns">
     <fieldset id="question">
-      <legend>Question</legend>
+      {% blocktrans %}<legend>Question</legend>{% endblocktrans %}
       <div class="row">
 	<div class="small-12 large-11 columns end">
 	  {% include "ndf/add_editor.html" with var_name="question" var_placeholder="Enter question" var_value=node.content_org %}
@@ -79,7 +82,7 @@
     </fieldset>
 
     <fieldset id="options" style="display:none;">
-      <legend>Options</legend>
+      {% blocktrans %}<legend>Options</legend>{% endblocktrans %}
       {% for option in node.options %}
 
       <div class="row" id="option_div{% if not forloop.first %}_{{forloop.counter}}{% endif %}">
