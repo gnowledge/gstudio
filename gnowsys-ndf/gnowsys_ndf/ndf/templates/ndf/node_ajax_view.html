@@ -758,9 +758,8 @@
      {% trans "Languages" %} 
       <br></br>
       {% get_possible_translations node as tran %}
-     {{tran}}kk {% for each in tran %}
+     {% for each in tran %}
         {% for k,v in each.items %}
-{{v}}aaaa
         <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
         {% endfor %}
       {% endfor %}
