@@ -8666,7 +8666,6 @@ input[type="checkbox"] + label, input[type="radio"] + label {
 pre {
   width: 92%;
   overflow: auto;
-  margin: 2rem 0;
   border: 1px solid #eee;
   border-left: 1rem solid #eee;
   font: lighter 1.2rem/2rem Monaco;
@@ -8676,35 +8675,35 @@ pre {
   font-family: monospace;
 }
 
-/* line 75, ../scss/foundation-skin.scss */
+/* line 74, ../scss/foundation-skin.scss */
 .fixme {
   opacity: 0.5;
 }
-/* line 78, ../scss/foundation-skin.scss */
+/* line 77, ../scss/foundation-skin.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 81, ../scss/foundation-skin.scss */
+/* line 80, ../scss/foundation-skin.scss */
 .fixme:hover:after {
   content: " fixme";
   color: orange;
 }
 
 /* Effects */
-/* line 89, ../scss/foundation-skin.scss */
+/* line 88, ../scss/foundation-skin.scss */
 .drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px #333;
   box-shadow: 0px 0px 5px 1px #333;
 }
 
-/* line 93, ../scss/foundation-skin.scss */
+/* line 92, ../scss/foundation-skin.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 97, ../scss/foundation-skin.scss */
+/* line 96, ../scss/foundation-skin.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -8713,13 +8712,13 @@ pre {
 }
 
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
-/* line 106, ../scss/foundation-skin.scss */
+/* line 105, ../scss/foundation-skin.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
      buttons when hovering. */
 }
-/* line 109, ../scss/foundation-skin.scss */
+/* line 108, ../scss/foundation-skin.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -8727,19 +8726,19 @@ pre {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 117, ../scss/foundation-skin.scss */
+/* line 116, ../scss/foundation-skin.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 119, ../scss/foundation-skin.scss */
+/* line 118, ../scss/foundation-skin.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #4c7861;
 }
-/* line 125, ../scss/foundation-skin.scss */
+/* line 124, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 127, ../scss/foundation-skin.scss */
+/* line 126, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -8750,7 +8749,7 @@ pre {
   white-space: nowrap;
   font-size: 1.5rem;
 }
-/* line 136, ../scss/foundation-skin.scss */
+/* line 135, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -8758,32 +8757,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 145, ../scss/foundation-skin.scss */
+/* line 144, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #ff980d;
   text-shadow: 0 0 1px #333;
 }
-/* line 154, ../scss/foundation-skin.scss */
+/* line 153, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 159, ../scss/foundation-skin.scss */
+/* line 158, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 167, ../scss/foundation-skin.scss */
+/* line 166, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 173, ../scss/foundation-skin.scss */
+/* line 172, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
