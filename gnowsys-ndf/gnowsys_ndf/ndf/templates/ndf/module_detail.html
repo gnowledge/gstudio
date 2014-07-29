@@ -1,4 +1,5 @@
 {% extends "ndf/node_details_base.html" %}
+{% load i18n %}
 {% block title %} {{title}} {% endblock %}
 {% block url %}{% url 'create_edit' groupid node %}{% endblock %}
 
@@ -26,7 +27,7 @@
 <!-- overiding block_related content -->
 {% block related_content %}
 <section class="medium-6 large-12 columns">
-  <h3>Modules</h3>
+  {% blocktrans %}<h3>Modules</h3>{% endblocktrans %}
   <div class ="row">
     <!-- bellow div for making tree from json data -->
     <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{node.pk}}"></div>
@@ -56,7 +57,7 @@
     </h2>
     <h3 class="subheader"></h3>
       <small> 
-	Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>
+	{% blocktrans %}Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>{% endblocktrans %}
       </small>
 
   </section>

@@ -1,12 +1,17 @@
-  <h3>List Of Members.</h3>
+{% load i18n %}
+  {% blocktrans %}
+<h3>List Of Members.</h3>{% endblocktrans %}
+
   {% if course_name %}
-  <h3> For Course:{{course_name}}</h3>
+  {% blocktrans %}
+<h3> For Course:{{course_name}}</h3>{% endblocktrans %}
+
   {% endif %}
   <table>
     <thead>
       <tr>
-        <th width="500">Users</th>
-        <th>Action</th>
+        <th width="500">{% trans "Users" %}</th>
+        <th>{% trans "Action" %}</th>
       </tr>
     </thead>
     <tbody>
@@ -14,7 +19,7 @@
       <tr>
         <td>{{user.username}}</td>
 	{% if can_remove %}
-        <td><a class="button alert tiny remove" href="#" id="{{user.id}}">Remove</a></td>
+        <td><a class="button alert tiny remove" href="#" id="{{user.id}}">{% trans "Remove" %}</a></td>
 	{% endif %}
       </tr>
       {% endfor %}

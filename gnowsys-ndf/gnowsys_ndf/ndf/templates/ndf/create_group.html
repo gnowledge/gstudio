@@ -1,11 +1,11 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 
 {% block title %} Create a new group {% endblock %}
 
 {% block meta_content %}
-
+{% blocktrans %}
 <h3>Types of Groups</h3>
 
 <h5>Open Groups</h5>
@@ -13,13 +13,13 @@
 
 <h5>Closed Groups</h5>
 <p>Closed groups are ideal for projects that require restricted access to content and documents. Users can only join after their membership request is approved or have been invited.</p>
-
+{% endblocktrans %}
   {% endblock %}
 
   {% block related_content %}
 
   {% if groups %}
-  Existing Groups:
+ {% trans " Existing Groups:" %}
 
   {% get_existing_groups_excluding_username as groups%}
   {% for items in groups %}  
@@ -31,7 +31,7 @@
 
   {% block body_content %} 
 
-  <h2>Create a new user group</h2>
+  <h2>{% trans "Create a new user group" %}</h2>
   {% get_existing_groups as groups%}
 
 
@@ -41,7 +41,7 @@
      <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
        <div style='display:table-row;' >
          <div style='display:table-cell;'> 
-          <font size="3">Name of the Group</font> 
+          <font size="3">{% trans "Name of the Group" %}</font> 
         </div>
         <div style='display:table-cell;'> 
           <input type="text"  id="group_name" name="groupname" placeholder="Enter Group Name">
@@ -49,13 +49,13 @@
         </div>
 
         <div style='display:table-cell;'> 
-          <font size="3" >Group Type</font>
+          <font size="3" >{% trans "Group Type" %}</font>
         </div>
         <div style='display:table-cell;'> 
           <select name="group_type" class="gtype">
-           <option id="PUBLIC">PUBLIC</option>
-           <option id="PRIVATE">PRIVATE</option>
-           <option id="ANONYMOUS">ANONYMOUS</option>
+           <option id="PUBLIC">{% trans "PUBLIC" %}</option>
+           <option id="PRIVATE">{% trans "PRIVATE" %}</option>
+           <option id="ANONYMOUS">{% trans "ANONYMOUS" %}</option>
          </select> 
        </div>
      </div>
@@ -66,9 +66,9 @@
       </div>
       <div style='display:table-cell;'> 
         <select name="edit_policy" class="editp">
-         <option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
-         <option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
-         <option id="NON_EDITABLE">NON_EDITABLE</option>
+         <option id="EDITABLE_NON_MODERATED">{% trans "EDITABLE_NON_MODERATED" %}</option>
+         <option id="EDITABLE_MODERATED">{% trans "EDITABLE_MODERATED" %}</option>
+         <option id="NON_EDITABLE">{% trans "NON_EDITABLE" %}</option>
        </select> 
      </div>
      <div style='display:table-cell;'> 
@@ -76,42 +76,42 @@
     </div>
     <div style='display:table-cell;'> 
       <select name="subscription" class="subscptn">
-       <option id="OPEN">OPEN</option>
-       <option id="BY_REQUEST">BY_REQUEST</option>
-       <option id="BY_INVITATION">BY_INVITATION</option>
+       <option id="OPEN">{% trans "OPEN" %}</option>
+       <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
+       <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
      </select>
    </div>
  </div>
 
  <div style='display:table-row;'>
   <div style='display:table-cell;'> 
-    <font size="3" >Group Existance visibility</font>
+    <font size="3" >{% trans "Group Existance visibility" %}</font>
   </div>
   <div style='display:table-cell;'> 
     <select name="existance" class="existance">
-     <option id="ANNOUNCED">ANNOUNCED</option>
-     <option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
+     <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
+     <option id="NOT_ANNOUNCED">{% trans "NOT_ANNOUNCED" %}</option>
    </select>
  </div>
  <div style='display:table-cell;'> 
-  <font size="3">  Group Member Visibility</font>
+  <font size="3">{% trans "Group Member Visibility" %}</font>
 </div>
 <div style='display:table-cell;'> 
   <select name="member" class="mem">
-   <option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
-   <option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
+   <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED_TO_MEM" %}</option>
+   <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT_DISCLOSED_TO_MEM" %}</option>
  </select>
 </div>
 </div>
 
 <div style='display:table-row;'>
   <div style='display:table-cell;'> 
-    <font size="3" >Group Encryption policy</font>
+    <font size="3" >{% trans "Group Encryption policy" %}</font>
   </div>
   <div style='display:table-cell;'> 
     <select name="encryption" class="encr">
-     <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
-     <option id="ENCRYPTED">ENCRYPTED</option>
+     <option id="NOT_ENCRYPTED">{% trans "NOT_ENCRYPTED" %}</option>
+     <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
    </select>
  </div>  
 </div>

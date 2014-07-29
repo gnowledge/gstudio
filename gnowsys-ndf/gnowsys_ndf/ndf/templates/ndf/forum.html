@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -31,14 +31,14 @@
 
 
 {% block meta_content %}
-  <h3>Forums</h3>
+  {% blocktrans %}<h3>Forums</h3>{% endblocktrans %}
 
  {% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
 	{% if user_access == "allow" %}
   
       <a class="small button" href="{% url 'create_forum' group_name_tag %}">
-	     <span class="fi-plus">&nbsp;&nbsp;Create Forum</span>
+	     <span class="fi-plus">&nbsp;&nbsp;{% trans "Create Forum" %}</span>
       </a>
   {% endif %}
   {% endif %}
@@ -133,7 +133,7 @@
     {% if not searching %}
   	<div class="row">
   	  <div class="small-12 columns">
-  	    <h5>This group doesn't have any forums. <b>Be the first to create a Forum!</b></h5>
+  	    {% blocktrans %}<h5>This group doesn't have any forums. <b>Be the first to create a Forum!</b></h5>{% endblocktrans %}
   	  </div>
   	</div>
     {% endif %}

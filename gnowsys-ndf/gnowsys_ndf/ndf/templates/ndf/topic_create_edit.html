@@ -38,23 +38,23 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <h2 class="medium-12 columns">
 		{% if node %}
-			Editing {{title}}: {{node.name}}
+		{% blocktrans %}Editing {{title}}: {{node.name}} {% endblocktrans %}
 		{% else %}
-			Create a New {{title}}
+		{% blocktrans %}Create a New {{title}} {% endblocktrans %}
 		{% endif %}
     </h2>
 
     <nav class="medium-12 columns">
    		<dl class="tabs" data-tab>
 		{% if node %}
-			<dd><h3>View:</h3></dd>
+			<dd><h3>{% trans "View:" %}</h3></dd>
 		
 			<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 		  	<!-- change name of collection tab overide block in your code -->
 		  		<a href="#panel-name-description"> {{title}} </a>
 			</dd>
 			<dd title="Click here to add/edit collection">
-	  			<a href="#panel-collection" class="collection_tab"> Collection </a> 
+	  			<a href="#panel-collection" class="collection_tab">{% trans "Collection" %} </a> 
 			</dd>
 			<!-- change name of metadata tab overide block in your code -->
 			<dd title="Click here to add/edit metadata">
@@ -85,29 +85,29 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-8 columns">
-		    			<label>{{title}} Name</label>
+		    			<label>{% blocktrans %}{{title}} Name {% endblocktrans %}</label>
 		    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-		    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 		  			</div>
 
 		  			<div class="medium-4 columns">
 		    			{% if node.created_by == request.user.pk %}		    	
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Privacy" %}</label></span>
 
 							<div class="privacy-mode switch round">
 							{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-								<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+								<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 
 								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-								<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+								<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 							{% else %}
 								{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
 									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-									<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+									<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 
 									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-									<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+									<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 								{% endif %}
 							{% endif %}
 								<span></span>
@@ -121,12 +121,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
 		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-		  					<i class="fi-marker"></i> &nbsp; Add Location
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 		  				</a>
 		  			</div>
 				</div>
@@ -156,21 +156,21 @@ background-repeat:no-repeat; background-size: 48px 48px
 		
 				<div class="row">
 		  			<div class="medium-8 columns">
-		    			<label>{{title}} Name</label>
+		    			<label>{% blocktrans %}{{title}} Name {% endblocktrans %}</label>
 		    			<input id="name_id" name="name" type="text" placeholder="Enter name..." required>
-		    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+		    			<small class="error">{% blocktrans %}Please give your page a descriptive name. It's helpful for others and for yourself.{% endblocktrans %}</small>
 		  			</div>
 
 		  			<div class="medium-4 columns">
 		    			
-						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% blocktrans %}Privacy{% endblocktrans %}</label></span>
 						<div class="privacy-mode switch round">
 					
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+							<label for="PUBLIC" onclick="">{% blocktrans %} Public {% endblocktrans %} <i class="fi-torsos-all"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+							<label for="PRIVATE" onclick="">{% blocktrans %} Private {% endblocktrans %} <i class="fi-lock"></i></label>
 						
 							<span></span>
 						</div>
@@ -182,12 +182,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
 		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-		  					<i class="fi-marker"></i> &nbsp; Add Location
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 		  				</a>
 		  			</div>
 				</div>
@@ -200,7 +200,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-12 columns">
-		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag</label>
+		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}</label>
 		    			</span>
 		    			<input id="tags_id" name="tags" type="text" placeholder="Separate tags with commas...">
 		  			</div>		
@@ -216,48 +216,48 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    <div class="content" id="panel-collection" style="width:95%;">
 	      <div class="row">
 		<div class="small-12 columns">
-		  <h5>Add or edit Collection : </h5>
+		  <h5>{% trans "Add or edit Collection :" %} </h5>
 		</div>				
 		<br/><br/>
 		
 		<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 		  <div id="SelectApp" class="row">
 		    <div class="small-2 columns line-height-2pt5">
-		      Classify by:
+		      {% trans "Classify by:" %}
 		    </div>
 		    <div class="small-2 columns">
 		      <input type="radio" name="col" value="Page"/>
-		      Page <span class="divider-line">|</span>
+		      {% trans "Page" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
 		    </div>
 		    <div class="small-2 columns">
 		      <input type="radio" name="col" value="File" />
-		      File <span class="divider-line">|</span>
+		      {% trans "File" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
 		    </div>
 		    <div class="small-2 columns">
 		      <input type="radio" name="col" value="Image" />
-		      Image <span class="divider-line">|</span>
+		      {% trans "Image" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-photo"></i>
 		      </span>
 		    </div>
 		    <div class="small-2 columns">
 		      <div class="row">
 		      <input type="radio" name="col" value="Video" />
-		      Video <span class="divider-line">|</span>
+		      {% trans "Video" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-video"></i>
 		      </span>
 		      </div>
 		      <div class="row">
 		      <input type="radio" name="col" value="Pandora Video" />
-		      Pandora <span class="divider-line">|</span>
+		      {% trans "Pandora" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-video"></i>
 		      </span>
 		      </div>
 		    </div>
 		    <div class="small-2 columns">
 		      <input type="radio" name="col" value="QuizObj" />
-		      Quiz <span class="divider-line">|</span>
+		      {% trans "Quiz" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
 		      </span>
 		    </div>

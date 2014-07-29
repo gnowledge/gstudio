@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% block title %}{{forum.name}}{% endblock %}
 
@@ -46,7 +47,7 @@
 
 {% block meta_content %}
 <!-- <h2>Threads</h2> -->
-<h3> &nbsp;Add thread to this forum</h3>
+{%  blocktrans %}<h3> &nbsp;Add thread to this forum</h3>{% endblocktrans %}
 {% endblock %}
 
 
@@ -62,7 +63,7 @@
 
       {% if user_access == "allow" %}
       <a class="button expand" href="{% url 'create_thread' groupid forum %}">
-        Create &nbsp;Thread
+       {% blocktrans %} Create &nbsp;Thread {% endblocktrans %}
       </a>
       {% endif %}
 
@@ -78,7 +79,7 @@
     {% include "ndf/replyforum.html" %}
   {% endif %} 
   {% endcomment %} -->
-  <h4>Top Contributors</h4>
+  <h4>{% trans "Top Contributors" %}</h4>
   {% endblock %}
 
   {% block body_content %}
@@ -86,7 +87,7 @@
   <!-- <div class="row"> -->
     <!-- <div class="small-12 large-12 columns"> -->
 
-    <h2>Forum: 
+    <h2>{% trans "Forum:" %} 
     <a title="{{forum.name}}" href="#">
      <a href="/{{groupid}}/forum/show/{{forum}}">
         {{forum.name}}</a></h2>
@@ -119,10 +120,10 @@
     <table width="100%">
       <thead>
         <tr>
-          <th width="200">Thread Name</th>
-          <th>Thread Content</th>
-          <th width="100">Total Reply</th>
-          <th width="300">Latest Activity</th>
+          <th width="200">{% trans "Thread Name" %}</th>
+          <th>{% trans "Thread Content" %}</th>
+          <th width="100">{% trans "Total Reply" %}</th>
+          <th width="300">{% trans "Latest Activity" %}</th>
         </tr>
       </thead>
       <tbody>

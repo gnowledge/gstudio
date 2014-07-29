@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% block title %} video Gallery {% endblock %}
 {% block body_content %} 
@@ -25,12 +26,12 @@
 	  </div>
 	  <div class="small-2 columns">
             <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
-	      <i class="fi-magnifying-glass large">search</i>
+	      <i class="fi-magnifying-glass large">{% trans "search" %}</i>
 	    </a>
 	  </div>
 	  <div class="small-2 columns">
             <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="button postfix secondary">
-	      <i class="fi-paperclip">upload</i>
+	      <i class="fi-paperclip">{% trans "upload" %}</i>
 	    </a>
 	  </div>
       </div>
@@ -47,7 +48,7 @@
     </a>
     {% get_user_object video.created_by as user_obj %}
     {% ifequal  user_obj.username  user.username  %}
-    <a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group' video %}?next={{request.path}}">Delete </a>
+    <a  class="btn btn-block btn-lg btn-danger" href="{% url 'delete_file' 'group' video %}?next={{request.path}}">{% trans "Delete" %} </a>
     {% endifequal %}
     </li>
   {% endfor %}
@@ -59,9 +60,9 @@
 <a id="close" href="#"><img width="19px;" style="position: absolute; top: -3%; left: calc(795px);" src="/static/ndf/images/close.jpeg"></a>
 <video id="play_video" src="" controls="controls" style="width:795px; height:450px"></video>
 <br/>
-<span style="float:left"> <a class="video_pre" href="#">&lt;&lt;&lt; previous</a>  </span>  
-<center><span> <a class="video_details_link" href="#"> more details </a></span>
- <span style="float:right"> <a class="video_next" href="#">next &gt;&gt;&gt;</a> </span> 
+<span style="float:left"> <a class="video_pre" href="#">&lt;&lt;&lt; {% trans "previous" %}</a>  </span>  
+<center><span> <a class="video_details_link" href="#"> {% trans "more details" %} </a></span>
+ <span style="float:right"> <a class="video_next" href="#">{% trans "next" %} &gt;&gt;&gt;</a> </span> 
 </div>
 <div class="joyride-modal-bg" id="backcover" style="display: none;"></div>
 {% endblock %}

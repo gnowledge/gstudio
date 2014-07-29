@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -12,7 +13,7 @@
 {% endblock %}
 
 {% block meta_content %}
-  <h2>Meeting</h2>
+  {% blocktrans %}<h2>Meeting</h2>{% endblocktrans %}
 {% endblock %}
 
 {% block search_content %}
@@ -28,7 +29,7 @@
     <div class="chat">
       <br/>
      <a class="button medium" href="" target="Chatb"> 
-      	<span class="start">&nbsp;&nbsp;Start</span>
+      	{% blocktrans %}<span class="start">&nbsp;&nbsp;Start</span>{% endblocktrans %}
       </a>
     </div>
   </div>
@@ -42,8 +43,8 @@
 {% with request.user.get_profile as profile %}
 
  <table>
-   <tr><th>Last Seen</th><td>{% if profile.last_seen %}{{ profile.last_seen|timesince }}{% else %}awhile{% endif %} ago</td></tr>
-   <tr><th>Online</th><td>{{ profile.online }}</td></tr>
+   <tr><th>{% trans "Last Seen" %}</th><td>{% if profile.last_seen %}{{ profile.last_seen|timesince }}{% else %}awhile{% endif %} ago</td></tr>
+   <tr><th>{% trans "Online" %}</th><td>{{ profile.online }}</td></tr>
  </table>
 
 {% endwith %}

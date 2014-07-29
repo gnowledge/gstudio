@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 
 {% block title %} {{title}} - {{node.name|default_if_none:"Create"}}  {% endblock %}
@@ -46,21 +46,21 @@ background-repeat:no-repeat; background-size: 48px 48px
      
      <span class="subheader">
       {% if node %}
-      Editing: 
+     {% trans "Editing:" %} 
      {% else %}
-      Create:
+      {% trans "Create:" %}
      {% endif %} 
      </span>
      
      <div>
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
-	    <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 	  </div>
      
       </h1>
                 
              <div class="large-4 columns">
-	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}{{node.tags|pluralize|default_if_none:"s"}}</label>
 	    </span>
 	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
 	  </div>		
@@ -75,10 +75,10 @@ background-repeat:no-repeat; background-size: 48px 48px
       <dl class="tabs" data-tab>
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
-	  <a href="#panel-name-description">{% block page_tab %} Node {% endblock %}</a>
+	  <a href="#panel-name-description">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
-	  <a href="#panel-prior-node" class="prior_node_tab">Requires</a>
+	  <a href="#panel-prior-node" class="prior_node_tab">{% trans "Requires" %}</a>
 	</dd>
 	<!-- change name of collection tab overide block in your code -->
 	<dd title="Click here to add/edit collection">
@@ -87,15 +87,15 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	<!-- change name of metadata tab overide block in your code -->
 	<dd title="Click here to add/edit metadata">
-	  <a href="#panel-metadata" >Metadata </a> 
+	  <a href="#panel-metadata" >{% trans "Metadata" %} </a> 
 	</dd>  
 	
 	<dd title="Click here to add/edit teaches">
-	 	<a href="#panel-teaches" class="teaches_tab" >Teaches </a> 
+	 	<a href="#panel-teaches" class="teaches_tab" >{% trans "Teaches" %} </a> 
 	</dd>
 	
 	<dd title="Click here to add/edit teaches">
-	 	<a href="#panel-assesses" class="assesses_tab" >Assesses </a> 
+	 	<a href="#panel-assesses" class="assesses_tab" >{% trans "Assesses" %} </a> 
 	</dd>
 	
 	
@@ -133,10 +133,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   <dd>
 
-    <a id="switch_group" href="#switchgrp">Click here to publish {{node.name}} in group/s</a>
+    <a id="switch_group" href="#switchgrp">{% blocktrans %}Click here to publish {{node.name}} in group/s{% endblocktrans %}</a>
 
        <div id="switchgrp" class="content">
-         <h4>Select Groups</h4>
+         <h4>{% trans "Select Groups" %}</h4>
 	 <div id="group_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       </div>
@@ -152,29 +152,29 @@ background-repeat:no-repeat; background-size: 48px 48px
         <div class="large-4 columns">
             <div class="panel">
                 
-                <h5>Settings</h5>
+                <h5>{% trans "Settings" %}</h5>
            
             <div class="row">
 	    {% if node.created_by == request.user.pk %}	
                      <div class="large-4 columns">
-			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Visibility</label></span></div>
+			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Visibility" %}</label></span></div>
                      
 
 			<div class="large-8 columns">
 				<div class="privacy-mode ">
 						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Visible <i class="fi-eye"></i></label>
+							<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Hidden <i class="fi-key"></i></label>
+							<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
 						{% else %}
 							{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
 								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-								<label for="PUBLIC" onclick="">Visible <i class="fi-eye"></i></label>
+								<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
 								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-								<label for="PRIVATE" onclick="">Hidden <i class="fi-key"></i></label>
+								<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
 							{% endif %}
 						{% endif %}
 							<span></span>
@@ -184,17 +184,17 @@ background-repeat:no-repeat; background-size: 48px 48px
 						
 			{% if not node %}
                      <div class="large-4 columns">
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">Visibility</label></span>
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">{% trans "Visibility" %}</label></span>
                          </div>
                      
                      <div class="large-8 columns">
 						<div class="privacy-mode">
 						
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Visible <i class="fi-eye"></i></label>
+							<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Hidden <i class="fi-key"></i></label>
+							<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
 						
 							<span></span>
 						</div>
@@ -206,7 +206,7 @@ background-repeat:no-repeat; background-size: 48px 48px
                 
                 <div class="row">
                 <div class="large-4 columns">
-                <label class="inline">Language</label>
+                <label class="inline">{% trans "Language" %}</label>
                     </div>
                 <div class="large-8 columns">
                <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
@@ -219,11 +219,11 @@ background-repeat:no-repeat; background-size: 48px 48px
                 
                  <div class="row">
                 <div class="large-4 columns">
-                <label class="inline">Location:</label>
+                <label class="inline">{% trans "Location:" %}</label>
                     </div>
                 <div class="large-8 columns">
               <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand">
-	  		<i class="fi-marker"></i> &nbsp; Add Location
+	  		<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 	  	</a>
                     </div>
 	     </div>
@@ -257,28 +257,28 @@ background-repeat:no-repeat; background-size: 48px 48px
 	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 	  <div id="SelectApp" class="row">
 	    <div class="small-2 columns line-height-2pt5">
-	      Classify by:
+	      {% trans "Classify by:" %}
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="Page"/>
-	      Page <span class="divider-line">|</span>
+	      {% trans "Page" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="File" />
-	      File <span class="divider-line">|</span>
+	      {% trans "File" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="Image" />
-	      Image <span class="divider-line">|</span>
+	      {% trans "Image" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-photo"></i>
 	      </span>
 	    </div>
 	    <div class="small-2 columns">
 	      <div class="row">
 	      <input type="radio" name="col" value="Video" />
-	      Video <span class="divider-line">|</span>
+	      {% trans "Video" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-video"></i>
 	      </span>
 	      </div>
@@ -291,7 +291,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="QuizObj" />
-	      Quiz <span class="divider-line">|</span>
+	      {% trans "Quiz" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
 	      </span>
 	    </div>
@@ -317,17 +317,17 @@ background-repeat:no-repeat; background-size: 48px 48px
     <div class="content" id="panel-metadata" style="width:95%;" >
       
       <div class="row">
-	  <h3>Add or edit Metadata - Please spend a few minutes </h3>
+	  <h3>{% trans "Add or edit Metadata - Please spend a few minutes" %} </h3>
         
 
         <div class="small-5 columns">
-         <h5>Age Range:</h5>  <input id="age_range" name="age_range" type="text" value="{{node.age_range}}"  >
+         <h5>{% trans "Age Range:" %}</h5>  <input id="age_range" name="age_range" type="text" value="{{node.age_range}}"  >
         
-         <h5>Target Audience: </h5> <input name="audience" type="text" value="{{node.audience}}"  >
-         <label><h5>Time Required :</h5> <select name="timerequired" value="{{node.timerequired}}"><option>0-2M</option><option>2-5M</option><option>5-15M</option><option>15-45M</option></select></label>
-         <label><h5>Interactivity Type :</h5> <select name="interactivitytype "><option>Active</option><option>Mixed</option><option>Expositive</option></select></label>
-         <label><h5>Based on Url: </h5> <input name="basedonurl" type="text" value="{{node.basedonurl}}"  ></label>
-         <label><h5>Educational Use: </h5> <input name="educationaluse" type="text" value="{{node.educationaluse}}" placeholder="" ></label>
+         <h5>{% trans "Target Audience:" %} </h5> <input name="audience" type="text" value="{{node.audience}}"  >
+         <label><h5>{% trans "Time Required :" %}</h5> <select name="timerequired" value="{{node.timerequired}}"><option>{% trans "0-2M" %}</option><option>{% trans "2-5M" %}</option><option>{% trans "5-15M" %}</option><option>{% trans "15-45M" %}</option></select></label>
+         <label><h5>{% trans "Interactivity Type :" %}</h5> <select name="interactivitytype "><option>{% trans "Active" %}</option><option>{% trans "Mixed" %}</option><option>{% trans "Expositive" %}</option></select></label>
+         <label><h5>{% trans "Based on Url:" %} </h5> <input name="basedonurl" type="text" value="{{node.basedonurl}}"  ></label>
+         <label><h5>{% trans "Educational Use:" %} </h5> <input name="educationaluse" type="text" value="{{node.educationaluse}}" placeholder="" ></label>
         </div>
         
         
@@ -370,12 +370,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 </dl>  -->         
 
         <div class="small-5 columns">
-	  <h5>Text Complexity</h5>  <input  name="textcomplexity" type="text" value="{{node.textcomplexity}}">
+	  <h5>{% trans "Text Complexity" %}</h5>  <input  name="textcomplexity" type="text" value="{{node.textcomplexity}}">
         
-         <h5>Reading Level: </h5> <input name="readinglevel" type="text" value="{{node.readinglevel}}" placeholder="" >
+         <h5>{% trans "Reading Level:" %} </h5> <input name="readinglevel" type="text" value="{{node.readinglevel}}" placeholder="" >
          
-         <h5>Educational Subject: </h5> <input name="educationalsubject" type="text" value="{{node.educationalsubject}}" placeholder="" >
-         <h5>Educational Level: </h5> <input name="educationallevel" type="text" value="{{node.educationallevel}}" placeholder="" >
+         <h5>{% trans "Educational Subject:" %} </h5> <input name="educationalsubject" type="text" value="{{node.educationalsubject}}" placeholder="" >
+         <h5>{% trans "Educational Level:" %} </h5> <input name="educationallevel" type="text" value="{{node.educationallevel}}" placeholder="" >
         </div>
         
       </div>
@@ -386,7 +386,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     <div class="content" id="panel-teaches"  style="width:95%;">
       		<div class="row">
 			<div class="small-12 columns">
-	  		<h5>Add or edit Teaches : </h5>
+	  		<h5>{% trans "Add or edit Teaches : " %}</h5>
 			</div>
 		<br/>
 	
@@ -401,7 +401,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <div class="content" id="panel-assesses"  style="width:95%;">
       		<div class="row">
 			<div class="small-12 columns">
-	  		<h5>Add or edit Assesses : </h5>
+	  		<h5>{% trans "Add or edit Assesses :" %} </h5>
 			</div>
 		<br/>
 	
@@ -788,3 +788,4 @@ $("#name_id").change(function(){
 </script>
 
 {% endblock %}
+
