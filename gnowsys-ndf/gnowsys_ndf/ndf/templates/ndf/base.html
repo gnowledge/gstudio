@@ -51,7 +51,7 @@
   </style>
 </head>
 
-<body>
+<body itemscope itemtype="http://schema.org/Webpage">
   <center>
     <img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif">
   </center>
@@ -211,6 +211,7 @@
               <div>
 		{% block collection_content %}  {% endblock %}
                   </div>
+              
               <div>
 		 {% block related_content %}  {% endblock %}
                   </div>

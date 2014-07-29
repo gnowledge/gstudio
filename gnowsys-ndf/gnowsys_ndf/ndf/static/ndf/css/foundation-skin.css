@@ -8262,7 +8262,7 @@ article h1:not(.subheader) div input:hover {
 /* line 211, ../scss/_styles.scss */
 .card > * {
   position: relative;
-  background-color: #eef7eb;
+  background-color: inherit;
   padding: 7px;
   border: 1px dashed #cfe8c7;
   display: block;
@@ -8279,29 +8279,28 @@ article h1:not(.subheader) div input:hover {
 /* line 228, ../scss/_styles.scss */
 .card > *.published {
   opacity: 1;
-  border-style: solid;
-  border-color: #1b432e;
+  background-color: #dff0d9;
 }
-/* line 233, ../scss/_styles.scss */
+/* line 232, ../scss/_styles.scss */
 .card > *.unapproved {
   opacity: 1;
   border-style: solid;
   border-color: #f04124;
 }
-/* line 239, ../scss/_styles.scss */
+/* line 238, ../scss/_styles.scss */
 .card > *:hover {
   border-style: solid;
   opacity: 1;
 }
-/* line 245, ../scss/_styles.scss */
+/* line 244, ../scss/_styles.scss */
 .card > *:hover i {
   opacity: 0.3;
 }
-/* line 248, ../scss/_styles.scss */
+/* line 247, ../scss/_styles.scss */
 .card > *:hover footer .age {
   display: block;
 }
-/* line 252, ../scss/_styles.scss */
+/* line 251, ../scss/_styles.scss */
 .card > * > i {
   position: absolute;
   top: -10px;
@@ -8310,34 +8309,34 @@ article h1:not(.subheader) div input:hover {
   color: #1b432e;
   opacity: 0.1;
 }
-/* line 260, ../scss/_styles.scss */
+/* line 259, ../scss/_styles.scss */
 .card > * .preview {
   float: left;
   padding-right: 5px;
   padding-top: 4px;
 }
-/* line 265, ../scss/_styles.scss */
+/* line 264, ../scss/_styles.scss */
 .card > * header {
   overflow: hidden;
 }
-/* line 268, ../scss/_styles.scss */
+/* line 267, ../scss/_styles.scss */
 .card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
 }
-/* line 273, ../scss/_styles.scss */
+/* line 272, ../scss/_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 276, ../scss/_styles.scss */
+/* line 275, ../scss/_styles.scss */
 .card > * p {
   color: #555;
   height: 80px;
   background-repeat: no-repeat;
   font-size: 80%;
 }
-/* line 282, ../scss/_styles.scss */
+/* line 281, ../scss/_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -8345,23 +8344,23 @@ article h1:not(.subheader) div input:hover {
   overflow: hidden;
   display: none;
 }
-/* line 288, ../scss/_styles.scss */
+/* line 287, ../scss/_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 292, ../scss/_styles.scss */
+/* line 291, ../scss/_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 296, ../scss/_styles.scss */
+/* line 295, ../scss/_styles.scss */
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
   color: #666666;
 }
-/* line 301, ../scss/_styles.scss */
+/* line 300, ../scss/_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -8371,7 +8370,7 @@ article h1:not(.subheader) div input:hover {
   width: 100%;
 }
 
-/* line 312, ../scss/_styles.scss */
+/* line 311, ../scss/_styles.scss */
 .edit-card {
   position: relative;
   background-color: #eef7eb;
@@ -8380,90 +8379,90 @@ article h1:not(.subheader) div input:hover {
 }
 
 /* Content Tabs */
-/* line 324, ../scss/_styles.scss */
+/* line 323, ../scss/_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
 
-/* line 333, ../scss/_styles.scss */
+/* line 332, ../scss/_styles.scss */
 article .tabs dd.active a {
   color: #47b079;
   border-bottom: 2px solid #47b079;
   font-weight: bold;
 }
-/* line 338, ../scss/_styles.scss */
+/* line 337, ../scss/_styles.scss */
 article .tabs dd:hover a {
   color: #47b079;
 }
 
-/* line 343, ../scss/_styles.scss */
+/* line 342, ../scss/_styles.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
-/* line 347, ../scss/_styles.scss */
+/* line 346, ../scss/_styles.scss */
 .content.row {
   margin: 0;
 }
 
 /* Default card */
-/* line 352, ../scss/_styles.scss */
+/* line 351, ../scss/_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 357, ../scss/_styles.scss */
+/* line 356, ../scss/_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 365, ../scss/_styles.scss */
+/* line 364, ../scss/_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 369, ../scss/_styles.scss */
+/* line 368, ../scss/_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
 }
-/* line 376, ../scss/_styles.scss */
+/* line 375, ../scss/_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   padding: 2px;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 390, ../scss/_styles.scss */
+/* line 389, ../scss/_styles.scss */
 .panel {
   background-color: #cfe8c7;
 }
 
 /* Content area */
-/* line 395, ../scss/_styles.scss */
+/* line 394, ../scss/_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 399, ../scss/_styles.scss */
+/* line 398, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 403, ../scss/_styles.scss */
+/* line 402, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 406, ../scss/_styles.scss */
+/* line 405, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 415, ../scss/_styles.scss */
+/* line 414, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8484,56 +8483,56 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 435, ../scss/_styles.scss */
+/* line 434, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 440, ../scss/_styles.scss */
+/* line 439, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 443, ../scss/_styles.scss */
+/* line 442, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 446, ../scss/_styles.scss */
+/* line 445, ../scss/_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 449, ../scss/_styles.scss */
+/* line 448, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 453, ../scss/_styles.scss */
+/* line 452, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 457, ../scss/_styles.scss */
+/* line 456, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 460, ../scss/_styles.scss */
+/* line 459, ../scss/_styles.scss */
 a.app i {
   font-size: 15px;
   color: white;
   margin-right: 8px;
 }
 
-/* line 465, ../scss/_styles.scss */
+/* line 464, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 473, ../scss/_styles.scss */
+/* line 472, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8541,13 +8540,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 480, ../scss/_styles.scss */
+/* line 479, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 485, ../scss/_styles.scss */
+/* line 484, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8561,13 +8560,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 495, ../scss/_styles.scss */
+/* line 494, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 500, ../scss/_styles.scss */
+/* line 499, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8578,7 +8577,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 511, ../scss/_styles.scss */
+/* line 510, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8590,12 +8589,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 523, ../scss/_styles.scss */
+/* line 522, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 526, ../scss/_styles.scss */
+/* line 525, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }
@@ -8604,26 +8603,38 @@ input.node-title {
 /*
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
-/* line 21, ../scss/foundation-skin.scss */
+/* Too many apps cause breakage */
+/* line 22, ../scss/foundation-skin.scss */
+.top-bar {
+  height: auto !important;
+}
+
+/* line 25, ../scss/foundation-skin.scss */
 .top-bar .dropdown a.button {
   padding: 0;
 }
 
-/* line 26, ../scss/foundation-skin.scss */
+/* line 30, ../scss/foundation-skin.scss */
 input[type="checkbox"] + label, input[type="radio"] + label {
   margin: inherit !important;
 }
 
 /* Protects reflowing elements on error */
-/* line 32, ../scss/foundation-skin.scss */
+/* line 36, ../scss/foundation-skin.scss */
 [data-abide] span.error, [data-abide] small.error {
   position: absolute;
+}
+
+/*active color for side-nav links*/
+/* line 41, ../scss/foundation-skin.scss */
+.side-nav li.active a:not(.button) {
+  color: white;
 }
 
 /*
 *   Foundation extensions
 */
-/* line 41, ../scss/foundation-skin.scss */
+/* line 50, ../scss/foundation-skin.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -8637,35 +8648,35 @@ pre {
   font-family: monospace;
 }
 
-/* line 55, ../scss/foundation-skin.scss */
+/* line 64, ../scss/foundation-skin.scss */
 .fixme {
   opacity: 0.5;
 }
-/* line 58, ../scss/foundation-skin.scss */
+/* line 67, ../scss/foundation-skin.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 61, ../scss/foundation-skin.scss */
+/* line 70, ../scss/foundation-skin.scss */
 .fixme:hover:after {
   content: " fixme";
   color: orange;
 }
 
 /* Effects */
-/* line 69, ../scss/foundation-skin.scss */
+/* line 78, ../scss/foundation-skin.scss */
 .drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px #333;
   box-shadow: 0px 0px 5px 1px #333;
 }
 
-/* line 73, ../scss/foundation-skin.scss */
+/* line 82, ../scss/foundation-skin.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 77, ../scss/foundation-skin.scss */
+/* line 86, ../scss/foundation-skin.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -8674,13 +8685,13 @@ pre {
 }
 
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
-/* line 86, ../scss/foundation-skin.scss */
+/* line 95, ../scss/foundation-skin.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
      buttons when hovering. */
 }
-/* line 89, ../scss/foundation-skin.scss */
+/* line 98, ../scss/foundation-skin.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -8688,19 +8699,19 @@ pre {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 97, ../scss/foundation-skin.scss */
+/* line 106, ../scss/foundation-skin.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 99, ../scss/foundation-skin.scss */
+/* line 108, ../scss/foundation-skin.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #4c7861;
 }
-/* line 105, ../scss/foundation-skin.scss */
+/* line 114, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 107, ../scss/foundation-skin.scss */
+/* line 116, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -8711,7 +8722,7 @@ pre {
   white-space: nowrap;
   font-size: 1.5rem;
 }
-/* line 116, ../scss/foundation-skin.scss */
+/* line 125, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -8719,32 +8730,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 125, ../scss/foundation-skin.scss */
+/* line 134, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #47b079;
   text-shadow: 0 0 1px #333;
 }
-/* line 134, ../scss/foundation-skin.scss */
+/* line 143, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 139, ../scss/foundation-skin.scss */
+/* line 148, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 147, ../scss/foundation-skin.scss */
+/* line 156, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 153, ../scss/foundation-skin.scss */
+/* line 162, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';

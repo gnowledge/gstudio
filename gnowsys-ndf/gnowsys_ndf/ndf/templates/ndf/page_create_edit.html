@@ -3,8 +3,8 @@
 {% load ndf_tags %}
 
 {% block meta_content %}
-  {% blocktrans %}<h3>Writing</h3>
-  <p class="text-justify"><b>Pages</b> are just like the page of your notebook. You can write your content here.</p>
+  <h3>{% trans "Page editor" %}</h3>
+  <p class="text-justify">{% blocktrans %}<b>Pages</b> are just like the page of your notebook. You can write your content here.</p>
   {% endblocktrans %}
   {% endblock %}
 
@@ -12,7 +12,6 @@
   {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
   {% if user_access == "allow" %}
-  <br/>
   <div class="create card">
     <div class="page">
       <br/>

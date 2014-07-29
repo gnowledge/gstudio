@@ -119,13 +119,19 @@
     <li class="card">
         
         {% group_type_info groupid request.user as grouptype %}
+        
       {% if grouptype == "Moderated" %}
       {% if node.status == "DRAFT" %}
-      <div class="unapproved page">
+      <div class="draft page">
+      {% endif %}
+           {% if node.status == "PUBLISHED" %}
+      <div class="published page">
       {% endif %}
           
           {% else %}
-          <div class="draft page">
+          
+          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} page'>
+              
       {% endif %} 
               
           <div class="label-list">{% for tag in node.tags|slice:":3" %}

@@ -61,9 +61,12 @@ urlpatterns = patterns('',
     
     
    #url(r'^(?P<group_id>[^/]+)/online','gnowsys_ndf.ndf.views.online.tests', name='Online'),                     ########## online app  
+
     (r'^(?P<group_id>[^/]+)/observation', include('gnowsys_ndf.ndf.urls.observation')),
-    # (r'^(?P<group_id>[^/]+)/Observation', include('gnowsys_ndf.ndf.urls.observation')),
     (r'^(?P<group_id>[^/]+)/Observations', include('gnowsys_ndf.ndf.urls.observation')),
+
+    url(r'^(?P<group_id>[^/]+)/(?P<node_id>[^/]+)/create_discussion$', 'gnowsys_ndf.ndf.views.methods.create_discussion', name='create_discussion'),    
+    url(r'^(?P<group_id>[^/]+)/discussion_reply$', 'gnowsys_ndf.ndf.views.methods.discussion_reply', name='discussion_reply'),    
 
     #url(r'^(?P<group_id>[^/]+)/visualize', 'gnowsys_ndf.ndf.views.visualize.graphs', name='visualize'),
     url(r'^(?P<group_id>[^/]+)/visualize', include('gnowsys_ndf.ndf.urls.visualise_urls')),

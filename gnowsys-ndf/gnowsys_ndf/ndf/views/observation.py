@@ -373,11 +373,13 @@ def save_image(request, group_id, app_id=None, app_name=None, app_set_id=None, s
             # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True, location=location)
 
             obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
+            # Sample output of (type tuple) obs_image: (ObjectId('5357634675daa23a7a5c2900'), 'True') 
 
-            if obs_image and ObjectId.is_valid(obs_image):
-            	# if image sucessfully get uploaded with returned of valid ObjectId
-            	return StreamingHttpResponse(str(obs_image))
+            # if image sucessfully get uploaded then it's valid ObjectId
+            if obs_image[0] and ObjectId.is_valid(obs_image[0]):
+
+            	return StreamingHttpResponse(str(obs_image[0]))
             
-            else:
-            	# file is not uploaded sucessfully or with error
+            else: # file is not uploaded sucessfully or uploaded with error
+            	
             	return StreamingHttpResponse("UploadError")	

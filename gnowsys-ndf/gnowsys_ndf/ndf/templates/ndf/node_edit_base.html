@@ -43,23 +43,24 @@ background-repeat:no-repeat; background-size: 48px 48px
         <header>
             <div class="row">
  <h1 class="large-8 columns">
+     
+     <span class="subheader">
       {% if node %}
-     {% blocktrans %} <span class="subheader">Editing: </span>{% endblocktrans %}
+     {% trans "Editing:" %} 
+     {% else %}
+      {% trans "Create:" %}
+     {% endif %} 
+     </span>
+     
      <div>
-	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    {% blocktrans %}<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>{% endblocktrans %}
+	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Give the {{title}} a name.." required>
+	    <small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 	  </div>
-      {% else %}
-      {% blocktrans %}Create a New {{title}}:{% endblocktrans %}
-     <div>
-	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    {% blocktrans %}<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>{% endblocktrans %}
-	  </div>
-      {% endif %}  
+     
       </h1>
                 
              <div class="large-4 columns">
-	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+	    <span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}{{node.tags|pluralize|default_if_none:"s"}}</label>
 	    </span>
 	    <input id="tags_id" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
 	  </div>		
@@ -77,12 +78,26 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  <a href="#panel-name-description">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
-	  {% blocktrans %}<a href="#panel-prior-node" class="prior_node_tab">Prior Node</a>{% endblocktrans %}
+	  <a href="#panel-prior-node" class="prior_node_tab">{% trans "Requires" %}</a>
 	</dd>
 	<!-- change name of collection tab overide block in your code -->
 	<dd title="Click here to add/edit collection">
-	  <a href="#panel-collection" class="collection_tab">{% block collection_tab %}{% trans "Collection" %} {% endblock %}</a> 
+	  <a href="#panel-collection" class="collection_tab">{% block collection_tab %}Collection {% endblock %}</a> 
 	</dd>  
+
+	<!-- change name of metadata tab overide block in your code -->
+	<dd title="Click here to add/edit metadata">
+	  <a href="#panel-metadata" >{% trans "Metadata" %} </a> 
+	</dd>  
+	
+	<dd title="Click here to add/edit teaches">
+	 	<a href="#panel-teaches" class="teaches_tab" >{% trans "Teaches" %} </a> 
+	</dd>
+	
+	<dd title="Click here to add/edit teaches">
+	 	<a href="#panel-assesses" class="assesses_tab" >{% trans "Assesses" %} </a> 
+	</dd>
+	
 	
      </dl>
      
@@ -118,10 +133,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   <dd>
 
-    {% blocktrans %}<a id="switch_group" href="#switchgrp">Click here to publish {{node.name}} in group/s</a>{% endblocktrans %}
+    <a id="switch_group" href="#switchgrp">{% blocktrans %}Click here to publish {{node.name}} in group/s{% endblocktrans %}</a>
 
        <div id="switchgrp" class="content">
-         {% blocktrans %}<h4>Select Groups</h4>{% endblocktrans %}
+         <h4>{% trans "Select Groups" %}</h4>
 	 <div id="group_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       </div>
@@ -137,29 +152,29 @@ background-repeat:no-repeat; background-size: 48px 48px
         <div class="large-4 columns">
             <div class="panel">
                 
-               {% blocktrans %} <h5>Settings</h5>{% endblocktrans %}
+                <h5>{% trans "Settings" %}</h5>
            
             <div class="row">
 	    {% if node.created_by == request.user.pk %}	
                      <div class="large-4 columns">
-			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span></div>
+			<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Visibility" %}</label></span></div>
                      
 
 			<div class="large-8 columns">
 				<div class="privacy-mode ">
 						{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							{% blocktrans %}<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>{% endblocktrans %}
+							<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							{% blocktrans %}<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>{% endblocktrans %}
+							<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
 						{% else %}
 							{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
 								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-								{% blocktrans %}<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>{% endblocktrans %}
+								<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
 								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-								{% blocktrans %}<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>{% endblocktrans %}
+								<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
 							{% endif %}
 						{% endif %}
 							<span></span>
@@ -169,17 +184,17 @@ background-repeat:no-repeat; background-size: 48px 48px
 						
 			{% if not node %}
                      <div class="large-4 columns">
-							{% blocktrans %}<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">Privacy</label></span>{% endblocktrans %}
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label class="inline">{% trans "Visibility" %}</label></span>
                          </div>
                      
                      <div class="large-8 columns">
 						<div class="privacy-mode">
 						
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							{% blocktrans %}<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>{% endblocktrans %}
+							<label for="PUBLIC" onclick="">{% trans "Visible" %} <i class="fi-eye"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							{% blocktrans %}<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>{% endblocktrans %}
+							<label for="PRIVATE" onclick="">{% trans "Hidden" %} <i class="fi-key"></i></label>
 						
 							<span></span>
 						</div>
@@ -187,33 +202,34 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			{% endif %}
 		{% endif %}	    
+            </div>
                 
+                <div class="row">
                 <div class="large-4 columns">
-                {% blocktrans %}<label class="inline">Language</label>{% endblocktrans %}
+                <label class="inline">{% trans "Language" %}</label>
                     </div>
                 <div class="large-8 columns">
-               <select name="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
+               <select name="lan">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
+                    </div>
                     </div>
 	   
-	     </div>
+	     
                 
                  
                 
                  <div class="row">
                 <div class="large-4 columns">
-                {% blocktrans %}<label class="inline">Location:</label>{% endblocktrans %}
+                <label class="inline">{% trans "Location:" %}</label>
                     </div>
                 <div class="large-8 columns">
               <a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers" class="tiny secondary button expand">
-	  		{% blocktrans %}<i class="fi-marker"></i> &nbsp; Add Location {% endblocktrans %}
+	  		<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 	  	</a>
                     </div>
 	     </div>
                 
                 </div>
-            
-            <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
-              
+                  
             
 	</div>
         
@@ -222,13 +238,8 @@ background-repeat:no-repeat; background-size: 48px 48px
     
     {% block prior_node %}
 
-    <div class="content" id="panel-prior-node"  style="width:95%;">
+    <div class="content" id="panel-prior-node">
       <div class="row">
-	<div class="small-12 columns">
-	  <h5>Add or edit Prior Node : </h5>
-	</div>
-	<br/>
-	
 	<div class="small-12 columns">
 	  <div id="prior_node_drawer">
 	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} -->
@@ -241,13 +252,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     {% block collection %}
 
-    <div class="content" id="panel-collection" style="width:95%;">
+    <div class="content" id="panel-collection">
       <div class="row">
-	<div class="small-12 columns">
-	  {% blocktrans %}<h5>Add or edit Collection : </h5> {% endblocktrans %}
-	</div>				
-	<br/><br/>
-	
 	<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 	  <div id="SelectApp" class="row">
 	    <div class="small-2 columns line-height-2pt5">
@@ -255,7 +261,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="Page"/>
-	     {% trans "Page" %} <span class="divider-line">|</span>
+	      {% trans "Page" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
 	    </div>
 	    <div class="small-2 columns">
@@ -265,7 +271,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    </div>
 	    <div class="small-2 columns">
 	      <input type="radio" name="col" value="Image" />
-	     {% trans "Image" %} <span class="divider-line">|</span>
+	      {% trans "Image" %} <span class="divider-line">|</span>
 	      <span class="fontsize-x-large"><i class="step fi-photo"></i>
 	      </span>
 	    </div>
@@ -300,9 +306,115 @@ background-repeat:no-repeat; background-size: 48px 48px
       </div>
     </div>
 
+      <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
+      
     {% endblock %}
+
     
-  </div>  
+  
+
+    
+    <div class="content" id="panel-metadata" style="width:95%;" >
+      
+      <div class="row">
+	  <h3>{% trans "Add or edit Metadata - Please spend a few minutes" %} </h3>
+        
+
+        <div class="small-5 columns">
+         <h5>{% trans "Age Range:" %}</h5>  <input id="age_range" name="age_range" type="text" value="{{node.age_range}}"  >
+        
+         <h5>{% trans "Target Audience:" %} </h5> <input name="audience" type="text" value="{{node.audience}}"  >
+         <label><h5>{% trans "Time Required :" %}</h5> <select name="timerequired" value="{{node.timerequired}}"><option>{% trans "0-2M" %}</option><option>{% trans "2-5M" %}</option><option>{% trans "5-15M" %}</option><option>{% trans "15-45M" %}</option></select></label>
+         <label><h5>{% trans "Interactivity Type :" %}</h5> <select name="interactivitytype "><option>{% trans "Active" %}</option><option>{% trans "Mixed" %}</option><option>{% trans "Expositive" %}</option></select></label>
+         <label><h5>{% trans "Based on Url:" %} </h5> <input name="basedonurl" type="text" value="{{node.basedonurl}}"  ></label>
+         <label><h5>{% trans "Educational Use:" %} </h5> <input name="educationaluse" type="text" value="{{node.educationaluse}}" placeholder="" ></label>
+        </div>
+        
+        
+        <!--
+	<div class="small-3 columns">
+                  <dl class="accordion" data-accordion>
+  <dd>
+    <a href="#align1"class="current">AlignmentObject1</a>
+    <div id="align1" class="content active">
+         <label>AlignmentType<select name="aligntype1"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework1" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname1" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl1" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription1" type="text" value="" placeholder="" >
+        
+         
+    </div>
+  </dd> </dl>
+  <dl class="accordion" data-accordion><dd>
+   
+     <a href="#align2" >AlignmentObject2</a>
+    <div id="align2" class="content active">
+         <label>AlignmentType<select name="aligntype"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework2" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname2" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl2" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription2" type="text" value="" placeholder="" >
+    </div>
+  </dd></dl>
+  <dl class="accordion" data-accordion><dd>
+     <a href="#align3">AlignmentObject 3</a>
+     <div id="align3" class="content active">
+         <label>AlignmentType<select name="aligntype"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework3" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname3" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl3" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription3" type="text" value="" placeholder="" >
+     </div>
+  </dd>
+</dl>  -->         
+
+        <div class="small-5 columns">
+	  <h5>{% trans "Text Complexity" %}</h5>  <input  name="textcomplexity" type="text" value="{{node.textcomplexity}}">
+        
+         <h5>{% trans "Reading Level:" %} </h5> <input name="readinglevel" type="text" value="{{node.readinglevel}}" placeholder="" >
+         
+         <h5>{% trans "Educational Subject:" %} </h5> <input name="educationalsubject" type="text" value="{{node.educationalsubject}}" placeholder="" >
+         <h5>{% trans "Educational Level:" %} </h5> <input name="educationallevel" type="text" value="{{node.educationallevel}}" placeholder="" >
+        </div>
+        
+      </div>
+        
+	
+    </div>  
+   
+    <div class="content" id="panel-teaches"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>{% trans "Add or edit Teaches : " %}</h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="teaches_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    </div>
+	
+     <div class="content" id="panel-assesses"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>{% trans "Add or edit Assesses :" %} </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="assesses_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    </div>
+
+</div> <!--the final one -->
+
   
   {% block add_fields %} {% endblock %}
   
@@ -313,7 +425,7 @@ background-repeat:no-repeat; background-size: 48px 48px
      <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
       <!-- #{#% #if '/edit/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
-        <a class="close-reveal-modal" >{% trans "&#215" %};</a>
+        <a class="close-reveal-modal" >&#215;</a>
         {% include "ndf/map_widget.html" with mode="edit" %}
         <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
       <!-- #{#%# endif %} -->
@@ -373,7 +485,7 @@ var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
 saveflag = 1;
 get_new_groups();
 new_groups=data_list;
-$.ajax({
+$.cd({
        url: turl,
        type: 'POST',
        data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
@@ -497,14 +609,65 @@ $("#name_id").change(function(){
 
 	});
 
+	$(".teaches_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "teaches",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#teaches_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+    
+        $(".assesses_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#assesses_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "assesses",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#assesses_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+
 
 	$("#save-node").click(function() {
 
 		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
-
-		$(".node_id").each(function (){
+		tch_arr=[]  // for teaches
+		assess_arr=[] // for assesses
+ 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());
 			}
@@ -516,12 +679,20 @@ $("#name_id").change(function(){
 			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
   				md_arr.push($(this).val());
   			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				assess_arr.push($(this).val());
+			}
 		});
-
-		$("#prior_node_list").val(pn_arr)
-		$("#collection_set_list").val(cn_arr) 
-		$("#module_list").val(md_arr)   
-
+		//alert(pn_arr + 'prior')
+		//alert(assess_arr + 'assess')
+		$("#prior_node_list").val(pn_arr);
+		$("#collection_list").val(cn_arr) ;
+		$("#module_list").val(md_arr);
+		$("#teaches_list").val(tch_arr);
+		$("#assesses_list").val(assess_arr);
 		{% block base_save_on_click %}{% endblock %}
 	});
 
@@ -617,3 +788,4 @@ $("#name_id").change(function(){
 </script>
 
 {% endblock %}
+

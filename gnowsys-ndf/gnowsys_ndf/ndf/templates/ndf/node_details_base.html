@@ -96,7 +96,7 @@
                 </div>
               </div>
 
-              <input type="submit" id="add_page" value="Save as Draft And Preview" class="medium round button"/>
+              <input type="submit" id="add_page" value="Save Page" class="medium round button"/>
 
               {% blocktrans %}<a class="close-reveal-modal">&#215;</a>{% endblocktrans %}
 
@@ -112,8 +112,7 @@
           <div id="view_add_file" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
         
             Welcome in reveal area
-
-            <a class="close-reveal-modal">&#215;</a>
+            <a class="close-reveal-modal">&#215;</a>           
           </div>
 {% endblocktrans %}
         </div>
@@ -125,7 +124,7 @@
 {% blocktrans %}
           <div id="view_add_event" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
         
-            Welcome in reveal area
+            <b>Add events feature will be comming soon</b>
 
             <a class="close-reveal-modal">&#215;</a>
           </div>
@@ -147,15 +146,22 @@ $("#add_page").click(function() {
           context_node: "{{node.pk}}",
           name: $(".name_id").val(),
           tags: $(".tags_id").val(),
-          // content_org: $(".orgitd").val()
+          content_org: $(".orgedit").val(),
           csrfmiddlewaretoken: '{{ csrf_token }}'
         },
         success: function(data) {
 
+          var page = $(".name_id").val();
+
+          if ($.trim(data) === "failure") {
+            alert("Page name "+ page +" already available, Please choose different name");
+          }
+
           if ($.trim(data) === "success") {
             location.reload(true);
           }
-          
+
+          $(".name_id").val("");
         }
       });
 

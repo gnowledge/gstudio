@@ -13,7 +13,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from gnowsys_ndf.ndf.org2any import org2html
-
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -38,7 +39,7 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
 
 #######################################################################################################################################
 
@@ -285,11 +286,17 @@ def file(request, group_id, file_id=None):
                                               ]
                                             }).sort("last_update", -1)
       
-      already_uploaded = request.GET.getlist('var', "")
+      already_uploaded = request.GET.getlist('var', "")     
+
       new_list = []  
       for each in already_uploaded:
-          new_list.append(eval(each))
+        for name in eval(each):
+          for k in name:
+            if type(k) is list:
+              new_list.append(k[0])
+
       already_uploaded = new_list
+
       # source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
 
       # pandora_video_id = []
@@ -376,12 +383,16 @@ def submitDoc(request, group_id):
     alreadyUploadedFiles = []
     str1 = ''
     img_type=""
+    topic_file = ""
+    is_video = ""
     obj_id_instance = ObjectId()
     if request.method == "POST":
         mtitle = request.POST.get("docTitle", "")
         userid = request.POST.get("user", "")
         language = request.POST.get("lan", "")
         img_type = request.POST.get("type", "")
+        topic_file = request.POST.get("type", "")
+        doc = request.POST.get("doc", "")
         usrname = request.user.username
         page_url = request.POST.get("page_url", "")
         content_org = request.POST.get('content_org', '')
@@ -389,7 +400,8 @@ def submitDoc(request, group_id):
         tags = request.POST.get('tags', "")
 
         i = 1
-	for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+
+        for index, each in enumerate(request.FILES.getlist("doc[]", "")):
             if mtitle:
                 if index == 0:
 
@@ -400,22 +412,30 @@ def submitDoc(request, group_id):
                     i = i + 1
             else:
                 title = each.name
-                f, is_video = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
-            if not obj_id_instance.is_valid(f):
-                alreadyUploadedFiles.append(f)
-                title = mtitle
-        for each in alreadyUploadedFiles:
-            str1 = str1 + 'var={"Newname":"' + each[0] + '",' + '"Oldname":"' + each[1] +'"}'+ '&'
+                f = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy)
 
+            if not obj_id_instance.is_valid(f):
+              alreadyUploadedFiles.append(f)
+              title = mtitle
+        
+        str1 = str(alreadyUploadedFiles)
+       
         if img_type != "": 
             
-            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id }))
+            return HttpResponseRedirect(reverse('userDashboard', kwargs={'group_id': group_id , 'usrid': userid}))
+
+        elif topic_file != "": 
+            
+            return HttpResponseRedirect(reverse('add_file', kwargs={'group_id': group_id }))
 
         else:
             if str1:
-                return HttpResponseRedirect(page_url+'?'+str1)
+                return HttpResponseRedirect(page_url+'?var='+str1)
             else:
+              if is_video == "True":
                 return HttpResponseRedirect(page_url+'?'+'is_video='+is_video)
+              else:
+                return HttpResponseRedirect(page_url)
                 
 
     else:
@@ -428,7 +448,6 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
     """
       this will create file object and save files in gridfs collection
     """
-    
     global count,first_object
     is_video = ""
     fcol = db[File.collection_name]
@@ -773,6 +792,7 @@ def file_detail(request, group_id, _id):
 
 
     file_node = collection.File.one({"_id": ObjectId(_id)})
+    file_node.get_neighbourhood(file_node.member_of)
     if file_node._type == "GSystemType":
 	return file(request, group_id, _id)
 
@@ -909,11 +929,31 @@ def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if request.method == "POST":
+
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
+	get_node_metadata(request,file_node,GST_FILE)
+	
+	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+
+	if teaches_list !='':
+			teaches_list=teaches_list.split(",")
+	
+	create_grelation_list(file_node._id,"teaches",teaches_list)
+
+	
+	assesses_list = request.POST.get('assesses_list','')
+	
+	if assesses_list !='':
+		assesses_list=assesses_list.split(",")
+					
+	create_grelation_list(file_node._id,"assesses",assesses_list)
+	
+
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:
+	file_node.get_neighbourhood(file_node.member_of)
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,
                                     'group_id': group_id,
