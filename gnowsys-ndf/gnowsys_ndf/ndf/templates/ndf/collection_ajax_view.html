@@ -130,16 +130,13 @@
 
 $(document).on('click', 'li.loadSelectedResource', function (e) {
     
-    // removing active class from other li
-    $(".side-nav > li").removeClass("active");
+    // to access in success block
+    var currObj = this;
 
-    // adding active to this li
-    $(this).addClass("active");
-    
     $.ajax({
 
       type: "POST",
-      url: "{% url 'collection_nav' groupid %}",
+      url: "{% url 'collection_nav' group_id %}",
       datatype: "html",
       data:{
         node_id: this.id,
@@ -147,6 +144,13 @@ $(document).on('click', 'li.loadSelectedResource', function (e) {
       },
       
       success: function(data) {
+        
+        // removing active class from other li
+        $(".side-nav > li").removeClass("active");
+
+        // adding active to this li
+        $(currObj).addClass("active");
+        
         // console.trace()
         // var prevHTML = $(document).children();
         $("#view_page").html(data);
@@ -165,6 +169,7 @@ $(document).on('click', 'li.loadSelectedResource', function (e) {
     });
   });
 
+  // {% comment %}
   // $(".select").click(function() {
 
   // 	$.ajax({
@@ -228,5 +233,6 @@ $(document).on('click', 'li.loadSelectedResource', function (e) {
 
 
   // });
+  // {% endcomment %} 
 
 </script>
