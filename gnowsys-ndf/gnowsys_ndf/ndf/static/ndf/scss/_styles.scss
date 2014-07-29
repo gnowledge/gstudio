@@ -93,9 +93,11 @@ main>aside{
         background-color: $theme-color-invert;
         
         h2{
+            font-size: 2rem;
             border: 1px solid #555;
-            border-bottom: 8px solid $highlight-color;
-            padding: 15px;
+            border-bottom: 4px solid $highlight-color;
+            padding: 5px;
+            padding-bottom: 3rem;
             background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
             margin: 0;
             a{
@@ -124,7 +126,10 @@ main>aside{
             margin: 0;
         }
             
-        
+        .f-dropdown.content{
+            width: auto;
+            padding: 0;
+        }
         header{
            
         }
@@ -168,7 +173,6 @@ main>aside{
     article{
         
         &>header,form>header{
-            background-color: $bg-color;
             padding: 15px;
             margin-bottom: 0.5rem;
         }

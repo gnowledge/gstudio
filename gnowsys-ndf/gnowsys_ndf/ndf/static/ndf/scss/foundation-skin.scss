@@ -35,13 +35,14 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 .icon-bar .item{
     border:1px solid #222;
     &.active{
-        background-color: $active-color;
+        background-color: black;
         i,label{
-        
+        color: white;
         }
     }
 }
 
+/*
 /* Protects reflowing elements on error */
 [data-abide] span.error, [data-abide] small.error{
     position: absolute;
@@ -143,7 +144,7 @@ pre{
       & + label:hover ~ label:before,
       & + label:hover:before {
       content: '\2605'; /* BLACK STAR */
-      color: $active-color;
+      color: $highlight-color;
       text-shadow: 0 0 1px #333;
     }
   }
@@ -171,7 +172,7 @@ pre{
   [type*="radio"] + label:hover ~ label:before,
   [type*="radio"] + label:hover:before {
     content: '\2605'; /* BLACK STAR */
-    color: $active-color;
+    color: $highlight-color;
     text-shadow: 0 0 1px #333;
   }
   }
