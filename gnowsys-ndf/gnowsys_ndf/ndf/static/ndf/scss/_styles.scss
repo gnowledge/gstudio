@@ -129,6 +129,10 @@ main>aside{
         .f-dropdown.content{
             width: auto;
             padding: 0;
+            border: 1px solid #222;
+            .item{
+                width: 70px;
+            }
         }
         header{
            
