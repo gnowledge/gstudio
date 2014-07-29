@@ -15,8 +15,9 @@ from gnowsys_ndf.ndf.models import File
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
-
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata
 db = get_database()
 collection = db[File.collection_name]
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3]})
@@ -157,6 +158,7 @@ def image_detail(request, group_id, _id):
     img_node = collection.File.one({"_id": ObjectId(_id)})
     if img_node._type == "GSystemType":
 	return imageDashboard(request, group_id, _id)
+    img_node.get_neighbourhood(img_node.member_of)
     return render_to_response("ndf/image_detail.html",
                                   { 'node': img_node,
                                     'group_id': group_id,
@@ -180,11 +182,26 @@ def image_edit(request,group_id,_id):
         pass
     img_node = collection.File.one({"_id": ObjectId(_id)})
     if request.method == "POST":
+
         # get_node_common_fields(request, img_node, group_id, GST_IMAGE)
         img_node.save(is_changed=get_node_common_fields(request, img_node, group_id, GST_IMAGE))
+	get_node_metadata(request,img_node,GST_IMAGE)
+	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+	if teaches_list !='':
+			teaches_list=teaches_list.split(",")
+	
+	create_grelation_list(img_node._id,"teaches",teaches_list)
+	assesses_list = request.POST.get('assesses_list','')	
+	if assesses_list !='':
+		assesses_list=assesses_list.split(",")
+					
+	create_grelation_list(img_node._id,"assesses",assesses_list)
+        
+	
         return HttpResponseRedirect(reverse('image_detail', kwargs={'group_id': group_id, '_id': img_node._id}))
         
     else:
+	img_node.get_neighbourhood(img_node.member_of)
         return render_to_response("ndf/image_edit.html",
                                   { 'node': img_node,
                                     'group_id': group_id,
