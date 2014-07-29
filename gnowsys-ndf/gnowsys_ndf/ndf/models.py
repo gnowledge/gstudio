@@ -970,7 +970,8 @@ class Group(GSystem):
         'disclosure_policy': basestring,    # Members of this group - disclosed or not 
         'encryption_policy': basestring,            # Encryption - yes or no
 
-        'group_admin': [int]				# ObjectId of Author class
+        'group_admin': [int],				# ObjectId of Author class
+        'partners':bool                      # Shows partners exists for a group or not     
     }
 
     use_dot_notation = True

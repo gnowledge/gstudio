@@ -21,9 +21,27 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Adding "partners" field with no default value
+    res = collection.update({'_type': {'$in': ['Group']}, 'partners': {'$exists': False}}, 
+                            {'$set': {'partners': False }}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'partners' field added to all Group documents totalling to : ", res['n']
+
+
+
+    # Adding "preferred_languages" field with no default value
+    res = collection.update({'_type': {'$in': ['Author']}, 'preferred_languages': {'$exists': False}}, 
+                            {'$set': {'preferred_languages': {}}}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'preferred_languages' field added to all author documents totalling to : ", res['n']
+    
+
+
     # Adding "rating" field with no default value
     res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'rating': {'$exists': False}}, 
-                            {'$set': {'rating': [{'score':0,'user_id':0,'ip_address':''}]}}, 
+                            {'$set': {'rating': []}}, 
                             upsert=False, multi=True
     )
     print "\n 'rating' field added to following no. of documents: ", res['n']

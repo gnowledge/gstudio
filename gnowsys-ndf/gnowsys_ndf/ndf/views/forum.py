@@ -488,7 +488,7 @@ def add_node(request,group_id):
         
 
 #         link=url
-        link = url
+#        link = url
         
 #         for each in colg.author_set:
 #             bx=User.objects.get(id=each)
@@ -522,11 +522,11 @@ def add_node(request,group_id):
 
 
 
-#     except Exception as e:
-#         return HttpResponse(""+str(e))
-#     return HttpResponse("success")
+    except Exception as e:
+        return HttpResponse(""+str(e))
+    return HttpResponse("success")
 
-
+    
 def get_profile_pic(username):
     
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(username) })

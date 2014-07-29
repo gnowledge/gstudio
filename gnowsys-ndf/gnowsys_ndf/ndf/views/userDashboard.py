@@ -42,8 +42,9 @@ ins_objectid  = ObjectId()
 #######################################################################################################################################
 
 
-def userpref(request):
-    print "in view"
+def userpref(request,group_id):
+    print request.user.username
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     return HttpResponse("Success")
     
     
