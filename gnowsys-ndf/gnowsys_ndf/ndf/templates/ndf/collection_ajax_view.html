@@ -1,15 +1,29 @@
 {% load ndf_tags %}
 {% load i18n %}
 
+<style type="text/css">
+
+  .current-resource{
+    background-color:#47b079; 
+    padding:0.5em;
+    cursor: pointer;
+  }
+
+  .current-resource div {
+    color: #f9f9f9;
+  }
+
+</style>
+
+
+{% comment %}
+<!-- 
 <ul class="side-nav">
-    <!-- Breadcrumbs List on top of collections on resource page   -->
     <nav class="breadcrumbs">
-    <!-- showing current page name with border and highlight -->
     {% for key,value in breadcrumbs_list %}
        <a name="{{key}}">{{ value }}</a>
     {% endfor %}
   </nav>
-  <!-- Breadcrumbs List on top of collections on resource page   -->
 
   {% if node.collection_dict|length > 0 %}
 
@@ -43,22 +57,26 @@
   {% endif %}
   {% endfor %}
 {% endif %}
+ -->
+ {% endcomment %}
 
-<ul class="no-bullet">
-
-    <a class="bc" name="{{key}}">{{ value }}</a>
+<ul class="side-nav">
 
   <!-- current page title -->
   {% for key,value in breadcrumbs_list %}
   {% get_memberof_name key as member_of_name %}
-  <li id="{{key}}" class="loadSelectedResource">
-    <div class="row" title="{{member_of_name}}">
-      <div class="small-2 columns">
-        <i class="fi-page-filled"></i>
+
+  <li id="{{key}}" class="active current-resource loadSelectedResource">
+    <div class="row" title="{{ member_of_name }} - {{ value }}">
+      <h5>
+      <div class="small-2 columns text-center">
+        <i class="fi-play"></i>
       </div>
-      <div class="small-10 columns" name="{{key}}">{{ value }}</div>
+      <div class="small-10 columns" name="{{key}}">{{ value | truncatechars:20 }}</div>
     </div>
+    </h5>
   </li>
+
   {% endfor %}
 
   {% if node.collection_dict|length > 0 %}
@@ -67,30 +85,39 @@
     {% get_memberof_name each_node.pk as member_of_name %}
 
       <li id="{{each_node.pk}}" class="loadSelectedResource">
-        <div class="row" name="{{each_node.pk}}" title="{{member_of_name}} - {{each_node.mime_type}}">
-          <div class="small-2 columns">
+        <a class="row" name="{{each_node.pk}}" title="{{member_of_name}} | {{ each_node.mime_type }}: {{ each_node.name }}">
+          <div class="small-2 small-push-2 columns text-center">
 
-            {% if "/zip" in each_node.mime_type %}
-              <i class="fi-archive"></i>
-            {% elif "image" in each_node.mime_type %}
-              <!-- <i class="fi-camera"></i> -->
-              <img src="{% url 'getImageThumbnail' groupid each_node.pk %}">
-            {% elif "/pdf" in each_node.mime_type %}
-              <!-- <i class="fi-page-pdf"></i> -->
-              <img src="{% url 'getFileThumbnail' group_id each_node.pk %}">
-            {% elif "ogg" in each_node.mime_type or "video" in each_node.mime_type %}
-              <i class="fi-video"></i>
-              <!-- <img src="#{#% url 'getvideoThumbnail' group_id each_node.pk %}"> -->
-              <!-- <div style="background:url#(#url 'getvideoThumbnail' group_id each_node.pk)"></div> -->
-            {% else %}
+            {% if member_of_name == "File" %}
+              {% if "/zip" in each_node.mime_type %}
+                <i class="fi-archive"></i>
+              {% elif "image" in each_node.mime_type %}
+                <!-- <i class="fi-camera"></i> -->
+                <img src="{% url 'getImageThumbnail' groupid each_node.pk %}">
+              {% elif "/pdf" in each_node.mime_type %}
+                <!-- <i class="fi-page-pdf"></i> -->
+                <img src="{% url 'getFileThumbnail' group_id each_node.pk %}">
+              {% elif "ogg" in each_node.mime_type or "video" in each_node.mime_type %}
+                <i class="fi-video"></i>
+                <!-- <img src="#{#% url 'getvideoThumbnail' group_id each_node.pk %}"> -->
+                <!-- <div style="background:url#(#url 'getvideoThumbnail' group_id each_node.pk)"></div> -->
+              {% else %}
+                <i class="fi-folder"></i>
+              {% endif %}
+            {% elif member_of_name == "Page" %}
               <i class="fi-page-filled"></i>
+            {% elif member_of_name == "Forum" %}
+              <i class="fi-comments"></i>
+            {% elif member_of_name == "Quiz" %}
+              <i class="fi-graph-bar"></i>
             {% endif %}
+
           
           </div>
-          <div class="small-10 columns" >
-            {{ each_node.name }}
+          <div class="small-8 columns" >
+            {{ each_node.name | truncatechars:20 }}
           </div>
-        </div>
+        </a>
       </li>
 
     {% endfor %}
@@ -102,6 +129,13 @@
 <script>
 
 $(document).on('click', 'li.loadSelectedResource', function (e) {
+    
+    // removing active class from other li
+    $(".side-nav > li").removeClass("active");
+
+    // adding active to this li
+    $(this).addClass("active");
+    
     $.ajax({
 
       type: "POST",
@@ -118,6 +152,10 @@ $(document).on('click', 'li.loadSelectedResource', function (e) {
         $("#view_page").html(data);
         // $("#view_page").foundation({bindings:'events'});
         $("#view-map-widget, a[data-reveal-id='view-map-widget'], a[href='#view-graph']").foundation();
+        $("#view-discussion, a[href='#view-discussion']").foundation();
+        $("dl.row.tabs").foundation();
+        $("div.tabs-content").foundation();
+        // $("dd > a[href='#view-discussion']").foundation();
         // $("#graph-hover").foundation({dropdown:{is_hover:false,active_class:'open'});        
         // window.history.pushState(“object or string”, “Title”, “/new-url”);
         // window.history.pushState({"html":prevHTML, "pageTitle":"try"},"", "#try");
@@ -127,68 +165,68 @@ $(document).on('click', 'li.loadSelectedResource', function (e) {
     });
   });
 
-  $(".select").click(function() {
+  // $(".select").click(function() {
 
-  	$.ajax({
-      type: "POST",
-      url: "{% url 'collection_nav' groupid %}",
-      datatype: "html",
-      data:{
-        node_id: this.name,
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function(data) {
-        $("#view_page").html(data);
-      }
-    });
+  // 	$.ajax({
+  //     type: "POST",
+  //     url: "{% url 'collection_nav' groupid %}",
+  //     datatype: "html",
+  //     data:{
+  //       node_id: this.name,
+  //       csrfmiddlewaretoken: '{{ csrf_token }}'
+  //     },
+  //     success: function(data) {
+  //       $("#view_page").html(data);
+  //     }
+  //   });
 
-  	$.ajax({
-      type: "POST",
-      url: "{% url 'collection_view' groupid %}",
-      datatype: "html",
-      data:{
-        node_id: this.name,
-        breadcrumbs_list: '{{ breadcrumbs_list }}',
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function(data) {
-        $("#view_collection").html(data);
-      }
-    });
+  // 	$.ajax({
+  //     type: "POST",
+  //     url: "{% url 'collection_view' groupid %}",
+  //     datatype: "html",
+  //     data:{
+  //       node_id: this.name,
+  //       breadcrumbs_list: '{{ breadcrumbs_list }}',
+  //       csrfmiddlewaretoken: '{{ csrf_token }}'
+  //     },
+  //     success: function(data) {
+  //       $("#view_collection").html(data);
+  //     }
+  //   });
 
-  });
+  // });
 
-  $("aside .breadcrumbs a").click(function() {
+  // $("aside .breadcrumbs a").click(function() {
 
-    $.ajax({
-      type: "POST",
-      url: "{% url 'collection_nav' groupid %}",
-      datatype: "html",
-      data:{
-        node_id: this.name,
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function(data) {
-        $("#view_page").html(data);
-      }
-    });
+  //   $.ajax({
+  //     type: "POST",
+  //     url: "{% url 'collection_nav' groupid %}",
+  //     datatype: "html",
+  //     data:{
+  //       node_id: this.name,
+  //       csrfmiddlewaretoken: '{{ csrf_token }}'
+  //     },
+  //     success: function(data) {
+  //       $("#view_page").html(data);
+  //     }
+  //   });
 
-    $.ajax({
-      type: "POST",
-      url: "{% url 'collection_view' groupid %}",
-      datatype: "html",
-      data:{
-        node_id: this.name,
-        modify_option: 'delete',
-        breadcrumbs_list: '{{ breadcrumbs_list }}',
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function(data) {
-        $("#view_collection").html(data);
-      }
-    });
+  //   $.ajax({
+  //     type: "POST",
+  //     url: "{% url 'collection_view' groupid %}",
+  //     datatype: "html",
+  //     data:{
+  //       node_id: this.name,
+  //       modify_option: 'delete',
+  //       breadcrumbs_list: '{{ breadcrumbs_list }}',
+  //       csrfmiddlewaretoken: '{{ csrf_token }}'
+  //     },
+  //     success: function(data) {
+  //       $("#view_collection").html(data);
+  //     }
+  //   });
 
 
-  });
+  // });
 
 </script>
