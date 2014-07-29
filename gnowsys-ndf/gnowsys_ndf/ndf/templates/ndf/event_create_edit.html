@@ -1,5 +1,6 @@
 {% extends "ndf/mis_base_create_edit.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% load pagination_tags %}
 
 {% block body_content %} 
@@ -7,6 +8,7 @@
     {% csrf_token %}
 
     <header class="row">
+     {% blocktrans %}
       <h2 class="medium-12 columns">
         {% if node %}
         Editing Event: {{node.name}}
@@ -14,11 +16,11 @@
         Create a New {{title}} Event
         {% endif %}
       </h2>
-
+      {% endblocktrans %}
       <nav class="medium-12 columns">
         <dl class="tabs" data-tab>
           <dd>
-            <h4>Tabs:</h4>
+            <h4>{% trans "Tabs:" %}</h4>
           </dd>
 
           {% for tab_details in property_order_list %}

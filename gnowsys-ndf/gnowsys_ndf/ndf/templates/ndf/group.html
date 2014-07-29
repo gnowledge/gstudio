@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -8,15 +8,17 @@
 
 
 {% block help_content %}
+{% blocktrans %}
 <p>Groups are an easy way to share content and conversation, either privately or with the world. Many times, a group already exist for a specific interest or topic. If you can't find one you like, feel free to start your own.</p>
 
 <h5>How do groups work?</h5>
 <p>Groups can either be public, restricted (users may read a brief description or overview but not view content) or completely private. Every group has a wiki, a pool for resources, and a discussion board for talking.</p>
+{% endblocktrans %}
 {% endblock %}
 
 
 {% block meta_content %}
-  <h3>Groups</h3>
+  {% blocktrans %}<h3>Groups</h3>{% endblocktrans %}
 {% endblock %}
 
 
@@ -34,7 +36,7 @@
     <div class="group">
       <br/>
       <a class="button medium" href="{% url 'create_group' group_name_tag %}">
-    	<span class="fi-plus">&nbsp;&nbsp;New Group</span>
+    	<span class="fi-plus">&nbsp;&nbsp;{% trans "New Group" %}</span>
       </a>
     </div>
   </div>
@@ -57,12 +59,12 @@
 {% if searching and group_nodes_count > 0 %}
 
   <div class="small-12 columns end">
-    <p>Search Results: <span class="label success round">Found {{group_nodes_count}} {{title|lower}}{{group_nodes_count|pluralize}}.</span></p>
+    <p>{% trans "Search Results:" %} <span class="label success round">Found {{group_nodes_count}} {{title|lower}}{{group_nodes_count|pluralize}}.</span></p>
   </div>
 
 {% elif searching and group_nodes_count == 0 %}
   <div class="small-12 columns">
-    <p>Search Results: <span class="label alert">No {{title|lower}}{{group_nodes_count|pluralize}} matched your search criteria!!!</span></p>
+    <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{group_nodes_count|pluralize}} matched your search criteria!!!</span></p>
   </div>  
 
 {% endif %}
@@ -108,7 +110,7 @@
     {% if not searching %}
       <div class="row">
         <div class="small-12 columns">
-          <h5>There are no groups created yet. <b>Be the first to create a Group!</b></h5>
+         {% blocktrans %} <h5>There are no groups created yet. <b>Be the first to create a Group!</b></h5> {% endblocktrans %}
         </div>
       </div>
     {% endif %}

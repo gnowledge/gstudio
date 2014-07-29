@@ -275,13 +275,34 @@ def drawer_widget(request, group_id):
     app = request.POST.get("app", '')
     # print "\nfield: ", field
     # print "\n app: ", app
+   
 
     if node:
       node = collection.Node.one({'_id': ObjectId(node) })
       if field == "prior_node":
         app = None
-
+	
         drawers = get_drawers(group_id, node._id, node.prior_node, app)
+      elif field == "teaches":
+	app = None
+	nlist=[]
+	relationtype = collection.Node.one({"_type":"RelationType","name":"teaches"})
+	list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+	for relation in list_grelations:
+		nlist.append(ObjectId(relation.right_subject))
+		
+	
+	drawers = get_drawers(group_id, node._id, nlist, app)
+      elif field == "assesses":
+	app = None
+	nlist=[]
+	relationtype = collection.Node.one({"_type":"RelationType","name":"assesses"})
+	list_grelations = collection.Node.find({"_type":"GRelation","subject":node._id,"relation_type":relationtype.get_dbref()})
+	for relation in list_grelations:
+		nlist.append(ObjectId(relation.right_subject))
+		
+	
+	drawers = get_drawers(group_id, node._id, nlist, app)
       elif field == "collection":
         if app == "Quiz":
           app = "QuizItem"

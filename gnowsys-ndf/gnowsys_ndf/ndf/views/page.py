@@ -29,11 +29,15 @@ from gnowsys_ndf.ndf.models import Node, GSystem, Triple
 from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields, update_mobwrite_content_org
+
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
 from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
 from gnowsys_ndf.mobwrite.diff_match_patch import diff_match_patch
+
 
 #######################################################################################################################################
 
@@ -299,6 +303,11 @@ def create_edit_page(request, group_id, node_id=None):
         # get_node_common_fields(request, page_node, group_id, gst_page)
 
         page_node.save(is_changed=get_node_common_fields(request, page_node, group_id, gst_page))
+
+
+
+	get_node_metadata(request,page_node,gst_page)
+
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 

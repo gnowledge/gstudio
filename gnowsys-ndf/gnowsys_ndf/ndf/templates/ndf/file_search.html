@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 {% block body_content %} 
@@ -12,7 +13,7 @@
 	</div>
 	<div class="small-2 columns">
           <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
-	    <i class="fi-magnifying-glass large">search</i>
+	    <i class="fi-magnifying-glass large">{% trans "search" %}</i>
 	  </a>
 	</div>
       </div>
@@ -36,10 +37,10 @@
       </div>
       <div style='display:table-cell;'>
 	{% get_user_object file.created_by as user_obj %}
-	<span style="padding-left:10px"><b>Posted by:</b> {{ user_obj.username}}</span><br />
-	<span style="padding-left:10px"><b>size:</b> {{file.file_size.size}}{{file.file_size.unit}}</span><br />
-	<span style="padding-left:10px"><b>file Type:</b> {{file.mime_type}}</span><br />
-	<span style="padding-left:10px"><b>Tags:</b> 
+	<span style="padding-left:10px"><b>{% trans "Posted by:" %}</b> {{ user_obj.username}}</span><br />
+	<span style="padding-left:10px"><b>{% trans "size:" %}</b> {{file.file_size.size}}{{file.file_size.unit}}</span><br />
+	<span style="padding-left:10px"><b>{% trans "file Type:" %}</b> {{file.mime_type}}</span><br />
+	<span style="padding-left:10px"><b>{% trans "Tags:" %}</b> 
 	  {% for each in file.tags %} 
 	  {{each}},
 	  {% endfor %}
@@ -49,7 +50,7 @@
   </div>
 <hr />
 {% empty %}
-    <span>No file found. Please try using some other keyword</span>
+    {% blocktrans %}<span>No file found. Please try using some other keyword</span>{% endblocktrans %}
 {% endfor %}
 </div>
 {% endblock %}

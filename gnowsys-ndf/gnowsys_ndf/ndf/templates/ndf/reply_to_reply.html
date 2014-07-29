@@ -1,4 +1,5 @@
 {% load ndf_tags %}
+{% load i18n %}
 <script type="text/javascript">
 $(document).ready(function(){
  $('#orgitdown{{each}}').orgitdown(mySettings);
@@ -76,9 +77,9 @@ div.overlay a.close {
 </style>
 
 
-<button rel="#reply_frm{{each}}" id="reply_forum{{each}}" type="button" >Reply</button>
+<button rel="#reply_frm{{each}}" id="reply_forum{{each}}" type="button" >{% trans "Reply" %}</button>
 <div class="overlay" id="reply_frm{{each}}">
-Reply to Reply:
+{% trans "Reply to Reply:" %}
   <textarea id="orgitdown{{each}}" name="content_org" placeholder="Please enter description..."></textarea>
 <input id="savereply{{each}}" type="button" value="Save">
 <input type="text" id="rep{{each}}" style="visibility:hidden" value="{{each}}">

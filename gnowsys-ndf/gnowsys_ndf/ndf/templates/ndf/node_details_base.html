@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
@@ -69,16 +69,16 @@
   <br/>
   <dl class="accordion" data-accordion>
     <dd>
-      <a href="#add_resources"> <b>Add resources in this topic</b> </a>
+      {% blocktrans %}<a href="#add_resources"> <b>Add resources in this topic</b> </a>{% endblocktrans %}
       <div id="add_resources" class="content">
         <div> 
 
             <a class="tiny button" data-reveal-id="view_add_page"> 
-              <span class="fi-plus">&nbsp;&nbsp;Add Page </span>&nbsp;&nbsp; <i class="fi-page"></i>  
+              {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Add Page </span>&nbsp;&nbsp; <i class="fi-page"></i>{% endblocktrans %}  
             </a>
             <div id="view_add_page" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
 
-              <h3>Add New Page:</h3>
+             {% blocktrans %} <h3>Add New Page:</h3>{% endblocktrans %}
               <!-- To enter name of the page -->
               <div>
                 <input class="name_id" name="name" type="text" placeholder="Enter name...">
@@ -98,7 +98,7 @@
 
               <input type="submit" id="add_page" value="Save Page" class="medium round button"/>
 
-              <a class="close-reveal-modal">&#215;</a>
+              {% blocktrans %}<a class="close-reveal-modal">&#215;</a>{% endblocktrans %}
 
             </div>          
 
@@ -108,43 +108,27 @@
           <a class="tiny button" data-reveal-id="view_add_file"> 
             <span class="fi-plus">&nbsp;&nbsp;Add File </span>&nbsp;&nbsp; <i class="fi-play"></i>  
           </a>
-
-          <div id="view_add_file" class="reveal-modal" data-reveal style="height:300px;"> 
-            <h3>Add New File:</h3><br/>
-            <!-- Upload file -->
-            <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' group_name_tag %}?context_node={{node.pk}}">
-            {% csrf_token %}
-
-            <div>
-              <span class="fi-upload"><input type="file" name="doc[]"  id="docFile" multiple/></span>
-            </div>
-            <!-- For making access policy of files PUBLIC initially by uploading it from topic page -->
-            <input type="hidden" name="login-mode" value="PUBLIC">
-            <!-- Just a hidden value which enables us to retun to add_file() in ajax_views when any file gets uploaded -->
-            <input type="hidden" name="type" value="topic_file">
-            <!-- This is for getting the user of the uploaded file -->
-            <input type="hidden" name="user" value="{{request.user.pk}}">
-            <input type="submit" class="small round button" id="add_file" value="Save File">
-
-            </form>
+{% blocktrans %}
+          <div id="view_add_file" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
+        
+            Welcome in reveal area
             <a class="close-reveal-modal">&#215;</a>           
-
           </div>
-
+{% endblocktrans %}
         </div>
 
         <div> 
           <a class="tiny button" data-reveal-id="view_add_event"> 
-            <span class="fi-plus">&nbsp;&nbsp;Add Events </span>&nbsp;&nbsp; <i class=""></i>  
+           {% blocktrans %} <span class="fi-plus">&nbsp;&nbsp;Add Events </span>&nbsp;&nbsp; <i class=""></i>{% endblocktrans %}  
           </a>
-
+{% blocktrans %}
           <div id="view_add_event" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
         
             <b>Add events feature will be comming soon</b>
 
             <a class="close-reveal-modal">&#215;</a>
           </div>
-
+{% endblocktrans %}
         </div>
       </div>
     </dd>

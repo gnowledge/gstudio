@@ -3,6 +3,7 @@
 <html lang="en">
 
 {% load ndf_tags %}
+{% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 
 <head>
@@ -12,7 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
 
-  <title>metaStudio - {% block title %} {% endblock %}</title>	
+  <title>metaStudio - {% block title %} {% endblock %} {}</title>	
 
   <link rel="shortcut icon" href="/static/ndf/images/favicon/logo.png"> <!-- checked -->
 
@@ -50,7 +51,7 @@
   </style>
 </head>
 
-<body>
+<body itemscope itemtype="http://schema.org/Webpage">
   <center>
     <img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif">
   </center>
@@ -63,10 +64,10 @@
 
       <ul class="title-area">
       	<li class="name">
-      	  <h1><a href="/home" accesskey="q"><img src="/static/ndf/scss/themes/metastudio/logo.svg"> meta<b>Studio</b></a></h1>
+      	  <h1><a href="/home" accesskey="q"><img src="/static/ndf/scss/themes/metastudio/logo.svg">meta<b>Studio</b></a></h1>
       	</li>
       	<li class="toggle-topbar menu-icon">
-      	  <a href="#">Menu</a>
+      	  <a href="#">{% trans "Menu" %}</a>
       	</li>
       </ul>
 
@@ -103,15 +104,14 @@
 	    {% endif %}
 
 	    <ul class="dropdown">
-	      <li class="text-center"><a href="{% url 'auth_password_change' %}">Change password</a></li>
-	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
+	      <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "Change password" %}</a></li>
+	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i>{% trans "Logout" %}</a></li>
 	    </ul>
 	  </li>
 
 	  <!-- Else show login link -->
 	  {% else %}
-	  <li class="has-form"><a class="button" href="{% url 'auth_login' %}" accesskey="l"><i class="fi-key"></i> Login</a></li>
-	  
+	  <li class="has-form"><a class="button" href="{% url 'auth_login' %}" accesskey="l"><i class="fi-key"></i> {% trans "Login" %}</a></li>
 	  {% endif %}
 
 	</ul>
@@ -146,7 +146,7 @@
 	      
 	      {% endif %}	
 
-          <li id="more_groups"><a class="group" href="{% url 'group' 'home' %}">See more groups...</a></li>
+          <li id="more_groups"><a class="group" href="{% url 'group' 'home' %}">{% trans "See more groups..." %}</a></li>
 	    </ul>
 
 	  </li>
@@ -177,7 +177,7 @@
 	      {% block help_content %}  {% endblock %}
 	    </div>
 
-	    <li><a href="#">About metaStudio</a></li>
+	    <li><a href="#">{% trans "About metaStudio" %}</a></li>
 	  </ul>
 	</aside>
 
@@ -223,7 +223,7 @@
 	            <div class="icon-bar four-up">
 	            	<!-- Here we are using "group_name_tag" since groupid value is overwrites in above section for different perspective -->
 	  				<a class="item user" href="{% url 'userDashboard' group_name_tag request.user.pk %}">
-	    				<label>My profile</label>
+	    				<label>{% trans "My profile" %}</label>
 	  				</a>
 				</div>
 			{% endif %}
@@ -279,7 +279,7 @@
       <div class="medium-3 columns">
     	<p>
              <small>
-        A project of <a href="http://lab.gnowledge.org/" target="_blank">Gnowledge Lab</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">Homi Bhabha Centre for Science Education (HBCSE)</a>, <a href="http://www.tifr.res.in" target="_blank">Tata Institute of Fundamental Research (TIFR), India</a>.
+        A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">{% trans "Homi Bhabha Centre for Science Education (HBCSE)" %}</a>, <a href="http://www.tifr.res.in" target="_blank">{% trans "Tata Institute of Fundamental Research (TIFR), India" %}</a>.
        </small>
         </p>
       </div>
@@ -287,13 +287,13 @@
       <div class="medium-9 columns">
          
            <p>
-                <span class="gnu-badge">100% स्वतंत्रता</span>
-        <a href="https://github.com/gnowledge/gstudio">View Source Code</a> or <a href="https://github.com/gnowledge/gstudio/issues?state=open">Report an issue</a>
+                <span class="gnu-badge">{% trans "100% स्वतंत्रता" %}</span>
+        <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a> or <a href="https://github.com/gnowledge/gstudio/issues?state=open">{% trans "Report an issue" %}</a>
         <br>
         
           <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/></a>
 <small>
-        &nbsp;&nbsp;&nbsp;All material is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise.
+        &nbsp;&nbsp;&nbsp;{% trans "All material is licensed under a" %} <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title = "http://creativecommons.org/licenses/by-sa/3.0/">{% trans "Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless mentioned otherwise." %}
     	</small>
           </p>
         

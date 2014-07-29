@@ -22,7 +22,8 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 
 from gnowsys_ndf.ndf.models import Node, Triple
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_drawers,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_metadata
 #######################################################################################################################################
 db = get_database()
 collection = db[Node.collection_name]
@@ -146,6 +147,10 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
             root_themes_id = []
             name = request.POST.get('name')
             collection_list = request.POST.get('collection_list','')
+	    prior_node_list = request.POST.get('prior_node_list','')
+	    teaches_list = request.POST.get('teaches_list','')
+	    assesses_list = request.POST.get('assesses_list','')
+	    
             
             # To find the root nodes to maintain the uniquness while creating and editing themes
             nodes = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
@@ -219,7 +224,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 
                 # For edititng themes 
                 if theme_GST._id in app_GST.member_of and translate != "true":
-                    
                     # To find themes uniqueness within the context of its parent Theme collection, while editing theme name
                     prior_theme_collection = [] 
                     nodes = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
@@ -257,7 +261,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             i = i+1
                         theme_topic_node.save() 
                         # End of storing collection
-
+			
+                       
                     title = theme_GST.name
                     # This will return to Themes Hierarchy  
                     if theme_GST:
@@ -294,7 +299,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             theme_topic_node.collection_set = []
                             if collection_list != '':
                                 collection_list = collection_list.split(",")
-                                
+            
                             i = 0
                             while (i < len(collection_list)):
                                 node_id = ObjectId(collection_list[i])
@@ -306,17 +311,49 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             theme_topic_node.save()
                             
                         title = topic_GST.name 
-                        
+                        #ash #currently working #prior,teaching
+			
+			get_node_metadata(request,theme_topic_node,topic_GST)
+			
+			
+			theme_topic_node.prior_node = []
+  			if prior_node_list != '':
+    				prior_node_list = prior_node_list.split(",")
+
+  			i = 0
+  			while (i < len(prior_node_list)):
+	    			node_id = ObjectId(prior_node_list[i])
+	    			if collection.Node.one({"_id": node_id}):
+      					theme_topic_node.prior_node.append(node_id)
+    
+    				i = i+1
+			theme_topic_node.save()
+		
+			if teaches_list !='':
+					teaches_list=teaches_list.split(",")
+					
+			create_grelation_list(theme_topic_node._id,"teaches",teaches_list)
+					
+
+			
+			if assesses_list !='':
+					assesses_list=assesses_list.split(",")
+					
+			create_grelation_list(theme_topic_node._id,"assesses",assesses_list)
+
+				
                         # This will return to Themes Hierarchy  
                         if theme_GST:
                             node = theme_GST
-                            
-
+                           
+    	
     else:
         app_node = None
         nodes_list = []
         
         app_GST = collection.Node.find_one({"_id":ObjectId(app_set_id)})
+
+	
         
         if app_GST:
             # For adding new Theme & Topic
@@ -379,7 +416,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     node = app_GST
                     prior_theme_collection = [] 
                     parent_nodes_collection = ""
-                    
+                    node.get_neighbourhood(node.member_of)
                     # To find topics uniqueness within the context of its parent Theme collection, while editing topic name
                     nodes = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
                     for each in nodes:

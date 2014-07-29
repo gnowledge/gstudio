@@ -1,5 +1,5 @@
 {% load ndf_tags %}
-    
+{% load i18n %}    
 <div id="rating-bar">
     <form>
   <fieldset>
@@ -10,6 +10,7 @@
     <!-- Sets the rating values as data attributes -->
        <div class="rating-bar" data-node="{{node}}" data-avg-rating="{{ratings.avg}}" data-votes="{{ratings.tot}}"  data-user-rating="{{ratings.user_rating}}">
 
+{% blocktrans %}
           <span>
       <input type="radio" id="rating-5" name="rating" value="5" /><label for="rating-5">5</label>
       <input type="radio" id="rating-4" name="rating" value="4" /><label for="rating-4">4</label>
@@ -17,8 +18,9 @@
   <input type="radio" id="rating-2" name="rating" value="2" /><label for="rating-2">2</label>
 <input type="radio" id="rating-1" name="rating" value="1" /><label for="rating-1">1</label>
 <input type="radio" id="rating-0" name="rating" value="0" class="last" /><label for="rating-0">0</label>
-           </span>
-           
+   
+        </span>
+{% endblocktrans %}           
            <div class="rating">Average: <span>{{ratings.tot|default:"unrated"}}</span></div>        
     </div>
          

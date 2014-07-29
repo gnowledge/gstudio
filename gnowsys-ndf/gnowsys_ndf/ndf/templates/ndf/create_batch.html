@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load pagination_tags %}
+{% load i18n %}
 {% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
 
@@ -121,7 +122,7 @@ $('#sel_course').change(function () {
   </div>
    <div class="row">
     <div class="large-9 columns">
-      <label>Enter Batch Name
+      <label>{% trans "Enter Batch Name" %}
 	<input type="text" placeholder="Batch Name" id="txt_batch_name" name="batch_name" value="{{batch.name}}" />
 	<input type="hidden" name="batch_count" value="{{batch_count}}"/>
 	<input type="hidden" name="node_id" value="{{batch.pk}}"/>
@@ -130,7 +131,7 @@ $('#sel_course').change(function () {
   </div>
   <div class="row">
     <div class="large-11 columns" >
-      <label><h3>Choose users</h3>
+      <label><h3>{% trans "Choose users" %}</h3>
 	<div id="user_drawer" >
 	  {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
 	</div>
