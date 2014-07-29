@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load pagination_tags %}
 {% load ndf_tags %}
 {% block title %} {{title}} {% endblock %}
@@ -107,16 +108,16 @@ set_drawer_value(group_id, st_batch_id);
 	   {% endif %}
 	   <div class="row">
 	     <div class="large-9 columns">
-	       <label>Enter Batch Name <span style="color:red"><b>*</b></span>
+	   {% blocktrans %}<label>Enter Batch Name <span style="color:red"><b>*</b></span>{% endblocktrans %}
 	      <input type="text" placeholder="Batch Name" id="txt_batch_name_{{each}}" name="batch_name_{{each}}" value="{{node.name}}" required/>
 	      <input type="hidden" name="node_id" value="{{node.pk}}"/>
 	    </label>
-	     <small class="error">Batch name required.</small>
+	     {% blocktrans %}<small class="error">Batch name required.</small>{% endblocktrans %}
 	  </div>
 	</div>
 	<div class="row">
 	  <div class="large-11 columns" >
-	    <label><h3>Choose members</h3>
+	    {% blocktrans %}<label><h3>Choose members</h3>{% endblocktrans %}
 	      <div id="user_drawer" >
 		{% include "ndf/drawer_widget.html" with widget_for=each %}
 	      </div>

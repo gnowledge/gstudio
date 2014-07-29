@@ -1,4 +1,5 @@
 {% load ndf_tags %}
+{% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 
 {% block head %}
@@ -178,23 +179,30 @@
 </div>
 <!-- end dialog -->
 
+{% get_schema node as schema %} 
+
+
+<div itemscope itemtype="{{schema.1.type}}">
 <header class="page">
     <div class="row">
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
-      <li><a href="#">Collection Name</a></li>
+      {% blocktrans %}<li><a href="#">Collection Name</a></li>{% endblocktrans %}
     </ul>
+
+
 
       <div class="label-list"> 
       {% for tag in node.tags %}
       <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+       <span itemprop="{{schema.1.tags}}" content="{{tag}}">
       {% endfor %}
 
     </div> 
       
     <h1>
-      <span class='node'>{{node.name}}</span>           
+      <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>     
   </h1>
 
   <div class="row">
@@ -202,7 +210,7 @@
       <dl class="row tabs" data-tab>
 
         {% if topic %}
-        <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> Contents </a></dd>
+       {% blocktrans %} <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> Contents </a></dd>{% endblocktrans %}
         {% endif %}
 
         <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
@@ -210,27 +218,27 @@
         <dd>
             <a href="#view-graph" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
                 <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-                    <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>
+                    {% blocktrans %}<li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>{% endblocktrans %}
                     {% if node.collection_set %}
-                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+                      {% blocktrans %}<li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>{% endblocktrans %}
                     {% endif %}
           
                     {% if node.prior_node %}
-                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+                     {% blocktrans %} <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>{% endblocktrans %}
                     {% endif %}
                 </ul>
         </dd>
 
-        <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+        {% blocktrans %}<dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>{% endblocktrans %}
 
-        <dd><a href="#view-discussion"><i class="fi-comment"></i> Discuss</a></dd>
+     {% blocktrans %}<dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>{% endblocktrans %}
       </dl>
     </div>
     
     <!-- Container for enabling/disabling annotation mode -->
     <div class="small-2 columns">          
       <div id = "toggleContainer" style="cursor: pointer; color: green;" onClick="toggle(this);">
-        <i class="fi-comments annotateIcon"></i> Annotate
+        {% blocktrans %}<i class="fi-comments annotateIcon"></i> Annotate{% endblocktrans %}
       </div>
     </div>
     <!--End container-->
@@ -239,17 +247,58 @@
         </div>
 </header>
 
-<div class="row">
 
+
+{% if schema.0 %}
+<meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">
+<meta itemprop="{{schema.1.DM}}" content="{{node.last_update}}" >
+<meta itemprop="{{schema.1.creator}}" content="{{node.user_details_dict.created_by}}">
+<meta itemprop="{{schema.1.editor}}" content="{{node.user_details_dict.modified_by}}">
+<meta itemprop="{{schema.1.lang}}" content="{{node.language}}">
+<meta itemprop="{{schema.1.agerange}}" content="{{node.age_range}}">
+<meta itemprop="{{schema.1.timerequired}}" content="{{node.timerequired}}">
+{% for contributor_name in node.user_details.contributors %}
+<meta itemprop="{{schema.1.contributor}}" content="{{contributor_name}}">
+{% endfor %}                                                             
+{% if node|is_File %}     		
+<meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " > 	
+<meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >     	
+{% endif %}                     					  
+{% endif %} 	
+
+{% for neighbour in node.teaches %} 																
+<div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
+	<meta itemprop="{{schema.1.educationalframework}}" content="">
+	<meta itemprop="{{schema.1.alignmenttype}}" content="teaches">	
+	<meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+	<meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
+	<meta itemprop ="{{Schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
+</div>
+{% endfor %}
+
+{% for neighbour in node.assesses %} 																
+<div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
+	<meta itemprop="{{schema.1.educationalframework}}" content="">
+	<meta itemprop="{{schema.1.alignmenttype}}" content="assesses">	
+	<meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+	<meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
+	<meta itemprop ="{{schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
+</div>
+{% endfor %}
+
+<div class="row">
+	
   <section class="medium-9 columns">
 
     <div class="tabs-content">
 
       <!-- Tab content -->
       <div class="content {% if not topic %}active commentable-section {% endif %}" id="view-page" data-section-id="1">
+	<div class="row">
+	<div class="small-4 columns">
         {% if node.prior_node|length > 0 %}
         <div class="panel">
-          <h6>You may want to read these first:</h6>
+          {% blocktrans %}<h6>You may want to read these first:</h6>{% endblocktrans %}
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
           {% if each_node.mime_type %}
@@ -260,7 +309,40 @@
           {% endfor %}
         </div>
         {% endif %}
-
+	</div>
+	<div class="small-4 columns">
+	{% if node.teaches %}
+	<div class="panel">
+		<h6>This resource teaches you these</h6>
+		
+	 {% for  each_node in node.teaches %}
+	 {% get_grid_fs_object each_node as grid_fs_obj %}
+          {% if each_node.mime_type %}
+          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          {% else %}
+          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          {% endif %}
+          {% endfor %}
+	</div>
+	{% endif %}
+	</div>
+	<div class="small-4 columns">
+	{% if node.assesses %}
+	<div class="panel">
+		<h6>This resource assesses these</h6>
+	 {% for  each_node in node.assesses %}
+	 {% get_grid_fs_object each_node as grid_fs_obj %}
+          {% if each_node.mime_type %}
+          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          {% else %}
+          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          {% endif %}
+          {% endfor %}
+	</div>
+	{% endif %}
+	</div>
+	</div>
+	
         <!-- Code for showing media details -->
         {% if node.mime_type %}
 
@@ -271,7 +353,7 @@
            
       <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
               <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
-              Your browser does not support the video tag.
+              {% trans "Your browser does not support the video tag." %}
             </video><br/><br/>
 
       {% get_pandoravideo_metadata video_obj as metadata %}
@@ -285,7 +367,7 @@
             <br/>
             <br/>
             <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm" > 
-              <span class="fi-download large"> Download </span>
+              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
             </a>
             {% endif %}
           </div>
@@ -295,14 +377,14 @@
             <video width="640px" controls buffered>
               <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
               <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-              Your browser does not support the video tag.
+              {% trans "Your browser does not support the video tag." %}
             </video>
 
             {% if user.is_authenticated %}
             <br/>
             <br/>
             <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-              <span class="fi-download large"> Download </span>
+              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
             </a>
             {% endif %}
           </div>
@@ -324,7 +406,7 @@
             <br/>
             <br/>
             <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-              <span class="fi-download large"> Download </span>
+              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
             </a>
             {% endif %}
           </div>
@@ -366,11 +448,10 @@
           <br>
           {% endfor %}
         {% endfor %}
-       
       <div id="commentable-area">
         {% with node.html_content|safe as description %}
         {% if description != "None" %}
-        {{ description }}
+      	<span itemprop="{{schema.1.description}}">{{ description }}</span>
         {% endif %}
         {% endwith %}
       </div>
@@ -385,7 +466,7 @@
           
           {% get_contents node.pk as contents %}
           <fieldset id="image_contents">
-            <legend>Images</legend>
+           {% blocktrans %} <legend>Images</legend>{% endblocktrans %}
 
             {% for k,v in contents.items %}
               {% if k == "image_contents" %}
@@ -401,7 +482,7 @@
           </fieldset>
 
           <fieldset id="video_contents">
-            <legend>Videos</legend>
+            {% blocktrans %}<legend>Videos</legend>{% endblocktrans %}
             {% for k,v in contents.items %}
               {% if k == "video_contents" %}
                 {% for e in v %}
@@ -416,7 +497,7 @@
           </fieldset>
 
           <fieldset id="document_contents">
-            <legend>Documents</legend>
+            {% blocktrans %}<legend>Documents</legend>{% endblocktrans %}
             {% for k,v in contents.items %}
               {% for e in v %}
 
@@ -603,19 +684,19 @@
           {% if node.collection_set and user.is_authenticated %}
             {% if user_access == "allow" %}
             <li>
-              <a href="#" id="module">Make Module</a>
+             {% blocktrans %} <a href="#" id="module">Make Module</a>{% endblocktrans %}
             </li>
             {% endif %}
           {% endif %}
 
           <!-- This button translates given resource -->
           <li>
-            <a href="{% url 'node_translation' group_name_tag node %} ">Translate</a>
+            <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
           </li>
             
             <!-- Delete button if page created by user -->
             {% if node.created_by == request.user.id %}
-      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
       {% endif %}
 
           <!--
@@ -639,7 +720,7 @@
             {% if node.member_of_names_list.0 == "File" %}
             <li>
               <a href="{% url create_url group_name_tag %}?next={{request.path}}">
-                <span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                {% blocktrans %}<span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
               </a>
             </li>
 
@@ -648,13 +729,13 @@
               
                 <li>
                   <a href="{% url create_url group_name_tag app_id %}">
-                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  {% blocktrans %}  <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
                   </a>
                 </li>
               {% else %}
                 <li>
                   <a href="{% url create_url group_name_tag %}">
-                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                    {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
                   </a>
                 </li>
               {% endif %}
@@ -674,10 +755,10 @@
       {% include "ndf/rating.html" %} 
       </div>
     <div>
-      Languages 
+     {% trans "Languages" %} 
       <br></br>
       {% get_possible_translations node as tran %}
-      {% for each in tran %}
+     {% for each in tran %}
         {% for k,v in each.items %}
         <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
         {% endfor %}
@@ -688,13 +769,14 @@
 
 </div>
 
+
 <footer>
 
   <p><small>
     <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>
 </footer>
-
+</div> <!-- schema ends here -->
 <script type="text/javascript">
 
 {% comment %}

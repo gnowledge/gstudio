@@ -1,8 +1,8 @@
 {% extends "ndf/node_edit_base.html" %}
-
+{% load i18n %}
 {% block meta_content %}
 
-
+{% blocktrans %}
     <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
 
     <p class="text-justify">You can build a quiz in two ways:
@@ -11,15 +11,17 @@
 	<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
       </ol>
     </p>
-
+{% endblocktrans %}
 
     <!-- Add button -->
     {% if user.is_authenticated %}
-    <p>
-    <a href="{% url 'quiz_create' groupid %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create' groupid %}" class="button small right">+ Add {{title}} Item</a>
+<p>
+    <a href="{% url 'quiz_create' groupid %}" class="button small">{% trans "+ Add" %} {{title}}</a>
+    <a href="{% url 'quiz_item_create' groupid %}" class="button small right">{% blocktrans %}   
+ {{title}} Item {% endblocktrans %}   
+</a>
     </p>
-    {% endif %}
+ {% endif %}
     
 
 {% endblock %}

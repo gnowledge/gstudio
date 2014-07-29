@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% load pagination_tags %}
 
 {% block title %} {{ title }} {% endblock %}
@@ -100,7 +101,7 @@
         {% else %}
         <a class="small-4 columns" href="{% url 'mis-po:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
         {% endif %}
-            +&nbsp;Add
+            +&nbsp; {% trans "Add" %}
           </a>
           {% endif %}
 

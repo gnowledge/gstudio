@@ -1,14 +1,15 @@
+{% load i18n %}
 <br/><br/>
 <div>
 
   <!-- Title only row -->
   <div class="row">
     <div class="small-5 columns">
-      Select from following resources :
+      {% trans "Select from following resources :" %}
     </div>
 
     <div class="small-5 columns">
-      Add selected to following Collection : 
+      {% trans "Add selected to following Collection :" %} 
     </div>
   </div>  
   <br/>
@@ -60,7 +61,7 @@
         {% endfor %}
         
         {% else %}  
-        <li class="bullet-item" > <i>No content of selected type ! </i> </li>
+        <li class="bullet-item" > <i> {% trans "No content of selected type !" %} </i> </li>
         {% endif %}
 
       </ul>

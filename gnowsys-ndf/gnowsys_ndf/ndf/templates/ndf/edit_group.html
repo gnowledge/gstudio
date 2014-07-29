@@ -1,5 +1,5 @@
 {% extends "ndf/node_edit_base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 
 {% block title %} {{node.name}} - edit {% endblock %}
@@ -60,14 +60,14 @@ ul#graph-hover.f-dropdown{
         <div style='display:table-row;'>
 
           <div style='display:table-cell;'> 
-            <font size="3" > Following policy</font>
+            <font size="3" >{% trans "Following policy" %}</font>
           </div>
 
           <div style='display:table-cell;'> 
             <select name="subscription_policy" id="subscription_policy">
-              <option id="OPEN">OPEN</option>
-              <option id="BY_REQUEST">BY_REQUEST</option>
-              <option id="BY_INVITATION">BY_INVITATION</option>
+              <option id="OPEN">{% trans "OPEN" %}</option>
+              <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
+              <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
             </select>
           </div>
 
@@ -91,26 +91,26 @@ ul#graph-hover.f-dropdown{
 
        <div style='display:table-row;' >
          <div style='display:table-cell;'> 
-          <font size="3" >Group Type</font>
+          <font size="3" >{% trans "Group Type" %}</font>
         </div>
 
         <div style='display:table-cell;'> 
           <select name="group_type" id="group_type">
-           <option id="PUBLIC">PUBLIC</option>
-           <option id="PRIVATE">PRIVATE</option>
-           <option id="ANONYMOUS">ANONYMOUS</option>
+           <option id="PUBLIC">{% trans "PUBLIC" %}</option>
+           <option id="PRIVATE">{% trans "PRIVATE" %}</option>
+           <option id="ANONYMOUS">{% trans "ANONYMOUS" %}</option>
          </select> 
        </div>
 
        <div style='display:table-cell;'> 
-        <font size="3" >Group Editing policy</font>
+        <font size="3" >{% trans "Group Editing policy" %}</font>
       </div>
 
       <div style='display:table-cell;'> 
         <select name="edit_policy" id="edit_policy">
-         <option id="EDITABLE_NON_MODERATED">EDITABLE_NON_MODERATED</option>
-         <option id="EDITABLE_MODERATED">EDITABLE_MODERATED</option>
-         <option id="NON_EDITABLE">NON_EDITABLE</option>
+         <option id="EDITABLE_NON_MODERATED">{% trans "EDITABLE_NON_MODERATED" %}</option>
+         <option id="EDITABLE_MODERATED">{% trans "EDITABLE_MODERATED" %}</option>
+         <option id="NON_EDITABLE">{% trans "NON_EDITABLE" %}</option>
        </select> 
      </div>
 
@@ -119,25 +119,25 @@ ul#graph-hover.f-dropdown{
    <div style='display:table-row;'>
 
     <div style='display:table-cell;'> 
-      <font size="3" >Group Subscription policy</font>
+      <font size="3" >{% trans "Group Subscription policy" %}</font>
     </div>
 
     <div style='display:table-cell;'> 
       <select name="subscription_policy" id="subscription_policy">
-       <option id="OPEN">OPEN</option>
-       <option id="BY_REQUEST">BY_REQUEST</option>
-       <option id="BY_INVITATION">BY_INVITATION</option>
+       <option id="OPEN">{% trans "OPEN" %}</option>
+       <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
+       <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
      </select>
    </div>
 
    <div style='display:table-cell;'> 
-    <font size="3" >Group Existance visibility</font>
+    <font size="3" >{% trans "Group Existance visibility" %}</font>
   </div>
 
   <div style='display:table-cell;'> 
     <select name="visibility_policy" id="visibility_policy">
-     <option id="ANNOUNCED">ANNOUNCED</option>
-     <option id="NOT_ANNOUNCED">NOT_ANNOUNCED</option>
+     <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
+     <option id="NOT_ANNOUNCED">{% trans "NOT_ANNOUNCED" %}</option>
    </select>
  </div>
 
@@ -146,24 +146,24 @@ ul#graph-hover.f-dropdown{
 <div style='display:table-row;'>
 
   <div style='display:table-cell;'> 
-    <font size="3">  Group Member Visibility</font>
+    <font size="3">  {% trans "Group Member Visibility" %}</font>
   </div>
 
   <div style='display:table-cell;'> 
     <select name="disclosure_policy" id="disclosure_policy">
-     <option id="DISCLOSED_TO_MEM">DISCLOSED_TO_MEM</option>
-     <option id="NOT_DISCLOSED_TO_MEM">NOT_DISCLOSED_TO_MEM</option>
+     <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED_TO_MEM" %}</option>
+     <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT_DISCLOSED_TO_MEM" %}</option>
    </select>
  </div>
 
  <div style='display:table-cell;'> 
-  <font size="3" >Group Encryption policy</font>
+  <font size="3" >{% trans "Group Encryption policy" %}</font>
 </div>
 
 <div style='display:table-cell;'> 
   <select name="encryption_policy" id="encryption_policy">
-   <option id="NOT_ENCRYPTED">NOT_ENCRYPTED</option>
-   <option id="ENCRYPTED">ENCRYPTED</option>
+   <option id="NOT_ENCRYPTED">{% trans "NOT_ENCRYPTED" %}</option>
+   <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
  </select>
  </div>
 
@@ -182,7 +182,7 @@ ul#graph-hover.f-dropdown{
 
   <dd>
 
-    <a id="app_selected" href="#mySystemtype">Click here to select apps for {{node.name}} </a>
+    <a id="app_selected" href="#mySystemtype">{% blocktrans %} Click here to select apps for {{node.name}}{% endblocktrans %} </a>
 
       <div id="mySystemtype" class="content">
 

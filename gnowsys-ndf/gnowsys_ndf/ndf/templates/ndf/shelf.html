@@ -1,6 +1,7 @@
+{% load i18n %}
 <div id="shelf">
 
-<h4 class="text-center">Shelf</h4>
+<h4 class="text-center">{% trans "Shelf" %}</h4>
 <dl class="accordion" data-accordion>
 <!-- Adding new shelf text input and add button -->
   <dd>  
@@ -10,7 +11,7 @@
           <input type="text" id="new-shelf-text" onkeyup="(this.value).trim().length?$('#add-shelf-btn').removeClass('disabled'):$('#add-shelf-btn').addClass('disabled');" placeholder="Add new shelf">
         </div>
         <div class="small-2 columns">
-          <div id="add-shelf-btn" class="button postfix disabled">Add</div>
+          <div id="add-shelf-btn" class="button postfix disabled">{% trans "Add" %}</div>
         </div>
       </div>
     </div>
@@ -48,7 +49,9 @@
             {% endif %}
 
             {% if shelf_item_available %}
-              <span style="color:red"> Shelf Item name {{shelf_item_available}} is already exist </span>
+              <span style="color:red"> {% blocktrans %}
+		Shelf Item name {{shelf_item_available}} is already exist{% endblocktrans %}
+ </span>
             {% endif %}
 
             <br/>
@@ -59,7 +62,9 @@
                   <a class="add-shelf-item"  name="{{each.name}}"><i class='button postfix fi-arrow-right'></i></a>
                 </div>
                 <div class="small-10 columns">
-        	          Add {{node.name}}          
+        	          {% blocktrans %}
+Add {{node.name}}{% endblocktrans %}
+          
                 </div>
               </div>
             </div>

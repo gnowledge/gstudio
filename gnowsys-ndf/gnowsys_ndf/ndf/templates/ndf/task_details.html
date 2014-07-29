@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load pagination_tags %}
 {% load ndf_tags %}
 {% load i18n %}
@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block meta_content %}
-  <h2>Task</h2>
+  <h2>{% trans "Task" %}</h2>
 {% endblock %}
 
 {% block search_content %}
@@ -27,7 +27,7 @@
      <div class="task">
       <br/>
       <a class="button medium" href="{% url 'task_create_edit' group_name %}">
-      	<span class="fi-plus">&nbsp;&nbsp;New Task</span>
+      	<span class="fi-plus">&nbsp;&nbsp;{% trans "New Task" %}</span>
       </a>
     </div>
   {% endif %}
@@ -50,7 +50,7 @@
     <div style="display:table; border:1px; border-spacing:6px; " class="medium-12 columns">
 	<div class="row">
 	  <div class="medium-3 columns">
-	    <label><b>Parent task:</b></label>
+	    <label><b>{% trans "Parent task:" %}</b></label>
 	  </div>
 	  <div class="medium-3 columns">
 	    <label>{% if parent %}{{parent}}{% else %} -- {% endif %}</label>
@@ -66,7 +66,7 @@
 	</div>
 	<div class="row">
 	  <div class="medium-3 columns">
-	    <label><b>Start date:</b></label>
+	    <label><b>{% trans "Start date:" %}</b></label>
 	  </div>
 	  <div class="medium-3 columns">
 	    <label>{% if start_time %}{{start_time}}{% else %} -- {% endif %}</label>
@@ -74,7 +74,7 @@
 	<!</div>	
 	<!<div class="row">
 	  <div class="medium-3 columns">
-	    <label><b>Priority:</b></label>
+	    <label><b>{% trans "Priority:" %}</b></label>
 	  </div>
 	  <div class="medium-3 columns">
 	    <label>{% if Priority %}{{Priority}}{% else %} -- {% endif %}</label>
@@ -82,7 +82,7 @@
 	</div>
 	<div class="row">
 	  <div class="medium-3 columns">
-	    <label><b>Due date:</b></label>
+	    <label><b>{% trans "Due date:" %}</b></label>
 	  </div>
 	  <div class="medium-3 columns">
 	    <label>{% if end_time %}{{end_time}}{% else %} -- {% endif %}</label>
@@ -90,7 +90,7 @@
 	<!</div>	
 	<!<div class="row">
 	  <div class="medium-3 columns">
-	    <label><b>Assignee:</b></label>
+	    <label><b>{% trans "Assignee:" %}</b></label>
 	  </div>
 	  <div class="medium-3 columns">
 	    <label>{% if Assignee %}{{Assignee}}{% else %} -- {% endif %}</label>
@@ -98,7 +98,7 @@
 	</div>
 	<div class="row">
 	  <div class="medium-3 columns">
-	    <label><b>Estimated time:</b></label>
+	    <label><b>{% trans "Estimated time:" %}</b></label>
 	  </div>
 	  <div class="medium-3 columns">
 	    <label>{% if Estimated_time %}{{Estimated_time}}{% else %} -- {% endif %}</label>
@@ -109,7 +109,7 @@
 	{% if subtask %}
 	<div class="row">
 	  <div class="medium-3 columns">
-	      <label><b>Sub Task:</b></label>
+	      <label><b>{% trans "Sub Task:" %}</b></label>
 	  </div>
 	  <div class="medium-3 columns">
 		{% for each_subtask in subtask %}
@@ -124,7 +124,7 @@
 	<hr>
 	<div class="row">
 	  <div class="medium-12 columns">
-	    <label><b>Description:</b>
+	    <label><b>{% trans "Description:" %}</b>
 		{% if user_obj.username = request.user.username or request.user.is_superuser %}
 		<a href="#" class="button tiny" style="float:right" data-reveal-id="contentModal">Edit</a>
 		{% endif %}
@@ -143,7 +143,7 @@
        <hr>
 	<div class="row">
 	  <div class="medium-12 columns">
-	    <label><b>History:</b></label>
+	    <label><b>{% trans "History:" %}</b></label>
 	  </div>
 	</div>
 	<div class="history_task" style="padding-left:20px;">
@@ -186,24 +186,24 @@
 
 
 <div id="titleModal" class="reveal-modal" data-reveal>
-  <label><b>Editing Name</b></label><br/>
+  <label><b>{% trans "Editing Name" %}</b></label><br/>
   <div class="medium-6 columns">
      <input id="name_id" name="name" type="text" value="{{node.name}}"  class="medium-3 columns" placeholder="Enter name..." required>
-     <a href="#" class="button tiny" id="title_save">Save</a>
+     <a href="#" class="button tiny" id="title_save">{% trans "Save" %}</a>
   </div>
-  <a class="close-reveal-modal">&#215;</a>
+  <a class="close-reveal-modal">{% trans "&#215;" %}</a>
 </div>
 <div id="contentModal" class="reveal-modal" data-reveal>
 	<div class="medium-12 columns">
-	    <label><b>Description</b></label>
+	    <label><b>{% trans "Description" %}</b></label>
 	    <div id="contentlist" class="content">
 		<div class="">
 		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org %}
 		</div>
 	    </div>
 	  </div>
-     <a href="#" class="button tiny" id="content_save">Save</a>
-  <a class="close-reveal-modal">&#215;</a>
+     <a href="#" class="button tiny" id="content_save">{% trans "Save" %}</a>
+  <a class="close-reveal-modal">{% trans "&#215;" %}</a>
 </div>
 {% endblock %}
 

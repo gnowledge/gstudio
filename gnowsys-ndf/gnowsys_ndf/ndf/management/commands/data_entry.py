@@ -46,10 +46,11 @@ mis_group = collection.Node.one({'_type': "Group",
                                          {'altnames': {'$regex': u"MIS_admin", '$options': 'i'}}],
                                  'group_type': "PRIVATE"
                                 }, 
-                                {'created_by': 1}
-                            )
-group_id = mis_group._id
-user_id = mis_group.created_by  # User who created the above private group
+                                {'created_by': 1})
+if(mis_group != None):                            
+	group_id =  mis_group._id
+	user_id =  mis_group.created_by  # User who created the above private group
+
 
 class Command(BaseCommand):
     help = "Based on "
