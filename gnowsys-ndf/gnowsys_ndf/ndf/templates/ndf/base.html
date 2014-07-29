@@ -109,11 +109,11 @@
               <li><a href="#" data-options="align:left" data-dropdown="drop" class="button">&laquo; User Preference </a> </li>
 	      <ul id="drop" class="large f-dropdown" data-dropdown-content> 
 		<li><a href="#">Preference Language</a>
-               <select name="pref">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
+               <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
                     
 		</li> 
 		<li><a href="#">Fallback Language</a>
-               <select name="fallback">{% for each in lan %}<option id="{{each}}" value="each">{{each}}</option>{% endfor %}</select>
+               <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
 
 </li> 
 <li class="text-center">
@@ -385,7 +385,20 @@
 
 		{% block script %} {% endblock %}	
 //set language prefernce
+  $(document).on('click',"#savepref",function(){
+var vpref=$("#pref").val();
+var fb=$("#fallback").val();
+var vurl='/{{group_id}}/userpreference/';
 
+$.ajax({
+       url: vurl,
+       type: 'POST',
+       data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
+
+       success:function(data){
+               alert("Successfully set the preferences"); }
+}); //ajax closes
+}); //document closes
   </script>
   
 <script src="/static/ndf/js/app.js"></script> <!-- checked -->

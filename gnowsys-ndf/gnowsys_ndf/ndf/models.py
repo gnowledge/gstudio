@@ -1018,7 +1018,9 @@ class Author(Group):
     structure = {                
         'email': unicode,       
         'password': unicode,
-        'visited_location': []
+        'visited_location': [],
+        'preferred_languages':dict          # preferred languages for users like preferred lang. , fall back lang. etc.
+
     }
 
     use_dot_notation = True
