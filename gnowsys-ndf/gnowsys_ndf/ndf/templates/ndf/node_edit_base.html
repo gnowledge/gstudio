@@ -78,12 +78,26 @@ background-repeat:no-repeat; background-size: 48px 48px
 	  <a href="#panel-name-description">{% block page_tab %} Node {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
-	  <a href="#panel-prior-node" class="prior_node_tab">Prior Node</a>
+	  <a href="#panel-prior-node" class="prior_node_tab">Requires</a>
 	</dd>
 	<!-- change name of collection tab overide block in your code -->
 	<dd title="Click here to add/edit collection">
 	  <a href="#panel-collection" class="collection_tab">{% block collection_tab %}Collection {% endblock %}</a> 
 	</dd>  
+
+	<!-- change name of metadata tab overide block in your code -->
+	<dd title="Click here to add/edit metadata">
+	  <a href="#panel-metadata" >Metadata </a> 
+	</dd>  
+	
+	<dd title="Click here to add/edit teaches">
+	 	<a href="#panel-teaches" class="teaches_tab" >Teaches </a> 
+	</dd>
+	
+	<dd title="Click here to add/edit teaches">
+	 	<a href="#panel-assesses" class="assesses_tab" >Assesses </a> 
+	</dd>
+	
 	
      </dl>
      
@@ -295,8 +309,112 @@ background-repeat:no-repeat; background-size: 48px 48px
       <input type="submit" id="save-node" value="Save as Draft And Preview" class="round button"/>
       
     {% endblock %}
+
     
-  </div>  
+  
+
+    
+    <div class="content" id="panel-metadata" style="width:95%;" >
+      
+      <div class="row">
+	  <h3>Add or edit Metadata - Please spend a few minutes </h3>
+        
+
+        <div class="small-5 columns">
+         <h5>Age Range:</h5>  <input id="age_range" name="age_range" type="text" value="{{node.age_range}}"  >
+        
+         <h5>Target Audience: </h5> <input name="audience" type="text" value="{{node.audience}}"  >
+         <label><h5>Time Required :</h5> <select name="timerequired" value="{{node.timerequired}}"><option>0-2M</option><option>2-5M</option><option>5-15M</option><option>15-45M</option></select></label>
+         <label><h5>Interactivity Type :</h5> <select name="interactivitytype "><option>Active</option><option>Mixed</option><option>Expositive</option></select></label>
+         <label><h5>Based on Url: </h5> <input name="basedonurl" type="text" value="{{node.basedonurl}}"  ></label>
+         <label><h5>Educational Use: </h5> <input name="educationaluse" type="text" value="{{node.educationaluse}}" placeholder="" ></label>
+        </div>
+        
+        
+        <!--
+	<div class="small-3 columns">
+                  <dl class="accordion" data-accordion>
+  <dd>
+    <a href="#align1"class="current">AlignmentObject1</a>
+    <div id="align1" class="content active">
+         <label>AlignmentType<select name="aligntype1"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework1" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname1" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl1" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription1" type="text" value="" placeholder="" >
+        
+         
+    </div>
+  </dd> </dl>
+  <dl class="accordion" data-accordion><dd>
+   
+     <a href="#align2" >AlignmentObject2</a>
+    <div id="align2" class="content active">
+         <label>AlignmentType<select name="aligntype"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework2" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname2" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl2" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription2" type="text" value="" placeholder="" >
+    </div>
+  </dd></dl>
+  <dl class="accordion" data-accordion><dd>
+     <a href="#align3">AlignmentObject 3</a>
+     <div id="align3" class="content active">
+         <label>AlignmentType<select name="aligntype"><option>Teaches</option><option>Assesses</option><option>Requires</option></select></label>
+	Educational Framework: <input id="" name="eduframework3" type="text" value="" placeholder="" >
+	Target Name: <input id="" name="tname3" type="text" value="" placeholder="" >
+        Target Url: <input id="" name="turl3" type="text" value="" placeholder="" >
+        Target Description: <input id="" name="tdescription3" type="text" value="" placeholder="" >
+     </div>
+  </dd>
+</dl>  -->         
+
+        <div class="small-5 columns">
+	  <h5>Text Complexity</h5>  <input  name="textcomplexity" type="text" value="{{node.textcomplexity}}">
+        
+         <h5>Reading Level: </h5> <input name="readinglevel" type="text" value="{{node.readinglevel}}" placeholder="" >
+         
+         <h5>Educational Subject: </h5> <input name="educationalsubject" type="text" value="{{node.educationalsubject}}" placeholder="" >
+         <h5>Educational Level: </h5> <input name="educationallevel" type="text" value="{{node.educationallevel}}" placeholder="" >
+        </div>
+        
+      </div>
+        
+	
+    </div>  
+   
+    <div class="content" id="panel-teaches"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Teaches : </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="teaches_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    </div>
+	
+     <div class="content" id="panel-assesses"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Assesses : </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="assesses_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    </div>
+
+</div> <!--the final one -->
+
   
   {% block add_fields %} {% endblock %}
   
@@ -367,7 +485,7 @@ var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
 saveflag = 1;
 get_new_groups();
 new_groups=data_list;
-$.ajax({
+$.cd({
        url: turl,
        type: 'POST',
        data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
@@ -491,14 +609,65 @@ $("#name_id").change(function(){
 
 	});
 
+	$(".teaches_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "teaches",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#teaches_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+    
+        $(".assesses_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#assesses_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "assesses",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#assesses_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+
 
 	$("#save-node").click(function() {
 
 		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
-
-		$(".node_id").each(function (){
+		tch_arr=[]  // for teaches
+		assess_arr=[] // for assesses
+ 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());
 			}
@@ -510,12 +679,20 @@ $("#name_id").change(function(){
 			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
   				md_arr.push($(this).val());
   			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				assess_arr.push($(this).val());
+			}
 		});
-
-		$("#prior_node_list").val(pn_arr)
-		$("#collection_set_list").val(cn_arr) 
-		$("#module_list").val(md_arr)   
-
+		//alert(pn_arr + 'prior')
+		//alert(assess_arr + 'assess')
+		$("#prior_node_list").val(pn_arr);
+		$("#collection_list").val(cn_arr) ;
+		$("#module_list").val(md_arr);
+		$("#teaches_list").val(tch_arr);
+		$("#assesses_list").val(assess_arr);
 		{% block base_save_on_click %}{% endblock %}
 	});
 

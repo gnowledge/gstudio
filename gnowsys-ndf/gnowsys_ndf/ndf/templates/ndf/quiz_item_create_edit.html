@@ -10,6 +10,26 @@
     display: none;
 }
 
+.resource-drawer { 
+border-color: #D3D3D3; border-style: solid; 
+padding: 0 !important; 
+overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+height:40px; 		
+background-repeat:no-repeat; background-size: 48px 48px
+}
+
+
 {% endblock %}
 
 {% block meta_content %}
@@ -37,7 +57,22 @@
 {% get_group_name groupid as group_name_tag %}
 <form id="quiz_item_create_form" method="POST" action="">
 {% csrf_token %}
-
+<header>
+<nav class="medium-12 columns">
+      <dl class="tabs" data-tab>
+	<dd><h3>View:</h3></dd>
+	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
+	  <!-- change name of collection tab overide block in your code -->
+	  <a href="#panel-name-description"> Quiz Item </a>
+	</dd>
+	<dd title="Click here to add/edit what this Quiz Assesses">
+	  <a href="#panel-assesses" class="assesses_tab">Assesses</a>
+	</dd>
+      </dl>
+</nav>
+</header>
+<div id="node-details-edit-div" class="tabs-content" > <!--1--> 
+<div class="active content row" id="panel-name-description"> <!--2-->
 <div class="row">
   <div class="small-12 large-12 columns">
   <fieldset id="type_tag">
@@ -148,9 +183,28 @@
 	</div>
       </div>
     </fieldset>
-
+   </div>
   </div>
-</div>
+</div>	
+
+ <div class="content" id="panel-assesses"  style="width:95%;">
+    <div class="row">
+	<div class="small-12 columns">
+	<h5>Add or edit Assesses12 : </h5>
+	</div>	
+		<br/>
+	
+	<div class="small-12 columns">
+	  <div id="assesses_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  </div>
+	</div>
+     </div>
+ </div>
+
+</div>  <!--final one -->
+	
+
 
 <div class="row">
   <div class="small-1 columns">
@@ -196,6 +250,49 @@ $('#quiz_type').blur(function (){
     $("#quiz_type_val").val($(this).val())
 });
 
+$(document).ready(function(){
+	 $(".assesses_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#assesses_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "assesses",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#assesses_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+
+	$("#save_quiz_item").click(function() {
+
+		assess_arr=[] // for assesses
+ 		$(".node_id").each(function (){
+			
+			
+			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				assess_arr.push($(this).val());
+			}
+		});
+		//alert(assess_arr)
+		
+		$("#assesses_list").val(assess_arr);
+		{% block base_save_on_click %}{% endblock %}
+	});
+});
+ 
 var no_of_options = 2;
 /*
  * Element     : add_option

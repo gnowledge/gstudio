@@ -20,6 +20,9 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
+from gnowsys_ndf.ndf.node_metadata_details import schema_dict
+
+
 
 register = Library()
 db = get_database()
@@ -28,6 +31,60 @@ at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'}, {'name':'ap
 translation_set=[]
 check=[]
 import json,ox
+
+
+
+
+@register.assignment_tag
+def get_schema(node):
+   obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
+   nam=node.member_of_names_list[0]
+   if(nam=='Page'):
+	#print s_dict[nam]
+        return [1,schema_dict[nam]]
+   elif(nam=='File'):
+	if( 'image' in node.mime_type):
+		return [1,schema_dict['Image']]
+        elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+        	return [1,schema_dict['Video']]
+	else:
+		return [1,schema_dict['Document']]	
+   else:
+	return [0,""]
+"""
+@register.assignment_tag
+def g2(node):
+     	node.get_neighbourhood(node.member_of)
+  #if(node.has_key('basedonurl')):
+	#schema_lrmi["basedonurl"] = node.basedonurl
+	#schema_lrmi["timerequired"] = node.timerequired
+	#schema_lrmi["agerange"]=node.age_range
+	#schema_lrmi["audience"]=node.audience
+	#schema_lrmi["interactivitytype"]=node.interactivitytype
+        return schema_lrmi 
+"""
+@register.filter
+def is_Page(node):
+	Page = collection.Node.one({"_type":"GSystemType","name":"Page"})
+	if(Page._id in node.member_of):
+		return 1
+	else:
+		return 0
+@register.filter
+def is_Quiz(node):
+	Quiz = collection.Node.one({"_type":"GSystemType","name":"Quiz"})
+	if(Quiz._id in node.member_of):
+		return 1
+	else:
+		return 0
+		
+@register.filter
+def is_File(node):
+	File = collection.Node.one({"_type":"GSystemType","name":"File"})
+	if(File._id in node.member_of):
+		return 1
+	else:
+		return 0
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
