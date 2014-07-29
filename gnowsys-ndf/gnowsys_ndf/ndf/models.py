@@ -1302,7 +1302,7 @@ class HistoryManager():
 	# assigning None value to key, which is not present in json_data compare to Node class keys
 	null = 0
 	import json
-	json_dict = eval(json_data)
+	json_dict = json.loads(json_data)
 	json_node_keys = document_object.keys()
 	json_dict_keys = json_dict.keys()
 	diff_keys = list(set(json_node_keys)-set(json_dict_keys))

@@ -21,6 +21,10 @@ from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
 from gnowsys_ndf.settings import LOCAL_LANG
+from gnowsys_ndf.ndf.node_metadata_details import schema_dict
+
+
+
 register = Library()
 db = get_database()
 collection = db[Node.collection_name]
@@ -28,6 +32,60 @@ at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'}, {'name':'ap
 translation_set=[]
 check=[]
 import json,ox
+
+
+
+
+@register.assignment_tag
+def get_schema(node):
+   obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
+   nam=node.member_of_names_list[0]
+   if(nam=='Page'):
+	#print s_dict[nam]
+        return [1,schema_dict[nam]]
+   elif(nam=='File'):
+	if( 'image' in node.mime_type):
+		return [1,schema_dict['Image']]
+        elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+        	return [1,schema_dict['Video']]
+	else:
+		return [1,schema_dict['Document']]	
+   else:
+	return [0,""]
+"""
+@register.assignment_tag
+def g2(node):
+     	node.get_neighbourhood(node.member_of)
+  #if(node.has_key('basedonurl')):
+	#schema_lrmi["basedonurl"] = node.basedonurl
+	#schema_lrmi["timerequired"] = node.timerequired
+	#schema_lrmi["agerange"]=node.age_range
+	#schema_lrmi["audience"]=node.audience
+	#schema_lrmi["interactivitytype"]=node.interactivitytype
+        return schema_lrmi 
+"""
+@register.filter
+def is_Page(node):
+	Page = collection.Node.one({"_type":"GSystemType","name":"Page"})
+	if(Page._id in node.member_of):
+		return 1
+	else:
+		return 0
+@register.filter
+def is_Quiz(node):
+	Quiz = collection.Node.one({"_type":"GSystemType","name":"Quiz"})
+	if(Quiz._id in node.member_of):
+		return 1
+	else:
+		return 0
+		
+@register.filter
+def is_File(node):
+	File = collection.Node.one({"_type":"GSystemType","name":"File"})
+	if(File._id in node.member_of):
+		return 1
+	else:
+		return 0
 
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
@@ -423,6 +481,76 @@ def thread_reply_count( oid ):
 			thread_reply_count(each._id)
 	
 	return global_thread_rep_counter
+
+
+# To get all the discussion replies
+# global variable to count thread's total reply
+# global_disc_rep_counter = 0	
+# global_disc_all_replies = []
+reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+@register.assignment_tag
+def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
+	'''
+	Method to count total replies for the disc.
+	'''
+
+	ins_objectid  = ObjectId()
+	if ins_objectid.is_valid(group_id) is False:
+		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		if group_ins:
+			group_id = str(group_ins._id)
+		else:
+			auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+			if auth :
+				group_id = str(auth._id)
+	else:
+		pass
+
+	# thr_rep = collection.GSystem.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})#.sort({'created_at': -1})
+	thr_rep = collection.Node.find({'_type':'GSystem', 'group_set':ObjectId(group_id), 'prior_node':ObjectId(oid), 'member_of':ObjectId(reply_st._id)}).sort('created_at', -1)
+
+	# to acces global_disc_rep_counter as global and not as local
+	# global global_disc_rep_counter 
+	# global global_disc_all_replies
+
+	if thr_rep and (thr_rep.count() > 0):
+
+		for each in thr_rep:
+
+			# print "\n\n",each.created_at
+			# if level == 1:
+			# 	global_disc_all_replies = temp_list + global_disc_all_replies
+			# 	temp_list = []
+
+			# global_disc_rep_counter += 1
+			temp_disc_reply = {"content":"", "last_update":"", "user":"", "oid":"", "prior_node":""}
+
+			temp_disc_reply["HTMLcontent"] = each.content
+			temp_disc_reply["ORGcontent"] = each.content_org
+			temp_disc_reply["last_update"] = each.last_update
+			temp_disc_reply["username"] = User.objects.get(pk=each.created_by).username
+			temp_disc_reply["userid"] = int(each.created_by)
+			temp_disc_reply["oid"] = str(each._id)
+			temp_disc_reply["prior_node"] = str(each.prior_node[0])
+			temp_disc_reply["level"] = level
+
+			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
+			if not any( d['oid'] == str(each._id) for d in global_disc_all_replies ):
+				if type(global_disc_all_replies) == str:
+					global_disc_all_replies = list(global_disc_all_replies)
+				global_disc_all_replies.append(temp_disc_reply)
+				# global_disc_all_replies.insert(0, temp_disc_reply)
+				# temp_list.append(temp_disc_reply)
+				# print "\n\n", temp_list
+								
+			# print "\n\n---- : ", level, " : ", each.content_org, temp_disc_reply
+			# get_disc_replies(each._id, (level+1), temp_list)
+			get_disc_replies(each._id, group_id, global_disc_all_replies, (level+1) )
+	
+	# print global_disc_all_replies
+	return global_disc_all_replies
+# global_disc_all_replies = []
 	
 
 @register.assignment_tag

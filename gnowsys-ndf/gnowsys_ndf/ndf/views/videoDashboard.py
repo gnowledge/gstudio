@@ -14,8 +14,9 @@ except ImportError:  # old pymongo
 from gnowsys_ndf.ndf.models import File
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
-
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata
 
 
 db = get_database()
@@ -151,8 +152,21 @@ def video_edit(request,group_id,_id):
     vid_node = collection.File.one({"_id": ObjectId(_id)})
     video_obj=request.GET.get("vid_id","")
     if request.method == "POST":
+
         # get_node_common_fields(request, vid_node, group_id, GST_VIDEO)
         vid_node.save(is_changed=get_node_common_fields(request, vid_node, group_id, GST_VIDEO))
+	get_node_metadata(request,vid_node,GST_VIDEO)
+	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+	if teaches_list !='':
+			teaches_list=teaches_list.split(",")
+	create_grelation_list(vid_node._id,"teaches",teaches_list)
+	
+	if assesses_list !='':
+		assesses_list=assesses_list.split(",")
+					
+	create_grelation_list(vid_node._id,"assesses",assesses_list)
+        
+
         return HttpResponseRedirect(reverse('video_detail', kwargs={'group_id': group_id, '_id': vid_node._id}))
         
     else:

@@ -1,4 +1,5 @@
 {% load ndf_tags %}
+{% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 
 {% block head %}
@@ -14,68 +15,144 @@
   <script type="text/javascript" src="/static/ndf/bower_components/side-comments/release/side-comments.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/side-comments.css">
   <link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/side-comments/release/themes/default-theme.css">
+
+  <!-- orgitdown! -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/jquery.orgitdown-foundation.js"></script>
+  <!-- orgitdown! toolbar settings -->
+  <script type="text/javascript" src="/static/ndf/orgitdown/skins/gstudio/set.js"></script>
+  <!-- orgitdown! skin -->
+  <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
+
 {% endblock %}
 
 <!-- css for drawer widget -->
 <style type = "text/css">
-.movingDiv{
-  display:none; 
-  position:absolute;
-  color: green;
-  font-size: 10px; 
-  z-index:40; 
-  background-color:white; 
-  box-shadow: 0px 0px 5px #888888; 
-}
-.annotatedElement{
-background-color : rgba(255,0,0,0.2);
-font-weight:bold;
-} 
-.movingDivIcon{
-  font-size: 35px;
-  color: green;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-.annotateIcon{
-  font-size: 35px;
-  color: green;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-.divider-line { font-size: xx-large; color:lightgray; }
-.line-height-2 { line-height:2; }
-.line-height-2pt5 { line-height:2.5; }
-.fontsize-x-large { font-size: x-large; }
 
-.margin-0 { margin: 0 !important ;}
+  .movingDiv{
+    display:none; 
+    position:absolute;
+    color: green;
+    font-size: 10px; 
+    z-index:40; 
+    background-color:white; 
+    box-shadow: 0px 0px 5px #888888; 
+  }
+  .annotatedElement{
+  background-color : rgba(255,0,0,0.2);
+  font-weight:bold;
+  } 
+  .movingDivIcon{
+    font-size: 35px;
+    color: green;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .annotateIcon{
+    font-size: 35px;
+    color: green;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
 
-.resource-drawer {
-border-color: #D3D3D3; border-style: solid;
-padding: 0 !important;
-overflow-y: auto;
-}
+  .margin-0 { margin: 0 !important ;}
 
-.resource-drawer li.bullet-item:hover{
-background-color: #ecf0f1; cursor:pointer;
-}
+  .resource-drawer {
+  border-color: #D3D3D3; border-style: solid;
+  padding: 0 !important;
+  overflow-y: auto;
+  }
 
-.posted-by{ color: #808080; font-size: small; }
+  .resource-drawer li.bullet-item:hover{
+  background-color: #ecf0f1; cursor:pointer;
+  }
 
-.selected-resource { background-color:lightgray !important ; }
+  .posted-by{ color: #808080; font-size: small; }
 
-.resource-type-image {
-height:40px;
-background-repeat:no-repeat; background-size: 48px 48px
-}
+  .selected-resource { background-color:lightgray !important ; }
 
-ul#graph-hover.f-dropdown{
-  width: inherit !important;
-}
+  .resource-type-image {
+  height:40px;
+  background-repeat:no-repeat; background-size: 48px 48px
+  }
 
-#graph-hover > li > a:hover {
-  color: #555555;
-}
+  ul#graph-hover.f-dropdown{
+    width: inherit !important;
+  }
+
+  #graph-hover > li > a:hover {
+    color: #555555;
+  }
+
+
+  /*orgitdown style*/
+
+  .orgitdown{
+    /*height:100px;*/
+    width: 100% !important;
+  }
+  
+  .row.orgitdownContainer{
+    /*height:100px;*/
+    background-color: #EEEEEE;
+    padding: 0 1em;
+  }
+
+  .row.orgitdownContainer > ul
+  {
+    margin-bottom: 0 !important; 
+  }
+  /*.orgitdownEditor{
+    height:60px;
+  */}
+
+  .orgitdownContainer::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px; 
+  
+  }
+
+  .reply-btn{
+    cursor: pointer;
+    /*margin-left: -1.3em;
+    margin-top: -1em;
+    position: relative;
+    width: 21.87rem;*/
+  }
+
+  .reply-button:hover {
+    font-weight: bold;
+  }
+
+  .disc-replies { 
+    
+    padding:10px;
+    background-color:#cfe8c7;
+    width:25em;
+    max-width: 40em;
+    margin-left: 48px; 
+    margin-top: 10px;
+  }
+
+  .align-center {
+    margin: 0 auto;
+    display: block;
+  }
 
 </style>
 
@@ -102,23 +179,30 @@ ul#graph-hover.f-dropdown{
 </div>
 <!-- end dialog -->
 
+{% get_schema node as schema %} 
+
+
+<div itemscope itemtype="{{schema.1.type}}">
 <header class="page">
     <div class="row">
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
-      <li><a href="#">Collection Name</a></li>
+      {% blocktrans %}<li><a href="#">Collection Name</a></li>{% endblocktrans %}
     </ul>
+
+
 
       <div class="label-list"> 
       {% for tag in node.tags %}
       <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+       <span itemprop="{{schema.1.tags}}" content="{{tag}}">
       {% endfor %}
 
     </div> 
       
     <h1>
-      <span class='node'>{{node.name}}</span>           
+      <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>     
   </h1>
 
   <div class="row">
@@ -126,7 +210,7 @@ ul#graph-hover.f-dropdown{
       <dl class="row tabs" data-tab>
 
         {% if topic %}
-        <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> Contents </a></dd>
+       {% blocktrans %} <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> Contents </a></dd>{% endblocktrans %}
         {% endif %}
 
         <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
@@ -134,27 +218,27 @@ ul#graph-hover.f-dropdown{
         <dd>
             <a href="#view-graph" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
                 <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-                    <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>
+                    {% blocktrans %}<li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>{% endblocktrans %}
                     {% if node.collection_set %}
-                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
+                      {% blocktrans %}<li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>{% endblocktrans %}
                     {% endif %}
           
                     {% if node.prior_node %}
-                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+                     {% blocktrans %} <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>{% endblocktrans %}
                     {% endif %}
                 </ul>
         </dd>
 
-        <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+        {% blocktrans %}<dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>{% endblocktrans %}
 
-        <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+     {% blocktrans %}<dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>{% endblocktrans %}
       </dl>
     </div>
     
     <!-- Container for enabling/disabling annotation mode -->
     <div class="small-2 columns">          
       <div id = "toggleContainer" style="cursor: pointer; color: green;" onClick="toggle(this);">
-        <i class="fi-comments annotateIcon"></i> Annotate
+        {% blocktrans %}<i class="fi-comments annotateIcon"></i> Annotate{% endblocktrans %}
       </div>
     </div>
     <!--End container-->
@@ -163,17 +247,58 @@ ul#graph-hover.f-dropdown{
         </div>
 </header>
 
-<div class="row">
 
+
+{% if schema.0 %}
+<meta itemprop="{{schema.1.DC}}" content="{{node.created_at}}">
+<meta itemprop="{{schema.1.DM}}" content="{{node.last_update}}" >
+<meta itemprop="{{schema.1.creator}}" content="{{node.user_details_dict.created_by}}">
+<meta itemprop="{{schema.1.editor}}" content="{{node.user_details_dict.modified_by}}">
+<meta itemprop="{{schema.1.lang}}" content="{{node.language}}">
+<meta itemprop="{{schema.1.agerange}}" content="{{node.age_range}}">
+<meta itemprop="{{schema.1.timerequired}}" content="{{node.timerequired}}">
+{% for contributor_name in node.user_details.contributors %}
+<meta itemprop="{{schema.1.contributor}}" content="{{contributor_name}}">
+{% endfor %}                                                             
+{% if node|is_File %}     		
+<meta  itemprop="{{schema.1.size}}" content="{{node.file_size.size}} " > 	
+<meta  itemprop="{{schema.1.format}}" content="{{node.mime_type}}" >     	
+{% endif %}                     					  
+{% endif %} 	
+
+{% for neighbour in node.teaches %} 																
+<div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
+	<meta itemprop="{{schema.1.educationalframework}}" content="">
+	<meta itemprop="{{schema.1.alignmenttype}}" content="teaches">	
+	<meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+	<meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
+	<meta itemprop ="{{Schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
+</div>
+{% endfor %}
+
+{% for neighbour in node.assesses %} 																
+<div itemprop="{{schema.1.educationalalignment}}" itemscope itemtype="alignmentObject">
+	<meta itemprop="{{schema.1.educationalframework}}" content="">
+	<meta itemprop="{{schema.1.alignmenttype}}" content="assesses">	
+	<meta itemprop="{{schema.1.targeturl}}" content="{{neighbour.url}}"> 
+	<meta itemprop ="{{schema.1.targetname}}" content ="{{neighbour.name}}">
+	<meta itemprop ="{{schema.1.targetdescription}}" content ="{{neighbour.html_content}}"> 
+</div>
+{% endfor %}
+
+<div class="row">
+	
   <section class="medium-9 columns">
 
     <div class="tabs-content">
 
       <!-- Tab content -->
       <div class="content {% if not topic %}active commentable-section {% endif %}" id="view-page" data-section-id="1">
+	<div class="row">
+	<div class="small-4 columns">
         {% if node.prior_node|length > 0 %}
         <div class="panel">
-          <h6>You may want to read these first:</h6>
+          {% blocktrans %}<h6>You may want to read these first:</h6>{% endblocktrans %}
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
           {% if each_node.mime_type %}
@@ -184,7 +309,40 @@ ul#graph-hover.f-dropdown{
           {% endfor %}
         </div>
         {% endif %}
-
+	</div>
+	<div class="small-4 columns">
+	{% if node.teaches %}
+	<div class="panel">
+		<h6>This resource teaches you these</h6>
+		
+	 {% for  each_node in node.teaches %}
+	 {% get_grid_fs_object each_node as grid_fs_obj %}
+          {% if each_node.mime_type %}
+          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          {% else %}
+          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          {% endif %}
+          {% endfor %}
+	</div>
+	{% endif %}
+	</div>
+	<div class="small-4 columns">
+	{% if node.assesses %}
+	<div class="panel">
+		<h6>This resource assesses these</h6>
+	 {% for  each_node in node.assesses %}
+	 {% get_grid_fs_object each_node as grid_fs_obj %}
+          {% if each_node.mime_type %}
+          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+          {% else %}
+          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          {% endif %}
+          {% endfor %}
+	</div>
+	{% endif %}
+	</div>
+	</div>
+	
         <!-- Code for showing media details -->
         {% if node.mime_type %}
 
@@ -195,7 +353,7 @@ ul#graph-hover.f-dropdown{
            
       <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
               <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
-              Your browser does not support the video tag.
+              {% trans "Your browser does not support the video tag." %}
             </video><br/><br/>
 
       {% get_pandoravideo_metadata video_obj as metadata %}
@@ -209,7 +367,7 @@ ul#graph-hover.f-dropdown{
             <br/>
             <br/>
             <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm" > 
-              <span class="fi-download large"> Download </span>
+              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
             </a>
             {% endif %}
           </div>
@@ -219,14 +377,14 @@ ul#graph-hover.f-dropdown{
             <video width="640px" controls buffered>
               <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
               <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-              Your browser does not support the video tag.
+              {% trans "Your browser does not support the video tag." %}
             </video>
 
             {% if user.is_authenticated %}
             <br/>
             <br/>
             <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-              <span class="fi-download large"> Download </span>
+              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
             </a>
             {% endif %}
           </div>
@@ -248,7 +406,7 @@ ul#graph-hover.f-dropdown{
             <br/>
             <br/>
             <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-              <span class="fi-download large"> Download </span>
+              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
             </a>
             {% endif %}
           </div>
@@ -290,11 +448,10 @@ ul#graph-hover.f-dropdown{
           <br>
           {% endfor %}
         {% endfor %}
-       
       <div id="commentable-area">
         {% with node.html_content|safe as description %}
         {% if description != "None" %}
-        {{ description }}
+      	<span itemprop="{{schema.1.description}}">{{ description }}</span>
         {% endif %}
         {% endwith %}
       </div>
@@ -309,7 +466,7 @@ ul#graph-hover.f-dropdown{
           
           {% get_contents node.pk as contents %}
           <fieldset id="image_contents">
-            <legend>Images</legend>
+           {% blocktrans %} <legend>Images</legend>{% endblocktrans %}
 
             {% for k,v in contents.items %}
               {% if k == "image_contents" %}
@@ -325,7 +482,7 @@ ul#graph-hover.f-dropdown{
           </fieldset>
 
           <fieldset id="video_contents">
-            <legend>Videos</legend>
+            {% blocktrans %}<legend>Videos</legend>{% endblocktrans %}
             {% for k,v in contents.items %}
               {% if k == "video_contents" %}
                 {% for e in v %}
@@ -340,7 +497,7 @@ ul#graph-hover.f-dropdown{
           </fieldset>
 
           <fieldset id="document_contents">
-            <legend>Documents</legend>
+            {% blocktrans %}<legend>Documents</legend>{% endblocktrans %}
             {% for k,v in contents.items %}
               {% for e in v %}
 
@@ -388,7 +545,74 @@ ul#graph-hover.f-dropdown{
        <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
        <!-- #{#%# endif %} -->
      </div>
+
+
+    <!-- discussion content area -->
+    <div id="view-discussion" class="content">
+    {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+
+      <br/>
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org" style="margin-bottom:0;">
+      {% if all_replies %}
+        Add Reply
+      {% else %}
+        Start discussion
+      {% endif %}
+      </div>
+
+      <div id="replies-area">
+        
+        <!-- populating replies -->
+        {% for each_reply in all_replies %}
+
+          <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-priornode-id="{{ each_reply.prior_node }}">
+            
+            <div class="row"> 
+              <div class="small-3 columns">
+                <a class="text-center" href="/home/{{each_reply.userid}}/userDashboard">
+                  <span class="align-center"><i class="fi-torso"></i></span>
+                  <label>{{ each_reply.username }}</label>
+                </a>
+              </div>
+              <div class="small-9 columns">
+                {% spaceless %}
+                  {{each_reply.HTMLcontent | safe }}
+                {% endspaceless %}
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="small-9 columns"> <small>{{ each_reply.last_update }}</small> </div>
+              <div class='reply-btn text-right small-3 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
+                reply
+              </div>
+            </div>
+
+          </div>
+
+        {% endfor %}
+        <!-- END of populating replies -->
+        
+      </div>
+
+      <!-- orgitdown container   -->
+      <div id="org" style="" class="reveal-modal small" data-reveal>
+        <!-- Reply : -->
+
+        <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
+
+        <input data-id="{{ node.pk }}" type="button" value="Post Reply"  class="button expand reply-button" onclick="addReply($(this))">
+
+        <input type="hidden" id="prior-node" style="visibility:hidden" value="">
+        <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
+
+      </div>
+      <!-- end of orgit down container -->
+
     </div>
+    <!-- END of discussion content area -->     
+
+    </div><!-- end of tab's content -->
   </section>
 
   <section class="medium-3 columns">
@@ -460,19 +684,19 @@ ul#graph-hover.f-dropdown{
           {% if node.collection_set and user.is_authenticated %}
             {% if user_access == "allow" %}
             <li>
-              <a href="#" id="module">Make Module</a>
+             {% blocktrans %} <a href="#" id="module">Make Module</a>{% endblocktrans %}
             </li>
             {% endif %}
           {% endif %}
 
           <!-- This button translates given resource -->
           <li>
-            <a href="{% url 'node_translation' group_name_tag node %} ">Translate</a>
+            <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
           </li>
             
             <!-- Delete button if page created by user -->
             {% if node.created_by == request.user.id %}
-      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">Delete</a>
+      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
       {% endif %}
 
           <!--
@@ -496,7 +720,7 @@ ul#graph-hover.f-dropdown{
             {% if node.member_of_names_list.0 == "File" %}
             <li>
               <a href="{% url create_url group_name_tag %}?next={{request.path}}">
-                <span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                {% blocktrans %}<span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
               </a>
             </li>
 
@@ -505,13 +729,13 @@ ul#graph-hover.f-dropdown{
               
                 <li>
                   <a href="{% url create_url group_name_tag app_id %}">
-                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                  {% blocktrans %}  <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
                   </a>
                 </li>
               {% else %}
                 <li>
                   <a href="{% url create_url group_name_tag %}">
-                    <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>
+                    {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
                   </a>
                 </li>
               {% endif %}
@@ -531,10 +755,10 @@ ul#graph-hover.f-dropdown{
       {% include "ndf/rating.html" %} 
       </div>
     <div>
-      Languages 
+     {% trans "Languages" %} 
       <br></br>
       {% get_possible_translations node as tran %}
-      {% for each in tran %}
+     {% for each in tran %}
         {% for k,v in each.items %}
         <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
         {% endfor %}
@@ -545,14 +769,233 @@ ul#graph-hover.f-dropdown{
 
 </div>
 
+
 <footer>
 
   <p><small>
     <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>
 </footer>
-
+</div> <!-- schema ends here -->
 <script type="text/javascript">
+
+{% comment %}
+  {% for each in all_replies %}
+
+    var htmlContent = '<div class="disc-replies">' + '{{each.content | safe | linebreaksbr }}' + '<br><div class="reply-btn" data-id=' + '{{ each.oid }}' + ' onclick="openOrgEditor($(this))" >reply</div> {{ each.last_update|date }} </div><br>'
+    console.log(htmlContent)
+    $("#replies-area").append(htmlContent)
+    
+  {% endfor %}
+{% endcomment %}
+  
+  // for discussion tab
+
+  {% if all_replies %}
+              // $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent();
+              // calcMargLeft = $tempPrior.css("margin-left");
+              // calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+
+              // // add reply text content after #replies-area
+              // $($tempPrior).after(
+              //   "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
+              //   + data[2]
+              //   + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div><br>")
+              // .fadeIn(8000);
+
+    // var $allReplies = $("#replies-area .disc-replies")
+
+    // $.each()
+
+  {% endif %}
+
+
+  $("#orgitdownreps").orgitdown(mySettings);
+
+  function createDiscussion()
+  {
+
+    {% if user.is_authenticated %}
+
+    // ajax to create thread for first time.
+    $.ajax({
+      
+      url: "{% url 'create_discussion' group_id node.pk %}",
+
+      success: function(data){
+          
+          data = JSON.parse(data);
+
+          if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
+          {
+            
+            // $("#create-discussion").hide();
+
+            // changing method to behave same as sub-reply button
+            $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+
+            $("#prior-node").val("{{ node.pk }}") // _id
+            // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
+            
+            $("#create-discussion").trigger("click");
+          }
+          // else if( data[0] == "Thread-exist" ){
+          //   // alert(data)
+          //   $("#create-discussion").hide();
+          //   $("#prior-node").val("{{ node.pk }}") // _id         
+          //   // changing method to behave same as sub-reply button   
+          //   $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+          //   $("create-discussion").trigger("click");
+          // }
+          else{ alert(data) }
+
+        },
+      complete: function(){
+        // $("#prior-node").val("") // removing _id
+      }
+
+    });
+    // --- END ajax and create thread for first time.
+    
+    {% else %}
+
+      alert("To start discussion you need to login first.");
+
+    {% endif %}
+
+  }
+  // --- END of createDiscussion()
+
+
+  // function called by "Add Reply" and "Reply" buttons to open editor
+  function openOrgEditor(sourceObj)
+  {
+
+    var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
+    $("#prior-node").val(sourceObjDataId);
+    
+    // tempOrgObj = $("#org").clone(true, true);
+    // console.log($(sourceObj));
+    
+    // $("#org").detach();
+    
+    // if( sourceObjDataId == "{{ node.pk }}")
+    // {
+    //   $('div[data-id="'+ sourceObjDataId +'"]').after(tempOrgObj);
+    // }
+    // else
+    // {
+    //   $tempPrior = $('div[data-id="'+ sourceObjDataId +'"]').parent();
+    //   calcMargLeft = $tempPrior.css("margin-left");
+    //   calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+
+    //   $('div[data-id="'+ sourceObjDataId +'"]').parent().after(tempOrgObj);
+    // }
+    
+    // $("#org").fadeIn();
+    if( sourceObjDataId != "{{ node.pk }}")
+    {
+      $('#org').foundation('reveal', 'open');
+    }
+  }
+
+
+  function addReply(sourceObj)
+  {
+    $('#org').foundation('reveal', 'close');
+
+    var priorNodeId = $("#prior-node").val(),
+        replyContent = $("#orgitdownreps").val().trim();
+
+    // If reply is non empty - make ajax to save reply.
+    if( (replyContent.length > 0) && (priorNodeId.length == 24) )
+    {
+
+      $.ajax({
+        
+        type: "POST",
+
+        url: "{% url 'discussion_reply' group_id %}",
+
+        data: { 
+
+          "csrfmiddlewaretoken": "{{ csrf_token }}",
+          "prior_node_id": priorNodeId,
+          "reply_text_content": replyContent
+        },
+
+        success: function(data){
+            
+            data = JSON.parse(data);
+            aaa = data;
+
+            if( data[0] == "reply_saved" )
+            {
+              
+              $("#org").fadeOut();          // hide editor
+              $("#orgitdownreps").val("");  // make textarea empty
+
+              if(priorNodeId == "{{ node.pk }}")  // main reply
+              {
+                // change the text of Start discussion and make it visible
+                $("#create-discussion").html("Add Reply");                
+                // $("#create-discussion").fadeIn();
+
+                // [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
+
+                // add reply text content after #replies-area
+                $("#replies-area").prepend(
+                  "<div style='margin-top:20px;' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
+                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/userDashboard' class='text-center'>"
+                  + "<span class='align-center'><i class='fi-torso'></i></span>"
+                  + "<label>" + data[6] + "</label></a></div>"
+                  + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
+
+                  + "<div class='row'><div class='small-9 columns'><small>"
+                  + data[7] + "</small></div> <div data-org-content='"
+                  + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
+                  + data[1] + "' class='reply-btn text-right small-3 columns'> reply </div></div></div>"
+                  ).fadeIn(8000);
+
+              }
+              else  // sub-reply
+              {
+                $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent().parent();
+                calcMargLeft = $tempPrior.css("margin-left");
+                calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+
+                // add reply text content as sub-reply
+                $($tempPrior).after(
+                "<div style='margin-left:"+ calcMargLeft +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
+                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/userDashboard' class='text-center'>"
+                  + "<span class='align-center'><i class='fi-torso'></i></span>"
+                  + "<label>" + data[6] + "</label></a></div>"
+                  + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
+
+                  + "<div class='row'><div class='small-9 columns'><small>"
+                  + data[7] + "</small></div> <div data-org-content='"
+                  + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
+                  + data[1] + "' class='reply-btn text-right small-3 columns'> reply </div></div></div>"
+                  ).fadeIn(8000);
+              }
+            }
+            else if( data[0] == "no_content" ){
+              
+              alert("Please provide the reply content.")
+            }
+            else { alert(data) }
+          }
+      });// --- END of ajax to save reply    
+    }
+    else // content is not provided
+    {
+      alert("Please provide the reply content.")
+    } // --- END of IF-ELSE
+  
+  } // --- END of addReply()
+
+  // --- END of discussion code ----
+
 
   // Taken value of svg data of that node globally
   var svgdata;
@@ -1022,7 +1465,7 @@ function highlightAll()
 */
 function toggle(el)
 {
-  console.log("toggleClass at beginning: " + toggleValue);
+  // console.log("toggleClass at beginning: " + toggleValue);
   if (toggleValue == 1)
    {
          //Disable annotations
@@ -1044,7 +1487,7 @@ function toggle(el)
   }
 
   toggleValue *= -1;
-  console.log("toggleClass at end: " + toggleValue);
+  // console.log("toggleClass at end: " + toggleValue);
 }
 
 function getPosition(element) {
