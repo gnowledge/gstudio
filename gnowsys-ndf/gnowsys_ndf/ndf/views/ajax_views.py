@@ -151,6 +151,7 @@ def collection_view(request, group_id):
 
     collection = db[Node.collection_name]
     node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+    print "\n\n------", node_obj, "\n\n"
 
     breadcrumbs_list = breadcrumbs_list.replace("&#39;","'")
     breadcrumbs_list = ast.literal_eval(breadcrumbs_list)
