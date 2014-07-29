@@ -2,7 +2,7 @@
 
 
 #append gsystem_type name to create factory GSystemType
-factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'}, {'name':'Reply','meta_type':'factory_types'}, {'name':'Author','meta_type':'factory_types'}, {'name':'Shelf','meta_type':'factory_types'}, {'name':'QuizItem','meta_type':'factory_types'}, {'name':'Pandora_video','meta_type':'factory_types'},{'name':'Foundation Course','meta_type':'factory_types'},{'name':'task_update_history','meta_type':'factory_types'}]
+factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'}, {'name':'Reply','meta_type':'factory_types'}, {'name':'Author','meta_type':'factory_types'}, {'name':'Shelf','meta_type':'factory_types'}, {'name':'QuizItem','meta_type':'factory_types'}, {'name':'Pandora_video','meta_type':'factory_types'},{'name':'Foundation Course','meta_type':'factory_types'},{'name':'task_update_history','meta_type':'factory_types'},{'name':'Topic','meta_type':'factory_types'},{'name':'Theme','meta_type':'factory_types'},{'name':'theme_item','meta_type':'factory_types'}]
 
 
 #fill attribute name,data_type,gsystem_type name in bellow dict to create factory Attribute Type
