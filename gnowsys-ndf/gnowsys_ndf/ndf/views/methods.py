@@ -116,7 +116,10 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     collection = db[Node.collection_name]
     
     theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
+    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+
+    forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
+    reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
 
     drawer = None    
     
@@ -180,9 +183,9 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     else:
       # For heterogeneous collection      
       if theme_GST_id or topic_GST_id:
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
       else:
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})           
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}, 'member_of': { '$nin':[reply_GST_id._id, forum_GST_id._id]} })
            
     
     if (nid is None) and (not nlist):
