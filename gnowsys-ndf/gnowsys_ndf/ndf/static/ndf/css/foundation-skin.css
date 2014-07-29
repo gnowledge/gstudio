@@ -8237,7 +8237,7 @@ main > aside > div .side-nav li a {
   border-left: 2px solid black;
 }
 /* line 167, ../scss/_styles.scss */
-main > aside > div .side-nav li a:hover {
+main > aside > div .side-nav li.active a, main > aside > div .side-nav li a:hover {
   border-left: 2px solid #47b079;
 }
 
