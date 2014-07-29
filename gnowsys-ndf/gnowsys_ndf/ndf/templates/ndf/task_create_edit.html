@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-{% load i18n %}
+
 {% load pagination_tags %}
 {% load ndf_tags %}
 {% load i18n %}
@@ -127,9 +127,9 @@ $('#hidden_watchers').val(selected);
 {% csrf_token %}
     <h2 class="medium-12 columns">
       {% if node %}
-    {% blocktrans %}  Editing {{title}}: {{node.name}} {% endblocktrans %}
+      Editing {{title}}: {{node.name}}
       {% else %}
-      {% blocktrans %} Create a New {{title}}{% blocktrans %}
+      Create a New {{title}}
       {% endif %}
     </h2>
     <br/><br/><br/><br/>
@@ -139,27 +139,27 @@ $('#hidden_watchers').val(selected);
 	  <div class="medium-12 columns">
 	    <label>{{title}} Name <font color="red">*</font></label>
 	    <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-	    <small class="error">{% trans "Please give your Task a descriptive name. It's helpful for others and for yourself." %}</small>
+	    <small class="error">Please give your Task a descriptive name. It's helpful for others and for yourself.</small>
 	  </div>
 	</div>
 	{% endif %}
 	<div class="row">
 	  <div class="medium-12 columns">
-	    <label>{% "Parent task" %}</label>
+	    <label>Parent task</label>
 	    <input id="parent" value="{{parent}}">
 	    <input type="hidden" name="parent" id="hidden_parent" value="{{parent_id}}">
 	  </div>
 	</div>
 	<div class="row">
 	  <div class="medium-6 columns">
-	    <label>{% trans "Status" %} <font color="red">*</font> </label>
+	    <label>Status <font color="red">*</font> </label>
 		<select required="" class="medium" id="customDropdown" name="Status" data-invalid="">
-			<option selected="selected" value="New" id="New">{% trans "New" %}</option>
-			<option value="In Progress" id="In Progress">{% trans "In Progress" %}</option>
-			<option value="Resolved" id="Resolved">{% trans "Resolved" %}</option>
-			<option value="Feedback" id="Feedback">{% trans "Feedback" %}</option>
-			<option value="Closed" id="Closed">{% trans "Closed" %}</option>
-			<option value="Rejected" id="Rejected">{% trans "Rejected" %}</option></select>
+			<option selected="selected" value="New" id="New">New</option>
+			<option value="In Progress" id="In Progress">In Progress</option>
+			<option value="Resolved" id="Resolved">Resolved</option>
+			<option value="Feedback" id="Feedback">Feedback</option>
+			<option value="Closed" id="Closed">Closed</option>
+			<option value="Rejected" id="Rejected">Rejected</option></select>
 		</select>
 		<small class="error">Broke.</small>
 	  </div>
@@ -172,11 +172,11 @@ $('#hidden_watchers').val(selected);
 	  <div class="medium-6 columns">
 	    <label>Priority <font color="red">*</font></label>
 	    <select required="" class="medium" id="customDropdown1" name="Priority" data-invalid="">
-		<option value="Low" id="Low">{% trans "Low" %}</option>
-		<option selected="selected" value="Normal" id="Normal">{% trans "Normal" %}</option>
-		<option value="High" id="High">{% trans "High" %}</option>
-		<option value="Urgent" id="Urgent">{% trans "Urgent" %}</option>
-		<option value="Immediate" id="Immediate">{% trans "Immediate" %}</option></select>
+		<option value="Low" id="Low">Low</option>
+		<option selected="selected" value="Normal" id="Normal">Normal</option>
+		<option value="High" id="High">High</option>
+		<option value="Urgent" id="Urgent">Urgent</option>
+		<option value="Immediate" id="Immediate">Immediate</option></select>
 	    </select>
 	  </div>
 	  <div class="medium-6 columns">
@@ -186,7 +186,7 @@ $('#hidden_watchers').val(selected);
 	</div>	
 	<div class="row">
 	  <div class="medium-6 columns">
-	    <label>{% trans "Assignee" %}</label>
+	    <label>Assignee</label>
 	   	<select name="Assignee" class="medium" id="customDropdown2" data-invalid="">
 			<option value="" selected="selected"></option>
 		</select>
@@ -194,7 +194,7 @@ $('#hidden_watchers').val(selected);
 	  <div class="medium-3 columns">
 	    <label>Estimated time
 	    <input id="Estimated time" name="Estimated_time" type="text" value="{{Estimated_time}}" placeholder="Enter Hours..."/>
-	    <small class="error">{% trans "Please give Time in HH:MM:SS" %}</small>
+	    <small class="error">Please give Time in HH:MM:SS</small>
 	    </label>
 	  </div>
 	  <div class="medium-3 columns">
@@ -203,7 +203,7 @@ $('#hidden_watchers').val(selected);
 	</div>
 	<div class="row">
 	  <div class="medium-12 columns">
-	    <label>{% trans "Description" %}</label>
+	    <label>Description</label>
 	    <div id="contentlist" class="content">
 		<div class="">
 		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
@@ -214,7 +214,7 @@ $('#hidden_watchers').val(selected);
 	{% if not task_id %}
 	<div class="row">
 	  <div class="medium-3 columns">
-	    <label>{% trans "Watchers" %}</label>
+	    <label>Watchers</label>
 	  </div>
 	  <div class="medium-6 columns">
 		<div class="watchers"></div>
@@ -232,4 +232,5 @@ $('#hidden_watchers').val(selected);
 </form>
 
 {% endblock %}
+
 
