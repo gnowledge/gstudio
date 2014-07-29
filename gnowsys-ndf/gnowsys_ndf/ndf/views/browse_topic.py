@@ -187,12 +187,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             
                                 if "Theme" in each.member_of_names_list:
                                     app_obj = theme_GST
-                                else:
-                                    app_obj = topic_GST
-                                   
-                                get_node_common_fields(request, theme_topic_node, group_id, app_obj, each)
-                                theme_topic_node.save()
-                                coll_set_dict[each._id]=theme_topic_node._id
+                                    get_node_common_fields(request, theme_topic_node, group_id, app_obj, each)
+                                    theme_topic_node.save()
+                                    coll_set_dict[each._id]=theme_topic_node._id
                                 # relation_type=collection.Node.one({'$and':[{'name':'translation_of'},{'_type':'RelationType'}]})
                                 # grelation=collection.GRelation()
                                 # grelation.relation_type=relation_type
@@ -200,16 +197,16 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 # grelation.right_subject=theme_topic_node._id
                                 # grelation.name=u""
                                 # grelation.save()
-                            
                             for each in coll_set1:
-                                if each.collection_set:
-                                    for collset in each.collection_set:
-                                        p=coll_set_dict[each._id]
-                                        parent_node=collection.Node.one({'_id':ObjectId(str(p))})
-                                        n= coll_set_dict[collset]
-                                        sub_node=collection.Node.one({'_id':ObjectId(str(n))})
-                                        parent_node.collection_set.append(sub_node._id)
-                                        parent_node.save()
+                                if "Theme" in each.member_of_names_list:
+                                    if each.collection_set:
+                                        for collset in each.collection_set:
+                                            p=coll_set_dict[each._id]
+                                            parent_node=collection.Node.one({'_id':ObjectId(str(p))})
+                                            n= coll_set_dict[collset]
+                                            sub_node=collection.Node.one({'_id':ObjectId(str(n))})
+                                            parent_node.collection_set.append(sub_node._id)
+                                            parent_node.save()
                         
                 # This will return to Themes Hierarchy  
                 if theme_GST:
@@ -443,22 +440,27 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                             'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,
                             'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
                             'theme_GST_id': theme_GST._id, 'topic_GST_id': topic_GST._id,
-                            'themes_list_items': themes_list_items,'nodes':nodes_dict
+                            'themes_list_items': themes_list_items,'nodes':nodes_dict,'lan':LOCAL_LANG
                        },context_instance = RequestContext(request)
                               
     )
 
 def get_coll_set(node):
   obj=collection.Node.one({'_id':ObjectId(node)})
-  if  obj.collection_set:
-    if obj not in list_trans_coll:
-      list_trans_coll.append(obj)
-    for each in obj.collection_set:
-        n=collection.Node.one({'_id':each})
-        if n not in list_trans_coll:
-            list_trans_coll.append(n)
-            if n.collection_set:
-                get_coll_set(n._id)
+  if "Theme" in obj.member_of_names_list:  
+      if  obj.collection_set:
+          if obj not in list_trans_coll:
+              list_trans_coll.append(obj)
+      for each in obj.collection_set:
+          n=collection.Node.one({'_id':each})
+          if "Theme" in n.member_of_names_list:  
+  
+              if n not in list_trans_coll:
+                  list_trans_coll.append(n)
+                  if n.collection_set:
+                      if "Theme" in n.member_of_names_list:  
+  
+                          get_coll_set(n._id)
                   
   #new_list=list_trans_coll
   #list_trans_coll = []
