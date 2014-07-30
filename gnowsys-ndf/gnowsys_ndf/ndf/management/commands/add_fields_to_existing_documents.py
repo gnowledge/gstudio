@@ -22,11 +22,11 @@ class Command(BaseCommand):
     # Keep latest fields to be added at top
 
     # Adding "partners" field with no default value
-    res = collection.update({'_type': {'$in': ['Group']}, 'partners': {'$exists': False}}, 
-                            {'$set': {'partners': False }}, 
+    res = collection.update({'_type': {'$in': ['Group']}, 'partner': {'$exists': False}}, 
+                            {'$set': {'partner': False }}, 
                             upsert=False, multi=True
     )
-    print "\n 'partners' field added to all Group documents totalling to : ", res['n']
+    print "\n 'partner' field added to all Group documents totalling to : ", res['n']
 
 
 
