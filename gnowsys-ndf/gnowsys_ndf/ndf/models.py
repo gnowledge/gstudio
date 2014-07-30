@@ -970,7 +970,8 @@ class Group(GSystem):
         'disclosure_policy': basestring,    # Members of this group - disclosed or not 
         'encryption_policy': basestring,            # Encryption - yes or no
 
-        'group_admin': [int]				# ObjectId of Author class
+        'group_admin': [int],				# ObjectId of Author class
+        'partner':bool                      # Shows partners exists for a group or not     
     }
 
     use_dot_notation = True
@@ -1018,7 +1019,9 @@ class Author(Group):
     structure = {                
         'email': unicode,       
         'password': unicode,
-        'visited_location': []
+        'visited_location': [],
+        'preferred_languages':dict          # preferred languages for users like preferred lang. , fall back lang. etc.
+
     }
 
     use_dot_notation = True
