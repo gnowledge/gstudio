@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-
+from gnowsys_ndf.settings import LOCAL_LANG
 
 from django_mongokit import get_database
 
@@ -41,6 +41,14 @@ ins_objectid  = ObjectId()
 #                                                                     V I E W S   D E F I N E D   F O R   U S E R   D A S H B O A R D
 #######################################################################################################################################
 
+
+def userpref(request,group_id):
+    print request.user.username
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    return HttpResponse("Success")
+    
+    
+    
 
 def dashboard(request, group_id, usrid):	
     ins_objectid  = ObjectId()

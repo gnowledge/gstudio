@@ -20,6 +20,7 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
+from gnowsys_ndf.settings import LOCAL_LANG
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
 
@@ -89,6 +90,10 @@ def is_File(node):
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
+
+@register.assignment_tag
+def get_languages():
+        return LOCAL_LANG
 
 @register.assignment_tag
 def get_node_ratings(request,node):
@@ -880,8 +885,10 @@ def get_contents(node_id):
 
 @register.assignment_tag
 def get_group_type(group_id, user):
+        
 
 	try:
+
 		col_Group = db[Node.collection_name]
 
 		if group_id == '/home/':
