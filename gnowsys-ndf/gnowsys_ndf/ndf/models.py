@@ -971,7 +971,7 @@ class Group(GSystem):
         'encryption_policy': basestring,            # Encryption - yes or no
 
         'group_admin': [int],				# ObjectId of Author class
-        'partners':bool                      # Shows partners exists for a group or not     
+        'partner':bool                      # Shows partners exists for a group or not     
     }
 
     use_dot_notation = True
