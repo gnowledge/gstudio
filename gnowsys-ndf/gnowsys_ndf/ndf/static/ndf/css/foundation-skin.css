@@ -8158,22 +8158,22 @@ main > aside > div h2 {
   font-size: 2rem;
   border-bottom: 4px solid #47b079;
   padding: 5px;
-  padding-bottom: 3rem;
   background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
   margin: 0;
 }
-/* line 101, ../scss/_styles.scss */
+/* line 100, ../scss/_styles.scss */
 main > aside > div h2 a {
   color: #47b079;
 }
-/* line 103, ../scss/_styles.scss */
+/* line 102, ../scss/_styles.scss */
 main > aside > div h2 a:hover {
   color: black;
 }
-/* line 109, ../scss/_styles.scss */
+/* line 108, ../scss/_styles.scss */
 main > aside > div h3 {
   font-size: 1.2rem;
   font-weight: normal;
+  color: white;
 }
 /* line 113, ../scss/_styles.scss */
 main > aside > div h4 {
@@ -8692,20 +8692,25 @@ pre {
 }
 
 /* Utility class to display the next siblings on hoverr */
+/* line 97, ../scss/foundation-skin.scss */
+.extra.app {
+  display: none;
+}
+
 /* Effects */
-/* line 101, ../scss/foundation-skin.scss */
+/* line 103, ../scss/foundation-skin.scss */
 .drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px #333;
   box-shadow: 0px 0px 5px 1px #333;
 }
 
-/* line 105, ../scss/foundation-skin.scss */
+/* line 107, ../scss/foundation-skin.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 109, ../scss/foundation-skin.scss */
+/* line 111, ../scss/foundation-skin.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -8714,13 +8719,13 @@ pre {
 }
 
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
-/* line 118, ../scss/foundation-skin.scss */
+/* line 120, ../scss/foundation-skin.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
      buttons when hovering. */
 }
-/* line 121, ../scss/foundation-skin.scss */
+/* line 123, ../scss/foundation-skin.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -8728,19 +8733,19 @@ pre {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 129, ../scss/foundation-skin.scss */
+/* line 131, ../scss/foundation-skin.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 131, ../scss/foundation-skin.scss */
+/* line 133, ../scss/foundation-skin.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #4c7861;
 }
-/* line 137, ../scss/foundation-skin.scss */
+/* line 139, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 139, ../scss/foundation-skin.scss */
+/* line 141, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -8751,7 +8756,7 @@ pre {
   white-space: nowrap;
   font-size: 1.5rem;
 }
-/* line 148, ../scss/foundation-skin.scss */
+/* line 150, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -8759,32 +8764,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 157, ../scss/foundation-skin.scss */
+/* line 159, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #ff980d;
   text-shadow: 0 0 1px #333;
 }
-/* line 166, ../scss/foundation-skin.scss */
+/* line 168, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 171, ../scss/foundation-skin.scss */
+/* line 173, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 179, ../scss/foundation-skin.scss */
+/* line 181, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 185, ../scss/foundation-skin.scss */
+/* line 187, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';

@@ -95,7 +95,6 @@ main>aside{
             font-size: 2rem;
             border-bottom: 4px solid $active-color;
             padding: 5px;
-            padding-bottom: 3rem;
             background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
             margin: 0;
             a{
@@ -109,6 +108,7 @@ main>aside{
         h3{
             font-size: 1.2rem;
             font-weight: normal;
+            color: white;
         }
         h4{
             font-size: 1rem;

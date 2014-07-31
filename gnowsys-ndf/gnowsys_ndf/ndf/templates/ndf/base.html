@@ -377,11 +377,18 @@
    $("#ajax_load_image").hide();
                     $("#content").css({"opacity":"",})
 });
+      
       //Toggles the display of main sidebar for 12 col article view
       var toggleMainSidebar = function(){
               $("main>aside").toggle();
               $("main>article").toggleClass("large-9 large-12");
       };
+      
+//   Show extra apps on hovering over the more icon  
+      $(".icon-bar .more").on("mouseenter", function(){
+          $(this).toggleClass("active");
+          $(".extra.app").toggle();
+      });
 
       //Functions to automatically add an <i> element icon inside node spans 
 		$(".user").prepend(function(){
