@@ -105,24 +105,32 @@
 	    {% endif %}
             {% get_languages as lan %}
 	    <ul class="dropdown">
+            
 	      <li class="text-center"><a href="{% url 'auth_password_change' %}">Change password</a></li>
+            
+             <li>
+            <a href="#" data-reveal-id="languageModal">Language Preference </a> 
+            
+            <div id="languageModal" class="small reveal-modal" data-reveal>
+                    <h2>Language preference</h2>
+                
+                    <h3>Primary language</h3>
+  <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
+                   
+                        <h3>Secondary language</h3>
+   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>   
+                
+    
+                
+                          <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+    
+            </li>
+            
 	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
-              <li><a href="#" data-options="align:left" data-dropdown="drop" class="button">&laquo; User Preference </a> </li>
-	      <ul id="drop" class="large f-dropdown" data-dropdown-content> 
-		<li><a href="#">Preference Language</a>
-               <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
-                    
-		</li> 
-		<li><a href="#">Fallback Language</a>
-               <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
-
-		</li> 
-		<li class="text-center">
-		  <input type="button" id="savepref" value="Save pref" class="button tiny"/></li>
-
-              
-	      </ul>
-
+            
+       
 	    </ul>
 	 
 
