@@ -352,7 +352,9 @@
 
 
   <footer>
-      <div class="medium-3 columns">
+      
+      
+      <div class="small-3 columns">
     	<p>
              <small>
         A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">{% trans "Homi Bhabha Centre for Science Education (HBCSE)" %}</a>, <a href="http://www.tifr.res.in" target="_blank">{% trans "Tata Institute of Fundamental Research (TIFR), India" %}</a>.
@@ -360,7 +362,7 @@
         </p>
       </div>
 
-      <div class="medium-9 columns">
+      <div class="small-9 columns">
          
            <p>
                 <span class="gnu-badge">{% trans "100% स्वतंत्रता" %}</span>
@@ -394,7 +396,12 @@
     .ajaxComplete(function() {
    $("#ajax_load_image").hide();
                     $("#content").css({"opacity":"",})
-});;
+});
+      //Toggles the display of main sidebar for 12 col article view
+      var toggleMainSidebar = function(){
+              $("main>aside").toggle();
+              $("main>article").toggleClass("large-9 large-12");
+      };
 
       //Functions to automatically add an <i> element icon inside node spans 
 		$(".user").prepend(function(){
