@@ -452,6 +452,52 @@ def get_gapps_menubar(request, group_id):
 		group_id=gpid._id
 		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
+@register.inclusion_tag('ndf/gapps_iconbar.html')
+def get_gapps_iconbar(request, group_id):
+	"""Get Gapps menu-bar
+	"""
+	try:
+		selectedGapp = request.META["PATH_INFO"]
+		group_name = ""
+		collection = db[Node.collection_name]
+		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
+		gapps = {}
+		i = 0;
+		meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+		
+		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		not_in_menu_bar = []
+		if group_obj.name == "home":
+			not_in_menu_bar = ["Image", "Video"]
+		else :
+			not_in_menu_bar = ["Image", "Video", "Group"]						
+		for node in GAPPS:
+			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+			if node:
+				if node.name not in not_in_menu_bar:
+					i = i+1;
+					gapps[i] = {'id': node._id, 'name': node.name.lower()}
+
+		if len(selectedGapp.split("/")) > 2 :
+			selectedGapp = selectedGapp.split("/")[2]
+		else :
+			selectedGapp = selectedGapp.split("/")[1]
+		if group_id == None:
+			group_id=gpid._id
+		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		if not group_obj:
+			group_id=gpid._id
+		else :
+			group_name = group_obj.name
+
+		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
+	except invalid_id:
+		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+		group_id=gpid._id
+		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
 global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
