@@ -84,6 +84,15 @@ pre{
     }
 }
 
+/* Utility class to display the child spans of this element on hover */
+.show-span-on-hover{
+    span{
+    display:none;
+    }
+    &:hover span{
+    display:inline;
+    }
+}
 /* Effects */
 .drop-shadow{
 	-webkit-box-shadow: 0px 0px 5px 1px #333;
