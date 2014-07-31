@@ -8246,6 +8246,10 @@ main > aside > div .side-nav li.active a, main > aside > div .side-nav li a:hove
   border-left: 2px solid #47b079;
 }
 
+/* line 177, ../scss/_styles.scss */
+article {
+  overflow-x: scroll;
+}
 /* line 179, ../scss/_styles.scss */
 article > header, article form > header {
   padding: 15px;
