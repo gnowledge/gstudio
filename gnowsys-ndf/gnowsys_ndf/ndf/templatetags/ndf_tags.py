@@ -452,6 +452,7 @@ def get_gapps_menubar(request, group_id):
 		group_id=gpid._id
 		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
+# This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
 @register.inclusion_tag('ndf/gapps_iconbar.html')
 def get_gapps_iconbar(request, group_id):
 	"""Get Gapps menu-bar

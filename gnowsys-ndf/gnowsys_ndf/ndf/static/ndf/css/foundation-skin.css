@@ -8530,20 +8530,13 @@ a.app {
 }
 
 /* line 467, ../scss/_styles.scss */
-a.app i {
-  font-size: 15px;
-  color: white;
-  margin-right: 8px;
-}
-
-/* line 472, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 480, ../scss/_styles.scss */
+/* line 475, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8551,13 +8544,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 487, ../scss/_styles.scss */
+/* line 482, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 492, ../scss/_styles.scss */
+/* line 487, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8571,13 +8564,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 502, ../scss/_styles.scss */
+/* line 497, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 507, ../scss/_styles.scss */
+/* line 502, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8588,7 +8581,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 518, ../scss/_styles.scss */
+/* line 513, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8600,12 +8593,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 530, ../scss/_styles.scss */
+/* line 525, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 533, ../scss/_styles.scss */
+/* line 528, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }
@@ -8698,20 +8691,21 @@ pre {
   display: inline;
 }
 
+/* Utility class to display the next siblings on hoverr */
 /* Effects */
-/* line 97, ../scss/foundation-skin.scss */
+/* line 101, ../scss/foundation-skin.scss */
 .drop-shadow {
   -webkit-box-shadow: 0px 0px 5px 1px #333;
   box-shadow: 0px 0px 5px 1px #333;
 }
 
-/* line 101, ../scss/foundation-skin.scss */
+/* line 105, ../scss/foundation-skin.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 105, ../scss/foundation-skin.scss */
+/* line 109, ../scss/foundation-skin.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -8720,13 +8714,13 @@ pre {
 }
 
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
-/* line 114, ../scss/foundation-skin.scss */
+/* line 118, ../scss/foundation-skin.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
      buttons when hovering. */
 }
-/* line 117, ../scss/foundation-skin.scss */
+/* line 121, ../scss/foundation-skin.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -8734,19 +8728,19 @@ pre {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 125, ../scss/foundation-skin.scss */
+/* line 129, ../scss/foundation-skin.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 127, ../scss/foundation-skin.scss */
+/* line 131, ../scss/foundation-skin.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #4c7861;
 }
-/* line 133, ../scss/foundation-skin.scss */
+/* line 137, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 135, ../scss/foundation-skin.scss */
+/* line 139, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -8757,7 +8751,7 @@ pre {
   white-space: nowrap;
   font-size: 1.5rem;
 }
-/* line 144, ../scss/foundation-skin.scss */
+/* line 148, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -8765,32 +8759,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 153, ../scss/foundation-skin.scss */
+/* line 157, ../scss/foundation-skin.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #ff980d;
   text-shadow: 0 0 1px #333;
 }
-/* line 162, ../scss/foundation-skin.scss */
+/* line 166, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 167, ../scss/foundation-skin.scss */
+/* line 171, ../scss/foundation-skin.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 175, ../scss/foundation-skin.scss */
+/* line 179, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 181, ../scss/foundation-skin.scss */
+/* line 185, ../scss/foundation-skin.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
