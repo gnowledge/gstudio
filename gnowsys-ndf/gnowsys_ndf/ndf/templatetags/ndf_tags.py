@@ -801,6 +801,7 @@ def get_theme_node(groupid, node):
 
 	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 	theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+	theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
 	# code for finding nodes collection has only topic instances or not
 	# It checks if first element in collection is theme instance or topic instance accordingly provide checks
@@ -808,6 +809,8 @@ def get_theme_node(groupid, node):
 		collection_nodes = collection.Node.one({'_id': ObjectId(node.collection_set[0]) })
 		if theme_GST._id in collection_nodes.member_of:
 			return "Theme_Enabled"
+		if theme_item_GST._id in collection_nodes.member_of:
+			return "Theme_Item_Enabled"
 		if topic_GST._id in collection_nodes.member_of:
 			return "Topic_Enabled"
 		

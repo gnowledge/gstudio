@@ -347,6 +347,17 @@ if profile_pic_obj:
     profile_pic_obj.delete()
     print "Deleted GST document of profile_pic"
 
+# For creating Browse Topic as a collection of Theme & Topic
+theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+br_topic = collection.Node.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
+if not br_topic.collection_set:
+    br_topic.collection_set.append(theme_GST._id)
+    br_topic.collection_set.append(topic_GST._id)
+    br_topic.created_by = user_id
+    br_topic.modified_by = user_id
+    br_topic.save()
+
 
 # For adding visited_location field (default value set as []) in User Groups.
 try:
