@@ -182,10 +182,12 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     else:
       # For heterogeneous collection      
-      if theme_GST_id or topic_GST_id:
+      if theme_GST_id and topic_GST_id and forum_GST_id and reply_GST_id:
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
-      else:
+      elif forum_GST_id and reply_GST_id:
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}, 'member_of': { '$nin':[reply_GST_id._id, forum_GST_id._id]} })
+      else:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]} })
            
     
     if (nid is None) and (not nlist):

@@ -59,7 +59,7 @@ $aside-color:#524549;
 // Since the typical default browser font-size is 16px, that makes the calculation for grid size.
 // If you want your base font-size to be different and not have it affect the grid breakpoints,
 // set $rem-base to $base-font-size and make sure $base-font-size is a px value.
-// $base-font-size: 100%;
+ $base-font-size: 14px;
 
 // The $base-line-height is 100% while $base-font-size is 150%
 // $base-line-height: 150%;
@@ -323,14 +323,14 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 //$include-html-icon-bar-classes: $include-html-classes;
 
 // We use these to style the icon-bar and items
-$icon-bar-bg: inherit ;
-$icon-bar-font-color: white ;
-$icon-bar-font-size: 0.5rem;
-$icon-bar-hover-color: #333 ;
-$icon-bar-icon-color: white ;
-$icon-bar-icon-size: 1.875rem ;
-$icon-bar-image-width: 1.875rem ;
-$icon-bar-image-height: 1.875rem ;
+//$icon-bar-bg: inherit ;
+$icon-bar-font-color: #ccc ;
+//$icon-bar-font-size: 0.5rem;
+$icon-bar-hover-color: black ;
+$icon-bar-icon-color: #ccc ;
+//$icon-bar-icon-size: 1.875rem ;
+//$icon-bar-image-width: 1.875rem ;
+//$icon-bar-image-height: 1.875rem ;
 $icon-bar-active-color: white ;
 $icon-bar-item-padding: 0.5rem;
     
@@ -453,7 +453,7 @@ $icon-bar-item-padding: 0.5rem;
 // $f-dropdown-margin-top: 2px;
 
 // We use this to control the background color
-// $f-dropdown-bg: #fff;
+ $f-dropdown-bg: $theme-color-invert;
 
 // We use this to set the border styles for dropdowns.
 // $f-dropdown-border-style: solid;
