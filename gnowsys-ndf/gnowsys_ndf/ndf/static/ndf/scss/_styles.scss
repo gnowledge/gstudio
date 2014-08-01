@@ -49,7 +49,6 @@
             border-top: 2px dotted #aaa;
 			padding:20px 0;
 			position: relative;
-            margin: 0 2rem;
             color:#888;
             min-height: 100px;
             background-color: rgba(255,255,255,0.5);
@@ -92,19 +91,26 @@ main>aside{
     &>div{
         background-color: $theme-color-invert;
         
-        h2,h3{
-            color:white;
+        h2{
+            font-size: 2rem;
+            padding: 5px;
+            background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
             margin: 0;
+            a{
+            color: $active-color;
+                &:hover{
+                    color:black;
+                }
+            }
+        }
+        nav{
+            border-bottom: 4px solid $active-color;
         }
         
-        h2{
-            font-size: 1.4rem;
-            font-weight: bold;
-            
-        }
         h3{
             font-size: 1.2rem;
             font-weight: normal;
+            color: white;
         }
         h4{
             font-size: 1rem;
@@ -120,11 +126,16 @@ main>aside{
             margin: 0;
         }
             
-        
+        .f-dropdown.content{
+            width: auto;
+            padding: 0;
+            border: 1px solid #222;
+            .item{
+                width: 70px;
+            }
+        }
         header{
-            min-height: 8rem;
-            border-bottom: 1px solid black;
-            padding: 15px;
+           padding: 10px;
         }
         
         footer{
@@ -147,13 +158,13 @@ main>aside{
             background-color: #444;
             padding: 0;
             border-bottom: 2px solid $active-color;
-        margin: 0;
+            margin: 0;
             li{
                 border-bottom: 1px solid #555;
                 a{
                     border-left: 2px solid black;
                 }
-                a:hover{
+                &.active a,a:hover{
                     border-left: 2px solid $active-color;
                 }
             }
@@ -164,9 +175,8 @@ main>aside{
 
 //    Article styles
     article{
-        
+        overflow-x: visible;
         &>header,form>header{
-            background-color: $bg-color;
             padding: 15px;
             margin-bottom: 0.5rem;
         }
@@ -455,11 +465,6 @@ a.node{
 
 a.app{
 	overflow: hidden;
-}
-a.app i{
-	font-size:15px;
-	color:white;
-	margin-right:8px;
 }
 .button.edit{
 	margin-bottom: 0;
