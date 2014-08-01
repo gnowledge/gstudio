@@ -92,14 +92,11 @@ main>aside{
         background-color: $theme-color-invert;
         
         h2{
-            font-size: 2rem;
-            padding: 5px;
             background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
-            margin: 0;
             a{
-            color: $active-color;
+            color: black;
                 &:hover{
-                    color:black;
+                    //color:black;
                 }
             }
         }
@@ -109,6 +106,13 @@ main>aside{
             i{
                 display: none!important; /* Hide icons till we can retreive custom icons from the system */
             }
+                
+                .more.active{
+                    background-color: inherit;
+                    label{
+                    font-weight: bold;
+                    }
+                }
             }
         }
         
