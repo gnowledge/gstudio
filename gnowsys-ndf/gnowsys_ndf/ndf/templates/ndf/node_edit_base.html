@@ -626,7 +626,6 @@ $("#name_id").change(function(){
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function(data) {
-				 //alert(data);
 				$("#teaches_drawer").html(data);
 				$("#save-node").css("display", "block");
 			}
