@@ -106,15 +106,31 @@
 
         <div> 
           <a class="tiny button" data-reveal-id="view_add_file"> 
-            <span class="fi-plus">&nbsp;&nbsp;Add File </span>&nbsp;&nbsp; <i class="fi-play"></i>  
+            {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Add File </span>&nbsp;&nbsp; <i class="fi-play"></i>{% endblocktrans %}  
           </a>
-{% blocktrans %}
-          <div id="view_add_file" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
-        
-            Welcome in reveal area
-            <a class="close-reveal-modal">&#215;</a>           
+
+          <div id="view_add_file" class="reveal-modal" data-reveal style="height:300px;">
+            {% blocktrans %}<h3>Add New File:</h3>{% endblocktrans %}<br/>
+            <!-- Upload file -->
+            <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' group_name_tag %}?context_node={{node.pk}}">
+            {% csrf_token %}
+
+            <div>
+              <span class="fi-upload"><input type="file" name="doc[]" id="docFile" multiple/></span>
+            </div>
+            <!-- For making access policy of files PUBLIC initially by uploading it from topic page -->
+            <input type="hidden" name="login-mode" value="PUBLIC">
+            <!-- Just a hidden value which enables us to retun to add_file() in ajax_views when any file gets uploaded -->
+            <input type="hidden" name="type" value="topic_file">
+            <!-- This is for getting the user of the uploaded file -->
+            <input type="hidden" name="user" value="{{request.user.pk}}">
+            <input type="submit" class="small round button" id="add_file" value="Save File">
+
+            </form>
+            {% blocktrans %}<a class="close-reveal-modal">&#215;</a>{% endblocktrans %}
+
           </div>
-{% endblocktrans %}
+
         </div>
 
         <div> 
