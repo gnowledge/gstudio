@@ -410,7 +410,7 @@
       	<!-- Button that converts collection into module-->
       	
       	{% if node.collection_set and user.is_authenticated%}
-        	{% blocktrans %}<a href="#" class="button" id="module"></i> <span>Make Module</a>{% endblocktrans %}
+        	<a href="#" class="button" id="module"></i> <span>{% trans "Make Module" %}</a>
       	{% endif %}
 
         {% if node %}
@@ -421,12 +421,12 @@
         	{% if group_policy == "allow" %}
         	  {% if is_group %} 
               <div>
-      	       {% blocktrans %} <a class="button small" href="{% url 'publish_group'  group_id node %}"> Publish </a>{% endblocktrans %}
+      	       <a class="button small" href="{% url 'publish_group'  group_id node %}"> {% trans "Publish" %} </a>
       	      </div>
 
         	  {% else %}
         	    <div>
-      	       {% blocktrans %} <a class="button small" href="{% url 'publish_page'  group_id node %}"> Publish </a>{% endblocktrans %}  
+      	       <a class="button small" href="{% url 'publish_page'  group_id node %}">{% trans "Publish" %} </a>  
       	      </div>
       	    {% endif %}
 

@@ -20,7 +20,7 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
-from gnowsys_ndf.settings import LOCAL_LANG
+from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
 
@@ -93,7 +93,7 @@ def get_user_preferences(group,user):
 
 @register.assignment_tag
 def get_languages():
-        return LOCAL_LANG
+        return LANGUAGES
 
 @register.assignment_tag
 def get_node_ratings(request,node):
@@ -801,6 +801,7 @@ def get_theme_node(groupid, node):
 
 	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 	theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+	theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
 	# code for finding nodes collection has only topic instances or not
 	# It checks if first element in collection is theme instance or topic instance accordingly provide checks
@@ -808,6 +809,8 @@ def get_theme_node(groupid, node):
 		collection_nodes = collection.Node.one({'_id': ObjectId(node.collection_set[0]) })
 		if theme_GST._id in collection_nodes.member_of:
 			return "Theme_Enabled"
+		if theme_item_GST._id in collection_nodes.member_of:
+			return "Theme_Item_Enabled"
 		if topic_GST._id in collection_nodes.member_of:
 			return "Topic_Enabled"
 		

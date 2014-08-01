@@ -1,19 +1,196 @@
  # Django settings for gnowsys-ndf project.
-
+from django.conf import global_settings
+from django.utils.translation import ugettext
 import os
-ugettext = lambda s: s
 DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
-# List of Indian Languages 
-LOCAL_LANG = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Urdu','Gujarati','Kannada','Malayalam','Oriya','Punjabi','Assamese','Maithili','Santali','Kashmiri','Nepali','Gondi','Sindhi','Konkani']
+LANGUAGES = (('en', 'English'),('mr', 'Marathi'),('mun','Munda'),('mni','Manipuri'),('ori','Oriya'),('pi','Pali'),('raj','Rajasthani'),('lah','Lahnda'),('gu','Gujarati'),('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'), ('dra','Dravidian'), ('gon','Gondi'), ('bra','Braj'), ('mi','Malayalam'), ('mai','Maithili'), ('mag','Magahi'), ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'), ('awa','Awadhi'),('sa','Sanskrit'),('sat','Santali'), ('him','Himachali'), ('sd','Sindhi'), ('af', 'Afrikaans'), ('as','Assamese'),('ar', 'Arabic'), ('az', 'Azerbaijani'), ('bg', 'Bulgarian'), ('be', 'Belarusian'), ('bn', 'Bengali'), ('br', 'Breton'), ('bs', 'Bosnian'), ('ca', 'Catalan'),('bho','Bhojpuri'), ('cs', 'Czech'), ('cy', 'Welsh'), ('da', 'Danish'), ('de', 'German'), ('el', 'Greek'), ('en-gb', 'British English'), ('eo', 'Esperanto'), ('es', 'Spanish'), ('es-ar', 'Argentinian Spanish'), ('es-mx', 'Mexican Spanish'), ('es-ni', 'Nicaraguan Spanish'), ('es-ve', 'Venezuelan Spanish'), ('et', 'Estonian'), ('eu', 'Basque'), ('fa', 'Persian'), ('fi', 'Finnish'), ('fr', 'French'), ('fy-nl', 'Frisian'), ('ga', 'Irish'), ('gl', 'Galician'), ('he', 'Hebrew'), ('hi', 'Hindi'), ('hr', 'Croatian'), ('hu', 'Hungarian'), ('ia', 'Interlingua'), ('id', 'Indonesian'), ('is', 'Icelandic'), ('it', 'Italian'), ('ja', 'Japanese'), ('ka', 'Georgian'), ('kk', 'Kazakh'), ('km', 'Khmer'), ('kn', 'Kannada'), ('ko', 'Korean'), ('lb', 'Luxembourgish'), ('lt', 'Lithuanian'), ('lv', 'Latvian'), ('mk', 'Macedonian'), ('ml', 'Malayalam'), ('mn', 'Mongolian'), ('my', 'Burmese'), ('nb', 'Norwegian Bokmal'), ('ne', 'Nepali'), ('nl', 'Dutch'), ('nn', 'Norwegian Nynorsk'), ('os', 'Ossetic'), ('pa', 'Punjabi'), ('pl', 'Polish'), ('pt', 'Portuguese'), ('pt-br', 'Brazilian Portuguese'), ('ro', 'Romanian'), ('ru', 'Russian'), ('sk', 'Slovak'), ('sl', 'Slovenian'), ('sq', 'Albanian'), ('sr', 'Serbian'), ('sr-latn', 'Serbian Latin'), ('sv', 'Swedish'), ('sw', 'Swahili'), ('ta', 'Tamil'), ('te', 'Telugu'), ('th', 'Thai'), ('tr', 'Turkish'), ('tt', 'Tatar'), ('udm', 'Udmurt'), ('uk', 'Ukrainian'), ('ur', 'Urdu'), ('vi', 'Vietnamese'), ('zh-cn', 'Simplified Chinese'), ('zh-tw', 'Traditional Chinese')) 
 
-# LANGUAGES = (
-#   ('de', ugettext('German')),
-#   )
-#SMTP setting for sending mail (Using python default SMTP server)
+EXTRA_LANG_INFO = {
+    'mr': {
+        'bidi': True, # right-to-left
+        'code': 'mr',
+        'name': 'Marathi',
+        'name_local': 'Marathi'
+    },
+    'mun': {
+        'bidi': True, # right-to-left
+        'code': 'mun',
+        'name': 'Munda',
+        'name_local': 'Munda'
+    },
+
+    'mni': {
+        'bidi': True, # right-to-left
+        'code': 'ug',
+        'name': 'Manipuri',
+        'name_local': 'Manipuri'
+    },
+    'ori': {
+        'bidi': True, # right-to-left
+        'code': 'ori',
+        'name': 'Oriya',
+        'name_local': 'Oriya'
+    },
+    'mr': {
+        'bidi': True, # right-to-left
+        'code': 'mr',
+        'name': 'Marathi',
+        'name_local': 'Marathi'
+    },
+    'pi': {
+        'bidi': True, # right-to-left
+        'code': 'pi',
+        'name': 'Pali',
+        'name_local': 'Pali'
+    },
+    'raj': {
+        'bidi': True, # right-to-left
+        'code': 'raj',
+        'name': 'Rajasthani',
+        'name_local': 'Rajasthani'
+    },
+    'sa': {
+        'bidi': True, # right-to-left
+        'code': 'sa',
+        'name': 'Sanskrit',
+        'name_local': 'Sanskrit'
+    },
+
+    'sat': {
+        'bidi': True, # right-to-left
+        'code': 'sat',
+        'name': 'Santali',
+        'name_local': 'Santali'
+    },
+    'sd': {
+        'bidi': True, # right-to-left
+        'code': 'sa',
+        'name': 'Sindhi',
+        'name_local': 'Sindhi'
+    },
+    'as': {
+        'bidi': True, # right-to-left
+        'code': 'as',
+        'name': 'Assamese',
+        'name_local': 'Assamese'
+    },
+    'awa': {
+        'bidi': True, # right-to-left
+        'code': 'awa',
+        'name': 'Awadhi',
+        'name_local': 'Awadhi'
+    },
+    'bho': {
+        'bidi': True, # right-to-left
+        'code': 'bho',
+        'name': 'Bhojpuri',
+        'name_local': 'Bhojpuri'
+    },
+    'bh': {
+        'bidi': True, # right-to-left
+        'code': 'bh',
+        'name': 'Bihari',
+        'name_local': 'Bihari'
+    },
+    'bra': {
+        'bidi': True, # right-to-left
+        'code': 'bho',
+        'name': 'Braj',
+        'name_local': 'Braj'
+    },
+    'gon': {
+        'bidi': True, # right-to-left
+        'code': 'gon',
+        'name': 'Gondi',
+        'name_local': 'Gondi'
+    },
+    'dra': {
+        'bidi': True, # right-to-left
+        'code': 'bho',
+        'name': 'Dravidian',
+        'name_local': 'Dravidian'
+    },
+    'gu': {
+        'bidi': True, # right-to-left
+        'code': 'gu',
+        'name': 'Gujarati',
+        'name_local': 'Gujarati'
+    },
+    'him': {
+        'bidi': True, # right-to-left
+        'code': 'him',
+        'name': 'Himachali',
+        'name_local': 'Himachali'
+    },
+    'ks': {
+        'bidi': True, # right-to-left
+        'code': 'ks',
+        'name': 'Kashmiri',
+        'name_local': 'Kashmiri'
+    },
+    'kha': {
+        'bidi': True, # right-to-left
+        'code': 'kha',
+        'name': 'Khasi',
+        'name_local': 'Khasi'
+    },
+    'kok': {
+        'bidi': True, # right-to-left
+        'code': 'kok',
+        'name': 'Konkani',
+        'name_local': 'Konkani'
+    },
+    'kru': {
+        'bidi': True, # right-to-left
+        'code': 'kru',
+        'name': 'Kurukh',
+        'name_local': 'Kurukh'
+    },
+    'lah': {
+        'bidi': True, # right-to-left
+        'code': 'lah',
+        'name': 'Lahnda',
+        'name_local': 'Lahnda'
+    },
+    'lus': {
+        'bidi': True, # right-to-left
+        'code': 'lus',
+        'name': 'Lushai',
+        'name_local': 'Lushai'
+    },
+    'mag': {
+        'bidi': True, # right-to-left
+        'code': 'mag',
+        'name': 'Magahi',
+        'name_local': 'Magahi'
+    },
+    'mai': {
+        'bidi': True, # right-to-left
+        'code': 'mai',
+        'name': 'Maithili',
+        'name_local': 'Maithili'
+    },
+    'mi': {
+        'bidi': True, # right-to-left
+        'code': 'mi',
+        'name': 'Malayalam',
+        'name_local': 'Malayalam'
+    },
+    
+}
+# Add custom languages not provided by Django
+import django.conf.locale
+LANG_INFO = dict(django.conf.locale.LANG_INFO.items() + EXTRA_LANG_INFO.items())
+django.conf.locale.LANG_INFO = LANG_INFO
+
+# Languages using BiDi (right-to-left) layout
+#LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",) 
+
+# #SMTP setting for sending mail (Using python default SMTP server)
 EMAIL_USE_TLS = False
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
@@ -72,6 +249,7 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
+
 USE_I18N = True
 
 # If you set this to False, Django will not format dates, numbers and
@@ -233,7 +411,7 @@ META_TYPE = [u"GAPP",u"factory_types"]
 #Default APPs inculde in beloow GAPPS list
 
 
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData"]
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Browse Topic", u"Browse Resource", u"Meeting"]
 
 
 

@@ -41,6 +41,7 @@ gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 #This function is used to check (while creating a new group) group exists or not
 #This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 def checkgroup(request,group_name):
@@ -308,6 +309,8 @@ def drawer_widget(request, group_id):
           app = "QuizItem"
         elif app == "Theme":
           app = "Theme"
+        elif app == "Theme Item":
+          app == "theme_item"
         elif app == "Topic":
           app = "Topic"
         elif app == "Module":
@@ -325,6 +328,8 @@ def drawer_widget(request, group_id):
         app = "QuizItem"
       elif field == "collection" and app == "Theme":
         app = "Theme"
+      elif field == "collection" and app == "Theme Item":
+        app = "theme_item"
       elif field == "collection" and app == "Course":
         app = "Module"
       else:
@@ -349,7 +354,7 @@ def get_collection_list(collection_list, node):
     for each in node.collection_set:
       col_obj = collection.Node.one({'_id': ObjectId(each)})
       if col_obj:
-        if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
+        if theme_item_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
           for cl in collection_list:
             if cl['id'] == node.pk:
               node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
@@ -380,20 +385,24 @@ def get_tree_hierarchy(request, group_id, node_id):
     collection_list = []
     themes_list = []
 
-    cur = collection.Node.find({'member_of': node._id,'group_set':ObjectId(group_id) })
+    theme_node = collection.Node.one({'_id': ObjectId(node._id) })
+    # print "\ntheme_node: ",theme_node.name,"\n"
+    if theme_node.collection_set:
 
-    for e in cur:
-      for l in e.collection_set:
-        themes_list.append(l)
+      for e in theme_node.collection_set:
+        objs = collection.Node.one({'_id': ObjectId(e) })
+        for l in objs.collection_set:
+          themes_list.append(l)
 
-    cur.rewind()
 
-    for each in cur:
-      if each._id not in themes_list:
-        if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
-          node_type = collection.Node.one({'_id': ObjectId(each.member_of[0])}).name
-          collection_list.append({'name': each.name, 'id': each.pk, 'node_type': node_type})
-          collection_list = get_collection_list(collection_list, each)
+      for each in theme_node.collection_set:
+        obj = collection.Node.one({'_id': ObjectId(each) })
+        if obj._id not in themes_list:
+          if theme_item_GST._id in obj.member_of or topic_GST._id in obj.member_of:
+
+            node_type = collection.Node.one({'_id': ObjectId(obj.member_of[0])}).name
+            collection_list.append({'name': obj.name, 'id': obj.pk, 'node_type': node_type})
+            collection_list = get_collection_list(collection_list, obj)
 
     data = collection_list
 
@@ -410,7 +419,7 @@ def add_sub_themes(request, group_id):
     themes_list = themes_list.replace("&quot;","'")
     themes_list = ast.literal_eval(themes_list)
 
-    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
     context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
     
     # Save the sub-theme first  
@@ -420,7 +429,7 @@ def add_sub_themes(request, group_id):
         node = collection.GSystem()
         # get_node_common_fields(request, node, group_id, theme_GST)
       
-        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_GST))
+        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST))
         node.reload()
         # Add this sub-theme into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -433,9 +442,37 @@ def add_sub_themes(request, group_id):
     return HttpResponse("None")
 
 
+def add_theme_item(request, group_id):
+
+  if request.is_ajax() and request.method == "POST":    
+
+    context_theme_id = request.POST.get("context_theme", '')
+    name =request.POST.get('name','')
+
+    context_theme = collection.Node.one({'_id': ObjectId(context_theme_id) })
+
+    list_theme_items = []
+    if name and context_theme:
+
+      for each in context_theme.collection_set:
+        obj = collection.Node.one({'_id': ObjectId(each) })
+        if obj.name == name:
+          return HttpResponse("failure")
+
+      theme_item_node = collection.GSystem()
+
+      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST))
+      theme_item_node.reload()
+
+      # Add this theme item into context theme's collection_set
+      collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      context_theme.reload()
+
+    return HttpResponse("success")
+
 def add_topics(request, group_id):
   if request.is_ajax() and request.method == "POST":    
-    print "\n Inside add_topics ajax view\n"
+    # print "\n Inside add_topics ajax view\n"
     context_node_id = request.POST.get("context_node", '')
     add_topic_name = request.POST.get("add_topic_name", '')
     topics_list = request.POST.get("nodes_list", '')
@@ -448,7 +485,7 @@ def add_topics(request, group_id):
 
     # Save the topic first  
     if add_topic_name:
-      print "\ntopic name: ", add_topic_name
+      # print "\ntopic name: ", add_topic_name
       if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
         node = collection.GSystem()
         # get_node_common_fields(request, node, group_id, topic_GST)
@@ -535,6 +572,57 @@ def add_file(request, group_id):
 
 def node_collection(node=None, group_id=None):
 
+    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+
+    if node.collection_set:
+      for each in node.collection_set:
+        
+        each_node = collection.Node.one({'_id': ObjectId(each)})
+        
+        if each_node.collection_set:
+          
+          node_collection(each_node, group_id)
+        else:
+          # After deleting theme instance it's should also remove from collection_set
+          cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+          for e in cur:
+            if each_node._id in e.collection_set:
+              collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
+
+
+          # print "\n node ", each_node.name ,"has been deleted \n"
+          each_node.delete()
+
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    else:
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    return True
+
+
+def theme_node_collection(node=None, group_id=None):
+
     theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 
     if node.collection_set:
@@ -588,6 +676,10 @@ def delete_themes(request, group_id):
   '''delete themes objects'''
   send_dict = []
   if request.is_ajax() and request.method =="POST":
+     context_node_id=request.POST.get('context_theme','') 
+     if context_node_id:
+      context_theme_node = collection.Node.one({'_id': ObjectId(context_node_id)}) 
+
      deleteobjects = request.POST['deleteobjects']
      confirm = request.POST.get("confirm","")
   for each in  deleteobjects.split(","):
@@ -595,7 +687,15 @@ def delete_themes(request, group_id):
       # print "\n confirmed objects: ", node.name
 
       if confirm:
-        node_collection(node, group_id)
+        
+        if context_node_id:
+          node_collection(node, group_id)
+          if node._id in context_theme_node.collection_set:
+            collection.update({'_id': context_theme_node._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+
+        else:
+          theme_node_collection(node, group_id)
 
       else:
         send_dict.append({"title":node.name})
