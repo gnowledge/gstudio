@@ -8172,100 +8172,105 @@ main > aside > div h2 a:hover {
 main > aside > div nav {
   border-bottom: 4px solid #47b079;
 }
-/* line 110, ../scss/_styles.scss */
+/* line 109, ../scss/_styles.scss */
+main > aside > div nav .icon-bar i {
+  display: none !important;
+  /* Hide icons till we can retreive custom icons from the system */
+}
+/* line 115, ../scss/_styles.scss */
 main > aside > div h3 {
   font-size: 1.2rem;
   font-weight: normal;
   color: white;
 }
-/* line 115, ../scss/_styles.scss */
+/* line 120, ../scss/_styles.scss */
 main > aside > div h4 {
   font-size: 1rem;
   color: #eee;
 }
-/* line 118, ../scss/_styles.scss */
+/* line 123, ../scss/_styles.scss */
 main > aside > div h4 span {
   display: none;
 }
-/* line 121, ../scss/_styles.scss */
+/* line 126, ../scss/_styles.scss */
 main > aside > div h4:hover span {
   display: inline;
 }
-/* line 125, ../scss/_styles.scss */
+/* line 130, ../scss/_styles.scss */
 main > aside > div h5, main > aside > div h6 {
   margin: 0;
 }
-/* line 129, ../scss/_styles.scss */
+/* line 134, ../scss/_styles.scss */
 main > aside > div .f-dropdown.content {
   width: auto;
   padding: 0;
   border: 1px solid #222;
 }
-/* line 133, ../scss/_styles.scss */
+/* line 138, ../scss/_styles.scss */
 main > aside > div .f-dropdown.content .item {
   width: 70px;
 }
-/* line 137, ../scss/_styles.scss */
+/* line 142, ../scss/_styles.scss */
 main > aside > div header {
   padding: 10px;
 }
-/* line 141, ../scss/_styles.scss */
+/* line 146, ../scss/_styles.scss */
 main > aside > div footer {
   background-color: #222;
   min-height: 1rem;
 }
-/* line 144, ../scss/_styles.scss */
+/* line 149, ../scss/_styles.scss */
 main > aside > div footer label {
   font-size: 0.7rem;
 }
-/* line 151, ../scss/_styles.scss */
+/* line 156, ../scss/_styles.scss */
 main > aside > div a, main > aside > div p {
   color: white;
 }
-/* line 153, ../scss/_styles.scss */
+/* line 158, ../scss/_styles.scss */
 main > aside > div a:hover, main > aside > div p:hover {
   color: white;
 }
-/* line 157, ../scss/_styles.scss */
+/* line 162, ../scss/_styles.scss */
 main > aside > div .side-nav {
   background-color: #444;
   padding: 0;
   border-bottom: 2px solid #47b079;
   margin: 0;
 }
-/* line 162, ../scss/_styles.scss */
+/* line 167, ../scss/_styles.scss */
 main > aside > div .side-nav li {
   border-bottom: 1px solid #555;
 }
-/* line 164, ../scss/_styles.scss */
+/* line 169, ../scss/_styles.scss */
 main > aside > div .side-nav li a {
   border-left: 2px solid black;
 }
-/* line 167, ../scss/_styles.scss */
+/* line 172, ../scss/_styles.scss */
 main > aside > div .side-nav li.active a, main > aside > div .side-nav li a:hover {
   border-left: 2px solid #47b079;
 }
 
-/* line 177, ../scss/_styles.scss */
+/* line 182, ../scss/_styles.scss */
 article {
   overflow-x: visible;
 }
-/* line 179, ../scss/_styles.scss */
+/* line 184, ../scss/_styles.scss */
 article > header, article form > header {
   padding: 15px;
   margin-bottom: 0.5rem;
 }
-/* line 187, ../scss/_styles.scss */
+/* line 192, ../scss/_styles.scss */
 article h1:not(.subheader), article h1:not(.subheader) div input:not(.subheader) {
   font-family: "Georgia Serif", Serif;
   font-style: italic;
 }
-/* line 191, ../scss/_styles.scss */
+/* line 196, ../scss/_styles.scss */
 article h1:not(.subheader) div, article h1:not(.subheader) div input:not(.subheader) div {
   display: inline-block;
   position: relative;
 }
-/* line 194, ../scss/_styles.scss */
+/* line 199, ../scss/_styles.scss */
 article h1:not(.subheader) div input {
   height: 200%;
   font-style: italic;
@@ -8275,13 +8280,13 @@ article h1:not(.subheader) div input {
   border-bottom: 2px dotted #222;
   background-color: inherit;
 }
-/* line 204, ../scss/_styles.scss */
+/* line 209, ../scss/_styles.scss */
 article h1:not(.subheader) div input:hover {
   background-color: white;
 }
 
 /* Card block */
-/* line 221, ../scss/_styles.scss */
+/* line 226, ../scss/_styles.scss */
 .card > * {
   position: relative;
   background-color: inherit;
@@ -8291,38 +8296,38 @@ article h1:not(.subheader) div input:hover {
   opacity: 0.9;
   overflow: hidden;
 }
-/* line 231, ../scss/_styles.scss */
+/* line 236, ../scss/_styles.scss */
 .card > * > a {
   color: inherit;
   display: block;
   position: relative;
   z-index: 200;
 }
-/* line 238, ../scss/_styles.scss */
+/* line 243, ../scss/_styles.scss */
 .card > *.published {
   opacity: 1;
   background-color: #dff0d9;
 }
-/* line 242, ../scss/_styles.scss */
+/* line 247, ../scss/_styles.scss */
 .card > *.unapproved {
   opacity: 1;
   border-style: solid;
   border-color: #f04124;
 }
-/* line 248, ../scss/_styles.scss */
+/* line 253, ../scss/_styles.scss */
 .card > *:hover {
   border-style: solid;
   opacity: 1;
 }
-/* line 254, ../scss/_styles.scss */
+/* line 259, ../scss/_styles.scss */
 .card > *:hover i {
   opacity: 0.3;
 }
-/* line 257, ../scss/_styles.scss */
+/* line 262, ../scss/_styles.scss */
 .card > *:hover footer .age {
   display: block;
 }
-/* line 261, ../scss/_styles.scss */
+/* line 266, ../scss/_styles.scss */
 .card > * > i {
   position: absolute;
   top: -10px;
@@ -8331,34 +8336,34 @@ article h1:not(.subheader) div input:hover {
   color: #1b432e;
   opacity: 0.1;
 }
-/* line 269, ../scss/_styles.scss */
+/* line 274, ../scss/_styles.scss */
 .card > * .preview {
   float: left;
   padding-right: 5px;
   padding-top: 4px;
 }
-/* line 274, ../scss/_styles.scss */
+/* line 279, ../scss/_styles.scss */
 .card > * header {
   overflow: hidden;
 }
-/* line 277, ../scss/_styles.scss */
+/* line 282, ../scss/_styles.scss */
 .card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
 }
-/* line 282, ../scss/_styles.scss */
+/* line 287, ../scss/_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 285, ../scss/_styles.scss */
+/* line 290, ../scss/_styles.scss */
 .card > * p {
   color: #555;
   height: 80px;
   background-repeat: no-repeat;
   font-size: 80%;
 }
-/* line 291, ../scss/_styles.scss */
+/* line 296, ../scss/_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -8366,23 +8371,23 @@ article h1:not(.subheader) div input:hover {
   overflow: hidden;
   display: none;
 }
-/* line 297, ../scss/_styles.scss */
+/* line 302, ../scss/_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 301, ../scss/_styles.scss */
+/* line 306, ../scss/_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 305, ../scss/_styles.scss */
+/* line 310, ../scss/_styles.scss */
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
   color: #666666;
 }
-/* line 310, ../scss/_styles.scss */
+/* line 315, ../scss/_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -8392,7 +8397,7 @@ article h1:not(.subheader) div input:hover {
   width: 100%;
 }
 
-/* line 321, ../scss/_styles.scss */
+/* line 326, ../scss/_styles.scss */
 .edit-card {
   position: relative;
   background-color: #eef7eb;
@@ -8401,90 +8406,90 @@ article h1:not(.subheader) div input:hover {
 }
 
 /* Content Tabs */
-/* line 333, ../scss/_styles.scss */
+/* line 338, ../scss/_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
 
-/* line 342, ../scss/_styles.scss */
+/* line 347, ../scss/_styles.scss */
 article .tabs dd.active a {
   color: #47b079;
   border-bottom: 2px solid #47b079;
   font-weight: bold;
 }
-/* line 347, ../scss/_styles.scss */
+/* line 352, ../scss/_styles.scss */
 article .tabs dd:hover a {
   color: #47b079;
 }
 
-/* line 352, ../scss/_styles.scss */
+/* line 357, ../scss/_styles.scss */
 .tabs-content > .content {
   padding-top: 0;
 }
 
-/* line 356, ../scss/_styles.scss */
+/* line 361, ../scss/_styles.scss */
 .content.row {
   margin: 0;
 }
 
 /* Default card */
-/* line 361, ../scss/_styles.scss */
+/* line 366, ../scss/_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 366, ../scss/_styles.scss */
+/* line 371, ../scss/_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 374, ../scss/_styles.scss */
+/* line 379, ../scss/_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 378, ../scss/_styles.scss */
+/* line 383, ../scss/_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
 }
-/* line 385, ../scss/_styles.scss */
+/* line 390, ../scss/_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   padding: 2px;
 }
 
 /*************************** 2. Custom CSS overrides ***********************/
-/* line 399, ../scss/_styles.scss */
+/* line 404, ../scss/_styles.scss */
 .panel {
   background-color: #cfe8c7;
 }
 
 /* Content area */
-/* line 404, ../scss/_styles.scss */
+/* line 409, ../scss/_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 408, ../scss/_styles.scss */
+/* line 413, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 412, ../scss/_styles.scss */
+/* line 417, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 415, ../scss/_styles.scss */
+/* line 420, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 424, ../scss/_styles.scss */
+/* line 429, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8505,49 +8510,49 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 444, ../scss/_styles.scss */
+/* line 449, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 449, ../scss/_styles.scss */
+/* line 454, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 452, ../scss/_styles.scss */
+/* line 457, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 455, ../scss/_styles.scss */
+/* line 460, ../scss/_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 458, ../scss/_styles.scss */
+/* line 463, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 462, ../scss/_styles.scss */
+/* line 467, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 466, ../scss/_styles.scss */
+/* line 471, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 469, ../scss/_styles.scss */
+/* line 474, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 477, ../scss/_styles.scss */
+/* line 482, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8555,13 +8560,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 484, ../scss/_styles.scss */
+/* line 489, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 489, ../scss/_styles.scss */
+/* line 494, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8575,13 +8580,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 499, ../scss/_styles.scss */
+/* line 504, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 504, ../scss/_styles.scss */
+/* line 509, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8592,7 +8597,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 515, ../scss/_styles.scss */
+/* line 520, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8604,12 +8609,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 527, ../scss/_styles.scss */
+/* line 532, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 530, ../scss/_styles.scss */
+/* line 535, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }

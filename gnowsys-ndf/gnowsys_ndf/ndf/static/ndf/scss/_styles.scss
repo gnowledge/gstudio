@@ -105,6 +105,11 @@ main>aside{
         }
         nav{
             border-bottom: 4px solid $active-color;
+            .icon-bar{
+            i{
+                display: none!important; /* Hide icons till we can retreive custom icons from the system */
+            }
+            }
         }
         
         h3{
