@@ -20,7 +20,7 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
-from gnowsys_ndf.settings import LOCAL_LANG
+from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
 
@@ -93,7 +93,7 @@ def get_user_preferences(group,user):
 
 @register.assignment_tag
 def get_languages():
-        return LOCAL_LANG
+        return LANGUAGES
 
 @register.assignment_tag
 def get_node_ratings(request,node):

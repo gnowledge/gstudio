@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from django_mongokit import get_database
 
-from gnowsys_ndf.settings import LOCAL_LANG
+from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.views.methods import *
 
 import json

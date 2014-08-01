@@ -7,15 +7,13 @@
   <form data-abide id="form-edit-node" method="POST" action="">
 
     <header class="row">
-{% blocktrans %}      
 <h2 class="medium-12 columns">
         {% if node %}
-        Editing {{title}}: {{node.name}}
+       {% trans "Editing" %} {{title}}: {{node.name}}
         {% else %}
-        Register a New {{title}}
+        {% "Register a New" %} {{title}}
         {% endif %}
       </h2>
-{% endblocktrans %}
       <nav class="medium-12 columns">
         <dl class="tabs" data-tab>
           <dd>
