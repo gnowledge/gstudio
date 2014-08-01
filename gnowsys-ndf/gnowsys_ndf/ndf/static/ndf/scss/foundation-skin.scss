@@ -31,7 +31,18 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 	margin: inherit!important;
 }
 
+/* Styles icon-bar */
+.icon-bar .item{
+    border:1px solid #222;
+    &.active{
+        background-color: black;
+        i,label{
+        color: white;
+        }
+    }
+}
 
+/*
 /* Protects reflowing elements on error */
 [data-abide] span.error, [data-abide] small.error{
     position: absolute;
@@ -50,7 +61,6 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 pre{
     width:92%;
 	overflow: auto;
-	margin: 2rem 0;
 	border: 1px solid #eee;
 	border-left: 1rem solid #eee;
 	font: lighter 1.2rem/2rem Monaco;
@@ -72,6 +82,21 @@ pre{
             color:orange;
         }
     }
+}
+
+/* Utility class to display the child spans of this element on hover */
+.show-span-on-hover{
+    span{
+    display:none;
+    }
+    &:hover span{
+    display:inline;
+    }
+}
+/* Utility class to display the next siblings on hoverr */
+.extra.app {
+  display: none;
+    
 }
 
 /* Effects */
@@ -133,7 +158,7 @@ pre{
       & + label:hover ~ label:before,
       & + label:hover:before {
       content: '\2605'; /* BLACK STAR */
-      color: $active-color;
+      color: $highlight-color;
       text-shadow: 0 0 1px #333;
     }
   }
@@ -161,7 +186,7 @@ pre{
   [type*="radio"] + label:hover ~ label:before,
   [type*="radio"] + label:hover:before {
     content: '\2605'; /* BLACK STAR */
-    color: $active-color;
+    color: $highlight-color;
     text-shadow: 0 0 1px #333;
   }
   }
