@@ -3017,7 +3017,7 @@ button::-moz-focus-inner {
   width: 100%;
   max-height: none;
   height: auto;
-  background: #0b1b12;
+  background: white;
   border: solid 1px #cccccc;
   font-size: 0.875rem;
   z-index: 99;
@@ -3079,7 +3079,7 @@ button::-moz-focus-inner {
   width: 100%;
   max-height: none;
   height: auto;
-  background: #0b1b12;
+  background: white;
   border: solid 1px #cccccc;
   font-size: 0.875rem;
   z-index: 99;
@@ -3132,7 +3132,7 @@ button::-moz-focus-inner {
   width: 100%;
   max-height: none;
   height: auto;
-  background: #0b1b12;
+  background: white;
   border: solid 1px #cccccc;
   font-size: 0.875rem;
   z-index: 99;
@@ -3187,7 +3187,7 @@ button::-moz-focus-inner {
   width: 100%;
   max-height: none;
   height: auto;
-  background: #0b1b12;
+  background: white;
   border: solid 1px #cccccc;
   font-size: 0.875rem;
   z-index: 99;
@@ -3262,7 +3262,7 @@ button::-moz-focus-inner {
   width: 100%;
   height: auto;
   max-height: none;
-  background: #0b1b12;
+  background: white;
   border: solid 1px #cccccc;
   font-size: 0.875rem;
   z-index: 99;
