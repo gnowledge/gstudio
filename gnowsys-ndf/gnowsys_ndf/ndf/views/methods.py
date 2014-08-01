@@ -14,8 +14,11 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
 
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
+
 import subprocess
 import re
 import ast
@@ -113,7 +116,10 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     collection = db[Node.collection_name]
     
     theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
-    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
+    topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+
+    forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
+    reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
 
     drawer = None    
     
@@ -176,10 +182,12 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     else:
       # For heterogeneous collection      
-      if theme_GST_id or topic_GST_id:
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      if theme_GST_id and topic_GST_id and forum_GST_id and reply_GST_id:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      elif forum_GST_id and reply_GST_id:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}, 'member_of': { '$nin':[reply_GST_id._id, forum_GST_id._id]} })
       else:
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})           
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]} })
            
     
     if (nid is None) and (not nlist):
@@ -415,7 +423,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   # -------------------------------------------------------------------------------- prior_node
 
-  # node.prior_node = []
+   
   # if prior_node_list != '':
   #   prior_node_list = prior_node_list.split(",")
 
@@ -426,7 +434,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   #     node.prior_node.append(node_id)
     
   #   i = i+1
- 
+  #node.prior_node = []
   if prior_node_list != '':
     prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
 
@@ -767,6 +775,88 @@ def update_mobwrite_content_org(node_system):
     textobj = TextObj(filename=filename,text=content_org)
     textobj.save()
   return textobj
+
+
+                      
+"""
+def get_node_metadata_fields(request, node, node_type):
+	if(node.has_key('_id')):
+  		for at in node_type.attribute_type_set:
+			field_value=(request.POST.get(at.name,""))
+	
+			create_gattribute(node._id,at,field_value)
+"""
+
+def get_node_metadata(request,node,node_type):
+	attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
+	if(node.has_key('_id')):
+		for atname in attribute_type_list:
+			field_value=unicode(request.POST.get(atname,""))
+			at=collection.Node.one({"_type":"AttributeType","name":atname})	
+			if(at!=None):
+				create_gattribute(node._id,at,field_value)		
+"""			
+def create_AttributeType(name, data_type, system_name, user_id):
+
+	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
+	if (cursor != None):
+		print "The AttributeType already exists."
+	else:
+		attribute_type = collection.AttributeType()
+		attribute_type.name = unicode(name)
+		attribute_type.data_type = data_type
+		system_type = collection.Node.one({"name":system_name})
+		attribute_type.subject_type.append(system_type._id)
+		attribute_type.created_by = user_id
+		attribute_type.modified_by = user_id
+	        attribute_type.status=u"PUBLISHED"
+		#factory_id = collection.Node.one({"name":u"factory_types"})._id
+		#attribute_type.member_of.append(factory_id)
+		attribute_type.save()
+		system_type.attribute_type_set.append(attribute_type)
+		system_type.save()
+
+def create_RelationType(name,inverse_name,subject_type_name,object_type_name,user_id):
+
+	cursor = collection.Node.one({"name":unicode(name)})
+        if cursor!=None:
+		print "The RelationType already exists."
+	else:
+		relation_type = collection.RelationType()
+                relation_type.name = unicode(name)
+                system_type = collection.Node.one({"name":unicode(subject_type_name)})
+                relation_type.subject_type.append(system_type._id)
+                relation_type.inverse_name = unicode(inverse_name)
+		relation_type.created_by = user_id
+                relation_type.modified_by = user_id
+		relation_type.status=u"PUBLISHED"
+		object_type = collection.Node.one({"name":unicode(object_type_name)})
+		relation_type.object_type.append(ObjectId(object_type._id))
+                relation_type.save()
+		system_type.relation_type_set.append(relation_type)
+		system_type.save()
+"""
+
+def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
+# function to create grelations for new ones and delete old ones.
+	relationtype = collection.Node.one({"_type":"RelationType","name":unicode(relation_type_name)})
+	
+	#list_current_grelations = collection.Node.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
+	#removes all existing relations given subject and relation type and then creates again.
+	collection.remove({"_type":"GRelation","subject":subject_id,"relation_type":relationtype.get_dbref()})
+	
+	
+	
+	for relation_id in right_subject_id_list:
+	    
+	    gr_node = collection.GRelation()
+            gr_node.subject = ObjectId(subject_id)
+            gr_node.relation_type = relationtype
+            gr_node.right_subject = ObjectId(relation_id)
+	    gr_node.status = u"PUBLISHED"
+            gr_node.save()
+		
+
 
 def get_property_order_with_value(node):
   new_property_order = []
@@ -1244,8 +1334,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
   except Exception as e:
       error_message = "\n GRelationCreateError: " + str(e) + "\n"
       raise Exception(error_message)
-
-
 
 # Method to create discussion thread for File and Page.
 def create_discussion(request, group_id, node_id):

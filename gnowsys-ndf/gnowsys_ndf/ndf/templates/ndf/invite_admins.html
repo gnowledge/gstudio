@@ -1,5 +1,5 @@
 {% load ndf_tags %}
-
+{% load i18n %}
 <script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
 <link href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css" rel="stylesheet"> <!-- checked -->
 
@@ -109,15 +109,15 @@ function adget_all_data(){
 
 <div id="inviteadmins" class="reveal-modal " data-reveal >
      
-     <h2>Select users</h2>
+     {% blocktrans %}<h2>Select users</h2>{% endblocktrans %}
       <div id="admin_module_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="admin_colln_set"  %}
       </div>
 
-            <label><input type="checkbox" id="adminchecknotif" value="ON"> Send notification mails to all except the group owner</label>
+            {% blocktrans %}<label><input type="checkbox" id="adminchecknotif" value="ON">Send notification mails to all except the group owner</label>{% endblocktrans %}
               
       <input type="button" id="#submitUserInvite" class="button small" value="submit" onClick="admininvite()"> 
-     <a class="close-reveal-modal group">&#215;</a>
+     <a class="close-reveal-modal group">{% trans "&#215" %}; </a>
 </div>
 </div>
 

@@ -13,7 +13,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from gnowsys_ndf.ndf.org2any import org2html
-
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+from gnowsys_ndf.ndf.views.methods import get_node_metadata
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -38,7 +39,7 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
 
 #######################################################################################################################################
 
@@ -791,6 +792,7 @@ def file_detail(request, group_id, _id):
 
 
     file_node = collection.File.one({"_id": ObjectId(_id)})
+    file_node.get_neighbourhood(file_node.member_of)
     if file_node._type == "GSystemType":
 	return file(request, group_id, _id)
 
@@ -866,11 +868,19 @@ def getFileThumbnail(request, group_id, _id):
 
     if file_node is not None:
         if file_node.fs_file_ids:
-            if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
-                f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
-                return HttpResponse(f.read(), content_type=f.content_type)
-            else:
-                return HttpResponse("")
+
+          # getting latest uploaded pic's _id
+          file_fs = file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]
+         
+          if (file_node.fs.files.exists(file_fs)):
+            f = file_node.fs.files.get(ObjectId(file_fs))
+
+            # if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
+            #     f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
+            return HttpResponse(f.read(), content_type=f.content_type)
+
+          else:
+              return HttpResponse("")
         else:
             return HttpResponse("")
     else:
@@ -927,11 +937,31 @@ def file_edit(request,group_id,_id):
     file_node = collection.File.one({"_id": ObjectId(_id)})
 
     if request.method == "POST":
+
         # get_node_common_fields(request, file_node, group_id, GST_FILE)
         file_node.save(is_changed=get_node_common_fields(request, file_node, group_id, GST_FILE))
+	get_node_metadata(request,file_node,GST_FILE)
+	
+	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
+
+	if teaches_list !='':
+			teaches_list=teaches_list.split(",")
+	
+	create_grelation_list(file_node._id,"teaches",teaches_list)
+
+	
+	assesses_list = request.POST.get('assesses_list','')
+	
+	if assesses_list !='':
+		assesses_list=assesses_list.split(",")
+					
+	create_grelation_list(file_node._id,"assesses",assesses_list)
+	
+
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:
+	file_node.get_neighbourhood(file_node.member_of)
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,
                                     'group_id': group_id,

@@ -1,6 +1,6 @@
 {% load ndf_tags %}
-
-{% block title %} <h4>{{author.name}}'s - Preferences </h4> {% endblock %}
+{% load i18n %}
+{% block title %} <h4>{{author.name}}'s - {% trans "Preferences" %} </h4> {% endblock %}
 <hr>
 <style type="text/css">
 .resource-drawer {
@@ -28,25 +28,25 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 <dl class="accordion" data-accordion>
 <dd>
-<a id="forum_notif_pref" href="#preference">Click here to turn off notification preferences for groups</a>
+<a id="forum_notif_pref" href="#preference">{% trans "Click here to turn off notification preferences for groups" %}</a>
 <div id="preference" class="content">
 
 <div class="small-8 columns" style="display:table; border:1px; border-spacing:10px;left:-40px;">
 <div style="display:table-row;">
     <div style="display:table-cell">
-           <font size="5"> Forum Notifications </font>
+           <font size="5"> {% trans "Forum Notifications" %} </font>
     </div>
     <div style="display:table-cell">
              <div id="options">
-                 <input type="radio" value="On" name="forum"><font size="4">On</font> &nbsp;
+                 <input type="radio" value="On" name="forum"><font size="4">{% trans "On" %}</font> &nbsp;
 
-                 <input type="radio" value="Off" name="forum"><font size="4">Off</font>
+                 <input type="radio" value="Off" name="forum"><font size="4">{% trans "Off" %}</font>
               </div>
     </div>
 </div> <!-- table row closes-->
 <div style="display:table-row;">
    <div style="display:table-cell;">
-      Select Groups:
+      {% trans "Select Groups:" %}
   </div>
 </div>
 </div> <!-- div small-10 columns closes --> 

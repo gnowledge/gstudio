@@ -1,4 +1,5 @@
 {% extends "ndf/mis_base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 
@@ -40,7 +41,7 @@
         <dd><a href="#view-scheduler-calendar"><i class="fi-calendar"></i> Events </a></dd>
 
         <!-- <dd><a href="#view-page"><i class="fi-eye"></i> Read</a></dd> -->
-
+      {% blocktrans %}
         <dd>
           <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
@@ -54,6 +55,7 @@
 
         <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
       </dl>
+{% endblocktrans %}
     </section>
   </header>
 

@@ -122,8 +122,19 @@ Use corresponding package names if you are using an RPM based distro
 * Since gstudio is frequently updated, please obtain the latest code
   from git repo. After each update run (a) & (b) commands before running (c).
 
+8. To edit SCSS/SAAS stylesheets:
+
+  Installing Ruby and compass:
+    (1) sudo apt-get install ruby
+    (2) sudo gem install compass
+
+  Running compass:
+    (1) Navigate at manage.py file.
+    (2) Run following command (to start compass) and then edit scss stylesheets:
+        compass watch
+
+
 * Any issues with this procedure or you need any further help, or to
   file bugs etc. visit ask us in the mailing list:
 
   - http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
-

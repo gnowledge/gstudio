@@ -20,6 +20,10 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
+from gnowsys_ndf.settings import LOCAL_LANG
+from gnowsys_ndf.ndf.node_metadata_details import schema_dict
+
+
 
 register = Library()
 db = get_database()
@@ -29,9 +33,67 @@ translation_set=[]
 check=[]
 import json,ox
 
+
+
+
+@register.assignment_tag
+def get_schema(node):
+   obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
+   nam=node.member_of_names_list[0]
+   if(nam=='Page'):
+	#print s_dict[nam]
+        return [1,schema_dict[nam]]
+   elif(nam=='File'):
+	if( 'image' in node.mime_type):
+		return [1,schema_dict['Image']]
+        elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+        	return [1,schema_dict['Video']]
+	else:
+		return [1,schema_dict['Document']]	
+   else:
+	return [0,""]
+"""
+@register.assignment_tag
+def g2(node):
+     	node.get_neighbourhood(node.member_of)
+  #if(node.has_key('basedonurl')):
+	#schema_lrmi["basedonurl"] = node.basedonurl
+	#schema_lrmi["timerequired"] = node.timerequired
+	#schema_lrmi["agerange"]=node.age_range
+	#schema_lrmi["audience"]=node.audience
+	#schema_lrmi["interactivitytype"]=node.interactivitytype
+        return schema_lrmi 
+"""
+@register.filter
+def is_Page(node):
+	Page = collection.Node.one({"_type":"GSystemType","name":"Page"})
+	if(Page._id in node.member_of):
+		return 1
+	else:
+		return 0
+@register.filter
+def is_Quiz(node):
+	Quiz = collection.Node.one({"_type":"GSystemType","name":"Quiz"})
+	if(Quiz._id in node.member_of):
+		return 1
+	else:
+		return 0
+		
+@register.filter
+def is_File(node):
+	File = collection.Node.one({"_type":"GSystemType","name":"File"})
+	if(File._id in node.member_of):
+		return 1
+	else:
+		return 0
+
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
+
+@register.assignment_tag
+def get_languages():
+        return LOCAL_LANG
 
 @register.assignment_tag
 def get_node_ratings(request,node):
@@ -389,6 +451,53 @@ def get_gapps_menubar(request, group_id):
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		group_id=gpid._id
 		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+
+# This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
+@register.inclusion_tag('ndf/gapps_iconbar.html')
+def get_gapps_iconbar(request, group_id):
+	"""Get Gapps menu-bar
+	"""
+	try:
+		selectedGapp = request.META["PATH_INFO"]
+		group_name = ""
+		collection = db[Node.collection_name]
+		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
+		gapps = {}
+		i = 0;
+		meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+		
+		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		not_in_menu_bar = []
+		if group_obj.name == "home":
+			not_in_menu_bar = ["Image", "Video"]
+		else :
+			not_in_menu_bar = ["Image", "Video", "Group"]						
+		for node in GAPPS:
+			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+			if node:
+				if node.name not in not_in_menu_bar:
+					i = i+1;
+					gapps[i] = {'id': node._id, 'name': node.name.lower()}
+
+		if len(selectedGapp.split("/")) > 2 :
+			selectedGapp = selectedGapp.split("/")[2]
+		else :
+			selectedGapp = selectedGapp.split("/")[1]
+		if group_id == None:
+			group_id=gpid._id
+		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		if not group_obj:
+			group_id=gpid._id
+		else :
+			group_name = group_obj.name
+
+		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
+	except invalid_id:
+		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+		group_id=gpid._id
+		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
@@ -823,8 +932,10 @@ def get_contents(node_id):
 
 @register.assignment_tag
 def get_group_type(group_id, user):
+        
 
 	try:
+
 		col_Group = db[Node.collection_name]
 
 		if group_id == '/home/':
@@ -939,6 +1050,21 @@ def get_memberof_objects_count(key,group_id):
 		return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
 	except:
 		return 'null'
+
+
+'''Pass the ObjectId and get the name of it's first member_of element'''
+@register.assignment_tag
+def get_memberof_name(node_id):
+	try:
+		node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+		member_of_name = ""
+		if node_obj.member_of:
+			member_of_name = collection.Node.one({'_id': ObjectId(node_obj.member_of[0]) }).name
+		return member_of_name
+	except:
+		return 'null'
+
+
 	
 @register.filter
 def get_dict_item(dictionary, key):

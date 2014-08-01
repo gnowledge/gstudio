@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% load pagination_tags %}
 {% block title %} Admin {% endblock %}
 {% block meta_content %}
@@ -43,7 +44,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 {% block body_content %} 
 <div id="myGroup" class="reveal-modal" data-reveal style="width:30%;left:100%; overflow: auto;text-overflow: ellipsis;">
      <p>Hold down "Control", to select more than one.</p>
-     <h2>Select Groups</h2>
+     <h2>{% trans "Select Groups" %}</h2>
      <select id="id_groups" name="groups" multiple="multiple" style="max-width:500px;height:180px;">
        {% for group in Groups%}
        <option value="{{group.id}}" name="{{group.title}}">{{group.title}}</option>
@@ -55,7 +56,7 @@ background-repeat:no-repeat; background-size: 48px 48px
  {% if class_name == "GSystemType"  %}
 
 <div id="mySystemtype" class="reveal-modal" data-reveal >
-     <h2>Select Collections</h2>
+     <h2>{% trans "Select Collections" %}</h2>
       <div id="module_drawer" >
         {% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       </div>
@@ -106,16 +107,16 @@ background-repeat:no-repeat; background-size: 48px 48px
       <th width="140" style="display:none">Id</th>
       <th width="140">Title</th>
     {% if class_name == "File" or class_name ==  "GSystem"  %}
-      <th width="140">Group(s)</th>
+      <th width="140">{% trans "Group(s)" %}</th>
     {% endif %}
-      <th width="140" style="display:none">Type(s)</th>
-      <th width="140" style="display:none">Author</th>
-      <th width="140" style="display:none">Creation date</th>
+      <th width="140" style="display:none">{% trans "Type(s)" %}</th>
+      <th width="140" style="display:none">{% trans "Author" %}</th>
+      <th width="140" style="display:none">{% trans "Creation date" %}</th>
       {% if class_name == "GSystemType"  %}
-      <th width="140">Member OF</th>
-      <th width="140">Collection</th>
-      <th width="140">AttributeType_set</th>
-      <th width="140">RelationType_set</th>
+      <th width="140">{% trans "Member OF" %}</th>
+      <th width="140">{% trans "Collection" %}</th>
+      <th width="140">{% trans "AttributeType_set" %}</th>
+      <th width="140">{% trans "RelationType_set" %}</th>
       <th width="140"></th>
       {% endif %}
       	
@@ -169,7 +170,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	    <td>
 	      <a class="button medium" href="{% url 'adminDesignerDashboardClassEdit' class_name each.Id %}?translate=True">
-                Translate
+                {% trans "Translate" %}
 
 	    </td>
     </tr>
