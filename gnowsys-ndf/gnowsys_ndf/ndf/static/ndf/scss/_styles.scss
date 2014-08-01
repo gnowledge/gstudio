@@ -92,11 +92,12 @@ main>aside{
         background-color: $theme-color-invert;
         
         h2{
-            background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
+            background: #fff url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
+            margin: 0;
             a{
             color: black;
                 &:hover{
-                    //color:black;
+                    color:black;
                 }
             }
         }
