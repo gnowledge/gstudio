@@ -62,8 +62,14 @@
 		</fieldset>
 		<fieldset>
 			<legend>{% trans "Select Language" %}</legend>
-			<div class="large-4 columns"><select name="lan" id="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select>
-	     </div>
+			<div class="large-4 columns">
+			  <select name="lan">
+					      {% get_language_info_list for LANGUAGES as languages %}
+					      {% for language in languages %}
+					      <option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})
+					      </option>
+					      {% endfor %}
+					    </select></div>
 		</fieldset>
 
 		<fieldset>

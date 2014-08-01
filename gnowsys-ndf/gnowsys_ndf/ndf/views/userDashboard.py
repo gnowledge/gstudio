@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
-from gnowsys_ndf.settings import LOCAL_LANG
+from gnowsys_ndf.settings import LANGUAGES
 
 from django_mongokit import get_database
 
