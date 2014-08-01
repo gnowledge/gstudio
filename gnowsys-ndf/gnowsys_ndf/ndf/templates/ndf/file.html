@@ -18,11 +18,18 @@
  {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
   {% if user_access == "allow" %}
-
-      <a class="small button" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-        <span class="fi-upload">&nbsp;&nbsp;{% trans "Upload File" %}</span>
-      </a>
- 
+  <br>
+  <div class="row">
+  
+    <a class="small-2 small-push-1 columns small button" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" title="{% trans 'Upload File' %}">
+      <i class="fi-arrow-up"></i>
+    </a>
+  
+    <a class="small-7 small-pull-1 small-offset-1 columns small button" href="{% url 'explore_resources' group_name_tag %}">
+      <i class="fi-list-thumbnails"></i> &nbsp; {% trans "Explore Resorces" %}
+    </a>
+  
+  </div>
   {% endif %}
   {% endif %}
 {% endblock %}

@@ -969,3 +969,51 @@ def file_edit(request,group_id,_id):
                                 },
                                   context_instance=RequestContext(request)
                               )
+
+def explore_resources(request, group_id):
+
+  # getting group obj from name
+  group_obj = collection.Node.one({ "_type": "Group", "name": group_id })
+
+  # checking if passed group_id is group name or group Id
+  if group_obj and (group_id == group_obj.name):
+    group_name = group_id
+    group_id = group_obj._id
+  
+  else: # passes group_id is _id and not name
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id):
+      group_obj = collection.Node.one({ "_id":ObjectId(group_id) }) # retrieve Obj by _id
+      if group_obj:
+        group_name = group_obj.name
+        group_id = group_id       # for clarity
+
+  file_id = collection.Node.find_one({'_type':"GSystemType", "name":"File"}, {"_id":1})
+
+  # print group_obj
+  files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id._id)]}, 
+                                    '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    '$or': [
+                                      {'access_policy': u"PUBLIC"},
+                                      {'$and': [
+                                          {'access_policy': u"PRIVATE"}, 
+                                          {'created_by': request.user.id}
+                                        ]
+                                      }
+                                    ]
+                                  }).sort("last_update", -1)
+  
+  for each in files:
+    each.get_neighbourhood(each.member_of)
+    print "\n\n\n========", each
+
+  files.rewind();
+
+  return render_to_response("ndf/explore_resources.html",
+                            {
+                              "group_id": group_id, "groupid": group_id,
+                              "files": files
+                            },
+                            context_instance=RequestContext(request)
+                          )
