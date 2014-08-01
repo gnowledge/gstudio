@@ -38,7 +38,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <h2 class="medium-12 columns">
 		{% if node %}
-		{% blocktrans %}Editing {{title}}: {{node.name}} {% endblocktrans %}
+		{% blocktrans with node.name as node_name %}Editing {{title}}: {{node_name}} {% endblocktrans %}
 		{% else %}
 		{% blocktrans %}Create a New {{title}} {% endblocktrans %}
 		{% endif %}
