@@ -12,9 +12,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-
 from django_mongokit import get_database
-from gnowsys_ndf.settings import LOCAL_LANG
+from gnowsys_ndf.settings import LANGUAGES
 from django.utils.translation import ugettext as _  
 
 try:
@@ -282,7 +281,6 @@ def create_edit_page(request, group_id, node_id=None):
 
     context_variables = { 'title': gst_page.name,
                           'group_id': group_id,
-                          'lan':LOCAL_LANG,
                           'groupid': group_id
                       }
     
@@ -541,9 +539,8 @@ def translate_node(request,group_id,node_id=None):
                                 'node':node,
                                 'node_name':node_name,
                                 'groupid':group_id,
-                                'group_id':group_id,
-                                'lan':LOCAL_LANG
-                               },
+                                'group_id':group_id
+                                      },
                              
                               context_instance = RequestContext(request)
     )        

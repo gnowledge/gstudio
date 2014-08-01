@@ -8,15 +8,15 @@
     {% csrf_token %}
 
     <header class="row">
-     {% blocktrans %}
       <h2 class="medium-12 columns">
         {% if node %}
-        Editing Event: {{node.name}}
-        {% else %}
-        Create a New {{title}} Event
+     
+       {% trans "Editing Event:" %} {{node.name}}
+	{% endblocktrans %}
+         {% else %}
+       {% trans "Create a New" %} {{title}} Event
         {% endif %}
-      </h2>
-      {% endblocktrans %}
+	</h2>
       <nav class="medium-12 columns">
         <dl class="tabs" data-tab>
           <dd>

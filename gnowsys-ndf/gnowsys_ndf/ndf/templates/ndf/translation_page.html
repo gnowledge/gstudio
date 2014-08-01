@@ -31,12 +31,18 @@ $("#lan option[value={{v}}]").remove();
 
 </script>
 
-       <div class="large-12 columns">
+<div class="large-12 columns">
 <table class="large-6 columns">
 <div class="row">
 <div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
 <div class="large-6 columns">
-<select name="lan" id="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
+<select name="lan">
+{% get_language_info_list for LANGUAGES as languages %}
+{% for language in languages %}
+<option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+{% endfor %}
+</select>
+
 
 
 </div>
