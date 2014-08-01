@@ -970,7 +970,7 @@ def file_edit(request,group_id,_id):
                                   context_instance=RequestContext(request)
                               )
 
-def explore_resources(request, group_id):
+def data_review(request, group_id):
 
   # getting group obj from name
   group_obj = collection.Node.one({ "_type": "Group", "name": group_id })
@@ -1006,11 +1006,11 @@ def explore_resources(request, group_id):
   
   for each in files:
     each.get_neighbourhood(each.member_of)
-    print "\n\n\n========", each
+    print "\n\n\n========", each.structure
 
   files.rewind();
 
-  return render_to_response("ndf/explore_resources.html",
+  return render_to_response("ndf/data_review.html",
                             {
                               "group_id": group_id, "groupid": group_id,
                               "files": files
