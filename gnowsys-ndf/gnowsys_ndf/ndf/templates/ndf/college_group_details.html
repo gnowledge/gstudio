@@ -10,7 +10,7 @@
 {% block script %}
 // <script type="text/javascript">
   $(document).on('click', '#Student', function (){
-    alert($(this).attr("id") + " --- {{node.pk}} --- {{node.name}}")
+    // alert($(this).attr("id") + " --- {{node.pk}} --- {{node.name}}")
     $.ajax({
       url: "{% url 'get_students_assignments' groupid %}",
 

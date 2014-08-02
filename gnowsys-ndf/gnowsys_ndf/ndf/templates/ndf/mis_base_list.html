@@ -73,7 +73,7 @@
           {% if gstaff_access %}
           <th>Edit</th>
 
-          <th>Confirmation status</th>
+          <!-- <th>Confirmation status</th> -->
 
           {% if is_link_needed %}
           <th>Link to User A/C</th>
@@ -111,12 +111,12 @@
           </td>
           {% endif %}
 
-          <td>
+<!--           <td>
             <div id="enrollement_code_{{each.pk}}">
             <a href="#" class="button small enrollment_code" onclick="get_enrollment_code('{{each.pk}}')">Confirm</a>
             </div>
           </td>
-
+ -->
           {% if is_link_needed %}
           {% check_node_linked each.pk as is_linked %}
           <td style="font-size:11px;">

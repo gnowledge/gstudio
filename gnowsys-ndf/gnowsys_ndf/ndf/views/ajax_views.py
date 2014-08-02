@@ -1,7 +1,7 @@
-
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json  
+
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -17,7 +17,6 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 import ast
 
-
 from django_mongokit import get_database
 
 try:
@@ -28,6 +27,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
@@ -1717,6 +1717,7 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
+
 def get_students_assignments(request, group_id):
   """
 
@@ -1734,76 +1735,107 @@ def get_students_assignments(request, group_id):
       if request.GET.has_key("user_id"):
         user_id = int(request.GET.get("user_id", ""))
 
-      college_group = collection.Node.one({'_id': ObjectId(group_id)}, {'name': 1, 'tags': 1, 'author_set': 1})
-      page = collection.Node.one({'_type': "GSystemType", 'name': "Page"}, {'_id': 1})
-      # print "\n page: ", page._id
-      image = collection.Node.one({'_type': "GSystemType", 'name': "Image"}, {'_id': 1})
-      # print " image: ", image._id
-      video = collection.Node.one({'_type': "GSystemType", 'name': "Video"}, {'_id': 1})
-      # print " video: ", video._id
+      # Fetching college group
+      college_group = collection.Node.one({'_id': ObjectId(group_id)}, {'name': 1, 'tags': 1, 'author_set': 1, 'created_by': 1})
+      page_res = collection.Node.one({'_type': "GSystemType", 'name': "Page"}, {'_id': 1})
+      # print "\n page_res: ", page_res._id
+      file_res = collection.Node.one({'_type': "GSystemType", 'name': "File"}, {'_id': 1})
+      # print " file_res: ", file_res._id
+      image_res = collection.Node.one({'_type': "GSystemType", 'name': "Image"}, {'_id': 1})
+      # print " image_res: ", image_res._id
+      video_res = collection.Node.one({'_type': "GSystemType", 'name': "Video"}, {'_id': 1})
+      # print " video_res: ", video_res._id
 
       student_list = []
       # print " college_group (author_set): ", college_group.author_set, "\n"
 
       if user_id:
+        # Fetch assignment details of a given student
         student_dict = {}
+        num_pages = []
+        num_images = []
+        num_videos = []
+        num_files = []
 
-        num_pages = collection.Node.find({'member_of': page._id, 'created_by': user_id}, {'name': 1, '_id': 0})
-        num_images = collection.Node.find({'member_of': image._id, 'created_by': user_id}, {'name': 1, '_id': 0})
-        num_videos = collection.Node.find({'member_of': video._id, 'created_by': user_id}, {'name': 1, '_id': 0})
-        
-        # print "\n num_pages: ", num_pages.count()
-        student_dict["Pages"] = list(num_pages)
-        print "\n student_dict['Pages']: ", student_dict["Pages"], "\n"
-        # print " num_images: ", num_images.count()
-        student_dict["Images"] = list(num_images)
-        # print " num_videos: ", num_videos.count()
-        student_dict["Videos"] = list(num_videos)
+        # Fetch student's user-group
+        user_group = collection.Node.one({'_type': "Author", 'created_by': user_id})
+        student_dict["username"] = user_group.name
 
-        # Student's Author node
-        student_author_node = collection.Node.one({'_type': "Author", 'created_by': user_id})
-        # print "\n student_author_node: ", student_author_node.name
-        # Student's node 
-        student_has_login = collection.Node.one({'_type': "GRelation", 'right_subject': student_author_node._id})
-        student_node = collection.Node.one({'_id': student_has_login.subject}, {'name': 1})
-        # print " student_node: ", student_node.name
-        student_dict["Name"] = student_node.name
-        student_dict["user_id"] = user_id
+        # Fetch all resources from student's user-group
+        resources = collection.Node.find({'group_set': user_group._id}, {'name': 1, 'member_of': 1, 'created_at': 1})
 
-        return HttpResponse(json.dumps(student_dict))
+        for res in resources:
+          if page_res._id in res.member_of:
+            num_pages.append(res)
+
+          elif image_res._id in res.member_of:
+            num_images.append(res)
+
+          elif video_res._id in res.member_of:
+            num_videos.append(res)
+
+          elif file_res._id in res.member_of:
+            num_files.append(res)
+
+        student_dict["Pages"] = num_pages
+        # print "\n student_dict['Pages']: ", student_dict["Pages"], "\n"
+        student_dict["Images"] = num_images
+        # print "\n student_dict['Images']: ", student_dict["Images"], "\n"
+        student_dict["Videos"] = num_videos
+        # print "\n student_dict['Videos']: ", student_dict["Videos"], "\n"
+        student_dict["Files"] = num_files
+        # print "\n student_dict['Files']: ", student_dict["Files"], "\n"
+
+        return HttpResponse(json.dumps(student_dict, cls=NodeJSONEncoder))
 
       else:
+        # Fetch assignment details of all students belonging to the college group
         for user_id in college_group.author_set:
+          if user_id == college_group.created_by:
+            continue
+
           student_dict = {}
+          num_pages = 0
+          num_images = 0
+          num_videos = 0
+          num_files = 0
 
-          num_pages = collection.Node.find({'member_of': page._id, 'created_by': user_id})
-          num_images = collection.Node.find({'member_of': image._id, 'created_by': user_id})
-          num_videos = collection.Node.find({'member_of': video._id, 'created_by': user_id})
-          
-          # print "\n num_pages: ", num_pages.count()
-          student_dict["Pages"] = num_pages.count()
-          # print " num_images: ", num_images.count()
-          student_dict["Images"] = num_images.count()
-          # print " num_videos: ", num_videos.count()
-          student_dict["Videos"] = num_videos.count()
-          student_dict["Total"] = num_pages.count() + num_images.count() + num_videos.count()
+          # Fetch student's user-group
+          user_group = collection.Node.one({'_type': "Author", 'created_by': user_id})
 
-          # Student's Author node
-          student_author_node = collection.Node.one({'_type': "Author", 'created_by': user_id})
-          # print "\n student_author_node: ", student_author_node.name
-          # Student's node 
-          student_has_login = collection.Node.one({'_type': "GRelation", 'right_subject': student_author_node._id})
-          student_node = collection.Node.one({'_id': student_has_login.subject}, {'name': 1})
+          # Fetch student's node from his/her has_login relationship
+          student_has_login_rel = collection.Node.one({'_type': "GRelation", 'right_subject': user_group._id})
+          student_node = collection.Node.one({'_id': student_has_login_rel.subject}, {'name': 1})
           # print " student_node: ", student_node.name
           student_dict["Name"] = student_node.name
           student_dict["user_id"] = user_id
 
+          # Fetch all resources from student's user-group
+          resources = collection.Node.find({'group_set': user_group._id}, {'member_of': 1})
+
+          for res in resources:
+            if page_res._id in res.member_of:
+              num_pages = num_pages + 1
+
+            elif image_res._id in res.member_of:
+              num_images = num_images + 1
+
+            elif video_res._id in res.member_of:
+              num_videos = num_videos + 1
+
+            elif file_res._id in res.member_of:
+              num_files = num_files + 1
+
+          student_dict["Pages"] = num_pages
+          student_dict["Images"] = num_images
+          student_dict["Videos"] = num_videos
+          student_dict["Files"] = num_files
+          student_dict["Total"] = num_pages + num_images + num_videos + num_files
+
           # print "\n student_dict: ", student_dict
           student_list.append(student_dict)
 
-        # print "\n student_list: ", student_list, "\n"
-        # print "\n group_id: ", group_id
-        # print " college_group_id: ", college_group_id
+        # Outside of above for loop
 
         return render_to_response("ndf/student_statistics.html",
                                   {'node': college_group,'student_list': student_list},
