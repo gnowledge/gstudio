@@ -5,7 +5,7 @@
 {% load ndf_tags %}
 {% if already_uploaded %} 
 <div id="message">
-  <span style="color:red">{% trans "Listed below files are already uploaded please choose different files" %}</span>
+  <span style="color:red">{% trans "Files Listed below are already uploaded. Duplicate file uploads are not possible." %}</span>
   <ul>
     {% for each in already_uploaded %}
     <li>{{each}}</li>
