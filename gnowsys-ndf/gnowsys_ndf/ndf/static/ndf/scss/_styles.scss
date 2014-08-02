@@ -6,15 +6,20 @@
 
 @import url("css.css");
 
-
-		nav h1 img{
+//Logo
+.top-bar{
+    h1{
+        img{
             /* Logo */
 			height: 1.8rem;
 			margin-right: 5px;
 		}
-		nav h1 a{
+        a{
 			color:white!important;
 		}
+    }
+}
+
 
 		body>header{
             //Site header
@@ -41,10 +46,9 @@
 
 		body>footer{
             //Site footer
-            border-top: 2px dotted #ccc;
+            border-top: 2px dotted #aaa;
 			padding:20px 0;
 			position: relative;
-            margin: 0 2rem;
             color:#888;
             min-height: 100px;
             background-color: rgba(255,255,255,0.5);
@@ -52,6 +56,17 @@
             a{
 			color: #777;
 		}
+            .gnu-badge{
+                padding: 6px 9px 6px 80px;
+                border: 1px dashed #ddd;
+                margin-bottom: 3px;
+                margin-right: 3px;
+                display: inline-block;
+                background: #fafafa url("../images/gnu-head.png") no-repeat -35px -9px;
+                &:hover{
+                    background-position: -35px -19px;
+                }
+            }
 		}
 
 
@@ -66,102 +81,146 @@
 		}
 
 
-/*************************** 1. Foundation CSS overrides ***********************/
-
-/* Foundation hacks */
-
-input[type="checkbox"] + label, input[type="radio"] + label{
-	margin: inherit!important;
-}
 
 /* Sections */
 
 
+
+//Main sidebar
 main>aside{
-	margin-bottom: 0.5rem;
+    &>div{
+        background-color: $theme-color-invert;
+        
+        h2{
+            font-size: 2rem;
+            padding: 5px;
+            background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
+            margin: 0;
+            a{
+            color: $active-color;
+                &:hover{
+                    color:black;
+                }
+            }
+        }
+        nav{
+            border-bottom: 4px solid $active-color;
+        }
+        
+        h3{
+            font-size: 1.2rem;
+            font-weight: normal;
+            color: white;
+        }
+        h4{
+            font-size: 1rem;
+            color: #eee;
+            span{
+                display: none;
+            }
+            &:hover span{
+                display: inline;
+            }
+        }
+        h5,h6{
+            margin: 0;
+        }
+            
+        .f-dropdown.content{
+            width: auto;
+            padding: 0;
+            border: 1px solid #222;
+            .item{
+                width: 70px;
+            }
+        }
+        header{
+           padding: 10px;
+        }
+        
+        footer{
+            background-color: #222;
+            min-height: 1rem;
+            label{
+                font-size: 0.7rem;
+            }
+        }
+        
+        
+        // Aside link styles
+        a,p{
+                color: white;
+            &:hover{
+                color:white;
+            }
+            }
+        .side-nav{
+            background-color: #444;
+            padding: 0;
+            border-bottom: 2px solid $active-color;
+            margin: 0;
+            li{
+                border-bottom: 1px solid #555;
+                a{
+                    border-left: 2px solid black;
+                }
+                &.active a,a:hover{
+                    border-left: 2px solid $active-color;
+                }
+            }
+        }
+        
+    }
+}
 
-header{
-	margin-top: 1rem;
-}
-a{
-	color: #008759;
-    &:hover{
-	color: inherit;
-}
-}
-
-}
-
-h2:not(.subheader){
+//    Article styles
+    article{
+        overflow-x: visible;
+        &>header,form>header{
+            padding: 15px;
+            margin-bottom: 0.5rem;
+        }
+        
+        &>footer{
+        }
+    
+h1:not(.subheader){
 	font-family: "Georgia Serif", Serif;
+    font-style: italic;
     
     div{
         display:inline-block;
         position: relative;
         input{
-            @extend h2;
-            
-            height: 3rem;
+            height:200%;
+            font-style: italic;
+            @extend h1;
+            padding-left:5px; 
             box-shadow: none;
-            border: none;
-            border-bottom: 2px dotted darken($theme-color,50%);
+            border-width: 0 0 2px 0;
+            border-bottom: 2px dotted #222;
+            background-color: inherit;
+            
+            &:hover{
+            background-color: white;
+            }
         }
     }
 }
-
-/* Off canvas navigation */
-aside.left-off-canvas-menu{
-	background-color: #222;
-	color:white;
-}
-a#toggle-shelf{
-	position: absolute;
-	top:1rem;
-	right: 1rem;
-	color: black;
-	z-index: 10;
-}
-a#toggle-shelf:hover{
-	color: black;
-}
-a#toggle-shelf i{
-	font-size: 30px;
-}
-
-.inner-wrap>aside h4{
-	color: white;
-	padding:10px;
-}
+    }
 
 
 
-/* Should be in Foundation */
 
-/* Effects */
-.drop-shadow{
-	-webkit-box-shadow: 0px 0px 5px 1px #333;
-	box-shadow: 0px 0px 5px 1px #333;
-}
-.rounded{
-	border-radius: 2px;
-	-webkit-border-radius:2px;
-}
-.transition-opacity{
-	transition: opacity .3s ease;
-	-moz-transition: opacity .3s ease;
-	-webkit-transition: opacity .3s ease;
-	-o-transition: opacity .3s ease;
-}
+
 
 /* Card block */
 
-.medium-block-grid-2 > .card:first-child{
-    // First card
-    //width: 100%;
-}
+
+
 .card>*{
 	position: relative;
-	background-color: $bg-color;
+	background-color: inherit;
 	padding:7px;
 	border: 1px dashed darken($bg-color,10%);
 	display: block;
@@ -178,8 +237,7 @@ a#toggle-shelf i{
     
      &.published{
         opacity: 1;
-        border-style: solid;
-        border-color: $primary-color;
+        background-color: darken($bg-color,5%);
     }
     &.unapproved{
         opacity: 1;
@@ -244,13 +302,6 @@ a#toggle-shelf i{
         width: 100%;
     }
 }
-    section{
-	background-color: #ddd;
-}
-    .button{
-	opacity:0.1;
-}
-    
     footer{
         margin-top: 1rem;
         font-size: 70%;
@@ -271,37 +322,11 @@ a#toggle-shelf i{
     position: relative;
 	background-color: $bg-color;
 	padding:10px;
-	border: 1px dashed darken($bg-color,10%);
+//	border: 1px dashed darken($bg-color,10%);
 	display: block;
     
 }
 
-/* Create card */
-.create.card>*{
-	background-color: #999;
-	opacity:1;
-    
-    &:hover{
-	background-color: #008759;
-    }
-}
-
-.create.card{
-    h4{
-	color:white;
-}
-    .button{
-	border:1px solid #00ba7b;
-        opacity:0.5;
-}
-    label{
-	color:white;
-}
-    .switch label{
-	color:inherit;
-}
-   
-}
 
 /* Content Tabs */
 article .tabs{
@@ -309,22 +334,21 @@ article .tabs{
 	margin-right: 5px;
 	font-size: 1.3rem;
 }
-    dd.active a{
-	color:#222;
-	background-color: inherit;
-}
-dd a{
-	color:#aaa;
-	background-color: inherit;
-	padding: 0.5rem;
-	padding-left: 1rem;
-    &:hover{
-	background-color: inherit;
-	color:#999;
-}
-}
+   
 }
 
+article{
+.tabs {
+    dd.active a{
+        color:$active-color;
+        border-bottom: 2px solid $active-color;
+        font-weight: bold;
+    }
+    dd:hover a{
+        color:$active-color;
+    }
+}
+}
 .tabs-content>.content{
 	padding-top: 0;
 }
@@ -343,13 +367,7 @@ dd a{
 	display: block;
 }
 
-.card>*:hover .button{
-	opacity:1;
-	transition: opacity .5s ease-in ease-in;
-	-moz-transition: opacity .5s ease-in;
-	-webkit-transition: opacity .5s ease-in;
-	-o-transition: opacity .5s ease-in;
-}
+
 
 /* Inline label list */
 
@@ -376,26 +394,6 @@ dd a{
 
 /*************************** 2. Custom CSS overrides ***********************/
 
-main aside{
-	padding-top: 1rem;
-    &.fade{
-	opacity:0.8;
-}
-}
-
-
-aside>section{
-	margin:inherit!important;
-	margin-bottom:5px;
-	padding-bottom: 3rem;
-    &>div{
-	padding: 15px;
-}
-}
-
-
-aside .meta i{color: #ccc;}
-aside:hover .meta i{color: black;}
 
 
 .panel{
@@ -404,7 +402,7 @@ aside:hover .meta i{color: black;}
 
 /* Content area */
 article{
-	margin-top: 0.5rem;
+    
 	padding-bottom: 4rem; 
 	
     &>header{
@@ -455,11 +453,7 @@ textarea{
 	color: inherit;
 }
 .user i{
-	padding: 0.2em 0.5em;
-	margin-right:0.4em;
-	color:white;
-	background-color:#ddd;
-	opacity:0.8;
+margin-right: 3px;
 }
 .user:hover i{
 	opacity:1;
@@ -472,37 +466,10 @@ a.node{
 a.app{
 	overflow: hidden;
 }
-a.app i{
-	font-size:15px;
-	color:white;
-	margin-right:8px;
-}
 .button.edit{
 	margin-bottom: 0;
 }
 
-/* Sidebar Search Results */
-main .search{
-	margin:0;
-}
-main .search div>*{
-	margin: 0;
-}
-#search-results{
-	list-style: none;
-	margin:0;
-}
-#search-results li{
-
-}
-#search-results a{
-	background-color: black;
-	padding: 0.5rem;
-	display: block;
-}
-#search-results a:hover{
-	background-color: #444;
-}
 
 /************ Forms **************/
 

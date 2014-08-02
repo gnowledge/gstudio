@@ -1,5 +1,6 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% block title %} {{title}} {% endblock %}
 {% block url %}{% url 'create_edit' groupid node %}{% endblock %}
 
@@ -18,20 +19,22 @@
       {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
       {% user_access_policy groupid request.user as user_access %}
       {% if user.is_superuser or node.created_by == user.id %}
-      <span><a class="button" href="{% url 'edit' groupid node.pk %}">Edit</a></span>
+      <span><a class="button" href="{% url 'edit' groupid node.pk %}">{% trans "Edit" %}</a></span>
       {% endif %}
       {% endif %}
     </h2>
     <h3 class="subheader"></h3>
       <small>
-        Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history<\
+	{% blocktrans with node.last_update|timesince as timesince %}
+        Edited {{timesince}} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history<\
 /a>
       </small>
+ {% endblocktrans %}
 
   </section>
 </header>
 <div class="row">
-<h3> Members of {{node.name}} :</h3>
+<h3> Members of {{node.name}}: </h3>
 {% for each in student_coll %}
 <div>
 <a href ="">{{each.name}}</a><br><br>
@@ -42,5 +45,5 @@
 
 
 {% block meta_content %}
-  <h2>Batch</h2>
+  <h2>{% trans "Batch" %}</h2>
 {% endblock %}

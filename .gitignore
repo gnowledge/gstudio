@@ -55,6 +55,9 @@ docs/_build/
 # emacs tags
 TAGS
 
+# Temporary cache files
+.sass-cache
+
 # others
 local/
 include/
@@ -63,4 +66,5 @@ bower_components/
 mathjax/
 schema_files/
 *.db
+*~
 wikidata/

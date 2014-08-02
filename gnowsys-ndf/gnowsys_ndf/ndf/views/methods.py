@@ -2,7 +2,9 @@
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.shortcuts import render_to_response, render
+from django.http import HttpResponse
 from django.template import RequestContext
+from django.core.serializers.json import DjangoJSONEncoder
 import mongokit 
 
 ''' -- imports from application folders/files -- '''
@@ -12,12 +14,16 @@ from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
 
+from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
+
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
+
 import subprocess
 import re
 import ast
 import string
+import json
 from datetime import datetime
 ######################################################################################################################################
 
@@ -25,6 +31,9 @@ db = get_database()
 collection = db[Node.collection_name]
 
 history_manager = HistoryManager()
+theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+
 #######################################################################################################################################
 #                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
 #######################################################################################################################################
@@ -108,7 +117,12 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     
     theme_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
     topic_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})    
+    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
+    forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
+    reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
+
+    
     drawer = None    
     
     if checked:     
@@ -165,15 +179,19 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "Theme":
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
+      elif checked == "theme_item":
+        drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_item_GST._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
+
+
       elif checked == "Topic":
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})   
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})   
 
     else:
       # For heterogeneous collection      
-      if theme_GST_id or topic_GST_id:
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      if theme_GST_id or topic_GST_id or theme_item_GST or forum_GST_id or reply_GST_id:
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
       else:
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})           
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]} })
            
     
     if (nid is None) and (not nlist):
@@ -213,8 +231,7 @@ def get_resource_type(request,node_id):
   get_resource_type=collection.Node.one({'_id':ObjectId(node_id)})
   get_type=get_resource_type._type
   return get_type 
-   
-
+                          
 def get_translate_common_fields(request,get_type,node, group_id, node_type, node_id):
   """ retrive & update the common fields required for translation of the node """
 
@@ -273,29 +290,41 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
     filename = slugify(name) + "-" + usrname + "-"
     node.content = org2html(content_org, file_prefix=filename)
 
-  
 
-def get_node_common_fields(request, node, group_id, node_type):
+
+def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   """Updates the retrieved values of common fields from request into the given node."""
   # print "\n Coming here...\n\n"
 
   gcollection = db[Node.collection_name]
   group_obj=gcollection.Node.one({'_id':ObjectId(group_id)})
   collection = None
+  if coll_set:
+      if "Theme" in coll_set.member_of_names_list:
+        node_type = theme_GST
+      else:
+        node_type = topic_GST
+                                
+      name = request.POST.get('name_'+ str(coll_set._id),"")
+      content_org = request.POST.get(str(coll_set._id),"")
+      tags = request.POST.get('tags'+ str(coll_set._id),"")
+     
+  else:    
+    name =request.POST.get('name','')
+    content_org = request.POST.get('content_org')
+    tags = request.POST.get('tags')
+  language= request.POST.get('lan')
+  sub_theme_name = request.POST.get("sub_theme_name", '')
+  add_topic_name = request.POST.get("add_topic_name", '')
   is_changed = False
-
-  name = unicode(request.POST.get('name', ""))
   sub_theme_name = unicode(request.POST.get("sub_theme_name", ''))
   add_topic_name = unicode(request.POST.get("add_topic_name", ''))
   usrid = int(request.user.id)
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
-  language= request.POST.get('lan')
-  tags = request.POST.get('tags')
   prior_node_list = request.POST.get('prior_node_list','')
   collection_list = request.POST.get('collection_set_list','')
   module_list = request.POST.get('module_list','')
-  content_org = unicode(request.POST.get('content_org'))
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
 
@@ -381,9 +410,7 @@ def get_node_common_fields(request, node, group_id, node_type):
     if user_group_obj:
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
-
   # -------------------------------------------------------------------------------- tags
-
   if tags:
     tags_list = []
 
@@ -400,7 +427,7 @@ def get_node_common_fields(request, node, group_id, node_type):
 
   # -------------------------------------------------------------------------------- prior_node
 
-  # node.prior_node = []
+   
   # if prior_node_list != '':
   #   prior_node_list = prior_node_list.split(",")
 
@@ -411,7 +438,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   #     node.prior_node.append(node_id)
     
   #   i = i+1
- 
+  #node.prior_node = []
   if prior_node_list != '':
     prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
 
@@ -544,7 +571,7 @@ def get_node_common_fields(request, node, group_id, node_type):
   
 def get_versioned_page(node):
             
-       
+          
     rcs = RCS()
     fp = history_manager.get_file_path(node)
     cmd= 'rlog  %s' % \
@@ -554,20 +581,19 @@ def get_versioned_page(node):
         stdout=subprocess.PIPE)
     for line in iter(proc1.stdout.readline,b''):
        
-       if line.find('revision')!=-1 and line.find('selected') == -1:
-
+      if line.find('revision')!=-1 and line.find('selected') == -1:
           rev_no=string.split(line,'revision')
           rev_no=rev_no[1].strip( '\t\n\r')
-          rev_no=rev_no.strip(' ')
-       if line.find('status')!=-1:
+          rev_no=rev_no.split()[0]
+      if line.find('status')!=-1:
           up_ind=line.find('status')
           if line.find(('PUBLISHED'),up_ind) !=-1:
-              # rev_no=rev_no.strip(' ')
 	       rev_no=rev_no.split()[0]
                node=history_manager.get_version_document(node,rev_no)
                proc1.kill()
                return (node,rev_no)    
-       if rev_no == '1.1':
+      if rev_no == '1.1':
+          
            node=history_manager.get_version_document(node,'1.1')
            proc1.kill()
            return(node,'1.1')
@@ -612,12 +638,13 @@ and if he has published his contents then he would be shown the current publishe
 
 '''
      username =request.user
+     # print node,"nodeeee"
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
      if  ver2 != '1.1':                           
 	    if node2 is not None:
-		print "direct"
+		# print "direct"
                 if node2.status == 'PUBLISHED':
                   
 			if float(ver2) > float(ver1):			
@@ -752,6 +779,88 @@ def update_mobwrite_content_org(node_system):
     textobj = TextObj(filename=filename,text=content_org)
     textobj.save()
   return textobj
+
+
+                      
+"""
+def get_node_metadata_fields(request, node, node_type):
+	if(node.has_key('_id')):
+  		for at in node_type.attribute_type_set:
+			field_value=(request.POST.get(at.name,""))
+	
+			create_gattribute(node._id,at,field_value)
+"""
+
+def get_node_metadata(request,node,node_type):
+	attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
+	if(node.has_key('_id')):
+		for atname in attribute_type_list:
+			field_value=unicode(request.POST.get(atname,""))
+			at=collection.Node.one({"_type":"AttributeType","name":atname})	
+			if(at!=None):
+				create_gattribute(node._id,at,field_value)		
+"""			
+def create_AttributeType(name, data_type, system_name, user_id):
+
+	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
+	if (cursor != None):
+		print "The AttributeType already exists."
+	else:
+		attribute_type = collection.AttributeType()
+		attribute_type.name = unicode(name)
+		attribute_type.data_type = data_type
+		system_type = collection.Node.one({"name":system_name})
+		attribute_type.subject_type.append(system_type._id)
+		attribute_type.created_by = user_id
+		attribute_type.modified_by = user_id
+	        attribute_type.status=u"PUBLISHED"
+		#factory_id = collection.Node.one({"name":u"factory_types"})._id
+		#attribute_type.member_of.append(factory_id)
+		attribute_type.save()
+		system_type.attribute_type_set.append(attribute_type)
+		system_type.save()
+
+def create_RelationType(name,inverse_name,subject_type_name,object_type_name,user_id):
+
+	cursor = collection.Node.one({"name":unicode(name)})
+        if cursor!=None:
+		print "The RelationType already exists."
+	else:
+		relation_type = collection.RelationType()
+                relation_type.name = unicode(name)
+                system_type = collection.Node.one({"name":unicode(subject_type_name)})
+                relation_type.subject_type.append(system_type._id)
+                relation_type.inverse_name = unicode(inverse_name)
+		relation_type.created_by = user_id
+                relation_type.modified_by = user_id
+		relation_type.status=u"PUBLISHED"
+		object_type = collection.Node.one({"name":unicode(object_type_name)})
+		relation_type.object_type.append(ObjectId(object_type._id))
+                relation_type.save()
+		system_type.relation_type_set.append(relation_type)
+		system_type.save()
+"""
+
+def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
+# function to create grelations for new ones and delete old ones.
+	relationtype = collection.Node.one({"_type":"RelationType","name":unicode(relation_type_name)})
+	
+	#list_current_grelations = collection.Node.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
+	#removes all existing relations given subject and relation type and then creates again.
+	collection.remove({"_type":"GRelation","subject":subject_id,"relation_type":relationtype.get_dbref()})
+	
+	
+	
+	for relation_id in right_subject_id_list:
+	    
+	    gr_node = collection.GRelation()
+            gr_node.subject = ObjectId(subject_id)
+            gr_node.relation_type = relationtype
+            gr_node.right_subject = ObjectId(relation_id)
+	    gr_node.status = u"PUBLISHED"
+            gr_node.save()
+		
+
 
 def get_property_order_with_value(node):
   new_property_order = []
@@ -1229,3 +1338,114 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
   except Exception as e:
       error_message = "\n GRelationCreateError: " + str(e) + "\n"
       raise Exception(error_message)
+
+# Method to create discussion thread for File and Page.
+def create_discussion(request, group_id, node_id):
+  '''
+  Method to create discussion thread for File and Page.
+  '''
+
+  try:
+
+    twist_st = collection.Node.one({'_type':'GSystemType', 'name':'Twist'})
+
+    node = collection.Node.one({'_id': ObjectId(node_id)})
+
+    # group = collection.Group.one({'_id':ObjectId(group_id)})
+
+    thread = collection.Node.one({ "_type": "GSystem", "name": node.name, "member_of": ObjectId(twist_st._id), "prior_node": ObjectId(node_id) })
+    
+    if not thread:
+      
+      # retriving RelationType
+      # relation_type = collection.Node.one({ "_type": "RelationType", "name": u"has_thread", "inverse_name": u"thread_of" })
+      
+      # Creating thread with the name of node
+      thread_obj = collection.GSystem()
+
+      thread_obj.name = unicode(node.name)
+      thread_obj.status = u"PUBLISHED"
+
+      thread_obj.created_by = int(request.user.id)
+      thread_obj.modified_by = int(request.user.id)
+      thread_obj.contributors.append(int(request.user.id))
+
+      thread_obj.member_of.append(ObjectId(twist_st._id))
+      thread_obj.prior_node.append(ObjectId(node_id))
+      thread_obj.group_set.append(ObjectId(group_id))
+      
+      thread_obj.save()
+
+      # creating GRelation
+      # create_grelation(node_id, relation_type, twist_st)
+      response_data = [ "thread-created", str(thread_obj._id) ]
+
+      return HttpResponse(json.dumps(response_data))
+
+    else:
+      response_data =  [ "Thread-exist", str(thread._id) ]
+      return HttpResponse(json.dumps(response_data))
+  
+  except Exception as e:
+    
+    error_message = "\n DiscussionThreadCreateError: " + str(e) + "\n"
+    raise Exception(error_message)
+    # return HttpResponse("server-error")
+
+
+# to add discussion replies
+def discussion_reply(request, group_id):
+
+  try:
+
+    prior_node = request.POST.get("prior_node_id", "")
+    content_org = request.POST.get("reply_text_content", "") # reply content
+
+    # process and save node if it reply has content  
+    if content_org:
+  
+      user_id = int(request.user.id)
+      user_name = unicode(request.user.username)
+
+      # auth = collection.Node.one({'_type': 'Author', 'name': user_name })
+      reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+      
+      # creating empty GST and saving it
+      reply_obj = collection.GSystem()
+
+      reply_obj.name = unicode("Reply of:" + str(prior_node))
+      reply_obj.status = u"PUBLISHED"
+
+      reply_obj.created_by = user_id
+      reply_obj.modified_by = user_id
+      reply_obj.contributors.append(user_id)
+
+      reply_obj.member_of.append(ObjectId(reply_st._id))
+      reply_obj.prior_node.append(ObjectId(prior_node))
+      reply_obj.group_set.append(ObjectId(group_id))
+  
+      reply_obj.content_org = unicode(content_org)
+      filename = slugify(unicode("Reply of:" + str(prior_node))) + "-" + user_name + "-"
+      reply_obj.content = org2html(content_org, file_prefix=filename)
+  
+      # saving the reply obj
+      reply_obj.save()
+
+      formated_time = reply_obj.created_at.strftime("%B %d, %Y, %I:%M %p")
+      
+      # ["status_info", "reply_id", "prior_node", "html_content", "org_content", "user_id", "user_name", "created_at" ]
+      reply = json.dumps( [ "reply_saved", str(reply_obj._id), str(reply_obj.prior_node[0]), reply_obj.content, reply_obj.content_org, user_id, user_name, formated_time], cls=DjangoJSONEncoder )
+      # print "\n\n====", reply
+
+      return HttpResponse( reply )
+
+    else: # no reply content
+
+      return HttpResponse(json.dumps(["no_content"]))      
+
+  except Exception as e:
+    
+    error_message = "\n DiscussionReplyCreateError: " + str(e) + "\n"
+    raise Exception(error_message)
+
+    return HttpResponse(json.dumps(["Server Error"]))

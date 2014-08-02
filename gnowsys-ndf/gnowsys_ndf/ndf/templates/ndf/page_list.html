@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -6,13 +7,16 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block help_topics %}
+{% blocktrans %}
   <li><a href="#">Pages Introduction</a></li>
   <li><a href="#">Working with Pages</a></li>
   <li><a href="#">Page types</a></li>
+{% endblocktrans %}
 {% endblock %}
 
 
 {% block help_content %}
+{% blocktrans %}
   <p>
     Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.
   </p>
@@ -21,11 +25,24 @@
   <p>
     Anyone with an account can create a new article. When creating a new article, the initial contributor can choose to have a defined list of authors, all of whom can edit the page, or have an open, wiki-like format where anyone can contribute.
   </p>
+{% endblocktrans %}
 {% endblock %}
 
 
 {% block meta_content %}
-  <h2>Pages</h2>
+ {% blocktrans %} <h3>Pages</h3>{% endblocktrans %}
+
+{% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+
+      <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
+	{% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Create {{title}}</span>{% endblocktrans %}
+      </a>
+  
+  {% endif %}
+  {% endif %}
+
 {% endblock %}
 
 
@@ -35,20 +52,31 @@
 
 
 {% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-  <br/>
-  <div class="create card">
-    <div class="page">
-      <br/>
-      <a class="button medium" href="{% url 'page_create_edit' group_name_tag %}">
-	<span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
-      </a>
-    </div>
-  </div>
-  {% endif %}
-  {% endif %}
+
+{% get_resource_collection groupid title as page_collections %}
+
+
+<ul class="side-nav">
+
+  {% autopaginate page_collections 23 %}
+
+  <!-- Existing card list-->
+  {% for node in page_collections %}
+    <li>
+     
+      <h5>
+      <a class="select" class="collection" href="{% url 'page_details' group_name_tag node %}"><i class="fi-page-multiple"></i>  {{ node.name|truncatechars:20 }}        
+    </a>
+</h5>
+    
+          
+    </li>  
+  
+
+  {% endfor %}
+
+</ul>
+  
 {% endblock %}
 
 
@@ -58,7 +86,7 @@
 <header class="row">
   <dl class="tabs" data-tab>
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd>
-    <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
+    {% blocktrans %}<dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>{% endblocktrans %}
   </dl>
 </header>
 
@@ -91,13 +119,19 @@
     <li class="card">
         
         {% group_type_info groupid request.user as grouptype %}
+        
       {% if grouptype == "Moderated" %}
       {% if node.status == "DRAFT" %}
-      <div class="unapproved page">
+      <div class="draft page">
+      {% endif %}
+           {% if node.status == "PUBLISHED" %}
+      <div class="published page">
       {% endif %}
           
           {% else %}
-          <div class="draft page">
+          
+          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} page'>
+              
       {% endif %} 
               
           <div class="label-list">{% for tag in node.tags|slice:":3" %}
@@ -132,7 +166,7 @@
     {% if not searching %}
       <div class="row">
         <div class="small-12 columns">
-          <h5>This group doesn't have any pages. <b>Be the first to create a Page!</b></h5>
+        <h5>  {% blocktrans %} This group doesn't have any pages. <b>Be the first to create a Page!</b>{% endblocktrans %} </h5>
         </div>
       </div>
     {% endif %}
@@ -163,7 +197,6 @@
         {% endfor %}
         </div>
 
-        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
         <h4>
           {{ node.name|truncatechars:20 }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
         </h4>
@@ -200,7 +233,7 @@
   
   {% empty %}
     {% if not searching %}
-          <h5>This group doesn't have any collections.</h5>
+     <h5>    {% blocktrans %} This group doesn't have any collections.{% endblocktrans %} </h5>
     {% endif %}
 
   {% endfor %}

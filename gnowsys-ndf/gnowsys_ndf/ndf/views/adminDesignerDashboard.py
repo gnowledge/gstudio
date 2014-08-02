@@ -83,7 +83,7 @@ def adminDesignerDashboardClassCreate(request, class_name, node_id=None):
     delete class's objects
     '''
     new_instance_type = None
-
+    LANGUAGES = ""
     definitionlist = []
     contentlist = []
     dependencylist = []

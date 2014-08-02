@@ -1,6 +1,7 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% block meta_content %}  
-<h2>Visualize</h2>
+<h2>{% trans "Visualize" %}</h2>
 {% endblock %}
 
 {% block style %} 			
@@ -68,34 +69,36 @@ width:200px;
 	<!-- <input type="file" id="file-select" name="doc" onchange="" /> -->
 	<!-- <input type="text" id="type_graph" name="type_graph"> -->
 	<!-- <input type="button" id="see_value" name="see_value" onClick="put_text()"> -->
-	<h4><strong>Step 1 : </strong></h4>
+	<h4><strong>{% trans "Step 1: " %} </strong></h4>
 	<!-- <br> -->
-	<p class="stephead">Select a Graph/Visualization of your choice.</p>
+	<p class="stephead">{% trans "Select a Graph/Visualization of your choice." %}</p>
 	<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4" disabled> 
-		<li><img class="th" id="img1" src="/static/ndf/images/bar_chr.png" alt="not found" onclick="vis_choice(1)"/><br>Bar Chart</li> 
-		<li><img class="th" id="img2" src="/static/ndf/images/pie.png" onclick="vis_choice(2)"/><br>Pie Chart</li> 
-		<li><img class="th" id="img3" src="/static/ndf/images/ScatterPlot.png" onclick="vis_choice(3)" /><br>Scatter Plot</li> 
-		<li><img class="th" id="img4" src="/static/ndf/images/TagCloud.png" onclick="vis_choice(4)" /><br>Tag Cloud</li> 
+		<li><img class="th" id="img1" src="/static/ndf/images/bar_chr.png" alt="not found" onclick="vis_choice(1)"/><br>{% trans "Bar Chart" %}</li> 
+		<li><img class="th" id="img2" src="/static/ndf/images/pie.png" onclick="vis_choice(2)"/><br>{% trans "Pie Chart" %}</li> 
+		<li><img class="th" id="img3" src="/static/ndf/images/ScatterPlot.png" onclick="vis_choice(3)" /><br>{% trans "Scatter Plot" %}</li> 
+		<li><img class="th" id="img4" src="/static/ndf/images/TagCloud.png" onclick="vis_choice(4)" /><br>{% trans "Tag Cloud" %}</li> 
 	</ul>
 
 	<!-- <input type="file" id="file-select" name="doc[]" id="" /> -->
 	<hr>
-	<h4><strong>Step 2 : </strong></h4>
-	<p class="stephead">Upload a CSV file. Please see the instructions regarding the CSV format. 
+	<h4><strong>{% trans "Step 2: " %} </strong></h4>
+	<p class="stephead">{% trans "Upload a CSV file. Please see the instructions regarding the CSV format." %} 
 	<br> 
-	<br><a href="#" data-reveal-id="myInstr" onclick="graphing()">Instructions for CSV file</a></p>
+	<br><a href="#" data-reveal-id="myInstr" onclick="graphing()">{% trans "Instructions for CSV file" %}</a></p>
 
-	<div id="myInstr" class="reveal-modal" data-reveal> <h2>Instructions</h2> 
+	<div id="myInstr" class="reveal-modal" data-reveal> <h2>{% trans "Instructions" %}</h2> 
 		<ul>
-		<li>CSV files can easily be created from Excel spreadsheets/LibreOffice Calc.
+		<li>{% trans "CSV files can easily be created from Excel spreadsheets/LibreOffice Calc." %}
 		</li> 
-		<li>Just click on "save as" and when choosing the format, select "Text CSV (.csv)" instead of .xls .</li>
+		<li>{% trans "Just click on "save as" and when choosing the format, select "Text CSV (.csv)" instead of .xls ." %}</li>
 		<br>
 		<img src="/static/ndf/images/Instr_csv.JPG" style="height:200px;width:200px;"/>
-		<li>Currently the graphing app supports CSV files with only 2 columns. So, your spread sheet must have only two columns.</li>
+{% blocktrans %}		
+<li>Currently the graphing app supports CSV files with only 2 columns. So, your spread sheet must have only two columns.</li>
 		<li>The first row in every column must be the column heading and not any data value.</li>
-		<li>For Example - If you want to plot Cities v/s Annual Rainfall, the first row in your speardsheet must be a heading like "City Name" or "Cities" or something similar and not be a data value like "Mumbai.
+		<li>For Example - If you want to plot Cities v/s Annual Rainfall, the first row in your speardsheet must be a heading like "City Name" or "Cities" or something similar and not be a data value like "Mumbai".
 		<br>
+{% endblocktrans %}
 		<img src="/static/ndf/images/Instr_sheet.jpg" style="height:150px;width:400px;"/>
 		</li>
 
@@ -159,12 +162,12 @@ document.getElementById('fileinput').addEventListener('change', readSingleFile, 
 			}
 		</script>
 		<hr>
-		<h4><strong>Step 3 : </strong></h4>
-		<p class="stephead">Almost there! Just click on the button below to create the visualization.</p>
-		<a class="button medium" href="#" data-reveal-id="myModal" onclick="graphing()">Create Graph!</a> <div id="myModal" class="reveal-modal" data-reveal> <h2>Awesome. I have it.</h2> 
+		<h4><strong>Step 3:  </strong></h4>
+		<p class="stephead">{% trans "Almost there! Just click on the button below to create the visualization." %}</p>
+		<a class="button medium" href="#" data-reveal-id="myModal" onclick="graphing()">{% trans "Create Graph!" %}</a> <div id="myModal" class="reveal-modal" data-reveal> <h2>{% trans "Awesome. I have it." %}</h2> 
 		<div id="itsme"><div id="tooltip" class="hidden">
-			<p><strong>Details</strong></p>
-			<p><span id="value">100</span></p>
+			<p><strong>{% trans "Details" %}</strong></p>
+			<p><span id="value">{% trans "100" %}</span></p>
 		</div><div id="itsme2"></div></div> <a class="close-reveal-modal">&#215;</a> </div>
 
 		

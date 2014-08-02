@@ -102,8 +102,13 @@
 				header = $('<div class="orgitdownHeader"></div>').insertBefore($$);
 				$(dropMenus(options.markupSet)).appendTo(header);
 
+
 				// add the footer after the textarea
 				footer = $('<div class="small-12 columns orgitdownFooter"></div>').insertAfter($$);
+
+				// add the live bar after textarea
+				live = $('<div class="small-12 columns orgitdownLive"></div>').insertAfter($$);
+				live.html('<p id="plistOnlineUser"></p><ul style="color: green; max-height: 100px; overflow: auto;" id="listOnlineUser"></ul>');
 
 				// add the resize handle after textarea
 				if (options.resizeHandle === true && $.browser.safari !== true) {

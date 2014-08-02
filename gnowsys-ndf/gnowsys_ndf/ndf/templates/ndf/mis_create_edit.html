@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 
@@ -119,7 +120,7 @@
   {% if already_uploaded_file %}
 	<div class="row">
     <div class="small-12 columns">
-		<p> <font size ="5" color="red">This file :{{already_uploaded_file}} Already uploaded please choose another file</font> </p>
+		{% blocktrans %}<p> <font size ="5" color="red">This file :{{already_uploaded_file}} Already uploaded please choose another file</font> </p>{% endblocktrans %}
     <div>
 	</div>
   <br/>
@@ -150,21 +151,21 @@
 				<select id="id_auto_now_add" id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
 
 					{% if at.database_value %}
-					<option value="">Unknown</option>
+					<option value="">{% trans "Unknown" %}</option>
 					{% else %}
-					<option selected="selected" value="">Unknown</option>
+					<option selected="selected" value="">{% trans "Unknown" %}</option>
 					{% endif %}
 
 					{% if at.database_value == "Yes"%}
-					<option selected="selected" value="Yes">Yes</option>
+					<option selected="selected" value="Yes">{% trans "Yes" %}</option>
 					{% else %}
-					<option value="Yes">Yes</option>
+					<option value="Yes">{% trans "Yes" %}</option>
 					{% endif %}
 
 					{% if at.database_value == "No"%}
-					<option selected="selected" value="No">No</option>
+					<option selected="selected" value="No">{% trans "No" %}</option>
 					{% else %}
-					<option value="No">No</option>
+					<option value="No">{% trans "No" %}</option>
 					{% endif %}
 
 				</select>
@@ -173,30 +174,30 @@
 				{% if at.type == "attendees" %}
 				<a href="" id="label_{{at.type}}" data-reveal-id="view-map-edit-widget1" title="Click to add attendence">Set Batch of Attendees/Students</a>
 
-        <!-- Overlay : Map EDIT Widget -->
+        <!-- Overlay :, Map EDIT Widget -->
         <div class="content reveal-modal" id="view-map-edit-widget1" data-reveal>    
-          <a class="close-reveal-modal" >&#215;</a>
+          <a class="close-reveal-modal" >{% trans "&#215" %};</a>
 
-          <h3>Attendence</h3>
+          <h3>{% trans "Attendence" %}</h3>
 
           <div class="row">
             <div class="small-2 columns">
-              <label for="label-fc" class="left inline">Foundation Course</label>
+              <label for="label-fc" class="left inline">{% trans "Foundation Course" %}</label>
             </div>
             <div  class="small-5 end columns">
               <select id="label-fc">
-                <option>FC Check</option>
+                <option>{% trans "FC Check" %}</option>
               </select>
             </div>
           </div>
 
           <div class="row">
             <div class="small-2 columns">
-              <label for="label-batch" class="left inline">Batches</label>
+              <label for="label-batch" class="left inline">{% trans "Batches" %}</label>
             </div>
             <div  class="small-5 end columns">
               <select id="label-batch">
-                <option>Batch Check</option>
+                <option>{% trans "Batch Check" %}</option>
               </select>
             </div>
           </div>
@@ -256,14 +257,14 @@
 
 			<div class="small-5 end columns">
 				<a href="#view-map-edit-widget" id="label-location" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-					<i class="fi-marker"></i> &nbsp; Add Location
+					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 				</a>
 			</div>      
 		</div>  
 
 		<!-- Overlay : Map EDIT Widget -->
 		<div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
-			<a class="close-reveal-modal" >&#215;</a>
+			<a class="close-reveal-modal" >{% trans "&#215" %};</a>
 			{% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
 		</div>
 		<!-- END of Map Widget Overlay -->
@@ -272,7 +273,7 @@
 
 		<div class="row">
 			<div class="small-2 columns"> 
-				<label for="label-tags" class="left inline">Tags</label>
+				<label for="label-tags" class="left inline">{% trans "Tags" %}</label>
 			</div>
 			<div class="small-5 end columns">
 				<input id="label-tags" name="tags" type="text" value="{{tags}}" placeholder="Separate tags with commas...">
@@ -282,7 +283,7 @@
 		{% if File == "True" %}
 		<div class="row">
 			<div class="small-2 columns"> 
-				<label for="label-file" class="left inline">Upload File</label>
+				<label for="label-file" class="left inline">{% trans "Upload File" %}</label>
 			</div>
 			<div class="small-5 end columns">
 				<input id="label-file" name="file" type="file">
@@ -292,7 +293,7 @@
     
 		<div class="row">
 			<div class="small-2 columns"> 
-				<label for="label-content" class="left inline">Content</label>
+				<label for="label-content" class="left inline">{% trans "Content" %}</label>
 			</div>
 			<div class="small-7 end columns">
 				<div id="label-content" class="content">

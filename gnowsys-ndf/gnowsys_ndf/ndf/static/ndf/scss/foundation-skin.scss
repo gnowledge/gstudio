@@ -18,14 +18,41 @@
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
 
-nav.top-bar{
-    // Icons in the top-bar links caused heights of the li to vary by a few pixels and broke the layout of content below in firefox browser
-    height:inherit;
+/* Too many apps cause breakage */
+.top-bar{
+    height: auto!important;
 }
-
-.top-bar-section ul li > a.button{
+.top-bar .dropdown a.button{
     padding: 0;
 }
+
+
+input[type="checkbox"] + label, input[type="radio"] + label{
+	margin: inherit!important;
+}
+
+/* Styles icon-bar */
+.icon-bar .item{
+    border:1px solid #222;
+    &.active{
+        background-color: black;
+        i,label{
+        color: white;
+        }
+    }
+}
+
+/*
+/* Protects reflowing elements on error */
+[data-abide] span.error, [data-abide] small.error{
+    position: absolute;
+}
+
+/*active color for side-nav links*/
+.side-nav li.active a:not(.button){
+    color:$side-nav-link-color-active;
+}
+
 
 /*
 *   Foundation extensions
@@ -34,7 +61,6 @@ nav.top-bar{
 pre{
     width:92%;
 	overflow: auto;
-	margin: 2rem 0;
 	border: 1px solid #eee;
 	border-left: 1rem solid #eee;
 	font: lighter 1.2rem/2rem Monaco;
@@ -56,4 +82,112 @@ pre{
             color:orange;
         }
     }
+}
+
+/* Utility class to display the child spans of this element on hover */
+.show-span-on-hover{
+    span{
+    display:none;
+    }
+    &:hover span{
+    display:inline;
+    }
+}
+/* Utility class to display the next siblings on hoverr */
+.extra.app {
+  display: none;
+    
+}
+
+/* Effects */
+.drop-shadow{
+	-webkit-box-shadow: 0px 0px 5px 1px #333;
+	box-shadow: 0px 0px 5px 1px #333;
+}
+.rounded{
+	border-radius: 2px;
+	-webkit-border-radius:2px;
+}
+.transition-opacity{
+	transition: opacity .3s ease;
+	-moz-transition: opacity .3s ease;
+	-webkit-transition: opacity .3s ease;
+	-o-transition: opacity .3s ease;
+}
+
+/*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
+
+.rating-bar {
+ 
+
+  &>span {
+      /* remove inline-block whitespace */
+      font-size: 0;
+         /* flip the order so we can use the + and ~ combinators */
+  unicode-bidi: bidi-override;
+  direction: rtl;
+  }
+    
+    &.unrated{
+        /* If the user has not rated yet */
+        &:checked ~ label:before{
+      color: $secondary-color;
+    }
+  }
+        
+
+  [type*="radio"] {
+    display: none;
+    & + label {
+      /* only enough room for the star */
+      display: inline-block;
+      overflow: hidden;
+      text-indent: 9999px;
+      width: 1em;
+      height: 1.4em;
+      white-space: nowrap;
+        font-size: 1.5rem;
+      &:before {
+        display: inline-block;
+        text-indent: -9999px;
+        content: '\2606'; /* WHITE STAR */
+        color: #888;
+      }
+    }
+    &:checked ~ label:before,
+      & + label:hover ~ label:before,
+      & + label:hover:before {
+      content: '\2605'; /* BLACK STAR */
+      color: $highlight-color;
+      text-shadow: 0 0 1px #333;
+    }
+  }
+  
+  /* the hidden clearer */
+    
+  .last[type*="radio"] + label {
+    text-indent: -9999px;
+    width: .5em;
+    margin-left: -.5em;
+  }
+  .last[type*="radio"] + label:before {
+    width: .5em;
+    height: 1.4em;
+  }
+  
+  /* this is gross, I threw this in to override the starred
+     buttons when hovering. */
+  &:hover{
+     [type*="radio"] + label:before {
+    content: '\2606'; /* WHITE STAR */
+    color: #888;
+    text-shadow: none;
+  }
+  [type*="radio"] + label:hover ~ label:before,
+  [type*="radio"] + label:hover:before {
+    content: '\2605'; /* BLACK STAR */
+    color: $highlight-color;
+    text-shadow: 0 0 1px #333;
+  }
+  }
 }

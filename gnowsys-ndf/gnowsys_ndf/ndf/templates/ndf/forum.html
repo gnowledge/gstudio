@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -31,32 +31,28 @@
 
 
 {% block meta_content %}
-  <h2>Forums</h2>
-  <br/>
+  {% blocktrans %}<h3>Forums</h3>{% endblocktrans %}
+
+ {% if user.is_authenticated %}
+	{% user_access_policy groupid request.user as user_access %}
+	{% if user_access == "allow" %}
+  
+      <a class="small button" href="{% url 'create_forum' group_name_tag %}">
+	     <span class="fi-plus">&nbsp;&nbsp;{% trans "Create Forum" %}</span>
+      </a>
+  {% endif %}
+  {% endif %}
+
 {% endblock %}
 
 
 {% block search_content %}
   {% include "ndf/node_search_base.html" %}
-  <br/>
 {% endblock %}
 
 
 {% block related_content %}
-  {% if user.is_authenticated %}
-	{% user_access_policy groupid request.user as user_access %}
-	{% if user_access == "allow" %}
-  <br/>
-  <div class="create card">
-    <div class="forum">
-      <br/>
-      <a class="button medium" href="{% url 'create_forum' group_name_tag %}">
-	     <span class="fi-plus">&nbsp;&nbsp;New Forum</span>
-      </a>
-    </div>
-  </div>
-  {% endif %}
-  {% endif %}
+ 
 {% endblock %}
 
 
@@ -85,7 +81,7 @@
 {% endif %}
 
 
-<ul class="small-block-grid-1 medium-block-grid-2">
+<ul class="small-block-grid-2 medium-block-grid-4">
   {% autopaginate existing_forums 23 %}
 
   {% for each in existing_forums %}
@@ -93,6 +89,7 @@
   <li class="card">
     <div class="forum">
 
+         <a href="{% url 'show' groupid each.id %}">
     <header>
       <div class="label-list">
       {% for tag in each.tags|slice:":3" %}
@@ -100,22 +97,15 @@
       {% endfor %}
       </div>
 
-      <div class="th"><img src="/static/ndf/scss/themes/metastudio/logo.svg"></div>
 
-      <h4>
-        {{ each.name|safe|striptags|truncatechars:20 }}
-        <div>
-          <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
-          <br/>
-          by <span href="#" class="user" data-gnow="">{{ each.user_details_dict.created_by }}</span> 
-          </small>
-        </div>
-      </h4>
+      <h5>
+        {{ each.name }}</h5>
+             
     </header>
-      
+      <section>
     <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+</section>
 
-    <a class="small button expand" href="{% url 'show' groupid each.id %}">View Details</a>
 
     {% comment %}
     {% if node.created_by == request.user.id %}
@@ -123,11 +113,19 @@
     {% endif %}
     {% endcomment %}
 
-    <footer class="row">
-      <div class="small-7 columns"><i class="fi-torsos-all gray-text"> </i> <strong>{{each.contributors|length}}</strong> <span class="gray-text">Contributor{{each.contributors|pluralize}}</span></div>
-      <div class="small-5 columns"><div class="right"><i class="fi-shuffle gray-text"> </i> <strong>{{each.threads}}</strong> <span class="gray-text">Thread{{each.threads|pluralize}}</span></div></div> 
+    <footer>
+        
+        <div class="age">
+         {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
+          by <span href="#" class="user" data-gnow="">{{ each.user_details_dict.created_by }}</span> 
+        
+        </div>
+        
+      <span><i class="fi-torsos-all gray-text"> </i> <strong>{{each.contributors|length}}</strong> <span class="gray-text">Contributor{{each.contributors|pluralize}}</span></span>
+      <span class="right"><i class="fi-shuffle gray-text"> </i> <strong>{{each.threads}}</strong> <span class="gray-text">Thread{{each.threads|pluralize}}</span></span> 
     </footer>
-
+</a>
+        
     </div>
   </li>
   
@@ -135,7 +133,7 @@
     {% if not searching %}
   	<div class="row">
   	  <div class="small-12 columns">
-  	    <h5>This group doesn't have any forums. <b>Be the first to create a Forum!</b></h5>
+  	   <h5> {% blocktrans %}This group doesn't have any forums. <b>Be the first to create a forum!</b></h5>{% endblocktrans %}<h5>
   	  </div>
   	</div>
     {% endif %}

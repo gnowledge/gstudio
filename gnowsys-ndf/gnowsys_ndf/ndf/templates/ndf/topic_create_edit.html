@@ -38,25 +38,37 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <h2 class="medium-12 columns">
 		{% if node %}
-			Editing {{title}}: {{node.name}}
+		{% blocktrans with node.name as node_name %}Editing {{title}}: {{node_name}} {% endblocktrans %}
 		{% else %}
-			Create a New {{title}}
+		{% blocktrans %}Create a New {{title}} {% endblocktrans %}
 		{% endif %}
     </h2>
 
     <nav class="medium-12 columns">
    		<dl class="tabs" data-tab>
 		{% if node %}
-			<dd><h3>View:</h3></dd>
+			<dd><h3>{% trans "View:" %}</h3></dd>
 		
 			<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 		  	<!-- change name of collection tab overide block in your code -->
 		  		<a href="#panel-name-description"> {{title}} </a>
 			</dd>
 			<dd title="Click here to add/edit collection">
-	  			<a href="#panel-collection" class="collection_tab"> Collection </a> 
+	  			<a href="#panel-collection" class="collection_tab">{% trans "Collection" %} </a> 
 			</dd>
-						  
+			<!-- change name of metadata tab overide block in your code -->
+			<dd title="Click here to add/edit metadata">
+	 			<a href="#panel-metadata" > Metadata </a> 
+			</dd> 
+			<dd title="Click here to add/edit requires">
+	 			<a href="#panel-prior-node" class="prior_node_tab" >Requires </a> 
+			</dd>
+			<dd title="Click here to add/edit assesses">
+	 			<a href="#panel-assesses " class="assesses_tab" >Assesses </a> 
+			</dd>
+			<dd title="Click here to add/edit teaches">
+	 			<a href="#panel-teaches" class="teaches_tab" >Teaches </a> 
+			</dd>			  
 		{% endif %}
      	</dl>
   	</nav>
@@ -73,29 +85,29 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-8 columns">
-		    			<label>{{title}} Name</label>
+		    			<label>{% blocktrans %}{{title}} Name {% endblocktrans %}</label>
 		    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-		    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 		  			</div>
 
 		  			<div class="medium-4 columns">
 		    			{% if node.created_by == request.user.pk %}		    	
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Privacy" %}</label></span>
 
 							<div class="privacy-mode switch round">
 							{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-								<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+								<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 
 								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-								<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+								<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 							{% else %}
 								{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
 									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-									<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+									<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 
 									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-									<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+									<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 								{% endif %}
 							{% endif %}
 								<span></span>
@@ -109,12 +121,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
 		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-		  					<i class="fi-marker"></i> &nbsp; Add Location
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 		  				</a>
 		  			</div>
 				</div>
@@ -144,21 +156,21 @@ background-repeat:no-repeat; background-size: 48px 48px
 		
 				<div class="row">
 		  			<div class="medium-8 columns">
-		    			<label>{{title}} Name</label>
+		    			<label>{% blocktrans %}{{title}} Name {% endblocktrans %}</label>
 		    			<input id="name_id" name="name" type="text" placeholder="Enter name..." required>
-		    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+		    			<small class="error">{% blocktrans %}Please give your page a descriptive name. It's helpful for others and for yourself.{% endblocktrans %}</small>
 		  			</div>
 
 		  			<div class="medium-4 columns">
 		    			
-						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% blocktrans %}Privacy{% endblocktrans %}</label></span>
 						<div class="privacy-mode switch round">
 					
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+							<label for="PUBLIC" onclick="">{% blocktrans %} Public {% endblocktrans %} <i class="fi-torsos-all"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+							<label for="PRIVATE" onclick="">{% blocktrans %} Private {% endblocktrans %} <i class="fi-lock"></i></label>
 						
 							<span></span>
 						</div>
@@ -170,12 +182,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
 		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-		  					<i class="fi-marker"></i> &nbsp; Add Location
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 		  				</a>
 		  			</div>
 				</div>
@@ -188,7 +200,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-12 columns">
-		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag</label>
+		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}</label>
 		    			</span>
 		    			<input id="tags_id" name="tags" type="text" placeholder="Separate tags with commas...">
 		  			</div>		
@@ -204,48 +216,48 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    <div class="content" id="panel-collection" style="width:95%;">
 	      <div class="row">
 		<div class="small-12 columns">
-		  <h5>Add or edit Collection : </h5>
+		  <h5>{% trans "Add or edit Collection: " %} </h5>
 		</div>				
 		<br/><br/>
 		
 		<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}>
 		  <div id="SelectApp" class="row">
 		    <div class="small-2 columns line-height-2pt5">
-		      Classify by:
+		      {% trans "Classify by:" %}
 		    </div>
 		    <div class="small-2 columns">
 		      <input type="radio" name="col" value="Page"/>
-		      Page <span class="divider-line">|</span>
+		      {% trans "Page" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-page-filled"></i></span>
 		    </div>
 		    <div class="small-2 columns">
 		      <input type="radio" name="col" value="File" />
-		      File <span class="divider-line">|</span>
+		      {% trans "File" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-page-multiple"></i></span>
 		    </div>
 		    <div class="small-2 columns">
 		      <input type="radio" name="col" value="Image" />
-		      Image <span class="divider-line">|</span>
+		      {% trans "Image" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-photo"></i>
 		      </span>
 		    </div>
 		    <div class="small-2 columns">
 		      <div class="row">
 		      <input type="radio" name="col" value="Video" />
-		      Video <span class="divider-line">|</span>
+		      {% trans "Video" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-video"></i>
 		      </span>
 		      </div>
 		      <div class="row">
 		      <input type="radio" name="col" value="Pandora Video" />
-		      Pandora <span class="divider-line">|</span>
+		      {% trans "Pandora" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-video"></i>
 		      </span>
 		      </div>
 		    </div>
 		    <div class="small-2 columns">
 		      <input type="radio" name="col" value="QuizObj" />
-		      Quiz <span class="divider-line">|</span>
+		      {% trans "Quiz" %} <span class="divider-line">|</span>
 		      <span class="fontsize-x-large"><i class="step fi-pencil"></i>
 		      </span>
 		    </div>
@@ -261,16 +273,89 @@ background-repeat:no-repeat; background-size: 48px 48px
 	    </div>
 
 	    {% endblock %}
-    	
-	</div>  
+    	  <!-- this is for requires -->
+          <div class="content" id="panel-teaches"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Teaches:  </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="teaches_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    	</div>
+	
+	 <div class="content" id="panel-prior-node"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Requires: </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="prior_node_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+    	</div>
+	<div class="content" id="panel-assesses"  style="width:95%;">
+      		<div class="row">
+			<div class="small-12 columns">
+	  		<h5>Add or edit Assesses:  </h5>
+			</div>
+		<br/>
+	
+			<div class="small-12 columns">
+	  		<div id="assesses_drawer">
+	    <!-- {#% edit_drawer_widget "prior_node" groupid node title %#} --> 
+	  		</div>
+			</div>
+      		</div>
+       </div>
+
+	 <div class="content" id="panel-metadata" style="width:95%;" >
+      
+      <div class="row">
+	  <h3>Add or edit Metadata - Please spend a few minutes </h3>
+        
+
+        <div class="small-5 columns">
+         <h5>Age Range:</h5>  <input id="age_range" name="age_range" type="text" value="{{node.age_range}}"  >
+        
+         <h5>Target Audience: </h5> <input name="audience" type="text" value="{{node.audience}}"  >
+         <label><h5>Time Required: </h5> <select name="timerequired" value="{{node.timerequired}}"><option>0-2M</option><option>2-5M</option><option>5-15M</option><option>15-45M</option></select></label>
+         <label><h5>Interactivity Type: </h5> <select name="interactivitytype "><option>Active</option><option>Mixed</option><option>Expositive</option></select></label>
+         <label><h5>Based on Url: </h5> <input name="basedonurl" type="text" value="{{node.basedonurl}}"  ></label>
+         <label><h5>Educational Use: </h5> <input name="educationaluse" type="text" value="{{node.educationaluse}}" placeholder="" ></label>
+        </div>
+
+	 <div class="small-5 columns">
+	  <h5>Text Complexity</h5>  <input  name="textcomplexity" type="text" value="{{node.textcomplexity}}" placeholder="" >
+        
+         <h5>Reading Level: </h5> <input name="readinglevel" type="text" value="{{node.readinglevel}}" placeholder="" >
+         
+         <h5>Educational Subject: </h5> <input name="educationalsubject" type="text" value="{{node.educationalsubject}}" placeholder="" >
+         <h5>Educational Level: </h5> <input name="educationallevel" type="text" value="{{node.educationallevel}}" placeholder="" >
+        </div>
+      </div>
+        
+	
+    </div>  
+
+    </div>  <!--final div -->
 
 	{% block add_fields %} {% endblock %}
-  
+  		
   	<div class="row" >
     	<input type="submit" id="save-node" value="Save as Draft And Preview" class="button medium-6 columns"/>
   	</div>
 
-  	<!-- Overlay : Map Widget -->
+  	<!-- Overlay: Map Widget -->
     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
   		<a class="close-reveal-modal" >&#215;</a>
@@ -361,19 +446,107 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 	});
 
+	$(".prior_node_tab").click(function() {
 
+		
+		$("#save-node").css("display", "none");
+		$('#prior_node_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "prior_node",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#prior_node_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+
+	$(".teaches_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "teaches",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#teaches_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
+	
+	$(".assesses_tab").click(function() {
+
+		
+		$("#save-node").css("display", "none");
+		$('#assesses_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: '{{node.pk}}',
+				field: "assesses",
+				app: "{{title}}",
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				 //alert(data);
+				$("#assesses_drawer").html(data);
+				$("#save-node").css("display", "block");
+			}
+		});
+
+	});
 	$("#save-node").click(function() {
 		cn_arr = []
-
+		pn_arr = []
+		tch_arr = []
+		assess_arr=[]
 		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
 				cn_arr.push($(this).val());
 			}
-
+			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+				pn_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				assess_arr.push($(this).val());
+			}
 		});
-
-		$("#collection_list").val(cn_arr); 
+		//alert(assess_arr)
+		$("#collection_list").val(cn_arr);
+		$("#prior_node_list").val(pn_arr);
+		$("#teaches_list").val(tch_arr);
+		$("#assesses_list").val(assess_arr);
 		location.reload(true);
+
+		
 
 	});
 

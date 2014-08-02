@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% block title %}{{ title }}{% endblock %}
 
@@ -22,7 +23,8 @@
 
 {% block meta_content %}
 {% get_group_name groupid as group_name_tag %}
-    <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
+{% blocktrans %}   
+ <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
 
     <p class="text-justify">You can build a quiz in two ways:
       <ol  class="text-justify">
@@ -30,14 +32,17 @@
 	<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
       </ol>
     </p>
-
+{% endblocktrans %}
     <!-- Add button -->
     {% if user.is_authenticated %}
-    <p>
-    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">+ Add {{title}}</a>
-    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">+ Add {{title}} Item</a>
+
+<p>
+    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">{% blocktrans %} + Add {{title}}{% endblocktrans %} </a>
+    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">{% blocktrans %}   
++ Add {{title}} Item</a>{% endblocktrans %}   
+
     </p>
-    {% endif %}
+ {% endif %}
     
 {% endblock %}
 
@@ -47,9 +52,9 @@
 
     <div class="small-12 columns">
       <ul class="inline-list">
-	<li><h3>Question</h3></li>
+	{% blocktrans %}<li><h3>Question</h3></li>{% endblocktrans %}
 	{% if user.is_authenticated %}
-	<li><a href="{% url 'quiz_item_edit' group_name_tag node %}" class="button small">Edit this Question</a></li>
+	<li><a href="{% url 'quiz_item_edit' group_name_tag node %}" class="button small"> {% trans "Edit this Question" %}</a></li>
 	{% endif %}
       </ul>
       <p>

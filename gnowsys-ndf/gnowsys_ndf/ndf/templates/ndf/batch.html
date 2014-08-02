@@ -1,7 +1,9 @@
 {% extends "ndf/base.html" %}
 {% load pagination_tags %}
 {% load ndf_tags %}
-{% block title %} {{title}} {% endblock %}
+{% load i18n %}
+{% block title %} {% blocktrans %} {{title}}  {% endblocktrans %}
+{% endblock %}
 
 {% block style %}
 <!-- Style for drawer widget -->
@@ -133,13 +135,13 @@ if(txt_input <= 0)
       </h4>
     </header>
    <p>{{ node.html_content|safe|striptags|truncatechars:75 }}</p>
-    <a  class="small button expand" href="{% url 'detail' groupid node %}" id="{{node.pk}}">Detail</a> 
+    <a  class="small button expand" href="{% url 'detail' groupid node %}" id="{{node.pk}}">{% trans "Detail" %}</a> 
     {% get_user_object node.created_by as user_obj %}
     {% ifequal user_obj.username user.username %}
-    <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">Delete </a>
+    <a class="button alert tiny" href="{% url 'delete_module' group_name_tag node %}?next={{request.path}}">{% trans "Delete" %} </a>
     {% endifequal %}
     {% comment %}
-     <a class="button  tiny" href="{% url 'edit' groupid node %}">Edit</a>
+     <a class="button  tiny" href="{% url 'edit' groupid node %}">{% trans "Edit" %}</a>
      {% endcomment %}
     <footer class="row">
     </footer>
@@ -156,16 +158,17 @@ if(txt_input <= 0)
 <form data-abide id="form-create-batch" method="POST" action="{% url 'create_new' groupid %}">{% csrf_token %}
 <div class="row">
   <div class="small-2 large-4 columns">
-    <b>Student Present in this group:{{student_count}}</b>
+    <b> {% blocktrans %}Students present in this group: {{student_count}}{% endblocktrans %}
+</b>
   </div>
 </div>
 <br>
 <div class="row">
   <div class="large-4 columns">
-    <label>Enter No Of Batches to Create
+    <label>{% trans "Number of batches to create" %}
       <input type="text" pattern="\d*" id="txt_batch_count" name="batch_count" placeholder="Enter Number Only" required>
     </label>
-    <small class="error">Entered value should be numbers</small>
+    <small class="error">{% trans "Entered value should be numbers" %}</small>
   </div>
 </div>
 

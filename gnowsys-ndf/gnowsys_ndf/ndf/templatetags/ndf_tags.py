@@ -20,6 +20,10 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
+from gnowsys_ndf.settings import LANGUAGES
+from gnowsys_ndf.ndf.node_metadata_details import schema_dict
+
+
 
 register = Library()
 db = get_database()
@@ -29,18 +33,80 @@ translation_set=[]
 check=[]
 import json,ox
 
+
+
+
+@register.assignment_tag
+def get_schema(node):
+   obj=collection.Node.find_one({"_id":ObjectId(node.member_of[0])},{"name":1})
+   nam=node.member_of_names_list[0]
+   if(nam=='Page'):
+	#print s_dict[nam]
+        return [1,schema_dict[nam]]
+   elif(nam=='File'):
+	if( 'image' in node.mime_type):
+		return [1,schema_dict['Image']]
+        elif('video' in node.mime_type or 'Pandora_video' in node.mime_type):
+        	return [1,schema_dict['Video']]
+	else:
+		return [1,schema_dict['Document']]	
+   else:
+	return [0,""]
+"""
+@register.assignment_tag
+def g2(node):
+     	node.get_neighbourhood(node.member_of)
+  #if(node.has_key('basedonurl')):
+	#schema_lrmi["basedonurl"] = node.basedonurl
+	#schema_lrmi["timerequired"] = node.timerequired
+	#schema_lrmi["agerange"]=node.age_range
+	#schema_lrmi["audience"]=node.audience
+	#schema_lrmi["interactivitytype"]=node.interactivitytype
+        return schema_lrmi 
+"""
+@register.filter
+def is_Page(node):
+	Page = collection.Node.one({"_type":"GSystemType","name":"Page"})
+	if(Page._id in node.member_of):
+		return 1
+	else:
+		return 0
+@register.filter
+def is_Quiz(node):
+	Quiz = collection.Node.one({"_type":"GSystemType","name":"Quiz"})
+	if(Quiz._id in node.member_of):
+		return 1
+	else:
+		return 0
+		
+@register.filter
+def is_File(node):
+	File = collection.Node.one({"_type":"GSystemType","name":"File"})
+	if(File._id in node.member_of):
+		return 1
+	else:
+		return 0
+
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
 
 @register.assignment_tag
-def get_node_ratings(node):
+def get_languages():
+        return LANGUAGES
+
+@register.assignment_tag
+def get_node_ratings(request,node):
         try:
+                user=request.user
                 node=collection.Node.one({'_id':ObjectId(node._id)})
                 sum=0
                 dic={}
                 cnt=0
+                userratng=0
                 for each in node.rating:
+                     if each['user_id'] == user.id:
+                             userratng=each['score']
                      if each['user_id']==0:
                              cnt=cnt+1
                      sum=sum+each['score']
@@ -52,6 +118,7 @@ def get_node_ratings(node):
                         avg_ratng=float(sum)/tot_ratng
                 dic['avg']=avg_ratng
                 dic['tot']=tot_ratng
+                dic['user_rating']=userratng
                 return dic
         except Exception as e:
                 print "Error in get_node_ratings "+str(e)
@@ -385,6 +452,53 @@ def get_gapps_menubar(request, group_id):
 		group_id=gpid._id
 		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
+# This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
+@register.inclusion_tag('ndf/gapps_iconbar.html')
+def get_gapps_iconbar(request, group_id):
+	"""Get Gapps menu-bar
+	"""
+	try:
+		selectedGapp = request.META["PATH_INFO"]
+		group_name = ""
+		collection = db[Node.collection_name]
+		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
+		gapps = {}
+		i = 0;
+		meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+		
+		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		not_in_menu_bar = []
+		if group_obj.name == "home":
+			not_in_menu_bar = ["Image", "Video"]
+		else :
+			not_in_menu_bar = ["Image", "Video", "Group"]						
+		for node in GAPPS:
+			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+			if node:
+				if node.name not in not_in_menu_bar:
+					i = i+1;
+					gapps[i] = {'id': node._id, 'name': node.name.lower()}
+
+		if len(selectedGapp.split("/")) > 2 :
+			selectedGapp = selectedGapp.split("/")[2]
+		else :
+			selectedGapp = selectedGapp.split("/")[1]
+		if group_id == None:
+			group_id=gpid._id
+		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		if not group_obj:
+			group_id=gpid._id
+		else :
+			group_name = group_obj.name
+
+		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
+	except invalid_id:
+		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+		group_id=gpid._id
+		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
 global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
@@ -414,6 +528,76 @@ def thread_reply_count( oid ):
 			thread_reply_count(each._id)
 	
 	return global_thread_rep_counter
+
+
+# To get all the discussion replies
+# global variable to count thread's total reply
+# global_disc_rep_counter = 0	
+# global_disc_all_replies = []
+reply_st = collection.Node.one({ '_type':'GSystemType', 'name':'Reply'})
+@register.assignment_tag
+def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
+	'''
+	Method to count total replies for the disc.
+	'''
+
+	ins_objectid  = ObjectId()
+	if ins_objectid.is_valid(group_id) is False:
+		group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        # auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+		if group_ins:
+			group_id = str(group_ins._id)
+		else:
+			auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+			if auth :
+				group_id = str(auth._id)
+	else:
+		pass
+
+	# thr_rep = collection.GSystem.find({'$and':[ {'_type':'GSystem'}, {'prior_node':ObjectId(oid)}, {'member_of':ObjectId(reply_st._id)} ]})#.sort({'created_at': -1})
+	thr_rep = collection.Node.find({'_type':'GSystem', 'group_set':ObjectId(group_id), 'prior_node':ObjectId(oid), 'member_of':ObjectId(reply_st._id)}).sort('created_at', -1)
+
+	# to acces global_disc_rep_counter as global and not as local
+	# global global_disc_rep_counter 
+	# global global_disc_all_replies
+
+	if thr_rep and (thr_rep.count() > 0):
+
+		for each in thr_rep:
+
+			# print "\n\n",each.created_at
+			# if level == 1:
+			# 	global_disc_all_replies = temp_list + global_disc_all_replies
+			# 	temp_list = []
+
+			# global_disc_rep_counter += 1
+			temp_disc_reply = {"content":"", "last_update":"", "user":"", "oid":"", "prior_node":""}
+
+			temp_disc_reply["HTMLcontent"] = each.content
+			temp_disc_reply["ORGcontent"] = each.content_org
+			temp_disc_reply["last_update"] = each.last_update
+			temp_disc_reply["username"] = User.objects.get(pk=each.created_by).username
+			temp_disc_reply["userid"] = int(each.created_by)
+			temp_disc_reply["oid"] = str(each._id)
+			temp_disc_reply["prior_node"] = str(each.prior_node[0])
+			temp_disc_reply["level"] = level
+
+			# to avoid redundancy of dicts, it checks if any 'oid' is not equals to each._id. Then only append to list
+			if not any( d['oid'] == str(each._id) for d in global_disc_all_replies ):
+				if type(global_disc_all_replies) == str:
+					global_disc_all_replies = list(global_disc_all_replies)
+				global_disc_all_replies.append(temp_disc_reply)
+				# global_disc_all_replies.insert(0, temp_disc_reply)
+				# temp_list.append(temp_disc_reply)
+				# print "\n\n", temp_list
+								
+			# print "\n\n---- : ", level, " : ", each.content_org, temp_disc_reply
+			# get_disc_replies(each._id, (level+1), temp_list)
+			get_disc_replies(each._id, group_id, global_disc_all_replies, (level+1) )
+	
+	# print global_disc_all_replies
+	return global_disc_all_replies
+# global_disc_all_replies = []
 	
 
 @register.assignment_tag
@@ -617,6 +801,7 @@ def get_theme_node(groupid, node):
 
 	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 	theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+	theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
 	# code for finding nodes collection has only topic instances or not
 	# It checks if first element in collection is theme instance or topic instance accordingly provide checks
@@ -624,6 +809,8 @@ def get_theme_node(groupid, node):
 		collection_nodes = collection.Node.one({'_id': ObjectId(node.collection_set[0]) })
 		if theme_GST._id in collection_nodes.member_of:
 			return "Theme_Enabled"
+		if theme_item_GST._id in collection_nodes.member_of:
+			return "Theme_Item_Enabled"
 		if topic_GST._id in collection_nodes.member_of:
 			return "Topic_Enabled"
 		
@@ -748,8 +935,10 @@ def get_contents(node_id):
 
 @register.assignment_tag
 def get_group_type(group_id, user):
+        
 
 	try:
+
 		col_Group = db[Node.collection_name]
 
 		if group_id == '/home/':
@@ -864,6 +1053,21 @@ def get_memberof_objects_count(key,group_id):
 		return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
 	except:
 		return 'null'
+
+
+'''Pass the ObjectId and get the name of it's first member_of element'''
+@register.assignment_tag
+def get_memberof_name(node_id):
+	try:
+		node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+		member_of_name = ""
+		if node_obj.member_of:
+			member_of_name = collection.Node.one({'_id': ObjectId(node_obj.member_of[0]) }).name
+		return member_of_name
+	except:
+		return 'null'
+
+
 	
 @register.filter
 def get_dict_item(dictionary, key):

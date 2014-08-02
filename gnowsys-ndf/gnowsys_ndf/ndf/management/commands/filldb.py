@@ -302,6 +302,18 @@ def create_sts(factory_gsystem_types,user_id):
             meta_type_id = meta_type._id
         create_gsystem_type(name, user_id, meta_type_id)
 
+
+    # For creating Browse Topic as a collection of Theme & Topic
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    br_topic = collection.Node.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
+    if not br_topic.collection_set:
+        br_topic.collection_set.append(theme_GST._id)
+        br_topic.collection_set.append(topic_GST._id)
+        br_topic.created_by = 1
+        br_topic.modified_by = 1
+        br_topic.save()
+
 # Update type_of field to list
 type_of_cursor=collection.find({'type_of':{'$exists':True}})
 for object_cur in type_of_cursor:
@@ -348,6 +360,8 @@ if profile_pic_obj:
     print "Deleted GST document of profile_pic"
 
 
+
+
 # For adding visited_location field (default value set as []) in User Groups.
 try:
     author = collection.Node.one({'_type': "GSystemType", 'name': "Author"})
@@ -382,3 +396,14 @@ try:
 except Exception as e:
     print str(e)
 
+# adding Task GST into start_time and end_time ATs subject_type
+start_time = collection.Node.one({'_type': u'AttributeType', 'name': u'start_time'})
+end_time = collection.Node.one({'_type': u'AttributeType', 'name': u'end_time'})
+task = collection.Node.find_one({'_type':u'GSystemType', 'name':u'Task'})
+if task:
+	if not task._id in start_time.subject_type :
+		start_time.subject_type.append(task._id)
+		start_time.save()
+	if not task._id in end_time.subject_type :
+		end_time.subject_type.append(task._id)
+		end_time.save()
