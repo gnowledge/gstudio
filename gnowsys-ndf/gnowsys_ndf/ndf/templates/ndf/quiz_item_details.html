@@ -54,7 +54,7 @@
       <ul class="inline-list">
 	{% blocktrans %}<li><h3>Question</h3></li>{% endblocktrans %}
 	{% if user.is_authenticated %}
-	{% blocktrans %}<li><a href="{% url 'quiz_item_edit' group_name_tag node %}" class="button small">Edit this Question</a></li>{% endblocktrans %}
+	<li><a href="{% url 'quiz_item_edit' group_name_tag node %}" class="button small"> {% trans "Edit this Question" %}</a></li>
 	{% endif %}
       </ul>
       <p>
