@@ -158,14 +158,14 @@ if(txt_input <= 0)
 <form data-abide id="form-create-batch" method="POST" action="{% url 'create_new' groupid %}">{% csrf_token %}
 <div class="row">
   <div class="small-2 large-4 columns">
-    <b> {% blocktrans %}Student Present in this group:{{student_count}}{% endblocktrans %}
+    <b> {% blocktrans %}Students present in this group: {{student_count}}{% endblocktrans %}
 </b>
   </div>
 </div>
 <br>
 <div class="row">
   <div class="large-4 columns">
-    <label>{% trans "Enter No Of Batches to Create" %}
+    <label>{% trans "Number of batches to create" %}
       <input type="text" pattern="\d*" id="txt_batch_count" name="batch_count" placeholder="Enter Number Only" required>
     </label>
     <small class="error">{% trans "Entered value should be numbers" %}</small>
