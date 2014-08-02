@@ -282,7 +282,6 @@
 
     	<!-- close the off-canvas menu -->
     	<a class="exit-off-canvas"></a>
->>>>>>> a93671d2fa765b9a6008d75c607986b064d83e90
 	
       </div>
     </div>
@@ -364,6 +363,19 @@
       $("main>aside").toggle();
       $("main>article").toggleClass("large-9 large-12");
     };
+      
+      //Organise the apps in the icon bar based on whats active
+      (function organizeIconBar(){
+          
+          //If there is a 5th app
+          if( $('.icon-bar a.app').eq(4) ){
+              // Move the 5th to last app into an seperate div to hide when needed
+              extraAppsContainerStart = '<a class="item more" href="#"><i class="fi-plus"></i><label>...</label></a><div class="more apps">';
+              extraAppsContainerEnd = '</div>'
+              $(extraAppsContainerStart).insertBefore($('.icon-bar a.app').eq(3));
+              $(extraAppsContainerEnd).insertAfter($('.icon-bar a.app').eq(-1));               
+          }
+      })();
     
     // Show extra apps on hovering over the more icon  
     $(".icon-bar .more").on("mouseenter", function(){
