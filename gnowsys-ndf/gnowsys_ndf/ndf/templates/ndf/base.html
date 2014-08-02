@@ -72,17 +72,19 @@
       </ul>
 
       <section class="top-bar-section">
-      	<!-- Right Nav Section -->
-      	<ul class="right">
-      	  
-      	  <!-- Top bar search form -->
-      	  <li class="has-form hide">
-      	    <div id="search-bar" class="row collapse">
-      	      <div class="large-12 small-12 columns">
-      		      <input type="text" placeholder="coming soon ..">
-      	      </div>
-      	    </div>
-      	  </li>
+	
+	<!-- Right Nav Section -->
+	<ul class="right">
+	  
+	  <!-- Top bar search form -->
+	  <li class="has-form">
+	    <div id="search-bar" class="row collapse">
+	      <div class="large-12 small-12 columns">
+		      <input type="text" placeholder="coming soon ..">
+	      </div>
+	    </div>
+	  </li>
+
 
           {% get_group_object groupid as group_object %}
       	  
@@ -184,24 +186,25 @@
     <div class="off-canvas-wrap" data-offcanvas>
       <div class="inner-wrap">
 	
-    	<!-- Off Canvas Meta Map -->
-    	<aside class="left-off-canvas-menu">
-    	  <!-- whatever you want goes here -->
-    	  <h4><i class='fi-info'></i> Help</h4>
-    	  <ul class="off-canvas-list">
-    	    {% block help_topics %}  {% endblock %}
+	<!-- Off Canvas Meta Map -->
+	<aside id="help" class="left-off-canvas-menu">
+	  <!-- whatever you want goes here -->
+	  <h4><i class='fi-info'></i> Help</h4>
+	  <ul class="off-canvas-list">
+	    {% block help_topics %}  {% endblock %}
 
-    	    <div>
-    	      {% block help_content %}  {% endblock %}
-    	    </div>
+	    <div>
+	      {% block help_content %}  {% endblock %}
+	    </div>
 
-    	    <li><a href="#">{% trans "About metaStudio" %}</a></li>
-    	  </ul>
-    	</aside>
+	    <li><a href="#">{% trans "About metaStudio" %}</a></li>
+	  </ul>
+	</aside>
 
-    	<main class="row">  
-    	  
-    	  <!-- Start of sidebar section (main aside) -->
+	<main class="row">  
+	  
+	  <!-- Start of sidebar section (main aside) -->
+
         <aside class="large-3 medium-4 columns">
           <div>
             <h2><a class="active-menu" href="{% url 'groupchange' group_object.name %}">{{group_object.name}}</a></h2>
@@ -272,7 +275,7 @@
     	</main>
 
     	<!-- Off Canvas User Shelf -->
-    	<aside class="right-off-canvas-menu">
+    	<aside id="shelf"  class="right-off-canvas-menu">
     	  <!-- Shelf content code and logic -->
     	  {% block shelf_content %} {% endblock %}
     	</aside>
@@ -286,13 +289,31 @@
 
 
   <footer>
-    <div class="medium-3 columns">
-      <p>
-      <small>
-      A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">{% trans "Homi Bhabha Centre for Science Education (HBCSE)" %}</a>, <a href="http://www.tifr.res.in" target="_blank">{% trans "Tata Institute of Fundamental Research (TIFR), India" %}</a>.
-      </small>
-      </p>
-    </div>
+
+      
+      
+      <div class="medium-3 columns">
+          <p>
+             <small>
+        A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">{% trans "Homi Bhabha Centre for Science Education (HBCSE)" %}</a>, <a href="http://www.tifr.res.in" target="_blank">{% trans "Tata Institute of Fundamental Research (TIFR), India" %}</a>.
+       </small>
+        </p>
+    	
+             <p>
+                <span class="gnu-badge show-span-on-hover">{% trans "100% स्वतंत्" %}
+                    <span>
+        <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a></span></span>
+        <br>
+        
+          <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/>
+<small>
+        <span>{% trans "All material is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License unless mentioned otherwise." %}</span>
+   
+    	</small>
+               </a>
+          </p>
+          
+      </div>
 
 
       <div class="medium-6 columns">
@@ -309,22 +330,12 @@
       </div>
       <div class="medium-3 columns">
          
-           <p>
-                <span class="gnu-badge show-span-on-hover">{% trans "100% Software Freedom" %}
-                    <span>
-        <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a></span></span>
 
-        </span>
-
-        <br>
         
-        <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/>
-          <small>
-            <span>{% trans "All material is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License unless mentioned otherwise." %}</span>
-        	</small>
-        </a>
-      </p>
-    </div>
+          
+        
+      </div>
+
   </footer>
 
   <!-- JS -->
@@ -352,6 +363,25 @@
       $("main>aside").toggle();
       $("main>article").toggleClass("large-9 large-12");
     };
+      
+      //Organise the apps in the icon bar based on whats active
+      (function organizeIconBar(){
+    
+          //If there more than 4 apps, then we need to keep things organized by hiding extra apps
+          if( $('nav .icon-bar').eq(4) ){
+              // First lets move the active app as the first item so that its visible to the user
+              $('.icon-bar a.app.active').prependTo($('nav .icon-bar'));
+              
+              // All those extra apps more than 3 will be hidden
+              $('nav .icon-bar a').slice(3).addClass("extra"); 
+              
+              // Add a show more button after the third one to show those extra apps
+              showMoreButton = '<a class="item more" href="#"><i class="fi-plus"></i><label>...</label></a>';
+              $(showMoreButton).insertAfter($('nav .icon-bar a').eq(2));
+                     
+          }
+          
+      })();
     
     // Show extra apps on hovering over the more icon  
     $(".icon-bar .more").on("mouseenter", function(){
