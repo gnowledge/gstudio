@@ -30,11 +30,15 @@
 
 /* Styles icon-bar */
 .icon-bar .item{
-    border:1px solid #222;
+    label{
+        font-size: 1.1rem;
+    }
     &.active{
-        background-color: black;
+        background-color: white;
         i,label{
-        color: white;
+            
+            color: $theme-color-invert;
+        font-weight: bold;
         }
     }
 }

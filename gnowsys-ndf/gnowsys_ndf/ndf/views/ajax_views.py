@@ -1,7 +1,7 @@
-
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json  
+
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -17,7 +17,6 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 import ast
 
-
 from django_mongokit import get_database
 
 try:
@@ -28,6 +27,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
@@ -1592,6 +1592,8 @@ def delComment(request, group_id):
   print "Inside del comments"
   return HttpResponse("comment deleted")
 
+# Views related to MIS-GAPP =======================================================================================
+
 def set_user_link(request, group_id):
   """
   This view creates a relationship (has_login) between the given node (node_id) and the author node (username);
@@ -1669,6 +1671,19 @@ def set_user_link(request, group_id):
       
     return HttpResponse(json.dumps({'result': result, 'message': error_message}))
 
+def set_enrollment_code(request, group_id):
+  """
+  """
+  if request.is_ajax() and request.method == "POST":
+    print "\n From set_enrollment_code... \n"
+    return HttpResponse("Five digit code")
+
+  else:
+    error_message = " EnrollementCodeError: Either not an ajax call or not a POST request!!!"
+    raise Exception(error_message)
+
+# ====================================================================================================
+
 def edit_task_title(request, group_id):
     '''
     This function will edit task's title 
@@ -1702,3 +1717,136 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
+
+def get_students_assignments(request, group_id):
+  """
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  """
+  gr_node = None
+
+  try:
+    if request.is_ajax() and request.method =="GET":
+      user_id = 0
+
+      if request.GET.has_key("user_id"):
+        user_id = int(request.GET.get("user_id", ""))
+
+      # Fetching college group
+      college_group = collection.Node.one({'_id': ObjectId(group_id)}, {'name': 1, 'tags': 1, 'author_set': 1, 'created_by': 1})
+      page_res = collection.Node.one({'_type': "GSystemType", 'name': "Page"}, {'_id': 1})
+      # print "\n page_res: ", page_res._id
+      file_res = collection.Node.one({'_type': "GSystemType", 'name': "File"}, {'_id': 1})
+      # print " file_res: ", file_res._id
+      image_res = collection.Node.one({'_type': "GSystemType", 'name': "Image"}, {'_id': 1})
+      # print " image_res: ", image_res._id
+      video_res = collection.Node.one({'_type': "GSystemType", 'name': "Video"}, {'_id': 1})
+      # print " video_res: ", video_res._id
+
+      student_list = []
+      # print " college_group (author_set): ", college_group.author_set, "\n"
+
+      if user_id:
+        # Fetch assignment details of a given student
+        student_dict = {}
+        num_pages = []
+        num_images = []
+        num_videos = []
+        num_files = []
+
+        # Fetch student's user-group
+        user_group = collection.Node.one({'_type': "Author", 'created_by': user_id})
+        student_dict["username"] = user_group.name
+
+        # Fetch all resources from student's user-group
+        resources = collection.Node.find({'group_set': user_group._id}, {'name': 1, 'member_of': 1, 'created_at': 1})
+
+        for res in resources:
+          if page_res._id in res.member_of:
+            num_pages.append(res)
+
+          elif image_res._id in res.member_of:
+            num_images.append(res)
+
+          elif video_res._id in res.member_of:
+            num_videos.append(res)
+
+          elif file_res._id in res.member_of:
+            num_files.append(res)
+
+        student_dict["Pages"] = num_pages
+        # print "\n student_dict['Pages']: ", student_dict["Pages"], "\n"
+        student_dict["Images"] = num_images
+        # print "\n student_dict['Images']: ", student_dict["Images"], "\n"
+        student_dict["Videos"] = num_videos
+        # print "\n student_dict['Videos']: ", student_dict["Videos"], "\n"
+        student_dict["Files"] = num_files
+        # print "\n student_dict['Files']: ", student_dict["Files"], "\n"
+
+        return HttpResponse(json.dumps(student_dict, cls=NodeJSONEncoder))
+
+      else:
+        # Fetch assignment details of all students belonging to the college group
+        for user_id in college_group.author_set:
+          if user_id == college_group.created_by:
+            continue
+
+          student_dict = {}
+          num_pages = 0
+          num_images = 0
+          num_videos = 0
+          num_files = 0
+
+          # Fetch student's user-group
+          user_group = collection.Node.one({'_type': "Author", 'created_by': user_id})
+
+          # Fetch student's node from his/her has_login relationship
+          student_has_login_rel = collection.Node.one({'_type': "GRelation", 'right_subject': user_group._id})
+          student_node = collection.Node.one({'_id': student_has_login_rel.subject}, {'name': 1})
+          # print " student_node: ", student_node.name
+          student_dict["Name"] = student_node.name
+          student_dict["user_id"] = user_id
+
+          # Fetch all resources from student's user-group
+          resources = collection.Node.find({'group_set': user_group._id}, {'member_of': 1})
+
+          for res in resources:
+            if page_res._id in res.member_of:
+              num_pages = num_pages + 1
+
+            elif image_res._id in res.member_of:
+              num_images = num_images + 1
+
+            elif video_res._id in res.member_of:
+              num_videos = num_videos + 1
+
+            elif file_res._id in res.member_of:
+              num_files = num_files + 1
+
+          student_dict["Pages"] = num_pages
+          student_dict["Images"] = num_images
+          student_dict["Videos"] = num_videos
+          student_dict["Files"] = num_files
+          student_dict["Total"] = num_pages + num_images + num_videos + num_files
+
+          # print "\n student_dict: ", student_dict
+          student_list.append(student_dict)
+
+        # Outside of above for loop
+
+        return render_to_response("ndf/student_statistics.html",
+                                  {'node': college_group,'student_list': student_list},
+                                  context_instance = RequestContext(request)
+                                )
+    
+    else:
+      error_message = "StudentDataGetError: Invalid ajax call!!!"
+      # raise Exception(error_message)
+      return StreamingHttpResponse(error_message)
+
+  except Exception as e:
+    print "\n StudentDataGetError: " + str(e)
+    raise Http404(e)

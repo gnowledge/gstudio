@@ -51,13 +51,24 @@ body{
 
 		body>footer{
             //Site footer
-            border-top: 2px dotted #aaa;
 			padding:20px 0;
 			position: relative;
             color:#888;
             min-height: 170px;
-            background: rgba(255,255,255,0.5) url($theme-path+"footer_background_image.png") no-repeat 95% 50%;
-            
+            background-color: rgba(255,255,255,0.1);
+
+            .sponsor{
+                background: url($theme-path+"footer_background_image.png") no-repeat center top;
+                &>*{
+                    opacity: 0.1;
+                }
+                &:hover{
+                    background:none;
+                    >*{
+                     opacity: 1;
+                }
+                }
+            }
             a{
 			color: #777;
 		}
@@ -92,12 +103,15 @@ body{
 
 
 //Main sidebar
+main.row{
+    padding-right: 5px;
+}
+
 main>aside{
     &>div{
-        background-color: $theme-color-invert;
+        
         
         h2{
-            background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
             margin: 0;
             a{
             color: white;
@@ -107,14 +121,13 @@ main>aside{
             }
         }
         nav{
-            border-bottom: 4px solid $active-color;
             .icon-bar{
             i{
                 display: none!important; /* Hide icons till we can retreive custom icons from the system */
             }
                 
                 .more.active{
-                    background-color: inherit;
+                    background-color: #666;
                     label{
                     font-weight: bold;
                     }
@@ -152,7 +165,9 @@ main>aside{
         header{
            padding: 10px;
         }
-        
+         section{
+             background-color: $theme-color-invert;
+         }
         footer{
             background-color: #222;
             min-height: 1rem;
@@ -400,7 +415,7 @@ article{
     
     .label{
     text-transform: uppercase;
-    //background-color: $info-color;
+    background-color: transparent;
     padding: 2px;
 }  
 }

@@ -184,7 +184,7 @@
 
 <div itemscope itemtype="{{schema.1.type}}">
 <header class="page">
-    <div class="row">
+    
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
@@ -199,7 +199,7 @@
        <span itemprop="{{schema.1.tags}}" content="{{tag}}">
       {% endfor %}
 
-    </div> 
+        </div> 
       
     <h1>
       <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>     
@@ -432,7 +432,7 @@
             <div class="small-7 end columns">
               {% if field.type == "RelationType" %}
                 {% if field.value|length > 5 %}
-                  <a href="#">{{field.value|length}}</a>
+                  <a href="#" id="{{field.altnames}}">{{field.value|length}}</a>
 
                 {% else %}
                 {% for n in field.value %}
