@@ -34,7 +34,7 @@ class Command(BaseCommand):
     print "\n options: ", options, "\n"
 
     # Creating private groups ------------------------------------------------------------------------------------------
-    if True:
+    if False:
       try:
         create_college_group()
 
@@ -54,7 +54,7 @@ class Command(BaseCommand):
               log_file.writelines(log_list)
 
     # Assigning Student & Voluntary Teacher Nodes' to respective college groups ----------------------------------------
-    if False:
+    if True:
       system_type = ""
       try:
         # Assigning college's group id to group_set field of respective Student nodes

@@ -73,6 +73,8 @@
           {% if gstaff_access %}
           <th>Edit</th>
 
+          <!-- <th>Confirmation status</th> -->
+
           {% if is_link_needed %}
           <th>Link to User A/C</th>
           {% endif %}
@@ -87,20 +89,34 @@
       
           <td  id="{{each.pk}}" class="objectsCheckbox"> <input type="checkbox"> </td>
           {% if app_name == "MIS" %}
-          <td  class="name" style="font-size:14px;"><a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name|title}}</a></td>
+          <td style="font-size:14px;">
+            <a href="{% url 'mis:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name|title}}</a>
+          </td>
           {% else %}
-          <td  class="name" style="font-size:14px;"><a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name|title}}</a></td>
+          <td style="font-size:14px;">
+            <a href="{% url 'mis-po:mis_app_instance_detail' groupid app_id app_set_id each.pk %}">{{each.name|title}}</a>
+          </td>
           {% endif %}
 
           {% if gstaff_access %}
-          <!-- Show below Edit & Link buttons only to authorized users -->
+          <!-- Show below Edit, Confirm & Link buttons only to GStaff members -->
 
           {% if app_name == "MIS" %}
-          <td  class="name"><a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">{% trans "Edit" %}</a></td>
+          <td>
+            <a href="{% url 'mis:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">{% trans "Edit" %}</a>
+          </td>
           {% else %}
-          <td  class="name"><a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">{% trans "Edit" %}</a></td>
+          <td>
+            <a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id each.pk %}" style="font-size:14px;" class="button small">{% trans "Edit" %}</a>
+          </td>
           {% endif %}
 
+<!--           <td>
+            <div id="enrollement_code_{{each.pk}}">
+            <a href="#" class="button small enrollment_code" onclick="get_enrollment_code('{{each.pk}}')">Confirm</a>
+            </div>
+          </td>
+ -->
           {% if is_link_needed %}
           {% check_node_linked each.pk as is_linked %}
           <td style="font-size:11px;">
@@ -112,7 +128,7 @@
           </td>
           {% endif %}
 
-          <!-- endif of authorized users -->
+          <!-- endif of GStaff members -->
           {% endif %}
         </tr>
 
@@ -347,5 +363,29 @@ $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
 
 // ========================================================================================
 
+function get_enrollment_code(node_id) {
+  alert("node_id: " + node_id)
+
+  $.ajax({
+    url:"{% url 'set_enrollment_code' groupid %}",
+
+    data: {
+      node_id: node_id,
+      csrfmiddlewaretoken: "{{csrf_token}}"
+    },
+
+    type: "POST",
+
+    dataType: "html",
+
+    success: function(data) {
+      $("#enrollement_code_"+node_id).html("Enrollment Code: <br><b>"+data+"</b>")
+    },
+
+    error: function(data) {
+      alert("EnrollementCodeError: Either not an ajax call or not a POST request!!!")
+    }
+  });
+}
 // </script>
 {% endblock %}  
