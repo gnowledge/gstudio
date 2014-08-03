@@ -6,6 +6,11 @@
 
 @import url("css.css");
 
+body{
+  
+            background: darken($theme-color-invert,4%);
+}
+
 //Logo
 .top-bar{
     h1{
@@ -29,12 +34,12 @@
 
 		.workspace{
             //This is the main content container between the header and footer
+            background: url($theme-path+"body_background_image.png") no-repeat 0 bottom;
 			min-height: 100%;
 			margin-bottom: -130px!important;
 			-webkit-box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
-            background: url($theme-path+$page-background) no-repeat 0 bottom;
             
             &:after{
             //Hack for setting div height to the height of the browser window
@@ -50,8 +55,8 @@
 			padding:20px 0;
 			position: relative;
             color:#888;
-            min-height: 100px;
-            background-color: rgba(255,255,255,0.5);
+            min-height: 170px;
+            background: rgba(255,255,255,0.5) url($theme-path+"footer_background_image.png") no-repeat 95% 50%;
             
             a{
 			color: #777;
@@ -92,12 +97,12 @@ main>aside{
         background-color: $theme-color-invert;
         
         h2{
-            background: #fff url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
+            background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
             margin: 0;
             a{
-            color: black;
+            color: white;
                 &:hover{
-                    color:black;
+                    color:white;
                 }
             }
         }
@@ -185,6 +190,7 @@ main>aside{
 
 //    Article styles
     article{
+        background-color: white;
         overflow-x: visible;
         &>header,form>header{
             padding: 15px;

@@ -25,14 +25,14 @@ $secondary-color: lighten(desaturate($primary-color,20%),20%);
  $info-color: $color0;
 
 $header-font-color: #222;
-$body-bg: white;
+$body-bg-color: #666;
 
 $bg-color: #eef7eb;
 $meta-color:#666;
 $active-color:lighten($theme-color,30%);
 
 //$label-font-color: #333;
- $label-font-color-alt: $body-bg;
+ $label-font-color-alt: $body-bg-color;
 
 $base-color: #e7caa4;
 $aside-color:#524549;
