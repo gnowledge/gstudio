@@ -10,7 +10,7 @@
 // Color Pallette
 $theme-color:#33C284 !default;
 $theme-color-invert:scale-color($theme-color, $lightness: -60%);
-
+$theme-text-color:scale-color($theme-color, $lightness: -40%);
 
 //
 // FOUNDATION SETTINGS
@@ -29,7 +29,7 @@ $body-bg-color: #666;
 
 $bg-color: #eef7eb;
 $meta-color:#666;
-$active-color:lighten($theme-color,30%);
+$active-color:lighten($theme-text-color,20%);
 
 //$label-font-color: #333;
  $label-font-color-alt: $body-bg-color;
@@ -326,7 +326,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 $icon-bar-bg: transparent ;
 $icon-bar-font-color: white ;
 //$icon-bar-font-size: 0.5rem;
-$icon-bar-hover-color: #777 ;
+$icon-bar-hover-color: $theme-color ;
 $icon-bar-icon-color: #ccc ;
 //$icon-bar-icon-size: 1.875rem ;
 //$icon-bar-image-width: 1.875rem ;
@@ -399,7 +399,8 @@ $icon-bar-item-padding: 0.5rem;
 // $button-border-style: solid;
 
 // We use this to set the default radius used throughout the core.
-// $button-radius: $global-radius;
+$global-radius:5px;
+ $button-radius: $global-radius;
 // $button-round: $global-rounded;
 
 // We use this to set default opacity for disabled buttons.
@@ -1122,7 +1123,7 @@ $icon-bar-item-padding: 0.5rem;
  $tabs-navigation-bg-color: inherit  ;
  $tabs-navigation-active-bg-color: inherit;
  $tabs-navigation-hover-bg-color: inherit;
- $tabs-navigation-font-color: $meta-color;
+ $tabs-navigation-font-color: $theme-text-color;
 // $tabs-navigation-font-size: rem-calc(16);
 // $tabs-navigation-font-family: $body-font-family;
 
@@ -1182,7 +1183,7 @@ $icon-bar-item-padding: 0.5rem;
 // $include-html-top-bar-classes: $include-html-classes;
 
 // Background color for the top bar
- $topbar-bg-color: $theme-color-invert;
+ $topbar-bg-color: #00C1CD;
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin

@@ -34,10 +34,8 @@
         font-size: 1.1rem;
     }
     &.active{
-        background-color: white;
+        background-color: $theme-color;
         i,label{
-            
-            color: $theme-color-invert;
         font-weight: bold;
         }
     }
