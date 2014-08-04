@@ -304,6 +304,7 @@ def group_dashboard(request,group_id=None):
     grpid=""
     shelf_list = {}
     shelves = []
+    alternate_template = ""
 
     if group_id == None:
       groupobj=gs_collection.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -348,6 +349,13 @@ def group_dashboard(request,group_id=None):
   property_order_list = []
   if groupobj.has_key("group_of"):
     if groupobj['group_of']:
+      # print "\n ", groupobj['group_of'][0], "\n"
+      college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+
+      if college:
+        if college._id in groupobj['group_of'][0]['member_of']:
+          alternate_template = "ndf/college_group_details.html"
+
       property_order_list = get_property_order_with_value(groupobj['group_of'][0])
 
   # First time breadcrumbs_list created on click of page details
@@ -356,7 +364,8 @@ def group_dashboard(request,group_id=None):
   breadcrumbs_list.append( (str(groupobj._id), groupobj.name) )
   annotations = json.dumps(groupobj.annotations)
 
-  return render_to_response("ndf/groupdashboard.html",{'node': groupobj, 'groupid':grpid, 
+  default_template = "ndf/groupdashboard.html"
+  return render_to_response([alternate_template, default_template] ,{'node': groupobj, 'groupid':grpid, 
                                                        'group_id':grpid, 'user':request.user, 
                                                        'shelf_list': shelf_list,
                                                        'annotations' : annotations,

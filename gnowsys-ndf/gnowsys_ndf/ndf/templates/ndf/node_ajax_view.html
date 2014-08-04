@@ -432,7 +432,7 @@
             <div class="small-7 end columns">
               {% if field.type == "RelationType" %}
                 {% if field.value|length > 5 %}
-                  <a href="#">{{field.value|length}}</a>
+                  <a href="#" id="{{field.altnames}}">{{field.value|length}}</a>
 
                 {% else %}
                 {% for n in field.value %}

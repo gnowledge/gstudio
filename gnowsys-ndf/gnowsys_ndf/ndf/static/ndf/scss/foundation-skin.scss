@@ -27,9 +27,6 @@
 }
 
 
-input[type="checkbox"] + label, input[type="radio"] + label{
-	margin: inherit!important;
-}
 
 /* Styles icon-bar */
 .icon-bar .item{
@@ -147,6 +144,7 @@ pre{
       height: 1.4em;
       white-space: nowrap;
         font-size: 1.5rem;
+        margin:0;
       &:before {
         display: inline-block;
         text-indent: -9999px;

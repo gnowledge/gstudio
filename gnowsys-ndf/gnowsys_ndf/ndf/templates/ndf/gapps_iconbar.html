@@ -1,83 +1,43 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
+
 <!-- GApps Menubar -->
 {% check_gapp_menus groupid as check_menu %}
 
 
 {% if check_menu %}
-
 {% get_apps_for_groups groupid as gapps %}
-
-
 {% endif %}
 
 
 <input type="hidden" value="{{newgroup}}">
 
 <nav>
-          <div class="icon-bar four-up">
-              
-{% for index_key, app_dict in gapps.items|slice:":3" %}
 
-{% check_is_gstaff_for_gapp groupid app_dict request.user as gstaff_access_for_gapp %}
+  <div class="icon-bar four-up">
+    
+    {% for index_key, app_dict in gapps.items %}
 
-{% if gstaff_access_for_gapp %}
+    {% check_is_gstaff_for_gapp groupid app_dict request.user as gstaff_access_for_gapp %}
+    {% if gstaff_access_for_gapp %}
+    <a class="{% comment %} Sets active class on active app{% endcomment %}
+  	{% if app_dict.name|lower == selectedGapp|lower %}
+  	active 
 
- 
-  <a class="{% comment %} Sets active class on active app{% endcomment %}
-	{% if app_dict.name|lower == selectedGapp|lower %}
-	
-	active 
+  	{% elif app_dict.id|safe == selectedGapp|safe %}
+  	active
+  	
+  	{% endif %}
+  	{{app_dict.name|title}} app item" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
+      <i class='fi-play'></i>
+      <label>{{app_dict.name|title}}</label>
+    </a>           
+    {% endif %}
 
-	{% elif app_dict.id|safe == selectedGapp|safe %}
-
-	active
-	
-	{% endif %}
-	{{app_dict.name|title}} app item" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
-    <i class='fi-play'></i>
-    <label>{{app_dict.name|title}}</label>
-  </a>           
-
-{% endif %}
-
-{% endfor %}
-              
-               <a class="item more" href="#"><i class='fi-plus'></i>
-    <label>More</label></a>
-                
-
-
-              
-              {% for index_key, app_dict in gapps.items|slice:"4:" %}
-
-{% check_is_gstaff_for_gapp groupid app_dict request.user as gstaff_access_for_gapp %}
-
-{% if gstaff_access_for_gapp %}
-
- 
-  <a class="{% comment %} Sets active class on active app{% endcomment %}
-	{% if app_dict.name|lower == selectedGapp|lower %}
-	
-	active 
-
-	{% elif app_dict.id|safe == selectedGapp|safe %}
-
-	active
-	
-	{% endif %}
-	{{app_dict.name|title}} extra app item" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
-    <i class='fi-play'></i>
-    <label>{{app_dict.name|title}}</label>
-  </a>           
-
-{% endif %}
-
-{% endfor %}
+    {% endfor %}
       
-
-               </div>
-              </nav>
+  </div>
+</nav>
 
 <!-- ============= -->

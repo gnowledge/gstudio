@@ -85,7 +85,7 @@
 
   {% if already_uploaded %} 
   <div id="message">
-    <span style="color:red">{% trans "Listed below files are already uploaded please choose different files" %}</span>
+    <span style="color:red">{% trans "Files Listed below are already uploaded. Duplicate file uploads are not possible." %}</span>
     <ul>
       {% for each in already_uploaded %} 
         <li><b>"{{each}}"</b> {% trans "this file is already uploaded please choose different file" %} </li>
@@ -165,7 +165,7 @@
         {% if not searching %}
           <div class="row">
             <div class="small-12 columns">
-              <h5>This group doesn't have any files. <b>Be the first to upload a File!</b></h5>
+       <h5> {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %} </h5>
             </div>
           </div>
         {% endif %}
@@ -433,7 +433,7 @@
         {% if not searching %}
           <div class="row">
             <div class="small-12 columns">
-              <h5>{% blocktrans %}This group doesn't have any videos. <b>Be the first to upload a Video!</b>{% endblocktrans %}</h5>
+              <h5>{% blocktrans %}This group doesn't have any videos. <b>Be the first to upload a video!</b>{% endblocktrans %}</h5>
             </div>
           </div>
         {% endif %}
@@ -519,7 +519,7 @@
         {% if not searching %}
           <div class="row">
             <div class="small-12 columns">
-              {% blocktrans %}<h5>This group doesn't have any pandora videos.</h5>{% endblocktrans %}
+              {% blocktrans %}<h5>This group doesn't have any pan.do/ra videos.</h5>{% endblocktrans %}
             </div>
           </div>
         {% endif %}

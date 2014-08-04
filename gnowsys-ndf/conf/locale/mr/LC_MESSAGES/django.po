@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-01 10:53+0530\n"
+"POT-Creation-Date: 2014-08-02 16:03+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,13 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: gnowsys_ndf/ndf/templates/admin/base_site.html:7
-msgid "Metastudio administration"
+msgid "metaStudio administration"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:8
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:8
 #: gnowsys_ndf/ndf/templates/ndf/file.html:81
-msgid "Listed below files are already uploaded please choose different files"
+msgid ""
+"Files Listed below are already uploaded. Duplicate file uploads are not "
+"possible."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:18
@@ -32,23 +34,22 @@ msgid "File Name"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:19
+#: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:25
 #: gnowsys_ndf/ndf/templates/ndf/version_page.html:15
 msgid "View"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:25
-msgid "view"
-msgstr ""
-
 #: gnowsys_ndf/ndf/templates/ndf/ImageDashboard.html:29
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:21
 #: gnowsys_ndf/ndf/templates/ndf/file_search.html:16
 #: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:29
-msgid "search"
+msgid "Search"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/ImageDashboard.html:34
+#: gnowsys_ndf/ndf/templates/ndf/beta.html:25
 #: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:34
-msgid "upload"
+msgid "Upload"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:16
@@ -98,7 +99,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:106
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:89
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:96
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:220
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:221
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:100
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:107
 msgid "Public"
@@ -108,7 +109,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:109
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:92
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:99
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:223
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:224
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:103
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:110
 msgid "Private"
@@ -116,16 +117,18 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:121
 msgid ""
-"It will take time to upload and process files, you can continue your work on "
-"this site"
+"Depending on the size of file/s and your Internet speed, upload process may "
+"take time. Please do not close this window."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:123
-msgid "For fast uploading of videos, upload videos in webm format"
+msgid ""
+"Please upload videos in webm format. If you upload videos of other formats, "
+"it will take longer to publish them."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:129
-msgid "You are Not Authorised user please login to upload files"
+msgid "You are not an authorised user. Please login to upload files."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:47
@@ -152,16 +155,16 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:114
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:120
 #: gnowsys_ndf/ndf/templates/ndf/mis_list.html:138
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:233
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:303
 msgid "Creation date"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:116
-msgid "Member OF"
+msgid "Member of"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:117
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:58
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:59
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:57
 msgid "Collection"
 msgstr ""
@@ -176,7 +179,7 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:173
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:694
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:258
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:328
 msgid "Translate"
 msgstr ""
 
@@ -282,53 +285,45 @@ msgstr ""
 msgid "Menu"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:131
+#: gnowsys_ndf/ndf/templates/ndf/base.html:136
 #: gnowsys_ndf/ndf/templates/registration/login.html:4
 #: gnowsys_ndf/ndf/templates/registration/login.html:41
 msgid "Login"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:166
+#: gnowsys_ndf/ndf/templates/ndf/base.html:169
 msgid "See more groups..."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:197
+#: gnowsys_ndf/ndf/templates/ndf/base.html:198
 msgid "About metaStudio"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:300
+#: gnowsys_ndf/ndf/templates/ndf/base.html:292
 msgid "Gnowledge Lab"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:300
+#: gnowsys_ndf/ndf/templates/ndf/base.html:292
 msgid "Homi Bhabha Centre for Science Education (HBCSE)"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:300
+#: gnowsys_ndf/ndf/templates/ndf/base.html:292
 msgid "Tata Institute of Fundamental Research (TIFR), India"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:308
+#: gnowsys_ndf/ndf/templates/ndf/base.html:313
 #, python-format
-msgid "100%% स्वतंत्रता"
+msgid "100%% Software Freedom"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:309
+#: gnowsys_ndf/ndf/templates/ndf/base.html:315
 msgid "View Source Code"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:309
-msgid "Report an issue"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/base.html:314
-msgid "All material is licensed under a"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/base.html:314
+#: gnowsys_ndf/ndf/templates/ndf/base.html:323
 msgid ""
-"Creative Commons Attribution-ShareAlike 3.0 Unported License</a> unless "
-"mentioned otherwise."
+"All material is licensed under a Creative Commons Attribution-Share Alike "
+"3.0 Unported License unless mentioned otherwise."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:5
@@ -350,11 +345,11 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:162
 #, python-format
-msgid "Student Present in this group:%(student_count)s"
+msgid "Students present in this group: %(student_count)s"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:169
-msgid "Enter No Of Batches to Create"
+msgid "Number of batches to create"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:172
@@ -368,7 +363,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:99
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:101
 #: gnowsys_ndf/ndf/templates/ndf/mis_list.html:141
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:235
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:305
 msgid "Edit"
 msgstr ""
 
@@ -381,14 +376,6 @@ msgid ""
 "/a>\n"
 "      </small>\n"
 " "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/beta.html:21
-msgid "Search"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/beta.html:25
-msgid "Upload"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:34
@@ -461,14 +448,13 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course.html:115
 msgid ""
-"<h5> This group doesn't have any courses. <b>Be the first to create a Course!"
-"</b></h5>"
+"This group doesn't have any courses. <b>Be the first to create a course!</b>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:6
 msgid ""
 "\n"
-"  <h3>Course Building</h3>\n"
+"  <h3>Building of a Course </h3>\n"
 "  <p class=\"text-justify\"><b>Course</b> is a sequenced collection of "
 "already freezed modules.</p>\n"
 msgstr ""
@@ -484,7 +470,7 @@ msgid "Add Module"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:39
-msgid "Add or Remove Module :"
+msgid "Add or Remove Module:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:47
@@ -521,15 +507,16 @@ msgid "New Forum"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/create_forum.html:83
-msgid "Create a new Forum discussion"
+msgid "Create a new discussion thread"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/create_forum.html:91
-msgid "Forum name :"
+msgid "Forum name:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/create_forum.html:115
-msgid "Description :"
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:127
+msgid "Description:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/create_group.html:8
@@ -675,7 +662,7 @@ msgid "Thread:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/create_thread.html:95
-msgid "Thread Content :"
+msgid "Thread Content: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/create_thread.html:130
@@ -690,18 +677,18 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:118
 #: gnowsys_ndf/ndf/templates/ndf/mis_list.html:136
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:231
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:301
 msgid "Title"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:119
 #: gnowsys_ndf/ndf/templates/ndf/mis_list.html:137
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:232
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:302
 msgid "Created by"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:142
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:267
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:337
 msgid "No data to display"
 msgstr ""
 
@@ -731,7 +718,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:260
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:226
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:125
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:240
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:241
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:129
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:190
 msgid "Add Location"
@@ -752,11 +739,11 @@ msgid "download"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:8
-msgid "Select from following resources :"
+msgid "Select from following resources: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:12
-msgid "Add selected to following Collection :"
+msgid "Add selected to following Collection: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:64
@@ -877,6 +864,11 @@ msgstr ""
 msgid "this file is already uploaded please choose different file"
 msgstr ""
 
+#: gnowsys_ndf/ndf/templates/ndf/file.html:162
+msgid ""
+"This group doesn't have any files. <b>Be the first to upload a file!</b>"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/file.html:254
 msgid ""
 "This group doesn't have any documents. <b>Be the first to upload a Document!"
@@ -890,11 +882,11 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/file.html:433
 msgid ""
-"This group doesn't have any videos. <b>Be the first to upload a Video!</b>"
+"This group doesn't have any videos. <b>Be the first to upload a video!</b>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/file.html:520
-msgid "<h5>This group doesn't have any pandora videos.</h5>"
+msgid "<h5>This group doesn't have any pan.do/ra videos.</h5>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/file.html:573
@@ -935,8 +927,8 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/forum.html:137
 msgid ""
-"<h5>This group doesn't have any forums. <b>Be the first to create a Forum!</"
-"b></h5>"
+"This group doesn't have any forums. <b>Be the first to create a forum!</b></"
+"h5>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/forumdetails.html:50
@@ -1119,8 +1111,8 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:127
 #, python-format
 msgid ""
-" <h5>This group doesn't have any events. <b>Be the first to create the "
-"%(title)s event!</b></h5>"
+" This group doesn't have any events. <b>Be the first to create the %(title)s "
+"event!</b> "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:123
@@ -1193,8 +1185,7 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/module.html:117
 msgid ""
-" <h5>This group doesn't have any modules. <b>Be the first to create a Module!"
-"</b></h5>"
+" This group doesn't have any modules. <b>Be the first to create a Module!</b>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/module_detail.html:30
@@ -1334,27 +1325,27 @@ msgid " <h3>Add New Page:</h3>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:101
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:130
 msgid "<a class=\"close-reveal-modal\">&#215;</a>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:111
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:109
 msgid ""
-"\n"
-"          <div id=\"view_add_file\" class=\"reveal-modal\" data-reveal style="
-"\"height:500px;overflow:scroll;\"> \n"
-"        \n"
-"            Welcome in reveal area\n"
-"            <a class=\"close-reveal-modal\">&#215;</a>           \n"
-"          </div>\n"
+"<span class=\"fi-plus\">&nbsp;&nbsp;Add File </span>&nbsp;&nbsp; <i class="
+"\"fi-play\"></i>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:122
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:113
+msgid "<h3>Add New File:</h3>"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:138
 msgid ""
 " <span class=\"fi-plus\">&nbsp;&nbsp;Add Events </span>&nbsp;&nbsp; <i class="
 "\"\"></i>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:124
+#: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:140
 msgid ""
 "\n"
 "          <div id=\"view_add_event\" class=\"reveal-modal\" data-reveal "
@@ -1376,7 +1367,7 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:57
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:79
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:211
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:212
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:90
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:161
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:82
@@ -1386,7 +1377,7 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:63
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:253
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:254
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:203
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:96
 msgid "Tag"
@@ -1440,7 +1431,7 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:209
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:113
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:235
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:236
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:124
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:185
 msgid "Language"
@@ -1494,7 +1485,7 @@ msgid "Target Audience:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:327
-msgid "Time Required :"
+msgid "Time Required: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:327
@@ -1514,7 +1505,7 @@ msgid "15-45M"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
-msgid "Interactivity Type :"
+msgid "Interactivity Type: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
@@ -1530,7 +1521,7 @@ msgid "Expositive"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:329
-msgid "Based on Url:"
+msgid "Based on Url: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:330
@@ -1554,11 +1545,11 @@ msgid "Educational Level:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:389
-msgid "Add or edit Teaches : "
+msgid "Add or edit Teaches: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:404
-msgid "Add or edit Assesses :"
+msgid "Add or edit Assesses:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:8
@@ -1655,12 +1646,11 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/page_list.html:169
 msgid ""
-" <h5>This group doesn't have any pages. <b>Be the first to create a Page!</"
-"b></h5>"
+" This group doesn't have any pages. <b>Be the first to create a Page!</b>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/page_list.html:236
-msgid " <h5>This group doesn't have any collections.</h5>"
+msgid " This group doesn't have any collections."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:12
@@ -1808,7 +1798,7 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:55
-msgid "Question"
+msgid "<li><h3>Question</h3></li>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:57
@@ -1870,8 +1860,8 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:150
 msgid ""
-"<h5>This group doesn't have any quiz-items. <b>Be the first to create a Quiz-"
-"Item!</b></h5>"
+"This group doesn't have any quiz-items. <b>Be the first to create a Quiz-"
+"Item!</b>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/rating.html:13
@@ -1932,8 +1922,9 @@ msgid "Add a thread to the Forum:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/replyforum.html:95
-msgid "Thread Name :"
-msgstr ""
+#, fuzzy
+msgid "Thread Name: "
+msgstr "थीम नाव"
 
 #: gnowsys_ndf/ndf/templates/ndf/shelf.html:4
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:458
@@ -1965,8 +1956,7 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/task.html:107
 msgid ""
-"<h5>This group doesn't have any task. <b>Be the first to create a Task!</b></"
-"h5>"
+"This group doesn't have any tasks. <b>Be the first to create a Task!</b>"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/task_details.html:30
@@ -2001,10 +1991,6 @@ msgstr ""
 msgid "Sub Task:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:127
-msgid "Description:"
-msgstr ""
-
 #: gnowsys_ndf/ndf/templates/ndf/task_details.html:146
 msgid "History:"
 msgstr ""
@@ -2020,9 +2006,9 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/task_details.html:194
 #: gnowsys_ndf/ndf/templates/ndf/task_details.html:206
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:171
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:199
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:276
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:192
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:269
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:277
 msgid "&#215;"
 msgstr ""
 
@@ -2032,10 +2018,6 @@ msgstr ""
 msgid "Description"
 msgstr "वर्णन"
 
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:155
-msgid "Themes"
-msgstr ""
-
 #: gnowsys_ndf/ndf/templates/ndf/theme.html:156
 msgid "Fold"
 msgstr ""
@@ -2044,16 +2026,17 @@ msgstr ""
 msgid "Unfold"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:166
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:194
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:187
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:264
 msgid ""
 "Are you sure you want to delete? All of the related items for the following "
 "themes also will be deleted:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:41
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:41
 #, python-format
-msgid "Editing %(title)s: %(node.name)s"
+msgid "Editing %(title)s: %(node_name)s "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:43
@@ -2077,22 +2060,17 @@ msgstr ""
 msgid "Privacy"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:161
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:160
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:147
 msgid "Theme Name"
 msgstr "थीम नाव"
 
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:176
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:175
 msgid "+ Add Topic"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:180
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:179
 msgid "Topic Name"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:41
-#, python-format
-msgid "Editing %(title)s: %(node.name)s "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:43
@@ -2115,7 +2093,7 @@ msgid " Private "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:219
-msgid "Add or edit Collection :"
+msgid "Add or edit Collection: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:253
@@ -2132,7 +2110,8 @@ msgid "Page Name"
 msgstr "पृष्ठ नाव"
 
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:70
-msgid "Tags :"
+#, fuzzy
+msgid "Tags: "
 msgstr "टॅग्ज"
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:8
@@ -2239,7 +2218,7 @@ msgid "Forum not found ! "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:282
-msgid "Contributed Resources :"
+msgid "Contributed Resources :,"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:302
@@ -2271,7 +2250,7 @@ msgid "Forum not found !"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:435
-msgid "Collaborators :"
+msgid "Collaborators:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:446
@@ -2347,7 +2326,7 @@ msgid "Visualize"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/visualize.html:72
-msgid "Step 1 :"
+msgid "Step 1: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/visualize.html:74
@@ -2371,7 +2350,7 @@ msgid "Tag Cloud"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/visualize.html:84
-msgid "Step 2 :"
+msgid "Step 2: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/visualize.html:85
@@ -2604,7 +2583,7 @@ msgstr ""
 msgid ""
 "\n"
 "\t<br/>\n"
-"\t<h3> Oops : </h3>\n"
+"\t<h3> Oops: </h3>\n"
 "\t<h4>It seems that your activation key is invalid. Please check the url "
 "again.</h4>\n"
 msgstr ""
@@ -2725,7 +2704,7 @@ msgid "Confirm password reset"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:9
-msgid "Enter your new password below to reset your password :"
+msgid "Enter your new password below to reset your password:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:16

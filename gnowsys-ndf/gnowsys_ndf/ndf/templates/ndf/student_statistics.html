@@ -1,0 +1,203 @@
+{% load ndf_tags %}
+
+<script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
+
+<div class="rows student-data" id="all_assignments" style="display: none">
+  <dl class="accordion small-12 columns" data-accordion="accordion">
+    <dd class="accordion-navigation s_pages">
+      <a href="#panel_pages">Pages</a>
+      <div id="panel_pages" class="content active">
+      </div>
+    </dd>
+    <dd class="accordion-navigation s_images">
+      <a href="#panel_images">Images</a>
+      <div id="panel_images" class="content">
+      </div>
+    </dd>
+    <dd class="accordion-navigation s_videos">
+      <a href="#panel_videos">Videos</a>
+      <div id="panel_videos" class="content">
+      </div>
+    </dd>
+    <dd class="accordion-navigation s_files">
+      <a href="#panel_files">Files</a>
+      <div id="panel_files" class="content">
+      </div>
+    </dd>
+  </dl>
+</div>
+
+<header class="row">
+  <section class="small-12 columns">
+    <h2>
+      <span class='node'>{{node.name}}</span>      
+      <small class="label-list"> 
+      {% for tag in node.tags %}
+      <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+      {% endfor %}
+      </small>      
+    </h2>
+  </section>
+</header>
+
+<div id="loading-image" style="display: none"><img src="/static/ndf/images/ajax-loader-trans.gif"></div>
+{% for each in student_list %}
+
+{% if forloop.first %}
+<div class="rows">
+  <div class="small-3 columns">
+    <th>Student Name</th>
+  </div>
+  <div class="small-9 columns">
+    <th>Contributions/Assignments</th>
+  </div>
+</div>
+<div class="rows">
+  <hr>
+</div>
+{% endif %}
+  
+<a href="#" id="{{each.user_id}}" class="rows {% if each.Total > 0 %}student{% endif %}">
+  <br>
+  <div class="small-3 columns">
+    {{each.Name|title}}
+  </div>
+  <div class="small-9 columns">
+    {% if each.Total > 0 %}
+    {{each.Total}} (Pages: {{each.Pages}}, Images: {{each.Images}}, Videos: {{each.Videos}}, Files: {{each.Files}})
+    
+    {% else %}
+    No assignments!
+    {% endif %}
+  </div>
+  <br>
+</a>
+
+{% empty %}
+  <h5>No students have registered yet!!!</h5>
+
+{% endfor %}
+
+<script type="text/javascript">
+  $(document).foundation();
+
+  $('#loading-image').bind('ajaxStart', function(){
+    $(this).show();
+  }).bind('ajaxStop', function(){
+    $(this).hide();
+  });
+
+  var prev_selected_student_id = 0;
+  $(document).on('click', '.student', function (){
+
+    // Hide earlier visible Assignments-div
+    if ($("#all_assignments").css("display") != "none") {
+        // Must empty the below div's otherwise append() in ajax call's success() will keep the previous content as it is
+        $("#panel_pages").empty()
+        $("#panel_images").empty()
+        $("#panel_videos").empty()
+        $("#panel_files").empty()
+
+        $("#all_assignments").toggle()
+    }
+
+    /*
+      - Fetch assignments of given student, only if different student identified
+      - After fetching, populate data in "all_assignments" div 
+      - After populating, toggle that div's status
+    */
+    selected_student = $( this )
+    selected_student_id = parseInt(selected_student.attr("id"))
+    // alert("prev_selected_student_id : " + prev_selected_student_id + "\n selected_student_id : " + selected_student_id)
+    // console.log("selected_student id: " + selected_student_id)
+
+    if (prev_selected_student_id != selected_student_id) {
+      // alert("node: {{node.pk}}")
+      $.ajax({
+        url: "{% url 'get_students_assignments' node.pk %}?user_id=" + selected_student_id,
+
+        type: "GET",
+
+        dataType: "json",
+
+        beforeSend: function(){
+
+        },
+
+        success: function(data){
+          user_group = data["username"]
+          resource_id = ""
+
+          // Fill Pages-accordion
+          if (data["Pages"].length > 0) {
+            $.each(data["Pages"], function(i, val){
+              resource_id = val['_id']
+              url_val = "{% url 'page_details' 'user_group' 'resource_id' %}".replace('user_group', user_group).replace('resource_id', resource_id)
+              anchor_tag = "<a href="+url_val+" target='_blank'> "+val["name"]+" </a>"
+              $("#panel_pages").append(anchor_tag)
+            });
+            $(".s_pages").css("display", "block")
+          }
+
+          else {
+            $(".s_pages").css("display", "none")
+          }
+
+          // Fill Images-accordion
+          if (data["Images"].length > 0) {
+            $.each(data["Images"], function(i, val){
+              resource_id = val['_id']
+              url_val = "{% url 'file_detail' 'user_group' 'resource_id' %}".replace('user_group', user_group).replace('resource_id', resource_id)
+              anchor_tag = "<a href="+url_val+" target='_blank'> "+val["name"]+" </a>"
+              $("#panel_images").append(anchor_tag)
+            });
+            $(".s_images").css("display", "block")
+          }
+          else {
+            $(".s_images").css("display", "none")
+          }
+
+          // Fill Videos-accordion
+          if (data["Videos"].length > 0) {
+            $.each(data["Videos"], function(i, val){
+              resource_id = val['_id']
+              url_val = "{% url 'file_detail' 'user_group' 'resource_id' %}".replace('user_group', user_group).replace('resource_id', resource_id)
+              anchor_tag = "<a href="+url_val+" target='_blank'> "+val["name"]+" </a>"
+              $("#panel_videos").append(anchor_tag)
+            });
+            $(".s_videos").css("display", "block")
+          }
+          else {
+            $(".s_videos").css("display", "none")
+          }
+
+          // Fill Files-accordion
+          if (data["Files"].length > 0) {
+            $.each(data["Files"], function(i, val){
+              resource_id = val['_id']
+              url_val = "{% url 'file_detail' 'user_group' 'resource_id' %}".replace('user_group', user_group).replace('resource_id', resource_id)
+              anchor_tag = "<a href="+url_val+" target='_blank'> "+val["name"]+" </a>"
+              $("#panel_files").append(anchor_tag)
+            });
+            $(".s_files").css("display", "block")
+          }
+          else {
+            $(".s_files").css("display", "none")
+          }
+
+        },
+
+        complete: function(){
+          // Toggles the div consisting of Accordions of Pages, Images, Videos & Files for corresponding student
+          selected_student.after($("#all_assignments").toggle())
+          prev_selected_student_id = selected_student_id
+        }
+      });
+    }
+
+    else {
+      // Necessary, otherwise it won't show assignments for last clicked student, if same is clicked continuously
+      prev_selected_student_id = 0
+    }
+  });
+</script>

@@ -257,7 +257,7 @@
 
 	<div class="marker-alert-success"> Good work ! &nbsp;&nbsp;You had succesfully added the Marker </div>
 
-	<div class="marker-alert-error"> Something went wrong : </div>
+	<div class="marker-alert-error"> Something went wrong: </div>
 
 	<div id="map" data-mode="{{ mode }}" data-template-view="{{ template_view }}">
 		<input type="hidden" data-map-markers="{{ node.location }}" value="{{ location }}" name="map-geojson-data"/>
@@ -454,7 +454,7 @@
 
 						tempPopupContent = placename? '<ul class="pricing-table"><li class="title"><b>Placename : </b> '+placename +'</li>':tempPopupContent;
 
-						tempPopupContent = datetime? tempPopupContent + '<li class="bullet-item"><b>Date Time : </b>'+datetime+'</li>':tempPopupContent;
+						tempPopupContent = datetime? tempPopupContent + '<li class="bullet-item"><b>Date Time: , </b>'+datetime+'</li>':tempPopupContent;
 
 						var regex = /((ftp|https?):\/\/([-\w\.]+)+(:\d+)?(\/([\w\-/_\.]*(\?\S+)?)?)?)/ig
 						// var regex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
@@ -463,9 +463,9 @@
 
 						var testLinks = description.replace(regex,"<a href='$1' target='_blank'>$1</a>");
 
-						tempPopupContent = description? tempPopupContent + '<li class="bullet-item"><b>Description : </b> ' + testLinks + '</li>' :tempPopupContent;
+						tempPopupContent = description? tempPopupContent + '<li class="bullet-item"><b>Description: </b> ' + testLinks + '</li>' :tempPopupContent;
 
-						tempPopupContent = tags? tempPopupContent + '<li class="bullet-item"><b>Tags : </b>' + tags + '</li>' :tempPopupContent;
+						tempPopupContent = tags? tempPopupContent + '<li class="bullet-item"><b>Tags: </b>' + tags + '</li>' :tempPopupContent;
 
 						// fileslinks -------------------
 						
@@ -492,7 +492,7 @@
 
 						// });
 
-						tempPopupContent = attached_files? tempPopupContent + '<li class="bullet-item"><b>Attached Files : </b><ul class="read-images">' + 
+						tempPopupContent = attached_files? tempPopupContent + '<li class="bullet-item"><b>Attached Files: </b><ul class="read-images">' + 
 											fileListHtml
 											+ '</ul></li>' :tempPopupContent;
 
@@ -501,14 +501,14 @@
 						// END of files links ----------------
 
 						// adding created by in popup
-						created_by = (created_by.indexOf("anonymous_") == 0)? (created_by.split("_")[2])?created_by.split("_")[2]+ " (Anonymous User)":"Anonymous User" : created_by;
+						created_by = (created_by.indexOf("anonymous_") == 0)? (created_by.split("_")[2])?created_by.split("_")[2]+ " (Anonymous User)":"Anonymous User": created_by;
 
-						tempPopupContent = created_by? tempPopupContent + '<i style="color:gray; margin-left:"> Contributed by : ' + created_by + '</i>':tempPopupContent;
+						tempPopupContent = created_by? tempPopupContent + '<i style="color:gray; margin-left:"> Contributed by: ' + created_by + '</i>':tempPopupContent;
 
 			  						// console.log(edited_by);
 
 						// adding edited_by field
-						tempPopupContent = (edited_by.length > 1)? tempPopupContent + '<br/><br/><i style="color:#b2b2b2; margin-left:"> Edited by : ' + edited_by + '</i>':tempPopupContent;
+						tempPopupContent = (edited_by.length > 1)? tempPopupContent + '<br/><br/><i style="color:#b2b2b2; margin-left:"> Edited by: ' + edited_by + '</i>':tempPopupContent;
 
 						hasDataFlag = tempPopupContent.length>0 ? true : false;
 
@@ -1005,7 +1005,7 @@
 			$(popupHtmlObj).children("input.marker-creator").val(created_by.split("_")[2]);
 			
 			{% if user.is_authenticated %}
-				$(popupHtmlObj).children("input.marker-tags").after("<div style='color:gray'> by : "+created_by+"</div><br/>");	
+				$(popupHtmlObj).children("input.marker-tags").after("<div style='color:gray'> by: "+created_by+"</div><br/>");	
 			{% endif %}
 			// $(popupHtmlObj).children("div.images-list").find("ul.attached-images");
 
@@ -1043,7 +1043,7 @@
 				{
 					$(".leaflet-popup-content:visible input, textarea").prop("disabled", true);
 					$(popupHtmlObj).children("div.edit-delete-cntr").replaceWith("<a class='button tiny expand success annon-login' style='border-top: medium solid #FFFFFF; z-index: 2;' title='click to register' href='/accounts/login/' target='_blank'>Login / Register</a>")
-					$(".leaflet-popup-content:visible label:nth-child(1)").before('<div class="ask-register-div">Please register yourself before contributing any resource<hr/><span style="font-size:0.5em; ">NOTE : You can only read but can not edit any fields</span></div>');
+					$(".leaflet-popup-content:visible label:nth-child(1)").before('<div class="ask-register-div">Please register yourself before contributing any resource<hr/><span style="font-size:0.5em; ">NOTE: You can only read but can not edit any fields</span></div>');
 					$(".leaflet-popup-content:visible div.ask-register-div").fadeOut(15000);
 				}
 
