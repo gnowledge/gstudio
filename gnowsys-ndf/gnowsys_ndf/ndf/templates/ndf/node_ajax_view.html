@@ -556,7 +556,7 @@
       {% if all_replies %}
         Add Reply
       {% else %}
-        Start discussion
+        Initiate discussion on {{ node.name }}
       {% endif %}
       </div>
 
@@ -601,7 +601,7 @@
 
         <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
 
-        <input data-id="{{ node.pk }}" type="button" value="Post Reply"  class="button expand reply-button" onclick="addReply($(this))">
+        <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
 
         <input type="hidden" id="prior-node" style="visibility:hidden" value="">
         <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
