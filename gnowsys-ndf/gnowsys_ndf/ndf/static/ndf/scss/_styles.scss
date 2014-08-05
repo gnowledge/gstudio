@@ -200,7 +200,9 @@ main>aside{
                     border-left: 2px solid black;
                 }
                 &.active a,a:hover{
+                    color:white!important;
                     border-left: 2px solid $active-color;
+                    background-color: $active-color;
                 }
             }
         }
