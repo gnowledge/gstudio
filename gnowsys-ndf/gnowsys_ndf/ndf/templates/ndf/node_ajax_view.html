@@ -183,7 +183,7 @@
 
 
 <div itemscope itemtype="{{schema.1.type}}">
-<header class="page">
+<header class="row page">
     
   <section class="medium-12 columns" >
     <ul class="breadcrumbs">
@@ -196,7 +196,7 @@
       <div class="label-list"> 
       {% for tag in node.tags %}
       <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-       <span itemprop="{{schema.1.tags}}" content="{{tag}}">
+       <span itemprop="{{schema.1.tags}}" content="{{tag}}"></span>
       {% endfor %}
 
         </div> 

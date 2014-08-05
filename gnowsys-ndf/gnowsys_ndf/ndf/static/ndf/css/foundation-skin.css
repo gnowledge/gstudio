@@ -3955,7 +3955,7 @@ label.error {
 }
 /* line 159, ../bower_components/foundation/scss/foundation/components/_icon-bar.scss */
 .icon-bar > * i {
-  color: #cccccc;
+  color: white;
 }
 
 /* line 211, ../bower_components/foundation/scss/foundation/components/_icon-bar.scss */
