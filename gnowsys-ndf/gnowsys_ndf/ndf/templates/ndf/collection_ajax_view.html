@@ -60,7 +60,7 @@
  -->
  {% endcomment %}
 
-<ul class="side-nav">
+<ul class="side-nav collection">
 
   <!-- current page title -->
   {% for key,value in breadcrumbs_list %}
@@ -73,8 +73,8 @@
         <i class="fi-play"></i>
       </div>
       <div class="small-10 columns" name="{{key}}">{{ value | truncatechars:20 }}</div>
-    </div>
     </h5>
+      </div>
   </li>
 
   {% endfor %}
