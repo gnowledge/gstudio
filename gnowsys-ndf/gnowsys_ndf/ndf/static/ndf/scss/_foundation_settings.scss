@@ -709,7 +709,7 @@ $global-radius:5px;
 
 // Off Canvas Menu Variables
 // $off-canvas-width: 250px;
-// $off-canvas-bg: #333;
+ $off-canvas-bg: darken($theme-text-color,20%);
 
 // Off Canvas Menu List Variables
 // $off-canvas-label-padding: 0.3rem rem-calc(15);
@@ -1119,7 +1119,7 @@ $global-radius:5px;
 
 // $include-html-tabs-classes: $include-html-classes;
 
- $tabs-navigation-padding: 0.6rem;
+ $tabs-navigation-padding: 0.4rem;
  $tabs-navigation-bg-color: inherit  ;
  $tabs-navigation-active-bg-color: inherit;
  $tabs-navigation-hover-bg-color: inherit;

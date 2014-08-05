@@ -47,12 +47,7 @@
     padding-left: 5px;
     padding-right: 5px;
   }
-  .annotateIcon{
-    font-size: 35px;
-    color: green;
-    padding-left: 5px;
-    padding-right: 5px;
-  }
+    
   .divider-line { font-size: xx-large; color:lightgray; }
   .line-height-2 { line-height:2; }
   .line-height-2pt5 { line-height:2.5; }
@@ -185,7 +180,7 @@
 <div itemscope itemtype="{{schema.1.type}}">
 <header class="row page">
     
-  <section class="medium-12 columns" >
+  <section class="medium-9 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
       {% blocktrans %}<li><a href="#">Collection Name</a></li>{% endblocktrans %}
@@ -202,48 +197,48 @@
         </div> 
       
     <h1>
-      <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>     
-  </h1>
-
-  <div class="row">
-    <div class="small-10 columns"> 
-      <dl class="row tabs" data-tab>
-
+      <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span> 
+          <!-- Tabs for content and discussion views-->
+      <dl class="tabs" data-tab>
         {% if topic %}
        {% blocktrans %} <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> Contents </a></dd>{% endblocktrans %}
         {% endif %}
 
         <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
 
-        <dd class="{% if topic %}active{% endif %}">
-            <a href="#view-graph" data-dropdown="graph-hover" data-options="is_hover:true; active_class:open"><i class="fi-share"></i>Graph</a>
-                <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-                    {% blocktrans %}<li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>{% endblocktrans %}
+     {% blocktrans %}<dd><a href="#view-discussion"><i class="fi-comment"></i> Discuss</a></dd>{% endblocktrans %}
+      </dl>
+  </h1>
+</section>
+ 
+    <div class="medium-3 columns"> 
+        
+      
+        
+        <!-- Modal links for associated views like graphs and map-->
+        <ul class="side-nav">
+  <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% blocktrans %}Location{% endblocktrans %}</a></li>
+            
+  <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% blocktrans %}Graphs{% endblocktrans %}</a>
+            </li>
+            
+            <ul id="graph-list" class="f-dropdown" data-dropdown-content>
+  <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% blocktrans %}Concept Graph{% endblocktrans %}</a></li>
+                    
                     {% if node.collection_set %}
-                      {% blocktrans %}<li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>{% endblocktrans %}
+                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% blocktrans %}Collection Graph{% endblocktrans %}</a></li>
                     {% endif %}
           
                     {% if node.prior_node %}
-                     {% blocktrans %} <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>{% endblocktrans %}
-                    {% endif %}
-                </ul>
-        </dd>
+                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% blocktrans %}Dependency Graph{% endblocktrans %}</a></li>
+                    {% endif %}               
+</ul>
+           <li>
+                <a id = "toggleContainer"  href="#" onClick="toggle(this);">
+        <i class="fi-comments annotateIcon"></i> {% blocktrans %}Annotate{% endblocktrans %}
+      </a></li> 
+</ul>
 
-        {% blocktrans %}<dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>{% endblocktrans %}
-
-     {% blocktrans %}<dd><a href="#view-discussion"><i class="fi-comment"></i> Discuss</a></dd>{% endblocktrans %}
-      </dl>
-    </div>
-    
-    <!-- Container for enabling/disabling annotation mode -->
-    <div class="small-2 columns">          
-      <div id = "toggleContainer" style="cursor: pointer; color: green;" onClick="toggle(this);">
-        {% blocktrans %}<i class="fi-comments annotateIcon"></i> Annotate{% endblocktrans %}
-      </div>
-    </div>
-    <!--End container-->
-  </div>
-</section>
         </div>
 </header>
 

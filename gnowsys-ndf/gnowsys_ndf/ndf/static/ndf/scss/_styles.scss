@@ -225,6 +225,12 @@ h1:not(.subheader){
 	font-family: "Georgia Serif", Serif;
     font-style: italic;
     
+    .tabs{
+        display: inline-block;
+        position: relative;
+        bottom: -0.5rem;
+    }
+    
     div{
         display:inline-block;
         position: relative;
@@ -375,10 +381,14 @@ article .tabs{
 }
 
 article{
+    padding-left: 2rem!important;
 .tabs {
+    dd a{
+        border-radius: 2px;
+    }
     dd.active a{
         color:$active-color;
-        //border-bottom: 2px solid $active-color;
+        border: 1px solid;
         font-weight: bold;
     }
     dd:hover a{
