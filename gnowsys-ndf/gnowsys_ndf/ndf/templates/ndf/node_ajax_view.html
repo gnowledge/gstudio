@@ -778,89 +778,67 @@
 </div> <!-- schema ends here -->
 <script type="text/javascript">
 
-{% comment %}
-  {% for each in all_replies %}
-
-    var htmlContent = '<div class="disc-replies">' + '{{each.content | safe | linebreaksbr }}' + '<br><div class="reply-btn" data-id=' + '{{ each.oid }}' + ' onclick="openOrgEditor($(this))" >reply</div> {{ each.last_update|date }} </div><br>'
-    console.log(htmlContent)
-    $("#replies-area").append(htmlContent)
-    
-  {% endfor %}
-{% endcomment %}
   
   // for discussion tab
 
-  {% if all_replies %}
-              // $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent();
-              // calcMargLeft = $tempPrior.css("margin-left");
-              // calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+  // storing ndf_tags return values in JS variables
+  {% user_access_policy groupid request.user as user_access %}
+  var user_access = "{{ user_access }}"; // "allow" or "disallow"
 
-              // // add reply text content after #replies-area
-              // $($tempPrior).after(
-              //   "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
-              //   + data[2]
-              //   + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div><br>")
-              // .fadeIn(8000);
-
-    // var $allReplies = $("#replies-area .disc-replies")
-
-    // $.each()
-
-  {% endif %}
-
+  {% edit_policy groupid node request.user as status %}
+  var edit_policy = "{{ status }}"; // "allow" or "disallow"
 
   $("#orgitdownreps").orgitdown(mySettings);
 
   function createDiscussion()
   {
 
-    {% if user.is_authenticated %}
-
-    // ajax to create thread for first time.
-    $.ajax({
-      
-      url: "{% url 'create_discussion' group_id node.pk %}",
-
-      success: function(data){
+    if( user_access == "allow" and edit_policy == "allow" )
+    {  
+        // ajax to create thread for first time.
+        $.ajax({
           
-          data = JSON.parse(data);
-
-          if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
-          {
-            
-            // $("#create-discussion").hide();
-
-            // changing method to behave same as sub-reply button
-            $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
-
-            $("#prior-node").val("{{ node.pk }}") // _id
-            // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
-            
-            $("#create-discussion").trigger("click");
-          }
-          // else if( data[0] == "Thread-exist" ){
-          //   // alert(data)
-          //   $("#create-discussion").hide();
-          //   $("#prior-node").val("{{ node.pk }}") // _id         
-          //   // changing method to behave same as sub-reply button   
-          //   $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
-          //   $("create-discussion").trigger("click");
-          // }
-          else{ alert(data) }
-
-        },
-      complete: function(){
-        // $("#prior-node").val("") // removing _id
-      }
-
-    });
-    // --- END ajax and create thread for first time.
+          url: "{% url 'create_discussion' group_id node.pk %}",
     
-    {% else %}
-
-      alert("To start discussion you need to login first.");
-
-    {% endif %}
+          success: function(data){
+              
+              data = JSON.parse(data);
+    
+              if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
+              {
+                
+                // $("#create-discussion").hide();
+    
+                // changing method to behave same as sub-reply button
+                $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+    
+                $("#prior-node").val("{{ node.pk }}") // _id
+                // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
+                
+                $("#create-discussion").trigger("click");
+              }
+              // else if( data[0] == "Thread-exist" ){
+              //   // alert(data)
+              //   $("#create-discussion").hide();
+              //   $("#prior-node").val("{{ node.pk }}") // _id         
+              //   // changing method to behave same as sub-reply button   
+              //   $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+              //   $("create-discussion").trigger("click");
+              // }
+              else{ alert(data) }
+    
+            },
+          complete: function(){
+            // $("#prior-node").val("") // removing _id
+          }
+    
+        });
+        // --- END ajax and create thread for first time.
+        }
+        else
+        {
+          alert("To start discussion you need to login first.");
+        }
 
   }
   // --- END of createDiscussion()
