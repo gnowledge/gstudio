@@ -387,11 +387,11 @@ article{
 .tabs {
     dd a{
         border-radius: 2px;
+        border: 1px transparent;
     }
     dd.active a{
         color:$active-color;
         border: 1px solid;
-        font-weight: bold;
     }
     dd:hover a{
         color:$active-color;

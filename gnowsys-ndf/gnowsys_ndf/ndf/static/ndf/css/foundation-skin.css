@@ -8464,12 +8464,12 @@ article {
 /* line 388, ../scss/_styles.scss */
 article .tabs dd a {
   border-radius: 2px;
+  border: 1px transparent;
 }
-/* line 391, ../scss/_styles.scss */
+/* line 392, ../scss/_styles.scss */
 article .tabs dd.active a {
   color: #10c1cb;
   border: 1px solid;
-  font-weight: bold;
 }
 /* line 396, ../scss/_styles.scss */
 article .tabs dd:hover a {

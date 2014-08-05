@@ -201,12 +201,14 @@
           <!-- Tabs for content and discussion views-->
       <dl class="tabs" data-tab>
         {% if topic %}
-       {% blocktrans %} <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> Contents </a></dd>{% endblocktrans %}
+       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% blocktrans %}Contents{% endblocktrans %}</a></dd>
         {% endif %}
 
-        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% blocktrans %}View{% endblocktrans %}</a></dd>
 
-     {% blocktrans %}<dd><a href="#view-discussion"><i class="fi-comment"></i> Discuss</a></dd>{% endblocktrans %}
+     <dd><a href="#view-changes"><i class="fi-clock"></i> {% blocktrans %}Changes{% endblocktrans %}</a></dd>
+          <dd><a href="#view-discussion"><i class="fi-comment"></i> {% blocktrans %}Discuss{% endblocktrans %}</a></dd>
+          
       </dl>
   </h1>
 </section>
@@ -492,7 +494,7 @@
           </fieldset>
 
           <fieldset id="document_contents">
-            {% blocktrans %}<legend>Documents</legend>{% endblocktrans %}
+            <legend>{% blocktrans %}Documents{% endblocktrans %}</legend>
             {% for k,v in contents.items %}
               {% for e in v %}
 
@@ -542,6 +544,35 @@
      </div>
 
 
+          <!-- View node change history area -->
+    <div id="view-changes" class="content">
+        
+        <p>
+        {{ node.member_of_names_list.0 }} 
+        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+            </p>
+        
+          <h4>{% blocktrans %}Recent changes{% endblocktrans %}:</h4>
+        <ul class="side-nav">
+        {% for seq_no, version_no in node.version_dict.items|slice:"-20:" reversed %}
+          <li title="Version #{{version_no}}">
+            {% if forloop.last and forloop.counter > 5 %}
+            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">All Changes</a>
+            
+            {% else %}
+            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
+
+            {% endif %}
+          </li> 
+          {% endfor %}
+        </ul>
+          
+      
+
+        
+        </div>
+        
+        
     <!-- discussion content area -->
     <div id="view-discussion" class="content">
     {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
@@ -612,27 +643,7 @@
 
   <section class="medium-3 columns">
     <div class="panel">
-      <!-- <h3 class="subheader"></h3> -->
-      <p>
-        {{ node.member_of_names_list.0 }} 
-        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
-        <br>
-        <small>
-          <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
-          {% for seq_no, version_no in node.version_dict.items|slice:"-6:" reversed %}
-          <abbr title="Version #{{version_no}}">
-            {% if forloop.last and forloop.counter > 5 %}
-            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">. . .</a>
-            
-            {% else %}
-            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
-
-            {% endif %}
-          </abbr> 
-          {% endfor %}
-        </small>
-      </p>
-
+    
       <!-- Start of Block: For listing Editing options --> 
       {% user_access_policy groupid request.user as user_access %}
 
