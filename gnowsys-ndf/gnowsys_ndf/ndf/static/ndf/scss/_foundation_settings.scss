@@ -27,7 +27,7 @@ $secondary-color: lighten(desaturate($primary-color,20%),20%);
 $header-font-color: #222;
 $body-bg-color: #666;
 
-$bg-color: #eef7eb;
+$bg-color: lighten($theme-color,90%);
 $meta-color:#666;
 $active-color:lighten($theme-text-color,20%);
 

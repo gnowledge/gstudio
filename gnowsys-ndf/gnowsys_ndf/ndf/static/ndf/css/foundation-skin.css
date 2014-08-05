@@ -8328,7 +8328,7 @@ article h1:not(.subheader) div input:hover {
   position: relative;
   background-color: inherit;
   padding: 7px;
-  border: 1px dashed #cfe8c7;
+  border: 1px dashed #d0f9fb;
   display: block;
   opacity: 0.9;
   overflow: hidden;
@@ -8343,7 +8343,7 @@ article h1:not(.subheader) div input:hover {
 /* line 275, ../scss/_styles.scss */
 .card > *.published {
   opacity: 1;
-  background-color: #dff0d9;
+  background-color: #e7fcfd;
 }
 /* line 279, ../scss/_styles.scss */
 .card > *.unapproved {
@@ -8437,7 +8437,7 @@ article h1:not(.subheader) div input:hover {
 /* line 358, ../scss/_styles.scss */
 .edit-card {
   position: relative;
-  background-color: #eef7eb;
+  background-color: white;
   padding: 10px;
   display: block;
 }
@@ -8452,7 +8452,6 @@ article .tabs i {
 /* line 379, ../scss/_styles.scss */
 article .tabs dd.active a {
   color: #10c1cb;
-  border-bottom: 2px solid #10c1cb;
   font-weight: bold;
 }
 /* line 384, ../scss/_styles.scss */
@@ -8493,8 +8492,9 @@ article .tabs dd:hover a {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
+  background-color: transparent;
 }
-/* line 422, ../scss/_styles.scss */
+/* line 423, ../scss/_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   background-color: transparent;
@@ -8503,26 +8503,26 @@ article .tabs dd:hover a {
 
 /*************************** 2. Custom CSS overrides ***********************/
 /* Content area */
-/* line 436, ../scss/_styles.scss */
+/* line 437, ../scss/_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 440, ../scss/_styles.scss */
+/* line 441, ../scss/_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 444, ../scss/_styles.scss */
+/* line 445, ../scss/_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 447, ../scss/_styles.scss */
+/* line 448, ../scss/_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 456, ../scss/_styles.scss */
+/* line 457, ../scss/_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8543,49 +8543,49 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 476, ../scss/_styles.scss */
+/* line 477, ../scss/_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 481, ../scss/_styles.scss */
+/* line 482, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 484, ../scss/_styles.scss */
+/* line 485, ../scss/_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 487, ../scss/_styles.scss */
+/* line 488, ../scss/_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 490, ../scss/_styles.scss */
+/* line 491, ../scss/_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 494, ../scss/_styles.scss */
+/* line 495, ../scss/_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 498, ../scss/_styles.scss */
+/* line 499, ../scss/_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 501, ../scss/_styles.scss */
+/* line 502, ../scss/_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 509, ../scss/_styles.scss */
+/* line 510, ../scss/_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8593,13 +8593,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 516, ../scss/_styles.scss */
+/* line 517, ../scss/_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 521, ../scss/_styles.scss */
+/* line 522, ../scss/_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8613,13 +8613,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 531, ../scss/_styles.scss */
+/* line 532, ../scss/_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 536, ../scss/_styles.scss */
+/* line 537, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8630,7 +8630,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 547, ../scss/_styles.scss */
+/* line 548, ../scss/_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8642,12 +8642,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 559, ../scss/_styles.scss */
+/* line 560, ../scss/_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 562, ../scss/_styles.scss */
+/* line 563, ../scss/_styles.scss */
 #splash > img {
   position: absolute;
 }

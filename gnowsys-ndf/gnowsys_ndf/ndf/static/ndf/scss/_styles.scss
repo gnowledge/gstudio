@@ -378,7 +378,7 @@ article{
 .tabs {
     dd.active a{
         color:$active-color;
-        border-bottom: 2px solid $active-color;
+        //border-bottom: 2px solid $active-color;
         font-weight: bold;
     }
     dd:hover a{
@@ -417,6 +417,7 @@ article{
         @extend .label;
         opacity:0.2!important;
     padding: 2px;
+        background-color: transparent;
     }
     
     .label{
