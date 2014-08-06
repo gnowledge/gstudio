@@ -17,12 +17,12 @@
 {% csrf_token %}
 <script type="text/javascript">
 $(document).ready(function(){
-$("#lan option[value={{node.language}}]").remove();
+$("#lan option[value='{{node.language}}']").remove();
 {% if node %}
 {% get_possible_translations node as translations %}
 {% for each in translations %}
 {% for k,v in each.items %}
-$("#lan option[value={{v}}]").remove();
+$("#lan option[value='{{v}}']").remove();
 
 {% endfor %}
 {% endfor %}
@@ -39,7 +39,7 @@ $("#lan option[value={{v}}]").remove();
 <select name="lan">
 {% get_language_info_list for LANGUAGES as languages %}
 {% for language in languages %}
-<option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+<option value="{{ language.name_local }} ({{ language.code }})">{{ language.name_local }} ({{ language.code }})</option>
 {% endfor %}
 </select>
 
