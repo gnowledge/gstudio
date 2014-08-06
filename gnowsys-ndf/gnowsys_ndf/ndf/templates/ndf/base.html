@@ -360,7 +360,9 @@
       
       //Organise the apps in the icon bar based on whats active
       (function organizeIconBar(){
-    
+            
+          //Only if there is a 5th app, otherwise we dont need to organize anything
+           if( $('nav .icon-bar a').eq(5) ){
               // First lets move the active app as the first item so that its visible to the user
               $('.icon-bar a.app.active').prependTo($('nav .icon-bar'));
               
@@ -368,8 +370,10 @@
               $('nav .icon-bar a').slice(3).addClass("extra"); 
               
               // Add a show more button after the third one to show those extra apps
+         
               showMoreButton = '<a class="item more" href="#"><i class="fi-plus"></i><label>...</label></a>';
-              $(showMoreButton).insertAfter($('nav .icon-bar a').eq(2));
+              $(showMoreButton).insertBefore($('nav .icon-bar a').eq(3));
+          }
             
       })();
     
