@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% block title %} Image Gallery {% endblock %}
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
@@ -25,12 +26,12 @@
 	  </div>
 	  <div class="small-2 columns">
             <a href="#" class="button postfix" onclick="document.forms[0].submit();return false;">
-	      <i class="fi-magnifying-glass large">search</i>
+	      <i class="fi-magnifying-glass large">{% trans "Search" %}</i>
 	    </a>
 	  </div>
 	  <div class="small-2 columns">
             <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" class="button postfix secondary">
-	      <i class="fi-paperclip">upload</i>
+	      <i class="fi-paperclip">{% trans "Upload" %}</i>
 	    </a>
 	  </div>
       </div>

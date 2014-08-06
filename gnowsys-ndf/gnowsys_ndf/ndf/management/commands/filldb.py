@@ -302,6 +302,18 @@ def create_sts(factory_gsystem_types,user_id):
             meta_type_id = meta_type._id
         create_gsystem_type(name, user_id, meta_type_id)
 
+
+    # For creating Browse Topic as a collection of Theme & Topic
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+    br_topic = collection.Node.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
+    if not br_topic.collection_set:
+        br_topic.collection_set.append(theme_GST._id)
+        br_topic.collection_set.append(topic_GST._id)
+        br_topic.created_by = 1
+        br_topic.modified_by = 1
+        br_topic.save()
+
 # Update type_of field to list
 type_of_cursor=collection.find({'type_of':{'$exists':True}})
 for object_cur in type_of_cursor:
@@ -346,6 +358,8 @@ profile_pic_obj = collection.Node.one({'_type': 'GSystemType','name': u'profile_
 if profile_pic_obj:
     profile_pic_obj.delete()
     print "Deleted GST document of profile_pic"
+
+
 
 
 # For adding visited_location field (default value set as []) in User Groups.

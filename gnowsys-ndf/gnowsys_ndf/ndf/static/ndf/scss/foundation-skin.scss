@@ -27,11 +27,21 @@
 }
 
 
-input[type="checkbox"] + label, input[type="radio"] + label{
-	margin: inherit!important;
+
+/* Styles icon-bar */
+.icon-bar .item{
+    label{
+        font-size: 1.1rem;
+    }
+    &.active{
+        background-color: $theme-color;
+        i,label{
+        font-weight: bold;
+        }
+    }
 }
 
-
+/*
 /* Protects reflowing elements on error */
 [data-abide] span.error, [data-abide] small.error{
     position: absolute;
@@ -50,11 +60,10 @@ input[type="checkbox"] + label, input[type="radio"] + label{
 pre{
     width:92%;
 	overflow: auto;
-	margin: 2rem 0;
 	border: 1px solid #eee;
 	border-left: 1rem solid #eee;
 	font: lighter 1.2rem/2rem Monaco;
-	background: url('/static/ndf/images/pre.png');
+	background: url('/static/ndf/pre.png');
 	background-size:1px 4rem;
 	padding-left:0.5rem;
 	font-family: monospace;
@@ -74,10 +83,25 @@ pre{
     }
 }
 
+/* Utility class to display the child spans of this element on hover */
+.show-span-on-hover{
+    span{
+    display:none;
+    }
+    &:hover span{
+    display:inline;
+    }
+}
+/* Utility class to display the next siblings on hoverr */
+.extra.app {
+  display: none;
+    
+}
+
 /* Effects */
 .drop-shadow{
-	-webkit-box-shadow: 0px 0px 5px 1px #333;
-	box-shadow: 0px 0px 5px 1px #333;
+	-webkit-box-shadow: 0px 0px 5px 1px black;
+	box-shadow: 0px 0px 5px 1px black;
 }
 .rounded{
 	border-radius: 2px;
@@ -122,6 +146,7 @@ pre{
       height: 1.4em;
       white-space: nowrap;
         font-size: 1.5rem;
+        margin:0;
       &:before {
         display: inline-block;
         text-indent: -9999px;
@@ -133,7 +158,7 @@ pre{
       & + label:hover ~ label:before,
       & + label:hover:before {
       content: '\2605'; /* BLACK STAR */
-      color: $active-color;
+      color: $highlight-color;
       text-shadow: 0 0 1px #333;
     }
   }
@@ -161,7 +186,7 @@ pre{
   [type*="radio"] + label:hover ~ label:before,
   [type*="radio"] + label:hover:before {
     content: '\2605'; /* BLACK STAR */
-    color: $active-color;
+    color: $highlight-color;
     text-shadow: 0 0 1px #333;
   }
   }

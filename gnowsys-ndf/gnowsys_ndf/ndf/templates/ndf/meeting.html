@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -6,13 +7,15 @@
 {% block title %} {{ title }} {% endblock %}
 
 {% block help_content %}
+{% blocktrans %}
   <p>
     Lets u have video chat.
   </p>
+{% endblocktrans %}
 {% endblock %}
 
 {% block meta_content %}
-  <h2>Meeting</h2>
+  {% blocktrans %}<h2>Meeting</h2>{% endblocktrans %}
 {% endblock %}
 
 {% block search_content %}
@@ -31,7 +34,7 @@
                	
            
       	<a class="button medium" href="https://chatb.org/#{{meetingid}}" target="Chatb"> 
-        <span class="start">&nbsp;&nbsp;Start Meeting</span>
+        <span class="start">&nbsp;&nbsp;{% trans "Start Meeting" %}</span>
       </a>
     </div>
   </div>

@@ -20,6 +20,7 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
+from gnowsys_ndf.settings import LANGUAGES
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
 
@@ -89,6 +90,10 @@ def is_File(node):
 @register.inclusion_tag('ndf/userpreferences.html')
 def get_user_preferences(group,user):
 	return {'groupid':group,'author':user}
+
+@register.assignment_tag
+def get_languages():
+        return LANGUAGES
 
 @register.assignment_tag
 def get_node_ratings(request,node):
@@ -447,6 +452,53 @@ def get_gapps_menubar(request, group_id):
 		group_id=gpid._id
 		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
+# This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
+@register.inclusion_tag('ndf/gapps_iconbar.html')
+def get_gapps_iconbar(request, group_id):
+	"""Get Gapps menu-bar
+	"""
+	try:
+		selectedGapp = request.META["PATH_INFO"]
+		group_name = ""
+		collection = db[Node.collection_name]
+		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
+		gapps = {}
+		i = 0;
+		meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
+		
+		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
+		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		not_in_menu_bar = []
+		if group_obj.name == "home":
+			not_in_menu_bar = ["Image", "Video"]
+		else :
+			not_in_menu_bar = ["Image", "Video", "Group"]						
+		for node in GAPPS:
+			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
+			if node:
+				if node.name not in not_in_menu_bar:
+					i = i+1;
+					gapps[i] = {'id': node._id, 'name': node.name.lower()}
+
+		if len(selectedGapp.split("/")) > 2 :
+			selectedGapp = selectedGapp.split("/")[2]
+		else :
+			selectedGapp = selectedGapp.split("/")[1]
+		if group_id == None:
+			group_id=gpid._id
+		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+		if not group_obj:
+			group_id=gpid._id
+		else :
+			group_name = group_obj.name
+
+		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
+	except invalid_id:
+		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
+		group_id=gpid._id
+		return {'template': 'ndf/gapps_iconbar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
+
 
 global_thread_rep_counter = 0	# global variable to count thread's total reply
 global_thread_latest_reply = {"content_org":"", "last_update":"", "user":""}
@@ -749,6 +801,7 @@ def get_theme_node(groupid, node):
 
 	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 	theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+	theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
 	# code for finding nodes collection has only topic instances or not
 	# It checks if first element in collection is theme instance or topic instance accordingly provide checks
@@ -756,6 +809,8 @@ def get_theme_node(groupid, node):
 		collection_nodes = collection.Node.one({'_id': ObjectId(node.collection_set[0]) })
 		if theme_GST._id in collection_nodes.member_of:
 			return "Theme_Enabled"
+		if theme_item_GST._id in collection_nodes.member_of:
+			return "Theme_Item_Enabled"
 		if topic_GST._id in collection_nodes.member_of:
 			return "Topic_Enabled"
 		
@@ -880,8 +935,10 @@ def get_contents(node_id):
 
 @register.assignment_tag
 def get_group_type(group_id, user):
+        
 
 	try:
+
 		col_Group = db[Node.collection_name]
 
 		if group_id == '/home/':
@@ -889,8 +946,13 @@ def get_group_type(group_id, user):
 
 		else:  
 			gid = ""
+
+			# Splitting url-content based on backward-slashes
 			split_content = group_id.strip().split("/")
 
+			# If very first character is not backward-slash
+			# Then group id/name will be the very first element in splitted url-content list
+			# Else, it will be the second element
 			if split_content[0] != "":
 				gid = split_content[0]
 
@@ -901,14 +963,14 @@ def get_group_type(group_id, user):
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
 			else:
-				colg = col_Group.Group.find_one({'_type': 'Group', 'name': gid})
+				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
 				if colg :
 					pass
 
 				else:		
 					colg = None
   		
-		#check if Group exist in the database
+		# Check if Group exist in the database
 		if colg is not None:
 
 			# Check is user is logged in
@@ -996,6 +1058,21 @@ def get_memberof_objects_count(key,group_id):
 		return collection.Node.find({'member_of': {'$all': [ObjectId(key)]},'group_set': {'$all': [ObjectId(group_id)]}}).count()
 	except:
 		return 'null'
+
+
+'''Pass the ObjectId and get the name of it's first member_of element'''
+@register.assignment_tag
+def get_memberof_name(node_id):
+	try:
+		node_obj = collection.Node.one({'_id': ObjectId(node_id)})
+		member_of_name = ""
+		if node_obj.member_of:
+			member_of_name = collection.Node.one({'_id': ObjectId(node_obj.member_of[0]) }).name
+		return member_of_name
+	except:
+		return 'null'
+
+
 	
 @register.filter
 def get_dict_item(dictionary, key):

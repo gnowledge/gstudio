@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% load pagination_tags %}
 
 {% block title %} {{ title }} {% endblock %}
@@ -84,7 +85,7 @@
     
       <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
         
-        <h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3> 
+        <h3>{% trans "Are you sure you want to delete? All of the following related items also will be deleted:" %}</h3> 
         
         <input class="button confirmDeleteObjects" type="button" value="Confirm">
         <input class="button cancelDeleteObjects" type="button" value="Cancel">
@@ -114,10 +115,10 @@
           {% if nodes %}
     
             <th width="20"> <input class="checkedAll" type="checkbox"></th>
-            <th width="150">Title</th>
-            <th width="150">Created by</th>
-            <th width="150">Creation date</th>
-            <th width="150">Edit</th>
+            <th width="150">{% trans "Title" %}</th>
+            <th width="150">{% trans "Created by" %}</th>
+            <th width="150">{% trans "Creation date" %}</th>
+            <th width="150">{% trans "Edit" %}</th>
       
           {% endif %}
     
@@ -132,13 +133,13 @@
             <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance" group_name_tag app_name app_id app_set_id each.id %}">{{each.name}}</a></td>
             <td  class="created_by" style="font-size:11px;">{{each.created_by}}</td>
             <td  class="created_at" style="font-size:11px;">{{each.created_at}}</td>
-            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" group_name_tag app_name app_id app_set_id each.id %}" class="button medium">Edit</a></td>
+            <td  class="name" style="font-size:11px;"><a href="{% url "GAPPS_set_instance_edit" group_name_tag app_name app_id app_set_id each.id %}" class="button medium">{% trans "Edit" %}</a></td>
         
           </tr>
           
           {% empty %}
 
-          <h3>No data to display</h3>
+          <h3>{% trans "No data to display" %}</h3>
 
         {% endfor %}
 
@@ -210,11 +211,11 @@
       <div style="display:table-row;">
         
         <div style="display:table-cell;">
-   <font size="3"> Location </font>
+   <font size="3"> {% trans "Location" %} </font>
         </div>
     
         <div style="display:table-cell;">
-   <a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a>
+   <a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a>
         </div>
 
       </div>
@@ -232,7 +233,7 @@
         <div style="display:table-row;">
           
           <div style="display:table-cell;">
-     <font size="3"> tags </font>
+     <font size="3">{% trans "tags" %} </font>
           </div>
           <div style="display:table-cell;">
             <font size="3"> {{tags}} </font>
@@ -245,7 +246,7 @@
         <div style="display:table-row;">
           
           <div style="display:table-cell;">
-     <font size="3"> Uploaded File </font>
+     <font size="3"> {% trans "Uploaded File" %} </font>
           </div>
           
           {% if mime_type %}
@@ -275,7 +276,7 @@
     {% if content %}
     <div style="display:table-row;">
       <div style="display:table-cell;">
-<font size="3"> content: </font>
+<font size="3">{% trans "content:" %} </font>
       </div>
     </div>
     
@@ -296,7 +297,7 @@
 {% if create_new %}
 	{% if already_uploaded_file %}
 	<div>
-		<font size ="5" color="red">This file :{{already_uploaded_file}} Already uploaded please choose another file</font>
+		<font size ="5" color="red">This file: {{already_uploaded_file}} Already uploaded please choose another file</font>
 	</div>
 	{% endif %}
 
@@ -325,21 +326,21 @@
 					<select id="id_auto_now_add" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
 
 						{% if at.database_value %}
-						<option value="">Unknown</option>
+						<option value="">{% trans "Unknown" %}</option>
 						{% else %}
-						<option selected="selected" value="">Unknown</option>
+						<option selected="selected" value="">{% trans "Unknown" %}</option>
 						{% endif %}
 
 						{% if at.database_value == "Yes"%}
-						<option selected="selected" value="Yes">Yes</option>
+						<option selected="selected" value="Yes">{% trans "Yes" %}</option>
 						{% else %}
-						<option value="Yes">Yes</option>
+						<option value="Yes">{% trans "Yes" %}</option>
 						{% endif %}
 
 						{% if at.database_value == "No"%}
-						<option selected="selected" value="No">No</option>
+						<option selected="selected" value="No">{% trans "No" %}</option>
 						{% else %}
-						<option value="No">No</option>
+						<option value="No">{% trans "No" }</option>
 						{% endif %}
 
 					</select>
@@ -361,9 +362,9 @@
 				<div style="display:table-cell;">
 					<select id="relation_selection" name="{% if rt.database_id %} {{rt.database_id}} {% else %}{{rt.type_id}} {% endif %}" style="width:50%">
 						{% if rt.database_value_id %}
-						<option value="">Unknown</option>
+						<option value="">{% trans "Unknown" %}</option>
 						{% else %}
-						<option selected="selected" value="">Unknown</option>
+						<option selected="selected" value="">{% trans "Unknown" %}</option>
 						{% endif %}
 
 						{% for each_gsystem in rt.object_type %}
@@ -382,12 +383,12 @@
 			<!-- map/location widget : EDIT -->
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
-					<font size="3"> Add Location </font> 
+					<font size="3"> {% trans "Add Location" %} </font> 
 				</div>
 
 				<div style="display:table-cell;">
 					<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-						<i class="fi-marker"></i> &nbsp; Add Location
+						<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 					</a>
 				</div>      
 			</div>  
@@ -403,7 +404,7 @@
 
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
-					<font size="3"> Tags</font> 
+					<font size="3"> {% trans "Tags" %}</font> 
 				</div>
 				<div style="display:table-cell;">
 					<input id="tags_id" name="tags" type="textbox" value="{{tags}}" placeholder="Separate tags with commas...">
@@ -413,7 +414,7 @@
 			{% if File == "True" %}
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
-					<font size="3">Upload File</font> 
+					<font size="3">{% trans "Upload File" %}</font> 
 				</div>
 				<div style="display:table-cell;">
 					<input id="file_id" name="file" type="file">
@@ -423,7 +424,7 @@
       
 			<div style="display:table-row;">
 				<div style="display:table-cell;"> 
-					<font size="3"> Content</font> 
+					<font size="3"> {% trans "Content" %}</font> 
 				</div>
 				<div style="display:table-cell">
 					<div id="contentlist" class="content">

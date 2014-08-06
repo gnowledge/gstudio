@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -7,19 +7,19 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block help_content %}
-<p>About Course... <em>coming soon</em></p>
+<p>{% trans "About Course... <em>coming soon</em>" %}</p>
 {% endblock %}
 
 
 {% block meta_content %}
-  <h3>Courses</h3>
+  <h3>{% trans "Courses" %}</h3>
 
  {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
   {% if user_access == "allow" %}
 
       <a class="small button" href="{% url 'create_edit' group_name_tag %}">
-        <span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+        <span class="fi-plus">&nbsp;&nbsp;{% blocktrans %} New {{title}} {% endblocktrans %}</span>
       </a>
 
   {% endif %}
@@ -42,21 +42,21 @@
 
 <header class="row">
   <dl class="tabs" data-tab>
-    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Courses {% if course_coll.count %}({{ course_coll.count }}){% endif %}</a></dd>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i>{% trans "All Courses" %} {% if course_coll.count %}({{ course_coll.count }}){% endif %}</a></dd>
   </dl>
 </header>
 
 {% if searching and course_coll.count > 0 %}
 <div class="row">
   <div class="small-12 columns end">
-    <p>Search Results: <span class="label success round">Found {{course_coll.count}} {{title|lower}}{{course_coll.count|pluralize}}.</span></p>
+    <p>{% trans "Search Results:" %} <span class="label success round"> Found {{course_coll.count}} {{title|lower}}{{course_coll.count|pluralize}}.</span></p>
   </div>
 </div>
 
 {% elif searching and course_coll.count == 0 %}
 <div class="row">
   <div class="small-12 columns">
-    <p>Search Results: <span class="label alert">No {{title|lower}}{{course_coll.count|pluralize}} matched your search criteria!!!</span></p>
+    <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{course_coll.count|pluralize}} matched your search criteria!!!</span></p>
   </div>  
 </div>  
 
@@ -90,12 +90,12 @@
     
       <p>{{ course.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
       
-      <a class="small button expand" href="{% url 'course_detail' group_name_tag course %}">View Details</a>
+      <a class="small button expand" href="{% url 'course_detail' group_name_tag course %}"> {% trans "View Details" %}</a>
 
       {% comment %}
       {% get_user_object node.created_by as user_obj %}
       {% ifequal user_obj.username user.username %}
-      <a class="button alert tiny" href="{% url 'delete_module' group_name_tag course %}?next={{request.path}}">Delete </a>
+      <a class="button alert tiny" href="{% url 'delete_module' group_name_tag course %}?next={{request.path}}">{% trans "Delete" %} </a>
       {% endifequal %}
       {% endcomment %}
 
@@ -111,7 +111,7 @@
     {% if not searching %}
     <div class="row">
       <div class="small-12 columns">
-        <h5>This group doesn't have any courses. <b>Be the first to create a Course!</b></h5>
+<h5> {% blocktrans %}This group doesn't have any courses. <b>Be the first to create a course!</b>{% endblocktrans %} </h5>
       </div>
     </div>
     {% endif %}

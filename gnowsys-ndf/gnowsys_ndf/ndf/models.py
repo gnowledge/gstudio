@@ -970,7 +970,8 @@ class Group(GSystem):
         'disclosure_policy': basestring,    # Members of this group - disclosed or not 
         'encryption_policy': basestring,            # Encryption - yes or no
 
-        'group_admin': [int]				# ObjectId of Author class
+        'group_admin': [int],				# ObjectId of Author class
+        'partner':bool                      # Shows partners exists for a group or not     
     }
 
     use_dot_notation = True
@@ -1018,7 +1019,9 @@ class Author(Group):
     structure = {                
         'email': unicode,       
         'password': unicode,
-        'visited_location': []
+        'visited_location': [],
+        'preferred_languages':dict          # preferred languages for users like preferred lang. , fall back lang. etc.
+
     }
 
     use_dot_notation = True
@@ -1340,6 +1343,16 @@ class HistoryManager():
 
         return doc_obj
 
+class NodeJSONEncoder(json.JSONEncoder):
+  def default(self, o):
+    if isinstance(o, ObjectId):
+      return str(o)
+
+    if isinstance(o, datetime.datetime):
+      return o.strftime("%d/%m/%Y %H:%M:%S")
+
+    return json.JSONEncoder.default(self, o)
+
 
 #######################################################################################################################################
 #  TRIPLE CLASS DEFINITIONS
@@ -1348,113 +1361,159 @@ class HistoryManager():
 @connection.register
 class Triple(DjangoDocument):
 
-    objects = models.Manager()
+  objects = models.Manager()
 
-    collection_name = 'Nodes'
-    structure = {
-        '_type': unicode,
-        'name': unicode,
-        'subject_scope': basestring,
-        'subject': ObjectId,	          # ObjectId's of GSystem Class
-        'lang': basestring,               # Put validation for standard language codes
-        'status': STATUS_CHOICES_TU
-    }
+  collection_name = 'Nodes'
+  structure = {
+    '_type': unicode,
+    'name': unicode,
+    'subject_scope': basestring,
+    'subject': ObjectId,	          # ObjectId's of GSystem Class
+    'lang': basestring,               # Put validation for standard language codes
+    'status': STATUS_CHOICES_TU
+  }
+  
+  required_fields = ['name', 'subject']
+  use_dot_notation = True
+  use_autorefs = True
+  ########## Built-in Functions (Overridden) ##########
+  
+  def __unicode__(self):
+    return self._id
+  
+  def identity(self):
+    return self.__unicode__()
+  
+  def save(self, *args, **kwargs):
+    is_new = False
+
+
+    if not self.has_key('_id'):
+      is_new = True               # It's a new document, hence yet no ID!"
+
+    collection = get_database()[Node.collection_name]
     
-    required_fields = ['name', 'subject']
-    use_dot_notation = True
-    use_autorefs = True
-    ########## Built-in Functions (Overridden) ##########
-    
-    def __unicode__(self):
-        return self._id
-    
-    def identity(self):
-        return self.__unicode__()
-    
-    def save(self, *args, **kwargs):
-        is_new = False
-	
+    """
+    Check for correct GSystemType match in AttributeType and GAttribute, similarly for RelationType and GRelation
+    """
+    #it's me
+    subject_name = collection.Node.one({'_id': self.subject}).name
+    subject_system_flag = False
+    subject_id = self.subject
+    subject_document = collection.Node.one({"_id":self.subject})
+    # print subject_document
 
-        if not self.has_key('_id'):
-            is_new = True               # It's a new document, hence yet no ID!"
+    subject_type_list = []
+    subject_member_of_list = []
+    name_value = u""
+    if self._type == "GAttribute":
+      self.name = subject_name + " -- " + self.attribute_type['name'] + " -- " + unicode(self.object_value)
+      name_value = self.name
 
-        collection = get_database()[Node.collection_name]
-        
-	"""
-	Check for correct GSystemType match in AttributeType and GAttribute, similarly for RelationType and GRelation
-	"""
-	#it's me
-	subject_name = collection.Node.one({'_id': self.subject}).name
-        subject_system_flag = False
-        subject_id = self.subject
-        subject_document = collection.Node.one({"_id":self.subject})
-        print subject_document
+      subject_type_list = self.attribute_type['subject_type']
+      subject_member_of_list = subject_document.member_of
 
-        if self._type == "GAttribute":
-            self.name = subject_name + " -- " + self.attribute_type['name'] + " -- " + unicode(self.object_value)
-	    subject_type_list = []
-	    subject_type_list = self.attribute_type['subject_type']
- 	    subject_member_of_list = []
-	    subject_member_of_list = subject_document.member_of
-	    intersection = set(subject_member_of_list) & set(subject_type_list)
-	    if intersection:
-	    	subject_system_flag = True
-	    	
+      intersection = set(subject_member_of_list) & set(subject_type_list)
+      if intersection:
+        subject_system_flag = True
 
-        elif self._type == "GRelation":
-	    right_subject_document = collection.Node.one({'_id': self.right_subject})
-            right_subject_name = collection.Node.one({'_id': self.right_subject}).name
-            self.name = subject_name + " -- " + self.relation_type['name'] + " -- " + right_subject_name
-	    subject_type_list = self.relation_type['subject_type']
-	    object_type_list= self.relation_type['object_type']
-	    left_subject_member_of_list = subject_document.member_of
-	    right_subject_member_of_list = right_subject_document.member_of
-	    left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
-	    right_intersection = set(object_type_list) & set(right_subject_member_of_list)
-	    if left_intersection and right_intersection:
-	    		subject_system_flag = True
+      else:
+        # If instersection is not found with member_of fields' ObjectIds, 
+        # then check for type_of field of each one of the member_of node
+        for gst_id in subject_member_of_list:
+          gst_node = collection.Node.one({'_id': gst_id}, {'type_of': 1})
+          if set(gst_node.type_of) & set(subject_type_list):
+            subject_system_flag = True
+            break
 
-	if self._type =="GRelation" and subject_system_flag == False:
-		print "The 2 lists do not have any common element"
-		raise Exception("Cannot create the GRelation as the subject/object that you have mentioned is not a member of a GSytemType for which this RelationType is defined")
-	
-	if self._type =="GAttribute" and subject_system_flag == False:
-		print "The 2 lists do not have any common element"
-		raise Exception("Cannot create the GAttribute as the subject that you have mentioned is not a member of a GSystemType which this AttributeType is defined")
+    elif self._type == "GRelation":
+      right_subject_document = collection.Node.one({'_id': self.right_subject})
+      right_subject_name = collection.Node.one({'_id': self.right_subject}).name
+      self.name = subject_name + " -- " + self.relation_type['name'] + " -- " + right_subject_name
+      name_value = self.name
 
-	#it's me
-	#check for data_type in GAttribute case. Object value of the GAttribute must have the same type as that of the type specified in AttributeType
-	"""
-	if self._type == "GAttribute":
-		data_type_in_attribute_type = self.attribute_type['data_type']
-		data_type_of_object_value = type(self.object_value)
-		print "Attribute:: " + str(data_type_in_attribute_type)
-		print "Value:: " + str(data_type_of_object_value)
-		if data_type_in_attribute_type != data_type_of_object_value:
-			raise Exception("The DataType of the value you have entered for this attribute is not correct. Pls ener a value with type ---> " + str(data_type_in_attribute_type))
+      subject_type_list = self.relation_type['subject_type']
+      object_type_list= self.relation_type['object_type']
 
-	"""
-	#end of data_type_check
+      left_subject_member_of_list = subject_document.member_of
+      right_subject_member_of_list = right_subject_document.member_of
 
-        super(Triple, self).save(*args, **kwargs)
-        
-        history_manager = HistoryManager()
-        rcs_obj = RCS()
+      left_intersection = set(subject_type_list) & set(left_subject_member_of_list)
+      right_intersection = set(object_type_list) & set(right_subject_member_of_list)
+      if left_intersection and right_intersection:
+        subject_system_flag = True
 
-        if is_new:
-            # Create history-version-file
-            if history_manager.create_or_replace_json_file(self):
-                fp = history_manager.get_file_path(self)
-                message = "This document (" + self.name + ") is created on " + datetime.datetime.now().strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+      else:
+        left_subject_system_flag = False
+        if left_intersection:
+          left_subject_system_flag = True
+
         else:
-            # Update history-version-file
-            fp = history_manager.get_file_path(self)
-            rcs_obj.checkout(fp)
+          for gst_id in left_subject_member_of_list:
+            gst_node = collection.Node.one({'_id': gst_id}, {'type_of': 1})
+            if set(gst_node.type_of) & set(subject_type_list):
+              left_subject_system_flag = True
+              break
 
-            if history_manager.create_or_replace_json_file(self):
-                message = "This document (" + self.name + ") is lastly updated on " + datetime.datetime.now().strftime("%d %B %Y")
-                rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+
+        right_subject_system_flag = False
+        if right_intersection:
+          right_subject_system_flag = True
+
+        else:
+          for gst_id in right_subject_member_of_list:
+            gst_node = collection.Node.one({'_id': gst_id}, {'type_of': 1})
+            if set(gst_node.type_of) & set(object_type_list):
+              right_subject_system_flag = True
+              break
+
+        if left_subject_system_flag and right_subject_system_flag:
+          subject_system_flag = True
+
+    if self._type =="GRelation" and subject_system_flag == False:
+      print "The 2 lists do not have any common element"
+      raise Exception("\n Cannot create the GRelation ("+name_value+") as the subject/object that you have mentioned is not a member of a GSytemType for which this RelationType is defined!!!\n")
+
+    if self._type =="GAttribute" and subject_system_flag == False:
+      print "The 2 lists do not have any common element"
+      error_message = "\n "+name_value+ " -- subject_type_list ("+str(subject_type_list)+") -- subject_member_of_list ("+str(subject_member_of_list)+") \n"
+
+      raise Exception(error_message + "Cannot create the GAttribute ("+name_value+") as the subject that you have mentioned is not a member of a GSystemType which this AttributeType is defined")
+
+    #it's me
+    #check for data_type in GAttribute case. Object value of the GAttribute must have the same type as that of the type specified in AttributeType
+    """
+    if self._type == "GAttribute":
+    data_type_in_attribute_type = self.attribute_type['data_type']
+    data_type_of_object_value = type(self.object_value)
+    print "Attribute:: " + str(data_type_in_attribute_type)
+    print "Value:: " + str(data_type_of_object_value)
+    if data_type_in_attribute_type != data_type_of_object_value:
+    	raise Exception("The DataType of the value you have entered for this attribute is not correct. Pls ener a value with type ---> " + str(data_type_in_attribute_type))
+
+    """
+    #end of data_type_check
+
+    super(Triple, self).save(*args, **kwargs)
+    
+    history_manager = HistoryManager()
+    rcs_obj = RCS()
+
+    if is_new:
+      # Create history-version-file
+      if history_manager.create_or_replace_json_file(self):
+        fp = history_manager.get_file_path(self)
+        message = "This document (" + self.name + ") is created on " + datetime.datetime.now().strftime("%d %B %Y")
+        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+    else:
+      # Update history-version-file
+      fp = history_manager.get_file_path(self)
+      rcs_obj.checkout(fp)
+
+      if history_manager.create_or_replace_json_file(self):
+        message = "This document (" + self.name + ") is lastly updated on " + datetime.datetime.now().strftime("%d %B %Y")
+        rcs_obj.checkin(fp, 1, message.encode('utf-8'))
 
 
 @connection.register

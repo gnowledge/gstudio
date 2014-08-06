@@ -1,10 +1,12 @@
 {% extends "ndf/node_edit_base.html" %}
-
+{% load i18n %}
 {% load ndf_tags %}
 
 {% block meta_content %}
-  <h3>Course Building</h3>
+{% blocktrans %}
+  <h3>Building of a Course </h3>
   <p class="text-justify"><b>Course</b> is a sequenced collection of already freezed modules.</p>
+{% endblocktrans %}
 {% endblock %}
 
 
@@ -17,7 +19,8 @@
     <div class="course">
       <br/>
       <a class="button medium" href="{% url 'create_edit' group_name_tag %}">
-        <span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+        <span class="fi-plus">&nbsp;&nbsp;{% blocktrans %}New {{title}}{% endblocktrans %}
+</span>
       </a>
     </div>
   </div>
@@ -27,13 +30,13 @@
 
 
 {% block page_tab %} Basic {% endblock %}
-{% block collection_tab %}Add Module {% endblock %}
+{% block collection_tab %}{% trans "Add Module" %} {% endblock %}
 
 {% block collection %}
 <div class="content" id="panel-collection" style="width:95%;">
   <div class="row">
     <div class="small-12 columns">
-      <h5>Add or Remove Module : </h5>
+      <h5>{% trans "Add or Remove Module:" %} </h5>
     </div>
     <div class="small-12 columns">
       <div id="module_drawer" >

@@ -1,5 +1,6 @@
 {% extends "ndf/node_details_base.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% block title %} {{title}} {% endblock %}
 {% block url %}{% url 'create_edit' groupid node %}{% endblock %}
 
@@ -43,7 +44,7 @@
 <!-- overiding block_related content -->
 {% block related_content %}
 <section class="medium-6 large-12 columns">
-  <h3>Modules</h3>
+  <h3>{% trans "Modules" %}</h3>
   <div class ="row">
     {% for each in node.collection_set %}
     <!-- bellow div for making tree from json data -->
@@ -72,11 +73,13 @@
   <section class="medium-10 columns" >
     <h2>
       <span class='node'>{{node.name}}</span>
-      <span><a class="button" href="{% url 'create_edit' group_name_tag node.pk %}">Edit</a></span>
+      <span><a class="button" href="{% url 'create_edit' group_name_tag node.pk %}">{% trans "Edit" %}</a></span>
     </h2>
     <h3 class="subheader"></h3>
-      <small> 
+      <small>
+	{% blocktrans %}
 	Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>
+	{% endblocktrans %}
       </small>
 
   </section>

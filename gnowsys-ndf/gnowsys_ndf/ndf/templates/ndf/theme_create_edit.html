@@ -38,26 +38,26 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <h2 class="medium-12 columns">
 		{% if node %}
-			Editing {{title}}: {{node.name}}
+			{% blocktrans with node.name as node_name %}Editing {{title}}: {{node_name}} {% endblocktrans %}
 		{% else %}
-			Create a New {{title}}
+			{% blocktrans %}Create a New {{title}}{% endblocktrans %}
 		{% endif %}
     </h2>
 
     <nav class="medium-12 columns">
    		<dl class="tabs" data-tab>
 		{% if node %}
-			<dd><h3>View:</h3></dd>
+			<dd><h3>{% trans "View:" %}</h3></dd>
 		
-			<dd title="Click here to add Name, Description, Privacy and Tags">
+			<dd class="{% if theme_GST_id in node.member_of %}active{% endif %}" title="Click here to add Name, Description, Privacy and Tags">
 		  	<!-- change name of collection tab overide block in your code -->
 		  		<a href="#panel-name-description"> {{title}} </a>
 			</dd>
+			
 			<!-- change name of collection tab overide block in your code -->
-			<dd class="active" title="Click here to add/edit collection">
-		  		<a href="#panel-collection">Collection </a> 
+			<dd class="{% if theme_GST_id not in node.member_of %}active{% endif %}" title="Click here to add/edit collection">
+		  		{% if theme_GST_id not in node.member_of %}<a href="#panel-collection">{% trans "Collection" %} </a> {% endif %}
 			</dd>  
-			  
 		{% endif %}
      	</dl>
   	</nav>
@@ -69,34 +69,34 @@ background-repeat:no-repeat; background-size: 48px 48px
   		{% if node %}
 
   		<!-- Block Description -->
-		<div class="content row" id="panel-name-description">
+		<div class="{% if theme_GST_id in node.member_of %}active{% endif %} content row" id="panel-name-description">
 	  		<div class="medium-6 columns">
 
 				<div class="row">
 		  			<div class="medium-8 columns">
-		    			<label>{{title}} Name</label>
+		    			<label>{% blocktrans %}{{title}} Name{% endblocktrans %}</label>
 		    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-		    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 		  			</div>
 
 		  			<div class="medium-4 columns">
 		    			{% if node.created_by == request.user.pk %}		    	
-							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>Privacy</label></span>
+							<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Privacy" %}</label></span>
 
 							<div class="privacy-mode switch round">
 							{% if node.access_policy == "PUBLIC" or node.group_type == "PUBLIC" %}
 								<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-								<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+								<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 
 								<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-								<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+								<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 							{% else %}
 								{% if node.access_policy == "PRIVATE" or node.group_type == "PRIVATE" %}
 									<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" >
-									<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+									<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 
 									<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio" checked>
-									<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+									<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 								{% endif %}
 							{% endif %}
 								<span></span>
@@ -110,12 +110,19 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+					      {% get_language_info_list for LANGUAGES as languages %}
+					      {% for language in languages %}
+					      <option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})
+					      </option>
+					      {% endfor %}
+					    </select>
+					  </label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
 		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-		  					<i class="fi-marker"></i> &nbsp; Add Location
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 		  				</a>
 		  			</div>
 				</div>
@@ -138,20 +145,19 @@ background-repeat:no-repeat; background-size: 48px 48px
 		</div>
 
 		<!-- Collection tab block -->
-	    <div class="active content" id="panel-collection" style="width:95%;">
+	    <div class="{% if theme_GST_id not in node.member_of %}active{% endif %} content" id="panel-collection" style="width:95%;">
 		    <div class="row">
-		    	{% if node %}
 
 		    	{% get_theme_node groupid node as add_topic %}
 				<div class="small-5 columns">		
-					{% if add_topic == True or add_topic == "Theme_Enabled" %}
+					{% if add_topic == True or add_topic == "Theme_Enabled" or add_topic == "Theme_Item_Enabled" %}
 		    		<dl class="accordion" data-accordion>
 		    			<dd>
           					<a class="add_theme medium-4 columns" href="#sub_theme"> + Add Theme Item </a>
          					
           					<div id="sub_theme" class="content">
           						<br/><br/>
-          						<label>Theme Name</label>
+          						<label>{% trans "Theme Name" %}</label>
 		    					<input id="sub_theme_id" type="text" placeholder="Enter name...">
 	    						<input id="save-sub-theme" value="Save" class="button small medium-2 columns"> 
 	          					
@@ -166,11 +172,11 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 					<dl class="accordion" data-accordion>
 		    			<dd>
-          					<a class="add_topic medium-4 columns" href="#add_topic"> + Add Topic </a>
+          					<a class="add_topic medium-4 columns" href="#add_topic">{% trans "+ Add Topic" %} </a>
          					
           					<div id="add_topic" class="content">
           						<br/><br/>
-          						<label>Topic Name</label>
+          						<label>{% trans "Topic Name" %}</label>
 		    					<input id="add_topic_id" type="text" placeholder="Enter name...">
 	    						<input id="save-topic" value="Save" class="button small medium-2 columns"> 
 	          					
@@ -180,7 +186,8 @@ background-repeat:no-repeat; background-size: 48px 48px
           			{% endif %}
 
 				</div>
-				{% endif %}
+				
+				
 				<div class="small-12 columns">
 			  		<div id="collection_drawer">
 
@@ -188,7 +195,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			  		</div>
 				</div>
-		      
+				
+		      	
 		  	</div>
 	 	</div>
 
@@ -201,7 +209,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  			<div class="medium-8 columns">
 		    			<label>{{title}} Name</label>
 		    			<input id="name_id" name="name" type="text" placeholder="Enter name..." required>
-		    			<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 		  			</div>
 
 		  			<div class="medium-4 columns">
@@ -210,10 +218,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 						<div class="privacy-mode switch round">
 					
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">Public <i class="fi-torsos-all"></i></label>
+							<label for="PUBLIC" onclick="">{% trans "Public" %} <i class="fi-torsos-all"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">Private <i class="fi-lock"></i></label>
+							<label for="PRIVATE" onclick="">{% trans "Private" %} <i class="fi-lock"></i></label>
 						
 							<span></span>
 						</div>
@@ -225,12 +233,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>Language<select name="lan"><option id="en" value="en">en</option><option id="hi" value="hi">hi</option><option id="mar" value="mar">mar</option></select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
 		  				<a href="#view-map-edit-widget" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-		  					<i class="fi-marker"></i> &nbsp; Add Location
+		  					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
 		  				</a>
 		  			</div>
 				</div>
@@ -243,7 +251,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-12 columns">
-		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag</label>
+		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}</label>
 		    			</span>
 		    			<input id="tags_id" name="tags" type="text" placeholder="Separate tags with commas...">
 		  			</div>		
@@ -266,7 +274,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   	<!-- Overlay : Map Widget -->
     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
-  		<a class="close-reveal-modal" >&#215;</a>
+  		<a class="close-reveal-modal" >{% trans "&#215;" %}</a>
         {% include "ndf/map_widget.html" with mode="edit" %}
     </div>
 
@@ -313,10 +321,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      },
 	      success: function(data) {
 
-	      	var theme = $("#sub_theme_id").val();
+	      	var theme_item = $("#sub_theme_id").val();
 
 	      	if ($.trim(data) === "failure") {
-	      		alert("Theme name "+ theme +" already available, Please choose different name");
+	      		alert("Theme Item name "+ theme_item +" already available, Please choose different name");
 	      	}
 
 	      	if ($.trim(data) === "None") {

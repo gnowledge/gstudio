@@ -1,12 +1,13 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% block title %} {{username}}'s - Dashboard  {% endblock %}
 
 {% block meta_content %}
 
-    <h3>About</h3>
+    <h3>{% trans "About" %}</h3>
 
-    <p><b>Dashboard</b> shows users' own activities in the site.</p>   
+    {% blocktrans %}<p><b>Dashboard</b> shows users' own activities in the site.</p>{% endblocktrans %}   
 
 {% endblock %}
 
@@ -28,17 +29,17 @@
 
 					<a href="#"><img  src="{% url 'getImageThumbnail' group_id prof_pic_obj %}" height="120" width="120"></img></a><br/>
 					{% if user_id == usr %}
-						<a href='#' id="pic">Change Profile Picture</a>
+						<a href='#' id="pic">{% trans "Change Profile Picture" %}</a>
 					{% endif %}
 				{% else %}
 					<span class="fi-torso" style="font-size:100pt;"> </span> <br/>
 					{% if user_id == usr %}
-						<a href='#' id="pic">Upload Profile Picture</a>
+						<a href='#' id="pic">{% trans "Upload Profile Picture" %}</a>
 					{% endif %}
 				{% endif %}		
 			
 				{% if already_uploaded != "None" %}
-					<br/><br/><span style="color:red"> {{already_uploaded}} image is already uploaded please choose different image</span>
+					<br/><br/><span style="color:red"> {% blocktrans %}{{already_uploaded}} image is already uploaded please choose different image {% endblocktrans %}</span>
 				{% endif %}
 
 			<div id="pic_div" style="display:none;">
@@ -51,18 +52,18 @@
 					<input type="submit" id="submitpostid" value="Save">
 
 					<p id="message" style="display:none">
-						Please wait for uploading profile picture
+						{% trans "Please wait for uploading profile picture" %}
 					</p>
 						
 				</form>
 			</div>
 			{% else %}
-				<p><em>You are Not Authorised user please login to upload profile picture </em></p>
+				<p><em>{% trans "You are Not Authorised user please login to upload profile picture" %} </em></p>
 			{% endif %}
 		</div>
 		<div class="small-9 columns" style="padding-top:30px;">
-			<h4><a href="#">Welcome {{username}}</a></h4>
-			Registerd on : &nbsp;{{DOJ}}
+			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
+			{% blocktrans %}Registerd on : &nbsp;{{DOJ}} {% endblocktrans %}
 		</div>
 	</div>
 	<br/>
@@ -76,12 +77,12 @@
 	<!-- Created Resources by user -->
 	<div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
-			Created Resources by {{username}}:						
+			{% blocktrans %}Created Resources by {{username}}:{% endblocktrans %}						
 		</div>
 	</div>
 	<div class="row" style="padding-top:10px;">
 		<div class="small-3 columns">
-			<h6 align="center"><b>Pages</b></h6>
+			<h6 align="center"><b>{% trans "Pages" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="page_drawer">
 			{% if page_drawer != "None" %}
         		<li class="price">
@@ -104,12 +105,12 @@
 					{% endif %}
 				{% endfor %}	
 			{% else %}  
-        		<li class="bullet-item" > <i>Page not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Page not found !" %} </i> </li>
         	{% endif %}			
 			</ul>
 		</div>
 		<div class="small-3 columns">
-			<h6 align="center"><b>Images</b></h6>
+			<h6 align="center"><b>{% trans "Images" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="image_drawer">  
 			{% if image_drawer != "None" %}
         		<li class="price">
@@ -133,12 +134,12 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}  
-        		<li class="bullet-item" > <i>Image not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Image not found !" %} </i> </li>
         	{% endif %}
 			</ul>
 		</div>
 		<div class="small-3 columns">
-			<h6 align="center"><b>Videos</b></h6>
+			<h6 align="center"><b>{% trans "Videos" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="video_drawer">  
 			{% if video_drawer != "None" %}
         		<li class="price">
@@ -160,12 +161,12 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}  
-        		<li class="bullet-item" > <i>Video not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Video not found ! " %}</i> </li>
         	{% endif %}
 			</ul>
 		</div>
 		<div class="small-3 columns">
-			<h6 align="center"><b>Files</b></h6>
+			<h6 align="center"><b>{% trans "Files" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="file_drawer">       
 			{% if file_drawer != "None" %}
         		<li class="price">
@@ -187,7 +188,7 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}  
-        		<li class="bullet-item" > <i>File not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "File not found ! " %}</i> </li>
         	{% endif %}
 			</ul>
 		</div>		
@@ -195,7 +196,7 @@
 
 	<div class="row" style="padding-top:10px;">
 		<div class="small-3 columns">
-			<h6 align="center"><b>Quizzes</b></h6>
+			<h6 align="center"><b>{% trans "Quizzes" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="quiz_drawer">
 			{% if quiz_drawer != "None" %}
         		<li class="price">
@@ -217,12 +218,12 @@
 					{% endif %}
 				{% endfor %}	
 			{% else %}  
-        		<li class="bullet-item" > <i>Quiz not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Quiz not found ! " %}</i> </li>
         	{% endif %}			
 			</ul>
 		</div>
 		<div class="small-3 columns">
-			<h6 align="center"><b>Groups</b></h6>
+			<h6 align="center"><b>{% trans "Groups" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="group_drawer">
 			{% if group_drawer != "None" %}
         		<li class="price">
@@ -242,12 +243,12 @@
 					{% endif %}
 				{% endfor %}	
 			{% else %}  
-        		<li class="bullet-item" > <i>Group not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Group not found !" %} </i> </li>
         	{% endif %}			
 			</ul>
 		</div>
 		<div class="small-3 columns small-pull-3 columns">
-			<h6 align="center"><b>Forums</b></h6>
+			<h6 align="center"><b>{% trans "Forums" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="forum_drawer">
 			{% if forum_drawer != "None" %}
         		<li class="price">
@@ -267,7 +268,7 @@
 					{% endif %}
 				{% endfor %}	
 			{% else %}  
-        		<li class="bullet-item" > <i>Forum not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Forum not found ! " %}</i> </li>
         	{% endif %}			
 			</ul>
 		</div>
@@ -278,12 +279,12 @@
 	<hr/>
 	<div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
-			Contributed Resources :						
+			{% trans "Contributed Resources :," %}						
 		</div>
 	</div>
 	<div class="row" style="padding-top:10px;">
 		<div class="small-3 columns">
-			<h6 align="center"><b>Pages</b></h6>
+			<h6 align="center"><b>{% trans "Pages" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="pg_contrib_drawer">
 			{% if page_drawer != "None" %}
         		<li class="price">
@@ -298,12 +299,12 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}  
-        		<li class="bullet-item" > <i>Page not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Page not found ! " %}</i> </li>
         	{% endif %}				
 			</ul>
 		</div>
 		<div class="small-3 columns">
-			<h6 align="center"><b>Images</b></h6>
+			<h6 align="center"><b>{% trans "Images" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="img_contrib_drawer">    
 			{% if image_drawer != "None" %}
         		<li class="price">
@@ -318,12 +319,12 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}  
-        		<li class="bullet-item" > <i>Image not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Image not found ! " %}</i> </li>
         	{% endif %}
 			</ul>
 		</div>
 		<div class="small-3 columns">
-			<h6 align="center"><b>Videos</b></h6>
+			<h6 align="center"><b>{% trans "Videos" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="vid_contrib_drawer"> 
 			{% if video_drawer != "None" %}
         		<li class="price">
@@ -338,12 +339,12 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}  
-        		<li class="bullet-item" > <i>Video not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Video not found !" %}</i> </li>
         	{% endif %}
 			</ul>
 		</div>
 		<div class="small-3 columns">
-			<h6 align="center"><b>Files</b></h6>
+			<h6 align="center"><b>{% trans "Files" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="file_contrib_drawer"> 
 			{% if file_drawer != "None" %}
         		<li class="price">
@@ -358,7 +359,7 @@
 					{% endif %}
 				{% endfor %}
 			{% else %}  
-        		<li class="bullet-item" > <i>File not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "File not found !" %} </i> </li>
         	{% endif %}
 			</ul>
 		</div>
@@ -366,7 +367,7 @@
 
 	<div class="row" style="padding-top:10px;">
 		<div class="small-3 columns">
-			<h6 align="center"><b>Quizzes</b></h6>
+			<h6 align="center"><b>{% trans "Quizzes" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="quiz_contrib_drawer">
 			{% if quiz_drawer != "None" %}
         		<li class="price">
@@ -381,12 +382,12 @@
 					{% endif %}
 				{% endfor %}	
 			{% else %}  
-        		<li class="bullet-item" > <i>Quiz not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Quiz not found !" %} </i> </li>
         	{% endif %}			
 			</ul>
 		</div>
 		<div class="small-3 columns">
-			<h6 align="center"><b>Groups</b></h6>
+			<h6 align="center"><b>{% trans "Groups" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="group_contrib_drawer">
 			{% if group_drawer != "None" %}
         		<li class="price">
@@ -400,12 +401,12 @@
 					{% endif %}
 				{% endfor %}	
 			{% else %}  
-        		<li class="bullet-item" > <i>Group not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Group not found ! " %}</i> </li>
         	{% endif %}			
 			</ul>
 		</div>
 		<div class="small-3 columns small-pull-3 columns">
-			<h6 align="center"><b>Forums</b></h6>
+			<h6 align="center"><b>{% trans "Forums" %}</b></h6>
 			<ul class="pricing-table resource-drawer" id="forum_contrib_drawer">
 			{% if forum_drawer != "None" %}
         		<li class="price">
@@ -419,7 +420,7 @@
 					{% endif %}
 				{% endfor %}	
 			{% else %}  
-        		<li class="bullet-item" > <i>Forum not found ! </i> </li>
+        		<li class="bullet-item" > <i>{% trans "Forum not found !" %} </i> </li>
         	{% endif %}			
 			</ul>
 		</div>
@@ -431,7 +432,7 @@
 	<hr/>
 	<div class="row">
 		<div class="small-2 columns" style="padding-top:10px;">
-			Collaborators :						
+			{% trans "Collaborators:" %}						
 		</div>
 		<div class="small-5 columns small-pull-5 columns" style="padding-top:10px;">
 			<ul class="pricing-table resource-drawer" id="collaborators_drawer"> 
@@ -442,7 +443,7 @@
 								<a href="{% url 'userDashboard' group_name_tag each.Id %}">{{ each.usrname }}  </a> 	
 							</div>
 							<div class="small-6 columns">
-								<a href="">modified: {{each.resource}}  </a>
+								<a href="">{% blocktrans %} modified: {{each.resource}}{% endblocktrans %}  </a>
 							</div>
 						</div>
 					</li>
@@ -454,7 +455,7 @@
 	<!-- Shelf -->
 	<div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
-			<b><a>Shelf</a></b>
+			<b><a>{% trans "Shelf" %}</a></b>
 			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
 		</div>
 	</div>

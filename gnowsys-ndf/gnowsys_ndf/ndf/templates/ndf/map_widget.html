@@ -1,5 +1,5 @@
 {% block head %}
-
+{% load i18n%}
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
 
 	<!-- JS Links -->
@@ -62,7 +62,14 @@
 	 	var osmUrl 	  = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
 	 	osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 	 	osm 	  = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
-	 	
+        
+        // Lets try to access some Bhuvan WMS tiles, currently does not work
+        var bhuvan = L.tileLayer.wms("http://tile3.nrsc.gov.in/tilecache/tilecache.py", {
+    layers: 'bhuvan_imagery',
+    format: 'image/jpeg',
+            crs : L.CRS.EPSG4326,
+    attribution: "Indian Remote Sensing Satellites, NRSC"
+});
 
 	 	// initialize the map on the "map" div with a given center and zoom
 	 	var map = L.map('map').setView([25.92,79.84], 5).addLayer(osm);

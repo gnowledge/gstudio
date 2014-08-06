@@ -1,0 +1,35 @@
+{% extends "ndf/groupdashboard.html" %}
+
+{% block body_content %}
+  <div id="students_list_div">
+    <!-- Will hold student's list -->
+    {{block.super}}
+  </div>
+{% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+  $(document).on('click', '#Student', function (){
+    // alert($(this).attr("id") + " --- {{node.pk}} --- {{node.name}}")
+    $.ajax({
+      url: "{% url 'get_students_assignments' groupid %}",
+
+      type: "GET",
+
+      dataType: "html",
+
+      beforeSend: function(){
+
+      },
+
+      success: function(data){
+        $("#students_list_div").html(data)
+      },
+
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+  });
+// </script>
+{% endblock %}

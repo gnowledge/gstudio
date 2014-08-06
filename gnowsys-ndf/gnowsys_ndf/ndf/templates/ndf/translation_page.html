@@ -18,7 +18,6 @@
 <script type="text/javascript">
 $(document).ready(function(){
 $("#lan option[value={{node.language}}]").remove();
-{% comment %}
 {% if node %}
 {% get_possible_translations node as translations %}
 {% for each in translations %}
@@ -28,17 +27,22 @@ $("#lan option[value={{v}}]").remove();
 {% endfor %}
 {% endfor %}
 {% endif %}
-{% endcomment %}
 });
 
 </script>
 
-       <div class="large-12 columns">
+<div class="large-12 columns">
 <table class="large-6 columns">
 <div class="row">
 <div class="large-6 columns text-center">{{node.language|default_if_none:""}}</div>
 <div class="large-6 columns">
-<select name="lan" id="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
+<select name="lan">
+{% get_language_info_list for LANGUAGES as languages %}
+{% for language in languages %}
+<option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+{% endfor %}
+</select>
+
 
 
 </div>
@@ -51,19 +55,19 @@ $("#lan option[value={{v}}]").remove();
 
 <div class="row">
 <div class="medium-8 columns">
- Page Name : {{node.name}}</br></br>
+{% trans "Page Name" %} : {{node.name}}</br></br>
 
               </div>
    </div>
 </br>
 <div class="row">
 <div class="medium-8 columns">
- Description :</br></br>
+ Description: </br></br>
 <textarea name="content" class="field left">{{node.content_org|default_if_none:""}}</textarea>
           </div></div>
 <div class="row">
 <div class="medium-8 columns">
-Tags : </br></br>
+{% trans "Tags: " %} </br></br>
 {{node.tags|join:', '|default_if_none:""}}
               </div></div>
   
@@ -71,18 +75,17 @@ Tags : </br></br>
           </div>
 
 <div class="large-6 columns">
-
 <div class="row">
 <div class="medium-8 columns">
-<label>Page Name</label>
+<label>{% trans "Page Name" %}</label>
 <input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
-<small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
+<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 </div>
            </div>
 
 <div class="row">
 <div class="large-12 columns">
-<label>Description</label>
+<label>{% trans "Description" %}</label>
  
 {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" %}
 </div>
@@ -90,7 +93,7 @@ Tags : </br></br>
 
 <div class="row">
 <div class="large-6 columns">
-<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{node.tags|pluralize|default_if_none:"s"}}</label>
+<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}{{node.tags|pluralize|default_if_none:"s"}}</label>
 </span>
 <input id="tags_id" name="tags" name="tags" type="text" value="{{node.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
 </div>
@@ -117,9 +120,9 @@ Tags : </br></br>
 <div class="row">
 <div class="medium-8 columns">
 {% if "Theme" in each.member_of_names_list %}
- Theme Name  :  {{each.name}}</br></br>
+ Theme Name:  {{each.name}}</br></br>
 {% else %}
-Topic Name  :  {{each.name}}</br></br>
+Topic Name:  {{each.name}}</br></br>
 {% endif %}     
          </div>
    </div>
@@ -128,16 +131,11 @@ Topic Name  :  {{each.name}}</br></br>
 {% if "Theme" not in each.member_of_names_list %}
 
 <div class="medium-8 columns">
- Description  :</br></br>
+ Description: </br></br>
 <textarea name="content" class="field left">{{each.content_org|default_if_none:""}}</textarea>
           </div>
 {% endif %}
 </div>
-<div class="row">
-<div class="medium-8 columns">
-Tags  : </br></br>
-{{each.tags|join:', '|default_if_none:""}}
-              </div></div>
   
 {% endfor %}
   
@@ -146,7 +144,7 @@ Tags  : </br></br>
 {% for each in list1 %}
 <div class="row">
 <div class="medium-8 columns">
-<label>{% trans "Page Name" %} </label>
+<label>{% trans "Theme Name" %} </label>
 <input type="hidden" id="name_id" name="name" value="{{node.name}}">
 <input id="name_id" name="name_{{each}}" type="text" value="{{each.name}}" placeholder="Enter name..." required>
 <small class="error">Please give your page a descriptive name. It's helpful for others and for yourself.</small>
@@ -165,12 +163,6 @@ Tags  : </br></br>
 
 </div>
 
-<div class="row">
-<div class="large-6 columns">
-<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>Tag{{each.tags|pluralize|default_if_none:"s"}}</label>
-</span>
-<input id="tags_id" name="tags_{{each}}" type="text" value="{{each.tags|join:', '|default_if_none:""}}" placeholder="Separate tags with commas...">
-</div>	
 {% endfor %}
 {% endif %}
 </div>

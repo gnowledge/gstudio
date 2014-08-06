@@ -1,5 +1,5 @@
 {% extends "ndf/base.html" %}
-
+{% load i18n %}
 {% load pagination_tags %}
 {% load ndf_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -26,12 +26,12 @@
 
 
 {% block help_content %}
-<p>About Module... <em>coming soon</em></p>
+{% blocktrans %}<p>About Module... <em>coming soon</em></p>{% endblocktrans %}
 {% endblock %}
 
 
 {% block meta_content %}
-  <h2>Modules</h2>
+ {% blocktrans %} <h2>Modules</h2> {% endblocktrans %}
 {% endblock %}
 
 
@@ -114,7 +114,7 @@
     {% if not searching %}
     <div class="row">
       <div class="small-12 columns">
-        <h5>This group doesn't have any modules. <b>Be the first to create a Module!</b></h5>
+       <h5> {% blocktrans %} This group doesn't have any modules. <b>Be the first to create a Module!</b>{% endblocktrans %} </h5>
       </div>
     </div>
     {% endif %}
@@ -150,7 +150,7 @@
 	{% empty %}
 	  <div class="row">
 	    <div class="small-12 columns">
-        <h5>This group doesn't have any modules. <b>Be the first to create a Module!</b></h5>
+       <h5> {% blocktrans %}This group doesn't have any modules. <b>Be the first to create a Module!</b>{% endblocktrans %} </h5>
 	    </div>
 	  </div>
 

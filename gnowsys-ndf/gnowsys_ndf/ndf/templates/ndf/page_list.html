@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+{% load i18n %}
 {% load ndf_tags %}
 {% load pagination_tags %}
 {% get_group_name groupid as group_name_tag %}
@@ -6,13 +7,16 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block help_topics %}
+{% blocktrans %}
   <li><a href="#">Pages Introduction</a></li>
   <li><a href="#">Working with Pages</a></li>
   <li><a href="#">Page types</a></li>
+{% endblocktrans %}
 {% endblock %}
 
 
 {% block help_content %}
+{% blocktrans %}
   <p>
     Pages are user-written articles on a range of subjects. Any contributor or a group of contributors can create (and own) new articles, and there can be multiple articles on the same topic, each written by a different author.
   </p>
@@ -21,24 +25,10 @@
   <p>
     Anyone with an account can create a new article. When creating a new article, the initial contributor can choose to have a defined list of authors, all of whom can edit the page, or have an open, wiki-like format where anyone can contribute.
   </p>
+{% endblocktrans %}
 {% endblock %}
 
 
-{% block meta_content %}
-  <h3>Pages</h3>
-
-{% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-
-      <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
-	<span class="fi-plus">&nbsp;&nbsp;Create {{title}}</span>
-      </a>
-  
-  {% endif %}
-  {% endif %}
-
-{% endblock %}
 
 
 {% block search_content %}
@@ -81,8 +71,18 @@
 <header class="row">
   <dl class="tabs" data-tab>
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd>
-    <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>
+    {% blocktrans %}<dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>{% endblocktrans %}
   </dl>
+    {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+
+      <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
+	{% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Create {{title}}</span>{% endblocktrans %}
+      </a>
+  
+  {% endif %}
+  {% endif %}
 </header>
 
 <div class="tabs-content">
@@ -161,7 +161,7 @@
     {% if not searching %}
       <div class="row">
         <div class="small-12 columns">
-          <h5>This group doesn't have any pages. <b>Be the first to create a Page!</b></h5>
+        <h5>  {% blocktrans %} This group doesn't have any pages. <b>Be the first to create a Page!</b>{% endblocktrans %} </h5>
         </div>
       </div>
     {% endif %}
@@ -228,7 +228,7 @@
   
   {% empty %}
     {% if not searching %}
-          <h5>This group doesn't have any collections.</h5>
+     <h5>    {% blocktrans %} This group doesn't have any collections.{% endblocktrans %} </h5>
     {% endif %}
 
   {% endfor %}

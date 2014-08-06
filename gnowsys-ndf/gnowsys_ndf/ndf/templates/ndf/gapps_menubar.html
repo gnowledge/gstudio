@@ -1,4 +1,5 @@
 {% load ndf_tags %}
+{% load i18n %}
 {% get_group_name groupid as group_name_tag %}
 <!-- GApps Menubar -->
 {% check_gapp_menus groupid as check_menu %}
@@ -14,11 +15,16 @@
 
 <input type="hidden" value="{{newgroup}}">
 
+<!-- The template has been modified to show only the groups, partner and other top level apps in the top navbar -->
+<!-- See gapps_iconbar.html for the app icon bar in the sidebar -->
+
 {% for index_key, app_dict in gapps.items %}
 
 {% check_is_gstaff_for_gapp groupid app_dict request.user as gstaff_access_for_gapp %}
 
 {% if gstaff_access_for_gapp %}
+
+{% if app_dict.name|lower == "group" %}
 <li class="
 
 	{% comment %} Sets active-menu class on active app{% endcomment %}
@@ -32,28 +38,18 @@
 	
 	{% endif %}
 	app">
+    
 	<a class="app" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
-
-	{% comment %} Includes an app icon if found{% endcomment %}
-	{% if app_dict.name|lower == "page" %}
-	<i class='fi-page left'></i>
-	{% elif app_dict.name|lower == "group" %}
 	<i class='fi-torsos left'></i>
-	{% elif app_dict.name|lower == "file" %}
-	<i class='fi-play'></i>
-	{% elif app_dict.name|lower == "forum" %}
-	<i class='fi-comments'></i>
-	{% elif app_dict.name|lower == "course" %}
-	<i class='fi-book'></i>
-	{% elif app_dict.name|lower == "quiz" %}
-	<i class='fi-graph-bar'></i>
-	{% endif %}
-
 	{{app_dict.name|title}}</a>
 
 </li>
 {% endif %}
 
+{% endif %}
+
 {% endfor %}
+
+
 
 <!-- ============= -->

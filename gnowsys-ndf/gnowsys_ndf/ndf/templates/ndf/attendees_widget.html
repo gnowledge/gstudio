@@ -1,3 +1,4 @@
+{% load i18n %}
 <style type="text/css">
 
 	.all-stud-table li.title {
@@ -20,24 +21,24 @@
 
 <a href="#attendance" data-reveal-id="attendance">
   <h1></h1>
-  Add Attendance
+  {% trans "Add Attendance" %}
 </a>
 
 <div id="attendance" class="reveal-modal" data-reveal>
   <a class="close-reveal-modal">&#215;</a>
 
-  <h2 class="text-center">Attendance</h2>
+  <h2 class="text-center">{% trans "Attendance" %}</h2>
   <br/><br/>
 
   <div class="row">
 
     <div class="small-2 columns"> 
-      <label class="left inline" for="Batch"> Batch </label>
+      <label class="left inline" for="Batch">{% trans "Batch" %} </label>
     </div>
 
     <div class="small-5 end columns">
       <select required="" name="Batch" class="medium" id="Batch">
-        <option value=""> Select the Batch </option>
+        <option value="">{% trans "Select the Batch" %}</option>
       </select>
     </div>
 
@@ -46,7 +47,7 @@
   <div class="row">
 
     <div class="small-2 columns"> 
-      <label class="left inline" for="Majority"> Majority </label>
+      <label class="left inline" for="Majority">{% trans "Majority" %} </label>
     </div>
 
     <div class="small-5 end columns">
@@ -54,12 +55,12 @@
       <div class="row">
         <div class="small-6 end columns">
           <input type="radio" name="majority" value="Present" id="present">
-          <label for="present">Present</label>
+          <label for="present">{% trans "Present" %}</label>
         </div>
       
         <div class="small-6 columns">
           <input type="radio" name="majority" value="Absent" id="absent">
-          <label for="absent">Absent</label>
+          <label for="absent">{% trans "Absent" %}</label>
         </div>
       </div>
       
@@ -75,24 +76,24 @@
     
       <!-- <h3>All students | </h3> -->
       <ul class="pricing-table all-stud-table">
-        <li class="title">All Students - Mark the attendance</li>
+        <li class="title">{% trans "All Students - Mark the attendance" %}</li>
         <li class="price">
           <input type="text" class="margin-0" id="" placeholder="Type here to search in the resources"/>
         </li>
         <li class="description">
           <div class="row">
-           <div class="small-8 columns">Students Name</div>
+           <div class="small-8 columns">{% trans "Students Name" %}</div>
            <div class="small-4 columns">
               <div class="row">
-                <div class="small-6 columns">Present</div>
-                <div class="small-6 columns">Absent</div>
+                <div class="small-6 columns">{% trans "Present" %}</div>
+                <div class="small-6 columns">{% trans "Absent" %}</div>
               </div>
            </div>
         </div>
         </li>
         <li class="bullet-item text-left">
           <div class="row">
-           <div class="small-8 columns">sdf</div>
+           <div class="small-8 columns">{% trans "sdf" %}</div>
            <div class="small-4 columns">
               <div class="row">
                 <div class="small-6 columns">
@@ -105,9 +106,9 @@
            </div>
         </div>
         </li>
-        <li class="bullet-item text-left">Student ##</li>
+        <li class="bullet-item text-left">{% trans "Student ##" %}</li>
         <li class="bullet-item text-left">....</li>
-        <li class="cta-button"><a class="button" href="#">Done</a></li>
+        <li class="cta-button"><a class="button" href="#">{% trans "Done" %}</a></li>
       </ul>
     </div>
 
@@ -116,16 +117,16 @@
       
       <!-- <h3>All students | </h3> -->
       <ul class="pricing-table present-table">
-        <li class="title">Present Students</li>
-        <li class="bullet-item text-left">Student ##</li>
+        <li class="title">{% trans "Present Students" %}</li>
+        <li class="bullet-item text-left">{% trans "Student ##" %}</li>
         <li class="bullet-item text-left">....</li>
         <!-- <li class="cta-button"><a class="button" href="#">Done</a></li> -->
       </ul>
 
       <!-- <h3>All students | </h3> -->
       <ul class="pricing-table absent-table">
-        <li class="title">Absent Students</li>
-        <li class="bullet-item text-left">Student ##</li>
+        <li class="title">{% trans "Absent Students" %}</li>
+        <li class="bullet-item text-left">{% trans "Student ##" %}</li>
         <!-- <li class="cta-button"><a class="button" href="#">Done</a></li> -->
       </ul>
     </div>
