@@ -37,8 +37,6 @@ from gnowsys_ndf.ndf.templatetags.ndf_tags import group_type_info
 
 db = get_database()
 collection = db[Node.collection_name]
-
-print "\n\nljlkjhkjh"
 def graphs(request,group_id):
 		# HttpResponseRedirect("ndf/visualize.html",
 		# 					 	{

@@ -237,7 +237,7 @@
                 <!-- Here we are using "group_name_tag" since groupid value is overwrites in above section for different perspective -->
                 <a class="left-off-canvas-toggle item help" >
                   <i class='fi-book'></i>
-                  <label>Reference</label>
+                  <label>Help</label>
                 </a> 
                             
         				<a class="item user" href="{% url 'userDashboard' group_object request.user.pk %}">
@@ -292,13 +292,7 @@
 
       
       
-      <div class="medium-3 columns">
-          <p>
-             <small>
-        A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">{% trans "Homi Bhabha Centre for Science Education (HBCSE)" %}</a>, <a href="http://www.tifr.res.in" target="_blank">{% trans "Tata Institute of Fundamental Research (TIFR), India" %}</a>.
-       </small>
-        </p>
-    	
+      <div class="medium-3 columns">    	
              <p>
                 <span class="gnu-badge show-span-on-hover">{% trans "100% स्वतंत्" %}
                     <span>
@@ -316,7 +310,7 @@
       </div>
 
 
-      <div class="medium-6 columns">
+      <div class="medium-7 columns">
          
           <ul class="inline-list">
   <li><a href="#">About</a></li>
@@ -327,13 +321,13 @@
               <li><a href="#">Contact</a></li>
 </ul>
         
-      </div>
-      <div class="medium-3 columns">
-         
-
-        
           
-        
+      </div>
+      <div class="medium-2 columns sponsor">
+         <p>
+        A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">{% trans "Homi Bhabha Centre for Science Education (HBCSE)" %}</a>, <a href="http://www.tifr.res.in" target="_blank">{% trans "Tata Institute of Fundamental Research (TIFR), India" %}</a>.
+        </p>
+
       </div>
 
   </footer>
@@ -367,8 +361,6 @@
       //Organise the apps in the icon bar based on whats active
       (function organizeIconBar(){
     
-          //If there more than 4 apps, then we need to keep things organized by hiding extra apps
-          if( $('nav .icon-bar').eq(4) ){
               // First lets move the active app as the first item so that its visible to the user
               $('.icon-bar a.app.active').prependTo($('nav .icon-bar'));
               
@@ -378,15 +370,13 @@
               // Add a show more button after the third one to show those extra apps
               showMoreButton = '<a class="item more" href="#"><i class="fi-plus"></i><label>...</label></a>';
               $(showMoreButton).insertAfter($('nav .icon-bar a').eq(2));
-                     
-          }
-          
+            
       })();
     
     // Show extra apps on hovering over the more icon  
     $(".icon-bar .more").on("mouseenter", function(){
         $(this).toggleClass("active");
-        $(".extra.app").toggle();
+        $(".extra.app").fadeToggle();
     });
 
     //Functions to automatically add an <i> element icon inside node spans 
