@@ -92,8 +92,8 @@
   </script>
   <style>
   	#app-set-item li { padding:0.5em }
-	#app-set-item li:hover { background-color:#e5e5e5; }
-	.selected-app-set-item { background-color:#e5e5e5; }
+/*	#app-set-item li:hover { background-color:#e5e5e5; }*/
+/*	.selected-app-set-item { background-color:#e5e5e5; }*/
 
 	.jqtree-closed > .jqtree-element i.icon-folder-open:before {
         content: "\f07b";
@@ -136,7 +136,7 @@
 <ul class="no-bullet">
   	<li>
       	<div>
-        	<a href="{% url 'theme_page' groupid app_id %}"> <input class="medium button split" type="button" value="Themes" > </a>
+        	<a href="{% url 'theme_page' group_name_tag %}"> <input class="medium button split" type="button" value="Themes" > </a>
       	</div>
     </li>
 
@@ -152,9 +152,30 @@
 
 	{% if themes_hierarchy %}
 
-		<h2> {% trans "Themes" %} </h2> 
+		<h2> {{node.name}} </h2> 
 		<a class="fold"><b><i class="fi-plus"></i> {% trans "Fold" %} </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
-		<a class="unfold"><b><i class="fi-minus"></i> {% trans "Unfold" %} </b></a>
+		<a class="unfold"><b><i class="fi-minus"></i> {% trans "Unfold" %} </b></a>&nbsp;&nbsp;&nbsp;&nbsp;
+		{% if user_access == "allow" %}
+
+          <a class="button tiny" data-reveal-id="view_add_page" title="Add Theme Item">
+            +&nbsp;Add Theme Item
+          </a>
+
+          <div id="view_add_page" class="reveal-modal" data-reveal style="height:300px;"> 
+
+              <h3>Add New Theme Item:</h3>
+              <!-- To enter name of theme item -->
+              <div>
+                <input class="name_id" name="name" type="text" placeholder="Enter name...">
+              </div>   <br/>           
+
+              <input type="submit" id="add_theme_item" value="Save Theme Item" class="medium round button"/>
+
+              <a class="close-reveal-modal">&#215;</a>
+
+          </div>          
+        {% endif %}
+
 
 		{% if user.is_authenticated %}
     		{% if user_access == "allow" %}
@@ -184,6 +205,55 @@
 
 	{% endif %}
 
+	<!-- For displaying themes items -->
+	{% if themes_cards  %}
+
+	<h2>Themes</h2><hr/>
+
+		<div class="content row" id="panel2-4">
+
+		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+  		<!-- Existing card list-->
+	  	{% for each in nodes %}
+		    <li class="card">
+		      <div class="page">
+		      	<div class="label-list">{% for tag in each.tags|slice:":3" %}
+		          <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
+		        {% endfor %}</div>
+
+		        <a href="{% url 'theme_page' group_name_tag each.pk %}">
+		      <header>
+		        <h5>
+		          {{ each.name }}{% if each.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+		        </h5>
+		      </header>
+
+		      <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+		      
+		      <footer>
+		          <div class="age">
+		            {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
+		            <br/>
+		            by <span class="user" href="{% url 'userDashboard' group_name_tag each.created_by %}" data-gnow="">{{each.user_details_dict.created_by}}</span> 
+		          </div>
+		        <span><strong>{{each.contributors|length}}</strong> Contributor{{each.contributors|pluralize}}</span>
+		        <span class="right"><strong>{{each.version_dict|length}}</strong> Edit{{each.version_dict|pluralize}}</span>
+          
+      		  </footer>
+      		  </a>
+
+		      </div>
+		    </li>  
+	  
+	  	{% endfor %}
+
+		</ul>
+
+		</div>
+
+
+	{% endif %}
 
 	{% if themes_list_items %}
 		{% if nodes %}
@@ -276,7 +346,7 @@
 	{% endif %}
 
 	{% if create_edit %}
-		{% if title == "Theme" %}
+		{% if title == "Theme" or title == "Theme Item" %}
 			{% include "ndf/theme_create_edit.html" %}
 		{% else %}
 			{% include "ndf/topic_create_edit.html" %}
@@ -285,17 +355,46 @@
 
 
 	<script type="text/javascript">
+
+		$("#add_theme_item").click(function() {
+		      $.ajax({
+		        type: "POST",
+		        url: "{% url 'add_theme_item' groupid %}",
+		        datatype: "html",
+		        data:{
+		          context_theme: "{{node.pk}}",
+		          name: $(".name_id").val(),
+		          csrfmiddlewaretoken: '{{ csrf_token }}'
+		        },
+		        success: function(data) {
+
+		          var item = $(".name_id").val();
+
+		          if ($.trim(data) === "failure") {
+		            alert("Theme item "+ item +" already available, Please choose different name");
+		          }
+
+		          if ($.trim(data) === "success") {
+		            location.reload(true);
+		          }
+
+		          $(".name_id").val("");
+		        }
+		      });
+
+		});
+
 		// script for fold themes hierarchy
 		$(".fold").click(function() {
 			$(function() {				
-				location.href = "{% url 'theme_page' group_name_tag %}";
+				location.href = "{% url 'theme_page' group_name_tag app_id %}";
 			});
 		});
 
 		// script for unfold themes hierarchy
 	    $(".unfold").click(function() {
 	    	$(function() {
-	    		location.href = "{% url 'theme_page' group_name_tag %}?unfold=true";	
+	    		location.href = "{% url 'theme_page' group_name_tag app_id %}?unfold=true";	
 	    	});
 	    });	
 
@@ -326,6 +425,7 @@
 		            url: "{% url 'delete_themes' groupid %}",
 		            type: 'POST',
 		            data:{
+		            	context_theme: "{{node.pk}}",
 		            	deleteobjects: str,
 		            	csrfmiddlewaretoken: '{{ csrf_token }}'
 		            },
@@ -374,6 +474,7 @@
 	            	url: "{% url 'delete_themes' groupid %}",
 	             	type: 'POST',
 	             	data:{
+		            	context_theme: "{{node.pk}}",
 	             		deleteobjects: str,
 	             		confirm:"yes",
 	             		csrfmiddlewaretoken: '{{ csrf_token }}'

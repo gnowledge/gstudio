@@ -118,15 +118,15 @@
 		<input type="hidden" name="user" value="{{user.id}}">
 		<input type="hidden" name="page_url" value="{{page_url}}">
 		<input type="submit" id="submitpostid" value="Submit" class="button small-10  small-push-1 column">
-		<p id="message" style="display:none"> {% trans "It will take time to upload and process files, you can continue your work on this site" %}
+		<p id="message" style="display:none"> {% trans "Depending on the size of file/s and your Internet speed, upload process may take time. Please do not close this window." %}
 			<br/>
-			{% trans "For fast uploading of videos, upload videos in webm format" %} </p>
+			{% trans "Please upload videos in webm format. If you upload videos of other formats, it will take longer to publish them." %} </p>
 		</form>
 
 
 
 		{% else %}
-		<p><em>{% trans "You are Not Authorised user please login to upload files" %} </em></p>
+		<p><em>{% trans "You are not an authorised user. Please login to upload files." %} </em></p>
 		{% endif %}
 		{% endblock %}
 		{% block script %}

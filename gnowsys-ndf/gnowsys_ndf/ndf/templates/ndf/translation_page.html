@@ -62,12 +62,12 @@ $("#lan option[value='{{v}}']").remove();
 </br>
 <div class="row">
 <div class="medium-8 columns">
- Description :</br></br>
+ Description: </br></br>
 <textarea name="content" class="field left">{{node.content_org|default_if_none:""}}</textarea>
           </div></div>
 <div class="row">
 <div class="medium-8 columns">
-{% trans "Tags :" %} </br></br>
+{% trans "Tags: " %} </br></br>
 {{node.tags|join:', '|default_if_none:""}}
               </div></div>
   
@@ -120,9 +120,9 @@ $("#lan option[value='{{v}}']").remove();
 <div class="row">
 <div class="medium-8 columns">
 {% if "Theme" in each.member_of_names_list %}
- Theme Name  :  {{each.name}}</br></br>
+ Theme Name:  {{each.name}}</br></br>
 {% else %}
-Topic Name  :  {{each.name}}</br></br>
+Topic Name:  {{each.name}}</br></br>
 {% endif %}     
          </div>
    </div>
@@ -131,7 +131,7 @@ Topic Name  :  {{each.name}}</br></br>
 {% if "Theme" not in each.member_of_names_list %}
 
 <div class="medium-8 columns">
- Description  :</br></br>
+ Description: </br></br>
 <textarea name="content" class="field left">{{each.content_org|default_if_none:""}}</textarea>
           </div>
 {% endif %}

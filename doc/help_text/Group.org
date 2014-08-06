@@ -18,6 +18,7 @@ Each group can be configured to have any or all of the following Apps:
 
 - Theme
 - Topic
+- Concept
 - Page
 - File (upload, download and curate) 
   - pictures,
@@ -33,10 +34,16 @@ Each group can be configured to have any or all of the following Apps:
 - Quiz
 - Question
 - Module (Published versions of  above resources as a collection)
-- Course
+- Course 
 - Meeting (Video, Audio and Instant Messaging)
 - Blog (coming soon)
 - News (coming soon)
+- Knowledge Map (coming soon)
+- EduMap (coming soon)
+  - School Map 
+  - College Map 
+  - University Map 
+  
 
 More and more Apps are being added as contributions from developers.
 You may want to propose an App or develop your own. 

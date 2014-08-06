@@ -38,7 +38,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <h2 class="medium-12 columns">
 		{% if node %}
-			{% blocktrans %}Editing {{title}}: {{node.name}}{% endblocktrans %}
+			{% blocktrans with node.name as node_name %}Editing {{title}}: {{node_name}} {% endblocktrans %}
 		{% else %}
 			{% blocktrans %}Create a New {{title}}{% endblocktrans %}
 		{% endif %}
@@ -49,15 +49,15 @@ background-repeat:no-repeat; background-size: 48px 48px
 		{% if node %}
 			<dd><h3>{% trans "View:" %}</h3></dd>
 		
-			<dd title="Click here to add Name, Description, Privacy and Tags">
+			<dd class="{% if theme_GST_id in node.member_of %}active{% endif %}" title="Click here to add Name, Description, Privacy and Tags">
 		  	<!-- change name of collection tab overide block in your code -->
 		  		<a href="#panel-name-description"> {{title}} </a>
 			</dd>
+			
 			<!-- change name of collection tab overide block in your code -->
-			<dd class="active" title="Click here to add/edit collection">
-		  		<a href="#panel-collection">{% trans "Collection" %} </a> 
+			<dd class="{% if theme_GST_id not in node.member_of %}active{% endif %}" title="Click here to add/edit collection">
+		  		{% if theme_GST_id not in node.member_of %}<a href="#panel-collection">{% trans "Collection" %} </a> {% endif %}
 			</dd>  
-			  
 		{% endif %}
      	</dl>
   	</nav>
@@ -69,7 +69,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   		{% if node %}
 
   		<!-- Block Description -->
-		<div class="content row" id="panel-name-description">
+		<div class="{% if theme_GST_id in node.member_of %}active{% endif %} content row" id="panel-name-description">
 	  		<div class="medium-6 columns">
 
 				<div class="row">
@@ -145,13 +145,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 		</div>
 
 		<!-- Collection tab block -->
-	    <div class="active content" id="panel-collection" style="width:95%;">
+	    <div class="{% if theme_GST_id not in node.member_of %}active{% endif %} content" id="panel-collection" style="width:95%;">
 		    <div class="row">
-		    	{% if node %}
 
 		    	{% get_theme_node groupid node as add_topic %}
 				<div class="small-5 columns">		
-					{% if add_topic == True or add_topic == "Theme_Enabled" %}
+					{% if add_topic == True or add_topic == "Theme_Enabled" or add_topic == "Theme_Item_Enabled" %}
 		    		<dl class="accordion" data-accordion>
 		    			<dd>
           					<a class="add_theme medium-4 columns" href="#sub_theme"> + Add Theme Item </a>
@@ -187,7 +186,8 @@ background-repeat:no-repeat; background-size: 48px 48px
           			{% endif %}
 
 				</div>
-				{% endif %}
+				
+				
 				<div class="small-12 columns">
 			  		<div id="collection_drawer">
 
@@ -195,7 +195,8 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 			  		</div>
 				</div>
-		      
+				
+		      	
 		  	</div>
 	 	</div>
 
@@ -320,10 +321,10 @@ background-repeat:no-repeat; background-size: 48px 48px
 	      },
 	      success: function(data) {
 
-	      	var theme = $("#sub_theme_id").val();
+	      	var theme_item = $("#sub_theme_id").val();
 
 	      	if ($.trim(data) === "failure") {
-	      		alert("Theme name "+ theme +" already available, Please choose different name");
+	      		alert("Theme Item name "+ theme_item +" already available, Please choose different name");
 	      	}
 
 	      	if ($.trim(data) === "None") {

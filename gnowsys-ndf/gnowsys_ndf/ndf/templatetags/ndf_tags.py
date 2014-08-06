@@ -801,6 +801,7 @@ def get_theme_node(groupid, node):
 
 	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 	theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+	theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
 	# code for finding nodes collection has only topic instances or not
 	# It checks if first element in collection is theme instance or topic instance accordingly provide checks
@@ -808,6 +809,8 @@ def get_theme_node(groupid, node):
 		collection_nodes = collection.Node.one({'_id': ObjectId(node.collection_set[0]) })
 		if theme_GST._id in collection_nodes.member_of:
 			return "Theme_Enabled"
+		if theme_item_GST._id in collection_nodes.member_of:
+			return "Theme_Item_Enabled"
 		if topic_GST._id in collection_nodes.member_of:
 			return "Topic_Enabled"
 		
@@ -943,8 +946,13 @@ def get_group_type(group_id, user):
 
 		else:  
 			gid = ""
+
+			# Splitting url-content based on backward-slashes
 			split_content = group_id.strip().split("/")
 
+			# If very first character is not backward-slash
+			# Then group id/name will be the very first element in splitted url-content list
+			# Else, it will be the second element
 			if split_content[0] != "":
 				gid = split_content[0]
 
@@ -955,14 +963,14 @@ def get_group_type(group_id, user):
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
 			else:
-				colg = col_Group.Group.find_one({'_type': 'Group', 'name': gid})
+				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
 				if colg :
 					pass
 
 				else:		
 					colg = None
   		
-		#check if Group exist in the database
+		# Check if Group exist in the database
 		if colg is not None:
 
 			# Check is user is logged in

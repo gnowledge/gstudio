@@ -1,7 +1,7 @@
-
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json  
+
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -17,7 +17,6 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 import ast
 
-
 from django_mongokit import get_database
 
 try:
@@ -28,6 +27,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
 from gnowsys_ndf.settings import GAPPS
@@ -41,6 +41,7 @@ gs_collection = db[GSystem.collection_name]
 collection = db[Node.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 #This function is used to check (while creating a new group) group exists or not
 #This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
 def checkgroup(request,group_name):
@@ -308,6 +309,8 @@ def drawer_widget(request, group_id):
           app = "QuizItem"
         elif app == "Theme":
           app = "Theme"
+        elif app == "Theme Item":
+          app == "theme_item"
         elif app == "Topic":
           app = "Topic"
         elif app == "Module":
@@ -325,6 +328,8 @@ def drawer_widget(request, group_id):
         app = "QuizItem"
       elif field == "collection" and app == "Theme":
         app = "Theme"
+      elif field == "collection" and app == "Theme Item":
+        app = "theme_item"
       elif field == "collection" and app == "Course":
         app = "Module"
       else:
@@ -349,7 +354,7 @@ def get_collection_list(collection_list, node):
     for each in node.collection_set:
       col_obj = collection.Node.one({'_id': ObjectId(each)})
       if col_obj:
-        if theme_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
+        if theme_item_GST._id in col_obj.member_of or topic_GST._id in col_obj.member_of:
           for cl in collection_list:
             if cl['id'] == node.pk:
               node_type = collection.Node.one({'_id': ObjectId(col_obj.member_of[0])}).name
@@ -380,20 +385,24 @@ def get_tree_hierarchy(request, group_id, node_id):
     collection_list = []
     themes_list = []
 
-    cur = collection.Node.find({'member_of': node._id,'group_set':ObjectId(group_id) })
+    theme_node = collection.Node.one({'_id': ObjectId(node._id) })
+    # print "\ntheme_node: ",theme_node.name,"\n"
+    if theme_node.collection_set:
 
-    for e in cur:
-      for l in e.collection_set:
-        themes_list.append(l)
+      for e in theme_node.collection_set:
+        objs = collection.Node.one({'_id': ObjectId(e) })
+        for l in objs.collection_set:
+          themes_list.append(l)
 
-    cur.rewind()
 
-    for each in cur:
-      if each._id not in themes_list:
-        if theme_GST._id in each.member_of or topic_GST._id in each.member_of:
-          node_type = collection.Node.one({'_id': ObjectId(each.member_of[0])}).name
-          collection_list.append({'name': each.name, 'id': each.pk, 'node_type': node_type})
-          collection_list = get_collection_list(collection_list, each)
+      for each in theme_node.collection_set:
+        obj = collection.Node.one({'_id': ObjectId(each) })
+        if obj._id not in themes_list:
+          if theme_item_GST._id in obj.member_of or topic_GST._id in obj.member_of:
+
+            node_type = collection.Node.one({'_id': ObjectId(obj.member_of[0])}).name
+            collection_list.append({'name': obj.name, 'id': obj.pk, 'node_type': node_type})
+            collection_list = get_collection_list(collection_list, obj)
 
     data = collection_list
 
@@ -410,7 +419,7 @@ def add_sub_themes(request, group_id):
     themes_list = themes_list.replace("&quot;","'")
     themes_list = ast.literal_eval(themes_list)
 
-    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
     context_node = collection.Node.one({'_id': ObjectId(context_node_id) })
     
     # Save the sub-theme first  
@@ -420,7 +429,7 @@ def add_sub_themes(request, group_id):
         node = collection.GSystem()
         # get_node_common_fields(request, node, group_id, theme_GST)
       
-        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_GST))
+        node.save(is_changed=get_node_common_fields(request, node, group_id, theme_item_GST))
         node.reload()
         # Add this sub-theme into context nodes collection_set
         collection.update({'_id': context_node._id}, {'$push': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)
@@ -433,9 +442,37 @@ def add_sub_themes(request, group_id):
     return HttpResponse("None")
 
 
+def add_theme_item(request, group_id):
+
+  if request.is_ajax() and request.method == "POST":    
+
+    context_theme_id = request.POST.get("context_theme", '')
+    name =request.POST.get('name','')
+
+    context_theme = collection.Node.one({'_id': ObjectId(context_theme_id) })
+
+    list_theme_items = []
+    if name and context_theme:
+
+      for each in context_theme.collection_set:
+        obj = collection.Node.one({'_id': ObjectId(each) })
+        if obj.name == name:
+          return HttpResponse("failure")
+
+      theme_item_node = collection.GSystem()
+
+      theme_item_node.save(is_changed=get_node_common_fields(request, theme_item_node, group_id, theme_item_GST))
+      theme_item_node.reload()
+
+      # Add this theme item into context theme's collection_set
+      collection.update({'_id': context_theme._id}, {'$push': {'collection_set': ObjectId(theme_item_node._id) }}, upsert=False, multi=False)
+      context_theme.reload()
+
+    return HttpResponse("success")
+
 def add_topics(request, group_id):
   if request.is_ajax() and request.method == "POST":    
-    print "\n Inside add_topics ajax view\n"
+    # print "\n Inside add_topics ajax view\n"
     context_node_id = request.POST.get("context_node", '')
     add_topic_name = request.POST.get("add_topic_name", '')
     topics_list = request.POST.get("nodes_list", '')
@@ -448,7 +485,7 @@ def add_topics(request, group_id):
 
     # Save the topic first  
     if add_topic_name:
-      print "\ntopic name: ", add_topic_name
+      # print "\ntopic name: ", add_topic_name
       if not add_topic_name.upper() in (topic_name.upper() for topic_name in topics_list):
         node = collection.GSystem()
         # get_node_common_fields(request, node, group_id, topic_GST)
@@ -535,6 +572,57 @@ def add_file(request, group_id):
 
 def node_collection(node=None, group_id=None):
 
+    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+
+    if node.collection_set:
+      for each in node.collection_set:
+        
+        each_node = collection.Node.one({'_id': ObjectId(each)})
+        
+        if each_node.collection_set:
+          
+          node_collection(each_node, group_id)
+        else:
+          # After deleting theme instance it's should also remove from collection_set
+          cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+          for e in cur:
+            if each_node._id in e.collection_set:
+              collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(each_node._id) }}, upsert=False, multi=False)      
+
+
+          # print "\n node ", each_node.name ,"has been deleted \n"
+          each_node.delete()
+
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    else:
+
+      # After deleting theme instance it's should also remove from collection_set
+      cur = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+
+      for e in cur:
+        if node._id in e.collection_set:
+          collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+
+      # print "\n node ", node.name ,"has been deleted \n"
+      node.delete()
+
+    return True
+
+
+def theme_node_collection(node=None, group_id=None):
+
     theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 
     if node.collection_set:
@@ -588,6 +676,10 @@ def delete_themes(request, group_id):
   '''delete themes objects'''
   send_dict = []
   if request.is_ajax() and request.method =="POST":
+     context_node_id=request.POST.get('context_theme','') 
+     if context_node_id:
+      context_theme_node = collection.Node.one({'_id': ObjectId(context_node_id)}) 
+
      deleteobjects = request.POST['deleteobjects']
      confirm = request.POST.get("confirm","")
   for each in  deleteobjects.split(","):
@@ -595,7 +687,15 @@ def delete_themes(request, group_id):
       # print "\n confirmed objects: ", node.name
 
       if confirm:
-        node_collection(node, group_id)
+        
+        if context_node_id:
+          node_collection(node, group_id)
+          if node._id in context_theme_node.collection_set:
+            collection.update({'_id': context_theme_node._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+
+
+        else:
+          theme_node_collection(node, group_id)
 
       else:
         send_dict.append({"title":node.name})
@@ -1492,6 +1592,8 @@ def delComment(request, group_id):
   print "Inside del comments"
   return HttpResponse("comment deleted")
 
+# Views related to MIS-GAPP =======================================================================================
+
 def set_user_link(request, group_id):
   """
   This view creates a relationship (has_login) between the given node (node_id) and the author node (username);
@@ -1569,6 +1671,19 @@ def set_user_link(request, group_id):
       
     return HttpResponse(json.dumps({'result': result, 'message': error_message}))
 
+def set_enrollment_code(request, group_id):
+  """
+  """
+  if request.is_ajax() and request.method == "POST":
+    print "\n From set_enrollment_code... \n"
+    return HttpResponse("Five digit code")
+
+  else:
+    error_message = " EnrollementCodeError: Either not an ajax call or not a POST request!!!"
+    raise Exception(error_message)
+
+# ====================================================================================================
+
 def edit_task_title(request, group_id):
     '''
     This function will edit task's title 
@@ -1602,3 +1717,136 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
+
+def get_students_assignments(request, group_id):
+  """
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+
+  Returns:
+  """
+  gr_node = None
+
+  try:
+    if request.is_ajax() and request.method =="GET":
+      user_id = 0
+
+      if request.GET.has_key("user_id"):
+        user_id = int(request.GET.get("user_id", ""))
+
+      # Fetching college group
+      college_group = collection.Node.one({'_id': ObjectId(group_id)}, {'name': 1, 'tags': 1, 'author_set': 1, 'created_by': 1})
+      page_res = collection.Node.one({'_type': "GSystemType", 'name': "Page"}, {'_id': 1})
+      # print "\n page_res: ", page_res._id
+      file_res = collection.Node.one({'_type': "GSystemType", 'name': "File"}, {'_id': 1})
+      # print " file_res: ", file_res._id
+      image_res = collection.Node.one({'_type': "GSystemType", 'name': "Image"}, {'_id': 1})
+      # print " image_res: ", image_res._id
+      video_res = collection.Node.one({'_type': "GSystemType", 'name': "Video"}, {'_id': 1})
+      # print " video_res: ", video_res._id
+
+      student_list = []
+      # print " college_group (author_set): ", college_group.author_set, "\n"
+
+      if user_id:
+        # Fetch assignment details of a given student
+        student_dict = {}
+        num_pages = []
+        num_images = []
+        num_videos = []
+        num_files = []
+
+        # Fetch student's user-group
+        user_group = collection.Node.one({'_type': "Author", 'created_by': user_id})
+        student_dict["username"] = user_group.name
+
+        # Fetch all resources from student's user-group
+        resources = collection.Node.find({'group_set': user_group._id}, {'name': 1, 'member_of': 1, 'created_at': 1})
+
+        for res in resources:
+          if page_res._id in res.member_of:
+            num_pages.append(res)
+
+          elif image_res._id in res.member_of:
+            num_images.append(res)
+
+          elif video_res._id in res.member_of:
+            num_videos.append(res)
+
+          elif file_res._id in res.member_of:
+            num_files.append(res)
+
+        student_dict["Pages"] = num_pages
+        # print "\n student_dict['Pages']: ", student_dict["Pages"], "\n"
+        student_dict["Images"] = num_images
+        # print "\n student_dict['Images']: ", student_dict["Images"], "\n"
+        student_dict["Videos"] = num_videos
+        # print "\n student_dict['Videos']: ", student_dict["Videos"], "\n"
+        student_dict["Files"] = num_files
+        # print "\n student_dict['Files']: ", student_dict["Files"], "\n"
+
+        return HttpResponse(json.dumps(student_dict, cls=NodeJSONEncoder))
+
+      else:
+        # Fetch assignment details of all students belonging to the college group
+        for user_id in college_group.author_set:
+          if user_id == college_group.created_by:
+            continue
+
+          student_dict = {}
+          num_pages = 0
+          num_images = 0
+          num_videos = 0
+          num_files = 0
+
+          # Fetch student's user-group
+          user_group = collection.Node.one({'_type': "Author", 'created_by': user_id})
+
+          # Fetch student's node from his/her has_login relationship
+          student_has_login_rel = collection.Node.one({'_type': "GRelation", 'right_subject': user_group._id})
+          student_node = collection.Node.one({'_id': student_has_login_rel.subject}, {'name': 1})
+          # print " student_node: ", student_node.name
+          student_dict["Name"] = student_node.name
+          student_dict["user_id"] = user_id
+
+          # Fetch all resources from student's user-group
+          resources = collection.Node.find({'group_set': user_group._id}, {'member_of': 1})
+
+          for res in resources:
+            if page_res._id in res.member_of:
+              num_pages = num_pages + 1
+
+            elif image_res._id in res.member_of:
+              num_images = num_images + 1
+
+            elif video_res._id in res.member_of:
+              num_videos = num_videos + 1
+
+            elif file_res._id in res.member_of:
+              num_files = num_files + 1
+
+          student_dict["Pages"] = num_pages
+          student_dict["Images"] = num_images
+          student_dict["Videos"] = num_videos
+          student_dict["Files"] = num_files
+          student_dict["Total"] = num_pages + num_images + num_videos + num_files
+
+          # print "\n student_dict: ", student_dict
+          student_list.append(student_dict)
+
+        # Outside of above for loop
+
+        return render_to_response("ndf/student_statistics.html",
+                                  {'node': college_group,'student_list': student_list},
+                                  context_instance = RequestContext(request)
+                                )
+    
+    else:
+      error_message = "StudentDataGetError: Invalid ajax call!!!"
+      # raise Exception(error_message)
+      return StreamingHttpResponse(error_message)
+
+  except Exception as e:
+    print "\n StudentDataGetError: " + str(e)
+    raise Http404(e)
