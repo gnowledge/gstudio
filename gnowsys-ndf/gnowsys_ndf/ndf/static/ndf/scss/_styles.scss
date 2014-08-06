@@ -384,9 +384,12 @@ article .tabs{
 
 article{
     padding-left: 2rem!important;
+    header{
+        
 .tabs {
+    display: inline-block;
     dd a{
-        border-radius: 2px;
+        border-radius: 4px;
         border: 1px transparent;
     }
     dd.active a{
@@ -404,6 +407,7 @@ article{
 
 .content.row{
     margin: 0;
+}
 }
 
 /* Default card */
