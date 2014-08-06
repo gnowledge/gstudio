@@ -80,7 +80,7 @@
   {% endif %}
   
     <div class="row">
-      {% if each.type_of or each.name == "Caste" or each.name == "Foundation Course" %}
+      {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
         {% if app_name == "MIS" %}
         <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
         {% else %}
@@ -126,17 +126,18 @@
   <br/>
 	{% endif %}
 
-	<form method="POST" action="."  enctype="multipart/form-data">
+	<form method="POST" action="."  enctype="multipart/form-data" data-abide>
 	{% csrf_token %}
 
 		<!-- <div style="display:table;  border:1px;   border-spacing:15px; " class="small-12 columns"> -->
-        
+    <br>
 		<div class="row">
 			<div class="small-2 columns"> 
         <label for="label-name" class="left inline">{{app_set_name}}'s Title</label>
 			</div>
 			<div class="small-5 end columns">
-				<input type="text" id="label-name" name="name" value="{{app_set_instance_name}}">
+				<input type="text" id="label-name" name="name" value="{{app_set_instance_name}}" required="">
+        <small class="error">{% blocktrans %}Please give title for {% endblocktrans %}{% trans app_set_name %} !!!</small>
 			</div>
 		</div>
 
@@ -148,7 +149,7 @@
 			</div>
 			<div class="small-5 end columns">
 				{% if at.value == "bool" %}
-				<select id="id_auto_now_add" id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
+				  <select id="id_auto_now_add" id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
 
 					{% if at.database_value %}
 					<option value="">{% trans "Unknown" %}</option>
@@ -168,9 +169,22 @@
 					<option value="No">{% trans "No" %}</option>
 					{% endif %}
 
-				</select>
+				  </select>
 
-				{% else %}
+        {% elif at.value == "IS()" %}
+        <select id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%" required="">
+
+          {% for v in at.sub_values %}
+          {% if forloop.counter == 1 %}
+          <option value="">- - - Select {{at.altnames}} - - -</option>
+          {% endif %}
+          <option value="{{v}}">{% trans v %}</option>
+          {% endfor %}
+
+        </select>
+		    <small class="error">{% blocktrans %}Please select {% endblocktrans %}{% trans at.altnames %} !!!</small>
+
+      	{% else %}
 				{% if at.type == "attendees" %}
 				<a href="" id="label_{{at.type}}" data-reveal-id="view-map-edit-widget1" title="Click to add attendence">Set Batch of Attendees/Students</a>
 
@@ -182,7 +196,7 @@
 
           <div class="row">
             <div class="small-2 columns">
-              <label for="label-fc" class="left inline">{% trans "Foundation Course" %}</label>
+              <label for="label-fc" class="left inline">{% trans "NUSSD Course" %}</label>
             </div>
             <div  class="small-5 end columns">
               <select id="label-fc">

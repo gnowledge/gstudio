@@ -96,23 +96,23 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
 
         app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
-        print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
+        # print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
 
       else:
         app_set_view_file_name = app_set.name.lower().replace(" ", "_")
-        print "\n app_set_view_file_name: ", app_set_view_file_name, "\n"
+        # print "\n app_set_view_file_name: ", app_set_view_file_name, "\n"
 
       app_set_view_file_path = os.path.join(os.path.dirname(__file__), app_set_view_file_name + view_file_extension)
-      print "\n app_set_view_file_path: ", app_set_view_file_path, "\n"
+      # print "\n app_set_view_file_path: ", app_set_view_file_path, "\n"
 
       if os.path.exists(app_set_view_file_path):
-        print "\n Call this function...\n"
+        # print "\n Call this function...\n"
         return eval(app_set_view_file_name + "_detail")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
 
       else:
-        print "\n Perform fallback code...\n"
+        # print "\n Perform fallback code...\n"
 
-      print "\n Going herer...\n\n"
+      # print "\n Going herer...\n\n"
       classtype = ""
       app_set_template = "yes"
       template = "ndf/"+template_prefix+"_list.html"
@@ -175,12 +175,12 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
                 tempdict['title'] = event.name
                 
                 if event.start_time:# and len(event.start_time) == 16:
-                    print "\n start_time: ", event.start_time, " -- ", event.start_time.strftime('%m/%d/%Y %H:%M')
+                    # print "\n start_time: ", event.start_time, " -- ", event.start_time.strftime('%m/%d/%Y %H:%M')
                     # dt = datetime.datetime.strptime(event.start_time , '%m/%d/%Y %H:%M')
                     dt = event.start_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['start'] = dt
                 if event.end_time:# and len(event.end_time) == 16:
-                    print "\n end_time: ", event.end_time, " -- ", event.end_time.strftime('%m/%d/%Y %H:%M')
+                    # print "\n end_time: ", event.end_time, " -- ", event.end_time.strftime('%m/%d/%Y %H:%M')
                     # dt = datetime.datetime.strptime(event.end_time , '%m/%d/%Y %H:%M')
                     dt = event.end_time.strftime('%m/%d/%Y %H:%M')
                     tempdict['end'] = dt
@@ -253,8 +253,8 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         system_id = system._id
         system_type = system._type
 
-        print "\n app_set_instance_name: ", app_set_instance_name
-        print "\n app_set_name: ", app_set_name
+        # print "\n app_set_instance_name: ", app_set_instance_name
+        # print "\n app_set_name: ", app_set_name
 
         if system_type == 'File':
             system_mime_type = system.mime_type
@@ -350,29 +350,29 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
 
             app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
-            print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
+            # print "\n app_set_view_file_name (type_of): ", app_set_view_file_name, "\n"
 
         else:
             app_set_view_file_name = app_set.name.lower().replace(" ", "_")
-            print "\n app_set_view_file_name: ", app_set_view_file_name, "\n"
+            # print "\n app_set_view_file_name: ", app_set_view_file_name, "\n"
 
         app_set_view_file_path = os.path.join(os.path.dirname(__file__), app_set_view_file_name + view_file_extension)
-        print "\n app_set_view_file_path: ", app_set_view_file_path, "\n"
+        # print "\n app_set_view_file_path: ", app_set_view_file_path, "\n"
 
         if os.path.exists(app_set_view_file_path):
-            print "\n Call this function...\n"
+            # print "\n Call this function...\n"
             return eval(app_set_view_file_name + "_create_edit")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
 
         else:
-            print "\n Perform fallback code...\n"
+            # print "\n Perform fallback code...\n"
 
-        print "\n Going herer...\n\n"
+        # print "\n Going herer...\n\n"
 
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
         title = systemtype_name + " - new"
         for each in systemtype.attribute_type_set:
-            systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type, 'altnames': each.altnames})
+            systemtype_attributetype_set.append({"type":each.name,"type_id":str(each._id),"value":each.data_type, 'sub_values': each.complex_data_type, 'altnames': each.altnames})
 
         for eachrt in systemtype.relation_type_set:
             # object_type = [ {"name":rtot.name, "id":str(rtot._id)} for rtot in collection.Node.find({'member_of': {'$all': [ collection.Node.find_one({"_id":eachrt.object_type[0]})._id]}}) ]
