@@ -1,0 +1,190 @@
+/*
+*   The Foundation Stylesheet
+*   You can paste sass snippets from compass or foundation here
+*   Consider submitting these snippets upstream
+*   http://compass-style.org/reference/compass/css3/
+*   http://foundation.zurb.com/docs/components/global.html
+*/
+
+
+
+    
+
+
+/*
+*   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
+*/
+
+/* Too many apps cause breakage */
+.top-bar{
+    height: auto!important;
+}
+.top-bar .dropdown a.button{
+    padding: 0;
+}
+
+
+
+/* Styles icon-bar */
+.icon-bar .item{
+    label{
+        font-size: 1.1rem;
+    }
+    &.active{
+        background-color: $theme-color;
+        i,label{
+        font-weight: bold;
+        }
+    }
+}
+
+/*
+/* Protects reflowing elements on error */
+[data-abide] span.error, [data-abide] small.error{
+    position: absolute;
+}
+
+/*active color for side-nav links*/
+.side-nav li.active a:not(.button){
+    color:$side-nav-link-color-active;
+}
+
+
+/*
+*   Foundation extensions
+*/
+
+pre{
+    width:92%;
+	overflow: auto;
+	border: 1px solid #eee;
+	border-left: 1rem solid #eee;
+	font: lighter 1.2rem/2rem Monaco;
+	background: url('/static/ndf/pre.png');
+	background-size:1px 4rem;
+	padding-left:0.5rem;
+	font-family: monospace;
+}
+
+
+.fixme{
+    // Use this class for any placeholder text to be replaced by variables by the developer
+    opacity: 0.5;
+    &:hover{
+        opacity:1;
+        color:inherit;
+        &:after{
+            content:" fixme";
+            color:orange;
+        }
+    }
+}
+
+/* Utility class to display the child spans of this element on hover */
+.show-span-on-hover{
+    span{
+    display:none;
+    }
+    &:hover span{
+    display:inline;
+    }
+}
+/* Utility class to display the next siblings on hoverr */
+.extra.app {
+  display: none;
+    
+}
+
+/* Effects */
+.drop-shadow{
+	-webkit-box-shadow: 0px 0px 5px 1px black;
+	box-shadow: 0px 0px 5px 1px black;
+}
+.rounded{
+	border-radius: 2px;
+	-webkit-border-radius:2px;
+}
+.transition-opacity{
+	transition: opacity .3s ease;
+	-moz-transition: opacity .3s ease;
+	-webkit-transition: opacity .3s ease;
+	-o-transition: opacity .3s ease;
+}
+
+/*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
+
+.rating-bar {
+ 
+
+  &>span {
+      /* remove inline-block whitespace */
+      font-size: 0;
+         /* flip the order so we can use the + and ~ combinators */
+  unicode-bidi: bidi-override;
+  direction: rtl;
+  }
+    
+    &.unrated{
+        /* If the user has not rated yet */
+        &:checked ~ label:before{
+      color: $secondary-color;
+    }
+  }
+        
+
+  [type*="radio"] {
+    display: none;
+    & + label {
+      /* only enough room for the star */
+      display: inline-block;
+      overflow: hidden;
+      text-indent: 9999px;
+      width: 1em;
+      height: 1.4em;
+      white-space: nowrap;
+        font-size: 1.5rem;
+        margin:0;
+      &:before {
+        display: inline-block;
+        text-indent: -9999px;
+        content: '\2606'; /* WHITE STAR */
+        color: #888;
+      }
+    }
+    &:checked ~ label:before,
+      & + label:hover ~ label:before,
+      & + label:hover:before {
+      content: '\2605'; /* BLACK STAR */
+      color: $highlight-color;
+      text-shadow: 0 0 1px #333;
+    }
+  }
+  
+  /* the hidden clearer */
+    
+  .last[type*="radio"] + label {
+    text-indent: -9999px;
+    width: .5em;
+    margin-left: -.5em;
+  }
+  .last[type*="radio"] + label:before {
+    width: .5em;
+    height: 1.4em;
+  }
+  
+  /* this is gross, I threw this in to override the starred
+     buttons when hovering. */
+  &:hover{
+     [type*="radio"] + label:before {
+    content: '\2606'; /* WHITE STAR */
+    color: #888;
+    text-shadow: none;
+  }
+  [type*="radio"] + label:hover ~ label:before,
+  [type*="radio"] + label:hover:before {
+    content: '\2605'; /* BLACK STAR */
+    color: $highlight-color;
+    text-shadow: 0 0 1px #333;
+  }
+  }
+}

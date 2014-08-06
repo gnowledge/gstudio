@@ -1,0 +1,580 @@
+/*
+*  Metstudio Platform Stylesheet
+*/
+
+//Import any custom css
+@import url("../../custom.css");
+
+body{
+  
+            background: darken($theme-color-invert,4%);
+}
+
+//Logo
+.top-bar{
+    border-bottom: 2px solid black;
+    h1{
+        img{
+            /* Logo */
+			height: 2.4rem;
+			margin-right: 5px;
+		}
+        a{
+			color:white!important;
+		}
+    }
+}
+
+
+		body>header{
+            //Site header
+			position: relative;
+            padding-bottom: 10px;
+		}
+
+		.workspace{
+            //This is the main content container between the header and footer
+            background: url("body_background_image.png") no-repeat 0 bottom;
+			min-height: 100%;
+			margin-bottom: -130px!important;
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+            
+            &:after{
+            //Hack for setting div height to the height of the browser window
+			content:"";
+			display:block;
+			height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
+		}
+		}
+
+		body>footer{
+            //Site footer
+			padding:20px 0;
+			position: relative;
+            color:#888;
+            min-height: 170px;
+            background-color: rgba(0,0,0,0.8);
+
+            .sponsor{
+                background: url("footer_background_image.png") no-repeat center top;
+                &>*{
+                    opacity: 0.1;
+                }
+                &:hover{
+                    background:none;
+                    >*{
+                     opacity: 1;
+                }
+                }
+            }
+            a{
+			color: #777;
+		}
+            .gnu-badge{
+                padding: 6px 9px 6px 80px;
+                border: 1px dashed #ddd;
+                margin-bottom: 3px;
+                margin-right: 3px;
+                display: inline-block;
+                background: #fafafa url("../../../images/gnu-head.png") no-repeat -35px -9px;
+                &:hover{
+                    background-position: -35px -19px;
+                }
+            }
+		}
+
+
+		.coll-arrows{
+			cursor:pointer;
+			display: block;
+			padding: 0.5rem;
+            
+            &:hover{
+			background-color: #D3D3D3;
+		}
+		}
+
+
+
+/* Sections */
+
+
+
+//Main sidebar
+main.row{
+    padding-right: 5px;
+}
+
+main>aside{
+    &>div{
+        
+        
+        h2{
+            margin-top: 2rem;
+            a{
+            color: white;
+                &:hover{
+                    color:white;
+                }
+            }
+        }
+        nav.app{
+            a{
+                background-color: $theme-text-color;
+                border: 1px solid black;
+            }
+            .icon-bar{
+            i{
+                display: none!important; /* Hide icons till we can retreive custom icons from the system */
+            }
+                
+                .more.active{
+                    background-color: $theme-color;
+                    label{
+                    font-weight: bold;
+                    }
+                }
+            }
+        }
+        
+        h3{
+            font-size: 1.2rem;
+            font-weight: normal;
+            color: white;
+        }
+        h4{
+            font-size: 1rem;
+            color: #eee;
+            span{
+                display: none;
+            }
+            &:hover span{
+                display: inline;
+            }
+        }
+        h5,h6{
+            margin: 0;
+        }
+            
+        .f-dropdown.content{
+            width: auto;
+            padding: 0;
+            border: 1px solid #222;
+            .item{
+                width: 70px;
+            }
+        }
+        header{
+           padding: 10px;
+        }
+         section{
+             background-color: $theme-color-invert;
+         }
+        footer{
+            background-color: #222;
+            min-height: 1rem;
+            label{
+                font-size: 0.7rem;
+            }
+        }
+        
+        
+        // Aside link styles
+        a,p{
+                color: white;
+            &:hover{
+                color:white;
+            }
+            }
+        .side-nav.collection{
+            background-color: #444;
+            padding: 0;
+            border-bottom: 2px solid $active-color;
+            margin: 0;
+            li{
+                border-bottom: 1px solid #555;
+                a{
+                    border-left: 2px solid black;
+                }
+                &.active a,a:hover{
+                    color:white!important;
+                    border-left: 2px solid $active-color;
+                    background-color: $active-color;
+                }
+            }
+        }
+        
+    }
+}
+
+//    Article styles
+    article{
+        background-color: white;
+        overflow-x: visible;
+        &>header,form>header{
+            padding: 15px;
+            margin-bottom: 0.5rem;
+            background-color: #f0f0f0;
+        }
+        
+        &>footer{
+        }
+    
+h1:not(.subheader){
+	font-family: "Georgia Serif", Serif;
+    font-style: italic;
+    
+    .tabs{
+        display: inline-block;
+        position: relative;
+        bottom: -0.5rem;
+    }
+    
+    div{
+        display:inline-block;
+        position: relative;
+        input{
+            height:200%;
+            font-style: italic;
+            @extend h1;
+            padding-left:5px; 
+            box-shadow: none;
+            border-width: 0 0 2px 0;
+            border-bottom: 2px dotted #222;
+            background-color: inherit;
+            
+            &:hover{
+            background-color: white;
+            }
+        }
+    }
+}
+    }
+
+
+
+
+
+
+/* Card block */
+
+
+
+.card>*{
+	position: relative;
+	background-color: inherit;
+	padding:7px;
+	border: 1px dashed darken($bg-color,10%);
+	display: block;
+	//color:$bg-color;
+	opacity:0.9;
+    overflow: hidden;
+    
+    >a{
+        color:inherit;
+        display: block;
+        position: relative;
+        z-index: 200;
+    }
+    
+     &.published{
+        opacity: 1;
+        background-color: darken($bg-color,5%);
+    }
+    &.unapproved{
+        opacity: 1;
+        border-style: solid;
+        border-color: $alert-color;
+    }
+
+    &:hover{
+	border-style:solid;
+	opacity:1;
+        >a{
+           
+        }
+        i{
+            opacity:0.3;
+        }
+        footer .age{
+            display: block;
+        }
+}
+    &>i{
+	position: absolute;
+	top: -10px;
+	right: 10px;
+	font-size: 3rem;
+	color:$theme-color;
+	opacity: 0.1;
+}
+    .preview{
+        float: left;
+        padding-right: 5px;
+        padding-top: 4px;
+    }
+    header{
+        overflow: hidden;
+    }
+    h5{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-bottom: 0;
+    }
+        .label{
+        opacity:0.5;
+    }
+    p{
+        color: #555;
+        height: 80px;
+        background-repeat: no-repeat;
+        font-size: 80%;
+    }
+    .th{
+        margin:20px auto;
+        width:80px;
+        height: 80px;
+        overflow: hidden;
+        display: none;
+        &:hover{
+        width: 150px;
+        height: 150px;
+    }
+        img{
+        width: 100%;
+    }
+}
+    footer{
+        margin-top: 1rem;
+        font-size: 70%;
+        clear: both;
+        color: $meta-color;
+            .age{
+                display: none;
+                position: absolute;
+                background-color: white;
+                z-index: 100;
+                bottom: 0;
+                width: 100%;
+            }
+        }
+}
+
+.edit-card{
+    position: relative;
+	background-color: $bg-color;
+	padding:10px;
+//	border: 1px dashed darken($bg-color,10%);
+	display: block;
+    
+}
+
+
+/* Content Tabs */
+article{
+    padding-left: 2rem!important;
+   
+        
+.tabs {
+    display: inline-block;
+    dd a{
+        border-radius: 4px;
+        border: 1px transparent;
+    }
+    dd.active a{
+        color:$active-color;
+        border: 1px solid;
+    }
+    dd:hover a{
+        color:$active-color;
+    }
+    
+    i{
+	margin-right: 5px;
+	font-size: 1.3rem;
+}
+}
+
+.tabs-content>.content{
+	padding-top: 0;
+}
+
+.content.row{
+    margin: 0;
+}
+}
+
+/* Default card */
+.card>:hover .label{
+	opacity:1;
+}
+
+
+.gallery .card .th{
+	display: block;
+}
+
+
+
+/* Inline label list */
+
+.label-list{
+	display: inline-block;
+	text-align: left;
+    margin-bottom: 0.1rem;
+    &:empty:before{
+        content:"UNTAGGED";
+        @extend .label;
+        opacity:0.2!important;
+    padding: 2px;
+        background-color: transparent;
+    }
+    
+    .label{
+    text-transform: uppercase;
+    background-color: transparent;
+    padding: 2px;
+}  
+}
+
+
+
+
+/*************************** 2. Custom CSS overrides ***********************/
+
+
+/* Content area */
+article{
+    
+	padding-bottom: 4rem; 
+	
+    &>header{
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 1rem!important;
+}
+    &>footer{
+	border-top: 1px dotted #ddd;
+}
+    .breadcrumbs{
+	display: none;
+	background-color: #eee;
+}
+}
+
+
+
+
+textarea{
+	min-height: 6rem;
+}
+/*
+.orgitdown textarea{
+	min-height: 15rem!important;
+}
+#content{
+	min-height: 10rem;
+
+}
+*/
+/*#content>p{
+	font-size: inherit;
+	line-height: 1.4;
+	color: #222;
+}*/
+/*************************** 3. Custom CSS Below ***********************/
+
+/*CSS fix for tables generated via orgitdown*/
+#content table td, #content colgroup col{
+	float: none !important;
+}
+
+
+.user{
+	color: inherit;
+}
+.user{
+	color: inherit;
+}
+.user i{
+margin-right: 3px;
+}
+.user:hover i{
+	opacity:1;
+}
+
+a.node{
+	display:block;
+}
+
+a.app{
+	overflow: hidden;
+}
+.button.edit{
+	margin-bottom: 0;
+}
+
+
+/************ Forms **************/
+
+/* Node edit */
+input.node-title{
+	font-size: 3rem;
+	height:  4rem;
+	display: inline-block;
+}
+
+/* view-graph in node_details_base.html */
+.graph-height{
+	height:70%;
+}
+
+/*for graph and location*/
+.graph-div {
+  height: 90%;
+  width: -webkit-calc(100% - 10px); width:-o-calc(100% - 10px); width: -moz-calc(100% - 10px); width: calc(100% - 10px) !important;
+  top: 5% !important;
+  left: 5px !important;
+  padding: 0px !important;
+  margin-left: 0 !important;
+}
+
+/*for graph and location*/
+.graph-div h3{
+  border-bottom: 2px inset #154534;
+  padding: 0.25em 0;
+}
+
+#view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal{
+	
+	z-index:1;
+	background-color: captiontext;
+	padding: 5px 15px 10px;
+	color:white !important;
+	opacity:0.8;
+	font-size: 2rem;
+	box-shadow: 0 1px 10px 2px #A9A9A9;
+}
+
+#view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover{
+	
+	background-color: white;
+	border-radius: 30px;
+	padding: 5px 15px 10px;
+	transition:2s;
+	opacity:1;
+	color:black !important;
+	font-size: 2rem;
+}
+
+/* Splash Page */
+#splash{
+	background-image: url('http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg');
+}
+#splash>img{
+	position: absolute;
+}
+
+/****************** CUSTOM *********************/
+
