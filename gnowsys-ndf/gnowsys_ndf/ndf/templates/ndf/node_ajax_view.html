@@ -130,14 +130,14 @@
     width: 21.87rem;*/
   }
 
-  .reply-button:hover {
+  .reply-btn:hover {
     font-weight: bold;
   }
 
   .disc-replies { 
     
     padding:10px;
-    background-color:#cfe8c7;
+    background-color:#d8f1f3;
     width:25em;
     max-width: 40em;
     margin-left: 48px; 
@@ -547,13 +547,13 @@
     {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
 
       <br/>
-      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org" style="margin-bottom:0;">
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
       {% if all_replies %}
-        Add Reply
+        Initiate New Discussion Thread
       {% else %}
         Initiate discussion on {{ node.name }}
       {% endif %}
-      </div>
+       </div>
 
       <div id="replies-area">
         
@@ -788,25 +788,25 @@
   function createDiscussion()
   {
 
-    if( user_access == "allow" and edit_policy == "allow" )
+    if( user_access == "allow" && edit_policy == "allow" )
     {  
         // ajax to create thread for first time.
         $.ajax({
-          
+
           url: "{% url 'create_discussion' group_id node.pk %}",
-    
+
           success: function(data){
-              
-              data = JSON.parse(data);
-    
-              if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
-              {
-                
+
+            data = JSON.parse(data);
+
+            if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
+            {
+
                 // $("#create-discussion").hide();
-    
+
                 // changing method to behave same as sub-reply button
                 $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
-    
+
                 $("#prior-node").val("{{ node.pk }}") // _id
                 // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
                 
@@ -821,53 +821,60 @@
               //   $("create-discussion").trigger("click");
               // }
               else{ alert(data) }
-    
-            },
-          complete: function(){
+
+            }//,
+          // complete: function(){
             // $("#prior-node").val("") // removing _id
-          }
-    
+          // }
+
         });
         // --- END ajax and create thread for first time.
-        }
-        else
-        {
-          alert("To start discussion you need to login first.");
-        }
+      }
+      else
+      {
+        alert("To start discussion you need to login and be the member of this group.");
+      }
 
-  }
+    }
   // --- END of createDiscussion()
 
 
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openOrgEditor(sourceObj)
   {
-
-    var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
-    $("#prior-node").val(sourceObjDataId);
-    
-    // tempOrgObj = $("#org").clone(true, true);
-    // console.log($(sourceObj));
-    
-    // $("#org").detach();
-    
-    // if( sourceObjDataId == "{{ node.pk }}")
-    // {
-    //   $('div[data-id="'+ sourceObjDataId +'"]').after(tempOrgObj);
-    // }
-    // else
-    // {
-    //   $tempPrior = $('div[data-id="'+ sourceObjDataId +'"]').parent();
-    //   calcMargLeft = $tempPrior.css("margin-left");
-    //   calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
-
-    //   $('div[data-id="'+ sourceObjDataId +'"]').parent().after(tempOrgObj);
-    // }
-    
-    // $("#org").fadeIn();
-    if( sourceObjDataId != "{{ node.pk }}")
+    if( user_access == "allow" && edit_policy == "allow" )
     {
-      $('#org').foundation('reveal', 'open');
+
+      var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
+      $("#prior-node").val(sourceObjDataId);
+      
+      // tempOrgObj = $("#org").clone(true, true);
+      // console.log($(sourceObj));
+      
+      // $("#org").detach();
+      
+      // if( sourceObjDataId == "{{ node.pk }}")
+      // {
+      //   $('div[data-id="'+ sourceObjDataId +'"]').after(tempOrgObj);
+      // }
+      // else
+      // {
+      //   $tempPrior = $('div[data-id="'+ sourceObjDataId +'"]').parent();
+      //   calcMargLeft = $tempPrior.css("margin-left");
+      //   calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+
+      //   $('div[data-id="'+ sourceObjDataId +'"]').parent().after(tempOrgObj);
+      // }
+      
+      // $("#org").fadeIn();
+      // if( sourceObjDataId != "{{ node.pk }}")
+      // {
+        $('#org').foundation('reveal', 'open');
+      // }
+    }
+    else
+    {
+      alert("To start discussion you need to login and be the member of this group.");
     }
   }
 
@@ -910,7 +917,7 @@
               if(priorNodeId == "{{ node.pk }}")  // main reply
               {
                 // change the text of Start discussion and make it visible
-                $("#create-discussion").html("Add Reply");                
+                $("#create-discussion").html("Initiate New Discussion Thread");                
                 // $("#create-discussion").fadeIn();
 
                 // [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
@@ -1116,7 +1123,7 @@ win.Selector.mouseup = function(e)
       st = st.trim();
   } 
   
-  console.log("stout: " + st)
+  //console.log("stout: " + st)
   st = st.trim();
   if (st)
   {
@@ -1135,7 +1142,7 @@ win.Selector.mouseup = function(e)
             //if discussion mode is not enabled, show annotate icon. 
             if (st != prevSel) 
             {
-                console.log("show menu");
+                //console.log("show menu");
                 $('#moving_div').css({
                    left:  e.pageX - 320,
                    top:   e.pageY - 60,
@@ -1144,7 +1151,7 @@ win.Selector.mouseup = function(e)
             }
             else 
             {
-                console.log("hide menu");
+                //console.log("hide menu");
                 $('#moving_div').css({
                      display: "none"
                 });
@@ -1154,7 +1161,7 @@ win.Selector.mouseup = function(e)
   }
   else
   {
-            console.log("hide menu");
+            //console.log("hide menu");
             $('#moving_div').css({
                  display: "none"
             });
@@ -1166,7 +1173,7 @@ function switchMode()
 {
     /*To switch to annotate mode when some text is selected*/
     toggle(document.getElementById("toggleContainer"));
-    console.log("st inside switchMode: " + st);
+    //console.log("st inside switchMode: " + st);
     highlightSearchTerms(st);
     existingComments = [];
     sideComments = new SideComments('#commentable-area', currentUser, existingComments);
@@ -1232,7 +1239,7 @@ sideComments.on('commentPosted', function( comment )
               // Once the comment is saved, insert the comment into the comment stream with "insertComment(comment)".
               //highlight this selection
               //update the local annotations variable
-              console.log("Inside success: Comment added!");
+              //console.log("Inside success: Comment added!");
               sideComments.insertComment(comment);
               highlightSearchTerms(st);
               annotations = jQuery.parseJSON(updatedAnnotationsField);
@@ -1255,7 +1262,7 @@ sideComments.on('addCommentAttempted', function()
 //Listen to "commentDeleted" and send a request to backend to delete the comment.
 /*sideComments.on('commentDeleted', function( commentId ) 
 {
-    console.log("entered del func")
+    //console.log("entered del func")
     $.ajax({
             url: "{% url 'delComment' groupid %}",
             success: function( success ) {
@@ -1272,13 +1279,13 @@ function showThread(elem)
   text = $(elem).text();
   existingComments = [];
   st = String(text);
-  console.log("You clicked on: " + st);
+  //console.log("You clicked on: " + st);
   for (i = 0; i < annotations.length; i++)
   {
       if(String(text).toLowerCase() == annotations[i].selectedText.toLowerCase())
       {
         existingComments.push(annotations[i]);
-        console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
+        //console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
         sideComments = new SideComments('#commentable-area', currentUser, existingComments); 
         break;
       }
@@ -1452,7 +1459,7 @@ function toggle(el)
         $(".side-comment").show();
         highlightAll(); 
         el.innerHTML = '<i class="fi-clipboard-pencil annotateIcon"></i> Annotate';
-        console.log("hide menu");
+        // console.log("hide menu");
         $('#moving_div').css({
              display: "none"
         });
