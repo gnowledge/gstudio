@@ -9,14 +9,12 @@
 
     <header class="row">
       <h2 class="medium-12 columns">
-        {% if node %}
-     
-       {% trans "Editing Event:" %} {{node.name}}
-	{% endblocktrans %}
-         {% else %}
-       {% trans "Create a New" %} {{title}} Event
-        {% endif %}
-	</h2>
+      {% if node %}
+      {% trans "Editing Event:" %} {{node.name}}
+      {% else %}
+      {% trans "Create a New" %} {{title}} Event
+      {% endif %}
+      </h2>
       <nav class="medium-12 columns">
         <dl class="tabs" data-tab>
           <dd>
