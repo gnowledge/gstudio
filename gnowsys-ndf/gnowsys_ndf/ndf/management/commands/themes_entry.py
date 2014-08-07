@@ -18,7 +18,6 @@ except ImportError:  # old pymongo
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import *
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 
 ####################################################################################################################
