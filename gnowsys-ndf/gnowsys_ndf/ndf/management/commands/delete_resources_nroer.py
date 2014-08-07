@@ -21,6 +21,7 @@ class Command(BaseCommand):
         
 
         grp = collection.Node.one({'_type': 'Group', '_id': ObjectId('53747277c1704121fe54be46')})
+        # grp = collection.Node.one({'_type': 'Group', 'name': 'home'})
         page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
 
         if grp:
