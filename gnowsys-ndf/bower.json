@@ -1,10 +1,11 @@
 {
   "name": "gstudio",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "homepage": "https://github.com/gnowledge/gstudio",
   "authors": [
     "Nagarjuna G. <nagarjun@gnowledge.org>",
-    "Kedar Aitawdekar <kedar2a@gmail.com>"
+    "Kedar Aitawdekar <kedar2a@gmail.com>",
+    "Arun Ganesh <arun.planemad@gmail.com>"
   ],
   "description": "Gstudio is a node description framework (NDF) to create knowledge networks and sematic web applications",
   "main": "manage.py",
@@ -17,7 +18,7 @@
     "tests"
   ],
   "dependencies": {
-    "foundation": "zurb/bower-foundation",
+    "foundation": "zurb/bower-foundation#latest",
     "foundation-icon-fonts": "zurb/foundation-icon-fonts",
     "foundation-datepicker": "*",
     "leaflet": "~0.7.3",
@@ -27,7 +28,7 @@
     "jqtree": "~0.21.0",
     "jquery-legacy": "jquery#1.10.2",
     "MathJax": "~2.4.0",
-    "d3": "~3.4.8",
+    "d3": "#latest",
     "FileSaver": "*",
     "underscore": "~1.6.0",
     "d3-cloud": "~1.0.5",

@@ -1,5 +1,8 @@
 /*
-*   _settings.scss - Metstudio style variables settings file
+*   Metstudio style settings file
+*   Based on foundation settings file from bower_components/foundation/_settings
+*   You can paste foundation sass variables here
+*   http://foundation.zurb.com/docs/using-sass.html
 */
 
 
@@ -7,10 +10,11 @@
 // THEME CONTROL SETTINGS
 //
 
+//
 // Color Pallette
 $theme-color:#33C284 !default;
 $theme-color-invert:scale-color($theme-color, $lightness: -60%);
-
+$theme-text-color:scale-color($theme-color, $lightness: -40%);
 
 //
 // FOUNDATION SETTINGS
@@ -25,14 +29,14 @@ $secondary-color: lighten(desaturate($primary-color,20%),20%);
  $info-color: $color0;
 
 $header-font-color: #222;
-$body-bg: white;
+$body-bg-color: #666;
 
-$bg-color: #eef7eb;
-$meta-color:#666;
-$active-color:lighten($theme-color,30%);
+$bg-color: lighten($theme-color,90%);
+$meta-color:#e01818;
+$active-color:lighten($theme-text-color,20%);
 
 //$label-font-color: #333;
- $label-font-color-alt: $body-bg;
+ $label-font-color-alt: $body-bg-color;
 
 $base-color: #e7caa4;
 $aside-color:#524549;
@@ -44,7 +48,7 @@ $aside-color:#524549;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Settings below are only for reference, copy the appropriate line to the top from components/foundation/_settings
+// Settings below are only for reference, copy the appropriate line to the top from bower_components/foundation/_settings
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -323,15 +327,15 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 //$include-html-icon-bar-classes: $include-html-classes;
 
 // We use these to style the icon-bar and items
-//$icon-bar-bg: inherit ;
-$icon-bar-font-color: #ccc ;
+$icon-bar-bg: transparent ;
+$icon-bar-font-color: white ;
 //$icon-bar-font-size: 0.5rem;
-$icon-bar-hover-color: black ;
-$icon-bar-icon-color: #ccc ;
+$icon-bar-hover-color: $theme-color ;
+$icon-bar-icon-color: white ;
 //$icon-bar-icon-size: 1.875rem ;
 //$icon-bar-image-width: 1.875rem ;
 //$icon-bar-image-height: 1.875rem ;
-$icon-bar-active-color: white ;
+$icon-bar-active-color: red ;
 $icon-bar-item-padding: 0.5rem;
     
 // Breadcrumbs
@@ -399,7 +403,8 @@ $icon-bar-item-padding: 0.5rem;
 // $button-border-style: solid;
 
 // We use this to set the default radius used throughout the core.
-// $button-radius: $global-radius;
+$global-radius:5px;
+ $button-radius: $global-radius;
 // $button-round: $global-rounded;
 
 // We use this to set default opacity for disabled buttons.
@@ -708,7 +713,7 @@ $icon-bar-item-padding: 0.5rem;
 
 // Off Canvas Menu Variables
 // $off-canvas-width: 250px;
-// $off-canvas-bg: #333;
+ $off-canvas-bg: darken($theme-text-color,20%);
 
 // Off Canvas Menu List Variables
 // $off-canvas-label-padding: 0.3rem rem-calc(15);
@@ -821,7 +826,7 @@ $icon-bar-item-padding: 0.5rem;
 // $include-html-panel-classes: $include-html-classes;
 
 // We use these to control the background and border styles
-// $panel-bg: scale-color(#fff, $lightness: -5%);
+ $panel-bg: scale-color($theme-color, $lightness: 98%);
 // $panel-border-style: solid;
 // $panel-border-size: 1px;
 
@@ -960,8 +965,8 @@ $icon-bar-item-padding: 0.5rem;
 
 // We use these to control link styles.
  $side-nav-link-color: #888;
- $side-nav-link-color-active: white;
- $side-nav-link-color-hover: white;
+ //$side-nav-link-color-active: white;
+ //$side-nav-link-color-hover: white;
 // $side-nav-font-size: rem-calc(14);
 // $side-nav-font-weight: normal;
 // $side-nav-font-family: $body-font-family;
@@ -1118,11 +1123,11 @@ $icon-bar-item-padding: 0.5rem;
 
 // $include-html-tabs-classes: $include-html-classes;
 
- $tabs-navigation-padding: 0.6rem;
+ $tabs-navigation-padding: 0.4rem;
  $tabs-navigation-bg-color: inherit  ;
  $tabs-navigation-active-bg-color: inherit;
  $tabs-navigation-hover-bg-color: inherit;
- $tabs-navigation-font-color: $meta-color;
+ $tabs-navigation-font-color: $theme-text-color;
 // $tabs-navigation-font-size: rem-calc(16);
 // $tabs-navigation-font-family: $body-font-family;
 
@@ -1182,7 +1187,7 @@ $icon-bar-item-padding: 0.5rem;
 // $include-html-top-bar-classes: $include-html-classes;
 
 // Background color for the top bar
- $topbar-bg-color: $theme-color-invert;
+ $topbar-bg-color: darken($theme-text-color,5%);
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin

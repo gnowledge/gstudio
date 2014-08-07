@@ -29,21 +29,6 @@
 {% endblock %}
 
 
-{% block meta_content %}
- {% blocktrans %} <h3>Pages</h3>{% endblocktrans %}
-
-{% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-
-      <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
-	{% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Create {{title}}</span>{% endblocktrans %}
-      </a>
-  
-  {% endif %}
-  {% endif %}
-
-{% endblock %}
 
 
 {% block search_content %}
@@ -88,6 +73,16 @@
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd>
     {% blocktrans %}<dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>{% endblocktrans %}
   </dl>
+    {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+
+      <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
+	{% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Create {{title}}</span>{% endblocktrans %}
+      </a>
+  
+  {% endif %}
+  {% endif %}
 </header>
 
 <div class="tabs-content">
