@@ -39,13 +39,13 @@ class Command(BaseCommand):
                     for objs in each.fs_file_ids:
                         each.fs.files.delete(objs)
 
+                each.delete()
                 print "\nfile object: ",each.name," removed successfully from home group"
-                each.delete()
 
-            data = collection.Node.find({'group_set': ObjectId(grp._id), 'member_of': {'$nin':[page_GST._id]} })
+            data = collection.Node.find({'_type': {'$nin': ['Group','Author']},'group_set': ObjectId(grp._id), 'member_of': {'$nin':[page_GST._id]} })
             for each in data:
-                print "\nObject : ", each.name," removed successfully from home group"
                 each.delete()
+                print "\nObject : ", each.name," removed successfully from home group"
 
         else:
             print "\n home Group not exists ... "
