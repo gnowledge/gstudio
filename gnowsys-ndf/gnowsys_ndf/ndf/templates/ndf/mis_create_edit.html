@@ -54,6 +54,8 @@
     .active-app-set-edit{ border-right: 4px solid #808080; }
 
     .active-app-set-view{ border-left: 4px solid #808080; }
+
+    small.error { line-height: 0 }
   </style>
 
 
@@ -150,7 +152,6 @@
 			<div class="small-5 end columns">
 				{% if at.value == "bool" %}
 				  <select id="id_auto_now_add" id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%">
-
 					{% if at.database_value %}
 					<option value="">{% trans "Unknown" %}</option>
 					{% else %}
@@ -168,19 +169,16 @@
 					{% else %}
 					<option value="No">{% trans "No" %}</option>
 					{% endif %}
-
 				  </select>
 
         {% elif at.value == "IS()" %}
         <select id="label_{{at.type}}" name="{% if at.database_id %} {{at.database_id}} {% else %}{{at.type_id}} {% endif %}" style="width:50%" required="">
-
           {% for v in at.sub_values %}
           {% if forloop.counter == 1 %}
           <option value="">- - - Select {{at.altnames}} - - -</option>
           {% endif %}
-          <option value="{{v}}">{% trans v %}</option>
+          <option value="{{v}}" {% if v == at.database_value %} selected {% endif %} >{% trans v %}</option>
           {% endfor %}
-
         </select>
 		    <small class="error">{% blocktrans %}Please select {% endblocktrans %}{% trans at.altnames %} !!!</small>
 
@@ -263,37 +261,6 @@
 		{% endfor %}
 		{% endif %}
 
-		<!-- map/location widget : EDIT -->
-		<div class="row">
-			<div class="small-2 columns"> 
-				<label for="label-location" class="left inline">Location</label>
-			</div>
-
-			<div class="small-5 end columns">
-				<a href="#view-map-edit-widget" id="label-location" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
-					<i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
-				</a>
-			</div>      
-		</div>  
-
-		<!-- Overlay : Map EDIT Widget -->
-		<div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
-			<a class="close-reveal-modal" >{% trans "&#215" %};</a>
-			{% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
-		</div>
-		<!-- END of Map Widget Overlay -->
-
-		<!-- END of location/map widget -->
-
-		<div class="row">
-			<div class="small-2 columns"> 
-				<label for="label-tags" class="left inline">{% trans "Tags" %}</label>
-			</div>
-			<div class="small-5 end columns">
-				<input id="label-tags" name="tags" type="text" value="{{tags}}" placeholder="Separate tags with commas...">
-			</div>
-		</div>
-     
 		{% if File == "True" %}
 		<div class="row">
 			<div class="small-2 columns"> 
@@ -305,6 +272,37 @@
 		</div>
 		{% endif %}
     
+    <div class="row">
+      <div class="small-2 columns"> 
+        <label for="label-tags" class="left inline">{% trans "Tags" %}</label>
+      </div>
+      <div class="small-5 end columns">
+        <input id="label-tags" name="tags" type="text" value="{{tags}}" placeholder="Separate tags with commas...">
+      </div>
+    </div>
+
+    <!-- map/location widget : EDIT -->
+    <div class="row">
+      <div class="small-2 columns"> 
+        <label for="label-location" class="left inline">Location</label>
+      </div>
+
+      <div class="small-5 end columns">
+        <a href="#view-map-edit-widget" id="label-location" data-reveal-id="view-map-edit-widget" title="Click to add location markers">
+          <i class="fi-marker"></i> &nbsp; {% trans "Add Location" %}
+        </a>
+      </div>      
+    </div>  
+
+    <!-- Overlay : Map EDIT Widget -->
+    <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
+      <a class="close-reveal-modal" >{% trans "&#215" %};</a>
+      {% include "ndf/map_widget.html" with mode="edit" source="custom_template_edit" %}
+    </div>
+    <!-- END of Map Widget Overlay -->
+
+    <!-- END of location/map widget -->
+     
 		<div class="row">
 			<div class="small-2 columns"> 
 				<label for="label-content" class="left inline">{% trans "Content" %}</label>

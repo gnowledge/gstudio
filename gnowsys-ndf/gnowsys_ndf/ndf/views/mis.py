@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.shortcuts import render_to_response #, render  uncomment when to use
 from django.template import RequestContext
+from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 
 from django.contrib.auth.models import User
@@ -22,6 +23,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 # from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.views.file import *
+from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.event import *
 from gnowsys_ndf.ndf.views.person import *
 
@@ -109,10 +111,8 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         # print "\n Call this function...\n"
         return eval(app_set_view_file_name + "_detail")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
 
-      else:
-        # print "\n Perform fallback code...\n"
+      # print "\n Perform fallback code...\n"
 
-      # print "\n Going herer...\n\n"
       classtype = ""
       app_set_template = "yes"
       template = "ndf/"+template_prefix+"_list.html"
@@ -363,10 +363,8 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
             # print "\n Call this function...\n"
             return eval(app_set_view_file_name + "_create_edit")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
 
-        else:
-            # print "\n Perform fallback code...\n"
 
-        # print "\n Going herer...\n\n"
+        # print "\n Perform fallback code...\n"
 
         systemtype = collection.Node.find_one({"_id":ObjectId(app_set_id)})
         systemtype_name = systemtype.name
