@@ -626,7 +626,6 @@ $("#name_id").change(function(){
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function(data) {
-				 //alert(data);
 				$("#teaches_drawer").html(data);
 				$("#save-node").css("display", "block");
 			}
@@ -787,5 +786,32 @@ $("#name_id").change(function(){
 
 </script>
 
+{% endblock %}
+
+{% block script %}
+{% get_node_type node as nodetype %}
+var nt="{{nodetype}}"
+$(document).ready(function() 
+   {
+     $(".assesses_tab").hide();
+     $(".teaches_tab").hide();
+     $(".prior_node_tab").hide();
+
+     if (nt == "Page" || nt == "File" || nt == "Concept")
+     {
+       $(".teaches_tab").show();
+       $(".prior_node_tab").show();
+     }
+     else if (nt == "Topic")
+     {
+       $(".prior_node_tab").show(); 
+     } 
+     else if(nt == "Quiz" || nt == "QuizItem")
+     {
+       $(".assesses_tab").show();
+
+     } 
+   });
+   
 {% endblock %}
 
