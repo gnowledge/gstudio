@@ -14,8 +14,6 @@ from gnowsys_ndf.ndf.models import Node
 collection = get_database()[Node.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})  
 theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item' })
-topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-br_topic = collection.Node.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
 
 
 class Command(BaseCommand):
