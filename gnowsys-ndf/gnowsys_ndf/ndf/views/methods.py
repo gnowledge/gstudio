@@ -840,7 +840,6 @@ def create_RelationType(name,inverse_name,subject_type_name,object_type_name,use
 def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
 # function to create grelations for new ones and delete old ones.
 	relationtype = collection.Node.one({"_type":"RelationType","name":unicode(relation_type_name)})
-	
 	#list_current_grelations = collection.Node.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
 	#removes all existing relations given subject and relation type and then creates again.
 	collection.remove({"_type":"GRelation","subject":subject_id,"relation_type":relationtype.get_dbref()})

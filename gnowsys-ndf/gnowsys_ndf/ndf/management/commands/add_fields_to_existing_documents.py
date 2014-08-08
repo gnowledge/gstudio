@@ -21,14 +21,30 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
-    # Adding "partners" field with no default value
+    # Removing existing "cr_or_xcr" field with no default value
+    res = collection.update({'_type': {'$in': ['Group']}, 'cr_or_xcr': {'$exists': True}}, 
+                            {'$unset': {'cr_or_xcr': False }}, 
+                            upsert=False, multi=True
+    )
+    if res['n']:
+           print "\n Already existing 'cr_or_xcr' field removed from documents totalling to : ", res['n']
+
+    # Adding "curricular" field with no default value
+    res = collection.update({'_type': {'$in': ['Group']}, 'curricular': {'$exists': False}}, 
+                            {'$set': {'curricular': False }}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'curricular' field added to all Group documents totalling to : ", res['n']
+
+    # Removing existing "partners" field with no default value
     res = collection.update({'_type': {'$in': ['Group']}, 'partners': {'$exists': True}}, 
                             {'$unset': {'partners': False }}, 
                             upsert=False, multi=True
     )
-    print "\n Already existing 'partners' field removed from documents totalling to : ", res['n']
+    if res['n']:
+           print "\n Already existing 'partners' field removed from documents totalling to : ", res['n']
 
-    # Adding "partners" field with no default value
+    # Adding "partner" field with no default value
     res = collection.update({'_type': {'$in': ['Group']}, 'partner': {'$exists': False}}, 
                             {'$set': {'partner': False }}, 
                             upsert=False, multi=True

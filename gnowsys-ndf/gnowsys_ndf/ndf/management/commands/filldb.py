@@ -205,12 +205,25 @@ def create_attribute_type(at_name, user_id, data_type, system_type_id_list, meta
         except Exception as e:
             print 'AttributeType',at_name,'fails to create because:',e
     else:
+        #Editing already existing document
+        edited=False
         if not node.member_of:
             if meta_type_id:
                 node.member_of.append(meta_type_id)
                 print "Edited member_of",node.name
-                node.save()
-        print 'AttributeType',at_name,'already created'
+                edited=True
+        if not node.subject_type == system_type_id_list:
+            node.subject_type=system_type_id_list
+            edited=True
+            print "Edited subject_type of",node.name,"Earlier it was",node.subject_type,"now it is ",system_type_id_list
+        if not node.data_type == data_type:
+            node.data_type=data_type
+            edited=True
+            print "Edited data_type of",node.name,"Earlier it was",node.data_type,"now it is ",data_type
+        if edited:
+            node.save()
+        else:
+            print 'AttributeType',at_name,'already created'
 
 
 def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id = None):
@@ -239,12 +252,24 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
         except Exception as e:
             print 'RelationType',rt_name,'fails to create because:',e
     else:
+        # Edit already existing document
+        edited=False
         if not rt_node.member_of:
             if meta_type_id:
                 rt_node.member_of.append(meta_type_id)
-                rt_node.save()
+                edited=True
                 print "Edited member_of",rt_node.name
-        print 'RelationType',rt_node.name,'already created'
+        if not rt_node.subject_type == subject_type_id_list:
+            rt_node.subject_type=subject_type_id_list
+            edited=True
+            print "Edited subject_type of",rt_node.name,"Earlier it was ",rt_node.subject_type,"now it is",subject_type_id_list
+        if not rt_node.object_type == object_type_id_list:
+            rt_node.object_type=object_type_id_list,"Earlier it was",rt_node.object_type,"now it is",object_type_id_list
+            edited=True
+        if edited :
+            rt_node.save()
+        else:
+            print 'RelationType',rt_node.name,'already created'
 
 
 def create_ats(factory_attribute_types,user_id):
