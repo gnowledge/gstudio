@@ -185,10 +185,18 @@ def parse_data_create_gtype(json_file_path):
                 if not json_document['required'].istitle():
                     json_document['required'] = ast.literal_eval(json_document['required'].title())
 
-                if json_document['required'] not in [True, False]:
-                    error_message = "\n InvalidDataError: For "+type_name+" (" + json_document['name'] + ") invalid data found in \"required\" field !!!"
-                    log_list.append(error_message)
-                    raise Exception(error_message)
+                    if json_document['required'] not in [True, False]:
+                        error_message = "\n InvalidDataError: For "+type_name+" (" + json_document['name'] + ") invalid data found in \"required\" field !!!"
+                        log_list.append(error_message)
+                        raise Exception(error_message)
+
+                if not json_document['editable'].istitle():
+                    json_document['editable'] = ast.literal_eval(json_document['editable'].title())
+
+                    if json_document['editable'] not in [True, False]:
+                        error_message = "\n InvalidDataError: For "+type_name+" (" + json_document['name'] + ") invalid data found in \"editable\" field !!!"
+                        log_list.append(error_message)
+                        raise Exception(error_message)
 
                 if json_document['data_type'] not in DATA_TYPE_CHOICES:
                     error_message = "\n InvalidDataTypeError: For "+type_name+" (" + json_document['name'] + ") invalid data-type found!!!"

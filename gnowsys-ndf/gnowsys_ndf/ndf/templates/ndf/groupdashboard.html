@@ -177,15 +177,19 @@ $(document).ready(function()
     <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
   {% endifequal %} 
  {% endif %}
+
+<a data-reveal-id="intro-page">.</a>
+
 {% endblock %}
 
 
 {% block body_content %}
 
 <!--Place for group splash page design-->
-<!--a class="button" data-reveal-id="splash">Intro</a>
 
-<div id="splash" class="reveal-modal medium" data-reveal>
+<div id="intro-page" class="reveal-modal x-large" data-reveal>
+    
+    
 
   <div class="large-4 small-centered columns">
     <h2>Do things:</h2>
@@ -196,7 +200,7 @@ $(document).ready(function()
     </ul>
   </div>
 
-</div-->
+</div>
 
 {{ block.super }}
 

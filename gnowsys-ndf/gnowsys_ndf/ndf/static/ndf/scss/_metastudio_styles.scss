@@ -1,17 +1,22 @@
 /*
-*   application.scss - Metstudio app layout stylsheet
-*
-*   Use this stylesheet for placements, positioning and sizing of elements
+*  Metstudio Platform Stylesheet
 */
 
-@import url("css.css");
+//Import any custom css
+@import url("../../custom.css");
+
+body{
+  
+            background: darken($theme-color-invert,4%);
+}
 
 //Logo
 .top-bar{
+    border-bottom: 2px solid black;
     h1{
         img{
             /* Logo */
-			height: 1.8rem;
+			height: 2.4rem;
 			margin-right: 5px;
 		}
         a{
@@ -29,12 +34,12 @@
 
 		.workspace{
             //This is the main content container between the header and footer
+            background: url("body_background_image.png") no-repeat 0 bottom;
 			min-height: 100%;
 			margin-bottom: -130px!important;
 			-webkit-box-sizing: border-box;
 			-moz-box-sizing: border-box;
 			box-sizing: border-box;
-            background: url($theme-path+$page-background) no-repeat 0 bottom;
             
             &:after{
             //Hack for setting div height to the height of the browser window
@@ -46,13 +51,24 @@
 
 		body>footer{
             //Site footer
-            border-top: 2px dotted #aaa;
 			padding:20px 0;
 			position: relative;
             color:#888;
-            min-height: 100px;
-            background-color: rgba(255,255,255,0.5);
-            
+            min-height: 170px;
+            background-color: rgba(0,0,0,0.8);
+
+            .sponsor{
+                background: url("footer_background_image.png") no-repeat center top;
+                &>*{
+                    opacity: 0.1;
+                }
+                &:hover{
+                    background:none;
+                    >*{
+                     opacity: 1;
+                }
+                }
+            }
             a{
 			color: #777;
 		}
@@ -62,7 +78,7 @@
                 margin-bottom: 3px;
                 margin-right: 3px;
                 display: inline-block;
-                background: #fafafa url("../images/gnu-head.png") no-repeat -35px -9px;
+                background: #fafafa url("../../../images/gnu-head.png") no-repeat -35px -9px;
                 &:hover{
                     background-position: -35px -19px;
                 }
@@ -87,24 +103,40 @@
 
 
 //Main sidebar
+main.row{
+    padding-right: 5px;
+}
+
 main>aside{
     &>div{
-        background-color: $theme-color-invert;
+        
         
         h2{
-            font-size: 2rem;
-            padding: 5px;
-            background: url("../scss/themes/metastudio/images/Leonardo_polyhedra.jpg") 0 bottom;
-            margin: 0;
+            margin-top: 2rem;
             a{
-            color: $active-color;
+            color: white;
                 &:hover{
-                    color:black;
+                    color:white;
                 }
             }
         }
-        nav{
-            border-bottom: 4px solid $active-color;
+        nav.app{
+            a{
+                background-color: $theme-text-color;
+                border: 1px solid black;
+            }
+            .icon-bar{
+            i{
+                display: none!important; /* Hide icons till we can retreive custom icons from the system */
+            }
+                
+                .more.active{
+                    background-color: $theme-color;
+                    label{
+                    font-weight: bold;
+                    }
+                }
+            }
         }
         
         h3{
@@ -137,7 +169,9 @@ main>aside{
         header{
            padding: 10px;
         }
-        
+         section{
+             background-color: $theme-color-invert;
+         }
         footer{
             background-color: #222;
             min-height: 1rem;
@@ -154,7 +188,7 @@ main>aside{
                 color:white;
             }
             }
-        .side-nav{
+        .side-nav.collection{
             background-color: #444;
             padding: 0;
             border-bottom: 2px solid $active-color;
@@ -165,7 +199,9 @@ main>aside{
                     border-left: 2px solid black;
                 }
                 &.active a,a:hover{
+                    color:white!important;
                     border-left: 2px solid $active-color;
+                    background-color: $active-color;
                 }
             }
         }
@@ -175,10 +211,12 @@ main>aside{
 
 //    Article styles
     article{
+        background-color: white;
         overflow-x: visible;
         &>header,form>header{
             padding: 15px;
             margin-bottom: 0.5rem;
+            background-color: #f0f0f0;
         }
         
         &>footer{
@@ -187,6 +225,12 @@ main>aside{
 h1:not(.subheader){
 	font-family: "Georgia Serif", Serif;
     font-style: italic;
+    
+    .tabs{
+        display: inline-block;
+        position: relative;
+        bottom: -0.5rem;
+    }
     
     div{
         display:inline-block;
@@ -329,32 +373,37 @@ h1:not(.subheader){
 
 
 /* Content Tabs */
-article .tabs{
-    i{
-	margin-right: 5px;
-	font-size: 1.3rem;
-}
-   
-}
-
 article{
+    padding-left: 2rem!important;
+   
+        
 .tabs {
+    display: inline-block;
+    dd a{
+        border-radius: 4px;
+        border: 1px transparent;
+    }
     dd.active a{
         color:$active-color;
-        border-bottom: 2px solid $active-color;
-        font-weight: bold;
+        border: 1px solid;
     }
     dd:hover a{
         color:$active-color;
     }
+    
+    i{
+	margin-right: 5px;
+	font-size: 1.3rem;
 }
 }
+
 .tabs-content>.content{
 	padding-top: 0;
 }
 
 .content.row{
     margin: 0;
+}
 }
 
 /* Default card */
@@ -380,11 +429,12 @@ article{
         @extend .label;
         opacity:0.2!important;
     padding: 2px;
+        background-color: transparent;
     }
     
     .label{
     text-transform: uppercase;
-    //background-color: $info-color;
+    background-color: transparent;
     padding: 2px;
 }  
 }
@@ -394,11 +444,6 @@ article{
 
 /*************************** 2. Custom CSS overrides ***********************/
 
-
-
-.panel{
-    background-color: darken($bg-color,10%);
-}
 
 /* Content area */
 article{

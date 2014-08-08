@@ -47,12 +47,7 @@
     padding-left: 5px;
     padding-right: 5px;
   }
-  .annotateIcon{
-    font-size: 35px;
-    color: green;
-    padding-left: 5px;
-    padding-right: 5px;
-  }
+    
   .divider-line { font-size: xx-large; color:lightgray; }
   .line-height-2 { line-height:2; }
   .line-height-2pt5 { line-height:2.5; }
@@ -135,14 +130,14 @@
     width: 21.87rem;*/
   }
 
-  .reply-button:hover {
+  .reply-btn:hover {
     font-weight: bold;
   }
 
   .disc-replies { 
     
     padding:10px;
-    background-color:#cfe8c7;
+    background-color:#d8f1f3;
     width:25em;
     max-width: 40em;
     margin-left: 48px; 
@@ -183,9 +178,9 @@
 
 
 <div itemscope itemtype="{{schema.1.type}}">
-<header class="page">
-    <div class="row">
-  <section class="medium-12 columns" >
+<header class="row page">
+    
+  <section class="medium-9 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
       {% blocktrans %}<li><a href="#">Collection Name</a></li>{% endblocktrans %}
@@ -196,54 +191,170 @@
       <div class="label-list"> 
       {% for tag in node.tags %}
       <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-       <span itemprop="{{schema.1.tags}}" content="{{tag}}">
+       <span itemprop="{{schema.1.tags}}" content="{{tag}}"></span>
       {% endfor %}
 
-    </div> 
+        </div> 
       
     <h1>
-      <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span>     
-  </h1>
+      <span itemprop="{{schema.1.name}}" class='node'>{{node.name}}</span> 
+          <!-- Tabs for content and discussion views-->
+        <div class="node-bar">
+            
+              <!-- Start of Block: For listing Editing options --> 
+      {% user_access_policy groupid request.user as user_access %}
 
-  <div class="row">
-    <div class="small-10 columns"> 
-      <dl class="row tabs" data-tab>
+      {% edit_policy groupid node request.user as status %}
+      {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+        {% get_edit_url node.pk as edit_url %}
 
-        {% if topic %}
-       {% blocktrans %} <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> Contents </a></dd>{% endblocktrans %}
+        {% check_group node as is_group %}
+        {% if is_group %}
+        {% if user.is_superuser or node.created_by == user.id %}
+        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
         {% endif %}
 
-        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> Read</a></dd>
+        {% else %}
+        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
 
-        <dd class="{% if topic %}active{% endif %}">
-            <a href="#view-graph" data-dropdown="graph-hover" data-options="is_hover:true; active_class:open"><i class="fi-share"></i>Graph</a>
-                <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-                    {% blocktrans %}<li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">Concept Graph</a></li>{% endblocktrans %}
+        {% endif %}    
+
+        <ul id="edit-options" data-dropdown-content class="f-dropdown">
+
+          <!-- This button publishes the drafted resource -->
+          {% if node %}
+          {% get_publish_policy request groupid node as group_policy %}
+          {% if group_policy == "allow" %}
+            {% if is_group %}
+            {% if user.is_superuser or node.created_by == user.id %}
+            <li>
+              <a href="{% url 'publish_group' group_name_tag node %}">Publish</a>
+            </li>
+            {% endif %}
+            
+            {% else %}
+            <li>
+              <a href="{% url 'publish_page' group_name_tag node %}">Publish</a>
+            </li>
+            
+            {% endif %}
+            
+          {% endif %}
+          
+          {% endif %}
+
+          <!-- This button converts collection into module -->
+          {% if node.collection_set and user.is_authenticated %}
+            {% if user_access == "allow" %}
+            <li>
+             {% blocktrans %} <a href="#" id="module">Make Module</a>{% endblocktrans %}
+            </li>
+            {% endif %}
+          {% endif %}
+
+            
+            <!-- Delete button if page created by user -->
+            {% if node.created_by == request.user.id %}
+      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
+      {% endif %}
+
+          <!--
+            * This button Adds/Uploads New resource
+            * Displayed 
+              - For Pages and Files
+              - In case of Groups/Author, only to the superuser
+          -->
+          {% get_create_url node.pk as create_url %}
+
+          {% if is_group %}
+            {% if request.user.is_superuser %}
+            <li>
+              <a href="{% url create_url group_name_tag %}">
+                <span class="fi-plus">&nbsp;&nbsp; New Group</span>
+              </a>
+            </li>
+            {% endif %}
+
+          {% else %}
+            {% if node.member_of_names_list.0 == "File" %}
+            <li>
+              <a href="{% url create_url group_name_tag %}?next={{request.path}}">
+                {% blocktrans %}<span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+              </a>
+            </li>
+
+            {% else %}
+              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
+              
+                <li>
+                  <a href="{% url create_url group_name_tag app_id %}">
+                  {% blocktrans %}  <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+                  </a>
+                </li>
+              {% else %}
+                <li>
+                  <a href="{% url create_url group_name_tag %}">
+                    {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+                  </a>
+                </li>
+              {% endif %}
+
+            {% endif %}
+
+          {% endif %}
+
+        </ul>
+
+      {% endif %}
+      <!-- End of Block: For listing Editing options -->
+            
+          
+            </div>
+  </h1>
+      <h1 class="subheader">
+      <dl class="tabs" data-tab> 
+          
+        {% if topic %}
+       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% blocktrans %}Contents{% endblocktrans %}</a></dd>
+        {% endif %}
+
+        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% blocktrans %}View{% endblocktrans %}</a></dd>
+
+     <dd><a href="#view-changes"><i class="fi-clock"></i> {% blocktrans %}Changes{% endblocktrans %}</a></dd>
+          <dd><a href="#view-discussion"><i class="fi-comment"></i> {% blocktrans %}Discuss{% endblocktrans %}</a></dd>
+          
+      </dl>
+      </h1>
+</section>
+ 
+    <div class="medium-3 columns"> 
+        
+      
+        
+        <!-- Modal links for associated views like graphs and map-->
+        <ul class="side-nav">
+  <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% blocktrans %}Location{% endblocktrans %}</a></li>
+            
+  <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% blocktrans %}Graphs{% endblocktrans %}</a>
+            </li>
+            
+            <ul id="graph-list" class="f-dropdown" data-dropdown-content>
+  <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% blocktrans %}Concept Graph{% endblocktrans %}</a></li>
+                    
                     {% if node.collection_set %}
-                      {% blocktrans %}<li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>{% endblocktrans %}
+                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% blocktrans %}Collection Graph{% endblocktrans %}</a></li>
                     {% endif %}
           
                     {% if node.prior_node %}
-                     {% blocktrans %} <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>{% endblocktrans %}
-                    {% endif %}
-                </ul>
-        </dd>
+                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% blocktrans %}Dependency Graph{% endblocktrans %}</a></li>
+                    {% endif %}               
+</ul>
+           <li>
+                <a id = "toggleContainer"  href="#" onClick="toggle(this);">
+        <i class="fi-comments annotateIcon"></i> {% blocktrans %}Annotate{% endblocktrans %}
+      </a></li> 
+</ul>
 
-        {% blocktrans %}<dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>{% endblocktrans %}
-
-     {% blocktrans %}<dd><a href="#view-discussion"><i class="fi-comment"></i> Discuss</a></dd>{% endblocktrans %}
-      </dl>
-    </div>
-    
-    <!-- Container for enabling/disabling annotation mode -->
-    <div class="small-2 columns">          
-      <div id = "toggleContainer" style="cursor: pointer; color: green;" onClick="toggle(this);">
-        {% blocktrans %}<i class="fi-comments annotateIcon"></i> Annotate{% endblocktrans %}
-      </div>
-    </div>
-    <!--End container-->
-  </div>
-</section>
         </div>
 </header>
 
@@ -393,7 +504,7 @@
           <div>
             {% if 'image' in node.mime_type %}
             <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-              <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}"></img>
+              <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}">
             </a>
 
             {% else %}
@@ -432,7 +543,7 @@
             <div class="small-7 end columns">
               {% if field.type == "RelationType" %}
                 {% if field.value|length > 5 %}
-                  <a href="#">{{field.value|length}}</a>
+                  <a href="#" id="{{field.altnames}}">{{field.value|length}}</a>
 
                 {% else %}
                 {% for n in field.value %}
@@ -497,7 +608,7 @@
           </fieldset>
 
           <fieldset id="document_contents">
-            {% blocktrans %}<legend>Documents</legend>{% endblocktrans %}
+            <legend>{% blocktrans %}Documents{% endblocktrans %}</legend>
             {% for k,v in contents.items %}
               {% for e in v %}
 
@@ -547,18 +658,47 @@
      </div>
 
 
+          <!-- View node change history area -->
+    <div id="view-changes" class="content">
+        
+        <p>
+        {{ node.member_of_names_list.0 }} 
+        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+            </p>
+        
+          <h4>{% blocktrans %}Recent changes{% endblocktrans %}:</h4>
+        <ul class="side-nav">
+        {% for seq_no, version_no in node.version_dict.items|slice:"-20:" reversed %}
+          <li title="Version #{{version_no}}">
+            {% if forloop.last and forloop.counter > 5 %}
+            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">All Changes</a>
+            
+            {% else %}
+            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
+
+            {% endif %}
+          </li> 
+          {% endfor %}
+        </ul>
+          
+      
+
+        
+        </div>
+        
+        
     <!-- discussion content area -->
     <div id="view-discussion" class="content">
     {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
 
       <br/>
-      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" data-reveal-id="org" style="margin-bottom:0;">
+      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
       {% if all_replies %}
-        Add Reply
+        Initiate New Discussion Thread
       {% else %}
-        Start discussion
+        Initiate discussion on {{ node.name }}
       {% endif %}
-      </div>
+       </div>
 
       <div id="replies-area">
         
@@ -601,7 +741,7 @@
 
         <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
 
-        <input data-id="{{ node.pk }}" type="button" value="Post Reply"  class="button expand reply-button" onclick="addReply($(this))">
+        <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
 
         <input type="hidden" id="prior-node" style="visibility:hidden" value="">
         <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
@@ -616,153 +756,28 @@
   </section>
 
   <section class="medium-3 columns">
-    <div class="panel">
-      <!-- <h3 class="subheader"></h3> -->
-      <p>
-        {{ node.member_of_names_list.0 }} 
-        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
-        <br>
-        <small>
-          <a href="#view-changes"><i class="fi-clock"></i> Versions </a>
-          {% for seq_no, version_no in node.version_dict.items|slice:"-6:" reversed %}
-          <abbr title="Version #{{version_no}}">
-            {% if forloop.last and forloop.counter > 5 %}
-            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">. . .</a>
-            
-            {% else %}
-            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
-
-            {% endif %}
-          </abbr> 
-          {% endfor %}
-        </small>
-      </p>
-
-      <!-- Start of Block: For listing Editing options --> 
-      {% user_access_policy groupid request.user as user_access %}
-
-      {% edit_policy groupid node request.user as status %}
-      {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
-        {% get_edit_url node.pk as edit_url %}
-
-        {% check_group node as is_group %}
-        {% if is_group %}
-        {% if user.is_superuser or node.created_by == user.id %}
-        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
-        {% endif %}
-
-        {% else %}
-        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
-
-        {% endif %}    
-
-        <ul id="edit-options" data-dropdown-content class="f-dropdown">
-
-          <!-- This button publishes the drafted resource -->
-          {% if node %}
-          {% get_publish_policy request groupid node as group_policy %}
-          {% if group_policy == "allow" %}
-            {% if is_group %}
-            {% if user.is_superuser or node.created_by == user.id %}
-            <li>
-              <a href="{% url 'publish_group' group_name_tag node %}">Publish</a>
-            </li>
-            {% endif %}
-            
-            {% else %}
-            <li>
-              <a href="{% url 'publish_page' group_name_tag node %}">Publish</a>
-            </li>
-            
-            {% endif %}
-            
-          {% endif %}
-          
-          {% endif %}
-
-          <!-- This button converts collection into module -->
-          {% if node.collection_set and user.is_authenticated %}
-            {% if user_access == "allow" %}
-            <li>
-             {% blocktrans %} <a href="#" id="module">Make Module</a>{% endblocktrans %}
-            </li>
-            {% endif %}
-          {% endif %}
-
-          <!-- This button translates given resource -->
-          <li>
-            <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
-          </li>
-            
-            <!-- Delete button if page created by user -->
-            {% if node.created_by == request.user.id %}
-      <a class="tiny alert button" href="{% url 'page_delete' group_name_tag node %}">{% trans "Delete" %}</a>
-      {% endif %}
-
-          <!--
-            * This button Adds/Uploads New resource
-            * Displayed 
-              - For Pages and Files
-              - In case of Groups/Author, only to the superuser
-          -->
-          {% get_create_url node.pk as create_url %}
-
-          {% if is_group %}
-            {% if request.user.is_superuser %}
-            <li>
-              <a href="{% url create_url group_name_tag %}">
-                <span class="fi-plus">&nbsp;&nbsp; New Group</span>
-              </a>
-            </li>
-            {% endif %}
-
-          {% else %}
-            {% if node.member_of_names_list.0 == "File" %}
-            <li>
-              <a href="{% url create_url group_name_tag %}?next={{request.path}}">
-                {% blocktrans %}<span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
-              </a>
-            </li>
-
-            {% else %}
-              {% if node.member_of_names_list.0 == "Theme" or node.member_of_names_list.0 == "Topic" %}
-              
-                <li>
-                  <a href="{% url create_url group_name_tag app_id %}">
-                  {% blocktrans %}  <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
-                  </a>
-                </li>
-              {% else %}
-                <li>
-                  <a href="{% url create_url group_name_tag %}">
-                    {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
-                  </a>
-                </li>
-              {% endif %}
-
-            {% endif %}
-
-          {% endif %}
-
-        </ul>
-
-      {% endif %}
-      <!-- End of Block: For listing Editing options --> 
-
-    </div>
     
       <div>
       {% include "ndf/rating.html" %} 
       </div>
     <div>
-     {% trans "Languages" %} 
-      <br></br>
+        
+     
+      <ul class="side-nav">
+          <li>{% trans "In other languages:" %}</li>
       {% get_possible_translations node as tran %}
      {% for each in tran %}
         {% for k,v in each.items %}
         <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
         {% endfor %}
       {% endfor %}
+          
+          <!-- This button translates given resource -->
+          <li>
+            <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
+          </li>
+          
+          </ul>
 
     </div>
   </section>
@@ -772,129 +787,117 @@
 <footer>
 
   <p><small>
-    <em>Written by {{ node.user_details_dict.contributors|join:', ' }}</em>
+    <em>Created by {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>
 </footer>
+      
 </div> <!-- schema ends here -->
+    
+    
 <script type="text/javascript">
 
-{% comment %}
-  {% for each in all_replies %}
-
-    var htmlContent = '<div class="disc-replies">' + '{{each.content | safe | linebreaksbr }}' + '<br><div class="reply-btn" data-id=' + '{{ each.oid }}' + ' onclick="openOrgEditor($(this))" >reply</div> {{ each.last_update|date }} </div><br>'
-    console.log(htmlContent)
-    $("#replies-area").append(htmlContent)
-    
-  {% endfor %}
-{% endcomment %}
   
   // for discussion tab
 
-  {% if all_replies %}
-              // $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent();
-              // calcMargLeft = $tempPrior.css("margin-left");
-              // calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+  // storing ndf_tags return values in JS variables
+  {% user_access_policy groupid request.user as user_access %}
+  var user_access = "{{ user_access }}"; // "allow" or "disallow"
 
-              // // add reply text content after #replies-area
-              // $($tempPrior).after(
-              //   "<div style='margin-left:"+ calcMargLeft +"' class='disc-replies'>"
-              //   + data[2]
-              //   + "<br><div class='reply-btn' data-id='"+ data[1] +"' onclick='openOrgEditor($(this))' >reply</div></div><br>")
-              // .fadeIn(8000);
-
-    // var $allReplies = $("#replies-area .disc-replies")
-
-    // $.each()
-
-  {% endif %}
-
+  {% edit_policy groupid node request.user as status %}
+  var edit_policy = "{{ status }}"; // "allow" or "disallow"
 
   $("#orgitdownreps").orgitdown(mySettings);
 
   function createDiscussion()
   {
 
-    {% if user.is_authenticated %}
+    if( user_access == "allow" && edit_policy == "allow" )
+    {  
+        // ajax to create thread for first time.
+        $.ajax({
 
-    // ajax to create thread for first time.
-    $.ajax({
-      
-      url: "{% url 'create_discussion' group_id node.pk %}",
+          url: "{% url 'create_discussion' group_id node.pk %}",
 
-      success: function(data){
-          
-          data = JSON.parse(data);
+          success: function(data){
 
-          if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
-          {
-            
-            // $("#create-discussion").hide();
+            data = JSON.parse(data);
 
-            // changing method to behave same as sub-reply button
-            $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+            if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
+            {
 
-            $("#prior-node").val("{{ node.pk }}") // _id
-            // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
-            
-            $("#create-discussion").trigger("click");
-          }
-          // else if( data[0] == "Thread-exist" ){
-          //   // alert(data)
-          //   $("#create-discussion").hide();
-          //   $("#prior-node").val("{{ node.pk }}") // _id         
-          //   // changing method to behave same as sub-reply button   
-          //   $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
-          //   $("create-discussion").trigger("click");
+                // $("#create-discussion").hide();
+
+                // changing method to behave same as sub-reply button
+                $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+
+                $("#prior-node").val("{{ node.pk }}") // _id
+                // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
+                
+                $("#create-discussion").trigger("click");
+              }
+              // else if( data[0] == "Thread-exist" ){
+              //   // alert(data)
+              //   $("#create-discussion").hide();
+              //   $("#prior-node").val("{{ node.pk }}") // _id         
+              //   // changing method to behave same as sub-reply button   
+              //   $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
+              //   $("create-discussion").trigger("click");
+              // }
+              else{ alert(data) }
+
+            }//,
+          // complete: function(){
+            // $("#prior-node").val("") // removing _id
           // }
-          else{ alert(data) }
 
-        },
-      complete: function(){
-        // $("#prior-node").val("") // removing _id
+        });
+        // --- END ajax and create thread for first time.
+      }
+      else
+      {
+        alert("To start discussion you need to login and be the member of this group.");
       }
 
-    });
-    // --- END ajax and create thread for first time.
-    
-    {% else %}
-
-      alert("To start discussion you need to login first.");
-
-    {% endif %}
-
-  }
+    }
   // --- END of createDiscussion()
 
 
   // function called by "Add Reply" and "Reply" buttons to open editor
   function openOrgEditor(sourceObj)
   {
-
-    var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
-    $("#prior-node").val(sourceObjDataId);
-    
-    // tempOrgObj = $("#org").clone(true, true);
-    // console.log($(sourceObj));
-    
-    // $("#org").detach();
-    
-    // if( sourceObjDataId == "{{ node.pk }}")
-    // {
-    //   $('div[data-id="'+ sourceObjDataId +'"]').after(tempOrgObj);
-    // }
-    // else
-    // {
-    //   $tempPrior = $('div[data-id="'+ sourceObjDataId +'"]').parent();
-    //   calcMargLeft = $tempPrior.css("margin-left");
-    //   calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
-
-    //   $('div[data-id="'+ sourceObjDataId +'"]').parent().after(tempOrgObj);
-    // }
-    
-    // $("#org").fadeIn();
-    if( sourceObjDataId != "{{ node.pk }}")
+    if( user_access == "allow" && edit_policy == "allow" )
     {
-      $('#org').foundation('reveal', 'open');
+
+      var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
+      $("#prior-node").val(sourceObjDataId);
+      
+      // tempOrgObj = $("#org").clone(true, true);
+      // console.log($(sourceObj));
+      
+      // $("#org").detach();
+      
+      // if( sourceObjDataId == "{{ node.pk }}")
+      // {
+      //   $('div[data-id="'+ sourceObjDataId +'"]').after(tempOrgObj);
+      // }
+      // else
+      // {
+      //   $tempPrior = $('div[data-id="'+ sourceObjDataId +'"]').parent();
+      //   calcMargLeft = $tempPrior.css("margin-left");
+      //   calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
+
+      //   $('div[data-id="'+ sourceObjDataId +'"]').parent().after(tempOrgObj);
+      // }
+      
+      // $("#org").fadeIn();
+      // if( sourceObjDataId != "{{ node.pk }}")
+      // {
+        $('#org').foundation('reveal', 'open');
+      // }
+    }
+    else
+    {
+      alert("To start discussion you need to login and be the member of this group.");
     }
   }
 
@@ -937,7 +940,7 @@
               if(priorNodeId == "{{ node.pk }}")  // main reply
               {
                 // change the text of Start discussion and make it visible
-                $("#create-discussion").html("Add Reply");                
+                $("#create-discussion").html("Initiate New Discussion Thread");                
                 // $("#create-discussion").fadeIn();
 
                 // [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
@@ -1143,7 +1146,7 @@ win.Selector.mouseup = function(e)
       st = st.trim();
   } 
   
-  console.log("stout: " + st)
+  //console.log("stout: " + st)
   st = st.trim();
   if (st)
   {
@@ -1162,7 +1165,7 @@ win.Selector.mouseup = function(e)
             //if discussion mode is not enabled, show annotate icon. 
             if (st != prevSel) 
             {
-                console.log("show menu");
+                //console.log("show menu");
                 $('#moving_div').css({
                    left:  e.pageX - 320,
                    top:   e.pageY - 60,
@@ -1171,7 +1174,7 @@ win.Selector.mouseup = function(e)
             }
             else 
             {
-                console.log("hide menu");
+                //console.log("hide menu");
                 $('#moving_div').css({
                      display: "none"
                 });
@@ -1181,7 +1184,7 @@ win.Selector.mouseup = function(e)
   }
   else
   {
-            console.log("hide menu");
+            //console.log("hide menu");
             $('#moving_div').css({
                  display: "none"
             });
@@ -1193,7 +1196,7 @@ function switchMode()
 {
     /*To switch to annotate mode when some text is selected*/
     toggle(document.getElementById("toggleContainer"));
-    console.log("st inside switchMode: " + st);
+    //console.log("st inside switchMode: " + st);
     highlightSearchTerms(st);
     existingComments = [];
     sideComments = new SideComments('#commentable-area', currentUser, existingComments);
@@ -1259,7 +1262,7 @@ sideComments.on('commentPosted', function( comment )
               // Once the comment is saved, insert the comment into the comment stream with "insertComment(comment)".
               //highlight this selection
               //update the local annotations variable
-              console.log("Inside success: Comment added!");
+              //console.log("Inside success: Comment added!");
               sideComments.insertComment(comment);
               highlightSearchTerms(st);
               annotations = jQuery.parseJSON(updatedAnnotationsField);
@@ -1282,7 +1285,7 @@ sideComments.on('addCommentAttempted', function()
 //Listen to "commentDeleted" and send a request to backend to delete the comment.
 /*sideComments.on('commentDeleted', function( commentId ) 
 {
-    console.log("entered del func")
+    //console.log("entered del func")
     $.ajax({
             url: "{% url 'delComment' groupid %}",
             success: function( success ) {
@@ -1299,13 +1302,13 @@ function showThread(elem)
   text = $(elem).text();
   existingComments = [];
   st = String(text);
-  console.log("You clicked on: " + st);
+  //console.log("You clicked on: " + st);
   for (i = 0; i < annotations.length; i++)
   {
       if(String(text).toLowerCase() == annotations[i].selectedText.toLowerCase())
       {
         existingComments.push(annotations[i]);
-        console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
+        //console.log("existingComments" + existingComments[0]['comments'][0]['comment']);
         sideComments = new SideComments('#commentable-area', currentUser, existingComments); 
         break;
       }
@@ -1479,7 +1482,7 @@ function toggle(el)
         $(".side-comment").show();
         highlightAll(); 
         el.innerHTML = '<i class="fi-clipboard-pencil annotateIcon"></i> Annotate';
-        console.log("hide menu");
+        // console.log("hide menu");
         $('#moving_div').css({
              display: "none"
         });

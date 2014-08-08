@@ -59,7 +59,7 @@
   {% endif %}
   
     <div class="row">
-      {% if each.type_of or each.name == "Caste" or each.name == "Foundation Course" %}
+      {% if each.type_of or each.name == "Caste" or each.name == "NUSSD Course" %}
         {% if app_name == "MIS" %}
         <a class="small-8 columns" href="{% url 'mis:mis_app_detail' groupid app_id each.pk %}" title="View all {{each.name}}'s">
         {% else %}

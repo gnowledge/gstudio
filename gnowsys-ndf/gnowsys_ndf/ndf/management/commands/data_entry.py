@@ -201,7 +201,7 @@ def parse_data_create_gsystem(json_file_path):
         log_list.append(error_message)
         raise error_message
 
-    for json_document in json_documents_list:
+    for i, json_document in enumerate(json_documents_list):
         try:
             n_name = ""
             if json_document.has_key("first name"):
@@ -211,7 +211,7 @@ def parse_data_create_gsystem(json_file_path):
                 n_name += json_document["last name"]
                 json_document["name"] = n_name
 
-            info_message = "\n ============ Start of "+gsystem_type_name+"'s GSystem ("+json_document['name']+") creation/updation ============\n"
+            info_message = "\n ============ #"+ str(i+1) +" : Start of "+gsystem_type_name+"'s GSystem ("+json_document['name']+") creation/updation ============\n"
             log_list.append(info_message)
 
             parsed_json_document = {}
@@ -416,7 +416,8 @@ def create_edit_gsystem(gsystem_type_id, gsystem_type_name, json_document, user_
 
     node = collection.Node.one({'_type': "GSystem", 
                                 '$or': [{'name': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}, 
-                                        {'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}]
+                                        {'altnames': {'$regex': "^"+json_document['name']+"$", '$options': 'i'}}],
+                                'member_of': gsystem_type_id
                             })
 
     if node is None:

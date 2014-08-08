@@ -13,6 +13,7 @@ except ImportError:  # old pymongo
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import Node, Group
+from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 ####################################################################################################################
 
@@ -31,10 +32,8 @@ class Command(BaseCommand):
   help = "\tThis script handles works related to MIS app."
 
   def handle(self, *args, **options):
-    print "\n options: ", options, "\n"
-
     # Creating private groups ------------------------------------------------------------------------------------------
-    if True:
+    if False:
       try:
         create_college_group()
 
@@ -54,7 +53,7 @@ class Command(BaseCommand):
               log_file.writelines(log_list)
 
     # Assigning Student & Voluntary Teacher Nodes' to respective college groups ----------------------------------------
-    if False:
+    if True:
       system_type = ""
       try:
         # Assigning college's group id to group_set field of respective Student nodes
@@ -330,6 +329,32 @@ def create_enrollment_code(stud_id, attribute_type_node, new_enroll_code):
   except Exception as e:
     error_message = " GAttributeCreateError ("+str(stud_id)+") - "+str(e)+" !!!"
     raise Exception(error_message)
+
+def course_type_setup():
+  """
+  This function renames "Foundation Course" (GSystemType) to "NUSSD Course".
+
+  As per requirement, an AttributeType needs to be define, i.e. say "nussd_course_type" 
+  that will hold various types (including "Foundation Course", "Level-1 Domain", "Level-2 Domain").
+  And thus, it's must to perform above renaming part.
+  """
+  fc = collection.Node.one({'_type': "GSystemType", 'name': "Foundation Course"})
+
+  if fc:
+    collection.update({'_id': fc._id}, {'$set': {'name': u"NUSSD Course"}}, upsert=False, multi=False)
+    fc.reload()
+
+    nc_cur = collection.Node.find({'member_of': fc._id})
+    at_nct = collection.Node.one({'_type': "AttributeType", 'name': u"nussd_course_type"})
+
+    if at_nct:
+    for nc in nc_cur:
+      subject_id = nc._id
+      attribute_type_node = at_nct
+      object_value = at_nct.complex_data_type[0]
+      up_nc = create_gattribute(subject_id, attribute_type_node, object_value)
+
+
 
 
 

@@ -69,7 +69,7 @@ width:200px;
 	<!-- <input type="file" id="file-select" name="doc" onchange="" /> -->
 	<!-- <input type="text" id="type_graph" name="type_graph"> -->
 	<!-- <input type="button" id="see_value" name="see_value" onClick="put_text()"> -->
-	<h4><strong>{% trans "Step 1 :" %} </strong></h4>
+	<h4><strong>{% trans "Step 1: " %} </strong></h4>
 	<!-- <br> -->
 	<p class="stephead">{% trans "Select a Graph/Visualization of your choice." %}</p>
 	<ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4" disabled> 
@@ -81,7 +81,7 @@ width:200px;
 
 	<!-- <input type="file" id="file-select" name="doc[]" id="" /> -->
 	<hr>
-	<h4><strong>{% trans "Step 2 :" %} </strong></h4>
+	<h4><strong>{% trans "Step 2: " %} </strong></h4>
 	<p class="stephead">{% trans "Upload a CSV file. Please see the instructions regarding the CSV format." %} 
 	<br> 
 	<br><a href="#" data-reveal-id="myInstr" onclick="graphing()">{% trans "Instructions for CSV file" %}</a></p>
@@ -162,7 +162,7 @@ document.getElementById('fileinput').addEventListener('change', readSingleFile, 
 			}
 		</script>
 		<hr>
-		<h4><strong>Step 3 : </strong></h4>
+		<h4><strong>Step 3:  </strong></h4>
 		<p class="stephead">{% trans "Almost there! Just click on the button below to create the visualization." %}</p>
 		<a class="button medium" href="#" data-reveal-id="myModal" onclick="graphing()">{% trans "Create Graph!" %}</a> <div id="myModal" class="reveal-modal" data-reveal> <h2>{% trans "Awesome. I have it." %}</h2> 
 		<div id="itsme"><div id="tooltip" class="hidden">
