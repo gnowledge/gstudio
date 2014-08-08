@@ -406,7 +406,7 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-META_TYPE = [u"GAPP",u"factory_types"]
+META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
 
 #Default APPs inculde in beloow GAPPS list
 

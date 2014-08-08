@@ -264,8 +264,9 @@ def create_relation_type(rt_name, inverse_name, user_id, subject_type_id_list, o
             edited=True
             print "Edited subject_type of",rt_node.name,"Earlier it was ",rt_node.subject_type,"now it is",subject_type_id_list
         if not rt_node.object_type == object_type_id_list:
-            rt_node.object_type=object_type_id_list,"Earlier it was",rt_node.object_type,"now it is",object_type_id_list
+            rt_node.object_type=object_type_id_list
             edited=True
+            print "Edited object_type of",rt_node.name,"Earlier it was",rt_node.object_type,"now it is",object_type_id_list
         if edited :
             rt_node.save()
         else:

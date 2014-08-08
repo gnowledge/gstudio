@@ -21,6 +21,12 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Modify language field with unicode value if any document has language with dict datatype
+    res = collection.update({'language':{}},
+                            {'$set':{'language':u""}}, 
+                            upsert=False, multi=True
+    )
+
     # Removing existing "cr_or_xcr" field with no default value
     res = collection.update({'_type': {'$in': ['Group']}, 'cr_or_xcr': {'$exists': True}}, 
                             {'$unset': {'cr_or_xcr': False }}, 
