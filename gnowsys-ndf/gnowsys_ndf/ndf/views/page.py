@@ -29,7 +29,8 @@ from gnowsys_ndf.ndf.models import HistoryManager
 from gnowsys_ndf.ndf.rcslib import RCS
 from gnowsys_ndf.ndf.org2any import org2html
 
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields, get_translate_common_fields,get_page,get_resource_type,diff_string,get_node_metadata,create_grelation_list
+
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 
 from gnowsys_ndf.ndf.views.methods import get_versioned_page, get_page, get_resource_type, diff_string
@@ -245,9 +246,9 @@ def page(request, group_id, app_id=None):
 
           else:
             shelves = []
-
+ 
         annotations = json.dumps(page_node.annotations)
-
+        page_node.get_neighbourhood(page_node.member_of)
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
                                     'group_id': group_id,
@@ -305,14 +306,19 @@ def create_edit_page(request, group_id, node_id=None):
 
 
 	get_node_metadata(request,page_node,gst_page)
+        
+	teaches_list = request.POST.get('teaches_list','') # get the teaches list 
 
+	if teaches_list !='':
+			teaches_list=teaches_list.split(",")
+                        create_grelation_list(page_node._id,"teaches",teaches_list)
 
         return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
 
     else:
-        
         if node_id:
             page_node,ver=get_page(request,page_node)
+            page_node.get_neighbourhood(page_node.member_of)
             context_variables['node'] = page_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
