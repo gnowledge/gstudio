@@ -971,6 +971,9 @@ def file_edit(request,group_id,_id):
                               )
 
 def data_review(request, group_id):
+  '''
+  To get all the information related to resource object in the group.
+  '''
 
   # getting group obj from name
   group_obj = collection.Node.one({ "_type": "Group", "name": group_id })
@@ -991,7 +994,7 @@ def data_review(request, group_id):
   file_id = collection.Node.find_one({'_type':"GSystemType", "name":"File"}, {"_id":1})
 
   # print group_obj
-  files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id._id)]}, 
+  files_obj = collection.Node.find({'member_of': {'$all': [ObjectId(file_id._id)]}, 
                                     '_type': 'File', 'fs_file_ids':{'$ne': []}, 
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$or': [
@@ -1003,17 +1006,23 @@ def data_review(request, group_id):
                                       }
                                     ]
                                   }).sort("last_update", -1)
-  
-  for each in files:
-    each.get_neighbourhood(each.member_of)
-    print "\n\n\n========", each.structure
 
-  files.rewind();
+  # list to hold resources instances with it's attributes and relations
+  files_list = []
+
+  for each_resource in files_obj:
+    each_resource.get_neighbourhood(each_resource.member_of)
+    files_list.append(collection.GSystem(each_resource))
+    # print "\n\n\n========"#, each_resource.keys()
+    # for each, val in each_resource.iteritems():
+      # print each, "--", val,"\n"
+
+  files_obj.close();
 
   return render_to_response("ndf/data_review.html",
                             {
                               "group_id": group_id, "groupid": group_id,
-                              "files": files
+                              "files": files_list
                             },
                             context_instance=RequestContext(request)
                           )
