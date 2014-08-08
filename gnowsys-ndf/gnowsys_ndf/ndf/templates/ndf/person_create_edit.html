@@ -7,11 +7,11 @@
   <form data-abide id="form-edit-node" method="POST" action="">
 
     <header class="row">
-<h2 class="medium-12 columns">
+      <h2 class="medium-12 columns">
         {% if node %}
-       {% trans "Editing" %} {{title}}: {{node.name}}
+        {% trans "Editing" %} {{title}}: {{node.name}}
         {% else %}
-        {% "Register a New" %} {{title}}
+        {% trans "Register a New" %} {{title}}
         {% endif %}
       </h2>
       <nav class="medium-12 columns">
