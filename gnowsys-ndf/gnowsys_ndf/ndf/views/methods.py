@@ -1497,7 +1497,8 @@ def get_user_task(userObject):
     attr_end_time = collection.Node.find_one({"_type":"GAttribute", "attribute_type.$id":attributetype_end_time._id, "subject":task_node._id})
     if attr_status.object_value is not "closed":
       group = collection.Node.find_one({"_id":task_node.group_set[0]})
-      blankdict.update({'name':task_node.name, 'created_at':task_node.created_at, 'created_by':task_node.created_by, 'group_name':group.name})
+      user = User.objects.get(id=task_node.created_by)
+      blankdict.update({'name':task_node.name, 'created_at':task_node.created_at, 'created_by':user.username, 'group_name':group.name, 'id':str(task_node._id)})
       blankdict.update({'status':attr_status.object_value})
       blankdict.update({'due_time':attr_end_time.object_value})
       blank_list.append(blankdict)
