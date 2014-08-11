@@ -36,9 +36,12 @@ import json,ox
 
 @register.assignment_tag
 def get_node_type(node):
-   obj=collection.Node.find_one({"_id":ObjectId(node._id)})
-   nodetype=node.member_of_names_list[0]
-   return nodetype
+   if node:
+      obj=collection.Node.find_one({"_id":ObjectId(node._id)})
+      nodetype=node.member_of_names_list[0]
+      return nodetype
+   else:
+      return ""
 
 @register.assignment_tag
 def get_schema(node):
