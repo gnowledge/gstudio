@@ -75,7 +75,7 @@ background-repeat:no-repeat; background-size: 48px 48px
       <dl class="tabs" data-tab>
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
-	  <a href="#panel-name-description">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
+	  <a class="node_tab" href="#panel-name-description">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 	</dd>
 	<dd title="Click here to add/edit Prior Node">
 	  <a href="#panel-prior-node" class="prior_node_tab">{% trans "Requires" %}</a>
@@ -507,6 +507,9 @@ $.cd({
 }); //end of document click
 
 $(document).ready(function(){
+$(".prior_node_tab").trigger('click');
+$(".teaches_tab").trigger('click');
+$(".node_tab").trigger('click');
 $("#name_id").change(function(){
 
 			var name = $("#name_id").val();
@@ -660,8 +663,8 @@ $("#name_id").change(function(){
 
 
 	$("#save-node").click(function() {
-
-		pn_arr = []
+                      
+      		pn_arr = []
 		cn_arr = []
 		md_arr = [] //for adding module
 		tch_arr=[]  // for teaches

@@ -323,8 +323,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
   prior_node_list = request.POST.get('prior_node_list','')
+  print "prior node list",prior_node_list
 #  collection_list = request.POST.get('collection_set_list','')
   collection_list = request.POST.get('collection_list','')
+  print "collenct list",collection_list
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
@@ -442,9 +444,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   #node.prior_node = []
   if prior_node_list != '':
     prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
-
+    print "prior=",set(node.prior_node),set(prior_node_list)
     if set(node.prior_node) != set(prior_node_list):
+      print "dissimilar"
       i = 0
+      node.prior_node=[]
       while (i < len(prior_node_list)):
         node_id = ObjectId(prior_node_list[i])
         if gcollection.Node.one({"_id": node_id}):
@@ -454,7 +458,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         i = i+1
       # print "\n Changed: prior_node"
       is_changed = True
- 
+  else:
+    node.prior_node=[]
+    is_changed=True 
   # -------------------------------------------------------------------------------- collection
 
   # node.collection_set = []
@@ -472,8 +478,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   if collection_list != '':
     collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
-
+    print "check collection_list",set(node.collection_set),"and",set(collection_list)
     if set(node.collection_set) != set(collection_list):
+      print "list dissimilar",node.collection_set
       i = 0
       node.collection_set = []
 
@@ -488,7 +495,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         i = i+1
       # print "\n Changed: collection_list"
       is_changed = True
-     
+  else:
+    node.collection_set=[]
+    is_changed=True
   # -------------------------------------------------------------------------------- Module
 
   # node.collection_set = []
@@ -843,7 +852,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
 	#list_current_grelations = collection.Node.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
 	#removes all existing relations given subject and relation type and then creates again.
 	collection.remove({"_type":"GRelation","subject":subject_id,"relation_type":relationtype.get_dbref()})
-	
+
 	
 	
 	for relation_id in right_subject_id_list:
