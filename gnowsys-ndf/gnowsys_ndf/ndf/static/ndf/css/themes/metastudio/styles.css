@@ -8666,7 +8666,7 @@ article h1:not(.subheader) div input:hover {
   right: 10px;
   font-size: 3rem;
   color: #0eacb5;
-  opacity: 0.1;
+  opacity: 0.3;
 }
 /* line 313, ../../../scss/_metastudio_styles.scss */
 .card > * .preview {
