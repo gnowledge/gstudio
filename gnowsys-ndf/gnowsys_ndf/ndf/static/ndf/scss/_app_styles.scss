@@ -1,17 +1,14 @@
 /*
-*   foundation-skin.scss - Customized foundation stylesheet 
-*
-*   
+*   The Foundation Stylesheet
+*   You can paste sass snippets from compass or foundation here
+*   Consider submitting these snippets upstream
+*   http://compass-style.org/reference/compass/css3/
+*   http://foundation.zurb.com/docs/components/global.html
 */
 
-//Imports
-//The order of files allows the sass variables to be set first and then foundation is built using these variables
 
-@import "themes/metastudio/theme_settings";     //Skin settings
-@import "foundation_settings";             //Foundation settings
 
-@import "foundation";           //Foundation grid framework
-@import "styles";          //Application styles
+    
 
 
 /*

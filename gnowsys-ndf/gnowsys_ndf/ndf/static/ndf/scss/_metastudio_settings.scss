@@ -1,5 +1,8 @@
 /*
-*   _settings.scss - Metstudio style variables settings file
+*   Metstudio style settings file
+*   Based on foundation settings file from bower_components/foundation/_settings
+*   You can paste foundation sass variables here
+*   http://foundation.zurb.com/docs/using-sass.html
 */
 
 
@@ -7,6 +10,7 @@
 // THEME CONTROL SETTINGS
 //
 
+//
 // Color Pallette
 $theme-color:#33C284 !default;
 $theme-color-invert:scale-color($theme-color, $lightness: -60%);
@@ -28,7 +32,7 @@ $header-font-color: #222;
 $body-bg-color: #666;
 
 $bg-color: lighten($theme-color,90%);
-$meta-color:#666;
+$meta-color:#e01818;
 $active-color:lighten($theme-text-color,20%);
 
 //$label-font-color: #333;
@@ -44,7 +48,7 @@ $aside-color:#524549;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Settings below are only for reference, copy the appropriate line to the top from components/foundation/_settings
+// Settings below are only for reference, copy the appropriate line to the top from bower_components/foundation/_settings
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

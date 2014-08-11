@@ -1,10 +1,9 @@
 /*
-*   application.scss - Metstudio app layout stylsheet
-*
-*   Use this stylesheet for placements, positioning and sizing of elements
+*  Metstudio Platform Stylesheet
 */
 
-@import url("css.css");
+//Import any custom css
+@import url("../../custom.css");
 
 body{
   
@@ -17,7 +16,7 @@ body{
     h1{
         img{
             /* Logo */
-			height: 1.8rem;
+			height: 2.4rem;
 			margin-right: 5px;
 		}
         a{
@@ -35,7 +34,7 @@ body{
 
 		.workspace{
             //This is the main content container between the header and footer
-            background: url($theme-path+"body_background_image.png") no-repeat 0 bottom;
+            background: url("body_background_image.png") no-repeat 0 bottom;
 			min-height: 100%;
 			margin-bottom: -130px!important;
 			-webkit-box-sizing: border-box;
@@ -59,7 +58,7 @@ body{
             background-color: rgba(0,0,0,0.8);
 
             .sponsor{
-                background: url($theme-path+"footer_background_image.png") no-repeat center top;
+                background: url("footer_background_image.png") no-repeat center top;
                 &>*{
                     opacity: 0.1;
                 }
@@ -79,7 +78,7 @@ body{
                 margin-bottom: 3px;
                 margin-right: 3px;
                 display: inline-block;
-                background: #fafafa url("../images/gnu-head.png") no-repeat -35px -9px;
+                background: #fafafa url("../../../images/gnu-head.png") no-repeat -35px -9px;
                 &:hover{
                     background-position: -35px -19px;
                 }
@@ -309,7 +308,7 @@ h1:not(.subheader){
 	right: 10px;
 	font-size: 3rem;
 	color:$theme-color;
-	opacity: 0.1;
+	opacity: 0.3;
 }
     .preview{
         float: left;
@@ -374,36 +373,37 @@ h1:not(.subheader){
 
 
 /* Content Tabs */
-article .tabs{
-    i{
-	margin-right: 5px;
-	font-size: 1.3rem;
-}
-   
-}
-
 article{
     padding-left: 2rem!important;
+   
+        
 .tabs {
+    display: inline-block;
     dd a{
-        border-radius: 2px;
+        border-radius: 4px;
+        border: 1px transparent;
     }
     dd.active a{
         color:$active-color;
         border: 1px solid;
-        font-weight: bold;
     }
     dd:hover a{
         color:$active-color;
     }
+    
+    i{
+	margin-right: 5px;
+	font-size: 1.3rem;
 }
 }
+
 .tabs-content>.content{
 	padding-top: 0;
 }
 
 .content.row{
     margin: 0;
+}
 }
 
 /* Default card */

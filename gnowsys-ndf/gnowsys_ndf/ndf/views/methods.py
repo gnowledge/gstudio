@@ -323,7 +323,8 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
   prior_node_list = request.POST.get('prior_node_list','')
-  collection_list = request.POST.get('collection_set_list','')
+#  collection_list = request.POST.get('collection_set_list','')
+  collection_list = request.POST.get('collection_list','')
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
@@ -487,7 +488,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         i = i+1
       # print "\n Changed: collection_list"
       is_changed = True
-
      
   # -------------------------------------------------------------------------------- Module
 
@@ -503,7 +503,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   #     node.collection_set.append(node_id)
     
   #   i = i+1
-
   if module_list != '':
     collection_list = [ObjectId(each.strip()) for each in module_list.split(",")]
 
@@ -571,7 +570,6 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   
 def get_versioned_page(node):
             
-          
     rcs = RCS()
     fp = history_manager.get_file_path(node)
     cmd= 'rlog  %s' % \
@@ -593,7 +591,6 @@ def get_versioned_page(node):
                proc1.kill()
                return (node,rev_no)    
       if rev_no == '1.1':
-          
            node=history_manager.get_version_document(node,'1.1')
            proc1.kill()
            return(node,'1.1')
@@ -638,7 +635,6 @@ and if he has published his contents then he would be shown the current publishe
 
 '''
      username =request.user
-     # print node,"nodeeee"
      node1,ver1=get_versioned_page(node)
      node2,ver2=get_user_page(request,node)     
      
@@ -844,7 +840,6 @@ def create_RelationType(name,inverse_name,subject_type_name,object_type_name,use
 def create_grelation_list(subject_id, relation_type_name, right_subject_id_list):
 # function to create grelations for new ones and delete old ones.
 	relationtype = collection.Node.one({"_type":"RelationType","name":unicode(relation_type_name)})
-	
 	#list_current_grelations = collection.Node.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
 	#removes all existing relations given subject and relation type and then creates again.
 	collection.remove({"_type":"GRelation","subject":subject_id,"relation_type":relationtype.get_dbref()})
@@ -1180,7 +1175,6 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
 
   ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
-
   if ga_node is None:
     # Code for creation
     try:
@@ -1192,8 +1186,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
       
       ga_node.status = u"PUBLISHED"
       ga_node.save()
-      info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
-      print "\n ", info_message
+      #info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+      #print "\n ", info_message
 
     except Exception as e:
       error_message = "\n GAttributeCreateError: " + str(e) + "\n"
@@ -1223,11 +1217,9 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
         ga_node.status = u"PUBLISHED"
         ga_node.save()
         info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
-        print "\n", info_message
 
       else:
         info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
-        print "\n", info_message
 
     except Exception as e:
       error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
