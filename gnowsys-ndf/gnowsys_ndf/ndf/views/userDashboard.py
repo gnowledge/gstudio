@@ -23,6 +23,7 @@ except ImportError:  # old pymongo
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps
+from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
@@ -176,6 +177,110 @@ def dashboard(request, group_id, usrid):
                               },
                               context_instance=RequestContext(request)
     )
+
+def uDashboard(request, group_id):
+    usrid = group_id
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+        pass
+
+
+    ID = int(usrid)
+    userObject = User.objects.get(pk=ID)
+    usrname = userObject.username
+    date_of_join = request.user.date_joined
+    current_user = request.user.pk
+
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(usrname) })
+    prof_pic = collection.Node.one({'_type': u'RelationType', 'name': u'has_profile_pic'})
+    uploaded = "None"
+
+    if request.method == "POST" :
+      """
+      This will take the image uploaded by user and it searches if its already available in gridfs 
+      using its md5 
+      """ 	
+      for index, each in enumerate(request.FILES.getlist("doc[]", "")):
+      	fcol = db[File.collection_name]
+    	fileobj = fcol.File()
+    	filemd5 = hashlib.md5(each.read()).hexdigest()
+    	if fileobj.fs.files.exists({"md5":filemd5}):
+    	  coll = get_database()['fs.files']
+    	  a = coll.find_one({"md5":filemd5})
+    	  # prof_image takes the already available document of uploaded image from its md5 
+    	  prof_image = collection.Node.one({'_type': 'File', '_id': ObjectId(a['docid']) })
+
+    	else:
+    	  # If uploaded image is not found in gridfs stores this new image 
+      	  submitDoc(request, group_id)
+      	  # prof_image takes the already available document of uploaded image from its name
+      	  prof_image = collection.Node.one({'_type': 'File', 'name': unicode(each) })
+
+      # prof_img takes already available relation of user with its profile image
+      prof_img = collection.GRelation.one({'subject': ObjectId(auth._id), 'right_subject': ObjectId(prof_image._id) })
+      # If prof_img not found then it creates the relation of new uploaded image with its user
+      if not prof_img:
+        prof_img = collection.GRelation()
+        prof_img.subject = ObjectId(auth._id) 
+        prof_img.relation_type = prof_pic
+        prof_img.right_subject = ObjectId(prof_image._id)
+        prof_img.save()
+      else:
+        obj_img = collection.Node.one({'_id': ObjectId(prof_img.right_subject) })
+        uploaded = obj_img.name
+
+    
+    user_group = get_user_group(userObject)
+    user_task = get_user_task(userObject)
+    user_notification = get_user_notification(userObject)
+    user_activity = get_user_activity(userObject)
+                                                         
+    obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
+    
+    collab_drawer = []	
+    for each in obj.sort('last_update', -1):    # To populate collaborators according to their latest modification of particular resource:
+      for val in each.contributors:
+        name = User.objects.get(pk=val).username    
+        collab_drawer.append({'usrname':name, 'Id': val,'resource': each.name})   
+
+    
+    shelves = []
+    shelf_list = {}
+    if auth:
+      dbref_profile_pic = prof_pic.get_dbref()
+      prof_pic_rel = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_profile_pic })        
+
+      # prof_pic_rel will get the cursor object of relation of user with its profile picture 
+      if prof_pic_rel.count() :
+        index = prof_pic_rel.count() - 1
+        Index = prof_pic_rel[index].right_subject
+        # img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(prof_pic_rel['right_subject']) })      
+        img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
+      else:
+        img_obj = "" 
+
+    return render_to_response("ndf/uDashboard.html",
+                              {'username': usrname, 'user_id': ID, 'DOJ': date_of_join,
+                               'group_id':group_id, 'usr': current_user,             
+                               'author':auth,
+                               'already_uploaded': uploaded,
+                               'groupid':group_id,'prof_pic_obj': img_obj,
+                               'user_activity':user_activity, 'user_notification':user_notification,
+                               'user_task': user_task,'user_group':user_group
+                              },
+                              context_instance=RequestContext(request)
+    )
+
 
 def user_preferences(request,group_id,auth_id):
     try:
