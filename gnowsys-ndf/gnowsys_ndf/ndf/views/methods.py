@@ -13,7 +13,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.mobwrite.models import TextObj
 from gnowsys_ndf.ndf.models import HistoryManager
-
+from gnowsys_ndf.notification import models as notification
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 
 ''' -- imports from python libraries -- '''
@@ -323,8 +323,10 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
   prior_node_list = request.POST.get('prior_node_list','')
+  print "prior node list",prior_node_list
 #  collection_list = request.POST.get('collection_set_list','')
   collection_list = request.POST.get('collection_list','')
+  print "collenct list",collection_list
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
@@ -442,9 +444,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   #node.prior_node = []
   if prior_node_list != '':
     prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
-
+    print "prior=",set(node.prior_node),set(prior_node_list)
     if set(node.prior_node) != set(prior_node_list):
+      print "dissimilar"
       i = 0
+      node.prior_node=[]
       while (i < len(prior_node_list)):
         node_id = ObjectId(prior_node_list[i])
         if gcollection.Node.one({"_id": node_id}):
@@ -454,7 +458,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         i = i+1
       # print "\n Changed: prior_node"
       is_changed = True
- 
+  else:
+    node.prior_node=[]
+    is_changed=True 
   # -------------------------------------------------------------------------------- collection
 
   # node.collection_set = []
@@ -472,8 +478,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   if collection_list != '':
     collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
-
+    print "check collection_list",set(node.collection_set),"and",set(collection_list)
     if set(node.collection_set) != set(collection_list):
+      print "list dissimilar",node.collection_set
       i = 0
       node.collection_set = []
 
@@ -488,7 +495,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
         i = i+1
       # print "\n Changed: collection_list"
       is_changed = True
-     
+  else:
+    node.collection_set=[]
+    is_changed=True
   # -------------------------------------------------------------------------------- Module
 
   # node.collection_set = []
@@ -843,7 +852,7 @@ def create_grelation_list(subject_id, relation_type_name, right_subject_id_list)
 	#list_current_grelations = collection.Node.find({"_type":"GRelation","subject":subject_id,"relation_type":relationtype})
 	#removes all existing relations given subject and relation type and then creates again.
 	collection.remove({"_type":"GRelation","subject":subject_id,"relation_type":relationtype.get_dbref()})
-	
+
 	
 	
 	for relation_id in right_subject_id_list:
@@ -1186,8 +1195,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
       
       ga_node.status = u"PUBLISHED"
       ga_node.save()
-      info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
-      print "\n ", info_message
+      #info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+      #print "\n ", info_message
 
     except Exception as e:
       error_message = "\n GAttributeCreateError: " + str(e) + "\n"
@@ -1441,3 +1450,98 @@ def discussion_reply(request, group_id):
     raise Exception(error_message)
 
     return HttpResponse(json.dumps(["Server Error"]))
+
+
+def get_user_group(userObject):
+  '''
+  methods for getting user's belongs to group.
+  input (userObject) is user object
+  output list of dict, dict contain groupname, access, group_type, created_at and created_by
+  '''
+  blank_list = []
+  cur_groups_user = collection.Node.find({'_type': "Group", 
+                                          '$or': [
+                                            {'created_by': userObject.id}, 
+                                            {'group_admin': userObject.id},
+                                            {'author_set': userObject.id},
+                                          ]
+                                        }).sort('last_update', -1)
+  for eachgroup in cur_groups_user :
+    access = ""
+    if eachgroup.created_by == userObject.id:
+      access = "owner"
+    elif userObject.id in eachgroup.group_admin :
+      access = "admin"
+    elif userObject.id in eachgroup.author_set :
+      access = "member"
+    else :
+      access = "member"
+    user = User.objects.get(id=eachgroup.created_by)
+    blank_list.append({'id':str(eachgroup._id), 'name':eachgroup.name, 'access':access, 'group_type':eachgroup.group_type, 'created_at':eachgroup.created_at, 'created_by':user.username})
+  return blank_list
+  
+def get_user_task(userObject):
+  '''
+  methods for getting user's assigned task.
+  input (userObject) is user object
+  output list of dict, dict contain taskname, status, due_time, created_at and created_by, group_name
+  '''
+  blank_list = []
+  attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+  attributetype_status = collection.Node.find_one({"_type":'AttributeType', 'name':'Status'})
+  attributetype_end_time = collection.Node.find_one({"_type":'AttributeType', 'name':'end_time'})
+  attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":userObject.username})
+  for attr in attr_assignee :
+    blankdict = {}
+    task_node = collection.Node.find_one({'_id':attr.subject})
+    attr_status = collection.Node.find_one({"_type":"GAttribute", "attribute_type.$id":attributetype_status._id, "subject":task_node._id})
+    attr_end_time = collection.Node.find_one({"_type":"GAttribute", "attribute_type.$id":attributetype_end_time._id, "subject":task_node._id})
+    if attr_status.object_value is not "closed":
+      group = collection.Node.find_one({"_id":task_node.group_set[0]})
+      user = User.objects.get(id=task_node.created_by)
+      blankdict.update({'name':task_node.name, 'created_at':task_node.created_at, 'created_by':user.username, 'group_name':group.name, 'id':str(task_node._id)})
+      blankdict.update({'status':attr_status.object_value})
+      blankdict.update({'due_time':attr_end_time.object_value})
+      blank_list.append(blankdict)
+  return blank_list
+
+def get_user_notification(userObject):
+  '''
+  methods for getting user's notification.
+  input (userObject) is user object
+  output list of dict, dict contain notice label, notice display
+  '''
+  blank_list = []
+  notification_object = notification.NoticeSetting.objects.filter(user_id=userObject.id)
+  for each in notification_object.reverse():
+    ntid = each.notice_type_id
+    ntype = notification.NoticeType.objects.get(id=ntid)
+    label = ntype.label.split("-")[0]
+    blank_list.append({'label':label, 'display': ntype.display})
+  blank_list.reverse()
+  return blank_list
+
+def get_user_activity(userObject):
+  '''
+  methods for getting user's activity.
+  input (userObject) is user object
+  output list of dict, dict 
+  '''
+  blank_list = []
+  activity = ""
+  activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'Group'},{'_type':'File'}]}, 
+                                                 {'$or':[{'created_by':userObject.id}, {'modified_by':userObject.id}]}] }).sort('last_update', -1).limit(10)
+  for each in activity_user:
+    if each.created_by == each.modified_by :
+      if each.last_update == each.created_at:
+        activity =  'created'
+      else :
+        activity =  'modified'
+    else :
+      activity =  'created'
+    if each._type == 'Group':
+      blank_list.append({'id':str(each._id), 'name':each.name, 'date':each.last_update, 'activity': activity, 'type': each._type})
+    else :
+      member_of = collection.Node.find_one({"_id":each.member_of[0]})
+      blank_list.append({'id':str(each._id), 'name':each.name, 'date':each.last_update, 'activity': activity, 'type': each._type, 'group_id':str(each.group_set[0]), 'member_of':member_of.name.lower()})
+  return blank_list
