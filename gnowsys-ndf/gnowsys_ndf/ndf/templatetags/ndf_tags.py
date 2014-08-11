@@ -668,7 +668,7 @@ def check_user_join(request,group_id):
 		if colg.created_by == user_id:
 			return "author"
 		if colg.author_set:
-			if user_id in colg.author_set:
+			if user_id in colg.group_admin or user_id in colg.author_set:
 				return "joined"
 			else:
 				return "not"
