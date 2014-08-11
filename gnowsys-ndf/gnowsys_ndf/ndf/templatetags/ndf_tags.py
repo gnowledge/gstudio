@@ -982,8 +982,8 @@ def get_group_type(group_id, user):
 
 			# Check is user is logged in
 			if  user.id:
-				# condition for group accesseble to logged user
-				if colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
+				# condition for group accessible to logged user
+				if user.is_superuser or colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
 					return "allowed"
 				else:
 					error_message = "Access denied: You are not an authorized user!!!"
