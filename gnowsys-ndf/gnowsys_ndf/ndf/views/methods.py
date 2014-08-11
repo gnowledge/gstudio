@@ -1186,8 +1186,8 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
       
       ga_node.status = u"PUBLISHED"
       ga_node.save()
-      info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
-      print "\n ", info_message
+      #info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+      #print "\n ", info_message
 
     except Exception as e:
       error_message = "\n GAttributeCreateError: " + str(e) + "\n"
