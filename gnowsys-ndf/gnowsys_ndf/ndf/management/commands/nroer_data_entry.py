@@ -4,6 +4,7 @@ import csv
 import json
 import ast
 import datetime
+import urllib2
 
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
@@ -243,7 +244,7 @@ def parse_data_create_gsystem(json_file_path):
               # print "\n\n-----======-\n", attribute_relation_list
               
               # print "\n\n",parsed_json_document#.get(name)
-          # node = create_resource_system(parsed_json_document)
+          node = create_resource_gsystem(parsed_json_document)
               
               # if node:
               #     if not attribute_relation_list:
@@ -419,19 +420,23 @@ def parse_data_create_gsystem(json_file_path):
             print e
 
 
-def create_resource_system(resource_data):
+def create_resource_gsystem(resource_data):
   
-  # print resource_data.get("name")
-  
+  resource_link = resource_data.get("resource_link")
+  # print "\n----------\n", resource_link
+  files = urllib2.urlopen(resource_link)
+  # print files.read(100)
+
   title = resource_data["name"]
   userid = resource_data["created_by"]
+  group_id = home_group._id
   content_org = resource_data["content_org"]
   tags = resource_data["tags"]
   # img_type = resource_data[]
   language = resource_data["language"]
   # usrname = resource_data[]
   # page_url = resource_data[]
-  access_policy = resource_data["PUBLIC"]
+  access_policy = "PUBLIC"
 
 
   # for storing location in the file
