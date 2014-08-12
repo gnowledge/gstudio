@@ -323,10 +323,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
   prior_node_list = request.POST.get('prior_node_list','')
-  print "prior node list",prior_node_list
-#  collection_list = request.POST.get('collection_set_list','')
   collection_list = request.POST.get('collection_list','')
-  print "collenct list",collection_list
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
@@ -457,9 +454,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       i = i+1
     # print "\n Changed: prior_node"
     is_changed = True
-  # else:
-  #   node.prior_node=[]
-  #   is_changed=True 
+  
   # -------------------------------------------------------------------------------- collection
 
   # node.collection_set = []
@@ -493,9 +488,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       i = i+1
     # print "\n Changed: collection_list"
     is_changed = True
-  # else:
-  #   node.collection_set=[]
-  #   is_changed=True
+  
   # -------------------------------------------------------------------------------- Module
 
   # node.collection_set = []
