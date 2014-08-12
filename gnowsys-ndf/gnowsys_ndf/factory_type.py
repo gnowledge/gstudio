@@ -98,6 +98,9 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                                          'meta_type':'factory_types'}},
                            {'source':{'gsystem_names_list':['File','Page'],
                                       'data_type':'basestring',
+                                      'meta_type':'factory_types'}},
+                           {'adaptation_of':{'gsystem_names_list':['File','Page'],
+                                      'data_type':'basestring',
                                       'meta_type':'factory_types'}}]
 
 
