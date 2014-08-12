@@ -444,23 +444,22 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   #node.prior_node = []
   if prior_node_list != '':
     prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
-    print "prior=",set(node.prior_node),set(prior_node_list)
-    if set(node.prior_node) != set(prior_node_list):
-      print "dissimilar"
-      i = 0
-      node.prior_node=[]
-      while (i < len(prior_node_list)):
-        node_id = ObjectId(prior_node_list[i])
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.prior_node:
-            node.prior_node.append(node_id)
-        
-        i = i+1
-      # print "\n Changed: prior_node"
-      is_changed = True
-  else:
+
+  if set(node.prior_node) != set(prior_node_list):
+    i = 0
     node.prior_node=[]
-    is_changed=True 
+    while (i < len(prior_node_list)):
+      node_id = ObjectId(prior_node_list[i])
+      if gcollection.Node.one({"_id": node_id}):
+        if node_id not in node.prior_node:
+          node.prior_node.append(node_id)
+      
+      i = i+1
+    # print "\n Changed: prior_node"
+    is_changed = True
+  # else:
+  #   node.prior_node=[]
+  #   is_changed=True 
   # -------------------------------------------------------------------------------- collection
 
   # node.collection_set = []
@@ -478,26 +477,25 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   if collection_list != '':
     collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
-    print "check collection_list",set(node.collection_set),"and",set(collection_list)
-    if set(node.collection_set) != set(collection_list):
-      print "list dissimilar",node.collection_set
-      i = 0
-      node.collection_set = []
 
-      # checking if each _id in collection_list is valid or not
-      while (i < len(collection_list)):
-        node_id = ObjectId(collection_list[i])
-        
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.collection_set:
-            node.collection_set.append(node_id)
-        
-        i = i+1
-      # print "\n Changed: collection_list"
-      is_changed = True
-  else:
-    node.collection_set=[]
-    is_changed=True
+  if set(node.collection_set) != set(collection_list):
+    i = 0
+    node.collection_set = []
+
+    # checking if each _id in collection_list is valid or not
+    while (i < len(collection_list)):
+      node_id = ObjectId(collection_list[i])
+      
+      if gcollection.Node.one({"_id": node_id}):
+        if node_id not in node.collection_set:
+          node.collection_set.append(node_id)
+      
+      i = i+1
+    # print "\n Changed: collection_list"
+    is_changed = True
+  # else:
+  #   node.collection_set=[]
+  #   is_changed=True
   # -------------------------------------------------------------------------------- Module
 
   # node.collection_set = []
@@ -515,18 +513,18 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   if module_list != '':
     collection_list = [ObjectId(each.strip()) for each in module_list.split(",")]
 
-    if set(node.collection_set) != set(collection_list):
-      i = 0
-      while (i < len(collection_list)):
-        node_id = ObjectId(collection_list[i])
-        
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.collection_set:
-            node.collection_set.append(node_id)
-        
-        i = i+1
-      # print "\n Changed: module_list"
-      is_changed = True
+  if set(node.collection_set) != set(collection_list):
+    i = 0
+    while (i < len(collection_list)):
+      node_id = ObjectId(collection_list[i])
+      
+      if gcollection.Node.one({"_id": node_id}):
+        if node_id not in node.collection_set:
+          node.collection_set.append(node_id)
+      
+      i = i+1
+    # print "\n Changed: module_list"
+    is_changed = True
     
   # ------------------------------------------------------------------------------- org-content
   
