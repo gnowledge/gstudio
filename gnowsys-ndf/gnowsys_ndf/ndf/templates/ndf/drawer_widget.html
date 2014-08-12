@@ -148,8 +148,8 @@
     $(".resource-drawer").height(liHeight * 6);
 
     // To select the single as well as multiple items from list 
-    $(document).on('click','#{{widget_for}}_drawer1 li.bullet-item',function(e){
-    //$("#{{widget_for}}_drawer1 li.bullet-item").on("click", function(e) {
+    // $(document).on('click','#{{widget_for}}_drawer1 li.bullet-item',function(e){
+    $("#{{widget_for}}_drawer1 li.bullet-item").on("click", function(e) {
       if (e.ctrlKey)
       {        
         $(this).toggleClass('selected-resource');
@@ -162,8 +162,8 @@
         
     }); 
 
-     $(document).on('click','#{{widget_for}}_drawer2 li.bullet-item',function(e){
-    //$("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
+    // $(document).on('click','#{{widget_for}}_drawer2 li.bullet-item',function(e){
+    $("#{{widget_for}}_drawer2 li.bullet-item").click(function(e){
       
       if (e.ctrlKey)
       {        
