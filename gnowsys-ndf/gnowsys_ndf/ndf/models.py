@@ -928,7 +928,8 @@ class GSystem(Node):
                                                 # along with their sub-collection elemnts too 
         'author_set': [int],                     # List of Authors
 
-        'annotations' : [dict]      # List of json files for annotations on the page
+        'annotations' : [dict],      # List of json files for annotations on the page
+        'license': basestring       # contains license/s in string format
     }
     
     use_dot_notation = True
