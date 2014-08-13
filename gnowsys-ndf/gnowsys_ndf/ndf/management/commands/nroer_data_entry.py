@@ -36,6 +36,8 @@ from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
 from gnowsys_ndf.ndf.views.file import save_file, getFileSize
+from gnowsys_ndf.ndf.views.methods import create_gattribute
+from gnowsys_ndf.ndf.management.commands.data_entry import perform_eval_type
 
 ####################################################################################################################
 
@@ -286,6 +288,7 @@ def parse_data_create_gsystem(json_file_path):
               # print "\n", attr_key,"======", attr_value
               
               if key == attr_key:
+                # print key
                 is_relation = False
 
                 # setting value to "0" for int, float, long (to avoid casting error)
@@ -341,15 +344,18 @@ def parse_data_create_gsystem(json_file_path):
                     perform_eval_type(key, json_document, "GSystem")
 
                   subject_id = node._id
+                  # print "\n-----\nsubject_id: ", subject_id
                   attribute_type_node = collection.Node.one({'_type': "AttributeType", 
                                      '$or': [{'name': {'$regex': "^"+attr_key+"$", '$options': 'i'}}, 
                                      {'altnames': {'$regex': "^"+attr_key+"$", '$options': 'i'}}]
                                      })
+                  # print "\nattribute_type_node: ", attribute_type_node.name
                   object_value = json_document[key]
-
+                  # print "\nobject_value: ", object_value
                   ga_node = None
 
                   info_message = "\n Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
+                  # print info_message
                   # ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
 
                   # To break outer for loop as key found
@@ -358,8 +364,83 @@ def parse_data_create_gsystem(json_file_path):
                 else:
                   error_message = "\n DataNotFound: No data found for field ("+attr_key+") while creating GSystem ( -- "+node.name+") !!!\n"
 
-              if is_relation:
-                relation_list.append(key)
+            if is_relation:
+              relation_list.append(key)
+
+          if not relation_list:
+            # No possible relations defined for this node
+            info_message = "\n "+gsystem_type_name+" ("+node.name+"): No possible relations defined for this node !!!\n"
+            # log_list.append(info_message)
+            return
+
+          gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
+
+          # Write code for setting relations
+          for key in relation_list:
+            is_relation = True
+
+            for rel_key, rel_value in gst_possible_relations_dict.iteritems():
+              if key == rel_key:
+                is_relation = False
+
+                if json_document[key]:
+                  # Here semi-colon(';') is used instead of comma(',')
+                  # Beacuse one of the value may contain comma(',') which causes problem in finding required value in database
+                  if ";" not in json_document[key]:
+                    # Necessary to inform perform_eval_type() that handle this value as list
+                    json_document[key] = "\""+json_document[key]+"\", "
+
+                  else:
+                    formatted_value = ""
+                    for v in json_document[key].split(";"):
+                        formatted_value += "\""+v.strip(" ")+"\", "
+                    json_document[key] = formatted_value
+
+                  print "\n----------", json_document[key]
+                  # info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
+
+                  perform_eval_type(key, json_document, "GSystem", "GSystem")
+
+                  # for right_subject_id in json_document[key]:
+
+                  #   subject_id = node._id
+
+                  #   # Here we are appending list of ObjectIds of GSystemType's type_of field 
+                  #   # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
+                  #   # This is because some of the RelationType's are holding Base class's ObjectId
+                  #   # and not that of the Derived one's
+                  #   # Delibrately keeping GSystemType's ObjectId first in the list
+                  #   # And hence, used $in operator in the query!
+                  #   rel_subject_type = []
+                  #   rel_subject_type.append(file_gst._id)
+                    
+                  #   if file_gst.type_of:
+                  #       rel_subject_type.extend(file_gst.type_of)
+
+                  #   relation_type_node = collection.Node.one({'_type': "RelationType", 
+                  #                                             '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
+                  #                                                     {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
+                  #                                             'subject_type': {'$in': rel_subject_type}
+                  #                                     })
+
+                  #   info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(right_subject_id)+") ...\n"
+                  #   print info_message
+                  #   gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
+                  
+                  # To break outer for loop if key found
+                  break
+
+                else:
+                  error_message = "\n DataNotFound: No data found for relation ("+rel_key+") while creating GSystem ("+file_gst.name+" -- "+node.name+") !!!\n"
+                  # print error_message
+
+                  break
+
+
+
+
+
+          # print relation_list
 
       except Exception as e:
           # error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
