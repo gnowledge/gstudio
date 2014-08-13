@@ -215,6 +215,7 @@ def create_group(request,group_id):
     colg.visibility_policy = request.POST.get('existance', "")
     colg.disclosure_policy = request.POST.get('member', "")
     colg.encryption_policy = request.POST.get('encryption', "")
+    colg.agency_type=request.POST.get('agency_type',"")
     colg.save()
     
     if colg.edit_policy == "EDITABLE_MODERATED":
@@ -401,15 +402,15 @@ def edit_group(request,group_id):
 
     if page_node.access_policy == "PRIVATE":
       page_node.group_type = "PRIVATE"
-
     page_node.save(is_changed=is_node_changed)
     group_id=page_node._id
+    page_node.get_neighbourhood(page_node.member_of)
     return HttpResponseRedirect(reverse('groupchange', kwargs={'group_id':group_id}))
 
   else:
     if page_node.status == u"DRAFT":
       page_node, ver = get_page(request, page_node)
-
+      page_node.get_neighbourhood(page_node.member_of) 
   return render_to_response("ndf/edit_group.html",
                                     { 'node': page_node,
                                       'groupid':group_id,

@@ -56,11 +56,12 @@ ul#graph-hover.f-dropdown{
 
     {% if node.name == request.user.username %}
       <div id="change_settings" class="content">
+         <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
 
-        <div style='display:table-row;'>
+         <div style='display:table-row;'>
 
           <div style='display:table-cell;'> 
-            <font size="3" >{% trans "Following policy" %}</font>
+            <font size="3" >{% trans "Subscription policy" %}</font>
           </div>
 
           <div style='display:table-cell;'> 
@@ -70,8 +71,22 @@ ul#graph-hover.f-dropdown{
               <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
             </select>
           </div>
+          <div style='display:table-cell;'> 
+            <font size="3" >{% trans "User policy" %}</font>
+          </div>
+
+          {% get_author_agency_types as author_agency_types %}
+          <div style='display:table-cell;'> 
+            <select name="agency_type" id="agency_type">
+              {% for each in author_agency_types %}
+                 <option id="{{each}}">{{each}}</option>
+              {% endfor %}
+            </select>
+          </div>
+ 
 
         </div>
+
 
         <div style='display:table-row;'>
  
@@ -83,7 +98,7 @@ ul#graph-hover.f-dropdown{
         </div>
         
       </div>
-        
+     </div>   
     {% else %}
     <div id="change_settings" class="content">
 
@@ -166,8 +181,21 @@ ul#graph-hover.f-dropdown{
    <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
  </select>
  </div>
-
+</div>
 <div style='display:table-row;'>
+ <div style='display:table-cell;'> 
+    <font size="3" >{% trans "Group Agency Types" %}</font>
+  </div>
+ {% get_group_agency_types as agency_types %}
+  <div style='display:table-cell;'> 
+    <select name="agency_type" id="agency_type">
+     {% for each in agency_types %}
+     <option id="{{each}}">{{each}}</option>
+
+     {% endfor %}
+   </select>
+ </div>
+
   <div style='display:table-cell;' colspan='2' align="middle"> 
     <input type="button" id="changeButton" value="Change"  class="button">
     <img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
@@ -270,6 +298,7 @@ var subscription_policy  = document.getElementById("subscription_policy")
 var visibility_policy  = document.getElementById("visibility_policy")
 var disclosure_policy  = document.getElementById("disclosure_policy")
 var encryption_policy  = document.getElementById("encryption_policy")
+var agency_type = document.getElementById("agency_type")
 {% if node.edit_policy %}
 edit_policy.selectedIndex = edit_policy.options.{{node.edit_policy}}.index
 {% endif %}
@@ -291,7 +320,6 @@ encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_po
 
 
 $(document).on('click',"#changeButton",function(){
-
 $.ajax({
 url:'/{{node}}/ajax/change_group_settings/',
 type: 'POST',
