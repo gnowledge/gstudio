@@ -5,6 +5,18 @@ import json
 import ast
 import datetime
 import urllib2
+import hashlib
+import magic  #for this install python-magic example:pip install python-magic
+import subprocess
+import mimetypes
+from PIL import Image, ImageDraw, ImageFile #install PIL example:pip install PIL
+from StringIO import StringIO
+import os
+import subprocess
+import ox
+import threading
+import io
+from django.http import Http404
 
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
@@ -20,10 +32,10 @@ except ImportError:  # old pymongo
 
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
-from gnowsys_ndf.ndf.models import Node
+from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
-from gnowsys_ndf.ndf.views.file import save_file
+from gnowsys_ndf.ndf.views.file import save_file, getFileSize
 
 ####################################################################################################################
 
@@ -166,284 +178,263 @@ def parse_data_create_gsystem(json_file_path):
         raise error_message
 
     for i, json_document in enumerate(json_documents_list):
-        try:
+      # print i
+      try:
 
-          parsed_json_document = {}
-          node_field_json = {}
-          attribute_relation_list = []
+        parsed_json_document = {}
+        # node_field_json = {}
+        attribute_relation_list = []
+        
+        for key in json_document.iterkeys():
+          parsed_key = key.lower()
+          # print parsed_key
+          # parsed_key = parsed_key.replace(" ", "_")
           
-          for key in json_document.iterkeys():
-            parsed_key = key.lower()
-            # print parsed_key
-            # parsed_key = parsed_key.replace(" ", "_")
-            
-            if parsed_key in node_keys:
-              # print "~~~~" + key
+          if parsed_key in node_keys:
+            # print "~~~~" + key
 
-              # adding the default field values e.g: created_by, member_of
-              
-              # created_by
-              if parsed_key == "created_by":
-                if json_document[key]:
-                  temp_user_id = get_user_id(json_document[key].strip())
-                  if temp_user_id:
-                    parsed_json_document[parsed_key] = temp_user_id
-                else:
-                  parsed_json_document[parsed_key] = get_user_id("nroer_team")
-                # print "---", parsed_json_document[parsed_key]
-              # contributors
-              elif parsed_key == "contributors":
-                if json_document[key]:
-                  contrib_list = json_document[key].split(",")
-
-                  temp_contributors = []
-                  for each_user in contrib_list:
-                    user_id = get_user_id(each_user.strip())
-                    if user_id:
-                      temp_contributors.append(user_id)
-                  parsed_json_document[parsed_key] = temp_contributors
-                  # print "===", parsed_json_document[parsed_key]
-              # tags
-              elif (parsed_key == "tags") and json_document[key]:
-                tag_list = json_document[key].replace("\n", "").split(",")
-                temp_tag_list = []
-                for each_tag in tag_list:
-                  if each_tag:
-                    temp_tag_list.append(each_tag.strip())
-                parsed_json_document[parsed_key] = temp_tag_list
-                # print parsed_json_document[parsed_key]
-              #member_of
-              elif parsed_key == "member_of":
-                parsed_json_document[parsed_key] = [file_gst._id]
-                # print parsed_json_document[parsed_key]
-
-              # --- END of addind the default field values
-
-
-              if node_structure[parsed_key] == unicode:
-                parsed_json_document[parsed_key] = unicode(json_document[key])
-              elif node_structure[parsed_key] == basestring:
-                parsed_json_document[parsed_key] = str(json_document[key])
-              elif (node_structure[parsed_key] == int) and (type(json_document[key]) == int):
-                parsed_json_document[parsed_key] = int(json_document[key])
-              elif node_structure[parsed_key] == bool: # converting unicode to int and then to bool
-                parsed_json_document[parsed_key] = bool(int(json_document[key]))
-              elif node_structure[parsed_key] == datetime.datetime:
-                parsed_json_document[parsed_key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
+            # adding the default field values e.g: created_by, member_of
+            # created_by
+            if parsed_key == "created_by":
+              if json_document[key]:
+                temp_user_id = get_user_id(json_document[key].strip())
+                if temp_user_id:
+                  parsed_json_document[parsed_key] = temp_user_id
               else:
-                parsed_json_document[parsed_key] = json_document[key]
+                parsed_json_document[parsed_key] = get_user_id("nroer_team")
+              # print "---", parsed_json_document[parsed_key]
+            # contributors
+            elif parsed_key == "contributors":
+              if json_document[key]:
+                contrib_list = json_document[key].split(",")
 
-                    # creating file gst instance and feeding the values
-               # file_obj = collection.File()
+                temp_contributors = []
+                for each_user in contrib_list:
+                  user_id = get_user_id(each_user.strip())
+                  if user_id:
+                    temp_contributors.append(user_id)
+                parsed_json_document[parsed_key] = temp_contributors
+              else:
+                parsed_json_document[parsed_key] = []
+                # print "===", parsed_json_document[parsed_key]
+            # tags
+            elif (parsed_key == "tags") and json_document[key]:
+              tag_list = json_document[key].replace("\n", "").split(",")
+              temp_tag_list = []
+              for each_tag in tag_list:
+                if each_tag:
+                  temp_tag_list.append(each_tag.strip())
+              parsed_json_document[parsed_key] = temp_tag_list
+              # print parsed_json_document[parsed_key]
+            #member_of
+            elif parsed_key == "member_of":
+              parsed_json_document[parsed_key] = [file_gst._id]
+              # print parsed_json_document[parsed_key]
+            # --- END of addind the default field values
 
+            # processing for remaining fields
+            elif node_structure[parsed_key] == unicode:
+              parsed_json_document[parsed_key] = unicode(json_document[key])
+            elif node_structure[parsed_key] == basestring:
+              parsed_json_document[parsed_key] = str(json_document[key])
+            elif (node_structure[parsed_key] == int) and (type(json_document[key]) == int):
+              parsed_json_document[parsed_key] = int(json_document[key])
+            elif node_structure[parsed_key] == bool: # converting unicode to int and then to bool
+              parsed_json_document[parsed_key] = bool(int(json_document[key]))
+            # elif node_structure[parsed_key] == list:
+              # parsed_json_document[parsed_key] = list(json_document[key])
+            elif node_structure[parsed_key] == datetime.datetime:
+              parsed_json_document[parsed_key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
             else:
-              parsed_json_document[key] = json_document[key]
-              attribute_relation_list.append(key)
+              parsed_json_document[parsed_key] = json_document[key]
+            # --- END of processing for remaining fields
+
+                  # creating file gst instance and feeding the values
+             # file_obj = collection.File()
+
+          else:
+            parsed_json_document[key] = json_document[key]
+            attribute_relation_list.append(key)
+          
+          # print "\n----------\n", parsed_key , "\t" , parsed_json_document[parsed_key]
+            # print "\n\n-----======-\n", attribute_relation_list
             
-            # print "\n----------\n", parsed_key , "\t" , parsed_json_document[parsed_key]
-              # print "\n\n-----======-\n", attribute_relation_list
-              
-              # print "\n\n",parsed_json_document#.get(name)
-          node = create_resource_gsystem(parsed_json_document)
-              
-              # if node:
-              #     if not attribute_relation_list:
-              #         # Neither possible attribute fields, nor possible relations defined for this node
-              #         info_message = "\n "+gsystem_type_name+" ("+node.name+"): Neither possible attribute fields, nor possible relations defined for this node !\n"
-              #         log_list.append(info_message)
-              #         continue
-              
-              #     gst_possible_attributes_dict = node.get_possible_attributes(gsystem_type_id)
-              
-              #     relation_list = []
-              #     json_document['name'] = node.name
-              
-              #     # Write code for setting atrributes
-              #     for key in attribute_relation_list:
-              #         is_relation = True
-              
-              #         for attr_key, attr_value in gst_possible_attributes_dict.iteritems():
-              #             if key == attr_value['altnames'].lower() or key == attr_key.lower():
-              #                 is_relation = False
+        # print "\t",parsed_json_document.get("created_by")
+        # if i == 0:
+          # print parsed_json_document
+        
+        # node = create_resource_gsystem(parsed_json_document)
+        node = collection.File.one({ "_id": ObjectId('53eb5abf1d41c81d18bb104b') })
+        # print node, "\n"
+
+        if node and attribute_relation_list:
+
+          gst_possible_attributes_dict = node.get_possible_attributes(file_gst._id)
+          # print gst_possible_attributes_dict
+
+          relation_list = []
+          json_document['name'] = node.name
+
+
+          # Write code for setting atrributes
+          for key in attribute_relation_list:
             
-              #                 if json_document[key]:
-              #                     if attr_value['data_type'] == basestring:
-              #                         if u"\u2013" in json_document[key]:
-              #                             json_document[key] = json_document[key].replace(u"\u2013", "-")
+            is_relation = True
+            # print "\n", key, "----------\n"
+            
+            for attr_key, attr_value in gst_possible_attributes_dict.iteritems():
+              # print "\n", attr_key,"======", attr_value
               
-              #                     info_message = "\n For GAttribute parsing content | key: " + attr_key + " -- " + json_document[key]
-              #                     log_list.append(info_message)
-              
-              
-              #                     if attr_value['data_type'] == unicode:
-              #                         json_document[key] = unicode(json_document[key])
-              
-              #                     elif attr_value['data_type'] == bool: 
-              #                         if json_document[key].lower() == "yes":
-              #                             json_document[key] = True
-              #                         elif json_document[key].lower() == "no":
-              #                             json_document[key] = False
-              #                         else:
-              #                             json_document[key] = None
-              
-              #                     elif attr_value['data_type'] == datetime.datetime:
-              
-              #                         if key == "dob" or key == "date of birth":
-              #                             json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
-              #                         else:
-              #                             json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")
-              
-              #                     elif attr_value['data_type'] in [int, float, long]:
-              #                         if not json_document[key]:
-              #                             json_document[key] = 0
-              #                         else:
-              #                             if attr_value['data_type'] == int:
-              #                                 json_document[key] = int(json_document[key])
-              #                             elif attr_value['data_type'] == float:
-              #                                 json_document[key] = float(json_document[key])
-              #                             else:
-              #                                 json_document[key] = long(json_document[key])
+              if key == attr_key:
+                is_relation = False
 
-              #                     elif type(attr_value['data_type']) == IS:
-              #                         for op in attr_value['data_type']._operands:
-              #                             if op.lower() == json_document[key].lower():
-              #                                 json_document[key] = op
-              
-              #                     elif (attr_value['data_type'] in [list, dict]) or (type(attr_value['data_type']) in [list, dict]):
-              #                         if "," not in json_document[key]:
-              #                             # Necessary to inform perform_eval_type() that handle this value as list
-              #                             json_document[key] = "\"" + json_document[key] + "\", "
-              
-              #                         else:
-              #                             formatted_value = ""
-              #                             for v in json_document[key].split(","):
-              #                                 formatted_value += "\""+v.strip(" ")+"\", "
-              #                             json_document[key] = formatted_value
-              
-              #                         perform_eval_type(key, json_document, "GSystem")
-              
-              #                     subject_id = node._id
-              #                     attribute_type_node = collection.Node.one({'_type': "AttributeType", 
-              #                                                                '$or': [{'name': {'$regex': "^"+attr_key+"$", '$options': 'i'}}, 
-              #                                                                        {'altnames': {'$regex': "^"+attr_key+"$", '$options': 'i'}}]
-              #                                                            })
-              #                     object_value = json_document[key]
-              
-              #                     ga_node = None
-              
-              #                     info_message = "\n Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
-              #                     log_list.append(info_message)
-              #                     ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
-              
-              #                     # To break outer for loop as key found
-              #                     break
-              
-              #                 else:
-              #                     error_message = "\n DataNotFound: No data found for field ("+attr_key+") while creating GSystem ("+gsystem_type_name+" -- "+node.name+") !!!\n"
-              #                     log_list.append(error_message)
-              
-              #         if is_relation:
-              #             relation_list.append(key)
-              
-              #     if not relation_list:
-              #         # No possible relations defined for this node
-              #         info_message = "\n "+gsystem_type_name+" ("+node.name+"): No possible relations defined for this node !!!\n"
-              #         log_list.append(info_message)
-              #         return
-              
-              #     gst_possible_relations_dict = node.get_possible_relations(gsystem_type_id)
-              
-              #     # Write code for setting relations
-              #     for key in relation_list:
-              #         is_relation = True
-              
-              #         for rel_key, rel_value in gst_possible_relations_dict.iteritems():
-              #             if key == rel_value['altnames'].lower() or key == rel_key.lower():
-              #                 is_relation = False
-              
-              #                 if json_document[key]:
-              #                     # Here semi-colon(';') is used instead of comma(',')
-              #                     # Beacuse one of the value may contain comma(',') which causes problem in finding required value in database
-              #                     if ";" not in json_document[key]:
-              #                         # Necessary to inform perform_eval_type() that handle this value as list
-              #                         json_document[key] = "\""+json_document[key]+"\", "
+                # setting value to "0" for int, float, long (to avoid casting error)
+                if (attr_value['data_type'] in [int, float, long]) and (not json_document[key]):
+                  json_document[key] = 0
 
-            #                     else:
-            #                         formatted_value = ""
-            #                         for v in json_document[key].split(";"):
-            #                             formatted_value += "\""+v.strip(" ")+"\", "
-            #                         json_document[key] = formatted_value
+                if json_document[key]:
 
-            #                     info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
-            #                     log_list.append(info_message)
+                  if attr_value['data_type'] == basestring:
 
-            #                     perform_eval_type(key, json_document, "GSystem", "GSystem")
+                    info_message = "\n For GAttribute parsing content | key: " + attr_key + " -- value: " + json_document[key]
+                    # print info_message
 
-            #                     for right_subject_id in json_document[key]:
-            #                         subject_id = node._id
+                  elif attr_value['data_type'] == unicode:
+                    json_document[key] = unicode(json_document[key])
 
-            #                         # Here we are appending list of ObjectIds of GSystemType's type_of field 
-            #                         # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
-            #                         # This is because some of the RelationType's are holding Base class's ObjectId
-            #                         # and not that of the Derived one's
-            #                         # Delibrately keeping GSystemType's ObjectId first in the list
-            #                         # And hence, used $in operator in the query!
-            #                         rel_subject_type = []
-            #                         rel_subject_type.append(gsystem_type_id)
-            #                         if gsystem_type_node.type_of:
-            #                             rel_subject_type.extend(gsystem_type_node.type_of)
+                  elif attr_value['data_type'] == bool: 
+                    # setting int values for CR/XCR
+                    if json_document[key] == "CR":
+                      json_document[key] = 1
+                    elif json_document[key] == "XCR":
+                      json_document[key] = 0
+                    
+                    json_document[key] = bool(int(json_document[key]))
+                    
+                  elif attr_value['data_type'] == datetime.datetime:
+                    json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
 
-            #                         relation_type_node = collection.Node.one({'_type': "RelationType", 
-            #                                                                   '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
-            #                                                                           {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
-            #                                                                   'subject_type': {'$in': rel_subject_type}
-            #                                                           })
+                  elif attr_value['data_type'] == int:
+                    json_document[key] = int(json_document[key])
+                  elif attr_value['data_type'] == float:
+                    json_document[key] = float(json_document[key])
+                  elif attr_value['data_type'] == long:
+                    json_document[key] = long(json_document[key])
 
-            #                         info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(right_subject_id)+") ...\n"
-            #                         log_list.append(info_message)
-            #                         gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
+                  elif type(attr_value['data_type']) == IS:
+                    # print IS
+                    for op in attr_value['data_type']._operands:
+                      if op.lower() == json_document[key].lower():
+                        json_document[key] = op
 
-            #                     # To break outer for loop if key found
-            #                     break
+                  elif (attr_value['data_type'] in [list, dict]) or (type(attr_value['data_type']) in [list, dict]):
+                    if "," not in json_document[key]:
+                      # Necessary to inform perform_eval_type() that handle this value as list
+                      json_document[key] = "\"" + json_document[key] + "\", "
 
-            #                 else:
-            #                     error_message = "\n DataNotFound: No data found for relation ("+rel_key+") while creating GSystem ("+gsystem_type_name+" -- "+node.name+") !!!\n"
-            #                     log_list.append(error_message)
-            #                     # print error_message
+                    else:
+                      formatted_value = ""
+                      for v in json_document[key].split(","):
+                        formatted_value += "\""+v.strip(" ")+"\", "
+                        json_document[key] = formatted_value
 
-            #                     break
+                    perform_eval_type(key, json_document, "GSystem")
 
+                  subject_id = node._id
+                  attribute_type_node = collection.Node.one({'_type': "AttributeType", 
+                                     '$or': [{'name': {'$regex': "^"+attr_key+"$", '$options': 'i'}}, 
+                                     {'altnames': {'$regex': "^"+attr_key+"$", '$options': 'i'}}]
+                                     })
+                  object_value = json_document[key]
 
-        except Exception as e:
-            # error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
-            # print error_message # Keep it!
-            print e
+                  ga_node = None
+
+                  info_message = "\n Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
+                  # ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
+
+                  # To break outer for loop as key found
+                  break
+
+                else:
+                  error_message = "\n DataNotFound: No data found for field ("+attr_key+") while creating GSystem ( -- "+node.name+") !!!\n"
+
+              if is_relation:
+                relation_list.append(key)
+
+      except Exception as e:
+          # error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
+          # print error_message # Keep it!
+          print e
 
 
 def create_resource_gsystem(resource_data):
   
+  # fetching resource from url
   resource_link = resource_data.get("resource_link")
-  # print "\n----------\n", resource_link
   files = urllib2.urlopen(resource_link)
-  # print files.read(100)
+  files = io.BytesIO(files.read())
+  filename = resource_link.split("/")[-1]
+  filemd5 = hashlib.md5(files.read()).hexdigest()
+  size, unit = getFileSize(files)
+  size = {'size':round(size, 2), 'unit':unicode(unit)}
+  
+  fcol = get_database()[File.collection_name]
+  fileobj = fcol.File()
 
-  title = resource_data["name"]
-  userid = resource_data["created_by"]
-  group_id = home_group._id
-  content_org = resource_data["content_org"]
-  tags = resource_data["tags"]
-  # img_type = resource_data[]
-  language = resource_data["language"]
-  # usrname = resource_data[]
-  # page_url = resource_data[]
-  access_policy = "PUBLIC"
+  check_obj_by_name = collection.File.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
+  # print "\n====", check_obj_by_name
 
+  if fileobj.fs.files.exists({"md5":filemd5}) or check_obj_by_name:
+    
+    coll_oid = get_database()['fs.files']
+    cur_oid = coll_oid.find_one({"md5":filemd5})
+    # printing appropriate error message
+    if check_obj_by_name:
+      print "\nResource with same name of ", resource_data["name"] ," and _type 'File' exist in the group. Ref _id: ", check_obj_by_name._id
+    else:      
+      print "\nResource file exists in DB: ", cur_oid
+    return check_obj_by_name
 
-  # for storing location in the file
+  else:
+    print "\nSaving resource: ", unicode(resource_data["name"])
+    
+    filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
 
-  # location = []
-  # location.append(json.loads(request.POST.get("location", "{}")))
-  # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True, location=location)
+    # filling values in fileobj
+    fileobj.name = resource_data["name"]
+    fileobj.created_by = resource_data["created_by"]
+    fileobj.group_set.append(home_group._id)
+    fileobj.member_of.append(file_gst._id)
+    fileobj.content_org = resource_data["content_org"]
+    fileobj.tags = resource_data["tags"]
+    fileobj.language = resource_data["language"]
+    # username = User.objects.get(id=userid).username
+    fileobj.access_policy = u"PUBLIC"
+    # print title, "\n----------\n", userid, "\n", group_id, "\n", content_org, "\n", tags, "\n", language, "\n", access_policy
+    fileobj.altnames = resource_data["altnames"]
+    fileobj.featured = resource_data["featured"]
+    fileobj.contributors = resource_data["contributors"] if resource_data["contributors"] else []
+    fileobj.license = resource_data["license"]
+    fileobj.status = u"PUBLISHED"
 
-  # obs_image = save_file(each,title,userid,group_id, content_org, tags, img_type, language, usrname, access_policy, oid=True)
-  return ""
+    fileobj.file_size = size
+    fileobj.mime_type = filetype
+    fileobj.save()
+
+    files.seek(0)
+    objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
+    collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
+    # print "\n----------", fileobj
+
+    # filetype1 = mimetypes.guess_type(filename)[0]
+    # print filetype1
+
+    # calling save_file()
+    # resource_save_reply = save_file(files, title, userid, group_id, content_org, tags, img_type, language, username, access_policy, oid=True)
+    # print type(resource_save_reply), "=====", resource_save_reply
+
+    # resource_obj = collection.File.one({"_id":ObjectId(str(resource_save_reply[0]))})
+    
+    # resource_obj.save()
+
+    return fileobj
