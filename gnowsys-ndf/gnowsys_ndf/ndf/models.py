@@ -335,7 +335,7 @@ class Node(DjangoDocument):
 
         if kwargs.has_key("is_changed"):
           if not kwargs["is_changed"]:
-            print "\n ", self.name, "(", self._id, ") -- Nothing has changed !\n\n"
+            #print "\n ", self.name, "(", self._id, ") -- Nothing has changed !\n\n"
             return
 
         is_new = False

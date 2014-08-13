@@ -170,13 +170,13 @@ $(document).ready(function()
 
   {% endif %}
 
-  {% get_user_object node.created_by as user_obj %}
-  {% ifequal user_obj.username user.username %}
+  {% endif %}
+
+  {% check_is_gstaff groupid request.user as is_gstaff %}
+  {% if is_gstaff %}
     {% include "ndf/invite_users.html" %}
     {% include "ndf/invite_admins.html" %}
-    <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
-  {% endifequal %} 
- {% endif %}
+  {% endif %} 
 
 <a data-reveal-id="intro-page">.</a>
 
