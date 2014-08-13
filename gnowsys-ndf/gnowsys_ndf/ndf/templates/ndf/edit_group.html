@@ -51,8 +51,7 @@ ul#graph-hover.f-dropdown{
 <dl class="accordion" data-accordion>
 
   <dd>
-    <a href="#change_settings">Click here
- to change {{node.name}}'s settings </a>
+    <a href="#change_settings">{% blocktrans with node.name as name %}Click here to change {{name}}'s settings {% endblocktrans %}</a>
 
     {% if node.name == request.user.username %}
       <div id="change_settings" class="content">
@@ -182,35 +181,35 @@ ul#graph-hover.f-dropdown{
  </select>
  </div>
 </div>
+ {% get_group_agency_types as agency_types %}
+
 <div style='display:table-row;'>
  <div style='display:table-cell;'> 
     <font size="3" >{% trans "Group Agency Types" %}</font>
   </div>
- {% get_group_agency_types as agency_types %}
   <div style='display:table-cell;'> 
     <select name="agency_type" id="agency_type">
      {% for each in agency_types %}
      <option id="{{each}}">{{each}}</option>
-
      {% endfor %}
    </select>
  </div>
-
-  <div style='display:table-cell;' colspan='2' align="middle"> 
+  <div style='display:table-cell;'> 
     <input type="button" id="changeButton" value="Change"  class="button">
-    <img id="ajax_search" width="50" style="display: none;" src="/static/ndf/images/ajax-wait.gif">
-    <font id="status"></font>
-  </div>
-</div>
+   </div>
+</div> <!-- row ending -->
+</div>   <!-- table ending -->
+</div> <!-- div change settings ends -->
 {% endif %}
 </dd>
 </dl>
+
 <br/>
 <dl class="accordion" data-accordion>
 
   <dd>
 
-    <a id="app_selected" href="#mySystemtype">{% blocktrans %} Click here to select apps for {{node.name}}{% endblocktrans %} </a>
+    <a id="app_selected" href="#mySystemtype">{% blocktrans with node.name as name %} Click here to select apps for {{name}} {% endblocktrans %}</a>
 
       <div id="mySystemtype" class="content">
 
@@ -229,7 +228,6 @@ ul#graph-hover.f-dropdown{
 
 {{ block.super }}
 {% endblock %}
-
 
 
 {% block script %}
@@ -299,6 +297,7 @@ var visibility_policy  = document.getElementById("visibility_policy")
 var disclosure_policy  = document.getElementById("disclosure_policy")
 var encryption_policy  = document.getElementById("encryption_policy")
 var agency_type = document.getElementById("agency_type")
+
 {% if node.edit_policy %}
 edit_policy.selectedIndex = edit_policy.options.{{node.edit_policy}}.index
 {% endif %}
@@ -317,13 +316,15 @@ disclosure_policy.selectedIndex = disclosure_policy.options.{{node.disclosure_po
 {% if node.encryption_policy %}
 encryption_policy.selectedIndex = encryption_policy.options.{{node.encryption_policy}}.index
 {% endif %}
-
+{% if node.agency_type %}
+agency_type.selectedIndex = agency_type.options.{{node.agency_type}}.index
+{% endif %}
 
 $(document).on('click',"#changeButton",function(){
 $.ajax({
 url:'/{{node}}/ajax/change_group_settings/',
 type: 'POST',
-data: {edit_policy:edit_policy.value, group_type:group_type.value, subscription_policy:subscription_policy.value, visibility_policy:visibility_policy.value, disclosure_policy:disclosure_policy.value, encryption_policy:encryption_policy.value, csrfmiddlewaretoken: '{{ csrf_token }}', group_id:"{{node}}"},
+data: {edit_policy:edit_policy.value, group_type:group_type.value, subscription_policy:subscription_policy.value, visibility_policy:visibility_policy.value, disclosure_policy:disclosure_policy.value, encryption_policy:encryption_policy.value, agency_type:agency_type, csrfmiddlewaretoken: '{{ csrf_token }}', group_id:"{{node}}"},
 beforeSend: function() {
 $("#ajax_search").show();
 },
