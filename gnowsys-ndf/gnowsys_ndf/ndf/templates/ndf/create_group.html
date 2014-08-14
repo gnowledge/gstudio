@@ -114,15 +114,26 @@
      <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
    </select>
  </div>  
+
+  <div style='display:table-cell;'> 
+    <font size="3" >{% trans "Group Agency Types" %}</font>
+  </div>
+ {% get_group_agency_types as agency_types %}
+  <div style='display:table-cell;'> 
+    <select name="agency_type" class="agencygrp">
+     {% for each in agency_types %}
+     <option id="{{each}}">{{each}}</option>
+
+     {% endfor %}
+   </select>
+ </div>
+
 </div>
-
-
 <div style='display:table-row;'>
   <div style='display:table-cell;' colspan='2' align="middle"> 
     <input type="button" id="savegrp" value="Create Group"  class="button" onClick="check_values()">
     <input type="submit" id="grpsubmit" value="Create Group" class="button" style="visibility:hidden" >
   </div>
-</div>
 </div>
 
 <input type="hidden" id="nodes_list" value="{{nodes_list}}">           

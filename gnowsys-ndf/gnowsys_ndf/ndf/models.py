@@ -35,7 +35,7 @@ from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
-
+from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.ndf.rcslib import RCS
 
 
@@ -107,6 +107,10 @@ DATA_TYPE_CHOICES = (
     "ObjectId",
     "IS()"
 )
+
+    
+
+
 
 #######################################################################################################################################
 # CUSTOM DATA-TYPE DEFINITIONS
@@ -968,11 +972,12 @@ class Group(GSystem):
         'edit_policy': basestring,           # Editing policy of the group - non editable,editable moderated or editable non-moderated
         'subscription_policy': basestring,   # Subscription policy to this group - open, by invitation, by request
         'visibility_policy': basestring,     # Existance of the group - announced or not announced
-        'disclosure_policy': basestring,    # Members of this group - disclosed or not 
-        'encryption_policy': basestring,            # Encryption - yes or no
+        'disclosure_policy': basestring,     # Members of this group - disclosed or not 
+        'encryption_policy': basestring,     # Encryption - yes or no
+        'agency_type': basestring,           # A choice field such as Pratner,Govt.Agency, NGO etc.
 
-        'group_admin': [int],				# ObjectId of Author class
-        'partner':bool                      # Shows partners exists for a group or not     
+        'group_admin': [int],		     # ObjectId of Author class
+        'partner':bool                       # Shows partners exists for a group or not     
     }
 
     use_dot_notation = True
@@ -983,7 +988,8 @@ class Group(GSystem):
         'subscription_policy':lambda x: x in SUBSCRIPTION_POLICY,
         'visibility_policy':lambda x: x in EXISTANCE_POLICY,
         'disclosure_policy':lambda x: x in LIST_MEMBER_POLICY,
-        'encryption_policy':lambda x: x in ENCRYPTION_POLICY
+        'encryption_policy':lambda x: x in ENCRYPTION_POLICY,
+        'agency_type':lambda x: x in GROUP_AGENCY_TYPES
     } 
 
     def is_gstaff(self, user):
@@ -1022,10 +1028,13 @@ class Author(Group):
         'password': unicode,
         'visited_location': [],
         'preferred_languages':dict          # preferred languages for users like preferred lang. , fall back lang. etc.
-
     }
 
     use_dot_notation = True
+
+    validators = {
+        'agency_type':lambda x: x in AUTHOR_AGENCY_TYPES
+    }
 
     required_fields = ['name', 'password']
     
