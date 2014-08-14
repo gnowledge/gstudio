@@ -35,9 +35,9 @@ from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
-from gnowsys_ndf.ndf.views.file import save_file, getFileSize
-from gnowsys_ndf.ndf.views.methods import create_gattribute
 from gnowsys_ndf.ndf.management.commands.data_entry import perform_eval_type
+# from gnowsys_ndf.ndf.views.file import save_file, getFileSize
+# from gnowsys_ndf.ndf.views.methods import create_gattribute
 
 ####################################################################################################################
 
@@ -266,7 +266,7 @@ def parse_data_create_gsystem(json_file_path):
           # print parsed_json_document
         
         # node = create_resource_gsystem(parsed_json_document)
-        node = collection.File.one({ "_id": ObjectId('53eb5abf1d41c81d18bb104b') })
+        node = collection.File.one({ "_id": ObjectId('53ec620190b55024eeed2f63') })
         # print node, "\n"
 
         if node and attribute_relation_list:
@@ -386,46 +386,50 @@ def parse_data_create_gsystem(json_file_path):
                 if json_document[key]:
                   # Here semi-colon(';') is used instead of comma(',')
                   # Beacuse one of the value may contain comma(',') which causes problem in finding required value in database
-                  if ";" not in json_document[key]:
-                    # Necessary to inform perform_eval_type() that handle this value as list
-                    json_document[key] = "\""+json_document[key]+"\", "
+                  # if ";" not in json_document[key]:
+                  #   # Necessary to inform perform_eval_type() that handle this value as list
+                  #   json_document[key] = "\""+json_document[key]+"\", "
 
-                  else:
-                    formatted_value = ""
-                    for v in json_document[key].split(";"):
-                        formatted_value += "\""+v.strip(" ")+"\", "
-                    json_document[key] = formatted_value
+                  # else:
+                  #   formatted_value = ""
+                  #   for v in json_document[key].split(";"):
+                  #       formatted_value += "\""+v.strip(" ")+"\", "
+                  #   json_document[key] = formatted_value
 
-                  print "\n----------", json_document[key]
+                  # print "\n----------", json_document[key]
                   # info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
 
-                  perform_eval_type(key, json_document, "GSystem", "GSystem")
+                  print json_document[key]
+
+                  # perform_eval_type(key, json_document, "GSystem", "GSystem")
 
                   # for right_subject_id in json_document[key]:
+                  #   print "\njson_document[key]: ", json_document[key]
 
                   #   subject_id = node._id
-
-                  #   # Here we are appending list of ObjectIds of GSystemType's type_of field 
-                  #   # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
-                  #   # This is because some of the RelationType's are holding Base class's ObjectId
-                  #   # and not that of the Derived one's
-                  #   # Delibrately keeping GSystemType's ObjectId first in the list
-                  #   # And hence, used $in operator in the query!
-                  #   rel_subject_type = []
-                  #   rel_subject_type.append(file_gst._id)
+                  #   print "subject_id : ", subject_id
+                  #   print "node.name: ", node.name
+                    # Here we are appending list of ObjectIds of GSystemType's type_of field 
+                    # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
+                    # This is because some of the RelationType's are holding Base class's ObjectId
+                    # and not that of the Derived one's
+                    # Delibrately keeping GSystemType's ObjectId first in the list
+                    # And hence, used $in operator in the query!
+                    # rel_subject_type = []
+                    # rel_subject_type.append(file_gst._id)
                     
-                  #   if file_gst.type_of:
-                  #       rel_subject_type.extend(file_gst.type_of)
+                    # if file_gst.type_of:
+                    #     rel_subject_type.extend(file_gst.type_of)
 
-                  #   relation_type_node = collection.Node.one({'_type': "RelationType", 
-                  #                                             '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
-                  #                                                     {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
-                  #                                             'subject_type': {'$in': rel_subject_type}
-                  #                                     })
+                    # relation_type_node = collection.Node.one({'_type': "RelationType", 
+                    #                                           '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
+                    #                                                   {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
+                    #                                           'subject_type': {'$in': rel_subject_type}
+                    #                                   })
 
-                  #   info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(right_subject_id)+") ...\n"
-                  #   print info_message
-                  #   gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
+                    # info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(right_subject_id)+") ...\n"
+                    # print info_message
+                    # gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
                   
                   # To break outer for loop if key found
                   break
@@ -519,3 +523,19 @@ def create_resource_gsystem(resource_data):
     # resource_obj.save()
 
     return fileobj
+
+
+def getFileSize(File):
+    """
+    obtain file size if provided file object
+    """
+    try:
+        File.seek(0,os.SEEK_END)
+        num=int(File.tell())
+        for x in ['bytes','KB','MB','GB','TB']:
+            if num < 1024.0:
+                return  (num, x)
+            num /= 1024.0
+    except Exception as e:
+        print "Unabe to calucalate size",e
+        return 0,'bytes'
