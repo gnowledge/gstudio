@@ -39,7 +39,8 @@
 {% endblock%}
 
 {% block meta_content %}
-{% user_access_policy groupid request.user as user_access %}
+{% check_is_gstaff groupid request.user as gstaff_access %}
+
 <ul class="side-nav"> 
 	<li>
 		<a></a>
@@ -68,7 +69,7 @@
           {{each.name}} ({{count}})
         </a>
 
-        {% if user_access == "allow" %}
+        {% if gstaff_access %}
         {% if app_name == "MIS" %}
         <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
         {% else %}

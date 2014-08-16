@@ -88,7 +88,7 @@ urlpatterns = patterns('',
     # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/(?P<app_set_instance_id>[\w-]+)/edit/$', custom_app_new_view, name='GAPPS_set_instance_edit'),
     # url(r'^(?P<group_id>[^/]+)/(?P<app_name>[^/]+)/(?P<app_id>[\w-]+)/(?P<app_set_id>[\w-]+)/new/$', custom_app_new_view, name='GAPPS_set_new_instance'),
     
-    (r'^home','gnowsys_ndf.ndf.views.group.group_dashboard'),
+    # (r'^home','gnowsys_ndf.ndf.views.group.group_dashboard'),
     # (r'^home/', 'gnowsys_ndf.ndf.views.home.homepage'),
     
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
