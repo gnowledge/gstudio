@@ -953,21 +953,17 @@ def get_contents(node_id):
 
 @register.assignment_tag
 def get_group_type(group_id, user):
-        
-
 	try:
-
 		col_Group = db[Node.collection_name]
+
+		# Splitting url-content based on backward-slashes
+		split_content = group_id.strip().split("/")
+		gid = ""
 
 		if group_id == '/home/':
 			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 
 		else:  
-			gid = ""
-
-			# Splitting url-content based on backward-slashes
-			split_content = group_id.strip().split("/")
-
 			# If very first character is not backward-slash
 			# Then group id/name will be the very first element in splitted url-content list
 			# Else, it will be the second element
@@ -988,33 +984,57 @@ def get_group_type(group_id, user):
 				else:		
 					colg = None
   		
-		# Check if Group exist in the database
+		# Check if Group exists in the database
 		if colg is not None:
 
-			# Check is user is logged in
-			if  user.id:
-				# condition for group accessible to logged user
+			# Check is user logged in
+			if user.is_authenticated():
+				# Condition for group accessible to logged in user
 				if user.is_superuser or colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
-					return "allowed"
+					# Condition for GAPPs accessible to gstaff (i.e. "mis", "mis-po", "batch")
+					if len(split_content) > 2 and split_content[2] != "":
+						gapp = split_content[2]
+
+						if check_is_gapp_for_gstaff(colg._id, {'name': gapp}, user):
+							return "allowed"
+
+						else:
+							error_message = "Access denied: You are not an authorized user to access this GAPP ("+gapp.upper()+")!!!"
+							raise Http404(error_message)
+
+					else:
+						# If only group is specified
+						return "allowed"
+
 				else:
-					error_message = "Access denied: You are not an authorized user!!!"
+					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
 					raise Http404(error_message)
 
 			else:
-				#condition for groups, accessible to not logged users
+				# Condition for group accessible to logged out user
 				if colg.group_type == "PUBLIC":
 					return "allowed"
+
 				else:
-					error_message = "Access denied: You are not an authorized user!!!"
+					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
 					raise Http404(error_message)
+
 		else:
-			return "pass"
+			# If given ObjectId/name doesn't exists in database
+			# Then compare with a given list of names as these were used in one of the urls
+			# And still no match found, throw an error - Group doesn't exists
+			if gid in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
+				return "pass"
+
+			else:
+				error_message = "GroupNotFoundError: This group ("+gid+") doesn't exists!!!"
+				raise Http404(error_message)
 
 	except Http404 as e:
 		raise Http404(e)
 		
 	except Exception as e:
-		print "Error in group_type_tag "+str(e)
+		print "\n Error in get_group_type() templatetag: " + str(e) + "\n"
 		colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return "pass"
 
@@ -1315,7 +1335,7 @@ def check_is_gstaff(groupid, user):
 
 
 @register.assignment_tag
-def check_is_gstaff_for_gapp(groupid, app_dict, user):
+def check_is_gapp_for_gstaff(groupid, app_dict, user):
   """
   This restricts view of MIS & MIS-PO GApps to only GStaff members (super-user, creator, admin-user) of the group. 
   That is, other subscribed-members of the group can't even see these GApps.
@@ -1334,7 +1354,7 @@ def check_is_gstaff_for_gapp(groupid, app_dict, user):
   """
 
   try:
-    if app_dict["name"].lower() in ["mis", "mis-po", "batch", "task"]:
+    if app_dict["name"].lower() in ["mis", "mis-po", "batch"]:
       return check_is_gstaff(groupid, user)
 
     else:
@@ -1542,7 +1562,7 @@ def get_field_type(node_structure, field_name):
 @register.inclusion_tag('ndf/html_field_widget.html')
 # def html_widget(node_id, field, field_type, field_value):
 # def html_widget(node_id, node_member_of, field, field_value):
-def html_widget(node_id, field):
+def html_widget(groupid, node_id, field):
   """
   Returns html-widget for given attribute-field; that is, passed in form of
   field_name (as attribute's name) and field_type (as attribute's data-type)
@@ -1635,7 +1655,7 @@ def html_widget(node_id, field):
     elif is_AT_RT_base == "RelationType":
       is_relation_field = True
       is_required_field = True
-      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}},
+      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}, 'group_set': ObjectId(groupid)},
                                                             {'_id': 1, 'name': 1}
                                                           )
                                       )
