@@ -46,7 +46,7 @@
           <div class="small-3 columns"> 
             <label for="{{field.name}}" class="left inline"> {{field.altnames}} </label>
           </div>
-          <div class="small-7 end columns">
+          <div class="small-9 columns">
             {% html_widget groupid node.pk field %}
           </div>
         </div>
@@ -75,8 +75,15 @@
 {% block script %}
   // <script type="text/javascript">
 
+  $(function() {
+    $("#dob").datepicker({
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "1980:2005"
+    });
+  });
+
   $("#save-node").click(function() {
-    // alert($(this).val() + " clicked...")
     name = ""
     first_name = $("#first_name").val().trim()
     middle_name = $("#middle_name").val().trim()
@@ -92,38 +99,7 @@
     }
 
     $("#name").val(name)
-
-    alert($("#name").val())
   });
-
-  var dtOBInput = $("#dob")
-  // alert(dtOBInput)
-  if(dtOBInput.length > 0) {
-    dtOBInput.datetimepicker({ 
-
-      hourGrid: 6,
-      minuteGrid: 15,
-
-      // onClose: function(dateText, inst) {
-
-      //   if (endDtInput.val() != '') {
-
-      //     var testStartDate = dtOBInput.datetimepicker('getDate');
-      //     var testEndDate = endDtInput.datetimepicker('getDate');
-
-      //     if (testStartDate > testEndDate)
-      //       endDtInput.datetimepicker('setDate', testStartDate);
-
-      //   }
-      //   else {
-      //     endDtInput.val(dateText);
-      //   }
-      // },
-      onSelect: function (selectedDateTime){
-        endDtInput.datetimepicker('option', 'minDate', dtOBInput.datetimepicker('getDate') );
-      }
-    });
-  }
 
   // totWhen ---------------
   var totWhen = $("#tot_when")
