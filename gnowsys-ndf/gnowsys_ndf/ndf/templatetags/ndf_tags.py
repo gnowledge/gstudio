@@ -1161,7 +1161,7 @@ def user_access_policy(node, user):
 
   Check is performed in given sequence as follows (sequence has importance):
   - If user is superuser, then he/she is allowed
-  - Else if user is creator of the group, then he/she is allowed
+  - Else if user is creator or admin of the group, then he/she is allowed
   - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
   - Else if user is member of the group, then he/she is allowed
   - Else user is NOT allowed!
@@ -1185,6 +1185,8 @@ def user_access_policy(node, user):
   user_access = False
 
   try:
+  	# Please make a note, here the order in which check is performed is IMPORTANT!
+
     if user.is_superuser:
       user_access = True
 
@@ -1192,6 +1194,9 @@ def user_access_policy(node, user):
       group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
 
       if user.id == group_node.created_by:
+        user_access = True
+
+      elif user.id in group_node.group_admin:
         user_access = True
 
       elif group_node.edit_policy == "NON_EDITABLE":
