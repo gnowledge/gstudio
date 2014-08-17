@@ -975,7 +975,7 @@ def get_group_type(group_id, user):
 
 			# gid = group_id.replace("/", "").strip()
 			if ObjectId.is_valid(gid):
-				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
+				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
 			else:
 				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
 				if colg :
