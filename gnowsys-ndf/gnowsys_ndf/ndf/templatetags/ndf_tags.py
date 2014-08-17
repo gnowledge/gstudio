@@ -1662,7 +1662,7 @@ def html_widget(groupid, node_id, field):
       is_required_field = True
       field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}, 'group_set': ObjectId(groupid)},
                                                             {'_id': 1, 'name': 1}
-                                                          )
+                                                          ).sort('name', 1)
                                       )
                                 )
       field_value = [str(each._id) for each in field_value]
