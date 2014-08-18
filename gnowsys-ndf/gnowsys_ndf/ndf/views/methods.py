@@ -25,7 +25,7 @@ import ast
 import string
 import json
 from datetime import datetime
-######################################################################################################################################
+
 
 db = get_database()
 collection = db[Node.collection_name]
@@ -34,9 +34,9 @@ history_manager = HistoryManager()
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 
-#######################################################################################################################################
-#                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
-#######################################################################################################################################
+
+# C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
+
 coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
@@ -355,10 +355,14 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     is_changed = True
           
     # End of if
+    specific_url = set_all_urls(node.member_of)
+    node.url = specific_url
 
-  # --------------------------------------------------------------------------- For create/edit
+  #  For create/edit
+  
 
-  # -------------------------------------------------------------------------------- name
+
+  #   name
  
   if name:
     if node.name != name:
@@ -378,14 +382,14 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: topic"
       is_changed = True
 
-  # -------------------------------------------------------------------------------- language
+  #  language
 
   if language:
     node.language = unicode(language) 
   else:
     node.language = u"en"
 
-  # -------------------------------------------------------------------------------- access_policy
+  #  access_policy
 
   if access_policy:
     # Policy will be changed only by the creator of the resource
@@ -410,7 +414,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if user_group_obj:
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
-  # -------------------------------------------------------------------------------- tags
+  #  tags
   if tags:
     tags_list = []
 
@@ -425,7 +429,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: tags"
       is_changed = True
 
-  # -------------------------------------------------------------------------------- prior_node
+  #  prior_node
 
    
   # if prior_node_list != '':
@@ -455,7 +459,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # print "\n Changed: prior_node"
     is_changed = True
   
-  # -------------------------------------------------------------------------------- collection
+  #  collection
 
   # node.collection_set = []
   # if collection_list != '':
@@ -489,7 +493,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # print "\n Changed: collection_list"
     is_changed = True
   
-  # -------------------------------------------------------------------------------- Module
+  #  Module
 
   # node.collection_set = []
   # if module_list != '':
@@ -519,7 +523,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     # print "\n Changed: module_list"
     is_changed = True
     
-  # ------------------------------------------------------------------------------- org-content
+  #  org-content
   
   if content_org:
     if node.content_org != content_org:
@@ -532,7 +536,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: content_org"
       is_changed = True
 
-  # ----------------------------------------------------------------------------- visited_location in author class
+  # visited_location in author class
   if node.location != map_geojson_data:
     node.location = map_geojson_data # Storing location data
     # print "\n Changed: map"
@@ -627,18 +631,17 @@ def get_user_page(request,node):
            return(node,'1.1')
                    
 def get_page(request,node):
-     ''' function to filter between the page to be displyed to user 
-           i.e which page to be shown to the user drafted or the published page
-	if a user have some drafted content then he wouldbe shown his own drafted contents 
-and if he has published his contents then he would be shown the current published contents
-
-
-'''
-     username =request.user
-     node1,ver1=get_versioned_page(node)
-     node2,ver2=get_user_page(request,node)     
-     
-     if  ver2 != '1.1':                           
+  ''' 
+  function to filter between the page to be displyed to user 
+  i.e which page to be shown to the user drafted or the published page
+  if a user have some drafted content then he would be shown his own drafted contents 
+  and if he has published his contents then he would be shown the current published contents
+  '''
+  username =request.user
+  node1,ver1=get_versioned_page(node)
+  node2,ver2=get_user_page(request,node)     
+  
+  if  ver2 != '1.1':                           
 	    if node2 is not None:
 		# print "direct"
                 if node2.status == 'PUBLISHED':
@@ -665,7 +668,7 @@ and if he has published his contents then he would be shown the current publishe
                         
 			return(node1,ver1)		
 	    
-     else:
+  else:
          
         # if node._type == "GSystem" and node1.status == "DRAFT":
         #     if node1.created_by ==request.user.id:
@@ -1331,6 +1334,37 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
       error_message = "\n GRelationCreateError: " + str(e) + "\n"
       raise Exception(error_message)
 
+      
+
+      
+###############################################      ###############################################
+def set_all_urls(member_of):
+	print "INSIDE SET ALL URLS"
+	Gapp_obj = collection.Node.one({"_type":"MetaType", "name":"GAPP"})
+	factory_obj = collection.Node.one({"_type":"MetaType", "name":"factory_types"})
+
+	url = ""	
+	gsType = member_of[0]
+	gsType_obj = collection.Node.one({"_id":ObjectId(gsType)})
+	
+	if Gapp_obj._id in gsType_obj.member_of:
+		if gsType_obj.name == u"Quiz":
+		    url = u"quiz/details"
+		else:
+		    url = gsType_obj.name.lower()
+	elif factory_obj._id in gsType_obj.member_of:
+		if gsType_obj.name == u"QuizItem":
+		    url = u"quiz/details"
+		elif gsType_obj.name == u"Twist":
+		    url = u"forum/thread"
+		else:
+		    url = gsType_obj.name.lower()
+	else:
+		url = u"None"
+	return url
+###############################################	###############################################    
+
+
 # Method to create discussion thread for File and Page.
 def create_discussion(request, group_id, node_id):
   '''
@@ -1536,3 +1570,5 @@ def get_user_activity(userObject):
       member_of = collection.Node.find_one({"_id":each.member_of[0]})
       blank_list.append({'id':str(each._id), 'name':each.name, 'date':each.last_update, 'activity': activity, 'type': each._type, 'group_id':str(each.group_set[0]), 'member_of':member_of.name.lower()})
   return blank_list
+
+
