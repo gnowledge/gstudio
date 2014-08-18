@@ -36,6 +36,7 @@
       </nav>
     </header>
 
+    <br>
     <div id="event-details-edit-div" class="tabs-content" >
       {% for tab_name, tab_fields_list in property_order_list %}
       <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
@@ -47,7 +48,7 @@
           </div>
           <div class="small-5 end columns">
             {#% html_widget node.pk node_member_of field field_value %#}
-            {% html_widget node.pk field %}
+            {% html_widget groupid node.pk field %}
           </div>
         </div>
         {% endfor %}
