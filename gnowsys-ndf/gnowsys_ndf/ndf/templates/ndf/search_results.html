@@ -1,0 +1,208 @@
+{% extends "ndf/base.html" %}
+
+{% block body_content %} 
+<h1>Search</h1>
+<script type = "text/javascript" src = "/static/ndf/js/jquery2.js"></script>
+
+<form name="search_form" method="GET" action="{% url 'results' groupid %}">
+	{% csrf_token %}
+	Enter the value to be searched:
+	<input type="text" name="search_text" id="search_text">
+	<!--<input type="button" name="subButton" id="subButton" value="Submit" /> -->
+	<h5> Search by: </h5>
+	<input type="checkbox" name="search_fields" id="chk_name" value="name" />Name
+	<input type="checkbox" name="search_fields" id="chk_tags" value="tags" />Tags 
+	<input type="checkbox" name="search_fields" id="chk_content" value="contents" />Content <br>
+	Search particular user:	
+	<select name="users">
+		<option value="all">All users</option>
+		{% for mem in authors %}		
+			<option value="hello">{{ mem }} </option>
+  		{% endfor %}
+	</select>
+	<!--<input type="checkbox" name="add_filters" id="chk_tags" value="search_groups" />Search in my groups 
+	<input type="checkbox" name="add_filters" id="chk_content" value="sort_last_modified" />Sort by last modified <br>
+	-->
+	<input type="submit" name="subButton2" id="subButton2" value="Submit" />
+</form>
+<div id="results">
+
+</div>
+<div id="pages">
+	
+</div>
+<script>
+	function getUrlVars() {
+	    var vars = {};
+	    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+		vars[key] = value;
+	    });
+	    return vars;
+	}
+
+	var search_key = String(getUrlVars()["search_text"]);
+	search_key.replace('+', ' ')
+	$('#search_text').val(search_key);
+</script>
+<script type="text/javascript">
+	var html_div = [];
+	var group = "{{ groupid }}";
+	var base_url = location.host+"/"+group+"/";
+	var page_no = 0;
+	var results_per_page = 10;
+	var results_in_current_page = 0;
+	var cur_page = 0;
+
+	$(document).ready(function() {
+
+		sData = "{{ search_results }}";
+		sData = sData.replace(/&quot;/g, '"'); 
+		//alert(sData);		
+		sData = jQuery.parseJSON(sData);
+		parse_data(sData);
+		
+		function parse_data(sData) {
+
+			// -------------------- SEARCH BY NAME ------------------------------------------- //
+			var a = sData.exact.name.length;
+				html_div[cur_page] = "";			
+				for (i=0; i<a; i++) {
+				html_div[cur_page] += "<p><a href='http://" + base_url + sData.exact.name[i].link.toLowerCase() + "/" + sData.exact.name[i]._id+"' target='_blank'>";
+				type = String(sData.exact.name[i].link).toLowerCase();
+				if (type=="quiz/details") {
+					type = "Quiz / Quiz Item";
+				}
+				html_div[cur_page] += sData.exact.name[i].name + "</a><br><span style='font-size:12px'>" + type + "<br>Created by: "+sData.exact.name[i].created_by + "<br>Last modified: "+sData.exact.name[i].last_update;
+				html_div[cur_page] += "</span></p>";
+				results_in_current_page += 1;
+				if (results_in_current_page >= results_per_page) {
+					cur_page += 1;
+					results_in_current_page = 0;
+					html_div[cur_page] = "";
+				}										
+			}
+
+			//html_div[cur_page] += "<p>stemmed</p>";									
+
+			a = sData.stemmed.name.length;
+			for (i=0; i<a; i++) {
+				html_div[cur_page] += "<p><a href='http://" + base_url + sData.stemmed.name[i].link.toLowerCase() + "/" + sData.stemmed.name[i]._id+"' target='_blank'>";
+				type = String(sData.stemmed.name[i].link).toLowerCase();
+				if (type=="quiz/details") {
+					type = "Quiz / Quiz Item";
+				}
+				html_div[cur_page] += sData.stemmed.name[i].name + "</a><br><span style='font-size:12px'>" + type + "<br>Created by: "+sData.stemmed.name[i].created_by + "<br>Last modified: "+sData.stemmed.name[i].last_update;
+				html_div[cur_page] += "</span></p>";
+				results_in_current_page += 1;
+				if (results_in_current_page >= results_per_page) {
+					cur_page += 1;
+					results_in_current_page = 0;
+					html_div[cur_page] = "";
+					//alert("change");
+				}										
+			}
+			html_div[cur_page] += "<br>";
+		
+			// -------------------------------------------------------------------------------- //
+
+			
+			// -------------------- SEARCH BY TAGS ------------------------------------------- //
+			//html_div[cur_page] += "<h3> Search by tags:<br></h3><ul>";
+			
+			a = sData.exact.tags.length;
+			for (i=0; i<a; i++) {
+				html_div[cur_page] += "<p><a href='http://" + base_url + sData.exact.tags[i].link.toLowerCase() + "/" + sData.exact.tags[i]._id+"' target='_blank'>";
+				type = String(sData.exact.tags[i].link).toLowerCase();
+				if (type=="quiz/details") {
+					type = "Quiz / Quiz Item";
+				}
+				html_div[cur_page] += sData.exact.tags[i].name + "</a><br><span style='font-size:12px'>" + type + "<br>Created by: "+sData.exact.tags[i].created_by + "<br>Last modified: "+sData.exact.tags[i].last_update;
+				html_div[cur_page] += "</span></p>";
+				results_in_current_page += 1;
+				if (results_in_current_page >= results_per_page) {
+					cur_page += 1;
+					results_in_current_page = 0;
+					html_div[cur_page] = "";
+				}																			
+			}
+
+			//html_div[cur_page] += "<p>stemmed</p>";									
+			
+			a = sData.stemmed.tags.length;
+			for (i=0; i<a; i++) {
+				html_div[cur_page] += "<p><a href='http://" + base_url + sData.stemmed.tags[i].link.toLowerCase() + "/" + sData.stemmed.tags[i]._id+"' target='_blank'>";
+				type = String(sData.stemmed.tags[i].link).toLowerCase();
+				if (type=="quiz/details") {
+					type = "Quiz / Quiz Item";
+				}
+				html_div[cur_page] += sData.stemmed.tags[i].name + "</a><br><span style='font-size:12px'>" + type + "<br>Created by: "+sData.stemmed.tags[i].created_by + "<br>Last modified: "+sData.stemmed.tags[i].last_update;
+				html_div[cur_page] += "</span></p>";
+				results_in_current_page += 1;
+				if (results_in_current_page >= results_per_page) {
+					cur_page += 1;
+					results_in_current_page = 0;
+					html_div[cur_page] = "";
+				}							
+			}
+			html_div[cur_page] += "<br>";
+		
+
+			// -------------------- SEARCH BY CONTENTS ------------------------------------------- //
+			//html_div[cur_page] += "<h3> Search by contents:<br></h3>";
+			a = sData.exact.content.length;
+			for (i=0; i<a; i++) {
+				html_div[cur_page] += "<p><a href='http://" + base_url + sData.exact.content[i].link.toLowerCase() + "/" + sData.exact.content[i]._id+"' target='_blank'>";
+				type = String(sData.exact.content[i].link).toLowerCase();
+				if (type=="quiz/details") {
+					type = "Quiz / Quiz Item";
+				}
+				html_div[cur_page] += sData.exact.content[i].name + "</a><br><span style='font-size:12px'>" + type + "<br>Created by: "+sData.exact.content[i].created_by + "<br>Last modified: " + sData.exact.content[i].last_update;
+				html_div[cur_page] += "</span></p>";
+				results_in_current_page += 1;
+				if (results_in_current_page >= results_per_page) {
+					cur_page += 1;
+					results_in_current_page = 0;
+					html_div[cur_page] = "";
+				}			
+			}
+
+			// html_div[cur_page] += "<p>stemmed</p>";				
+
+			a = sData.stemmed.content.length;
+			for (i=0; i<a; i++) {
+				html_div[cur_page] += "<p><a href='http://" + base_url + sData.stemmed.content[i].link.toLowerCase() + "/" + sData.stemmed.content[i]._id+"' target='_blank'>";
+				type = String(sData.stemmed.content[i].link).toLowerCase();
+				if (type=="quiz/details") {
+					type = "Quiz / Quiz Item";
+				}
+				html_div[cur_page] += sData.stemmed.content[i].name + "</a><br><span style='font-size:12px'>" + type + "<br>Created by: " + sData.stemmed.content[i].created_by + "<br>Last modified: " + sData.stemmed.content[i].last_update;
+				html_div[cur_page] += "</span></p>";
+				results_in_current_page += 1;
+				if (results_in_current_page >= results_per_page) {
+					cur_page += 1;
+					results_in_current_page = 0;
+					html_div[cur_page] = "";
+				}
+			}
+			html_div[cur_page] += "<br>";
+			//alert(html_div[page_no]);
+			$("#results").html(html_div[page_no]);
+
+			pages = "<h6>Pages:</h6><hr>";
+			pages += "<ul style='float:left; list-style-type:none;'>";
+			for (i=0; i < cur_page+1; i++) {
+				pages+= "<li onClick='changePage(" + i + ")' style='cursor:pointer'>" + (i+1) + "</li>";
+			}
+			pages+="</ul>";
+			$("#pages").html(pages);
+			//alert(results_in_current_page);
+		};
+	});
+
+function changePage(p) {
+	$("#results").html(html_div[p]);
+}
+
+</script>
+
+{% endblock %}

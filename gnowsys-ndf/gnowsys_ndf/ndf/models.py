@@ -1,4 +1,4 @@
-# imports from python libraries #######################################################################################################
+# imports from python libraries 
 import os
 import hashlib
 import datetime
@@ -7,7 +7,8 @@ import json
 from random import random
 from random import choice
 
-# imports from installed packages #####################################################################################################
+# imports from installed packages 
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.models import check_password
@@ -30,7 +31,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 
-# imports from application folders/files ##############################################################################################
+# imports from application folders/files 
 from gnowsys_ndf.settings import RCS_REPO_DIR
 from gnowsys_ndf.settings import RCS_REPO_DIR_HASH_LEVEL
 from gnowsys_ndf.settings import MARKUP_LANGUAGE
@@ -39,8 +40,6 @@ from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.ndf.rcslib import RCS
 
 
-
-#######################################################################################################################################
 
 NODE_TYPE_CHOICES = (
     ('Nodes'),
@@ -110,11 +109,15 @@ DATA_TYPE_CHOICES = (
 
     
 
+my_doc_requirement = u'storing_orignal_doc'
+reduced_doc_requirement = u'storing_reduced_doc'
+to_reduce_doc_requirement = u'storing_to_be_reduced_doc'
+indexed_word_list_requirement = u'storing_indexed_words'
 
 
-#######################################################################################################################################
+
 # CUSTOM DATA-TYPE DEFINITIONS
-#######################################################################################################################################
+
 
 STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED')
 STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
@@ -123,11 +126,8 @@ QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice
 QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 
 
-
-
-#######################################################################################################################################
 # FRAME CLASS DEFINITIONS
-#######################################################################################################################################
+
 
 
 
@@ -189,155 +189,147 @@ class Node(DjangoDocument):
 
     @property
     def user_details_dict(self):
-      """Retrieves names of created-by & modified-by users from the given node, 
-      and appends those to 'user_details' dict-variable
-      """
-      user_details = {}
-      if self.created_by:
-        user_details['created_by'] = User.objects.get(pk=self.created_by).username
+        """Retrieves names of created-by & modified-by users from the given node, 
+        and appends those to 'user_details' dict-variable
+        """
+        user_details = {}
+        if self.created_by:
+            user_details['created_by'] = User.objects.get(pk=self.created_by).username
 
-      contributor_names = []
-      for each_pk in self.contributors:
-        contributor_names.append(User.objects.get(pk=each_pk).username)
+        contributor_names = []
+        for each_pk in self.contributors:
+            contributor_names.append(User.objects.get(pk=each_pk).username)
+        # user_details['modified_by'] = contributor_names
+        user_details['contributors'] = contributor_names
 
-      # user_details['modified_by'] = contributor_names
-      user_details['contributors'] = contributor_names
+        if self.modified_by:
+            user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
 
-      if self.modified_by:
-        user_details['modified_by'] = User.objects.get(pk=self.modified_by).username
-
-      return user_details
+        return user_details
 
     @property
     def member_of_names_list(self):
-      """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
-      built from 'member_of' field (list of ObjectIds)
-      """
-      member_of_names = []
+        """Returns a list having names of each member (GSystemType, i.e Page, File, etc.), 
+        built from 'member_of' field (list of ObjectIds)
+        """
+        member_of_names = []
 
-      collection = get_database()[Node.collection_name]
-      if self.member_of:
-        for each_member_id in self.member_of:
-          if type(each_member_id) == ObjectId:
-            _id = each_member_id
-
-          else:
-            _id = each_member_id['$oid']
-
-          if _id:
-            mem=collection.Node.one({'_id': ObjectId(_id)})
-            if mem:
-              member_of_names.append(mem.name)
-
-      else:
-        for each_member_id in self.gsystem_type:
-          if type(each_member_id) == ObjectId:
-            _id = each_member_id
-
-          else:
-            _id = each_member_id['$oid']
-
-          if _id:
-            mem=collection.Node.one({'_id': ObjectId(_id)})
-            if mem:
-              member_of_names.append(mem.name)
-
-      return member_of_names
+        collection = get_database()[Node.collection_name]
+        if self.member_of:
+            for each_member_id in self.member_of:
+                if type(each_member_id) == ObjectId:
+                    _id = each_member_id
+                else:
+                    _id = each_member_id['$oid']
+                if _id:
+                    mem=collection.Node.one({'_id': ObjectId(_id)})
+                    if mem:
+                        member_of_names.append(mem.name)
+        else:
+            for each_member_id in self.gsystem_type:
+                if type(each_member_id) == ObjectId:
+                    _id = each_member_id
+                else:
+                    _id = each_member_id['$oid']
+                if _id:
+                    mem=collection.Node.one({'_id': ObjectId(_id)})
+                    if mem:
+                        member_of_names.append(mem.name)
+        return member_of_names
 
     @property        
     def prior_node_dict(self):
-      """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-      pair respectively for prior_node objects of the given node.
-      """
-      collection = get_database()[Node.collection_name]
-      obj_dict = {}
+        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+        pair respectively for prior_node objects of the given node.
+        """
+        
+        collection = get_database()[Node.collection_name]
+        
+        obj_dict = {}
 
-      i = 0
-      for each_id in self.prior_node:
-        i = i + 1
+        i = 0
+        for each_id in self.prior_node:
+            i = i + 1
 
-        if each_id != self._id:
-          node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
-          dict_key = i
-          dict_value = node_collection_object
-          
-          obj_dict[dict_key] = dict_value
+            if each_id != self._id:
+                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
+                dict_key = i
+                dict_value = node_collection_object
+                
+                obj_dict[dict_key] = dict_value
 
-      return obj_dict
+        return obj_dict
 
     @property
     def collection_dict(self):
-      """Returns a dictionary consisting of key-value pair as ObjectId-Document 
-      pair respectively for collection_set objects of the given node.
-      """
+        """Returns a dictionary consisting of key-value pair as ObjectId-Document 
+        pair respectively for collection_set objects of the given node.
+        """
 
-      collection = get_database()[Node.collection_name]
-      obj_dict = {}
+        collection = get_database()[Node.collection_name]
+        
+        obj_dict = {}
 
-      i = 0;
-      for each_id in self.collection_set:
-        i = i + 1
+        i = 0;
+        for each_id in self.collection_set:
+            i = i + 1
 
-        if each_id != self._id:
-          node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
-          dict_key = i
-          dict_value = node_collection_object
-          
-          obj_dict[dict_key] = dict_value
+            if each_id != self._id:
+                node_collection_object = collection.Node.one({"_id": ObjectId(each_id)})
+                dict_key = i
+                dict_value = node_collection_object
+                
+                obj_dict[dict_key] = dict_value
 
-      return obj_dict
+        return obj_dict
 
     @property
     def html_content(self):
-      """Returns the content in proper html-format.
-      """
-      if MARKUP_LANGUAGE == 'markdown':
-        return markdown(self.content, MARKDOWN_EXTENSIONS)
-
-      elif MARKUP_LANGUAGE == 'textile':
-        return textile(self.content)
-
-      elif MARKUP_LANGUAGE == 'restructuredtext':
-        return restructuredtext(self.content)
-
-      return self.content
+        """Returns the content in proper html-format.
+        """
+        if MARKUP_LANGUAGE == 'markdown':
+            return markdown(self.content, MARKDOWN_EXTENSIONS)
+        elif MARKUP_LANGUAGE == 'textile':
+            return textile(self.content)
+        elif MARKUP_LANGUAGE == 'restructuredtext':
+            return restructuredtext(self.content)
+        return self.content
         
     @property
     def current_version(self):
-      history_manager= HistoryManager()
-      return history_manager.get_current_version(self)    
+        history_manager= HistoryManager()
+        return history_manager.get_current_version(self)    
 
     @property
     def version_dict(self):
-      """Returns a dictionary containing list of revision numbers of
-      the given node.
-      
-      Example:
-      {
-       "1": "1.1",
-       "2": "1.2",
-       "3": "1.3",
-      }
-      """
-      history_manager = HistoryManager()
-      return history_manager.get_version_dict(self)
+        """Returns a dictionary containing list of revision numbers of
+        the given node.
+        
+        Example:
+        {
+         "1": "1.1",
+         "2": "1.2",
+         "3": "1.3",
+        }
+        """
+        history_manager = HistoryManager()
+        return history_manager.get_version_dict(self)
 
 
     ########## Built-in Functions (Overridden) ##########
     
     def __unicode__(self):
-      return self._id
+        return self._id
     
     def identity(self):
-      return self.__unicode__()
+        return self.__unicode__()
     
     def save(self, *args, **kwargs):
-
         if kwargs.has_key("is_changed"):
           if not kwargs["is_changed"]:
             #print "\n ", self.name, "(", self._id, ") -- Nothing has changed !\n\n"
             return
-
+    
         is_new = False
 
         if not self.has_key('_id'):
@@ -380,6 +372,39 @@ class Node(DjangoDocument):
         
         super(Node, self).save(*args, **kwargs)
         
+        #print "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",self._id
+        
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    	#This is the save method of the node class.It is still not known on which objects is this save method applicable
+    	#We still do not know if this save method is called for the classes which extend the Node Class or for every class
+    	#There is a very high probability that it is called for classes which extend the Node Class only
+    	#The classes which we have i.e. the MyReduce() and ToReduce() class do not extend from the node class
+    	#Hence calling the save method on those objects should not create a recursive function
+    	
+    	#If it is a new document then
+    		#Make a new object of ToReduce class and the id of this document to that object
+    	#else
+   		#Check whether there is already an object of ToReduce() with the id of this object.
+   		#If there is an object present
+   			#pass
+   		#else add that object
+   	#I have not applied the above algorithm
+   	
+   	#Instead what I have done is that I have searched the ToReduce() collection class and searched whether the ID of this 
+   	#document is present or not.
+   	#If the id is not present then add that id.If it is present then do not add that id
+   		
+   	old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})	
+    	if not old_doc:
+    		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
+    		z = collection.ToReduceDocs()
+    		z.doc_id = self._id
+    		z.required_for = to_reduce_doc_requirement
+    		z.save()
+    		
+    	#If you create/edit anything then this code shall add it in the URL
+    	#===================================================================================================================#
+        
         history_manager = HistoryManager()
         rcs_obj = RCS()
 
@@ -402,7 +427,6 @@ class Node(DjangoDocument):
             rcs_obj.checkout(fp)
 
             try:
-                # print "\n Updating...", self._id, " -- ", self.name
                 if history_manager.create_or_replace_json_file(self):
                     user = User.objects.get(pk=self.modified_by).username
                     message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
@@ -410,6 +434,8 @@ class Node(DjangoDocument):
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
                 raise RuntimeError(err)
+    
+
                 
 
     ##########  User-Defined Functions ##########
@@ -418,7 +444,7 @@ class Node(DjangoDocument):
         """Returns user-defined attribute(s) of given node which belongs to either given single/list of GType(s).
 
         Keyword arguments:
-        gsystem_type_id_or_list -- Single/List of ObjectId(s) of GSystemTypes' to which the given node (self) belongs
+        gsystem_type_id_or_list --  Single/List of ObjectId(s) of GSystemTypes' to which the given node (self) belongs
   
         If node (self) has '_id' -- Node is created; indicating possible attributes needs to be searched under GAttribute collection & return 
         value of those attributes (previously existing) as part of the list along with attribute-data_type
@@ -900,7 +926,9 @@ class ProcessType(Node):
     }
     use_dot_notation = True
 
-
+# user should have a list of groups
+# attributeType added should automatically be added to the attribute_type_set of GSystemType
+ 
 @connection.register
 class GSystemType(Node):
     """Class to organize Systems
@@ -1083,10 +1111,8 @@ class Author(Group):
         return True
 
 
-
-#######################################################################################################################################
 #  HELPER -- CLASS DEFINITIONS
-#######################################################################################################################################
+
 
 class HistoryManager():
     """Handles history management for documents of a collection 
@@ -1392,7 +1418,7 @@ class Triple(DjangoDocument):
   
   def identity(self):
     return self.__unicode__()
-  
+
   def save(self, *args, **kwargs):
     is_new = False
 
@@ -1540,6 +1566,24 @@ class GAttribute(Triple):
     use_autorefs = True                   # To support Embedding of Documents
 
 
+  
+
+
+@connection.register
+class GAttribute(Triple):
+
+    structure = {
+        'attribute_type_scope': basestring,
+        'attribute_type': AttributeType,  # DBRef of AttributeType Class
+        'object_value_scope': basestring,
+        'object_value': None		  # value -- it's data-type, is determined by attribute_type field
+    }
+    
+    required_fields = ['attribute_type', 'object_value']
+    use_dot_notation = True
+    use_autorefs = True                   # To support Embedding of Documents
+
+
 @connection.register
 class GRelation(Triple):
 
@@ -1554,3 +1598,49 @@ class GRelation(Triple):
     use_dot_notation = True
     use_autorefs = True                   # To support Embedding of Documents
 
+
+
+####################################### Added on 19th June 2014 for SEARCH ##############################
+
+
+@connection.register
+class ReducedDocs(DjangoDocument):
+	structure={
+		'content':dict, #This contains the content in the dictionary format
+		'orignal_id':ObjectId,#The object ID of the orignal document
+		'required_for':unicode,
+		'is_indexed':bool, #This will be true if the map reduced document has been indexed.If it is not then it will be false
+	}
+	use_dot_notation = True
+
+@connection.register
+class ToReduceDocs(DjangoDocument):
+	structure={
+		'doc_id':ObjectId,
+		'required_for':unicode,
+	}
+	use_dot_notation = True
+
+@connection.register
+class IndexedWordList(DjangoDocument):
+	structure={
+		'word_start_id':float,
+		'words':dict,
+		'required_for':unicode,
+	}
+	use_dot_notation = True
+	#word_start_id = 0 --- a ,1---b,2---c .... 25---z,26--misc.
+
+
+	
+"""
+@connection.register
+class allLinks(DjangoDocument):
+    structure = {
+	'member_of':ObjectId,
+	'link':unicode,
+	'required_for':unicode,
+    }
+    # required_fields = ['member_of', 'link']
+    use_dot_notation = True
+"""
