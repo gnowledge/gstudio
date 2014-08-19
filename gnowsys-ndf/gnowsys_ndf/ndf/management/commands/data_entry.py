@@ -677,7 +677,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
             
             ga_node.status = u"PUBLISHED"
             ga_node.save()
-            info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+            info_message = " GAttribute (", ga_node.name ,") created successfully.\n"
             log_list.append(info_message)
 
         except Exception as e:
@@ -708,11 +708,11 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
             if is_ga_node_changed:
                 ga_node.status = u"PUBLISHED"
                 ga_node.save()
-                info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+                info_message = " GAttribute (", ga_node.name,") updated successfully.\n"
                 log_list.append(info_message)
 
             else:
-                info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+                info_message = " GAttribute (", ga_node.name, ") already exists (Nothing updated) !\n"
                 log_list.append(info_message)
 
         except Exception as e:
@@ -744,7 +744,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id):
             gr_node.status = u"PUBLISHED"
             
             gr_node.save()
-            info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+            info_message = " GRelation (", gr_node.name, ") created successfully.\n"
             log_list.append(info_message)
 
         except Exception as e:
