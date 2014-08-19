@@ -430,7 +430,7 @@
           {% if each_node.mime_type %}
           <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
           {% else %}
-          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
           {% endif %}
           {% endfor %}
 	</div>
