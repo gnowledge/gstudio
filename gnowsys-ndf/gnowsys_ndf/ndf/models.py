@@ -116,7 +116,7 @@ DATA_TYPE_CHOICES = (
 # CUSTOM DATA-TYPE DEFINITIONS
 #######################################################################################################################################
 
-STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED')
+STATUS_CHOICES_TU = IS(u'DRAFT', u'HIDDEN', u'PUBLISHED', u'DELETED')
 STATUS_CHOICES = tuple(str(qtc) for qtc in STATUS_CHOICES_TU)
 
 QUIZ_TYPE_CHOICES_TU = IS(u'Short-Response', u'Single-Choice', u'Multiple-Choice')
@@ -551,7 +551,7 @@ class Node(DjangoDocument):
             # Checking in GRelation collection - to collect relations' values, if already set!
             if self.has_key("_id"):
                 # If - node has key '_id'
-                relations = collection.Triple.find({'_type': "GRelation", 'subject': self._id})
+                relations = collection.Triple.find({'_type': "GRelation", 'subject': self._id, 'status': u"PUBLISHED"})
                 for rel_obj in relations:
                     # rel_obj is of type - GRelation [subject(node._id), relation_type(RelationType), right_subject(value of related object)]
                     # Must convert rel_obj.relation_type [dictionary] to collection.Node(rel_obj.relation_type) [document-object]
@@ -579,7 +579,7 @@ class Node(DjangoDocument):
             # Checking in GRelation collection - to collect inverse-relations' values, if already set!
             if self.has_key("_id"):
                 # If - node has key '_id'
-                relations = collection.Triple.find({'_type': "GRelation", 'right_subject': self._id})
+                relations = collection.Triple.find({'_type': "GRelation", 'right_subject': self._id, 'status': u"PUBLISHED"})
                 for rel_obj in relations:
                     # rel_obj is of type - GRelation [subject(node._id), relation_type(RelationType), right_subject(value of related object)]
                     # Must convert rel_obj.relation_type [dictionary] to collection.Node(rel_obj.relation_type) [document-object]
