@@ -211,6 +211,7 @@ main>aside{
 
 //    Article styles
     article{
+        min-height: 400px;
         background-color: white;
         overflow-x: visible;
         &>header,form>header{
