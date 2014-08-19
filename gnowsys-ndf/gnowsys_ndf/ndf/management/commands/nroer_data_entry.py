@@ -35,7 +35,7 @@ from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
-from gnowsys_ndf.ndf.management.commands.data_entry import perform_eval_type
+from gnowsys_ndf.ndf.management.commands.data_entry import create_grelation, create_gattribute
 # from gnowsys_ndf.ndf.views.file import save_file, getFileSize
 # from gnowsys_ndf.ndf.views.methods import create_gattribute
 
@@ -51,6 +51,9 @@ SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
 collection = get_database()[Node.collection_name]
 file_gst = collection.GSystemType.one({"name": "File"})
 home_group = collection.Group.one({"name": "home", "_type":"Group"})
+theme_gst = collection.GSystemType.one({ "name": "Theme" })
+theme_item_gst = collection.GSystemType.one({ "name": "theme_item" })
+topic_gst = collection.GSystemType.one({ "name": "Topic" })
 
 class Command(BaseCommand):
     help = "\n\tFor saving data in gstudio DB from NROER schema files. This will create 'File' type GSystem instances.\n\tCSV file condition: The first row should contain DB names.\n"
@@ -266,7 +269,7 @@ def parse_data_create_gsystem(json_file_path):
           # print parsed_json_document
         
         # node = create_resource_gsystem(parsed_json_document)
-        node = collection.File.one({ "_id": ObjectId('53ec620190b55024eeed2f63') })
+        node = collection.File.one({ "_id": ObjectId('53eb5abf1d41c81d18bb104b') })
         # print node, "\n"
 
         if node and attribute_relation_list:
@@ -380,7 +383,8 @@ def parse_data_create_gsystem(json_file_path):
             is_relation = True
 
             for rel_key, rel_value in gst_possible_relations_dict.iteritems():
-              if key == rel_key:
+              if key == rel_key: # commented because teaches is only relation being used for time being
+              # if key == "teaches":
                 is_relation = False
 
                 if json_document[key]:
@@ -396,39 +400,94 @@ def parse_data_create_gsystem(json_file_path):
                   #       formatted_value += "\""+v.strip(" ")+"\", "
                   #   json_document[key] = formatted_value
 
+                  # -----------------------------
+                  def _get_id_from_hierarchy(hier_list, oid=None):
+                    '''
+                    Returns the last hierarchical element's ObjectId.
+                    Arguments to be passes is list of unicode names.
+                    e.g.
+                    hier_list = [u'NCF', u'Science', u'Physical world', u'Materials', u'States of matter', u'Liquids']
+                    '''
+                    # print oid
+                    if len(hier_list) >= 2:
+                      if oid:
+                        curr_oid = collection.GSystem.one({ "_id": oid })
+                        # print curr_oid.name
+                      else:
+                        curr_oid = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+
+                      next_oid = collection.GSystem.one({ 
+                                                "name": hier_list[1],
+                                                'group_set': {'$all': [ObjectId(home_group._id)]},
+                                                'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
+                                                '_id': {'$in': curr_oid.collection_set }
+                                                })
+
+                      # print "||||||", next_oid.name
+                      hier_list.remove(hier_list[0])
+                      _get_id_from_hierarchy(hier_list, next_oid._id)
+                    
+                    if len(hier_list) == 1:
+                      if oid:
+                        # print "oid: ", oid
+                        return oid
+                      else:
+                        return collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} }, {"_id": 1} )
+                    # -----------------------------                  
+
+
+                  if ":" in json_document[key]:
+                    formatted_list = []
+                    temp_teaches_list = json_document[key].replace("\n", "").split(":")
+                    # print temp_teaches
+                    for v in temp_teaches_list:
+                      formatted_list.append(v.strip())
+
+                    right_subject_id = []
+                    right_subject_id.append(_get_id_from_hierarchy(formatted_list)._id)
+                    json_document[key] = right_subject_id
+                    # print json_document[key]
+                  
+                  else:
+                    formatted_list = list(json_document[key].strip())
+                    right_subject_id = []
+                    right_subject_id.append(_get_id_from_hierarchy(formatted_list)._id)
+                    json_document[key] = right_subject_id
+
+
                   # print "\n----------", json_document[key]
                   # info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
 
-                  print json_document[key]
+                  # print list(json_document[key])
 
                   # perform_eval_type(key, json_document, "GSystem", "GSystem")
 
-                  # for right_subject_id in json_document[key]:
-                  #   print "\njson_document[key]: ", json_document[key]
+                  for right_subject_id in json_document[key]:
+                    print "\njson_document[key]: ", json_document[key]
 
-                  #   subject_id = node._id
-                  #   print "subject_id : ", subject_id
-                  #   print "node.name: ", node.name
+                    subject_id = node._id
+                    print "subject_id : ", subject_id
+                    print "node.name: ", node.name
                     # Here we are appending list of ObjectIds of GSystemType's type_of field 
                     # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
                     # This is because some of the RelationType's are holding Base class's ObjectId
                     # and not that of the Derived one's
                     # Delibrately keeping GSystemType's ObjectId first in the list
                     # And hence, used $in operator in the query!
-                    # rel_subject_type = []
-                    # rel_subject_type.append(file_gst._id)
+                    rel_subject_type = []
+                    rel_subject_type.append(file_gst._id)
                     
-                    # if file_gst.type_of:
-                    #     rel_subject_type.extend(file_gst.type_of)
+                    if file_gst.type_of:
+                        rel_subject_type.extend(file_gst.type_of)
 
-                    # relation_type_node = collection.Node.one({'_type': "RelationType", 
-                    #                                           '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
-                    #                                                   {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
-                    #                                           'subject_type': {'$in': rel_subject_type}
-                    #                                   })
+                    relation_type_node = collection.Node.one({'_type': "RelationType", 
+                                                              '$or': [{'name': {'$regex': "^"+rel_key+"$", '$options': 'i'}}, 
+                                                                      {'altnames': {'$regex': "^"+rel_key+"$", '$options': 'i'}}],
+                                                              'subject_type': {'$in': rel_subject_type}
+                                                      })
 
-                    # info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(right_subject_id)+") ...\n"
-                    # print info_message
+                    info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(right_subject_id)+") ...\n"
+                    print info_message
                     # gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
                   
                   # To break outer for loop if key found
