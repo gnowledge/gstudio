@@ -3,6 +3,37 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
+{% block style %}
+// <style type="text/css">
+.divider-line { font-size: xx-large; color:lightgray; }
+.line-height-2 { line-height:2; }
+.line-height-2pt5 { line-height:2.5; }
+.fontsize-x-large { font-size: x-large; }
+
+.margin-0 { margin: 0 !important ;}
+
+.resource-drawer { 
+  border-color: #D3D3D3; border-style: solid; 
+  padding: 0 !important; 
+  overflow-y: auto;
+}
+
+.resource-drawer li.bullet-item:hover{
+  background-color: #ecf0f1; cursor:pointer;
+}
+
+.posted-by{ color: #808080; font-size: small; }
+
+.selected-resource { background-color:lightgray !important ; }
+
+.resource-type-image {
+  height:40px;    
+  background-repeat:no-repeat; background-size: 48px 48px
+}
+
+// </style>
+{% endblock %}
+
 {% block body_content %} 
   <form data-abide id="form-edit-node" method="POST" action="">
 
@@ -83,7 +114,7 @@
     });
   });
 
-  // ------------------------------------------------------------------------ Start: State based District selection
+// State-wise District selection ------------------------------------------------------------------------
 
   // Disable District field, later on will be enabled after a state is selected
   $("select#person_belongs_to_district").attr('disabled', 'disabled')
@@ -153,9 +184,51 @@
     }
   });
 
-  // -------------------------------------------------------------------------- End: State based District selection
+// Tranferring values from multiple selection widget into outer dropdown --------------------------------
+  $(document).on('closed', '[data-reveal]', function () {
+    /*
+     *  On closing of reveal-modal
+     */
+    var widget_for = $(this).attr('id').replace('_modal', '')
 
+    // First empty all values of District field (dropdown/select)
+    $("select#" + widget_for).empty();
+
+    // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
+    class_value = ".node_id." + widget_for + "_values"
+    right_drawer_len = $(class_value).size()
+
+    if (right_drawer_len > 0) {
+      $(class_value).each(function (){
+        // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
+        // alert("value : " + $(this).val() + " -- " + $(this).attr('name'));
+        resource_id = $(this).val()
+        resource_name = $(this).attr('name')
+
+        // Make very first entry as given below
+        $("select#" + widget_for).append(
+            $("<option></option>")
+              .attr("value", resource_id)
+              .attr("selected", "selected")
+              .text(resource_name)
+        );
+      });
+    }
+
+    else {
+      // Make very first entry as given below
+      $("select#" + widget_for).append(
+          $("<option></option>")
+            .attr("value", "")
+            .text("- - - Select - - -")
+      );
+    }
+  });
+
+// On click of save --------------------------------------------------------------------------
   $("#save-node").click(function() {
+    
+  // Store concatenated first, middle & last name field's values into name field (hidden input field)
     name = ""
     first_name = $("#first_name").val().trim()
     middle_name = $("#middle_name").val().trim()
@@ -171,9 +244,13 @@
     }
 
     $("#name").val(name)
+
+  // Enable any disabled field
+  
+    $("select#person_belongs_to_district").removeAttr('disabled')
   });
 
-  // totWhen ---------------
+// totWhen ---------------
   var totWhen = $("#tot_when")
 
   if(totWhen.length > 0) {
@@ -211,4 +288,5 @@
     return datesList;
   }
   // </script>
-{% endblock %}	
+
+{% endblock %}
