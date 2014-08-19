@@ -75,12 +75,48 @@
 {% block script %}
   // <script type="text/javascript">
 
+  var currentYear = (new Date()).getFullYear()
+  lowerYearRange = currentYear - 80;
+  upperYearRange = currentYear + 20;
+
   $(function() {
-    $("#dob").datepicker({
+    $(".date_month_day_year").datepicker({
       changeMonth: true,
       changeYear: true,
-      yearRange: "1980:2005"
+      yearRange: "" + lowerYearRange + ":" + upperYearRange
     });
+
+    $(".date_year").datepicker({
+      changeYear: true,
+      dateFormat: 'yy',
+      yearRange: "" + lowerYearRange + ":" + upperYearRange,
+
+      onClose: function(dateText, inst) {
+        var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+        $(this).datepicker('setDate', new Date(year, 1, 1));
+      },
+
+      beforeShow: function() {
+        var year = $(this).val();
+        if (year) {
+          $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+          $(this).datepicker('setDate', new Date(year, 1, 1));
+        }
+      }
+    });
+
+  });
+
+  $(document).on('focus click', '.date_year' ,function(){
+    $(".ui-datepicker-calendar").hide();
+    $(".ui-datepicker-month").hide();
+    $(".ui-datepicker-prev").hide();
+    $(".ui-datepicker-next").hide();
+    $("#ui-datepicker-div").position({
+      my: "center top",
+      at: "center bottom",
+      of: $(this)
+    }); 
   });
 
   // ------------------------------------------------------------------------ Start: State based District selection

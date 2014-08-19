@@ -48,7 +48,7 @@
     {% endif %}
 
   {% elif field_type == "datetime" %}
-    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:'m/d/Y'}}" {% if is_required_field %}required{% endif %} style="float:left; width:45%" placeholder="MM/DD/YYYY [or] YYYY"/>
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:field.validators.0}}" class="{{field.validators.1}}" {% if is_required_field %}required{% endif %} style="float:left; width:45%" placeholder="{{field.validators.2}}"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% blocktrans with alt=field.altnames %}Please set {{alt}}!!!{% endblocktrans %}</small>
