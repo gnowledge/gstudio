@@ -95,7 +95,7 @@ Use corresponding package names if you are using an RPM based distro
         npm install -g bower
         sudo npm install -g bower
 
-    (5) To install JS/CSS dependencies: (Be there at project root level)
+    (5) To install JS/CSS dependencies: (Be there at project root level - in gnowsys-ndf directory)
         bower install
 
 7. To run "gstudio" project, perform following steps: 
