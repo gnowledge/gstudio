@@ -44,6 +44,7 @@ class Command(BaseCommand):
     if res['n']:
            print "\n 'agency_type' field added to 'Author' documents totalling to : ", res['n']
 
+
     # Modify language field with unicode value if any document has language with dict datatype
     res = collection.update({'language':{}},
                             {'$set':{'language':u""}}, 
