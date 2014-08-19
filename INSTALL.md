@@ -91,11 +91,10 @@ Use corresponding package names if you are using an RPM based distro
           (b) sudo apt-get update
           (c) sudo apt-get install python-software-properties python g++ make nodejs
 
-    (4) Installing Bower (try any one of following):
-        npm install -g bower
+    (4) Installing Bower:
         sudo npm install -g bower
 
-    (5) To install JS/CSS dependencies: (Be there at project root level - in gnowsys-ndf directory)
+    (5) To install JS/CSS dependencies: (Navigate to project root - cd gstudio/gnowsys-ndf )
         bower install
 
 7. To run "gstudio" project, perform following steps: 
@@ -129,7 +128,7 @@ Use corresponding package names if you are using an RPM based distro
     (2) sudo gem install compass
 
   Running compass:
-    (1) Navigate at manage.py file.
+    (1) Navigate to project root manage.py file.
     (2) Run following command (to start compass) and then edit scss stylesheets:
         compass watch
 
@@ -138,3 +137,4 @@ Use corresponding package names if you are using an RPM based distro
   file bugs etc. visit ask us in the mailing list:
 
   - http://gnowledge.org/cgi-bin/mailman/listinfo/gnowsys-dev
+  
