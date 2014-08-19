@@ -72,7 +72,7 @@ class Command(BaseCommand):
 				    if "csv" in file_extension:
 
 				        # Process csv file and convert it to json format at first
-				        info_message = "\n CSVType: Following file (" + file_path + ") found!!!"
+				        info_message = "\n- CSVType: Following file (" + file_path + ") found!!!"
 				        print info_message
 									    
 				        try:
@@ -96,11 +96,11 @@ class Command(BaseCommand):
 				            if os.path.exists(json_file_path):
 				                file_path = json_file_path
 				                is_json_file_exists = True
-				                info_message = "\n JSONType: Following file (" + json_file_path + ") created successfully.\n"
+				                info_message = "\n- JSONType: Following file (" + json_file_path + ") created successfully.\n"
 				                print info_message
 
 				        except Exception as e:
-				            error_message = "\n CSV-JSONError: " + str(e)
+				            error_message = "\n!! CSV-JSONError: " + str(e)
 				            print error_message
 				        # End of csv-json coversion
 
@@ -108,25 +108,25 @@ class Command(BaseCommand):
 				        is_json_file_exists = True
 
 				    else:
-				        error_message = "\n FileTypeError: Please choose either 'csv' or 'json' format supported files!!!\n"
+				        error_message = "\n!! FileTypeError: Please choose either 'csv' or 'json' format supported files!!!\n"
 				        print error_message
 				        raise Exception(error_mesage)
 
 				    if is_json_file_exists:
 				        # Process json file and create required GSystems, GRelations, and GAttributes
-				        info_message = "\n Task initiated: Processing json-file...\n"
+				        info_message = "\n------- Task initiated: Processing json-file -------\n"
 				        print info_message
 
 				        parse_data_create_gsystem(file_path)
 				    
 				        # End of processing json file
 
-				        info_message = "\n Task finised: Successfully processed json-file.\n"
+				        info_message = "\n------- Task finised: Successfully processed json-file -------\n"
 				        print info_message
 				        # End of creation of respective GSystems, GAttributes and GRelations for Enrollment
 
 				else:
-				    error_message = "\n FileNotFound: Following path (" + file_path + ") doesn't exists!!!\n"
+				    error_message = "\n!! FileNotFound: Following path (" + file_path + ") doesn't exists!!!\n"
 				    print error_message
 				    raise Exception(error_message)
 
@@ -140,7 +140,7 @@ def get_user_id(user_name):
     user_obj = User.objects.get(username=user_name)
     return int(user_obj.id)
   except Exception as e:
-    print e, "for username: ", user_name 
+    print e, "\n!! for username: ", user_name 
     return False
 
 
@@ -179,27 +179,26 @@ def parse_data_create_gsystem(json_file_path):
             json_documents_list.append(json_document)
 
     except Exception as e:
-        error_message = "\n While parsing the file ("+json_file_path+") got following error...\n " + str(e)
+        error_message = "\n!! While parsing the file ("+json_file_path+") got following error...\n " + str(e)
         raise error_message
 
     for i, json_document in enumerate(json_documents_list):
-      # print i
+      
+      print "\n\n********** Processing row number : [", i, "] **********"
+
       try:
 
         parsed_json_document = {}
-        # node_field_json = {}
         attribute_relation_list = []
         
         for key in json_document.iterkeys():
           parsed_key = key.lower()
-          # print parsed_key
-          # parsed_key = parsed_key.replace(" ", "_")
           
           if parsed_key in node_keys:
-            # print "~~~~" + key
+            # print parsed_key
 
             # adding the default field values e.g: created_by, member_of
-            # created_by
+            # created_by:
             if parsed_key == "created_by":
               if json_document[key]:
                 temp_user_id = get_user_id(json_document[key].strip())
@@ -208,7 +207,8 @@ def parse_data_create_gsystem(json_file_path):
               else:
                 parsed_json_document[parsed_key] = get_user_id("nroer_team")
               # print "---", parsed_json_document[parsed_key]
-            # contributors
+            
+            # contributors:
             elif parsed_key == "contributors":
               if json_document[key]:
                 contrib_list = json_document[key].split(",")
@@ -222,7 +222,8 @@ def parse_data_create_gsystem(json_file_path):
               else:
                 parsed_json_document[parsed_key] = []
                 # print "===", parsed_json_document[parsed_key]
-            # tags
+            
+            # tags:
             elif (parsed_key == "tags") and json_document[key]:
               tag_list = json_document[key].replace("\n", "").split(",")
               temp_tag_list = []
@@ -231,11 +232,14 @@ def parse_data_create_gsystem(json_file_path):
                   temp_tag_list.append(each_tag.strip())
               parsed_json_document[parsed_key] = temp_tag_list
               # print parsed_json_document[parsed_key]
-            #member_of
+            
+            #member_of:
             elif parsed_key == "member_of":
               parsed_json_document[parsed_key] = [file_gst._id]
               # print parsed_json_document[parsed_key]
-            # --- END of addind the default field values
+            
+            # --- END of adding the default field values
+
 
             # processing for remaining fields
             elif node_structure[parsed_key] == unicode:
@@ -252,26 +256,20 @@ def parse_data_create_gsystem(json_file_path):
               parsed_json_document[parsed_key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
             else:
               parsed_json_document[parsed_key] = json_document[key]
-            # --- END of processing for remaining fields
 
-                  # creating file gst instance and feeding the values
-             # file_obj = collection.File()
+            # --- END of processing for remaining fields
 
           else:
             parsed_json_document[key] = json_document[key]
             attribute_relation_list.append(key)
           
-          # print "\n----------\n", parsed_key , "\t" , parsed_json_document[parsed_key]
-            # print "\n\n-----======-\n", attribute_relation_list
-            
-        # print "\t",parsed_json_document.get("created_by")
-        # if i == 0:
-          # print parsed_json_document
-        
-        # node = create_resource_gsystem(parsed_json_document)
-        node = collection.File.one({ "_id": ObjectId('53eb5abf1d41c81d18bb104b') })
+        # calling method to create File GSystems
+        node = create_resource_gsystem(parsed_json_document)
+        # node = collection.File.one({ "_id": ObjectId('') })
         # print node, "\n"
 
+
+        # starting processing for the attributes and relations saving
         if node and attribute_relation_list:
 
           gst_possible_attributes_dict = node.get_possible_attributes(file_gst._id)
@@ -328,7 +326,6 @@ def parse_data_create_gsystem(json_file_path):
                     json_document[key] = long(json_document[key])
 
                   elif type(attr_value['data_type']) == IS:
-                    # print IS
                     for op in attr_value['data_type']._operands:
                       if op.lower() == json_document[key].lower():
                         json_document[key] = op
@@ -357,22 +354,22 @@ def parse_data_create_gsystem(json_file_path):
                   # print "\nobject_value: ", object_value
                   ga_node = None
 
-                  info_message = "\n Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
-                  # print info_message
-                  # ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
-
+                  info_message = "\n- Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
+                  print info_message
+                  ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
+                  print "\nga_node : \n", ga_node.name
                   # To break outer for loop as key found
                   break
 
                 else:
-                  error_message = "\n DataNotFound: No data found for field ("+attr_key+") while creating GSystem ( -- "+node.name+") !!!\n"
+                  error_message = "\n!! DataNotFound: No data found for field ("+attr_key+") while creating GSystem ( -- "+node.name+")\n"
 
             if is_relation:
               relation_list.append(key)
 
           if not relation_list:
             # No possible relations defined for this node
-            info_message = "\n "+gsystem_type_name+" ("+node.name+"): No possible relations defined for this node !!!\n"
+            info_message = "\n!! ("+node.name+"): No possible relations defined for this node.\n"
             # log_list.append(info_message)
             return
 
@@ -439,7 +436,7 @@ def parse_data_create_gsystem(json_file_path):
                   if ":" in json_document[key]:
                     formatted_list = []
                     temp_teaches_list = json_document[key].replace("\n", "").split(":")
-                    # print temp_teaches
+                    # print "\n temp_teaches", temp_teaches
                     for v in temp_teaches_list:
                       formatted_list.append(v.strip())
 
@@ -456,8 +453,8 @@ def parse_data_create_gsystem(json_file_path):
 
 
                   # print "\n----------", json_document[key]
-                  # info_message = "\n For GRelation parsing content | key: " + rel_key + " -- " + json_document[key]
-
+                  info_message = "\n- For GRelation parsing content | key: " , rel_key , " -- " , json_document[key]
+                  print info_message
                   # print list(json_document[key])
 
                   # perform_eval_type(key, json_document, "GSystem", "GSystem")
@@ -486,24 +483,23 @@ def parse_data_create_gsystem(json_file_path):
                                                               'subject_type': {'$in': rel_subject_type}
                                                       })
 
-                    info_message = "\n Creating GRelation ("+node.name+" -- "+rel_key+" -- "+str(right_subject_id)+") ...\n"
+                    info_message = "\n- Creating GRelation (", node.name, " -- ", rel_key, " -- ", str(right_subject_id),") ...\n"
                     print info_message
-                    # gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
-                  
+                    gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
+                    print "\n gr_node: \n", gr_node.name                  
                   # To break outer for loop if key found
                   break
 
                 else:
-                  error_message = "\n DataNotFound: No data found for relation ("+rel_key+") while creating GSystem ("+file_gst.name+" -- "+node.name+") !!!\n"
-                  # print error_message
+                  error_message = "\n!! DataNotFound: No data found for relation (", rel_key, ") while creating GSystem (",file_gst.name, " -- ", node.name,")\n"
+                  print error_message
 
                   break
 
-
-
-
-
           # print relation_list
+        else:
+            print "\n!! Either resource is already created or file is already saved into gridfs/DB"
+            continue
 
       except Exception as e:
           # error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
@@ -537,10 +533,10 @@ def create_resource_gsystem(resource_data):
       print "\nResource with same name of ", resource_data["name"] ," and _type 'File' exist in the group. Ref _id: ", check_obj_by_name._id
     else:      
       print "\nResource file exists in DB: ", cur_oid
-    return check_obj_by_name
+    return None
 
   else:
-    print "\nSaving resource: ", unicode(resource_data["name"])
+    print "\n- Creating resource: ", unicode(resource_data["name"])
     
     filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
 
