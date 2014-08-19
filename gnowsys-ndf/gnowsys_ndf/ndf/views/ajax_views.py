@@ -17,6 +17,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 import ast
 
+from stemming.porter2 import stem
+
 from django_mongokit import get_database
 
 try:
@@ -35,6 +37,11 @@ from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
 from gnowsys_ndf.ndf.org2any import org2html
 
+import json
+from bson.objectid import ObjectId
+
+
+
  
 db = get_database()
 gs_collection = db[GSystem.collection_name]
@@ -44,6 +51,14 @@ topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 #This function is used to check (while creating a new group) group exists or not
 #This is called in the lost focus event of the group_name text box, to check the existance of group, in order to avoid duplication of group names.
+
+class Encoder(json.JSONEncoder):
+	def default(self, obj):
+		if isinstance(obj, ObjectId):
+			return str(obj)
+		else:
+			return obj
+
 def checkgroup(request,group_name):
     titl=request.GET.get("gname","")
     retfl=check_existing_group(titl)
@@ -1592,7 +1607,7 @@ def delComment(request, group_id):
   print "Inside del comments"
   return HttpResponse("comment deleted")
 
-# Views related to MIS-GAPP =======================================================================================
+# Views related to STUDIO.TISS =======================================================================================
 
 def set_user_link(request, group_id):
   """
@@ -1681,42 +1696,6 @@ def set_enrollment_code(request, group_id):
   else:
     error_message = " EnrollementCodeError: Either not an ajax call or not a POST request!!!"
     raise Exception(error_message)
-
-# ====================================================================================================
-
-def edit_task_title(request, group_id):
-    '''
-    This function will edit task's title 
-    '''
-    if request.is_ajax() and request.method =="POST":
-        taskid = request.POST.get('taskid',"")
-        title = request.POST.get('title',"")
-	task = collection.Node.find_one({'_id':ObjectId(taskid)})
-        task.name = title
-	task.save()
-        return HttpResponse(task.name)
-    else:
-	raise Http404
-
-def edit_task_content(request, group_id):
-    '''
-    This function will edit task's title 
-    '''
-    if request.is_ajax() and request.method =="POST":
-        taskid = request.POST.get('taskid',"")
-        content_org = request.POST.get('content_org',"")
-	task = collection.Node.find_one({'_id':ObjectId(taskid)})
-        task.content_org = unicode(content_org)
-    
-  	# Required to link temporary files with the current user who is modifying this document
-    	usrname = request.user.username
-    	filename = slugify(task.name) + "-" + usrname + "-"
-    	task.content = org2html(content_org, file_prefix=filename)
-	task.save()
-        return HttpResponse(task.content)
-    else:
-	raise Http404
-
 
 def get_students_assignments(request, group_id):
   """
@@ -1850,3 +1829,95 @@ def get_students_assignments(request, group_id):
   except Exception as e:
     print "\n StudentDataGetError: " + str(e)
     raise Http404(e)
+
+def get_districts(request, group_id):
+  """
+  This view fetches district(s) belonging to given state.
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  state_id - ObjectId of the currently selected state`
+
+  Returns:
+  A dictionary consisting of following key:-
+  districts - a list variable consisting of two elements i.e., 
+              first-element: subject (District's ObjectId), second-element: manipulated-name-value (District's name)
+  message - a string variable giving the error-message
+  """
+  gr_node = None
+
+  try:
+    if request.is_ajax() and request.method == "GET":
+      state_id = request.GET.get("state_id", "")
+
+      # districts -- [first-element: subject (District's ObjectId), second-element: manipulated-name-value (District's name)]
+      districts = []
+
+      # Fetching RelationType: District - district_of (name) | has_district (inverse_name) - State
+      rt_district_of = collection.Node.one({'_type': "RelationType", 'name': "district_of"})
+
+      # Fetching all districts belonging to given state in sorted order by name
+      if rt_district_of:
+        cur_districts = collection.Triple.find({'_type': "GRelation", 
+                                                'relation_type.$id': rt_district_of._id, 
+                                                'right_subject': ObjectId(state_id)
+                                              }).sort('name', 1)
+
+        if cur_districts.count():
+          for d in cur_districts:
+            districts.append([str(d.subject), d.name.split(" -- ")[0]])
+
+        else:
+          error_message = "No districts found"
+          raise Exception(error_message)
+
+      else:
+        error_message = "RelationType (district_of) doesn't exists"
+        raise Exception(error_message)
+      
+      return HttpResponse(json.dumps(districts))
+
+    else:
+      error_message = " DistrictFetchError: Either not an ajax call or not a GET request!!!"
+      return HttpResponse(json.dumps({'message': " DistrictFetchError - Something went wrong in ajax call !!! \n\n Please contact system administrator."}))
+
+  except Exception as e:
+    error_message = "\n DistrictFetchError: " + str(e) + "!!!"
+    return HttpResponse(json.dumps({'message': error_message}))
+
+# ====================================================================================================
+
+def edit_task_title(request, group_id):
+    '''
+    This function will edit task's title 
+    '''
+    if request.is_ajax() and request.method =="POST":
+        taskid = request.POST.get('taskid',"")
+        title = request.POST.get('title',"")
+	task = collection.Node.find_one({'_id':ObjectId(taskid)})
+        task.name = title
+	task.save()
+        return HttpResponse(task.name)
+    else:
+	raise Http404
+
+def edit_task_content(request, group_id):
+    '''
+    This function will edit task's title 
+    '''
+    if request.is_ajax() and request.method =="POST":
+        taskid = request.POST.get('taskid',"")
+        content_org = request.POST.get('content_org',"")
+	task = collection.Node.find_one({'_id':ObjectId(taskid)})
+        task.content_org = unicode(content_org)
+    
+  	# Required to link temporary files with the current user who is modifying this document
+    	usrname = request.user.username
+    	filename = slugify(task.name) + "-" + usrname + "-"
+    	task.content = org2html(content_org, file_prefix=filename)
+	task.save()
+        return HttpResponse(task.content)
+    else:
+	raise Http404
+
+

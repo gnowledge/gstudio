@@ -21,7 +21,7 @@
           </dd>
 
           {% for tab_details in property_order_list %}
-          <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to add Name, start-time, end-time, attendence...">
+          <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to {{tab_details.0}} details...">
             <a href="#panel_{{tab_details.0}}">{{tab_details.0}}</a>
           </dd>
           {% endfor %}
@@ -37,6 +37,7 @@
 
     {% csrf_token %}
 
+    <br>
     <div id="event-details-edit-div" class="tabs-content" >
       {% for tab_name, tab_fields_list in property_order_list %}
       <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
@@ -45,8 +46,8 @@
           <div class="small-3 columns"> 
             <label for="{{field.name}}" class="left inline"> {{field.altnames}} </label>
           </div>
-          <div class="small-7 end columns">
-            {% html_widget node.pk field %}
+          <div class="small-9 columns">
+            {% html_widget groupid node.pk field %}
           </div>
         </div>
         {% endfor %}
@@ -74,8 +75,87 @@
 {% block script %}
   // <script type="text/javascript">
 
+  $(function() {
+    $("#dob").datepicker({
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "1980:2005"
+    });
+  });
+
+  // ------------------------------------------------------------------------ Start: State based District selection
+
+  // Disable District field, later on will be enabled after a state is selected
+  $("select#person_belongs_to_district").attr('disabled', 'disabled')
+
+  $("select#person_belongs_to_state").change(function() {
+    // Get selected State's value (ObjectId) and selected-index
+    selected_state_id = $(this).val()
+    selected_state_index = this.selectedIndex
+
+    if (selected_state_index != 0) {
+      // Perform this only when a State is selected
+      // Ajax call that fetches all Districts belonging to selected State
+      $.ajax({
+        url:"{% url 'get_districts' groupid %}",
+
+        data: {
+          state_id: selected_state_id
+        },
+
+        type: "GET",
+
+        dataType: "json",
+
+        complete: function () {
+          // Enable District field
+          $("select#person_belongs_to_district").removeAttr('disabled')
+        },
+
+        success: function (data) {
+          if (data.hasOwnProperty("message")) {
+            // Pops-up only when there is any error found during the ajax call
+            alert(data["message"])
+          }
+
+          else {
+            // First empty all values of District field (dropdown/select)
+            $("select#person_belongs_to_district").empty();
+
+            // Make very first entry as given below
+            $("select#person_belongs_to_district").append(
+                $("<option></option>")
+                  .attr("value", "")
+                  .text("- - - Select district - - -")
+            );
+
+            // Fill returned district values based on which state is selected
+            $.each(data, function(i, value) {
+              $("select#person_belongs_to_district").append(
+                $("<option></option>")
+                  .attr("value", value[0])
+                  .text(value[1])
+              );
+            });
+
+            // Set very first entry so that user doesn't forgets to select a value
+            $("select#person_belongs_to_district").prop("selectedIndex", 0);
+          }
+        }
+      });
+    }
+
+    else {
+      // If state is not selected or changed back to very first element from State's dropdown
+      // then set even District field's value to very first entry and disabled it until user again selects any state
+      $("select#person_belongs_to_district").prop("selectedIndex", 0);
+      $("select#person_belongs_to_district").attr('disabled', 'disabled')
+    }
+  });
+
+  // -------------------------------------------------------------------------- End: State based District selection
+
   $("#save-node").click(function() {
-    // alert($(this).val() + " clicked...")
     name = ""
     first_name = $("#first_name").val().trim()
     middle_name = $("#middle_name").val().trim()
@@ -91,38 +171,7 @@
     }
 
     $("#name").val(name)
-
-    alert($("#name").val())
   });
-
-  var dtOBInput = $("#dob")
-  // alert(dtOBInput)
-  if(dtOBInput.length > 0) {
-    dtOBInput.datetimepicker({ 
-
-      hourGrid: 6,
-      minuteGrid: 15,
-
-      // onClose: function(dateText, inst) {
-
-      //   if (endDtInput.val() != '') {
-
-      //     var testStartDate = dtOBInput.datetimepicker('getDate');
-      //     var testEndDate = endDtInput.datetimepicker('getDate');
-
-      //     if (testStartDate > testEndDate)
-      //       endDtInput.datetimepicker('setDate', testStartDate);
-
-      //   }
-      //   else {
-      //     endDtInput.val(dateText);
-      //   }
-      // },
-      onSelect: function (selectedDateTime){
-        endDtInput.datetimepicker('option', 'minDate', dtOBInput.datetimepicker('getDate') );
-      }
-    });
-  }
 
   // totWhen ---------------
   var totWhen = $("#tot_when")

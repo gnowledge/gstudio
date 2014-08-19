@@ -45,6 +45,18 @@
       margin-top: 1em;
     }
 
+    .ui-datepicker-title select {
+      background-color: #e6e6e6;
+      /*border-collapse: separate;
+      border-spacing: 30px 0px;*/
+      font-family: inherit;
+      /*font-size: 0.3em;*/
+      font-weight: normal;
+      height: 1.5rem;
+      /*margin: 30px 0;*/
+      padding: 0;
+    }
+
     .active-app-set, .active-app-set-edit, .active-app-set-view {
     
       background-color:#efefef;
@@ -61,11 +73,19 @@
 
       border-left: 4px solid #808080;
     }
+
+    small.error {
+      display: block;
+      line-height: 0;
+      padding: 0;
+      margin-bottom: 1rem;
+      margin-top: 0.9rem;
+    }
   </style>
 {% endblock%}
 
 {% block meta_content %}
-  {% user_access_policy groupid request.user as user_access %}
+  {% check_is_gstaff groupid request.user as gstaff_access %}
 
   <ul class="side-nav"> 
   	<li>
@@ -95,7 +115,7 @@
           {{each.name}} ({{count}})
         </a>
 
-        {% if user_access == "allow" %}
+        {% if gstaff_access %}
         {% if app_name == "MIS" %}
         <a class="small-4 columns" href="{% url 'mis:mis_app_instance_create' groupid app_id each.pk %}" title="Add {{each.name}}">
         {% else %}

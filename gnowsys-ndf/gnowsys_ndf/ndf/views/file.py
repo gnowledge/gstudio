@@ -39,9 +39,9 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,set_all_urls
 
-#######################################################################################################################################
+
 
 db = get_database()
 collection = db[Node.collection_name]
@@ -51,9 +51,9 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'}
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
 
-###################################################################################################################################
+
 # VIEWS DEFINED FOR GAPP -- 'FILE'
-###################################################################################################################################
+
 lock=threading.Lock()
 count = 0    
 
@@ -510,6 +510,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                         fileobj.group_set.append(user_group_object._id)
 
             fileobj.member_of.append(GST_FILE._id)
+            #### ADDED ON 14th July.IT's DONE
+            fileobj.url = set_all_urls(fileobj.member_of)
             fileobj.mime_type = filetype
             if img_type == "" or img_type == None:
                 if content_org:

@@ -1,0 +1,32 @@
+
+// REQUIREMENTS.TXT
+pip install -U pyyaml nltk
+pip install numpy
+
+
+Install.txt-----------------
+1. Activate the environment
+2. Go to gstudio/gnowsys-ndf (directory containing manage.py)
+3. run ipython / python
+4. in python shell run the foll. commands:-
+	>>> import nltk
+	>>> nltk.download()
+	
+	CASE 1: GUI OPENS
+	-- Go to the 'Corpora' tab
+	-- Download the module with identifier - "stopwords"
+	-- Download the module with identifier - "wordnet"
+	-- Go to "Models" tab
+	-- Download the module with identifier - "maxnet_treebank_pos_tag"
+	-- Download the module with identifier - "punkt"
+
+	Case 2: GUI Does not open
+	-- Press d
+	-- It prompts for the identifier => Enter "stopwords" => It gets downloaded
+	-- It prompts for the identifier => Enter "wordnet" => It gets downloaded
+	-- It prompts for the identifier => Enter "maxent_treebank_pos_tagger" => It gets downloaded
+	-- Download the module with identifier - "punkt"
+
+exit ipython
+
+

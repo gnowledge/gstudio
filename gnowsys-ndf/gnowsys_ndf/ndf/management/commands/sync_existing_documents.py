@@ -28,6 +28,23 @@ class Command(BaseCommand):
     )
     print "\n 'license' field added to following no. of documents: ", res['n']
 
+    # Adding "Agency_type" field adding to group documents with default values
+    res = collection.update({'_type': {'$in': ['Group']}, 'agency_type': {'$exists': False}}, 
+                            {'$set': {'agency_type': "Project" }}, 
+                            upsert=False, multi=True
+    )
+    if res['n']:
+           print "\n 'agency_type' field added to 'Group' documents totalling to : ", res['n']
+
+    # Adding "Agency_type" field adding to author documents with default values
+    res = collection.update({'_type': {'$in': ['Author']}, 'agency_type': {'$exists': False}}, 
+                            {'$set': {'agency_type': "Others" }}, 
+                            upsert=False, multi=True
+    )
+    if res['n']:
+           print "\n 'agency_type' field added to 'Author' documents totalling to : ", res['n']
+
+
     # Modify language field with unicode value if any document has language with dict datatype
     res = collection.update({'language':{}},
                             {'$set':{'language':u""}}, 
