@@ -223,7 +223,6 @@ def parse_data_create_gtype(json_file_path):
                 log_list.append(error_message)
                 print error_message # Keep it!
 
-        
     elif "RT" in json_file_path:
       	type_name = "RelationType"
 
@@ -232,6 +231,7 @@ def parse_data_create_gtype(json_file_path):
             try:
                 json_document['name'] = unicode(json_document['name'])
                 json_document['inverse_name'] = unicode(json_document['inverse_name'])
+                json_document['object_cardinality'] = int(json_document['object_cardinality'])
 
                 perform_eval_type("subject_type", json_document, type_name, "GSystemType")
                 perform_eval_type("object_type", json_document, type_name, "GSystemType")
@@ -249,7 +249,6 @@ def parse_data_create_gtype(json_file_path):
 
             except Exception as e:
                 error_message = "\n While creating "+type_name+" ("+json_document['name']+") got following error...\n " + str(e)
-                log_list.append(error_message)
                 print error_message # Keep it!
 
 def perform_eval_type(eval_field, json_document, type_to_create, type_convert_objectid):
