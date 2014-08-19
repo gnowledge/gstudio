@@ -300,49 +300,56 @@ def get_all_replies(parent):
 	 return ex_reply
 
 
-# @register.inclusion_tag('ndf/drawer_widget.html')
-# def edit_drawer_widget(field, group_id, node, checked=None):
+@register.inclusion_tag('ndf/drawer_widget.html')
+def edit_drawer_widget(field, group_id, node, checked=None):
 
-# 	drawers = None
-# 	drawer1 = None
-# 	drawer2 = None
+	drawers = None
+	drawer1 = None
+	drawer2 = None
 
-# 	if node :
-# 		if field == "collection":
-# 			if checked == "Quiz":
-# 				checked = "QuizItem"
-# 			elif checked == "Theme":
-# 				checked = "Theme"
-# 			else:
-# 				checked = None
-# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-# 		elif field == "prior_node":
-# 			checked = None
-# 			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
-# 		elif field == "module":
-# 			checked = "Module"
-# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+	if node:
+		if field == "collection":
+			if checked == "Quiz":
+				checked = "QuizItem"
+			elif checked == "Theme":
+				checked = "Theme"
+			else:
+				checked = None
+			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+		elif field == "prior_node":
+			checked = None
+			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+		elif field == "module":
+			checked = "Module"
+			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+		elif type(checked) == list:
+			# Special case used while dealing with RelationType widget
+			drawers = get_drawers(group_id, node['_id'], node[field], checked)
 		
-# 		drawer1 = drawers['1']
-# 		drawer2 = drawers['2']
+		drawer1 = drawers['1']
+		drawer2 = drawers['2']
 
-# 	else:
-# 		if field == "collection" and checked == "Quiz":
-# 			checked = "QuizItem"
+	else:
+		if field == "collection" and checked == "Quiz":
+			checked = "QuizItem"
 
-# 		elif field == "collection" and checked == "Theme":
-# 			checked = "Theme"
+		elif field == "collection" and checked == "Theme":
+			checked = "Theme"
 			
-# 		elif field == "module":
-# 			checked = "Module"
-			
-# 		else:
-# 			# To make the collection work as Heterogenous one, by default
-# 			checked = None
+		elif field == "module":
+			checked = "Module"
 
-# 		drawer1 = get_drawers(group_id, None, [], checked)
+		elif type(checked) == list:
+			# Special case used while dealing with RelationType widget
+			checked = checked
 
-# 	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
+		else:
+			# To make the collection work as Heterogenous one, by default
+			checked = None
+
+		drawer1 = get_drawers(group_id, None, [], checked)
+
+	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
@@ -1575,6 +1582,10 @@ def html_widget(groupid, node_id, field):
   # gs = None
   field_value_choices = []
 
+  # This field is especially required for drawer-widets to work used in cases of RelationTypes
+  # Represents a dummy document that holds node's _id and node's right_subject value(s) from it's GRelation instance
+  node_dict = {}
+
   is_list_of = False
   LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
               "[<type 'unicode'>]", "[<type 'basestring'>]",
@@ -1596,6 +1607,7 @@ def html_widget(groupid, node_id, field):
   try:
     if node_id:
       node_id = ObjectId(node_id)
+      node_dict['_id'] = node_id
 
     # if node_member_of:
     #   gs = collection.GSystem()
@@ -1660,16 +1672,22 @@ def html_widget(groupid, node_id, field):
     elif is_AT_RT_base == "RelationType":
       is_relation_field = True
       is_required_field = True
-      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}, 'group_set': ObjectId(groupid)},
-                                                            {'_id': 1, 'name': 1}
-                                                          ).sort('name', 1)
+
+      field_value_choices.extend(list(collection.Node.find({'_type': "GSystem", 
+																														'member_of': {'$in': field["object_type"]}, 
+																														'status': u"PUBLISHED",
+																														'group_set': ObjectId(groupid)
+																													}).sort('name', 1)
                                       )
                                 )
+
       field_value = [str(each._id) for each in field_value]
+      if node_id:
+      	node_dict[field['name']] = [ObjectId(each) for each in field_value]
 
     return {'template': 'ndf/html_field_widget.html',
             'field': field, 'field_type': field_type, 'field_value': field_value,
-            'node_id': node_id,
+            'node_id': node_id, 'groupid': groupid, 'node_dict': node_dict,
             'field_value_choices': field_value_choices,
             'is_base_field': is_base_field,
             'is_attribute_field': is_attribute_field,
