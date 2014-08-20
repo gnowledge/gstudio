@@ -1,5 +1,6 @@
 {% load ndf_tags %}
 {% load i18n %}
+
 <!-- {{field.name}} -- {{field_type}} -->
 <!-- Base fields / AttributeType fields -->
 {% if is_base_field or is_attribute_field %}
@@ -48,7 +49,7 @@
     {% endif %}
 
   {% elif field_type == "datetime" %}
-    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:'m/d/Y'}}" {% if is_required_field %}required{% endif %} style="float:left; width:45%" placeholder="MM/DD/YYYY [or] YYYY"/>
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:field.validators.0}}" class="{{field.validators.1}}" {% if is_required_field %}required{% endif %} style="float:left; width:45%" placeholder="{{field.validators.2}}"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% blocktrans with alt=field.altnames %}Please set {{alt}}!!!{% endblocktrans %}</small>
@@ -80,7 +81,8 @@
 
 <!-- RelationType fields -->
 {% elif is_relation_field %}
-  <select id="{{field.name}}" class="medium" name="{{field.name}}" required="" style="float:left; width:95%">
+  {% if field.object_cardinality == 1 %}
+  <select id="{{field.name}}" name="{{field.name}}" required="" style="float:left; width:95%">
     <option value="">- - - Select {{field.altnames|lower}} - - -</option>
     {% for choice in field_value_choices %}
     <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{{choice.name}}</option>
@@ -88,5 +90,38 @@
   </select>
   <i style="color:red; float:left display:inline">*</i>
   <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>
+
+  {% else %}
+  <select id="{{field.name}}" name="{{field.name}}" multiple size="2" required="" style="float:left; width:85%; height: 2.9rem;">
+    {% if not field_value %}
+    <option value="">- - - Select {{field.altnames|lower}} - - -</option>
+    {% endif %}
+
+    {% for choice in field_value_choices %}
+    {% if choice.pk in field_value %}
+    <option value="{{choice.pk}}" selected="" >{{choice.name}}</option>
+    {% endif %}
+    {% endfor %}
+
+  </select>
+  <i style="color:red; float:left display:inline">*</i>
+  <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>
+  
+  <a href="" class="button tiny round" style="float: right;" data-reveal-id="{{field.name}}_modal">
+    {% if not field_value %}Select{% else %}Change{% endif %}
+  </a>
+
+  <div id="{{field.name}}_modal" class="reveal-modal xlarge" style="height: 90% !important" data-reveal>
+    <div id="{{field.name}}_drawer">
+      <h3>Select {{field.altnames}}</h3>
+      {% edit_drawer_widget field.name groupid node_dict field_value_choices %}
+    </div>
+    <a class="close-reveal-modal">&#215;</a>
+  </div>
+
+  {% endif %}
+  
+  {% comment %}
+  {% endcomment %}
 
 {% endif %}
