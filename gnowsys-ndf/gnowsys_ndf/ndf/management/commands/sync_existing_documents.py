@@ -21,6 +21,13 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Adds "license" field (with default value as "") to all documents belonging to GSystems (except Author).
+    res = collection.update({'_type': {'$nin': ["Author", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]}, 'license': {'$exists': False}}, 
+                            {'$set': {'license': ""}}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'license' field added to following no. of documents: ", res['n']
+
     # Adding "Agency_type" field adding to group documents with default values
     res = collection.update({'_type': {'$in': ['Group']}, 'agency_type': {'$exists': False}}, 
                             {'$set': {'agency_type': "Project" }}, 

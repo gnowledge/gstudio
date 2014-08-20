@@ -678,11 +678,13 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
             
             ga_node.status = u"PUBLISHED"
             ga_node.save()
-            info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+            info_message = "GAttribute ("+ str(ga_node.name) +") created successfully.\n"
+            print info_message
             log_list.append(info_message)
 
         except Exception as e:
             error_message = "\n GAttributeCreateError: " + str(e) + "\n"
+            print error_message
             log_list.append(error_message)
             raise Exception(error_message)
 
@@ -709,15 +711,18 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
             if is_ga_node_changed:
                 ga_node.status = u"PUBLISHED"
                 ga_node.save()
-                info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+                info_message = " GAttribute ("+ str(ga_node.name) +") updated successfully.\n"
+                print info_message
                 log_list.append(info_message)
 
             else:
-                info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+                info_message = " GAttribute ("+ str(ga_node.name)+ ") already exists (Nothing updated) !\n"
+                print info_message
                 log_list.append(info_message)
 
         except Exception as e:
             error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
+            print error_message
             log_list.append(error_message)
             raise Exception(error_message)
 
@@ -745,16 +750,19 @@ def create_grelation(subject_id, relation_type_node, right_subject_id):
             gr_node.status = u"PUBLISHED"
             
             gr_node.save()
-            info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+            info_message = " GRelation ("+ str(gr_node.name)+ ") created successfully.\n"
+            print info_message
             log_list.append(info_message)
 
         except Exception as e:
             error_message = "\n GRelationCreateError: " + str(e) + "\n"
+            print error_message
             log_list.append(error_message)
             raise Exception(error_message)
 
     else:
-        info_message = " GRelation ("+gr_node.name+") already exists !\n"
+        info_message = " GRelation ("+str(gr_node.name)+") already exists !\n"
+        print info_message
         log_list.append(info_message)
 
     return gr_node
