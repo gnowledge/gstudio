@@ -16,6 +16,7 @@ import subprocess
 import ox
 import threading
 import io
+import time
 from django.http import Http404
 
 ''' imports from installed packages '''
@@ -48,6 +49,9 @@ from gnowsys_ndf.ndf.management.commands.data_entry import create_grelation, cre
 
 SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
 
+log_list = [] # To hold intermediate errors
+log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
+
 collection = get_database()[Node.collection_name]
 file_gst = collection.GSystemType.one({"name": "File"})
 home_group = collection.Group.one({"name": "home", "_type":"Group"})
@@ -60,79 +64,96 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-        	# print "working........" + SCHEMA_ROOT
+            # print "working........" + SCHEMA_ROOT
 
-			for file_name in args:
-				file_path = os.path.join(SCHEMA_ROOT, file_name)
+            for file_name in args:
+                file_path = os.path.join(SCHEMA_ROOT, file_name)
 
-				if os.path.exists(file_path):
+                if os.path.exists(file_path):
 
-				    file_extension = os.path.splitext(file_name)[1]
+                    file_extension = os.path.splitext(file_name)[1]
 
-				    if "csv" in file_extension:
+                    if "csv" in file_extension:
 
-				        # Process csv file and convert it to json format at first
-				        info_message = "\n- CSVType: Following file (" + file_path + ") found!!!"
-				        print info_message
-									    
-				        try:
-				            csv_file_path = file_path
-				            json_file_name = file_name.rstrip("csv") + "json"
-				            json_file_path = os.path.join(SCHEMA_ROOT, json_file_name)
-				            json_file_content = ""
-				        
-				            with open(csv_file_path, 'rb') as csv_file:
-				                csv_file_content = csv.DictReader(csv_file, delimiter=",")
-				                json_file_content = []
-				                for row in csv_file_content:
-				                    json_file_content.append(row)
+                        # Process csv file and convert it to json format at first
+                        info_message = "\n- CSV File (" + file_path + ") found!!!"
+                        print info_message
+                        log_list.append(info_message)
+                						    
+                        try:
+                            csv_file_path = file_path
+                            json_file_name = file_name.rstrip("csv") + "json"
+                            json_file_path = os.path.join(SCHEMA_ROOT, json_file_name)
+                            json_file_content = ""
 
-				            with open(json_file_path, 'w') as json_file:
-				                json.dump(json_file_content, 
-				                          json_file, 
-				                          indent=4, 
-				                          sort_keys=False)
+                            with open(csv_file_path, 'rb') as csv_file:
+                                csv_file_content = csv.DictReader(csv_file, delimiter=",")
+                                json_file_content = []
 
-				            if os.path.exists(json_file_path):
-				                file_path = json_file_path
-				                is_json_file_exists = True
-				                info_message = "\n- JSONType: Following file (" + json_file_path + ") created successfully.\n"
-				                print info_message
+                                for row in csv_file_content:
+                                    json_file_content.append(row)
 
-				        except Exception as e:
-				            error_message = "\n!! CSV-JSONError: " + str(e)
-				            print error_message
-				        # End of csv-json coversion
+                            with open(json_file_path, 'w') as json_file:
+                                json.dump(json_file_content, json_file, indent=4, sort_keys=False)
+                            
+                            if os.path.exists(json_file_path):
+                                file_path = json_file_path
+                                is_json_file_exists = True
+                                info_message = "\n- JSONType: File (" + json_file_path + ") created successfully.\n"
+                                print info_message
+                                log_list.append(info_message)
 
-				    elif "json" in file_extension:
-				        is_json_file_exists = True
+                        except Exception as e:
+                            error_message = "\n!! CSV-JSONError: " + str(e)
+                            print error_message
+                            log_list.append(error_message)
+                            # End of csv-json coversion
 
-				    else:
-				        error_message = "\n!! FileTypeError: Please choose either 'csv' or 'json' format supported files!!!\n"
-				        print error_message
-				        raise Exception(error_mesage)
+                    elif "json" in file_extension:
+                        is_json_file_exists = True
 
-				    if is_json_file_exists:
-				        # Process json file and create required GSystems, GRelations, and GAttributes
-				        info_message = "\n------- Task initiated: Processing json-file -------\n"
-				        print info_message
+                    else:
+                        error_message = "\n!! FileTypeError: Please choose either 'csv' or 'json' format supported files!!!\n"
+                        print error_message
+                        log_list.append(error_message)
+                        raise Exception(error_mesage)
 
-				        parse_data_create_gsystem(file_path)
-				    
-				        # End of processing json file
+                    if is_json_file_exists:
+                        # Process json file and create required GSystems, GRelations, and GAttributes
+                        info_message = "\n------- Task initiated: Processing json-file -------\n"
+                        print info_message
+                        log_list.append(info_message)
 
-				        info_message = "\n------- Task finised: Successfully processed json-file -------\n"
-				        print info_message
-				        # End of creation of respective GSystems, GAttributes and GRelations for Enrollment
+                        parse_data_create_gsystem(file_path)
+                        
+                        # End of processing json file
 
-				else:
-				    error_message = "\n!! FileNotFound: Following path (" + file_path + ") doesn't exists!!!\n"
-				    print error_message
-				    raise Exception(error_message)
+                        info_message = "\n------- Task finised: Successfully processed json-file -------\n"
+                        print info_message
+                        log_list.append(info_message)
+                        # End of creation of respective GSystems, GAttributes and GRelations for Enrollment
+                        
+                else:
+                    error_message = "\n!! FileNotFound: Following path (" + file_path + ") doesn't exists!!!\n"
+                    print error_message
+                    log_list.append(error_message)
+                    raise Exception(error_message)
 
-
+                    
         except Exception as e:
-        	print str(e)
+            print str(e)
+            log_list.append(e)
+
+        finally:
+            if log_list:
+
+                log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+                log_file_name = args[0].rstrip("csv") + "log"
+                log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+                with open(log_file_path, 'a') as log_file:
+                    log_file.writelines(log_list)
+
+  # --- End of handle() ---
 
 
 def get_user_id(user_name):
@@ -140,7 +161,9 @@ def get_user_id(user_name):
     user_obj = User.objects.get(username=user_name)
     return int(user_obj.id)
   except Exception as e:
-    print e, "\n!! for username: ", user_name 
+    error_message = e + "\n!! for username: "+ user_name
+    print error_message 
+    log_list.append(error_message)
     return False
 
 
@@ -180,12 +203,15 @@ def parse_data_create_gsystem(json_file_path):
 
     except Exception as e:
         error_message = "\n!! While parsing the file ("+json_file_path+") got following error...\n " + str(e)
+        log_list.append(error_message)
         raise error_message
 
     for i, json_document in enumerate(json_documents_list):
       
-      print "\n\n********** Processing row number : [", i, "] **********"
-
+      info_message = "\n\n********** Processing row number : ["+ str(i)+ "] **********"
+      print info_message
+      log_list.append(info_message)
+      
       try:
 
         parsed_json_document = {}
@@ -300,8 +326,9 @@ def parse_data_create_gsystem(json_file_path):
 
                   if attr_value['data_type'] == basestring:
 
-                    info_message = "\n For GAttribute parsing content | key: " + attr_key + " -- value: " + json_document[key]
-                    # print info_message
+                    info_message = "\n- For GAttribute parsing content | key: " + attr_key + " -- value: " + json_document[key]
+                    print info_message
+                    log_list.append(info_message)
 
                   elif attr_value['data_type'] == unicode:
                     json_document[key] = unicode(json_document[key])
@@ -356,21 +383,30 @@ def parse_data_create_gsystem(json_file_path):
 
                   info_message = "\n- Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
                   print info_message
+                  log_list.append(info_message)
+
                   ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
-                  print "\nga_node : \n", ga_node.name
+                  
+                  info_message = "- Created ga_node : "+ str(ga_node.name) + "\n"
+                  print info_message
+                  log_list.append(info_message)
+                  
                   # To break outer for loop as key found
                   break
 
                 else:
-                  error_message = "\n!! DataNotFound: No data found for field ("+attr_key+") while creating GSystem ( -- "+node.name+")\n"
+                  error_message = "\n!! DataNotFound: No data found for field ("+str(attr_key)+") while creating GSystem ( -- "+str(node.name)+")\n"
+                  print error_message
+                  log_list.append(error_message)
 
             if is_relation:
               relation_list.append(key)
 
           if not relation_list:
             # No possible relations defined for this node
-            info_message = "\n!! ("+node.name+"): No possible relations defined for this node.\n"
-            # log_list.append(info_message)
+            info_message = "\n!! ("+str(node.name)+"): No possible relations defined for this node.\n"
+            print info_message
+            log_list.append(info_message)
             return
 
           gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
@@ -453,18 +489,19 @@ def parse_data_create_gsystem(json_file_path):
 
 
                   # print "\n----------", json_document[key]
-                  info_message = "\n- For GRelation parsing content | key: " , rel_key , " -- " , json_document[key]
+                  info_message = "\n- For GRelation parsing content | key: " + str(rel_key) + " -- " + str(json_document[key])
                   print info_message
+                  log_list.append(info_message)
                   # print list(json_document[key])
 
                   # perform_eval_type(key, json_document, "GSystem", "GSystem")
 
                   for right_subject_id in json_document[key]:
-                    print "\njson_document[key]: ", json_document[key]
+                    # print "\njson_document[key]: ", json_document[key]
 
                     subject_id = node._id
-                    print "subject_id : ", subject_id
-                    print "node.name: ", node.name
+                    # print "subject_id : ", subject_id
+                    # print "node.name: ", node.name
                     # Here we are appending list of ObjectIds of GSystemType's type_of field 
                     # along with the ObjectId of GSystemType's itself (whose GSystem is getting created)
                     # This is because some of the RelationType's are holding Base class's ObjectId
@@ -483,28 +520,37 @@ def parse_data_create_gsystem(json_file_path):
                                                               'subject_type': {'$in': rel_subject_type}
                                                       })
 
-                    info_message = "\n- Creating GRelation (", node.name, " -- ", rel_key, " -- ", str(right_subject_id),") ...\n"
+                    info_message = "\n- Creating GRelation ("+ str(node.name)+ " -- "+ str(rel_key)+ " -- "+ str(right_subject_id)+") ..."
                     print info_message
+                    log_list.append(info_message)
                     gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
-                    print "\n gr_node: \n", gr_node.name                  
+                    
+                    info_message = "\n Grelation created (gr_node): "+ str(gr_node.name) + "\n"
+                    print info_message
+                    log_list.append(info_message)
+
                   # To break outer for loop if key found
                   break
 
                 else:
-                  error_message = "\n!! DataNotFound: No data found for relation (", rel_key, ") while creating GSystem (",file_gst.name, " -- ", node.name,")\n"
+                  error_message = "\n!! DataNotFound: No data found for relation ("+ str(rel_key)+ ") while creating GSystem (" + str(file_gst.name) + " -- " + str(node.name) + ")\n"
                   print error_message
+                  log_list.append(error_message)
 
                   break
 
           # print relation_list
         else:
-            print "\n!! Either resource is already created or file is already saved into gridfs/DB"
+            info_message = "\n!! Either resource is already created or file is already saved into gridfs/DB"
+            print info_message
+            log_list.append(info_message)
+
             continue
 
       except Exception as e:
-          # error_message = "\n While creating "+gsystem_type_name+"'s GSystem ("+json_document['name']+") got following error...\n " + str(e)
-          # print error_message # Keep it!
-          print e
+          error_message = "\n While creating ("+str(json_document['name'])+") got following error...\n " + str(e)
+          print error_message # Keep it!
+          log_list.append(error_message)
 
 
 def create_resource_gsystem(resource_data):
@@ -530,13 +576,16 @@ def create_resource_gsystem(resource_data):
     cur_oid = coll_oid.find_one({"md5":filemd5})
     # printing appropriate error message
     if check_obj_by_name:
-      print "\nResource with same name of ", resource_data["name"] ," and _type 'File' exist in the group. Ref _id: ", check_obj_by_name._id
+      info_message = "\n- Resource with same name of "+ str(resource_data["name"]) +" and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name._id)
+      log_list.append(info_message)
     else:      
-      print "\nResource file exists in DB: ", cur_oid
+      info_message = "\n- Resource file exists in DB: " + str(cur_oid._id)
+      log_list.append(info_message)
     return None
 
   else:
-    print "\n- Creating resource: ", unicode(resource_data["name"])
+    info_message = "\n- Creating resource: " + str(resource_data["name"])
+    log_list.append(info_message)
     
     filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
 
@@ -592,5 +641,7 @@ def getFileSize(File):
                 return  (num, x)
             num /= 1024.0
     except Exception as e:
-        print "Unabe to calucalate size",e
+        error_message = "Unabe to calucalate size" + e
+        print error_message
+        log_list.append(error_message)
         return 0,'bytes'
