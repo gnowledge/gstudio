@@ -645,7 +645,8 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
         else:
             node = collection.Node.one({'_type': type_convert_objectid, 
                                         '$or': [{'name': {'$regex': "^"+data+"$", '$options': 'i'}}, 
-                                                {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}]
+                                                {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}],
+                                        'group_set': group_id
                                        }, 
                                        {'_id': 1}
                                    )
