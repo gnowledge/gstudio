@@ -64,7 +64,8 @@
     
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
-
+{% get_group_object groupid as group_object %}
+      
     <nav class="top-bar drop-shadow" data-topbar>
 
       <ul class="title-area">
@@ -88,7 +89,7 @@
                       name="search_form" method="GET" >
           <div class="row collapse">
             <div class="large-8 small-9 columns">
-              <input type="text" name="search_text" id="search_text" placeholder="Search" autocomplete="off" required/>
+              <input type="text" name="search_text" id="search_text" placeholder="Search {{group_object.name}}" autocomplete="off" required/>
             </div>
             <div class="large-4 small-3 columns">
               <input type="submit" class="button expand" value="Submit" />
@@ -123,7 +124,7 @@
 	  
 
 
-          {% get_group_object groupid as group_object %}
+          
       	  
           <!-- If logged in show user options -->
       	  {% if user.is_authenticated %}
