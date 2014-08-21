@@ -1298,7 +1298,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
           # So change their status from PUBLISHED to DELETED
           n.status = u"DELETED"
           n.save()
-          info_message = "MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
+          info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
           print "\n", info_message
 
       if right_subject_id_or_list:
@@ -1322,7 +1322,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
-            info_message = "MultipleGRelation: GRelation ("+gr_node.name+") created successfully.\n"
+            info_message = " MultipleGRelation: GRelation ("+gr_node.name+") created successfully.\n"
             print "\n", info_message
 
             gr_node_list.append(gr_node)
@@ -1333,13 +1333,13 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
               gr_node.status = u"PUBLISHED"
               gr_node.save()
 
-              info_message = "MultipleGRelation: GRelation ("+gr_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+              info_message = " MultipleGRelation: GRelation ("+gr_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
               print "\n", info_message
 
               gr_node_list.append(gr_node)
 
             else:
-              error_message = "MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
+              error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
               raise Exception(error_message)
 
       return gr_node_list
@@ -1371,11 +1371,11 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             # If deleted, change it's status back to Published from Deleted
             node.status = u"PUBLISHED"
             node.save()
-            info_message = "SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
             print "\n", info_message
 
           elif node.status == u"PUBLISHED":
-            info_message = "SingleGRelation: GRelation ("+node.name+") already exists !\n"
+            info_message = " SingleGRelation: GRelation ("+node.name+") already exists !\n"
             print "\n", info_message
 
         else:
@@ -1384,7 +1384,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             node.status = u"DELETED"
             node.save()
 
-            info_message = "SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
             print "\n", info_message 
 
       if gr_node is None:
