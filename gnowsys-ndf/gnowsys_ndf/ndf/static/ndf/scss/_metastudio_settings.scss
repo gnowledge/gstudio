@@ -1214,7 +1214,7 @@ $global-radius:5px;
 // $topbar-link-color-active: #fff;
 // $topbar-link-color-active-hover: #fff;
 // $topbar-link-weight: normal;
-// $topbar-link-font-size: rem-calc(13);
+ $topbar-link-font-size: 1rem;
 // $topbar-link-hover-lightness: -10%; // Darken by 10%
  $topbar-link-bg-hover: scale-color($theme-color-invert, $lightness: 20%);
  $topbar-link-bg-active: $theme-color;

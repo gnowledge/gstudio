@@ -7028,13 +7028,13 @@ meta.foundation-mq-topbar {
   padding: 12px 0 12px 0;
   padding-left: 15px;
   font-family: "Source Sans Pro", "Ubuntu", "FreeSans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
-  font-size: 0.8125rem;
+  font-size: 1rem;
   font-weight: normal;
   text-transform: none;
 }
 /* line 309, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > a.button {
-  font-size: 0.8125rem;
+  font-size: 1rem;
   padding-right: 15px;
   padding-left: 15px;
   background-color: #0eacb5;
@@ -7093,7 +7093,7 @@ meta.foundation-mq-topbar {
 }
 /* line 320, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > button {
-  font-size: 0.8125rem;
+  font-size: 1rem;
   padding-right: 15px;
   padding-left: 15px;
   background-color: #0eacb5;
@@ -8374,23 +8374,23 @@ body {
   border-bottom: 2px solid black;
   z-index: 2000;
 }
-/* line 18, ../../../scss/_metastudio_styles.scss */
+/* line 17, ../../../scss/_metastudio_styles.scss */
+.top-bar .active {
+  background-color: #0c9199 !important;
+}
+/* line 21, ../../../scss/_metastudio_styles.scss */
 .top-bar h1 img, .top-bar article h1:not(.subheader) div input img, article h1:not(.subheader) div .top-bar input img {
   /* Logo */
   height: 2.4rem;
   margin-right: 5px;
 }
-/* line 23, ../../../scss/_metastudio_styles.scss */
+/* line 26, ../../../scss/_metastudio_styles.scss */
 .top-bar h1 a, .top-bar article h1:not(.subheader) div input a, article h1:not(.subheader) div .top-bar input a {
   color: white !important;
 }
-/* line 29, ../../../scss/_metastudio_styles.scss */
+/* line 32, ../../../scss/_metastudio_styles.scss */
 .top-bar .search .show label {
   color: white;
-}
-/* line 34, ../../../scss/_metastudio_styles.scss */
-.top-bar .group > a {
-  font-size: 100%;
 }
 
 /* line 40, ../../../scss/_metastudio_styles.scss */
