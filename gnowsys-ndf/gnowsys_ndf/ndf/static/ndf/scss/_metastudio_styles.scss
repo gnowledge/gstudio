@@ -13,6 +13,7 @@ body{
 //Logo
 .top-bar{
     border-bottom: 2px solid black;
+    z-index: 2000;
     h1{
         img{
             /* Logo */
@@ -22,6 +23,13 @@ body{
         a{
 			color:white!important;
 		}
+    }
+    .search{
+        .show{
+            label{
+                color:white;
+            }
+        }
     }
 }
 
@@ -109,17 +117,7 @@ main.row{
 
 main>aside{
     &>div{
-        
-        
-        h2{
-            margin-top: 2rem;
-            a{
-            color: white;
-                &:hover{
-                    color:white;
-                }
-            }
-        }
+      
         nav.app{
             a{
                 background-color: $theme-text-color;
