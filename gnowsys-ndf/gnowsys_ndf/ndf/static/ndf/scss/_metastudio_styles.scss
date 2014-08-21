@@ -215,6 +215,8 @@ main>aside{
 
 //    Article styles
     article{
+        position: relative;
+        z-index: 1;
         min-height: 400px;
         background-color: white;
         overflow-x: visible;

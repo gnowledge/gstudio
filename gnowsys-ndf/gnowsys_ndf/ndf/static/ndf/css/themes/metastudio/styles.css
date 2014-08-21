@@ -8578,33 +8578,35 @@ main > aside > div .side-nav.collection li.active a, main > aside > div .side-na
 
 /* line 217, ../../../scss/_metastudio_styles.scss */
 article {
+  position: relative;
+  z-index: 1;
   min-height: 400px;
   background-color: white;
   overflow-x: visible;
 }
-/* line 221, ../../../scss/_metastudio_styles.scss */
+/* line 223, ../../../scss/_metastudio_styles.scss */
 article > header, article form > header {
   padding: 15px;
   margin-bottom: 0.5rem;
   background-color: #f0f0f0;
 }
-/* line 230, ../../../scss/_metastudio_styles.scss */
+/* line 232, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader), article h1:not(.subheader) div input:not(.subheader) {
   font-family: "Bree Serif", "Georgia Serif", Serif;
   font-style: italic;
 }
-/* line 234, ../../../scss/_metastudio_styles.scss */
+/* line 236, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader) .tabs {
   display: inline-block;
   position: relative;
   bottom: -0.5rem;
 }
-/* line 240, ../../../scss/_metastudio_styles.scss */
+/* line 242, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader) div, article h1:not(.subheader) div input:not(.subheader) div {
   display: inline-block;
   position: relative;
 }
-/* line 243, ../../../scss/_metastudio_styles.scss */
+/* line 245, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader) div input {
   height: 200%;
   font-style: italic;
@@ -8614,13 +8616,13 @@ article h1:not(.subheader) div input {
   border-bottom: 2px dotted #222;
   background-color: inherit;
 }
-/* line 253, ../../../scss/_metastudio_styles.scss */
+/* line 255, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader) div input:hover {
   background-color: white;
 }
 
 /* Card block */
-/* line 270, ../../../scss/_metastudio_styles.scss */
+/* line 272, ../../../scss/_metastudio_styles.scss */
 .card > * {
   position: relative;
   background-color: inherit;
@@ -8630,38 +8632,38 @@ article h1:not(.subheader) div input:hover {
   opacity: 0.9;
   overflow: hidden;
 }
-/* line 280, ../../../scss/_metastudio_styles.scss */
+/* line 282, ../../../scss/_metastudio_styles.scss */
 .card > * > a {
   color: inherit;
   display: block;
   position: relative;
   z-index: 200;
 }
-/* line 287, ../../../scss/_metastudio_styles.scss */
+/* line 289, ../../../scss/_metastudio_styles.scss */
 .card > *.published {
   opacity: 1;
   background-color: #e7fcfd;
 }
-/* line 291, ../../../scss/_metastudio_styles.scss */
+/* line 293, ../../../scss/_metastudio_styles.scss */
 .card > *.unapproved {
   opacity: 1;
   border-style: solid;
   border-color: #f04124;
 }
-/* line 297, ../../../scss/_metastudio_styles.scss */
+/* line 299, ../../../scss/_metastudio_styles.scss */
 .card > *:hover {
   border-style: solid;
   opacity: 1;
 }
-/* line 303, ../../../scss/_metastudio_styles.scss */
+/* line 305, ../../../scss/_metastudio_styles.scss */
 .card > *:hover i {
   opacity: 0.3;
 }
-/* line 306, ../../../scss/_metastudio_styles.scss */
+/* line 308, ../../../scss/_metastudio_styles.scss */
 .card > *:hover footer .age {
   display: block;
 }
-/* line 310, ../../../scss/_metastudio_styles.scss */
+/* line 312, ../../../scss/_metastudio_styles.scss */
 .card > * > i {
   position: absolute;
   top: -10px;
@@ -8670,34 +8672,34 @@ article h1:not(.subheader) div input:hover {
   color: #0eacb5;
   opacity: 0.3;
 }
-/* line 318, ../../../scss/_metastudio_styles.scss */
+/* line 320, ../../../scss/_metastudio_styles.scss */
 .card > * .preview {
   float: left;
   padding-right: 5px;
   padding-top: 4px;
 }
-/* line 323, ../../../scss/_metastudio_styles.scss */
+/* line 325, ../../../scss/_metastudio_styles.scss */
 .card > * header {
   overflow: hidden;
 }
-/* line 326, ../../../scss/_metastudio_styles.scss */
+/* line 328, ../../../scss/_metastudio_styles.scss */
 .card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
 }
-/* line 331, ../../../scss/_metastudio_styles.scss */
+/* line 333, ../../../scss/_metastudio_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 334, ../../../scss/_metastudio_styles.scss */
+/* line 336, ../../../scss/_metastudio_styles.scss */
 .card > * p {
   color: #555;
   height: 80px;
   background-repeat: no-repeat;
   font-size: 80%;
 }
-/* line 340, ../../../scss/_metastudio_styles.scss */
+/* line 342, ../../../scss/_metastudio_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -8705,23 +8707,23 @@ article h1:not(.subheader) div input:hover {
   overflow: hidden;
   display: none;
 }
-/* line 346, ../../../scss/_metastudio_styles.scss */
+/* line 348, ../../../scss/_metastudio_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 350, ../../../scss/_metastudio_styles.scss */
+/* line 352, ../../../scss/_metastudio_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 354, ../../../scss/_metastudio_styles.scss */
+/* line 356, ../../../scss/_metastudio_styles.scss */
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
   color: #e01818;
 }
-/* line 359, ../../../scss/_metastudio_styles.scss */
+/* line 361, ../../../scss/_metastudio_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -8731,7 +8733,7 @@ article h1:not(.subheader) div input:hover {
   width: 100%;
 }
 
-/* line 370, ../../../scss/_metastudio_styles.scss */
+/* line 372, ../../../scss/_metastudio_styles.scss */
 .edit-card {
   position: relative;
   background-color: white;
@@ -8740,68 +8742,68 @@ article h1:not(.subheader) div input:hover {
 }
 
 /* Content Tabs */
-/* line 381, ../../../scss/_metastudio_styles.scss */
+/* line 383, ../../../scss/_metastudio_styles.scss */
 article {
   padding-left: 2rem !important;
 }
-/* line 385, ../../../scss/_metastudio_styles.scss */
+/* line 387, ../../../scss/_metastudio_styles.scss */
 article .tabs {
   display: inline-block;
 }
-/* line 387, ../../../scss/_metastudio_styles.scss */
+/* line 389, ../../../scss/_metastudio_styles.scss */
 article .tabs dd a {
   border-radius: 4px;
   border: 1px transparent;
 }
-/* line 391, ../../../scss/_metastudio_styles.scss */
+/* line 393, ../../../scss/_metastudio_styles.scss */
 article .tabs dd.active a {
   color: #10c1cb;
   border: 1px solid;
 }
-/* line 395, ../../../scss/_metastudio_styles.scss */
+/* line 397, ../../../scss/_metastudio_styles.scss */
 article .tabs dd:hover a {
   color: #10c1cb;
 }
-/* line 399, ../../../scss/_metastudio_styles.scss */
+/* line 401, ../../../scss/_metastudio_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
-/* line 405, ../../../scss/_metastudio_styles.scss */
+/* line 407, ../../../scss/_metastudio_styles.scss */
 article .tabs-content > .content {
   padding-top: 0;
 }
-/* line 409, ../../../scss/_metastudio_styles.scss */
+/* line 411, ../../../scss/_metastudio_styles.scss */
 article .content.row {
   margin: 0;
 }
 
 /* Default card */
-/* line 415, ../../../scss/_metastudio_styles.scss */
+/* line 417, ../../../scss/_metastudio_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 420, ../../../scss/_metastudio_styles.scss */
+/* line 422, ../../../scss/_metastudio_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 428, ../../../scss/_metastudio_styles.scss */
+/* line 430, ../../../scss/_metastudio_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 432, ../../../scss/_metastudio_styles.scss */
+/* line 434, ../../../scss/_metastudio_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
   background-color: transparent;
 }
-/* line 440, ../../../scss/_metastudio_styles.scss */
+/* line 442, ../../../scss/_metastudio_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   background-color: transparent;
@@ -8810,26 +8812,26 @@ article .content.row {
 
 /*************************** 2. Custom CSS overrides ***********************/
 /* Content area */
-/* line 454, ../../../scss/_metastudio_styles.scss */
+/* line 456, ../../../scss/_metastudio_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 458, ../../../scss/_metastudio_styles.scss */
+/* line 460, ../../../scss/_metastudio_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 462, ../../../scss/_metastudio_styles.scss */
+/* line 464, ../../../scss/_metastudio_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 465, ../../../scss/_metastudio_styles.scss */
+/* line 467, ../../../scss/_metastudio_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 474, ../../../scss/_metastudio_styles.scss */
+/* line 476, ../../../scss/_metastudio_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -8850,49 +8852,49 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 494, ../../../scss/_metastudio_styles.scss */
+/* line 496, ../../../scss/_metastudio_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 499, ../../../scss/_metastudio_styles.scss */
+/* line 501, ../../../scss/_metastudio_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 502, ../../../scss/_metastudio_styles.scss */
+/* line 504, ../../../scss/_metastudio_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 505, ../../../scss/_metastudio_styles.scss */
+/* line 507, ../../../scss/_metastudio_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 508, ../../../scss/_metastudio_styles.scss */
+/* line 510, ../../../scss/_metastudio_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 512, ../../../scss/_metastudio_styles.scss */
+/* line 514, ../../../scss/_metastudio_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 516, ../../../scss/_metastudio_styles.scss */
+/* line 518, ../../../scss/_metastudio_styles.scss */
 a.app {
   overflow: hidden;
 }
 
-/* line 519, ../../../scss/_metastudio_styles.scss */
+/* line 521, ../../../scss/_metastudio_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 527, ../../../scss/_metastudio_styles.scss */
+/* line 529, ../../../scss/_metastudio_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -8900,13 +8902,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 534, ../../../scss/_metastudio_styles.scss */
+/* line 536, ../../../scss/_metastudio_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 539, ../../../scss/_metastudio_styles.scss */
+/* line 541, ../../../scss/_metastudio_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -8920,13 +8922,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 549, ../../../scss/_metastudio_styles.scss */
+/* line 551, ../../../scss/_metastudio_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 554, ../../../scss/_metastudio_styles.scss */
+/* line 556, ../../../scss/_metastudio_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -8937,7 +8939,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 565, ../../../scss/_metastudio_styles.scss */
+/* line 567, ../../../scss/_metastudio_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -8949,12 +8951,12 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 577, ../../../scss/_metastudio_styles.scss */
+/* line 579, ../../../scss/_metastudio_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 580, ../../../scss/_metastudio_styles.scss */
+/* line 582, ../../../scss/_metastudio_styles.scss */
 #splash > img {
   position: absolute;
 }
