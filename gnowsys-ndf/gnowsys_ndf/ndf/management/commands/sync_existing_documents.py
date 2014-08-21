@@ -22,7 +22,7 @@ class Command(BaseCommand):
     # Keep latest fields to be added at top
 
     # Adds "license" field (with default value as "") to all documents belonging to GSystems (except Author).
-    res = collection.update({'_type': {'$nin': ["Author", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]}, 'license': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ["MetaType", "Author", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]}, 'license': {'$exists': False}}, 
                             {'$set': {'license': ""}}, 
                             upsert=False, multi=True
     )
