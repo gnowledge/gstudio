@@ -60,9 +60,10 @@ class HomeRedirectView(RedirectView):
                 if user_id not in auth.contributors:
                     auth.contributors.append(user_id)
                 # Get group_type and group_affiliation stored in node_holder for this author 
-                temp_details=collection.Node.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':request.user.id}]})
-                auth.agency_type=temp_details.details_to_hold['agency_type']
-                auth.group_affiliation=temp_details.details_to_hold['group_affiliation']
+                temp_details=collection.Node.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
+                if temp_details:
+                    auth.agency_type=temp_details.details_to_hold['agency_type']
+                    auth.group_affiliation=temp_details.details_to_hold['group_affiliation']
                 auth.save()
                 
             # This will return a string in url as username and allows us to redirect into user group as soon as user logsin.
