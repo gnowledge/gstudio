@@ -439,13 +439,28 @@ class Node(DjangoDocument):
         else:
             # Update history-version-file
             fp = history_manager.get_file_path(self)
-            rcs_obj.checkout(fp)
+
+            try:
+                rcs_obj.checkout(fp)
+            except Exception as err:
+                try:
+                    if history_manager.create_or_replace_json_file(self):
+                        fp = history_manager.get_file_path(self)
+                        user = User.objects.get(pk=self.created_by).username
+                        message = "This document (" + self.name + ") is re-created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+                        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+                except Exception as err:
+                    print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be re-created!!!\n"
+                    collection.remove({'_id': self._id})
+                    raise RuntimeError(err)
 
             try:
                 if history_manager.create_or_replace_json_file(self):
                     user = User.objects.get(pk=self.modified_by).username
                     message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
                     rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
                 raise RuntimeError(err)
