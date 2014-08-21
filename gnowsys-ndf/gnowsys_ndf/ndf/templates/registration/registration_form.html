@@ -19,15 +19,15 @@
     {{ form }}
      <tr><th>{% trans "Group agency type" %}</th>
       <td colspan="2">
-        <select name="group_agency_type">
+        <select name="agency_type">
          {% for each in agency_types %}
-           <option id="{{each}}">{{each}}</option>
+           <option id="{{each}}" name="group_agency_type">{{each}}</option>
          {% endfor %}
         </select>
       </td>
      </tr>
      <tr><th>{% trans "Affiliation" %}</th> 
-       <td colspan="2"><input type="text" id="Affiliation"></td>
+       <td colspan="2"><input type="text" id="Affiliation" name="group_affiliation"></td>
      </tr>
      <tr>
        <td colspan="2"><p>Use at least one uppercase letter, one numeral, and 8 characters.</p> </td>
