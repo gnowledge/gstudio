@@ -8589,7 +8589,7 @@ article > header, article form > header {
 }
 /* line 226, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader), article h1:not(.subheader) div input:not(.subheader) {
-  font-family: "Georgia Serif", Serif;
+  font-family: "Bree Serif", "Georgia Serif", Serif;
   font-style: italic;
 }
 /* line 230, ../../../scss/_metastudio_styles.scss */

@@ -224,7 +224,7 @@ main>aside{
         }
     
 h1:not(.subheader){
-	font-family: "Georgia Serif", Serif;
+	font-family: $serif-font;
     font-style: italic;
     
     .tabs{
