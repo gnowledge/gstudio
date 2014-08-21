@@ -629,14 +629,17 @@ def convert_mid_size_image(files):
     '''
     mid_size_img = StringIO()
     img = Image.open(StringIO(files.read()))
-    width , height = img.size
-    diff = width - height
-    if (diff > 0):
-        diviser = width / 1000
-    else:
-        diviser = height / 1000
-    size = int(width / diviser),int(height / diviser)
-    img.resize(size,Image.ANTIALIAS)
+    width, height = img.size
+
+    widthRatio = 1000 / float(width)
+    heightRatio = 1000 / float(height)
+
+    width = int(float(width) * float(widthRatio))
+    height = int(float(height) * float(heightRatio))
+
+    size = width, height
+
+    img.resize(size, Image.ANTIALIAS)
     img.save(mid_size_img, "JPEG")
     mid_size_img.seek(0)
     return mid_size_img
