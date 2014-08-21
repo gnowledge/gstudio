@@ -38,6 +38,8 @@ from gnowsys_ndf.settings import MARKUP_LANGUAGE
 from gnowsys_ndf.settings import MARKDOWN_EXTENSIONS
 from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.ndf.rcslib import RCS
+from django.dispatch import receiver
+from registration.signals import user_registered
 
 
 
@@ -129,6 +131,19 @@ QUIZ_TYPE_CHOICES = tuple(str(qtc) for qtc in QUIZ_TYPE_CHOICES_TU)
 # FRAME CLASS DEFINITIONS
 
 
+@receiver(user_registered)
+def user_registered_handler(sender, user, request, **kwargs):
+            collection = get_database()[Node.collection_name]
+            tmp_hold=collection.node_holder()
+            dict_to_hold={}
+            dict_to_hold['node_type']='Author'
+            dict_to_hold['userid']=user.id
+            dict_to_hold['agency_type']=request.POST.get("agency_type","")
+            dict_to_hold['group_affiliation']=request.POST.get("group_affiliation","")
+            tmp_hold.details_to_hold=dict_to_hold 
+            tmp_hold.save()
+            return
+    
 
 
 @connection.register
@@ -424,13 +439,28 @@ class Node(DjangoDocument):
         else:
             # Update history-version-file
             fp = history_manager.get_file_path(self)
-            rcs_obj.checkout(fp)
+
+            try:
+                rcs_obj.checkout(fp)
+            except Exception as err:
+                try:
+                    if history_manager.create_or_replace_json_file(self):
+                        fp = history_manager.get_file_path(self)
+                        user = User.objects.get(pk=self.created_by).username
+                        message = "This document (" + self.name + ") is re-created by " + user + " on " + self.created_at.strftime("%d %B %Y")
+                        rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
+
+                except Exception as err:
+                    print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be re-created!!!\n"
+                    collection.remove({'_id': self._id})
+                    raise RuntimeError(err)
 
             try:
                 if history_manager.create_or_replace_json_file(self):
                     user = User.objects.get(pk=self.modified_by).username
                     message = "This document (" + self.name + ") is lastly updated by " + user + " status:" + self.status + " on " + self.last_update.strftime("%d %B %Y")
                     rcs_obj.checkin(fp, 1, message.encode('utf-8'))
+
             except Exception as err:
                 print "\n DocumentError: This document (", self._id, ":", self.name, ") can't be updated!!!\n"
                 raise RuntimeError(err)
@@ -1055,18 +1085,18 @@ class Author(Group):
         'email': unicode,       
         'password': unicode,
         'visited_location': [],
-        'preferred_languages':dict          # preferred languages for users like preferred lang. , fall back lang. etc.
+        'preferred_languages':dict,          # preferred languages for users like preferred lang. , fall back lang. etc.
+        'group_affiliation':basestring
     }
 
     use_dot_notation = True
 
     validators = {
-        'agency_type':lambda x: x in AUTHOR_AGENCY_TYPES
+        'agency_type':lambda x: x in AUTHOR_AGENCY_TYPES         # agency_type inherited from Group class
     }
 
     required_fields = ['name', 'password']
     
-
     def __init__(self, *args, **kwargs):
         super(Author, self).__init__(*args, **kwargs)
         
@@ -1632,8 +1662,17 @@ class IndexedWordList(DjangoDocument):
 	use_dot_notation = True
 	#word_start_id = 0 --- a ,1---b,2---c .... 25---z,26--misc.
 
+# This is like a temperory holder, where you can hold any node temporarily and later permenently save in database 
+@connection.register
+class node_holder(DjangoDocument):
+        objects = models.Manager()
+        structure={
+            '_type': unicode,
+            'details_to_hold':dict
+        }    
+        required_fields = ['details_to_hold']
+        use_dot_notation = True
 
-	
 """
 @connection.register
 class allLinks(DjangoDocument):

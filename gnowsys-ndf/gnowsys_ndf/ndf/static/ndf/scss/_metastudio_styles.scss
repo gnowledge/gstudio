@@ -13,6 +13,7 @@ body{
 //Logo
 .top-bar{
     border-bottom: 2px solid black;
+    z-index: 2000;
     h1{
         img{
             /* Logo */
@@ -22,6 +23,16 @@ body{
         a{
 			color:white!important;
 		}
+    }
+    .search{
+        .show{
+            label{
+                color:white;
+            }
+        }
+    }
+    .group>a{
+        font-size: 100%;
     }
 }
 
@@ -109,17 +120,7 @@ main.row{
 
 main>aside{
     &>div{
-        
-        
-        h2{
-            margin-top: 2rem;
-            a{
-            color: white;
-                &:hover{
-                    color:white;
-                }
-            }
-        }
+      
         nav.app{
             a{
                 background-color: $theme-text-color;
@@ -139,6 +140,9 @@ main>aside{
             }
         }
         
+        h2{
+            color:white;
+        }
         h3{
             font-size: 1.2rem;
             font-weight: normal;
@@ -211,6 +215,7 @@ main>aside{
 
 //    Article styles
     article{
+        min-height: 400px;
         background-color: white;
         overflow-x: visible;
         &>header,form>header{
@@ -223,7 +228,7 @@ main>aside{
         }
     
 h1:not(.subheader){
-	font-family: "Georgia Serif", Serif;
+	font-family: $serif-font;
     font-style: italic;
     
     .tabs{
