@@ -20,6 +20,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
+from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
@@ -215,15 +216,29 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
           if field_instance_type in [AttributeType, RelationType]:
             
-            if field_instance["name"] == "attendees" or field_instance["name"] == "12_passing_certificate":
+            if field_instance["name"] == "attendees":
               continue
 
             field_data_type = field_set['data_type']
 
             # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
             if field_instance_type == AttributeType:
-              field_value = request.POST[field_instance["name"]]
-              
+
+              if "File" in field_instance["validators"]:
+                # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
+                
+                field_value = request.FILES[field_instance["name"]]
+                file_name = person_gs.name + " -- " + field_instance["altnames"]
+                content_org = ""
+                tags = ""
+
+                # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
+                field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags)[0]
+
+              else:
+                # Other AttributeTypes 
+                field_value = request.POST[field_instance["name"]]
+
               # field_instance_type = "GAttribute"
               if field_instance["name"] == "12_passing_year" or field_instance["name"] == "degree_passing_year":
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
@@ -240,7 +255,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               field_value_list = request.POST.getlist(field_instance["name"])
 
               # field_instance_type = "GRelation"
-
               for i, field_value in enumerate(field_value_list):
                 field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
                 field_value_list[i] = field_value
