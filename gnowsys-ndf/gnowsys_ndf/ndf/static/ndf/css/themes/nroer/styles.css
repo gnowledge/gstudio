@@ -7645,7 +7645,7 @@ meta.foundation-mq-topbar {
 /* line 310, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .left-off-canvas-menu {
   -webkit-backface-visibility: hidden;
-  width: 15.625rem;
+  width: 350px;
   top: 0;
   bottom: 0;
   position: absolute;
@@ -7671,7 +7671,7 @@ meta.foundation-mq-topbar {
 /* line 311, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .right-off-canvas-menu {
   -webkit-backface-visibility: hidden;
-  width: 15.625rem;
+  width: 350px;
   top: 0;
   bottom: 0;
   position: absolute;
@@ -7728,12 +7728,12 @@ ul.off-canvas-list li a:hover {
 
 /* line 319, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .move-right > .inner-wrap {
-  -ms-transform: translate(15.625rem, 0);
-  -webkit-transform: translate3d(15.625rem, 0, 0);
-  -moz-transform: translate3d(15.625rem, 0, 0);
-  -ms-transform: translate3d(15.625rem, 0, 0);
-  -o-transform: translate3d(15.625rem, 0, 0);
-  transform: translate3d(15.625rem, 0, 0);
+  -ms-transform: translate(350px, 0);
+  -webkit-transform: translate3d(350px, 0, 0);
+  -moz-transform: translate3d(350px, 0, 0);
+  -ms-transform: translate3d(350px, 0, 0);
+  -o-transform: translate3d(350px, 0, 0);
+  transform: translate3d(350px, 0, 0);
 }
 /* line 322, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .move-right .exit-off-canvas {
@@ -7760,12 +7760,12 @@ ul.off-canvas-list li a:hover {
 
 /* line 326, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .move-left > .inner-wrap {
-  -ms-transform: translate(-15.625rem, 0);
-  -webkit-transform: translate3d(-15.625rem, 0, 0);
-  -moz-transform: translate3d(-15.625rem, 0, 0);
-  -ms-transform: translate3d(-15.625rem, 0, 0);
-  -o-transform: translate3d(-15.625rem, 0, 0);
-  transform: translate3d(-15.625rem, 0, 0);
+  -ms-transform: translate(-350px, 0);
+  -webkit-transform: translate3d(-350px, 0, 0);
+  -moz-transform: translate3d(-350px, 0, 0);
+  -ms-transform: translate3d(-350px, 0, 0);
+  -o-transform: translate3d(-350px, 0, 0);
+  transform: translate3d(-350px, 0, 0);
 }
 /* line 330, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .move-left .exit-off-canvas {
@@ -7824,19 +7824,19 @@ ul.off-canvas-list li a:hover {
 
 /* line 346, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .no-csstransforms .left-off-canvas-menu {
-  left: -15.625rem;
+  left: -350px;
 }
 /* line 347, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .no-csstransforms .right-off-canvas-menu {
-  right: -15.625rem;
+  right: -350px;
 }
 /* line 349, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .no-csstransforms .move-left > .inner-wrap {
-  right: 15.625rem;
+  right: 350px;
 }
 /* line 350, ../../../bower_components/foundation/scss/foundation/components/_offcanvas.scss */
 .no-csstransforms .move-right > .inner-wrap {
-  left: 15.625rem;
+  left: 350px;
 }
 
 /* small displays */
