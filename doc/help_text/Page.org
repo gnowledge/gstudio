@@ -28,18 +28,15 @@ Pages support the following features:
 - Insert footnotes and references
 
 Pages can be grouped together as a collection in a heirarchically to
-make an online book. 
+make an online document or a book. 
 
 Each page content can be annotated, discussed and rated.  When the
 page is about a geographical location the latitude and longitude
-information can be set.
+information can be set. 
 
 Most common metadata elements can also be set to each page as
 properties of the page informing the age group, intended auidence,
 what topic does the page teach (if it does), what other page you wish
 the reader to read before the current page etc.
 
-
-
-  
   

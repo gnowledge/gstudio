@@ -1,0 +1,24 @@
+
+* Files (Document Library)
+
+  A file is an App for sharing electronic documents of any type with
+  the group members.  
+
+  Files can be grouped as collections, both heterogeneous (files of
+  different type, say: images, videos and presentations) as well
+  homogeneous collections (all images or all videos etc.)
+
+  Presentation of some file types which a browser supports can be
+  viewed online.  If the media type of a file is not supported by the
+  browser, and browser does not have a plugin to present it, the site
+  will provide a download link.
+
+  When a file is already uploaded by another user, the site will
+  inform the user that such a file already exists.  If an image is
+  uploaded in another group, you may want to cross-publish it in more
+  than one group.
+
+  Each file can be rated, discussed and linked to other resources,
+  concepts, topics etc. Standard as well as learning resources
+  metadata can be set for every file.
+  

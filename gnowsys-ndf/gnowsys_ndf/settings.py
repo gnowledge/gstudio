@@ -187,6 +187,8 @@ import django.conf.locale
 LANG_INFO = dict(django.conf.locale.LANG_INFO.items() + EXTRA_LANG_INFO.items())
 django.conf.locale.LANG_INFO = LANG_INFO
 
+
+
 # Languages using BiDi (right-to-left) layout
 #LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",) 
 
@@ -279,11 +281,6 @@ STATIC_ROOT = '/static'
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
-LOCALE_PATHS = (
-    '/home/supriya/Desktop/gstudio/gstudio/gnowsys-ndf/conf/locale/',
-)
-
-#LOCALE_PATHS= "/home/supriya/Desktop/gstudio"
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -366,6 +363,9 @@ INSTALLED_APPS = (
     'online_status',                       #for online_users     
 )
 
+AUTHENTICATION_BACKENDS=(
+'registration_email.auth.EmailBackend',
+)
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
 
@@ -417,7 +417,15 @@ AUTHOR_AGENCY_TYPES=["Student","Teacher","TeacherTrainer","Faculty","Researcher"
 
 GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Browse Topic", u"Browse Resource", u"Meeting"]
 
+##Defined all site specific variables
 
+GSTUDIO_SITE_ORG="A project of Gnowledge Lab at the Homi Bhabha Centre for Science Education (HBCSE), Tata Institute of Fundamental Research (TIFR), India. "
+GSTUDIO_SITE_LOGO="/static/ndf/css/themes/metastudio/logo.svg"
+GSTUDIO_COPYRIGHT=""
+GSTUDIO_GIT_REPO="https://github.com/gnowledge/gstudio"
+GSTUDIO_SITE_PRIVACY_POLICY=""
+GSTUDIO_SITE_TERMS_OF_SERVICE=""
+GSTUDIO_SITE_DEFAULT_LANGUAGE=u"('en', 'English')"
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
