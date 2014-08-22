@@ -25,7 +25,7 @@ from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import get_drawers,get_all_gapps
 from gnowsys_ndf.ndf.views.methods import get_user_group, get_user_task, get_user_notification, get_user_activity
 from gnowsys_ndf.ndf.views.file import * 
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_DEFAULT_LANGUAGE
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_all_user_groups
 
 #######################################################################################################################################
@@ -46,6 +46,16 @@ ins_objectid  = ObjectId()
 def userpref(request,group_id):
     print request.user.username
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+    lan_dict={}
+    pref=request.POST["pref"]
+    fall_back=request.POST["fallback"]
+    if pref:
+        lan_dict['primary']=pref
+        lan_dict['secondary']=fall_back
+        lan_dict['default']=GSTUDIO_SITE_DEFAULT_LANGUAGE
+        auth.preferred_languages=lan_dict
+        auth.modified_by=request.user.id
+        auth.save()
     return HttpResponse("Success")
     
     
