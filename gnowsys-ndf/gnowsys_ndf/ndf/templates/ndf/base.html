@@ -240,12 +240,16 @@
 	</aside>
 
 	<main class="row">  
-	  
+	  <header>
+          <div class="small-12 columns">
+        {% get_gapps_iconbar request groupid %}
+              </div>
+        </header>
 	  <!-- Start of sidebar section (main aside) -->
 
         <aside class="large-3 medium-4 columns">
           <div>
-            {% get_gapps_iconbar request groupid %}
+            
             <header>
               {% block meta_content %}  {% endblock %} 
               {% block concern_information %} {% endblock %}
@@ -397,24 +401,6 @@
       $("main>article").toggleClass("large-9 large-12");
     };
       
-      //Organise the apps in the icon bar based on whats active
-      (function organizeIconBar(){
-            
-          //Only if there is a 5th app, otherwise we dont need to organize anything
-           if( $('nav .icon-bar a').eq(5) ){
-              // First lets move the active app as the first item so that its visible to the user
-              $('.icon-bar a.app.active').prependTo($('nav .icon-bar'));
-              
-              // All those extra apps more than 3 will be hidden
-              $('nav .icon-bar a').slice(3).addClass("extra"); 
-              
-              // Add a show more button after the third one to show those extra apps
-         
-              showMoreButton = '<a class="item more" href="#"><i class="fi-plus"></i><label>...</label></a>';
-              $(showMoreButton).insertBefore($('nav .icon-bar a').eq(3));
-          }
-            
-      })();
     
     // Show extra apps on hovering over the more icon  
     $(".icon-bar .more").on("mouseenter", function(){
