@@ -132,13 +132,13 @@
       	    {% get_profile_pic  request.user as prof_pic %}
 
       	    {% if prof_pic %}
-      	    <a href="{% url 'userDashboard' group_object request.user.pk %}">
+      	    <a href="{% url 'dashboard' request.user.pk %}">
       	      <img  src="{% url 'getImageThumbnail' group_object prof_pic %}" height="30" width="30">
       	      {{ user.username }}
       	    </a>
       	    
       	    {% else %}
-      	    <a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_object request.user.pk %}">
+      	    <a class="user" data-gnow="#aabb44" href="{% url 'dashboard' request.user.pk %}">
       	      {{ user.username }}
       	    </a>
       	    {% endif %}
@@ -277,7 +277,7 @@
                   <label>Help</label>
                 </a> 
                             
-        				<a class="item user" href="{% url 'userDashboard' group_object request.user.pk %}">
+        				<a class="item user" href="{% url 'dashboard' request.user.pk %}">
           				<label>My profile</label>
         				</a>
       				</div>
