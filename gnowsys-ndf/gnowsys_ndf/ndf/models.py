@@ -409,13 +409,16 @@ class Node(DjangoDocument):
    	#document is present or not.
    	#If the id is not present then add that id.If it is present then do not add that id
    		
-   	old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})	
+   	old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
+        
     	if not old_doc:
     		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
     		z = collection.ToReduceDocs()
     		z.doc_id = self._id
     		z.required_for = to_reduce_doc_requirement
     		z.save()
+        else:
+            is_new=True    
     		
     	#If you create/edit anything then this code shall add it in the URL
     	#===================================================================================================================#
