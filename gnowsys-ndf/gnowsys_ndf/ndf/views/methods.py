@@ -25,7 +25,7 @@ import ast
 import string
 import json
 from datetime import datetime
-######################################################################################################################################
+
 
 db = get_database()
 collection = db[Node.collection_name]
@@ -34,9 +34,9 @@ history_manager = HistoryManager()
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 
-#######################################################################################################################################
-#                                                                       C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
-#######################################################################################################################################
+
+# C O M M O N   M E T H O D S   D E F I N E D   F O R   V I E W S
+
 coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
@@ -121,7 +121,6 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
     reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
-
     
     drawer = None    
     
@@ -182,9 +181,12 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "theme_item":
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_item_GST._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
-
       elif checked == "Topic":
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})   
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})
+
+      elif type(checked) == list:
+        # Special case: used while dealing with RelationType widget
+        drawer = checked
 
     else:
       # For heterogeneous collection      
@@ -197,6 +199,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     if (nid is None) and (not nlist):
       for each in drawer:               
         dict_drawer[each._id] = each
+
 
     elif (nid is None) and (nlist):
       for each in drawer:
@@ -323,10 +326,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   usrname = unicode(request.user.username)
   access_policy = request.POST.get("login-mode", '') 
   prior_node_list = request.POST.get('prior_node_list','')
-  print "prior node list",prior_node_list
-#  collection_list = request.POST.get('collection_set_list','')
   collection_list = request.POST.get('collection_list','')
-  print "collenct list",collection_list
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
@@ -358,10 +358,14 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     is_changed = True
           
     # End of if
+    specific_url = set_all_urls(node.member_of)
+    node.url = specific_url
 
-  # --------------------------------------------------------------------------- For create/edit
+  #  For create/edit
+  
 
-  # -------------------------------------------------------------------------------- name
+
+  #   name
  
   if name:
     if node.name != name:
@@ -381,14 +385,14 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: topic"
       is_changed = True
 
-  # -------------------------------------------------------------------------------- language
+  #  language
 
   if language:
     node.language = unicode(language) 
   else:
     node.language = u"en"
 
-  # -------------------------------------------------------------------------------- access_policy
+  #  access_policy
 
   if access_policy:
     # Policy will be changed only by the creator of the resource
@@ -413,7 +417,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     if user_group_obj:
       if user_group_obj._id not in node.group_set:
         node.group_set.append(user_group_obj._id)
-  # -------------------------------------------------------------------------------- tags
+  #  tags
   if tags:
     tags_list = []
 
@@ -428,7 +432,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: tags"
       is_changed = True
 
-  # -------------------------------------------------------------------------------- prior_node
+  #  prior_node
 
    
   # if prior_node_list != '':
@@ -444,24 +448,21 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   #node.prior_node = []
   if prior_node_list != '':
     prior_node_list = [ObjectId(each.strip()) for each in prior_node_list.split(",")]
-    print "prior=",set(node.prior_node),set(prior_node_list)
-    if set(node.prior_node) != set(prior_node_list):
-      print "dissimilar"
-      i = 0
-      node.prior_node=[]
-      while (i < len(prior_node_list)):
-        node_id = ObjectId(prior_node_list[i])
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.prior_node:
-            node.prior_node.append(node_id)
-        
-        i = i+1
-      # print "\n Changed: prior_node"
-      is_changed = True
-  else:
+
+  if set(node.prior_node) != set(prior_node_list):
+    i = 0
     node.prior_node=[]
-    is_changed=True 
-  # -------------------------------------------------------------------------------- collection
+    while (i < len(prior_node_list)):
+      node_id = ObjectId(prior_node_list[i])
+      if gcollection.Node.one({"_id": node_id}):
+        if node_id not in node.prior_node:
+          node.prior_node.append(node_id)
+      
+      i = i+1
+    # print "\n Changed: prior_node"
+    is_changed = True
+  
+  #  collection
 
   # node.collection_set = []
   # if collection_list != '':
@@ -478,27 +479,24 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
   if collection_list != '':
     collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
-    print "check collection_list",set(node.collection_set),"and",set(collection_list)
-    if set(node.collection_set) != set(collection_list):
-      print "list dissimilar",node.collection_set
-      i = 0
-      node.collection_set = []
 
-      # checking if each _id in collection_list is valid or not
-      while (i < len(collection_list)):
-        node_id = ObjectId(collection_list[i])
-        
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.collection_set:
-            node.collection_set.append(node_id)
-        
-        i = i+1
-      # print "\n Changed: collection_list"
-      is_changed = True
-  else:
-    node.collection_set=[]
-    is_changed=True
-  # -------------------------------------------------------------------------------- Module
+  if set(node.collection_set) != set(collection_list):
+    i = 0
+    node.collection_set = []
+
+    # checking if each _id in collection_list is valid or not
+    while (i < len(collection_list)):
+      node_id = ObjectId(collection_list[i])
+      
+      if gcollection.Node.one({"_id": node_id}):
+        if node_id not in node.collection_set:
+          node.collection_set.append(node_id)
+      
+      i = i+1
+    # print "\n Changed: collection_list"
+    is_changed = True
+  
+  #  Module
 
   # node.collection_set = []
   # if module_list != '':
@@ -515,20 +513,20 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   if module_list != '':
     collection_list = [ObjectId(each.strip()) for each in module_list.split(",")]
 
-    if set(node.collection_set) != set(collection_list):
-      i = 0
-      while (i < len(collection_list)):
-        node_id = ObjectId(collection_list[i])
-        
-        if gcollection.Node.one({"_id": node_id}):
-          if node_id not in node.collection_set:
-            node.collection_set.append(node_id)
-        
-        i = i+1
-      # print "\n Changed: module_list"
-      is_changed = True
+  if set(node.collection_set) != set(collection_list):
+    i = 0
+    while (i < len(collection_list)):
+      node_id = ObjectId(collection_list[i])
+      
+      if gcollection.Node.one({"_id": node_id}):
+        if node_id not in node.collection_set:
+          node.collection_set.append(node_id)
+      
+      i = i+1
+    # print "\n Changed: module_list"
+    is_changed = True
     
-  # ------------------------------------------------------------------------------- org-content
+  #  org-content
   
   if content_org:
     if node.content_org != content_org:
@@ -541,7 +539,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: content_org"
       is_changed = True
 
-  # ----------------------------------------------------------------------------- visited_location in author class
+  # visited_location in author class
   if node.location != map_geojson_data:
     node.location = map_geojson_data # Storing location data
     # print "\n Changed: map"
@@ -636,18 +634,17 @@ def get_user_page(request,node):
            return(node,'1.1')
                    
 def get_page(request,node):
-     ''' function to filter between the page to be displyed to user 
-           i.e which page to be shown to the user drafted or the published page
-	if a user have some drafted content then he wouldbe shown his own drafted contents 
-and if he has published his contents then he would be shown the current published contents
-
-
-'''
-     username =request.user
-     node1,ver1=get_versioned_page(node)
-     node2,ver2=get_user_page(request,node)     
-     
-     if  ver2 != '1.1':                           
+  ''' 
+  function to filter between the page to be displyed to user 
+  i.e which page to be shown to the user drafted or the published page
+  if a user have some drafted content then he would be shown his own drafted contents 
+  and if he has published his contents then he would be shown the current published contents
+  '''
+  username =request.user
+  node1,ver1=get_versioned_page(node)
+  node2,ver2=get_user_page(request,node)     
+  
+  if  ver2 != '1.1':                           
 	    if node2 is not None:
 		# print "direct"
                 if node2.status == 'PUBLISHED':
@@ -674,7 +671,7 @@ and if he has published his contents then he would be shown the current publishe
                         
 			return(node1,ver1)		
 	    
-     else:
+  else:
          
         # if node._type == "GSystem" and node1.status == "DRAFT":
         #     if node1.created_by ==request.user.id:
@@ -1237,30 +1234,48 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
   return ga_node
 
 
-def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs):
+def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):
   """
-  Creates a GRelation document (instance).
+  Creates single or multiple GRelation documents (instances) based on given RelationType's cardinality (one-to-one / one-to-many).
 
   Arguments:
   subject_id -- ObjectId of the subject-node
   relation_type_node -- Document of the RelationType node (Embedded document)
-  right_subject_id -- ObjectId of the right_subject node
+  right_subject_id_or_list -- 
+    - When one to one relationship: Single ObjectId of the right_subject node
+    - When one to many relationship: List of ObjectId(s) of the right_subject node(s)
 
   Returns:
-  Created GRelation document.
+  - When one to one relationship: Created/Updated/Existed document.
+  - When one to many relationship: Created/Updated/Existed list of documents.
+  
   """
   gr_node = None
   multi_relations = False
 
   try:
-    if kwargs.has_key("multi"):
-      multi_relations = kwargs["multi"]
-
     subject_id = ObjectId(subject_id)
-    right_subject_id = ObjectId(right_subject_id)
+
+    if relation_type_node["object_cardinality"]:
+      # If object_cardinality value exists and greater than 1 (or eaqual to 100)
+      # Then it signifies it's a one to many type of relationship
+      # assign multi_relations = True
+      if relation_type_node["object_cardinality"] > 1:
+        multi_relations = True
+
+        # Check whether right_subject_id_or_list is list or not
+        # If not convert it to list
+        if not isinstance(right_subject_id_or_list, list):
+          right_subject_id_or_list = [right_subject_id_or_list]
+
+        # Check whether all values of a list are of ObjectId data-type or not 
+        # If not convert them to ObjectId
+        for i, each in enumerate(right_subject_id_or_list):
+          right_subject_id_or_list[i] = ObjectId(each)
+
 
     if multi_relations:
-      # For dealing with multiple relations
+      # For dealing with multiple relations (one to many)
 
       # Iterate and find all relationships (including DELETED ones' also)
       nodes = collection.Triple.find({'_type': "GRelation", 
@@ -1268,15 +1283,29 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
                                       'relation_type': relation_type_node.get_dbref()
                                     })
 
+      gr_node_list = []
+
       for n in nodes:
-        if n.right_subject in right_subject_id:
+        if n.right_subject in right_subject_id_or_list:
           if n.status != u"DELETED":
             # If match found with existing one's, then only remove that ObjectId from the given list of ObjectIds
-            right_subject_id.remove(n.right_subject)
+            # Just to remove already existing entries (whose status is PUBLISHED)
+            right_subject_id_or_list.remove(n.right_subject)
+            gr_node_list.append(n)
 
-      if right_subject_id:
-        # If still ObjectId list persists, it means either they are new ones' or they are from deleted ones'
-        for nid in right_subject_id:
+        else:
+          # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
+          # So change their status from PUBLISHED to DELETED
+          n.status = u"DELETED"
+          n.save()
+          info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
+          print "\n", info_message
+
+      if right_subject_id_or_list:
+        # If still ObjectId list persists, it means either they are new ones' or from deleted ones'
+        # For deleted one's, find them and modify their status to PUBLISHED
+        # For newer one's, create them as new document
+        for nid in right_subject_id_or_list:
           gr_node = collection.Triple.one({'_type': "GRelation", 
                                             'subject': subject_id, 
                                             'relation_type': relation_type_node.get_dbref(),
@@ -1289,25 +1318,74 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
 
             gr_node.subject = subject_id
             gr_node.relation_type = relation_type_node
-            gr_node.right_subject = right_subject_id
+            gr_node.right_subject = nid
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            info_message = " MultipleGRelation: GRelation ("+gr_node.name+") created successfully.\n"
+            print "\n", info_message
+
+            gr_node_list.append(gr_node)
 
           else:
             # Deleted one found so change it's status back to Published
             if gr_node.status == u'DELETED':
-              collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+              gr_node.status = u"PUBLISHED"
+              gr_node.save()
 
-          info_message = " GRelation ("+gr_node.name+") created successfully.\n"
-          print "\n", info_message
+              info_message = " MultipleGRelation: GRelation ("+gr_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+              print "\n", info_message
+
+              gr_node_list.append(gr_node)
+
+            else:
+              error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
+              raise Exception(error_message)
+
+      return gr_node_list
 
     else:
-      # For dealing with single relation
-      gr_node = collection.Triple.one({'_type': "GRelation", 
-                                       'subject': subject_id, 
-                                       'relation_type': relation_type_node.get_dbref()
-                                      })
+      # For dealing with single relation (one to one)
+
+      gr_node = None
+
+      if isinstance(right_subject_id_or_list, list):
+        right_subject_id_or_list = ObjectId(right_subject_id_or_list[0])
+
+      else:
+        right_subject_id_or_list = ObjectId(right_subject_id_or_list)
+
+      gr_node_cur = collection.Triple.find({'_type': "GRelation", 
+                                            'subject': subject_id, 
+                                            'relation_type.$id': relation_type_node._id
+                                          })
+
+      for node in gr_node_cur:
+        if node.right_subject == right_subject_id_or_list:
+          # If match found, it means it could be either DELETED one or PUBLISHED one
+
+          # Set gr_node value as matched value, so that no need to create new one 
+          gr_node = node
+
+          if node.status == u"DELETED":
+            # If deleted, change it's status back to Published from Deleted
+            node.status = u"PUBLISHED"
+            node.save()
+            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            print "\n", info_message
+
+          elif node.status == u"PUBLISHED":
+            info_message = " SingleGRelation: GRelation ("+node.name+") already exists !\n"
+            print "\n", info_message
+
+        else:
+          # If match not found and if it's PUBLISHED one, modify it to DELETED
+          if node.status == u'PUBLISHED':
+            node.status = u"DELETED"
+            node.save()
+
+            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            print "\n", info_message 
 
       if gr_node is None:
         # Code for creation
@@ -1315,7 +1393,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
 
         gr_node.subject = subject_id
         gr_node.relation_type = relation_type_node
-        gr_node.right_subject = right_subject_id
+        gr_node.right_subject = right_subject_id_or_list
 
         gr_node.status = u"PUBLISHED"
         
@@ -1323,22 +1401,42 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
         info_message = " GRelation ("+gr_node.name+") created successfully.\n"
         print "\n", info_message
 
-      else:
-        if gr_node.right_subject != right_subject_id:
-          collection.update({'_id': gr_node._id}, {'$set': {'right_subject': right_subject_id}}, upsert=False, multi=False)
-
-        elif gr_node.right_subject == right_subject_id and gr_node.status == u"DELETED":
-          collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
-
-        else:
-          info_message = " GRelation ("+gr_node.name+") already exists !\n"
-          print "\n", info_message
-
-    return gr_node
+      return gr_node
 
   except Exception as e:
-      error_message = "\n GRelationCreateError: " + str(e) + "\n"
+      error_message = "\n GRelationError: " + str(e) + "\n"
       raise Exception(error_message)
+
+      
+
+      
+###############################################      ###############################################
+def set_all_urls(member_of):
+	print "INSIDE SET ALL URLS"
+	Gapp_obj = collection.Node.one({"_type":"MetaType", "name":"GAPP"})
+	factory_obj = collection.Node.one({"_type":"MetaType", "name":"factory_types"})
+
+	url = ""	
+	gsType = member_of[0]
+	gsType_obj = collection.Node.one({"_id":ObjectId(gsType)})
+	
+	if Gapp_obj._id in gsType_obj.member_of:
+		if gsType_obj.name == u"Quiz":
+		    url = u"quiz/details"
+		else:
+		    url = gsType_obj.name.lower()
+	elif factory_obj._id in gsType_obj.member_of:
+		if gsType_obj.name == u"QuizItem":
+		    url = u"quiz/details"
+		elif gsType_obj.name == u"Twist":
+		    url = u"forum/thread"
+		else:
+		    url = gsType_obj.name.lower()
+	else:
+		url = u"None"
+	return url
+###############################################	###############################################    
+
 
 # Method to create discussion thread for File and Page.
 def create_discussion(request, group_id, node_id):
@@ -1545,3 +1643,5 @@ def get_user_activity(userObject):
       member_of = collection.Node.find_one({"_id":each.member_of[0]})
       blank_list.append({'id':str(each._id), 'name':each.name, 'date':each.last_update, 'activity': activity, 'type': each._type, 'group_id':str(each.group_set[0]), 'member_of':member_of.name.lower()})
   return blank_list
+
+

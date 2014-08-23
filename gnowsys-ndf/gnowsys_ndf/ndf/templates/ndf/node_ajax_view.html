@@ -203,9 +203,8 @@
             
               <!-- Start of Block: For listing Editing options --> 
       {% user_access_policy groupid request.user as user_access %}
-
       {% edit_policy groupid node request.user as status %}
-      {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
+     {% if user.is_authenticated and status == "allow" and user_access == "allow" %}
         {% get_edit_url node.pk as edit_url %}
 
         {% check_group node as is_group %}
@@ -431,7 +430,7 @@
           {% if each_node.mime_type %}
           <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
           {% else %}
-          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
           {% endif %}
           {% endfor %}
 	</div>

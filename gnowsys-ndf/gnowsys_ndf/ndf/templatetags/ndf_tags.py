@@ -10,6 +10,7 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
+
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
@@ -20,7 +21,10 @@ from gnowsys_ndf.ndf.views.methods import get_drawers
 from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
+
 from gnowsys_ndf.settings import LANGUAGES
+from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
+
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
 
@@ -33,6 +37,14 @@ translation_set=[]
 check=[]
 import json,ox
 
+
+@register.assignment_tag
+def get_author_agency_types():
+   return AUTHOR_AGENCY_TYPES
+
+@register.assignment_tag
+def get_group_agency_types():
+   return GROUP_AGENCY_TYPES
 
 @register.assignment_tag
 def get_node_type(node):
@@ -289,49 +301,56 @@ def get_all_replies(parent):
 	 return ex_reply
 
 
-# @register.inclusion_tag('ndf/drawer_widget.html')
-# def edit_drawer_widget(field, group_id, node, checked=None):
+@register.inclusion_tag('ndf/drawer_widget.html')
+def edit_drawer_widget(field, group_id, node, checked=None):
 
-# 	drawers = None
-# 	drawer1 = None
-# 	drawer2 = None
+	drawers = None
+	drawer1 = None
+	drawer2 = None
 
-# 	if node :
-# 		if field == "collection":
-# 			if checked == "Quiz":
-# 				checked = "QuizItem"
-# 			elif checked == "Theme":
-# 				checked = "Theme"
-# 			else:
-# 				checked = None
-# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-# 		elif field == "prior_node":
-# 			checked = None
-# 			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
-# 		elif field == "module":
-# 			checked = "Module"
-# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+	if node:
+		if field == "collection":
+			if checked == "Quiz":
+				checked = "QuizItem"
+			elif checked == "Theme":
+				checked = "Theme"
+			else:
+				checked = None
+			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+		elif field == "prior_node":
+			checked = None
+			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+		elif field == "module":
+			checked = "Module"
+			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+		elif type(checked) == list:
+			# Special case used while dealing with RelationType widget
+			drawers = get_drawers(group_id, node['_id'], node[field], checked)
 		
-# 		drawer1 = drawers['1']
-# 		drawer2 = drawers['2']
+		drawer1 = drawers['1']
+		drawer2 = drawers['2']
 
-# 	else:
-# 		if field == "collection" and checked == "Quiz":
-# 			checked = "QuizItem"
+	else:
+		if field == "collection" and checked == "Quiz":
+			checked = "QuizItem"
 
-# 		elif field == "collection" and checked == "Theme":
-# 			checked = "Theme"
+		elif field == "collection" and checked == "Theme":
+			checked = "Theme"
 			
-# 		elif field == "module":
-# 			checked = "Module"
-			
-# 		else:
-# 			# To make the collection work as Heterogenous one, by default
-# 			checked = None
+		elif field == "module":
+			checked = "Module"
 
-# 		drawer1 = get_drawers(group_id, None, [], checked)
+		elif type(checked) == list:
+			# Special case used while dealing with RelationType widget
+			checked = checked
 
-# 	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
+		else:
+			# To make the collection work as Heterogenous one, by default
+			checked = None
+
+		drawer1 = get_drawers(group_id, None, [], checked)
+
+	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
@@ -942,21 +961,17 @@ def get_contents(node_id):
 
 @register.assignment_tag
 def get_group_type(group_id, user):
-        
-
 	try:
-
 		col_Group = db[Node.collection_name]
+
+		# Splitting url-content based on backward-slashes
+		split_content = group_id.strip().split("/")
+		gid = ""
 
 		if group_id == '/home/':
 			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 
 		else:  
-			gid = ""
-
-			# Splitting url-content based on backward-slashes
-			split_content = group_id.strip().split("/")
-
 			# If very first character is not backward-slash
 			# Then group id/name will be the very first element in splitted url-content list
 			# Else, it will be the second element
@@ -965,10 +980,16 @@ def get_group_type(group_id, user):
 
 			else:
 				gid = split_content[1]
-
+			
 			# gid = group_id.replace("/", "").strip()
+			
 			if ObjectId.is_valid(gid):
-				colg = col_Group.Group.one({'_type': 'Group', '_id': ObjectId(gid)})
+				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
+
+				#check for valid Django Id
+			elif user.id is not None and (int(user.id) == int(gid)) :
+				colg = col_Group.Node.find_one({'_type': "Author", 'created_by': int(gid)})
+
 			else:
 				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
 				if colg :
@@ -976,34 +997,60 @@ def get_group_type(group_id, user):
 
 				else:		
 					colg = None
+
+						
   		
-		# Check if Group exist in the database
+		# Check if Group exists in the database
 		if colg is not None:
 
-			# Check is user is logged in
-			if  user.id:
-				# condition for group accessible to logged user
+			# Check is user logged in
+			if user.is_authenticated():
+				# Condition for group accessible to logged in user
 				if user.is_superuser or colg.created_by == user.id or user.id in colg.group_admin or user.id in colg.author_set or colg.group_type=="PUBLIC":
-					return "allowed"
+					# Condition for GAPPs accessible to gstaff (i.e. "mis", "mis-po", "batch")
+					if len(split_content) > 2 and split_content[2] != "":
+						gapp = split_content[2]
+
+						if check_is_gapp_for_gstaff(colg._id, {'name': gapp}, user):
+							return "allowed"
+
+						else:
+							error_message = "Access denied: You are not an authorized user to access this GAPP ("+gapp.upper()+")!!!"
+							raise Http404(error_message)
+
+					else:
+						# If only group is specified
+						return "allowed"
+
 				else:
-					error_message = "Access denied: You are not an authorized user!!!"
+					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
 					raise Http404(error_message)
 
 			else:
-				#condition for groups, accessible to not logged users
+				# Condition for group accessible to logged out user
 				if colg.group_type == "PUBLIC":
 					return "allowed"
+
 				else:
-					error_message = "Access denied: You are not an authorized user!!!"
+					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
 					raise Http404(error_message)
+
 		else:
-			return "pass"
+			# If given ObjectId/name doesn't exists in database
+			# Then compare with a given list of names as these were used in one of the urls
+			# And still no match found, throw an error - Group doesn't exists
+			if gid in ["online", "i18n", "raw", "r", "m", "t", "new", "mobwrite", "admin", "benchmarker", "accounts", "Beta"]:
+				return "pass"
+
+			else:
+				error_message = "GroupNotFoundError: This group ("+gid+") doesn't exists!!!"
+				raise Http404(error_message)
 
 	except Http404 as e:
 		raise Http404(e)
 		
 	except Exception as e:
-		print "Error in group_type_tag "+str(e)
+		print "\n Error in get_group_type() templatetag: " + str(e) + "\n"
 		colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return "pass"
 
@@ -1130,7 +1177,7 @@ def user_access_policy(node, user):
 
   Check is performed in given sequence as follows (sequence has importance):
   - If user is superuser, then he/she is allowed
-  - Else if user is creator of the group, then he/she is allowed
+  - Else if user is creator or admin of the group, then he/she is allowed
   - Else if group's edit-policy is "NON_EDITABLE" (currently "home" is such group), then user is NOT allowed
   - Else if user is member of the group, then he/she is allowed
   - Else user is NOT allowed!
@@ -1154,6 +1201,8 @@ def user_access_policy(node, user):
   user_access = False
 
   try:
+  	# Please make a note, here the order in which check is performed is IMPORTANT!
+
     if user.is_superuser:
       user_access = True
 
@@ -1161,6 +1210,9 @@ def user_access_policy(node, user):
       group_node = collection.Node.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(node)})
 
       if user.id == group_node.created_by:
+        user_access = True
+
+      elif user.id in group_node.group_admin:
         user_access = True
 
       elif group_node.edit_policy == "NON_EDITABLE":
@@ -1304,7 +1356,7 @@ def check_is_gstaff(groupid, user):
 
 
 @register.assignment_tag
-def check_is_gstaff_for_gapp(groupid, app_dict, user):
+def check_is_gapp_for_gstaff(groupid, app_dict, user):
   """
   This restricts view of MIS & MIS-PO GApps to only GStaff members (super-user, creator, admin-user) of the group. 
   That is, other subscribed-members of the group can't even see these GApps.
@@ -1323,7 +1375,7 @@ def check_is_gstaff_for_gapp(groupid, app_dict, user):
   """
 
   try:
-    if app_dict["name"].lower() in ["mis", "mis-po", "batch", "task"]:
+    if app_dict["name"].lower() in ["mis", "mis-po", "batch"]:
       return check_is_gstaff(groupid, user)
 
     else:
@@ -1548,13 +1600,17 @@ def get_field_type(node_structure, field_name):
 @register.inclusion_tag('ndf/html_field_widget.html')
 # def html_widget(node_id, field, field_type, field_value):
 # def html_widget(node_id, node_member_of, field, field_value):
-def html_widget(node_id, field):
+def html_widget(groupid, node_id, field):
   """
   Returns html-widget for given attribute-field; that is, passed in form of
   field_name (as attribute's name) and field_type (as attribute's data-type)
   """
   # gs = None
   field_value_choices = []
+
+  # This field is especially required for drawer-widets to work used in cases of RelationTypes
+  # Represents a dummy document that holds node's _id and node's right_subject value(s) from it's GRelation instance
+  node_dict = {}
 
   is_list_of = False
   LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
@@ -1577,6 +1633,7 @@ def html_widget(node_id, field):
   try:
     if node_id:
       node_id = ObjectId(node_id)
+      node_dict['_id'] = node_id
 
     # if node_member_of:
     #   gs = collection.GSystem()
@@ -1610,7 +1667,10 @@ def html_widget(node_id, field):
     field['altnames'] = field_altnames
 
     if not field_value:
-      field_value = ""
+      if type(field_type) == IS:
+      	field_value = [] 
+      else:
+      	field_value = ""
 
     if type(field_type) == type:
       field_type = field_type.__name__
@@ -1641,16 +1701,22 @@ def html_widget(node_id, field):
     elif is_AT_RT_base == "RelationType":
       is_relation_field = True
       is_required_field = True
-      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}},
-                                                            {'_id': 1, 'name': 1}
-                                                          )
+
+      field_value_choices.extend(list(collection.Node.find({'_type': "GSystem", 
+																														'member_of': {'$in': field["object_type"]}, 
+																														'status': u"PUBLISHED",
+																														'group_set': ObjectId(groupid)
+																													}).sort('name', 1)
                                       )
                                 )
+
       field_value = [str(each._id) for each in field_value]
+      if node_id:
+      	node_dict[field['name']] = [ObjectId(each) for each in field_value]
 
     return {'template': 'ndf/html_field_widget.html',
             'field': field, 'field_type': field_type, 'field_value': field_value,
-            'node_id': node_id,
+            'node_id': node_id, 'groupid': groupid, 'node_dict': node_dict,
             'field_value_choices': field_value_choices,
             'is_base_field': is_base_field,
             'is_attribute_field': is_attribute_field,

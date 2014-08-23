@@ -1,7 +1,7 @@
 {% extends "registration/registration_base.html" %}
 
 {% load i18n %}
-
+{% load ndf_tags %}
 {% block title %}{% trans "Register for an account" %}{% endblock %}
 
 {% block style %}
@@ -12,17 +12,28 @@
 {% endblock %}
 
 {% block body_content %}
-
+{% get_author_agency_types as agency_types %}
 <table>
   <form method='post' action=''>
     {% csrf_token %}
     {{ form }}
+     <tr><th>{% trans "Group agency type" %}</th>
+      <td colspan="2">
+        <select name="agency_type">
+         {% for each in agency_types %}
+           <option id="{{each}}" name="group_agency_type">{{each}}</option>
+         {% endfor %}
+        </select>
+      </td>
+     </tr>
+     <tr><th>{% trans "Affiliation" %}</th> 
+       <td colspan="2"><input type="text" id="Affiliation" name="group_affiliation"></td>
+     </tr>
+     <tr>
+       <td colspan="2"><p>Use at least one uppercase letter, one numeral, and 8 characters.</p> </td>
+     </tr>
     <tr>
-      <td colspan="2"><p>Use at least one uppercase letter, one numeral, and 8 characters.</p> </td>
-    </tr>
-    
-    <tr>
-      <td colspan="2"><input type="submit" class="button small" value="{% trans 'Send activation email' %}" /></td>
+       <td colspan="2"><input type="submit" class="button small" value="{% trans 'Send activation email' %}"></td>
     </tr>
   </form>
 </table>

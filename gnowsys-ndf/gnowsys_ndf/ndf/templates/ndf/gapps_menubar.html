@@ -20,7 +20,7 @@
 
 {% for index_key, app_dict in gapps.items %}
 
-{% check_is_gstaff_for_gapp groupid app_dict request.user as gstaff_access_for_gapp %}
+{% check_is_gapp_for_gstaff groupid app_dict request.user as gstaff_access_for_gapp %}
 
 {% if gstaff_access_for_gapp %}
 

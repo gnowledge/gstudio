@@ -39,9 +39,9 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
-from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list
+from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,set_all_urls
 
-#######################################################################################################################################
+
 
 db = get_database()
 collection = db[Node.collection_name]
@@ -51,9 +51,9 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'}
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
 
-###################################################################################################################################
+
 # VIEWS DEFINED FOR GAPP -- 'FILE'
-###################################################################################################################################
+
 lock=threading.Lock()
 count = 0    
 
@@ -510,6 +510,8 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                         fileobj.group_set.append(user_group_object._id)
 
             fileobj.member_of.append(GST_FILE._id)
+            #### ADDED ON 14th July.IT's DONE
+            fileobj.url = set_all_urls(fileobj.member_of)
             fileobj.mime_type = filetype
             if img_type == "" or img_type == None:
                 if content_org:
@@ -627,14 +629,17 @@ def convert_mid_size_image(files):
     '''
     mid_size_img = StringIO()
     img = Image.open(StringIO(files.read()))
-    width , height = img.size
-    diff = width - height
-    if (diff > 0):
-        diviser = width / 1000
-    else:
-        diviser = height / 1000
-    size = int(width / diviser),int(height / diviser)
-    img.resize(size,Image.ANTIALIAS)
+    width, height = img.size
+
+    widthRatio = 1000 / float(width)
+    heightRatio = 1000 / float(height)
+
+    width = int(float(width) * float(widthRatio))
+    height = int(float(height) * float(heightRatio))
+
+    size = width, height
+
+    img.resize(size, Image.ANTIALIAS)
     img.save(mid_size_img, "JPEG")
     mid_size_img.seek(0)
     return mid_size_img
@@ -969,3 +974,60 @@ def file_edit(request,group_id,_id):
                                 },
                                   context_instance=RequestContext(request)
                               )
+
+def data_review(request, group_id):
+  '''
+  To get all the information related to resource object in the group.
+  '''
+
+  # getting group obj from name
+  group_obj = collection.Node.one({ "_type": "Group", "name": group_id })
+
+  # checking if passed group_id is group name or group Id
+  if group_obj and (group_id == group_obj.name):
+    group_name = group_id
+    group_id = group_obj._id
+  
+  else: # passes group_id is _id and not name
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id):
+      group_obj = collection.Node.one({ "_id":ObjectId(group_id) }) # retrieve Obj by _id
+      if group_obj:
+        group_name = group_obj.name
+        group_id = group_id       # for clarity
+
+  file_id = collection.Node.find_one({'_type':"GSystemType", "name":"File"}, {"_id":1})
+
+  # print group_obj
+  files_obj = collection.Node.find({'member_of': {'$all': [ObjectId(file_id._id)]}, 
+                                    '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    '$or': [
+                                      {'access_policy': u"PUBLIC"},
+                                      {'$and': [
+                                          {'access_policy': u"PRIVATE"}, 
+                                          {'created_by': request.user.id}
+                                        ]
+                                      }
+                                    ]
+                                  }).sort("last_update", -1)
+
+  # list to hold resources instances with it's attributes and relations
+  files_list = []
+
+  for each_resource in files_obj:
+    each_resource.get_neighbourhood(each_resource.member_of)
+    files_list.append(collection.GSystem(each_resource))
+    # print "\n\n\n========"#, each_resource.keys()
+    # for each, val in each_resource.iteritems():
+      # print each, "--", val,"\n"
+
+  files_obj.close();
+
+  return render_to_response("ndf/data_review.html",
+                            {
+                              "group_id": group_id, "groupid": group_id,
+                              "files": files_list
+                            },
+                            context_instance=RequestContext(request)
+                          )

@@ -23,6 +23,10 @@
 
   <!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> <!-- checked -->
+    
+  <!-- Open Source webfonts for better typography -->
+  <!--link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'-->
 
   <!-- Modernizr - Browser detection JS http://modernizr.com/ -->
   <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script> <!-- checked -->
@@ -60,11 +64,13 @@
     
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
+{% get_group_object groupid as group_object %}
+      
     <nav class="top-bar drop-shadow" data-topbar>
 
       <ul class="title-area">
       	<li class="name">
-      	  <h1><a href="/home" accesskey="q"><img src="/static/ndf/css/themes/metastudio/logo.svg"></a></h1>
+      	  <h1><a href="/home/" accesskey="q"><img src="/static/ndf/css/themes/metastudio/logo.svg"></a></h1>
       	</li>
       	<li class="toggle-topbar menu-icon">
       	  <a href="#">{% trans "Menu" %}</a>
@@ -75,18 +81,50 @@
 	
 	<!-- Right Nav Section -->
 	<ul class="right">
+        
+        <li class="has-form show-on-hover search">
+            
+            <form 
+                      {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                      name="search_form" method="GET" >
+          <div class="row collapse">
+            <div class="large-8 small-9 columns">
+              <input type="text" name="search_text" id="search_text" placeholder="Search {{group_object.name}}" autocomplete="off" required/>
+            </div>
+            <div class="large-4 small-3 columns">
+              <input type="submit" class="button expand" value="Submit" />
+            </div>
+             </div>
+              
+<!-- Hiding search options on the top bar, this is available from the results page to refine-->
+                   <!--ul class="show">
+	      	<li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
+                <label for="chk_name">Name</label>
+            </li>
+            <li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
+                <label for="chk_tags">Tags</label>
+            </li>
+            <li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
+                <label for="chk_content">Contents</label><br>
+			</li>
+			<li >
+				{% if groupid %}
+				<a href="{% url 'search_page' groupid %}">Advanced Search</a>
+				{% endif %}
+			</li>
+	      
+	    </ul-->
+
+          
+                </form>
+        </li>
 	  
-	  <!-- Top bar search form -->
-	  <li class="has-form">
-	    <div id="search-bar" class="row collapse">
-	      <div class="large-12 small-12 columns">
-		      <input type="text" placeholder="coming soon ..">
-	      </div>
-	    </div>
-	  </li>
 
 
-          {% get_group_object groupid as group_object %}
+          
       	  
           <!-- If logged in show user options -->
       	  {% if user.is_authenticated %}
@@ -94,13 +132,13 @@
       	    {% get_profile_pic  request.user as prof_pic %}
 
       	    {% if prof_pic %}
-      	    <a href="{% url 'userDashboard' group_object request.user.pk %}">
+      	    <a href="{% url 'dashboard' request.user.pk %}">
       	      <img  src="{% url 'getImageThumbnail' group_object prof_pic %}" height="30" width="30">
       	      {{ user.username }}
       	    </a>
       	    
       	    {% else %}
-      	    <a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_object request.user.pk %}">
+      	    <a class="user" data-gnow="#aabb44" href="{% url 'dashboard' request.user.pk %}">
       	      {{ user.username }}
       	    </a>
       	    {% endif %}
@@ -207,7 +245,6 @@
 
         <aside class="large-3 medium-4 columns">
           <div>
-            <h2><a class="active-menu" href="{% url 'groupchange' group_object.name %}">{{group_object.name}}</a></h2>
             {% get_gapps_iconbar request groupid %}
             <header>
               {% block meta_content %}  {% endblock %} 
@@ -240,7 +277,7 @@
                   <label>Help</label>
                 </a> 
                             
-        				<a class="item user" href="{% url 'userDashboard' group_object request.user.pk %}">
+        				<a class="item user" href="{% url 'dashboard' request.user.pk %}">
           				<label>My profile</label>
         				</a>
       				</div>
@@ -294,9 +331,11 @@
       
       <div class="medium-3 columns">    	
              <p>
-                <span class="gnu-badge show-span-on-hover">{% trans "100% स्वतंत्" %}
+                 <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a>
+
+                <span class="xgnu-badge show-span-on-hover hide">{% trans "100% स्वतंत्" %}
                     <span>
-        <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a></span></span>
+        </span></span>
         <br>
         
           <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/>
@@ -447,6 +486,7 @@
     }); //document closes
 
   	{% block script %} {% endblock %}	
+
   </script>
   
   <script src="/static/ndf/js/app.js"></script> <!-- checked -->
