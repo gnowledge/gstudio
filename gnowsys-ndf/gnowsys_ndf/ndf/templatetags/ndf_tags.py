@@ -1641,7 +1641,10 @@ def html_widget(groupid, node_id, field):
     field['altnames'] = field_altnames
 
     if not field_value:
-      field_value = ""
+      if type(field_type) == IS:
+      	field_value = [] 
+      else:
+      	field_value = ""
 
     if type(field_type) == type:
       field_type = field_type.__name__
