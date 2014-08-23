@@ -215,6 +215,8 @@
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   		<!-- Existing card list-->
+		{% get_preferred_lang request nodes "Theme" as nodes %}
+
 	  	{% for each in nodes %}
 		    <li class="card">
 		      <div class="page">

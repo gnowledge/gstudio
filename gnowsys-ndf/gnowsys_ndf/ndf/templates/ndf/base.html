@@ -480,7 +480,8 @@
         data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
 
         success:function(data){
-          alert("Successfully set the preferences"); 
+          alert("Successfully set the preferences");
+	  location.reload()
         }
       }); //ajax closes
     }); //document closes
