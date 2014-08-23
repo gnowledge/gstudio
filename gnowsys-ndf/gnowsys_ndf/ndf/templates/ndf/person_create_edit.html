@@ -5,31 +5,33 @@
 
 {% block style %}
 // <style type="text/css">
-.divider-line { font-size: xx-large; color:lightgray; }
-.line-height-2 { line-height:2; }
-.line-height-2pt5 { line-height:2.5; }
-.fontsize-x-large { font-size: x-large; }
 
-.margin-0 { margin: 0 !important ;}
+/* CSS for Multiple-selection (or drawer) widget */
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
 
-.resource-drawer { 
-  border-color: #D3D3D3; border-style: solid; 
-  padding: 0 !important; 
-  overflow-y: auto;
-}
+  .margin-0 { margin: 0 !important ;}
 
-.resource-drawer li.bullet-item:hover{
-  background-color: #ecf0f1; cursor:pointer;
-}
+  .resource-drawer { 
+    border-color: #D3D3D3; border-style: solid; 
+    padding: 0 !important; 
+    overflow-y: auto;
+  }
 
-.posted-by{ color: #808080; font-size: small; }
+  .resource-drawer li.bullet-item:hover{
+    background-color: #ecf0f1; cursor:pointer;
+  }
 
-.selected-resource { background-color:lightgray !important ; }
+  .posted-by{ color: #808080; font-size: small; }
 
-.resource-type-image {
-  height:40px;    
-  background-repeat:no-repeat; background-size: 48px 48px
-}
+  .selected-resource { background-color:lightgray !important ; }
+
+  .resource-type-image {
+    height:40px;    
+    background-repeat:no-repeat; background-size: 48px 48px
+  }
 
 /* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
   dl.tabs>dd a.disable {
@@ -42,42 +44,42 @@
 {% block body_content %} 
   <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
 
-    <header class="row">
+    <header class="row" style="margin: 1rem 0 0 0 ;">
       <h2 class="small-12 columns">
         {% if node %}
-        {% trans "Editing" %} {{title}}: {{node.name}}
+        {% blocktrans with title_var=title node_name=node.name %} Editing {{title_var}}: {{node_name}} {% endblocktrans %}
         {% else %}
-        {% trans "Register a New" %} {{title}}
+        {% blocktrans with title_var=title %} Register a New {{title_var}} {% endblocktrans %}
         {% endif %}
       </h2>
-
-      <nav class="small-12 columns" style="margin-top: 1rem; margin-bottom: 0;">
-        <dl class="tabs" data-tab>
-          <dd>
-            <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
-          </dd>
-
-          {% for tab_details in property_order_list %}
-          <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
-            <a href="#panel_{{tab_details.0}}" class="disable">
-              {% blocktrans with tab_name=tab_details.0 %} {{tab_name}} {% endblocktrans %}
-            </a>
-          </dd>
-          {% endfor %}
-        </dl>
-      </nav>
     </header>
+
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab>
+        <dd>
+          <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
+        </dd>
+
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}" class="disable">
+            {% blocktrans with tab_name=tab_details.0 %} {{tab_name}} {% endblocktrans %}
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
 
     {% csrf_token %}
 
-    <br>
-    <div id="event-details-edit-div" class="tabs-content" >
+    <div id="people-details-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
       {% for tab_name, tab_fields_list in property_order_list %}
       <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+        <br>
         {% for field in tab_fields_list %}
         <div class="row">
           <div class="small-3 columns"> 
-            <label for="{{field.name}}" class="left inline">
+            <label for="{{field.name}}" class="right inline">
               {% blocktrans with field_label=field.altnames %} {{field_label}} {% endblocktrans %}
             </label>
           </div>
