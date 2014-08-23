@@ -10,6 +10,7 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
+
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
@@ -979,10 +980,16 @@ def get_group_type(group_id, user):
 
 			else:
 				gid = split_content[1]
-
+			
 			# gid = group_id.replace("/", "").strip()
+			
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
+
+				#check for valid Django Id
+			elif user.id is not None and (int(user.id) == int(gid)) :
+				colg = col_Group.Node.find_one({'_type': "Author", 'created_by': int(gid)})
+
 			else:
 				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
 				if colg :
@@ -990,6 +997,8 @@ def get_group_type(group_id, user):
 
 				else:		
 					colg = None
+
+						
   		
 		# Check if Group exists in the database
 		if colg is not None:
