@@ -43,7 +43,7 @@
 				{% endif %}
 
 			<div id="pic_div" style="display:none;">
-				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'userDashboard' group_name_tag usr %}">
+				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
 					{% csrf_token %}
 					<input type="file" name="doc[]"  id="docFile" multiple/>
 
@@ -440,7 +440,7 @@
 					<li class="bullet-item text-left"> 					
 						<div class="row">
 							<div class="small-6 columns">
-								<a href="{% url 'userDashboard' group_name_tag each.Id %}">{{ each.usrname }}  </a> 	
+								<a href="{% url 'dashboard' each.Id %}">{{ each.usrname }}  </a> 	
 							</div>
 							<div class="small-6 columns">
 								<a href="">{% blocktrans %} modified: {{each.resource}}{% endblocktrans %}  </a>
