@@ -169,6 +169,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   property_order_list = []
 
+  template = ""
   template_prefix = "mis"
 
   for eachset in app.collection_set:
@@ -176,6 +177,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   if app_set_id:
     person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_create_edit.html"
     title = person_gst.name
     person_gs = collection.GSystem()
     person_gs.member_of.append(person_gst._id)
@@ -272,7 +274,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
-  template = "ndf/person_create_edit.html"
+  default_template = "ndf/person_create_edit.html"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
@@ -289,7 +291,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
     # return render_to_response([template, default_template], 
-    return render_to_response(template, 
+    return render_to_response([template, default_template], 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
