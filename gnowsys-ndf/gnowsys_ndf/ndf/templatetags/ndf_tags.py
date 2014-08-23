@@ -1451,22 +1451,39 @@ def get_resource_collection(groupid, resource_type):
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+
 @register.assignment_tag
-def get_language_specific_nodes(request,nodes):
-   get_username=request.user.username
-   #uname=collection.Node.one('name':str(get_username),'_type':'Author')   
-   node_list=[]
-   pri_lang=u"hi"
-   sec_lang=u"en"
-   default=u"en"
-   #print uname,uname.preferred_languages,"$$$$$$$$$$$$$"
-   page=collection.Node.one({'name':u'Page','_type':'GSystemType'})
+def get_preferred_lang(request, nodes, node_type):
+   uname=collection.Node.one({'name':str(request.user.username)})
+   primary_list=[]
+   secondary_list=[]
+   default_list=[]
+   pref_lan=uname.preferred_languages
+   node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
    try:
       for each in nodes:
-         get_node=collection.Node.one({'$and':[{'member_of':page._id},{'group_set':ObjectId('5344df711606ea09bfef15f1')},{'language':{'$in':[pri_lang,sec_lang,default]}},{'_id':each._id}]})
-         if get_node:
-            node_list.append(get_node)
-      return node_list
+         if (pref_lan['primary'] != pref_lan['default']):
+            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            if primary_nodes:
+               primary_list.append(primary_nodes)
+         
+            else:
+               if (pref_lan['secondary'] != pref_lan['default']):
+                  secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref__lan['secondary']},{'_id':each._id}]})
+                  if secondary_nodes:
+                     secondary_list.append(secondary_nodes)
+            
+         if (pref_lan['secondary'] == pref_lan['default']) and (pref_lan['primary'] == pref_lan['default']):
+            default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['default']},{'_id':each._id}]})
+            if default_nodes:
+               default_list.append(default_nodes)
+      if primary_list:
+         return primary_list
+      if secondary_list:
+         return secondary_list
+      if default_list:
+         return default_list
+      
    except Exception as e:
       return 'error'
 

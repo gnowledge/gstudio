@@ -106,7 +106,9 @@
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
-  {% autopaginate page_nodes 23 %}
+{% get_preferred_lang request page_nodes "Page" as page_nodes %}
+
+{% autopaginate page_nodes 23 %}
 
   <!-- Existing card list-->
   {% for node in page_nodes %}
