@@ -1399,6 +1399,25 @@ def get_resource_collection(groupid, resource_type):
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+@register.assignment_tag
+def get_language_specific_nodes(request,nodes):
+   get_username=request.user.username
+   #uname=collection.Node.one('name':str(get_username),'_type':'Author')   
+   node_list=[]
+   pri_lang=u"hi"
+   sec_lang=u"en"
+   default=u"en"
+   #print uname,uname.preferred_languages,"$$$$$$$$$$$$$"
+   page=collection.Node.one({'name':u'Page','_type':'GSystemType'})
+   try:
+      for each in nodes:
+         get_node=collection.Node.one({'$and':[{'member_of':page._id},{'group_set':ObjectId('5344df711606ea09bfef15f1')},{'language':{'$in':[pri_lang,sec_lang,default]}},{'_id':each._id}]})
+         if get_node:
+            node_list.append(get_node)
+      return node_list
+   except Exception as e:
+      return 'error'
+
 # getting video metadata from wetube.gnowledge.org
 @register.assignment_tag
 def get_pandoravideo_metadata(src_id):
@@ -1409,8 +1428,6 @@ def get_pandoravideo_metadata(src_id):
     return mdata
   except Exception as e:
     return 'null'
-
-
 
 @register.assignment_tag
 def get_source_id(obj_id):
