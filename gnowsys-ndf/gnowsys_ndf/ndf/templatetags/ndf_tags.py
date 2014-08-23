@@ -996,7 +996,7 @@ def get_group_type(group_id, user):
 							if int(user.id) == int_gid:
 								colg = col_Group.Node.one({'_type': "Author", 'created_by': int_gid})
 						else:
-							error_message = "Access denied: Dashboard url found, but it's not a valid django's ID ("+gid+")!!!"
+							error_message = "Access denied: Dashboard url found, but it's an invalid django's ID ("+gid+")!!!"
 							raise Http404(error_message)
 
 				else:
