@@ -31,6 +31,11 @@
   background-repeat:no-repeat; background-size: 48px 48px
 }
 
+/* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+  dl.tabs>dd a.disable {
+    pointer-events: none;
+    cursor: default;
+  }
 // </style>
 {% endblock %}
 
@@ -54,7 +59,9 @@
 
           {% for tab_details in property_order_list %}
           <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
-            <a href="#panel_{{tab_details.0}}">{% blocktrans with tab_name=tab_details.0 %}{{tab_name}}{% endblocktrans %}</a>
+            <a href="#panel_{{tab_details.0}}" class="disable">
+              {% blocktrans with tab_name=tab_details.0 %} {{tab_name}} {% endblocktrans %}
+            </a>
           </dd>
           {% endfor %}
         </dl>
@@ -70,7 +77,9 @@
         {% for field in tab_fields_list %}
         <div class="row">
           <div class="small-3 columns"> 
-            <label for="{{field.name}}" class="left inline"> {{field.altnames}} </label>
+            <label for="{{field.name}}" class="left inline">
+              {% blocktrans with field_label=field.altnames %} {{field_label}} {% endblocktrans %}
+            </label>
           </div>
           <div class="small-9 columns">
             {% html_widget groupid node.pk field %}
@@ -142,21 +151,32 @@
         if (i != totalTabs) {
           // Not in last tab
           $(this).children(".tab-nav").children(".for-next")
-            .append("<input type='button' class='button small round' id='tab-next' value='Next'>");
+            .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
         }
 
         if (i == totalTabs) {
           // Only in last tab
           $(this).children(".tab-nav").children(".for-save")
-            .append("<input type='submit' id='save-node' class='small button expand' value='Register' />");
+            .append("<input type='submit' id='save-node' class='small button expand' value='{% trans 'Register' %}' />");
         }
 
         if (i != 0) {
           // Not in first tab
           $(this).children(".tab-nav").children(".for-prev")
-            .append("<input type='button' class='button small round' id='tab-prev' value='Previous' style='float:right;'>");
+            .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
         }
       });
+  });
+
+// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons ----------
+  $(".content").on('click', '.tab_next' ,function(event){
+    event.preventDefault();
+    $('.active').removeClass('active').next().addClass('active');
+  });
+
+  $(".content").on('click', '.tab_prev' ,function(event){
+    event.preventDefault();
+    $('.active').removeClass('active').prev().addClass('active');
   });
 
 // Only keeping year's drop-down and hiding other datepicker's elements ---------------------------------
