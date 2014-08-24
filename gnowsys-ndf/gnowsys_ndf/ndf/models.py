@@ -1635,6 +1635,7 @@ class GRelation(Triple):
 @connection.register
 class ReducedDocs(DjangoDocument):
 	structure={
+    '_type': unicode,
 		'content':dict, #This contains the content in the dictionary format
 		'orignal_id':ObjectId,#The object ID of the orignal document
 		'required_for':unicode,
@@ -1645,6 +1646,7 @@ class ReducedDocs(DjangoDocument):
 @connection.register
 class ToReduceDocs(DjangoDocument):
 	structure={
+    '_type': unicode,
 		'doc_id':ObjectId,
 		'required_for':unicode,
 	}
@@ -1653,6 +1655,7 @@ class ToReduceDocs(DjangoDocument):
 @connection.register
 class IndexedWordList(DjangoDocument):
 	structure={
+    '_type': unicode,
 		'word_start_id':float,
 		'words':dict,
 		'required_for':unicode,
