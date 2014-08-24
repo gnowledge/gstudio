@@ -967,6 +967,7 @@ def get_group_type(group_id, user):
 		# Splitting url-content based on backward-slashes
 		split_content = group_id.strip().split("/")
 		gid = ""
+		colg = None
 
 		if group_id == '/home/':
 			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -986,19 +987,27 @@ def get_group_type(group_id, user):
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
 
-				#check for valid Django Id
-			elif user.id is not None and (int(user.id) == int(gid)) :
-				colg = col_Group.Node.find_one({'_type': "Author", 'created_by': int(gid)})
-
 			else:
-				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
-				if colg :
+				if 'dashboard' in group_id and gid != 'dashboard':
+					# It means it's a dashboard url and instead of ObjectId's check, check for django's ID
+					if user.id is not None:
+						if gid.isdigit():
+							int_gid = int(gid)
+							if int(user.id) == int_gid:
+								colg = col_Group.Node.one({'_type': "Author", 'created_by': int_gid})
+						else:
+							error_message = "Access denied: Dashboard url found, but it's an invalid django's ID ("+gid+")!!!"
+							raise Http404(error_message)
+
+				else:
+					# Case: Here instead of group's ObjectId, name is found
+					colg = col_Group.Node.one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
+
+				if colg:
 					pass
 
 				else:		
 					colg = None
-
-						
   		
 		# Check if Group exists in the database
 		if colg is not None:
