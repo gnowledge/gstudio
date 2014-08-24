@@ -409,21 +409,21 @@ class Node(DjangoDocument):
    	#document is present or not.
    	#If the id is not present then add that id.If it is present then do not add that id
    		
-   	old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})	
-    	if not old_doc:
+   	old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
+        
+    	if  not old_doc:
     		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
     		z = collection.ToReduceDocs()
     		z.doc_id = self._id
     		z.required_for = to_reduce_doc_requirement
     		z.save()
-    		
+    			
     	#If you create/edit anything then this code shall add it in the URL
     	#===================================================================================================================#
-        
+
         history_manager = HistoryManager()
         rcs_obj = RCS()
-
-        if is_new:
+	if is_new:
             # Create history-version-file
             try:
                 if history_manager.create_or_replace_json_file(self):
@@ -1452,8 +1452,7 @@ class Triple(DjangoDocument):
 
   def save(self, *args, **kwargs):
     is_new = False
-
-
+    
     if not self.has_key('_id'):
       is_new = True               # It's a new document, hence yet no ID!"
 
@@ -1564,14 +1563,13 @@ class Triple(DjangoDocument):
     
     history_manager = HistoryManager()
     rcs_obj = RCS()
-
     if is_new:
       # Create history-version-file
       if history_manager.create_or_replace_json_file(self):
         fp = history_manager.get_file_path(self)
         message = "This document (" + self.name + ") is created on " + datetime.datetime.now().strftime("%d %B %Y")
         rcs_obj.checkin(fp, 1, message.encode('utf-8'), "-i")
-
+    
     else:
       # Update history-version-file
       fp = history_manager.get_file_path(self)
