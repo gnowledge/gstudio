@@ -5,7 +5,6 @@
 
 {% block style %}
 // <style type="text/css">
-
 /* CSS for Multiple-selection (or drawer) widget */
   .divider-line { font-size: xx-large; color:lightgray; }
   .line-height-2 { line-height:2; }
@@ -108,45 +107,14 @@
 {% endblock %}
 
 {% block script %}
-  // <script type="text/javascript">
-
-// Default settings for date-widgets & tabs on page load ------------------------------------------------
+// <script type="text/javascript">
+// Default settings for date-widgets & tabs on page load ---------------------------------------------------------
   var currentYear = (new Date()).getFullYear()
   lowerYearRange = currentYear - 80;
   upperYearRange = currentYear + 20;
 
   $(function() {
-    // Settings for datepicker widget (with all) --------------------------------------------------------
-      $(".date_month_day_year").datepicker({
-        changeMonth: true,
-        changeYear: true,
-        yearRange: "" + lowerYearRange + ":" + upperYearRange
-      });
-
-    // Settings for datepicker widget (only for year) ---------------------------------------------------
-      $(".date_year").datepicker({
-        changeYear: true,
-        dateFormat: 'yy',
-        yearRange: "" + lowerYearRange + ":" + upperYearRange,
-
-        onClose: function(dateText, inst) {
-          $(this).val(dateText)
-        },
-
-        beforeShow: function() {
-          var year = $(this).val();
-          if (year) {
-            $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
-            $(this).datepicker('setDate', new Date(year, 1, 1));
-          }
-        },
-
-        onChangeMonthYear: function(year, month, inst){
-          $(this).val(year)
-        }
-      });
-
-    // Tabs: Adding Next and Previous buttons for navigation --------------------------------------------
+    // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
       $(".content").each(function(i) {
         totalTabs = $(".content").size() - 1
 
@@ -168,12 +136,51 @@
             .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
         }
       });
+
+    // Settings for datepicker widget (with all) -----------------------------------------------------------------
+      $(".date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "" + lowerYearRange + ":" + upperYearRange
+      });
+
+    // Settings for datepicker widget (only for year) ------------------------------------------------------------
+      $(".date_year").datepicker({
+        changeYear: true,
+        dateFormat: 'yy',
+        yearRange: "" + lowerYearRange + ":" + upperYearRange,
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText)
+        },
+
+        beforeShow: function() {
+          var year = $(this).val();
+          if (year) {
+            $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+            $(this).datepicker('setDate', new Date(year, 1, 1));
+          }
+        },
+
+        onChangeMonthYear: function(year, month, inst){
+          $(this).val(year)
+        }
+      });
   });
 
-// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons ----------
+// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
   $(".content").on('click', '.tab_next' ,function(event){
     event.preventDefault();
-    $('.active').removeClass('active').next().addClass('active');
+
+    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+    $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+    // Then check no. of data-invalid fields
+    // if count == 0, then only proceed to next tab
+    if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+      // Valid, move to next step
+      $('.active').removeClass('active').next().addClass('active');
+    }
   });
 
   $(".content").on('click', '.tab_prev' ,function(event){
@@ -181,7 +188,7 @@
     $('.active').removeClass('active').prev().addClass('active');
   });
 
-// Only keeping year's drop-down and hiding other datepicker's elements ---------------------------------
+// Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
   $(document).on('focus click', '.date_year' ,function(){
     $(".ui-datepicker-calendar").hide();
     $(".ui-datepicker-month").hide();
@@ -194,7 +201,7 @@
     }); 
   });
 
-// State-wise District selection ------------------------------------------------------------------------
+// State-wise District selection ---------------------------------------------------------------------------------
 
   // Disable District field, later on will be enabled after a state is selected
   $("select#person_belongs_to_district").attr('disabled', 'disabled')
@@ -264,7 +271,7 @@
     }
   });
 
-// Tranferring values from multiple selection widget into outer dropdown --------------------------------
+// Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
   $(document).on('closed', '[data-reveal]', function () {
     /*
      *  On closing of reveal-modal
@@ -305,10 +312,9 @@
     }
   });
 
-// On click of save -------------------------------------------------------------------------------------
+// On click of save ----------------------------------------------------------------------------------------------
   $("#save-node").click(function() {
-    
-  // Store concatenated first, middle & last name field's values into name field (hidden input field)
+  // Store concatenated first, middle & last name field's values into name field (hidden input field) ------------
     name = ""
     first_name = $("#first_name").val().trim()
     middle_name = $("#middle_name").val().trim()
@@ -325,11 +331,13 @@
 
     $("#name").val(name)
 
-  // Enable any disabled field
-    $("select#person_belongs_to_district").removeAttr('disabled')
+  // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+    $(".content").find(":input[disabled]").each(function(){
+      $(this).removeAttr('disabled');
+    });
   });
 
-// totWhen ----------------------------------------------------------------------------------------------
+// totWhen -------------------------------------------------------------------------------------------------------
   var totWhen = $("#tot_when")
 
   if(totWhen.length > 0) {
@@ -366,6 +374,6 @@
 
     return datesList;
   }
-  // </script>
+// </script>
 
 {% endblock %}
