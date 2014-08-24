@@ -3,6 +3,7 @@ import os
 import csv
 import json
 import ast
+import time
 # import mimetypes
 
 ''' imports from installed packages '''
@@ -26,6 +27,7 @@ from gnowsys_ndf.ndf.models import Node, GSystemType, AttributeType, RelationTyp
 SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
 
 log_list = [] # To hold intermediate errors
+log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 collection = get_database()[Node.collection_name]
 is_json_file_exists = False
