@@ -5,7 +5,6 @@
 
 {% block style %}
 // <style type="text/css">
-
 /* CSS for Multiple-selection (or drawer) widget */
   .divider-line { font-size: xx-large; color:lightgray; }
   .line-height-2 { line-height:2; }
@@ -72,7 +71,6 @@
 
     {% csrf_token %}
 
-    <!-- border-color: #0c949c ba891 -->
     <div id="people-details-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
       <!-- Personal-Details tab /////////////////////////////////////////////////////////////////////// -->
       <div class="active content row" id="panel_{{property_order_list.0.0}}">
@@ -453,20 +451,43 @@
 {% block script %}
   // <script type="text/javascript">
 
-// Default settings for date-widgets & tabs on page load ------------------------------------------------
+// Default settings for tabs, date-widgets & college-dropdown on page load ---------------------------------------
   var currentYear = (new Date()).getFullYear()
   lowerYearRange = currentYear - 80;
   upperYearRange = currentYear + 20;
 
   $(function() {
-    // Settings for datepicker widget (with all) --------------------------------------------------------
+    // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
+      $(".content").each(function(i) {
+        totalTabs = $(".content").size() - 1
+
+        if (i != totalTabs) {
+          // Not in last tab
+          $(this).children(".tab-nav").children(".for-next")
+            .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
+        }
+
+        if (i == totalTabs) {
+          // Only in last tab
+          $(this).children(".tab-nav").children(".for-save")
+            .append("<input type='submit' id='save-node' class='small button expand' value='{% trans 'Register' %}' style='float:right;' />");
+        }
+
+        if (i != 0) {
+          // Not in first tab
+          $(this).children(".tab-nav").children(".for-prev")
+            .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
+        }
+      });
+
+    // Settings for datepicker widget (with all) -----------------------------------------------------------------
       $(".date_month_day_year").datepicker({
         changeMonth: true,
         changeYear: true,
         yearRange: "" + lowerYearRange + ":" + upperYearRange
       });
 
-    // Settings for datepicker widget (only for year) ---------------------------------------------------
+    // Settings for datepicker widget (only for year) ------------------------------------------------------------
       $(".date_year").datepicker({
         changeYear: true,
         dateFormat: 'yy',
@@ -489,34 +510,33 @@
         }
       });
 
-    // Tabs: Adding Next and Previous buttons for navigation --------------------------------------------
-      $(".content").each(function(i) {
-        totalTabs = $(".content").size() - 1
+    // Retrieve group-name & match with list of college-names from dropdown --------------------------------------
+      {% get_group_name groupid as group_name_tag %}
+      var group_name_str = "{{group_name_tag}}";
 
-        if (i != totalTabs) {
-          // Not in last tab
-          $(this).children(".tab-nav").children(".for-next")
-            .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
-        }
-
-        if (i == totalTabs) {
-          // Only in last tab
-          $(this).children(".tab-nav").children(".for-save")
-            .append("<input type='submit' id='save-node' class='small button expand' value='{% trans 'Register' %}' style='float:right;' />");
-        }
-
-        if (i != 0) {
-          // Not in first tab
-          $(this).children(".tab-nav").children(".for-prev")
-            .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
+      $("#student_belongs_to_college option").each(function(){
+        // If group-name matches with that of college-name, 
+        // then select that college from drop-down and disable it
+        if (group_name_str == $(this).text()) {
+          $(this).attr("selected", true);
+          $(this).parent().attr("disabled", "disabled");
         }
       });
   });
 
-// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons ----------
+// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
   $(".content").on('click', '.tab_next' ,function(event){
     event.preventDefault();
-    $('.active').removeClass('active').next().addClass('active');
+
+    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+    $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+    // Then check no. of data-invalid fields
+    // if count == 0, then only proceed to next tab
+    if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+      // Valid, move to next step
+      $('.active').removeClass('active').next().addClass('active');
+    }
   });
 
   $(".content").on('click', '.tab_prev' ,function(event){
@@ -524,8 +544,8 @@
     $('.active').removeClass('active').prev().addClass('active');
   });
 
-// Only keeping year's drop-down and hiding other datepicker's elements ---------------------------------
-  $(document).on('focus click', '.date_year' ,function(){
+// Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+  $(document).on('focus click blur', '.date_year' ,function(){
     $(".ui-datepicker-calendar").hide();
     $(".ui-datepicker-month").hide();
     $(".ui-datepicker-prev").hide();
@@ -537,7 +557,7 @@
     }); 
   });
 
-// State-wise District selection ------------------------------------------------------------------------
+// State-wise District selection ---------------------------------------------------------------------------------
 
   // Disable District field, later on will be enabled after a state is selected
   $("select#person_belongs_to_district").attr('disabled', 'disabled')
@@ -607,7 +627,7 @@
     }
   });
 
-// Tranferring values from multiple selection widget into outer dropdown --------------------------------
+// Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
   $(document).on('closed', '[data-reveal]', function () {
     /*
      *  On closing of reveal-modal
@@ -648,10 +668,9 @@
     }
   });
 
-// On click of save -------------------------------------------------------------------------------------
+// On click of save ----------------------------------------------------------------------------------------------
   $("#save-node").click(function() {
-    
-  // Store concatenated first, middle & last name field's values into name field (hidden input field)
+  // Store concatenated value of first, middle & last name field's values into name field (hidden input field) ---
     name = ""
     first_name = $("#first_name").val().trim()
     middle_name = $("#middle_name").val().trim()
@@ -666,10 +685,11 @@
       name = name + " " + last_name
     }
 
-    $("#name").val(name)
-
-  // Enable any disabled field
-    $("select#person_belongs_to_district").removeAttr('disabled')
+    $("#name").val(name);
+  
+  // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+    $(".content").find(":input[disabled]").each(function(){
+      $(this).removeAttr('disabled');
+    });
   });
-
 {% endblock %}
