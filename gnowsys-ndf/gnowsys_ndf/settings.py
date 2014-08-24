@@ -363,9 +363,9 @@ INSTALLED_APPS = (
     'online_status',                       #for online_users     
 )
 
-AUTHENTICATION_BACKENDS=(
-'registration_email.auth.EmailBackend',
-)
+# AUTHENTICATION_BACKENDS=(
+# 'registration_email.auth.EmailBackend',
+# )
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
 

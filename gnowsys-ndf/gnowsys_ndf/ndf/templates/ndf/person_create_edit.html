@@ -123,8 +123,7 @@
       yearRange: "" + lowerYearRange + ":" + upperYearRange,
 
       onClose: function(dateText, inst) {
-        var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-        $(this).datepicker('setDate', new Date(year, 1, 1));
+        $(this).val(dateText)
       },
 
       beforeShow: function() {
@@ -133,6 +132,10 @@
           $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
           $(this).datepicker('setDate', new Date(year, 1, 1));
         }
+      },
+
+      onChangeMonthYear: function(year, month, inst){
+        $(this).val(year)
       }
     });
 

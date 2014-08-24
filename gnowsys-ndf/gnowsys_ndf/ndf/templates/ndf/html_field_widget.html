@@ -20,20 +20,6 @@
     </div>
   </div>
 
-  {% elif is_mongokit_is_radio %}
-    <div style="float:left;">
-    {% for value in field_value_choices %}
-    {% if forloop.counter != 1 %}
-    &nbsp;&nbsp;&nbsp;
-    {% endif %}
-    <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
-    {% endfor %}
-    </div>
-    {% if is_required_field %}
-    <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %} Please select {{alt}}!!! {% endblocktrans %}</small>
-    {% endif %}
-
   {% elif field_type == "unicode" or field_type == "basestring" %}
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; {% if is_required_field %}width:95%{% endif %}"/>
     {% if is_required_field %}
@@ -104,6 +90,36 @@
         $('#uploadFile').val(this.value);
       });
     </script>
+
+  {% else %}
+
+    <!-- Special check for IS() : True (radio buttons) & False (dropdown) -->
+    {% if is_mongokit_is_radio %}
+      <div style="float:left;">
+      {% for value in field_value_choices %}
+      {% if forloop.counter != 1 %}
+      &nbsp;&nbsp;&nbsp;
+      {% endif %}
+      <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
+      {% endfor %}
+      </div>
+      {% if is_required_field %}
+      <i style="color:red; float:left display:inline">*</i>
+      <small class="error">{% blocktrans with alt=field.altnames %} Please select {{alt}}!!! {% endblocktrans %}</small>
+      {% endif %}
+
+    {% else %}
+      <select id="{{field.name}}" name="{{field.name}}" required="" style="float:left; width:95%">
+        <option value="">- - - Select {{field.altnames|lower}} - - -</option>
+        {% for choice in field_value_choices %}
+        <option value="{{choice.pk}}" {% if choice in field_value %} selected {% endif %} >{{choice}}</option>
+        {% endfor %}
+      </select>
+      <i style="color:red; float:left display:inline">*</i>
+      <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>  
+
+    {% endif %}
+
 
   {% endif %}
 

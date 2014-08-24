@@ -10,6 +10,7 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
+
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
@@ -979,10 +980,16 @@ def get_group_type(group_id, user):
 
 			else:
 				gid = split_content[1]
-
+			
 			# gid = group_id.replace("/", "").strip()
+			
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
+
+				#check for valid Django Id
+			elif user.id is not None and (int(user.id) == int(gid)) :
+				colg = col_Group.Node.find_one({'_type': "Author", 'created_by': int(gid)})
+
 			else:
 				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
 				if colg :
@@ -990,6 +997,8 @@ def get_group_type(group_id, user):
 
 				else:		
 					colg = None
+
+						
   		
 		# Check if Group exists in the database
 		if colg is not None:
@@ -1442,6 +1451,42 @@ def get_resource_collection(groupid, resource_type):
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+
+@register.assignment_tag
+def get_preferred_lang(request, nodes, node_type):
+   uname=collection.Node.one({'name':str(request.user.username)})
+   primary_list=[]
+   secondary_list=[]
+   default_list=[]
+   pref_lan=uname.preferred_languages
+   node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
+   try:
+      for each in nodes:
+         if (pref_lan['primary'] != pref_lan['default']):
+            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            if primary_nodes:
+               primary_list.append(primary_nodes)
+         
+            else:
+               if (pref_lan['secondary'] != pref_lan['default']):
+                  secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref__lan['secondary']},{'_id':each._id}]})
+                  if secondary_nodes:
+                     secondary_list.append(secondary_nodes)
+            
+         if (pref_lan['secondary'] == pref_lan['default']) and (pref_lan['primary'] == pref_lan['default']):
+            default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['default']},{'_id':each._id}]})
+            if default_nodes:
+               default_list.append(default_nodes)
+      if primary_list:
+         return primary_list
+      if secondary_list:
+         return secondary_list
+      if default_list:
+         return default_list
+      
+   except Exception as e:
+      return 'error'
+
 # getting video metadata from wetube.gnowledge.org
 @register.assignment_tag
 def get_pandoravideo_metadata(src_id):
@@ -1452,8 +1497,6 @@ def get_pandoravideo_metadata(src_id):
     return mdata
   except Exception as e:
     return 'null'
-
-
 
 @register.assignment_tag
 def get_source_id(obj_id):
@@ -1641,7 +1684,10 @@ def html_widget(groupid, node_id, field):
     field['altnames'] = field_altnames
 
     if not field_value:
-      field_value = ""
+      if type(field_type) == IS:
+      	field_value = [] 
+      else:
+      	field_value = ""
 
     if type(field_type) == type:
       field_type = field_type.__name__
