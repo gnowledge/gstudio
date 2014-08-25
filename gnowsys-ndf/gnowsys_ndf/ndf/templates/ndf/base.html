@@ -5,7 +5,7 @@
 {% load ndf_tags %}
 {% load i18n %}
 {% get_group_name groupid as group_name_tag %}
-
+     
 <head>
 
   <meta charset="utf-8">
@@ -70,7 +70,8 @@
 
       <ul class="title-area">
       	<li class="name">
-      	  <h1><a href="/home/" accesskey="q"><img src="/static/ndf/css/themes/metastudio/logo.svg"></a></h1>
+     {% get_site_variables as site %}
+      	  <h1><a href="/home/" accesskey="q"><img src="{{site.LOGO}}"></a></h1>
       	</li>
       	<li class="toggle-topbar menu-icon">
       	  <a href="#">{% trans "Menu" %}</a>
@@ -328,14 +329,18 @@
   <footer>
 
       
-      
       <div class="medium-3 columns">    	
              <p>
                  <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a>
 
                 <span class="xgnu-badge show-span-on-hover hide">{% trans "100% स्वतंत्" %}
                     <span>
-        </span></span>
+
+
+
+        <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a>
+		</span></span>
+
         <br>
         
           <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/>
@@ -352,12 +357,12 @@
       <div class="medium-7 columns">
          
           <ul class="inline-list">
-  <li><a href="#">About</a></li>
-  <li><a href="#">GNOWSYS</a></li>
-  <li><a href="#">Partners</a></li>
-  <li><a href="#">Terms of Service</a></li>
-  <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Contact</a></li>
+  <li><a href="{{site.ABOUT}}">About</a></li>
+  <li><a href="{{site.SITE_POWEREDBY}}">Powered by</a></li>
+  <li><a href="{{site.PARTNERS}}">Partners</a></li>
+  <li><a href="{{site.TERMS_OF_SERVICE}}">Terms of Service</a></li>
+  <li><a href="{{site.PRIVACY_POLICY}}">Privacy Policy</a></li>
+              <li><a href="{{site.CONTACT}}">Contact</a></li>
 </ul>
         
           
@@ -480,7 +485,8 @@
         data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
 
         success:function(data){
-          alert("Successfully set the preferences"); 
+          alert("Successfully set the preferences");
+	  location.reload()
         }
       }); //ajax closes
     }); //document closes

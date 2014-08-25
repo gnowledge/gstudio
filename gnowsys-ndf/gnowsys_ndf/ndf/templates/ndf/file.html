@@ -152,7 +152,7 @@
                <div class="age">
               {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
               <br/>
-              by <span class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</span> 
+              by <span class="user" href="{% url 'dashboard' file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</span> 
             </div>
             <span>{{file.mime_type|truncatechars:15}}</span>
             <span class="right"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</span>
@@ -228,7 +228,7 @@
             <small class="subheader">
               {{ doc.member_of_names_list|join:', ' }} created {{doc.created_at|timesince}} ago 
               <br/>
-              by <a class="user" href="{% url 'userDashboard' group_name_tag doc.created_by %}" data-gnow="">{{doc.user_details_dict.created_by}}</a> 
+              by <a class="user" href="{% url 'dashboard' doc.created_by %}" data-gnow="">{{doc.user_details_dict.created_by}}</a> 
             </small>
             </div>
           </header>
@@ -315,7 +315,7 @@
             <small class="subheader">
               {{ image.member_of_names_list|join:', ' }} created {{image.created_at|timesince}} ago
               <br/>
-              by <a class="user" href="{% url 'userDashboard' group_name_tag image.created_by %}" data-gnow="">{{image.user_details_dict.created_by}}</a> 
+              by <a class="user" href="{% url 'dashboard' image.created_by %}" data-gnow="">{{image.user_details_dict.created_by}}</a> 
             </small>
             </div>
             </h4>
@@ -404,7 +404,7 @@
             <div>
               <small class="subheader">{{ video.member_of_names_list|join:', ' }} created {{video.created_at|timesince}} ago 
               <br/>
-              by <a class="user" href="{% url 'userDashboard' group_name_tag video.created_by %}" data-gnow="">{{video.user_details_dict.created_by}}</a>
+              by <a class="user" href="{% url 'dashboard' video.created_by %}" data-gnow="">{{video.user_details_dict.created_by}}</a>
               </small>
             </div>
             </h4>
@@ -564,7 +564,7 @@
             <small class="subheader">
               {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
               <br/>
-              by <a class="user" href="{% url 'userDashboard' group_name_tag file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</a> 
+              by <a class="user" href="{% url 'dashboard' file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</a> 
             </small>
             </div>
             </h4>
