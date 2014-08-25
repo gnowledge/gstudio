@@ -981,8 +981,9 @@ def data_review(request, group_id):
   '''
 
   # getting group obj from name
-  group_obj = collection.Node.one({ "_type": "Group", "name": group_id })
 
+  group_obj = collection.Node.one({ "_type": {"$in":["Group","Author"]}, "name": group_id })
+  
   # checking if passed group_id is group name or group Id
   if group_obj and (group_id == group_obj.name):
     group_name = group_id
