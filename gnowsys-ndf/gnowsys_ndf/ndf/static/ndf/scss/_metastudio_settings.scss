@@ -5,7 +5,6 @@
 *   http://foundation.zurb.com/docs/using-sass.html
 */
 
-
 //
 // THEME CONTROL SETTINGS
 //
@@ -1217,7 +1216,7 @@ $global-radius:5px;
  $topbar-link-font-size: 1rem;
 // $topbar-link-hover-lightness: -10%; // Darken by 10%
  $topbar-link-bg-hover: scale-color($theme-color-invert, $lightness: 10%);
- $topbar-link-bg-active: $theme-color;
+ //$topbar-link-bg-active: $theme-color;
 // $topbar-link-bg-active-hover: scale-color($primary-color, $lightness: -14%);
 // $topbar-link-font-family: $body-font-family;
 

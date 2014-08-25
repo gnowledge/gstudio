@@ -3,14 +3,14 @@
 */
 
 //Import any custom css
-@import url("../../custom.css");
+//@import url("../../custom.css");
 
-body{
+body{ 
   
-            background: darken($theme-color-invert,4%);
+            background-color: #eee;
 }
 
-//Logo
+
 .top-bar{
     border-bottom: 2px solid black;
     z-index: 200;
@@ -58,10 +58,6 @@ body{
 }
 
 
-		body>header{
-            //Site header
-			position: relative;  
-		}
 
 		.workspace{
             //This is the main content container between the header and footer
@@ -79,6 +75,7 @@ body{
 			height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
 		}
 		}
+
 
 		body>footer{
             //Site footer
@@ -134,9 +131,7 @@ body{
 
 
 //Main sidebar
-main.row{
-    padding-right: 5px;
-    
+main.row{    
         .button-group{
             i{
                 display: none!important; /* Hide icons till we can retreive custom icons from the system */
