@@ -6,4 +6,5 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.task',
                        url(r'^/(?P<task_id>[\w-]+)$', 'task_details', name='task_details'),
                        url(r'^/edit/(?P<task_id>[\w-]+)/$', 'create_edit_task', name='task_edit'),
 		       url(r'^/delete_task/(?P<_id>[\w-]+)$', 'delete_task', name='delete_task'),
+		       url(r'^/filter/(?P<choice>[\w-]+)/status/(?P<status>[\w-]+)$','check_filter',name='check_filter'),
                        )
