@@ -290,21 +290,6 @@
               </div>
             </section>
                 
-            <footer>
-              {% if user.is_authenticated %}
-              <div class="icon-bar four-up">
-                <!-- Here we are using "group_name_tag" since groupid value is overwrites in above section for different perspective -->
-                <a class="left-off-canvas-toggle item help" >
-                  <i class='fi-book'></i>
-                  <label>Help</label>
-                </a> 
-                            
-        				<a class="item user" href="{% url 'dashboard' request.user.pk %}">
-          				<label>My profile</label>
-        				</a>
-      				</div>
-              {% endif %}
-            </footer>	  
 
             <div>
             	{% block add_resource_content %}  {% endblock %}
