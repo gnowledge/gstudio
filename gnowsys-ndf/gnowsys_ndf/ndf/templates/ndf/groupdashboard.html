@@ -133,14 +133,14 @@ $(document).ready(function()
 <h4><i class="fi-torsos"></i>{{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}</h4>
 {% endblock %}
 
-{% block concern_information %}
+{% block app_settings_dropdown %}
 
   {% check_is_user_group group_id as is_user_group %}
   {% get_policy node request.user as policy  %}
 
   {% if policy %}
   <!-- Triggers the modals -->
-  <a href="#" id ="btn_list_member" data-reveal-id="firstModal" class="radius button small">{% trans "List Members" %}</a>
+  <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
 
   <!-- Reveal Modals begin -->
   <div id="firstModal" class="reveal-modal" data-reveal></div>
@@ -155,18 +155,18 @@ $(document).ready(function()
   {% if user.is_authenticated %}
   {% if user_is_joined == "joined" %}
     {% if is_user_group and node.created_by != request.user %}
-    <input class="button small" type="submit" id="notify" value="Stop following" class="button" align="center" style="visibility:visible" >
+    <li><input class="button" type="submit" id="notify" value="Stop following"></li>
 
     {% else %}
-    <input class="button small" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible">
+    <li><input class="button" type="submit" id="notify" value="Unsubscribe"></li>
     {% endif %} 
 
   {% elif user_is_joined == "not" or not user.is_authenticated %}
     {% if is_user_group and node.created_by != request.user %}
-    <input class="button small" type="submit" id="notify" value="Follow" class="button" align="center" style="visibility:visible" >
+    <li><input class="button" type="submit" id="notify" value="Follow"></li>
 
     {% else %}
-    <input class="button small" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
+    <li><input class="button" type="submit" id="notify" value="Join"></li>
     {% endif %}
 
   {% endif %}

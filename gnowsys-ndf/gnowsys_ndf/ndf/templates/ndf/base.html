@@ -244,9 +244,8 @@
                <!-- app options-->
                <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown"><i class="fi-plus"></i> Options</a><br>
 <ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
-  <li><a href="#">This is a link</a></li>
-  <li><a href="#">This is another</a></li>
-  <li><a href="#">Yet another</a></li>
+  {% block app_settings_dropdown %} {% endblock %}
+    
 </ul>
                       </li>
                   <li class="right">
