@@ -1492,18 +1492,21 @@ def get_preferred_lang(request, nodes, node_type):
    try:
       for each in nodes:
          if (pref_lan['primary'] != pref_lan['default']):
-            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            # primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            primary_nodes=collection.Node.one({'_id':each._id})
             if primary_nodes:
                primary_list.append(primary_nodes)
          
             else:
                if (pref_lan['secondary'] != pref_lan['default']):
-                  secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref__lan['secondary']},{'_id':each._id}]})
+                  # secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref__lan['secondary']},{'_id':each._id}]})
+                  secondary_nodes=collection.Node.one({'_id':each._id})
                   if secondary_nodes:
                      secondary_list.append(secondary_nodes)
             
          if (pref_lan['secondary'] == pref_lan['default']) and (pref_lan['primary'] == pref_lan['default']):
-            default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['default']},{'_id':each._id}]})
+            # default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['default']},{'_id':each._id}]})
+            default_nodes=collection.Node.one({'_id':each._id})
             if default_nodes:
                default_list.append(default_nodes)
       if primary_list:
