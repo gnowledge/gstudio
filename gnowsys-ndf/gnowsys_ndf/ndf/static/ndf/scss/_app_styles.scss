@@ -24,6 +24,7 @@
 }
 
 main>nav>.button-bar{
+    background-color: lighten($theme-color-invert,2%);
     li{
         .button{
         border-color:#222;

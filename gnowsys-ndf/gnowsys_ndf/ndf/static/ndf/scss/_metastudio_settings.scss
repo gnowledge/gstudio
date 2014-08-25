@@ -13,7 +13,7 @@
 //
 // Color Pallette
 $theme-color:#33C284 !default;
-$theme-color-invert:scale-color($theme-color, $lightness: -60%);
+$theme-color-invert:scale-color($theme-color, $lightness: -70%);
 $theme-text-color:scale-color($theme-color, $lightness: -40%);
 
 //
@@ -1189,7 +1189,7 @@ $global-radius:5px;
 // $include-html-top-bar-classes: $include-html-classes;
 
 // Background color for the top bar
- $topbar-bg-color: darken($theme-text-color,5%);
+ $topbar-bg-color: darken($theme-color-invert,10%);
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin

@@ -82,45 +82,7 @@
 	<!-- Right Nav Section -->
 	<ul class="right">
         
-        <li class="has-form show-on-hover search">
-            
-            <form 
-                      {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-                      name="search_form" method="GET" >
-          <div class="row collapse">
-            <div class="large-8 small-9 columns">
-              <input type="text" name="search_text" id="search_text" placeholder="Search {{group_object.name}}" autocomplete="off" required/>
-            </div>
-            <div class="large-4 small-3 columns">
-              <input type="submit" class="button expand" value="Submit" />
-            </div>
-             </div>
-              
-<!-- Hiding search options on the top bar, this is available from the results page to refine-->
-                   <!--ul class="show">
-	      	<li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
-                <label for="chk_name">Name</label>
-            </li>
-            <li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
-                <label for="chk_tags">Tags</label>
-            </li>
-            <li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
-                <label for="chk_content">Contents</label><br>
-			</li>
-			<li >
-				{% if groupid %}
-				<a href="{% url 'search_page' groupid %}">Advanced Search</a>
-				{% endif %}
-			</li>
-	      
-	    </ul-->
-
-          
-                </form>
-        </li>
+        
 	  
 
 
@@ -209,6 +171,44 @@
               <li id="more_groups"><a class="group" href="{% url 'group' 'home' %}">{% trans "See more groups..." %}</a></li>
       	    </ul>
       	  </li>
+            
+            <li class="has-form show-on-hover search">
+            
+            <form 
+                      {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                      name="search_form" method="GET" >
+          <div class="row collapse">
+            <div class="large-12 small-12 columns">
+              <input type="text" name="search_text" id="search_text" placeholder="Search {{group_object.name}}" autocomplete="off" required/>
+                <button type="submit" class="button expand" value="" ><i class="fi-magnifying-glass"></i></button>
+            </div>
+             </div>
+              
+<!-- Hiding search options on the top bar, this is available from the results page to refine-->
+                   <!--ul class="show">
+	      	<li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
+                <label for="chk_name">Name</label>
+            </li>
+            <li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
+                <label for="chk_tags">Tags</label>
+            </li>
+            <li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
+                <label for="chk_content">Contents</label><br>
+			</li>
+			<li >
+				{% if groupid %}
+				<a href="{% url 'search_page' groupid %}">Advanced Search</a>
+				{% endif %}
+			</li>
+	      
+	    </ul-->
+
+          
+                </form>
+        </li>
 
       	  {% get_gapps_menubar request groupid %}
       	</ul>
