@@ -137,7 +137,7 @@
 
 <!-- Current group selector -->
       	  <li class="has-dropdown group">
-      	    <a class="active" href="{% url 'groupchange' group_object.name %}"><i class="fi-home"></i> {{group_object.name|truncatechars:30}}</a>
+      	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:30}}</a>
       	    
       	    <!-- If logged in show user groups -->
       	    {% if user.is_authenticated %}
@@ -233,7 +233,7 @@
               
               <ul class="button-group medium-2 columns">
                   <li>
-            <a href="{% url 'groupchange' group_object.name %}" class="explorer button"><i class="fi-compass"></i> Explore</a>
+            <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> Front Page</a>
 
               </li>
                 </ul>
@@ -251,7 +251,7 @@
                       </li>
                   <li class="right">
                   {% if user.is_authenticated %}
-<a id="toggle-help" class="button right-off-canvas-toggle" ><i class='fi-lightbulb'></i> Help</a> 
+<a id="toggle-help" class="button right-off-canvas-toggle" ><i class='fi-lightbulb'></i></a> 
 {% endif %}
                   </li>
                   </ul>
@@ -315,13 +315,17 @@
 
     	<!-- Off Canvas User Shelf -->
     	<aside id="help"  class="right-off-canvas-menu">
-            {% block help_topics %}  {% endblock %}
-
-	    <div>
-	      {% block help_content %}  {% endblock %}
-	    </div>
-
-	    <li><a href="#">{% trans "About metaStudio" %}</a></li>
+            <ul class="off-canvas-list">
+                
+                <li><label><h4>User Guide</h4></label></li>
+                {% block detailed_help_content %}  {% endblock %}
+                <li><label>About this Application</label></li>
+                {% block help_content %}  {% endblock %}
+                <li><label>About this Group</label></li>
+                {% block about_group %}  {% endblock %}
+                <li><label>Meta Studio Version 0.8.23</label></li>
+                    <li><a href="#">{% trans "About metaStudio" %}</a></li>
+                </ul>
     	</aside>
 
     	<!-- close the off-canvas menu -->
@@ -454,6 +458,8 @@
 		function(){
 			$(this).find(">div>div").slideUp();
 		});
+      
+      
 
     //set language prefernce
     $(document).on('click',"#savepref",function(){

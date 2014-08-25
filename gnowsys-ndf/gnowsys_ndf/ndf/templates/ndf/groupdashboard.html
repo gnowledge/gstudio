@@ -128,7 +128,6 @@ $(document).ready(function()
 
 <!-- overide meta_content block from base.html -->
 {% block meta_content %}
-  {% blocktrans %}<h3>Dashboard</h3>{% endblocktrans %}
 
 <h4><i class="fi-torsos"></i>{{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}</h4>
 {% endblock %}
@@ -181,11 +180,7 @@ $(document).ready(function()
   {% endif %} 
 
 
-
-<a data-reveal-id="landing-page">.</a>
-
-    <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
-
+{% endblock %}
 
   <!-- SCRIPT ADDED TO ALLOW SEARCH ON THE ITEMS IN THE GROUP -->
 <!-- Seems to be redundant with the top bar search
@@ -230,12 +225,13 @@ $(document).ready(function()
   </script>
 -->
 
-{% endblock %}
+
 
 
 {% block body_content %}
 
 <!--Place for group splash page design-->
+<a data-reveal-id="landing-page">.</a>
 
 <div id="landing-page" class="reveal-modal full" data-reveal>
     

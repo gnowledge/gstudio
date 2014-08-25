@@ -713,16 +713,16 @@ $global-radius:5px;
 // $tabbar-header-margin: 0;
 
 // Off Canvas Menu Variables
- $off-canvas-width: 350px;
- $off-canvas-bg: darken($theme-text-color,20%);
+ $off-canvas-width: 400px;
+ $off-canvas-bg: #333;
 
 // Off Canvas Menu List Variables
 // $off-canvas-label-padding: 0.3rem rem-calc(15);
-// $off-canvas-label-color: #999;
+ $off-canvas-label-color: black;
 // $off-canvas-label-text-transform: uppercase;
 // $off-canvas-label-font-weight: bold;
-// $off-canvas-label-bg: #444;
-// $off-canvas-label-border-top: 1px solid scale-color(#444, $lightness: 14%);
+ $off-canvas-label-bg: #666;
+ $off-canvas-label-border-top: 1px solid scale-color(#444, $lightness: -14%);
 // $off-canvas-label-border-bottom: none;
 // $off-canvas-label-margin:0;
 // $off-canvas-link-padding: rem-calc(10, 15);
@@ -747,7 +747,7 @@ $global-radius:5px;
 // $off-canvas-overlay-transition: background 300ms ease;
 // $off-canvas-overlay-cursor: pointer;
 // $off-canvas-overlay-box-shadow: -4px 0 4px rgba(#000, 0.5), 4px 0 4px rgba(#000, 0.5);
-// $off-canvas-overlay-background: rgba(#FFF, 0.2);
+ $off-canvas-overlay-background: rgba(#aaa, 0.3);
 // $off-canvas-overlay-background-hover: rgba(#FFF, 0.05);
 
 // Transition Variables

@@ -147,15 +147,21 @@ main>nav{
         text-transform: uppercase;
         font-size: 0.8rem;
         padding: 0.8rem 1rem;
+            &.home{
+                font-weight: bold;
+            }
             &.settings,&#toggle-help{
                 padding: 6px 10px;
                 color: #333;
                // font-size: 110%;
-                background-color: rgba(255,255,255,0.1);
+                background-color: rgba(255,255,255,0.3);
                 &:hover{
                     background-color: rgba(0,0,0,0.2);
                     color:white;
                 }
+            }
+            &#toggle-help{
+                background-color: inherit;
             }
             &.settings{
                 &:after{
@@ -433,7 +439,6 @@ h1:not(.subheader){
 
 /* Content Tabs */
 article{
-    padding-left: 2rem!important;
    
         
 .tabs {
@@ -637,4 +642,15 @@ input.node-title{
 #landing-page{
     background-color: #666;
     top:0;
+}
+
+// Off Canvas Areas
+aside#help{
+    h4{
+        color:black;
+    }
+    p,h5,h6{
+        color:#ddd;
+    padding: 0.3rem 0.9375rem;
+    }
 }
