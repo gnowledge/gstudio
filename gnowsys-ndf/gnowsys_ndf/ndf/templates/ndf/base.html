@@ -68,7 +68,7 @@
       
     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
-      <ul class="title-area small-3 columns">
+      <ul class="title-area medium-2 columns">
       	<li class="name">
       	  <h1><a href="/home/" accesskey="q"><img src="/static/ndf/css/themes/metastudio/logo.svg"></a></h1>
       	</li>
@@ -80,7 +80,7 @@
       <section class="top-bar-section">
 	
 	<!-- Right Nav Section -->
-	<ul class="right">
+	<ul class="right medium-3 columns">
         
 <!-- Language selector-->
             <li class="has-form">
@@ -132,7 +132,7 @@
         <!-- Closes Right Nav section -->
 
       	<!-- Left Nav Section -->
-      	<ul class="left">
+      	<ul class="left medium-7 columns">
 
 <!-- Current group selector -->
       	  <li class="has-dropdown group">
@@ -244,16 +244,21 @@
               
         {% get_gapps_iconbar request groupid %}
               
-              <ul class="button-group medium-2 columns">
+              <ul class="tools button-group medium-2 columns right">
                   <li>
                <!-- app options-->
-               <a href="#" data-dropdown="drop1" class="settings button dropdown"><i class="fi-wrench"></i></a><br>
-<ul id="drop1" data-dropdown-content class="f-dropdown">
+               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown">Options <i class="fi-plus"></i></a><br>
+<ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
   <li><a href="#">This is a link</a></li>
   <li><a href="#">This is another</a></li>
   <li><a href="#">Yet another</a></li>
 </ul>
                       </li>
+                  <li class="right">
+                  {% if user.is_authenticated %}
+<a id="toggle-help" class="button right-off-canvas-toggle" >Help <i class='fi-lightbulb'></i></a> 
+{% endif %}
+                  </li>
                   </ul>
               
               </div>

@@ -18,7 +18,10 @@
 .top-bar .dropdown a.button{
     padding: 0;
 }
-
+.top-bar section>ul{
+    padding:inherit;
+    margin: inherit;
+}
 
 
 /*
