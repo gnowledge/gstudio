@@ -17,11 +17,12 @@ import ox
 import threading
 import io
 import time
-from django.http import Http404
 
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
+from django.http import Http404
+from django.template.defaultfilters import slugify
 
 from django_mongokit import get_database
 from mongokit import IS
@@ -30,13 +31,13 @@ try:
   from bson import ObjectId
 except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
-
 ''' imports from application folders/files '''
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
 from gnowsys_ndf.ndf.management.commands.data_entry import create_grelation, create_gattribute
+from gnowsys_ndf.ndf.org2any import org2html
 # from gnowsys_ndf.ndf.views.file import save_file, getFileSize
 # from gnowsys_ndf.ndf.views.methods import create_gattribute
 
@@ -590,11 +591,22 @@ def create_resource_gsystem(resource_data):
     filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
 
     # filling values in fileobj
-    fileobj.name = resource_data["name"]
+    name = unicode(resource_data["name"])
+    fileobj.name = name
     fileobj.created_by = resource_data["created_by"]
     fileobj.group_set.append(home_group._id)
     fileobj.member_of.append(file_gst._id)
-    fileobj.content_org = resource_data["content_org"]
+    
+    # storing content_org and content
+    content_org = resource_data["content_org"]
+
+    if content_org:
+      fileobj.content_org = unicode(content_org)
+      # Required to link temporary files with the current user who is modifying this document
+      # usrname = request.user.username
+      filename = slugify(name) + "-" + "nroer_team" + "-" + ObjectId().__str__()
+      fileobj.content = org2html(content_org, file_prefix=filename)
+
     fileobj.tags = resource_data["tags"]
     fileobj.language = resource_data["language"]
     # username = User.objects.get(id=userid).username
