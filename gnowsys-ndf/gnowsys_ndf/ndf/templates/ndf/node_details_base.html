@@ -65,6 +65,12 @@
 
 {% block add_resource_content %}  
 
+{% user_access_policy groupid request.user as user_access %}
+
+{% if user.is_authenticated %}
+{% if user_access == "allow" %}
+
+
 {% if topic %}
   <br/>
   <dl class="accordion" data-accordion>
@@ -184,6 +190,12 @@ $("#add_page").click(function() {
 });
 
 </script>
+{% endif %}
+
+{% endif %}
+
+{% else %}
+  <b>Please login to see the add resource options</b>
 {% endif %}
 
 {% endblock %}
