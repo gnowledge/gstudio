@@ -628,7 +628,7 @@ def create_resource_gsystem(resource_data):
     #   resource_data[contributors] = []
 
     # fileobj.contributors = resource_data[contributors]
-    fileobj.contributors = get_user_id("nroer_team")
+    fileobj.contributors.append(get_user_id("nroer_team"))
 
     fileobj.license = resource_data["license"]
     fileobj.status = u"PUBLISHED"
