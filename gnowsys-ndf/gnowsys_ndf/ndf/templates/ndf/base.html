@@ -66,9 +66,9 @@
     
 {% get_group_object groupid as group_object %}
       
-    <nav class="top-bar drop-shadow" data-topbar role="navigation">
+    <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
-      <ul class="title-area">
+      <ul class="title-area small-3 columns">
       	<li class="name">
       	  <h1><a href="/home/" accesskey="q"><img src="/static/ndf/css/themes/metastudio/logo.svg"></a></h1>
       	</li>
@@ -234,6 +234,18 @@
 	<main class="row">  
 	  <nav>
           <div class="button-bar">
+              
+              <!-- Group options-->
+              <ul class="button-group">
+                  <li>
+            <a href="#" data-dropdown="drop1" class="settings button dropdown"><i class="fi-wrench"></i></a><br>
+<ul id="drop1" data-dropdown-content class="f-dropdown">
+  <li><a href="#">This is a link</a></li>
+  <li><a href="#">This is another</a></li>
+  <li><a href="#">Yet another</a></li>
+</ul>
+              </li>
+                </ul>
         {% get_gapps_iconbar request groupid %}
               </div>
         </nav>

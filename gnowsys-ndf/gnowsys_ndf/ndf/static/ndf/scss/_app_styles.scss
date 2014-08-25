@@ -19,30 +19,6 @@
     padding: 0;
 }
 
-main>nav>.button-bar{
-    background-color: lighten($theme-color-invert,2%);
-    li{
-        .button{
-        border-color:#222;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        padding: 0.5rem 1rem;
-        background-color: transparent;
-        color: $primary-color;
-        margin: 0;
-            &:hover{
-                color:white;
-            }
-        }
-        
-        &.active{
-            .button{
-                background-color: $primary-color;
-                color:white;
-            }
-        }
-    }
-}
 
 
 /*

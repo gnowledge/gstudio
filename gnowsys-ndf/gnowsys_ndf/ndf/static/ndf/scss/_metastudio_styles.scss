@@ -15,7 +15,7 @@ body{
     border-bottom: 2px solid black;
     z-index: 200;
     .active{
-        background-color:  $topbar-link-bg-hover!important;
+        border-bottom:  1px solid $active-color;
     }
     h1{
         img{
@@ -129,16 +129,45 @@ body{
 /* Sections */
 
 
-
-//Main sidebar
-main.row{    
-        .button-group{
-            i{
-                display: none!important; /* Hide icons till we can retreive custom icons from the system */
+main>nav>.button-bar{
+    background-color: $active-color;
+    li{
+        
+        .button{
+            border: none;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        padding: 0.8rem 1rem;
+            &.settings{
+                padding-right: 3.5625rem;
+                font-weight: bold;
+                color: white;
+                font-size: 100%;
             }
             
+        background-color: transparent;
+        color: black;
+        margin: 0;
+            &:hover{
+                color:white;
+            }
         }
+        
+        &.active{
+            .button{
+                background-color: $primary-color;
+                color:white;
+            }
+        }
+    }
+    
+    /* Hide icons till we can retreive custom icons from the system */
+    app.i{
+                display: none!important; 
+            }
 }
+
+
 
 main>aside{
     &>div{
@@ -520,9 +549,6 @@ a.node{
 	display:block;
 }
 
-a.app{
-	overflow: hidden;
-}
 .button.edit{
 	margin-bottom: 0;
 }
