@@ -23,20 +23,30 @@
     padding: 0;
 }
 
-
-
-/* Styles icon-bar */
-.icon-bar .item{
-    label{
-        font-size: 1.1rem;
-    }
-    &.active{
-        background-color: $theme-color;
-        i,label{
-        font-weight: bold;
+main>nav>.button-bar{
+    li{
+        .button{
+        border-color:#222;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        padding: 0.5rem 1rem;
+        background-color: transparent;
+        color: $primary-color;
+        margin: 0;
+            &:hover{
+                color:white;
+            }
+        }
+        
+        &.active{
+            .button{
+                background-color: $primary-color;
+                color:white;
+            }
         }
     }
 }
+
 
 /*
 /* Protects reflowing elements on error */

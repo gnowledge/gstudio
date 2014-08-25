@@ -5,6 +5,8 @@
 {% block title %} Group Dashboard {% endblock %}
 
 {% block head %}
+<link rel="/static/ndf/bower_components/slick-carousel/slick/slick.css">
+<script src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"> </script>
 
 <script type="text/javascript" >
   var chk_login = "{{ user }}";
@@ -178,7 +180,9 @@ $(document).ready(function()
     {% include "ndf/invite_admins.html" %}
   {% endif %} 
 
-<a data-reveal-id="intro-page">.</a>
+
+
+<a data-reveal-id="landing-page">.</a>
 
     <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
 
@@ -233,9 +237,10 @@ $(document).ready(function()
 
 <!--Place for group splash page design-->
 
-<div id="intro-page" class="reveal-modal x-large" data-reveal>
+<div id="landing-page" class="reveal-modal full" data-reveal>
     
-    
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Panthera_tigris7.jpg/450px-Panthera_tigris7.jpg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Tagore3.jpg">
 
   <div class="large-4 small-centered columns">
     <h2>Do things:</h2>
@@ -247,6 +252,10 @@ $(document).ready(function()
   </div>
 
 </div>
+
+<script type="text/javascript" >
+    $('[data-reveal-id="landing-page"]').trigger('click');
+    </script>
 
 {{ block.super }}
 

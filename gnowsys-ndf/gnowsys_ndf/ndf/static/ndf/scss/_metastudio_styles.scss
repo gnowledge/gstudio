@@ -13,7 +13,7 @@ body{
 //Logo
 .top-bar{
     border-bottom: 2px solid black;
-    z-index: 2000;
+    z-index: 200;
     .active{
         background-color:  $topbar-link-bg-hover!important;
     }
@@ -116,7 +116,7 @@ body{
 main.row{
     padding-right: 5px;
     
-        .sub-nav{
+        .button-group{
             i{
                 display: none!important; /* Hide icons till we can retreive custom icons from the system */
             }
@@ -574,3 +574,7 @@ input.node-title{
 
 /****************** CUSTOM *********************/
 
+#landing-page{
+    background-color: #666;
+    top:0;
+}
