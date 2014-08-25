@@ -232,21 +232,30 @@
 	</aside>
 
 	<main class="row">  
-	  <nav>
+	  <nav class="drop-shadow">
           <div class="button-bar">
               
-              <!-- Group options-->
-              <ul class="button-group">
+              <ul class="button-group medium-2 columns">
                   <li>
-            <a href="#" data-dropdown="drop1" class="settings button dropdown"><i class="fi-wrench"></i></a><br>
+            <a href="{% url 'groupchange' group_object.name %}" class="explorer button"><i class="fi-compass"></i> Explore</a>
+
+              </li>
+                </ul>
+              
+        {% get_gapps_iconbar request groupid %}
+              
+              <ul class="button-group medium-2 columns">
+                  <li>
+               <!-- app options-->
+               <a href="#" data-dropdown="drop1" class="settings button dropdown"><i class="fi-wrench"></i></a><br>
 <ul id="drop1" data-dropdown-content class="f-dropdown">
   <li><a href="#">This is a link</a></li>
   <li><a href="#">This is another</a></li>
   <li><a href="#">Yet another</a></li>
 </ul>
-              </li>
-                </ul>
-        {% get_gapps_iconbar request groupid %}
+                      </li>
+                  </ul>
+              
               </div>
         </nav>
 	  <!-- Start of sidebar section (main aside) -->

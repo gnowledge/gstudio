@@ -8972,11 +8972,20 @@ body > footer .gnu-badge:hover {
 
 /* Sections */
 /* line 132, ../../../scss/_metastudio_styles.scss */
+main > nav {
+  position: relative;
+  z-index: 10;
+}
+/* line 135, ../../../scss/_metastudio_styles.scss */
 main > nav > .button-bar {
   background-color: #0081ff;
   /* Hide icons till we can retreive custom icons from the system */
 }
-/* line 136, ../../../scss/_metastudio_styles.scss */
+/* line 137, ../../../scss/_metastudio_styles.scss */
+main > nav > .button-bar .button-group {
+  margin: 0;
+}
+/* line 142, ../../../scss/_metastudio_styles.scss */
 main > nav > .button-bar li .button {
   border: none;
   text-transform: uppercase;
@@ -8986,112 +8995,112 @@ main > nav > .button-bar li .button {
   color: black;
   margin: 0;
 }
-/* line 141, ../../../scss/_metastudio_styles.scss */
+/* line 147, ../../../scss/_metastudio_styles.scss */
 main > nav > .button-bar li .button.settings {
   padding-right: 3.5625rem;
   font-weight: bold;
   color: white;
   font-size: 100%;
 }
-/* line 151, ../../../scss/_metastudio_styles.scss */
+/* line 157, ../../../scss/_metastudio_styles.scss */
 main > nav > .button-bar li .button:hover {
   color: white;
 }
-/* line 157, ../../../scss/_metastudio_styles.scss */
+/* line 163, ../../../scss/_metastudio_styles.scss */
 main > nav > .button-bar li.active .button {
   background-color: #0081ff;
   color: white;
 }
-/* line 165, ../../../scss/_metastudio_styles.scss */
-main > nav > .button-bar app.i {
+/* line 171, ../../../scss/_metastudio_styles.scss */
+main > nav > .button-bar .app i {
   display: none !important;
 }
 
-/* line 177, ../../../scss/_metastudio_styles.scss */
+/* line 183, ../../../scss/_metastudio_styles.scss */
 main > aside > div h2 {
   color: white;
 }
-/* line 180, ../../../scss/_metastudio_styles.scss */
+/* line 186, ../../../scss/_metastudio_styles.scss */
 main > aside > div h3 {
   font-size: 1.2rem;
   font-weight: normal;
   color: white;
 }
-/* line 185, ../../../scss/_metastudio_styles.scss */
+/* line 191, ../../../scss/_metastudio_styles.scss */
 main > aside > div h4 {
   font-size: 1rem;
   color: #eee;
 }
-/* line 188, ../../../scss/_metastudio_styles.scss */
+/* line 194, ../../../scss/_metastudio_styles.scss */
 main > aside > div h4 span {
   display: none;
 }
-/* line 191, ../../../scss/_metastudio_styles.scss */
+/* line 197, ../../../scss/_metastudio_styles.scss */
 main > aside > div h4:hover span {
   display: inline;
 }
-/* line 195, ../../../scss/_metastudio_styles.scss */
+/* line 201, ../../../scss/_metastudio_styles.scss */
 main > aside > div h5, main > aside > div h6 {
   margin: 0;
 }
-/* line 199, ../../../scss/_metastudio_styles.scss */
+/* line 205, ../../../scss/_metastudio_styles.scss */
 main > aside > div .f-dropdown.content {
   width: auto;
   padding: 0;
   border: 1px solid #222;
 }
-/* line 203, ../../../scss/_metastudio_styles.scss */
+/* line 209, ../../../scss/_metastudio_styles.scss */
 main > aside > div .f-dropdown.content .item {
   width: 70px;
 }
-/* line 207, ../../../scss/_metastudio_styles.scss */
+/* line 213, ../../../scss/_metastudio_styles.scss */
 main > aside > div header {
   padding: 10px;
 }
-/* line 210, ../../../scss/_metastudio_styles.scss */
+/* line 216, ../../../scss/_metastudio_styles.scss */
 main > aside > div section {
   background-color: #00274d;
 }
-/* line 213, ../../../scss/_metastudio_styles.scss */
+/* line 219, ../../../scss/_metastudio_styles.scss */
 main > aside > div footer {
   background-color: #222;
   min-height: 1rem;
 }
-/* line 216, ../../../scss/_metastudio_styles.scss */
+/* line 222, ../../../scss/_metastudio_styles.scss */
 main > aside > div footer label {
   font-size: 0.7rem;
 }
-/* line 223, ../../../scss/_metastudio_styles.scss */
+/* line 229, ../../../scss/_metastudio_styles.scss */
 main > aside > div a, main > aside > div p {
   color: white;
 }
-/* line 225, ../../../scss/_metastudio_styles.scss */
+/* line 231, ../../../scss/_metastudio_styles.scss */
 main > aside > div a:hover, main > aside > div p:hover {
   color: white;
 }
-/* line 229, ../../../scss/_metastudio_styles.scss */
+/* line 235, ../../../scss/_metastudio_styles.scss */
 main > aside > div .side-nav.collection {
   background-color: #444;
   padding: 0;
   border-bottom: 2px solid #0081ff;
   margin: 0;
 }
-/* line 234, ../../../scss/_metastudio_styles.scss */
+/* line 240, ../../../scss/_metastudio_styles.scss */
 main > aside > div .side-nav.collection li {
   border-bottom: 1px solid #555;
 }
-/* line 236, ../../../scss/_metastudio_styles.scss */
+/* line 242, ../../../scss/_metastudio_styles.scss */
 main > aside > div .side-nav.collection li a {
   border-left: 2px solid black;
 }
-/* line 239, ../../../scss/_metastudio_styles.scss */
+/* line 245, ../../../scss/_metastudio_styles.scss */
 main > aside > div .side-nav.collection li.active a, main > aside > div .side-nav.collection li a:hover {
   color: white !important;
   border-left: 2px solid #0081ff;
   background-color: #0081ff;
 }
 
-/* line 251, ../../../scss/_metastudio_styles.scss */
+/* line 257, ../../../scss/_metastudio_styles.scss */
 article {
   position: relative;
   z-index: 1;
@@ -9099,29 +9108,29 @@ article {
   background-color: white;
   overflow-x: visible;
 }
-/* line 257, ../../../scss/_metastudio_styles.scss */
+/* line 263, ../../../scss/_metastudio_styles.scss */
 article > header, article form > header {
   padding: 15px;
   margin-bottom: 0.5rem;
   background-color: #f0f0f0;
 }
-/* line 266, ../../../scss/_metastudio_styles.scss */
+/* line 272, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader), article h1:not(.subheader) div input:not(.subheader) {
   font-family: "Bree Serif", "Georgia Serif", Serif;
   font-style: italic;
 }
-/* line 270, ../../../scss/_metastudio_styles.scss */
+/* line 276, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader) .tabs {
   display: inline-block;
   position: relative;
   bottom: -0.5rem;
 }
-/* line 276, ../../../scss/_metastudio_styles.scss */
+/* line 282, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader) div, article h1:not(.subheader) div input:not(.subheader) div {
   display: inline-block;
   position: relative;
 }
-/* line 279, ../../../scss/_metastudio_styles.scss */
+/* line 285, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader) div input {
   height: 200%;
   font-style: italic;
@@ -9131,13 +9140,13 @@ article h1:not(.subheader) div input {
   border-bottom: 2px dotted #222;
   background-color: inherit;
 }
-/* line 289, ../../../scss/_metastudio_styles.scss */
+/* line 295, ../../../scss/_metastudio_styles.scss */
 article h1:not(.subheader) div input:hover {
   background-color: white;
 }
 
 /* Card block */
-/* line 306, ../../../scss/_metastudio_styles.scss */
+/* line 312, ../../../scss/_metastudio_styles.scss */
 .card > * {
   position: relative;
   background-color: inherit;
@@ -9147,38 +9156,38 @@ article h1:not(.subheader) div input:hover {
   opacity: 0.9;
   overflow: hidden;
 }
-/* line 316, ../../../scss/_metastudio_styles.scss */
+/* line 322, ../../../scss/_metastudio_styles.scss */
 .card > * > a {
   color: inherit;
   display: block;
   position: relative;
   z-index: 200;
 }
-/* line 323, ../../../scss/_metastudio_styles.scss */
+/* line 329, ../../../scss/_metastudio_styles.scss */
 .card > *.published {
   opacity: 1;
   background-color: #e5f2ff;
 }
-/* line 327, ../../../scss/_metastudio_styles.scss */
+/* line 333, ../../../scss/_metastudio_styles.scss */
 .card > *.unapproved {
   opacity: 1;
   border-style: solid;
   border-color: #f04124;
 }
-/* line 333, ../../../scss/_metastudio_styles.scss */
+/* line 339, ../../../scss/_metastudio_styles.scss */
 .card > *:hover {
   border-style: solid;
   opacity: 1;
 }
-/* line 339, ../../../scss/_metastudio_styles.scss */
+/* line 345, ../../../scss/_metastudio_styles.scss */
 .card > *:hover i {
   opacity: 0.3;
 }
-/* line 342, ../../../scss/_metastudio_styles.scss */
+/* line 348, ../../../scss/_metastudio_styles.scss */
 .card > *:hover footer .age {
   display: block;
 }
-/* line 346, ../../../scss/_metastudio_styles.scss */
+/* line 352, ../../../scss/_metastudio_styles.scss */
 .card > * > i {
   position: absolute;
   top: -10px;
@@ -9187,34 +9196,34 @@ article h1:not(.subheader) div input:hover {
   color: #0081ff;
   opacity: 0.3;
 }
-/* line 354, ../../../scss/_metastudio_styles.scss */
+/* line 360, ../../../scss/_metastudio_styles.scss */
 .card > * .preview {
   float: left;
   padding-right: 5px;
   padding-top: 4px;
 }
-/* line 359, ../../../scss/_metastudio_styles.scss */
+/* line 365, ../../../scss/_metastudio_styles.scss */
 .card > * header {
   overflow: hidden;
 }
-/* line 362, ../../../scss/_metastudio_styles.scss */
+/* line 368, ../../../scss/_metastudio_styles.scss */
 .card > * h5 {
   white-space: nowrap;
   text-overflow: ellipsis;
   margin-bottom: 0;
 }
-/* line 367, ../../../scss/_metastudio_styles.scss */
+/* line 373, ../../../scss/_metastudio_styles.scss */
 .card > * .label, .card > * .label-list:empty:before {
   opacity: 0.5;
 }
-/* line 370, ../../../scss/_metastudio_styles.scss */
+/* line 376, ../../../scss/_metastudio_styles.scss */
 .card > * p {
   color: #555;
   height: 80px;
   background-repeat: no-repeat;
   font-size: 80%;
 }
-/* line 376, ../../../scss/_metastudio_styles.scss */
+/* line 382, ../../../scss/_metastudio_styles.scss */
 .card > * .th {
   margin: 20px auto;
   width: 80px;
@@ -9222,23 +9231,23 @@ article h1:not(.subheader) div input:hover {
   overflow: hidden;
   display: none;
 }
-/* line 382, ../../../scss/_metastudio_styles.scss */
+/* line 388, ../../../scss/_metastudio_styles.scss */
 .card > * .th:hover {
   width: 150px;
   height: 150px;
 }
-/* line 386, ../../../scss/_metastudio_styles.scss */
+/* line 392, ../../../scss/_metastudio_styles.scss */
 .card > * .th img {
   width: 100%;
 }
-/* line 390, ../../../scss/_metastudio_styles.scss */
+/* line 396, ../../../scss/_metastudio_styles.scss */
 .card > * footer {
   margin-top: 1rem;
   font-size: 70%;
   clear: both;
   color: #e01818;
 }
-/* line 395, ../../../scss/_metastudio_styles.scss */
+/* line 401, ../../../scss/_metastudio_styles.scss */
 .card > * footer .age {
   display: none;
   position: absolute;
@@ -9248,7 +9257,7 @@ article h1:not(.subheader) div input:hover {
   width: 100%;
 }
 
-/* line 406, ../../../scss/_metastudio_styles.scss */
+/* line 412, ../../../scss/_metastudio_styles.scss */
 .edit-card {
   position: relative;
   background-color: white;
@@ -9257,68 +9266,68 @@ article h1:not(.subheader) div input:hover {
 }
 
 /* Content Tabs */
-/* line 417, ../../../scss/_metastudio_styles.scss */
+/* line 423, ../../../scss/_metastudio_styles.scss */
 article {
   padding-left: 2rem !important;
 }
-/* line 421, ../../../scss/_metastudio_styles.scss */
+/* line 427, ../../../scss/_metastudio_styles.scss */
 article .tabs {
   display: inline-block;
 }
-/* line 423, ../../../scss/_metastudio_styles.scss */
+/* line 429, ../../../scss/_metastudio_styles.scss */
 article .tabs dd a {
   border-radius: 4px;
   border: 1px transparent;
 }
-/* line 427, ../../../scss/_metastudio_styles.scss */
+/* line 433, ../../../scss/_metastudio_styles.scss */
 article .tabs dd.active a {
   color: #0081ff;
   border: 1px solid;
 }
-/* line 431, ../../../scss/_metastudio_styles.scss */
+/* line 437, ../../../scss/_metastudio_styles.scss */
 article .tabs dd:hover a {
   color: #0081ff;
 }
-/* line 435, ../../../scss/_metastudio_styles.scss */
+/* line 441, ../../../scss/_metastudio_styles.scss */
 article .tabs i {
   margin-right: 5px;
   font-size: 1.3rem;
 }
-/* line 441, ../../../scss/_metastudio_styles.scss */
+/* line 447, ../../../scss/_metastudio_styles.scss */
 article .tabs-content > .content {
   padding-top: 0;
 }
-/* line 445, ../../../scss/_metastudio_styles.scss */
+/* line 451, ../../../scss/_metastudio_styles.scss */
 article .content.row {
   margin: 0;
 }
 
 /* Default card */
-/* line 451, ../../../scss/_metastudio_styles.scss */
+/* line 457, ../../../scss/_metastudio_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 456, ../../../scss/_metastudio_styles.scss */
+/* line 462, ../../../scss/_metastudio_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 464, ../../../scss/_metastudio_styles.scss */
+/* line 470, ../../../scss/_metastudio_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 468, ../../../scss/_metastudio_styles.scss */
+/* line 474, ../../../scss/_metastudio_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
   background-color: transparent;
 }
-/* line 476, ../../../scss/_metastudio_styles.scss */
+/* line 482, ../../../scss/_metastudio_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   background-color: transparent;
@@ -9327,26 +9336,26 @@ article .content.row {
 
 /*************************** 2. Custom CSS overrides ***********************/
 /* Content area */
-/* line 490, ../../../scss/_metastudio_styles.scss */
+/* line 496, ../../../scss/_metastudio_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 494, ../../../scss/_metastudio_styles.scss */
+/* line 500, ../../../scss/_metastudio_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 498, ../../../scss/_metastudio_styles.scss */
+/* line 504, ../../../scss/_metastudio_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 501, ../../../scss/_metastudio_styles.scss */
+/* line 507, ../../../scss/_metastudio_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 510, ../../../scss/_metastudio_styles.scss */
+/* line 516, ../../../scss/_metastudio_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -9367,44 +9376,44 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 530, ../../../scss/_metastudio_styles.scss */
+/* line 536, ../../../scss/_metastudio_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 535, ../../../scss/_metastudio_styles.scss */
-.user {
-  color: inherit;
-}
-
-/* line 538, ../../../scss/_metastudio_styles.scss */
-.user {
-  color: inherit;
-}
-
 /* line 541, ../../../scss/_metastudio_styles.scss */
+.user {
+  color: inherit;
+}
+
+/* line 544, ../../../scss/_metastudio_styles.scss */
+.user {
+  color: inherit;
+}
+
+/* line 547, ../../../scss/_metastudio_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 544, ../../../scss/_metastudio_styles.scss */
+/* line 550, ../../../scss/_metastudio_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 548, ../../../scss/_metastudio_styles.scss */
+/* line 554, ../../../scss/_metastudio_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 552, ../../../scss/_metastudio_styles.scss */
+/* line 558, ../../../scss/_metastudio_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 560, ../../../scss/_metastudio_styles.scss */
+/* line 566, ../../../scss/_metastudio_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -9412,13 +9421,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 567, ../../../scss/_metastudio_styles.scss */
+/* line 573, ../../../scss/_metastudio_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 572, ../../../scss/_metastudio_styles.scss */
+/* line 578, ../../../scss/_metastudio_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -9432,13 +9441,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 582, ../../../scss/_metastudio_styles.scss */
+/* line 588, ../../../scss/_metastudio_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 587, ../../../scss/_metastudio_styles.scss */
+/* line 593, ../../../scss/_metastudio_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -9449,7 +9458,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 598, ../../../scss/_metastudio_styles.scss */
+/* line 604, ../../../scss/_metastudio_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -9461,18 +9470,18 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 610, ../../../scss/_metastudio_styles.scss */
+/* line 616, ../../../scss/_metastudio_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 613, ../../../scss/_metastudio_styles.scss */
+/* line 619, ../../../scss/_metastudio_styles.scss */
 #splash > img {
   position: absolute;
 }
 
 /****************** CUSTOM *********************/
-/* line 619, ../../../scss/_metastudio_styles.scss */
+/* line 625, ../../../scss/_metastudio_styles.scss */
 #landing-page {
   background-color: #666;
   top: 0;

@@ -129,8 +129,14 @@ body{
 /* Sections */
 
 
-main>nav>.button-bar{
+main>nav{
+    position: relative;
+    z-index: 10;
+&>.button-bar{
     background-color: $active-color;
+    .button-group{
+        margin: 0;
+    }
     li{
         
         .button{
@@ -162,11 +168,11 @@ main>nav>.button-bar{
     }
     
     /* Hide icons till we can retreive custom icons from the system */
-    app.i{
+    .app i{
                 display: none!important; 
             }
 }
-
+}
 
 
 main>aside{
