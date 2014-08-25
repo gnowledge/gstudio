@@ -7,11 +7,12 @@
 
 body{ 
   
-            background-color: #eee;
+            background-color: #fafafa;
 }
 
 
 .top-bar{
+    padding: 5px 0;
     border-bottom: 2px solid black;
     z-index: 200;
     .active{
@@ -276,7 +277,6 @@ main>aside{
         position: relative;
         z-index: 1;
         min-height: 400px;
-        background-color: white;
         overflow-x: visible;
         &>header,form>header{
             padding: 15px;
