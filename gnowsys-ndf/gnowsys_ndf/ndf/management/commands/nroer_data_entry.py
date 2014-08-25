@@ -614,7 +614,22 @@ def create_resource_gsystem(resource_data):
     # print title, "\n----------\n", userid, "\n", group_id, "\n", content_org, "\n", tags, "\n", language, "\n", access_policy
     fileobj.altnames = resource_data["altnames"]
     fileobj.featured = resource_data["featured"]
-    fileobj.contributors = resource_data["contributors"] if resource_data["contributors"] else []
+
+    # if resource_data[contributors]
+    #   contrib_list = resource_data[contributors].split(",")
+
+    #   temp_contributors = []
+    #   for each_user in contrib_list:
+    #     user_id = get_user_id(each_user.strip())
+    #     if user_id:
+    #       temp_contributors.append(user_id)
+    #       resource_data[contributors] = temp_contributors
+    # else:
+    #   resource_data[contributors] = []
+
+    # fileobj.contributors = resource_data[contributors]
+    fileobj.contributors = get_user_id("nroer_team")
+
     fileobj.license = resource_data["license"]
     fileobj.status = u"PUBLISHED"
 
