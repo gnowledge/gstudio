@@ -44,33 +44,7 @@ $('.start_date').fdatepicker();
 $('.start_date').fdatepicker('update','06/14/2014');
 {% endif %}
 $('.due_date').fdatepicker();
-user_list =JSON.parse(update_user_list())
-function update_user_list()
-{
-var ajurl ="{% url 'get_group_member_user' groupid %}";
-var users = [];
-  $.ajax({
-	url:ajurl,
-	async: false, 	
-  success: function(data){
-  users = data; },
-  });
-return users;
-}
-$.each(user_list, function(key,value) {   
-     $('#customDropdown2')
-         .append($("<option></option>")
-         .attr("value",value)
-         .text(value)
-	 .attr("id",value)); 
-     var div = $("<div>"+"</div>")
-		.attr("class","row")
-		.appendTo($(".watchers"));
-     var input = $("<input> "+value)
-		 .attr("type","checkbox")
-		 .attr("id",value) 
-		 .appendTo(div);
-});
+
 {% if Status %}
 var edit_Status  = document.getElementById("customDropdown")
 edit_Status.selectedIndex = edit_Status.options.{{Status}}.index
@@ -123,7 +97,42 @@ $('#hidden_watchers').val(selected);
 {% endblock %}
   
 {% block body_content %}
+<script type="text/javascript">
+  update_user_list( function(data) {
+$.each(data, function(key,value){
+	$('#customDropdown2')
+         .append($("<option></option>")
+         .attr("value",value)
+         .text(value)
+	 .attr("id",value)); 
+     var div = $("<div>"+"</div>")
+		.attr("class","row")
+		.appendTo($(".watchers"));
+     var input = $("<input> "+value)
+		 .attr("type","checkbox")
+		 .attr("id",value) 
+		 .appendTo(div);	        
+    });
+});
 
+function update_user_list(fn)
+{
+var ajurl ="{% url 'get_group_member_user' group_id %}";
+var user=new Array();
+var a;
+  $.ajax({
+	url:ajurl,
+   	dataType:'json', 	
+  success: function(data){
+    fn(data);
+  		},
+  
+	});
+
+
+}
+
+</script>  
 <form data-abide id="form-edit-node" method="POST" action="">
 {% csrf_token %}
     <h2 class="medium-12 columns">
