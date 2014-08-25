@@ -43,7 +43,7 @@
                   <b> {{value.name}} </b>
                 </div>                
                 <div class="small-12 columns text-left" style="padding-top:3px">
-                  <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'userDashboard' groupid value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                  <i class="posted-by" >{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
                 </div>     
               </div>
 
@@ -113,7 +113,7 @@
               </div>                
               <!-- <div class="small-7 columns text-right"> -->
               <div class="small-12 columns text-left" style="padding-top:3px">
-                <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'userDashboard' groupid value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
+                <i class="posted-by">{{ value.member_of_names_list|join:', ' }} by <a class="user" href="{% url 'dashboard' value.created_by %}" data-gnow="">{{value.user_details_dict.created_by}}</a> on {{value.created_at|date:"j F Y"}} </i>
               </div>     
             </div>
 
