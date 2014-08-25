@@ -472,13 +472,16 @@ class Node(DjangoDocument):
    		
    	old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':self._id})
         
+    	if not old_doc:
+    		#print "~~~~~~~~~~~~~~~~~~~~It is not present in the ToReduce() class collection.Message Coming from save() method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",self._id
     	if  not old_doc:
+
 
     		z = collection.ToReduceDocs()
     		z.doc_id = self._id
     		z.required_for = to_reduce_doc_requirement
     		z.save()
-    			
+
     	#If you create/edit anything then this code shall add it in the URL
 
         history_manager = HistoryManager()
