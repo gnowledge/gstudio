@@ -28,6 +28,8 @@ body{
 		}
     }
     .search{
+        position: relative;
+        padding-top: 3px;
         input{
             color: white;
             background-color: transparent;
@@ -38,9 +40,19 @@ body{
         }
         [type="submit"]{
             background-color: transparent;
-            width: 30px;
             position: absolute;
             right: 0;
+            top: 21%;
+        }
+    }
+    .language.button{
+        background-color: #555;
+        color:black;
+        margin-top: 4px;
+        padding: 4px 7px;
+        &:hover{
+            background-color: white;
+            color: black;
         }
     }
 }
