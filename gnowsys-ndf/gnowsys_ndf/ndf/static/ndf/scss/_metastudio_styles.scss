@@ -465,13 +465,12 @@ article{
 }
 }
 
-.tabs-content>.content{
-	padding-top: 0;
-}
+    section.content{
+        background-color:white;
+        border: 1px solid #eee;
+    }
 
-.content.row{
-    margin: 0;
-}
+
 }
 
 /* Default card */

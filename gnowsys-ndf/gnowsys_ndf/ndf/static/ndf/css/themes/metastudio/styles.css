@@ -9314,40 +9314,37 @@ article .tabs i {
   font-size: 1.3rem;
 }
 /* line 468, ../../../scss/_metastudio_styles.scss */
-article .tabs-content > .content {
-  padding-top: 0;
-}
-/* line 472, ../../../scss/_metastudio_styles.scss */
-article .content.row {
-  margin: 0;
+article section.content {
+  background-color: white;
+  border: 1px solid #eee;
 }
 
 /* Default card */
-/* line 478, ../../../scss/_metastudio_styles.scss */
+/* line 477, ../../../scss/_metastudio_styles.scss */
 .card > :hover .label, .card > :hover .label-list:empty:before {
   opacity: 1;
 }
 
-/* line 483, ../../../scss/_metastudio_styles.scss */
+/* line 482, ../../../scss/_metastudio_styles.scss */
 .gallery .card .th {
   display: block;
 }
 
 /* Inline label list */
-/* line 491, ../../../scss/_metastudio_styles.scss */
+/* line 490, ../../../scss/_metastudio_styles.scss */
 .label-list {
   display: inline-block;
   text-align: left;
   margin-bottom: 0.1rem;
 }
-/* line 495, ../../../scss/_metastudio_styles.scss */
+/* line 494, ../../../scss/_metastudio_styles.scss */
 .label-list:empty:before {
   content: "UNTAGGED";
   opacity: 0.2 !important;
   padding: 2px;
   background-color: transparent;
 }
-/* line 503, ../../../scss/_metastudio_styles.scss */
+/* line 502, ../../../scss/_metastudio_styles.scss */
 .label-list .label, .label-list .label-list:empty:before {
   text-transform: uppercase;
   background-color: transparent;
@@ -9356,26 +9353,26 @@ article .content.row {
 
 /*************************** 2. Custom CSS overrides ***********************/
 /* Content area */
-/* line 517, ../../../scss/_metastudio_styles.scss */
+/* line 516, ../../../scss/_metastudio_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 521, ../../../scss/_metastudio_styles.scss */
+/* line 520, ../../../scss/_metastudio_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
   margin-bottom: 1rem !important;
 }
-/* line 525, ../../../scss/_metastudio_styles.scss */
+/* line 524, ../../../scss/_metastudio_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 528, ../../../scss/_metastudio_styles.scss */
+/* line 527, ../../../scss/_metastudio_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 537, ../../../scss/_metastudio_styles.scss */
+/* line 536, ../../../scss/_metastudio_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -9396,44 +9393,44 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 557, ../../../scss/_metastudio_styles.scss */
+/* line 556, ../../../scss/_metastudio_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 562, ../../../scss/_metastudio_styles.scss */
+/* line 561, ../../../scss/_metastudio_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 565, ../../../scss/_metastudio_styles.scss */
+/* line 564, ../../../scss/_metastudio_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 568, ../../../scss/_metastudio_styles.scss */
+/* line 567, ../../../scss/_metastudio_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 571, ../../../scss/_metastudio_styles.scss */
+/* line 570, ../../../scss/_metastudio_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 575, ../../../scss/_metastudio_styles.scss */
+/* line 574, ../../../scss/_metastudio_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 579, ../../../scss/_metastudio_styles.scss */
+/* line 578, ../../../scss/_metastudio_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 587, ../../../scss/_metastudio_styles.scss */
+/* line 586, ../../../scss/_metastudio_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -9441,13 +9438,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 594, ../../../scss/_metastudio_styles.scss */
+/* line 593, ../../../scss/_metastudio_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 599, ../../../scss/_metastudio_styles.scss */
+/* line 598, ../../../scss/_metastudio_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -9461,13 +9458,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 609, ../../../scss/_metastudio_styles.scss */
+/* line 608, ../../../scss/_metastudio_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 614, ../../../scss/_metastudio_styles.scss */
+/* line 613, ../../../scss/_metastudio_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -9478,7 +9475,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 625, ../../../scss/_metastudio_styles.scss */
+/* line 624, ../../../scss/_metastudio_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -9490,28 +9487,28 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 637, ../../../scss/_metastudio_styles.scss */
+/* line 636, ../../../scss/_metastudio_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 640, ../../../scss/_metastudio_styles.scss */
+/* line 639, ../../../scss/_metastudio_styles.scss */
 #splash > img {
   position: absolute;
 }
 
 /****************** CUSTOM *********************/
-/* line 646, ../../../scss/_metastudio_styles.scss */
+/* line 645, ../../../scss/_metastudio_styles.scss */
 #landing-page {
   background-color: #666;
   top: 0;
 }
 
-/* line 653, ../../../scss/_metastudio_styles.scss */
+/* line 652, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 656, ../../../scss/_metastudio_styles.scss */
+/* line 655, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
