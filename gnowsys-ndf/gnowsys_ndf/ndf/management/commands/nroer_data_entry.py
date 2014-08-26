@@ -81,7 +81,7 @@ class Command(BaseCommand):
                         # Process csv file and convert it to json format at first
                         info_message = "\n- CSV File (" + file_path + ") found!!!"
                         print info_message
-                        log_list.append(info_message)
+                        log_list.append(str(info_message))
                 						    
                         try:
                             csv_file_path = file_path
@@ -104,12 +104,12 @@ class Command(BaseCommand):
                                 is_json_file_exists = True
                                 info_message = "\n- JSONType: File (" + json_file_path + ") created successfully.\n"
                                 print info_message
-                                log_list.append(info_message)
+                                log_list.append(str(info_message))
 
                         except Exception as e:
                             error_message = "\n!! CSV-JSONError: " + str(e)
                             print error_message
-                            log_list.append(error_message)
+                            log_list.append(str(error_message))
                             # End of csv-json coversion
 
                     elif "json" in file_extension:
@@ -118,14 +118,14 @@ class Command(BaseCommand):
                     else:
                         error_message = "\n!! FileTypeError: Please choose either 'csv' or 'json' format supported files!!!\n"
                         print error_message
-                        log_list.append(error_message)
+                        log_list.append(str(error_message))
                         raise Exception(error_mesage)
 
                     if is_json_file_exists:
                         # Process json file and create required GSystems, GRelations, and GAttributes
                         info_message = "\n------- Task initiated: Processing json-file -------\n"
                         print info_message
-                        log_list.append(info_message)
+                        log_list.append(str(info_message))
 
                         parse_data_create_gsystem(file_path)
                         
@@ -133,26 +133,28 @@ class Command(BaseCommand):
 
                         info_message = "\n------- Task finised: Successfully processed json-file -------\n"
                         print info_message
-                        log_list.append(info_message)
+                        log_list.append(str(info_message))
                         # End of creation of respective GSystems, GAttributes and GRelations for Enrollment
                         
                 else:
                     error_message = "\n!! FileNotFound: Following path (" + file_path + ") doesn't exists!!!\n"
                     print error_message
-                    log_list.append(error_message)
+                    log_list.append(str(error_message))
                     raise Exception(error_message)
 
                     
         except Exception as e:
             print str(e)
-            log_list.append(e)
+            log_list.append(str(e))
 
         finally:
             if log_list:
 
                 log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+                # print log_list
                 log_file_name = args[0].rstrip("csv") + "log"
                 log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+                # print log_file_path
                 with open(log_file_path, 'a') as log_file:
                     log_file.writelines(log_list)
 
@@ -166,7 +168,7 @@ def get_user_id(user_name):
   except Exception as e:
     error_message = e + "\n!! for username: "+ user_name
     print error_message 
-    log_list.append(error_message)
+    log_list.append(str(error_message))
     return False
 
 
@@ -206,14 +208,14 @@ def parse_data_create_gsystem(json_file_path):
 
     except Exception as e:
         error_message = "\n!! While parsing the file ("+json_file_path+") got following error...\n " + str(e)
-        log_list.append(error_message)
+        log_list.append(str(error_message))
         raise error_message
 
     for i, json_document in enumerate(json_documents_list):
       
       info_message = "\n\n********** Processing row number : ["+ str(i)+ "] **********"
       print info_message
-      log_list.append(info_message)
+      log_list.append(str(info_message))
       
       try:
 
@@ -331,7 +333,7 @@ def parse_data_create_gsystem(json_file_path):
 
                     info_message = "\n- For GAttribute parsing content | key: " + attr_key + " -- value: " + json_document[key]
                     print info_message
-                    log_list.append(info_message)
+                    log_list.append(str(info_message))
 
                   elif attr_value['data_type'] == unicode:
                     json_document[key] = unicode(json_document[key])
@@ -386,13 +388,13 @@ def parse_data_create_gsystem(json_file_path):
 
                   info_message = "\n- Creating GAttribute ("+node.name+" -- "+attribute_type_node.name+" -- "+str(json_document[key])+") ...\n"
                   print info_message
-                  log_list.append(info_message)
+                  log_list.append(str(info_message))
 
                   ga_node = create_gattribute(subject_id, attribute_type_node, object_value)
                   
                   info_message = "- Created ga_node : "+ str(ga_node.name) + "\n"
                   print info_message
-                  log_list.append(info_message)
+                  log_list.append(str(info_message))
                   
                   # To break outer for loop as key found
                   break
@@ -400,7 +402,7 @@ def parse_data_create_gsystem(json_file_path):
                 else:
                   error_message = "\n!! DataNotFound: No data found for field ("+str(attr_key)+") while creating GSystem ( -- "+str(node.name)+")\n"
                   print error_message
-                  log_list.append(error_message)
+                  log_list.append(str(error_message))
 
             if is_relation:
               relation_list.append(key)
@@ -409,7 +411,7 @@ def parse_data_create_gsystem(json_file_path):
             # No possible relations defined for this node
             info_message = "\n!! ("+str(node.name)+"): No possible relations defined for this node.\n"
             print info_message
-            log_list.append(info_message)
+            log_list.append(str(info_message))
             return
 
           gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
@@ -446,29 +448,42 @@ def parse_data_create_gsystem(json_file_path):
                     '''
                     # print oid
                     if len(hier_list) >= 2:
-                      if oid:
-                        curr_oid = collection.GSystem.one({ "_id": oid })
-                        # print curr_oid.name
-                      else:
-                        curr_oid = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                      try:
+                        if oid:
+                          curr_oid = collection.GSystem.one({ "_id": oid })
+                          # print curr_oid._id
+                        else:
+                          curr_oid = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
 
-                      next_oid = collection.GSystem.one({ 
-                                                "name": hier_list[1],
-                                                'group_set': {'$all': [ObjectId(home_group._id)]},
-                                                'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
-                                                '_id': {'$in': curr_oid.collection_set }
-                                                })
+                        if curr_oid:
+                          object_exist = True
+                          next_oid = collection.GSystem.one({ 
+                                                    "name": hier_list[1],
+                                                    'group_set': {'$all': [ObjectId(home_group._id)]},
+                                                    'member_of': {'$in': [ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]},
+                                                    '_id': {'$in': curr_oid.collection_set }
+                                                    })
 
-                      # print "||||||", next_oid.name
-                      hier_list.remove(hier_list[0])
-                      _get_id_from_hierarchy(hier_list, next_oid._id)
-                    
-                    if len(hier_list) == 1:
-                      if oid:
-                        # print "oid: ", oid
-                        return oid
-                      else:
-                        return collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} }, {"_id": 1} )
+                          # print "||||||", next_oid.name
+                          hier_list.remove(hier_list[0])
+                          _get_id_from_hierarchy(hier_list, next_oid._id)
+                        else:
+                          object_exists = False
+
+
+                      except Exception as e:
+                        error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
+                        print error_message
+                        log_list.append(error_message)
+                      
+                      if len(hier_list) == 1:
+                        if oid:
+                          # print "oid: ", oid
+                          return oid
+                        else:
+                          return collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} }, {"_id": 1} )
+                      elif:
+
                     # -----------------------------                  
 
 
@@ -494,7 +509,7 @@ def parse_data_create_gsystem(json_file_path):
                   # print "\n----------", json_document[key]
                   info_message = "\n- For GRelation parsing content | key: " + str(rel_key) + " -- " + str(json_document[key])
                   print info_message
-                  log_list.append(info_message)
+                  log_list.append(str(info_message))
                   # print list(json_document[key])
 
                   # perform_eval_type(key, json_document, "GSystem", "GSystem")
@@ -525,12 +540,12 @@ def parse_data_create_gsystem(json_file_path):
 
                     info_message = "\n- Creating GRelation ("+ str(node.name)+ " -- "+ str(rel_key)+ " -- "+ str(right_subject_id)+") ..."
                     print info_message
-                    log_list.append(info_message)
+                    log_list.append(str(info_message))
                     gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
                     
                     info_message = "\n Grelation created (gr_node): "+ str(gr_node.name) + "\n"
                     print info_message
-                    log_list.append(info_message)
+                    log_list.append(str(info_message))
 
                   # To break outer for loop if key found
                   break
@@ -538,7 +553,7 @@ def parse_data_create_gsystem(json_file_path):
                 else:
                   error_message = "\n!! DataNotFound: No data found for relation ("+ str(rel_key)+ ") while creating GSystem (" + str(file_gst.name) + " -- " + str(node.name) + ")\n"
                   print error_message
-                  log_list.append(error_message)
+                  log_list.append(str(error_message))
 
                   break
 
@@ -546,14 +561,14 @@ def parse_data_create_gsystem(json_file_path):
         else:
             info_message = "\n!! Either resource is already created or file is already saved into gridfs/DB"
             print info_message
-            log_list.append(info_message)
+            log_list.append(str(info_message))
 
             continue
 
       except Exception as e:
           error_message = "\n While creating ("+str(json_document['name'])+") got following error...\n " + str(e)
           print error_message # Keep it!
-          log_list.append(error_message)
+          log_list.append(str(error_message))
 
 
 def create_resource_gsystem(resource_data):
@@ -580,15 +595,15 @@ def create_resource_gsystem(resource_data):
     # printing appropriate error message
     if check_obj_by_name:
       info_message = "\n- Resource with same name of "+ str(resource_data["name"]) +" and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name._id)
-      log_list.append(info_message)
+      log_list.append(str(info_message))
     else:      
       info_message = "\n- Resource file exists in DB: " + str(cur_oid._id)
-      log_list.append(info_message)
+      log_list.append(str(info_message))
     return None
 
   else:
     info_message = "\n- Creating resource: " + str(resource_data["name"])
-    log_list.append(info_message)
+    log_list.append(str(info_message))
     
     filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
 
@@ -606,10 +621,22 @@ def create_resource_gsystem(resource_data):
       fileobj.content_org = unicode(content_org)
       # Required to link temporary files with the current user who is modifying this document
       # usrname = request.user.username
-      filename = slugify(name) + "-" + "nroer_team" + "-" + ObjectId().__str__()
+      filename = slugify(name) + "-" + "nroer_team"
       fileobj.content = org2html(content_org, file_prefix=filename)
 
-    fileobj.tags = resource_data["tags"]
+    # fileobj.tags = resource_data["tags"]
+
+    # tags:
+    if not type(resource_data["tags"]) is list:
+      tag_list = resource_data["tags"].replace("\n", "").split(",")
+      temp_tag_list = []
+      for each_tag in tag_list:
+        if each_tag:
+          temp_tag_list.append(each_tag.strip())
+      fileobj.tags = temp_tag_list
+    else:
+      fileobj.tags = resource_data["tags"]
+
     fileobj.language = resource_data["language"]
     # username = User.objects.get(id=userid).username
     fileobj.access_policy = u"PUBLIC"
@@ -639,12 +666,14 @@ def create_resource_gsystem(resource_data):
     fileobj.mime_type = filetype
     fileobj.save()
 
+    log_list.append("\n- Created resource/GSystem object of name: '" + fileobj.name + "' having ObjectId: " + fileobj._id.__str__())
+
     files.seek(0)
     objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
-    # print "\n----------", fileobj
 
-    # need to add thumbnail creating code
+    log_list.append("\n- Saved resource into gridfs. \n")
+    # print "\n----------", fileobj
     
     # filetype1 = mimetypes.guess_type(filename)[0]
     # print filetype1
@@ -686,7 +715,7 @@ def getFileSize(File):
     except Exception as e:
         error_message = "Unabe to calucalate size" + e
         print error_message
-        log_list.append(error_message)
+        log_list.append(str(error_message))
         return 0,'bytes'
 
 
