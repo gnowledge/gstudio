@@ -22,7 +22,7 @@ class Command(BaseCommand):
     # Keep latest fields to be added at top
 
     # Adds "license" field (with default value as "") to all documents belonging to GSystems (except Author).
-    res = collection.update({'_type': {'$nin': ["MetaType", "Author", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]}, 'license': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ["MetaType", "Author", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'license': {'$exists': False}}, 
                             {'$set': {'license': ""}}, 
                             upsert=False, multi=True
     )
@@ -46,8 +46,8 @@ class Command(BaseCommand):
 
 
     # Modify language field with unicode value if any document has language with dict datatype
-    res = collection.update({'language':{}},
-                            {'$set':{'language':u""}}, 
+    res = collection.update({'language': {}},
+                            {'$set': {'language': u""}}, 
                             upsert=False, multi=True
     )
 
@@ -93,7 +93,7 @@ class Command(BaseCommand):
 
 
     # Adding "rating" field with no default value
-    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'rating': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'rating': {'$exists': False}}, 
                             {'$set': {'rating': []}}, 
                             upsert=False, multi=True
     )
@@ -121,28 +121,28 @@ class Command(BaseCommand):
     print "\n 'subject_scope', 'relation_type_scope', 'right_subject_scope' fields added to following no. of documents: ", res['n']
 
     # Adds "annotations" field (with default value as []) to all documents belonging to GSystems
-    res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute"]}, 'annotations': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'annotations': {'$exists': False}}, 
                             {'$set': {'annotations': []}}, 
                             upsert=False, multi=True
     )
     print "\n annotations field added to following no. of documents: ", res['n']
 
     # Adds "group_set" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
-    res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'group_set': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation", "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'group_set': {'$exists': False}}, 
                             {'$set': {'group_set': []}}, 
                             upsert=False, multi=True
     )
     print "\n group_set field added to following no. of documents: ", res['n']
 
     # Adds "property_order" field (with default value as []) to all documents except those which belongs to either GAttribute or GRelation
-    res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation"]}, 'property_order': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ["GAttribute", "GRelation", "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'property_order': {'$exists': False}}, 
                             {'$set': {'property_order': []}}, 
                             upsert=False, multi=True
     )
     print "\n property_order field added to following no. of documents: ", res['n']
 
     # Adding "modified_by" field with None as it's default value
-    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'modified_by': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'modified_by': {'$exists': False}}, 
                             {'$set': {'modified_by': None}}, 
                             upsert=False, multi=True
     )
@@ -156,28 +156,28 @@ class Command(BaseCommand):
     print "\n complex_data_type field added to following no. of documents: ", res['n']
 
     # Adding "post_node" field with empty list as it's default value
-    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'post_node': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'post_node': {'$exists': False}}, 
                             {'$set': {'post_node': []}}, 
                             upsert=False, multi=True
     )
     print "\n post_node field added to following no. of documents: ", res['n']
 
     # Adding "collection_set" field with empty list as it's default value
-    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'collection_set': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'collection_set': {'$exists': False}}, 
                             {'$set': {'collection_set': []}}, 
                             upsert=False, multi=True
     )
     print "\n collection_set field added to following no. of documents: ", res['n']
 
     # Adding "location" field with no default value
-    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'location': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'location': {'$exists': False}}, 
                             {'$set': {'location': []}}, 
                             upsert=False, multi=True
     )
     print "\n location field added to following no. of documents: ", res['n'], "\n"
 
     # Adding "language" field with no default value
-    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation']}, 'language': {'$exists': False}}, 
+    res = collection.update({'_type': {'$nin': ['GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'language': {'$exists': False}}, 
                             {'$set': {'language': unicode('')}}, 
                             upsert=False, multi=True
     )
@@ -189,9 +189,9 @@ class Command(BaseCommand):
     collection.update({'_type': 'Group', 'group_type': 'PUBLIC'}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
     
     # For Non-Group documents which doesn't consits of access_policy field, add it with PUBLIC as it's default value
-    collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation']}, 'access_policy': {'$exists': False}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
+    collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'access_policy': {'$exists': False}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
     
-    collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation']}, 'access_policy': {'$in': [None, "PUBLIC"]}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
-    collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation']}, 'access_policy': "PRIVATE"}, {'$set': {'access_policy': u"PRIVATE"}}, upsert=False, multi=True)
+    collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'access_policy': {'$in': [None, "PUBLIC"]}}, {'$set': {'access_policy': u"PUBLIC"}}, upsert=False, multi=True)
+    collection.update({'_type': {'$nin': ['Group', 'GAttribute', 'GRelation', "ReducedDocs", "ToReduceDocs", "IndexedWordList"]}, 'access_policy': "PRIVATE"}, {'$set': {'access_policy': u"PRIVATE"}}, upsert=False, multi=True)
 
     

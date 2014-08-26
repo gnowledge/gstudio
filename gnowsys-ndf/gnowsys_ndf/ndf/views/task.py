@@ -7,7 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-
+from django.http import HttpResponseRedirect
+from django.http import HttpResponse
+import json
+from gnowsys_ndf.ndf.models import NodeJSONEncoder
 try:
     from bson import ObjectId
 except ImportError:  # old pymongo
@@ -304,3 +307,97 @@ def delete_task(request, group_name, _id):
     except Exception as e:
         print "Exception:", e
     return HttpResponseRedirect(pageurl) 
+
+
+@login_required
+def check_filter(request,group_name,choice,status=None):
+    at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
+    blank_dict = {}
+    history = []
+    subtask = []
+    group_name=group_name
+    ins_objectid  = ObjectId()
+    task=[]
+    if ins_objectid.is_valid(group_name) is False :
+      group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+          group_id = str(auth._id)
+    else :
+        pass
+    #section to get the Tasks 
+    GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+    attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Status'})
+    attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    
+    Completed_Status_List=['Resolved','Closed']
+    title = "Task"
+    TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
+    task_list=[]
+    self_task=[]
+    #Task Completed 
+    for each in TASK_inst:
+    	 
+    	attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
+    	attr1 = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key1._id})
+    	
+    	if int(choice) == int(1):
+    			self_task.append(each)
+
+    	if int(choice) == int(2):
+    		message="No Completed Task"
+    		if attr:
+    			if attr.object_value in Completed_Status_List:
+    				    self_task.append(each)
+                        
+
+
+    	#Task Created By Me
+        elif int(choice) == int(3):
+	 		
+    		creator_id=each.created_by
+    		message="No Task Created"
+    		auth1 = collection.Node.one({'_type': 'Author', 'created_by': creator_id })   
+    		if auth.name == auth1.name:
+    	  		self_task.append(each)
+    	           
+    	#Task Assign To me
+    	elif int(choice) == int(4):
+    			message="Nothing Assigned"         
+    			if attr1:
+                            if attr.object_value == request.user:
+                                self_task.append(each)
+                                
+    	elif int(choice) == int(5):
+				message="No Pending Task"
+				if attr:
+                            		if attr.object_value not in Completed_Status_List and attr.object_value != 'Rejected':
+                  						self_task.append(each)
+                				
+
+        #Task Listing According to the Status
+        elif int(choice)==int(6):
+        	message="No"+" "+status+" "+"Task"
+        	if attr:
+        		#This Dictionary created saves the status and 'Task Node' i.e 'In Progress':'Node'
+        		if attr.object_value == status:
+        				self_task.append(each)
+                    	
+
+        	self_task.sort()
+   
+
+        if not self_task:
+        	send=message
+        else:
+        	send=""		
+
+    template = "ndf/task_card_view.html"
+    variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
+    return render_to_response(template, variable)
+    #return HttpResponse(json.dumps(self_task,cls=NodeJSONEncoder))

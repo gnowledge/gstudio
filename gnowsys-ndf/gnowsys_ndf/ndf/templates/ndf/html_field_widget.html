@@ -20,22 +20,15 @@
     </div>
   </div>
 
-  {% elif is_mongokit_is_radio %}
-    <div style="float:left;">
-    {% for value in field_value_choices %}
-    {% if forloop.counter != 1 %}
-    &nbsp;&nbsp;&nbsp;
-    {% endif %}
-    <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
-    {% endfor %}
-    </div>
+  {% elif field.validators.0 == "email" %}
+    <input type="email" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %} Please select {{alt}}!!! {% endblocktrans %}</small>
+    <small class="error">{% blocktrans with alt=field.altnames %}Please fill valid {{alt}}!!!{% endblocktrans %}</small>
     {% endif %}
 
   {% elif field_type == "unicode" or field_type == "basestring" %}
-    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; {% if is_required_field %}width:95%{% endif %}"/>
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% blocktrans with alt=field.altnames %}Please fill {{alt}}!!!{% endblocktrans %}</small>
@@ -49,14 +42,14 @@
     {% endif %}
 
   {% elif field_type == "datetime" %}
-    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:field.validators.0}}" class="{{field.validators.1}}" {% if is_required_field %}required{% endif %} style="float:left; width:45%" placeholder="{{field.validators.2}}"/>
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:field.validators.0}}" class="{{field.validators.1}}" {% if is_required_field %}required{% endif %} style="float:left; width:10rem" placeholder="{{field.validators.2}}"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% blocktrans with alt=field.altnames %}Please set {{alt}}!!!{% endblocktrans %}</small>
     {% endif %}
 
   {% elif field_type == "bool" %}
-    <div style="float:left;">
+    <div style="float:left; margin-top:0.5rem;">
     {% for value in field_value_choices %}
     {% if forloop.counter != 1 %}
     &nbsp;&nbsp;&nbsp;
@@ -91,12 +84,14 @@
         filter: alpha(opacity=0);
       }
     </style>
-    <div style="float:left; width:70%">
-      <input type="text" id="uploadFile" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:75%; margin-right:1rem;"/>
+    <div style="float:left;">
+      <input type="text" id="uploadFile" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" {% if is_required_field %}required{% endif %} />
       <a href="#" class="fileUpload button tiny round" style="margin-top:2px;">
-          <span>Upload</span>
-          <input id="uploadBtn" type="file" name="{{field.name}}" class="upload"/>
+          <span>{% trans "Upload" %}</span>
+          <input id="uploadBtn" type="file" name="{{field.name}}" class="upload" {% if is_required_field %}required{% endif %} />
+          <small class="error">{% blocktrans with alt=field.altnames %}Upload!!!{% endblocktrans %}</small>
       </a>
+      <i style="color:red; float:left display:inline">*</i>
     </div>
     <script type="text/javascript">
       $('#uploadBtn').change(function () {
@@ -104,6 +99,36 @@
         $('#uploadFile').val(this.value);
       });
     </script>
+
+  {% else %}
+
+    <!-- Special check for IS() : True (radio buttons) & False (dropdown) -->
+    {% if is_mongokit_is_radio %}
+      <div style="float:left; margin-top:0.5rem;">
+      {% for value in field_value_choices %}
+      {% if forloop.counter != 1 %}
+      &nbsp;&nbsp;&nbsp;
+      {% endif %}
+      <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{% blocktrans %}{{value}}{% endblocktrans %}</label>
+      {% endfor %}
+      </div>
+      {% if is_required_field %}
+      <i style="color:red; float:left display:inline">*</i>
+      <small class="error">{% blocktrans with alt=field.altnames %} Please select {{alt}}!!! {% endblocktrans %}</small>
+      {% endif %}
+
+    {% else %}
+      <select id="{{field.name}}" name="{{field.name}}" required="" style="float:left; width:95%">
+        <option value="">- - - Select {{field.altnames|lower}} - - -</option>
+        {% for choice in field_value_choices %}
+        <option value="{{choice}}" {% if choice in field_value %} selected {% endif %} >{% blocktrans %}{{choice}}{% endblocktrans %}</option>
+        {% endfor %}
+      </select>
+      <i style="color:red; float:left display:inline">*</i>
+      <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>  
+
+    {% endif %}
+
 
   {% endif %}
 
@@ -114,7 +139,7 @@
   <select id="{{field.name}}" name="{{field.name}}" required="" style="float:left; width:95%">
     <option value="">- - - Select {{field.altnames|lower}} - - -</option>
     {% for choice in field_value_choices %}
-    <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{{choice.name}}</option>
+    <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{% blocktrans with alt=choice.name %}{{alt}}{% endblocktrans %}</option>
     {% endfor %}
   </select>
   <i style="color:red; float:left display:inline">*</i>
@@ -128,7 +153,7 @@
 
     {% for choice in field_value_choices %}
     {% if choice.pk in field_value %}
-    <option value="{{choice.pk}}" selected="" >{{choice.name}}</option>
+    <option value="{{choice.pk}}" selected="" >{% blocktrans with alt=choice.name %}{{alt}}{% endblocktrans %}</option>
     {% endif %}
     {% endfor %}
 
@@ -137,12 +162,12 @@
   <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>
   
   <a href="" class="button tiny round" style="float: right;" data-reveal-id="{{field.name}}_modal">
-    {% if not field_value %}Select{% else %}Change{% endif %}
+    {% if not field_value %}{% trans "Select" %}{% else %}{% trans "Change" %}{% endif %}
   </a>
 
   <div id="{{field.name}}_modal" class="reveal-modal xlarge" style="height: 90% !important" data-reveal>
     <div id="{{field.name}}_drawer">
-      <h3>Select {{field.altnames}}</h3>
+      <h3>{% blocktrans with alt=field.altnames %}Select {{alt}}{% endblocktrans %}</h3>
       {% edit_drawer_widget field.name groupid node_dict field_value_choices %}
     </div>
     <a class="close-reveal-modal">&#215;</a>
