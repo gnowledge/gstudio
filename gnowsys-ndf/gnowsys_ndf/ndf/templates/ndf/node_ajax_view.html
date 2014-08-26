@@ -579,52 +579,33 @@ This section has been integrated to groupdashboard and appears in block app_acti
         <div class="content active" id="contents"> 
           
           {% get_contents node.pk as contents %}
-          <fieldset id="image_contents">
-           {% blocktrans %} <legend>Images</legend>{% endblocktrans %}
+          {% for k,v in contents.items %}    
 
-            {% for k,v in contents.items %}
-              {% if k == "image_contents" %}
-                {% for e in v %}
-                  <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
-                    <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
-                    <br/><div>{{e.0}}</div>
-                  </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
+            <fieldset id="{{k}}">
+              {% blocktrans %} <legend>{{k}}</legend>{% endblocktrans %}
 
-          </fieldset>
-
-          <fieldset id="video_contents">
-            {% blocktrans %}<legend>Videos</legend>{% endblocktrans %}
-            {% for k,v in contents.items %}
-              {% if k == "video_contents" %}
-                {% for e in v %}
-                  <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
-                    <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
-                    <br/><div>{{e.0}}</div>
-                  </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
-
-          </fieldset>
-
-          <fieldset id="document_contents">
-            <legend>{% blocktrans %}Documents{% endblocktrans %}</legend>
-            {% for k,v in contents.items %}
               {% for e in v %}
+                {% if k == "Images" %}
+                    <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
+                      <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
+                      <br/><div>{{e.0}}</div>
+                    </a>&nbsp;&nbsp;&nbsp;&nbsp;
 
-                {% if k == "page_contents" %}
-                  <a href="{% url 'page_details' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
-                {% elif k == "document_contents" %}
-                  <a href ="{% url 'file_detail' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
-                {% endif %}              
+                {% elif k == "Videos" %}
+                    <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
+                      <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
+                      <br/><div>{{e.0}}</div>
+                    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
+                {% else %}
+                    <a href ="{% url 'file_detail' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
+                {% endif %}
+                
               {% endfor %}
-            {% endfor %}
+            </fieldset>
 
-          </fieldset>
+          {% endfor %}
+          
 
         </div>
       {% endif %}
