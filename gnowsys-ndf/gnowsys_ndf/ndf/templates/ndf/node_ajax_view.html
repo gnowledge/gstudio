@@ -266,6 +266,9 @@
           {% get_create_url node.pk as create_url %}
 
           {% if is_group %}
+            
+<!-- 
+This section has been integrated to groupdashboard and appears in block app_action_list
             {% if request.user.is_superuser %}
             <li>
               <a href="{% url create_url group_name_tag %}">
@@ -273,6 +276,7 @@
               </a>
             </li>
             {% endif %}
+-->
 
           {% else %}
             {% if node.member_of_names_list.0 == "File" %}

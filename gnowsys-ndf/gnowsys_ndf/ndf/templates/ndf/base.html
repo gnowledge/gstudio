@@ -233,7 +233,7 @@
               
               <ul class="button-group medium-2 columns">
                   <li>
-            <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> Front Page</a>
+            <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> {% trans "Dashboard" %}</a>
 
               </li>
                 </ul>
@@ -241,18 +241,19 @@
         {% get_gapps_iconbar request groupid %}
               
               <ul class="tools button-group medium-2 columns right">
+                  <!-- Show app options if user is logged in-->
+                  {% if user.is_authenticated %}
                   <li>
-               <!-- app options-->
                <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown"><i class="fi-plus"></i> Actions</a><br>
 <ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
-  {% block app_settings_dropdown %} {% endblock %}
+  {% block app_action_list %} {% endblock %}
     
 </ul>
                       </li>
+                  {% endif %}
+                  
                   <li class="right">
-                  {% if user.is_authenticated %}
 <a id="toggle-help" class="button right-off-canvas-toggle" ><i class='fi-lightbulb'></i></a> 
-{% endif %}
                   </li>
                   </ul>
               
@@ -275,6 +276,7 @@
               {% endblock %}
             </section>
 
+            <section>
             <section>
               <div>
           		{% block collection_content %}  {% endblock %}

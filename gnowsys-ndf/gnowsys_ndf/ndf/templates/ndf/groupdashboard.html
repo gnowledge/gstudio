@@ -132,10 +132,19 @@ $(document).ready(function()
 <h4><i class="fi-torsos"></i>{{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}</h4>
 {% endblock %}
 
-{% block app_settings_dropdown %}
+{% block app_action_list %}
 
   {% check_is_user_group group_id as is_user_group %}
   {% get_policy node request.user as policy  %}
+
+{% get_create_url node.pk as create_url %}
+{% if request.user.is_superuser %}
+            <li>
+              <a href="{% url create_url group_name_tag %}">
+                <span class="fi-plus"> {% trans "Create a New Group" %}</span>
+              </a>
+            </li>
+            {% endif %}
 
   {% if policy %}
   <!-- Triggers the modals -->

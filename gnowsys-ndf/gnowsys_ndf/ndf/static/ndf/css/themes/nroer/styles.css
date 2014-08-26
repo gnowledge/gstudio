@@ -9043,18 +9043,18 @@ main > nav > .button-bar .app i {
 
 /* line 206, ../../../scss/_metastudio_styles.scss */
 main > aside > div h2 {
-  color: white;
+  color: #111;
 }
 /* line 209, ../../../scss/_metastudio_styles.scss */
 main > aside > div h3 {
   font-size: 1.2rem;
   font-weight: normal;
-  color: white;
+  color: #222;
 }
 /* line 214, ../../../scss/_metastudio_styles.scss */
 main > aside > div h4 {
   font-size: 1rem;
-  color: #eee;
+  color: #222;
 }
 /* line 217, ../../../scss/_metastudio_styles.scss */
 main > aside > div h4 span {
