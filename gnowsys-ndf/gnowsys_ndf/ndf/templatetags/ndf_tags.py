@@ -1,5 +1,5 @@
 ''' -- imports from python libraries -- '''
-import re
+import re, magic
 
 ''' -- imports from installed packages -- '''
 from django.contrib.auth.models import User
@@ -936,47 +936,93 @@ def get_contents(node_id):
 	video_contents = []
 	document_contents = []
 	page_contents = []
-
-	page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'}) 
+	audio_contents = []
+	interactive_contents = []
 
 	obj = collection.Node.one({'_id': ObjectId(node_id) })
-	if obj.collection_set:
-		for each in obj.collection_set:
-			coll_obj = collection.Node.one({'_id': ObjectId(each) })
 
-			if coll_obj.has_key("mime_type"):
-				if 'image' in coll_obj.mime_type:
-					image_contents.append((coll_obj.name, coll_obj._id))
-				elif 'video' in coll_obj.mime_type:
-					video_contents.append((coll_obj.name, coll_obj._id))
-				else:
-					if coll_obj._type == "File":
-						document_contents.append((coll_obj.name, coll_obj._id))
-			else: 
-				if page_GST._id in coll_obj.member_of:
-					page_contents.append((coll_obj.name, coll_obj._id))
+	RT = collection.Node.one({'_type':'RelationType', 'name': 'teaches'})
+	list_grelations = collection.Node.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type':RT.get_dbref() })
+	for rel in list_grelations:
+		rel_obj = collection.Node.one({'_id': ObjectId(rel.subject)})
 
+		if rel_obj._type == "File":
+			gattr = collection.Node.one({'_type': 'AttributeType', 'name': u'educationaluse'})
+			list_gattr = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject":rel_obj._id})
+			for attr in list_gattr:
+				left_obj = collection.Node.one({'_id': ObjectId(attr.subject) })
+				if attr.object_value == "Images":
+					image_contents.append((left_obj.name, left_obj._id))
+				elif attr.object_value == "Videos":
+					video_contents.append((left_obj.name, left_obj._id))
+				elif attr.object_value == "Audios":
+					audio_contents.append((left_obj.name, left_obj._id))
+				elif attr.object_value == "Interactives":
+					interactive_contents.append((left_obj.name, left_obj._id))
+				elif attr.object_value == "Documents":
+					document_contents.append((left_obj.name, left_obj._id))
 
-		if not image_contents:
-			image_contents.append("None")
-		elif image_contents:
-			contents['image_contents'] = image_contents
+				
+	if image_contents:
+		contents['Images'] = image_contents
+	
+	if video_contents:
+		contents['Videos'] = video_contents
 
-		if not video_contents:
-			video_contents.append("None")
-		elif video_contents:
-			contents['video_contents'] = video_contents
+	if audio_contents:
+		contents['Audios'] = audio_contents		
+	
+	if document_contents:
+		contents['Documents'] = document_contents
+	
+	if interactive_contents:
+		contents['Interactives'] = interactive_contents
+	
 
-		if not document_contents:
-			document_contents.append("None")
-		elif document_contents:
-			contents['document_contents'] = document_contents
-		
-		if page_contents:
-			contents['page_contents'] = page_contents		
-
-	# print "\n",document_contents,"\n"
+	# print "\n",contents,"\n"
 	return contents
+
+
+	# page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'}) 
+
+	# obj = collection.Node.one({'_id': ObjectId(node_id) })
+	# if obj.collection_set:
+	# 	for each in obj.collection_set:
+	# 		coll_obj = collection.Node.one({'_id': ObjectId(each) })
+
+	# 		if coll_obj.has_key("mime_type"):
+	# 			if 'image' in coll_obj.mime_type:
+	# 				image_contents.append((coll_obj.name, coll_obj._id))
+	# 			elif 'video' in coll_obj.mime_type:
+	# 				video_contents.append((coll_obj.name, coll_obj._id))
+	# 			else:
+	# 				if coll_obj._type == "File":
+	# 					document_contents.append((coll_obj.name, coll_obj._id))
+	# 		else: 
+	# 			if page_GST._id in coll_obj.member_of:
+	# 				page_contents.append((coll_obj.name, coll_obj._id))
+	
+
+	# 	if not image_contents:
+	# 		image_contents.append("None")
+	# 	elif image_contents:
+	# 		contents['image_contents'] = image_contents
+
+	# 	if not video_contents:
+	# 		video_contents.append("None")
+	# 	elif video_contents:
+	# 		contents['video_contents'] = video_contents
+
+	# 	if not document_contents:
+	# 		document_contents.append("None")
+	# 	elif document_contents:
+	# 		contents['document_contents'] = document_contents
+		
+	# 	if page_contents:
+	# 		contents['page_contents'] = page_contents		
+
+	# # print "\n",document_contents,"\n"
+	# return contents
 
 
 @register.assignment_tag
