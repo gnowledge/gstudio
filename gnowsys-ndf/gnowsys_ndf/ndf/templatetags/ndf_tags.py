@@ -1528,7 +1528,8 @@ def get_resource_collection(groupid, resource_type):
 
 
 @register.assignment_tag
-def get_preferred_lang(request, nodes, node_type):
+def get_preferred_lang(request, group_id, nodes, node_type):
+   group=collection.Node.one({'_id':(ObjectId(group_id))})
    uname=collection.Node.one({'name':str(request.user.username), '_type': {'$in': ["Group", "Author"]}})
    primary_list=[]
    secondary_list=[]
@@ -1538,17 +1539,17 @@ def get_preferred_lang(request, nodes, node_type):
       node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
       try:
          for each in nodes:
-            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':each._id}]})
             if primary_nodes:
                primary_list.append(primary_nodes)
             
             else:
-               secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['secondary']},{'_id':each._id}]})
+               secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['secondary']},{'_id':each._id}]})
                if secondary_nodes:
                   secondary_list.append(secondary_nodes)
                   
             if (pref_lan['secondary'] == pref_lan['default']) and (pref_lan['primary'] == pref_lan['default']):
-               default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['default']},{'_id':each._id}]})
+               default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
                if default_nodes:
                   default_list.append(default_nodes)
          if primary_list:
