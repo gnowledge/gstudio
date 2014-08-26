@@ -1,0 +1,59 @@
+{% load i18n %}
+{% load pagination_tags %}
+{% load ndf_tags %}
+{% load i18n %}
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  {% autopaginate TASK_inst 23 %}
+ 
+  {% for node in TASK_inst %}
+    
+  {% get_version_of_module node.pk as version %}
+  <li class="card">
+    <div class="course">
+      <header>
+        <div class="label-list">
+          {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          {% endfor %}
+        </div>
+          
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+        <h4>{{ node.name|truncatechars:20 }}</h4>
+
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+          <br/>
+          by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </header>
+
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+      <a class="small button expand" href="{% url 'task_details' group_name node %}">{% trans "Detail" %}</a> 
+
+      {% get_user_object node.created_by as user_obj %}
+      {% ifequal user_obj.username user.username %}
+      <a class="button alert tiny" href="{% url 'delete_task' group_name node %}?next={{request.path}}">{% trans "Delete" %}</a>
+      {% endifequal %}
+
+      
+    </div>
+  </li>  
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-12 columns">
+       <h5> {% blocktrans %}{{send}}</b>{% endblocktrans %} </h5>
+      </div>
+    </div>
+    {% endif %}
+
+  {% endfor %}
+
+  {% paginate %}
+
+</ul>

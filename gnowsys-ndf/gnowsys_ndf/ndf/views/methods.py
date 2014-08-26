@@ -290,7 +290,7 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
     node.name=unicode(name)
     # Required to link temporary files with the current user who is modifying this document
     usrname = request.user.username
-    filename = slugify(name) + "-" + usrname + "-"
+    filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
     node.content = org2html(content_org, file_prefix=filename)
 
 
@@ -534,7 +534,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       
       # Required to link temporary files with the current user who is modifying this document
       usrname = request.user.username
-      filename = slugify(name) + "-" + usrname + "-"
+      filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
       node.content = org2html(content_org, file_prefix=filename)
       # print "\n Changed: content_org"
       is_changed = True

@@ -15,6 +15,8 @@ from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS as setting_gapps, META_TYPE,CREATE_GROUP_VISIBILITY
+from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO
+
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
 from gnowsys_ndf.ndf.views.methods import get_drawers
@@ -37,6 +39,24 @@ translation_set=[]
 check=[]
 import json,ox
 
+
+
+@register.assignment_tag
+def get_site_variables():
+   site_var={}
+   site_var['ORG_NAME']=GSTUDIO_ORG_NAME
+   site_var['LOGO']=GSTUDIO_SITE_LOGO
+   site_var['COPYRIGHT']=GSTUDIO_COPYRIGHT
+   site_var['GIT_REPO']=GSTUDIO_GIT_REPO
+   site_var['PRIVACY_POLICY']=GSTUDIO_SITE_PRIVACY_POLICY
+   site_var['TERMS_OF_SERVICE']=GSTUDIO_SITE_TERMS_OF_SERVICE
+   site_var['ORG_LOGO']=GSTUDIO_ORG_LOGO
+   site_var['ABOUT']=GSTUDIO_SITE_ABOUT
+   site_var['SITE_POWEREDBY']=GSTUDIO_SITE_POWEREDBY
+   site_var['PARTNERS']=GSTUDIO_SITE_PARTNERS
+   site_var['CONTACT']=GSTUDIO_SITE_CONTACT
+
+   return  site_var
 
 @register.assignment_tag
 def get_author_agency_types():
@@ -967,6 +987,7 @@ def get_group_type(group_id, user):
 		# Splitting url-content based on backward-slashes
 		split_content = group_id.strip().split("/")
 		gid = ""
+		colg = None
 
 		if group_id == '/home/':
 			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -986,21 +1007,27 @@ def get_group_type(group_id, user):
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
 
-                        
-				#check for valid Django Id
-			elif user.id is not None and type(gid) == int and (int(user.id) == int(gid)):
-                                
-				colg = col_Group.Node.find_one({'_type': "Author", 'created_by': int(gid)})
-
 			else:
-                                colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
-				if colg :
+				if 'dashboard' in group_id and gid != 'dashboard':
+					# It means it's a dashboard url and instead of ObjectId's check, check for django's ID
+					if user.id is not None:
+						if gid.isdigit():
+							int_gid = int(gid)
+							if int(user.id) == int_gid:
+								colg = col_Group.Node.one({'_type': "Author", 'created_by': int_gid})
+						else:
+							error_message = "Access denied: Dashboard url found, but it's an invalid django's ID ("+gid+")!!!"
+							raise Http404(error_message)
+
+				else:
+					# Case: Here instead of group's ObjectId, name is found
+					colg = col_Group.Node.one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
+
+				if colg:
 					pass
 
 				else:		
 					colg = None
-
-						
   		
 		# Check if Group exists in the database
 		if colg is not None:
@@ -1466,18 +1493,22 @@ def get_preferred_lang(request, nodes, node_type):
    try:
       for each in nodes:
          if (pref_lan['primary'] != pref_lan['default']):
-            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uid.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+           # primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uid.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            # primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            primary_nodes=collection.Node.one({'_id':each._id})
             if primary_nodes:
                primary_list.append(primary_nodes)
          
             else:
                if (pref_lan['secondary'] != pref_lan['default']):
-                  secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref__lan['secondary']},{'_id':each._id}]})
+                  # secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref__lan['secondary']},{'_id':each._id}]})
+                  secondary_nodes=collection.Node.one({'_id':each._id})
                   if secondary_nodes:
                      secondary_list.append(secondary_nodes)
             
          if (pref_lan['secondary'] == pref_lan['default']) and (pref_lan['primary'] == pref_lan['default']):
-            default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['default']},{'_id':each._id}]})
+            # default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['default']},{'_id':each._id}]})
+            default_nodes=collection.Node.one({'_id':each._id})
             if default_nodes:
                default_list.append(default_nodes)
       if primary_list:

@@ -215,7 +215,9 @@
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   		<!-- Existing card list-->
-		{% get_preferred_lang request nodes "Theme" as nodes %}
+  		{% if user.is_authenticated %}
+			{% get_preferred_lang request nodes "Theme" as nodes %}
+		{% endif %}
 
 	  	{% for each in nodes %}
 		    <li class="card">
@@ -237,7 +239,7 @@
 		          <div class="age">
 		            {{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
 		            <br/>
-		            by <span class="user" href="{% url 'userDashboard' group_name_tag each.created_by %}" data-gnow="">{{each.user_details_dict.created_by}}</span> 
+		            by <span class="user" href="{% url 'dashboard' each.created_by %}" data-gnow="">{{each.user_details_dict.created_by}}</span> 
 		          </div>
 		        <span><strong>{{each.contributors|length}}</strong> Contributor{{each.contributors|pluralize}}</span>
 		        <span class="right"><strong>{{each.version_dict|length}}</strong> Edit{{each.version_dict|pluralize}}</span>

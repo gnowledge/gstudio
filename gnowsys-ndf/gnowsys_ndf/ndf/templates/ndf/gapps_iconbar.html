@@ -13,31 +13,30 @@
 
 <input type="hidden" value="{{newgroup}}">
 
-<nav class="app">
-
-  <div class="icon-bar four-up">
+<ul class="app button-group medium-8 columns">
     
     {% for index_key, app_dict in gapps.items %}
 
     {% check_is_gapp_for_gstaff groupid app_dict request.user as gstaff_access_for_gapp %}
     {% if gstaff_access_for_gapp %}
-    <a class="{% comment %} Sets active class on active app{% endcomment %}
+    <li class="{% comment %} Sets active class on active app{% endcomment %}
   	{% if app_dict.name|lower == selectedGapp|lower %}
   	active 
 
   	{% elif app_dict.id|safe == selectedGapp|safe %}
   	active
   	
-  	{% endif %}
-  	{{app_dict.name|title}} app item" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
-      <i class='fi-play'></i>
-      <label>{{app_dict.name|title}}</label>
-    </a>           
+  	{% endif %}">
+        
+    <a class="
+  	{{app_dict.name|title}} app small button rounded" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
+      <i class='fi-play'></i> {{app_dict.name|title}}
+    </a>  
+        </li>
     {% endif %}
 
     {% endfor %}
       
-  </div>
-</nav>
+</ul>
 
 <!-- ============= -->

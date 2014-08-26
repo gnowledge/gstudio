@@ -7,10 +7,6 @@
 */
 
 
-
-    
-
-
 /*
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
@@ -22,21 +18,11 @@
 .top-bar .dropdown a.button{
     padding: 0;
 }
-
-
-
-/* Styles icon-bar */
-.icon-bar .item{
-    label{
-        font-size: 1.1rem;
-    }
-    &.active{
-        background-color: $theme-color;
-        i,label{
-        font-weight: bold;
-        }
-    }
+.top-bar section>ul{
+    padding:inherit;
+    margin: inherit;
 }
+
 
 /*
 /* Protects reflowing elements on error */
