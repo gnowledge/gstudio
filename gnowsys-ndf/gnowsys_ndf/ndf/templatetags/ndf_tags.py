@@ -10,11 +10,12 @@ from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
 
+
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS as setting_gapps, META_TYPE,CREATE_GROUP_VISIBILITY
-from gnowsys_ndf.settings import GSTUDIO_SITE_ORG,GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_SITE_ORG,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_CONTACT
+from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
@@ -320,49 +321,56 @@ def get_all_replies(parent):
 	 return ex_reply
 
 
-# @register.inclusion_tag('ndf/drawer_widget.html')
-# def edit_drawer_widget(field, group_id, node, checked=None):
+@register.inclusion_tag('ndf/drawer_widget.html')
+def edit_drawer_widget(field, group_id, node, checked=None):
 
-# 	drawers = None
-# 	drawer1 = None
-# 	drawer2 = None
+	drawers = None
+	drawer1 = None
+	drawer2 = None
 
-# 	if node :
-# 		if field == "collection":
-# 			if checked == "Quiz":
-# 				checked = "QuizItem"
-# 			elif checked == "Theme":
-# 				checked = "Theme"
-# 			else:
-# 				checked = None
-# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-# 		elif field == "prior_node":
-# 			checked = None
-# 			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
-# 		elif field == "module":
-# 			checked = "Module"
-# 			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+	if node:
+		if field == "collection":
+			if checked == "Quiz":
+				checked = "QuizItem"
+			elif checked == "Theme":
+				checked = "Theme"
+			else:
+				checked = None
+			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+		elif field == "prior_node":
+			checked = None
+			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+		elif field == "module":
+			checked = "Module"
+			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+		elif type(checked) == list:
+			# Special case used while dealing with RelationType widget
+			drawers = get_drawers(group_id, node['_id'], node[field], checked)
 		
-# 		drawer1 = drawers['1']
-# 		drawer2 = drawers['2']
+		drawer1 = drawers['1']
+		drawer2 = drawers['2']
 
-# 	else:
-# 		if field == "collection" and checked == "Quiz":
-# 			checked = "QuizItem"
+	else:
+		if field == "collection" and checked == "Quiz":
+			checked = "QuizItem"
 
-# 		elif field == "collection" and checked == "Theme":
-# 			checked = "Theme"
+		elif field == "collection" and checked == "Theme":
+			checked = "Theme"
 			
-# 		elif field == "module":
-# 			checked = "Module"
-			
-# 		else:
-# 			# To make the collection work as Heterogenous one, by default
-# 			checked = None
+		elif field == "module":
+			checked = "Module"
 
-# 		drawer1 = get_drawers(group_id, None, [], checked)
+		elif type(checked) == list:
+			# Special case used while dealing with RelationType widget
+			checked = checked
 
-# 	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
+		else:
+			# To make the collection work as Heterogenous one, by default
+			checked = None
+
+		drawer1 = get_drawers(group_id, None, [], checked)
+
+	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
@@ -979,6 +987,7 @@ def get_group_type(group_id, user):
 		# Splitting url-content based on backward-slashes
 		split_content = group_id.strip().split("/")
 		gid = ""
+		colg = None
 
 		if group_id == '/home/':
 			colg = col_Group.Node.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
@@ -992,13 +1001,29 @@ def get_group_type(group_id, user):
 
 			else:
 				gid = split_content[1]
-
+			
 			# gid = group_id.replace("/", "").strip()
+			
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
+
 			else:
-				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
-				if colg :
+				if 'dashboard' in group_id and gid != 'dashboard':
+					# It means it's a dashboard url and instead of ObjectId's check, check for django's ID
+					if user.id is not None:
+						if gid.isdigit():
+							int_gid = int(gid)
+							if int(user.id) == int_gid:
+								colg = col_Group.Node.one({'_type': "Author", 'created_by': int_gid})
+						else:
+							error_message = "Access denied: Dashboard url found, but it's an invalid django's ID ("+gid+")!!!"
+							raise Http404(error_message)
+
+				else:
+					# Case: Here instead of group's ObjectId, name is found
+					colg = col_Group.Node.one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
+
+				if colg:
 					pass
 
 				else:		
@@ -1455,6 +1480,41 @@ def get_resource_collection(groupid, resource_type):
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+
+@register.assignment_tag
+def get_preferred_lang(request, nodes, node_type):
+   uname=collection.Node.one({'name':str(request.user.username), '_type': {'$in': ["Group", "Author"]}})
+   primary_list=[]
+   secondary_list=[]
+   default_list=[]
+   if uname:
+      pref_lan=uname.preferred_languages
+      node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
+      try:
+         for each in nodes:
+            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            if primary_nodes:
+               primary_list.append(primary_nodes)
+            
+            else:
+               secondary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['secondary']},{'_id':each._id}]})
+               if secondary_nodes:
+                  secondary_list.append(secondary_nodes)
+                  
+            if (pref_lan['secondary'] == pref_lan['default']) and (pref_lan['primary'] == pref_lan['default']):
+               default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['default']},{'_id':each._id}]})
+               if default_nodes:
+                  default_list.append(default_nodes)
+         if primary_list:
+            return primary_list
+         if secondary_list:
+            return secondary_list
+         if default_list:
+            return default_list
+      
+      except Exception as e:
+         return 'error'
+
 # getting video metadata from wetube.gnowledge.org
 @register.assignment_tag
 def get_pandoravideo_metadata(src_id):
@@ -1465,8 +1525,6 @@ def get_pandoravideo_metadata(src_id):
     return mdata
   except Exception as e:
     return 'null'
-
-
 
 @register.assignment_tag
 def get_source_id(obj_id):
@@ -1595,6 +1653,10 @@ def html_widget(groupid, node_id, field):
   # gs = None
   field_value_choices = []
 
+  # This field is especially required for drawer-widets to work used in cases of RelationTypes
+  # Represents a dummy document that holds node's _id and node's right_subject value(s) from it's GRelation instance
+  node_dict = {}
+
   is_list_of = False
   LIST_OF = [ "[<class 'bson.objectid.ObjectId'>]",
               "[<type 'unicode'>]", "[<type 'basestring'>]",
@@ -1616,6 +1678,7 @@ def html_widget(groupid, node_id, field):
   try:
     if node_id:
       node_id = ObjectId(node_id)
+      node_dict['_id'] = node_id
 
     # if node_member_of:
     #   gs = collection.GSystem()
@@ -1649,7 +1712,10 @@ def html_widget(groupid, node_id, field):
     field['altnames'] = field_altnames
 
     if not field_value:
-      field_value = ""
+      if type(field_type) == IS:
+      	field_value = [] 
+      else:
+      	field_value = ""
 
     if type(field_type) == type:
       field_type = field_type.__name__
@@ -1680,16 +1746,22 @@ def html_widget(groupid, node_id, field):
     elif is_AT_RT_base == "RelationType":
       is_relation_field = True
       is_required_field = True
-      field_value_choices.extend(list(collection.Node.find( {'_type': "GSystem", 'member_of': {'$in': field["object_type"]}, 'group_set': ObjectId(groupid)},
-                                                            {'_id': 1, 'name': 1}
-                                                          ).sort('name', 1)
+
+      field_value_choices.extend(list(collection.Node.find({'_type': "GSystem", 
+																														'member_of': {'$in': field["object_type"]}, 
+																														'status': u"PUBLISHED",
+																														'group_set': ObjectId(groupid)
+																													}).sort('name', 1)
                                       )
                                 )
+
       field_value = [str(each._id) for each in field_value]
+      if node_id:
+      	node_dict[field['name']] = [ObjectId(each) for each in field_value]
 
     return {'template': 'ndf/html_field_widget.html',
             'field': field, 'field_type': field_type, 'field_value': field_value,
-            'node_id': node_id,
+            'node_id': node_id, 'groupid': groupid, 'node_dict': node_dict,
             'field_value_choices': field_value_choices,
             'is_base_field': is_base_field,
             'is_attribute_field': is_attribute_field,

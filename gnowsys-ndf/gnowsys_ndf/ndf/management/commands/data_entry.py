@@ -3,6 +3,7 @@ import os
 import csv
 import json
 import ast
+import time
 import datetime
 
 ''' imports from installed packages '''
@@ -33,6 +34,7 @@ from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
 SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
 
 log_list = [] # To hold intermediate errors
+log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 collection = get_database()[Node.collection_name]
 is_json_file_exists = False
@@ -645,7 +647,8 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
         else:
             node = collection.Node.one({'_type': type_convert_objectid, 
                                         '$or': [{'name': {'$regex': "^"+data+"$", '$options': 'i'}}, 
-                                                {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}]
+                                                {'altnames': {'$regex': "^"+data+"$", '$options': 'i'}}],
+                                        'group_set': group_id
                                        }, 
                                        {'_id': 1}
                                    )
@@ -677,11 +680,13 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
             
             ga_node.status = u"PUBLISHED"
             ga_node.save()
-            info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+            info_message = "GAttribute ("+ str(ga_node.name) +") created successfully.\n"
+            print info_message
             log_list.append(info_message)
 
         except Exception as e:
             error_message = "\n GAttributeCreateError: " + str(e) + "\n"
+            print error_message
             log_list.append(error_message)
             raise Exception(error_message)
 
@@ -708,15 +713,18 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
             if is_ga_node_changed:
                 ga_node.status = u"PUBLISHED"
                 ga_node.save()
-                info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+                info_message = " GAttribute ("+ str(ga_node.name) +") updated successfully.\n"
+                print info_message
                 log_list.append(info_message)
 
             else:
-                info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+                info_message = " GAttribute ("+ str(ga_node.name)+ ") already exists (Nothing updated) !\n"
+                print info_message
                 log_list.append(info_message)
 
         except Exception as e:
             error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
+            print error_message
             log_list.append(error_message)
             raise Exception(error_message)
 
@@ -744,16 +752,19 @@ def create_grelation(subject_id, relation_type_node, right_subject_id):
             gr_node.status = u"PUBLISHED"
             
             gr_node.save()
-            info_message = " GRelation ("+gr_node.name+") created successfully.\n"
+            info_message = " GRelation ("+ str(gr_node.name)+ ") created successfully.\n"
+            print info_message
             log_list.append(info_message)
 
         except Exception as e:
             error_message = "\n GRelationCreateError: " + str(e) + "\n"
+            print error_message
             log_list.append(error_message)
             raise Exception(error_message)
 
     else:
-        info_message = " GRelation ("+gr_node.name+") already exists !\n"
+        info_message = " GRelation ("+str(gr_node.name)+") already exists !\n"
+        print info_message
         log_list.append(info_message)
 
     return gr_node

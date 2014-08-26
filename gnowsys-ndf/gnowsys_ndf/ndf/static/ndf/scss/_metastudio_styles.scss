@@ -3,34 +3,66 @@
 */
 
 //Import any custom css
-@import url("../../custom.css");
+//@import url("../../custom.css");
 
-body{
+body{ 
   
-            background: darken($theme-color-invert,4%);
+            background-color: #fafafa;
 }
 
-//Logo
+
 .top-bar{
+    padding: 5px 0;
     border-bottom: 2px solid black;
+    z-index: 200;
+    .active{
+        border-bottom:  1px solid $active-color;
+    }
     h1{
         img{
             /* Logo */
-			height: 2.4rem;
+			height: 45px;
 			margin-right: 5px;
 		}
         a{
 			color:white!important;
 		}
     }
+    .search{
+        position: relative;
+        padding-top: 3px;
+        margin-left: 1rem;
+        input{
+            height: inherit;
+            top:5px;
+            font-size:1rem;
+            color: white;
+            background-color: transparent;
+            border-color: rgba(255,255,255,0.2);
+            &:focus{
+                border-color: rgba(255,255,255,0.8);
+            }
+        }
+        [type="submit"]{
+            background-color: transparent;
+            position: absolute;
+            right: 0;
+            top: 21%;
+        }
+    }
+    .language.button{
+        background-color: #555;
+        color:black;
+        margin-top: 4px;
+        padding: 4px 7px;
+        &:hover{
+            background-color: white;
+            color: black;
+        }
+    }
 }
 
 
-		body>header{
-            //Site header
-			position: relative;
-            padding-bottom: 10px;
-		}
 
 		.workspace{
             //This is the main content container between the header and footer
@@ -48,6 +80,7 @@ body{
 			height:130px;    // allows the content of the footer to be visible at the bottom. This should match the margin-bottom of the div
 		}
 		}
+
 
 		body>footer{
             //Site footer
@@ -101,52 +134,86 @@ body{
 /* Sections */
 
 
-
-//Main sidebar
-main.row{
-    padding-right: 5px;
-}
-
-main>aside{
-    &>div{
+main>nav{
+    position: relative;
+    z-index: 10;
+&>.button-bar{
+    background-color: $active-color;
+    .button-group{
+        margin: 0;
+        &.tools{
+           padding: 5px;
+        }
+    }
+    li{
         
-        
-        h2{
-            margin-top: 2rem;
-            a{
-            color: white;
+        .button{
+            border: none;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        padding: 0.8rem 1rem;
+            &.home{
+                font-weight: bold;
+            }
+            &.settings,&#toggle-help{
+                padding: 6px 10px;
+                color: #333;
+               // font-size: 110%;
+                background-color: rgba(255,255,255,0.3);
                 &:hover{
+                    background-color: rgba(0,0,0,0.2);
                     color:white;
                 }
             }
-        }
-        nav.app{
-            a{
-                background-color: $theme-text-color;
-                border: 1px solid black;
+            &#toggle-help{
+                background-color: inherit;
             }
-            .icon-bar{
-            i{
-                display: none!important; /* Hide icons till we can retreive custom icons from the system */
-            }
-                
-                .more.active{
-                    background-color: $theme-color;
-                    label{
-                    font-weight: bold;
-                    }
+            &.settings{
+                &:after{
+                    border: none;
                 }
+            }
+            
+        background-color: transparent;
+        color: black;
+        margin: 0;
+            &:hover{
+                color:white;
             }
         }
         
+        &.active{
+            .button{
+                background-color: $primary-color;
+                color:white;
+            }
+        }
+    }
+    
+    /* Hide icons till we can retreive custom icons from the system */
+    .app i{
+                display: none!important; 
+            }
+}
+}
+
+
+main>aside{
+    &>div{
+      
+        
+        
+        h2{
+            color:#111;
+        }
         h3{
             font-size: 1.2rem;
             font-weight: normal;
-            color: white;
+            color: #222;
         }
         h4{
             font-size: 1rem;
-            color: #eee;
+            color: #222;
             span{
                 display: none;
             }
@@ -211,7 +278,9 @@ main>aside{
 
 //    Article styles
     article{
-        background-color: white;
+        position: relative;
+        z-index: 1;
+        min-height: 400px;
         overflow-x: visible;
         &>header,form>header{
             padding: 15px;
@@ -223,7 +292,7 @@ main>aside{
         }
     
 h1:not(.subheader){
-	font-family: "Georgia Serif", Serif;
+	font-family: $serif-font;
     font-style: italic;
     
     .tabs{
@@ -264,7 +333,7 @@ h1:not(.subheader){
 
 .card>*{
 	position: relative;
-	background-color: inherit;
+	background-color: white;
 	padding:7px;
 	border: 1px dashed darken($bg-color,10%);
 	display: block;
@@ -374,7 +443,6 @@ h1:not(.subheader){
 
 /* Content Tabs */
 article{
-    padding-left: 2rem!important;
    
         
 .tabs {
@@ -397,13 +465,12 @@ article{
 }
 }
 
-.tabs-content>.content{
-	padding-top: 0;
-}
+    section.content{
+        background-color:white;
+        border: 1px solid #eee;
+    }
 
-.content.row{
-    margin: 0;
-}
+
 }
 
 /* Default card */
@@ -508,9 +575,6 @@ a.node{
 	display:block;
 }
 
-a.app{
-	overflow: hidden;
-}
 .button.edit{
 	margin-bottom: 0;
 }
@@ -578,3 +642,18 @@ input.node-title{
 
 /****************** CUSTOM *********************/
 
+#landing-page{
+    background-color: #666;
+    top:0;
+}
+
+// Off Canvas Areas
+aside#help{
+    h4{
+        color:black;
+    }
+    p,h5,h6{
+        color:#ddd;
+    padding: 0.3rem 0.9375rem;
+    }
+}

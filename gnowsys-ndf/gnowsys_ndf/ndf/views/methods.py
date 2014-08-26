@@ -121,7 +121,6 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
 
     forum_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Forum'}, {'_id':1})
     reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
-
     
     drawer = None    
     
@@ -182,9 +181,12 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       elif checked == "theme_item":
         drawer = collection.Node.find({'_type': u"GSystem", 'member_of': {'$in':[theme_item_GST._id, topic_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}}) 
 
-
       elif checked == "Topic":
-        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})   
+        drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id, theme_item_GST._id, topic_GST_id._id]},'group_set': {'$all': [ObjectId(group_id)]}})
+
+      elif type(checked) == list:
+        # Special case: used while dealing with RelationType widget
+        drawer = checked
 
     else:
       # For heterogeneous collection      
@@ -197,6 +199,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     if (nid is None) and (not nlist):
       for each in drawer:               
         dict_drawer[each._id] = each
+
 
     elif (nid is None) and (nlist):
       for each in drawer:
@@ -287,7 +290,7 @@ def get_translate_common_fields(request,get_type,node, group_id, node_type, node
     node.name=unicode(name)
     # Required to link temporary files with the current user who is modifying this document
     usrname = request.user.username
-    filename = slugify(name) + "-" + usrname + "-"
+    filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
     node.content = org2html(content_org, file_prefix=filename)
 
 
@@ -531,7 +534,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       
       # Required to link temporary files with the current user who is modifying this document
       usrname = request.user.username
-      filename = slugify(name) + "-" + usrname + "-"
+      filename = slugify(name) + "-" + usrname + "-" + ObjectId().__str__()
       node.content = org2html(content_org, file_prefix=filename)
       # print "\n Changed: content_org"
       is_changed = True
@@ -1231,30 +1234,48 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
   return ga_node
 
 
-def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs):
+def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, **kwargs):
   """
-  Creates a GRelation document (instance).
+  Creates single or multiple GRelation documents (instances) based on given RelationType's cardinality (one-to-one / one-to-many).
 
   Arguments:
   subject_id -- ObjectId of the subject-node
   relation_type_node -- Document of the RelationType node (Embedded document)
-  right_subject_id -- ObjectId of the right_subject node
+  right_subject_id_or_list -- 
+    - When one to one relationship: Single ObjectId of the right_subject node
+    - When one to many relationship: List of ObjectId(s) of the right_subject node(s)
 
   Returns:
-  Created GRelation document.
+  - When one to one relationship: Created/Updated/Existed document.
+  - When one to many relationship: Created/Updated/Existed list of documents.
+  
   """
   gr_node = None
   multi_relations = False
 
   try:
-    if kwargs.has_key("multi"):
-      multi_relations = kwargs["multi"]
-
     subject_id = ObjectId(subject_id)
-    right_subject_id = ObjectId(right_subject_id)
+
+    if relation_type_node["object_cardinality"]:
+      # If object_cardinality value exists and greater than 1 (or eaqual to 100)
+      # Then it signifies it's a one to many type of relationship
+      # assign multi_relations = True
+      if relation_type_node["object_cardinality"] > 1:
+        multi_relations = True
+
+        # Check whether right_subject_id_or_list is list or not
+        # If not convert it to list
+        if not isinstance(right_subject_id_or_list, list):
+          right_subject_id_or_list = [right_subject_id_or_list]
+
+        # Check whether all values of a list are of ObjectId data-type or not 
+        # If not convert them to ObjectId
+        for i, each in enumerate(right_subject_id_or_list):
+          right_subject_id_or_list[i] = ObjectId(each)
+
 
     if multi_relations:
-      # For dealing with multiple relations
+      # For dealing with multiple relations (one to many)
 
       # Iterate and find all relationships (including DELETED ones' also)
       nodes = collection.Triple.find({'_type': "GRelation", 
@@ -1262,15 +1283,29 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
                                       'relation_type': relation_type_node.get_dbref()
                                     })
 
+      gr_node_list = []
+
       for n in nodes:
-        if n.right_subject in right_subject_id:
+        if n.right_subject in right_subject_id_or_list:
           if n.status != u"DELETED":
             # If match found with existing one's, then only remove that ObjectId from the given list of ObjectIds
-            right_subject_id.remove(n.right_subject)
+            # Just to remove already existing entries (whose status is PUBLISHED)
+            right_subject_id_or_list.remove(n.right_subject)
+            gr_node_list.append(n)
 
-      if right_subject_id:
-        # If still ObjectId list persists, it means either they are new ones' or they are from deleted ones'
-        for nid in right_subject_id:
+        else:
+          # Case: When already existing entry doesn't exists in newly come list of right_subject(s)
+          # So change their status from PUBLISHED to DELETED
+          n.status = u"DELETED"
+          n.save()
+          info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
+          print "\n", info_message
+
+      if right_subject_id_or_list:
+        # If still ObjectId list persists, it means either they are new ones' or from deleted ones'
+        # For deleted one's, find them and modify their status to PUBLISHED
+        # For newer one's, create them as new document
+        for nid in right_subject_id_or_list:
           gr_node = collection.Triple.one({'_type': "GRelation", 
                                             'subject': subject_id, 
                                             'relation_type': relation_type_node.get_dbref(),
@@ -1283,25 +1318,74 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
 
             gr_node.subject = subject_id
             gr_node.relation_type = relation_type_node
-            gr_node.right_subject = right_subject_id
+            gr_node.right_subject = nid
 
             gr_node.status = u"PUBLISHED"
             gr_node.save()
+            info_message = " MultipleGRelation: GRelation ("+gr_node.name+") created successfully.\n"
+            print "\n", info_message
+
+            gr_node_list.append(gr_node)
 
           else:
             # Deleted one found so change it's status back to Published
             if gr_node.status == u'DELETED':
-              collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
+              gr_node.status = u"PUBLISHED"
+              gr_node.save()
 
-          info_message = " GRelation ("+gr_node.name+") created successfully.\n"
-          print "\n", info_message
+              info_message = " MultipleGRelation: GRelation ("+gr_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+              print "\n", info_message
+
+              gr_node_list.append(gr_node)
+
+            else:
+              error_message = " MultipleGRelation: Corrupt value found - GRelation ("+gr_node.name+")!!!\n"
+              raise Exception(error_message)
+
+      return gr_node_list
 
     else:
-      # For dealing with single relation
-      gr_node = collection.Triple.one({'_type': "GRelation", 
-                                       'subject': subject_id, 
-                                       'relation_type': relation_type_node.get_dbref()
-                                      })
+      # For dealing with single relation (one to one)
+
+      gr_node = None
+
+      if isinstance(right_subject_id_or_list, list):
+        right_subject_id_or_list = ObjectId(right_subject_id_or_list[0])
+
+      else:
+        right_subject_id_or_list = ObjectId(right_subject_id_or_list)
+
+      gr_node_cur = collection.Triple.find({'_type': "GRelation", 
+                                            'subject': subject_id, 
+                                            'relation_type.$id': relation_type_node._id
+                                          })
+
+      for node in gr_node_cur:
+        if node.right_subject == right_subject_id_or_list:
+          # If match found, it means it could be either DELETED one or PUBLISHED one
+
+          # Set gr_node value as matched value, so that no need to create new one 
+          gr_node = node
+
+          if node.status == u"DELETED":
+            # If deleted, change it's status back to Published from Deleted
+            node.status = u"PUBLISHED"
+            node.save()
+            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            print "\n", info_message
+
+          elif node.status == u"PUBLISHED":
+            info_message = " SingleGRelation: GRelation ("+node.name+") already exists !\n"
+            print "\n", info_message
+
+        else:
+          # If match not found and if it's PUBLISHED one, modify it to DELETED
+          if node.status == u'PUBLISHED':
+            node.status = u"DELETED"
+            node.save()
+
+            info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            print "\n", info_message 
 
       if gr_node is None:
         # Code for creation
@@ -1309,7 +1393,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
 
         gr_node.subject = subject_id
         gr_node.relation_type = relation_type_node
-        gr_node.right_subject = right_subject_id
+        gr_node.right_subject = right_subject_id_or_list
 
         gr_node.status = u"PUBLISHED"
         
@@ -1317,21 +1401,10 @@ def create_grelation(subject_id, relation_type_node, right_subject_id, **kwargs)
         info_message = " GRelation ("+gr_node.name+") created successfully.\n"
         print "\n", info_message
 
-      else:
-        if gr_node.right_subject != right_subject_id:
-          collection.update({'_id': gr_node._id}, {'$set': {'right_subject': right_subject_id}}, upsert=False, multi=False)
-
-        elif gr_node.right_subject == right_subject_id and gr_node.status == u"DELETED":
-          collection.update({'_id': gr_node._id}, {'$set': {'status': u"PUBLISHED"}}, upsert=False, multi=False)
-
-        else:
-          info_message = " GRelation ("+gr_node.name+") already exists !\n"
-          print "\n", info_message
-
-    return gr_node
+      return gr_node
 
   except Exception as e:
-      error_message = "\n GRelationCreateError: " + str(e) + "\n"
+      error_message = "\n GRelationError: " + str(e) + "\n"
       raise Exception(error_message)
 
       

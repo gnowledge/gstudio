@@ -23,6 +23,10 @@
 
   <!-- Foundation Icon Font http://zurb.com/playground/foundation-icon-fonts-3 -->
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> <!-- checked -->
+    
+  <!-- Open Source webfonts for better typography -->
+  <!--link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'-->
 
   <!-- Modernizr - Browser detection JS http://modernizr.com/ -->
   <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script> <!-- checked -->
@@ -60,10 +64,11 @@
     
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
+{% get_group_object groupid as group_object %}
+      
+    <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
-    <nav class="top-bar drop-shadow" data-topbar>
-
-      <ul class="title-area">
+      <ul class="title-area medium-2 columns">
       	<li class="name">
      {% get_site_variables as site %}
       	  <h1><a href="/home/" accesskey="q"><img src="{{site.LOGO}}"></a></h1>
@@ -76,119 +81,45 @@
       <section class="top-bar-section">
 	
 	<!-- Right Nav Section -->
-	<ul class="right">
-	  
-	  	  <li class="has-dropdown group">
-
-	    {% get_group_object groupid as group_object %}
-	    <a class="active-menu" ><i class="fi-page-search"></i> Search</a>
-	    
-	    <!-- If logged in show user groups -->
-
-	    <ul class="dropdown" style="width:250%">
-	      <!-- Create dropdown item for each group -->
-	      	<li style="display:block;background:#000;color:#fff;">
-	      		{% if groupid %}
-	      		<form action="{% url 'results' groupid %}" name="search_form" method="GET" >
-	      		{% else %}
-	      		<form action="" name="search_form" method="GET" >
-	      		{% endif %}
-		      		<input type="text" name="search_text" id="search_text" placeholder="search site.." autocomplete="off" required/>
- 					<br>
-		      		Search by:<br>
-		      		<input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
-		      		<label style="background:#000;color:#fff" for="chk_name">Name</label><br>
-					<input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
-					<label style="background:#000;color:#fff" for="chk_tags">Tags</label><br>
-					<input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
-					<label style="background:#000;color:#fff" for="chk_content">Contents</label><br>
-					<input type="submit" class="button" style="width:100%" value="Submit" />
-
-				</form>
-			</li>
-			<li >
-				{% if groupid %}
-				<a href="{% url 'search_page' groupid %}">Search Options</a>
-				{% endif %}
-			</li>
-	      
-	    </ul>
-
-	  </li>
+	<ul class="right medium-3 columns">
         
-	  <!-- Top bar search form -->
-	  <!-- li class="has-form">
-	    <div id="search-bar" class="row collapse">
-	      <div class="large-12 small-12 columns">
-	  <li class="has-dropdown" style="color:#fff;background:#000;padding:10px">
-	      Search
-	      <ul class="dropdown" style="width:300%">
-			      	<li style="display:block;background:#000;color:#fff;padding:5px;">
-			      		<form action="" name="search_form" method="GET" >
-				      		<input type="text" name="search_text" id="search_text" placeholder="search site.." style="width:80%;float:left"/>
-				      		<input type="image" src="/static/ndf/images/search.png" style="float:right;position:absolute;top:2px" width="35em" alt="submit" />
-				      		<br><br>
-				      		Search by:<br>
-				      		<input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
-				      		<label style="background:#000;color:#fff" for="chk_name">Name</label><br>
-							<input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
-							<label style="background:#000;color:#fff" for="chk_tags">Tags</label><br>
-							<input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
-							<label style="background:#000;color:#fff" for="chk_content">Contents</label><br>
-						</form>
-					</li>
-					<li >
-						<a href="">Search Options</a>
-					</li>
-		    </ul>
-	      </div>
-	    </div>
-	    
-	  </li -->
+<!-- Language selector-->
+            <li class="has-form">
+                {% get_languages as lan %}
+                <a class="tiny radius language button" href="#" data-reveal-id="languageModal">en</a> 
 
-
-          {% get_group_object groupid as group_object %}
-      	  
+                <div id="languageModal" class="small reveal-modal" data-reveal>
+                  <h2>Language preference</h2>
+                      
+                  <h3>Primary language</h3>
+                  <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>    
+                  <h3>Secondary language</h3>
+                  <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>      
+                  <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/>
+                  <a class="close-reveal-modal">&#215;</a>
+                </div>
+              </li>
+        
           <!-- If logged in show user options -->
       	  {% if user.is_authenticated %}
       	  <li class="has-dropdown">
       	    {% get_profile_pic  request.user as prof_pic %}
 
       	    {% if prof_pic %}
-      	    <a href="{% url 'userDashboard' group_object request.user.pk %}">
+      	    <a href="{% url 'dashboard' request.user.pk %}">
       	      <img  src="{% url 'getImageThumbnail' group_object prof_pic %}" height="30" width="30">
       	      {{ user.username }}
       	    </a>
       	    
       	    {% else %}
-      	    <a class="user" data-gnow="#aabb44" href="{% url 'userDashboard' group_object request.user.pk %}">
+      	    <a class="user" data-gnow="#aabb44" href="{% url 'dashboard' request.user.pk %}">
       	      {{ user.username }}
       	    </a>
       	    {% endif %}
             
-            {% get_languages as lan %}
       	    <ul class="dropdown">
                   
       	      <li class="text-center"><a href="{% url 'auth_password_change' %}">Change password</a></li>
-
-              <li>
-                <a href="#" data-reveal-id="languageModal">Language Preference </a> 
-
-                <div id="languageModal" class="small reveal-modal" data-reveal>
-                  <h2>Language preference</h2>
-                      
-                  <h3>Primary language</h3>
-                  <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>
-                         
-                  <h3>Secondary language</h3>
-                  <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>   
-                      
-          
-                      
-                                <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/>
-                  <a class="close-reveal-modal">&#215;</a>
-                </div>
-              </li>
                   
       	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
       	    </ul>
@@ -202,10 +133,11 @@
         <!-- Closes Right Nav section -->
 
       	<!-- Left Nav Section -->
-      	<ul class="left">
+      	<ul class="left medium-7 columns">
 
+<!-- Current group selector -->
       	  <li class="has-dropdown group">
-      	    <a class="active-menu" href="{% url 'groupchange' group_object.name %}"><i class="fi-home"></i> {{group_object.name|truncatechars:30}}</a>
+      	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:30}}</a>
       	    
       	    <!-- If logged in show user groups -->
       	    {% if user.is_authenticated %}
@@ -232,8 +164,46 @@
               <li id="more_groups"><a class="group" href="{% url 'group' 'home' %}">{% trans "See more groups..." %}</a></li>
       	    </ul>
       	  </li>
+            
+<!-- Extra group selector-->
+            {% get_gapps_menubar request groupid %}
+            
+<!-- Search bar -->
+            <li class="has-form search">
+            
+            <form 
+                      {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                      name="search_form" method="GET" >
+              <input type="text" name="search_text" id="search_text" placeholder="Search {{group_object.name}}" autocomplete="off" required/>
+                <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
+        
+              
+<!-- Hiding search options on the top bar, this is available from the results page to refine-->
+                   <!--ul class="show">
+	      	<li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
+                <label for="chk_name">Name</label>
+            </li>
+            <li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
+                <label for="chk_tags">Tags</label>
+            </li>
+            <li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
+                <label for="chk_content">Contents</label><br>
+			</li>
+			<li >
+				{% if groupid %}
+				<a href="{% url 'search_page' groupid %}">Advanced Search</a>
+				{% endif %}
+			</li>
+	      
+	    </ul-->
 
-      	  {% get_gapps_menubar request groupid %}
+          
+                </form>
+        </li>
+
       	</ul>
         <!-- Closes Left Nav section -->
       </section>
@@ -252,24 +222,48 @@
 	  <!-- whatever you want goes here -->
 	  <h4><i class='fi-info'></i> Help</h4>
 	  <ul class="off-canvas-list">
-	    {% block help_topics %}  {% endblock %}
-
-	    <div>
-	      {% block help_content %}  {% endblock %}
-	    </div>
-
-	    <li><a href="#">{% trans "About metaStudio" %}</a></li>
+	     <!-- Shelf content code and logic -->
+    	  {% block shelf_content %} {% endblock %}
 	  </ul>
 	</aside>
 
 	<main class="row">  
-	  
+	  <nav class="drop-shadow">
+          <div class="button-bar">
+              
+              <ul class="button-group medium-2 columns">
+                  <li>
+            <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> {% trans "Dashboard" %}</a>
+
+              </li>
+                </ul>
+              
+        {% get_gapps_iconbar request groupid %}
+              
+              <ul class="tools button-group medium-2 columns right">
+                  <!-- Show app options if user is logged in-->
+                  {% if user.is_authenticated %}
+                  <li>
+               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown"><i class="fi-plus"></i> Actions</a><br>
+<ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
+  {% block app_action_list %} {% endblock %}
+    
+</ul>
+                      </li>
+                  {% endif %}
+                  
+                  <li class="right">
+<a id="toggle-help" class="button right-off-canvas-toggle" ><i class='fi-lightbulb'></i></a> 
+                  </li>
+                  </ul>
+              
+              </div>
+        </nav>
 	  <!-- Start of sidebar section (main aside) -->
 
-        <aside class="large-3 medium-4 columns">
+        <aside class="medium-2 columns">
           <div>
-            <h2><a class="active-menu" href="{% url 'groupchange' group_object.name %}">{{group_object.name}}</a></h2>
-            {% get_gapps_iconbar request groupid %}
+            
             <header>
               {% block meta_content %}  {% endblock %} 
               {% block concern_information %} {% endblock %}
@@ -283,6 +277,7 @@
             </section>
 
             <section>
+            <section>
               <div>
           		{% block collection_content %}  {% endblock %}
               </div>
@@ -292,21 +287,6 @@
               </div>
             </section>
                 
-            <footer>
-              {% if user.is_authenticated %}
-              <div class="icon-bar four-up">
-                <!-- Here we are using "group_name_tag" since groupid value is overwrites in above section for different perspective -->
-                <a class="left-off-canvas-toggle item help" >
-                  <i class='fi-book'></i>
-                  <label>Help</label>
-                </a> 
-                            
-        				<a class="item user" href="{% url 'userDashboard' group_object request.user.pk %}">
-          				<label>My profile</label>
-        				</a>
-      				</div>
-              {% endif %}
-            </footer>	  
 
             <div>
             	{% block add_resource_content %}  {% endblock %}
@@ -316,7 +296,7 @@
         <!-- End of related content -->	
 
         <!-- Start of content section -->
-        <article class="large-9 medium-8 columns">
+        <article class="medium-10 columns">
           <!-- The actual body content -->
           <!-- Url redirection -->
       	    
@@ -336,9 +316,18 @@
     	</main>
 
     	<!-- Off Canvas User Shelf -->
-    	<aside id="shelf"  class="right-off-canvas-menu">
-    	  <!-- Shelf content code and logic -->
-    	  {% block shelf_content %} {% endblock %}
+    	<aside id="help"  class="right-off-canvas-menu">
+            <ul class="off-canvas-list">
+                
+                <li><label><h4>User Guide</h4></label></li>
+                {% block detailed_help_content %}  {% endblock %}
+                <li><label>About this Application</label></li>
+                {% block help_content %}  {% endblock %}
+                <li><label>About this Group</label></li>
+                {% block about_group %}  {% endblock %}
+                <li><label>Meta Studio Version 0.8.23</label></li>
+                    <li><a href="#">{% trans "About metaStudio" %}</a></li>
+                </ul>
     	</aside>
 
     	<!-- close the off-canvas menu -->
@@ -354,12 +343,19 @@
       
       <div class="medium-3 columns">    	
              <p>
-                <span class="gnu-badge show-span-on-hover">{% trans "100% स्वतंत्" %}
+                 <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a>
+
+                <span class="xgnu-badge show-span-on-hover hide">{% trans "100% स्वतंत्" %}
                     <span>
-        <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a></span></span>
+
+
+
+        <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a>
+		</span></span>
+
         <br>
         
-          <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png"/>
+          <a class="show-span-on-hover" rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" title="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="/static/ndf/images/cc-by-sa.png"/>
 <small>
         <span>{% trans "All material is licensed under a Creative Commons Attribution-Share Alike 3.0 Unported License unless mentioned otherwise." %}</span>
    
@@ -374,7 +370,7 @@
          
           <ul class="inline-list">
   <li><a href="{{site.ABOUT}}">About</a></li>
-  <li><a href="{{site.POWEREDBY}}">Powered by</a></li>
+  <li><a href="{{site.SITE_POWEREDBY}}">Powered by</a></li>
   <li><a href="{{site.PARTNERS}}">Partners</a></li>
   <li><a href="{{site.TERMS_OF_SERVICE}}">Terms of Service</a></li>
   <li><a href="{{site.PRIVACY_POLICY}}">Privacy Policy</a></li>
@@ -418,30 +414,6 @@
       $("main>article").toggleClass("large-9 large-12");
     };
       
-      //Organise the apps in the icon bar based on whats active
-      (function organizeIconBar(){
-            
-          //Only if there is a 5th app, otherwise we dont need to organize anything
-           if( $('nav .icon-bar a').eq(5) ){
-              // First lets move the active app as the first item so that its visible to the user
-              $('.icon-bar a.app.active').prependTo($('nav .icon-bar'));
-              
-              // All those extra apps more than 3 will be hidden
-              $('nav .icon-bar a').slice(3).addClass("extra"); 
-              
-              // Add a show more button after the third one to show those extra apps
-         
-              showMoreButton = '<a class="item more" href="#"><i class="fi-plus"></i><label>...</label></a>';
-              $(showMoreButton).insertBefore($('nav .icon-bar a').eq(3));
-          }
-            
-      })();
-    
-    // Show extra apps on hovering over the more icon  
-    $(".icon-bar .more").on("mouseenter", function(){
-        $(this).toggleClass("active");
-        $(".extra.app").fadeToggle();
-    });
 
     //Functions to automatically add an <i> element icon inside node spans 
 		$(".user").prepend(function(){
@@ -488,6 +460,8 @@
 		function(){
 			$(this).find(">div>div").slideUp();
 		});
+      
+      
 
     //set language prefernce
     $(document).on('click',"#savepref",function(){
@@ -501,12 +475,14 @@
         data: {pref:vpref,fallback:fb,csrfmiddlewaretoken: '{{ csrf_token }}'},
 
         success:function(data){
-          alert("Successfully set the preferences"); 
+          alert("Successfully set the preferences");
+	  location.reload()
         }
       }); //ajax closes
     }); //document closes
 
   	{% block script %} {% endblock %}	
+
   </script>
   
   <script src="/static/ndf/js/app.js"></script> <!-- checked -->

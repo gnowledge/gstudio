@@ -3,6 +3,7 @@ import os
 import csv
 import json
 import ast
+import time
 # import mimetypes
 
 ''' imports from installed packages '''
@@ -26,6 +27,7 @@ from gnowsys_ndf.ndf.models import Node, GSystemType, AttributeType, RelationTyp
 SCHEMA_ROOT = os.path.join( os.path.dirname(__file__), "schema_files" )
 
 log_list = [] # To hold intermediate errors
+log_list.append("\n######### Script run on : " + time.strftime("%c") + " #########\n############################################################\n")
 
 collection = get_database()[Node.collection_name]
 is_json_file_exists = False
@@ -206,6 +208,7 @@ def parse_data_create_gtype(json_file_path):
 
                 perform_eval_type("complex_data_type", json_document, type_name, "AttributeType")
                 perform_eval_type("subject_type", json_document, type_name, "GSystemType")
+                perform_eval_type("validators", json_document, type_name, "AttributeType")
 
             except Exception as e:
               error_message = "\n While parsing "+type_name+"(" + json_document['name'] + ") got following error...\n " + str(e)
@@ -223,7 +226,6 @@ def parse_data_create_gtype(json_file_path):
                 log_list.append(error_message)
                 print error_message # Keep it!
 
-        
     elif "RT" in json_file_path:
       	type_name = "RelationType"
 
@@ -232,6 +234,7 @@ def parse_data_create_gtype(json_file_path):
             try:
                 json_document['name'] = unicode(json_document['name'])
                 json_document['inverse_name'] = unicode(json_document['inverse_name'])
+                json_document['object_cardinality'] = int(json_document['object_cardinality'])
 
                 perform_eval_type("subject_type", json_document, type_name, "GSystemType")
                 perform_eval_type("object_type", json_document, type_name, "GSystemType")
@@ -249,7 +252,6 @@ def parse_data_create_gtype(json_file_path):
 
             except Exception as e:
                 error_message = "\n While creating "+type_name+" ("+json_document['name']+") got following error...\n " + str(e)
-                log_list.append(error_message)
                 print error_message # Keep it!
 
 def perform_eval_type(eval_field, json_document, type_to_create, type_convert_objectid):
@@ -275,9 +277,13 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
 
 
     type_list = []
+
     for data in json_document[eval_field]:
         if (eval_field == "complex_data_type") and ((data in DATA_TYPE_CHOICES) or (json_document['data_type'] == "IS()")):
             type_list.append(unicode(data))
+
+        elif eval_field == "validators":
+            type_list.append(data)
 
         else:
             node = collection.Node.one({'_type': type_convert_objectid, 'name': data})

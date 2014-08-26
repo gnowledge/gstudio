@@ -246,7 +246,7 @@
       <div class="panel">
         <p>
         {{ node.member_of_names_list.0 }} 
-        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
         <br>
         <small>
           <a href="#view-changes"><i class="fi-clock"></i> Versions </a>

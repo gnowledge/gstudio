@@ -3,87 +3,205 @@
 {% load ndf_tags %}
 {% load pagination_tags %}
 
-{% block body_content %} 
-  <form data-abide id="form-edit-node" method="POST" action="">
+{% block style %}
+// <style type="text/css">
+/* CSS for Multiple-selection (or drawer) widget */
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
 
-    <header class="row">
-      <h2 class="medium-12 columns">
+  .margin-0 { margin: 0 !important ;}
+
+  .resource-drawer { 
+    border-color: #D3D3D3; border-style: solid; 
+    padding: 0 !important; 
+    overflow-y: auto;
+  }
+
+  .resource-drawer li.bullet-item:hover{
+    background-color: #ecf0f1; cursor:pointer;
+  }
+
+  .posted-by{ color: #808080; font-size: small; }
+
+  .selected-resource { background-color:lightgray !important ; }
+
+  .resource-type-image {
+    height:40px;    
+    background-repeat:no-repeat; background-size: 48px 48px
+  }
+
+/* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+  dl.tabs>dd a.disable {
+    pointer-events: none;
+    cursor: default;
+  }
+// </style>
+{% endblock %}
+
+{% block body_content %} 
+  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
+
+    <header class="row" style="margin: 1rem 0 0 0 ;">
+      <h2 class="small-12 columns">
         {% if node %}
-        {% trans "Editing" %} {{title}}: {{node.name}}
+        {% blocktrans with title_var=title node_name=node.name %} Editing {{title_var}}: {{node_name}} {% endblocktrans %}
         {% else %}
-        {% trans "Register a New" %} {{title}}
+        {% blocktrans with title_var=title %} Register a New {{title_var}} {% endblocktrans %}
         {% endif %}
       </h2>
-      <nav class="medium-12 columns">
-        <dl class="tabs" data-tab>
-          <dd>
-            {% blocktrans %}<h4>Tabs:</h4>{% endblocktrans %}
-          </dd>
-
-          {% for tab_details in property_order_list %}
-          <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to {{tab_details.0}} details...">
-            <a href="#panel_{{tab_details.0}}">{{tab_details.0}}</a>
-          </dd>
-          {% endfor %}
-
-          <!-- Add more tabs below 
-          <dd title="Click here to add/edit...">
-            <a href="#panel_?" class="tab_?">Prior Node</a>
-          </dd>
-          -->
-        </dl>
-      </nav>
     </header>
+
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab>
+        <dd>
+          <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
+        </dd>
+
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}" class="disable">
+            {% blocktrans with tab_name=tab_details.0 %} {{tab_name}} {% endblocktrans %}
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
 
     {% csrf_token %}
 
-    <br>
-    <div id="event-details-edit-div" class="tabs-content" >
+    <div id="people-details-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
       {% for tab_name, tab_fields_list in property_order_list %}
       <div class="{% if forloop.counter == 1 %}active {% endif %}content row" id="panel_{{tab_name}}">
+        <br>
         {% for field in tab_fields_list %}
         <div class="row">
           <div class="small-3 columns"> 
-            <label for="{{field.name}}" class="left inline"> {{field.altnames}} </label>
+            <label for="{{field.name}}" class="right inline">
+              {% blocktrans with field_label=field.altnames %} {{field_label}} {% endblocktrans %}
+            </label>
           </div>
           <div class="small-9 columns">
             {% html_widget groupid node.pk field %}
           </div>
         </div>
         {% endfor %}
+        <br>
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          <div class="small-2 small-offset-2 columns for-next">
+          </div>
+        </div>    
       </div>
       {% endfor %}
 
-      <!-- Additional panels if required
-      <div class="" id="panel_?">
-      </div>
-      -->
       <input type="hidden" id="name" name="name" value="">
     </div>
-
-    <br>
-    <div class="row">
-      <div class="small-4 small-offset-2 end columns">
-        <input type="submit" id="save-node" class="small button expand" value="Save" />
-      </div>
-    </div>    
 
   </form>
 
 {% endblock %}
 
 {% block script %}
-  // <script type="text/javascript">
+// <script type="text/javascript">
+// Default settings for date-widgets & tabs on page load ---------------------------------------------------------
+  var currentYear = (new Date()).getFullYear()
+  lowerYearRange = currentYear - 80;
+  upperYearRange = currentYear + 20;
 
   $(function() {
-    $("#dob").datepicker({
-      changeMonth: true,
-      changeYear: true,
-      yearRange: "1980:2005"
-    });
+    // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
+      $(".content").each(function(i) {
+        totalTabs = $(".content").size() - 1
+
+        if (i != totalTabs) {
+          // Not in last tab
+          $(this).children(".tab-nav").children(".for-next")
+            .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
+        }
+
+        if (i == totalTabs) {
+          // Only in last tab
+          $(this).children(".tab-nav").children(".for-save")
+            .append("<input type='submit' id='save-node' class='small button expand' value='{% trans 'Register' %}' />");
+        }
+
+        if (i != 0) {
+          // Not in first tab
+          $(this).children(".tab-nav").children(".for-prev")
+            .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
+        }
+      });
+
+    // Settings for datepicker widget (with all) -----------------------------------------------------------------
+      $(".date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "" + lowerYearRange + ":" + upperYearRange
+      });
+
+    // Settings for datepicker widget (only for year) ------------------------------------------------------------
+      $(".date_year").datepicker({
+        changeYear: true,
+        dateFormat: 'yy',
+        yearRange: "" + lowerYearRange + ":" + upperYearRange,
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText)
+        },
+
+        beforeShow: function() {
+          var year = $(this).val();
+          if (year) {
+            $(this).datepicker('option', 'defaultDate', new Date(year, 1, 1));
+            $(this).datepicker('setDate', new Date(year, 1, 1));
+          }
+        },
+
+        onChangeMonthYear: function(year, month, inst){
+          $(this).val(year)
+        }
+      });
   });
 
-  // ------------------------------------------------------------------------ Start: State based District selection
+// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
+  $(".content").on('click', '.tab_next' ,function(event){
+    event.preventDefault();
+
+    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+    $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+    // Then check no. of data-invalid fields
+    // if count == 0, then only proceed to next tab
+    if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+      // Valid, move to next step
+      $('.active').removeClass('active').next().addClass('active');
+    }
+  });
+
+  $(".content").on('click', '.tab_prev' ,function(event){
+    event.preventDefault();
+    $('.active').removeClass('active').prev().addClass('active');
+  });
+
+// Only keeping year's drop-down and hiding other datepicker's elements ------------------------------------------
+  $(document).on('focus click', '.date_year' ,function(){
+    $(".ui-datepicker-calendar").hide();
+    $(".ui-datepicker-month").hide();
+    $(".ui-datepicker-prev").hide();
+    $(".ui-datepicker-next").hide();
+    $("#ui-datepicker-div").position({
+      my: "center top",
+      at: "center bottom",
+      of: $(this)
+    }); 
+  });
+
+// State-wise District selection ---------------------------------------------------------------------------------
 
   // Disable District field, later on will be enabled after a state is selected
   $("select#person_belongs_to_district").attr('disabled', 'disabled')
@@ -153,9 +271,50 @@
     }
   });
 
-  // -------------------------------------------------------------------------- End: State based District selection
+// Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
+  $(document).on('closed', '[data-reveal]', function () {
+    /*
+     *  On closing of reveal-modal
+     */
+    var widget_for = $(this).attr('id').replace('_modal', '')
 
+    // First empty all values of District field (dropdown/select)
+    $("select#" + widget_for).empty();
+
+    // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
+    class_value = ".node_id." + widget_for + "_values"
+    right_drawer_len = $(class_value).size()
+
+    if (right_drawer_len > 0) {
+      $(class_value).each(function (){
+        // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
+        // alert("value : " + $(this).val() + " -- " + $(this).attr('name'));
+        resource_id = $(this).val()
+        resource_name = $(this).attr('name')
+
+        // Make very first entry as given below
+        $("select#" + widget_for).append(
+            $("<option></option>")
+              .attr("value", resource_id)
+              .attr("selected", "selected")
+              .text(resource_name)
+        );
+      });
+    }
+
+    else {
+      // Make very first entry as given below
+      $("select#" + widget_for).append(
+          $("<option></option>")
+            .attr("value", "")
+            .text("- - - Select - - -")
+      );
+    }
+  });
+
+// On click of save ----------------------------------------------------------------------------------------------
   $("#save-node").click(function() {
+  // Store concatenated first, middle & last name field's values into name field (hidden input field) ------------
     name = ""
     first_name = $("#first_name").val().trim()
     middle_name = $("#middle_name").val().trim()
@@ -171,9 +330,14 @@
     }
 
     $("#name").val(name)
+
+  // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+    $(".content").find(":input[disabled]").each(function(){
+      $(this).removeAttr('disabled');
+    });
   });
 
-  // totWhen ---------------
+// totWhen -------------------------------------------------------------------------------------------------------
   var totWhen = $("#tot_when")
 
   if(totWhen.length > 0) {
@@ -210,5 +374,6 @@
 
     return datesList;
   }
-  // </script>
-{% endblock %}	
+// </script>
+
+{% endblock %}

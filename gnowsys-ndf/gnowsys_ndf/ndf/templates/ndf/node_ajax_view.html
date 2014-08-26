@@ -152,7 +152,7 @@
 </style>
 
 {% if user.is_authenticated %}
-<a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+<!--<a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> -->
 {% endif %}
 
 <!-- Icon to add annotations -->
@@ -266,6 +266,9 @@
           {% get_create_url node.pk as create_url %}
 
           {% if is_group %}
+            
+<!-- 
+This section has been integrated to groupdashboard and appears in block app_action_list
             {% if request.user.is_superuser %}
             <li>
               <a href="{% url create_url group_name_tag %}">
@@ -273,6 +276,7 @@
               </a>
             </li>
             {% endif %}
+-->
 
           {% else %}
             {% if node.member_of_names_list.0 == "File" %}
@@ -398,7 +402,7 @@
 
 <div class="row">
 	
-  <section class="medium-9 columns">
+  <section class="medium-9 columns content">
 
     <div class="tabs-content">
 
@@ -430,7 +434,7 @@
           {% if each_node.mime_type %}
           <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
           {% else %}
-          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
           {% endif %}
           {% endfor %}
 	</div>
@@ -662,7 +666,7 @@
         
         <p>
         {{ node.member_of_names_list.0 }} 
-        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'userDashboard' group_name_tag node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
             </p>
         
           <h4>{% blocktrans %}Recent changes{% endblocktrans %}:</h4>
@@ -708,7 +712,7 @@
             
             <div class="row"> 
               <div class="small-3 columns">
-                <a class="text-center" href="/home/{{each_reply.userid}}/userDashboard">
+                <a class="text-center" href="/home/{{each_reply.userid}}/dashboard">
                   <span class="align-center"><i class="fi-torso"></i></span>
                   <label>{{ each_reply.username }}</label>
                 </a>
@@ -947,7 +951,7 @@
                 // add reply text content after #replies-area
                 $("#replies-area").prepend(
                   "<div style='margin-top:20px;' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
-                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/userDashboard' class='text-center'>"
+                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
                   + "<span class='align-center'><i class='fi-torso'></i></span>"
                   + "<label>" + data[6] + "</label></a></div>"
                   + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
@@ -968,7 +972,7 @@
                 // add reply text content as sub-reply
                 $($tempPrior).after(
                 "<div style='margin-left:"+ calcMargLeft +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
-                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/userDashboard' class='text-center'>"
+                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
                   + "<span class='align-center'><i class='fi-torso'></i></span>"
                   + "<label>" + data[6] + "</label></a></div>"
                   + "<div class='small-9 columns'>"+ data[3] +"</div></div>"

@@ -43,7 +43,7 @@
 				{% endif %}
 
 			<div id="pic_div" style="display:none;">
-				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'userDashboard' group_name_tag usr %}">
+				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
 					{% csrf_token %}
 					<input type="file" name="doc[]"  id="docFile" multiple/>
 

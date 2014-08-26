@@ -20,6 +20,7 @@ except ImportError:  # old pymongo
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
+from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields, parse_template_data
 from gnowsys_ndf.ndf.views.methods import get_property_order_with_value
 from gnowsys_ndf.ndf.views.methods import create_gattribute, create_grelation
@@ -168,6 +169,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   property_order_list = []
 
+  template = ""
   template_prefix = "mis"
 
   for eachset in app.collection_set:
@@ -175,6 +177,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   if app_set_id:
     person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_create_edit.html"
     title = person_gst.name
     person_gs = collection.GSystem()
     person_gs.member_of.append(person_gst._id)
@@ -200,7 +203,6 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       person_gs.status = u"PUBLISHED"
 
     person_gs.save(is_changed=is_changed)
-    # print "\n person: ", person_gs._id, " -- ", person_gs.name, "\n"
   
     # [B] Store AT and/or RT field(s) of given person-node (i.e., person_gs)
     for tab_details in property_order_list:
@@ -209,48 +211,70 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
         # field_set pattern -- {'_id', 'data_type', 'name', 'altnames', 'value'}
         # print " ", field_set["name"]
 
-        # * Fetch only Attribute field(s) / Relation field(s)
+        # Fetch only Attribute field(s) / Relation field(s)
         if field_set.has_key('_id'):
           field_instance = collection.Node.one({'_id': field_set['_id']})
           field_instance_type = type(field_instance)
 
           if field_instance_type in [AttributeType, RelationType]:
             
-            if field_instance["name"] == "attendees" or field_instance["name"] == "12_passing_certificate":
+            if field_instance["name"] == "attendees":
               continue
 
-            # Fetch corresponding AT/RT-fields value from request object
-            field_value = request.POST[field_instance["name"]]
-
             field_data_type = field_set['data_type']
-            # print " --> ", type(field_data_type)
 
-            # 2) Parse fetched-value depending upon AT/RT--fields' data-type
+            # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
             if field_instance_type == AttributeType:
-              # print " ", field_instance["name"], " -- ", field_value
-              field_instance_type = "GAttribute"
+
+              if "File" in field_instance["validators"]:
+                # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
+                
+                field_value = request.FILES[field_instance["name"]]
+                file_name = person_gs.name + " -- " + field_instance["altnames"]
+                content_org = ""
+                tags = ""
+
+                # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
+                field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags)[0]
+
+              else:
+                # Other AttributeTypes 
+                field_value = request.POST[field_instance["name"]]
+
+              # field_instance_type = "GAttribute"
               if field_instance["name"] == "12_passing_year" or field_instance["name"] == "degree_passing_year":
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
+              elif field_instance["name"] == "dob":
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
               else:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
 
-              # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
               if field_value:
                 person_gs_triple_instance = create_gattribute(person_gs._id, collection.AttributeType(field_instance), field_value)
                 print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
 
             else:
-              field_instance_type = "GRelation"
-              field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
-              # print "\n ", type(collection.RelationType(field_instance)), " -- \n", collection.RelationType(field_instance)
-              if field_value:
-                person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value)
+              field_value_list = request.POST.getlist(field_instance["name"])
+
+              # field_instance_type = "GRelation"
+              for i, field_value in enumerate(field_value_list):
+                field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
+                field_value_list[i] = field_value
+
+              person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value_list)
+              if isinstance(person_gs_triple_instance, list):
+                print "\n"
+                for each in person_gs_triple_instance:
+                  print " person_gs_triple_instance: ", each._id, " -- ", each.name
+                print "\n"
+
+              else:
                 print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
     
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
-  template = "ndf/person_create_edit.html"
+  default_template = "ndf/person_create_edit.html"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
@@ -267,7 +291,7 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
     # return render_to_response([template, default_template], 
-    return render_to_response(template, 
+    return render_to_response([template, default_template], 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
