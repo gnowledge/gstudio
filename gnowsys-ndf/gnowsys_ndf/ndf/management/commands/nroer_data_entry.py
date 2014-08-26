@@ -17,6 +17,8 @@ import ox
 import threading
 import io
 import time
+import subprocess
+from StringIO import StringIO
 
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
@@ -642,17 +644,31 @@ def create_resource_gsystem(resource_data):
     collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
     # print "\n----------", fileobj
 
+    # need to add thumbnail creating code
+    
     # filetype1 = mimetypes.guess_type(filename)[0]
     # print filetype1
 
-    # calling save_file()
-    # resource_save_reply = save_file(files, title, userid, group_id, content_org, tags, img_type, language, username, access_policy, oid=True)
-    # print type(resource_save_reply), "=====", resource_save_reply
-
-    # resource_obj = collection.File.one({"_id":ObjectId(str(resource_save_reply[0]))})
+    '''storing thumbnail of pdf and svg files  in saved object'''        
+    if 'pdf' in filetype or 'svg' in filetype:
+      thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
+      tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
+      collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+     
     
-    # resource_obj.save()
-
+    '''storing thumbnail of image in saved object'''
+    if 'image' in filetype:
+      collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
+      thumbnailimg = convert_image_thumbnail(files)
+      tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
+      collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+      
+      files.seek(0)
+      mid_size_img = convert_mid_size_image(files)
+      if  mid_size_img:
+        mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
+        collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
+  
     return fileobj
 
 
@@ -662,7 +678,7 @@ def getFileSize(File):
     """
     try:
         File.seek(0,os.SEEK_END)
-        num=int(File.tell())
+        num = int(File.tell())
         for x in ['bytes','KB','MB','GB','TB']:
             if num < 1024.0:
                 return  (num, x)
@@ -672,3 +688,54 @@ def getFileSize(File):
         print error_message
         log_list.append(error_message)
         return 0,'bytes'
+
+
+def convert_pdf_thumbnail(files,_id):
+    '''
+    convert pdf file's thumnail
+    '''
+    filename = str(_id)
+    os.system("mkdir -p "+ "/tmp"+"/"+filename+"/")
+    fd = open('%s/%s/%s' % (str("/tmp"),str(filename),str(filename)), 'wb')
+    files.seek(0)
+    fd.write(files.read())
+    fd.close()
+    subprocess.check_call(['convert', '-thumbnail', '128x128',str("/tmp/"+filename+"/"+filename+"[0]"),str("/tmp/"+filename+"/"+filename+"-thumbnail.png")])
+    thumb_pdf = open("/tmp/"+filename+"/"+filename+"-thumbnail.png", 'r')
+    return thumb_pdf
+
+
+def convert_image_thumbnail(files):
+    """
+    convert image file into thumbnail
+    """
+    files.seek(0)
+    thumb_io = StringIO()
+    size = 128, 128
+    img = Image.open(StringIO(files.read()))
+    img.thumbnail(size, Image.ANTIALIAS)
+    img.save(thumb_io, "JPEG")
+    thumb_io.seek(0)
+    return thumb_io
+
+
+def convert_mid_size_image(files):
+    '''
+    convert image into 1000 pixel size userd for image gallery
+    '''
+    mid_size_img = StringIO()
+    img = Image.open(StringIO(files.read()))
+    width, height = img.size
+
+    widthRatio = 1000 / float(width)
+    heightRatio = 1000 / float(height)
+
+    width = int(float(width) * float(widthRatio))
+    height = int(float(height) * float(heightRatio))
+
+    size = width, height
+
+    img.resize(size, Image.ANTIALIAS)
+    img.save(mid_size_img, "JPEG")
+    mid_size_img.seek(0)
+    return mid_size_img
