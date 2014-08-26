@@ -986,12 +986,14 @@ def get_group_type(group_id, user):
 			if ObjectId.is_valid(gid):
 				colg = col_Group.Group.one({'_type': {'$in': ["Group", "Author"]}, '_id': ObjectId(gid)})
 
+                        
 				#check for valid Django Id
-			elif user.id is not None and (int(user.id) == int(gid)) :
+			elif user.id is not None and type(gid) == int and (int(user.id) == int(gid)):
+                                
 				colg = col_Group.Node.find_one({'_type': "Author", 'created_by': int(gid)})
 
 			else:
-				colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
+                                colg = col_Group.Node.find_one({'_type': {'$in': ["Group", "Author"]}, 'name': gid})
 				if colg :
 					pass
 
@@ -1455,6 +1457,7 @@ def get_resource_collection(groupid, resource_type):
 @register.assignment_tag
 def get_preferred_lang(request, nodes, node_type):
    uname=collection.Node.one({'name':str(request.user.username)})
+   uid=collection.Node.one({'_id':uname._id})
    primary_list=[]
    secondary_list=[]
    default_list=[]
@@ -1463,7 +1466,7 @@ def get_preferred_lang(request, nodes, node_type):
    try:
       for each in nodes:
          if (pref_lan['primary'] != pref_lan['default']):
-            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uname.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
+            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':uid.group_set},{'language':pref_lan['primary']},{'_id':each._id}]})
             if primary_nodes:
                primary_list.append(primary_nodes)
          
