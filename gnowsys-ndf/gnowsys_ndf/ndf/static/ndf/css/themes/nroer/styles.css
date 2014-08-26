@@ -8860,7 +8860,7 @@ body {
 /* line 22, ../../../scss/_metastudio_styles.scss */
 .top-bar h1 img, .top-bar article h1:not(.subheader) div input img, article h1:not(.subheader) div .top-bar input img {
   /* Logo */
-  height: 2.4rem;
+  height: 45px;
   margin-right: 5px;
 }
 /* line 27, ../../../scss/_metastudio_styles.scss */
@@ -9173,7 +9173,7 @@ article h1:not(.subheader) div input:hover {
 /* line 334, ../../../scss/_metastudio_styles.scss */
 .card > * {
   position: relative;
-  background-color: inherit;
+  background-color: white;
   padding: 7px;
   border: 1px dashed #cce6ff;
   display: block;

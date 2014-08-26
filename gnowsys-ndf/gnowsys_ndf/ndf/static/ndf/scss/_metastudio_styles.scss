@@ -21,7 +21,7 @@ body{
     h1{
         img{
             /* Logo */
-			height: 2.4rem;
+			height: 45px;
 			margin-right: 5px;
 		}
         a{
@@ -333,7 +333,7 @@ h1:not(.subheader){
 
 .card>*{
 	position: relative;
-	background-color: inherit;
+	background-color: white;
 	padding:7px;
 	border: 1px dashed darken($bg-color,10%);
 	display: block;
