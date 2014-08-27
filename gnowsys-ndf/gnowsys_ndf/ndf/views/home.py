@@ -16,7 +16,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.ndf.models import GSystemType,Node
 
 #######################################################################################################################################
@@ -71,7 +71,10 @@ class HomeRedirectView(RedirectView):
                 
             # This will return a string in url as username and allows us to redirect into user group as soon as user logsin.
             #return "/{0}/".format(auth.pk)
-            return "/{0}/dashboard".format(self.request.user.id)     
+            if GSTUDIO_SITE_LANDING_PAGE == 'home':
+                return "/home/"		
+            else:    
+                return "/{0}/dashboard".format(self.request.user.id)     
         else:
             # If user is not loggedin it will redirect to home as our base group.
             return "/home/"		

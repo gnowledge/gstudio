@@ -57,7 +57,7 @@ def get_site_variables():
    site_var['PARTNERS']=GSTUDIO_SITE_PARTNERS
    site_var['CONTACT']=GSTUDIO_SITE_CONTACT
    site_var['CONTRIBUTE']=GSTUDIO_SITE_CONTRIBUTE
-   site_var['VIDEO']=GSTUDIO_SITE_VIDEO
+   site_var['SITE_VIDEO']=GSTUDIO_SITE_VIDEO
    site_var['LANDING_PAGE']=GSTUDIO_SITE_LANDING_PAGE
 
    return  site_var

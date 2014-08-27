@@ -434,8 +434,8 @@ GSTUDIO_SITE_PARTNERS=""
 GSTUDIO_ORG_LOGO=""
 GSTUDIO_SITE_ORG=""
 GSTUDIO_SITE_CONTRIBUTE=""
-GSTUDIO_SITE_VIDEO="pandora and local"
-GSTUDIO_SITE_LANDING_PAGE="udashboard"
+GSTUDIO_SITE_VIDEO="pandora"  #possible values are 'local','pandora' and 'pandora_and_local'
+GSTUDIO_SITE_LANDING_PAGE="udashboard"  #possible values are 'home' and 'udashboard'
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
