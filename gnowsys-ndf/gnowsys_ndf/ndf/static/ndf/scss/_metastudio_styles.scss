@@ -645,9 +645,11 @@ input.node-title{
 
 /* UI Button */
 .ui.button{
-    border: 1px solid #666;
+    border: 1px solid rgba(0,0,0,0.2);
     background-color: transparent;
     color: #ddd;
+    padding: 0.8rem;
+    z-index: 500;
     label{
             color:#666;
         }
@@ -656,8 +658,8 @@ input.node-title{
         display: none;
     }
     &:hover,&:active{
-        border-color: #ddd;
-        background-color: #555;
+        border-color: rgba(255,255,255,0.2);
+        background-color: rgba(0,0,0,0.1);
         label{
             color:#ddd;
         }
@@ -669,23 +671,26 @@ input.node-title{
         }
     }
 }
+
+
 /* For landing page */
+
 .landing{
     position: relative;
     #language-selector{
         position: absolute;
     top:10px;
     right: 10px;
-
     }
+    
     header{
         background-color: #444;
-        padding:2rem;
+        padding:2rem 0;
         
     h1{
         color: white;
        font-size: 2rem;
-        line-height: 0.7;
+        line-height: 0.9;
         &.subheader{
             color: #aaa;
         }
@@ -693,8 +698,17 @@ input.node-title{
     }
     
 }
+section.banner{
+    padding:0 2rem;
+    margin: 2rem 0;
+    border:2px solid black;
+    border-width: 4px 0;
+    background-color: rgba(255,255,255,0.2);
+}
 #group-banner{
-    background-color: white;
+    background-color: #eee;
+    padding: 1rem;
+margin:0;
 }
 // Off Canvas Areas
 aside#help{

@@ -9498,74 +9498,87 @@ input.node-title {
 /* UI Button */
 /* line 647, ../../../scss/_metastudio_styles.scss */
 .ui.button {
-  border: 1px solid #666;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   background-color: transparent;
   color: #ddd;
+  padding: 0.8rem;
+  z-index: 500;
 }
-/* line 651, ../../../scss/_metastudio_styles.scss */
+/* line 653, ../../../scss/_metastudio_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 654, ../../../scss/_metastudio_styles.scss */
+/* line 656, ../../../scss/_metastudio_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: none;
 }
-/* line 658, ../../../scss/_metastudio_styles.scss */
+/* line 660, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover, .ui.button:active {
-  border-color: #ddd;
-  background-color: #555;
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
 }
-/* line 661, ../../../scss/_metastudio_styles.scss */
+/* line 663, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 664, ../../../scss/_metastudio_styles.scss */
+/* line 666, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 667, ../../../scss/_metastudio_styles.scss */
+/* line 669, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
 /* For landing page */
-/* line 673, ../../../scss/_metastudio_styles.scss */
+/* line 678, ../../../scss/_metastudio_styles.scss */
 .landing {
   position: relative;
 }
-/* line 675, ../../../scss/_metastudio_styles.scss */
+/* line 680, ../../../scss/_metastudio_styles.scss */
 .landing #language-selector {
   position: absolute;
   top: 10px;
   right: 10px;
 }
-/* line 681, ../../../scss/_metastudio_styles.scss */
+/* line 686, ../../../scss/_metastudio_styles.scss */
 .landing header {
   background-color: #444;
-  padding: 2rem;
+  padding: 2rem 0;
 }
-/* line 685, ../../../scss/_metastudio_styles.scss */
+/* line 690, ../../../scss/_metastudio_styles.scss */
 .landing header h1, .landing header article h1:not(.subheader) div input, article h1:not(.subheader) div .landing header input {
   color: white;
   font-size: 2rem;
-  line-height: 0.7;
+  line-height: 0.9;
 }
-/* line 689, ../../../scss/_metastudio_styles.scss */
+/* line 694, ../../../scss/_metastudio_styles.scss */
 .landing header h1.subheader, .landing header article h1:not(.subheader) div input.subheader, article h1:not(.subheader) div .landing header input.subheader {
   color: #aaa;
 }
 
-/* line 696, ../../../scss/_metastudio_styles.scss */
-#group-banner {
-  background-color: white;
+/* line 701, ../../../scss/_metastudio_styles.scss */
+section.banner {
+  padding: 0 2rem;
+  margin: 2rem 0;
+  border: 2px solid black;
+  border-width: 4px 0;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* line 701, ../../../scss/_metastudio_styles.scss */
+/* line 708, ../../../scss/_metastudio_styles.scss */
+#group-banner {
+  background-color: #eee;
+  padding: 1rem;
+  margin: 0;
+}
+
+/* line 715, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 704, ../../../scss/_metastudio_styles.scss */
+/* line 718, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
