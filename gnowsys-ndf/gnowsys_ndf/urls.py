@@ -11,7 +11,7 @@ urlpatterns = patterns('',
     (r'^$', include('gnowsys_ndf.ndf.urls')),
     (r'^ndf/', include('gnowsys_ndf.ndf.urls')),
     (r'^benchmarker/', include('gnowsys_ndf.benchmarker.urls')),
-    (r'^i18n/', include('django.conf.urls.i18n')),
+    #(r'^i18n/', include('django.conf.urls.i18n')),
     (r'^admin/', include(admin.site.urls)),
    # (r'^online/', include('online_status.urls')),                     # for online_users
 

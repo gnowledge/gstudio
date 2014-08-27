@@ -99,6 +99,20 @@
                   <a class="close-reveal-modal">&#215;</a>
                 </div>
               </li>
+<li>	    
+<form action="/i18n/setlang/" method="POST">
+  {% csrf_token %}
+  <input name="next" type="hidden" value="/pref_lang/?url={{request.get_full_path}}&group_id={{group_id}}"/>
+  <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+    
+  <select name="language">
+    {% for lang in LANGUAGES %}
+    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+    {% endfor %}
+  </select>
+  <input type="submit" value="Go" />
+</form>
+</li>
         
           <!-- If logged in show user options -->
       	  {% if user.is_authenticated %}
@@ -385,7 +399,6 @@
         </p>
 
       </div>
-
   </footer>
 
   <!-- JS -->

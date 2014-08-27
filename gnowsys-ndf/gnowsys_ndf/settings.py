@@ -266,6 +266,9 @@ USE_TZ = True
 # Example: "/home/media/media.lawrence.com/media/"
 MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'ndf/static/')
 
+# Django-provide base translation in django/conf/locale.
+LOCALE_PATHS = (os.path.join(os.path.dirname(__file__), '..','conf/locale/'),)
+
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
@@ -329,6 +332,7 @@ ROOT_URLCONF = 'gnowsys_ndf.ndf.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'gnowsys_ndf.wsgi.application'
 
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
@@ -339,6 +343,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.i18n',
     'django.core.context_processors.request',
+    #'django.core.context_processors.csrf',
 )
 
 INSTALLED_APPS = (	
@@ -425,7 +430,7 @@ GSTUDIO_COPYRIGHT=""
 GSTUDIO_GIT_REPO="https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY=""
 GSTUDIO_SITE_TERMS_OF_SERVICE=""
-GSTUDIO_SITE_DEFAULT_LANGUAGE=u"('en', 'English')"
+GSTUDIO_SITE_DEFAULT_LANGUAGE=u"en"
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True
