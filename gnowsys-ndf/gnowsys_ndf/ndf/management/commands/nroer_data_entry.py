@@ -470,7 +470,6 @@ def parse_data_create_gsystem(json_file_path):
                         else:
                           object_exists = False
 
-
                       except Exception as e:
                         error_message = "\n!! Error in getting _id from teaches hierarchy. " + str(e)
                         print error_message
@@ -481,8 +480,20 @@ def parse_data_create_gsystem(json_file_path):
                           # print "oid: ", oid
                           return oid
                         else:
-                          return collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} }, {"_id": 1} )
-                      elif:
+                          temp_obj = collection.GSystem.one({ "name": hier_list[0], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                          if temp_obj:
+                            return temp_obj._id
+                          else:
+                            return None
+
+                      # if any one of the item of hierarchy does not exist in database then:
+                      elif not object_exist:
+                        temp_obj = collection.GSystem.one({ "name": hier_list[len(hier_list)-1], 'group_set': {'$all': [ObjectId(home_group._id)]}, 'member_of': {'$in': [ObjectId(theme_gst._id), ObjectId(theme_item_gst._id), ObjectId(topic_gst._id)]} })
+                        if temp_obj:
+                          return temp_obj._id
+                        else:
+                          return None
+
 
                     # -----------------------------                  
 
@@ -495,14 +506,22 @@ def parse_data_create_gsystem(json_file_path):
                       formatted_list.append(v.strip())
 
                     right_subject_id = []
-                    right_subject_id.append(_get_id_from_hierarchy(formatted_list)._id)
-                    json_document[key] = right_subject_id
-                    # print json_document[key]
+                    rsub_id = _get_id_from_hierarchy(formatted_list)
+
+                    # checking every item in hierarchy exist and leaf node's _id found
+                    if rsub_id:
+                      right_subject_id.append(rsub_id)
+                      json_document[key] = right_subject_id
+                      # print json_document[key]
+                    else:
+                      error_message = "\n!! While creating teaches rel: Any one of the item in hierarchy"+ str(json_document[key]) +"does not exist in Db. \n!! So relation: " + str(key) + "cannot be created.\n"
+                      log_list.append(error_message)
+                      break
                   
                   else:
                     formatted_list = list(json_document[key].strip())
                     right_subject_id = []
-                    right_subject_id.append(_get_id_from_hierarchy(formatted_list)._id)
+                    right_subject_id.append(_get_id_from_hierarchy(formatted_list))
                     json_document[key] = right_subject_id
 
 
