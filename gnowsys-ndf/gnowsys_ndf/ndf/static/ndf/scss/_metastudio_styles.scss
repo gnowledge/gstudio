@@ -293,9 +293,9 @@ main>aside{
         }
     
 h1:not(.subheader){
-	font-family: $serif-font;
-    font-style: italic;
-    
+//	font-family: $serif-font;
+//    font-style: italic;
+//    
     .tabs{
         display: inline-block;
         position: relative;
@@ -643,11 +643,59 @@ input.node-title{
 
 /****************** CUSTOM *********************/
 
-#landing-page{
-    background-color: #666;
-    top:0;
+/* UI Button */
+.ui.button{
+    border: 1px solid #666;
+    background-color: transparent;
+    color: #ddd;
+    label{
+            color:#666;
+        }
+    small{
+        margin-left: 2px;
+        display: none;
+    }
+    &:hover,&:active{
+        border-color: #ddd;
+        background-color: #555;
+        label{
+            color:#ddd;
+        }
+        small{
+            display: inline;
+        }
+        &:focus{
+            font-weight: bold;
+        }
+    }
 }
+/* For landing page */
+.landing{
+    position: relative;
+    #language-selector{
+        position: absolute;
+    top:10px;
+    right: 10px;
 
+    }
+    header{
+        background-color: #444;
+        padding:2rem;
+        
+    h1{
+        color: white;
+       font-size: 2rem;
+        line-height: 0.7;
+        &.subheader{
+            color: #aaa;
+        }
+    }
+    }
+    
+}
+#group-banner{
+    background-color: white;
+}
 // Off Canvas Areas
 aside#help{
     h4{
