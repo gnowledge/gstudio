@@ -28,8 +28,8 @@ class Command(BaseCommand):
 
     try:
       if options['reduce']:
-        print "\n Creates map-reduced document and sets up url for various documents \n"
-        map_reduce_docs()
+        print "\n Sets up url of documents for GSystem and File \n"
+        setup_urls()
 
         print "\n **** Search script executed successfully. ****\n"
     except Exception as e:
@@ -99,50 +99,89 @@ def update_structure():
 
     print "\n No. of IndexedWordList document(s)' structure cleaned (& added _type field): ", c, "\n"
 
-def map_reduce_docs():
+def setup_urls():
   '''
-  Creates map-reduced document and sets up url for various documents
+  Sets up url of documents for GSystem and File
   '''
-  # I'm assuming this section creates reduced doc and sets up url
-
+  # I'm assuming this section sets up url
   # to_reduce_doc_requirement = u'storing_to_be_reduced_doc' 
 
-  allNulls = collection.Node.find({"_type":"GSystem", "access_policy":None})
-  for obj in allNulls:
-    old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':ObjectId(obj._id)})
-    if  old_doc is None:
-      obj.access_policy = u'PUBLIC'
-      obj.save()
+  # Replacing access_policy value from None to "PUBLIC" of all documents for GSystems and Files
+  allNulls = collection.Node.find({"_type": {'$in': [u"GSystem", u"File"]}, "access_policy": {'$in': [None, u"None"]}})
+  ap_cnt = allNulls.count()
+  ap_c = 0
+  if ap_cnt:
+    print "\n Updating access_policy: "
+    for obj in allNulls:
+      if obj.access_policy == None or obj.access_policy == u"None":
+        obj.access_policy = u'PUBLIC'
+        obj.save()
+        ap_c = ap_c + 1
+        print " .",
 
-  allGSystems = collection.Node.find({"_type":"GSystem"})
-  Gapp_obj = collection.Node.one({"_type":"MetaType", "name":"GAPP"})
+  # Setting up urls
+  allGSystems = collection.Node.find({"_type": {'$in': [u"GSystem", u"File"]}})
+  Gapp_obj = collection.Node.one({"_type": "MetaType", "name": "GAPP"})
   factory_obj = collection.Node.one({"_type":"MetaType", "name":"factory_types"})
-  for gs in allGSystems:
-    old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':ObjectId(gs._id)})
-    if old_doc is None:
+  u_cnt = allGSystems.count()
+  u_c = 0
+  if u_cnt:
+    print " Updating url: "
+    for gs in allGSystems:
       gsType = gs.member_of[0]
-      gsType_obj = collection.Node.one({"_id":ObjectId(gsType)})
+      gsType_obj = collection.Node.one({"_id": ObjectId(gsType)})
+      is_url_changed = False
+
       if Gapp_obj._id in gsType_obj.member_of:
         if gsType_obj.name == u"Quiz":
-          gs.url = u"quiz/details"
+          url = u"quiz/details"
+          if gs.url != url:
+            gs.url = url
+            is_url_changed = True
         else:
-          gs.url = gsType_obj.name.lower()
+          url = gsType_obj.name.lower()
+          if gs.url != url:
+            gs.url = url
+            is_url_changed = True
+
       elif factory_obj._id in gsType_obj.member_of:
         if gsType_obj.name == u"QuizItem":
-          gs.url = u"quiz/details"
-        if gsType_obj.name == u"Twist":
-          gs.url = u"forum/thread"
-        else:
-          gs.url = gsType_obj.name.lower()
-      else:
-        gs.url = u"None"
-      gs.save()
-    else:
-      print "\n This document ("+str(gs._id)+") is already map-reduced."   
+          url = u"quiz/details"
+          if gs.url != url:
+            gs.url = url
+            is_url_changed = True
 
-  allGSystems = collection.Node.find({"$or": [ {"_type":"GSystem"}, {"_type":"File"} ] })
-  for gs in allGSystems:
-    old_doc = collection.ToReduceDocs.find_one({'required_for':to_reduce_doc_requirement,'doc_id':ObjectId(gs._id)})
-    if old_doc is None:  
-      gs.save()
+        if gsType_obj.name == u"Twist":
+          url = u"forum/thread"
+          if gs.url != url:
+            gs.url = url
+            is_url_changed = True
+        else:
+          url = gsType_obj.name.lower()
+          if gs.url != url:
+            gs.url = url
+            is_url_changed = True
+
+      else:
+        if gs.url != None:
+          gs.url = None
+          is_url_changed = True
+
+      # Save document only when it's url is changed
+      if is_url_changed:
+        gs.save()
+        u_c = u_c + 1
+        print " .",
+
+  print "\n Document(s) found with None as access_policy: ", ap_cnt
+  print " No. of document(s) whose 'access_policy' field updated: ", ap_c, "\n"
+
+  print "\n No. of GSystem(s) [including File(s)] found: ", u_cnt
+  print " No. of document(s) whose 'url' field updated: ", u_c, "\n"
+
+
+  # Avadoot: I didn't got what the below piece of code does, so commenting it!
+  # allGSystems = collection.Node.find({"_type": {'$in': [u"GSystem", u"File"]}})
+  # for gs in allGSystems:
+  #   gs.save()
 

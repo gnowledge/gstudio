@@ -193,11 +193,32 @@
         for (i=0; i<a; i++) {
           
           // ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-          type = alterType(sData.exact.name[i].link);
-          console.log(type);
+          if (sData.exact.name[i].link != null) {
+            type = alterType(sData.exact.name[i].link);
+            console.log(type);
 
-          GSystem_link = assignLink(type, sData.exact.name[i].link.toLowerCase(), sData.exact.name[i]._id);
-          html_div[cur_page] += generateCard(sData.exact.name[i].name, type, sData.exact.name[i].created_by, sData.exact.name[i].last_update, GSystem_link);
+            GSystem_link = assignLink(type, sData.exact.name[i].link.toLowerCase(), sData.exact.name[i]._id);
+            html_div[cur_page] += generateCard(sData.exact.name[i].name, type, sData.exact.name[i].created_by, sData.exact.name[i].last_update, GSystem_link);
+
+            results_in_current_page += 1;
+            if (results_in_current_page >= results_per_page) {
+              html_div[cur_page] += "</ul>";
+              cur_page += 1;
+              results_in_current_page = 0;
+              html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
+            }                   
+          }
+      }
+                
+      a = sData.stemmed.name.length;
+      for (i=0; i<a; i++) {
+
+        // ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
+        if (sData.stemmed.name[i].link != null) {
+          type = alterType(sData.stemmed.name[i].link);
+
+          GSystem_link = assignLink(type, sData.stemmed.name[i].link.toLowerCase(), sData.stemmed.name[i]._id);
+          html_div[cur_page] += generateCard(sData.stemmed.name[i].name, type, sData.stemmed.name[i].created_by, sData.stemmed.name[i].last_update, GSystem_link);
 
           results_in_current_page += 1;
           if (results_in_current_page >= results_per_page) {
@@ -205,25 +226,8 @@
             cur_page += 1;
             results_in_current_page = 0;
             html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
-          }                   
-      }
-                
-      a = sData.stemmed.name.length;
-      for (i=0; i<a; i++) {
-
-        // ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-        type = alterType(sData.stemmed.name[i].link);
-
-        GSystem_link = assignLink(type, sData.stemmed.name[i].link.toLowerCase(), sData.stemmed.name[i]._id);
-        html_div[cur_page] += generateCard(sData.stemmed.name[i].name, type, sData.stemmed.name[i].created_by, sData.stemmed.name[i].last_update, GSystem_link);
-
-        results_in_current_page += 1;
-        if (results_in_current_page >= results_per_page) {
-          html_div[cur_page] += "</ul>";
-          cur_page += 1;
-          results_in_current_page = 0;
-          html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
-        }                   
+          }
+        }
       }  
       // -------------------------------------------------------------------------------- //
       
@@ -232,18 +236,20 @@
       for (i=0; i<a; i++) { 
 
         // ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-        type = alterType(sData.exact.tags[i].link);
+        if (sData.exact.tags[i].link != null) {
+          type = alterType(sData.exact.tags[i].link);
 
-        GSystem_link = assignLink(type, sData.exact.tags[i].link.toLowerCase(), sData.exact.tags[i]._id);
-        html_div[cur_page] += generateCard(sData.exact.tags[i].name, type, sData.exact.tags[i].created_by, sData.exact.tags[i].last_update, GSystem_link);
+          GSystem_link = assignLink(type, sData.exact.tags[i].link.toLowerCase(), sData.exact.tags[i]._id);
+          html_div[cur_page] += generateCard(sData.exact.tags[i].name, type, sData.exact.tags[i].created_by, sData.exact.tags[i].last_update, GSystem_link);
 
-        results_in_current_page += 1;
-        if (results_in_current_page >= results_per_page) {
-          html_div[cur_page] += "</ul>";
-          cur_page += 1;
-          results_in_current_page = 0;
-          html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
-        }                                     
+          results_in_current_page += 1;
+          if (results_in_current_page >= results_per_page) {
+            html_div[cur_page] += "</ul>";
+            cur_page += 1;
+            results_in_current_page = 0;
+            html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
+          }
+        }
       }
       
 
@@ -251,18 +257,20 @@
       for (i=0; i<a; i++) {
         
         // ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-        type = alterType(sData.stemmed.tags[i].link);
+        if (sData.stemmed.tags[i].link != null) {
+          type = alterType(sData.stemmed.tags[i].link);
 
-        GSystem_link = assignLink(type, sData.stemmed.tags[i].link.toLowerCase(), sData.stemmed.tags[i]._id);
-        html_div[cur_page] += generateCard(sData.stemmed.tags[i].name, type, sData.stemmed.tags[i].created_by, sData.stemmed.tags[i].last_update, GSystem_link);
+          GSystem_link = assignLink(type, sData.stemmed.tags[i].link.toLowerCase(), sData.stemmed.tags[i]._id);
+          html_div[cur_page] += generateCard(sData.stemmed.tags[i].name, type, sData.stemmed.tags[i].created_by, sData.stemmed.tags[i].last_update, GSystem_link);
 
-        results_in_current_page += 1;
-        if (results_in_current_page >= results_per_page) {
-          html_div[cur_page] += "</ul>";
-          cur_page += 1;
-          results_in_current_page = 0;
-          html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
-        }             
+          results_in_current_page += 1;
+          if (results_in_current_page >= results_per_page) {
+            html_div[cur_page] += "</ul>";
+            cur_page += 1;
+            results_in_current_page = 0;
+            html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
+          }
+        }
       }
     
 
@@ -271,35 +279,39 @@
       for (i=0; i<a; i++) {
         
         // ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-        type = alterType(sData.exact.content[i].link);
+        if (sData.exact.content[i].link != null) {
+          type = alterType(sData.exact.content[i].link);
 
-        GSystem_link = assignLink(type, sData.exact.content[i].link.toLowerCase(), sData.exact.content[i]._id);
-        html_div[cur_page] += generateCard(sData.exact.content[i].name, type, sData.exact.content[i].created_by, sData.exact.content[i].last_update, GSystem_link);
+          GSystem_link = assignLink(type, sData.exact.content[i].link.toLowerCase(), sData.exact.content[i]._id);
+          html_div[cur_page] += generateCard(sData.exact.content[i].name, type, sData.exact.content[i].created_by, sData.exact.content[i].last_update, GSystem_link);
 
-        results_in_current_page += 1;
-        if (results_in_current_page >= results_per_page) {
-          html_div[cur_page] += "</ul>";
-          cur_page += 1;
-          results_in_current_page = 0;
-          html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
-        }     
+          results_in_current_page += 1;
+          if (results_in_current_page >= results_per_page) {
+            html_div[cur_page] += "</ul>";
+            cur_page += 1;
+            results_in_current_page = 0;
+            html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
+          }
+        }
       }     
 
       a = sData.stemmed.content.length;
       for (i=0; i<a; i++) {
         
         // ASSIGN THE TYPE FIELD AND CHANGE IT IF IT IS A QUIZ/DETAIL
-        type = alterType(sData.stemmed.content[i].link);
+        if (sData.stemmed.content[i].link != null) {
+          type = alterType(sData.stemmed.content[i].link);
 
-        GSystem_link = assignLink(type, sData.stemmed.content[i].link.toLowerCase(), sData.stemmed.content[i]._id);
-        html_div[cur_page] += generateCard(sData.stemmed.content[i].name, type, sData.stemmed.content[i].created_by, sData.stemmed.content[i].last_update, GSystem_link);
+          GSystem_link = assignLink(type, sData.stemmed.content[i].link.toLowerCase(), sData.stemmed.content[i]._id);
+          html_div[cur_page] += generateCard(sData.stemmed.content[i].name, type, sData.stemmed.content[i].created_by, sData.stemmed.content[i].last_update, GSystem_link);
 
-        results_in_current_page += 1;
-        if (results_in_current_page >= results_per_page) {
-          html_div[cur_page] += "</ul>";
-          cur_page += 1;
-          results_in_current_page = 0;
-          html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
+          results_in_current_page += 1;
+          if (results_in_current_page >= results_per_page) {
+            html_div[cur_page] += "</ul>";
+            cur_page += 1;
+            results_in_current_page = 0;
+            html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';
+          }
         }
       }
       
@@ -384,18 +396,20 @@
 
       html_div[cur_page] = "<ul class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";      
       for (i=0; i<a; i++) {
-        type = alterType(sData[i].link);
-        GSystem_link = assignLink(type, sData[i].link.toLowerCase(), sData[i]._id);
+        if (sData[i].link != null) {
+          type = alterType(sData[i].link);
+          GSystem_link = assignLink(type, sData[i].link.toLowerCase(), sData[i]._id);
 
-        html_div[cur_page] += generateCard(sData[i].name, type, sData[i].created_by, sData[i].last_update, GSystem_link);
+          html_div[cur_page] += generateCard(sData[i].name, type, sData[i].created_by, sData[i].last_update, GSystem_link);
 
-        results_in_current_page += 1;
-        if (results_in_current_page >= results_per_page) {
-          html_div[cur_page] += "</ul>";
-          cur_page += 1;
-          results_in_current_page = 0;
-          html_div[cur_page] = "<ul class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
-        }                   
+          results_in_current_page += 1;
+          if (results_in_current_page >= results_per_page) {
+            html_div[cur_page] += "</ul>";
+            cur_page += 1;
+            results_in_current_page = 0;
+            html_div[cur_page] = "<ul class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";
+          }
+        }
       }
       $("#results").html(html_div[page_no]);
 
