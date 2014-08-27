@@ -9544,7 +9544,7 @@ input.node-title {
 }
 /* line 686, ../../../scss/_metastudio_styles.scss */
 .landing header {
-  background-color: #444;
+  background-color: #222;
   padding: 2rem 0;
 }
 /* line 690, ../../../scss/_metastudio_styles.scss */
@@ -9562,23 +9562,41 @@ input.node-title {
 section.banner {
   padding: 0 2rem;
   margin: 2rem 0;
-  border: 2px solid black;
-  border-width: 4px 0;
-  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px solid #12d9e4;
+  border-width: 2px 0;
+  background-color: rgba(0, 0, 0, 0.1);
 }
-
 /* line 708, ../../../scss/_metastudio_styles.scss */
-#group-banner {
-  background-color: #eee;
-  padding: 1rem;
+section.banner > * {
+  background-color: #0eacb5;
+  color: #eee;
   margin: 0;
 }
+/* line 710, ../../../scss/_metastudio_styles.scss */
+section.banner > * .slide {
+  padding: 2rem;
+  background-color: #0c969d;
+}
+/* line 716, ../../../scss/_metastudio_styles.scss */
+section.banner > * h3, section.banner > * h4, section.banner > * h5, section.banner > * h6, section.banner > * blockquote {
+  color: white;
+}
+/* line 719, ../../../scss/_metastudio_styles.scss */
+section.banner > * blockquote {
+  font-size: 150%;
+  font-style: italic;
+}
+/* line 723, ../../../scss/_metastudio_styles.scss */
+section.banner > * p:first-child {
+  color: white;
+  font-size: 140%;
+}
 
-/* line 715, ../../../scss/_metastudio_styles.scss */
+/* line 734, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 718, ../../../scss/_metastudio_styles.scss */
+/* line 737, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;

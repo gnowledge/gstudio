@@ -684,7 +684,7 @@ input.node-title{
     }
     
     header{
-        background-color: #444;
+        background-color: #222;
         padding:2rem 0;
         
     h1{
@@ -701,15 +701,34 @@ input.node-title{
 section.banner{
     padding:0 2rem;
     margin: 2rem 0;
-    border:2px solid black;
-    border-width: 4px 0;
-    background-color: rgba(255,255,255,0.2);
+    border:2px solid lighten($primary-color,10%);
+    border-width: 2px 0;
+    background-color: rgba(0,0,0,0.1);
+    
+    &>*{
+    background-color: $primary-color;
+        .slide{
+            padding: 2rem;
+            background-color: darken($primary-color,5%);
+        }
+    color:#eee;
+    margin:0;
+    h3,h4,h5,h6,blockquote{
+        color:white;
+    }
+        blockquote{
+            font-size: 150%;
+            font-style:italic;
+        }
+    p:first-child{
+        color:white;
+        font-size:140%;
+        }
+    
+    }
+    
 }
-#group-banner{
-    background-color: #eee;
-    padding: 1rem;
-margin:0;
-}
+
 // Off Canvas Areas
 aside#help{
     h4{
