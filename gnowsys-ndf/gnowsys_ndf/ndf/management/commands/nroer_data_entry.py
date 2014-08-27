@@ -624,6 +624,7 @@ def create_resource_gsystem(resource_data):
     info_message = "\n- Creating resource: " + str(resource_data["name"])
     log_list.append(str(info_message))
     
+    files.seek(0)
     filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
 
     # filling values in fileobj
@@ -676,13 +677,15 @@ def create_resource_gsystem(resource_data):
     #   resource_data[contributors] = []
 
     # fileobj.contributors = resource_data[contributors]
-    fileobj.contributors.append(get_user_id("nroer_team"))
+    user_id = get_user_id("nroer_team")
+    fileobj.contributors.append(user_id)
 
     fileobj.license = resource_data["license"]
     fileobj.status = u"PUBLISHED"
 
     fileobj.file_size = size
     fileobj.mime_type = filetype
+    fileobj.modified_by = user_id
     fileobj.save()
 
     log_list.append("\n- Created resource/GSystem object of name: '" + fileobj.name + "' having ObjectId: " + fileobj._id.__str__())
