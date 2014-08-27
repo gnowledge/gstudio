@@ -473,18 +473,17 @@
       {% for each in pandoraCollection %}
       {% get_source_id each.pk as source_id %}
       {% get_user_object each.created_by as user_obj %}
-      {% for src_id in source_id %}
       <li class="card">
         <div class="file">
 
         <header>
           <div class="th">
-          <a href="http://wetube.gnowledge.org/{{src_id}}/480p.webm">
-          <img src="http://wetube.gnowledge.org/{{src_id}}/icon128.jpg">
+          <a href="http://wetube.gnowledge.org/{{source_id}}/480p.webm">
+          <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
           </a>
           </div>
 
-          <h4>{{each.name|truncatechars:20}}</h4>
+          <h4>{{each.name}}</h4>
 
           <div>
             <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
@@ -512,8 +511,6 @@
 
         </div>
       </li>
-
-      {% endfor %}
 
       {% empty %}
         {% if not searching %}

@@ -216,7 +216,7 @@
 
   		<!-- Existing card list-->
   		{% if user.is_authenticated %}
-			{% get_preferred_lang request nodes "Theme" as nodes %}
+			{% get_preferred_lang request group_id nodes "Theme" as nodes %}
 		{% endif %}
 
 	  	{% for each in nodes %}

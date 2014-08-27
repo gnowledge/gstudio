@@ -111,8 +111,8 @@ urlpatterns = patterns('',
         name='password_reset'
     ),
     
+     (r'^accounts/', include('registration_email.backends.default.urls')),
     url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
-    (r'^accounts/', include('registration.backends.default.urls')),
-    
+   
     url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )
