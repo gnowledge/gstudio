@@ -427,14 +427,15 @@ This section has been integrated to groupdashboard and appears in block app_acti
 	<div class="small-4 columns">
 	{% if node.teaches %}
 	<div class="panel">
-		<h6>This resource teaches you these</h6>
+		<h6>This resource teaches you: </h6>
 		
 	 {% for  each_node in node.teaches %}
 	 {% get_grid_fs_object each_node as grid_fs_obj %}
           {% if each_node.mime_type %}
           <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
           {% else %}
-          <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>
+          {% if not forloop.last %},&nbsp; {% endif %}
           {% endif %}
           {% endfor %}
 	</div>
@@ -463,67 +464,67 @@ This section has been integrated to groupdashboard and appears in block app_acti
           {% get_grid_fs_object node as grid_fs_obj %}
 
           {% if 'Pandora_video' in node.member_of_names_list %}
-          <div>
-           
-      <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
-              <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
-              {% trans "Your browser does not support the video tag." %}
-            </video><br/><br/>
+            <div>
+              <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+                  <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
+                  {% trans "Your browser does not support the video tag." %}
+              </video><br/><br/>
 
-      {% get_pandoravideo_metadata video_obj as metadata %}
-      {% for k,v in metadata.items %} 
-            {% if k != "cuts" %}
-      <h3>{{k}} : {{v}}<h3>
-    <br/>
-    {% endif %}
-      {% endfor %}
-            {% if user.is_authenticated %}
-            <br/>
-            <br/>
-            <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm" > 
-              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
-            </a>
-            {% endif %}
-          </div>
+              {% get_pandoravideo_metadata video_obj as metadata %}
+              {% for k,v in metadata.items %} 
+                    {% if k != "cuts" %}
+                      <h3>{{k}} : {{v}}<h3>
+                      <br/>
+                    {% endif %}
+              {% endfor %}
+              {% if user.is_authenticated %}
+                <br/>
+                <br/>
+                <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
+                  {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
+                </a>
+              {% endif %}
+            </div>
 
           {% elif 'video' in node.mime_type %}
-          <div>
-            <video width="640px" controls buffered>
-              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-              {% trans "Your browser does not support the video tag." %}
-            </video>
+            <div>
+              <video width="640px" controls buffered>
+                <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
+                <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
+                {% trans "Your browser does not support the video tag." %}
+              </video>
 
-            {% if user.is_authenticated %}
-            <br/>
-            <br/>
-            <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
-            </a>
-            {% endif %}
-          </div>
-    
+              {% if user.is_authenticated %}
+              <br/>
+              <br/>
+              <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+                {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
+              </a>
+              {% endif %}
+            </div>
+
           {% else %}    
-          <div>
-            {% if 'image' in node.mime_type %}
-            <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-              <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}">
-            </a>
+            {{node.mime_type}}
+            <div>
+              {% if 'image' in node.mime_type %}
+              <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+                <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}">
+              </a>
 
-            {% else %}
-            <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-              {{ grid_fs_obj.filename }}
-            </a>
-            {% endif %}
+              {% else %}
+              <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+                {{ grid_fs_obj.filename }}
+              </a>
+              {% endif %}
 
-            {% if user.is_authenticated %}
-            <br/>
-            <br/>
-            <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
-            </a>
-            {% endif %}
-          </div>
+              {% if user.is_authenticated %}
+              <br/>
+              <br/>
+              <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
+              </a>
+              {% endif %}
+            </div>
     
           {% endif %}
     
