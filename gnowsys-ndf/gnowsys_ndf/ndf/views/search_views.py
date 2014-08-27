@@ -25,7 +25,6 @@ POSSIBLE_SEARCH_TYPES = ["GSystem", "File"]
 collection = get_database()[Node.collection_name]
 #############
 
-
 # CLASS FOR ENCODING INTO JSON - OBJECTID TO STRING CONVERSION
 class Encoder(json.JSONEncoder):
 	def default(self, obj):
@@ -192,8 +191,9 @@ def results_search(request, group_id):
 			if (search_by_name == True):						# IF TRUE, THEN SEARCH BY NAME
 				all_GSystemTypes.rewind()
 				count = 0
+
 			if (search_by_name == True):						# IF TRUE, THEN SEARCH BY NAME
-				all_GSystemTypes
+				all_GSystemTypes.rewind()							# amn Corrected
 
 				"""
 					Following lines search for all GSystemTypes and then all GSystems in those GSystem types created by the selected user
