@@ -39,6 +39,8 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
     allVideosData=allVideo['data']['items']
     pandora_video_st=collection.Node.one({'$and':[{'name':'Pandora_video'},{'_type':'GSystemType'}]})
     source_id_at=collection.Node.one({'$and':[{'name':'source_id'},{'_type':'AttributeType'}]})
+    grp = collection.Node.one({'_type': 'Group', 'name':'home' })
+
     pandora_video_id=[]
     
     source_id_set=[]
@@ -52,6 +54,7 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
             gs.name=each['title'].lower()
             gs.created_by=1
             gs.modified_by = 1
+            gs.group_set.append(grp._id)
             if 1 not in gs.contributors:
                 gs.contributors.append(1)
                 gs.save()
