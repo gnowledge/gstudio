@@ -68,3 +68,4 @@ schema_files/
 *.db
 *~
 wikidata/
+*local_settings.py
