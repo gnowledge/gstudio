@@ -9137,7 +9137,6 @@ article {
 /* line 286, ../../../scss/_metastudio_styles.scss */
 article > header, article form > header {
   padding: 15px;
-  margin-bottom: 0.5rem;
   background-color: #f0f0f0;
 }
 /* line 299, ../../../scss/_metastudio_styles.scss */
@@ -9357,7 +9356,6 @@ article {
 /* line 521, ../../../scss/_metastudio_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
-  margin-bottom: 1rem !important;
 }
 /* line 525, ../../../scss/_metastudio_styles.scss */
 article > footer {
@@ -9505,80 +9503,82 @@ input.node-title {
   padding: 0.8rem;
   z-index: 500;
 }
-/* line 654, ../../../scss/_metastudio_styles.scss */
+/* line 657, ../../../scss/_metastudio_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 657, ../../../scss/_metastudio_styles.scss */
+/* line 660, ../../../scss/_metastudio_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: none;
 }
-/* line 661, ../../../scss/_metastudio_styles.scss */
+/* line 664, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
   background-color: rgba(0, 0, 0, 0.1);
 }
-/* line 664, ../../../scss/_metastudio_styles.scss */
+/* line 667, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 667, ../../../scss/_metastudio_styles.scss */
+/* line 670, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 670, ../../../scss/_metastudio_styles.scss */
+/* line 673, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
 /* For landing page */
-/* line 679, ../../../scss/_metastudio_styles.scss */
+/* line 682, ../../../scss/_metastudio_styles.scss */
 .landing {
   position: relative;
 }
-/* line 681, ../../../scss/_metastudio_styles.scss */
+/* line 684, ../../../scss/_metastudio_styles.scss */
 .landing #language-selector {
   position: absolute;
   top: 10px;
   right: 10px;
 }
-/* line 687, ../../../scss/_metastudio_styles.scss */
-.landing header {
-  background-color: white;
-  padding: 1rem 0;
-}
 /* line 690, ../../../scss/_metastudio_styles.scss */
+.landing header {
+  position: relative;
+  z-index: 50;
+  background-color: #fff;
+  padding: 1rem 0 0 0;
+}
+/* line 696, ../../../scss/_metastudio_styles.scss */
 .landing header .logo {
   color: #555;
   text-align: center;
 }
-/* line 696, ../../../scss/_metastudio_styles.scss */
-.landing header h1 small, .landing header article h1:not(.subheader) div input small, article h1:not(.subheader) div .landing header input small {
-  display: block;
-  line-height: 1.2rem;
+/* line 701, ../../../scss/_metastudio_styles.scss */
+.landing header h1, .landing header article h1:not(.subheader) div input, article h1:not(.subheader) div .landing header input {
+  font-size: 2rem;
+  line-height: 1;
 }
 
-/* line 704, ../../../scss/_metastudio_styles.scss */
+/* line 709, ../../../scss/_metastudio_styles.scss */
 section.banner {
   padding: 0 2rem;
-  margin: 2rem 0;
+  margin-bottom: 2rem;
   border: 2px solid #12d9e4;
   border-width: 2px 0;
   background-color: rgba(0, 0, 0, 0.1);
 }
-/* line 711, ../../../scss/_metastudio_styles.scss */
+/* line 716, ../../../scss/_metastudio_styles.scss */
 section.banner > * {
   background-color: #0eacb5;
   color: #eee;
   margin: 0;
 }
-/* line 713, ../../../scss/_metastudio_styles.scss */
+/* line 718, ../../../scss/_metastudio_styles.scss */
 section.banner > * .slide {
   padding: 1rem;
   background-color: #0c969d;
 }
-/* line 716, ../../../scss/_metastudio_styles.scss */
+/* line 721, ../../../scss/_metastudio_styles.scss */
 section.banner > * .slide > i {
   position: absolute;
   font-size: 15rem;
@@ -9587,26 +9587,26 @@ section.banner > * .slide > i {
   opacity: 0.1;
   right: 5%;
 }
-/* line 727, ../../../scss/_metastudio_styles.scss */
+/* line 732, ../../../scss/_metastudio_styles.scss */
 section.banner > * h3, section.banner > * h4, section.banner > * h5, section.banner > * h6, section.banner > * blockquote {
   color: white;
 }
-/* line 730, ../../../scss/_metastudio_styles.scss */
+/* line 735, ../../../scss/_metastudio_styles.scss */
 section.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 734, ../../../scss/_metastudio_styles.scss */
+/* line 739, ../../../scss/_metastudio_styles.scss */
 section.banner > * p:first-child {
   color: white;
   font-size: 120%;
 }
 
-/* line 747, ../../../scss/_metastudio_styles.scss */
+/* line 752, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 750, ../../../scss/_metastudio_styles.scss */
+/* line 755, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
@@ -9711,7 +9711,7 @@ pre {
 
 /* Effects */
 /* line 95, ../../../scss/_app_styles.scss */
-.drop-shadow {
+.drop-shadow, .landing header {
   -webkit-box-shadow: 0px 0px 5px 1px black;
   box-shadow: 0px 0px 5px 1px black;
 }

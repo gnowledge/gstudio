@@ -285,7 +285,7 @@ main>aside{
         overflow-x: visible;
         &>header,form>header{
             padding: 15px;
-            margin-bottom: 0.5rem;
+//            margin-bottom: 0.5rem;
             background-color: #f0f0f0;
         }
         
@@ -520,7 +520,7 @@ article{
 	
     &>header{
 	border-bottom: 1px solid #ddd;
-	margin-bottom: 1rem!important;
+//	margin-bottom: 1rem!important;
 }
     &>footer{
 	border-top: 1px dotted #ddd;
@@ -651,6 +651,9 @@ input.node-title{
     color: #ddd;
     padding: 0.8rem;
     z-index: 500;
+    &.language{
+        
+    }
     label{
             color:#666;
         }
@@ -685,25 +688,27 @@ input.node-title{
     }
     
     header{
-        background-color: white;
-        padding:1rem 0;
+        position: relative;
+        z-index: 50;
+        background-color: #fff;
+        padding:1rem 0 0 0;
+        @extend .drop-shadow;
         .logo{
             color:#555;
             text-align: center;
         }
         
     h1{
-        small{
-            display:block;
-            line-height: 1.2rem;
-        }
+        font-size: 2rem;
+            line-height: 1;
+
     }
     }
     
 }
 section.banner{
     padding:0 2rem;
-    margin: 2rem 0;
+    margin-bottom: 2rem;
     border:2px solid lighten($primary-color,10%);
     border-width: 2px 0;
     background-color: rgba(0,0,0,0.1);
