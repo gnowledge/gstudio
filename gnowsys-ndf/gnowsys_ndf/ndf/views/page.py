@@ -47,6 +47,8 @@ collection_tr = db[Triple.collection_name]
 gst_page = collection.Node.one({'_type': 'GSystemType', 'name': GAPPS[0]})
 history_manager = HistoryManager()
 rcs = RCS()
+appid=collection.Node.one({'name':u'Page','_type':'GSystemType'})
+app_id=appid._id
 
 #######################################################################################################################################
 # VIEWS DEFINED FOR GAPP -- 'PAGE'
@@ -110,6 +112,7 @@ def page(request, group_id, app_id=None):
 
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
+                                 'app_id':app_id,
                                  'searching': True, 'query': search_field,
                                  'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                 }, 
@@ -135,6 +138,7 @@ def page(request, group_id, app_id=None):
 
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
+                                     'app_id':app_id,
                                      'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                     }, 
                                     context_instance=RequestContext(request))
@@ -158,6 +162,7 @@ def page(request, group_id, app_id=None):
           
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
+                                     'app_id':app_id,
                                      'page_nodes':content,
                                      'groupid':group_id,
                                      'group_id':group_id
@@ -194,6 +199,7 @@ def page(request, group_id, app_id=None):
 
           return render_to_response("ndf/page_list.html",
                                     {'title': title,
+                                     'app_id':app_id,
                                      'page_nodes': page_nodes,
                                      'groupid':group_id,
                                      'group_id':group_id
