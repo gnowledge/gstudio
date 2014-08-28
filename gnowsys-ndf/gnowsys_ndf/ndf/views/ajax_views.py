@@ -639,6 +639,7 @@ def node_collection(node=None, group_id=None):
 def theme_node_collection(node=None, group_id=None):
 
     theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
     if node.collection_set:
       for each in node.collection_set:
@@ -650,7 +651,7 @@ def theme_node_collection(node=None, group_id=None):
           node_collection(each_node, group_id)
         else:
           # After deleting theme instance it's should also remove from collection_set
-          cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+          cur = collection.Node.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
           for e in cur:
             if each_node._id in e.collection_set:
@@ -660,9 +661,8 @@ def theme_node_collection(node=None, group_id=None):
           # print "\n node ", each_node.name ,"has been deleted \n"
           each_node.delete()
 
-
       # After deleting theme instance it's should also remove from collection_set
-      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
       for e in cur:
         if node._id in e.collection_set:
@@ -674,12 +674,11 @@ def theme_node_collection(node=None, group_id=None):
     else:
 
       # After deleting theme instance it's should also remove from collection_set
-      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+      cur = collection.Node.find({'member_of': {'$all': [theme_GST._id,theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
 
       for e in cur:
         if node._id in e.collection_set:
           collection.update({'_id': e._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
-
 
       # print "\n node ", node.name ,"has been deleted \n"
       node.delete()
@@ -690,30 +689,46 @@ def theme_node_collection(node=None, group_id=None):
 def delete_themes(request, group_id):
   '''delete themes objects'''
   send_dict = []
+  deleteobjects = ""
+  deleteobj = ""
   if request.is_ajax() and request.method =="POST":
-     context_node_id=request.POST.get('context_theme','') 
-     if context_node_id:
+    context_node_id=request.POST.get('context_theme','') 
+    if context_node_id:
       context_theme_node = collection.Node.one({'_id': ObjectId(context_node_id)}) 
 
-     deleteobjects = request.POST['deleteobjects']
-     confirm = request.POST.get("confirm","")
-  for each in  deleteobjects.split(","):
-      node = collection.Node.one({ '_id': ObjectId(each)})
-      # print "\n confirmed objects: ", node.name
+     
+    confirm = request.POST.get("confirm","")
+    deleteobj = request.POST.get('deleteobj',"")
+    theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
+    theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 
-      if confirm:
-        
-        if context_node_id:
-          node_collection(node, group_id)
-          if node._id in context_theme_node.collection_set:
-            collection.update({'_id': context_theme_node._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
+    if deleteobj:
+      obj = collection.Node.one({'_id': ObjectId(deleteobj) })
+      obj.delete()          
+      node = collection.Node.one({'member_of': {'$in':[theme_GST._id, theme_item_GST._id]}, 'collection_set': ObjectId(deleteobj) })
+      collection.update({'_id': node._id}, {'$pull': {'collection_set': ObjectId(deleteobj) }}, upsert=False, multi=False)      
+
+    else:
+      deleteobjects = request.POST['deleteobjects']
+
+    if deleteobjects:
+      for each in  deleteobjects.split(","):
+          node = collection.Node.one({ '_id': ObjectId(each)})
+          # print "\n confirmed objects: ", node.name
+
+          if confirm:
+            
+            if context_node_id:
+              node_collection(node, group_id)
+              if node._id in context_theme_node.collection_set:
+                collection.update({'_id': context_theme_node._id}, {'$pull': {'collection_set': ObjectId(node._id) }}, upsert=False, multi=False)      
 
 
-        else:
-          theme_node_collection(node, group_id)
+            else:
+              theme_node_collection(node, group_id)
 
-      else:
-        send_dict.append({"title":node.name})
+          else:
+            send_dict.append({"title":node.name})
 
   return StreamingHttpResponse(json.dumps(send_dict).encode('utf-8'),content_type="text/json", status=200)
 
