@@ -75,7 +75,7 @@ def main():
           theme_node.contributors.append(1)
           theme_node.created_by = 1
           theme_node.group_set.append(get_group._id)
-          theme_node.language = u"('hi', 'Hindi')"
+          theme_node.language = u"hi"
           theme_node.member_of.append(app_obj._id)
           theme_node.modified_by = 1
           theme_node.status = u"DRAFT"

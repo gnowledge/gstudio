@@ -84,22 +84,36 @@
 	<!-- Right Nav Section -->
 	<ul class="right medium-3 columns">
         
-<!-- Language selector-->
-            <li class="has-form">
-                {% get_languages as lan %}
-                <a class="tiny radius language button" href="#" data-reveal-id="languageModal">en</a> 
+<!-- <\!-- Language selector-\-> -->
+<!--             <li class="has-form"> -->
+<!--                 {% get_languages as lan %} -->
+<!--                 <a class="tiny radius language button" href="#" data-reveal-id="languageModal">en</a>  -->
 
-                <div id="languageModal" class="small reveal-modal" data-reveal>
-                  <h2>Language preference</h2>
+<!--                 <div id="languageModal" class="small reveal-modal" data-reveal> -->
+<!--                   <h2>Language preference</h2> -->
                       
-                  <h3>Primary language</h3>
-                  <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>    
-                  <h3>Secondary language</h3>
-                  <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>      
-                  <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/>
-                  <a class="close-reveal-modal">&#215;</a>
-                </div>
-              </li>
+<!--                   <h3>Primary language</h3> -->
+<!--                   <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>     -->
+<!--                   <h3>Secondary language</h3> -->
+<!--                   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>       -->
+<!--                   <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/> -->
+<!--                   <a class="close-reveal-modal">&#215;</a> -->
+<!--                 </div> -->
+<!--               </li> -->
+<li>	    
+  <form action="/i18n/setlang/" method="POST">
+  {% csrf_token %}
+  <input name="next" type="hidden" value="/pref_lang/?url={{request.path}}&group_id={{group_id}}&appid={{appId}}"/>
+  <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+    
+  <select name="language">
+    {% for lang in LANGUAGES %}
+    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+    {% endfor %}
+  </select>
+  <input type="submit" value="Go" />
+</form>
+</li>
         
           <!-- If logged in show user options -->
       	  {% if user.is_authenticated %}
@@ -388,7 +402,6 @@
         </p>
 
       </div>
-
   </footer>
 
   <!-- JS -->

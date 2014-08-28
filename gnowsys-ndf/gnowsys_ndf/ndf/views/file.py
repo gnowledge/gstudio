@@ -50,7 +50,10 @@ GST_FILE = collection.GSystemType.one({'name': GAPPS[1], '_type':'GSystemType'})
 GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
+app=collection.Node.one({'name':u'File','_type':'GSystemType'})
+appId=app._id
 
+    
 
 # VIEWS DEFINED FOR GAPP -- 'FILE'
 
@@ -219,7 +222,8 @@ def file(request, group_id, file_id=None):
       already_uploaded = request.GET.getlist('var', "")
 
       return render_to_response("ndf/file.html",
-                                {'title': title, 
+                                {'title': title,
+                                 'appId':appId,
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
@@ -325,7 +329,8 @@ def file(request, group_id, file_id=None):
       datavisual = json.dumps(datavisual)
 
       return render_to_response("ndf/file.html", 
-                                {'title': title, 
+                                {'title': title,
+                                 'appId':appId,
                                  'already_uploaded': already_uploaded,
                                  # 'sourceid':source_id_set,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
