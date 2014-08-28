@@ -21,9 +21,9 @@ GAPP = collection.Node.one({'$and':[{'_type':'MetaType'},{'name':'GAPP'}]}) # fe
 
 def lang_pref(request):
     url=request.GET.get('url','')
+    #appid=request.GET.get('appid','')
     group_id=request.GET.get('group_id','')
     lan_dict={}
-    print request.LANGUAGE_CODE
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     if auth:
         lan_dict['primary']=request.LANGUAGE_CODE
@@ -31,4 +31,10 @@ def lang_pref(request):
         auth.preferred_languages=lan_dict
         auth.modified_by=request.user.id
         auth.save()
+    # if appid:
+    #     appname=collection.Node.one({'_id':ObjectId(str(appid))})
+        
+    #     if (appname.name == "Browse Topic"):
+    #         return HttpResponseRedirect("/home/"+appname.name.lower())
+    # else:
     return HttpResponseRedirect(url)

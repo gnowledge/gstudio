@@ -30,6 +30,8 @@ collection = db[Node.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
+app=collection.Node.one({'name':u'Browse Topic','_type':'GSystemType'})
+appId=app._id
 #######################################################################################################################################
 list_trans_coll = []
 coll_set_dict={}
@@ -102,7 +104,8 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                                'group_id': group_id,'groupid': group_id,'node': node,
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,
                                'title': title,'themes_list_items': themes_list_items,
-                               'themes_hierarchy': themes_hierarchy, 'unfold': unfold
+                               'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
+                                'appId':appId,
                                },
                              
                               context_instance = RequestContext(request)
@@ -542,7 +545,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
         
     return render_to_response("ndf/theme.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
-                            'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,
+                            'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,'appId':appId,
                             'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
                             'theme_GST_id': theme_GST._id,'theme_item_GST_id': theme_item_GST._id, 'topic_GST_id': topic_GST._id,
                             'themes_list_items': themes_list_items,'nodes':nodes_dict,'lan':LANGUAGES
