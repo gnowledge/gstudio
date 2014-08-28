@@ -9498,67 +9498,68 @@ input.node-title {
 /* UI Button */
 /* line 647, ../../../scss/_metastudio_styles.scss */
 .ui.button {
+  margin-right: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.2);
   background-color: transparent;
   color: #ddd;
   padding: 0.8rem;
   z-index: 500;
 }
-/* line 653, ../../../scss/_metastudio_styles.scss */
+/* line 654, ../../../scss/_metastudio_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 656, ../../../scss/_metastudio_styles.scss */
+/* line 657, ../../../scss/_metastudio_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: none;
 }
-/* line 660, ../../../scss/_metastudio_styles.scss */
+/* line 661, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
   background-color: rgba(0, 0, 0, 0.1);
 }
-/* line 663, ../../../scss/_metastudio_styles.scss */
+/* line 664, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 666, ../../../scss/_metastudio_styles.scss */
+/* line 667, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 669, ../../../scss/_metastudio_styles.scss */
+/* line 670, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
 /* For landing page */
-/* line 678, ../../../scss/_metastudio_styles.scss */
+/* line 679, ../../../scss/_metastudio_styles.scss */
 .landing {
   position: relative;
 }
-/* line 680, ../../../scss/_metastudio_styles.scss */
+/* line 681, ../../../scss/_metastudio_styles.scss */
 .landing #language-selector {
   position: absolute;
   top: 10px;
   right: 10px;
 }
-/* line 686, ../../../scss/_metastudio_styles.scss */
+/* line 687, ../../../scss/_metastudio_styles.scss */
 .landing header {
-  background-color: #222;
-  padding: 2rem 0;
+  background-color: white;
+  padding: 1rem 0;
 }
 /* line 690, ../../../scss/_metastudio_styles.scss */
-.landing header h1, .landing header article h1:not(.subheader) div input, article h1:not(.subheader) div .landing header input {
-  color: white;
-  font-size: 2rem;
-  line-height: 0.9;
+.landing header .logo {
+  color: #555;
+  text-align: center;
 }
-/* line 694, ../../../scss/_metastudio_styles.scss */
-.landing header h1.subheader, .landing header article h1:not(.subheader) div input.subheader, article h1:not(.subheader) div .landing header input.subheader {
-  color: #aaa;
+/* line 696, ../../../scss/_metastudio_styles.scss */
+.landing header h1 small, .landing header article h1:not(.subheader) div input small, article h1:not(.subheader) div .landing header input small {
+  display: block;
+  line-height: 1.2rem;
 }
 
-/* line 701, ../../../scss/_metastudio_styles.scss */
+/* line 704, ../../../scss/_metastudio_styles.scss */
 section.banner {
   padding: 0 2rem;
   margin: 2rem 0;
@@ -9566,37 +9567,46 @@ section.banner {
   border-width: 2px 0;
   background-color: rgba(0, 0, 0, 0.1);
 }
-/* line 708, ../../../scss/_metastudio_styles.scss */
+/* line 711, ../../../scss/_metastudio_styles.scss */
 section.banner > * {
   background-color: #0eacb5;
   color: #eee;
   margin: 0;
 }
-/* line 710, ../../../scss/_metastudio_styles.scss */
+/* line 713, ../../../scss/_metastudio_styles.scss */
 section.banner > * .slide {
-  padding: 2rem;
+  padding: 1rem;
   background-color: #0c969d;
 }
 /* line 716, ../../../scss/_metastudio_styles.scss */
+section.banner > * .slide > i {
+  position: absolute;
+  font-size: 15rem;
+  pointer-events: none;
+  color: white;
+  opacity: 0.1;
+  right: 5%;
+}
+/* line 727, ../../../scss/_metastudio_styles.scss */
 section.banner > * h3, section.banner > * h4, section.banner > * h5, section.banner > * h6, section.banner > * blockquote {
   color: white;
 }
-/* line 719, ../../../scss/_metastudio_styles.scss */
+/* line 730, ../../../scss/_metastudio_styles.scss */
 section.banner > * blockquote {
-  font-size: 150%;
+  font-size: 140%;
   font-style: italic;
 }
-/* line 723, ../../../scss/_metastudio_styles.scss */
+/* line 734, ../../../scss/_metastudio_styles.scss */
 section.banner > * p:first-child {
   color: white;
-  font-size: 140%;
+  font-size: 120%;
 }
 
-/* line 734, ../../../scss/_metastudio_styles.scss */
+/* line 747, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 737, ../../../scss/_metastudio_styles.scss */
+/* line 750, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;

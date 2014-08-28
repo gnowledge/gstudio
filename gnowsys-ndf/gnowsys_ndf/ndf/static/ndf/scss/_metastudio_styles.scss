@@ -645,6 +645,7 @@ input.node-title{
 
 /* UI Button */
 .ui.button{
+    margin-right: 0.5rem;
     border: 1px solid rgba(0,0,0,0.2);
     background-color: transparent;
     color: #ddd;
@@ -684,15 +685,17 @@ input.node-title{
     }
     
     header{
-        background-color: #222;
-        padding:2rem 0;
+        background-color: white;
+        padding:1rem 0;
+        .logo{
+            color:#555;
+            text-align: center;
+        }
         
     h1{
-        color: white;
-       font-size: 2rem;
-        line-height: 0.9;
-        &.subheader{
-            color: #aaa;
+        small{
+            display:block;
+            line-height: 1.2rem;
         }
     }
     }
@@ -708,8 +711,16 @@ section.banner{
     &>*{
     background-color: $primary-color;
         .slide{
-            padding: 2rem;
+            padding: 1rem;
             background-color: darken($primary-color,5%);
+            &>i{
+                position: absolute;
+                font-size: 15rem;
+                pointer-events: none;
+                color: white;
+                opacity:0.1;
+                right:5%;
+            }
         }
     color:#eee;
     margin:0;
@@ -717,16 +728,18 @@ section.banner{
         color:white;
     }
         blockquote{
-            font-size: 150%;
+            font-size: 140%;
             font-style:italic;
         }
     p:first-child{
         color:white;
-        font-size:140%;
+        font-size:120%;
         }
     
     }
-    
+    // Slick Carousel
+    .slick-dots .button{
+    }
 }
 
 // Off Canvas Areas
