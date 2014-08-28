@@ -33,6 +33,8 @@ def custom_app_view(request, group_id, app_name, app_id=None, app_set_id=None, a
     else :
         pass
     if app_id is None:
+        if app_name == "partners":
+            app_name = "Partners"
         app_ins = collection.Node.find_one({'_type':"GSystemType", "name":app_name})
         if app_ins:
             app_id = str(app_ins._id)

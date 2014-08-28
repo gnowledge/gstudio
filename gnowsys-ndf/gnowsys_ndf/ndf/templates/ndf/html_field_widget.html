@@ -27,6 +27,13 @@
     <small class="error">{% blocktrans with alt=field.altnames %}Please fill valid {{alt}}!!!{% endblocktrans %}</small>
     {% endif %}
 
+  {% elif field.validators.0 == "tel" %}
+    <input type="tel" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" placeholder="{{field.help_text}}" {% if is_required_field %}required{% endif %} pattern="{{field.validators.1}}" style="float:left; width:95%"/>
+    {% if is_required_field or field.validators %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{% blocktrans with alt=field.help_text %}Please fill valid {{alt}}!!!{% endblocktrans %}</small>
+    {% endif %}
+
   {% elif field_type == "unicode" or field_type == "basestring" %}
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
     {% if is_required_field %}
@@ -91,7 +98,9 @@
           <input id="uploadBtn" type="file" name="{{field.name}}" class="upload" {% if is_required_field %}required{% endif %} />
           <small class="error">{% blocktrans with alt=field.altnames %}Upload!!!{% endblocktrans %}</small>
       </a>
+      {% if is_required_field %}
       <i style="color:red; float:left display:inline">*</i>
+      {% endif %}
     </div>
     <script type="text/javascript">
       $('#uploadBtn').change(function () {
