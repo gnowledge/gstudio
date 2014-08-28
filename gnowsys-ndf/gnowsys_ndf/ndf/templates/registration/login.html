@@ -15,7 +15,7 @@
 <br/>
 {% if form.errors %}
 
-<p>{% blocktrans %}Your username and password didn't match. Please try again.{% endblocktrans %}</p>
+<p>{% blocktrans %}Please give a valid email.{% endblocktrans %}</p>
 {% endif %}
 
 <form method="post" id="loginSubmit" action="{% url 'auth_login' %}">{% csrf_token %}

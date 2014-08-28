@@ -16,7 +16,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.ndf.models import GSystemType,Node
 
 #######################################################################################################################################
@@ -60,15 +60,21 @@ class HomeRedirectView(RedirectView):
                 if user_id not in auth.contributors:
                     auth.contributors.append(user_id)
                 # Get group_type and group_affiliation stored in node_holder for this author 
-                temp_details=collection.Node.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
-                if temp_details:
-                    auth.agency_type=temp_details.details_to_hold['agency_type']
-                    auth.group_affiliation=temp_details.details_to_hold['group_affiliation']
+                try:
+                    temp_details=collection.Node.one({'$and':[{'_type':'node_holder'},{'details_to_hold.node_type':'Author'},{'details_to_hold.userid':user_id}]})
+                    if temp_details:
+                        auth.agency_type=temp_details.details_to_hold['agency_type']
+                        auth.group_affiliation=temp_details.details_to_hold['group_affiliation']
+                except e as Exception:
+                    print "error in getting node_holder details for an author"+str(e)
                 auth.save()
                 
             # This will return a string in url as username and allows us to redirect into user group as soon as user logsin.
             #return "/{0}/".format(auth.pk)
-            return "/{0}/dashboard".format(self.request.user.id)     
+            if GSTUDIO_SITE_LANDING_PAGE == 'home':
+                return "/home/"		
+            else:    
+                return "/{0}/dashboard".format(self.request.user.id)     
         else:
             # If user is not loggedin it will redirect to home as our base group.
             return "/home/"		

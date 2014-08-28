@@ -366,11 +366,12 @@ INSTALLED_APPS = (
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
     'online_status',                       #for online_users     
+    'registration_email',
 )
 
-# AUTHENTICATION_BACKENDS=(
-# 'registration_email.auth.EmailBackend',
-# )
+AUTHENTICATION_BACKENDS=(
+'registration_email.auth.EmailBackend',
+)
 
 ACCOUNT_ACTIVATION_DAYS = 2 # Two days for activation.
 
@@ -424,13 +425,22 @@ GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Co
 
 ##Defined all site specific variables
 
-GSTUDIO_SITE_ORG="A project of Gnowledge Lab at the Homi Bhabha Centre for Science Education (HBCSE), Tata Institute of Fundamental Research (TIFR), India. "
+GSTUDIO_ORG_NAME="A project of Gnowledge Lab at the Homi Bhabha Centre for Science Education (HBCSE), Tata Institute of Fundamental Research (TIFR), India. "
 GSTUDIO_SITE_LOGO="/static/ndf/css/themes/metastudio/logo.svg"
 GSTUDIO_COPYRIGHT=""
 GSTUDIO_GIT_REPO="https://github.com/gnowledge/gstudio"
 GSTUDIO_SITE_PRIVACY_POLICY=""
 GSTUDIO_SITE_TERMS_OF_SERVICE=""
 GSTUDIO_SITE_DEFAULT_LANGUAGE=u"en"
+GSTUDIO_SITE_ABOUT=""
+GSTUDIO_SITE_POWEREDBY=""
+GSTUDIO_SITE_CONTACT=""
+GSTUDIO_SITE_PARTNERS=""
+GSTUDIO_ORG_LOGO=""
+GSTUDIO_SITE_ORG=""
+GSTUDIO_SITE_CONTRIBUTE=""
+GSTUDIO_SITE_VIDEO="pandora"  #possible values are 'local','pandora' and 'pandora_and_local'
+GSTUDIO_SITE_LANDING_PAGE="udashboard"  #possible values are 'home' and 'udashboard'
 
 #Visibility for 'Create Group'
 CREATE_GROUP_VISIBILITY=True

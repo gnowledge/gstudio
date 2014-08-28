@@ -183,6 +183,7 @@ def parse_data_create_gtype(json_file_path):
             try:
                 json_document['name'] = unicode(json_document['name'])
                 json_document['altnames'] = unicode(json_document['altnames'])
+                json_document['help_text'] = unicode(json_document['help_text'])
               
                 if not json_document['required'].istitle():
                     json_document['required'] = ast.literal_eval(json_document['required'].title())
@@ -354,6 +355,7 @@ def create_edit_type(type_name, json_document, user_id):
                 if type(node[key]) == list:
                     if set(node[key]) != set(json_document[key]):
                         # node[key].extend(json_document[key])
+                        node[key] = []
                         for each in json_document[key]:
                         	if each not in node[key]:
                         		node[key].append(each)

@@ -27,6 +27,7 @@ urlpatterns = patterns('',
         },
 	name='auth_password_reset'
     ),
-    url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
-    (r'^accounts/', include('registration.backends.default.urls')),
+#    url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
+#    url(r'^accounts/',include('registration_email.backends.default.urls')),
+#    (r'^accounts/', include('registration.backends.default.urls')),
 )
