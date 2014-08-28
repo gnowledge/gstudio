@@ -417,6 +417,11 @@
       $("main>article").toggleClass("large-9 large-12");
     };
       
+      //Hide broken image links
+$('img').error(function(){
+        $(this).attr('src', 'missing.png');
+});
+
 
     //Functions to automatically add an <i> element icon inside node spans 
 		$(".user").prepend(function(){

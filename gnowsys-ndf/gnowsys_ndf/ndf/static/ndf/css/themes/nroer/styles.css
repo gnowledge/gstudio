@@ -6425,7 +6425,7 @@ p {
   font-family: inherit;
   font-weight: normal;
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.4;
   margin-bottom: 1.25rem;
   text-rendering: optimizeLegibility;
 }
@@ -6455,7 +6455,7 @@ h1, article h1:not(.subheader) div input, h2, h3, h4, h5, h6 {
 }
 /* line 262, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 h1 small, article h1:not(.subheader) div input small, h2 small, h3 small, h4 small, h5 small, h6 small {
-  font-size: 60%;
+  font-size: 80%;
   color: #6f6f6f;
   line-height: 0;
 }
@@ -6525,7 +6525,7 @@ b {
 
 /* line 299, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 small {
-  font-size: 60%;
+  font-size: 80%;
   line-height: inherit;
 }
 
@@ -6547,7 +6547,7 @@ ul,
 ol,
 dl {
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.4;
   margin-bottom: 1.25rem;
   list-style-position: outside;
   font-family: inherit;
@@ -6665,7 +6665,7 @@ blockquote cite a:visited {
 /* line 417, ../../../bower_components/foundation/scss/foundation/components/_type.scss */
 blockquote,
 blockquote p {
-  line-height: 1.6;
+  line-height: 1.4;
   color: #6f6f6f;
 }
 
