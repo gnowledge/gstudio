@@ -23,8 +23,9 @@ def lang_pref(request):
     url=request.GET.get('url','')
     group_id=request.GET.get('group_id','')
     lan_dict={}
+    print request.LANGUAGE_CODE
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if request.LANGUAGE_CODE:
+    if auth:
         lan_dict['primary']=request.LANGUAGE_CODE
         lan_dict['default']=u"en"
         auth.preferred_languages=lan_dict

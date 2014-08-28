@@ -1531,32 +1531,36 @@ def get_resource_collection(groupid, resource_type):
 def get_preferred_lang(request, group_id, nodes, node_type):
    group=collection.Node.one({'_id':(ObjectId(group_id))})
    uname=collection.Node.one({'name':str(request.user.username), '_type': {'$in': ["Group", "Author"]}})
+   
    primary_list=[]
    default_list=[]
+   node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
+
    if uname:
       pref_lan=uname.preferred_languages
-      node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
-      try:
-         for each in nodes:
-            primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':each._id}]})
-            if primary_nodes:
-               print primary_nodes.name,"1111111111111111111111111111111111"
-               primary_list.append(primary_nodes)
+   else:
+      pref_lan={}
+      pref_lan['primary']=request.LANGUAGE_CODE
+      pref_lan['default']=u"en"
+   try:
+      for each in nodes:
+         primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':each._id}]})
+         if primary_nodes:
+            primary_list.append(primary_nodes)
             
-            else:
-               default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
-               if default_nodes:
-                  default_list.append(default_nodes)
+         else:
+            default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
+            if default_nodes:
+               default_list.append(default_nodes)
                   
             
-         if primary_list:
-            return primary_list
-         if default_list:
-            return default_list
+      if primary_list:
+         return primary_list
+      if default_list:
+         return default_list
       
-      except Exception as e:
-         print "reeor",e
-         return 'error'
+   except Exception as e:
+      return 'error'
 
 # getting video metadata from wetube.gnowledge.org
 @register.assignment_tag

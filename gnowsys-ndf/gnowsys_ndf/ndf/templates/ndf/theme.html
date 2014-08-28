@@ -152,7 +152,7 @@
 
 	{% if themes_hierarchy %}
 
-		<h2> {{node.name}} </h2> 
+		<h2> {{node.name}}</h2> 
 		<a class="fold"><b><i class="fi-plus"></i> {% trans "Fold" %} </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
 		<a class="unfold"><b><i class="fi-minus"></i> {% trans "Unfold" %} </b></a>&nbsp;&nbsp;&nbsp;&nbsp;
 		{% if user_access == "allow" %}
@@ -200,6 +200,7 @@
 
 		{% if node %}
 			<!-- If "Theme" node -->
+  		
 			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>			
 		{% endif %}
 
@@ -215,10 +216,8 @@
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   		<!-- Existing card list-->
-  		{% if user.is_authenticated %}
-			{% get_preferred_lang request group_id nodes "Theme" as nodes %}
-		{% endif %}
-
+  		{% get_preferred_lang request group_id nodes "Theme" as nodes %}
+	
 	  	{% for each in nodes %}
 		    <li class="card">
 		      <div class="page">
