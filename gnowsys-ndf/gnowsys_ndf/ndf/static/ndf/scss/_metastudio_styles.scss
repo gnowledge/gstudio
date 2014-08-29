@@ -237,9 +237,6 @@ main>aside{
         header{
            padding: 10px;
         }
-         section{
-             background-color: $theme-color-invert;
-         }
         footer{
             background-color: #222;
             min-height: 1rem;
@@ -688,6 +685,7 @@ input.node-title{
     }
     
     header{
+        background-image: url(".../nroer/indian_pigments.jpg");
         position: relative;
         z-index: 50;
         background-color: #fff;
