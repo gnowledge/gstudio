@@ -31,7 +31,6 @@ theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
 app=collection.Node.one({'name':u'Browse Topic','_type':'GSystemType'})
-appId=app._id
 #######################################################################################################################################
 list_trans_coll = []
 coll_set_dict={}
@@ -105,7 +104,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,
                                'title': title,'themes_list_items': themes_list_items,
                                'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
-                                'appId':appId,
+                                'appId':app._id,
                                },
                              
                               context_instance = RequestContext(request)
@@ -378,11 +377,16 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     # End of finding the root nodes
                     
                     if name:
-                        if theme_topic_node.name == name:
-                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
-                        else:
+                        if theme_topic_node.name != name:
+                            topic_name = theme_topic_node.name
                             if not name.upper() in (theme_name.upper() for theme_name in root_topics):
                                 theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
+
+                            elif topic_name.upper() == name.upper():
+                                theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))                                
+
+                        else:
+                            theme_topic_node.save(is_changed=get_node_common_fields(request, theme_topic_node, group_id, topic_GST))
 
 
                         if collection_list:
@@ -418,21 +422,22 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 theme_topic_node.prior_node.append(node_id)
                                 
                             i = i+1
+                        
                         theme_topic_node.save()
-            		
+
                         if teaches_list !='':
                             teaches_list=teaches_list.split(",")
                             
-                        create_grelation_list(theme_topic_node._id,"teaches",teaches_list)
+                            create_grelation_list(theme_topic_node._id,"teaches",teaches_list)
                         
                         
                         
                         if assesses_list !='':
                             assesses_list=assesses_list.split(",")
                             
-                        create_grelation_list(theme_topic_node._id,"assesses",assesses_list)
+                            create_grelation_list(theme_topic_node._id,"assesses",assesses_list)
 				
-    	
+
                         # This will return to edit topic  
                         if theme_topic_node:
                             theme_topic_node.reload()
@@ -545,7 +550,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
         
     return render_to_response("ndf/theme.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
-                            'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,'appId':appId,
+                            'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,'appId':app._id,
                             'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
                             'theme_GST_id': theme_GST._id,'theme_item_GST_id': theme_item_GST._id, 'topic_GST_id': topic_GST._id,
                             'themes_list_items': themes_list_items,'nodes':nodes_dict,'lan':LANGUAGES

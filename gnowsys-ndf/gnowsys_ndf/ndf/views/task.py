@@ -22,6 +22,8 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 collection = get_database()[Node.collection_name]
 sitename=Site.objects.all()
+app = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+
 if sitename :
 	sitename = sitename[0]
 else : 
@@ -49,7 +51,7 @@ def task(request, group_name, task_id=None):
     title = "Task"
     TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     template = "ndf/task.html"
-    variable = RequestContext(request, {'title': title, 'TASK_inst': TASK_inst, 'group_id': group_id, 'groupid': group_id, 'group_name':group_name })
+    variable = RequestContext(request, {'title': title, 'appId':app._id, 'TASK_inst': TASK_inst, 'group_id': group_id, 'groupid': group_id, 'group_name':group_name })
     return render_to_response(template, variable)
 
 def task_details(request, group_name, task_id):
@@ -94,7 +96,7 @@ def task_details(request, group_name, task_id):
 				postnode_task = sys_each_postnode.altnames
 			history.append({'id':str(sys_each_postnode._id), 'name':sys_each_postnode.name, 'created_by':sys_each_postnode_user.username, 'created_at':sys_each_postnode.created_at, 'altnames':eval(postnode_task), 'content':sys_each_postnode.content})
     history.reverse()
-    var = { 'title': task_node.name,'group_id': group_id, 'groupid': group_id, 'group_name': group_name, 'node':task_node, 'history':history, 'subtask':subtask}
+    var = { 'title': task_node.name,'group_id': group_id, 'appId':app._id, 'groupid': group_id, 'group_name': group_name, 'node':task_node, 'history':history, 'subtask':subtask}
     var.update(blank_dict)
     variables = RequestContext(request, var)
     template = "ndf/task_details.html"
@@ -255,7 +257,7 @@ def create_edit_task(request, group_name, task_id=None):
 		blank_dict['parent'] = pri_node.name 
 		blank_dict['parent_id'] = str(pri_node._id)
 
-    var = { 'title': 'Task','group_id': group_id, 'groupid': group_id, 'group_name': group_name, 'node':edit_task_node, 'task_id':task_id }
+    var = { 'title': 'Task','group_id': group_id, 'groupid': group_id,'appId':app._id, 'group_name': group_name, 'node':edit_task_node, 'task_id':task_id }
     var.update(blank_dict)
     context_variables = var
 
@@ -398,6 +400,6 @@ def check_filter(request,group_name,choice,status=None):
         	send=""		
 
     template = "ndf/task_card_view.html"
-    variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
+    variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':send})
     return render_to_response(template, variable)
     #return HttpResponse(json.dumps(self_task,cls=NodeJSONEncoder))
