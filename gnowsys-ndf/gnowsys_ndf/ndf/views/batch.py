@@ -18,6 +18,7 @@ from gnowsys_ndf.ndf.models import GSystemType, Node
 db = get_database()
 collection = db[Node.collection_name]
 GST_BATCH = collection.GSystemType.one({'name': GAPPS[9]})
+app = collection.GSystemType.one({'name': GAPPS[9]})
 
 def batch(request, group_id):
     """
@@ -40,7 +41,7 @@ def batch(request, group_id):
     student_coll = collection.GSystem.find({'member_of': {'$all': [st_student._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     #users_in_group = collection.Node.one({'_id':ObjectId(group_id)}).author_set
     template = "ndf/batch.html"
-    variable = RequestContext(request, {'batch_coll': batch_coll,'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id,'student_count':student_coll.count()})
+    variable = RequestContext(request, {'batch_coll': batch_coll,'appId':app._id, 'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'st_batch_id':GST_BATCH._id,'student_count':student_coll.count()})
     return render_to_response(template, variable)
 
 #older methode to create and edit batch
@@ -70,7 +71,7 @@ def create_and_edit(request, group_id, _id = None):
                 course_name = collection.Node.one({'_id':ObjectId(course.subject)}).name
 
         template = "ndf/create_batch.html"
-        variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':batch_count,'st_batch_id':GST_BATCH._id,'fc_courses':fc_courses,'batch':batch,'course_name':course_name})
+        variable = RequestContext(request, {'group_id':group_id, 'appId':app._id, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':batch_count,'st_batch_id':GST_BATCH._id,'fc_courses':fc_courses,'batch':batch,'course_name':course_name})
         return render_to_response(template, variable)
 
 def new_create_and_edit(request, group_id, _id = None):
@@ -83,7 +84,7 @@ def new_create_and_edit(request, group_id, _id = None):
     if _id:
         batch = collection.Node.one({'_id':ObjectId(_id)})
     template = "ndf/new_create_batch.html"
-    variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':xrange(batch_count),'st_batch_id':GST_BATCH._id,'count':batch_count, 'node':batch})
+    variable = RequestContext(request, {'group_id':group_id, 'appId':app._id, 'groupid':group_id,'title':GST_BATCH.name,'batch_count':xrange(batch_count),'st_batch_id':GST_BATCH._id,'count':batch_count, 'node':batch})
     return render_to_response(template, variable)
 
 #older save and update for batches    Not in use
@@ -122,7 +123,7 @@ def save_and_update(request, group_id):
             return HttpResponseRedirect('/'+group_id+'/'+'batch')
         else:
             template = "ndf/create_batch.html"
-            variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id,'title':GST_BATCH.name, 'batch_count':batch_count,'st_batch_id':GST_BATCH._id,'fc_courses':fc_courses})
+            variable = RequestContext(request, {'group_id':group_id,'appId':app._id, 'groupid':group_id,'title':GST_BATCH.name, 'batch_count':batch_count,'st_batch_id':GST_BATCH._id,'fc_courses':fc_courses})
         return render_to_response(template, variable)
 
 def save(request, group_id):
@@ -178,5 +179,5 @@ def detail(request, group_id, _id):
         n = collection.Node.one({'_id':ObjectId(each.subject)})
         student_coll.append(n)
     template = "ndf/batch_detail.html"
-    variable = RequestContext(request, {'node':node, 'groupid':group_id,'title':GST_BATCH.name, 'student_coll':student_coll})
+    variable = RequestContext(request, {'node':node, 'appId':app._id, 'groupid':group_id,'title':GST_BATCH.name, 'student_coll':student_coll})
     return render_to_response(template, variable)
