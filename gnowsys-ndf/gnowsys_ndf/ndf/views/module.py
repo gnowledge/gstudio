@@ -17,6 +17,7 @@ from gnowsys_ndf.ndf.models import GSystemType, Node
 
 collection = get_database()[Node.collection_name]
 GST_MODULE = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[8]})
+app = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[8]})
 
 def module(request, group_id, module_id=None):
     """
@@ -54,7 +55,8 @@ def module(request, group_id, module_id=None):
       # module_nodes_count = course_coll.count()
 
       return render_to_response("ndf/module.html",
-                                {'title': title, 
+                                {'title': title,
+                                 'appId':app._id,
                                  'searching': True, 'query': search_field,
                                  'module_coll': module_coll, 'groupid':group_id, 'group_id':group_id
                                 }, 
@@ -66,7 +68,7 @@ def module(request, group_id, module_id=None):
       title = GST_MODULE.name
       module_coll = collection.GSystem.find({'member_of': {'$all': [ObjectId(module_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}})
       template = "ndf/module.html"
-      variable = RequestContext(request, {'title': title, 'module_coll': module_coll, 'group_id': group_id, 'groupid': group_id})
+      variable = RequestContext(request, {'title': title, 'appId':app._id, 'module_coll': module_coll, 'group_id': group_id, 'groupid': group_id})
       return render_to_response(template, variable)
 
 
@@ -88,6 +90,7 @@ def module_detail(request, group_id, _id):
 	return module(request, group_id, _id)
     return render_to_response("ndf/module_detail.html",
                                   { 'node': course_node,
+                                    'appId':app._id,
                                     'groupid': group_id,
                                     'group_id':group_id
                                   },

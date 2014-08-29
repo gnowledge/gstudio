@@ -42,6 +42,7 @@ collection = db[Node.collection_name]
 gst_quiz = collection.Node.one({'_type': u'GSystemType', 'name': GAPPS[6]})
 history_manager = HistoryManager()
 rcs = RCS()
+app = collection.Node.one({'_type': u'GSystemType', 'name': GAPPS[6]})
 
 #######################################################################################################################################
 #                                                                            V I E W S   D E F I N E D   F O R   G A P P -- ' P A G E '
@@ -78,6 +79,7 @@ def quiz(request, group_id, app_id=None):
 	#quiz_node.get_neighbourhood(quiz_node.member_of)
         return render_to_response("ndf/quiz_list.html",
                                   {'title': title, 
+                                   'appId':app._id,
                                    'quiz_nodes': quiz_nodes, 'quiz_nodes_count': quiz_nodes_count,
                                    'quiz_item_nodes': quiz_item_nodes, 'quiz_item_nodes_count': quiz_item_nodes_count,
                                    'groupid':group_id,
@@ -94,6 +96,7 @@ def quiz(request, group_id, app_id=None):
         template_name = ""
         context_variables = { 'node': node,
                               'title': title,
+                              'appId':app._id,
                               'group_id': group_id,
                               'groupid':group_id
                           }
@@ -231,13 +234,14 @@ def create_edit_quiz_item(request, group_id, node_id=None):
 			assesses_list=assesses_list.split(",")
 	create_grelation_list(quiz_item_node._id,"assesses",assesses_list)
 
-        return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id, 'app_id': quiz_item_node._id}))
+        return HttpResponseRedirect(reverse('quiz', kwargs={'group_id': group_id, 'appId':app._id,'app_id': quiz_item_node._id}))
         
     else:
         if node_id:
             context_variables['node'] = quiz_item_node
             context_variables['groupid'] = group_id
             context_variables['group_id'] = group_id
+            content_variable['appId']=app._id
             
         return render_to_response("ndf/quiz_item_create_edit.html",
                                   context_variables,
@@ -290,13 +294,14 @@ def create_edit_quiz(request, group_id, node_id=None):
 	create_grelation_list(quiz_node._id,"assesses",assesses_list)
 
 	
-        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id, 'app_id': quiz_node._id}))
+        return HttpResponseRedirect(reverse('quiz_details', kwargs={'group_id': group_id,'appId':app._id, 'app_id': quiz_node._id}))
 	
     else:
         if node_id:
             context_variables['node'] = quiz_node
             context_variables['groupid'] = group_id
             context_variables['group_id']=group_id
+            content_variables['appId']=app._id
         quiz_node.get_neighbourhood(quiz_node.member_of)    
         return render_to_response("ndf/quiz_create_edit.html",
                                   context_variables,
