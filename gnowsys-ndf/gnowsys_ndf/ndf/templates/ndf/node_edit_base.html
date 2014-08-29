@@ -485,23 +485,14 @@ var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
 saveflag = 1;
 get_new_groups();
 new_groups=data_list;
-$.cd({
+$.ajax({
        url: turl,
        type: 'POST',
        data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
-       beforeSend: function(){
-              $("#ajax_load_image").show();
-              $("#body").css({"opacity":"0.1",})
-                              },
         success: function(data){
                        alert("Successfully switched groups");
             
            },
-       complete: function(){
-                    $("#ajax_load_image").hide();
-                $("#body").css({"opacity":"",})
-
-          }
 }); //end of ajax
 
 }); //end of document click

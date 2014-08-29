@@ -113,7 +113,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
 					      {% get_language_info_list for LANGUAGES as languages %}
 					      {% for language in languages %}
-					      <option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})
+					      <option value="{{ language.code }}">{{ language.code }}
 					      </option>
 					      {% endfor %}
 					    </select>
@@ -233,7 +233,13 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+					      {% get_language_info_list for LANGUAGES as languages %}
+					      {% for language in languages %}
+					      <option value="{{ language.code }}">{{ language.code }}
+					      </option>
+					      {% endfor %}
+					  </select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
