@@ -260,10 +260,9 @@
                   <!-- Show app options if user is logged in-->
                   {% if user.is_authenticated %}
                   <li>
-               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown"><i class="fi-plus"></i> Actions</a><br>
+               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> Actions</a><br>
 <ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
   {% block app_action_list %} {% endblock %}
-    
 </ul>
                       </li>
                   {% endif %}
