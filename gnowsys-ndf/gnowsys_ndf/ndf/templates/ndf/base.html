@@ -101,12 +101,13 @@
 <!--                 </div> -->
 <!--               </li> -->
 <li>	    
+
   <form action="/i18n/setlang/" method="POST">
   {% csrf_token %}
   <input name="next" type="hidden" value="/pref_lang/?url={{request.path}}&group_id={{group_id}}&appid={{appId}}"/>
   <input name="url" type="hidden" value="{{request.get_full_path}}"/>
     
-  <select name="language">
+  <select name="language" id="lan">
     {% for lang in LANGUAGES %}
     <option value="{{ lang.0 }}">{{ lang.1 }}</option>
     {% endfor %}
@@ -500,6 +501,11 @@
 
   </script>
   
+<script type="text/javascript">
+  $(document).ready(function(){
+  $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true)
+})
+  </script>
   <script src="/static/ndf/js/app.js"></script> <!-- checked -->
 
 </body>
