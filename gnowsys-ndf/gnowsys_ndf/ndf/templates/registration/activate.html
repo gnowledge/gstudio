@@ -9,20 +9,21 @@
 
 {% if account %}
 
-{% blocktrans %}
+
 	<br/>
-	<h3>Thanks {{ account }}, activation complete! </h3>
+	<h3>{% trans "Thanks" %} {{ account }}, {% trans "Your activation complete!" %} </h3>
 	<br/>
-	<h4>You may now <a href='{{ auth_login_url }}'>login</a> using the username and password you set at registration.</h4>
-{% endblocktrans %}
+
+	<h4> <a href='{{ auth_login_url }}'> You may login </a> {% "using your email and password." %} </h4>
+
 
 {% else %}
 
-{% blocktrans %}
+
 	<br/>
-	<h3> Oops: </h3>
-	<h4>It seems that your activation key is invalid. Please check the url again.</h4>
-{% endblocktrans %}
+
+	<h4>{% trans "Oops! It seems that your activation key is invalid. Please check the url or try to reset your password again. " %} </h4>
+
 {% endif %}
 
 {% endblock %}

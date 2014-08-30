@@ -4,21 +4,18 @@
 {% load i18n %}
 {% block help_content %}
 
-{% blocktrans %}  
-<p class="text-justify">
+{% blocktrans %}  <p class="text-justify">
   A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.
   </p>
-
   <p class="text-justify">You can build a quiz in two ways:
     <ol  class="text-justify">
       <li>By editing, Quiz node (via collection-list).</li>
       <li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
-    </ol>
-  </p>
+    </ol>  </p>
 {% endblocktrans %}
 {% endblock %}
 
 
 {% block meta_content %}
-  {% blocktrans %}<h3>Quiz</h3>{% endblocktrans %}
+  <h3>{% trans "Quiz " %}</h3>
 {% endblock %}

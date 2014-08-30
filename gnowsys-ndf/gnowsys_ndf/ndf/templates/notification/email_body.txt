@@ -1,6 +1,6 @@
-{% load i18n %}{% load url from future %}{% url "notification_notices" as notices_url %}{% blocktrans %}You have received the following notice from {{ current_site }}:
+{% load i18n %}{% load url from future %}{% url "notification_notices" as notices_url %}{% trans "You have received the following notice from the site: " %}{{ current_site }}:
 
 
 {{ message }}
 
-{% endblocktrans %}
+

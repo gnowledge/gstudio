@@ -23,23 +23,21 @@
 
 {% block meta_content %}
 {% get_group_name groupid as group_name_tag %}
-{% blocktrans %}   
- <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
+{% blocktrans %}  <p class="text-justify">A <b>Quiz</b> is a sequenced collection of <b>quiz items</b>. A quiz-item can be any of the three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>. <i>submit response</i> and <i>match the following</i> types will be implemented very soon.</p>
 
     <p class="text-justify">You can build a quiz in two ways:
       <ol  class="text-justify">
 	<li>By editing, Quiz node (via collection-list).</li>
 	<li>By using 'Quiz-Item' button corresponding to the Quiz.</li>
-      </ol>
-    </p>
+      </ol>    </p>
 {% endblocktrans %}
     <!-- Add button -->
     {% if user.is_authenticated %}
 
 <p>
-    <a href="{% url 'quiz_create' group_name_tag %}" class="button small">{% blocktrans %} + Add {{title}}{% endblocktrans %} </a>
-    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">{% blocktrans %}   
-+ Add {{title}} Item</a>{% endblocktrans %}   
+    <a href="{% url 'quiz_create' group_name_tag %}" class="button small"> {% trans "+ Add" %} {{title}} </a>
+    <a href="{% url 'quiz_item_create' group_name_tag %}" class="button small right">   
+ {% trans "+ Add" %} {{title}} {% trans "Item" %}</a>
 
     </p>
  {% endif %}
@@ -52,19 +50,19 @@
 
     <div class="small-12 columns">
       <ul class="inline-list">
-	{% blocktrans %}<li><h3>Question</h3></li>{% endblocktrans %}
+	<li><h3>{% trans "Question" %}</h3></li>
 	{% if user.is_authenticated %}
 	<li><a href="{% url 'quiz_item_edit' group_name_tag node %}" class="button small"> {% trans "Edit this Question" %}</a></li>
 	{% endif %}
       </ul>
       <p>
-	{{ node.member_of_names_list|join:', ' }} posted on {{ node.created_at|date:"j F Y" }} by {{ node.user_details_dict.created_by }}
+	{{ node.member_of_names_list|join:', ' }} {% trans "posted on" %} {{ node.created_at|date:"j F Y" }} {% trans "by " %} {{ node.user_details_dict.created_by }}
       </p>
       <p>
-	Contributors: {{ node.user_details_dict.contributors|join:', ' }}
+	{% trans "Contributors:  " %}{{ node.user_details_dict.contributors|join:', ' }}
       </p>
       <p>
-	Last update: {{ node.last_update|date:"j F Y" }}
+	{% trans "Last update:  " %}{{ node.last_update|date:"j F Y" }}
       </p>
       <p>
 	Version{{ node.version_dict|length|pluralize }}: 
@@ -96,7 +94,7 @@
     </div>
     
     <div class="small-12 columns" id="answer_fs">
-      <h4>Answer</h4>
+      <h4>{% trans "Answer" %}</h4>
       <div class="panel callout radius">
 	{% for ca in node.correct_answer %}
           {% if node.options %}

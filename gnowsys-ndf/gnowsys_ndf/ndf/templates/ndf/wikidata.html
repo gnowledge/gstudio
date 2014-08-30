@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block related_content %}	
-	<center>{% blocktrans %}{{ topic_count }} items found {% endblocktrans %} </center>	
+	<center>{{ topic_count }} {% trans "items found " %} </center>	
 	{% for topic in topic_coll %}
     		{% if selected_topic.name == topic.name %}
 		<br/> 
@@ -53,10 +53,8 @@
 	<br>
 	<h2>
 	<strong><center>
-{% blocktrans %}
-	Tags Topic Display
+{% blocktrans %} Tags Topic Display
 	</h2><h5>Following are the topics with the tag <strong>"{{tag}}"</strong></center><br><br>
-	
 	Select the topic from the panel on the left to view the details about that topic. The knowledge graph for that particular topic is also available on the same page.
 {% endblocktrans %}
 	</strong>
@@ -204,7 +202,7 @@ $(document).on('opened', '#view-map-widget[data-reveal]', function () {
 
 		<p>
 		<ul>
-		<strong>{% trans "Sub_Class_of" %}</strong>
+		<strong>{% trans "Member of" %}</strong>
 			{% for parent_class in selected_topic.member_of_names_list %}
 				<li>{{ parent_class }}</li>
 			{% endfor %}
@@ -212,7 +210,7 @@ $(document).on('opened', '#view-map-widget[data-reveal]', function () {
 		<br>
 		<br>
 		<ul>
-		<strong>{% trans "Dynamic Attributes:" %}</strong>
+		<strong>{% trans "Attributes:" %}</strong>
 		<br><br>
 		{% for gattribute in attribute_set %}
 			{% if 'image' in gattribute.attribute_type.name %}
@@ -224,7 +222,7 @@ $(document).on('opened', '#view-map-widget[data-reveal]', function () {
 		{% endfor %}
 		</ul>
 		<ul>
-		<strong>{% trans "Dynamic Relations:" %}</strong>
+		<strong>{% trans "Relations:" %}</strong>
 		<br>
 		{% for relation_name, relation_value in relation_set.items %}
 			<li>{{ relation_name }}: {{ relation_value }}</li>

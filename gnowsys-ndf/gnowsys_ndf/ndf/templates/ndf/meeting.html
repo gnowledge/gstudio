@@ -7,15 +7,14 @@
 {% block title %} {{ title }} {% endblock %}
 
 {% block help_content %}
-{% blocktrans %}
   <p>
-    Lets u have video chat.
+    {% trans "Video chat." %}
   </p>
-{% endblocktrans %}
+
 {% endblock %}
 
 {% block meta_content %}
-  {% blocktrans %}<h2>Meeting</h2>{% endblocktrans %}
+  <h2>{% trans "Meeting" %}</h2>
 {% endblock %}
 
 {% block search_content %}
