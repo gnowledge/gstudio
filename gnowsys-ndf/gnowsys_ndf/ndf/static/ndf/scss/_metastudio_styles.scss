@@ -12,32 +12,35 @@ body{
 
 
 .top-bar{
+    a.language.button{
+        padding: 5px 10px;
+        margin-top:3px;
+            background-color: #555;
+            color:black;
+            &:hover{
+                background-color: white;
+                color:black;
+            }
+        }
     ul.language-selector{
-        background-color: #333;
         height: $topbar-height;
         float: left;
         margin:0;
-        a{
-            margin: 0 10px;
-        }
     }
     .active{
         background-color:black!important;
     }
     h1{
-        a{
-            padding:0!important;
-        }
         img{
             /* Logo */
-			max-height: 50%;
+			max-height: 75%;
 		}
         a{
 			color:white!important;
 		}
     }
-    .group .logo{
-        max-height:  40px;
+    .group:hover{
+        background-color: #111;
     }
     .search{
         position: relative;
