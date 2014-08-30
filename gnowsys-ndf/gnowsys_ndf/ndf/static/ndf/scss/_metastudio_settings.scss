@@ -21,7 +21,7 @@ $theme-text-color:scale-color($theme-color, $lightness: -40%);
 
 // We use these as default colors throughout
 $primary-color: $theme-color;
-$secondary-color: lighten(desaturate($primary-color,20%),20%);
+$secondary-color: lighten(desaturate($primary-color,80%),30%);
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
  //$warning-color: #f2bf8a;
