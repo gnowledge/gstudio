@@ -1188,11 +1188,11 @@ $global-radius:5px;
 // $include-html-top-bar-classes: $include-html-classes;
 
 // Background color for the top bar
- $topbar-bg-color: darken($theme-color-invert,10%);
+ $topbar-bg-color: #222;
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin
-// $topbar-height: 70px;
+ $topbar-height: 50px;
  $topbar-margin-bottom: 0;
 
 // Controlling the styles for the title in the top bar
@@ -1208,16 +1208,16 @@ $global-radius:5px;
 // $topbar-dropdown-toggle-alpha: 0.4;
 
 // Set the link colors and styles for top-level nav
-// $topbar-link-color: #fff;
-// $topbar-link-color-hover: #fff;
-// $topbar-link-color-active: #fff;
+// $topbar-link-color: #222;
+// $topbar-link-color-hover: #111;
+// $topbar-link-color-active: #000;
 // $topbar-link-color-active-hover: #fff;
 // $topbar-link-weight: normal;
  $topbar-link-font-size: 1rem;
 // $topbar-link-hover-lightness: -10%; // Darken by 10%
  $topbar-link-bg-hover: scale-color($theme-color-invert, $lightness: 10%);
- //$topbar-link-bg-active: $theme-color;
-// $topbar-link-bg-active-hover: scale-color($primary-color, $lightness: -14%);
+ $topbar-link-bg-active: $active-color;
+$topbar-link-bg-active-hover: $active-color;
 // $topbar-link-font-family: $body-font-family;
 
 // $topbar-button-font-size: 0.75rem;

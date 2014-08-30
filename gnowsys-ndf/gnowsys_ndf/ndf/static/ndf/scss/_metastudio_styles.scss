@@ -12,22 +12,35 @@ body{
 
 
 .top-bar{
-    border-bottom: 2px solid black;
-    z-index: 200;
+    a.language.button{
+        padding: 5px 10px;
+        margin-top:3px;
+            background-color: #555;
+            color:black;
+            &:hover{
+                background-color: white;
+                color:black;
+            }
+        }
+    ul.language-selector{
+        height: $topbar-height;
+        float: left;
+        margin:0;
+    }
     .active{
-        border-bottom:  1px solid $active-color;
+        background-color:black!important;
     }
     h1{
-        a{
-            padding:0!important;
-        }
         img{
             /* Logo */
-			max-height: 80%;
+			max-height: 75%;
 		}
         a{
 			color:white!important;
 		}
+    }
+    .group:hover{
+        background-color: #111;
     }
     .search{
         position: relative;
@@ -47,16 +60,6 @@ body{
             background-color: transparent;
             position: absolute;
             right: 0;
-        }
-    }
-    .language.button{
-        background-color: #555;
-        color:black;
-        margin-top: 3px;
-        padding: 4px 7px;
-        &:hover{
-            background-color: white;
-            color: black;
         }
     }
 }
@@ -134,6 +137,7 @@ body{
 
 
 main>nav{
+    border-top:3px solid black;
     position: relative;
     z-index: 10;
 &>.button-bar{
