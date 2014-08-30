@@ -48,7 +48,7 @@
         {% if node %}
         {% blocktrans with title_var=title node_name=node.name %} Editing {{title_var}}: {{node_name}} {% endblocktrans %}
         {% else %}
-        {% blocktrans with title_var=title %} {% trans "Register a New " %} {{title_var}} {% endblocktrans %}
+        {% blocktrans with title_var=title %} Register a New {{title_var}} {% endblocktrans %}
         {% endif %}
       </h2>
     </header>
