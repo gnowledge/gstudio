@@ -312,7 +312,7 @@ def delete_task(request, group_name, _id):
     return HttpResponseRedirect(pageurl) 
 
 
-@login_required
+
 def check_filter(request,group_name,choice,status=None):
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}
@@ -343,6 +343,7 @@ def check_filter(request,group_name,choice,status=None):
     TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     task_list=[]
     self_task=[]
+    send="This group doesn't have any files"
     #Task Completed 
     for each in TASK_inst:
     	 
@@ -394,7 +395,7 @@ def check_filter(request,group_name,choice,status=None):
 
         	self_task.sort()
    
-
+        
         if not self_task:
         	send=message
         else:
