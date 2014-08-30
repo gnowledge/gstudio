@@ -12,6 +12,15 @@ body{
 
 
 .top-bar{
+    ul.language-selector{
+        background-color: #333;
+        height: $topbar-height;
+        float: left;
+        margin:0;
+        a{
+            margin: 0 10px;
+        }
+    }
     .active{
         background-color:black!important;
     }
@@ -48,16 +57,6 @@ body{
             background-color: transparent;
             position: absolute;
             right: 0;
-        }
-    }
-    .language.button{
-        background-color: #555;
-        color:black;
-        margin-top: 3px;
-        padding: 4px 7px;
-        &:hover{
-            background-color: white;
-            color: black;
         }
     }
 }

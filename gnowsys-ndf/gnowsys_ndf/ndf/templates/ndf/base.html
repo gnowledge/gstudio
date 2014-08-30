@@ -66,13 +66,14 @@
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
 {% get_group_object groupid as group_object %}
+       {% get_site_variables as site %}
       
     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
-      <ul class="title-area name">
+      <ul class="language-selector">
           <!-- Language selector--> 
         
-             <li class="has-form"> 
+             <li> 
                  <a class="tiny radius language button" href="#" data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
 
                  <div id="languageModal" class="small reveal-modal" data-reveal> 
@@ -101,11 +102,18 @@
 <!--                   <a class="close-reveal-modal">&#215;</a> -->
                  </div> 
                </li>
+      </ul>
+
+        <ul class="title-area ">
+      	<li class="name">
+     {% get_site_variables as site %}
+      	  <h1><a href="/home/" accesskey="q"><img src="{{site.LOGO}}"></a></h1>
+      	</li>
       	<li class="toggle-topbar menu-icon">
       	  <a href="#">{% trans "Menu" %}</a>
       	</li>
       </ul>
-
+        
       <section class="top-bar-section">
 	
 	<!-- Right Nav Section -->
@@ -149,9 +157,8 @@
       	<ul class="left">
 
 <!-- Current group selector -->
-            <li>
-                {% get site_variables as site %}
-            <h1><a id="home-group" class="group" href="/home"><img class="logo" src="{{site.LOGO}}"></a></h1>
+            <li class="name">
+            <a id="home-group" class="group" href="/home"><h1><img class="logo" src="{{site.LOGO}}"></h1></a>
             </li>
       	  <li class="has-dropdown group">
       	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:30}}</a>
