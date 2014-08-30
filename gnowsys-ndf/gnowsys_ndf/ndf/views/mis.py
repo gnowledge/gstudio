@@ -34,6 +34,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
     custom view for custom GAPPS
     """
 
+    auth = None
     if ObjectId.is_valid(group_id) is False :
       group_ins = collection.Node.one({'_type': "Group","name": group_id})
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -82,8 +83,18 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
 
     template_prefix = "mis"
 
-    for eachset in app.collection_set:
-      app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+    if request.user.id:
+      if auth is None:
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+
+      agency_type = auth.agency_type
+      agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+      if agency_type_node:
+        for eachset in agency_type_node.collection_set:
+          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+
+    # for eachset in app.collection_set:
+    #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
       # app_set = collection.Node.find_one({"_id":eachset})
       # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
@@ -283,7 +294,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     """
     create new instance of app_set of apps view for custom GAPPS
     """
-
+    auth = None
     if ObjectId.is_valid(group_id) is False :
       group_ins = collection.Node.one({'_type': "Group","name": group_id})
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -334,8 +345,17 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     user_id = int(request.user.id)  # getting django user id
     user_name = unicode(request.user.username)  # getting django user name
 
-    for eachset in app.collection_set:
-      app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+    if request.user.id:
+      if auth is None:
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      agency_type = auth.agency_type
+      agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+      if agency_type_node:
+        for eachset in agency_type_node.collection_set:
+          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+
+    # for eachset in app.collection_set:
+    #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
       # app_set = collection.Node.find_one({"_id":eachset})
       # app_collection_set.append({"id": str(app_set._id), "name": app_set.name, 'type_of'})
 
