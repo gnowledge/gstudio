@@ -8862,7 +8862,7 @@ body {
 /* line 25, ../../../scss/_metastudio_styles.scss */
 .top-bar ul.language-selector {
   height: 50px;
-  float: left;
+  float: right;
   margin: 0;
 }
 /* line 30, ../../../scss/_metastudio_styles.scss */
@@ -9531,13 +9531,7 @@ input.node-title {
 .landing {
   position: relative;
 }
-/* line 683, ../../../scss/_metastudio_styles.scss */
-.landing #language-selector {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-/* line 689, ../../../scss/_metastudio_styles.scss */
+/* line 684, ../../../scss/_metastudio_styles.scss */
 .landing header {
   background-image: url(".../nroer/indian_pigments.jpg");
   position: relative;
@@ -9545,37 +9539,40 @@ input.node-title {
   background-color: #fff;
   padding: 1rem 0 0 0;
 }
-/* line 696, ../../../scss/_metastudio_styles.scss */
+/* line 691, ../../../scss/_metastudio_styles.scss */
 .landing header .logo {
   color: #555;
   text-align: center;
 }
-/* line 701, ../../../scss/_metastudio_styles.scss */
-.landing header h1, .landing header article h1:not(.subheader) div input, article h1:not(.subheader) div .landing header input {
-  font-size: 2rem;
+/* line 694, ../../../scss/_metastudio_styles.scss */
+.landing header .logo h1, .landing header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div .landing header .logo input {
+  font-size: 1.6rem;
   line-height: 1;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
-/* line 709, ../../../scss/_metastudio_styles.scss */
+/* line 707, ../../../scss/_metastudio_styles.scss */
 section.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
   border: 2px solid #339aff;
   border-width: 2px 0;
   background-color: rgba(0, 0, 0, 0.1);
+  max-height: 300px;
 }
-/* line 716, ../../../scss/_metastudio_styles.scss */
+/* line 715, ../../../scss/_metastudio_styles.scss */
 section.banner > * {
   background-color: #0081ff;
   color: #eee;
   margin: 0;
 }
-/* line 718, ../../../scss/_metastudio_styles.scss */
+/* line 717, ../../../scss/_metastudio_styles.scss */
 section.banner > * .slide {
   padding: 1rem;
   background-color: #0074e6;
 }
-/* line 721, ../../../scss/_metastudio_styles.scss */
+/* line 720, ../../../scss/_metastudio_styles.scss */
 section.banner > * .slide > i {
   position: absolute;
   font-size: 15rem;
@@ -9584,26 +9581,26 @@ section.banner > * .slide > i {
   opacity: 0.1;
   right: 5%;
 }
-/* line 732, ../../../scss/_metastudio_styles.scss */
+/* line 731, ../../../scss/_metastudio_styles.scss */
 section.banner > * h3, section.banner > * h4, section.banner > * h5, section.banner > * h6, section.banner > * blockquote {
   color: white;
 }
-/* line 735, ../../../scss/_metastudio_styles.scss */
+/* line 734, ../../../scss/_metastudio_styles.scss */
 section.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 739, ../../../scss/_metastudio_styles.scss */
+/* line 738, ../../../scss/_metastudio_styles.scss */
 section.banner > * p:first-child {
   color: white;
   font-size: 120%;
 }
 
-/* line 752, ../../../scss/_metastudio_styles.scss */
+/* line 751, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 755, ../../../scss/_metastudio_styles.scss */
+/* line 754, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;

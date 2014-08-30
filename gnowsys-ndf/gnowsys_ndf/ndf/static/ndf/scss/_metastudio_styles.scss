@@ -24,7 +24,7 @@ body{
         }
     ul.language-selector{
         height: $topbar-height;
-        float: left;
+        float: right;
         margin:0;
     }
     .active{
@@ -680,11 +680,6 @@ input.node-title{
 
 .landing{
     position: relative;
-    #language-selector{
-        position: absolute;
-    top:10px;
-    right: 10px;
-    }
     
     header{
         background-image: url(".../nroer/indian_pigments.jpg");
@@ -696,13 +691,16 @@ input.node-title{
         .logo{
             color:#555;
             text-align: center;
-        }
-        
-    h1{
-        font-size: 2rem;
+            h1{
+        font-size: 1.6rem;
             line-height: 1;
+        font-weight: bold;
+        text-transform: uppercase;
 
     }
+        }
+        
+    
     }
     
 }
@@ -712,6 +710,7 @@ section.banner{
     border:2px solid lighten($primary-color,10%);
     border-width: 2px 0;
     background-color: rgba(0,0,0,0.1);
+    max-height: 300px;
     
     &>*{
     background-color: $primary-color;
