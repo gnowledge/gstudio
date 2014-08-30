@@ -162,12 +162,12 @@
 		</div>
 	</div>
 {% empty %}
---
+
 {% endfor %}	
         </div>
     </div>
   </section>
-  <section class="medium-3 columns">
+  <section class="medium-3 columns ">
     <div class="panel">
      <h3 class="subheader"></h3>
        Edited {{ node.last_update|timesince }} ago by <a class="user">{{node.user_details_dict.modified_by}}</a>
@@ -178,8 +178,9 @@
           {% endfor %}
         </div>
       </small>
+      
      <a href="{% url 'task_edit' group_name node %}" class="small button split edit"><i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span></a> 
-
+    
     </div>
 
   </section>

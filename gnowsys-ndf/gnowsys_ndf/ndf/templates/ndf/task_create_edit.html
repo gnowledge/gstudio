@@ -231,7 +231,13 @@ $('#hidden_watchers').val(selected);
       </div>
     </div>
 </form>
-
+ <form  class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'submitDoc' group_name_tag %}">{% csrf_token %}
+     <input type="file" name="doc[]"  id="docFile" multiple/>
+     <input type="hidden" name="node" value="{{node.pk}}">
+     <input type="hidden" name="user" value="{{user.id}}">
+     <input type="hidden" name="page_url" value="{{request.path}}">
+     <input type="submit" id="submitpostid" value="Submit" class="button small-1  small-push-1 column">
+     </form>
 {% endblock %}
 
 

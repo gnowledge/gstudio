@@ -126,7 +126,7 @@ def create_edit_task(request, group_name, task_id=None):
     if task_id:
         task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
 	edit_task_node = task_node
-	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
+	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"]
     	
     else:
         task_node = collection.GSystem()
@@ -140,6 +140,7 @@ def create_edit_task(request, group_name, task_id=None):
         Priority = request.POST.get("Priority","")
         Due_date = request.POST.get("Due_date","")
         Assignee = request.POST.get("Assignee","")
+        Up_Task  = request.POST.get("var","")
         Estimated_time = request.POST.get("Estimated_time","")
 	watchers = request.POST.get("watchers","")
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
@@ -178,7 +179,7 @@ def create_edit_task(request, group_name, task_id=None):
 					change_list.append('Parent changed from '+parent_object.name+' to '+changed_object.name) # updated details
 
         task_node.save()
-	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"] # fields
+	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"] # fields
 	if not task_id: # create
 	    for each in at_list:
 	         if request.POST.get(each,""):
