@@ -258,13 +258,12 @@
 	{% if themes_cards  %}
 
 	<h2>Themes</h2><hr/>
-
 		<div class="content row" id="panel2-4">
 
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   		<!-- Existing card list-->
-  	{% get_preferred_lang request group_id nodes "Theme" as nodes %}
+  		{% get_preferred_lang request group_id nodes "Theme" as nodes %}
 	
 	  	{% for each in nodes %}
 		    <li class="card">

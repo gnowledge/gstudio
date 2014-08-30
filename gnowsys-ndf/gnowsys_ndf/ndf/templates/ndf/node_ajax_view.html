@@ -183,7 +183,7 @@
   <section class="medium-9 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
-      {% blocktrans %}<li><a href="#">Collection Name</a></li>{% endblocktrans %}
+      <li><a href="#">{% trans "Collection Name " %}</a></li>
     </ul>
 
 
@@ -210,11 +210,11 @@
         {% check_group node as is_group %}
         {% if is_group %}
         {% if user.is_superuser or node.created_by == user.id %}
-        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
+        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
         {% endif %}
 
         {% else %}
-        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
+        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
 
         {% endif %}    
 
@@ -227,7 +227,7 @@
             {% if is_group %}
             {% if user.is_superuser or node.created_by == user.id %}
             <li>
-              <a href="{% url 'publish_group' group_name_tag node %}">Publish</a>
+              <a href="{% url 'publish_group' group_name_tag node %}">{% trans "Publish" %}</a>
             </li>
             {% endif %}
             
@@ -246,7 +246,7 @@
           {% if node.collection_set and user.is_authenticated %}
             {% if user_access == "allow" %}
             <li>
-             {% blocktrans %} <a href="#" id="module">Make Module</a>{% endblocktrans %}
+             <a href="#" id="module">{% trans "Make Module" %}</a>
             </li>
             {% endif %}
           {% endif %}
@@ -282,7 +282,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
             {% if node.member_of_names_list.0 == "File" %}
             <li>
               <a href="{% url create_url group_name_tag %}?next={{request.path}}">
-                {% blocktrans %}<span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+                <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
               </a>
             </li>
 
@@ -291,13 +291,13 @@ This section has been integrated to groupdashboard and appears in block app_acti
               
                 <li>
                   <a href="{% url create_url group_name_tag app_id %}">
-                  {% blocktrans %}  <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                   </a>
                 </li>
               {% else %}
                 <li>
                   <a href="{% url create_url group_name_tag %}">
-                    {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                   </a>
                 </li>
               {% endif %}
@@ -318,13 +318,13 @@ This section has been integrated to groupdashboard and appears in block app_acti
       <dl class="tabs" data-tab> 
           
         {% if topic %}
-       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% blocktrans %}Contents{% endblocktrans %}</a></dd>
+       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% trans "Contents" %}</a></dd>
         {% endif %}
 
-        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% blocktrans %}View{% endblocktrans %}</a></dd>
+        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
 
-     <dd><a href="#view-changes"><i class="fi-clock"></i> {% blocktrans %}Changes{% endblocktrans %}</a></dd>
-          <dd><a href="#view-discussion"><i class="fi-comment"></i> {% blocktrans %}Discuss{% endblocktrans %}</a></dd>
+     <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes" %}</a></dd>
+          <dd><a href="#view-discussion"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
           
       </dl>
       </h1>
@@ -336,25 +336,25 @@ This section has been integrated to groupdashboard and appears in block app_acti
         
         <!-- Modal links for associated views like graphs and map-->
         <ul class="side-nav">
-  <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% blocktrans %}Location{% endblocktrans %}</a></li>
+  <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></li>
             
-  <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% blocktrans %}Graphs{% endblocktrans %}</a>
+  <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
             </li>
             
             <ul id="graph-list" class="f-dropdown" data-dropdown-content>
-  <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% blocktrans %}Concept Graph{% endblocktrans %}</a></li>
+  <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph" %}</a></li>
                     
                     {% if node.collection_set %}
-                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% blocktrans %}Collection Graph{% endblocktrans %}</a></li>
+                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
                     {% endif %}
           
                     {% if node.prior_node %}
-                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% blocktrans %}Dependency Graph{% endblocktrans %}</a></li>
+                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
                     {% endif %}               
 </ul>
            <li>
                 <a id = "toggleContainer"  href="#" onClick="toggle(this);">
-        <i class="fi-comments annotateIcon"></i> {% blocktrans %}Annotate{% endblocktrans %}
+        <i class="fi-comments annotateIcon"></i> {% trans "Annotate" %}
       </a></li> 
 </ul>
 
@@ -412,7 +412,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
 	<div class="small-4 columns">
         {% if node.prior_node|length > 0 %}
         <div class="panel">
-          {% blocktrans %}<h6>You may want to read these first:</h6>{% endblocktrans %}
+          <h6>{% trans "You may want to read these first: " %}</h6>
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
           {% if each_node.mime_type %}
@@ -481,7 +481,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
                 <br/>
                 <br/>
                 <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
-                  {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
+                  <span class="fi-download large"> {% trans "Download " %} </span>
                 </a>
               {% endif %}
             </div>
@@ -498,7 +498,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
               <br/>
               <br/>
               <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-                {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
+                <span class="fi-download large"> {% trans "Download " %} </span>
               </a>
               {% endif %}
             </div>
@@ -521,7 +521,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
               <br/>
               <br/>
               <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-                {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
+                <span class="fi-download large"> {% trans "Download " %} </span>
               </a>
               {% endif %}
             </div>
@@ -583,7 +583,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
           {% for k,v in contents.items %}    
 
             <fieldset id="{{k}}">
-              {% blocktrans %} <legend>{{k}}</legend>{% endblocktrans %}
+              <legend>{{k}}</legend>
 
               {% for e in v %}
                 {% if k == "Images" %}
@@ -651,7 +651,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
         Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
             </p>
         
-          <h4>{% blocktrans %}Recent changes{% endblocktrans %}:</h4>
+          <h4>{% trans "Recent changes" %}:</h4>
         <ul class="side-nav">
         {% for seq_no, version_no in node.version_dict.items|slice:"-20:" reversed %}
           <li title="Version #{{version_no}}">
@@ -749,7 +749,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
         
      
       <ul class="side-nav">
-          <li>{% trans "In other languages:" %}</li>
+          <li>{% trans "In other languages" %}</li>
       {% get_possible_translations node as tran %}
      {% for each in tran %}
         {% for k,v in each.items %}
@@ -772,7 +772,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
 <footer>
 
   <p><small>
-    <em>Created by {{ node.user_details_dict.contributors|join:', ' }}</em>
+    <em>{% trans "Created by" %} {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>
 </footer>
       

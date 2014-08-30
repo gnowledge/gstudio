@@ -107,7 +107,7 @@ def create_theme(obj):
 		theme_node.contributors.append(1)
 		theme_node.created_by = 1
 		theme_node.group_set.append(group_id)
-		theme_node.language = u"('en', 'English')"
+		theme_node.language = u"en"
 		theme_node.member_of.append(theme_GST._id)
 		theme_node.modified_by = 1
 		theme_node.status = u"DRAFT"
@@ -161,7 +161,7 @@ def create_theme_item(obj, prev, row):
 		theme_item_node.contributors.append(1)
 		theme_item_node.created_by = 1
 		theme_item_node.group_set.append(group_id)
-		theme_item_node.language = u"('en', 'English')"
+		theme_item_node.language = u"en"
 		theme_item_node.member_of.append(theme_item_GST._id)
 		theme_item_node.modified_by = 1
 		theme_item_node.status = u"DRAFT"
@@ -216,7 +216,7 @@ def create_topic(obj, prev, row):
 		topic_node.contributors.append(1)
 		topic_node.created_by = 1
 		topic_node.group_set.append(group_id)
-		topic_node.language = u"('en', 'English')"
+		topic_node.language = u"en"
 		topic_node.member_of.append(topic_GST._id)
 		topic_node.modified_by = 1
 		topic_node.status = u"DRAFT"

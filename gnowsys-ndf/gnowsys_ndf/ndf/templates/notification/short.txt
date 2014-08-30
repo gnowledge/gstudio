@@ -2,8 +2,6 @@
 {% load ndf_tags %}
 {% get_site_info as site_info %}
 
-{% blocktrans %}
+{% trans "Activity notification from" %}  {{site_info}}
 
-Activity notification from  {{site_info}}
 
-{% endblocktrans %}
