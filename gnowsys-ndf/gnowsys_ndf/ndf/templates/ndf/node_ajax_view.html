@@ -210,11 +210,11 @@
         {% check_group node as is_group %}
         {% if is_group %}
         {% if user.is_superuser or node.created_by == user.id %}
-        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
+        <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
         {% endif %}
 
         {% else %}
-        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> Edit now<span data-dropdown="edit-options"></span></a>
+        <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
 
         {% endif %}    
 
@@ -227,7 +227,7 @@
             {% if is_group %}
             {% if user.is_superuser or node.created_by == user.id %}
             <li>
-              <a href="{% url 'publish_group' group_name_tag node %}">Publish</a>
+              <a href="{% url 'publish_group' group_name_tag node %}">{% trans "Publish" %}</a>
             </li>
             {% endif %}
             
@@ -246,7 +246,7 @@
           {% if node.collection_set and user.is_authenticated %}
             {% if user_access == "allow" %}
             <li>
-             <a href="#" id="module">{% trans "Make Module " %}</a>
+             <a href="#" id="module">{% trans "Make Module" %}</a>
             </li>
             {% endif %}
           {% endif %}
@@ -282,7 +282,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
             {% if node.member_of_names_list.0 == "File" %}
             <li>
               <a href="{% url create_url group_name_tag %}?next={{request.path}}">
-                <span class="fi-upload">&nbsp;&nbsp; {% trans "New " %} {{node.member_of_names_list.0}}</span>
+                <span class="fi-upload">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
               </a>
             </li>
 
@@ -291,13 +291,13 @@ This section has been integrated to groupdashboard and appears in block app_acti
               
                 <li>
                   <a href="{% url create_url group_name_tag app_id %}">
-                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New " %} {{node.member_of_names_list.0}}</span>
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                   </a>
                 </li>
               {% else %}
                 <li>
                   <a href="{% url create_url group_name_tag %}">
-                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New " %} {{node.member_of_names_list.0}}</span>
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{node.member_of_names_list.0}}</span>
                   </a>
                 </li>
               {% endif %}

@@ -193,7 +193,7 @@
             <form 
                       {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                       name="search_form" method="GET" >
-              <input type="text" name="search_text" id="search_text" placeholder="Search {{group_object.name}}" autocomplete="off" required/>
+              <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
                 <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
         
               
