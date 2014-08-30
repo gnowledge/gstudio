@@ -87,7 +87,7 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // We use these to control various global styles
  //
 // $body-font-color: #222;
- $body-font-family: "Source Sans Pro", "Ubuntu", "FreeSans","Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+ $body-font-family: "Source Sans Pro","Open Sans", "Ubuntu", "FreeSans","Helvetica Neue", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
 // $body-font-style: normal;
 
@@ -1192,7 +1192,7 @@ $global-radius:5px;
 // $topbar-bg: $topbar-bg-color;
 
 // Height and margin
- $topbar-height: 70px;
+// $topbar-height: 70px;
  $topbar-margin-bottom: 0;
 
 // Controlling the styles for the title in the top bar
