@@ -13,19 +13,20 @@
   
     <div id="myModal" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
       
-      {% blocktrans %}<h3>Are you sure you want to delete? All of the following related items also will be deleted:</h3>{% endblocktrans %} 
+      <h3>{% trans "Are you sure you want to delete? All of the following related items also will be deleted!" %}</h3>
       
       <input class="button confirmDeleteObjects" type="button" value="Confirm">
       <input class="button cancelDeleteObjects" type="button" value="Cancel">
       <div id="deletion_results"></div>
-      <a class="close-reveal-modal">{% trans "&#215" %};</a>
+      <a class="close-reveal-modal"> &#215;</a>
 
     </div>
 
     <div id="linkModal" class="reveal-modal small" data-reveal>
       <center>
       {% blocktrans %}<h3>Link user-account to respective user-details</h3>
-      <p>NOTE: Please provide username of the user (i.e. student/voluntary-teacher), that he/she has registered on to the website.</p>{% endblocktrans %}
+      <p>NOTE: Please provide username of the user (i.e. student/voluntary-teacher), that he/she has registered on to the website.</p>
+      {% endblocktrans %}
       </center>
 
       <form id="linkform" data-abide>
@@ -35,7 +36,7 @@
           </div>
           <div class="small-6 columns end">
             <input id="link_to" name="link_to" type="text" required >
-            {% blocktrans %}<small class="error">Please fill username !!</small>{% endblocktrans %}
+            <small class="error">{% trans "Please fill username!" %}</small>
           </div>
         </div>
 
@@ -140,7 +141,7 @@
   {% else %}
   <div class="row">
     <div class="small-12 columns">
-     <h5> {% blocktrans %} This group doesn't have any <b>{{title}}</b> registered yet. {% endblocktrans %} </h5>
+     <h5> {% trans "This group doesn't have a registered" %}<b> {{title}}</b>.  </h5>
     </div>
   </div>
 

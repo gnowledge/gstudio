@@ -15,26 +15,26 @@
 <br/>
 {% if form.errors %}
 
-<p>{% blocktrans %}Please give a valid email.{% endblocktrans %}</p>
+<p>{% trans "Please give a valid email. " %}</p>
 {% endif %}
 
 <form method="post" id="loginSubmit" action="{% url 'auth_login' %}">{% csrf_token %}
 <table>
 	<tr>
-		<td>{% trans form.username.label_tag %}</td>
+		<td>{{ form.username.label_tag }}</td>
 		<td>{{ form.username }}</td>
 		<td><i class="fi-torso"></i></td>
 	</tr>
 	<tr>
-		<td>{% trans form.password.label_tag %}</td>
+		<td>{{ form.password.label_tag }}</td>
 		<td>{{ form.password }}</td>
 		<td><i class="fi-key"></i></td>
 	</tr>
 	<tr>
 		<td colspan="3">
-			{% blocktrans %}
-				<a href="{{ auth_pwd_reset_url }}" title="Recover your password" >Forgot</a> your password ?
-			{% endblocktrans %}
+
+				<a href="{{ auth_pwd_reset_url }}" title="Recover your password" >{% trans "Forgot your password?" %}</a>
+
 		</td>
 	</tr>
 	<tr>
@@ -42,9 +42,9 @@
 	</tr>
 	<tr>
 		<td colspan="3"> 
-			{% blocktrans %}
-				Don't have an account ? <a title="Click here to register" href="{{ register_url }}">Register yourself now.</a> 
-			{% endblocktrans %}
+
+				 <a title="Click here to register" href="{{ register_url }}">{% trans "Don't have an account? Register yourself now. " %}</a> 
+
 		</td>
 	</tr>
 </table>

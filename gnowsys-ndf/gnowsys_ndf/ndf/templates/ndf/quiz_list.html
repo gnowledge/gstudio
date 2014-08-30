@@ -5,8 +5,8 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block help_content %}
-{% blocktrans %}
-<h3>About Quiz/QuizItem</h3>
+
+<h3>{% trans "About Quiz/QuizItem" %}</h3>
 <p class="text-justify">By <b>Quiz Item</b>, you can create a miscellaneous quiz-question. This quiz-question can be of, basically three types: <strong><i>short response, single-choice</i></strong> and <strong><i>multiple-choice</i></strong>.</p>
 
 <p class="text-justify">By <b>Quiz</b>, you can build a quiz having list of quiz-items. Quiz-Items can be added to quiz in two ways:
@@ -15,19 +15,19 @@
    <li>By using Quiz-Item button corresponding to the Quiz node (i.e. this will automatically add the quiz-item node to your quiz node).</li>
  </ol>
 </p>
-{% endblocktrans %}
+
 {% endblock %}
 
 
 {% block meta_content %}
- {% blocktrans %} <h3>Quizzes</h3>{% endblocktrans %}
+  <h3>x{% trans "Quizzes" %}</h3>
 
  {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
    {% if user_access == "allow" %}
 
       <a class="small button" href="{% url 'quiz_create' group_name_tag %}">
-	       {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>{% endblocktrans %}
+	       <span class="fi-plus">&nbsp;{% trans "New" %}&nbsp;&nbsp;{{title}}</span>
       </a>
    
   {% endif %}
@@ -49,11 +49,11 @@
 {% block body_content %} 
 {% get_group_name groupid as group_name_tag %}
 <header class="row">
-{% blocktrans %}
-  <h2 class="medium-12 columns">Quiz
+
+  <h2 class="medium-12 columns">{% trans "Quiz" %}
 
   </h2>
-{% endblocktrans %}
+
   <div class="medium-12 columns">
    <!-- Add button -->
    {% if user.is_authenticated %}
@@ -61,10 +61,10 @@
    {% user_access_policy groupid request.user as user_access %}
    {% if user_access == "allow" %}
       
-   <a href="{% url 'quiz_create' group_name_tag %}" class="button small">{% blocktrans %}   
-+ Add {{title}} {% endblocktrans %}</a>
-<a href="{% url 'quiz_item_create' group_name_tag %}" class="button small">{% blocktrans %}   
-+ Add {{title}} Item {% endblocktrans %}   
+   <a href="{% url 'quiz_create' group_name_tag %}" class="button small">
++ {% trans "Add" %} {{title}} </a>
+<a href="{% url 'quiz_item_create' group_name_tag %}" class="button small">
++ {% trans "Add" %} {{title}} {% trans "Item" %} 
 </a>
 
   {% endif %}
@@ -77,7 +77,7 @@
   <!-- column-left for Quiz -->
   <div class="small-5 columns">
 
-    {% blocktrans %}<h5>Quiz</h5>{% endblocktrans %}
+    <h5>{% trans "Quiz" %}</h5>
     {% for node in quiz_nodes %}
       {% if node.created_by == request.user.pk %}  
     <div class="row">
@@ -122,7 +122,7 @@
    {% empty %}
    <div class="row">
     <div class="small-12 columns">
-      <h5>This group doesn't have any quiz. <b>Be the first to create a Quiz!</b></h5>
+      <h5>{% trans "This group doesn't have any quiz. Be the first to create a Quiz!" %}</h5>
     </div>
    </div>
 
@@ -134,7 +134,7 @@
 <!-- column-right for Quiz-Items -->
 <div class="small-7 columns" >
 
- {% blocktrans %} <h5>Quiz Items</h5>{% endblocktrans %}
+ <h5>{% trans "Quiz Items" %}</h5>
   {% for node in quiz_item_nodes %}
   <div class="row" style="padding-left:8px;">
 
@@ -147,7 +147,7 @@
  {% empty %}
  <div class="row">
   <div class="small-12 columns">
-    <h5>{% blocktrans %}This group doesn't have any quiz-items. <b>Be the first to create a Quiz-Item!</b>{% endblocktrans %}</h5>
+    <h5>{% trans "This group doesn't have any quiz-items. Be the first to create a Quiz-Item!" %}</h5>
   </div>
  </div>
 

@@ -3,10 +3,8 @@
 {% load ndf_tags %}
 
 {% block meta_content %}
-{% blocktrans %}
-  <h3>Building of a Course </h3>
-  <p class="text-justify"><b>Course</b> is a sequenced collection of already freezed modules.</p>
-{% endblocktrans %}
+{% blocktrans %} <h3>Building of a Course </h3>
+  <p class="text-justify"><b>Course</b> is a sequenced collection of already freezed modules.</p>{% endblocktrans %}
 {% endblock %}
 
 
@@ -19,7 +17,7 @@
     <div class="course">
       <br/>
       <a class="button medium" href="{% url 'create_edit' group_name_tag %}">
-        <span class="fi-plus">&nbsp;&nbsp;{% blocktrans %}New {{title}}{% endblocktrans %}
+        <span class="fi-plus">&nbsp;&nbsp;{% trans "New " %} {{title}}{% endblocktrans %}
 </span>
       </a>
     </div>
