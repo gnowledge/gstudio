@@ -39,7 +39,7 @@
 				{% endif %}		
 			
 				{% if already_uploaded != "None" %}
-					<br/><br/><span style="color:red"> {{already_uploaded}} {% trans "image is already uploaded please choose different image" %}</span>
+					<br/><br/><span style="color:red"> {% blocktrans %}{{already_uploaded}} image is already uploaded please choose different image {% endblocktrans %}</span>
 				{% endif %}
 
 			<div id="pic_div" style="display:none;">
@@ -62,8 +62,8 @@
 			{% endif %}
 		</div>
 		<div class="small-9 columns" style="padding-top:30px;">
-			<h4><a href="#">{% trans "Welcome " %} {{username}} </a></h4>
-			{% trans "Registerd on: " %} &nbsp;{{DOJ}} {% endblocktrans %}
+			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
+			{% blocktrans %}Registerd on : &nbsp;{{DOJ}} {% endblocktrans %}
 		</div>
 	</div>
 	<br/>
@@ -248,9 +248,11 @@
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
       {% if res_type == 'group' %}
       <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a>
-      {% else %}
-       	 <a class="small button expand" href="{% url res_type groupid node.pk  %}">{% trans "Detail" %}</a>
-     {% endif %}
+      {% elif res_type %}
+      	 <a class="small button expand" href="{% url res_type groupid node.pk  %}">{% trans "Detail" %}</a> 
+
+      
+      {% endif %}
       
     </div>
   </li>  

@@ -910,35 +910,33 @@ def get_edit_url(groupid):
 
 @register.assignment_tag
 def get_url(groupid):
-
+     
 	node = collection.Node.one({'_id': ObjectId(groupid) }) 
 	if node._type == 'GSystem':
 
 		type_name = collection.Node.one({'_id': node.member_of[0]}).name
 
 		if type_name == 'Quiz':
-			print "quiz"
 			return 'quiz_details'    
 		elif type_name == 'Page':
-			print "page"
 			return 'page_details' 
+		elif type_name == 'Theme' or type_name == 'theme_item':
+			return 'theme_page'
 		elif type_name == 'Forum':
-			print "forum"
 			return 'show'	
 	elif node._type == 'Group' :
-		print "group"
 		return 'group'
 
 	elif node._type == 'File':
 		if (node.mime_type) == ("application/octet-stream"): 
-			print "vedio"
 			return 'video_detail'       
 		elif 'image' in node.mime_type:
-			print "file edit1"
 			return 'file_detail'
 		else:
-			print "file edit2"
 			return 'file_detail'
+	else:
+			return 'None'
+
 
 @register.assignment_tag
 def get_create_url(groupid):
