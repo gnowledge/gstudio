@@ -9345,25 +9345,25 @@ article section.content {
 
 /*************************** 2. Custom CSS overrides ***********************/
 /* Content area */
-/* line 516, ../../../scss/_metastudio_styles.scss */
+/* line 518, ../../../scss/_metastudio_styles.scss */
 article {
   padding-bottom: 4rem;
 }
-/* line 520, ../../../scss/_metastudio_styles.scss */
+/* line 522, ../../../scss/_metastudio_styles.scss */
 article > header {
   border-bottom: 1px solid #ddd;
 }
-/* line 524, ../../../scss/_metastudio_styles.scss */
+/* line 526, ../../../scss/_metastudio_styles.scss */
 article > footer {
   border-top: 1px dotted #ddd;
 }
-/* line 527, ../../../scss/_metastudio_styles.scss */
+/* line 529, ../../../scss/_metastudio_styles.scss */
 article .breadcrumbs {
   display: none;
   background-color: #eee;
 }
 
-/* line 536, ../../../scss/_metastudio_styles.scss */
+/* line 538, ../../../scss/_metastudio_styles.scss */
 textarea {
   min-height: 6rem;
 }
@@ -9384,44 +9384,44 @@ textarea {
 }*/
 /*************************** 3. Custom CSS Below ***********************/
 /*CSS fix for tables generated via orgitdown*/
-/* line 556, ../../../scss/_metastudio_styles.scss */
+/* line 558, ../../../scss/_metastudio_styles.scss */
 #content table td, #content colgroup col {
   float: none !important;
 }
 
-/* line 561, ../../../scss/_metastudio_styles.scss */
+/* line 563, ../../../scss/_metastudio_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 564, ../../../scss/_metastudio_styles.scss */
+/* line 566, ../../../scss/_metastudio_styles.scss */
 .user {
   color: inherit;
 }
 
-/* line 567, ../../../scss/_metastudio_styles.scss */
+/* line 569, ../../../scss/_metastudio_styles.scss */
 .user i {
   margin-right: 3px;
 }
 
-/* line 570, ../../../scss/_metastudio_styles.scss */
+/* line 572, ../../../scss/_metastudio_styles.scss */
 .user:hover i {
   opacity: 1;
 }
 
-/* line 574, ../../../scss/_metastudio_styles.scss */
+/* line 576, ../../../scss/_metastudio_styles.scss */
 a.node {
   display: block;
 }
 
-/* line 578, ../../../scss/_metastudio_styles.scss */
+/* line 580, ../../../scss/_metastudio_styles.scss */
 .button.edit {
   margin-bottom: 0;
 }
 
 /************ Forms **************/
 /* Node edit */
-/* line 586, ../../../scss/_metastudio_styles.scss */
+/* line 588, ../../../scss/_metastudio_styles.scss */
 input.node-title {
   font-size: 3rem;
   height: 4rem;
@@ -9429,13 +9429,13 @@ input.node-title {
 }
 
 /* view-graph in node_details_base.html */
-/* line 593, ../../../scss/_metastudio_styles.scss */
+/* line 595, ../../../scss/_metastudio_styles.scss */
 .graph-height {
   height: 70%;
 }
 
 /*for graph and location*/
-/* line 598, ../../../scss/_metastudio_styles.scss */
+/* line 600, ../../../scss/_metastudio_styles.scss */
 .graph-div {
   height: 90%;
   width: -webkit-calc(100% - 10px);
@@ -9449,13 +9449,13 @@ input.node-title {
 }
 
 /*for graph and location*/
-/* line 608, ../../../scss/_metastudio_styles.scss */
+/* line 610, ../../../scss/_metastudio_styles.scss */
 .graph-div h3 {
   border-bottom: 2px inset #154534;
   padding: 0.25em 0;
 }
 
-/* line 613, ../../../scss/_metastudio_styles.scss */
+/* line 615, ../../../scss/_metastudio_styles.scss */
 #view-map-widget .close-reveal-modal, #view-map-edit-widget .close-reveal-modal {
   z-index: 1;
   background-color: captiontext;
@@ -9466,7 +9466,7 @@ input.node-title {
   box-shadow: 0 1px 10px 2px #A9A9A9;
 }
 
-/* line 624, ../../../scss/_metastudio_styles.scss */
+/* line 626, ../../../scss/_metastudio_styles.scss */
 #view-map-widget .close-reveal-modal:hover, #view-map-edit-widget .close-reveal-modal:hover {
   background-color: white;
   border-radius: 30px;
@@ -9478,19 +9478,19 @@ input.node-title {
 }
 
 /* Splash Page */
-/* line 636, ../../../scss/_metastudio_styles.scss */
+/* line 638, ../../../scss/_metastudio_styles.scss */
 #splash {
   background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
 }
 
-/* line 639, ../../../scss/_metastudio_styles.scss */
+/* line 641, ../../../scss/_metastudio_styles.scss */
 #splash > img {
   position: absolute;
 }
 
 /****************** CUSTOM *********************/
 /* UI Button */
-/* line 646, ../../../scss/_metastudio_styles.scss */
+/* line 648, ../../../scss/_metastudio_styles.scss */
 .ui.button {
   margin-right: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -9499,80 +9499,91 @@ input.node-title {
   padding: 0.8rem;
   z-index: 500;
 }
-/* line 656, ../../../scss/_metastudio_styles.scss */
+/* line 658, ../../../scss/_metastudio_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 659, ../../../scss/_metastudio_styles.scss */
+/* line 661, ../../../scss/_metastudio_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: none;
 }
-/* line 663, ../../../scss/_metastudio_styles.scss */
+/* line 665, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
   background-color: rgba(0, 0, 0, 0.1);
 }
-/* line 666, ../../../scss/_metastudio_styles.scss */
+/* line 668, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 669, ../../../scss/_metastudio_styles.scss */
+/* line 671, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 672, ../../../scss/_metastudio_styles.scss */
+/* line 674, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
 /* For landing page */
-/* line 681, ../../../scss/_metastudio_styles.scss */
-.landing {
-  position: relative;
-}
-/* line 684, ../../../scss/_metastudio_styles.scss */
-.landing header {
-  background-image: url(".../nroer/indian_pigments.jpg");
+/* line 683, ../../../scss/_metastudio_styles.scss */
+body > header {
+  background-image: url("../nroer/indian_pigments.jpg");
   position: relative;
   z-index: 50;
-  background-color: #fff;
-  padding: 1rem 0 0 0;
+  background-color: #0A253A;
+  padding: 1rem 0 1rem 0;
+  border-bottom: 2px solid #00CEFD;
 }
 /* line 691, ../../../scss/_metastudio_styles.scss */
-.landing header .logo {
+body > header .logo {
   color: #555;
   text-align: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.8);
 }
-/* line 694, ../../../scss/_metastudio_styles.scss */
-.landing header .logo h1, .landing header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div .landing header .logo input {
-  font-size: 1.6rem;
+/* line 696, ../../../scss/_metastudio_styles.scss */
+body > header .logo img {
+  max-width: 75%;
+  margin-bottom: 0.5rem;
+}
+/* line 700, ../../../scss/_metastudio_styles.scss */
+body > header .logo h1, body > header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div body > header .logo input {
+  font-size: 1rem;
   line-height: 1;
   font-weight: bold;
   text-transform: uppercase;
+  color: white;
 }
 
-/* line 707, ../../../scss/_metastudio_styles.scss */
+/* line 713, ../../../scss/_metastudio_styles.scss */
+.landing {
+  position: relative;
+}
+
+/* line 719, ../../../scss/_metastudio_styles.scss */
 section.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
   border: 2px solid #339aff;
   border-width: 2px 0;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.9);
   max-height: 300px;
+  overflow: hidden;
 }
-/* line 715, ../../../scss/_metastudio_styles.scss */
+/* line 727, ../../../scss/_metastudio_styles.scss */
 section.banner > * {
   background-color: #0081ff;
   color: #eee;
   margin: 0;
 }
-/* line 717, ../../../scss/_metastudio_styles.scss */
+/* line 729, ../../../scss/_metastudio_styles.scss */
 section.banner > * .slide {
   padding: 1rem;
   background-color: #0074e6;
 }
-/* line 720, ../../../scss/_metastudio_styles.scss */
+/* line 732, ../../../scss/_metastudio_styles.scss */
 section.banner > * .slide > i {
   position: absolute;
   font-size: 15rem;
@@ -9581,26 +9592,26 @@ section.banner > * .slide > i {
   opacity: 0.1;
   right: 5%;
 }
-/* line 731, ../../../scss/_metastudio_styles.scss */
+/* line 743, ../../../scss/_metastudio_styles.scss */
 section.banner > * h3, section.banner > * h4, section.banner > * h5, section.banner > * h6, section.banner > * blockquote {
   color: white;
 }
-/* line 734, ../../../scss/_metastudio_styles.scss */
+/* line 746, ../../../scss/_metastudio_styles.scss */
 section.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 738, ../../../scss/_metastudio_styles.scss */
+/* line 750, ../../../scss/_metastudio_styles.scss */
 section.banner > * p:first-child {
   color: white;
   font-size: 120%;
 }
 
-/* line 751, ../../../scss/_metastudio_styles.scss */
+/* line 763, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 754, ../../../scss/_metastudio_styles.scss */
+/* line 766, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
@@ -9689,7 +9700,7 @@ pre {
 
 /* Effects */
 /* line 86, ../../../scss/_app_styles.scss */
-.drop-shadow, .landing header {
+.drop-shadow, body > header {
   -webkit-box-shadow: 0px 0px 5px 1px black;
   box-shadow: 0px 0px 5px 1px black;
 }
