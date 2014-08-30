@@ -153,7 +153,7 @@
 
 <!-- Current group selector -->
             <li>
-            <a href="/home">Home</a>
+            <a href="/home">{% trans "Home" %}</a>
             </li>
       	  <li class="has-dropdown group">
       	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:30}}</a>
@@ -358,18 +358,22 @@
 
   <footer>
 
+       <div class="medium-12 columns">
+          <ul class="inline-list">
+  <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
+  <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
+  <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
+  <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
+  <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
+  <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
+  
+</ul>   
+      </div>
       
       <div class="medium-2 columns">    	
              <p>
-                 <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a>
-
-                <span class="xgnu-badge show-span-on-hover hide">{% trans "100% स्वतंत्" %}
-                    <span>
-
-
-
         <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a>
-		</span></span>
+		
 
         <br>
         
@@ -384,26 +388,14 @@
       </div>
 
 
-      <div class="medium-7 columns">
-         
-          <ul class="inline-list">
-  <li><a href="{{site.ABOUT}}">About</a></li>
-  <li><a href="{{site.SITE_POWEREDBY}}">Powered by</a></li>
-  <li><a href="{{site.PARTNERS}}">Partners</a></li>
-  <li><a href="{{site.TERMS_OF_SERVICE}}">Terms of Service</a></li>
-  <li><a href="{{site.PRIVACY_POLICY}}">Privacy Policy</a></li>
-  <li><a href="{{site.CONTACT}}">Contact</a></li>
-  <li><a href="{{site.CONTRIBUTE}}">Contribute</a></li>
-  
-</ul>
-        
+     
+      <div class="medium-10 columns">
+          <strong>Powered by <a href="https://github.com/gnowledge/gstudio" target="_blank">Gnowsys-Studio</a> at the <a href="http://www.hbcse.tifr.res.in/" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in/" target="_blank">TIFR</a>.</strong>
+
+<!--{{site.ORG_NAME |safe }}-->
           
       </div>
-      <div class="medium-3 columns sponsor">
-
-{{site.ORG_NAME |safe }}
-
-      </div>
+          
   </footer>
 
   <!-- JS -->
