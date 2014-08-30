@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> <!-- checked -->
     
   <!-- Open Source webfonts for better typography -->
-  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
 <!--    <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>-->
 
   <!-- Modernizr - Browser detection JS http://modernizr.com/ -->
@@ -152,6 +152,9 @@
       	<ul class="left medium-7 columns">
 
 <!-- Current group selector -->
+            <li>
+            <a href="/home">Home</a>
+            </li>
       	  <li class="has-dropdown group">
       	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:30}}</a>
       	    
@@ -260,7 +263,7 @@
                   <!-- Show app options if user is logged in-->
                   {% if user.is_authenticated %}
                   <li>
-               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> Actions</a><br>
+               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> {% trans "Actions" %}</a><br>
 <ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
   {% block app_action_list %} {% endblock %}
 </ul>
@@ -334,13 +337,13 @@
     	<aside id="help"  class="right-off-canvas-menu">
             <ul class="off-canvas-list">
                 
-                <li><label><h4>User Guide</h4></label></li>
+                <li><label><h4>{% trans "User Guide" %}</h4></label></li>
                 {% block detailed_help_content %}  {% endblock %}
-                <li><label>About this Application</label></li>
+                <li><label>{% trans "About this Application" %}</label></li>
                 {% block help_content %}  {% endblock %}
-                <li><label>About this Group</label></li>
+                <li><label>{% trans "About this Group" %}</label></li>
                 {% block about_group %}  {% endblock %}
-                <li><label>Meta Studio Version 0.8.23</label></li>
+                <li><label>Meta Studio {% trans "Version" %} 0.8.23</label></li>
                     <li><a href="#">{% trans "About metaStudio" %}</a></li>
                 </ul>
     	</aside>

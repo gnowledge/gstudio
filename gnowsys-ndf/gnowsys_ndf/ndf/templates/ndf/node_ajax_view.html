@@ -318,13 +318,13 @@ This section has been integrated to groupdashboard and appears in block app_acti
       <dl class="tabs" data-tab> 
           
         {% if topic %}
-       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% trans "Contents " %}</a></dd>
+       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% trans "Contents" %}</a></dd>
         {% endif %}
 
-        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% trans " View" %}</a></dd>
+        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
 
-     <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes " %}</a></dd>
-          <dd><a href="#view-discussion"><i class="fi-comment"></i> {% trans "Discuss " %}</a></dd>
+     <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes" %}</a></dd>
+          <dd><a href="#view-discussion"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
           
       </dl>
       </h1>
@@ -336,25 +336,25 @@ This section has been integrated to groupdashboard and appears in block app_acti
         
         <!-- Modal links for associated views like graphs and map-->
         <ul class="side-nav">
-  <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location " %}</a></li>
+  <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></li>
             
-  <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs " %}</a>
+  <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
             </li>
             
             <ul id="graph-list" class="f-dropdown" data-dropdown-content>
-  <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph " %}</a></li>
+  <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph" %}</a></li>
                     
                     {% if node.collection_set %}
-                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph " %}</a></li>
+                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph" %}</a></li>
                     {% endif %}
           
                     {% if node.prior_node %}
-                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph " %}</a></li>
+                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
                     {% endif %}               
 </ul>
            <li>
                 <a id = "toggleContainer"  href="#" onClick="toggle(this);">
-        <i class="fi-comments annotateIcon"></i> {% trans "Annotate " %}
+        <i class="fi-comments annotateIcon"></i> {% trans "Annotate" %}
       </a></li> 
 </ul>
 
@@ -651,7 +651,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
         Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
             </p>
         
-          <h4>{% trans "Recent changes " %}:</h4>
+          <h4>{% trans "Recent changes" %}:</h4>
         <ul class="side-nav">
         {% for seq_no, version_no in node.version_dict.items|slice:"-20:" reversed %}
           <li title="Version #{{version_no}}">
@@ -749,7 +749,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
         
      
       <ul class="side-nav">
-          <li>{% trans "In other languages:" %}</li>
+          <li>{% trans "In other languages" %}</li>
       {% get_possible_translations node as tran %}
      {% for each in tran %}
         {% for k,v in each.items %}
@@ -772,7 +772,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
 <footer>
 
   <p><small>
-    <em>Created by {{ node.user_details_dict.contributors|join:', ' }}</em>
+    <em>{% trans "Created by" %} {{ node.user_details_dict.contributors|join:', ' }}</em>
   </small></p>
 </footer>
       
