@@ -84,38 +84,37 @@
 	<!-- Right Nav Section -->
 	<ul class="right medium-3 columns">
         
-<!-- <\!-- Language selector-\-> -->
-<!--             <li class="has-form"> -->
-<!--                 {% get_languages as lan %} -->
-<!--                 <a class="tiny radius language button" href="#" data-reveal-id="languageModal">en</a>  -->
+ <!-- Language selector--> 
+        
+             <li class="has-form"> 
+                 <a class="tiny radius language button" href="#" data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
 
-<!--                 <div id="languageModal" class="small reveal-modal" data-reveal> -->
+                 <div id="languageModal" class="small reveal-modal" data-reveal> 
 <!--                   <h2>Language preference</h2> -->
                       
-<!--                   <h3>Primary language</h3> -->
+                   <h3>Preferred language</h3> 
+                      <form action="/i18n/setlang/" method="POST">
+                      {% csrf_token %}
+                      <input name="next" type="hidden" value="/pref_lang/?url={{request.path}}&group_id={{group_id}}&appid={{appId}}"/>
+                      <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+
+                      <select name="language" id="lan">
+                        {% for lang in LANGUAGES %}
+                        <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+                        {% endfor %}
+                      </select>
+                      <input type="submit" class="button" value='{% trans "Set Language" %}' />
+                    </form>
+                     
+<!--                       {% get_languages as lan %} -->
 <!--                   <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>     -->
 <!--                   <h3>Secondary language</h3> -->
 <!--                   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>       -->
 <!--                   <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/> -->
 <!--                   <a class="close-reveal-modal">&#215;</a> -->
-<!--                 </div> -->
-<!--               </li> -->
-<li>	    
-
-  <form action="/i18n/setlang/" method="POST">
-  {% csrf_token %}
-  <input name="next" type="hidden" value="/pref_lang/?url={{request.path}}&group_id={{group_id}}&appid={{appId}}"/>
-  <input name="url" type="hidden" value="{{request.get_full_path}}"/>
-    
-  <select name="language" id="lan">
-    {% for lang in LANGUAGES %}
-    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
-    {% endfor %}
-  </select>
-  <input type="submit" value="Go" />
-</form>
-</li>
-        
+                 </div> 
+               </li> 
+  
           <!-- If logged in show user options -->
       	  {% if user.is_authenticated %}
       	  <li class="has-dropdown">
@@ -135,9 +134,9 @@
             
       	    <ul class="dropdown">
                   
-      	      <li class="text-center"><a href="{% url 'auth_password_change' %}">Change password</a></li>
+      	      <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "User Settings" %}</a></li>
                   
-      	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
+      	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
       	    </ul>
           </li>
 
@@ -356,7 +355,7 @@
   <footer>
 
       
-      <div class="medium-3 columns">    	
+      <div class="medium-2 columns">    	
              <p>
                  <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a>
 
@@ -396,7 +395,7 @@
         
           
       </div>
-      <div class="medium-2 columns sponsor">
+      <div class="medium-3 columns sponsor">
 
 {{site.ORG_NAME |safe }}
 

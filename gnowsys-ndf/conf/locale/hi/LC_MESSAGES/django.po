@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-30 01:14+0530\n"
-"PO-Revision-Date: 2014-08-26 17:18+0530\n"
+"PO-Revision-Date: 2014-08-30 11:32+0530\n"
 "Last-Translator: user <ravikrishna010586@gmail.com>\n"
 "Language-Team: NROER\n"
 "Language: hi\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Virtaal 0.7.1\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #: gnowsys_ndf/ndf/templates/admin/base_site.html:7
 msgid "metaStudio administration"
@@ -309,9 +309,8 @@ msgid "See more groups..."
 msgstr "और अधिक समूहों को देखें......"
 
 #: gnowsys_ndf/ndf/templates/ndf/base.html:252
-#, fuzzy
 msgid "Dashboard"
-msgstr "<h3>डैसबोर्ड</h3>"
+msgstr "डैसबोर्"
 
 #: gnowsys_ndf/ndf/templates/ndf/base.html:345
 msgid "About metaStudio"
@@ -1407,9 +1406,8 @@ msgid "Annotate "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:415
-#, fuzzy
 msgid "You may want to read these first: "
-msgstr "<h6>आप पहले ये पढ़ना चाहेंगे:</h6>"
+msgstr "आप पहले ये पढ़ना चाहेंगे"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:654
 msgid "Recent changes "
@@ -1420,9 +1418,8 @@ msgid "In other languages:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:78
-#, fuzzy
 msgid "Add resources in this topic "
-msgstr "<a href=\"#add_resources\"> <b>इस प्रकरण पर संसाधन जोड़े</b> </a>"
+msgstr "इस प्रकरण पर संसाधन जोड़े"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:83
 #, fuzzy
@@ -1430,9 +1427,8 @@ msgid "Add Page "
 msgstr "टैग जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:87
-#, fuzzy
 msgid "Add New Page: "
-msgstr " <h3>नया पृष्ठ जोड़ें:</h3>"
+msgstr "नया पृष्ठ जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:115
 #, fuzzy
