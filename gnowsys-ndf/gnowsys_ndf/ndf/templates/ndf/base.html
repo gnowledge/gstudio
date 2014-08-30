@@ -153,7 +153,7 @@
 
 <!-- Current group selector -->
             <li>
-            <a href="/home">{% trans "Home" %}</a>
+            <a id="home-group" class="group" href="/home">{% trans "Home" %}</a>
             </li>
       	  <li class="has-dropdown group">
       	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:30}}</a>
@@ -428,6 +428,13 @@
         $(this).hide();
         //$(this).attr('src', 'missing.png');
     });
+      
+      //If on the home group, change group dropdown text to "Groups"
+      if( $(".group a.active").html() == "home")
+      {
+          $(".group a.active").html("Groups").removeClass("active");
+          $("#home-group").addClass("active");
+      }
 
 
     //Functions to automatically add an <i> element icon inside node spans 
