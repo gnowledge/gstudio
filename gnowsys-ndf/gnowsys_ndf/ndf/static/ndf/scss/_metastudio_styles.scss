@@ -12,10 +12,8 @@ body{
 
 
 .top-bar{
-    border-bottom: 2px solid black;
-    z-index: 200;
     .active{
-        border-bottom:  1px solid $active-color;
+        background-color:black!important;
     }
     h1{
         a{
@@ -28,6 +26,9 @@ body{
         a{
 			color:white!important;
 		}
+    }
+    .group .logo{
+        max-height:  40px;
     }
     .search{
         position: relative;
