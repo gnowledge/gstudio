@@ -5,7 +5,7 @@
   <div class="row collapse">
     <div class="small-10 columns">
       <input id="search_field" name="search_field" type="text" placeholder="Search by name/tags..." value="{{query|default_if_none:''}}" required />
-      {% blocktrans %}<small class="error">Please enter a keyword..</small>{% endblocktrans %}
+      <small class="error">{% trans "Please enter a keyword. " %}</small>
     </div>
     <div class="small-2 columns">
       <button type="submit" class="button postfix"><i class="fi-magnifying-glass"></i></button>

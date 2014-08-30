@@ -38,9 +38,9 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <h2 class="medium-12 columns">
 		{% if node %}
-		{% blocktrans with node.name as node_name %}Editing {{title}}: {{node_name}} {% endblocktrans %}
+		{% with node.name as node_name %}{% trans "Editing "%}{{title}}: {{node_name}}{% endwith%}
 		{% else %}
-		{% blocktrans %}Create a New {{title}} {% endblocktrans %}
+		{% trans "Create a New "%} {{title}} 
 		{% endif %}
     </h2>
 
@@ -54,20 +54,20 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  		<a href="#panel-name-description"> {{title}} </a>
 			</dd>
 			<dd title="Click here to add/edit collection">
-	  			<a href="#panel-collection" class="collection_tab">{% trans "Collection" %} </a> 
+  			<a href="#panel-collection" class="collection_tab">{% trans "Collection" %} </a> 
 			</dd>
 			<!-- change name of metadata tab overide block in your code -->
 			<dd title="Click here to add/edit metadata">
-	 			<a href="#panel-metadata" > Metadata </a> 
+ 			<a href="#panel-metadata" > {% trans "Metadata" %} </a> 
 			</dd> 
 			<dd title="Click here to add/edit requires">
-	 			<a href="#panel-prior-node" class="prior_node_tab" >Requires </a> 
+ 			<a href="#panel-prior-node" class="prior_node_tab" >{% trans "Requires" %} </a> 
 			</dd>
 			<dd title="Click here to add/edit assesses">
-	 			<a href="#panel-assesses " class="assesses_tab" >Assesses </a> 
+ 			<a href="#panel-assesses " class="assesses_tab" >{% trans "Assesses" %} </a> 
 			</dd>
 			<dd title="Click here to add/edit teaches">
-	 			<a href="#panel-teaches" class="teaches_tab" >Teaches </a> 
+ 			<a href="#panel-teaches" class="teaches_tab" >{% trans "Teaches" %} </a> 
 			</dd>			  
 		{% endif %}
      	</dl>
@@ -85,7 +85,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-8 columns">
-		    			<label>{% blocktrans %}{{title}} Name {% endblocktrans %}</label>
+		    			<label>{{title}} {% trans "Name" %} </label>
 		    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 		  			</div>
@@ -156,21 +156,21 @@ background-repeat:no-repeat; background-size: 48px 48px
 		
 				<div class="row">
 		  			<div class="medium-8 columns">
-		    			<label>{% blocktrans %}{{title}} Name {% endblocktrans %}</label>
+		    			<label>{{title}} {% trans "Name" %} </label>
 		    			<input id="name_id" name="name" type="text" placeholder="Enter name..." required>
-		    			<small class="error">{% blocktrans %}Please give your page a descriptive name. It's helpful for others and for yourself.{% endblocktrans %}</small>
+		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 		  			</div>
 
 		  			<div class="medium-4 columns">
 		    			
-						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% blocktrans %}Privacy{% endblocktrans %}</label></span>
+						<span data-tooltip class="has-tip" title="Public pages can be viewed and edited by any group member, while private pages are only for you"><label>{% trans "Privacy" %}</label></span>
 						<div class="privacy-mode switch round">
 					
 							<input id="PUBLIC" name="login-mode" value="PUBLIC" type="radio" checked>
-							<label for="PUBLIC" onclick="">{% blocktrans %} Public {% endblocktrans %} <i class="fi-torsos-all"></i></label>
+							<label for="PUBLIC" onclick="">{% trans "Public " %} <i class="fi-torsos-all"></i></label>
 
 							<input id="PRIVATE" name="login-mode" value="PRIVATE" type="radio">
-							<label for="PRIVATE" onclick="">{% blocktrans %} Private {% endblocktrans %} <i class="fi-lock"></i></label>
+							<label for="PRIVATE" onclick="">{% trans "Private" %}  <i class="fi-lock"></i></label>
 						
 							<span></span>
 						</div>
@@ -277,7 +277,7 @@ background-repeat:no-repeat; background-size: 48px 48px
           <div class="content" id="panel-teaches"  style="width:95%;">
       		<div class="row">
 			<div class="small-12 columns">
-	  		<h5>Add or edit Teaches:  </h5>
+	  		<h5>{% trans "Add or edit Teaches: " %} </h5>
 			</div>
 		<br/>
 	

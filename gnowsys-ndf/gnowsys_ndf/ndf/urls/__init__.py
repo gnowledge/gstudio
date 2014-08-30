@@ -16,6 +16,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^online/', include('online_status.urls')),                                #for online_users  
     (r'^i18n/', include('django.conf.urls.i18n')),
+    (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
     (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
     (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
     (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),

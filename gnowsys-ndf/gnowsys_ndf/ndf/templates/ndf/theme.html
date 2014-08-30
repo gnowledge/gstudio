@@ -53,39 +53,87 @@
 
         			if (user == "True")
         			{   
-        				$li.find('.jqtree-element').append(
-        					{% user_access_policy groupid request.user as user_access %}
-        					{% if user_access == "allow" %}
+        				if (node.node_type == "Topic"){
+        					$li.find('.jqtree-element').append(
+	        					{% user_access_policy groupid request.user as user_access %}
+	        					{% if user_access == "allow" %}
 
-                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+	                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/browse topic/'+node.id+'/"> </a>' 
 
-                			
-                			{% endif %}
-            			);	
+	                			{% endif %}
+	            			);	            			
+
+        				}
+        				else{
+        					
+        					$li.find('.jqtree-element').append(
+	        					{% user_access_policy groupid request.user as user_access %}
+	        					{% if user_access == "allow" %}
+
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+	                			
+	                			{% endif %}
+            				);
+
+        				}
+        					
         			}           		
 
         		}
-    		});
 
+    		});
+			
     		// bind 'tree.click' event
 			$tree.bind(
-			    'tree.dblclick',
+			    'tree.click',
 			    function(event) {
 			        // The clicked node is 'event.node'
 			        var node = event.node;
+			        
 			        // If its topic node i.e no children of this node then show the detail veiw for topic
 			  		if( node.children[0] == null ){
 
 			  			if (node.node_type == "Topic"){
-			  				location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
+		  					location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
 			  			}
 				        
 			  		}
 			  		
 			    }
 			);
-   
+
+			$tree.bind(
+			    'tree.contextmenu',
+			    function(event) {
+			        // The clicked node is 'event.node'
+			        var node = event.node;
+			        {% user_access_policy groupid request.user as user_access %}
+	        		{% if user_access == "allow" %}
+				        var msg = confirm("Do you want to delete this topic ?");
+				        if (msg == true) {
+
+				        	$.ajax({
+				            	url: "{% url 'delete_themes' groupid %}",
+				             	type: 'POST',
+				             	data:{
+				             		deleteobj: node.id,
+				             		csrfmiddlewaretoken: '{{ csrf_token }}'
+				             	},
+				             	success: function(result){
+				             		alert("Topic "+node.name+" deleted successfully");
+				             		location.reload(true);
+				             	},
+				             	
+				            });
+
+						}
+					{% endif %} 
+
+			    }
+			);
+
     	});
+
     });
 
 
@@ -152,7 +200,7 @@
 
 	{% if themes_hierarchy %}
 
-		<h2> {{node.name}} </h2> 
+		<h2> {{node.name}}</h2> 
 		<a class="fold"><b><i class="fi-plus"></i> {% trans "Fold" %} </b></a> &nbsp;&nbsp;&nbsp;&nbsp; 
 		<a class="unfold"><b><i class="fi-minus"></i> {% trans "Unfold" %} </b></a>&nbsp;&nbsp;&nbsp;&nbsp;
 		{% if user_access == "allow" %}
@@ -200,6 +248,7 @@
 
 		{% if node %}
 			<!-- If "Theme" node -->
+  		
 			<div id="app-set-item" class="themes" data-url="{% url 'get_tree_hierarchy' groupid node.pk %}"></div>			
 		{% endif %}
 
@@ -209,17 +258,13 @@
 	{% if themes_cards  %}
 
 	<h2>Themes</h2><hr/>
-
 		<div class="content row" id="panel2-4">
 
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   		<!-- Existing card list-->
-                {% comment %}
-  		{% if user.is_authenticated %}
-			{% get_preferred_lang request group_id nodes "Theme" as nodes %}
-		{% endif %}
-                {% endcomment %}
+  		{% get_preferred_lang request group_id nodes "Theme" as nodes %}
+	
 	  	{% for each in nodes %}
 		    <li class="card">
 		      <div class="page">

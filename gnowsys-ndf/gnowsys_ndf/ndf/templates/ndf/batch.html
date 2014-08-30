@@ -2,7 +2,7 @@
 {% load pagination_tags %}
 {% load ndf_tags %}
 {% load i18n %}
-{% block title %} {% blocktrans %} {{title}}  {% endblocktrans %}
+{% block title %}  {{title}}  
 {% endblock %}
 
 {% block style %}
@@ -158,8 +158,7 @@ if(txt_input <= 0)
 <form data-abide id="form-create-batch" method="POST" action="{% url 'create_new' groupid %}">{% csrf_token %}
 <div class="row">
   <div class="small-2 large-4 columns">
-    <b> {% blocktrans %}Students present in this group: {{student_count}}{% endblocktrans %}
-</b>
+    <b> {% trans "Students present in this group: " %} {{student_count}}</b>
   </div>
 </div>
 <br>

@@ -38,16 +38,16 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     <h2 class="medium-12 columns">
 		{% if node %}
-			{% blocktrans with node.name as node_name %}Editing {{title}}: {{node_name}} {% endblocktrans %}
+			{% with node.name as node_name %}{% trans "Editing " %} {{title}}: {{node_name}} {% endwith %}
 		{% else %}
-			{% blocktrans %}Create a New {{title}}{% endblocktrans %}
+			{% trans "Create a new " %} {{title}}
 		{% endif %}
     </h2>
 
     <nav class="medium-12 columns">
    		<dl class="tabs" data-tab>
 		{% if node %}
-			<dd><h3>{% trans "View:" %}</h3></dd>
+			<dd><h3>{% trans "View: " %}</h3></dd>
 		
 			<dd class="{% if theme_GST_id in node.member_of %}active{% endif %}" title="Click here to add Name, Description, Privacy and Tags">
 		  	<!-- change name of collection tab overide block in your code -->
@@ -74,7 +74,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-8 columns">
-		    			<label>{% blocktrans %}{{title}} Name{% endblocktrans %}</label>
+		    			<label>{{title}}{% trans " Name " %}</label>
 		    			<input id="name_id" name="name" type="text" value="{{node.name}}" placeholder="Enter name..." required>
 		    			<small class="error">{% trans "Please give your page a descriptive name. It's helpful for others and for yourself." %}</small>
 		  			</div>
@@ -113,7 +113,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
 					      {% get_language_info_list for LANGUAGES as languages %}
 					      {% for language in languages %}
-					      <option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})
+					      <option value="{{ language.code }}">{{ language.code }}
 					      </option>
 					      {% endfor %}
 					    </select>
@@ -233,7 +233,13 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  
-		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select></label>
+		  			<div class="large-6 columns"><label>{% trans "Language" %}<select name="lan">
+					      {% get_language_info_list for LANGUAGES as languages %}
+					      {% for language in languages %}
+					      <option value="{{ language.code }}">{{ language.code }}
+					      </option>
+					      {% endfor %}
+					  </select></label>
 		     		</div>
 
 		  			<div class="large-6 columns" style="padding: 1.8em;">
@@ -251,7 +257,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-12 columns">
-		    			<span data-tooltip class="has-tip" title="Tags help identify similiar work easily. You can add as many labels as you wish using a comma ','"><label>{% trans "Tag" %}</label>
+		    			<span data-tooltip class="has-tip" title="Tags are like keywords, they help identify similiar resources easily. You can add as many tags as you wish using a comma ','"><label>{% trans "Tag" %}</label>
 		    			</span>
 		    			<input id="tags_id" name="tags" type="text" placeholder="Separate tags with commas...">
 		  			</div>		
@@ -274,7 +280,7 @@ background-repeat:no-repeat; background-size: 48px 48px
   	<!-- Overlay : Map Widget -->
     <div class="content reveal-modal graph-div" id="view-map-edit-widget" data-reveal>    
       
-  		<a class="close-reveal-modal" >{% trans "&#215;" %}</a>
+  		<a class="close-reveal-modal" >&#215;</a>
         {% include "ndf/map_widget.html" with mode="edit" %}
     </div>
 

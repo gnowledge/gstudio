@@ -133,7 +133,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   <dd>
 
-    <a id="switch_group" href="#switchgrp">{% blocktrans %}Click here to publish {{node.name}} in group/s{% endblocktrans %}</a>
+    <a id="switch_group" href="#switchgrp">{{node.name}} {% trans "Publish this resource in other group/s" %}</a>
 
        <div id="switchgrp" class="content">
          <h4>{% trans "Select Groups" %}</h4>
@@ -317,7 +317,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     <div class="content" id="panel-metadata" style="width:95%;" >
       
       <div class="row">
-	  <h3>{% trans "Add or edit Metadata - Please spend a few minutes" %} </h3>
+	  <h3>{% trans "Please add or edit Metadata." %} </h3>
         
 
         <div class="small-5 columns">
@@ -485,23 +485,14 @@ var turl='/{{groupid}}/group/switch_group/'+'{{node}}';
 saveflag = 1;
 get_new_groups();
 new_groups=data_list;
-$.cd({
+$.ajax({
        url: turl,
        type: 'POST',
        data: {new_grps:new_groups,csrfmiddlewaretoken: '{{ csrf_token }}'},
-       beforeSend: function(){
-              $("#ajax_load_image").show();
-              $("#body").css({"opacity":"0.1",})
-                              },
         success: function(data){
                        alert("Successfully switched groups");
             
            },
-       complete: function(){
-                    $("#ajax_load_image").hide();
-                $("#body").css({"opacity":"",})
-
-          }
 }); //end of ajax
 
 }); //end of document click

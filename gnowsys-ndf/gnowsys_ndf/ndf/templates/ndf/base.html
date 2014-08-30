@@ -26,8 +26,8 @@
   <link rel="stylesheet" href="/static/ndf/bower_components/foundation-icon-fonts/foundation-icons.css"> <!-- checked -->
     
   <!-- Open Source webfonts for better typography -->
-  <!--link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'-->
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
+<!--    <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>-->
 
   <!-- Modernizr - Browser detection JS http://modernizr.com/ -->
   <script src="/static/ndf/bower_components/modernizr/modernizr.js"></script> <!-- checked -->
@@ -66,41 +66,57 @@
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
 {% get_group_object groupid as group_object %}
+       {% get_site_variables as site %}
       
     <nav class="top-bar drop-shadow row" data-topbar role="navigation">
 
-      <ul class="title-area medium-2 columns">
+        <ul class="title-area ">
       	<li class="name">
      {% get_site_variables as site %}
-      	  <h1><a href="/home/" accesskey="q"><img src="{{site.LOGO}}"></a></h1>
+      	  <h1><a href="/home/" class="group" accesskey="q" id="home-group"><img src="{{site.LOGO}}"></a></h1>
       	</li>
       	<li class="toggle-topbar menu-icon">
       	  <a href="#">{% trans "Menu" %}</a>
       	</li>
       </ul>
-
+        
       <section class="top-bar-section">
 	
 	<!-- Right Nav Section -->
-	<ul class="right medium-3 columns">
+	<ul class="right">
         
-<!-- Language selector-->
-            <li class="has-form">
-                {% get_languages as lan %}
-                <a class="tiny radius language button" href="#" data-reveal-id="languageModal">en</a> 
+    <!-- Language selector--> 
+        
+             <li class="has-form"> 
+                 <a href="#" class="rounded language button"  data-reveal-id="languageModal">{{request.LANGUAGE_CODE}}</a>  
 
-                <div id="languageModal" class="small reveal-modal" data-reveal>
-                  <h2>Language preference</h2>
+                 <div id="languageModal" class="small reveal-modal" data-reveal> 
+<!--                   <h2>Language preference</h2> -->
                       
-                  <h3>Primary language</h3>
-                  <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>    
-                  <h3>Secondary language</h3>
-                  <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>      
-                  <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/>
-                  <a class="close-reveal-modal">&#215;</a>
-                </div>
-              </li>
-        
+                   <h3>Preferred language</h3> 
+                      <form action="/i18n/setlang/" method="POST">
+                      {% csrf_token %}
+                      <input name="next" type="hidden" value="/pref_lang/?url={{request.path}}&group_id={{group_id}}&appid={{appId}}"/>
+                      <input name="url" type="hidden" value="{{request.get_full_path}}"/>
+
+                      <select name="language" id="lan">
+                        {% for lang in LANGUAGES %}
+                        <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+                        {% endfor %}
+                      </select>
+                      <input type="submit" class="button" value='{% trans "Set Language" %}' />
+                          <a class="close-reveal-modal">&#215;</a>
+                    </form>
+                     
+<!--                       {% get_languages as lan %} -->
+<!--                   <select id="pref">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>     -->
+<!--                   <h3>Secondary language</h3> -->
+<!--                   <select id="fallback">{% for each in lan %}<option id="{{each}}" value="{{each}}">{{each}}</option>{% endfor %}</select>       -->
+<!--                   <input type="button" id="savepref" value="Save Settings" class="small button" onclick="$('a.close-reveal-modal').trigger('click');"/> -->
+<!--                   <a class="close-reveal-modal">&#215;</a> -->
+                 </div> 
+               </li>
+  
           <!-- If logged in show user options -->
       	  {% if user.is_authenticated %}
       	  <li class="has-dropdown">
@@ -120,9 +136,9 @@
             
       	    <ul class="dropdown">
                   
-      	      <li class="text-center"><a href="{% url 'auth_password_change' %}">Change password</a></li>
+      	      <li class="text-center"><a href="{% url 'auth_password_change' %}">{% trans "User Settings" %}</a></li>
                   
-      	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> Logout</a></li>
+      	      <li><a class="button alert" href="{% url 'auth_logout' %}"><i class="fi-power"></i> {% trans "Logout" %}</a></li>
       	    </ul>
           </li>
 
@@ -134,7 +150,7 @@
         <!-- Closes Right Nav section -->
 
       	<!-- Left Nav Section -->
-      	<ul class="left medium-7 columns">
+      	<ul class="left">
 
 <!-- Current group selector -->
       	  <li class="has-dropdown group">
@@ -175,7 +191,7 @@
             <form 
                       {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                       name="search_form" method="GET" >
-              <input type="text" name="search_text" id="search_text" placeholder="Search {{group_object.name}}" autocomplete="off" required/>
+              <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
                 <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
         
               
@@ -245,10 +261,9 @@
                   <!-- Show app options if user is logged in-->
                   {% if user.is_authenticated %}
                   <li>
-               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown"><i class="fi-plus"></i> Actions</a><br>
+               <a href="#" data-dropdown="app-settings-dropdown" class="settings button dropdown" data-options="is_hover:true"><i class="fi-plus"></i> {% trans "Actions" %}</a><br>
 <ul id="app-settings-dropdown" data-dropdown-content class="f-dropdown">
   {% block app_action_list %} {% endblock %}
-    
 </ul>
                       </li>
                   {% endif %}
@@ -320,13 +335,13 @@
     	<aside id="help"  class="right-off-canvas-menu">
             <ul class="off-canvas-list">
                 
-                <li><label><h4>User Guide</h4></label></li>
+                <li><label><h4>{% trans "User Guide" %}</h4></label></li>
                 {% block detailed_help_content %}  {% endblock %}
-                <li><label>About this Application</label></li>
+                <li><label>{% trans "About this Application" %}</label></li>
                 {% block help_content %}  {% endblock %}
-                <li><label>About this Group</label></li>
+                <li><label>{% trans "About this Group" %}</label></li>
                 {% block about_group %}  {% endblock %}
-                <li><label>Meta Studio Version 0.8.23</label></li>
+                <li><label>Meta Studio {% trans "Version" %} 0.8.23</label></li>
                     <li><a href="#">{% trans "About metaStudio" %}</a></li>
                 </ul>
     	</aside>
@@ -341,18 +356,22 @@
 
   <footer>
 
+       <div class="medium-12 columns">
+          <ul class="inline-list">
+  <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
+  <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
+  <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
+  <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
+  <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
+  <li><a href="{{site.CONTRIBUTE}}">{% trans "Contribute" %}</a></li>
+  
+</ul>   
+      </div>
       
-      <div class="medium-3 columns">    	
+      <div class="medium-2 columns">    	
              <p>
-                 <a href="https://github.com/gnowledge/gstudio">{% trans "View Source Code" %}</a>
-
-                <span class="xgnu-badge show-span-on-hover hide">{% trans "100% स्वतंत्" %}
-                    <span>
-
-
-
         <a href="{{site.GIT_REPO}}">{% trans "View Source Code" %}</a>
-		</span></span>
+		
 
         <br>
         
@@ -367,33 +386,18 @@
       </div>
 
 
-      <div class="medium-7 columns">
-         
-          <ul class="inline-list">
-  <li><a href="{{site.ABOUT}}">About</a></li>
-  <li><a href="{{site.SITE_POWEREDBY}}">Powered by</a></li>
-  <li><a href="{{site.PARTNERS}}">Partners</a></li>
-  <li><a href="{{site.TERMS_OF_SERVICE}}">Terms of Service</a></li>
-  <li><a href="{{site.PRIVACY_POLICY}}">Privacy Policy</a></li>
-  <li><a href="{{site.CONTACT}}">Contact</a></li>
-  <li><a href="{{site.CONTRIBUTE}}">Contribute</a></li>
-  
-</ul>
-        
+     
+      <div class="medium-10 columns">
+          <strong>Powered by <a href="https://github.com/gnowledge/gstudio" target="_blank">Gnowsys-Studio</a> at the <a href="http://www.hbcse.tifr.res.in/" target="_blank">Homi Bhabha Centre for Science Education</a>, <a href="http://www.tifr.res.in/" target="_blank">TIFR</a>.</strong>
+
+<!--{{site.ORG_NAME |safe }}-->
           
       </div>
-      <div class="medium-2 columns sponsor">
-         <p>
-        A project of <a href="http://lab.gnowledge.org/" target="_blank">{% trans "Gnowledge Lab" %}</a> at the <a href="http://www.hbcse.tifr.res.in" target="_blank">{% trans "Homi Bhabha Centre for Science Education (HBCSE)" %}</a>, <a href="http://www.tifr.res.in" target="_blank">{% trans "Tata Institute of Fundamental Research (TIFR), India" %}</a>.
-        </p>
-
-      </div>
-
+          
   </footer>
 
   <!-- JS -->
   <script src="/static/ndf/bower_components/foundation/js/foundation.min.js"></script> <!-- checked -->
-  <script src="/static/ndf/bower_components/foundation/js/foundation/foundation.topbar.js"></script> <!-- checked -->
   
   <script type="text/javascript">
     
@@ -417,6 +421,19 @@
       $("main>article").toggleClass("large-9 large-12");
     };
       
+      //Hide broken image links
+    $('img').error(function(){
+        $(this).hide();
+        //$(this).attr('src', 'missing.png');
+    });
+      
+      //If on the home group, change group dropdown text to "Groups"
+      if( $(".group a.active").html() == "home")
+      {
+          $(".group a.active").html("Groups").removeClass("active");
+          $("#home-group").addClass("active");
+      }
+
 
     //Functions to automatically add an <i> element icon inside node spans 
 		$(".user").prepend(function(){
@@ -488,6 +505,11 @@
 
   </script>
   
+<script type="text/javascript">
+  $(document).ready(function(){
+  $('select option[value="{{request.LANGUAGE_CODE}}"]').attr("selected",true)
+})
+  </script>
   <script src="/static/ndf/js/app.js"></script> <!-- checked -->
 
 </body>

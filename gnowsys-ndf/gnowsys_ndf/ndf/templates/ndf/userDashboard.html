@@ -7,7 +7,7 @@
 
     <h3>{% trans "About" %}</h3>
 
-    {% blocktrans %}<p><b>Dashboard</b> shows users' own activities in the site.</p>{% endblocktrans %}   
+    <p><b>{% trans "Dashboard shows users' own activities in the site." %} </b> </p>   
 
 {% endblock %}
 
@@ -39,7 +39,7 @@
 				{% endif %}		
 			
 				{% if already_uploaded != "None" %}
-					<br/><br/><span style="color:red"> {% blocktrans %}{{already_uploaded}} image is already uploaded please choose different image {% endblocktrans %}</span>
+					<br/><br/><span style="color:red"> {{already_uploaded}} {% trans "File is already uploaded. Please choose a different file."  %}</span>
 				{% endif %}
 
 			<div id="pic_div" style="display:none;">
@@ -62,8 +62,8 @@
 			{% endif %}
 		</div>
 		<div class="small-9 columns" style="padding-top:30px;">
-			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
-			{% blocktrans %}Registerd on : &nbsp;{{DOJ}} {% endblocktrans %}
+			<h4><a href="#">{% trans "Welcome " %}{{username}} </a></h4>
+			{% trans "Registerd on: " %} &nbsp;{{DOJ}} 
 		</div>
 	</div>
 	<br/>
@@ -77,7 +77,7 @@
 	<!-- Created Resources by user -->
 	<div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
-			{% blocktrans %}Created Resources by {{username}}:{% endblocktrans %}						
+			{% trans "Created Resources by " %} {{username}}: 		
 		</div>
 	</div>
 	<div class="row" style="padding-top:10px;">
@@ -443,7 +443,7 @@
 								<a href="{% url 'dashboard' each.Id %}">{{ each.usrname }}  </a> 	
 							</div>
 							<div class="small-6 columns">
-								<a href="">{% blocktrans %} modified: {{each.resource}}{% endblocktrans %}  </a>
+							<a href=""> {% trans "modified: " %}{{each.resource}}  </a>
 							</div>
 						</div>
 					</li>

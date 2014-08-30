@@ -25,7 +25,7 @@ theme_item_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'theme_ite
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 get_group=collection.Node.one({'_type':'Group', 'name':u'home'})
 theme_list=collection.Node.find({'$and':[{'member_of':theme_GST._id},{'group_set':get_group._id}]})
-schema_file_xls = os.path.join( os.path.dirname(__file__), "schema_files/ncf_maps merged list.xlsravi.xls")
+schema_file_xls = os.path.join( os.path.dirname(__file__), "schema_files/ncf_hindi_themes.xls")
 schema_file_csv = os.path.join( os.path.dirname(__file__), "schema_files/theme_translations.csv")
 wb=xlrd.open_workbook(schema_file_xls)
 sheet = wb.sheet_by_index(0)
@@ -75,7 +75,7 @@ def main():
           theme_node.contributors.append(1)
           theme_node.created_by = 1
           theme_node.group_set.append(get_group._id)
-          theme_node.language = u"('hi', 'Hindi')"
+          theme_node.language = u"hi"
           theme_node.member_of.append(app_obj._id)
           theme_node.modified_by = 1
           theme_node.status = u"DRAFT"

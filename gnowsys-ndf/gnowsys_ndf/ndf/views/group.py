@@ -42,6 +42,7 @@ collection = db[Node.collection_name]
 get_all_usergroups=get_all_user_groups()
 at_apps_list=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'apps_list'}]})
 ins_objectid  = ObjectId()
+app=collection.Node.one({'name':u'Group','_type':'GSystemType'})
 
 
 
@@ -132,7 +133,8 @@ def group(request, group_id, app_id=None):
       group_count = cur_public.count()
 
     return render_to_response("ndf/group.html",
-                              {'title': title, 
+                              {'title': title,
+                               'appId':app._id,
                                'searching': True, 'query': search_field,
                                'group_nodes': group_nodes, 'group_nodes_count': group_count,
                                'groupid':group_id, 'group_id':group_id
@@ -170,7 +172,8 @@ def group(request, group_id, app_id=None):
 
     
     return render_to_response("ndf/group.html", 
-                              {'group_nodes': group_nodes, 
+                              {'group_nodes': group_nodes,
+                               'appId':app._id,
                                'group_nodes_count': group_count,
                                'groupid': group_id, 'group_id': group_id
                               }, context_instance=RequestContext(request))
@@ -261,7 +264,7 @@ def create_group(request,group_id):
       else:
         shelves = []
 
-    return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'node':colg,'user':request.user,
+    return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'appId':app._id,'node':colg,'user':request.user,
                                                          'groupid':group_id,'group_id':group_id,
                                                          'shelf_list': shelf_list,'shelves': shelves
                                                         },context_instance=RequestContext(request))
@@ -273,7 +276,7 @@ def create_group(request,group_id):
   for each in available_nodes:
     nodes_list.append(each.name)
 
-  return render_to_response("ndf/create_group.html", {'groupid':group_id,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
+  return render_to_response("ndf/create_group.html", {'groupid':group_id,'appId':app._id,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
     
 # def home_dashboard(request):
 #     try:
@@ -395,6 +398,7 @@ def group_dashboard(request,group_id=None):
   return render_to_response([alternate_template, default_template] ,{'node': groupobj, 'groupid':grpid, 
                                                        'group_id':grpid, 'user':request.user, 
                                                        'shelf_list': shelf_list,
+                                                       'appId':app._id,
                                                        'annotations' : annotations,
                                                        'shelves': shelves, 
                                                        'breadcrumbs_list': breadcrumbs_list
@@ -440,6 +444,7 @@ def edit_group(request,group_id):
       page_node.get_neighbourhood(page_node.member_of) 
   return render_to_response("ndf/edit_group.html",
                                     { 'node': page_node,
+                                      'appId':app._id,
                                       'groupid':group_id,
                                       'group_id':group_id
                                       },
@@ -572,6 +577,7 @@ def publish_group(request,group_id,node):
   return render_to_response("ndf/groupdashboard.html",
                                  { 'group_id':group_id,
                                    'node':node,
+                                   'appId':app._id,
                                    'groupid':group_id
                                  },
                                   context_instance=RequestContext(request)

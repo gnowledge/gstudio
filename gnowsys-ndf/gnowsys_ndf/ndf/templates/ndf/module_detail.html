@@ -27,7 +27,7 @@
 <!-- overiding block_related content -->
 {% block related_content %}
 <section class="medium-6 large-12 columns">
-  {% blocktrans %}<h3>Modules</h3>{% endblocktrans %}
+  <h3>{% trans "Modules " %}</h3>
   <div class ="row">
     <!-- bellow div for making tree from json data -->
     <div class="tree" data-url="{% url 'get_module_json' groupid %}?_id={{node.pk}}"></div>
@@ -57,7 +57,7 @@
     </h2>
     <h3 class="subheader"></h3>
       <small> 
-	{% blocktrans %}Edited {{ node.last_update|timesince }} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>{% endblocktrans %}
+	{{ node.last_update|timesince }} {% trans "ago edited by  " %}<a class="user">{% trans "User " %}</a> <a href="#view-changes"><i class="fi-clock"></i> View history</a>
       </small>
 
   </section>
