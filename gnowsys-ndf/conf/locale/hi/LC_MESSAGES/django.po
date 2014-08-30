@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-30 01:14+0530\n"
-"PO-Revision-Date: 2014-08-26 17:18+0530\n"
+"PO-Revision-Date: 2014-08-30 13:37+0530\n"
 "Last-Translator: user <ravikrishna010586@gmail.com>\n"
 "Language-Team: NROER\n"
 "Language: hi\n"
@@ -288,7 +288,7 @@ msgstr "उपस्थित छात्र"
 #: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:129
 #, fuzzy
 msgid "Student "
-msgstr "छात्र ##"
+msgstr "छात्र"
 
 #: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:128
 msgid "Absent Students"
@@ -309,9 +309,8 @@ msgid "See more groups..."
 msgstr "और अधिक समूहों को देखें......"
 
 #: gnowsys_ndf/ndf/templates/ndf/base.html:252
-#, fuzzy
 msgid "Dashboard"
-msgstr "<h3>डैसबोर्ड</h3>"
+msgstr "डैसबोर्"
 
 #: gnowsys_ndf/ndf/templates/ndf/base.html:345
 msgid "About metaStudio"
@@ -348,9 +347,8 @@ msgid "Delete"
 msgstr "मिटाएं"
 
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:162
-#, fuzzy
 msgid "Students present in this group: "
-msgstr "समूह में उपस्थित छात्रः (छात्र_संख्या)"
+msgstr "समूह में उपस्थित छात्रः"
 
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:168
 msgid "Number of batches to create"
@@ -373,9 +371,8 @@ msgstr "संपादित करें"
 
 #: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:29
 #: gnowsys_ndf/ndf/templates/ndf/module_detail.html:60
-#, fuzzy
 msgid "ago edited by  "
-msgstr "सृजक"
+msgstr "संपादक अनुसार"
 
 #: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:29
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:81
@@ -384,14 +381,12 @@ msgid "User"
 msgstr "उपभोक्ता"
 
 #: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:29
-#, fuzzy
 msgid "View history "
-msgstr "इतिहास"
+msgstr "इतिहास देखें"
 
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:41
-#, fuzzy
 msgid "File Size "
-msgstr "फ़ाइल नाम"
+msgstr "फ़ाइल आकार"
 
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:44
 #, fuzzy
@@ -432,7 +427,7 @@ msgstr "पाठ्यक्रम"
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:30
 #: gnowsys_ndf/ndf/templates/ndf/task.html:29
 msgid "New"
-msgstr ""
+msgstr "नया"
 
 #: gnowsys_ndf/ndf/templates/ndf/course.html:45
 msgid "All Courses"
@@ -472,16 +467,16 @@ msgid ""
 "already freezed modules.</p>"
 msgstr ""
 "<h3>पाठ्यक्रम निर्माण </h3>\n"
-"  <p class=\"text-justify\"><b>पाठ्यक्रम</b> पहले से तैयार श्रृंखलाबद्ध संग्रह है</p>\n"
+"  <p class=\"text-justify\"><b>पाठ्यक्रम</b> पहले से तैयार श्रृंखलाबद्ध संग्रह "
+"है</p>\n"
 
 #: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:20
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:285
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:294
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:300
 #: gnowsys_ndf/ndf/templates/ndf/page_create_edit.html:19
-#, fuzzy
 msgid "New "
-msgstr "नई फ़ाइल"
+msgstr "नया"
 
 #: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:31
 msgid "Add Module"
@@ -496,14 +491,12 @@ msgid "Modules"
 msgstr "मॉड्यूल"
 
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:81
-#, fuzzy
 msgid "ago edited by"
-msgstr "सृजक"
+msgstr "संपादक अनुसार"
 
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:81
-#, fuzzy
 msgid "View history"
-msgstr "इतिहास"
+msgstr "इतिहास देखें"
 
 #: gnowsys_ndf/ndf/templates/ndf/create_batch.html:125
 msgid "Enter Batch Name"
@@ -652,9 +645,10 @@ msgstr "एन्क्रिप्टेड"
 
 #: gnowsys_ndf/ndf/templates/ndf/create_group.html:116
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:188
-#, fuzzy
 msgid "Group Agency Types"
-msgstr "समूह प्रकार"
+msgstr ""
+"\n"
+"समूह एजेंसी प्रकार"
 
 #: gnowsys_ndf/ndf/templates/ndf/create_thread.html:37
 msgid "Thread"
@@ -751,14 +745,12 @@ msgid "download"
 msgstr "डाउनलोड"
 
 #: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:7
-#, fuzzy
 msgid "Select from following drawer: "
 msgstr "निम्नलिखित संसाधनों से चयन करें:"
 
 #: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:11
-#, fuzzy
 msgid "Add selected to following drawer: "
-msgstr "चयनित संसाधन को निम्नलिखित संग्रह के साथ जोड़ें:"
+msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:63
 msgid "No content of selected type !"
@@ -766,12 +758,11 @@ msgstr "चयनित प्रकार की कोई भी विषय 
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:54
 msgid "Click here to change settings of"
-msgstr ""
+msgstr "सेटिंग बदलने के लिए यहाँ क्लिक करें"
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:63
-#, fuzzy
 msgid "Subscription policy"
-msgstr "समूह सदस्यता नीति"
+msgstr "सदस्यता नीति"
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:69
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:142
@@ -788,7 +779,7 @@ msgstr "निमंत्रण द्वारा"
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:74
 #, fuzzy
 msgid "User policy"
-msgstr "उपभोक्ता ऑनलाइन"
+msgstr "उपभोक्ता नीति"
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:120
 msgid "Group Editing policy"
@@ -822,14 +813,12 @@ msgid "NOT DISCLOSED TO MEMBERS"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:179
-#, fuzzy
 msgid "NOT ENCRYPTED"
 msgstr "एन्क्रिप्टेड नहीं"
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:212
-#, fuzzy
 msgid "Click here to select apps for "
-msgstr "ऐप्स. चयन करने हेतु यहाँ किल्क करें। (नोड.नाम)"
+msgstr "ऐप्स. चयन करने हेतु यहाँ किल्क करें।"
 
 #: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:13
 #, fuzzy
@@ -911,7 +900,7 @@ msgstr "फ़ाइल"
 
 #: gnowsys_ndf/ndf/templates/ndf/file.html:29
 msgid "Data Review"
-msgstr ""
+msgstr "आँकड़े अवलोकन"
 
 #: gnowsys_ndf/ndf/templates/ndf/file.html:55
 #: gnowsys_ndf/ndf/templates/ndf/visualize.html:168
@@ -1058,12 +1047,14 @@ msgid ""
 "group has a wiki, a pool for resources, and a discussion board for talking.</"
 "p>"
 msgstr ""
-"समूह विषय वस्तु को वितरित करने तथा सम्प्रेषित करने का सरल मार्ग है। चाहे वो निजि तौर पर "
-"हो अथवा विश्व स्तरीय हो। कई बार विशिष्ट अभिरुचि या प्रकरण पर समूह पहले से उपस्थिति "
-"होते हैं। यदि आपको अपनी अभिरुच का समूह नहीं मिलता तो आप अपना समूह आरम्भ कर सकते हैं।\n"
-"समूह कैसे कार्य करते हैं? समूह सार्वजनिक (उपभोक्ता विषय वस्तु का संक्षिप्त विवरण अथवा रूप् "
-"रेखा पढ सकते हैं परंतु विषय वस्तु को पूर्णतः देख नहीं सकते है) अथवा पूर्णतः निजि रूप से अवरुध "
-"हो सकते हैं। प्रत्येक समूह एक विकी, संसाधन समूह तथा वार्ता हेतु परिचर्चा बोर्ड रखता है। "
+"समूह विषय वस्तु को वितरित करने तथा सम्प्रेषित करने का सरल मार्ग है। चाहे वो "
+"निजि तौर पर हो अथवा विश्व स्तरीय हो। कई बार विशिष्ट अभिरुचि या प्रकरण पर "
+"समूह पहले से उपस्थिति होते हैं। यदि आपको अपनी अभिरुच का समूह नहीं मिलता तो "
+"आप अपना समूह आरम्भ कर सकते हैं।\n"
+"समूह कैसे कार्य करते हैं? समूह सार्वजनिक (उपभोक्ता विषय वस्तु का संक्षिप्त "
+"विवरण अथवा रूप् रेखा पढ सकते हैं परंतु विषय वस्तु को पूर्णतः देख नहीं सकते "
+"है) अथवा पूर्णतः निजि रूप से अवरुध हो सकते हैं। प्रत्येक समूह एक विकी, "
+"संसाधन समूह तथा वार्ता हेतु परिचर्चा बोर्ड रखता है। "
 
 #: gnowsys_ndf/ndf/templates/ndf/group.html:31
 msgid "New Group"
@@ -1082,9 +1073,8 @@ msgid " <span>Group members</span> "
 msgstr " <span>समूह सदस्य</span> "
 
 #: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:144
-#, fuzzy
 msgid "Create a New Group"
-msgstr "नया बनायें"
+msgstr "नया समूह बनाएं"
 
 #: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:151
 msgid "List Members"
@@ -1097,44 +1087,42 @@ msgstr "सदस्यों की सूची"
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:155
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:184
 msgid "Please select "
-msgstr ""
+msgstr "कृपया चुनें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:27
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:48
-#, fuzzy
 msgid "Please fill valid "
-msgstr "कृपया वैध भरें % (क्षेत्र .विकल्प नाम)s!!!"
+msgstr "कृपया वैध भरें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:34
-#, fuzzy
 msgid "Please fill a valid  "
-msgstr "कृपया वैध भरें % (क्षेत्र .विकल्प नाम)s!!!"
+msgstr "कृपया वैध भरें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:41
 msgid "Please fill  "
-msgstr ""
+msgstr "कृपया भरें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:55
 msgid "Please set "
-msgstr ""
+msgstr "कृपया सेट करें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:68
 msgid "Please select  "
-msgstr ""
+msgstr "कृपया चुनें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:99
 #, fuzzy
 msgid "Upload! "
-msgstr "अपलोड"
+msgstr "अपलोड करें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:171
 msgid "Please select"
-msgstr ""
+msgstr "कृपया चुनें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:174
 #, fuzzy
 msgid "Select"
-msgstr "समूह चुनें"
+msgstr "चुनें"
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:174
 #: gnowsys_ndf/ndf/templates/notification/notice_settings.html:52
@@ -1145,7 +1133,7 @@ msgstr "बदलें"
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:179
 #, fuzzy
 msgid "Select "
-msgstr "समूह चुनें"
+msgstr "चुनें"
 
 #: gnowsys_ndf/ndf/templates/ndf/image_detail.html:4
 #: gnowsys_ndf/ndf/templates/ndf/video_detail.html:8
@@ -1177,7 +1165,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/mis_details.html:464
 #: gnowsys_ndf/ndf/templates/ndf/mis_list.html:111
 msgid "&#215"
-msgstr ""
+msgstr "&#215;"
 
 #: gnowsys_ndf/ndf/templates/ndf/invite_users.html:117
 msgid ""
@@ -1186,9 +1174,8 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/meeting.html:11
-#, fuzzy
 msgid "Video chat."
-msgstr "वीडियो"
+msgstr "वीडियो गपशप"
 
 #: gnowsys_ndf/ndf/templates/ndf/meeting.html:17
 #, fuzzy
@@ -1211,7 +1198,9 @@ msgstr "जोड़ें"
 msgid ""
 "Are you sure you want to delete? All of the following related items also "
 "will be deleted!"
-msgstr "क्या आप मिटानें के लिए तैयार है। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट जायेंगी"
+msgstr ""
+"क्या आप मिटानें के लिए तैयार है। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट "
+"जायेंगी"
 
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:27
 msgid ""
@@ -1228,12 +1217,11 @@ msgstr "उपभोक्ता नाम:"
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:39
 #, fuzzy
 msgid "Please fill username!"
-msgstr "कृपया भरें % (क्षेत्र .विकल्प नाम)s!!!"
+msgstr "कृपया उपभोक्ता का नाम भरें"
 
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:144
-#, fuzzy
 msgid "This group doesn't have a registered"
-msgstr "इस समूह में कोई संग्रह नहीं है"
+msgstr "इस समूह में कोई पंजीकृत नहीं है"
 
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:126
 #, python-format
@@ -1244,7 +1232,7 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:143
 msgid "Please give title for "
-msgstr ""
+msgstr "कृपया शीर्षक दीजिए"
 
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:194
 msgid "Attendence"
@@ -1253,7 +1241,7 @@ msgstr "उपस्थिति"
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:198
 #, fuzzy
 msgid "NUSSD Course"
-msgstr "पाठ्यक्रम"
+msgstr "NUSSD पाठ्यक्रम"
 
 #: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:202
 msgid "FC Check"
@@ -1329,100 +1317,85 @@ msgid "Enter Batch Name  "
 msgstr "बैच का नाम अंकित करें"
 
 #: gnowsys_ndf/ndf/templates/ndf/new_create_batch.html:115
-#, fuzzy
 msgid "Batch name required. "
-msgstr "आवश्यक समयः"
+msgstr "बैच के नाम की आवश्यकता"
 
 #: gnowsys_ndf/ndf/templates/ndf/new_create_batch.html:120
-#, fuzzy
 msgid "Choose members "
-msgstr "उपभोक्ता चुनें"
+msgstr "सदस्य चुनें"
 
 #: gnowsys_ndf/ndf/templates/ndf/newmeeting.html:21
 msgid "Accept invite  "
-msgstr ""
+msgstr "निमंत्रण स्वीकार"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:186
-#, fuzzy
 msgid "Collection Name "
-msgstr "संग्रह"
+msgstr "संग्रह का नाम"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:249
-#, fuzzy
 msgid "Make Module "
 msgstr "मॉड्यूल बनाओ"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:321
-#, fuzzy
 msgid "Contents "
-msgstr "विषय वस्तु"
+msgstr "विषय सूची"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:324
-#, fuzzy
 msgid " View"
 msgstr "देखें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:326
-#, fuzzy
 msgid "Changes "
 msgstr "बदलें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:327
 #: gnowsys_ndf/ndf/templates/ndf/person_details.html:56
-#, fuzzy
 msgid "Discuss "
 msgstr "परिचर्चा"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:339
 #: gnowsys_ndf/ndf/templates/ndf/person_details.html:54
-#, fuzzy
 msgid "Location "
 msgstr "स्थान"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:341
-#, fuzzy
 msgid "Graphs "
 msgstr "ग्राफ"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:345
 #: gnowsys_ndf/ndf/templates/ndf/person_details.html:48
-#, fuzzy
 msgid "Concept Graph "
 msgstr "संकल्पना ग्राफ"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:348
 #: gnowsys_ndf/ndf/templates/ndf/person_details.html:49
-#, fuzzy
 msgid "Collection Graph "
 msgstr "संग्रह ग्राफ"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:352
 #: gnowsys_ndf/ndf/templates/ndf/person_details.html:50
-#, fuzzy
 msgid "Dependency Graph "
 msgstr "निर्भरता ग्राफ"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:357
 msgid "Annotate "
-msgstr ""
+msgstr "टिप्पण"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:415
-#, fuzzy
 msgid "You may want to read these first: "
-msgstr "<h6>आप पहले ये पढ़ना चाहेंगे:</h6>"
+msgstr "आप पहले ये पढ़ना चाहेंगे"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:654
 msgid "Recent changes "
-msgstr ""
+msgstr "हालिया बदलाव"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:752
 msgid "In other languages:"
-msgstr ""
+msgstr "अन्य भाषा में"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:78
-#, fuzzy
 msgid "Add resources in this topic "
-msgstr "<a href=\"#add_resources\"> <b>इस प्रकरण पर संसाधन जोड़े</b> </a>"
+msgstr "इस प्रकरण पर संसाधन जोड़े"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:83
 #, fuzzy
@@ -1430,28 +1403,24 @@ msgid "Add Page "
 msgstr "टैग जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:87
-#, fuzzy
 msgid "Add New Page: "
-msgstr " <h3>नया पृष्ठ जोड़ें:</h3>"
+msgstr "नया पृष्ठ जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:115
-#, fuzzy
 msgid "Add File "
-msgstr "अपलोड हो चुकि फाइल"
+msgstr "फाइल जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:119
-#, fuzzy
 msgid "Add New File: "
-msgstr "नई फ़ाइल"
+msgstr "नई फ़ाइल जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:144
-#, fuzzy
 msgid "Add Events "
-msgstr "इवेंटस"
+msgstr "इवेंटस जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:149
 msgid "Add events feature will be comming soon "
-msgstr ""
+msgstr "जोड़ें गये विशेष इवेंटस शीघ्र आ रहे हैं"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:49
 msgid "Editing:"
@@ -1470,7 +1439,8 @@ msgstr "बनाएँ:"
 msgid ""
 "Please give your page a descriptive name. It's helpful for others and for "
 "yourself."
-msgstr "अपने पृष्ठ को एक विवरणात्मक नाम दें जो आपके और दूसरों के लिए सहायक होगा।"
+msgstr ""
+"अपने पृष्ठ को एक विवरणात्मक नाम दें जो आपके और दूसरों के लिए सहायक होगा।"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:63
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:260
@@ -1657,7 +1627,7 @@ msgstr "आकलन जोड़ें या संपादित करे�
 
 #: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:8
 msgid "Please enter a keyword. "
-msgstr ""
+msgstr "कृपया अपना कीवर्ड भरें"
 
 #: gnowsys_ndf/ndf/templates/ndf/online.html:16
 msgid "<h2>Meeting</h2>"
@@ -1744,22 +1714,22 @@ msgstr "संपादन:"
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:55
 #, fuzzy
 msgid "Register a New "
-msgstr "नया बनायें"
+msgstr "नया पंजीकरण"
 
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:59
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:63
 msgid "Fill"
-msgstr ""
+msgstr "फ़ाइल"
 
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:124
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:471
 msgid "Next"
-msgstr ""
+msgstr "आगे"
 
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:130
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:477
 msgid "Register"
-msgstr ""
+msgstr "पंजीकरण"
 
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:136
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:483
@@ -1797,7 +1767,7 @@ msgstr "+जोड़ें"
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:40
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:67
 msgid "Item"
-msgstr ""
+msgstr "वस्तु"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_details.html:7
 msgid ""
@@ -1838,24 +1808,21 @@ msgid "+ Add Quiz"
 msgstr "+ जोड़ें प्रश्नोत्तरी"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:79
-#, fuzzy
 msgid "Quiz Item"
-msgstr "प्रश्नोत्तरी"
+msgstr "प्रश्नोत्तरी वस्तु"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:82
 msgid "Type of Quiz"
-msgstr ""
+msgstr "प्रश्नोत्तरी के प्रकार"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:108
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:53
-#, fuzzy
 msgid "Question"
-msgstr "विवरण"
+msgstr "प्रश्न"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:117
-#, fuzzy
 msgid "Options"
-msgstr "क्रिया"
+msgstr "विकल्प"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:26
 msgid ""
@@ -1883,25 +1850,25 @@ msgstr "प्रेषक"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:59
 msgid "by "
-msgstr ""
+msgstr "अनुसार"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:62
-#, fuzzy
 msgid "Contributors:  "
-msgstr "शीर्ष योगदानकर्ता"
+msgstr "योगदानकर्ता"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:65
-#, fuzzy
 msgid "Last update:  "
-msgstr "आरंभ तिथिः"
+msgstr "अंतिम तिथिः"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_details.html:97
 msgid "Answer"
 msgstr ""
+"\t\n"
+"उत्तर"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:9
 msgid "About Quiz/QuizItem"
-msgstr ""
+msgstr "प्रश्नोत्तरी के बारे में/प्रश्नोत्तरी वस्तु"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:23
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:199
@@ -1910,24 +1877,23 @@ msgid "Quizzes"
 msgstr "प्रश्नोत्तरी"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:125
-#, fuzzy
 msgid "This group doesn't have any quiz. Be the first to create a Quiz!"
 msgstr ""
-"इस समूह में कोई प्रश्नोत्तरी-वस्तु नहीं है। <b>आप प्रश्नोत्तरी-वस्तु बनाने वाले प्रथम व्यक्ति हो "
-"सकते हैं</b>"
+"इस समूह में कोई प्रश्नोत्तरी-वस्तु नहीं है। <b>आप प्रश्नोत्तरी-वस्तु बनाने "
+"वाले प्रथम व्यक्ति हो सकते हैं</b>"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:137
 #, fuzzy
 msgid "Quiz Items"
-msgstr "प्रश्नोत्तरी"
+msgstr "प्रश्नोत्तरी वस्तु"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:150
 #, fuzzy
 msgid ""
 "This group doesn't have any quiz-items. Be the first to create a Quiz-Item!"
 msgstr ""
-"इस समूह में कोई प्रश्नोत्तरी-वस्तु नहीं है। <b>आप प्रश्नोत्तरी-वस्तु बनाने वाले प्रथम व्यक्ति हो "
-"सकते हैं</b>"
+"इस समूह में कोई प्रश्नोत्तरी-वस्तु नहीं है। <b>आप प्रश्नोत्तरी-वस्तु बनाने "
+"वाले प्रथम व्यक्ति हो सकते हैं</b>"
 
 #: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:3
 #, fuzzy
@@ -1936,7 +1902,7 @@ msgstr "सदस्यों की सूची"
 
 #: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:7
 msgid "For the course:  "
-msgstr ""
+msgstr "पाठ्यक्र के लिए:"
 
 #: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:13
 msgid "Users"
@@ -1973,51 +1939,49 @@ msgstr "शेल्फ"
 
 #: gnowsys_ndf/ndf/templates/ndf/shelf.html:53
 msgid "the resource already exists."
-msgstr ""
+msgstr "संसाधन पहले से ही उपलब्ध है"
 
 #: gnowsys_ndf/ndf/templates/ndf/shelf.html:66
-#, fuzzy
 msgid "Add "
-msgstr "टैग जोड़ें"
+msgstr "जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:341
 msgid "Passing Year"
-msgstr ""
+msgstr "उत्तीर्ण वर्ष"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:352
 msgid "Passing Certificate"
-msgstr ""
+msgstr "उत्तीर्ण प्रमाण-पत्र"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:368
-#, fuzzy
 msgid "Degree Name"
-msgstr "पृष्ठ नाम"
+msgstr "उपाधि का नाम"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:376
 msgid "Degree Year"
-msgstr ""
+msgstr "उपाधि वर्ष"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:384
 msgid "Enroll. (or Roll) No."
-msgstr ""
+msgstr "पंजीकरण (या अनुक्रमांक) संख्या"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:395
 msgid "Stream(Main Subject)"
-msgstr ""
+msgstr "वर्ग (मुख्य विषय)"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:403
 msgid "College"
-msgstr ""
+msgstr "महाविद्यालय"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:411
 #, fuzzy
 msgid "Registered for NSS?"
-msgstr "अकाउन्ट हेतु पंजीकरण"
+msgstr "एन.एस.एस. हेतु पंजीकरण"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:427
 #, fuzzy
 msgid "Registration Year"
-msgstr "पंजीकरण बंद हो गया है"
+msgstr "पंजीकरण पंजीकरण वर्ष"
 
 #: gnowsys_ndf/ndf/templates/ndf/tag_browser.html:6
 msgid "Will appear very soon .... "
@@ -2098,7 +2062,9 @@ msgstr "खोलिये"
 msgid ""
 "Are you sure you want to delete? All of the related items for the following "
 "themes also will be deleted:"
-msgstr "क्या आप मिटानें के लिए तैयार है। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट जायेंगी"
+msgstr ""
+"क्या आप मिटानें के लिए तैयार है। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट "
+"जायेंगी"
 
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:43
 #, fuzzy
@@ -2113,7 +2079,7 @@ msgstr "देखें%"
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:77
 #, fuzzy
 msgid " Name "
-msgstr "फ़ाइल नाम"
+msgstr "नाम"
 
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:84
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:95
@@ -2145,9 +2111,8 @@ msgstr "देखें%"
 
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:88
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:159
-#, fuzzy
 msgid "Name"
-msgstr "फ़ाइल नाम"
+msgstr "नाम"
 
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:170
 #, fuzzy
@@ -2195,9 +2160,8 @@ msgid "Upload Profile Picture"
 msgstr "प्रोफ़ाइल तस्वीर अपलोड करें"
 
 #: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:42
-#, fuzzy
 msgid "image is already uploaded please choose different image"
-msgstr "यह फाइल अपलोड की जा चुकी है कृपया अन्य फाइल चुने।"
+msgstr "यह छवि पहले से अपलोड है कृपया अन्य छवि चुनिए"
 
 #: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:55
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:55
@@ -2207,32 +2171,33 @@ msgstr "कृपया प्रोफ़ाइल तस्वीर अपल
 #: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:61
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:61
 msgid "You are Not Authorised user please login to upload profile picture"
-msgstr "आप अधिकृत उपभोक्ता नहीं हैं। कृपया प्रोफाइल छवि अपलोड करने से पहले लॉगिन करें।"
+msgstr ""
+"आप अधिकृत उपभोक्ता नहीं हैं। कृपया प्रोफाइल छवि अपलोड करने से पहले लॉगिन "
+"करें।"
 
 #: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:65
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:65
 msgid "Welcome "
-msgstr ""
+msgstr "स्वागत है"
 
 #: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:66
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:66
 #, fuzzy
 msgid "Registerd on: "
-msgstr "अकाउन्ट हेतु पंजीकरण"
+msgstr "पंजीकरण खुलें हैं"
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:10
 msgid "Dashboard shows users' own activities in the site."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:42
-#, fuzzy
 msgid "File is already uploaded. Please choose a different file."
 msgstr "यह फाइल अपलोड की जा चुकी है कृपया अन्य फाइल चुने।"
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:80
 #, fuzzy
 msgid "Created Resources by "
-msgstr "(उपभोक्ता नाम) संसाधन बनाया गया है"
+msgstr "संसाधन बनाया गया है"
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:85
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:287
@@ -2320,7 +2285,7 @@ msgstr "संयोजक:"
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:446
 msgid "modified: "
-msgstr ""
+msgstr "संशोधित:"
 
 #: gnowsys_ndf/ndf/templates/ndf/userpreferences.html:3
 msgid "Preferences"
@@ -2465,9 +2430,8 @@ msgid "Awesome. I have it."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/wikidata.html:10
-#, fuzzy
 msgid "items found "
-msgstr "कोई फाईल नहीं पायी गयी है"
+msgstr "वस्तुएँ पाई गईं हैं"
 
 #: gnowsys_ndf/ndf/templates/ndf/wikidata.html:29
 msgid "Sorry, no topics are available."
@@ -2496,14 +2460,12 @@ msgid "Wikipedia Page Link:"
 msgstr "विकिपीडिया पृष्ठ लिंक:"
 
 #: gnowsys_ndf/ndf/templates/ndf/wikidata.html:213
-#, fuzzy
 msgid "Attributes:"
-msgstr "गतिशील विशेषताएँ:"
+msgstr "विशेषताएँ:"
 
 #: gnowsys_ndf/ndf/templates/ndf/wikidata.html:225
-#, fuzzy
 msgid "Relations:"
-msgstr "गतिशील संबंध:"
+msgstr "संबंध:"
 
 #: gnowsys_ndf/ndf/templates/ndf/wikidata.html:230
 msgid "Sorry, no relations in this list."
@@ -2540,7 +2502,7 @@ msgstr "सूचनाएँ"
 
 #: gnowsys_ndf/ndf/templates/notification/email_body.txt:1
 msgid "You have received the following notice from the site: "
-msgstr ""
+msgstr "साइट से आप निम्नलिखित सुचनाएँ प्राप्त कर सकते है:"
 
 #: gnowsys_ndf/ndf/templates/notification/email_subject.txt:1
 #: gnowsys_ndf/notification/templates/notification/email_subject.txt:1
@@ -2562,12 +2524,12 @@ msgstr "सूचनाएँ"
 
 #: gnowsys_ndf/ndf/templates/notification/notice_settings.html:18
 msgid "You do not have a verified email address to which notices can be sent."
-msgstr ""
+msgstr "आपका ईमेल पता सत्यापित नहीं जिसपर सूचनाएँ भेजी जा सकें"
 
 #: gnowsys_ndf/ndf/templates/notification/notice_settings.html:18
 #, fuzzy
 msgid "Add one "
-msgstr "मॉड्यूल जोड़ें"
+msgstr "एक नया जोड़ें"
 
 #: gnowsys_ndf/ndf/templates/notification/notice_settings.html:27
 #: gnowsys_ndf/notification/templates/notification/notice_settings.html:27
@@ -2575,22 +2537,20 @@ msgid "Notification Type"
 msgstr "सूचना किस्म"
 
 #: gnowsys_ndf/ndf/templates/notification/short.txt:5
-#, fuzzy
 msgid "Activity notification from"
-msgstr "सक्रियता समस्या"
+msgstr "गतिविधि अधिसूचना से"
 
 #: gnowsys_ndf/ndf/templates/online_status/example.html:4
-#, fuzzy
 msgid "Users online"
 msgstr "उपभोक्ता ऑनलाइन"
 
 #: gnowsys_ndf/ndf/templates/online_status/example.html:7
 msgid "Status for user "
-msgstr ""
+msgstr "उपभोक्ता हेतु स्थिति"
 
 #: gnowsys_ndf/ndf/templates/online_status/example.html:10
 msgid "My status "
-msgstr ""
+msgstr "मेरी स्थिति"
 
 #: gnowsys_ndf/ndf/templates/registration/activate.html:4
 #: gnowsys_ndf/ndf/templates/registration/activation_complete.html:4
@@ -2603,7 +2563,7 @@ msgstr "सक्रियता समस्या"
 
 #: gnowsys_ndf/ndf/templates/registration/activate.html:14
 msgid "Thanks"
-msgstr ""
+msgstr "धन्यवाद"
 
 #: gnowsys_ndf/ndf/templates/registration/activate.html:14
 #, fuzzy
@@ -2617,18 +2577,17 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/activation_complete.html:12
-#, fuzzy
 msgid "Thanks, activation complete!"
-msgstr "सक्रियता पूर्ण हुई"
+msgstr "धन्यवाद, सक्रियता पूर्ण हुई"
 
 #: gnowsys_ndf/ndf/templates/registration/activation_complete.html:14
 msgid "You may now login using the username and password."
 msgstr ""
+"अब आप लॉगिंन करने के लिए उपभोक्ता नाम तथा कूटशब्द का प्रयोग कर सकते हैं।"
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.html:9
-#, fuzzy
 msgid "Account registration "
-msgstr "खाता पजीकृकरण हेतु %(साईट नाम)"
+msgstr "खाता पजीकृकरण"
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.html:11
 msgid ""
@@ -2644,30 +2603,28 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.html:22
 msgid "Sincerely,"
-msgstr ""
+msgstr "ईमानदारी से"
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.html:23
 msgid "Management Team"
-msgstr ""
+msgstr "प्रबंधन दल"
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email_subject.txt:1
-#, fuzzy
 msgid "Account registration for"
-msgstr "खाता पजीकृकरण हेतु %(साईट नाम)"
+msgstr "खाता पजीकृकरण हेतु"
 
 #: gnowsys_ndf/ndf/templates/registration/login.html:18
-#, fuzzy
 msgid "Please give a valid email. "
-msgstr "कृपया वैध भरें % (क्षेत्र .विकल्प नाम)s!!!"
+msgstr "कृपया एक वैद्य ईमेल दीजिए"
 
 #: gnowsys_ndf/ndf/templates/registration/login.html:36
 #, fuzzy
 msgid "Forgot your password?"
-msgstr "सेट कूटशब्द "
+msgstr "आप कूटशब्द भूल गए"
 
 #: gnowsys_ndf/ndf/templates/registration/login.html:46
 msgid "Don't have an account? Register yourself now. "
-msgstr ""
+msgstr "आपका कोई खाता नहीं है कृपया पहले अपना पंजीकरण करें"
 
 #: gnowsys_ndf/ndf/templates/registration/logout.html:4
 msgid "Logged out"
@@ -2693,11 +2650,11 @@ msgstr "कूटशब्द फिर सेट करें पूर्ण �
 #: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:11
 #, fuzzy
 msgid "Great! Your password has been reset! "
-msgstr "आपका कूटशब्द सफलतापूर्वक बदल गया है"
+msgstr "आपका कूटशब्द सफलतापूर्वक रिसेट गया है"
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:12
 msgid "You may now log in "
-msgstr ""
+msgstr "अब आप लागिंन कर सकते हैं"
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:4
 msgid "Confirm password reset"
@@ -2718,12 +2675,11 @@ msgstr "कूटशब्द फिर सेट करें"
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:9
 msgid "Work done for you! "
-msgstr ""
+msgstr "आपका कार्य पूर्ण हुआ"
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:11
-#, fuzzy
 msgid "We have sent you an email with a link to reset your password. "
-msgstr "फिर से सेट करने के लिए अपना नया कूटशब्द भरें"
+msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:12
 msgid "Please check your email and click the link to continue. "
@@ -2757,9 +2713,8 @@ msgid "Registration Closed"
 msgstr "पंजीकरण बंद हो गया है"
 
 #: gnowsys_ndf/ndf/templates/registration/registration_closed.html:12
-#, fuzzy
 msgid "Sorry, registration closed!  "
-msgstr "पंजीकरण बंद हो गया है"
+msgstr "क्षमा करें, पंजीकरण बंद हो गया है"
 
 #: gnowsys_ndf/ndf/templates/registration/registration_complete.html:4
 msgid "Activation email sent"
@@ -2780,13 +2735,16 @@ msgid "Register for an account"
 msgstr "अकाउन्ट हेतु पंजीकरण"
 
 #: gnowsys_ndf/ndf/templates/registration/registration_form.html:20
-#, fuzzy
 msgid "Group agency type"
-msgstr "समूह प्रकार"
+msgstr ""
+"\n"
+"समूह एजेंसी प्रकार"
 
 #: gnowsys_ndf/ndf/templates/registration/registration_form.html:29
 msgid "Affiliation"
 msgstr ""
+"\n"
+"संबद्धता"
 
 #: gnowsys_ndf/ndf/templates/registration/registration_form.html:36
 msgid "Send activation email"

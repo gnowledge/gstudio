@@ -3,7 +3,7 @@
 <div id="rating-bar" class="show-on-hover">
     <form>
         
-    <h6>Rating <span class="subheader" id="avg-rating">{{ratings.tot|default:"unrated"}}</span></h6>
+    <h6>{% trans "Rating" %} <span class="subheader" id="avg-rating">{{ratings.tot|default:"unrated"}}</span></h6>
      
        {% get_node_ratings request node as ratings %}
       
@@ -68,7 +68,7 @@ nodeId=$(".rating-bar").attr("data-node");
 
     //Sets the number of stars in the rating bar
     function setStars(stars){
-        $(".rating-bar input[value="+stars+"]").attr("checked","checked");
+        $(".rating-bar input[value="+stars+"]").prop("checked",true);
     }
     
 </script>
