@@ -47,6 +47,7 @@ collection_tr = db[Triple.collection_name]
 gst_page = collection.Node.one({'_type': 'GSystemType', 'name': GAPPS[0]})
 history_manager = HistoryManager()
 rcs = RCS()
+app=collection.Node.one({'name':u'Page','_type':'GSystemType'})
 
 #######################################################################################################################################
 # VIEWS DEFINED FOR GAPP -- 'PAGE'
@@ -110,6 +111,7 @@ def page(request, group_id, app_id=None):
 
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
+                                 'appId':app._id,
                                  'searching': True, 'query': search_field,
                                  'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                 }, 
@@ -135,6 +137,7 @@ def page(request, group_id, app_id=None):
 
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
+                                     'appId':app._id,
                                      'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                     }, 
                                     context_instance=RequestContext(request))
@@ -158,6 +161,7 @@ def page(request, group_id, app_id=None):
           
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
+                                     'appId':app._id,
                                      'page_nodes':content,
                                      'groupid':group_id,
                                      'group_id':group_id
@@ -194,6 +198,7 @@ def page(request, group_id, app_id=None):
 
           return render_to_response("ndf/page_list.html",
                                     {'title': title,
+                                     'appId':app._id,
                                      'page_nodes': page_nodes,
                                      'groupid':group_id,
                                      'group_id':group_id
@@ -251,6 +256,7 @@ def page(request, group_id, app_id=None):
         page_node.get_neighbourhood(page_node.member_of)
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
+                                    'appId':app._id,
                                     'group_id': group_id,
                                     'shelf_list': shelf_list,
                                     'annotations': annotations,
@@ -440,6 +446,7 @@ def version_node(request, group_id, node_id, version_no):
     return render_to_response("ndf/version_page.html",
                               {'view': view,
                                'node': node,
+                               'appId':app._id,
                                'group_id':group_id,
                                'groupid':group_id,
                                'selected_versions': selected_versions,
@@ -544,6 +551,7 @@ def translate_node(request,group_id,node_id=None):
             
         return render_to_response("ndf/translation_page.html",
                                {'content': content,
+                                'appId':app._id,
                                 'node':node,
                                 'node_name':node_name,
                                 'groupid':group_id,
@@ -668,6 +676,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      
      return render_to_response("ndf/version_page.html",
                                {'view': view,
+                                'appId':app._id,
                                 'version_no':version_1,
                                 'node':node,
                                 'groupid':group_id,
@@ -703,6 +712,7 @@ def revert_doc(request,group_id,node_id,version_1):
    
    return render_to_response("ndf/version_page.html",
                                {'view': view,
+                                'appId':app._id,
                                 'selected_versions': selected_versions, 
                                 'node':node,
                                 'groupid':group_id,

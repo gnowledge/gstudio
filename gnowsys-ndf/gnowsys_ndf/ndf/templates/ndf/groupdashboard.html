@@ -5,6 +5,8 @@
 {% block title %} Group Dashboard {% endblock %}
 
 {% block head %}
+<link rel="/static/ndf/bower_components/slick-carousel/slick/slick.css">
+<script src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js"> </script>
 
 <script type="text/javascript" >
   var chk_login = "{{ user }}";
@@ -126,19 +128,27 @@ $(document).ready(function()
 
 <!-- overide meta_content block from base.html -->
 {% block meta_content %}
-  {% blocktrans %}<h3>Dashboard</h3>{% endblocktrans %}
 
 <h4><i class="fi-torsos"></i>{{node.author_set|length}}{% blocktrans %} <span>Group members</span> {% endblocktrans %}</h4>
 {% endblock %}
 
-{% block concern_information %}
+{% block app_action_list %}
 
   {% check_is_user_group group_id as is_user_group %}
   {% get_policy node request.user as policy  %}
 
+{% get_create_url node.pk as create_url %}
+{% if request.user.is_superuser %}
+            <li>
+              <a href="{% url create_url group_name_tag %}">
+                <span class="fi-plus"> {% trans "Create a New Group" %}</span>
+              </a>
+            </li>
+            {% endif %}
+
   {% if policy %}
   <!-- Triggers the modals -->
-  <a href="#" id ="btn_list_member" data-reveal-id="firstModal" class="radius button small">{% trans "List Members" %}</a>
+  <li><a href="#" id ="btn_list_member" data-reveal-id="firstModal">{% trans "List Members" %}</a></li>
 
   <!-- Reveal Modals begin -->
   <div id="firstModal" class="reveal-modal" data-reveal></div>
@@ -153,18 +163,18 @@ $(document).ready(function()
   {% if user.is_authenticated %}
   {% if user_is_joined == "joined" %}
     {% if is_user_group and node.created_by != request.user %}
-    <input class="button small" type="submit" id="notify" value="Stop following" class="button" align="center" style="visibility:visible" >
+    <li><input class="button" type="submit" id="notify" value="Stop following"></li>
 
     {% else %}
-    <input class="button small" type="submit" id="notify" value="Unsubscribe" class="button" align="center" style="visibility:visible">
+    <li><input class="button" type="submit" id="notify" value="Unsubscribe"></li>
     {% endif %} 
 
   {% elif user_is_joined == "not" or not user.is_authenticated %}
     {% if is_user_group and node.created_by != request.user %}
-    <input class="button small" type="submit" id="notify" value="Follow" class="button" align="center" style="visibility:visible" >
+    <li><input class="button" type="submit" id="notify" value="Follow"></li>
 
     {% else %}
-    <input class="button small" type="submit" id="notify" value="Join" class="button" align="center" style="visibility:visible" >
+    <li><input class="button" type="submit" id="notify" value="Join"></li>
     {% endif %}
 
   {% endif %}
@@ -178,10 +188,8 @@ $(document).ready(function()
     {% include "ndf/invite_admins.html" %}
   {% endif %} 
 
-<a data-reveal-id="intro-page">.</a>
 
-    <a href="{% url 'groupchange' groupname  %}">{{ groupname.name }}</a>
-
+{% endblock %}
 
   <!-- SCRIPT ADDED TO ALLOW SEARCH ON THE ITEMS IN THE GROUP -->
 <!-- Seems to be redundant with the top bar search
@@ -226,16 +234,18 @@ $(document).ready(function()
   </script>
 -->
 
-{% endblock %}
+
 
 
 {% block body_content %}
 
 <!--Place for group splash page design-->
+<a data-reveal-id="landing-page">.</a>
 
-<div id="intro-page" class="reveal-modal x-large" data-reveal>
+<div id="landing-page" class="reveal-modal full" data-reveal>
     
-    
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Panthera_tigris7.jpg/450px-Panthera_tigris7.jpg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Tagore3.jpg">
 
   <div class="large-4 small-centered columns">
     <h2>Do things:</h2>
@@ -247,6 +257,10 @@ $(document).ready(function()
   </div>
 
 </div>
+
+<script type="text/javascript" >
+    $('[data-reveal-id="landing-page"]').trigger('click');
+    </script>
 
 {{ block.super }}
 

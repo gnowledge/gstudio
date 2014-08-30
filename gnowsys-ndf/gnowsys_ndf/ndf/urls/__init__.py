@@ -16,6 +16,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^online/', include('online_status.urls')),                                #for online_users  
     (r'^i18n/', include('django.conf.urls.i18n')),
+    (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
     (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
     (r'^admin/designer/', include('gnowsys_ndf.ndf.urls.adminDesignerDashboard')),
     (r'^raw/(?P<name>.+)/', 'gnowsys_ndf.mobwrite.views.raw'),
@@ -111,8 +112,8 @@ urlpatterns = patterns('',
         name='password_reset'
     ),
     
+     (r'^accounts/', include('registration_email.backends.default.urls')),
     url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm)),
-    (r'^accounts/', include('registration.backends.default.urls')),
-    
+   
     url(r'^Beta/', TemplateView.as_view(template_name= 'gstudio/beta.html'), name="beta"),
 )

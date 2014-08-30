@@ -47,6 +47,8 @@ sitename=Site.objects.all()[0]
 
 ##################
 collection = get_database()[Node.collection_name]
+app=collection.Node.one({'name':u'Meeting','_type':'GSystemType'})
+
 ##################
 
 def output(request, group_id, meetingid):                                                               #ramkarnani
@@ -66,7 +68,7 @@ def output(request, group_id, meetingid):                                       
             pass
             #template = "https://chatb/#"+meetingid
 	
-	return render_to_response("ndf/newmeeting.html",{'group_id': group_id,'groupid':group_id,'newmeetingid':newmeetingid},context_instance=RequestContext(request))
+	return render_to_response("ndf/newmeeting.html",{'group_id': group_id, 'appId':app._id, 'groupid':group_id,'newmeetingid':newmeetingid},context_instance=RequestContext(request))
 
 
 
@@ -93,7 +95,7 @@ def dashb(request, group_id):                                                   
     
     
 
-    return render_to_response("ndf/meeting.html",{'group_id': group_id,'groupid':group_id,'online_users':online_users,'meetingid':ins_objectid},context_instance=RequestContext(request))
+    return render_to_response("ndf/meeting.html",{'group_id': group_id,'appId':app._id,'groupid':group_id,'online_users':online_users,'meetingid':ins_objectid},context_instance=RequestContext(request))
 
 #### Ajax would be called here to get refreshed list of online members
 def get_online_users(request, group_id):                                                                        #ramkarnani

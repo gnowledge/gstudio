@@ -152,7 +152,7 @@
 </style>
 
 {% if user.is_authenticated %}
-<a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> 
+<!--<a id="toggle-shelf" class="right-off-canvas-toggle right" ><i class='fi-book-bookmark'></i></a> -->
 {% endif %}
 
 <!-- Icon to add annotations -->
@@ -183,7 +183,7 @@
   <section class="medium-9 columns" >
     <ul class="breadcrumbs">
       <li><a href="/{{groupid}}">{{groupid}}</a></li>
-      {% blocktrans %}<li><a href="#">Collection Name</a></li>{% endblocktrans %}
+      <li><a href="#">{% trans "Collection Name " %}</a></li>
     </ul>
 
 
@@ -246,7 +246,7 @@
           {% if node.collection_set and user.is_authenticated %}
             {% if user_access == "allow" %}
             <li>
-             {% blocktrans %} <a href="#" id="module">Make Module</a>{% endblocktrans %}
+             <a href="#" id="module">{% trans "Make Module " %}</a>
             </li>
             {% endif %}
           {% endif %}
@@ -266,6 +266,9 @@
           {% get_create_url node.pk as create_url %}
 
           {% if is_group %}
+            
+<!-- 
+This section has been integrated to groupdashboard and appears in block app_action_list
             {% if request.user.is_superuser %}
             <li>
               <a href="{% url create_url group_name_tag %}">
@@ -273,12 +276,13 @@
               </a>
             </li>
             {% endif %}
+-->
 
           {% else %}
             {% if node.member_of_names_list.0 == "File" %}
             <li>
               <a href="{% url create_url group_name_tag %}?next={{request.path}}">
-                {% blocktrans %}<span class="fi-upload">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+                <span class="fi-upload">&nbsp;&nbsp; {% trans "New " %} {{node.member_of_names_list.0}}</span>
               </a>
             </li>
 
@@ -287,13 +291,13 @@
               
                 <li>
                   <a href="{% url create_url group_name_tag app_id %}">
-                  {% blocktrans %}  <span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New " %} {{node.member_of_names_list.0}}</span>
                   </a>
                 </li>
               {% else %}
                 <li>
                   <a href="{% url create_url group_name_tag %}">
-                    {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp; New {{node.member_of_names_list.0}}</span>{% endblocktrans %}
+                    <span class="fi-plus">&nbsp;&nbsp; {% trans "New " %} {{node.member_of_names_list.0}}</span>
                   </a>
                 </li>
               {% endif %}
@@ -314,13 +318,13 @@
       <dl class="tabs" data-tab> 
           
         {% if topic %}
-       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% blocktrans %}Contents{% endblocktrans %}</a></dd>
+       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% trans "Contents " %}</a></dd>
         {% endif %}
 
-        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% blocktrans %}View{% endblocktrans %}</a></dd>
+        <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% trans " View" %}</a></dd>
 
-     <dd><a href="#view-changes"><i class="fi-clock"></i> {% blocktrans %}Changes{% endblocktrans %}</a></dd>
-          <dd><a href="#view-discussion"><i class="fi-comment"></i> {% blocktrans %}Discuss{% endblocktrans %}</a></dd>
+     <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes " %}</a></dd>
+          <dd><a href="#view-discussion"><i class="fi-comment"></i> {% trans "Discuss " %}</a></dd>
           
       </dl>
       </h1>
@@ -332,25 +336,25 @@
         
         <!-- Modal links for associated views like graphs and map-->
         <ul class="side-nav">
-  <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% blocktrans %}Location{% endblocktrans %}</a></li>
+  <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location " %}</a></li>
             
-  <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% blocktrans %}Graphs{% endblocktrans %}</a>
+  <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs " %}</a>
             </li>
             
             <ul id="graph-list" class="f-dropdown" data-dropdown-content>
-  <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% blocktrans %}Concept Graph{% endblocktrans %}</a></li>
+  <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph" id="clickConceptGraph">{% trans "Concept Graph " %}</a></li>
                     
                     {% if node.collection_set %}
-                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% blocktrans %}Collection Graph{% endblocktrans %}</a></li>
+                      <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph " %}</a></li>
                     {% endif %}
           
                     {% if node.prior_node %}
-                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% blocktrans %}Dependency Graph{% endblocktrans %}</a></li>
+                      <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph " %}</a></li>
                     {% endif %}               
 </ul>
            <li>
                 <a id = "toggleContainer"  href="#" onClick="toggle(this);">
-        <i class="fi-comments annotateIcon"></i> {% blocktrans %}Annotate{% endblocktrans %}
+        <i class="fi-comments annotateIcon"></i> {% trans "Annotate " %}
       </a></li> 
 </ul>
 
@@ -398,7 +402,7 @@
 
 <div class="row">
 	
-  <section class="medium-9 columns">
+  <section class="medium-9 columns content">
 
     <div class="tabs-content">
 
@@ -408,7 +412,7 @@
 	<div class="small-4 columns">
         {% if node.prior_node|length > 0 %}
         <div class="panel">
-          {% blocktrans %}<h6>You may want to read these first:</h6>{% endblocktrans %}
+          <h6>{% trans "You may want to read these first: " %}</h6>
           {% for index_key, each_node in node.prior_node_dict.items %}
           {% get_grid_fs_object each_node as grid_fs_obj %}
           {% if each_node.mime_type %}
@@ -423,14 +427,15 @@
 	<div class="small-4 columns">
 	{% if node.teaches %}
 	<div class="panel">
-		<h6>This resource teaches you these</h6>
+		<h6>This resource teaches you: </h6>
 		
 	 {% for  each_node in node.teaches %}
 	 {% get_grid_fs_object each_node as grid_fs_obj %}
           {% if each_node.mime_type %}
           <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
           {% else %}
-          <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+          <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>
+          {% if not forloop.last %},&nbsp; {% endif %}
           {% endif %}
           {% endfor %}
 	</div>
@@ -459,67 +464,67 @@
           {% get_grid_fs_object node as grid_fs_obj %}
 
           {% if 'Pandora_video' in node.member_of_names_list %}
-          <div>
-           
-      <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
-              <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
-              {% trans "Your browser does not support the video tag." %}
-            </video><br/><br/>
+            <div>
+              <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
+                  <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
+                  {% trans "Your browser does not support the video tag." %}
+              </video><br/><br/>
 
-      {% get_pandoravideo_metadata video_obj as metadata %}
-      {% for k,v in metadata.items %} 
-            {% if k != "cuts" %}
-      <h3>{{k}} : {{v}}<h3>
-    <br/>
-    {% endif %}
-      {% endfor %}
-            {% if user.is_authenticated %}
-            <br/>
-            <br/>
-            <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm" > 
-              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
-            </a>
-            {% endif %}
-          </div>
+              {% get_pandoravideo_metadata video_obj as metadata %}
+              {% for k,v in metadata.items %} 
+                    {% if k != "cuts" %}
+                      <h3>{{k}} : {{v}}<h3>
+                      <br/>
+                    {% endif %}
+              {% endfor %}
+              {% if user.is_authenticated %}
+                <br/>
+                <br/>
+                <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
+                  <span class="fi-download large"> {% trans "Download " %} </span>
+                </a>
+              {% endif %}
+            </div>
 
           {% elif 'video' in node.mime_type %}
-          <div>
-            <video width="640px" controls buffered>
-              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-              {% trans "Your browser does not support the video tag." %}
-            </video>
+            <div>
+              <video width="640px" controls buffered>
+                <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
+                <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
+                {% trans "Your browser does not support the video tag." %}
+              </video>
 
-            {% if user.is_authenticated %}
-            <br/>
-            <br/>
-            <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
-              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
-            </a>
-            {% endif %}
-          </div>
-    
+              {% if user.is_authenticated %}
+              <br/>
+              <br/>
+              <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
+                <span class="fi-download large"> {% trans "Download " %} </span>
+              </a>
+              {% endif %}
+            </div>
+
           {% else %}    
-          <div>
-            {% if 'image' in node.mime_type %}
-            <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-              <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}">
-            </a>
+            {{node.mime_type}}
+            <div>
+              {% if 'image' in node.mime_type %}
+              <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+                <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}">
+              </a>
 
-            {% else %}
-            <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-              {{ grid_fs_obj.filename }}
-            </a>
-            {% endif %}
+              {% else %}
+              <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+                {{ grid_fs_obj.filename }}
+              </a>
+              {% endif %}
 
-            {% if user.is_authenticated %}
-            <br/>
-            <br/>
-            <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-              {% blocktrans %}<span class="fi-download large"> Download </span>{% endblocktrans %}
-            </a>
-            {% endif %}
-          </div>
+              {% if user.is_authenticated %}
+              <br/>
+              <br/>
+              <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                <span class="fi-download large"> {% trans "Download " %} </span>
+              </a>
+              {% endif %}
+            </div>
     
           {% endif %}
     
@@ -575,52 +580,33 @@
         <div class="content active" id="contents"> 
           
           {% get_contents node.pk as contents %}
-          <fieldset id="image_contents">
-           {% blocktrans %} <legend>Images</legend>{% endblocktrans %}
+          {% for k,v in contents.items %}    
 
-            {% for k,v in contents.items %}
-              {% if k == "image_contents" %}
-                {% for e in v %}
-                  <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
-                    <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
-                    <br/><div>{{e.0}}</div>
-                  </a>&nbsp;&nbsp;&nbsp;&nbsp;
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
+            <fieldset id="{{k}}">
+              <legend>{{k}}</legend>
 
-          </fieldset>
-
-          <fieldset id="video_contents">
-            {% blocktrans %}<legend>Videos</legend>{% endblocktrans %}
-            {% for k,v in contents.items %}
-              {% if k == "video_contents" %}
-                {% for e in v %}
-                  <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
-                    <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
-                    <br/><div>{{e.0}}</div>
-                  </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
-
-          </fieldset>
-
-          <fieldset id="document_contents">
-            <legend>{% blocktrans %}Documents{% endblocktrans %}</legend>
-            {% for k,v in contents.items %}
               {% for e in v %}
+                {% if k == "Images" %}
+                    <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
+                      <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
+                      <br/><div>{{e.0}}</div>
+                    </a>&nbsp;&nbsp;&nbsp;&nbsp;
 
-                {% if k == "page_contents" %}
-                  <a href="{% url 'page_details' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
-                {% elif k == "document_contents" %}
-                  <a href ="{% url 'file_detail' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
-                {% endif %}              
+                {% elif k == "Videos" %}
+                    <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
+                      <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
+                      <br/><div>{{e.0}}</div>
+                    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
+                {% else %}
+                    <a href ="{% url 'file_detail' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
+                {% endif %}
+                
               {% endfor %}
-            {% endfor %}
+            </fieldset>
 
-          </fieldset>
+          {% endfor %}
+          
 
         </div>
       {% endif %}
@@ -665,7 +651,7 @@
         Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
             </p>
         
-          <h4>{% blocktrans %}Recent changes{% endblocktrans %}:</h4>
+          <h4>{% trans "Recent changes " %}:</h4>
         <ul class="side-nav">
         {% for seq_no, version_no in node.version_dict.items|slice:"-20:" reversed %}
           <li title="Version #{{version_no}}">

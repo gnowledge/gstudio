@@ -19,7 +19,7 @@
   {% if user_access == "allow" %}
 
       <a class="small button" href="{% url 'create_edit' group_name_tag %}">
-        <span class="fi-plus">&nbsp;&nbsp;{% blocktrans %} New {{title}} {% endblocktrans %}</span>
+        <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
       </a>
 
   {% endif %}

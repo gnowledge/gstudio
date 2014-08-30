@@ -15,7 +15,7 @@
     <div class="small-11 columns">
       {% include included_template_name with var_name=field.name var_placeholder="Enter the content here" var_value=field_value|default_if_none:"" node_id=node_id %}
       {% if is_required_field %}
-      <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>
+      <small class="error">{% with alt=field.altnames %}{% trans "Please select " %} {{alt}}!</small> {% endwith%}
       {% endif %}
     </div>
   </div>
@@ -24,28 +24,35 @@
     <input type="email" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %}Please fill valid {{alt}}!!!{% endblocktrans %}</small>
+    <small class="error">{%  with alt=field.altnames %}{% trans "Please fill valid " %}{{alt}}!</small>
+    {% endif %}
+
+  {% elif field.validators.0 == "tel" %}
+    <input type="tel" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" placeholder="{{field.help_text}}" {% if is_required_field %}required{% endif %} pattern="{{field.validators.1}}" style="float:left; width:95%"/>
+    {% if is_required_field or field.validators %}
+    <i style="color:red; float:left display:inline">*</i>
+    <small class="error">{%  with alt=field.help_text %}{% trans "Please fill a valid  " %} {{alt}}!</small>
     {% endif %}
 
   {% elif field_type == "unicode" or field_type == "basestring" %}
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %}Please fill {{alt}}!!!{% endblocktrans %}</small>
+    <small class="error">{% with alt=field.altnames %}{% trans "Please fill  " %} {{alt}}!</small>{% endwith%}
     {% endif %}
 
   {% elif field_type == "long" %}
     <input type="text" maxlength="{{field.maxlength}}" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %}Please fill valid {{alt}}!!!{% endblocktrans %}</small>
+    <small class="error">{%  with alt=field.altnames %}{% trans "Please fill valid " %} {{alt}}!</small>
     {% endif %}
 
   {% elif field_type == "datetime" %}
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:field.validators.0}}" class="{{field.validators.1}}" {% if is_required_field %}required{% endif %} style="float:left; width:10rem" placeholder="{{field.validators.2}}"/>
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %}Please set {{alt}}!!!{% endblocktrans %}</small>
+    <small class="error">{% with alt=field.altnames %}{% trans "Please set " %} {{alt}}!</small>{% endwith%}
     {% endif %}
 
   {% elif field_type == "bool" %}
@@ -58,7 +65,7 @@
     {% endfor %}
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>
+    <small class="error">{%  with alt=field.altnames %}{% trans "Please select  " %}{{alt}}!</small>
     {% endif %}
     </div>
 
@@ -66,7 +73,7 @@
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|join:', '|default_if_none:''}}" placeholder="Separate {{field.altnames|lower}} by commas..." {% if is_required_field %}required{% endif %} style="float:left; width:95%">
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>
+    <small class="error">{% with alt=field.altnames %}{% trans "Please select " %} {{alt}}!</small>{% endwith%}
     {% endif %}
 
   {% elif field_type == "ObjectId" and field.validators.0 == "File" %}
@@ -89,9 +96,11 @@
       <a href="#" class="fileUpload button tiny round" style="margin-top:2px;">
           <span>{% trans "Upload" %}</span>
           <input id="uploadBtn" type="file" name="{{field.name}}" class="upload" {% if is_required_field %}required{% endif %} />
-          <small class="error">{% blocktrans with alt=field.altnames %}Upload!!!{% endblocktrans %}</small>
+          <small class="error">{% with alt=field.altnames %}{% trans "Upload! " %}</small>{% endwith%}
       </a>
+      {% if is_required_field %}
       <i style="color:red; float:left display:inline">*</i>
+      {% endif %}
     </div>
     <script type="text/javascript">
       $('#uploadBtn').change(function () {
@@ -109,23 +118,23 @@
       {% if forloop.counter != 1 %}
       &nbsp;&nbsp;&nbsp;
       {% endif %}
-      <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{% blocktrans %}{{value}}{% endblocktrans %}</label>
+      <input type="radio" name="{{field.name}}" value="{{value}}" id="{{field.name}}{{value}}" {% if value == field_value %} checked {% endif %} {% if is_required_field %}required{% endif %}/><label for="{{field.name}}{{value}}">{{value}}</label>
       {% endfor %}
       </div>
       {% if is_required_field %}
       <i style="color:red; float:left display:inline">*</i>
-      <small class="error">{% blocktrans with alt=field.altnames %} Please select {{alt}}!!! {% endblocktrans %}</small>
+      <small class="error">{%  with alt=field.altnames %} {% trans "Please select " %} {{alt}}!</small>
       {% endif %}
 
     {% else %}
       <select id="{{field.name}}" name="{{field.name}}" required="" style="float:left; width:95%">
         <option value="">- - - Select {{field.altnames|lower}} - - -</option>
         {% for choice in field_value_choices %}
-        <option value="{{choice}}" {% if choice in field_value %} selected {% endif %} >{% blocktrans %}{{choice}}{% endblocktrans %}</option>
+        <option value="{{choice}}" {% if choice in field_value %} selected {% endif %} >{{choice}}</option>
         {% endfor %}
       </select>
       <i style="color:red; float:left display:inline">*</i>
-      <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>  
+      <small class="error">{%  with alt=field.altnames %}{% trans "Please select " %} {{alt}}!</small>  
 
     {% endif %}
 
@@ -139,11 +148,11 @@
   <select id="{{field.name}}" name="{{field.name}}" required="" style="float:left; width:95%">
     <option value="">- - - Select {{field.altnames|lower}} - - -</option>
     {% for choice in field_value_choices %}
-    <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{% blocktrans with alt=choice.name %}{{alt}}{% endblocktrans %}</option>
+    <option value="{{choice.pk}}" {% if choice.pk in field_value %} selected {% endif %} >{% with alt=choice.name %}{{alt}}</option>
     {% endfor %}
   </select>
   <i style="color:red; float:left display:inline">*</i>
-  <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>
+  <small class="error">{%  with alt=field.altnames %}{% trans "Please select " %} {{alt}}!</small>{% endwith%}
 
   {% else %}
   <select id="{{field.name}}" name="{{field.name}}" multiple size="2" required="" style="float:left; width:85%; height: 2.9rem;">
@@ -153,13 +162,13 @@
 
     {% for choice in field_value_choices %}
     {% if choice.pk in field_value %}
-    <option value="{{choice.pk}}" selected="" >{% blocktrans with alt=choice.name %}{{alt}}{% endblocktrans %}</option>
+    <option value="{{choice.pk}}" selected="" >{% with alt=choice.name %}{{alt}}</option>
     {% endif %}
     {% endfor %}
 
   </select>
   <i style="color:red; float:left display:inline">*</i>
-  <small class="error">{% blocktrans with alt=field.altnames %}Please select {{alt}}!!!{% endblocktrans %}</small>
+  <small class="error">{% with alt=field.altnames %}{% trans "Please select" %} {{alt}}!</small>{% endwith%}
   
   <a href="" class="button tiny round" style="float: right;" data-reveal-id="{{field.name}}_modal">
     {% if not field_value %}{% trans "Select" %}{% else %}{% trans "Change" %}{% endif %}
@@ -167,7 +176,7 @@
 
   <div id="{{field.name}}_modal" class="reveal-modal xlarge" style="height: 90% !important" data-reveal>
     <div id="{{field.name}}_drawer">
-      <h3>{% blocktrans with alt=field.altnames %}Select {{alt}}{% endblocktrans %}</h3>
+      <h3>{% with alt=field.altnames %}{% trans "Select " %} {{alt}}</h3>{% endwith%}
       {% edit_drawer_widget field.name groupid node_dict field_value_choices %}
     </div>
     <a class="close-reveal-modal">&#215;</a>

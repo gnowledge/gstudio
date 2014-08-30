@@ -1,10 +1,10 @@
 {% load i18n %}
-  {% blocktrans %}
-<h3>List Of Members.</h3>{% endblocktrans %}
+
+<h3>{% trans "List Of Members. " %}</h3>
 
   {% if course_name %}
-  {% blocktrans %}
-<h3> For Course:{{course_name}}</h3>{% endblocktrans %}
+
+<h3> {% trans "For the course:  " %}{{course_name}}</h3>
 
   {% endif %}
   <table>

@@ -75,16 +75,16 @@
   <br/>
   <dl class="accordion" data-accordion>
     <dd>
-      {% blocktrans %}<a href="#add_resources"> <b>Add resources in this topic</b> </a>{% endblocktrans %}
+      <a href="#add_resources"> <b>{% trans "Add resources in this topic " %}</b> </a>
       <div id="add_resources" class="content">
         <div> 
 
             <a class="tiny button" data-reveal-id="view_add_page"> 
-              {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Add Page </span>&nbsp;&nbsp; <i class="fi-page"></i>{% endblocktrans %}  
+              <span class="fi-plus">&nbsp;&nbsp;{% trans "Add Page " %} </span>&nbsp;&nbsp; <i class="fi-page"></i>
             </a>
             <div id="view_add_page" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
 
-             {% blocktrans %} <h3>Add New Page:</h3>{% endblocktrans %}
+              <h3>{% trans "Add New Page: " %}</h3>
               <!-- To enter name of the page -->
               <div>
                 <input class="name_id" name="name" type="text" placeholder="Enter name...">
@@ -104,7 +104,7 @@
 
               <input type="submit" id="add_page" value="Save Page" class="medium round button"/>
 
-              {% blocktrans %}<a class="close-reveal-modal">&#215;</a>{% endblocktrans %}
+              <a class="close-reveal-modal">&#215;</a>
 
             </div>          
 
@@ -112,11 +112,11 @@
 
         <div> 
           <a class="tiny button" data-reveal-id="view_add_file"> 
-            {% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Add File </span>&nbsp;&nbsp; <i class="fi-play"></i>{% endblocktrans %}  
+            <span class="fi-plus">&nbsp;&nbsp;{% trans "Add File " %} </span>&nbsp;&nbsp; <i class="fi-play"></i>
           </a>
 
           <div id="view_add_file" class="reveal-modal" data-reveal style="height:300px;">
-            {% blocktrans %}<h3>Add New File:</h3>{% endblocktrans %}<br/>
+            <h3>{% trans "Add New File: " %}</h3><br/>
             <!-- Upload file -->
             <form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'add_file' group_name_tag %}?context_node={{node.pk}}">
             {% csrf_token %}
@@ -133,7 +133,7 @@
             <input type="submit" class="small round button" id="add_file" value="Save File">
 
             </form>
-            {% blocktrans %}<a class="close-reveal-modal">&#215;</a>{% endblocktrans %}
+            <a class="close-reveal-modal">&#215;</a>
 
           </div>
 
@@ -141,16 +141,16 @@
 
         <div> 
           <a class="tiny button" data-reveal-id="view_add_event"> 
-           {% blocktrans %} <span class="fi-plus">&nbsp;&nbsp;Add Events </span>&nbsp;&nbsp; <i class=""></i>{% endblocktrans %}  
+           <span class="fi-plus">&nbsp;&nbsp;{% trans "Add Events " %} </span>&nbsp;&nbsp; <i class=""></i>
           </a>
-{% blocktrans %}
+
           <div id="view_add_event" class="reveal-modal" data-reveal style="height:500px;overflow:scroll;"> 
         
-            <b>Add events feature will be comming soon</b>
+            <b>{% trans "Add events feature will be comming soon " %}</b>
 
             <a class="close-reveal-modal">&#215;</a>
           </div>
-{% endblocktrans %}
+
         </div>
       </div>
     </dd>

@@ -31,29 +31,27 @@
 <hr />
 {% load url from future %}
 {% if files %}
-{% blocktrans %}
 
 <div style='display:table;  border:2px;   border-spacing:10px; '>
   <div style='display:table-row;' >
     <div style='display:table-cell;' align="middle">
-      <h4>File Name </h4>
+      <h4>{% trans "File Name" %} </h4>
     </div>
     <div style='display:table-cell;' align="middle">
-      <h4>File Size </h4>
+      <h4>{% trans "File Size " %} </h4>
     </div>  
     <div style='display:table-cell;' align="middle">
-      <h4>File Type </h4>
+      <h4>{% trans "File Type" %}</h4>
     </div>
     <div style='display:table-cell;' align="middle">
-      <h4>Posted by </h4>
+      <h4>{% trans "Posted by " %} </h4>
     </div>
     <div style='display:table-cell;' align="middle">
-	    <h4 >Download </h4>
+	    <h4 >{% trans "Download " %} </h4>
     </div>
     <div style='display:table-cell;' align="middle">
-	    <h4 >Delete </h4>
+	    <h4 >{% trans "Delete " %} </h4>
     </div>
-  </div>{% endblocktrans %}
 
     {% for file in files %}
     {% get_user_object file.created_by as user_obj %}

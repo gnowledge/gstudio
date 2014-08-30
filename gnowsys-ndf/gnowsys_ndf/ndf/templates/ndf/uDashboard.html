@@ -39,7 +39,7 @@
 				{% endif %}		
 			
 				{% if already_uploaded != "None" %}
-					<br/><br/><span style="color:red"> {% blocktrans %}{{already_uploaded}} image is already uploaded please choose different image {% endblocktrans %}</span>
+					<br/><br/><span style="color:red"> {{already_uploaded}} {% trans "image is already uploaded please choose different image" %}</span>
 				{% endif %}
 
 			<div id="pic_div" style="display:none;">
@@ -62,8 +62,8 @@
 			{% endif %}
 		</div>
 		<div class="small-9 columns" style="padding-top:30px;">
-			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
-			{% blocktrans %}Registerd on : &nbsp;{{DOJ}} {% endblocktrans %}
+			<h4><a href="#">{% trans "Welcome " %} {{username}} </a></h4>
+			{% trans "Registerd on: " %} &nbsp;{{DOJ}} {% endblocktrans %}
 		</div>
 	</div>
 	<br/>
