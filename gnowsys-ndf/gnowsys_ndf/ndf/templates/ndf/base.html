@@ -72,7 +72,8 @@
       <ul class="title-area medium-2 columns">
       	<li class="name">
      {% get_site_variables as site %}
-      	  <h1><a href="/home/" accesskey="q"><img src="{{site.LOGO}}"></a></h1>
+      	  <h1><a href="/home/" accesskey="q"><img src="/static/ndf/images/India_Flag.png"></a></h1>
+            
       	</li>
       	<li class="toggle-topbar menu-icon">
       	  <a href="#">{% trans "Menu" %}</a>
@@ -153,7 +154,7 @@
 
 <!-- Current group selector -->
             <li>
-            <a id="home-group" class="group" href="/home">{% trans "Home" %}</a>
+            <a id="home-group" class="group" href="/home"><img class="logo" src="{{site.LOGO}}"></a>
             </li>
       	  <li class="has-dropdown group">
       	    <a class="active" href="{% url 'groupchange' group_object.name %}">{{group_object.name|truncatechars:30}}</a>

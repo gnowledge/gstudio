@@ -7105,7 +7105,7 @@ meta.foundation-mq-topbar {
 /* line 110, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .contain-to-grid {
   width: 100%;
-  background: #010707;
+  background: #111111;
 }
 /* line 114, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .contain-to-grid .top-bar {
@@ -7136,16 +7136,16 @@ meta.foundation-mq-topbar {
 /* line 137, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .fixed.expanded:not(.top-bar) .top-bar-section {
   z-index: 98;
-  margin-top: 45px;
+  margin-top: 50px;
 }
 
 /* line 144, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar {
   overflow: hidden;
-  height: 45px;
-  line-height: 45px;
+  height: 50px;
+  line-height: 50px;
   position: relative;
-  background: #010707;
+  background: #111111;
   margin-bottom: 0;
 }
 /* line 153, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7183,13 +7183,13 @@ meta.foundation-mq-topbar {
 }
 /* line 181, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar .name {
-  height: 45px;
+  height: 50px;
   margin: 0;
   font-size: 16px;
 }
 /* line 186, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar .name h1, .top-bar .name article h1:not(.subheader) div input, article h1:not(.subheader) div .top-bar .name input {
-  line-height: 45px;
+  line-height: 50px;
   font-size: 1.0625rem;
   margin: 0;
 }
@@ -7199,7 +7199,7 @@ meta.foundation-mq-topbar {
   color: white;
   width: 75%;
   display: block;
-  padding: 0 15px;
+  padding: 0 16.66667px;
 }
 /* line 201, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar .toggle-topbar {
@@ -7215,9 +7215,9 @@ meta.foundation-mq-topbar {
   font-weight: bold;
   position: relative;
   display: block;
-  padding: 0 15px;
-  height: 45px;
-  line-height: 45px;
+  padding: 0 16.66667px;
+  height: 50px;
+  line-height: 50px;
 }
 /* line 219, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar .toggle-topbar.menu-icon {
@@ -7228,7 +7228,7 @@ meta.foundation-mq-topbar {
 .top-bar .toggle-topbar.menu-icon a {
   height: 34px;
   line-height: 33px;
-  padding: 0 40px 0 15px;
+  padding: 0 41.66667px 0 16.66667px;
   color: white;
   position: relative;
 }
@@ -7240,7 +7240,7 @@ meta.foundation-mq-topbar {
   height: 0;
   top: 50%;
   margin-top: -8px;
-  right: 15px;
+  right: 16.66667px;
   box-shadow: 0 0px 0 1px white, 0 7px 0 1px white, 0 14px 0 1px white;
   width: 16px;
 }
@@ -7255,7 +7255,7 @@ meta.foundation-mq-topbar {
 }
 /* line 256, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar.expanded .title-area {
-  background: #010707;
+  background: #111111;
 }
 /* line 259, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar.expanded .toggle-topbar a {
@@ -7285,7 +7285,7 @@ meta.foundation-mq-topbar {
 /* line 288, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .divider,
 .top-bar-section [role="separator"] {
-  border-top: solid 1px #000303;
+  border-top: solid 1px #090909;
   clear: both;
   height: 1px;
   width: 100%;
@@ -7300,7 +7300,7 @@ meta.foundation-mq-topbar {
   width: 100%;
   color: white;
   padding: 12px 0 12px 0;
-  padding-left: 15px;
+  padding-left: 16.66667px;
   font-family: "Source Sans Pro", "Open Sans", "Ubuntu", "FreeSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1rem;
   font-weight: normal;
@@ -7309,8 +7309,8 @@ meta.foundation-mq-topbar {
 /* line 309, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > a.button {
   font-size: 1rem;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 16.66667px;
+  padding-left: 16.66667px;
   background-color: #0eacb5;
   border-color: #0b8a91;
   color: white;
@@ -7368,8 +7368,8 @@ meta.foundation-mq-topbar {
 /* line 320, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section ul li > button {
   font-size: 1rem;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 16.66667px;
+  padding-left: 16.66667px;
   background-color: #0eacb5;
   border-color: #0b8a91;
   color: white;
@@ -7442,7 +7442,7 @@ meta.foundation-mq-topbar {
 }
 /* line 353, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .has-form {
-  padding: 15px;
+  padding: 16.66667px;
 }
 /* line 356, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .has-dropdown {
@@ -7457,7 +7457,7 @@ meta.foundation-mq-topbar {
   border: inset 5px;
   border-color: transparent transparent transparent rgba(255, 255, 255, 0.4);
   border-left-style: solid;
-  margin-right: 15px;
+  margin-right: 16.66667px;
   margin-top: -4.5px;
   position: absolute;
   top: 50%;
@@ -7504,7 +7504,7 @@ meta.foundation-mq-topbar {
 /* line 396, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .dropdown li a {
   font-weight: normal;
-  padding: 8px 15px;
+  padding: 8px 16.66667px;
 }
 /* line 399, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .dropdown li a.parent-link {
@@ -7518,7 +7518,7 @@ meta.foundation-mq-topbar {
 /* line 407, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .dropdown li.title h5 a, .top-bar-section .dropdown li.parent-link a {
   color: white;
-  line-height: 22.5px;
+  line-height: 25px;
   display: block;
 }
 /* line 411, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7527,7 +7527,7 @@ meta.foundation-mq-topbar {
 }
 /* line 414, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .dropdown li.has-form {
-  padding: 8px 15px;
+  padding: 8px 16.66667px;
 }
 /* line 415, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .dropdown li .button, .top-bar-section .dropdown li button {
@@ -7535,7 +7535,7 @@ meta.foundation-mq-topbar {
 }
 /* line 418, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
 .top-bar-section .dropdown label {
-  padding: 8px 15px 2px;
+  padding: 8px 16.66667px 2px;
   margin-bottom: 0;
   text-transform: uppercase;
   color: #777777;
@@ -7551,7 +7551,7 @@ meta.foundation-mq-topbar {
 @media only screen and (min-width: 40.063em) {
   /* line 434, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar {
-    background: #010707;
+    background: #111111;
     overflow: visible;
   }
   /* line 172, ../../../bower_components/foundation/scss/foundation/components/_global.scss */
@@ -7585,7 +7585,7 @@ meta.foundation-mq-topbar {
   }
   /* line 452, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar.expanded {
-    background: #010707;
+    background: #111111;
   }
 
   /* line 455, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7622,9 +7622,9 @@ meta.foundation-mq-topbar {
   }
   /* line 487, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li:not(.has-form) a:not(.button) {
-    padding: 0 15px;
-    line-height: 45px;
-    background: #010707;
+    padding: 0 16.66667px;
+    line-height: 50px;
+    background: #111111;
   }
   /* line 491, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li:not(.has-form) a:not(.button):hover {
@@ -7633,8 +7633,8 @@ meta.foundation-mq-topbar {
   }
   /* line 500, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section li.active:not(.has-form) a:not(.button) {
-    padding: 0 15px;
-    line-height: 45px;
+    padding: 0 16.66667px;
+    line-height: 50px;
     color: white;
     background: #0eacb5;
   }
@@ -7645,7 +7645,7 @@ meta.foundation-mq-topbar {
   }
   /* line 517, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .has-dropdown > a {
-    padding-right: 35px !important;
+    padding-right: 36.66667px !important;
   }
   /* line 519, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .has-dropdown > a:after {
@@ -7657,7 +7657,7 @@ meta.foundation-mq-topbar {
     border-color: rgba(255, 255, 255, 0.4) transparent transparent transparent;
     border-top-style: solid;
     margin-top: -2.5px;
-    top: 22.5px;
+    top: 25px;
   }
   /* line 528, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .has-dropdown.moved {
@@ -7701,9 +7701,9 @@ meta.foundation-mq-topbar {
   /* line 562, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .dropdown li a {
     color: white;
-    line-height: 45px;
+    line-height: 50px;
     white-space: nowrap;
-    padding: 12px 15px;
+    padding: 12px 16.66667px;
     background: #333333;
   }
   /* line 571, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
@@ -7731,16 +7731,16 @@ meta.foundation-mq-topbar {
   .top-bar-section > ul > .divider, .top-bar-section > ul > [role="separator"] {
     border-bottom: none;
     border-top: none;
-    border-right: solid 1px #054044;
+    border-right: solid 1px #303030;
     clear: none;
-    height: 45px;
+    height: 50px;
     width: 0;
   }
   /* line 608, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .has-form {
-    background: #010707;
-    padding: 0 15px;
-    height: 45px;
+    background: #111111;
+    padding: 0 16.66667px;
+    height: 50px;
   }
   /* line 616, ../../../bower_components/foundation/scss/foundation/components/_top-bar.scss */
   .top-bar-section .right li .dropdown {
@@ -8863,7 +8863,7 @@ body {
 /* line 24, ../../../scss/_metastudio_styles.scss */
 .top-bar h1 img, .top-bar article h1:not(.subheader) div input img, article h1:not(.subheader) div .top-bar input img {
   /* Logo */
-  max-height: 80%;
+  max-height: 50%;
 }
 /* line 28, ../../../scss/_metastudio_styles.scss */
 .top-bar h1 a, .top-bar article h1:not(.subheader) div input a, article h1:not(.subheader) div .top-bar input a {
@@ -9618,31 +9618,15 @@ aside#help p, aside#help h5, aside#help h6 {
 *   Foundation fixes and hacks. Please document issues on https://github.com/zurb/foundation/issues
 */
 /* Too many apps cause breakage */
-/* line 15, ../../../scss/_app_styles.scss */
-.top-bar {
-  height: auto !important;
-}
-
-/* line 18, ../../../scss/_app_styles.scss */
-.top-bar .dropdown a.button {
-  padding: 0;
-}
-
-/* line 21, ../../../scss/_app_styles.scss */
-.top-bar section > ul {
-  padding: inherit;
-  margin: inherit;
-}
-
 /*
 /* Protects reflowing elements on error */
-/* line 29, ../../../scss/_app_styles.scss */
+/* line 20, ../../../scss/_app_styles.scss */
 [data-abide] span.error, [data-abide] small.error {
   position: absolute;
 }
 
 /*active color for side-nav links*/
-/* line 34, ../../../scss/_app_styles.scss */
+/* line 25, ../../../scss/_app_styles.scss */
 .side-nav li.active a:not(.button) {
   color: #acacac;
 }
@@ -9650,7 +9634,7 @@ aside#help p, aside#help h5, aside#help h6 {
 /*
 *   Foundation extensions
 */
-/* line 43, ../../../scss/_app_styles.scss */
+/* line 34, ../../../scss/_app_styles.scss */
 pre {
   width: 92%;
   overflow: auto;
@@ -9663,61 +9647,61 @@ pre {
   font-family: monospace;
 }
 
-/* line 56, ../../../scss/_app_styles.scss */
+/* line 47, ../../../scss/_app_styles.scss */
 .fixme {
   opacity: 0.5;
 }
-/* line 59, ../../../scss/_app_styles.scss */
+/* line 50, ../../../scss/_app_styles.scss */
 .fixme:hover {
   opacity: 1;
   color: inherit;
 }
-/* line 62, ../../../scss/_app_styles.scss */
+/* line 53, ../../../scss/_app_styles.scss */
 .fixme:hover:after {
   content: " fixme";
   color: orange;
 }
 
 /* Utility class to display the child spans of this element on hover */
-/* line 71, ../../../scss/_app_styles.scss */
+/* line 62, ../../../scss/_app_styles.scss */
 .show-span-on-hover span {
   display: none;
 }
-/* line 74, ../../../scss/_app_styles.scss */
+/* line 65, ../../../scss/_app_styles.scss */
 .show-span-on-hover:hover span {
   display: inline;
 }
 
-/* line 80, ../../../scss/_app_styles.scss */
+/* line 71, ../../../scss/_app_styles.scss */
 .show-on-hover .show {
   display: none;
   z-index: 1000;
 }
-/* line 84, ../../../scss/_app_styles.scss */
+/* line 75, ../../../scss/_app_styles.scss */
 .show-on-hover:hover .show {
   display: block;
 }
 
 /* Utility class to display the next siblings on hoverr */
-/* line 89, ../../../scss/_app_styles.scss */
+/* line 80, ../../../scss/_app_styles.scss */
 .extra.app {
   display: none;
 }
 
 /* Effects */
-/* line 95, ../../../scss/_app_styles.scss */
+/* line 86, ../../../scss/_app_styles.scss */
 .drop-shadow, .landing header {
   -webkit-box-shadow: 0px 0px 5px 1px black;
   box-shadow: 0px 0px 5px 1px black;
 }
 
-/* line 99, ../../../scss/_app_styles.scss */
+/* line 90, ../../../scss/_app_styles.scss */
 .rounded {
   border-radius: 2px;
   -webkit-border-radius: 2px;
 }
 
-/* line 103, ../../../scss/_app_styles.scss */
+/* line 94, ../../../scss/_app_styles.scss */
 .transition-opacity {
   transition: opacity .3s ease;
   -moz-transition: opacity .3s ease;
@@ -9726,13 +9710,13 @@ pre {
 }
 
 /*Ratings bar based on http://codepen.io/lsirivong/pen/ekBxI */
-/* line 112, ../../../scss/_app_styles.scss */
+/* line 103, ../../../scss/_app_styles.scss */
 .rating-bar {
   /* the hidden clearer */
   /* this is gross, I threw this in to override the starred
      buttons when hovering. */
 }
-/* line 115, ../../../scss/_app_styles.scss */
+/* line 106, ../../../scss/_app_styles.scss */
 .rating-bar > span {
   /* remove inline-block whitespace */
   font-size: 0;
@@ -9740,19 +9724,19 @@ pre {
   unicode-bidi: bidi-override;
   direction: rtl;
 }
-/* line 123, ../../../scss/_app_styles.scss */
+/* line 114, ../../../scss/_app_styles.scss */
 .rating-bar.unrated {
   /* If the user has not rated yet */
 }
-/* line 125, ../../../scss/_app_styles.scss */
+/* line 116, ../../../scss/_app_styles.scss */
 .rating-bar.unrated:checked ~ label:before {
   color: #a9b2b3;
 }
-/* line 131, ../../../scss/_app_styles.scss */
+/* line 122, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] {
   display: none;
 }
-/* line 133, ../../../scss/_app_styles.scss */
+/* line 124, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label {
   /* only enough room for the star */
   display: inline-block;
@@ -9764,7 +9748,7 @@ pre {
   font-size: 1.5rem;
   margin: 0;
 }
-/* line 143, ../../../scss/_app_styles.scss */
+/* line 134, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"] + label:before {
   display: inline-block;
   text-indent: -9999px;
@@ -9772,32 +9756,32 @@ pre {
   /* WHITE STAR */
   color: #888;
 }
-/* line 152, ../../../scss/_app_styles.scss */
+/* line 143, ../../../scss/_app_styles.scss */
 .rating-bar [type*="radio"]:checked ~ label:before, .rating-bar [type*="radio"] + label:hover ~ label:before, .rating-bar [type*="radio"] + label:hover:before {
   content: '\2605';
   /* BLACK STAR */
   color: #ff980d;
   text-shadow: 0 0 1px #333;
 }
-/* line 161, ../../../scss/_app_styles.scss */
+/* line 152, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label {
   text-indent: -9999px;
   width: .5em;
   margin-left: -.5em;
 }
-/* line 166, ../../../scss/_app_styles.scss */
+/* line 157, ../../../scss/_app_styles.scss */
 .rating-bar .last[type*="radio"] + label:before {
   width: .5em;
   height: 1.4em;
 }
-/* line 174, ../../../scss/_app_styles.scss */
+/* line 165, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:before {
   content: '\2606';
   /* WHITE STAR */
   color: #888;
   text-shadow: none;
 }
-/* line 180, ../../../scss/_app_styles.scss */
+/* line 171, ../../../scss/_app_styles.scss */
 .rating-bar:hover [type*="radio"] + label:hover ~ label:before,
 .rating-bar:hover [type*="radio"] + label:hover:before {
   content: '\2605';
