@@ -23,7 +23,7 @@ body{
         }
         img{
             /* Logo */
-			max-height: 90%;
+			max-height: 80%;
 		}
         a{
 			color:white!important;
@@ -31,11 +31,10 @@ body{
     }
     .search{
         position: relative;
-        padding-top: 18px;
         margin-left: 1rem;
         input{
             height: inherit;
-            top:5px;
+            top:7px;
             font-size:1rem;
             color: white;
             background-color: transparent;
@@ -48,13 +47,12 @@ body{
             background-color: transparent;
             position: absolute;
             right: 0;
-            top: 21px;
         }
     }
     .language.button{
         background-color: #555;
         color:black;
-        margin-top: 15px;
+        margin-top: 3px;
         padding: 4px 7px;
         &:hover{
             background-color: white;
