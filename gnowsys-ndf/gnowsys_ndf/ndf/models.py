@@ -1401,7 +1401,6 @@ class HistoryManager():
             file_path = self.get_file_path(document_object)
 
             json_data = document_object.to_json_type()
-
             #------------------------------------------------------------------
             # Creating/Overwriting data into json-file and rcs-file
             #------------------------------------------------------------------
@@ -1432,7 +1431,8 @@ class HistoryManager():
                 rcs_file.write(json.dumps(json_data,
                                           sort_keys=True,
                                           indent=4,
-                                          separators=(',', ': ')
+                                          separators=(',', ': '),
+                                          cls=NodeJSONEncoder
                                           )
                                )
                 
@@ -1454,7 +1454,6 @@ class HistoryManager():
             + "\n\tObjectId: " + document_object._id.__str__() \
             + "\n\t    Type: " + document_object._type \
             + "\n\t    Name: " + document_object.name
-
             raise RuntimeError(msg)
 
         return file_res
@@ -1584,6 +1583,7 @@ class Triple(DjangoDocument):
     subject_type_list = []
     subject_member_of_list = []
     name_value = u""
+
     if self._type == "GAttribute":
       self.name = subject_name + " -- " + self.attribute_type['name'] + " -- " + unicode(self.object_value)
       name_value = self.name
@@ -1653,9 +1653,8 @@ class Triple(DjangoDocument):
       raise Exception("\n Cannot create the GRelation ("+name_value+") as the subject/object that you have mentioned is not a member of a GSytemType for which this RelationType is defined!!!\n")
 
     if self._type =="GAttribute" and subject_system_flag == False:
-      print "The 2 lists do not have any common element"
+      print "\n The 2 lists do not have any common element\n"
       error_message = "\n "+name_value+ " -- subject_type_list ("+str(subject_type_list)+") -- subject_member_of_list ("+str(subject_member_of_list)+") \n"
-
       raise Exception(error_message + "Cannot create the GAttribute ("+name_value+") as the subject that you have mentioned is not a member of a GSystemType which this AttributeType is defined")
 
     #it's me
@@ -1673,7 +1672,7 @@ class Triple(DjangoDocument):
     #end of data_type_check
 
     super(Triple, self).save(*args, **kwargs)
-    
+        
     history_manager = HistoryManager()
     rcs_obj = RCS()
     if is_new:
