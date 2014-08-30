@@ -355,7 +355,7 @@ for object_cur in type_of_cursor:
 collection.update({'n': {'$exists': True}}, {'$unset': {'n': ""}}, upsert=False, multi=True)
 
 # Updates wherever modified_by field is None with default value as either first contributor or the creator of the resource
-modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation', 'node_holder']}, 'modified_by': None})
+modified_by_cur = collection.Node.find({'_type': {'$nin': ['GAttribute', 'GRelation', 'node_holder', 'ToReduceDocs', 'ReducedDocs', 'IndexedWordList']}, 'modified_by': None})
 if modified_by_cur.count > 0:
     for n in modified_by_cur:
 	#print n, "\n"
@@ -370,7 +370,7 @@ if modified_by_cur.count > 0:
                     print "\n Please set created_by value for node (", n._id, " -- ", n._type, " : ", n.name, ")\n"
 
 # Updating faulty modified_by and contributors values (in case of user-group and file documents)
-cur = collection.Node.find({'modified_by': {'$exists': True}, '_type':{'$nin':['node_holder']}})
+cur = collection.Node.find({'_type': {'$nin': ['node_holder', 'ToReduceDocs', 'ReducedDocs', 'IndexedWordList']}, 'modified_by': {'$exists': True}})
 for n in cur:
     # By faulty, it means modified_by and contributors has 1 as their values
     # 1 stands for superuser
