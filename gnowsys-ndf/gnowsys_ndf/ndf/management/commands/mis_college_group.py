@@ -14,6 +14,7 @@ except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 
 ''' imports from application folders/files '''
+from gnowsys_ndf.settings import META_TYPE
 from gnowsys_ndf.ndf.models import Node, Group
 from gnowsys_ndf.ndf.views.methods import create_gattribute
 
@@ -35,6 +36,7 @@ class Command(BaseCommand):
 
   user_defined_option_list = (
     make_option('-d', '--setup-data', action='store_true', dest='setup_mis_data', default=False, help='This sets up group(s) with MIS-data.'),
+    make_option('-g', '--setup-gapps', action='store_true', dest='setup_gapps', default=False, help='This sets up default GAPPS for group(s).'),
   )
 
   option_list = option_list + user_defined_option_list
@@ -42,6 +44,26 @@ class Command(BaseCommand):
   help = "This script handles works related to MIS GAPP."
 
   def handle(self, *args, **options):
+    # Setting up default GAPPS for group(s) ----------------------------------------------------------------------------
+    if options['setup_gapps']:
+      try:
+        info_message = "\n Setting up default GAPPS for group(s).\n"
+        log_list.append(info_message)
+        info_message = ""
+        setup_default_gapps()
+      except Exception as e:
+        print "\n GAPPSSetupError: " + str(e)
+        pass
+      finally:
+        if log_list:
+          log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+
+          log_file_name = os.path.splitext(os.path.basename(__file__))[0] + ".log"
+          log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+
+          with open(log_file_path, 'a') as log_file:
+            log_file.writelines(log_list)
+
     # Setting up group(s) with MIS data --------------------------------------------------------------------------------
     if options['setup_mis_data']:
       try:
@@ -209,12 +231,103 @@ class Command(BaseCommand):
 
 	# ------------------------ End of handle() --------------------------------    
 
+def setup_default_gapps():
+  '''
+  This sets up default GAPPS for group(s).
+  '''
+
+  default_gapps_names_list = ["Page", "File", "Forum", "Task", "MIS", "Meeting"]
+  info_message = "\n Default GAPPS names: " + str(default_gapps_names_list)
+
+  # Fetch GAPPS and populate their document-node in a different list
+  default_gapps_list = [] # Will hold document of each corresponding GAPP name from above given list
+  meta_type_gapp = collection.Node.one({'_type': "MetaType", 'name': META_TYPE[0]})
+  info_message += "\n Default GAPPS list: \n"
+  for each in default_gapps_names_list:
+    gapp_node = collection.Node.one({'_type': "GSystemType", 'member_of': meta_type_gapp._id, 'name': each})
+
+    if gapp_node:
+      default_gapps_list.append(gapp_node)
+      info_message += " " + gapp_node.name + "("+str(gapp_node._id)+")\n"
+
+  log_list.append(info_message)
+
+  # If length of list-of-names & list-of-documents doesn't match throw Exception
+  if len(default_gapps_names_list) != len(default_gapps_list):
+    error_message = "\n GAPPSSetupError: Few GAPPS not found!!!\n"
+    log_list.append(error_message)
+    raise Exception(error_message)
+
+  # Fetch AttributeType node - apps_list
+  at_apps_list = collection.Node.one({'_type': "AttributeType", 'name': "apps_list"})
+  if not at_apps_list:
+    error_message = "\n GAPPSSetupError: AttributeType (apps_list) doesn't exists.. please create explicitly!!!\n"
+    log_list.append(error_message)
+    raise Exception(error_message)
+  info_message = "\n AttributeType: " + at_apps_list.name + "("+str(at_apps_list._id)+")\n"
+  log_list.append(info_message)
+
+  # Fetch MIS_admin group - required for fetching GSystems of College GSystemType
+  mis_admin = collection.Node.one({'_type': "Group", 
+                                   '$or': [{'name': {'$regex': u"MIS_admin", '$options': 'i'}}, 
+                                           {'altnames': {'$regex': u"MIS_admin", '$options': 'i'}}],
+                                   'group_type': "PRIVATE"
+                                  },
+                                  {'name': 1}
+                                  )
+  if not mis_admin:
+    error_message = "\n GAPPSSetupError: Group (MIS_admin) doesn't exists.. please check!!!\n"
+    log_list.append(error_message)
+    raise Exception(error_message)
+  info_message = "\n Group: " + mis_admin.name + "("+str(mis_admin._id)+")\n"
+  log_list.append(info_message)
+
+  # Fetch GSystems of College GSystemType belonging to MIS_admin group
+  college = collection.Node.one({'_type': "GSystemType", 'name': u"College"}, {'name': 1})
+  if not college:
+    error_message = "\n GAPPSSetupError: GSystemType (College) doesn't exists.. please check!!!\n"
+    log_list.append(error_message)
+    raise Exception(error_message)
+  info_message = "\n GSystemType: " + college.name + "("+str(college._id)+")\n"
+  log_list.append(info_message)
+
+  college_cur = list(collection.Node.find({'_type': "GSystem", 'member_of': college._id, 'group_set': mis_admin._id}))
+
+  for i, each in enumerate(college_cur):
+    g = collection.Node.one({'_type': "Group", 'name': each.name, 'group_type': "PRIVATE"}, {'name': 1})
+    if g:
+      info_message = "\n "+str(i+1)+") Setting GAPPS for this college group ("+g.name+" -- "+str(g._id)+")\n"
+      log_list.append(info_message)
+
+      is_apps_list = collection.Node.one({'_type': "GAttribute", 'subject': g._id, 'attribute_type.$id': at_apps_list._id})
+      if is_apps_list:
+        info_message = " Default GAPPs list already exists for Group ("+g.name+" -- "+str(g._id)+"), so overriding it..."
+        log_list.append(info_message)
+        res = collection.update({'_id': is_apps_list._id}, {'$set': {'object_value': default_gapps_list}}, upsert=False, multi=False)
+        if res["n"]:
+          is_apps_list.reload()
+          info_message = "\n Successfully overridden: " + str(is_apps_list._id) + "\n"
+          log_list.append(info_message)
+        else:
+          info_message = "\n Not overridden: " + str(is_apps_list._id) + "\n"
+          log_list.append(info_message)
+
+      else:
+        info_message = " Default GAPPs list doesn't exists for Group ("+g.name+" -- "+str(g._id)+"), so creating..."
+        log_list.append(info_message)
+        ga = create_gattribute(g._id, at_apps_list, default_gapps_list)
+        info_message = "\n Successfully created: " + str(ga._id) + "\n"
+        log_list.append(info_message)
+    
+    else:
+      error_message = "\n GAPPSSetupError: This college group ("+each.name+") doesn't exists.. please create explicitly!!!\n"
+      log_list.append(error_message)
+
+
 def setup_mis_data():
   '''
   This sets up group(s) with MIS-data.
   '''
-
-  info_message = ""
   # Fetch MIS_admin group details
   mis_admin = collection.Node.one({'_type': "Group", 
                                  '$or': [{'name': {'$regex': u"MIS_admin", '$options': 'i'}}, 
@@ -229,7 +342,15 @@ def setup_mis_data():
   log_list.append(info_message)
   info_message = ""
 
-  groups_name_list = ["Platform Development"]
+  # Set groups_name_list with values
+  groups_name_list = []
+  # groups_name_list = ["Platform Development"]
+  # or ----- 
+  college = collection.Node.one({'_type': "GSystemType", 'name': u"College"}, {'name': 1})
+  college_cur = collection.Node.find({'_type': "GSystem", 'member_of': college._id, 'group_set': mis_admin._id}, {'name': 1})
+
+  for each in college_cur:
+    groups_name_list.append(each.name)
 
   def setup_groups(groups_name_list, cur):
     info_message = "\n groups_name_list: " + str(groups_name_list)
@@ -238,7 +359,7 @@ def setup_mis_data():
     # Creating list of ObjectId(s) of group(s)
     groups_list = [] # Holds ObjectId of groups listed in groups_name_list
     for each in groups_name_list:
-      gr = collection.Node.one({'_type': "Group", 'name': each}, {'name': 1})
+      gr = collection.Node.one({'_type': "Group", 'name': each, 'group_type': "PRIVATE"}, {'name': 1})
       if gr:
         groups_list.append(gr._id)
 
