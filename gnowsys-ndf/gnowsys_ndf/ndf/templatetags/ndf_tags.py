@@ -14,7 +14,7 @@ from django.shortcuts import render_to_response, render
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, META_TYPE,CREATE_GROUP_VISIBILITY
+from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY
 from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 
 
@@ -234,13 +234,25 @@ def get_apps_for_groups(groupid):
 			meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
 			GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
 			group_obj=collection.Group.one({'_id':ObjectId(groupid)})
+
+			# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
+			not_in_menu_bar = []
 			if group_obj.name == "home":
+				# From "home" group hide following GAPPS: Image, Video
 				not_in_menu_bar = ["Image", "Video"]
 			else :
+				# From other remaining groups hide following GAPPS: Group, Image, Video
 				not_in_menu_bar = ["Image", "Video", "Group"]
+
+			# Defalut GAPPS to be listed on gapps-meubar/gapps-iconbar
+			global DEFAULT_GAPPS_LIST
+			if not DEFAULT_GAPPS_LIST:
+				# If DEFAULT_GAPPS_LIST is empty, set bulit-in GAPPS (setting_gapps) list from settings file
+				DEFAULT_GAPPS_LIST = setting_gapps
+
 			for node in GAPPS:
 				if node:
-					if node.name not in not_in_menu_bar:
+					if node.name not in not_in_menu_bar and node.name in DEFAULT_GAPPS_LIST:
 						i = i+1;
 						if node.name in setting_gapps:
 							gapps[i] = {'id': node._id, 'name': node.name.lower()}
@@ -472,15 +484,26 @@ def get_gapps_menubar(request, group_id):
 		
 		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
 		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+
+		# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
 		not_in_menu_bar = []
 		if group_obj.name == "home":
+			# From "home" group hide following GAPPS: Image, Video
 			not_in_menu_bar = ["Image", "Video"]
 		else :
-			not_in_menu_bar = ["Image", "Video", "Group"]						
+			# From other remaining groups hide following GAPPS: Group, Image, Video
+			not_in_menu_bar = ["Image", "Video", "Group"]
+
+		# Defalut GAPPS to be listed on gapps-meubar/gapps-iconbar
+		global DEFAULT_GAPPS_LIST
+		if not DEFAULT_GAPPS_LIST:
+			# If DEFAULT_GAPPS_LIST is empty, set bulit-in GAPPS (setting_gapps) list from settings file
+			DEFAULT_GAPPS_LIST = setting_gapps
+
 		for node in GAPPS:
 			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
 			if node:
-				if node.name not in not_in_menu_bar:
+				if node.name not in not_in_menu_bar and node.name in DEFAULT_GAPPS_LIST:
 					i = i+1;
 					gapps[i] = {'id': node._id, 'name': node.name.lower()}
 
@@ -512,22 +535,32 @@ def get_gapps_iconbar(request, group_id):
 		group_name = ""
 		collection = db[Node.collection_name]
 		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
 		gapps = {}
 		i = 0;
 		meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
 		
 		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
 		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
+
+		# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
 		not_in_menu_bar = []
 		if group_obj.name == "home":
+			# From "home" group hide following GAPPS: Image, Video
 			not_in_menu_bar = ["Image", "Video"]
 		else :
-			not_in_menu_bar = ["Image", "Video", "Group"]						
+			# From other remaining groups hide following GAPPS: Group, Image, Video
+			not_in_menu_bar = ["Image", "Video", "Group"]
+
+		# Defalut GAPPS to be listed on gapps-meubar/gapps-iconbar
+		global DEFAULT_GAPPS_LIST
+		if not DEFAULT_GAPPS_LIST:
+			# If DEFAULT_GAPPS_LIST is empty, set bulit-in GAPPS (setting_gapps) list from settings file
+			DEFAULT_GAPPS_LIST = setting_gapps
+
 		for node in GAPPS:
 			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
 			if node:
-				if node.name not in not_in_menu_bar:
+				if node.name not in not_in_menu_bar and node.name in DEFAULT_GAPPS_LIST:
 					i = i+1;
 					gapps[i] = {'id': node._id, 'name': node.name.lower()}
 
@@ -1081,7 +1114,6 @@ def get_group_type(group_id, user):
   		
 		# Check if Group exists in the database
 		if colg is not None:
-
 			# Check is user logged in
 			if user.is_authenticated():
 				# Condition for group accessible to logged in user
@@ -1108,7 +1140,21 @@ def get_group_type(group_id, user):
 			else:
 				# Condition for group accessible to logged out user
 				if colg.group_type == "PUBLIC":
-					return "allowed"
+					# Condition for GAPPs accessible to gstaff (i.e. "mis", "mis-po", "batch")
+					if len(split_content) > 2 and split_content[2] != "":
+						gapp = split_content[2]
+
+						if check_is_gapp_for_gstaff(colg._id, {'name': gapp}, user):
+							return "allowed"
+
+						else:
+							error_message = "Access denied: You are not an authorized user to access this GAPP ("+gapp.upper()+")!!!"
+							raise Http404(error_message)
+
+					else:
+						# If only group is specified
+						return "allowed"
+					# return "allowed"
 
 				else:
 					error_message = "Access denied: You are not an authorized user to access this group ("+colg.name.upper()+")!!!"
