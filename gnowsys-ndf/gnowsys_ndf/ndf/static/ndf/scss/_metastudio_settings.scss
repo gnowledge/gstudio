@@ -21,7 +21,7 @@ $theme-text-color:scale-color($theme-color, $lightness: -40%);
 
 // We use these as default colors throughout
 $primary-color: $theme-color;
-$secondary-color: lighten(desaturate($primary-color,20%),20%);
+$secondary-color: lighten(desaturate($primary-color,80%),30%);
 // $alert-color: #f04124;
 // $success-color: #43AC6A;
  //$warning-color: #f2bf8a;
@@ -187,13 +187,13 @@ $row-width: inherit;    //Expand to full browser width instead of 960px
 // $subheader-bottom-margin: .5rem;
 
 // A general <small> styling
-// $small-font-size: 60%;
+ $small-font-size: 80%;
 // $small-font-color: scale-color($header-font-color, $lightness: 35%);
 
 // We use these to style paragraphs
 // $paragraph-font-family: inherit;
 // $paragraph-font-weight: normal;
-// $paragraph-line-height: 1.6;
+ $paragraph-line-height: 1.4;
 // $paragraph-margin-bottom: rem-calc(20);
 // $paragraph-aside-font-size: rem-calc(14);
 // $paragraph-aside-line-height: 1.35;

@@ -237,9 +237,6 @@ main>aside{
         header{
            padding: 10px;
         }
-         section{
-             background-color: $theme-color-invert;
-         }
         footer{
             background-color: #222;
             min-height: 1rem;
@@ -285,7 +282,7 @@ main>aside{
         overflow-x: visible;
         &>header,form>header{
             padding: 15px;
-            margin-bottom: 0.5rem;
+//            margin-bottom: 0.5rem;
             background-color: #f0f0f0;
         }
         
@@ -293,9 +290,9 @@ main>aside{
         }
     
 h1:not(.subheader){
-	font-family: $serif-font;
-    font-style: italic;
-    
+//	font-family: $serif-font;
+//    font-style: italic;
+//    
     .tabs{
         display: inline-block;
         position: relative;
@@ -520,7 +517,7 @@ article{
 	
     &>header{
 	border-bottom: 1px solid #ddd;
-	margin-bottom: 1rem!important;
+//	margin-bottom: 1rem!important;
 }
     &>footer{
 	border-top: 1px dotted #ddd;
@@ -643,9 +640,109 @@ input.node-title{
 
 /****************** CUSTOM *********************/
 
-#landing-page{
-    background-color: #666;
-    top:0;
+/* UI Button */
+.ui.button{
+    margin-right: 0.5rem;
+    border: 1px solid rgba(0,0,0,0.2);
+    background-color: transparent;
+    color: #ddd;
+    padding: 0.8rem;
+    z-index: 500;
+    &.language{
+        
+    }
+    label{
+            color:#666;
+        }
+    small{
+        margin-left: 2px;
+        display: none;
+    }
+    &:hover,&:active{
+        border-color: rgba(255,255,255,0.2);
+        background-color: rgba(0,0,0,0.1);
+        label{
+            color:#ddd;
+        }
+        small{
+            display: inline;
+        }
+        &:focus{
+            font-weight: bold;
+        }
+    }
+}
+
+
+/* For landing page */
+
+.landing{
+    position: relative;
+    #language-selector{
+        position: absolute;
+    top:10px;
+    right: 10px;
+    }
+    
+    header{
+        background-image: url(".../nroer/indian_pigments.jpg");
+        position: relative;
+        z-index: 50;
+        background-color: #fff;
+        padding:1rem 0 0 0;
+        @extend .drop-shadow;
+        .logo{
+            color:#555;
+            text-align: center;
+        }
+        
+    h1{
+        font-size: 2rem;
+            line-height: 1;
+
+    }
+    }
+    
+}
+section.banner{
+    padding:0 2rem;
+    margin-bottom: 2rem;
+    border:2px solid lighten($primary-color,10%);
+    border-width: 2px 0;
+    background-color: rgba(0,0,0,0.1);
+    
+    &>*{
+    background-color: $primary-color;
+        .slide{
+            padding: 1rem;
+            background-color: darken($primary-color,5%);
+            &>i{
+                position: absolute;
+                font-size: 15rem;
+                pointer-events: none;
+                color: white;
+                opacity:0.1;
+                right:5%;
+            }
+        }
+    color:#eee;
+    margin:0;
+    h3,h4,h5,h6,blockquote{
+        color:white;
+    }
+        blockquote{
+            font-size: 140%;
+            font-style:italic;
+        }
+    p:first-child{
+        color:white;
+        font-size:120%;
+        }
+    
+    }
+    // Slick Carousel
+    .slick-dots .button{
+    }
 }
 
 // Off Canvas Areas

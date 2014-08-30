@@ -68,7 +68,7 @@ nodeId=$(".rating-bar").attr("data-node");
 
     //Sets the number of stars in the rating bar
     function setStars(stars){
-        $(".rating-bar input[value="+stars+"]").attr("checked","checked");
+        $(".rating-bar input[value="+stars+"]").prop("checked",true);
     }
     
 </script>
