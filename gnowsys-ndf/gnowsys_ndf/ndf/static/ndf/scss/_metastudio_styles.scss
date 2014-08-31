@@ -714,12 +714,14 @@ input.node-title{
 .landing{
     position: relative;
     
-   
+   h2{
+       margin-top: 2rem;
+   }
     
 }
 section.promo{
     background-color: rgba(0,0,0,0.9);
-    
+    border-bottom: 4px solid #00CEFD;
     .meta{
         h4{
             color:white;

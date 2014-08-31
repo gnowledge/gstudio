@@ -9560,41 +9560,46 @@ input.node-title {
 .landing {
   position: relative;
 }
+/* line 717, ../../../scss/_metastudio_styles.scss */
+.landing h2 {
+  margin-top: 2rem;
+}
 
-/* line 720, ../../../scss/_metastudio_styles.scss */
+/* line 722, ../../../scss/_metastudio_styles.scss */
 section.promo {
   background-color: rgba(0, 0, 0, 0.9);
+  border-bottom: 4px solid #00CEFD;
 }
-/* line 724, ../../../scss/_metastudio_styles.scss */
+/* line 726, ../../../scss/_metastudio_styles.scss */
 section.promo .meta h4 {
   color: white;
 }
 
-/* line 731, ../../../scss/_metastudio_styles.scss */
+/* line 733, ../../../scss/_metastudio_styles.scss */
 ul.partner img {
   max-height: 150px;
 }
 
-/* line 736, ../../../scss/_metastudio_styles.scss */
+/* line 738, ../../../scss/_metastudio_styles.scss */
 div.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
   border: 2px solid #12b0ff;
   border-width: 2px 0;
 }
-/* line 741, ../../../scss/_metastudio_styles.scss */
+/* line 743, ../../../scss/_metastudio_styles.scss */
 div.banner > * {
   background-color: #0094de;
   color: #eee;
   margin: 0;
 }
-/* line 743, ../../../scss/_metastudio_styles.scss */
+/* line 745, ../../../scss/_metastudio_styles.scss */
 div.banner > * .slide {
   padding: 1rem;
   background-color: #0083c5;
   height: 250px !important;
 }
-/* line 747, ../../../scss/_metastudio_styles.scss */
+/* line 749, ../../../scss/_metastudio_styles.scss */
 div.banner > * .slide > i {
   position: absolute;
   font-size: 15rem;
@@ -9603,26 +9608,26 @@ div.banner > * .slide > i {
   opacity: 0.1;
   right: 5%;
 }
-/* line 758, ../../../scss/_metastudio_styles.scss */
+/* line 760, ../../../scss/_metastudio_styles.scss */
 div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 761, ../../../scss/_metastudio_styles.scss */
+/* line 763, ../../../scss/_metastudio_styles.scss */
 div.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 765, ../../../scss/_metastudio_styles.scss */
+/* line 767, ../../../scss/_metastudio_styles.scss */
 div.banner > * p:first-child {
   color: white;
   font-size: 120%;
 }
 
-/* line 778, ../../../scss/_metastudio_styles.scss */
+/* line 780, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 781, ../../../scss/_metastudio_styles.scss */
+/* line 783, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
