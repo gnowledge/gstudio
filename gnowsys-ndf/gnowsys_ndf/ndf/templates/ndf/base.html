@@ -61,7 +61,6 @@
     <img id="ajax_load_image" width="50" style="display: none; position:fixed; top: 50%; left: 55%; margin-top: -50px; margin-left: -100px;z-index:1000;" src="/static/ndf/images/ajax-wait.gif">
   </center>
 
-  <header>
     
     <!-- Foundation top bar http://foundation.zurb.com/docs/components/topbar.html -->
     
@@ -84,6 +83,42 @@
 	
 	<!-- Right Nav Section -->
 	<ul class="right">
+        
+        <!-- Search bar -->
+            <li class="has-form search">
+            
+            <form 
+                      {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
+                      name="search_form" method="GET" >
+              <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
+        
+              
+<!-- Hiding search options on the top bar, this is available from the results page to refine-->
+                   <!--ul class="show">
+	      	<li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
+                <label for="chk_name">Name</label>
+            </li>
+            <li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
+                <label for="chk_tags">Tags</label>
+            </li>
+            <li>
+                <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
+                <label for="chk_content">Contents</label><br>
+			</li>
+			<li >
+				{% if groupid %}
+				<a href="{% url 'search_page' groupid %}">Advanced Search</a>
+				{% endif %}
+			</li>
+	      
+	    </ul-->
+
+          
+                </form>
+        </li>
         
     <!-- Language selector--> 
         
@@ -182,44 +217,25 @@
       	    </ul>
       	  </li>
             
+<!-- Special customization for Sep 1 demo of NROER; Remove this before updating servers other than NROER -->
+<!--
+            <span class="nroer-sep-1">
+            <li>
+      	    <a href="{{ site.PARTNERS}}">Partners</a>
+                </li>
+      	   <li>
+      	    <a href="{{ site.GROUPS}}">Groups</a>
+                </li>
+                <script>
+                $(".has-dropdown.group").hide();
+                </script>
+                </span>
+-->
+<!--  Remove till here -->
+            
 <!-- Extra group selector-->
             {% get_gapps_menubar request groupid %}
             
-<!-- Search bar -->
-            <li class="has-form search">
-            
-            <form 
-                      {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
-                      name="search_form" method="GET" >
-              <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
-                <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
-        
-              
-<!-- Hiding search options on the top bar, this is available from the results page to refine-->
-                   <!--ul class="show">
-	      	<li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_name" value="name" />
-                <label for="chk_name">Name</label>
-            </li>
-            <li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_tags" value="tags" />
-                <label for="chk_tags">Tags</label>
-            </li>
-            <li>
-                <input type="checkbox" name="search_fields" checked="true" id="chk_content" value="contents" />
-                <label for="chk_content">Contents</label><br>
-			</li>
-			<li >
-				{% if groupid %}
-				<a href="{% url 'search_page' groupid %}">Advanced Search</a>
-				{% endif %}
-			</li>
-	      
-	    </ul-->
-
-          
-                </form>
-        </li>
 
       	</ul>
         <!-- Closes Left Nav section -->
@@ -227,7 +243,6 @@
 
     </nav>
 
-  </header> 
 
 
   <div class="workspace">
@@ -286,13 +301,6 @@
             </header>
 
             <!-- Meta content in the (main aside header)-->
-            <section>
-        		  {% block search_content %}
-              <h4 class="hide"><input id="name_id" name="name" type="text" value="" placeholder="Search" required=""></h4>
-              {% endblock %}
-            </section>
-
-            <section>
             <section>
               <div>
           		{% block collection_content %}  {% endblock %}
@@ -360,6 +368,7 @@
           <ul class="inline-list">
   <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
   <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
+  <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
   <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
   <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
   <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
