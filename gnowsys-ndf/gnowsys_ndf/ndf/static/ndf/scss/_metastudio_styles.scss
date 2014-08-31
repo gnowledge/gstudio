@@ -38,7 +38,7 @@ body{
             }
         img{
             /* Logo */
-			max-height: 75%;
+			height: $topbar-height * 0.8;
 		}
         a{
 			color:white!important;

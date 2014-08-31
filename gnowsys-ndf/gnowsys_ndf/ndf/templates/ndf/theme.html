@@ -131,7 +131,18 @@
 
 			    }
 			);
-
+                     
+//                     Fold/Unfold item on click
+                     $tree.click(function() {
+  var tree = $tree.tree('getTree');
+  tree.iterate(function(node) {
+ 
+    if (node.hasChildren()) {
+      $tree.tree('closeNode', node, true);
+    }
+    return true;
+  });
+});
     	});
 
     });
