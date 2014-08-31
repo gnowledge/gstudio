@@ -7,6 +7,11 @@
 <!-- orgitdown! skin -->
 <link rel="stylesheet" type="text/css" href="/static/ndf/orgitdown/skins/gstudio/style.css" />
 
+<style type="text/css">
+
+
+</style
+
 <!-- start of mobwrite -->
 {% if node_id %}
 	<script src="/static/js/mobwrite/diff_match_patch.js"></script>
@@ -80,4 +85,66 @@
 {% else %}
   $("#orgitdown_{{var_name}}").orgitdown(mySettings);
 {% endif %}
+
+function myFunction(str){ 
+				cite = document.getElementById(str.id).name;
+				var txtAreaContainer = $(".orgitdownContainer textarea");
+				cursor_position=$(txtAreaContainer).prop('selectionStart')
+				string1=txtAreaContainer.val().substring(0,cursor_position);
+				string2=txtAreaContainer.val().substring(cursor_position,txtAreaContainer.val().length);
+				string3=cite
+				string4=string1+string3+string2
+				txtAreaContainer.val(string4);
+				$('#bib-text').foundation('reveal', 'close');
+			}
+$(".orgitdownButton.orgitdownButton10 a").click(function(){
+		  $.ajax({
+          url: "{% url 'view_articles' group_id %}",
+          type:"GET",
+          success: function(data) {
+			data = JSON.parse(data);
+			temp = '';
+			for(i=0; i<data.length; i++)
+			{
+				console.log(data.length)
+				$.each(data[i], function(j, entry){
+						temp += '<dd class="accordion-navigation"><a href="#'+j+'">'+j+'</a><div id="'+j+'" class="content">';
+						temp2 = '';
+						array=entry
+						for(j=0;j<array.length;j++)
+						{
+							prop=(array[j].name)
+							prop2=(array[j].cite)
+							temp2 += '<div> <button id="#'+prop+'" name="'+prop2+'" onclick="myFunction(this)">'+ prop +' </button> </div>';
+							
+						}
+						temp2 += '</div></dd>'
+						
+						temp += temp2;
+
+					})
+
+			}
+				
+			$('#bib-text').foundation('reveal', 'open');
+
+			document.getElementById("bib1").innerHTML=temp;
+			
+			
+		}
+
+        }); 
+		});
+
 </script>
+
+<div id="bib-text" class="reveal-modal" data-reveal>
+<dl class="accordion" data-accordion id="bib1">
+  
+</dl>
+<a class="close-reveal-modal">&#215;</a>
+</div>
+<div id="alert" class="reveal-modal small" data-reveal>
+<p> citation has been inserted </p>
+<a class="close-reveal-modal">&#215;</a>
+</div>

@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, url
-
 urlpatterns = patterns('gnowsys_ndf.ndf.views.task',
                        url(r'^$', 'task', name='task'),
                        url(r'^/create$', 'create_edit_task', name='task_create_edit'),
@@ -8,3 +7,4 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.task',
 		       url(r'^/delete_task/(?P<_id>[\w-]+)$', 'delete_task', name='delete_task'),
 		       url(r'^/filter/(?P<choice>[\w-]+)/status/(?P<status>[\w-]+)$','check_filter',name='check_filter'),
                        )
+
