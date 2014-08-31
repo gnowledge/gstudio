@@ -11,17 +11,13 @@
 
 {% block body_content %}
 
-<script>
-    $("body>*").remove();
-    
-</script>
 
 <div id="landing">
 {% include "ndf/landing_page_beta.html" %}
 </div>
 
 <script>
-    $("#landing").insertAfter("body");
+    $("#landing").prependTo("body").nextAll('*').remove();;
 </script>
 
 
