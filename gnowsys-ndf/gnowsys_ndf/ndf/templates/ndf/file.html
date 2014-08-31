@@ -36,34 +36,16 @@
 
 <li>
     <a href="#" data-reveal-id="library-statistics">
-      {% trans "View Library Statistics" %}
+      {% trans "File Statistics" %}
     </a>
   </li>
 
-<div class="reveal-modal" id="library-statistics">
+<div class="medium reveal-modal" id="library-statistics" data-reveal>
 
- <h4>File Statistics</h4>
-  <br>
-    <dl class="tabs" data-tab>
-    <dd class="tab-title active"><a href="#bar_visual">Bar</a></dd>
-    <dd class="tab-title"><a href="#pie_visual">Pie</a></dd>
-  </dl>
-  <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
-  <br/>
-  <div class="tabs-content">
-  <div id="tooltip" class="hidden">
-      <p><strong> {% trans "Details" %}</strong></p>
-      <p><span id="tip-value">{% trans "100" %}</span></p>
-    </div>
-    <div class="content active" id="bar_visual">
-      {% include "ndf/bar_visualization.html" %}
-  </div>
-  <div class="content" id="pie_visual">
-
-    {% include "ndf/pie_visualization.html" %}
+    {% include "ndf/file_statistics.html" %}
     
-  </div>
-</div></div>
+    <a class="close-reveal-modal">&#215;</a>
+</div>
 
 {% endblock %}
 
