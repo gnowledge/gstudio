@@ -31,6 +31,11 @@ body{
         background-color:black!important;
     }
     h1{
+        .flag{
+                height: 20px;
+            margin-bottom: 4px;
+            margin-right: 2px;
+            }
         img{
             /* Logo */
 			max-height: 75%;
@@ -697,8 +702,9 @@ input.node-title{
                 max-width: 75%;
                 margin-bottom: 0.5rem;
             }
+            
             h1{
-        font-size: 1rem;
+        font-size: 1.2rem;
             line-height: 1;
         font-weight: bold;
         text-transform: uppercase;
@@ -722,13 +728,12 @@ section.banner{
     border:2px solid lighten($primary-color,10%);
     border-width: 2px 0;
     background-color: rgba(0,0,0,0.9);
-    max-height: 300px;
-    overflow: hidden;
     &>*{
     background-color: $primary-color;
         .slide{
             padding: 1rem;
             background-color: darken($primary-color,5%);
+            height:250px!important;
             &>i{
                 position: absolute;
                 font-size: 15rem;
