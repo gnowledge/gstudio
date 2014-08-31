@@ -9527,8 +9527,8 @@ input.node-title {
 
 /* For landing page */
 /* line 683, ../../../scss/_metastudio_styles.scss */
-body > header {
-  background-image: url("../nroer/indian_pigments.jpg");
+#landing > header {
+  background-image: url("/static/ndf/css/themes/nroer/indian_pigments.jpg");
   position: relative;
   z-index: 50;
   background-color: #0A253A;
@@ -9536,19 +9536,19 @@ body > header {
   border-bottom: 2px solid #00CEFD;
 }
 /* line 691, ../../../scss/_metastudio_styles.scss */
-body > header .logo {
+#landing > header .logo {
   color: #555;
   text-align: center;
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.8);
 }
 /* line 696, ../../../scss/_metastudio_styles.scss */
-body > header .logo img {
+#landing > header .logo img {
   max-width: 75%;
   margin-bottom: 0.5rem;
 }
 /* line 701, ../../../scss/_metastudio_styles.scss */
-body > header .logo h1, body > header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div body > header .logo input {
+#landing > header .logo h1, #landing > header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div #landing > header .logo input {
   font-size: 1.2rem;
   line-height: 1;
   font-weight: bold;
@@ -9698,7 +9698,7 @@ pre {
 
 /* Effects */
 /* line 86, ../../../scss/_app_styles.scss */
-.drop-shadow, body > header {
+.drop-shadow, #landing > header {
   -webkit-box-shadow: 0px 0px 5px 1px black;
   box-shadow: 0px 0px 5px 1px black;
 }
