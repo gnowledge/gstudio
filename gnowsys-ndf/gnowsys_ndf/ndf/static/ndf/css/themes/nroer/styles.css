@@ -9528,7 +9528,7 @@ input.node-title {
 /* For landing page */
 /* line 683, ../../../scss/_metastudio_styles.scss */
 #landing > header {
-  background-image: url("/static/ndf/css/themes/nroer/indian_pigments.jpg");
+  background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
   position: relative;
   z-index: 50;
   background-color: #0A253A;
