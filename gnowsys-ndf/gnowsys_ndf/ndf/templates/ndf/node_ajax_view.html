@@ -149,6 +149,10 @@
     display: block;
   }
 
+  #html-res-iframe{
+    border: none;
+  }
+
 </style>
 
 {% if user.is_authenticated %}
@@ -519,6 +523,19 @@ This section has been integrated to groupdashboard and appears in block app_acti
                   </audio>
                 </div>
               </div>
+              Resource Type: {{node.mime_type}}
+              <br/>
+                <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+                {{ grid_fs_obj.filename }}
+              </a>
+              {% elif 'html' in node.mime_type %}
+              <!-- <div class="row"> -->
+                <!-- <div class="small-12 columns"> -->
+                  <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    <p>Your browser does not support the audio element </p>
+                  </iframe>
+                <!-- </div> -->
+              <!-- </div> -->
               Resource Type: {{node.mime_type}}
               <br/>
                 <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
@@ -1501,5 +1518,16 @@ function getPosition(element) {
     }
     return { x: xPosition, y: yPosition };
 }
+
+  // iframe for html content  
+  function adjustIframeHt(){
+
+    iframeBodyHt = $("iframe#html-res-iframe").contents().find("body").height();
+    // console.log(iframeBodyHt);
+    $("iframe").height(iframeBodyHt + 50);
+
+  }
+
+  $("document").ready(function(){ setTimeout(function() { adjustIframeHt() },2000) });
 
 </script>
