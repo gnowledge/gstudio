@@ -133,16 +133,12 @@
 			);
                      
 //                     Fold/Unfold item on click
-                     $tree.click(function() {
-  var tree = $tree.tree('getTree');
-  tree.iterate(function(node) {
- 
-    if (node.hasChildren()) {
-      $tree.tree('closeNode', node, true);
-    }
-    return true;
-  });
-});
+//                     $tree.delegate(".jstree-open>a", "click.jstree", function(event){
+//                        $.jstree._reference(this).close_node(this,false,false);
+//                    }).delegate(".jstree-closed>a", "click.jstree", function(event){
+//                        $.jstree._reference(this).open_node(this,false,false);
+//});
+
     	});
 
     });
