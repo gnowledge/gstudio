@@ -217,6 +217,20 @@
       	    </ul>
       	  </li>
             
+<!-- Special customization for Sep 1 demo of NROER; Remove this before updating servers other than NROER -->
+            <span class="nroer-sep-1">
+            <li>
+      	    <a href="{{ site.PARTNERS}}">Partners</a>
+                </li>
+      	   <li>
+      	    <a href="{{ site.GROUPS}}">Groups</a>
+                </li>
+                <script>
+                $(".has-dropdown.group").hide();
+                </script>
+                </span>
+<!--  Remove till here -->
+            
 <!-- Extra group selector-->
             {% get_gapps_menubar request groupid %}
             
@@ -359,7 +373,7 @@
           <ul class="inline-list">
   <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
   <li><a href="{{site.PARTNERS}}">{% trans "Partners" %}</a></li>
-  <li><a href="{{site.GOUPS}}">{% trans "Groups" %}</a></li>
+  <li><a href="{{site.GROUPS}}">{% trans "Groups" %}</a></li>
   <li><a href="{{site.TERMS_OF_SERVICE}}">{% trans "Terms of Service" %}</a></li>
   <li><a href="{{site.PRIVACY_POLICY}}">{% trans "Privacy Policy" %}</a></li>
   <li><a href="{{site.CONTACT}}">{% trans "Contact" %}</a></li>
