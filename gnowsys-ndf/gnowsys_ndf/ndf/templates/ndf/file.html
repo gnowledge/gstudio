@@ -33,16 +33,16 @@
   {% endif %}
   {% endif %}
 
-{% endblock %}
 
-{% block search_content %}
-  {% include "ndf/node_search_base.html" %}
-{% endblock %}
+<li>
+    <a href="#" data-reveal-id="library-statistics">
+      {% trans "View Library Statistics" %}
+    </a>
+  </li>
 
+<div class="reveal-modal" id="library-statistics">
 
-{% block related_content %}
- 
-  <h4>File Statistics</h4>
+ <h4>File Statistics</h4>
   <br>
     <dl class="tabs" data-tab>
     <dd class="tab-title active"><a href="#bar_visual">Bar</a></dd>
@@ -63,8 +63,14 @@
     {% include "ndf/pie_visualization.html" %}
     
   </div>
-</div>
+</div></div>
+
 {% endblock %}
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+{% endblock %}
+
 
 
 {% block body_content %}
