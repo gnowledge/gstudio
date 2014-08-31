@@ -73,7 +73,7 @@ body{
 
 		.workspace{
             //This is the main content container between the header and footer
-            background: url("body_background_image.png") no-repeat 0 bottom;
+            background: url("watermark.png") no-repeat 0 80%;
 			min-height: 100%;
 			margin-bottom: -130px!important;
 			-webkit-box-sizing: border-box;
@@ -634,13 +634,6 @@ input.node-title{
 	font-size: 2rem;
 }
 
-/* Splash Page */
-#splash{
-	background-image: url('http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg');
-}
-#splash>img{
-	position: absolute;
-}
 
 /****************** CUSTOM *********************/
 

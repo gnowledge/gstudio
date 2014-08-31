@@ -8915,7 +8915,7 @@ body {
 
 /* line 74, ../../../scss/_metastudio_styles.scss */
 .workspace {
-  background: url("body_background_image.png") no-repeat 0 bottom;
+  background: url("watermark.png") no-repeat 0 80%;
   min-height: 100%;
   margin-bottom: -130px !important;
   -webkit-box-sizing: border-box;
@@ -9476,20 +9476,9 @@ input.node-title {
   font-size: 2rem;
 }
 
-/* Splash Page */
-/* line 638, ../../../scss/_metastudio_styles.scss */
-#splash {
-  background-image: url("http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg");
-}
-
-/* line 641, ../../../scss/_metastudio_styles.scss */
-#splash > img {
-  position: absolute;
-}
-
 /****************** CUSTOM *********************/
 /* UI Button */
-/* line 648, ../../../scss/_metastudio_styles.scss */
+/* line 641, ../../../scss/_metastudio_styles.scss */
 .ui.button {
   margin-right: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -9498,35 +9487,35 @@ input.node-title {
   padding: 0.8rem;
   z-index: 500;
 }
-/* line 658, ../../../scss/_metastudio_styles.scss */
+/* line 651, ../../../scss/_metastudio_styles.scss */
 .ui.button label {
   color: #666;
 }
-/* line 661, ../../../scss/_metastudio_styles.scss */
+/* line 654, ../../../scss/_metastudio_styles.scss */
 .ui.button small {
   margin-left: 2px;
   display: inline;
 }
-/* line 665, ../../../scss/_metastudio_styles.scss */
+/* line 658, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
   background-color: rgba(0, 0, 0, 0.9);
 }
-/* line 668, ../../../scss/_metastudio_styles.scss */
+/* line 661, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover label, .ui.button:active label {
   color: #ddd;
 }
-/* line 671, ../../../scss/_metastudio_styles.scss */
+/* line 664, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover small, .ui.button:active small {
   display: inline;
 }
-/* line 674, ../../../scss/_metastudio_styles.scss */
+/* line 667, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover:focus, .ui.button:active:focus {
   font-weight: bold;
 }
 
 /* For landing page */
-/* line 683, ../../../scss/_metastudio_styles.scss */
+/* line 676, ../../../scss/_metastudio_styles.scss */
 #landing > header {
   background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
   position: relative;
@@ -9535,19 +9524,19 @@ input.node-title {
   padding: 1rem 0 1rem 0;
   border-bottom: 2px solid #00CEFD;
 }
-/* line 691, ../../../scss/_metastudio_styles.scss */
+/* line 684, ../../../scss/_metastudio_styles.scss */
 #landing > header .logo {
   color: #555;
   text-align: center;
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.8);
 }
-/* line 696, ../../../scss/_metastudio_styles.scss */
+/* line 689, ../../../scss/_metastudio_styles.scss */
 #landing > header .logo img {
   max-width: 75%;
   margin-bottom: 0.5rem;
 }
-/* line 701, ../../../scss/_metastudio_styles.scss */
+/* line 694, ../../../scss/_metastudio_styles.scss */
 #landing > header .logo h1, #landing > header .logo article h1:not(.subheader) div input, article h1:not(.subheader) div #landing > header .logo input {
   font-size: 1.2rem;
   line-height: 1;
@@ -9556,50 +9545,50 @@ input.node-title {
   color: white;
 }
 
-/* line 714, ../../../scss/_metastudio_styles.scss */
+/* line 707, ../../../scss/_metastudio_styles.scss */
 .landing {
   position: relative;
 }
-/* line 717, ../../../scss/_metastudio_styles.scss */
+/* line 710, ../../../scss/_metastudio_styles.scss */
 .landing h2 {
   margin-top: 2rem;
 }
 
-/* line 722, ../../../scss/_metastudio_styles.scss */
+/* line 715, ../../../scss/_metastudio_styles.scss */
 section.promo {
   background-color: rgba(0, 0, 0, 0.9);
   border-bottom: 4px solid #00CEFD;
 }
-/* line 726, ../../../scss/_metastudio_styles.scss */
+/* line 719, ../../../scss/_metastudio_styles.scss */
 section.promo .meta h4 {
   color: white;
 }
 
-/* line 733, ../../../scss/_metastudio_styles.scss */
+/* line 726, ../../../scss/_metastudio_styles.scss */
 ul.partner img {
   max-height: 150px;
 }
 
-/* line 738, ../../../scss/_metastudio_styles.scss */
+/* line 731, ../../../scss/_metastudio_styles.scss */
 div.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
   border: 2px solid #12d9e4;
   border-width: 2px 0;
 }
-/* line 743, ../../../scss/_metastudio_styles.scss */
+/* line 736, ../../../scss/_metastudio_styles.scss */
 div.banner > * {
   background-color: #0eacb5;
   color: #eee;
   margin: 0;
 }
-/* line 745, ../../../scss/_metastudio_styles.scss */
+/* line 738, ../../../scss/_metastudio_styles.scss */
 div.banner > * .slide {
   padding: 1rem;
   background-color: #0c969d;
   height: 250px !important;
 }
-/* line 749, ../../../scss/_metastudio_styles.scss */
+/* line 742, ../../../scss/_metastudio_styles.scss */
 div.banner > * .slide > i {
   position: absolute;
   font-size: 15rem;
@@ -9608,26 +9597,26 @@ div.banner > * .slide > i {
   opacity: 0.1;
   right: 5%;
 }
-/* line 760, ../../../scss/_metastudio_styles.scss */
+/* line 753, ../../../scss/_metastudio_styles.scss */
 div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 763, ../../../scss/_metastudio_styles.scss */
+/* line 756, ../../../scss/_metastudio_styles.scss */
 div.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 767, ../../../scss/_metastudio_styles.scss */
+/* line 760, ../../../scss/_metastudio_styles.scss */
 div.banner > * p:first-child {
   color: white;
   font-size: 120%;
 }
 
-/* line 780, ../../../scss/_metastudio_styles.scss */
+/* line 773, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 783, ../../../scss/_metastudio_styles.scss */
+/* line 776, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;
