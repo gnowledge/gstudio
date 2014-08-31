@@ -412,6 +412,6 @@ def edit_entry(request,group_id,node_id):
     '''
     zipped=zip(tags,values)
     variable=RequestContext(request,{'group_id':group_id,'groupid':group_id,'title':GST_current.name ,'tags':tags,'values':values,'zipped':zipped,'content_org':content_org})
-    template="ndf/edit_sentry.html"
+    template="ndf/edit_entry.html"
     return render_to_response(template,variable)
     
