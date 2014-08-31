@@ -9493,7 +9493,7 @@ input.node-title {
 .ui.button {
   margin-right: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.5);
   color: #ddd;
   padding: 0.8rem;
   z-index: 500;
@@ -9510,7 +9510,7 @@ input.node-title {
 /* line 665, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover, .ui.button:active {
   border-color: rgba(255, 255, 255, 0.2);
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.9);
 }
 /* line 668, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover label, .ui.button:active label {
@@ -9562,27 +9562,31 @@ input.node-title {
 }
 
 /* line 720, ../../../scss/_metastudio_styles.scss */
-section.banner {
+section.promo {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+/* line 724, ../../../scss/_metastudio_styles.scss */
+div.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
   border: 2px solid #12b0ff;
   border-width: 2px 0;
-  background-color: rgba(0, 0, 0, 0.9);
 }
-/* line 726, ../../../scss/_metastudio_styles.scss */
-section.banner > * {
+/* line 729, ../../../scss/_metastudio_styles.scss */
+div.banner > * {
   background-color: #0094de;
   color: #eee;
   margin: 0;
 }
-/* line 728, ../../../scss/_metastudio_styles.scss */
-section.banner > * .slide {
+/* line 731, ../../../scss/_metastudio_styles.scss */
+div.banner > * .slide {
   padding: 1rem;
   background-color: #0083c5;
   height: 250px !important;
 }
-/* line 732, ../../../scss/_metastudio_styles.scss */
-section.banner > * .slide > i {
+/* line 735, ../../../scss/_metastudio_styles.scss */
+div.banner > * .slide > i {
   position: absolute;
   font-size: 15rem;
   pointer-events: none;
@@ -9590,26 +9594,26 @@ section.banner > * .slide > i {
   opacity: 0.1;
   right: 5%;
 }
-/* line 743, ../../../scss/_metastudio_styles.scss */
-section.banner > * h3, section.banner > * h4, section.banner > * h5, section.banner > * h6, section.banner > * blockquote {
+/* line 746, ../../../scss/_metastudio_styles.scss */
+div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 746, ../../../scss/_metastudio_styles.scss */
-section.banner > * blockquote {
+/* line 749, ../../../scss/_metastudio_styles.scss */
+div.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 750, ../../../scss/_metastudio_styles.scss */
-section.banner > * p:first-child {
+/* line 753, ../../../scss/_metastudio_styles.scss */
+div.banner > * p:first-child {
   color: white;
   font-size: 120%;
 }
 
-/* line 763, ../../../scss/_metastudio_styles.scss */
+/* line 766, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 766, ../../../scss/_metastudio_styles.scss */
+/* line 769, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;

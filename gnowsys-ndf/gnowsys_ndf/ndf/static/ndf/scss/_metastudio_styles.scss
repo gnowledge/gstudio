@@ -648,7 +648,7 @@ input.node-title{
 .ui.button{
     margin-right: 0.5rem;
     border: 1px solid rgba(0,0,0,0.2);
-    background-color: transparent;
+    background-color: rgba(0,0,0,0.5);
     color: #ddd;
     padding: 0.8rem;
     z-index: 500;
@@ -664,7 +664,7 @@ input.node-title{
     }
     &:hover,&:active{
         border-color: rgba(255,255,255,0.2);
-        background-color: rgba(0,0,0,0.1);
+        background-color: rgba(0,0,0,0.9);
         label{
             color:#ddd;
         }
@@ -717,12 +717,15 @@ input.node-title{
    
     
 }
-section.banner{
+section.promo{
+    background-color: rgba(0,0,0,0.9);
+}
+
+div.banner{
     padding:0 2rem;
     margin-bottom: 2rem;
     border:2px solid lighten($primary-color,10%);
     border-width: 2px 0;
-    background-color: rgba(0,0,0,0.9);
     &>*{
     background-color: $primary-color;
         .slide{
