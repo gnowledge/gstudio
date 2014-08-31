@@ -38,7 +38,7 @@ body{
             }
         img{
             /* Logo */
-			max-height: 75%;
+			height: $topbar-height * 0.8;
 		}
         a{
 			color:white!important;
@@ -65,6 +65,7 @@ body{
             background-color: transparent;
             position: absolute;
             right: 0;
+            padding:8px;
         }
     }
 }
@@ -97,20 +98,15 @@ body{
             min-height: 170px;
             background-color: rgba(0,0,0,0.8);
 
-            .sponsor{
-                background: url("footer_background_image.png") no-repeat center top;
-                &>*{
-                    opacity: 0.1;
-                }
-                &:hover{
-                    background:none;
-                    >*{
-                     opacity: 1;
-                }
-                }
-            }
+           section:first-child{
+               border-bottom: 1px solid #222;
+               margin-bottom: 1rem;
+           }
             a{
 			color: #777;
+                &:hover{
+                    color:#eee;
+                }
 		}
             .gnu-badge{
                 padding: 6px 9px 6px 80px;

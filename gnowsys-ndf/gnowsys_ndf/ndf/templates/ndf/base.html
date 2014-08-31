@@ -85,7 +85,13 @@
 	<ul class="right">
         
         <!-- Search bar -->
-            <li class="has-form search">
+        
+<!-- Old Contextual Search-->
+         <li class="has-form search">
+  {% include "ndf/node_search_base.html" %}
+             </li>
+
+            <li class="has-form search hide">
             
             <form 
                       {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
@@ -363,7 +369,7 @@
 
 
   <footer>
-
+<section class="row">
        <div class="medium-12 columns">
           <ul class="inline-list">
   <li><a href="{{site.ABOUT}}">{% trans "About" %}</a></li>
@@ -376,6 +382,8 @@
   
 </ul>   
       </div>
+    
+    </section>
       
       <div class="medium-2 columns">    	
              <p>
