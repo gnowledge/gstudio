@@ -1,13 +1,19 @@
 {% extends "ndf/node_details_base.html" %}
 
 <!-- from django.contrib.auth.decorators import login_required -->
-{% block title %} Group Dashboard {% endblock %}
+{% block title %} Group Dashboard {% endblock %} 
 
 
 
 {% block body_content %}
 
+<div id="landing">
+{% include "ndf/landing_page_beta.html" %}
+</div>
 
-{% include "ndf/landing_page_beta.html" %}  
+<script>
+    $("body").replaceWith($("#landing"));
+//    $("#landing").appendTo("body");
+</script>
 
 {% endblock %}
