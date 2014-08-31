@@ -9505,7 +9505,7 @@ input.node-title {
 /* line 661, ../../../scss/_metastudio_styles.scss */
 .ui.button small {
   margin-left: 2px;
-  display: none;
+  display: inline;
 }
 /* line 665, ../../../scss/_metastudio_styles.scss */
 .ui.button:hover, .ui.button:active {
@@ -9570,26 +9570,31 @@ section.promo .meta h4 {
   color: white;
 }
 
-/* line 730, ../../../scss/_metastudio_styles.scss */
+/* line 731, ../../../scss/_metastudio_styles.scss */
+ul.partner img {
+  max-height: 150px;
+}
+
+/* line 736, ../../../scss/_metastudio_styles.scss */
 div.banner {
   padding: 0 2rem;
   margin-bottom: 2rem;
   border: 2px solid #12b0ff;
   border-width: 2px 0;
 }
-/* line 735, ../../../scss/_metastudio_styles.scss */
+/* line 741, ../../../scss/_metastudio_styles.scss */
 div.banner > * {
   background-color: #0094de;
   color: #eee;
   margin: 0;
 }
-/* line 737, ../../../scss/_metastudio_styles.scss */
+/* line 743, ../../../scss/_metastudio_styles.scss */
 div.banner > * .slide {
   padding: 1rem;
   background-color: #0083c5;
   height: 250px !important;
 }
-/* line 741, ../../../scss/_metastudio_styles.scss */
+/* line 747, ../../../scss/_metastudio_styles.scss */
 div.banner > * .slide > i {
   position: absolute;
   font-size: 15rem;
@@ -9598,26 +9603,26 @@ div.banner > * .slide > i {
   opacity: 0.1;
   right: 5%;
 }
-/* line 752, ../../../scss/_metastudio_styles.scss */
+/* line 758, ../../../scss/_metastudio_styles.scss */
 div.banner > * h3, div.banner > * h4, div.banner > * h5, div.banner > * h6, div.banner > * blockquote {
   color: white;
 }
-/* line 755, ../../../scss/_metastudio_styles.scss */
+/* line 761, ../../../scss/_metastudio_styles.scss */
 div.banner > * blockquote {
   font-size: 140%;
   font-style: italic;
 }
-/* line 759, ../../../scss/_metastudio_styles.scss */
+/* line 765, ../../../scss/_metastudio_styles.scss */
 div.banner > * p:first-child {
   color: white;
   font-size: 120%;
 }
 
-/* line 772, ../../../scss/_metastudio_styles.scss */
+/* line 778, ../../../scss/_metastudio_styles.scss */
 aside#help h4 {
   color: black;
 }
-/* line 775, ../../../scss/_metastudio_styles.scss */
+/* line 781, ../../../scss/_metastudio_styles.scss */
 aside#help p, aside#help h5, aside#help h6 {
   color: #ddd;
   padding: 0.3rem 0.9375rem;

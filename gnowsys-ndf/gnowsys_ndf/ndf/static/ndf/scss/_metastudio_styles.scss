@@ -660,7 +660,7 @@ input.node-title{
         }
     small{
         margin-left: 2px;
-        display: none;
+        display: inline;
     }
     &:hover,&:active{
         border-color: rgba(255,255,255,0.2);
@@ -724,6 +724,12 @@ section.promo{
         h4{
             color:white;
         }
+    }
+}
+
+ul.partner{
+    img{
+        max-height: 150px;
     }
 }
 
