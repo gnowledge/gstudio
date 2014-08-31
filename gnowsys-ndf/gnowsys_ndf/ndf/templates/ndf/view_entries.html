@@ -1,0 +1,160 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+div.horizontalgap{float:left;overflow:hidden;height:1px;width:0px;}
+
+{% block title %} {{title|upper}} {% endblock %}
+
+{% block help_topics %}
+<ul>
+  <li><a href="#">{{title}} Introduction</a></li>
+  <li><a href="#">Working with {{title}}</a></li>
+  <li><a href="#">{{title}} types</a></li>
+</ul>
+{% endblock %}
+
+
+{% block help_content %}
+  <p>
+    {{title}} entries store the metadata of various {{title}}.
+  </p>
+  
+  <h5>Who can make a entry?</h5>
+  <p>
+    Anyone with an account can create a new {{title}}
+
+{% endblock %}
+{% comment %}
+    {% block related_content %}
+<div class="create card">
+    <div class={{title}}>
+      <br/>
+      <a class="button medium" href="{% url 'create_entries' group_id %}?num={{num}}">
+        <span class="fi-plus">&nbsp;&nbsp;New {{title}}</span>
+      </a>
+    </div>
+  </div>
+{% endblock %}
+{% endcomment %}
+{% block meta_content %}
+  <h2>{{title}}</h2>
+{% endblock %}
+
+
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+ 
+  
+{% endblock %}
+{% comment %}
+{% block body_content %}
+<label><b>{{title}}</b></label>
+</br>
+</br>
+  {% for each in entry_inst %}
+  <div>
+   
+    
+  <a float="left" href={% url 'view_sentry' group_id each %}>{{each.name}}</a>  
+  </br> </br>
+  </br>
+
+
+</div>
+  {% endfor %}
+{% endblock %}
+{% endcomment %}
+
+
+
+
+
+{% block body_content %}
+
+<header class="row">
+  <dl class="tabs" data-tab>
+    <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All {{title}} {% if entry_inst.count %}({{ entry_inst.count }}){% endif %}</a></dd>
+  </dl>
+</header>
+
+{% if searching and entry_inst.count > 0 %}
+<div class="row">
+  <div class="small-12 columns end">
+    <p>Search Results: <span class="label success round">Found {{entry_inst.count}} {{title|lower}}{{entry_inst.count|pluralize}}.</span></p>
+  </div>
+</div>
+
+{% elif searching and entry_inst.count == 0 %}
+<div class="row">
+  <div class="small-12 columns">
+    <p>Search Results: <span class="label alert">No {{title|lower}}{{entry_inst.count|pluralize}} matched your search criteria!!!</span></p>
+  </div>  
+</div>  
+
+{% endif %}
+
+
+<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+
+  {% autopaginate entry_inst 23 %}
+
+  {% for node in entry_inst %}
+  {% get_version_of_module node.pk as version %}
+  <li class="card">
+    <div class="course">
+
+      <header>
+        <div class="label-list">
+          {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          {% endfor %}
+        </div>
+
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+        <h4>{{ node.name|truncatechars:20 }}</h4>
+
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+          <br/>
+          by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </header>
+
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+      
+
+      {% get_user_object node.created_by as user_obj %}
+      {% ifequal user_obj.username user.username %}
+      <a class="small button expand" href="{% url 'view_sentry' groupid node %}">Detail</a> 
+      <a class="button alert tiny" href="{% url 'delete_sentry' groupid node %}?next={{request.path}}">Delete</a>
+      <a class="button alert tiny" href="{% url 'edit_entry' groupid node %}">Edit</a>
+      {% endifequal %}
+
+
+    </div>
+  </li>  
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-12 columns">
+        <h5>This group doesn't have any {{title}}. <b>Be the first to create a {{title|upper}}!</b></h5>
+      </div>
+    </div>
+    {% endif %}
+
+  {% endfor %}
+
+  {% paginate %}
+
+</ul>
+
+
+
+{% endblock %}
+
+
