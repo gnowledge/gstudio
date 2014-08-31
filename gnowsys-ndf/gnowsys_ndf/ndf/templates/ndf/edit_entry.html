@@ -1,0 +1,41 @@
+{% extends "ndf/base.html" %}
+{% block meta_content %}
+  <h3>Editing {{title}}</h3>
+{% endblock %}
+
+
+{% block body_content %}
+<form data-abide id="form-edit-node" method="POST" action="#">
+  {% csrf_token %}
+  <header class="row">
+
+    <h2 class="medium-12 columns">
+     
+      {% if node %}
+      Editing {{title}}: {
+    
+      {% else %}
+      Edit {{title}}
+      {% endif %}
+    </h2>
+
+    </header>
+   
+    
+  {% for each1,each2 in zipped %}
+  <label>{{each1}}</label>
+  <input type=each style="width:500px;height:28px;" name={{each1}} value="{{each2}}">
+  </br>
+  </br>
+  </br>
+  {% endfor %}
+  <div class="" style="width:500px;height:100px;">
+    {% include "ndf/add_editor.html"  with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
+</div>
+</br>
+</br>
+</br></br></br>
+  <input type="submit" value="save" id="save-node" class="button medium-6 columns">
+  </form>
+
+{% endblock %}
