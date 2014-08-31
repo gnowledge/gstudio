@@ -22,11 +22,11 @@
   <div class="row">
   
     <a class="small-2 small-push-1 columns small button" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" title="{% trans 'Upload File' %}">
-      <i class="fi-arrow-up"></i>
+      Upload
     </a>
   
     <a class="small-7 small-pull-1 small-offset-1 columns small button" href="{% url 'data_review' group_name_tag %}">
-      <i class="fi-list-thumbnails"></i> &nbsp; {% trans "Data Review" %}
+      {% trans "Data Review" %}
     </a>
   
   </div>
