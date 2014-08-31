@@ -24,13 +24,18 @@ body{
         }
     ul.language-selector{
         height: $topbar-height;
-        float: left;
+        float: right;
         margin:0;
     }
     .active{
         background-color:black!important;
     }
     h1{
+        .flag{
+                height: 20px;
+            margin-bottom: 4px;
+            margin-right: 2px;
+            }
         img{
             /* Logo */
 			max-height: 75%;
@@ -513,6 +518,8 @@ article{
 
 
 /* Content area */
+
+
 article{
     
 	padding-bottom: 4rem; 
@@ -678,32 +685,41 @@ input.node-title{
 
 /* For landing page */
 
-.landing{
-    position: relative;
-    #language-selector{
-        position: absolute;
-    top:10px;
-    right: 10px;
-    }
-    
-    header{
-        background-image: url(".../nroer/indian_pigments.jpg");
+ body>header{
+        background-image: url("../nroer/indian_pigments.jpg");
         position: relative;
         z-index: 50;
-        background-color: #fff;
-        padding:1rem 0 0 0;
+        background-color: #0A253A;
+        padding:1rem 0 1rem 0;
         @extend .drop-shadow;
+        border-bottom: 2px solid #00CEFD;
         .logo{
             color:#555;
             text-align: center;
-        }
-        
-    h1{
-        font-size: 2rem;
+            padding: 1rem;
+            background-color: rgba(0,0,0,0.8);
+            img{
+                max-width: 75%;
+                margin-bottom: 0.5rem;
+            }
+            
+            h1{
+        font-size: 1.2rem;
             line-height: 1;
+        font-weight: bold;
+        text-transform: uppercase;
+                color:white;
 
     }
+        }
+        
+    
     }
+
+.landing{
+    position: relative;
+    
+   
     
 }
 section.banner{
@@ -711,13 +727,13 @@ section.banner{
     margin-bottom: 2rem;
     border:2px solid lighten($primary-color,10%);
     border-width: 2px 0;
-    background-color: rgba(0,0,0,0.1);
-    
+    background-color: rgba(0,0,0,0.9);
     &>*{
     background-color: $primary-color;
         .slide{
             padding: 1rem;
             background-color: darken($primary-color,5%);
+            height:250px!important;
             &>i{
                 position: absolute;
                 font-size: 15rem;
