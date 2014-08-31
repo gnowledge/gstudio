@@ -504,17 +504,30 @@ This section has been integrated to groupdashboard and appears in block app_acti
             </div>
 
           {% else %}    
-            {{node.mime_type}}
+            
             <div>
               {% if 'image' in node.mime_type %}
+              Resource Type: {{node.mime_type}}
               <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
                 <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}">
               </a>
-
-              {% else %}
-              <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+              {% elif 'audio' in node.mime_type %}
+              <div class="row">
+                <div class="small-12 columns">
+                  <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
+                    <p>Your browser does not support the audio element </p>
+                  </audio>
+                </div>
+              </div>
+              Resource Type: {{node.mime_type}}
+              <br/>
+                <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
                 {{ grid_fs_obj.filename }}
               </a>
+              {% else %}
+                <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                  {{ grid_fs_obj.filename }}
+                </a>
               {% endif %}
 
               {% if user.is_authenticated %}
