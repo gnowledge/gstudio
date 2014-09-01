@@ -34,6 +34,8 @@ try:
 except ImportError:  # old pymongo
   from pymongo.objectid import ObjectId
 ''' imports from application folders/files '''
+
+from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import DATA_TYPE_CHOICES
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
@@ -61,6 +63,7 @@ home_group = collection.Group.one({"name": "home", "_type":"Group"})
 theme_gst = collection.GSystemType.one({ "name": "Theme" })
 theme_item_gst = collection.GSystemType.one({ "name": "theme_item" })
 topic_gst = collection.GSystemType.one({ "name": "Topic" })
+GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'})
 
 class Command(BaseCommand):
     help = "\n\tFor saving data in gstudio DB from NROER schema files. This will create 'File' type GSystem instances.\n\tCSV file condition: The first row should contain DB names.\n"
@@ -213,7 +216,7 @@ def parse_data_create_gsystem(json_file_path):
 
     for i, json_document in enumerate(json_documents_list):
       
-      info_message = "\n\n********** Processing row number : ["+ str(i)+ "] **********"
+      info_message = "\n\n\n********** Processing row number : ["+ str(i)+ "] **********"
       print info_message
       log_list.append(str(info_message))
       

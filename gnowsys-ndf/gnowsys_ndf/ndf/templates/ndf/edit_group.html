@@ -51,7 +51,7 @@ ul#graph-hover.f-dropdown{
 <dl class="accordion" data-accordion>
 
   <dd>
-    <a href="#change_settings">{%  with node.name as name %}{% trans "Click here to change settings of" %} {{name}} </a>
+    <a href="#change_settings">{% blocktrans with node.name as name %} Click here to change settings of {{name}} {% endblocktrans %}</a>
 
     {% if node.name == request.user.username %}
       <div id="change_settings" class="content">
@@ -209,7 +209,7 @@ ul#graph-hover.f-dropdown{
 
   <dd>
 
-    <a id="app_selected" href="#mySystemtype">{% with node.name as name %} {% trans "Click here to select apps for " %} {{name}} </a>{% endwith%}
+    <a id="app_selected" href="#mySystemtype">{% blocktrans with node.name as name %} Click here to select apps for {{name}} {% endblocktrans %}</a>
 
       <div id="mySystemtype" class="content">
 

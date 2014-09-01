@@ -24,16 +24,21 @@ body{
         }
     ul.language-selector{
         height: $topbar-height;
-        float: left;
+        float: right;
         margin:0;
     }
     .active{
         background-color:black!important;
     }
     h1{
+        .flag{
+                height: 20px;
+            margin-bottom: 4px;
+            margin-right: 2px;
+            }
         img{
             /* Logo */
-			max-height: 75%;
+			height: $topbar-height * 0.8;
 		}
         a{
 			color:white!important;
@@ -60,6 +65,7 @@ body{
             background-color: transparent;
             position: absolute;
             right: 0;
+            padding:8px;
         }
     }
 }
@@ -92,20 +98,15 @@ body{
             min-height: 170px;
             background-color: rgba(0,0,0,0.8);
 
-            .sponsor{
-                background: url("footer_background_image.png") no-repeat center top;
-                &>*{
-                    opacity: 0.1;
-                }
-                &:hover{
-                    background:none;
-                    >*{
-                     opacity: 1;
-                }
-                }
-            }
+           section:first-child{
+               border-bottom: 1px solid #222;
+               margin-bottom: 1rem;
+           }
             a{
 			color: #777;
+                &:hover{
+                    color:#eee;
+                }
 		}
             .gnu-badge{
                 padding: 6px 9px 6px 80px;
@@ -513,6 +514,8 @@ article{
 
 
 /* Content area */
+
+
 article{
     
 	padding-bottom: 4rem; 
@@ -678,32 +681,41 @@ input.node-title{
 
 /* For landing page */
 
-.landing{
-    position: relative;
-    #language-selector{
-        position: absolute;
-    top:10px;
-    right: 10px;
-    }
-    
-    header{
-        background-image: url(".../nroer/indian_pigments.jpg");
+ body>header{
+        background-image: url("../nroer/indian_pigments.jpg");
         position: relative;
         z-index: 50;
-        background-color: #fff;
-        padding:1rem 0 0 0;
+        background-color: #0A253A;
+        padding:1rem 0 1rem 0;
         @extend .drop-shadow;
+        border-bottom: 2px solid #00CEFD;
         .logo{
             color:#555;
             text-align: center;
-        }
-        
-    h1{
-        font-size: 2rem;
+            padding: 1rem;
+            background-color: rgba(0,0,0,0.8);
+            img{
+                max-width: 75%;
+                margin-bottom: 0.5rem;
+            }
+            
+            h1{
+        font-size: 1.2rem;
             line-height: 1;
+        font-weight: bold;
+        text-transform: uppercase;
+                color:white;
 
     }
+        }
+        
+    
     }
+
+.landing{
+    position: relative;
+    
+   
     
 }
 section.banner{
@@ -711,13 +723,13 @@ section.banner{
     margin-bottom: 2rem;
     border:2px solid lighten($primary-color,10%);
     border-width: 2px 0;
-    background-color: rgba(0,0,0,0.1);
-    
+    background-color: rgba(0,0,0,0.9);
     &>*{
     background-color: $primary-color;
         .slide{
             padding: 1rem;
             background-color: darken($primary-color,5%);
+            height:250px!important;
             &>i{
                 position: absolute;
                 font-size: 15rem;

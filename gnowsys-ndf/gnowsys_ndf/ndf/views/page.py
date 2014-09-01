@@ -57,18 +57,24 @@ def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     ins_objectid  = ObjectId()
+    print group_id
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+
         if group_ins:
             group_id = str(group_ins._id)
+          
+            print group_id
         else :
             auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+           
+
             if auth :
                 group_id = str(auth._id)
     else :
         pass
-    if app_id is None:
+    if app_id is None:  
         app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Page"})
         if app_ins:
             app_id = str(app_ins._id)
@@ -79,9 +85,8 @@ def page(request, group_id, app_id=None):
     group_object=collection.Group.one({'_id':ObjectId(group_id)})
 
     if request.method == "POST":
-    	# Page search view
+    
       title = gst_page.name
-      
       search_field = request.POST['search_field']
       page_nodes = collection.Node.find({
                                           'member_of': {'$all': [ObjectId(app_id)]},
@@ -108,6 +113,7 @@ def page(request, group_id, app_id=None):
                                           'group_set': {'$all': [ObjectId(group_id)]},
                                           'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
+    
 
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
@@ -273,7 +279,7 @@ def page(request, group_id, app_id=None):
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid  = ObjectId()
+    ins_objectid = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -339,6 +345,7 @@ def create_edit_page(request, group_id, node_id=None):
                                   context_instance=RequestContext(request)
                               )
 
+
 @login_required    
 def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
@@ -357,7 +364,6 @@ def delete_page(request, group_id, node_id):
                 group_id = str(auth._id)
     else :
         pass
-
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))

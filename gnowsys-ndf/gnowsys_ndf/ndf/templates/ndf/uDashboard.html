@@ -26,57 +26,61 @@
 			{% if user.is_authenticated %}
 
 				{% if prof_pic_obj %}
-
 					<a href="#"><img  src="{% url 'getImageThumbnail' group_id prof_pic_obj %}" height="120" width="120"></img></a><br/>
 					{% if user_id == usr %}
 						<a href='#' id="pic">{% trans "Change Profile Picture" %}</a>
 					{% endif %}
+
 				{% else %}
 					<span class="fi-torso" style="font-size:100pt;"> </span> <br/>
 					{% if user_id == usr %}
 						<a href='#' id="pic">{% trans "Upload Profile Picture" %}</a>
 					{% endif %}
+
 				{% endif %}		
 			
 				{% if already_uploaded != "None" %}
 					<br/><br/><span style="color:red"> {% blocktrans %}{{already_uploaded}} image is already uploaded please choose different image {% endblocktrans %}</span>
 				{% endif %}
 
-			<div id="pic_div" style="display:none;">
-				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
-					{% csrf_token %}
-					<input type="file" name="doc[]"  id="docFile" multiple/>
+  			<div id="pic_div" style="display:none;">
+  				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
+  					{% csrf_token %}
+  					<input type="file" name="doc[]"  id="docFile" multiple/>
 
-					<input type="hidden" name="type" value="profile_pic">						
-					<input type="hidden" name="user" value="{{usr}}">					
-					<input type="submit" id="submitpostid" value="Save">
+  					<input type="hidden" name="type" value="profile_pic">						
+  					<input type="hidden" name="user" value="{{usr}}">					
+  					<input type="submit" id="submitpostid" value="Save">
 
-					<p id="message" style="display:none">
-						{% trans "Please wait for uploading profile picture" %}
-					</p>
-						
-				</form>
-			</div>
+  					<p id="message" style="display:none">
+  						{% trans "Please wait for uploading profile picture" %}
+  					</p>
+  						
+  				</form>
+  			</div>
 			{% else %}
 				<p><em>{% trans "You are Not Authorised user please login to upload profile picture" %} </em></p>
+
 			{% endif %}
 		</div>
+
 		<div class="small-9 columns" style="padding-top:30px;">
+
 			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
 			{% blocktrans %}Registerd on : &nbsp;{{DOJ}} {% endblocktrans %}
 		</div>
 	</div>
-	<br/>
-	<div class="row">
+	
+  <br/>
+	
+  <div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
-			<b><a>{{username}}'s Dashboard</a></b>
+			<b><a>{% blocktrans %}{{username}}'s Dashboard{% endblocktrans %}</a></b>
 			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
 		</div>
 	</div>
-	
-	
-
 </div>
+
 
 
   <div class = "row">
@@ -158,8 +162,7 @@
   <hr></hr>
    <div id="Assigned Tasks" >
       
-      <div class="usergroup" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-			<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+     	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
   
   {% for node in user_task %}
@@ -210,9 +213,9 @@
   
 
 </ul>
-      </div>
-
+      
     </div>
+
     <h2>Activities:</h2>
     <hr></hr>
     <div id="Activity">
@@ -277,9 +280,9 @@
 </div>
 
 
+
 <script type="text/javascript">
 	$("input").each(function() {
-
 		$(this).bind('keydown keypress keyup change', function() {
 			var search = (this.value).toLowerCase();    	
     		var resource = (this.name); 
@@ -307,9 +310,6 @@
 				return false;
 			}
 	});
-
-	
-	
 </script>
 
 {% endblock %}

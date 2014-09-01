@@ -13,8 +13,21 @@ factory_gsystem_types = [{'name':'Twist','meta_type':'factory_types'},
                          {'name':'Topic','meta_type':'factory_types'},
                          {'name':'Theme','meta_type':'factory_types'},
                          {'name':'theme_item','meta_type':'factory_types'},
-                         {'name':'Concept','meta_type':'factory_types'}]
-
+                         {'name':'Concept','meta_type':'factory_types'},
+                         {'name':'article','meta_type':'factory_types'},
+                         {'name':'book','meta_type':'factory_types'},
+                         {'name':'conference','meta_type':'factory_types'},
+                         {'name':'inbook','meta_type':'factory_types'},
+                         {'name':'incollection','meta_type':'factory_types'},
+                         {'name':'inproceedings','meta_type':'factory_types'},
+                         {'name':'manual','meta_type':'factory_types'},
+                         {'name':'masterthesis','meta_type':'factory_types'},
+                         {'name':'misc','meta_type':'factory_types'},
+                         {'name':'phdthesis','meta_type':'factory_types'},
+                         {'name':'proceedings','meta_type':'factory_types'},
+                         {'name':'techreport','meta_type':'factory_types'},
+                         {'name':'unpublished_entry','meta_type':'factory_types'},
+                         {'name':'booklet','meta_type':'factory_types'}]
 
 
 #fill attribute name,data_type,gsystem_type name in bellow dict to create factory Attribute Type
@@ -100,8 +113,40 @@ factory_attribute_types = [{'quiz_type':{'gsystem_names_list':['QuizItem'],
                                       'data_type':'basestring',
                                       'meta_type':'factory_types'}},
                            {'adaptation_of':{'gsystem_names_list':['File','Page'],
-                                      'data_type':'basestring',
-                                      'meta_type':'factory_types'}}]
+                                             'data_type':'basestring',
+                                             'meta_type':'factory_types'}},
+                           {'BibTex_entry':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
+                                            'data_type':'basestring',
+                                            'meta_type':'factory_types'}},
+                           {'Citation':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
+                                        'data_type':'basestring',
+                                        'meta_type':'factory_types'}},
+                           {'entry_list':{'gsystem_names_list':['conference','inbook','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','incollection','article','book','booklet'],
+                                          'data_type':'basestring',
+                                          'meta_type':'factory_types'}}]
+
+# the following types are useful when BibApp's second phase
+# development begins. Currently this data is not set as attributes
+# {'author':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+# {'title':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+# {'publisher':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+# {'year':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+# {'volume':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+# {'edition':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+# {'month':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+# {'key':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+# {'note':{'gsystem_names_list':['book'],
+# 'data_type':'basestring','meta_type':'factory_types'}},
+
+
 
 
 #fill relation_type_name,inverse_name,subject_type,object_type in bellow dict to create factory Relation Type
@@ -140,6 +185,8 @@ factory_relation_types = [{'has_shelf':{'subject_type':['Author'],
                           {'assesses':{'subject_type':['Quiz','QuizItem'],
                                        'object_type':['Topic','Concept','Page'], 
                                        'inverse_name':'assessed_by', 
-                                       'meta_type':'factory_types'}}] 
-
-
+                                       'meta_type':'factory_types'}},
+                          {'has_bib_types':{'subject_type':['Bib_App'],
+                                            'object_type':['conference','inbook','inproceedings','incollection','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry','article','booklet','book'],
+                                            'inverse_name':'bib_type_of',
+                                            'meta_type':'factory_types'}}]

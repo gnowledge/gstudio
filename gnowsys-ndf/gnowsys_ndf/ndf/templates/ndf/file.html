@@ -7,65 +7,47 @@
 {% block title %} {{title}} {% endblock %}
 
 {% block help_content %}
+<h3>{% trans "Files" %}</h3>
   <p>
     {% trans "Upload your files from your computer to metaStudio. You can view the existing files in the group and create collections." %}
   </p>
 {% endblock %}
 
 
-{% block meta_content %}
-  <h3>{% trans "Files" %}</h3>
+{% block app_action_list %}
+
  {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
   {% if user_access == "allow" %}
-  <br>
-  <div class="row">
-  
-    <a class="small-2 small-push-1 columns small button" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}" title="{% trans 'Upload File' %}">
-      <i class="fi-arrow-up"></i>
+
+<li>
+    <a href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
+      {% trans "Upload File" %}
     </a>
-  
-    <a class="small-7 small-pull-1 small-offset-1 columns small button" href="{% url 'data_review' group_name_tag %}">
-      <i class="fi-list-thumbnails"></i> &nbsp; {% trans "Data Review" %}
+  </li>
+<li>
+    <a href="{% url 'data_review' group_name_tag %}">
+      {% trans "Data Review" %}
     </a>
-  
-  </div>
+  </li>
   {% endif %}
   {% endif %}
-{% endblock %}
 
 
-{% block search_content %}
-  {% include "ndf/node_search_base.html" %}
-{% endblock %}
+<li>
+    <a href="#" data-reveal-id="library-statistics">
+      {% trans "File Statistics" %}
+    </a>
+  </li>
 
+<div class="medium reveal-modal" id="library-statistics" data-reveal>
 
-{% block related_content %}
- 
-  <h4>File Statistics</h4>
-  <br>
-    <dl class="tabs" data-tab>
-    <dd class="tab-title active"><a href="#bar_visual">Bar</a></dd>
-    <dd class="tab-title"><a href="#pie_visual">Pie</a></dd>
-  </dl>
-  <!-- <p "font-family: tahoma">Hover over to view tooltip</p> -->
-  <br/>
-  <div class="tabs-content">
-  <div id="tooltip" class="hidden">
-      <p><strong> {% trans "Details" %}</strong></p>
-      <p><span id="tip-value">{% trans "100" %}</span></p>
-    </div>
-    <div class="content active" id="bar_visual">
-      {% include "ndf/bar_visualization.html" %}
-  </div>
-  <div class="content" id="pie_visual">
-
-    {% include "ndf/pie_visualization.html" %}
+    {% include "ndf/file_statistics.html" %}
     
-  </div>
+    <a class="close-reveal-modal">&#215;</a>
 </div>
-{% endblock %}
 
+{% endblock %}
 
 {% block body_content %}
 {% get_group_name groupid as group_name_tag %}
@@ -147,8 +129,13 @@
               
           </header>
                 <section>
+                {% if "image" in file.mime_type or "video" in file.mime_type or "pdf" in file.mime_type%}
 <img class="preview" src="{% url 'getFileThumbnail' group_name_tag file %}" />
      <!--     <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>-->
+     {% elif "audio" in file.mime_type %}
+      <i class="fi-volume"></i>
+
+     {% endif %}
                     </section>
           <footer>
 	    {% comment %}
