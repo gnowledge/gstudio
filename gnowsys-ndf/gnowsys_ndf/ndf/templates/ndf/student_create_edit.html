@@ -723,7 +723,7 @@
   });
 
 // On click of save ----------------------------------------------------------------------------------------------
-  $("#save-node").click(function() {
+  $(document).on("click", "#save-node", function() {
   // Store concatenated value of first, middle & last name field's values into name field (hidden input field) ---
     name = ""
     first_name = $("#first_name").val().trim()
@@ -740,7 +740,7 @@
     }
 
     $("#name").val(name);
-  
+
   // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
     $(".content").find(":input[disabled]").each(function(){
       $(this).removeAttr('disabled');
