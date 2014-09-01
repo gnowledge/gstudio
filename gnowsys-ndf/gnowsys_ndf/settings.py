@@ -415,6 +415,7 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+
 META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
 
 GROUP_AGENCY_TYPES=["Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
@@ -424,7 +425,7 @@ AUTHOR_AGENCY_TYPES=["Student","Teacher","TeacherTrainer","Faculty","Researcher"
 # Built-in GAPPS list 
 # DON'T EDIT THIS LIST - for listing purpose on gapps-menubar/gapps-iconbar, instead make use of below one in local_setting file
 # ONLY TO BE EDITED - in case of adding new built-in GAPPS
-GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Browse Topic", u"Browse Resource", u"Meeting"]
+GAPPS = [u"Page", u"File", u"Group", u"Image", u"Video", u"Forum", u"Quiz", u"Course", u"Module", u"Batch", u"Task", u"WikiData", u"Browse Topic", u"Browse Resource", u"Meeting",u"Bib_App"]
 
 # This is to be used for listing default GAPPS on gapps-menubar/gapps-iconbar
 # DON'T EDIT this variable here.
@@ -446,6 +447,7 @@ GSTUDIO_SITE_ABOUT=""
 GSTUDIO_SITE_POWEREDBY=""
 GSTUDIO_SITE_CONTACT=""
 GSTUDIO_SITE_PARTNERS=""
+GSTUDIO_SITE_GROUPS=""
 GSTUDIO_ORG_LOGO=""
 GSTUDIO_SITE_ORG=""
 GSTUDIO_SITE_CONTRIBUTE=""

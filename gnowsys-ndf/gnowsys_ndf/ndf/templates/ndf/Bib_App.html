@@ -1,0 +1,122 @@
+{% extends "ndf/base.html" %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+{% get_group_name groupid as group_name_tag %}
+
+
+{% block title %} <h> Bibliography Citations </h> {% endblock %}
+
+{% block help_topics %}
+<ul>
+  <li><a href="#">Bibtex entry</a></li>
+  <li><a href="#">Working with Bibtex entries</a></li>
+  <li><a href="#">BIbtex entry types</a></li>
+</ul>
+{% endblock %}
+
+{% block help_content %}
+  <p>
+    BibTex entries store the metadata of various articles,booklets ,journals.
+  </p>
+  
+  <h5>Who can make a entry?</h5>
+  <p>
+    Anyone with an account can create a new article. When creating a new article, the initial contributor can choose to have a defined list of authors, all of whom can edit the page, or have an open, wiki-like format where anyone can contribute.
+  </p>
+{% endblock %}
+
+
+{% block meta_content %}
+  </br>
+</br>
+{% endblock %}
+{% comment %}
+{% block body_content %}
+<p>This app allows users to store bibliographic data.You can cite that data while creating pages in MetaStudio.</p>
+{% endblock %}
+{% endcomment %}
+{% block search_content %}
+  {% include "ndf/node_search_base.html" %}
+
+
+  
+  {% if user.is_authenticated %}
+  {% user_access_policy groupid request.user as user_access %}
+  {% if user_access == "allow" %}
+
+ <a href="{% url 'create_entries' group_id %}?num=0" class="fi-plus"/> &nbsp&nbsp</a> 
+
+
+ <a href ="{% url 'view_entries' group_id %}?num=0">Article</a>
+ 
+<br/>
+ <br/>
+
+  <a href="{% url 'create_entries' group_id %}?num=1" class="fi-plus"> &nbsp&nbsp</a> 
+ 
+  
+ <a href ="{% url 'view_entries' group_id %}?num=1">Book</a>
+ </t>
+
+<br/> <br/>
+ <a href="{% url 'create_entries' group_id %}?num=2" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=2">Booklet</a>
+ </t></br></br>
+  <a href="{% url 'create_entries' group_id %}?num=3" class="fi-plus"> &nbsp&nbsp</a> 
+
+ <a href ="{% url 'view_entries' group_id %}?num=3">Conference</a>
+ </t></br></br>
+  <a href="{% url 'create_entries' group_id %}?num=4" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id  %}?num=4 ">Inbook</a> 
+ </t>
+ <br/> <br/>
+  <a href="{% url 'create_entries' group_id %}?num=5" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=5">Incollection</a> 
+ </t>
+  <br/> <br/>
+   <a href="{% url 'create_entries' group_id %}?num=6" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=6">Inproceedings</a> 
+ </t>
+ 
+ <br/> <br/>
+  <a href="{% url 'create_entries' group_id %}?num=7" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=7">Manual</a> 
+ </t>
+ 
+ <br/> <br/>
+ <a href="{% url 'create_entries' group_id %}?num=8" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=8">Masterthesis</a> 
+ </t>
+
+ <br/> <br/>
+ <a href="{% url 'create_entries' group_id %}?num=9" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=9">Misc</a> 
+ </t>
+
+ <br/> <br/>
+ <a href="{% url 'create_entries' group_id %}?num=10" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=10">Phdthesis</a> 
+ </t>
+ <br/> <br/>
+ <a href="{% url 'create_entries' group_id %}?num=11" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id  %}?num=11">Proceedings</a> 
+ </t>
+
+ <br/> <br/>
+ <a href="{% url 'create_entries' group_id %}?num=12" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=12">Techreport</a>
+ </t>
+
+ <br/> </br>
+ <a href="{% url 'create_entries' group_id %}?num=13" class="fi-plus"> &nbsp&nbsp</a> 
+ <a href ="{% url 'view_entries' group_id %}?num=13">unpublished_entry</a>
+ </t>
+
+ <br/>  
+
+ {% endif %}
+  {% endif %}
+{% endblock %}
+
+
+
