@@ -129,8 +129,13 @@
               
           </header>
                 <section>
+                {% if "image" in file.mime_type or "video" in file.mime_type or "pdf" in file.mime_type%}
 <img class="preview" src="{% url 'getFileThumbnail' group_name_tag file %}" />
      <!--     <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>-->
+     {% elif "audio" in file.mime_type %}
+      <i class="fi-volume"></i>
+
+     {% endif %}
                     </section>
           <footer>
 	    {% comment %}
