@@ -53,7 +53,7 @@
 {% get_group_name groupid as group_name_tag %}
 
 <header class="row">
-   <dl class="tabs" data-tab>
+   <dl class="tabs" data-tab data-options="deep_linking:true">
      <dd class="active"><a href="#view-all"><i class="fi-eye"></i>All files {% if files.count %}({{ files.count }}){% endif %}</a></dd>
      <dd><a href="#view-doc"><i class="fi-page-filled"></i>Documents {% if docCollection.count %}({{ docCollection.count }}){% endif %}</a></dd>
      <dd><a href="#view-image"><i class="fi-camera"></i>Images {% if imageCollection.count %}({{ imageCollection.count }}){% endif %}</a></dd>

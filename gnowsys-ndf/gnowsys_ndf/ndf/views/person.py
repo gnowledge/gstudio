@@ -249,20 +249,26 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
                 
-                field_value = request.FILES[field_instance["name"]]
-                file_name = person_gs.name + " -- " + field_instance["altnames"]
-                content_org = ""
-                tags = ""
+                if field_instance["name"] in request.FILES:
+                  field_value = request.FILES[field_instance["name"]]
 
+                else:
+                  field_value = ""
+                
                 # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
-                field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags)[0]
+                if field_value != '' and field_value != u'':
+                  file_name = person_gs.name + " -- " + field_instance["altnames"]
+                  content_org = ""
+                  tags = ""
+                  field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
 
               else:
                 # Other AttributeTypes 
                 field_value = request.POST[field_instance["name"]]
 
               # field_instance_type = "GAttribute"
-              if field_instance["name"] == "12_passing_year" or field_instance["name"] == "degree_passing_year":
+              print "\n Parsing data for: ", field_instance["name"]
+              if field_instance["name"] in ["12_passing_year", "degree_passing_year", "registration_year"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
               elif field_instance["name"] == "dob":
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
