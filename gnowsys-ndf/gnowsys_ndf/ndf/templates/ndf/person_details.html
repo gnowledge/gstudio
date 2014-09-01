@@ -31,7 +31,7 @@
         </small>      
       </h2>
 
-      <dl class="row tabs" data-tab>
+      <dl class="row tabs" data-tab data-options="deep_linking:true">
         {% for tab_details in property_order_list %}
         <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to add {{tab_details.0}} details...">
           <a href="#panel_{{tab_details.0}}">{{tab_details.0}}</a>

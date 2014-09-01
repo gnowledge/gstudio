@@ -63,7 +63,7 @@
 {% get_group_name groupid as group_name_tag %}
 
 <header class="row">
-  <dl class="tabs" data-tab>
+  <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd>
     {% blocktrans %}<dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>{% endblocktrans %}
   </dl>
