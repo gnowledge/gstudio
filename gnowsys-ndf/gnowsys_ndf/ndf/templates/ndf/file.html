@@ -194,7 +194,7 @@
 
 
     <!-- Card -->
-    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+    <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
 
       <!-- Existing card list-->
       {% autopaginate docCollection 23 %}
@@ -290,6 +290,11 @@
       <!-- Existing card list-->
       {% for image in imageCollection %}
       {% get_grid_fs_object image as grid_fs_obj %}
+       
+        
+        
+        
+        
       <li class="card">
         <div class="file">
 	   
