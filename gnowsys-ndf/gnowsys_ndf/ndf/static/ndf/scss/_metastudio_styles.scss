@@ -107,17 +107,10 @@ body{
                     color:#eee;
                 }
 		}
-            .gnu-badge{
-                padding: 6px 9px 6px 80px;
-                border: 1px dashed #ddd;
-                margin-bottom: 3px;
-                margin-right: 3px;
-                display: inline-block;
-                background: #fafafa url("../../../images/gnu-head.png") no-repeat -35px -9px;
-                &:hover{
-                    background-position: -35px -19px;
-                }
-            }
+           strong a{
+               border-bottom: 1px dotted #555;
+           }
+               
 		}
 
 
