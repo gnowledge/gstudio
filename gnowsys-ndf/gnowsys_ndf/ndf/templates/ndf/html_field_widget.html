@@ -21,14 +21,24 @@
   </div>
 
   {% elif field.validators.0 == "email" %}
-    <input type="email" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
+    <input type="email" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          {% if not field.editable %}readonly{% endif %} 
+          {% if is_required_field %}required{% endif %} 
+          style="float:left; width:95%"
+    />
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% blocktrans with alt=field.altnames %} Please fill valid {{alt}}! {% endblocktrans %}</small>
     {% endif %}
 
   {% elif field.validators.0 == "tel" %}
-    <input type="tel" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" placeholder="{{field.help_text}}" {% if is_required_field %}required{% endif %} pattern="{{field.validators.1}}" style="float:left; width:95%"/>
+    <input type="tel" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          placeholder="{{field.help_text|default_if_none:''}}" 
+          {% if not field.editable %}readonly{% endif %} 
+          {% if is_required_field %}required{% endif %} 
+          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
+          style="float:left; width:95%"
+    />
     {% if is_required_field or field.validators %}
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
@@ -37,21 +47,39 @@
     {% endif %}
 
   {% elif field_type == "unicode" or field_type == "basestring" %}
-    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          placeholder="{{field.help_text|default_if_none:''}}" 
+          {% if not field.editable %}readonly{% endif %} 
+          {% if is_required_field %}required{% endif %} 
+          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
+          style="float:left; width:95%"
+    />
+    {% if is_required_field or field.validators %}
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %} Please fill {{alt}}! {% endblocktrans %}</small>
+    {% endif %}
+    <small class="error">{% blocktrans with alt=field.altnames %} Please fill a valid {{alt}}! {% endblocktrans %}</small>
     {% endif %}
 
   {% elif field_type == "long" %}
-    <input type="text" maxlength="{{field.maxlength}}" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" {% if is_required_field %}required{% endif %} style="float:left; width:95%"/>
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          {% if is_required_field %}required{% endif %} 
+          maxlength="{{field.maxlength}}" 
+          style="float:left; width:95%"
+    />
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% blocktrans with alt=field.altnames %} Please fill valid {{alt}}! {% endblocktrans %}</small>
     {% endif %}
 
   {% elif field_type == "datetime" %}
-    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:field.validators.0}}" class="{{field.validators.1}}" {% if is_required_field %}required{% endif %} style="float:left; width:10rem" placeholder="{{field.validators.2}}"/>
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:field.validators.0}}" 
+          placeholder="{{field.validators.2}}"
+          {% if not field.editable %}readonly{% endif %} 
+          {% if is_required_field %}required{% endif %} 
+          class="{{field.validators.1}}" 
+          style="float:left; width:10rem" 
+    />
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
     <small class="error">{% blocktrans with alt=field.altnames %} Please set {{alt}}! {% endblocktrans %}</small>
