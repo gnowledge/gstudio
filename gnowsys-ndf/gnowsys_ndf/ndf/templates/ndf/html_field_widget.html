@@ -94,10 +94,10 @@
       }
     </style>
     <div style="float:left;">
-      <input type="text" id="uploadFile" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" {% if is_required_field %}required{% endif %} />
+      <input type="text" id="uploadFile_{{field.name}}" value="" placeholder="Choose {{field.altnames|lower}}" disabled="disabled" style="float:left; width:18rem; margin-right:0.5rem;" {% if is_required_field %}required{% endif %} />
       <a href="#" class="fileUpload button tiny round" style="margin-top:2px;">
           <span>{% trans "Upload" %}</span>
-          <input id="uploadBtn" type="file" name="{{field.name}}" class="upload" {% if is_required_field %}required{% endif %} />
+          <input id="uploadBtn_{{field.name}}" type="file" name="{{field.name}}" class="upload" {% if is_required_field %}required{% endif %} />
           <small class="error">{% trans "Upload! " %}</small>
       </a>
       {% if is_required_field %}
@@ -105,9 +105,9 @@
       {% endif %}
     </div>
     <script type="text/javascript">
-      $('#uploadBtn').change(function () {
+      $('#uploadBtn_{{field.name}}').change(function () {
         // alert("coming here " + this.value)
-        $('#uploadFile').val(this.value);
+        $('#uploadFile_{{field.name}}').val(this.value);
       });
     </script>
 
