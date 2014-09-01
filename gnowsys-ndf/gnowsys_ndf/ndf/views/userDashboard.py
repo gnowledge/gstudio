@@ -11,7 +11,7 @@ from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from gnowsys_ndf.ndf.views.ajax_views import set_drawer_widget
 from gnowsys_ndf.settings import LANGUAGES
-
+from gnowsys_ndf.notification import models as notification
 from django_mongokit import get_database
 
 try:
@@ -250,11 +250,57 @@ def uDashboard(request, group_id):
         uploaded = obj_img.name
 
     
-    user_group = get_user_group(userObject)
+    #user_group = get_user_group(userObject)
+    group_list=[]
+    user_activity=[]
+    group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}}).limit(4)
+    for i in group_cur:
+        group_list.append(i)
+        
     user_task = get_user_task(userObject)
     user_notification = get_user_notification(userObject)
-    user_activity = get_user_activity(userObject)
-                                                         
+    #user_activity = get_user_activity(userObject)
+    activity = ""
+    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
+                                                 
+                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
+
+                                                 }).sort('last_update', -1).limit(4)
+    a_user=[]
+    for i in activity_user:
+        if i._type != 'Batch' or i._type != 'Course' or i._type !='Module':
+            a_user.append(i)
+    for each in a_user:
+      if each.created_by == each.modified_by :
+        if each.last_update == each.created_at:
+          activity =  'created'
+        else :
+          activity =  'modified'
+      else :
+        activity =  'created'
+      if each._type == 'Group':
+
+        user_activity.append(each)
+      else :
+        member_of = collection.Node.find_one({"_id":each.member_of[0]})
+        user_activity.append(each)
+    notification_list=[]    
+    notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)
+    for each in notification_object:
+      ntid = each.notice_type_id
+      ntype = notification.NoticeType.objects.get(id=ntid)
+      label = ntype.label.split("-")[0]
+      notification_list.append(label)
+    
+    
+    user_assigned = []
+    attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username})
+    for attr in attr_assignee :
+     task_node = collection.Node.find_one({'_id':attr.subject})
+     user_assigned.append(task_node) 
+    
+                                                          
     obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
     
     collab_drawer = []	
@@ -278,15 +324,16 @@ def uDashboard(request, group_id):
         img_obj = collection.Node.one({'_type': 'File', '_id': ObjectId(Index) })      
       else:
         img_obj = "" 
-
+    print group_id
     return render_to_response("ndf/uDashboard.html",
                               {'username': usrname, 'user_id': ID, 'DOJ': date_of_join,
                                'group_id':group_id, 'usr': current_user,             
                                'author':auth,
                                'already_uploaded': uploaded,
                                'groupid':group_id,'prof_pic_obj': img_obj,
-                               'user_activity':user_activity, 'user_notification':user_notification,
-                               'user_task': user_task,'user_group':user_group
+                               'user_groups':group_list,
+                               'user_activity':user_activity, 'user_notification':notification_list,
+                               'user_task': user_assigned
                               },
                               context_instance=RequestContext(request)
     )
@@ -333,3 +380,50 @@ def user_preferences(request,group_id,auth_id):
     except Exception as e:
         print "Exception in userpreference view "+str(e)
         return HttpResponse("Failure")
+def user_template_view(request,group_id):
+    
+    auth_group = None
+    group_list=[]
+    group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}}).limit(4)
+    for i in group_cur:
+        group_list.append(i)
+
+    blank_list = []
+    attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username})
+    for attr in attr_assignee :
+     task_node = collection.Node.find_one({'_id':attr.subject})
+     blank_list.append(task_node) 
+       
+    notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)
+    for each in notification_object:
+      print "notification details"
+      ntid = each.notice_type_id
+      ntype = notification.NoticeType.objects.get(id=ntid)
+      label = ntype.label.split("-")[0]
+      blank_list.append({'label':label, 'display': ntype.display})
+    blank_list.reverse()
+     
+    blank_list = []
+    activity = ""
+    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'Group'},{'_type':'File'}]}, 
+                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] }).sort('last_update', -1).limit(4)
+    for each in activity_user:
+      if each.created_by == each.modified_by :
+        if each.last_update == each.created_at:
+          activity =  'created'
+        else :
+          activity =  'modified'
+      else :
+        activity =  'created'
+      if each._type == 'Group':
+        blank_list.append(each)
+      else :
+        member_of = collection.Node.find_one({"_id":each.member_of[0]})
+        blank_list.append(each)
+    
+    
+    template = "ndf/task_card_view.html"
+    #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
+    variable = RequestContext(request, {'TASK_inst':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
+    return render_to_response(template, variable)

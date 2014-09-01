@@ -40,7 +40,7 @@
 				{% endif %}		
 			
 				{% if already_uploaded != "None" %}
-					<br/><br/><span style="color:red"> {{already_uploaded}} {% trans "image is already uploaded please choose different image" %}</span>
+					<br/><br/><span style="color:red"> {% blocktrans %}{{already_uploaded}} image is already uploaded please choose different image {% endblocktrans %}</span>
 				{% endif %}
 
   			<div id="pic_div" style="display:none;">
@@ -65,8 +65,9 @@
 		</div>
 
 		<div class="small-9 columns" style="padding-top:30px;">
-			<h4><a href="#">{% blocktrans %} Welcome {{username}} {% endblocktrans %} </a></h4>
-			{% blocktrans %} Registerd on: &nbsp;{{DOJ}} {% endblocktrans %}
+
+			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
+			{% blocktrans %}Registerd on : &nbsp;{{DOJ}} {% endblocktrans %}
 		</div>
 	</div>
 	
@@ -81,76 +82,204 @@
 </div>
 
 
-<div class="row">
-  <div class="row">
-    <div class="small-9 columns" >
-      <h2>Group Statistics:</h2>
-      <div class="usergroup" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-      	{% for each in user_group %}
-      	<div class="row" style="padding:1px; " >
-      	  <div class="small-3 columns"> <a href="/{{each.name}}">{{each.name}}</a>  </div>
-      	  <div class="small-1 columns"> {{each.access}} </div>
-      	  <div class="small-4 columns"> {{each.created_at}} </div>
-      	  <div class="small-1 columns"> {{each.created_by}} </div>
-      	</div>
-      	{% empty %}
-      	<div> No groups </div>
-      	{% endfor %}
+
+  <div class = "row">
+    <h2>Groups:</h2>
+    <hr></hr>
+    <div class ="small-11 rows" id="trial">
+      
+      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  
+  
+  {% for node in user_groups %}
+    
+  {% get_version_of_module node.pk as version %}
+  <li class="card">
+    <div class="groups">
+      <header>
+        <div class="label-list">
+          {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          {% endfor %}
+        </div>
+          
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+        <h4>{{ node.name|truncatechars:20 }}</h4>
+
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+          <br/>
+          by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </header>
+
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+      <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a> 
+
+      
+      
+    </div>
+  </li>  
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-12 columns" align="left">
+       <h5> {% blocktrans %}No Groups </b>{% endblocktrans %} </h5>
       </div>
     </div>
+    {% endif %}
 
-    <div class="small-3 columns">
-      <h2>Notification:</h2>
-      <div class="user_notification" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-    	{% for each in user_notification %}
-    	<div class="row" style="padding:2px; " >
-    	  <div class="small-12 columns"> {{each.label}} <div style="font-size: x-small;">{{each.display}} </div> </div>
-    	</div>
-    	{% empty %}
-    	<div> No notification </div>
-    	{% endfor %}
-      </div>
+  {% endfor %}
+
+  
+
+</ul>
+
+
+
+	
+    </div>
+
+<!--<h2> Notifications:</h2> -->
+<hr></hr>
+    <div id="Notification">
+      
+      <div>
+      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+      <li class="card">
+
+      </li>
+
+      </ul>
     </div>
   </div>
+  
+  <h2>Assigned Tasks:</h2>
+  <hr></hr>
+   <div id="Assigned Tasks" >
+      
+     	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  
+  
+  {% for node in user_task %}
+    
+  {% get_version_of_module node.pk as version %}
+  <li class="card">
+    <div class="AssignedTask">
+      <header>
+        <div class="label-list">
+          {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          {% endfor %}
+        </div>
+          
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
 
-  <div class="row">
-    <div class="small-9 columns" >
-      <h2>Assigned Tasks:</h2>
-      <div class="usergroup" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-      	{% for each in user_task %}
-      	<div class="row" style="padding:1px; " >
-      	  <div class="small-3 columns"> <a href="/{{each.group_name}}/task/{{each.id}}">{{each.name}}</a>  </div>
-      	  <div class="small-1 columns"> {{each.status}} </div>
-      	  <div class="small-4 columns"> {{each.created_at}} </div>
-      	  <div class="small-1 columns"> {{each.created_by}} </div>
-      	</div>
-      	{% empty %}
-      	<div> No task </div>
-      	{% endfor %}
+        <h4>{{ node.name|truncatechars:20 }}</h4>
+
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+          <br/>
+          by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </header>
+
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+      <a class="small button expand" href="{% url 'task_details' group_id node.pk %}">{% trans "Detail" %}</a> 
+
+      
+
+      
+    </div>
+  </li>  
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-2 columns" align="right">
+       <h5> {% blocktrans %} No Assinged Task </b>{% endblocktrans %} </h5>
       </div>
     </div>
+    {% endif %}
 
-    <div class="small-3 columns">
-      <h2>Activity:</h2>
-      <div class="user_activity" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-      	{% for each in user_activity %}
-      	<div class="row" style="padding:3px; " >
-      	  <div class="small-12 columns"> 
-          {% if not each.group_id %} 
-            Group <a href="/{{each.name}}"> {{each.name}}</a> 
-          {% else %}
-            {{each.member_of|title}}  <a href="/{{each.group_id}}/{{each.member_of}}/{{each.id}}"> {{each.name}} </a>  
-          {% endif %} 
-          is {{each.activity}} on {{each.date}}
-          </div>
-      	</div>
-      	{% empty %}
-      	<div> No notification </div>
-      	{% endfor %}
+  {% endfor %}
+
+  
+
+</ul>
+      
+    </div>
+
+    <h2>Activities:</h2>
+    <hr></hr>
+    <div id="Activity">
+      
+       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+  
+  
+  {% for node in user_activity %}
+    
+  {% get_version_of_module node.pk as version %}
+  {% get_url node.pk as res_type %}
+  <li class="card">
+    <div class="course">
+      <header>
+        <div class="label-list">
+          {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
+          {% endfor %}
+        </div>
+          
+        <div class="th"><img src="/static/ndf/scss/metastudio/logo.svg"></div>
+
+        <h4>{{ node.name|truncatechars:20 }}</h4>
+
+        <div>
+          <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+          <br/>
+          by <span href="#" class="user" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+          </small>
+        </div>
+      </header>
+
+      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+      {% if res_type == 'group' %}
+      <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a>
+      {% elif res_type %}
+      	 <a class="small button expand" href="{% url res_type group_id node.pk  %}">{% trans "Detail" %}</a> 
+
+      
+      {% endif %}
+      
+    </div>
+  </li>  
+
+  {% empty %}
+    {% if not searching %}
+    <div class="row">
+      <div class="small-12 columns" align="left">
+       <h5> {% blocktrans %}No Recent Activities </b>{% endblocktrans %} </h5>
       </div>
+    </div>
+    {% endif %}
+
+  {% endfor %}
+
+  
+
+</ul>
+
     </div>
   </div>
 </div>
+
+
 
 <script type="text/javascript">
 	$("input").each(function() {
