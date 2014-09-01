@@ -188,7 +188,7 @@
 
       <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
 
-      <a class="small button expand" href="url 'task_details' group_name node">{% trans "Detail" %}</a> 
+      <a class="small button expand" href="{% url 'task_details' group_id node.pk %}">{% trans "Detail" %}</a> 
 
       
 
@@ -249,7 +249,7 @@
       {% if res_type == 'group' %}
       <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a>
       {% elif res_type %}
-      	 <a class="small button expand" href="{% url res_type groupid node.pk  %}">{% trans "Detail" %}</a> 
+      	 <a class="small button expand" href="{% url res_type group_id node.pk  %}">{% trans "Detail" %}</a> 
 
       
       {% endif %}

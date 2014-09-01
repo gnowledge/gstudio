@@ -261,9 +261,16 @@ def uDashboard(request, group_id):
     user_notification = get_user_notification(userObject)
     #user_activity = get_user_activity(userObject)
     activity = ""
-    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'Group'},{'_type':'File'}]}, 
-                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] }).sort('last_update', -1).limit(4)
-    for each in activity_user:
+    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
+                                                 
+                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
+
+                                                 }).sort('last_update', -1).limit(4)
+    a_user=[]
+    for i in activity_user:
+        if i._type != 'Batch' or i._type != 'Course' or i._type !='Module':
+            a_user.append(i)
+    for each in a_user:
       if each.created_by == each.modified_by :
         if each.last_update == each.created_at:
           activity =  'created'
@@ -273,11 +280,9 @@ def uDashboard(request, group_id):
         activity =  'created'
       if each._type == 'Group':
 
-        print each.name
         user_activity.append(each)
       else :
         member_of = collection.Node.find_one({"_id":each.member_of[0]})
-        print each.name
         user_activity.append(each)
     notification_list=[]    
     notification_object = notification.NoticeSetting.objects.filter(user_id=request.user.id)

@@ -923,7 +923,9 @@ def get_url(groupid):
 		elif type_name == 'Theme' or type_name == 'theme_item':
 			return 'theme_page'
 		elif type_name == 'Forum':
-			return 'show'	
+			return 'show'
+		elif type_name == 'Task':
+			return 'task_details'  		
 	elif node._type == 'Group' :
 		return 'group'
 
