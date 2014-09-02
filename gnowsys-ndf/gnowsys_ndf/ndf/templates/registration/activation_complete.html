@@ -6,13 +6,11 @@
 {% block body_content %}
 
 	{% url 'auth_login' as auth_login_url %}
-	
 
-		<br/>
-		<h3>{% trans "Thanks, activation complete!" %}</h3>
-		<br/>
-		<h4> <a href='{{ auth_login_url }}'>{% trans "You may now login using the username and password." %}</a></h4>
-
+	<br/>
+	<h3>{% trans "Thanks, activation complete!" %}</h3>
+	<br/>
+	<h4> <a href='{{ auth_login_url }}'>{% trans "You may now login using the username and password." %}</a></h4>
 
 {% endblock %}
 
