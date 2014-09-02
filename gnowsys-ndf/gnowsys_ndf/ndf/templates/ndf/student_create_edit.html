@@ -58,7 +58,7 @@
     </header>
 
     <nav class="row" style="margin-top: 0.5rem;">
-      <dl class="tabs small-12 columns" data-tab>
+      <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
         <dd>
           <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
         </dd>
@@ -523,8 +523,14 @@
 
         if (i == totalTabs) {
           // Only in last tab
+          var is_existing_student = "{{node.pk|default_if_none:''}}";
+          var submit_btn_label = '{% trans "Register" %}' // By default considering registering a new student
+          if (is_existing_student) {
+            // If value (ObjectId) found, it means updating existing student record
+            submit_btn_label = '{% trans "Update" %}'
+          }
           $(this).children(".tab-nav").children(".for-save")
-            .append("<input type='submit' id='save-node' class='small button expand' value='{% trans "Register" %}' style='float:right;' />");
+            .append("<input type='submit' id='save-node' class='small button expand' value='"+submit_btn_label+"' style='float:right;' />");
         }
 
         if (i != 0) {
@@ -723,7 +729,7 @@
   });
 
 // On click of save ----------------------------------------------------------------------------------------------
-  $("#save-node").click(function() {
+  $(document).on("click", "#save-node", function() {
   // Store concatenated value of first, middle & last name field's values into name field (hidden input field) ---
     name = ""
     first_name = $("#first_name").val().trim()
@@ -740,7 +746,7 @@
     }
 
     $("#name").val(name);
-  
+
   // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
     $(".content").find(":input[disabled]").each(function(){
       $(this).removeAttr('disabled');
