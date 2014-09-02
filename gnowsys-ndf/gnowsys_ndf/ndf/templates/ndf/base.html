@@ -87,16 +87,27 @@
         <!-- Search bar -->
         
 <!-- Old Contextual Search-->
-         <li class="has-form search">
+         <li class="has-form search hide">
   {% include "ndf/node_search_base.html" %}
              </li>
 
-            <li class="has-form search hide">
+            <li class="has-form search">
             
             <form 
                       {% if groupid %} action="{% url 'results' groupid %}" {% else %} action="" {% endif %}
                       name="search_form" method="GET" >
               <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
+                <div class="hide">
+                <input type="checkbox" name="search_fields" id="chk_name" value="name" />Name
+	<input type="checkbox" name="search_fields" id="chk_tags" value="tags" />Tags 
+	<input type="checkbox" name="search_fields" id="chk_content" value="contents" />Content <br>
+                    <select name="users">
+		<option value="all">All users</option>
+		{% for mem in authors %}		
+			<option value="hello">{{ mem }} </option>
+  		{% endfor %}
+	</select>
+                </div>
                 <button type="submit" class="button" value="" ><i class="fi-magnifying-glass"></i></button>
         
               
@@ -222,22 +233,6 @@
               <li id="more_groups"><a class="group" href="{% url 'group' 'home' %}">{% trans "See more groups..." %}</a></li>
       	    </ul>
       	  </li>
-            
-<!-- Special customization for Sep 1 demo of NROER; Remove this before updating servers other than NROER -->
-<!--
-            <span class="nroer-sep-1">
-            <li>
-      	    <a href="{{ site.PARTNERS}}">Partners</a>
-                </li>
-      	   <li>
-      	    <a href="{{ site.GROUPS}}">Groups</a>
-                </li>
-                <script>
-                $(".has-dropdown.group").hide();
-                </script>
-                </span>
--->
-<!--  Remove till here -->
             
 <!-- Extra group selector-->
             {% get_gapps_menubar request groupid %}
@@ -440,7 +435,7 @@
       
       //Hide broken image links
     $('img').error(function(){
-        $(this).hide();
+        $(this).addClass("hide");
         //$(this).attr('src', 'missing.png');
     });
       
