@@ -65,15 +65,13 @@ def task_details(request, group_name, task_id):
     elif ins_objectid.is_valid(group_name) is True :
       group_ins = collection.Node.find_one({'_type': "Group","_id": group_name})
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
-      if group_ins:
+    if group_ins:
         group_id = str(group_ins._id)
-      else :
+    else :
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :	
           group_id = str(auth._id)
-    else :
-        pass
-    
+        
     task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}
@@ -121,14 +119,13 @@ def create_edit_task(request, group_name, task_id=None):
     elif ins_objectid.is_valid(group_name) is True :
         group_ins = collection.Node.find_one({'_type': "Group","_id": group_name})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
-        if group_ins:
+    if group_ins:
             group_id = str(group_ins._id)
-        else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
     else :
-        pass
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+            group_id = str(auth._id)
+
     blank_dict = {}
     if task_id:
         task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
