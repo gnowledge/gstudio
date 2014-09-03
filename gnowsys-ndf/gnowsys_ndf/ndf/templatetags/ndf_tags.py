@@ -835,7 +835,7 @@ def get_user_group(user, selected_group_name):
   """
   group_list = []
   auth_group = None
-
+  
   group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 
   									'$or': [{'group_admin': user.id}, {'author_set': user.id}],
   								}).sort('last_update', -1).limit(9)
@@ -941,6 +941,38 @@ def get_edit_url(groupid):
 			return 'image_edit'
 		else:
 			return 'file_edit'
+
+@register.assignment_tag
+def get_url(groupid):
+     
+	node = collection.Node.one({'_id': ObjectId(groupid) }) 
+	if node._type == 'GSystem':
+
+		type_name = collection.Node.one({'_id': node.member_of[0]}).name
+
+		if type_name == 'Quiz':
+			return 'quiz_details'    
+		elif type_name == 'Page':
+			return 'page_details' 
+		elif type_name == 'Theme' or type_name == 'theme_item':
+			return 'theme_page'
+		elif type_name == 'Forum':
+			return 'show'
+		elif type_name == 'Task':
+			return 'task_details'  		
+	elif node._type == 'Group' :
+		return 'group'
+
+	elif node._type == 'File':
+		if (node.mime_type) == ("application/octet-stream"): 
+			return 'video_detail'       
+		elif 'image' in node.mime_type:
+			return 'file_detail'
+		else:
+			return 'file_detail'
+	else:
+			return 'None'
+
 
 @register.assignment_tag
 def get_create_url(groupid):
