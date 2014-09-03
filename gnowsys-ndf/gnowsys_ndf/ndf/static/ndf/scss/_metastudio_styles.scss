@@ -12,30 +12,47 @@ body{
 
 
 .top-bar{
-    border-bottom: 2px solid black;
-    z-index: 200;
+    a.language.button{
+        padding: 5px 10px;
+        margin-top:3px;
+            background-color: #555;
+            color:black;
+            &:hover{
+                background-color: white;
+                color:black;
+            }
+        }
+    ul.language-selector{
+        height: $topbar-height;
+        float: right;
+        margin:0;
+    }
     .active{
-        border-bottom:  1px solid $active-color;
+        background-color:black!important;
     }
     h1{
-        a{
-            padding:0!important;
-        }
+        .flag{
+                height: 20px;
+            margin-bottom: 4px;
+            margin-right: 2px;
+            }
         img{
             /* Logo */
-			max-height: 90%;
+			height: $topbar-height * 0.8;
 		}
         a{
 			color:white!important;
 		}
     }
+    .group:hover{
+        background-color: #111;
+    }
     .search{
         position: relative;
-        padding-top: 18px;
         margin-left: 1rem;
         input{
             height: inherit;
-            top:5px;
+            top:7px;
             font-size:1rem;
             color: white;
             background-color: transparent;
@@ -48,17 +65,6 @@ body{
             background-color: transparent;
             position: absolute;
             right: 0;
-            top: 21px;
-        }
-    }
-    .language.button{
-        background-color: #555;
-        color:black;
-        margin-top: 15px;
-        padding: 4px 7px;
-        &:hover{
-            background-color: white;
-            color: black;
         }
     }
 }
@@ -67,7 +73,7 @@ body{
 
 		.workspace{
             //This is the main content container between the header and footer
-            background: url("body_background_image.png") no-repeat 0 bottom;
+            background: url("watermark.png") no-repeat 0 80%;
 			min-height: 100%;
 			margin-bottom: -130px!important;
 			-webkit-box-sizing: border-box;
@@ -91,32 +97,20 @@ body{
             min-height: 170px;
             background-color: rgba(0,0,0,0.8);
 
-            .sponsor{
-                background: url("footer_background_image.png") no-repeat center top;
-                &>*{
-                    opacity: 0.1;
-                }
-                &:hover{
-                    background:none;
-                    >*{
-                     opacity: 1;
-                }
-                }
-            }
+           section:first-child{
+               border-bottom: 1px solid #222;
+               margin-bottom: 1rem;
+           }
             a{
 			color: #777;
-		}
-            .gnu-badge{
-                padding: 6px 9px 6px 80px;
-                border: 1px dashed #ddd;
-                margin-bottom: 3px;
-                margin-right: 3px;
-                display: inline-block;
-                background: #fafafa url("../../../images/gnu-head.png") no-repeat -35px -9px;
                 &:hover{
-                    background-position: -35px -19px;
+                    color:#eee;
                 }
-            }
+		}
+           strong a{
+               border-bottom: 1px dotted #555;
+           }
+               
 		}
 
 
@@ -136,6 +130,7 @@ body{
 
 
 main>nav{
+    border-top:3px solid black;
     position: relative;
     z-index: 10;
 &>.button-bar{
@@ -237,9 +232,6 @@ main>aside{
         header{
            padding: 10px;
         }
-         section{
-             background-color: $theme-color-invert;
-         }
         footer{
             background-color: #222;
             min-height: 1rem;
@@ -285,7 +277,7 @@ main>aside{
         overflow-x: visible;
         &>header,form>header{
             padding: 15px;
-            margin-bottom: 0.5rem;
+//            margin-bottom: 0.5rem;
             background-color: #f0f0f0;
         }
         
@@ -293,9 +285,9 @@ main>aside{
         }
     
 h1:not(.subheader){
-	font-family: $serif-font;
-    font-style: italic;
-    
+//	font-family: $serif-font;
+//    font-style: italic;
+//    
     .tabs{
         display: inline-block;
         position: relative;
@@ -514,13 +506,15 @@ article{
 
 
 /* Content area */
+
+
 article{
     
 	padding-bottom: 4rem; 
 	
     &>header{
 	border-bottom: 1px solid #ddd;
-	margin-bottom: 1rem!important;
+//	margin-bottom: 1rem!important;
 }
     &>footer{
 	border-top: 1px dotted #ddd;
@@ -633,19 +627,138 @@ input.node-title{
 	font-size: 2rem;
 }
 
-/* Splash Page */
-#splash{
-	background-image: url('http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg');
-}
-#splash>img{
-	position: absolute;
-}
 
 /****************** CUSTOM *********************/
 
-#landing-page{
-    background-color: #666;
-    top:0;
+/* UI Button */
+.ui.button{
+    margin-right: 0.5rem;
+    border: 1px solid rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.5);
+    color: #ddd;
+    padding: 0.8rem;
+    z-index: 500;
+    &.language{
+        
+    }
+    label{
+            color:#666;
+        }
+    small{
+        margin-left: 2px;
+        display: inline;
+    }
+    &:hover,&:active{
+        border-color: rgba(255,255,255,0.2);
+        background-color: rgba(0,0,0,0.9);
+        label{
+            color:#ddd;
+        }
+        small{
+            display: inline;
+        }
+        &:focus{
+            font-weight: bold;
+        }
+    }
+}
+
+
+/* For landing page */
+
+ #landing>header{
+        background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
+        position: relative;
+        z-index: 50;
+        background-color: #0A253A;
+        padding:1rem 0 1rem 0;
+        @extend .drop-shadow;
+        border-bottom: 2px solid #00CEFD;
+        .logo{
+            color:#555;
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(0,0,0,0.8);
+            img{
+                max-width: 75%;
+                margin-bottom: 0.5rem;
+            }
+            
+            h1{
+        font-size: 1.2rem;
+            line-height: 1;
+        font-weight: bold;
+        text-transform: uppercase;
+                color:white;
+
+    }
+        }
+        
+    
+    }
+
+.landing{
+    position: relative;
+    
+   h2{
+       margin-top: 2rem;
+   }
+    
+}
+section.promo{
+    background-color: rgba(0,0,0,0.9);
+    border-bottom: 4px solid #00CEFD;
+    .meta{
+        h4{
+            color:white;
+        }
+    }
+}
+
+ul.partner{
+    img{
+        max-height: 150px;
+    }
+}
+
+div.banner{
+    padding:0 2rem;
+    margin-bottom: 2rem;
+    border:2px solid lighten($primary-color,10%);
+    border-width: 2px 0;
+    &>*{
+    background-color: $primary-color;
+        .slide{
+            padding: 1rem;
+            background-color: darken($primary-color,5%);
+            height:250px!important;
+            &>i{
+                position: absolute;
+                font-size: 15rem;
+                pointer-events: none;
+                color: white;
+                opacity:0.1;
+                right:5%;
+            }
+        }
+    color:#eee;
+    margin:0;
+    h3,h4,h5,h6,blockquote{
+        color:white;
+    }
+        blockquote{
+            font-size: 140%;
+            font-style:italic;
+        }
+    p:first-child{
+        color:white;
+        font-size:120%;
+        }
+    
+    }
+    // Slick Carousel
+    .slick-dots .button{
+    }
 }
 
 // Off Canvas Areas

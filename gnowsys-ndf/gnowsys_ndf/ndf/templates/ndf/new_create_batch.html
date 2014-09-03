@@ -108,16 +108,16 @@ set_drawer_value(group_id, st_batch_id);
 	   {% endif %}
 	   <div class="row">
 	     <div class="large-9 columns">
-	   {% blocktrans %}<label>Enter Batch Name <span style="color:red"><b>*</b></span>{% endblocktrans %}
+	   <label>{% trans "Enter Batch Name  " %} <span style="color:red"><b>*</b></span>
 	      <input type="text" placeholder="Batch Name" id="txt_batch_name_{{each}}" name="batch_name_{{each}}" value="{{node.name}}" required/>
 	      <input type="hidden" name="node_id" value="{{node.pk}}"/>
 	    </label>
-	     {% blocktrans %}<small class="error">Batch name required.</small>{% endblocktrans %}
+	     <small class="error">{% trans "Batch name required. " %}</small>
 	  </div>
 	</div>
 	<div class="row">
 	  <div class="large-11 columns" >
-	    {% blocktrans %}<label><h3>Choose members</h3>{% endblocktrans %}
+	    <label><h3>{% trans "Choose members " %}</h3>
 	      <div id="user_drawer" >
 		{% include "ndf/drawer_widget.html" with widget_for=each %}
 	      </div>

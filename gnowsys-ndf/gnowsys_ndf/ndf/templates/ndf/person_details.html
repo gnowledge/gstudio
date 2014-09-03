@@ -31,7 +31,7 @@
         </small>      
       </h2>
 
-      <dl class="row tabs" data-tab>
+      <dl class="row tabs" data-tab data-options="deep_linking:true">
         {% for tab_details in property_order_list %}
         <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="Click here to add {{tab_details.0}} details...">
           <a href="#panel_{{tab_details.0}}">{{tab_details.0}}</a>
@@ -41,21 +41,21 @@
         <dd><a href="#view-scheduler-calendar"><i class="fi-calendar"></i> Events </a></dd>
 
         <!-- <dd><a href="#view-page"><i class="fi-eye"></i> Read</a></dd> -->
-      {% blocktrans %}
+
         <dd>
-          <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>Graph</a>
+          <a href="#" data-dropdown="graph-hover" data-options="is_hover:true"><i class="fi-share"></i>{% trans "Graph " %}</a>
           <ul id="graph-hover" class="f-dropdown" data-dropdown-content>
-            <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">Concept Graph</a></li>
-            <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">Collection Graph</a></li>
-            <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">Dependency Graph</a></li>
+            <li><a href="#view-concept-graph" data-reveal-id="view-concept-graph">{% trans "Concept Graph " %}</a></li>
+            <li><a href="#view-collection-graph" data-reveal-id="view-collection-graph">{% trans "Collection Graph " %}</a></li>
+            <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph " %}</a></li>
           </ul>
         </dd>
 
-        <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> Location</a></dd>
+        <dd><a href="#view-map-widget" data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location " %}</a></dd>
 
-        <dd><a href="#view-comments"><i class="fi-comment"></i> Discuss</a></dd>
+        <dd><a href="#view-comments"><i class="fi-comment"></i> {% trans "Discuss " %}</a></dd>
       </dl>
-{% endblocktrans %}
+
     </section>
   </header>
 

@@ -47,8 +47,7 @@ collection_tr = db[Triple.collection_name]
 gst_page = collection.Node.one({'_type': 'GSystemType', 'name': GAPPS[0]})
 history_manager = HistoryManager()
 rcs = RCS()
-appid=collection.Node.one({'name':u'Page','_type':'GSystemType'})
-app_id=appid._id
+app=collection.Node.one({'name':u'Page','_type':'GSystemType'})
 
 #######################################################################################################################################
 # VIEWS DEFINED FOR GAPP -- 'PAGE'
@@ -58,18 +57,24 @@ def page(request, group_id, app_id=None):
     """Renders a list of all 'Page-type-GSystems' available within the database.
     """
     ins_objectid  = ObjectId()
+    print group_id
     if ins_objectid.is_valid(group_id) is False :
-        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+
         if group_ins:
             group_id = str(group_ins._id)
+          
+            print group_id
         else :
             auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+           
+
             if auth :
                 group_id = str(auth._id)
     else :
         pass
-    if app_id is None:
+    if app_id is None:  
         app_ins = collection.Node.find_one({'_type':"GSystemType", "name":"Page"})
         if app_ins:
             app_id = str(app_ins._id)
@@ -80,9 +85,8 @@ def page(request, group_id, app_id=None):
     group_object=collection.Group.one({'_id':ObjectId(group_id)})
 
     if request.method == "POST":
-    	# Page search view
+    
       title = gst_page.name
-      
       search_field = request.POST['search_field']
       page_nodes = collection.Node.find({
                                           'member_of': {'$all': [ObjectId(app_id)]},
@@ -109,10 +113,11 @@ def page(request, group_id, app_id=None):
                                           'group_set': {'$all': [ObjectId(group_id)]},
                                           'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
+    
 
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
-                                 'app_id':app_id,
+                                 'appId':app._id,
                                  'searching': True, 'query': search_field,
                                  'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                 }, 
@@ -138,7 +143,7 @@ def page(request, group_id, app_id=None):
 
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
-                                     'app_id':app_id,
+                                     'appId':app._id,
                                      'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                     }, 
                                     context_instance=RequestContext(request))
@@ -162,7 +167,7 @@ def page(request, group_id, app_id=None):
           
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
-                                     'app_id':app_id,
+                                     'appId':app._id,
                                      'page_nodes':content,
                                      'groupid':group_id,
                                      'group_id':group_id
@@ -199,7 +204,7 @@ def page(request, group_id, app_id=None):
 
           return render_to_response("ndf/page_list.html",
                                     {'title': title,
-                                     'app_id':app_id,
+                                     'appId':app._id,
                                      'page_nodes': page_nodes,
                                      'groupid':group_id,
                                      'group_id':group_id
@@ -257,6 +262,7 @@ def page(request, group_id, app_id=None):
         page_node.get_neighbourhood(page_node.member_of)
         return render_to_response('ndf/page_details.html', 
                                   { 'node': page_node,
+                                    'appId':app._id,
                                     'group_id': group_id,
                                     'shelf_list': shelf_list,
                                     'annotations': annotations,
@@ -273,7 +279,7 @@ def page(request, group_id, app_id=None):
 def create_edit_page(request, group_id, node_id=None):
     """Creates/Modifies details about the given quiz-item.
     """
-    ins_objectid  = ObjectId()
+    ins_objectid = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -339,6 +345,7 @@ def create_edit_page(request, group_id, node_id=None):
                                   context_instance=RequestContext(request)
                               )
 
+
 @login_required    
 def delete_page(request, group_id, node_id):
     """Change the status to Hidden.
@@ -357,7 +364,6 @@ def delete_page(request, group_id, node_id):
                 group_id = str(auth._id)
     else :
         pass
-
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     
     return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
@@ -446,6 +452,7 @@ def version_node(request, group_id, node_id, version_no):
     return render_to_response("ndf/version_page.html",
                               {'view': view,
                                'node': node,
+                               'appId':app._id,
                                'group_id':group_id,
                                'groupid':group_id,
                                'selected_versions': selected_versions,
@@ -550,6 +557,7 @@ def translate_node(request,group_id,node_id=None):
             
         return render_to_response("ndf/translation_page.html",
                                {'content': content,
+                                'appId':app._id,
                                 'node':node,
                                 'node_name':node_name,
                                 'groupid':group_id,
@@ -674,6 +682,7 @@ def merge_doc(request,group_id,node_id,version_1,version_2):
      
      return render_to_response("ndf/version_page.html",
                                {'view': view,
+                                'appId':app._id,
                                 'version_no':version_1,
                                 'node':node,
                                 'groupid':group_id,
@@ -709,6 +718,7 @@ def revert_doc(request,group_id,node_id,version_1):
    
    return render_to_response("ndf/version_page.html",
                                {'view': view,
+                                'appId':app._id,
                                 'selected_versions': selected_versions, 
                                 'node':node,
                                 'groupid':group_id,

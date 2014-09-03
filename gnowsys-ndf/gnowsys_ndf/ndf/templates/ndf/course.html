@@ -19,7 +19,7 @@
   {% if user_access == "allow" %}
 
       <a class="small button" href="{% url 'create_edit' group_name_tag %}">
-        <span class="fi-plus">&nbsp;&nbsp;{% blocktrans %} New {{title}} {% endblocktrans %}</span>
+        <span class="fi-plus">&nbsp;&nbsp; {% trans "New" %} {{title}} </span>
       </a>
 
   {% endif %}
@@ -41,7 +41,7 @@
 {% block body_content %}
 
 <header class="row">
-  <dl class="tabs" data-tab>
+  <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i>{% trans "All Courses" %} {% if course_coll.count %}({{ course_coll.count }}){% endif %}</a></dd>
   </dl>
 </header>

@@ -18,6 +18,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 
 collection = get_database()[Node.collection_name]
 GST_COURSE = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
+app = collection.Node.one({'_type': "GSystemType", 'name': GAPPS[7]})
 
 def course(request, group_id, course_id=None):
     """
@@ -73,7 +74,8 @@ def course(request, group_id, course_id=None):
       # course_nodes_count = course_coll.count()
 
       return render_to_response("ndf/course.html",
-                                {'title': title, 
+                                {'title': title,
+                                 'appId':app._id,
                                  'searching': True, 'query': search_field,
                                  'course_coll': course_coll, 'groupid':group_id, 'group_id':group_id
                                 }, 
@@ -95,7 +97,7 @@ def course(request, group_id, course_id=None):
                                              ]
                                             })
       template = "ndf/course.html"
-      variable = RequestContext(request, {'title': title, 'course_nodes_count': course_coll.count(), 'course_coll': course_coll, 'groupid':group_id, 'group_id':group_id})
+      variable = RequestContext(request, {'title': title, 'course_nodes_count': course_coll.count(), 'course_coll': course_coll, 'groupid':group_id, 'appId':app._id, 'group_id':group_id})
       return render_to_response(template, variable)
 
 @login_required
@@ -127,13 +129,14 @@ def create_edit(request, group_id, node_id = None):
     if request.method == "POST":
         # get_node_common_fields(request, course_node, group_id, GST_COURSE)
         course_node.save(is_changed=get_node_common_fields(request, course_node, group_id, GST_COURSE))
-        return HttpResponseRedirect(reverse('course', kwargs={'group_id': group_id}))
+        return HttpResponseRedirect(reverse('course', kwargs={'appId':app._id,'group_id': group_id}))
         
     else:
         if node_id:
             context_variables['node'] = course_node
             context_variables['groupid']=group_id
             context_variables['group_id']=group_id
+            context_variables['appId']=app._id
         return render_to_response("ndf/course_create_edit.html",
                                   context_variables,
                                   context_instance=RequestContext(request)
@@ -158,7 +161,8 @@ def course_detail(request, group_id, _id):
     return render_to_response("ndf/course_detail.html",
                                   { 'node': course_node,
                                     'groupid': group_id,
-                                    'group_id':group_id
+                                    'group_id':group_id,
+                                    'appId':app._id
                                   },
                                   context_instance = RequestContext(request)
         )

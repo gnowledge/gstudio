@@ -39,15 +39,14 @@ urlpatterns = patterns('',
     (r'^(?P<group_id>[^/]+)/course', include('gnowsys_ndf.ndf.urls.course')),
     (r'^(?P<group_id>[^/]+)/module', include('gnowsys_ndf.ndf.urls.module')),
     (r'^(?P<group_id>[^/]+)/search', include('gnowsys_ndf.ndf.urls.search_urls')),
+    (r'^(?P<group_id>[^/]+)/search/', include('gnowsys_ndf.ndf.urls.search_urls')),	
     (r'^(?P<group_name>[^/]+)/task', include('gnowsys_ndf.ndf.urls.task')),
     (r'^(?P<group_id>[^/]+)/batch', include('gnowsys_ndf.ndf.urls.batch')),
     (r'^(?P<group_id>[^/]+)/ajax/', include('gnowsys_ndf.ndf.urls.ajax-urls')),
-    (r'^(?P<group_id>[^/]+)/search/', include('gnowsys_ndf.ndf.urls.search_urls')),	
+    (r'^(?P<group_id>[^/]+)/bib_app', include('gnowsys_ndf.ndf.urls.Bib_App')),
     (r'^(?P<group_id>[^/]+)/wikidata', include('gnowsys_ndf.ndf.urls.wikidata')),
     (r'^(?P<group_id>[^/]+)/', include('gnowsys_ndf.ndf.urls.user')),
-    (r'^(?P<group_id>[^/]+)/ratings', include('gnowsys_ndf.ndf.urls.ratings')),                     
-    
-    
+    (r'^(?P<group_id>[^/]+)/ratings', include('gnowsys_ndf.ndf.urls.ratings')),                 
     (r'^(?P<group_id>[^/]+)/browse topic', include('gnowsys_ndf.ndf.urls.browse_topic')),
     url(r'^(?P<group_id>[^/]+)/topic_details/(?P<app_Id>[\w-]+)', 'gnowsys_ndf.ndf.views.browse_topic.topic_detail_view', name='topic_details'),
 

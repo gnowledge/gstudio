@@ -156,7 +156,6 @@ def collection_nav(request, group_id):
                                   context_instance = RequestContext(request)
       )
 
-
 # This view handles the collection list of resource and its breadcrumbs
 def collection_view(request, group_id):
 
@@ -1454,14 +1453,40 @@ def get_online_editing_user(request, group_id):
             userslist.append("No users")
     else :
         userslist.append("No users")
+
     return StreamingHttpResponse(json.dumps(userslist).encode('utf-8'),content_type="text/json")
+def view_articles(request, group_id):
+  if request.is_ajax():
+    # extracting all the bibtex entries from database
+    GST_one=collection.Node.one({'_type':'AttributeType','name':'Citation'})
+    list_item=['article','book','booklet','conference','inbook','incollection','inproceedings','manual','masterthesis','misc','phdthesis','proceedings','techreport','unpublished_entry']
+    response_dict=[]
+
+    for each in list_item:
+      dict2={}
+      ref=collection.Node.one({'_type':'GSystemType','name':each})
+  
+      ref_entry=collection.GSystem.find({'member_of':{'$all':[ref._id]},'group_set':{'$all':[ObjectId(group_id)]},'status':u'PUBLISHED'})
+      
+      list_entry=[]
+      for every in ref_entry:
         
+        id=every._id
+        gst_attribute=collection.Node.one({'subject':ObjectId(every._id),'attribute_type.$id':ObjectId(GST_one._id)})
+        cite=gst_attribute.object_value
+        dict1 = {'name': every.name,'cite':cite}
+        list_entry.append(dict1)
+      dict2[each]=list_entry
+      response_dict.append(dict2)
+  return StreamingHttpResponse(json.dumps(response_dict))      
+
 def get_author_set_users(request, group_id):
     '''
     This ajax function will give all users present in node's author_set field
     '''
     user_list = []
     can_remove = False
+
     if request.is_ajax():
         _id = request.GET.get('_id',"")
         node = collection.Node.one({'_id':ObjectId(_id)})

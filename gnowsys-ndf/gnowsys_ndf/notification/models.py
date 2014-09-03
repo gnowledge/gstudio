@@ -40,6 +40,9 @@ class NoticeType(models.Model):
     def __unicode__(self):
         return self.label
     
+    def __str__(self):
+        return str(self.label)
+    
     class Meta:
         verbose_name = _("notice type")
         verbose_name_plural = _("notice types")

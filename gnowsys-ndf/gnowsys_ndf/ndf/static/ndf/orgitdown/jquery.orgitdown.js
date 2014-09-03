@@ -230,6 +230,9 @@
 				}
 				return magicMarkups(action);
 			}
+		    function cite() {
+                        alert("jquery test");}
+
 		    function close() {
                         $(".orgitdownContainer").hide();
 		        location.reload();}

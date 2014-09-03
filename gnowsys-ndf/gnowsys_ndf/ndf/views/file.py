@@ -51,7 +51,6 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'}
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
 app=collection.Node.one({'name':u'File','_type':'GSystemType'})
-appId=app._id
 
     
 
@@ -223,7 +222,7 @@ def file(request, group_id, file_id=None):
 
       return render_to_response("ndf/file.html",
                                 {'title': title,
-                                 'appId':appId,
+                                 'appId':app._id,
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
@@ -330,7 +329,7 @@ def file(request, group_id, file_id=None):
 
       return render_to_response("ndf/file.html", 
                                 {'title': title,
-                                 'appId':appId,
+                                 'appId':app._id,
                                  'already_uploaded': already_uploaded,
                                  # 'sourceid':source_id_set,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
@@ -883,8 +882,9 @@ def getFileThumbnail(request, group_id, _id):
           file_fs = file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]
          
           if (file_node.fs.files.exists(file_fs)):
-            f = file_node.fs.files.get(ObjectId(file_fs))
-
+            # f = file_node.fs.files.get(ObjectId(file_fs))
+            ## This is to display the thumbnail properly, depending upon the size of file.
+            f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
             # if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
             #     f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
             return HttpResponse(f.read(), content_type=f.content_type)
@@ -984,9 +984,8 @@ def data_review(request, group_id):
   '''
   To get all the information related to resource object in the group.
   '''
-
   # getting group obj from name
-  group_obj = collection.Node.one({ "_type": "Group", "name": group_id })
+  group_obj = collection.Node.one({ "_type": {"$in":["Group", "Author"]}, "name": unicode(group_id) })
 
   # checking if passed group_id is group name or group Id
   if group_obj and (group_id == group_obj.name):

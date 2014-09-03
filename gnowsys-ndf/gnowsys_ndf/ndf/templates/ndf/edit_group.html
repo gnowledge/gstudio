@@ -51,7 +51,7 @@ ul#graph-hover.f-dropdown{
 <dl class="accordion" data-accordion>
 
   <dd>
-    <a href="#change_settings">{% blocktrans with node.name as name %}Click here to change {{name}}'s settings {% endblocktrans %}</a>
+    <a href="#change_settings">{% blocktrans with node.name as name %} Click here to change settings of {{name}} {% endblocktrans %}</a>
 
     {% if node.name == request.user.username %}
       <div id="change_settings" class="content">
@@ -66,8 +66,8 @@ ul#graph-hover.f-dropdown{
           <div style='display:table-cell;'> 
             <select name="subscription_policy" id="subscription_policy">
               <option id="OPEN">{% trans "OPEN" %}</option>
-              <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
-              <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
+              <option id="BY_REQUEST">{% trans "BY REQUEST" %}</option>
+              <option id="BY_INVITATION">{% trans "BY INVITATION" %}</option>
             </select>
           </div>
           <div style='display:table-cell;'> 
@@ -122,8 +122,8 @@ ul#graph-hover.f-dropdown{
 
       <div style='display:table-cell;'> 
         <select name="edit_policy" id="edit_policy">
-         <option id="EDITABLE_NON_MODERATED">{% trans "EDITABLE_NON_MODERATED" %}</option>
-         <option id="EDITABLE_MODERATED">{% trans "EDITABLE_MODERATED" %}</option>
+         <option id="EDITABLE_NON_MODERATED">{% trans "EDITABLE amd NON_MODERATED" %}</option>
+         <option id="EDITABLE_MODERATED">{% trans "EDITABLE and MODERATED" %}</option>
          <option id="NON_EDITABLE">{% trans "NON_EDITABLE" %}</option>
        </select> 
      </div>
@@ -139,8 +139,8 @@ ul#graph-hover.f-dropdown{
     <div style='display:table-cell;'> 
       <select name="subscription_policy" id="subscription_policy">
        <option id="OPEN">{% trans "OPEN" %}</option>
-       <option id="BY_REQUEST">{% trans "BY_REQUEST" %}</option>
-       <option id="BY_INVITATION">{% trans "BY_INVITATION" %}</option>
+       <option id="BY_REQUEST">{% trans "BY REQUEST" %}</option>
+       <option id="BY_INVITATION">{% trans "BY INVITATION" %}</option>
      </select>
    </div>
 
@@ -151,7 +151,7 @@ ul#graph-hover.f-dropdown{
   <div style='display:table-cell;'> 
     <select name="visibility_policy" id="visibility_policy">
      <option id="ANNOUNCED">{% trans "ANNOUNCED" %}</option>
-     <option id="NOT_ANNOUNCED">{% trans "NOT_ANNOUNCED" %}</option>
+     <option id="NOT_ANNOUNCED">{% trans "NOT ANNOUNCED" %}</option>
    </select>
  </div>
 
@@ -165,8 +165,8 @@ ul#graph-hover.f-dropdown{
 
   <div style='display:table-cell;'> 
     <select name="disclosure_policy" id="disclosure_policy">
-     <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED_TO_MEM" %}</option>
-     <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT_DISCLOSED_TO_MEM" %}</option>
+     <option id="DISCLOSED_TO_MEM">{% trans "DISCLOSED TO MEMBERS" %}</option>
+     <option id="NOT_DISCLOSED_TO_MEM">{% trans "NOT DISCLOSED TO MEMBERS" %}</option>
    </select>
  </div>
 
@@ -176,7 +176,7 @@ ul#graph-hover.f-dropdown{
 
 <div style='display:table-cell;'> 
   <select name="encryption_policy" id="encryption_policy">
-   <option id="NOT_ENCRYPTED">{% trans "NOT_ENCRYPTED" %}</option>
+   <option id="NOT_ENCRYPTED">{% trans "NOT ENCRYPTED" %}</option>
    <option id="ENCRYPTED">{% trans "ENCRYPTED" %}</option>
  </select>
  </div>

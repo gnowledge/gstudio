@@ -1,4 +1,5 @@
 {% extends "ndf/base.html" %}
+
 {% load i18n %}
 {% load ndf_tags %}
 
@@ -72,7 +73,7 @@ background-repeat:no-repeat; background-size: 48px 48px
         
         <div class="row">
        <nav class="large-8 columns">
-      <dl class="tabs" data-tab>
+      <dl class="tabs" data-tab data-options="deep_linking:true">
 	<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
 	  <!-- change name of collection tab overide block in your code -->
 	  <a class="node_tab" href="#panel-name-description">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
@@ -133,7 +134,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
   <dd>
 
-    <a id="switch_group" href="#switchgrp">{% blocktrans %}Click here to publish {{node.name}} in group/s{% endblocktrans %}</a>
+    <a id="switch_group" href="#switchgrp">{{node.name}} {% trans "Publish this resource in other group/s" %}</a>
 
        <div id="switchgrp" class="content">
          <h4>{% trans "Select Groups" %}</h4>
@@ -317,7 +318,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     <div class="content" id="panel-metadata" style="width:95%;" >
       
       <div class="row">
-	  <h3>{% trans "Add or edit Metadata - Please spend a few minutes" %} </h3>
+	  <h3>{% trans "Please add or edit Metadata." %} </h3>
         
 
         <div class="small-5 columns">
@@ -436,6 +437,10 @@ background-repeat:no-repeat; background-size: 48px 48px
     </div>
 </form>
 
+
+
+
+<!-- Reveal Modals begin -->
 
 <script type="text/javascript">
 var data_list = ""

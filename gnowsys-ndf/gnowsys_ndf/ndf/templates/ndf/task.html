@@ -2,7 +2,6 @@
 {% load i18n %}
 {% load pagination_tags %}
 {% load ndf_tags %}
-{% load i18n %}
 {% block title %} {{title}} {% endblock %}
 
 {% block head %}
@@ -14,6 +13,7 @@
 {% block meta_content %}
   <h2>{% trans "Task" %}</h2>
 {% endblock %}
+
 {% block search_content %}
   {% include "ndf/node_search_base.html" %}
 {% endblock %}
@@ -26,7 +26,7 @@
      <div class="task">
       <br/>
       <a class="button medium" href="{% url 'task_create_edit' group_name %}">
-      	<span class="fi-plus">&nbsp;&nbsp;{% blocktrans %}New {{title}}{% endblocktrans %}</span>
+      	<span class="fi-plus">&nbsp;&nbsp;{% trans "New" %}{{title}}</span>
       </a>
     </div>
   {% endif %}
@@ -37,7 +37,7 @@
 {% block body_content %}
 
 <header class="row">
-  <dl class="tabs" data-tab>
+  <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#panel2-1" id="p1"><i class="fi-eye"></i> All Task {% if TASK_inst.count %}({{ TASK_inst.count }}){% endif %}</a></dd>
   <dd ><a href="#panel2-2" id="p2" name="Completed"> Completed </a></dd>
   <dd ><a href="#panel2-3" id="p3" name="Createdbyme"> Created by me </a></dd>

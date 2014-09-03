@@ -26,126 +26,134 @@
 			{% if user.is_authenticated %}
 
 				{% if prof_pic_obj %}
-
 					<a href="#"><img  src="{% url 'getImageThumbnail' group_id prof_pic_obj %}" height="120" width="120"></img></a><br/>
 					{% if user_id == usr %}
 						<a href='#' id="pic">{% trans "Change Profile Picture" %}</a>
 					{% endif %}
+
 				{% else %}
 					<span class="fi-torso" style="font-size:100pt;"> </span> <br/>
 					{% if user_id == usr %}
 						<a href='#' id="pic">{% trans "Upload Profile Picture" %}</a>
 					{% endif %}
+
 				{% endif %}		
 			
 				{% if already_uploaded != "None" %}
-					<br/><br/><span style="color:red"> {% blocktrans %}{{already_uploaded}} image is already uploaded please choose different image {% endblocktrans %}</span>
+					<br/><br/><span style="color:red"> {{already_uploaded}} {% trans "image is already uploaded please choose different image" %}</span>
 				{% endif %}
 
-			<div id="pic_div" style="display:none;">
-				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
-					{% csrf_token %}
-					<input type="file" name="doc[]"  id="docFile" multiple/>
+  			<div id="pic_div" style="display:none;">
+  				<form class="dropzone" id ="docPost" enctype="multipart/form-data" method="post" action="{% url 'dashboard' usr %}">
+  					{% csrf_token %}
+  					<input type="file" name="doc[]"  id="docFile" multiple/>
 
-					<input type="hidden" name="type" value="profile_pic">						
-					<input type="hidden" name="user" value="{{usr}}">					
-					<input type="submit" id="submitpostid" value="Save">
+  					<input type="hidden" name="type" value="profile_pic">						
+  					<input type="hidden" name="user" value="{{usr}}">					
+  					<input type="submit" id="submitpostid" value="Save">
 
-					<p id="message" style="display:none">
-						{% trans "Please wait for uploading profile picture" %}
-					</p>
-						
-				</form>
-			</div>
+  					<p id="message" style="display:none">
+  						{% trans "Please wait for uploading profile picture" %}
+  					</p>
+  						
+  				</form>
+  			</div>
 			{% else %}
 				<p><em>{% trans "You are Not Authorised user please login to upload profile picture" %} </em></p>
+
 			{% endif %}
 		</div>
+
 		<div class="small-9 columns" style="padding-top:30px;">
-			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
-			{% blocktrans %}Registerd on : &nbsp;{{DOJ}} {% endblocktrans %}
+			<h4><a href="#">{% blocktrans %} Welcome {{username}} {% endblocktrans %} </a></h4>
+			{% blocktrans %} Registerd on: &nbsp;{{DOJ}} {% endblocktrans %}
 		</div>
 	</div>
-	<br/>
-	<div class="row">
+	
+  <br/>
+	
+  <div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
-			<b><a>{{username}}'s Dashboard</a></b>
+			<b><a>{% blocktrans %}{{username}}'s Dashboard{% endblocktrans %}</a></b>
 			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
 		</div>
 	</div>
-	
-	
-
 </div>
+
+
 <div class="row">
   <div class="row">
     <div class="small-9 columns" >
       <h2>Group Statistics:</h2>
       <div class="usergroup" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-	{% for each in user_group %}
-	<div class="row" style="padding:1px; " >
-	  <div class="small-3 columns"> <a href="/{{each.name}}">{{each.name}}</a>  </div>
-	  <div class="small-1 columns"> {{each.access}} </div>
-	  <div class="small-4 columns"> {{each.created_at}} </div>
-	  <div class="small-1 columns"> {{each.created_by}} </div>
-	</div>
-	{% empty %}
-	<div> No groups </div>
-	{% endfor %}
+      	{% for each in user_group %}
+      	<div class="row" style="padding:1px; " >
+      	  <div class="small-3 columns"> <a href="/{{each.name}}">{{each.name}}</a>  </div>
+      	  <div class="small-1 columns"> {{each.access}} </div>
+      	  <div class="small-4 columns"> {{each.created_at}} </div>
+      	  <div class="small-1 columns"> {{each.created_by}} </div>
+      	</div>
+      	{% empty %}
+      	<div> No groups </div>
+      	{% endfor %}
       </div>
-	
     </div>
+
     <div class="small-3 columns">
       <h2>Notification:</h2>
       <div class="user_notification" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-	{% for each in user_notification %}
-	<div class="row" style="padding:2px; " >
-	  <div class="small-12 columns"> {{each.label}} <div style="font-size: x-small;">{{each.display}} </div> </div>
-	</div>
-	{% empty %}
-	<div> No notification </div>
-	{% endfor %}
+    	{% for each in user_notification %}
+    	<div class="row" style="padding:2px; " >
+    	  <div class="small-12 columns"> {{each.label}} <div style="font-size: x-small;">{{each.display}} </div> </div>
+    	</div>
+    	{% empty %}
+    	<div> No notification </div>
+    	{% endfor %}
       </div>
-
     </div>
   </div>
+
   <div class="row">
     <div class="small-9 columns" >
       <h2>Assigned Tasks:</h2>
       <div class="usergroup" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-	{% for each in user_task %}
-	<div class="row" style="padding:1px; " >
-	  <div class="small-3 columns"> <a href="/{{each.group_name}}/task/{{each.id}}">{{each.name}}</a>  </div>
-	  <div class="small-1 columns"> {{each.status}} </div>
-	  <div class="small-4 columns"> {{each.created_at}} </div>
-	  <div class="small-1 columns"> {{each.created_by}} </div>
-	</div>
-	{% empty %}
-	<div> No task </div>
-	{% endfor %}
+      	{% for each in user_task %}
+      	<div class="row" style="padding:1px; " >
+      	  <div class="small-3 columns"> <a href="/{{each.group_name}}/task/{{each.id}}">{{each.name}}</a>  </div>
+      	  <div class="small-1 columns"> {{each.status}} </div>
+      	  <div class="small-4 columns"> {{each.created_at}} </div>
+      	  <div class="small-1 columns"> {{each.created_by}} </div>
+      	</div>
+      	{% empty %}
+      	<div> No task </div>
+      	{% endfor %}
       </div>
-
     </div>
+
     <div class="small-3 columns">
       <h2>Activity:</h2>
       <div class="user_activity" style="overflow:auto; overflow-x:hidden; max-height:300px;">
-	{% for each in user_activity %}
-	<div class="row" style="padding:3px; " >
-	  <div class="small-12 columns"> {% if not each.group_id %} Group <a href="/{{each.name}}"> {{each.name}}</a> {% else %}
-                    {{each.member_of|title}}  <a href="/{{each.group_id}}/{{each.member_of}}/{{each.id}}"> {{each.name}} </a>  {% endif %} is {{each.activity}} on {{each.date}} </div>
-	</div>
-	{% empty %}
-	<div> No notification </div>
-	{% endfor %}
+      	{% for each in user_activity %}
+      	<div class="row" style="padding:3px; " >
+      	  <div class="small-12 columns"> 
+          {% if not each.group_id %} 
+            Group <a href="/{{each.name}}"> {{each.name}}</a> 
+          {% else %}
+            {{each.member_of|title}}  <a href="/{{each.group_id}}/{{each.member_of}}/{{each.id}}"> {{each.name}} </a>  
+          {% endif %} 
+          is {{each.activity}} on {{each.date}}
+          </div>
+      	</div>
+      	{% empty %}
+      	<div> No notification </div>
+      	{% endfor %}
       </div>
-
     </div>
   </div>
-
 </div>
+
 <script type="text/javascript">
 	$("input").each(function() {
-
 		$(this).bind('keydown keypress keyup change', function() {
 			var search = (this.value).toLowerCase();    	
     		var resource = (this.name); 
@@ -173,9 +181,6 @@
 				return false;
 			}
 	});
-
-	
-	
 </script>
 
 {% endblock %}

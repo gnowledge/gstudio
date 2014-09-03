@@ -25,11 +25,11 @@
     </h2>
     <h3 class="subheader"></h3>
       <small>
-	{% blocktrans with node.last_update|timesince as timesince %}
-        Edited {{timesince}} ago by <a class="user">User</a> <a href="#view-changes"><i class="fi-clock"></i> View history<\
+	{% with node.last_update|timesince as timesince %}
+        {{timesince}} {% trans "ago edited by  " %}<a class="user">{% trans "User" %}</a> <a href="#view-changes"><i class="fi-clock"></i> {% trans "View history " %}<\
 /a>
-      </small>
- {% endblocktrans %}
+      </small>{% endwith%}
+
 
   </section>
 </header>

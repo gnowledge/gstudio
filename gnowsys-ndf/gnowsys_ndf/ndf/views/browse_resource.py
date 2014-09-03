@@ -1,3 +1,4 @@
+
 ''' -- imports from installed packages -- ''' 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -20,6 +21,7 @@ db = get_database()
 collection = db[Node.collection_name]
 collection_tr = db[Triple.collection_name]
 GST_browse_resource = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Browse Resource'})
+app = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Browse Resource'})
 
 #######################################################################################################################################
 
@@ -117,6 +119,7 @@ def resource_list(request,group_id,app_id=None):
 
 	return render_to_response("ndf/resource_list.html", 
                                 {'title': title, 
+                                 'appId':app._id,
                                  'already_uploaded': already_uploaded,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection, 'pandoraCollection':get_member_set,

@@ -49,8 +49,8 @@
             {% endif %}
 
             {% if shelf_item_available %}
-              <span style="color:red"> {% blocktrans %}
-		Shelf Item name {{shelf_item_available}} is already exist{% endblocktrans %}
+              <span style="color:red"> 
+		{{shelf_item_available}} {% trans "the resource already exists." %}
  </span>
             {% endif %}
 
@@ -62,8 +62,8 @@
                   <a class="add-shelf-item"  name="{{each.name}}"><i class='button postfix fi-arrow-right'></i></a>
                 </div>
                 <div class="small-10 columns">
-        	          {% blocktrans %}
-Add {{node.name}}{% endblocktrans %}
+        	          
+{% trans "Add " %} {{node.name}}
           
                 </div>
               </div>
