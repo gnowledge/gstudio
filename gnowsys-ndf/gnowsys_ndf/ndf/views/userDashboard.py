@@ -188,6 +188,7 @@ def dashboard(request, group_id, usrid):
                               context_instance=RequestContext(request)
     )
 
+@login_required
 def uDashboard(request, group_id):
     usrid = group_id
     ins_objectid  = ObjectId()
@@ -203,7 +204,6 @@ def uDashboard(request, group_id):
     else :
         group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
         pass
-
 
     ID = int(usrid)
     userObject = User.objects.get(pk=ID)
