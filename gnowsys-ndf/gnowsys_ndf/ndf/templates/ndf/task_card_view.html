@@ -36,7 +36,7 @@
 
       {% get_user_object node.created_by as user_obj %}
       {% ifequal user_obj.username user.username %}
-      <a class="button alert tiny" href="{% url 'delete_task' group_name node %}?next={{request.path}}">{% trans "Delete" %}</a>
+      <a class="button alert tiny" href="{% url 'delete_task' group_name node %}">{% trans "Delete" %}</a>
       {% endifequal %}
 
       

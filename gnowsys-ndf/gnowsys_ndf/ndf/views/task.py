@@ -314,7 +314,8 @@ def delete_task(request, group_name, _id):
             node.delete()
     except Exception as e:
         print "Exception:", e
-    return HttpResponseRedirect(pageurl) 
+
+    return HttpResponseRedirect(reverse('task', kwargs={'group_name': group_name }))
 
 
 
