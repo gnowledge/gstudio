@@ -65,7 +65,6 @@ body{
             background-color: transparent;
             position: absolute;
             right: 0;
-            padding:8px;
         }
     }
 }
@@ -74,7 +73,7 @@ body{
 
 		.workspace{
             //This is the main content container between the header and footer
-            background: url("body_background_image.png") no-repeat 0 bottom;
+            background: url("watermark.png") no-repeat 0 80%;
 			min-height: 100%;
 			margin-bottom: -130px!important;
 			-webkit-box-sizing: border-box;
@@ -108,17 +107,10 @@ body{
                     color:#eee;
                 }
 		}
-            .gnu-badge{
-                padding: 6px 9px 6px 80px;
-                border: 1px dashed #ddd;
-                margin-bottom: 3px;
-                margin-right: 3px;
-                display: inline-block;
-                background: #fafafa url("../../../images/gnu-head.png") no-repeat -35px -9px;
-                &:hover{
-                    background-position: -35px -19px;
-                }
-            }
+           strong a{
+               border-bottom: 1px dotted #555;
+           }
+               
 		}
 
 
@@ -635,13 +627,6 @@ input.node-title{
 	font-size: 2rem;
 }
 
-/* Splash Page */
-#splash{
-	background-image: url('http://farm3.staticflickr.com/2517/3677733159_2e2c7bec4b_b.jpg');
-}
-#splash>img{
-	position: absolute;
-}
 
 /****************** CUSTOM *********************/
 
@@ -649,7 +634,7 @@ input.node-title{
 .ui.button{
     margin-right: 0.5rem;
     border: 1px solid rgba(0,0,0,0.2);
-    background-color: transparent;
+    background-color: rgba(0,0,0,0.5);
     color: #ddd;
     padding: 0.8rem;
     z-index: 500;
@@ -661,11 +646,11 @@ input.node-title{
         }
     small{
         margin-left: 2px;
-        display: none;
+        display: inline;
     }
     &:hover,&:active{
         border-color: rgba(255,255,255,0.2);
-        background-color: rgba(0,0,0,0.1);
+        background-color: rgba(0,0,0,0.9);
         label{
             color:#ddd;
         }
@@ -681,8 +666,8 @@ input.node-title{
 
 /* For landing page */
 
- body>header{
-        background-image: url("../nroer/indian_pigments.jpg");
+ #landing>header{
+        background-image: url("/static/ndf/css/themes/nroer/home_banner.jpg");
         position: relative;
         z-index: 50;
         background-color: #0A253A;
@@ -715,15 +700,32 @@ input.node-title{
 .landing{
     position: relative;
     
-   
+   h2{
+       margin-top: 2rem;
+   }
     
 }
-section.banner{
+section.promo{
+    background-color: rgba(0,0,0,0.9);
+    border-bottom: 4px solid #00CEFD;
+    .meta{
+        h4{
+            color:white;
+        }
+    }
+}
+
+ul.partner{
+    img{
+        max-height: 150px;
+    }
+}
+
+div.banner{
     padding:0 2rem;
     margin-bottom: 2rem;
     border:2px solid lighten($primary-color,10%);
     border-width: 2px 0;
-    background-color: rgba(0,0,0,0.9);
     &>*{
     background-color: $primary-color;
         .slide{

@@ -249,29 +249,35 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
               if "File" in field_instance["validators"]:
                 # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
                 
-                field_value = request.FILES[field_instance["name"]]
-                file_name = person_gs.name + " -- " + field_instance["altnames"]
-                content_org = ""
-                tags = ""
+                if field_instance["name"] in request.FILES:
+                  field_value = request.FILES[field_instance["name"]]
 
+                else:
+                  field_value = ""
+                
                 # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
-                field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags)[0]
+                if field_value != '' and field_value != u'':
+                  file_name = person_gs.name + " -- " + field_instance["altnames"]
+                  content_org = ""
+                  tags = ""
+                  field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
 
               else:
                 # Other AttributeTypes 
                 field_value = request.POST[field_instance["name"]]
 
               # field_instance_type = "GAttribute"
-              if field_instance["name"] == "12_passing_year" or field_instance["name"] == "degree_passing_year":
+              # print "\n Parsing data for: ", field_instance["name"]
+              if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
-              elif field_instance["name"] == "dob":
+              elif field_instance["name"] in ["dob", "registration_date"]:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
               else:
                 field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
 
               if field_value:
                 person_gs_triple_instance = create_gattribute(person_gs._id, collection.AttributeType(field_instance), field_value)
-                print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
+                # print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
 
             else:
               field_value_list = request.POST.getlist(field_instance["name"])
@@ -282,14 +288,14 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                 field_value_list[i] = field_value
 
               person_gs_triple_instance = create_grelation(person_gs._id, collection.RelationType(field_instance), field_value_list)
-              if isinstance(person_gs_triple_instance, list):
-                print "\n"
-                for each in person_gs_triple_instance:
-                  print " person_gs_triple_instance: ", each._id, " -- ", each.name
-                print "\n"
+              # if isinstance(person_gs_triple_instance, list):
+              #   print "\n"
+              #   for each in person_gs_triple_instance:
+              #     print " person_gs_triple_instance: ", each._id, " -- ", each.name
+              #   print "\n"
 
-              else:
-                print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
+              # else:
+              #   print "\n person_gs_triple_instance: ", person_gs_triple_instance._id, " -- ", person_gs_triple_instance.name
     
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))

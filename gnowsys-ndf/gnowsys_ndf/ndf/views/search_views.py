@@ -4,7 +4,11 @@ from gnowsys_ndf.ndf.models import *
 from django.template import RequestContext
 #from stemming.porter2 import stem
 import json
-from collections import OrderedDict
+try:
+        from collections import OrderedDict
+except ImportError:
+        # python 2.6 or earlier, use backport
+        from ordereddict import OrderedDict
 import difflib
 import string
 import datetime

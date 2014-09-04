@@ -4,6 +4,7 @@ from django.conf.urls import *
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 from django.views.generic import TemplateView
+from gnowsys_ndf.ndf.views.email_registration import password_reset_email,password_reset_error
 
 from registration.backends.default.views import RegistrationView
 
@@ -14,7 +15,7 @@ from gnowsys_ndf.ndf.views.custom_app_view import custom_app_view, custom_app_ne
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^online/', include('online_status.urls')),                                #for online_users  
+    (r'^online/', include('online_status.urls')),   #for online_users 
     (r'^i18n/', include('django.conf.urls.i18n')),
     (r'^pref_lang/$', include('gnowsys_ndf.ndf.urls.languagepref')),
     (r'^admin/data/', include('gnowsys_ndf.ndf.urls.adminDashboard')),
@@ -53,8 +54,6 @@ urlpatterns = patterns('',
     
     (r'^(?P<group_id>[^/]+)/mis', include('gnowsys_ndf.ndf.urls.mis', namespace='mis'), {'app_name': "MIS"}),
     (r'^(?P<group_id>[^/]+)/mis-po', include('gnowsys_ndf.ndf.urls.mis', namespace='mis-po'), {'app_name': "MIS-PO"}),
-
-    #ramkarnani
     url(r'^(?P<group_id>[^/]+)/inviteusers/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.invite_meeting', name='invite_meeting'),
 	url(r'^(?P<group_id>[^/]+)/meeting/(?P<meetingid>[^/]+)','gnowsys_ndf.ndf.views.meeting.output', name='newmeeting'), 
     url(r'^(?P<group_id>[^/]+)/meeting','gnowsys_ndf.ndf.views.meeting.dashb', name='Meeting'),                  ########## meeting app
@@ -101,8 +100,9 @@ urlpatterns = patterns('',
     url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', auth_views.password_reset_confirm, {'set_password_form': UserResetform},name='password_reset_confirm'),
     url(r'^accounts/password/reset/complete/$', auth_views.password_reset_complete, name='password_reset_complete'),
     url(r'^accounts/password/reset/done/$',auth_views.password_reset_done,name="password_reset_done"),
+    url(r'^accounts/password/reset/error/$', password_reset_error , name='password_reset_error'),
     url(r'^accounts/password/reset/$',
-        auth_views.password_reset,
+        password_reset_email,
         {
             'template_name': 'registration/password_reset_form.html',
             'email_template_name': 'registration/password_reset_email.html',

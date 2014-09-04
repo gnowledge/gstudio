@@ -1,0 +1,31 @@
+<!-- STATUS: DISUSED-->
+<!-- External landing page replacing the dashboard content that was tried out for NROER demo on Sep 1
+-->
+
+{% extends "ndf/node_details_base.html" %}
+
+<!-- from django.contrib.auth.decorators import login_required -->
+{% block title %} Group Dashboard {% endblock %} 
+
+{% block head %}
+<link href="/static/ndf/bower_components/slick-carousel/slick/slick.css" rel="stylesheet">
+    <script src="/static/ndf/bower_components/slick-carousel/slick/slick.min.js">
+    </script>
+{% endblock %}
+
+{% block body_content %}
+
+
+<div id="landing">
+{% include "ndf/landing_page_beta.html" %}
+</div>
+
+<script>
+    $("#landing").prependTo("body").nextAll('*').remove();;
+</script>
+
+
+
+
+
+{% endblock %}

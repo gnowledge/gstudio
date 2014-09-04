@@ -984,10 +984,10 @@ def data_review(request, group_id):
   '''
   To get all the information related to resource object in the group.
   '''
-
   # getting group obj from name
 
-  group_obj = collection.Node.one({ "_type": {"$in":["Group","Author"]}, "name": group_id })
+  group_obj = collection.Node.one({ "_type": {"$in":["Group", "Author"]}, "name": unicode(group_id) })
+
   
   # checking if passed group_id is group name or group Id
   if group_obj and (group_id == group_obj.name):

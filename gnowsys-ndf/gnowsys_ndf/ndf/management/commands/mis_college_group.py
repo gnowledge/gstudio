@@ -1,6 +1,7 @@
 ''' -- imports from python libraries -- '''
 import os
 import time
+import datetime
 
 ''' imports from installed packages '''
 from django.core.management.base import BaseCommand, CommandError
@@ -37,6 +38,7 @@ class Command(BaseCommand):
   user_defined_option_list = (
     make_option('-d', '--setup-data', action='store_true', dest='setup_mis_data', default=False, help='This sets up group(s) with MIS-data.'),
     make_option('-g', '--setup-gapps', action='store_true', dest='setup_gapps', default=False, help='This sets up default GAPPS for group(s).'),
+    make_option('-r', '--ren-regYear', action='store_true', dest='ren_regYear', default=False, help='This renames registration_year to registration_date and updates existing value(s), if exists.'),
   )
 
   option_list = option_list + user_defined_option_list
@@ -44,6 +46,29 @@ class Command(BaseCommand):
   help = "This script handles works related to MIS GAPP."
 
   def handle(self, *args, **options):
+    # Renames registration_year to registration_date & updates existing value(s) ------------------------------------
+    if options['ren_regYear']:
+      try:
+        info_message = "\n Renames registration_year to registration_date & updates existing value(s).\n"
+        log_list.append(info_message)
+        info_message = ""
+        update_registration_year()
+      
+      except Exception as e:
+        error_message = "\n RegistrationDateError: " + str(e) + " !!!\n"
+        log_list.append(error_message)
+        pass
+
+      finally:
+        if log_list:
+          log_list.append("\n ============================================================ End of Iteration ============================================================\n")
+
+          log_file_name = os.path.splitext(os.path.basename(__file__))[0] + ".log"
+          log_file_path = os.path.join(SCHEMA_ROOT, log_file_name)
+
+          with open(log_file_path, 'a') as log_file:
+            log_file.writelines(log_list)
+
     # Setting up default GAPPS for group(s) ----------------------------------------------------------------------------
     if options['setup_gapps']:
       try:
@@ -231,12 +256,83 @@ class Command(BaseCommand):
 
 	# ------------------------ End of handle() --------------------------------    
 
+def update_registration_year():
+  '''
+  This renames registration_year to registration_date and updates existing value(s), if exists.
+  '''
+
+  # Fetch the AttributeType (registration_year) & rename it using update command
+  ryat = collection.Node.one({'_type': "AttributeType", 'name': "registration_year"})
+
+  if not ryat:
+    # It means already updated don't do anything
+    ryat = collection.Node.one({'_type': "AttributeType", 'name': "registration_date"})
+    info_message = "\n Already updated -- " + ryat.name + " (" + str(ryat._id) + ") !\n"
+    log_list.append(info_message)
+    return
+
+  info_message = "\n Before update: " + str(ryat._id) + " -- " + ryat.name + " -- " + str(ryat["validators"])
+  log_list.append(info_message)
+  
+  res = collection.update({'_id': ryat._id}, 
+                          {'$set': {'name': u"registration_date", 
+                                    'altnames': u"Date of Registration", 
+                                    'validators': [u"m/d/Y", u"date_month_day_year", u"MM/DD/YYYY"]
+                          }}, 
+                          upsert=False, multi=False
+                        )
+
+  if res['n']:
+    ryat.reload()
+    info_message = "\n After update: " + str(ryat._id) + " -- " + ryat.name + " -- " + str(ryat["validators"]) + "\n"
+    log_list.append(info_message)
+  
+    # If AttributeType is updated successfully, then look out for any existing value(s)
+    # With value as datetime.datetime(2014, 1, 1, 0, 0)
+    # If found, replace it with datetime.datetime(2014, 1, 1, 0, 0)
+
+    ry_cur = collection.Triple.find({'_type': "GAttribute", 'attribute_type.$id': ryat._id})
+
+    c = ry_cur.count() 
+    if c:
+      info_message = "\n No. of existing value(s) found: " + str(c)
+      log_list.append(info_message)
+
+      for each in ry_cur:
+        if each.object_value == datetime.datetime(2014, 1, 1, 0, 0):
+          d = datetime.datetime(2014, 9, 2, 0, 0)
+          res = collection.update({'_id': each._id}, 
+                                  {'$set': {'object_value': d, 
+                                            'name': each.name.replace("2014-01-01 00:00:00", str(d))
+                                  }}, 
+                                  upsert=False, multi=False
+                                )
+          if res['n']:
+            # n = collection.Triple.one({'_id': each._id})
+            each.reload()
+            info_message = "\n Updated: " + each.name#n.name
+
+          else:
+            info_message = "\n Not updated: " + each.name + " !!"
+
+          log_list.append(info_message)
+
+    else:
+      info_message = "\n No documents exist for update !!\n"
+      log_list.append(info_message)
+
+  else:
+    error_message = "Something went wrong while updating AttributeType - " + ryat.name + " (" + str(ryat._id) + ")"
+    log_list.append(error_message)
+    raise Exception(error_message)
+
+
 def setup_default_gapps():
   '''
   This sets up default GAPPS for group(s).
   '''
 
-  default_gapps_names_list = ["Page", "File", "Forum", "Task", "MIS", "Meeting"]
+  default_gapps_names_list = ["Page", "File", "Forum", "MIS"] #, "Task", "Meeting"]
   info_message = "\n Default GAPPS names: " + str(default_gapps_names_list)
 
   # Fetch GAPPS and populate their document-node in a different list
