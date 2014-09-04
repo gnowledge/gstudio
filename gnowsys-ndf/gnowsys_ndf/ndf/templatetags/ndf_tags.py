@@ -1229,6 +1229,9 @@ def check_accounts_url(path):
 	Checks whether the given path is of accounts related or not
 	Accounts means regarding login/logout or password-reset and all!
 
+	Arguments:
+	path -- Lastly visited url by the user taken from request object
+
 	Returns:
 	A boolean value indicating the same
 	'''

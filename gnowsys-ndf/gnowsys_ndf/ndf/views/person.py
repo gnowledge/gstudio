@@ -89,7 +89,8 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = person_gst.name
   
-    template = "ndf/person_list.html"
+    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
+    default_template = "ndf/person_list.html"
 
     if request.method=="POST":
       search = request.POST.get("search","")
@@ -100,7 +101,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       nodes = collection.Node.find({'member_of': person_gst._id, 'group_set': ObjectId(group_id)})
 
   if app_set_instance_id :
-    template = "ndf/person_details.html"
+    default_template = "ndf/person_details.html"
 
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
@@ -124,8 +125,8 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
-    # return render_to_response([template, default_template], 
-    return render_to_response(template, 
+    # return render_to_response(template, 
+    return render_to_response([template, default_template], 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
