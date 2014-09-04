@@ -15,8 +15,10 @@
 
 	<script type="text/javascript" src="/static/ndf/bower_components/jquery-ui/jquery-ui.min.js"></script> <!-- checked -->
 	<script type="text/javascript" src="/static/ndf/bower_components/foundation-datepicker/js/foundation-datepicker.js"></script> <!-- checked -->
-	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
+		<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css"> <!-- checked -->
 	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css"> <!-- checked -->
+		<script type="text/javascript" src="/static/ndf/js/CalendarControl.js"></script> <!-- checked -->
+
 
 <script type="text/javascript">
 </script>
@@ -28,6 +30,36 @@
     overflow-y: auto;
     padding-left: 10px;
     width: 300px;
+}
+</style>
+<style type="text/css">
+#CalendarControlIFrame {
+  display: none;
+  left: 0px;
+  position: fixed;
+  top: 100px;
+
+  height: 150px;
+  width: 50px;
+
+    left:100px;
+    top:200px;
+  z-index: 99;
+
+}
+
+
+#CalendarControl {
+  position:fixed;
+  background-color:#FFF;
+  margin:0;
+  padding:0;
+
+  display:none;
+  z-index: 100;
+    left:100px;
+    top:200px;
+
 }
 </style>
 {% endblock %}
@@ -166,9 +198,10 @@ $('#hidden_watchers').val(selected);
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Start date</label>
-	    <input class="start_date" name="start_time" type="text" placeholder="select date..." value="{{start_time}}">
+	    <input name="start_time" type="text" placeholder="select date..." onfocus="showCalendarControl(this);" value="{{start_time}}">
 	  </div>
 	</div>	
+
 	<div class="row">
 	  <div class="medium-6 columns">
 	    <label>Priority <font color="red">*</font></label>
@@ -182,7 +215,7 @@ $('#hidden_watchers').val(selected);
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Due date</label>
-	    <input class="due_date" name="end_time" type="text" placeholder="select date..." value="{{end_time}}">
+	    <input name="end_time" type="text" placeholder="select date..." onfocus="showCalendarControl(this);" value="{{end_time}}">
 	  </div>
 	</div>	
 	<div class="row">

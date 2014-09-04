@@ -476,7 +476,7 @@
               <div class="small-6 small-offset-3 columns end">
                 <div class="row">
                   <div class="small-4 columns">
-                    <label for="{{property_order_list.2.1.8.name}}" class="right inline"> {% trans "Registration Year" %} </label>
+                    <label for="{{property_order_list.2.1.8.name}}" class="right inline"> {% trans "Date of Registration" %} </label>
                   </div>
                   <div class="small-8 columns">
                     {% html_widget groupid node.pk property_order_list.2.1.8 %}
@@ -508,7 +508,7 @@
 // Default settings for tabs, date-widgets & college-dropdown on page load ---------------------------------------
   var currentYear = (new Date()).getFullYear()
   lowerYearRange = currentYear - 80;
-  upperYearRange = currentYear + 20;
+  upperYearRange = currentYear;
 
   $(function() {
     // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
@@ -541,10 +541,17 @@
       });
 
     // Settings for datepicker widget (with all) -----------------------------------------------------------------
-      $(".date_month_day_year").datepicker({
+      $("#dob.date_month_day_year").datepicker({
         changeMonth: true,
         changeYear: true,
-        yearRange: "" + lowerYearRange + ":" + upperYearRange
+        yearRange: "" + lowerYearRange + ":" + upperYearRange,
+      });
+
+      $("#registration_date.date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "" + lowerYearRange + ":" + upperYearRange,
+        maxDate: '0'
       });
 
     // Settings for datepicker widget (only for year) ------------------------------------------------------------

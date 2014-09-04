@@ -22,13 +22,17 @@
 
   {% elif field.validators.0 == "email" %}
     <input type="email" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          placeholder="{{field.help_text|default_if_none:''}}" 
           {% if not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
+          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}" 
           style="float:left; width:95%"
     />
+    {% if is_required_field or field.validators %}
     {% if is_required_field %}
     <i style="color:red; float:left display:inline">*</i>
-    <small class="error">{% blocktrans with alt=field.altnames %} Please fill valid {{alt}}! {% endblocktrans %}</small>
+    {% endif %}
+    <small class="error">{% blocktrans with alt=field.altnames %} Please fill a valid {{alt}}! {% endblocktrans %}</small>
     {% endif %}
 
   {% elif field.validators.0 == "tel" %}

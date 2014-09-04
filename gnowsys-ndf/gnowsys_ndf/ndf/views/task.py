@@ -62,14 +62,16 @@ def task_details(request, group_name, task_id):
     if ins_objectid.is_valid(group_name) is False :
       group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
       auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if group_ins:
+    elif ins_objectid.is_valid(group_name) is True :
+      group_ins = collection.Node.find_one({'_type': "Group","_id": group_name})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
+    if group_ins:
         group_id = str(group_ins._id)
-      else :
+    else :
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
         if auth :	
           group_id = str(auth._id)
-    else :
-        pass
+        
     task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}
@@ -114,14 +116,16 @@ def create_edit_task(request, group_name, task_id=None):
     if ins_objectid.is_valid(group_name) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if group_ins:
+    elif ins_objectid.is_valid(group_name) is True :
+        group_ins = collection.Node.find_one({'_type': "Group","_id": group_name})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
+    if group_ins:
             group_id = str(group_ins._id)
-        else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-            if auth :
-                group_id = str(auth._id)
     else :
-        pass
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+            group_id = str(auth._id)
+
     blank_dict = {}
     if task_id:
         task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
@@ -311,7 +315,7 @@ def delete_task(request, group_name, _id):
     return HttpResponseRedirect(pageurl) 
 
 
-@login_required
+
 def check_filter(request,group_name,choice,status=None):
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}
@@ -342,6 +346,7 @@ def check_filter(request,group_name,choice,status=None):
     TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     task_list=[]
     self_task=[]
+    send="This group doesn't have any files"
     #Task Completed 
     for each in TASK_inst:
     	 
@@ -393,7 +398,7 @@ def check_filter(request,group_name,choice,status=None):
 
         	self_task.sort()
    
-
+        
         if not self_task:
         	send=message
         else:

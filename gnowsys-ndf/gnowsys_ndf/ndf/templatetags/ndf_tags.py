@@ -835,7 +835,7 @@ def get_user_group(user, selected_group_name):
   """
   group_list = []
   auth_group = None
-
+  
   group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", selected_group_name]}, 
   									'$or': [{'group_admin': user.id}, {'author_set': user.id}],
   								}).sort('last_update', -1).limit(9)
@@ -943,6 +943,38 @@ def get_edit_url(groupid):
 			return 'file_edit'
 
 @register.assignment_tag
+def get_url(groupid):
+     
+	node = collection.Node.one({'_id': ObjectId(groupid) }) 
+	if node._type == 'GSystem':
+
+		type_name = collection.Node.one({'_id': node.member_of[0]}).name
+
+		if type_name == 'Quiz':
+			return 'quiz_details'    
+		elif type_name == 'Page':
+			return 'page_details' 
+		elif type_name == 'Theme' or type_name == 'theme_item':
+			return 'theme_page'
+		elif type_name == 'Forum':
+			return 'show'
+		elif type_name == 'Task':
+			return 'task_details'  		
+	elif node._type == 'Group' :
+		return 'group'
+
+	elif node._type == 'File':
+		if (node.mime_type) == ("application/octet-stream"): 
+			return 'video_detail'       
+		elif 'image' in node.mime_type:
+			return 'file_detail'
+		else:
+			return 'file_detail'
+	else:
+			return 'None'
+
+
+@register.assignment_tag
 def get_create_url(groupid):
 
   node = collection.Node.one({'_id': ObjectId(groupid) }) 
@@ -979,8 +1011,19 @@ def get_contents(node_id):
 
 	obj = collection.Node.one({'_id': ObjectId(node_id) })
 
-	RT = collection.Node.one({'_type':'RelationType', 'name': 'teaches'})
-	list_grelations = collection.Node.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type':RT.get_dbref() })
+	RT_teaches = collection.Node.one({'_type':'RelationType', 'name': 'teaches'})
+	RT_translation_of = collection.Node.one({'_type':'RelationType','name': 'translation_of'})
+
+	# "right_subject" is the translated node hence to find those relations which has translated nodes with RT 'translation_of'
+	# These are populated when translated topic clicked.
+	trans_grelations = collection.Node.find({'_type':'GRelation','right_subject':obj._id,'relation_type.$id':RT_translation_of._id })               
+	# If translated topic then, choose its subject value since subject value is the original topic node for which resources are attached with RT teaches. 
+	if trans_grelations.count() > 0:
+		obj = collection.Node.one({'_id': ObjectId(trans_grelations[0].subject)})
+
+	# If no translated topic then, take the "obj" value mentioned above which is original topic node for which resources are attached with RT teaches
+	list_grelations = collection.Node.find({'_type': 'GRelation', 'right_subject': obj._id, 'relation_type.$id': RT_teaches._id })
+
 	for rel in list_grelations:
 		rel_obj = collection.Node.one({'_id': ObjectId(rel.subject)})
 
@@ -1180,7 +1223,21 @@ def get_group_type(group_id, user):
 		colg=col_Group.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
 		return "pass"
 
+@register.assignment_tag
+def check_accounts_url(path):
+	'''
+	Checks whether the given path is of accounts related or not
+	Accounts means regarding login/logout or password-reset and all!
 
+	Returns:
+	A boolean value indicating the same
+	'''
+
+	if "accounts" in path:
+		return True
+
+	else:
+		return False
 
 '''this template function is used to get the user object from template''' 
 @register.assignment_tag 
@@ -1903,3 +1960,4 @@ def check_node_linked(node_id):
   except Exception as e:
     error_message = " NodeUserLinkFindError - " + str(e)
     raise Exception(error_message)
+

@@ -196,7 +196,17 @@
 
       	  <!-- Else show login link -->
       	  {% else %}
-      	  <li class="has-form"><a class="button" href="{% url 'auth_login' %}" accesskey="l"><i class="fi-key"></i> {% trans "Login" %}</a></li>
+          {% check_accounts_url request.path as is_ac_url %}
+          <!-- 
+          check_accounts_url:
+            If accounts related url exists in path, then returns True; otherwise False
+
+          Required only for:
+            If path is other than accounts then only append it for redirection after login
+            Otherwise it will get into unending loop i.e. as soon as logs-in it gets logged-out
+            as redirection-url was of logout; similar case with password-reset!
+          -->
+      	  <li class="has-form"><a class="button" href="{% url 'auth_login' %}{% if not is_ac_url %}?next={{request.path}}{% endif %}" accesskey="l"><i class="fi-key"></i> {% trans "Login" %}</a></li>
       	  {% endif %}
       	</ul>  
         <!-- Closes Right Nav section -->
