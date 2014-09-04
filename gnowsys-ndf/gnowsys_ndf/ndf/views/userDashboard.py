@@ -253,7 +253,10 @@ def uDashboard(request, group_id):
     #user_group = get_user_group(userObject)
     group_list=[]
     user_activity=[]
-    group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}}).limit(4)
+    group_cur = collection.Node.find({'_type': "Group", 'name': {'$nin': ["home", request.user.username]}, 
+                    '$or': [{'group_admin': request.user.id}, {'author_set': request.user.id}],
+                  }).sort('last_update', -1).limit(9)
+
     for i in group_cur:
         group_list.append(i)
         
@@ -265,7 +268,7 @@ def uDashboard(request, group_id):
                                                  
                                                  {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
 
-                                                 }).sort('last_update', -1).limit(4)
+                                                 }).sort('last_update', -1).limit(10)
     a_user=[]
     for i in activity_user:
         if i._type != 'Batch' or i._type != 'Course' or i._type !='Module':
@@ -295,7 +298,7 @@ def uDashboard(request, group_id):
     
     user_assigned = []
     attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username})
+    attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username}).sort('last_update',-1).limit(10)
     for attr in attr_assignee :
      task_node = collection.Node.find_one({'_id':attr.subject})
      user_assigned.append(task_node) 
