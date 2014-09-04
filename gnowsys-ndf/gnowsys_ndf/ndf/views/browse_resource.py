@@ -22,6 +22,7 @@ collection = db[Node.collection_name]
 collection_tr = db[Triple.collection_name]
 GST_browse_resource = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Browse Resource'})
 app = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Browse Resource'})
+pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id})
 
 #######################################################################################################################################
 
@@ -122,7 +123,8 @@ def resource_list(request,group_id,app_id=None):
                                  'appId':app._id,
                                  'already_uploaded': already_uploaded,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
-                                 'videoCollection': videoCollection, 'pandoraCollection':get_member_set,
+                                 'videoCollection': videoCollection, 'pandoravideoCollection':pandoravideoCollection,
+                                 'pandoraCollection':get_member_set,
                                  'is_video':is_video,'groupid': group_id, 'group_id':group_id,"datavisual":datavisual
                                 }, 
                                 context_instance = RequestContext(request))
