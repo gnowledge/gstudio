@@ -1179,11 +1179,15 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
 def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
-
-  ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
-  if ga_node is None:
+  
+  ga_node = collection.Triple.find({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
+  print "count=",ga_node.count() 
+  if ga_node.count()>0:
+    ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
+  if not ga_node.count() >0:
     # Code for creation
     try:
+      print "new create"
       ga_node = collection.GAttribute()
 
       ga_node.subject = subject_id
@@ -1191,6 +1195,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
       ga_node.object_value = object_value
       
       ga_node.status = u"PUBLISHED"
+      print "contr="
       ga_node.save()
       #info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
       #print "\n ", info_message
@@ -1221,6 +1226,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
 
       if is_ga_node_changed:
         ga_node.status = u"PUBLISHED"
+        print "node save"
         ga_node.save()
         info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
 

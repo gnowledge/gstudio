@@ -1645,11 +1645,14 @@ def get_preferred_lang(request, group_id, nodes, node_type):
    node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
 
    if uname:
-      pref_lan=uname.preferred_languages
-   else:
-      pref_lan={}
-      pref_lan['primary']=request.LANGUAGE_CODE
-      pref_lan['default']=u"en"
+      if uname.has_key("preferred_languages"):
+         pref_lan=uname.preferred_languages
+      else:
+         pref_lan={}
+         pref_lan['primary']=request.LANGUAGE_CODE
+         pref_lan['default']=u"en"
+         uname.pref_lang=pref_lan
+         uname.save()
    try:
       for each in nodes:
          primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':each._id}]})
