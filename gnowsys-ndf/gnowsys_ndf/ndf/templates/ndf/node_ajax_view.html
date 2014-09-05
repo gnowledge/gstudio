@@ -1103,12 +1103,20 @@ This section has been integrated to groupdashboard and appears in block app_acti
   // iframe for html content  
   function adjustIframeHt(){
 
-    iframeBodyHt = $("iframe#html-res-iframe").contents().find("body").height();
-    // console.log(iframeBodyHt);
+    var iframeBodyHt = $("iframe#html-res-iframe").contents().find("body").height();
     $("iframe").height(iframeBodyHt + 50);
+    
+    var changedHt;
+    
+    setTimeout(function(){
 
+      changedHt = $("iframe#html-res-iframe").contents().find("body").height();
+      if(changedHt > iframeBodyHt) { adjustIframeHt() }
+
+    }, 4000 );
+    
   }
 
-  $("document").ready(function(){ setTimeout(function() { adjustIframeHt() },2000) });
+  $("document").ready(function(){ setTimeout(function() { adjustIframeHt() },3000) });
 
 </script>
