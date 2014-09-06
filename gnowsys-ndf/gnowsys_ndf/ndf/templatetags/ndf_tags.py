@@ -1919,7 +1919,7 @@ def html_widget(groupid, node_id, field):
 
     return {'template': 'ndf/html_field_widget.html',
             'field': field, 'field_type': field_type, 'field_value': field_value,
-            'node_id': node_id, 'groupid': groupid, 'node_dict': node_dict,
+            'node_id': node_id, 'group_id': groupid, 'groupid': groupid, 'node_dict': node_dict,
             'field_value_choices': field_value_choices,
             'is_base_field': is_base_field,
             'is_attribute_field': is_attribute_field,
