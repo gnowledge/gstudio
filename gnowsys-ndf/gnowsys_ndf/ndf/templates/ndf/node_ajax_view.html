@@ -316,12 +316,8 @@ This section has been integrated to groupdashboard and appears in block app_acti
   </h1>
       <h1 class="subheader">
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
-          
-      {% if topic %}
-       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% trans "Contents" %}</a></dd>
-      {% endif %}
 
-      <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes" %}</a></dd>
       <dd><a href="#view-discussion"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
 
@@ -410,7 +406,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
     <div class="tabs-content">
 
       <!-- Tab content -->
-      <div class="content {% if not topic %}active commentable-section {% endif %}" id="view-page" data-section-id="1">
+      <div class="content active commentable-section" id="view-page" data-section-id="1">
 	<div class="row">
 	<div class="small-4 columns">
         {% if node.prior_node|length > 0 %}
@@ -601,14 +597,12 @@ This section has been integrated to groupdashboard and appears in block app_acti
         {% endwith %}
       </div>
       <!-- </div> -->
+      <!-- Resource contents of topic -->
 
-      </div>
-
-      <!-- Div included for setting default landing page for topic as an concept graph -->
       {% if topic %}
-        <div class="content" id="view-graph">  </div>
+        <!-- <div class="content" id="view-graph">  </div> -->
 
-        <div class="content active" id="contents"> 
+        <div class="content" id="contents"> 
           
           {% get_contents node.pk as contents %}
           {% for k,v in contents.items %}    
@@ -636,11 +630,14 @@ This section has been integrated to groupdashboard and appears in block app_acti
               {% endfor %}
             </fieldset>
 
-          {% endfor %}
-          
+          {% endfor %}          
 
         </div>
       {% endif %}
+      <!-- End of displaying topic page contents -->
+
+      </div>
+
 
       <!-- Content for Concept Graph -->
       <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
@@ -1103,12 +1100,20 @@ This section has been integrated to groupdashboard and appears in block app_acti
   // iframe for html content  
   function adjustIframeHt(){
 
-    iframeBodyHt = $("iframe#html-res-iframe").contents().find("body").height();
-    // console.log(iframeBodyHt);
+    var iframeBodyHt = $("iframe#html-res-iframe").contents().find("body").height();
     $("iframe").height(iframeBodyHt + 50);
+    
+    var changedHt;
+    
+    setTimeout(function(){
 
+      changedHt = $("iframe#html-res-iframe").contents().find("body").height();
+      if(changedHt > iframeBodyHt) { adjustIframeHt() }
+
+    }, 4000 );
+    
   }
 
-  $("document").ready(function(){ setTimeout(function() { adjustIframeHt() },2000) });
+  $("document").ready(function(){ setTimeout(function() { adjustIframeHt() },3000) });
 
 </script>
