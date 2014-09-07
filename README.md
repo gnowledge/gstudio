@@ -2,16 +2,17 @@ gstudio
 =======
 
 gstudio is an implementation of http://www.gnu.org/software/gnowsys/
-which is a Node Description Framework (NDF). It is a frame-based 
+which is a Node Description Framework (NDF). It is a frame-based
+knowledge representation model. 
 
 The project is released under GNU AGPL v3 license.
 
 Features of gstudio
 -------------------
 
-Read the file Features.org
+Read the file [Features.org](Features.org)
 
-Expected release of the version 1.0 during August 2014. until then
+Expected release of the version 1.0 during ~August 2014~ October 2014. until then
 enjoy the beta.
 
 Live sites using gstudio
