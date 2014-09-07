@@ -10,9 +10,9 @@ The project is released under GNU AGPL v3 license.
 Features of gstudio
 -------------------
 
-Read the file [Features.org](Features.org)
+Read the file [Features.org](https://github.com/gnowledge/gstudio/blob/mongokit/doc/Features.org)
 
-Expected release of the version 1.0 during ~August 2014~ October 2014. until then
+Expected release of the version 1.0 during ~~August 2014~~ October 2014. until then
 enjoy the beta.
 
 Live sites using gstudio
