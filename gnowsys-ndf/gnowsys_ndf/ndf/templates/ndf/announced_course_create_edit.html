@@ -1,0 +1,300 @@
+{% extends "ndf/mis_base_create_edit.html" %}
+{% load i18n %}
+{% load ndf_tags %}
+{% load pagination_tags %}
+
+{% block style %}
+// <style type="text/css">
+/* CSS for Multiple-selection (or drawer) widget */
+  .divider-line { font-size: xx-large; color:lightgray; }
+  .line-height-2 { line-height:2; }
+  .line-height-2pt5 { line-height:2.5; }
+  .fontsize-x-large { font-size: x-large; }
+
+  .margin-0 { margin: 0 !important ;}
+
+  .resource-drawer { 
+    border-color: #D3D3D3; border-style: solid; 
+    padding: 0 !important; 
+    overflow-y: auto;
+  }
+
+  .resource-drawer li.bullet-item:hover{
+    background-color: #ecf0f1; cursor:pointer;
+  }
+
+  .posted-by{ color: #808080; font-size: small; }
+
+  .selected-resource { background-color:lightgray !important ; }
+
+  .resource-type-image {
+    height:40px;    
+    background-repeat:no-repeat; background-size: 48px 48px
+  }
+
+/* Disable tab's (anchor tag's) click as it's navigation is propagated on buttons (Next & Previous) */
+  dl.tabs>dd a.disable {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .row .row {
+    margin: 0 0;
+  }
+// </style>
+{% endblock %}
+
+{% block body_content %} 
+  <form data-abide enctype="multipart/form-data" id="form-edit-node" method="POST" action="">
+
+    <header class="row" style="margin: 1rem 0 0 0 ;">
+      <h2 class="small-12 columns">
+        {% if node %}
+        {% blocktrans with title_var=title node_name=node.name %} Editing {{title_var}}: {{node_name}} {% endblocktrans %}
+        {% else %}
+        {% blocktrans with title_var=title %} Register a New {{title_var}} {% endblocktrans %}
+        {% endif %}
+      </h2>
+    </header>
+
+    <nav class="row" style="margin-top: 0.5rem;">
+      <dl class="tabs small-12 columns" data-tab data-options="deep_linking:true">
+        <dd>
+          <label><h4>{% trans "Fill"%}:&nbsp;&nbsp;</h4></label>
+        </dd>
+
+        {% for tab_details in property_order_list %}
+        <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
+          <a href="#panel_{{tab_details.0}}" class="disable">
+            {% blocktrans with tab_name=tab_details.0 %} {{tab_name}} {% endblocktrans %}
+          </a>
+        </dd>
+        {% endfor %}
+      </dl>
+    </nav>
+
+    {% csrf_token %}
+
+    <div id="announced-course-edit-div" class="tabs-content" style="border-style: solid; border-width: 1.5px; border-color: #0eacb5; padding: 0px 5px;" >
+      <div class="active content row" id="panel_{{property_order_list.0.0}}">
+        <div class="row">
+          <div class="small-3 columns">
+            <label for="{{property_order_list.0.1.0.name}}" class="right inline"> 
+              {% blocktrans with label_val=property_order_list.0.1.0.altnames %} {{label_val}} {% endblocktrans %}
+            </label>
+          </div>
+          <div class="small-6 columns end">
+            {% html_widget groupid node.pk property_order_list.0.1.0 %}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="small-3 columns">
+            <label for="NUSSD Course Duration/Period" class="right inline"> 
+              {% trans "NUSSD Course Duration/Period" %}
+            </label>
+          </div>
+          <div class="small-1 columns">
+            <label for="{{property_order_list.0.1.1.name}}" class="right inline"> 
+              {% trans "From" %}
+            </label>
+          </div>
+          <div class="small-2 columns">
+            {% html_widget groupid node.pk property_order_list.0.1.1 %}
+          </div>
+          <div class="small-1 columns">
+            <label for="{{property_order_list.0.1.2.name}}" class="right inline"> 
+              {% trans "To" %}
+            </label>
+          </div>
+          <div class="small-2 columns end">
+            {% html_widget groupid node.pk property_order_list.0.1.2 %}
+          </div>
+        </div>
+
+        <div class="row tab-nav">
+          <div class="small-2 columns for-prev">
+          </div>
+          <div class="small-4 small-offset-5 columns end for-save">
+          </div>
+          <div class="small-2 small-offset-2 columns for-next">
+          </div>
+        </div>    
+      </div>
+
+      <input type="hidden" id="name" name="name" value="">
+    </div>
+
+  </form>
+
+{% endblock %}
+
+{% block script %}
+// <script type="text/javascript">
+// Default settings for date-widgets & tabs on page load ---------------------------------------------------------
+  var currentYear = (new Date()).getFullYear()
+  lowerYearLimit = currentYear - 5;
+  upperYearLimit = currentYear + 5;
+
+  $(document).ready(function() {
+    // Change placeholders for start-time & end-time
+      // From MM/DD/YYYY HH:MM to MM/YYYY
+      $(".date_month_day_year").each(function(i) {
+        $(this).attr("placeholder", "MM/YYYY");
+      });
+
+    // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
+      $(".content").each(function(i) {
+        totalTabs = $(".content").size() - 1
+
+        if (i != totalTabs) {
+          // Not in last tab
+          $(this).children(".tab-nav").children(".for-next")
+            .append("<input type='button' class='button small round tab_next' value='{% trans 'Next' %}' />");
+        }
+
+        if (i == totalTabs) {
+          // Only in last tab
+          var is_existing_nussd_course = "{{node.pk|default_if_none:''}}";
+          var submit_btn_label = '{% trans "Register" %}' // By default considering registering a new nussd_course
+          if (is_existing_nussd_course) {
+            // If value (ObjectId) found, it means updating existing nussd_course record
+            submit_btn_label = '{% trans "Update" %}'
+          }
+          // $(this).children(".tab-nav").children(".for-save")
+          //   .append("<input type='submit' id='save-node' class='small button expand' value='"+submit_btn_label+"' style='float:right;' />");
+        }
+
+        if (i != 0) {
+          // Not in first tab
+          $(this).children(".tab-nav").children(".for-prev")
+            .append("<input type='button' class='button small round tab_prev' value='{% trans 'Previous' %}' style='float:right;' />");
+        }
+      });
+
+    // Settings for datepicker widget (with month & year) --------------------------------------------------------
+      $(".date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'mm/yy',
+        yearRange: "" + lowerYearLimit + ":" + upperYearLimit,
+
+        onClose: function(dateText, inst) {
+          $(this).val(dateText)
+        },
+
+        beforeShow: function() {
+          var month_year = $(this).val();
+          month_year = month_year.split("/")
+          // month[0]: month-value
+          // month[1]: year-value
+          // alert("val: " + month_year + " --0-- " + (month_year[0] - 1) + " --1-- " + month_year[1] )
+          // NOTE: Experienced an odd behavior which is stated as follows:
+          // > Month-value was automatically getting incremented by 1
+          // > Hence, to tackle that I'm explicitly subtracting 1 from it!
+
+          if (month_year) {
+            month = (month_year[0] - 1)
+            year = month_year[1]
+            $(this).datepicker('option', 'defaultDate', new Date(year, month, 1));
+            $(this).datepicker('setDate', new Date(year, month, 1));
+          }
+        },
+
+        onChangeMonthYear: function(year, month, inst){
+          $(this).val(month+"/"+year)
+        }
+      });
+  });
+
+// Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
+  $(".content").on('click', '.tab_next' ,function(event){
+    event.preventDefault();
+
+    // Forcefully blur all input elements, so that mandatory fields become data-invalid if not fill
+    $(this).parents(".tab-nav").parents(".content").find(':input[required]').blur();
+
+    // Then check no. of data-invalid fields
+    // if count == 0, then only proceed to next tab
+    if($(this).parents(".tab-nav").parents(".content").find(':input[data-invalid]').length == 0) {
+      // Valid, move to next step
+      $('.active').removeClass('active').next().addClass('active');
+    }
+  });
+
+  $(".content").on('click', '.tab_prev' ,function(event){
+    event.preventDefault();
+    $('.active').removeClass('active').prev().addClass('active');
+  });
+
+// Only keeping month's & year's drop-down and hiding other datepicker's elements --------------------------------
+  $(document).on('focus click', '.date_month_day_year' ,function(){
+    $(".ui-datepicker-calendar").hide();
+  });
+
+// Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
+  $(document).on('closed', '[data-reveal]', function () {
+    /*
+     *  On closing of reveal-modal
+     */
+    var widget_for = $(this).attr('id').replace('_modal', '')
+
+    // First empty all values of given field (dropdown/select)
+    $("select#" + widget_for).empty();
+
+    // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
+    class_value = ".node_id." + widget_for + "_values"
+    right_drawer_len = $(class_value).size()
+
+    if (right_drawer_len > 0) {
+      $(class_value).each(function (){
+        // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
+        resource_id = $(this).val()
+        resource_name = $(this).attr('name')
+
+        // Make very first entry as given below
+        $("select#" + widget_for).append(
+            $("<option></option>")
+              .attr("value", resource_id)
+              .attr("selected", "selected")
+              .text(resource_name)
+        );
+      });
+    }
+
+    else {
+      // Make very first entry as given below
+      $("select#" + widget_for).append(
+          $("<option></option>")
+            .attr("value", "")
+            .text("- - - Select - - -")
+      );
+    }
+  });
+
+// On click of Register/Update -----------------------------------------------------------------------------------
+  $(document).on("click", "#save-node", function() {
+  // Store concatenated first, middle & last name field's values into name field (hidden input field) ------------
+    name = ""
+    first_name = $("#first_name").val().trim()
+    middle_name = $("#middle_name").val().trim()
+    last_name = $("#last_name").val().trim()
+
+    name = first_name
+    if (middle_name != "") {
+      name = first_name + " " + middle_name
+    }
+
+    if (last_name != "") {
+      name = name + " " + last_name
+    }
+
+    $("#name").val(name)
+
+  // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+    $(".content").find(":input[disabled]").each(function(){
+      $(this).removeAttr('disabled');
+    });
+  });
+
+{% endblock %}
