@@ -507,9 +507,27 @@ This section has been integrated to groupdashboard and appears in block app_acti
             <div>
               {% if 'image' in node.mime_type %}
               Resource Type: {{node.mime_type}}
-              <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-                <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}">
-              </a>
+
+              <!-- lightbox for displaying image gallary -->
+              <ul class="clearing-thumbs clearing-feature small-block-grid-2" data-clearing> 
+                {% for image in imageCollection %}
+
+                  {% get_grid_fs_object image as grid_fs_obj %}
+                  {% if node.pk == image.pk %}
+                    <li class="clearing-featured-img">
+                  {% else %}
+                    <li>
+                  {% endif %}
+                  
+                  <a href="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}">
+                    <img class="imgLightbox" src="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}" data-caption="{{image.name}}" name="{{image.pk}}">
+                  </a>
+                  </li> 
+
+                {% endfor %}
+              </ul>
+              <!--  -->
+              
               {% elif 'audio' in node.mime_type %}
               <div class="row">
                 <div class="small-12 columns">
@@ -1025,6 +1043,11 @@ This section has been integrated to groupdashboard and appears in block app_acti
   $(document).on('click','#clickConceptGraph',function(){
     $('#view-concept-graph #chart-concept').append(svgdata); 
     $('#view-concept-graph').foundation('reveal', 'open'); 
+  });
+
+  $(document).on('dblclick','.imgLightbox',function(){
+    var img_node = $(this).attr('name');
+    location.href = "/{{group_name_tag}}/image/details/"+img_node;
   });
 
   $(document).on('close', '#view-concept-graph[data-reveal]', function () {
