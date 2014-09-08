@@ -24,6 +24,7 @@ except ImportError:  # old pymongo
 # from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.views.course import *
 from gnowsys_ndf.ndf.views.event import *
 from gnowsys_ndf.ndf.views.person import *
 
