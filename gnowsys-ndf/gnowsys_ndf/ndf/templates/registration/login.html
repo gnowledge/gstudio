@@ -15,7 +15,7 @@
 <br/>
 {% if form.errors %}
 
-<p>{% trans "Please give a valid email." %}</p>
+<p>{% trans "Either your email or password is incorrect." %}</p>
 {% endif %}
 
 <form method="post" id="loginSubmit" action="{% url 'auth_login' %}">

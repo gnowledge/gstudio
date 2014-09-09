@@ -56,18 +56,26 @@
    <dl class="tabs" data-tab data-options="deep_linking:true">
      <dd class="active"><a href="#view-all"><i class="fi-eye"></i>All files {% if files.count %}({{ files.count }}){% endif %}</a></dd>
      <dd><a href="#view-doc"><i class="fi-page-filled"></i>Documents {% if docCollection.count %}({{ docCollection.count }}){% endif %}</a></dd>
+     {% if interactiveCollection.count %}
+      <dd><a href="#view-interactive"><i class="fi-arrows-compress"></i>Interactives ({{ interactiveCollection.count }})</a></dd>
+     {% endif %}
+     {% if audioCollection.count %}
+      <dd><a href="#view-audio"><i class="fi-music"></i>Audios ({{ audioCollection.count }})</a></dd>
+     {% endif %}
      <dd><a href="#view-image"><i class="fi-camera"></i>Images {% if imageCollection.count %}({{ imageCollection.count }}){% endif %}</a></dd>
     {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
-     <dd><a href="#view-video"><i class="fi-video"></i>{% trans "Videos" %}{% if videoCollection.count %}({{ videoCollection.count }}){% endif %}</a></dd>
+     <dd><a href="#view-video"><i class="fi-video"></i>{% trans "Videos" %}{% if pandoravideoCollection.count %}({{ pandoravideoCollection.count }}){% endif %}</a></dd>
     {% endif %}
     {% if site.SITE_VIDEO == 'pandora_and_local' %}
      <dd><a href="#view-pandora-video"><i class="fi-video"></i>{% trans "Pandora Videos" %}</a></dd>
     {% endif %}
     {% if site.SITE_VIDEO == 'pandora' %}
-     <dd><a href="#view-pandora-video"><i class="fi-video"></i>{% trans "Videos" %}</a></dd>
+     <dd><a href="#view-pandora-video"><i class="fi-video"></i>{% trans "Videos" %} {% if pandoravideoCollection.count %}({{ pandoravideoCollection.count }}){% endif %}</a></dd>
     {% endif %}
 
+    {% if title != "Browse Resource" %}
      <dd><a href="#view-collection"><i class="fi-page-multiple"></i>{% trans "Collections" %}</a></dd>
+    {% endif %}
 
    </dl>
 </header>
@@ -204,46 +212,25 @@
       <li class="card">
         <div class="file">
 	  
+          <div class="label-list">{% for tag in doc.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
+            {% endfor %}</div>
+
+            <a href="{% url 'file_detail' group_name_tag doc %}">
           <header>
-            <div class="label-list">
-            {% for tag in doc.tags|slice:":3" %}
-              <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-            {% endfor %}
-            </div>
-
-            <div class="th">
-              <a href="{% url 'read_file' group_name_tag doc.pk grid_fs_obj.filename %}">
-              <!--<img src="/static/ndf/scss/themes/metastudio/logo.svg">-->
-              <img src="{% url 'getFileThumbnail' group_name_tag doc %}">
-              </a>
-            </div>
-
-            <h4>{{doc.name|truncatechars:20}}</h4>
-
-            <div>
-            <small class="subheader">
-              {{ doc.member_of_names_list|join:', ' }} created {{doc.created_at|timesince}} ago 
-              <br/>
-              by <a class="user" href="{% url 'dashboard' doc.created_by %}" data-gnow="">{{doc.user_details_dict.created_by}}</a> 
-            </small>
-            </div>
+            <h5>
+              {{ doc.name }}{% if doc.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+            </h5>
           </header>
 
           <p>{{ doc.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-
-          <a class="button expand" href ="{% url 'file_detail' group_name_tag doc %}">View details</a>
-	  {% comment %}
-          {% get_user_object doc.created_by as user_obj %}
-          {% if user_obj.username = user.username or request.user.is_superuser %}
-
-          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag doc %}?next={{request.path}}">Delete </a>
-
-	  {% endif %}
-	  {% endcomment %}
-          <footer class="row">
+          
+          <footer>
             <div class="small-6 columns">{{doc.mime_type|truncatechars:15}}</div>
             <div class="small-6 columns"><div class="right"><strong>{{doc.file_size.size}}</strong> {{doc.file_size.unit}}</div></div>
           </footer>
+          </a>
+
 	  
         </div>
       </li>
@@ -263,6 +250,151 @@
   {% paginate %}
 
   </div>
+
+<!--  -->
+
+<!-- Tab View 3 - Interactives -->
+{% if interactiveCollection %}
+  <div class="content" id="view-interactive">
+
+    {% if searching and interactiveCollection.count > 0 %}
+    <div class="row">
+      <div class="small-12 columns end">
+        <p>{% trans "Search Results:" %} <span class="label success round">Found {{interactiveCollection.count}} {{title|lower}}{{interactiveCollection.count|pluralize}}.</span></p>
+      </div>
+    </div>
+    
+    {% elif searching and interactiveCollection.count == 0 %}
+    <div class="row">
+      <div class="small-12 columns">
+        <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{interactiveCollection.count|pluralize}} matched your search criteria!!!</span></p>
+      </div>  
+    </div>  
+    
+    {% endif %}
+
+
+    <!-- Card -->
+    <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Existing card list-->
+      {% autopaginate interactiveCollection 23 %}
+      {% for inter in interactiveCollection %}      
+      {% get_grid_fs_object inter as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+          
+          <div class="label-list">{% for tag in inter.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
+            {% endfor %}</div>
+
+            <a href="{% url 'file_detail' group_name_tag inter %}">
+          <header>
+            <h5>
+              {{ inter.name }}{% if inter.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+            </h5>
+          </header>
+
+          <p>{{ inter.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+          
+          <footer>
+            <div class="small-6 columns">{{inter.mime_type|truncatechars:15}}</div>
+            <div class="small-6 columns"><div class="right"><strong>{{inter.file_size.size}}</strong> {{inter.file_size.unit}}</div></div>
+          </footer>
+          </a>
+
+        </div>
+      </li>
+
+      {% empty %}
+        {% if not searching %}
+          <div class="row">
+            <div class="small-12 columns">
+              <h5>{% blocktrans %}This group doesn't have any documents. <b>Be the first to upload a Interactive Document!</b> {% endblocktrans %}</h5>
+            </div>
+          </div>
+        {% endif %}
+      
+      {% endfor %}
+
+    </ul>
+    {% paginate %}
+
+  </div>
+{% endif %}
+
+
+<!-- Tab View 4 - Audios -->
+{% if audioCollection %}
+  <div class="content" id="view-audio">
+
+    {% if searching and audioCollection.count > 0 %}
+    <div class="row">
+      <div class="small-12 columns end">
+        <p>{% trans "Search Results:" %} <span class="label success round">Found {{audioCollection.count}} {{title|lower}}{{audioCollection.count|pluralize}}.</span></p>
+      </div>
+    </div>
+    
+    {% elif searching and audioCollection.count == 0 %}
+    <div class="row">
+      <div class="small-12 columns">
+        <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{audioCollection.count|pluralize}} matched your search criteria!!!</span></p>
+      </div>  
+    </div>  
+    
+    {% endif %}
+
+
+    <!-- Card -->
+    <ul class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+
+      <!-- Existing card list-->
+      {% autopaginate audioCollection 23 %}
+      {% for audio in audioCollection %}      
+      {% get_grid_fs_object audio as grid_fs_obj %}
+      <li class="card">
+        <div class="file">
+          
+          <div class="label-list">{% for tag in audio.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
+            {% endfor %}</div>
+
+            <a href="{% url 'file_detail' group_name_tag audio %}">
+          <header>
+            <h5>
+              {{ audio.name }}{% if audio.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+            </h5>
+          </header>
+
+          <p>{{ audio.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+          
+          <footer>
+            <div class="small-6 columns">{{audio.mime_type|truncatechars:15}}</div>
+            <div class="small-6 columns"><div class="right"><strong>{{audio.file_size.size}}</strong> {{audio.file_size.unit}}</div></div>
+          </footer>
+          </a>
+
+        </div>
+      </li>
+
+      {% empty %}
+        {% if not searching %}
+          <div class="row">
+            <div class="small-12 columns">
+              <h5>{% blocktrans %}This group doesn't have any documents. <b>Be the first to upload a Audio!</b> {% endblocktrans %}</h5>
+            </div>
+          </div>
+        {% endif %}
+      
+      {% endfor %}
+
+    </ul>
+    {% paginate %}
+
+  </div>
+{% endif %}
+
+<!--  -->
   
   <!-- Tab View #3 - Images -->
   <div class="content" id="view-image">

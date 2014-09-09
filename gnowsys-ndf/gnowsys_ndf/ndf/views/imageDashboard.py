@@ -159,10 +159,24 @@ def image_detail(request, group_id, _id):
     if img_node._type == "GSystemType":
 	return imageDashboard(request, group_id, _id)
     img_node.get_neighbourhood(img_node.member_of)
+
+    imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+                                              '_type': 'File','fs_file_ids': {'$ne': []}, 
+                                              'group_set': {'$all': [ObjectId(group_id)]},
+                                              '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                  {'access_policy': u"PRIVATE"}, 
+                                                  {'created_by': request.user.id}
+                                                  ]
+                                                }
+                                              ]
+                                            }).sort("last_update", -1)
+
     return render_to_response("ndf/image_detail.html",
                                   { 'node': img_node,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid':group_id, 'imageCollection': imageCollection
                                   },
                                   context_instance = RequestContext(request)
         )
