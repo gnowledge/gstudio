@@ -97,7 +97,7 @@
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
-        $("#shelf").html(data);
+        $("#shelf").html(data);        
       }
     });
 
@@ -105,35 +105,43 @@
 
   $(".add-shelf-item").click(function() {
 
+    var shelf = this.name;
+
     $.ajax({
       type: "POST",
       url: "{% url 'shelf' groupid %}",
       datatype: "html",
       data:{
-        shelf_name: this.name,
+        shelf_name: shelf,
         shelf_add: "{{ node.pk }}",
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
         $("#shelf").html(data);
+        alert("'{{node.name}}' added into the shelf '"+ shelf + "' Successfully" );
+        location.reload(true);                
       }
     });
 
   });
 
   $(".remove-shelf-item").click(function() {
+    var shelf_item = this.name;
+    var shelf = this.rel;
 
     $.ajax({
       type: "POST",
       url: "{% url 'shelf' groupid %}",
       datatype: "html",
       data:{
-        shelf_name: this.rel,
-        shelf_item_remove: this.name,
+        shelf_name: shelf,
+        shelf_item_remove: shelf_item,
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
         $("#shelf").html(data);
+        alert("'"+shelf_item+"' removed from shelf '"+ shelf + "' Successfully" );
+        location.reload(true);                
       }
     });
 
