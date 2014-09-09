@@ -554,6 +554,8 @@ This section has been integrated to groupdashboard and appears in block app_acti
                 <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
                 {{ grid_fs_obj.filename }}
               </a>
+
+              {% comment %}
               {% elif 'pdf' in node.mime_type %}
               <div class="row">
                 <div class="small-12 columns">
@@ -569,6 +571,8 @@ This section has been integrated to groupdashboard and appears in block app_acti
                 <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
                 {{ grid_fs_obj.filename }}
               </a>
+              {% endcomment %}
+              
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
