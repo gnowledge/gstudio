@@ -5,35 +5,46 @@
 {% block title %}{% trans "Register for an account" %}{% endblock %}
 
 {% block style %}
-	table{	margin:5em auto;}
 	th {	text-align:left;	}
 	table td {	padding:0.5em;	}
 	table ul   {	color:#ff3232;	}
 {% endblock %}
 
 {% block body_content %}
+
 {% get_author_agency_types as agency_types %}
-<table>
+
+<table class="medium-6 columns">
   <form method='post' action=''>
+      
+    <h2>{% trans "Register a new account" %}</h2>
+      
     {% csrf_token %}
     {{ form }}
-     <tr><th>{% trans "Group agency type" %}</th>
-      <td colspan="2">
-        <select name="agency_type">
-         {% for each in agency_types %}
-           <option id="{{each}}" name="group_agency_type">{{each}}</option>
-         {% endfor %}
-        </select>
-      </td>
-     </tr>
-     <tr><th>{% trans "Affiliation" %}</th> 
-       <td colspan="2"><input type="text" id="Affiliation" name="group_affiliation"></td>
-     </tr>
-     <tr>
-       <td colspan="2"><p>Use at least one uppercase letter, one numeral, and 8 characters.</p> </td>
-     </tr>
     <tr>
-       <td colspan="2"><input type="submit" class="button small" value="{% trans 'Send activation email' %}"></td>
+      <td></td>
+      <td><small>{% trans "Password must contain atleast 8 characters, one uppercase letter and one numeral" %}</small></td>
+    </tr>
+    
+    <tr><th><label for="">{% trans "Occupation" %}</label></th>
+      <td>
+      <select name="agency_type">
+        {% for each in agency_types %}
+        <option id="{{each}}" name="group_agency_type">{{each}}</option>
+        {% endfor %}
+      </select>
+      </td>
+    </tr>
+     
+    <tr><th><label for="affiliation">{% trans "Affiliation" %}</label></th> 
+      <td>
+        <input type="text" id="affiliation" name="group_affiliation">
+      </td>
+    </tr>
+    
+    <tr>
+      <td></td>
+      <td><input type="submit" class="button expand" value="{% trans 'Send activation email' %}"></td>
     </tr>
   </form>
 </table>

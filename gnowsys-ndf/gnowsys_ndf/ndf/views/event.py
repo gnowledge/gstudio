@@ -28,10 +28,10 @@ collection = get_database()[Node.collection_name]
 
 def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
-  custom view for custom GAPPS
+  View for handling Event and it's sub-types detail-view
   """
-  # print "\n Found event_detail n gone inn this...\n\n"
 
+  auth = None
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -54,8 +54,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
   app_name = app.name 
 
-  # print "\n coming in event detail... \n"
-  # app_name = "mis"
   app_set = ""
   app_collection_set = []
   title = ""
@@ -67,8 +65,17 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 
   template_prefix = "mis"
 
-  for eachset in app.collection_set:
-    app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  if request.user:
+    if auth is None:
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+    agency_type = auth.agency_type
+    agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    if agency_type_node:
+      for eachset in agency_type_node.collection_set:
+        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+
+  # for eachset in app.collection_set:
+  #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   nodes = None
   if app_set_id:
@@ -95,8 +102,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
     node.get_neighbourhood(node.member_of)
   #   print "\n node.keys(): ", node.keys(), "\n"
 
-  # print "\n event_gst._id: ", event_gst._id
-
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
@@ -117,7 +122,6 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
                             )
   
   except TemplateDoesNotExist as tde:
-    # print "\n ", tde
     error_message = "\n EventDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
   
@@ -129,10 +133,10 @@ def event_detail(request, group_id, app_id=None, app_set_id=None, app_set_instan
 @login_required
 def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
-  Creates/Modifies document of given event-type.
+  View for handling Event and it's sub-types create-edit-view
   """
-  # print "\n Found event_create_edit n gone inn this...\n\n"
 
+  auth = None
   if ObjectId.is_valid(group_id) is False :
     group_ins = collection.Node.one({'_type': "Group","name": group_id})
     auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -155,7 +159,6 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
 
   app_name = app.name 
 
-  # app_name = "mis"
   app_set = ""
   app_collection_set = []
   title = ""
@@ -167,8 +170,17 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
 
   template_prefix = "mis"
 
-  for eachset in app.collection_set:
-    app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
+  if request.user:
+    if auth is None:
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+    agency_type = auth.agency_type
+    agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+    if agency_type_node:
+      for eachset in agency_type_node.collection_set:
+        app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+
+  # for eachset in app.collection_set:
+  #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
 
   if app_set_id:
     event_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
@@ -215,36 +227,68 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
             if field_instance["name"] == "attendees":
               continue
 
-            # Fetch corresponding AT/RT-fields value from request object
-            field_value = request.POST[field_instance["name"]]
-            # print " ", field_instance["name"], " -- ", field_value
-
             field_data_type = field_set['data_type']
-            # print " --> ", type(field_data_type)
 
-            # 2) Parse fetched-value depending upon AT/RT--fields' data-type
+            # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
             if field_instance_type == AttributeType:
-              field_instance_type = "GAttribute"
-              field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
-              # print "\n ", type(collection.AttributeType(field_instance)), " -- \n", collection.AttributeType(field_instance)
+
+              if "File" in field_instance["validators"]:
+                # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
+                
+                if field_instance["name"] in request.FILES:
+                  field_value = request.FILES[field_instance["name"]]
+
+                else:
+                  field_value = ""
+                
+                # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
+                if field_value != '' and field_value != u'':
+                  file_name = event_gs.name + " -- " + field_instance["altnames"]
+                  content_org = ""
+                  tags = ""
+                  field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
+
+              else:
+                # Other AttributeTypes 
+                field_value = request.POST[field_instance["name"]]
+
+              # field_instance_type = "GAttribute"
+              # print "\n Parsing data for: ", field_instance["name"]
+              if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
+              elif field_instance["name"] in ["dob", "registration_date"]:
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
+              else:
+                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+
               if field_value:
                 event_gs_triple_instance = create_gattribute(event_gs._id, collection.AttributeType(field_instance), field_value)
-                print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
+                # print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
 
             else:
-              field_instance_type = "GRelation"
-              field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
-              # print "\n ", type(collection.RelationType(field_instance)), " -- \n", collection.RelationType(field_instance)
-              if field_value:
-                event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value)
-                print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
+              field_value_list = request.POST.getlist(field_instance["name"])
+
+              # field_instance_type = "GRelation"
+              for i, field_value in enumerate(field_value_list):
+                field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
+                field_value_list[i] = field_value
+
+              event_gs_triple_instance = create_grelation(event_gs._id, collection.RelationType(field_instance), field_value_list)
+              # if isinstance(event_gs_triple_instance, list):
+              #   print "\n"
+              #   for each in event_gs_triple_instance:
+              #     print " event_gs_triple_instance: ", each._id, " -- ", each.name
+              #   print "\n"
+
+              # else:
+              #   print "\n event_gs_triple_instance: ", event_gs_triple_instance._id, " -- ", event_gs_triple_instance.name
     
     # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   template = "ndf/event_create_edit.html"
   # default_template = "ndf/"+template_prefix+"_create_edit.html"
-  context_variables = { 'groupid': group_id, 
+  context_variables = { 'group_id': group_id, 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
@@ -266,7 +310,6 @@ def event_create_edit(request, group_id, app_id, app_set_id=None, app_set_instan
                             )
   
   except TemplateDoesNotExist as tde:
-    # print "\n ", tde
     error_message = "\n EventCreateEditViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
   

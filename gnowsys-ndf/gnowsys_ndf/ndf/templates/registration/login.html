@@ -15,10 +15,11 @@
 <br/>
 {% if form.errors %}
 
-<p>{% trans "Please give a valid email. " %}</p>
+<p>{% trans "Either your email or password is incorrect." %}</p>
 {% endif %}
 
-<form method="post" id="loginSubmit" action="{% url 'auth_login' %}">{% csrf_token %}
+<form method="post" id="loginSubmit" action="{% url 'auth_login' %}">
+{% csrf_token %}
 <table>
 	<tr>
 		<td>{{ form.username.label_tag }}</td>
@@ -32,9 +33,7 @@
 	</tr>
 	<tr>
 		<td colspan="3">
-
-				<a href="{{ auth_pwd_reset_url }}" title="Recover your password" >{% trans "Forgot your password?" %}</a>
-
+			<a href="{{ auth_pwd_reset_url }}" title="Recover your password" >{% trans "Forgot your password?" %}</a>
 		</td>
 	</tr>
 	<tr>
@@ -42,9 +41,7 @@
 	</tr>
 	<tr>
 		<td colspan="3"> 
-
-				 <a title="Click here to register" href="{{ register_url }}">{% trans "Don't have an account? Register yourself now. " %}</a> 
-
+			<a title="Click here to register" href="{{ register_url }}">{% trans "Don't have an account? Register yourself now." %}</a> 
 		</td>
 	</tr>
 </table>

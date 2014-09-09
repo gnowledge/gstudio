@@ -476,7 +476,7 @@
               <div class="small-6 small-offset-3 columns end">
                 <div class="row">
                   <div class="small-4 columns">
-                    <label for="{{property_order_list.2.1.8.name}}" class="right inline"> {% trans "Registration Year" %} </label>
+                    <label for="{{property_order_list.2.1.8.name}}" class="right inline"> {% trans "Date of Registration" %} </label>
                   </div>
                   <div class="small-8 columns">
                     {% html_widget groupid node.pk property_order_list.2.1.8 %}
@@ -507,9 +507,8 @@
 
 // Default settings for tabs, date-widgets & college-dropdown on page load ---------------------------------------
   var currentYear = (new Date()).getFullYear()
-  lowerYearRange = currentYear - 80;
-  upperYearRange = currentYear + 20;
-
+  lowerYearLimit = currentYear - 30;
+  // upperYearLimit differs so set in respective places
   $(function() {
     // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
       $(".content").each(function(i) {
@@ -541,17 +540,24 @@
       });
 
     // Settings for datepicker widget (with all) -----------------------------------------------------------------
-      $(".date_month_day_year").datepicker({
+      $("#dob.date_month_day_year").datepicker({
         changeMonth: true,
         changeYear: true,
-        yearRange: "" + lowerYearRange + ":" + upperYearRange
+        yearRange: "" + lowerYearLimit + ":" + (currentYear-14),
+      });
+
+      $("#registration_date.date_month_day_year").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        yearRange: "" + lowerYearLimit + ":" + currentYear,
+        maxDate: '0'
       });
 
     // Settings for datepicker widget (only for year) ------------------------------------------------------------
       $(".date_year").datepicker({
         changeYear: true,
         dateFormat: 'yy',
-        yearRange: "" + lowerYearRange + ":" + upperYearRange,
+        yearRange: "" + lowerYearLimit + ":" + currentYear,
 
         onClose: function(dateText, inst) {
           $(this).val(dateText)
@@ -694,7 +700,7 @@
      */
     var widget_for = $(this).attr('id').replace('_modal', '')
 
-    // First empty all values of District field (dropdown/select)
+    // First empty all values of given field (dropdown/select)
     $("select#" + widget_for).empty();
 
     // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
@@ -704,7 +710,6 @@
     if (right_drawer_len > 0) {
       $(class_value).each(function (){
         // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
-        // alert("value : " + $(this).val() + " -- " + $(this).attr('name'));
         resource_id = $(this).val()
         resource_name = $(this).attr('name')
 
@@ -728,7 +733,7 @@
     }
   });
 
-// On click of save ----------------------------------------------------------------------------------------------
+// On click of Register/Update -----------------------------------------------------------------------------------
   $(document).on("click", "#save-node", function() {
   // Store concatenated value of first, middle & last name field's values into name field (hidden input field) ---
     name = ""
@@ -752,4 +757,5 @@
       $(this).removeAttr('disabled');
     });
   });
+
 {% endblock %}

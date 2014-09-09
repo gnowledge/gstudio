@@ -51,7 +51,8 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'}
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
 app=collection.Node.one({'name':u'File','_type':'GSystemType'})
-
+pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id})
+     
     
 
 # VIEWS DEFINED FOR GAPP -- 'FILE'
@@ -89,7 +90,9 @@ def file(request, group_id, file_id=None):
 
       datavisual = []
 
-      files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
+      files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]},
+                                    '$or':[
+                                        {'member_of': {'$all': [pandora_video_st._id]}}],
                                     '$or': [
                                       {'$and': [
                                         {'name': {'$regex': search_field, '$options': 'i'}}, 
@@ -111,8 +114,10 @@ def file(request, group_id, file_id=None):
                                       }
                                     ],
                                     'group_set': {'$all': [ObjectId(group_id)]}
-                                  }).sort('last_update', -1)
-    
+                                  },
+
+                                    {'member_of': {'$all': [pandora_video_st._id]}}]
+      }).sort('last_update', -1)
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
                                             '_type': 'File', 
                                             '$or': [
@@ -226,7 +231,8 @@ def file(request, group_id, file_id=None):
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
-                                 'videoCollection': videoCollection, 'pandoraCollection': pandoraCollection,
+                                 'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection,
+                                 'pandoraCollection': pandoraCollection,
                                  'is_video':is_video,'groupid': group_id, 'group_id':group_id,"datavisual":datavisual
                                 }, 
                                 context_instance=RequestContext(request)
@@ -236,8 +242,7 @@ def file(request, group_id, file_id=None):
       # File list view
       title = GST_FILE.name
       datavisual = []
-     
-      files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, 
+      files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
                                     '_type': 'File', 'fs_file_ids':{'$ne': []}, 
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$or': [
@@ -248,8 +253,10 @@ def file(request, group_id, file_id=None):
                                         ]
                                       }
                                     ]
-                                  }).sort("last_update", -1)
-
+                                    },
+                                    {'member_of': {'$all': [pandora_video_st._id]}}
+                                       ]}).sort("last_update", -1)
+      
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
                                             '_type': 'File','fs_file_ids': {'$ne': []}, 
                                             'group_set': {'$all': [ObjectId(group_id)]},
@@ -333,8 +340,9 @@ def file(request, group_id, file_id=None):
                                  'already_uploaded': already_uploaded,
                                  # 'sourceid':source_id_set,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
-                                 'videoCollection': videoCollection, 'pandoraCollection':get_member_set,
-                                 'is_video':is_video,'groupid': group_id, 'group_id':group_id,"datavisual":datavisual
+                                 'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection, 
+                                 'pandoraCollection':get_member_set,'is_video':is_video,'groupid': group_id,
+                                 'group_id':group_id,"datavisual":datavisual
                                 }, 
                                 context_instance = RequestContext(request))
     else:
@@ -985,8 +993,10 @@ def data_review(request, group_id):
   To get all the information related to resource object in the group.
   '''
   # getting group obj from name
+
   group_obj = collection.Node.one({ "_type": {"$in":["Group", "Author"]}, "name": unicode(group_id) })
 
+  
   # checking if passed group_id is group name or group Id
   if group_obj and (group_id == group_obj.name):
     group_name = group_id

@@ -1,7 +1,9 @@
 {% load i18n %}
-{% url 'registration_activate' activation_key as activation_key_url%}
 
-{%  with sitename=site.name siteurl=site.domain %}
+{% url 'registration_activate' activation_key as activation_key_url %}
+
+{% blocktrans with sitename=site.name siteurl=site.domain %}
+
 You (or someone pretending to be you) have asked to register an account at
 {{ sitename }}.  If this wasn't you, please ignore this email
 and your address will be removed from our records.
@@ -14,3 +16,4 @@ http://{{ siteurl }}{{ activation_key_url }}
 Sincerely,
 {{ sitename }} Management
 
+{% endblocktrans %}

@@ -236,30 +236,4 @@ $(document).ready(function()
 
 
 
-{% block body_content %}
-
-<!--Place for group splash page design-->
-<a data-reveal-id="landing-page">.</a>
-
-<div id="landing-page" class="reveal-modal full" data-reveal>
-    
-   
-  <div class="large-4 small-centered columns">
-    <h2>Do things:</h2>
-    <ul id="some" class="button-group">
-      <li><a class="button rounded" href="">NUSSD</a></li>
-      <li><a class="button rounded" href="">CUBE</a></li>
-      <li><a class="button rounded" href="">Something Else..</a></li>
-    </ul>
-  </div>
-
-</div>
-
-<script type="text/javascript" >
-    $('[data-reveal-id="landing-page"]').trigger('click');
-    </script>
-
-{{ block.super }}
-
-{% endblock %}
-
+2

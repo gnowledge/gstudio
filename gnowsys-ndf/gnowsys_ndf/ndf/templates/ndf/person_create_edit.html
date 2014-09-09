@@ -110,8 +110,8 @@
 // <script type="text/javascript">
 // Default settings for date-widgets & tabs on page load ---------------------------------------------------------
   var currentYear = (new Date()).getFullYear()
-  lowerYearRange = currentYear - 80;
-  upperYearRange = currentYear + 20;
+  lowerYearLimit = currentYear - 80;
+  upperYearLimit = currentYear;
 
   $(function() {
     // Tabs: Adding Next and Previous buttons for navigation -----------------------------------------------------
@@ -126,8 +126,14 @@
 
         if (i == totalTabs) {
           // Only in last tab
+          var is_existing_person = "{{node.pk|default_if_none:''}}";
+          var submit_btn_label = '{% trans "Register" %}' // By default considering registering a new person
+          if (is_existing_person) {
+            // If value (ObjectId) found, it means updating existing person record
+            submit_btn_label = '{% trans "Update" %}'
+          }
           $(this).children(".tab-nav").children(".for-save")
-            .append("<input type='submit' id='save-node' class='small button expand' value='{% trans 'Register' %}' />");
+            .append("<input type='submit' id='save-node' class='small button expand' value='"+submit_btn_label+"' style='float:right;' />");
         }
 
         if (i != 0) {
@@ -141,14 +147,14 @@
       $(".date_month_day_year").datepicker({
         changeMonth: true,
         changeYear: true,
-        yearRange: "" + lowerYearRange + ":" + upperYearRange
+        yearRange: "" + lowerYearLimit + ":" + upperYearLimit
       });
 
     // Settings for datepicker widget (only for year) ------------------------------------------------------------
       $(".date_year").datepicker({
         changeYear: true,
         dateFormat: 'yy',
-        yearRange: "" + lowerYearRange + ":" + upperYearRange,
+        yearRange: "" + lowerYearLimit + ":" + upperYearLimit,
 
         onClose: function(dateText, inst) {
           $(this).val(dateText)
@@ -278,7 +284,7 @@
      */
     var widget_for = $(this).attr('id').replace('_modal', '')
 
-    // First empty all values of District field (dropdown/select)
+    // First empty all values of given field (dropdown/select)
     $("select#" + widget_for).empty();
 
     // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
@@ -288,7 +294,6 @@
     if (right_drawer_len > 0) {
       $(class_value).each(function (){
         // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
-        // alert("value : " + $(this).val() + " -- " + $(this).attr('name'));
         resource_id = $(this).val()
         resource_name = $(this).attr('name')
 
@@ -312,8 +317,8 @@
     }
   });
 
-// On click of save ----------------------------------------------------------------------------------------------
-  $("#save-node").click(function() {
+// On click of Register/Update -----------------------------------------------------------------------------------
+  $(document).on("click", "#save-node", function() {
   // Store concatenated first, middle & last name field's values into name field (hidden input field) ------------
     name = ""
     first_name = $("#first_name").val().trim()
@@ -374,6 +379,5 @@
 
     return datesList;
   }
-// </script>
 
 {% endblock %}
