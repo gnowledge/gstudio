@@ -56,7 +56,7 @@ def resource_list(request,group_id,app_id=None):
 	file_id = GST_FILE._id
 	datavisual = []
 	 
-	files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]}, 
+	files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
 	                                '_type': 'File', 'fs_file_ids':{'$ne': []}, 
 	                                'group_set': {'$all': [ObjectId(group_id)]},
 	                                '$or': [
@@ -67,7 +67,9 @@ def resource_list(request,group_id,app_id=None):
 	                                    ]
 	                                  }
 	                                ]
-	                              }).sort("last_update", -1)
+	                              },
+                                    {'member_of': {'$all': [pandora_video_st._id]}}
+                                       ]}).sort("last_update", -1)
 
 	docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
 	                                        '_type': 'File','fs_file_ids': {'$ne': []}, 
