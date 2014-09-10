@@ -201,6 +201,8 @@ $("#add_page").click(function() {
 {% endblock %}
 
 {% block shelf_content %}
+  {% shelf_allowed node as allowed %}
+  
   {% include "ndf/shelf.html" %}  
 {% endblock %}
 
