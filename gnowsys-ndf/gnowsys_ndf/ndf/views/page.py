@@ -114,7 +114,6 @@ def page(request, group_id, app_id=None):
                                           'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
     
-
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
                                  'appId':app._id,
@@ -365,8 +364,7 @@ def delete_page(request, group_id, node_id):
     else :
         pass
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
-    
-    return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
+    return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id}))
 
 
 
