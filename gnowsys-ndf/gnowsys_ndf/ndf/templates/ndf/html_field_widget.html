@@ -6,19 +6,13 @@
 {% if is_base_field or is_attribute_field %}
   {% if is_special_field %}
   <!-- Intentionally put this field at the top, as below because of it's data-type different widget may come -->
-  <div class="row" > 
-    <div class="small-1 columns">
-      {% if is_required_field %}
-      <i style="color:red">*</i>
-      {% endif %}
-    </div>
-    <div class="small-11 columns">
+    <div style="float:left;">
       {% include included_template_name with var_name=field.name var_placeholder="Enter the content here" var_value=field_value|default_if_none:"" node_id=node_id %}
       {% if is_required_field %}
+      <i style="color:red; display:inline">*</i>
       <small class="error">{% blocktrans with alt=field.altnames %} Please select {{alt}}! {% endblocktrans %}</small>
       {% endif %}
     </div>
-  </div>
 
   {% elif field.validators.0 == "email" %}
     <input type="email" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
@@ -53,7 +47,7 @@
   {% elif field_type == "unicode" or field_type == "basestring" %}
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
           placeholder="{{field.help_text|default_if_none:''}}" 
-          {% if not field.editable %}readonly{% endif %} 
+          {% if field.editable and not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
           pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
@@ -77,11 +71,11 @@
     {% endif %}
 
   {% elif field_type == "datetime" %}
-    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|date:field.validators.0}}" 
-          placeholder="{{field.validators.2}}"
+    <input type="text" id="{{field.name}}" name="{{field.name}}" value="{% if field.validators %}{{field_value|date:field.validators.0|default_if_none:''}}{% endif %}" 
+          placeholder="{{field.help_text|default_if_none:''}}"
           {% if not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
-          class="{{field.validators.1}}" 
+          class="{% if field.validators|length > 1 %}{{field.validators.1|default_if_none:''}}{% endif %}" 
           style="float:left; width:10rem" 
     />
     {% if is_required_field %}
@@ -189,7 +183,7 @@
   <small class="error">{% blocktrans with alt=field.altnames %} Please select {{alt}}! {% endblocktrans %}</small>
 
   {% else %}
-  <select id="{{field.name}}" name="{{field.name}}" multiple size="2" required="" style="float:left; width:85%; height: 2.9rem;">
+  <select id="{{field.name}}" name="{{field.name}}" multiple size="2" required="" style="float:left; width:80%; height: 2.9rem;">
     {% if not field_value %}
     <option value="">{% blocktrans with alt=field.altnames|lower %} - - - Select {{alt}} - - - {% endblocktrans %}</option>
     {% endif %}

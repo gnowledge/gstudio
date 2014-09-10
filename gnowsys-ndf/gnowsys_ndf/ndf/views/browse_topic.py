@@ -95,8 +95,10 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     else:
         # This will show Themes as a card view on landing page of browse topic
         themes_cards = True
-        nodes_dict = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
-
+        if request.user.username:
+            nodes_dict = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+        else:
+            nodes_dict = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'language': u"en",'group_set':{'$all': [ObjectId(group_id)]}})
 
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'themes_cards': themes_cards,

@@ -423,10 +423,9 @@ def edit_group(request,group_id):
     pass
 
   page_node = gs_collection.GSystem.one({"_id": ObjectId(group_id)})
-
   if request.method == "POST":
-    get_node_common_fields(request, page_node, group_id, gst_group)
-
+    is_node_changed=get_node_common_fields(request, page_node, group_id, gst_group)
+    
     if page_node.access_policy == "PUBLIC":
       page_node.group_type = "PUBLIC"
 

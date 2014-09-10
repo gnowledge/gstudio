@@ -1179,7 +1179,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
 def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
-
+  
   ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
   if ga_node is None:
     # Code for creation
