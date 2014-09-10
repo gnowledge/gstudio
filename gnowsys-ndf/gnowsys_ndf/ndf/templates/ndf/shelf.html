@@ -1,7 +1,7 @@
 {% load i18n %}
 <div id="shelf">
 
-<h4 class="text-center">{% trans "Shelf" %}</h4>
+<h4 class="text-center"><i class='fi-book-bookmark'></i>  {% trans "Shelf" %}</h4>
 <dl class="accordion" data-accordion>
 <!-- Adding new shelf text input and add button -->
   <dd>  
@@ -18,10 +18,6 @@
     
   </dd>
   
-  {% if shelf_available %}
-      <span style="color:red"> Shelf name {{already_available}} is already exist, please choose different shelf name</span>
-  {% endif %}
-
   {% for each in shelves %}   
 
     {% for key,val in shelf_list.items %}          
@@ -29,7 +25,7 @@
       {% if key == each.name %}
  
         <dd>
-          <a class="shelfName" href="#shelf{{each}}"> {{ key }} </a>
+          <a class="shelfName" href="#shelf{{each}}"> {{ key }}  <i class='right fi-minus-circle remove_shelf' name="{{key}}" style="font-size:15px; color:red;"></i> </a>
 
           <div id="shelf{{each}}" class="content">
             {% if val %}
@@ -47,15 +43,11 @@
               {% endfor %}
 
             {% endif %}
-
-            {% if shelf_item_available %}
-              <span style="color:red"> 
-		{{shelf_item_available}} {% trans "the resource already exists." %}
- </span>
-            {% endif %}
+           
 
             <br/>
-            {% if node.name not in val %}            
+
+            {% if node.name not in val and allowed %}            
             <div class="row">
               <div class="row collapse">
                 <div class="small-2 columns">
@@ -63,7 +55,7 @@
                 </div>
                 <div class="small-10 columns">
         	          
-{% trans "Add " %} {{node.name}}
+                  {% trans "Add " %} {{node.name}}
           
                 </div>
               </div>
@@ -87,17 +79,29 @@
 
   $("#add-shelf-btn").click(function() {
 
+    var shelf = $('#new-shelf-text').val();
+
     $.ajax({
       type: "POST",
       url: "{% url 'shelf' groupid %}",
       datatype: "html",
       data:{
-        shelf_name: $('#new-shelf-text').val(),
+        shelf_name: shelf,
         shelf_add: "{{ node.pk }}",
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
-        $("#shelf").html(data);
+
+        if ($.trim(data) === "failure") {
+          alert("Shelf '"+ shelf +"' already available, please choose different shelf name");
+        }
+
+        else{
+          $("#shelf").html(data);   
+          alert("New shelf '"+ shelf + "' created successfully" );          
+        }
+        // $("#shelf").html(data);   
+        location.reload(true);      
       }
     });
 
@@ -105,35 +109,65 @@
 
   $(".add-shelf-item").click(function() {
 
+    var shelf = this.name;
+
     $.ajax({
       type: "POST",
       url: "{% url 'shelf' groupid %}",
       datatype: "html",
       data:{
-        shelf_name: this.name,
+        shelf_name: shelf,
         shelf_add: "{{ node.pk }}",
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
         $("#shelf").html(data);
+        alert("'{{node.name}}' added into the shelf '"+ shelf + "' Successfully" );
+        location.reload(true);                
       }
     });
 
   });
 
-  $(".remove-shelf-item").click(function() {
+  $(".remove_shelf").click(function() {
+
+    var shelf = $(this).attr("name");
 
     $.ajax({
       type: "POST",
       url: "{% url 'shelf' groupid %}",
       datatype: "html",
       data:{
-        shelf_name: this.rel,
-        shelf_item_remove: this.name,
+        shelf_remove: shelf,
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
         $("#shelf").html(data);
+        alert("Shelf '"+shelf+"' removed Successfully" );
+        location.reload(true);                
+      }
+    });
+
+  });
+
+
+  $(".remove-shelf-item").click(function() {
+    var shelf_item = this.name;
+    var shelf = this.rel;
+
+    $.ajax({
+      type: "POST",
+      url: "{% url 'shelf' groupid %}",
+      datatype: "html",
+      data:{
+        shelf_name: shelf,
+        shelf_item_remove: shelf_item,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#shelf").html(data);
+        alert("'"+shelf_item+"' removed from shelf '"+ shelf + "' Successfully" );
+        location.reload(true);                
       }
     });
 
