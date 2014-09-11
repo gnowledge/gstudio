@@ -84,6 +84,31 @@ def page(request, group_id, app_id=None):
     con=[]
     group_object=collection.Group.one({'_id':ObjectId(group_id)})
 
+    # Code for user shelf
+    shelves = []
+    shelf_list = {}
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    
+    if auth:
+      has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+      dbref_has_shelf = has_shelf_RT.get_dbref()
+      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelf_list = {}
+
+      if shelf:
+        for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+            shelves.append(shelf_name)
+
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_list[shelf_name.name].append(shelf_item.name)
+
+      else:
+        shelves = []
+    # End of user shelf
+
     if request.method == "POST":
     
       title = gst_page.name
@@ -114,10 +139,9 @@ def page(request, group_id, app_id=None):
                                           'status': {'$nin': ['HIDDEN']}
                                       }).sort('last_update', -1)
     
-
       return render_to_response("ndf/page_list.html",
                                 {'title': title, 
-                                 'appId':app._id,
+                                 'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
                                  'searching': True, 'query': search_field,
                                  'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                 }, 
@@ -143,7 +167,7 @@ def page(request, group_id, app_id=None):
 
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
-                                     'appId':app._id,
+                                     'appId':app._id,'shelf_list': shelf_list,'shelves': shelves,
                                      'page_nodes': page_nodes, 'groupid':group_id, 'group_id':group_id
                                     }, 
                                     context_instance=RequestContext(request))
@@ -168,6 +192,7 @@ def page(request, group_id, app_id=None):
           return render_to_response("ndf/page_list.html",
                                     {'title': title, 
                                      'appId':app._id,
+                                     'shelf_list': shelf_list,'shelves': shelves,
                                      'page_nodes':content,
                                      'groupid':group_id,
                                      'group_id':group_id
@@ -205,6 +230,7 @@ def page(request, group_id, app_id=None):
           return render_to_response("ndf/page_list.html",
                                     {'title': title,
                                      'appId':app._id,
+                                     'shelf_list': shelf_list,'shelves': shelves,
                                      'page_nodes': page_nodes,
                                      'groupid':group_id,
                                      'group_id':group_id
@@ -235,28 +261,7 @@ def page(request, group_id, app_id=None):
         # Appends the elements in breadcrumbs_list first time the resource which is clicked
         breadcrumbs_list.append( (str(page_node._id), page_node.name) )
 
-        shelves = []
-        shelf_list = {}
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
         
-        if auth:
-          has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-          dbref_has_shelf = has_shelf_RT.get_dbref()
-          shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
-          shelf_list = {}
-
-          if shelf:
-            for each in shelf:
-                shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
-                shelves.append(shelf_name)
-
-                shelf_list[shelf_name.name] = []         
-                for ID in shelf_name.collection_set:
-                  shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-                  shelf_list[shelf_name.name].append(shelf_item.name)
-
-          else:
-            shelves = []
  
         annotations = json.dumps(page_node.annotations)
         page_node.get_neighbourhood(page_node.member_of)
@@ -365,8 +370,7 @@ def delete_page(request, group_id, node_id):
     else :
         pass
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
-    
-    return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id, 'app_id': gst_page._id}))
+    return HttpResponseRedirect(reverse('page', kwargs={'group_id': group_id}))
 
 
 

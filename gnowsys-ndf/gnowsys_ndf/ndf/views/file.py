@@ -82,6 +82,31 @@ def file(request, group_id, file_id=None):
         if file_ins:
             file_id = str(file_ins._id)
 
+    # Code for user shelf
+    shelves = []
+    shelf_list = {}
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    
+    if auth:
+      has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+      dbref_has_shelf = has_shelf_RT.get_dbref()
+      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelf_list = {}
+
+      if shelf:
+        for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+            shelves.append(shelf_name)
+
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_list[shelf_name.name].append(shelf_item.name)
+
+      else:
+        shelves = []
+    # End of user shelf
+
     if request.method == "POST":
       # File search view
       title = GST_FILE.name
@@ -229,7 +254,7 @@ def file(request, group_id, file_id=None):
                                 {'title': title,
                                  'appId':app._id,
                                  'searching': True, 'query': search_field,
-                                 'already_uploaded': already_uploaded,
+                                 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection,
                                  'pandoraCollection': pandoraCollection,
@@ -337,7 +362,7 @@ def file(request, group_id, file_id=None):
       return render_to_response("ndf/file.html", 
                                 {'title': title,
                                  'appId':app._id,
-                                 'already_uploaded': already_uploaded,
+                                 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection, 

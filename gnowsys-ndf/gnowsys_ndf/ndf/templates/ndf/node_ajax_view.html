@@ -1137,6 +1137,26 @@ This section has been integrated to groupdashboard and appears in block app_acti
     
   }
 
-  $("document").ready(function(){ setTimeout(function() { adjustIframeHt() },3000) });
+  $("document").ready(function(){
+
+    setTimeout(function() { adjustIframeHt() },3000) 
+
+    // making <a> disabled of images in html pages in iframe
+    var imgInIframe = $("iframe#html-res-iframe").contents().find("img");
+    
+    imgInIframe.each(function(){
+      
+      var tempImgAnchor = $(this).parent("a");
+
+      // additional check if parent is <a> and if it contains url pattern: "/gstudio/resources/images/show/"
+      if(tempImgAnchor.is("a") && $(tempImgAnchor).attr("href").trim().contains("/gstudio/resources/images/show/"))
+      {
+        tempImgAnchor.attr("href", "");
+        tempImgAnchor.on("click", function(e){ e.preventDefault(); } ) 
+      }
+    
+    })
+
+  });
 
 </script>

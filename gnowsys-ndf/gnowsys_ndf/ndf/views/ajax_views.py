@@ -199,6 +199,7 @@ def shelf(request, group_id):
     if request.is_ajax() and request.method == "POST":    
       shelf = request.POST.get("shelf_name", '')
       shelf_add = request.POST.get("shelf_add", '')
+      shelf_remove = request.POST.get("shelf_remove", '')
       shelf_item_remove = request.POST.get("shelf_item_remove", '')
 
       shelf_available = ""
@@ -233,6 +234,8 @@ def shelf(request, group_id):
             if shelf_item in shelf_gs.collection_set:
               shelf_Item = collection.Node.one({'_id': ObjectId(shelf_item)}).name       
               shelf_item_available = shelf_Item
+              return HttpResponse("failure")
+
             else:
               collection.update({'_id': shelf_gs._id}, {'$push': {'collection_set': ObjectId(shelf_item) }}, upsert=False, multi=False)
               shelf_gs.reload()
@@ -244,6 +247,13 @@ def shelf(request, group_id):
           
           else:
             shelf_available = shelf
+
+      elif shelf_remove:
+        shelf_gs = collection.Node.one({'name': unicode(shelf_remove), 'member_of': [ObjectId(shelf_gst._id)] })
+        shelf_rel = collection.Node.one({'_type': 'GRelation', 'subject': ObjectId(auth._id),'right_subject': ObjectId(shelf_gs._id) })
+
+        shelf_rel.delete()
+        shelf_gs.delete()
 
       else:
         shelf_gs = None
@@ -268,11 +278,7 @@ def shelf(request, group_id):
           shelves = []
 
       return render_to_response('ndf/shelf.html', 
-                                  { 'shelf_obj': shelf_gs,
-                                    'shelf_list': shelf_list, 
-                                    'shelves': shelves,
-                                    'shelf_available': shelf_available,
-                                    'shelf_item_available': shelf_item_available,
+                                  { 'shelf_obj': shelf_gs,'shelf_list': shelf_list,'shelves': shelves,
                                     'groupid':group_id
                                   },
                                   context_instance = RequestContext(request)

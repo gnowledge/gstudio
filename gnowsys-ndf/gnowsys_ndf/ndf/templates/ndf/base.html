@@ -263,7 +263,7 @@
 	<!-- Off Canvas Meta Map -->
 	<aside id="help" class="left-off-canvas-menu">
 	  <!-- whatever you want goes here -->
-	  <h4><i class='fi-info'></i> Help</h4>
+	  <!-- <h4><i class='fi-info'></i> Help</h4> -->
 	  <ul class="off-canvas-list">
 	     <!-- Shelf content code and logic -->
     	  {% block shelf_content %} {% endblock %}
@@ -275,13 +275,17 @@
           <div class="button-bar">
               
               <ul class="button-group medium-2 columns">
-                  <li>
-            <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> {% trans "Dashboard" %}</a>
+                <li class="left">
+                  <a id="toggle-shelf" class="button left-off-canvas-toggle" ><i class='fi-book-bookmark'></i></a> 
+                </li>
 
-              </li>
-                </ul>
+                <li>
+                  <a href="{% url 'groupchange' group_object.name %}" class="home button"><i class="fi-home"></i> {% trans "Dashboard" %}</a>
+
+                </li>
+              </ul>
               
-        {% get_gapps_iconbar request groupid %}
+              {% get_gapps_iconbar request groupid %}
               
               <ul class="tools button-group medium-2 columns right">
                   <!-- Show app options if user is logged in-->
@@ -297,6 +301,7 @@
                   <li class="right">
 <a id="toggle-help" class="button right-off-canvas-toggle" ><i class='fi-lightbulb'></i></a> 
                   </li>
+                  
                   </ul>
               
               </div>

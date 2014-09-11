@@ -469,6 +469,23 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid, 'groupid': groupid}
 
 
+
+@register.assignment_tag
+def shelf_allowed(node):
+	page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
+	file_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
+	course_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Course'})
+	quiz_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'Quiz'})
+	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+
+	allowed_list = [page_GST._id,file_GST._id,course_GST._id,quiz_GST._id,topic_GST._id]
+
+	for each in node.member_of:
+		if each in allowed_list :
+			allowed = "True"
+			return allowed
+
+
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(request, group_id):
 	"""Get Gapps menu-bar
