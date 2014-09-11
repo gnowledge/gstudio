@@ -46,20 +46,32 @@
            
 
             <br/>
-
-            {% if node.name not in val and allowed %}            
-            <div class="row">
-              <div class="row collapse">
-                <div class="small-2 columns">
-                  <a class="add-shelf-item"  name="{{each.name}}"><i class='button postfix fi-arrow-right'></i></a>
-                </div>
-                <div class="small-10 columns">
-        	          
-                  {% trans "Add " %} {{node.name}}
-          
+            {% if allowed %}
+              {% if node.name not in val %}            
+              <div class="row">
+                <div class="row collapse">
+                  <div class="small-2 columns">
+                    <a class="add-shelf-item"  name="{{each.name}}"><i class='button postfix fi-arrow-right'></i></a>
+                  </div>
+                  <div class="small-10 columns">
+          	          
+                    {% trans "Add " %} {{node.name}}
+            
+                  </div>
                 </div>
               </div>
-            </div>
+              {% endif %}
+
+            {% else %}
+
+              <div class="row">
+                <div class="row collapse">                  
+                  <div class="small-12 columns">                      
+                    <h5 style="color:gray;">This is not a valid resource, please go to detail view to select and keep resource in your shelf </h5>            
+                  </div>
+                </div>
+              </div>
+              
             {% endif %}
 
           </div>
