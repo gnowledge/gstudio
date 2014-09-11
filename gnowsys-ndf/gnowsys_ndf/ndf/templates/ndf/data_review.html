@@ -167,18 +167,35 @@
 {% endblock %}
 
 {% block data_review_pagination %}
-	
+	{{page_info.count}}
 	<div class="pagination-centered">
 		<ul class="pagination" role="menubar" aria-label="Pagination">
-		  <li class="arrow unavailable" aria-disabled="true"><a href="">&laquo; Previous</a></li>
-		  <li class="current"><a href="">1</a></li>
-		  <li><a href="">2</a></li>
-		  <li><a href="">3</a></li>
-		  <li><a href="">4</a></li>
-		  <li class="unavailable" aria-disabled="true"><a href="">&hellip;</a></li>
-		  <li><a href="">12</a></li>
-		  <li><a href="">13</a></li>
-		  <li class="arrow"><a href="">Next &raquo;</a></li>
+			{% if page_info.has_previous %}
+				<li class="arrow">
+					<a href="{% url 'data_review_page' group_name_tag page_info.previous_page %}">&laquo; Previous</a>
+				</li>
+				<li>
+					<a href="{% url 'data_review_page' group_name_tag page_info.previous_page %}">
+						{{ page_info.previous_page }}
+					</a>
+				</li>
+			{% endif %}
+			<li class="current"><a href="">{{ page_info.current_page }}</a></li>
+			
+			<!-- <li><a href="">3</a></li> -->
+			<!-- <li><a href="">4</a></li> -->
+			<!-- <li class="unavailable" aria-disabled="true"><a href="">&hellip;</a></li> -->
+			<!-- <li><a href="">12</a></li> -->
+			{% if page_info.has_next %}
+				<li>
+					<a href="{% url 'data_review_page' group_name_tag page_info.next_page %}">
+						{{ page_info.next_page }}
+					</a>
+				</li>
+				<li class="arrow">
+					<a href="{% url 'data_review_page' group_name_tag page_info.next_page %}">Next &raquo;</a>
+				</li>
+			{% endif %}
 		</ul>
 	</div>
 
