@@ -486,8 +486,6 @@ def shelf_allowed(node):
 			return allowed
 
 
-
-
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(request, group_id):
 	"""Get Gapps menu-bar
