@@ -46,6 +46,30 @@ def resource_list(request,group_id,app_id=None):
 	    if app_ins:
 	        app_id = str(app_ins._id)
 
+	# Code for displaying user shelf 
+	shelves = []
+	shelf_list = {}
+	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+
+	if auth:
+	  has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+	  dbref_has_shelf = has_shelf_RT.get_dbref()
+	  shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+	  shelf_list = {}
+
+	  if shelf:
+	    for each in shelf:
+	        shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+	        shelves.append(shelf_name)
+
+	        shelf_list[shelf_name.name] = []         
+	        for ID in shelf_name.collection_set:
+	          shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+	          shelf_list[shelf_name.name].append(shelf_item.name)
+
+	  else:
+	    shelves = []
+	# End of user shelf
 
 	# if GST_browse_resource._id == ObjectId(app_id):
 	"""
@@ -161,7 +185,7 @@ def resource_list(request,group_id,app_id=None):
 	return render_to_response("ndf/resource_list.html", 
                                 {'title': title, 
                                  'appId':app._id,
-                                 'already_uploaded': already_uploaded,
+                                 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection, 'pandoravideoCollection':pandoravideoCollection,
                                  'pandoraCollection':get_member_set,'interactiveCollection': interactiveCollection,
