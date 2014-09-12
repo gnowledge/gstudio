@@ -161,6 +161,14 @@
 {% endblock%}
 
 
+{% block shelf_content %}
+  {% if user.is_authenticated %}
+    {% include "ndf/shelf.html" %}
+  {% else %}
+  <h4>Please Login to create your shelf</h4>
+  {% endif %}  
+{% endblock %}
+
 {% block meta_content %}
 {% if user.is_authenticated %}
 {% user_access_policy groupid request.user as user_access %}

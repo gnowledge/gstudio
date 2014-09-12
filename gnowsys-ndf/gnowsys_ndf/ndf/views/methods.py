@@ -198,13 +198,13 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     
     if (nid is None) and (not nlist):
       for each in drawer:               
-        dict_drawer[each._id] = each
+        dict_drawer[each._id] = each.name
 
 
     elif (nid is None) and (nlist):
       for each in drawer:
         if each._id not in nlist:
-          dict1[each._id] = each
+          dict1[each._id] = each.name
 
       for oid in nlist: 
         obj = collection.Node.one({'_id': oid})
@@ -218,7 +218,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       for each in drawer:
         if each._id != nid:
           if each._id not in nlist:  
-            dict1[each._id] = each
+            dict1[each._id] = each.name
           
       for oid in nlist: 
         obj = collection.Node.one({'_id': oid})

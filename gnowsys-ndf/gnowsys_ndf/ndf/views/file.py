@@ -12,6 +12,9 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
+
+from mongokit import paginator
+
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
@@ -81,6 +84,31 @@ def file(request, group_id, file_id=None):
         file_ins = collection.Node.find_one({'_type':"GSystemType", "name":"File"})
         if file_ins:
             file_id = str(file_ins._id)
+
+    # Code for user shelf
+    shelves = []
+    shelf_list = {}
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    
+    if auth:
+      has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+      dbref_has_shelf = has_shelf_RT.get_dbref()
+      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelf_list = {}
+
+      if shelf:
+        for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+            shelves.append(shelf_name)
+
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_list[shelf_name.name].append(shelf_item.name)
+
+      else:
+        shelves = []
+    # End of user shelf
 
     if request.method == "POST":
       # File search view
@@ -229,7 +257,7 @@ def file(request, group_id, file_id=None):
                                 {'title': title,
                                  'appId':app._id,
                                  'searching': True, 'query': search_field,
-                                 'already_uploaded': already_uploaded,
+                                 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection,
                                  'pandoraCollection': pandoraCollection,
@@ -337,7 +365,7 @@ def file(request, group_id, file_id=None):
       return render_to_response("ndf/file.html", 
                                 {'title': title,
                                  'appId':app._id,
-                                 'already_uploaded': already_uploaded,
+                                 'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection, 
@@ -988,14 +1016,14 @@ def file_edit(request,group_id,_id):
                                   context_instance=RequestContext(request)
                               )
 
-def data_review(request, group_id):
+# data review in File app
+def data_review(request, group_id, page_no=1):
   '''
-  To get all the information related to resource object in the group.
+  To get all the information related to every resource object in the group.
   '''
   # getting group obj from name
 
   group_obj = collection.Node.one({ "_type": {"$in":["Group", "Author"]}, "name": unicode(group_id) })
-
   
   # checking if passed group_id is group name or group Id
   if group_obj and (group_id == group_obj.name):
@@ -1026,13 +1054,18 @@ def data_review(request, group_id):
                                     ]
                                   }).sort("last_update", -1)
 
+
+  # implementing pagination: paginator.Paginator(cursor_obj, <int: page no>, <int: no of obj in each page>)
+  # (ref: https://github.com/namlook/mongokit/blob/master/mongokit/paginator.py)
+  paged_resources = paginator.Paginator(files_obj, page_no, 10)
+
   # list to hold resources instances with it's attributes and relations
   files_list = []
 
-  for each_resource in files_obj:
+  for each_resource in paged_resources.items:
     each_resource.get_neighbourhood(each_resource.member_of)
     files_list.append(collection.GSystem(each_resource))
-    # print "\n\n\n========"#, each_resource.keys()
+    # print "\n\n\n========", each_resource.keys()
     # for each, val in each_resource.iteritems():
       # print each, "--", val,"\n"
 
@@ -1041,7 +1074,9 @@ def data_review(request, group_id):
   return render_to_response("ndf/data_review.html",
                             {
                               "group_id": group_id, "groupid": group_id,
-                              "files": files_list
+                              "files": files_list, "page_info": paged_resources
                             },
                             context_instance=RequestContext(request)
                           )
+# ---END of data review in File app
+
