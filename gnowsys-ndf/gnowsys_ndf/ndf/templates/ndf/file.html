@@ -73,7 +73,7 @@
      {% endif %}
      <dd><a href="#view-image"><i class="fi-camera"></i>Images {% if imageCollection.count %}({{ imageCollection.count }}){% endif %}</a></dd>
     {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
-     <dd><a href="#view-video"><i class="fi-video"></i>{% trans "Videos" %}{% if pandoravideoCollection.count %}({{ pandoravideoCollection.count }}){% endif %}</a></dd>
+     <dd><a href="#view-video"><i class="fi-video"></i>{% trans "Videos" %}</a></dd>
     {% endif %}
     {% if site.SITE_VIDEO == 'pandora_and_local' %}
      <dd><a href="#view-pandora-video"><i class="fi-video"></i>{% trans "Pandora Videos" %}</a></dd>
