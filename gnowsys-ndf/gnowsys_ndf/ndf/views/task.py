@@ -148,9 +148,10 @@ def create_edit_task(request, group_name, task_id=None):
         Estimated_time = request.POST.get("Estimated_time","")
 	watchers = request.POST.get("watchers","")
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+        tag=""
         if request.FILES.getlist('UploadTask'):
         	files=request.FILES.getlist('UploadTask')
-        	field_value = save_file(files[0], Assignee, request.user.id, group_id, content_org, tags="something")
+        	field_value = save_file(files[0], Assignee, request.user.id, group_id, content_org,tag)
         
     	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
@@ -224,7 +225,6 @@ def create_edit_task(request, group_name, task_id=None):
 			if attr : # already attribute exist 
 				if not attr.object_value == request.POST.get(each,"") :	
 					change_list.append(each.encode('utf8')+' changed from '+attr.object_value.encode('utf8')+' to '+request.POST.get(each,"").encode('utf8')) # updated 	details					
-				        print "getting here",each
 					attr.object_value = request.POST.get(each,"")
 					attr.save()
 					
