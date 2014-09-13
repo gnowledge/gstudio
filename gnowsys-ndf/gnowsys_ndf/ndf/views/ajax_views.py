@@ -1,6 +1,7 @@
 ''' -- imports from python libraries -- '''
 # import os -- Keep such imports here
 import json  
+import datetime
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect
@@ -1966,4 +1967,119 @@ def edit_task_content(request, group_id):
     else:
 	raise Http404
 
+# =============================================================================
+
+def get_announced_courses(request, group_id):
+  """
+  This view returns list of announced-course(s) that match given criteria
+  along with NUSSD-Course(s) for which match doesn't exists.
+
+  Arguments:
+  group_id - ObjectId of the currently selected group
+  start_time - Basestring representing start-time (format: MM/YYYY)
+  end_time - Basestring representing end-time (format: MM/YYYY)
+  nussd_course_type - Type of NUSSD course
+
+  Returns:
+  A dictionary consisting of following key-value pairs:-
+  success - Boolean giving the state of ajax call
+  message - Basestring giving the error/information message
+  unset_nc - dictionary consisting of announced-course(s) [if match found] and/or 
+             NUSSD-Courses [if match not found]
+  """
+  response_dict = {'success': False, 'message': ""}
+
+  try:
+    if request.is_ajax() and request.method == "GET":
+      # Fetch field(s) from GET object
+      start_time = request.GET.get("start_time", "")
+      end_time = request.GET.get("end_time", "")
+      nussd_course_type = request.GET.get("nussd_course_type", "")
+
+      # Check whether any field has missing value or not
+      if start_time == "" or end_time == "" or nussd_course_type == "":
+        error_message = "Invalid data: No data found in any of the field(s)!!!"
+        raise Exception(error_message)
+
+      # Fetch "Announced Course" GSystemType
+      announced_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "Announced Course"})
+      if not announced_course_gt:
+        # If not found, throw exception
+        error_message = "'Announced Course' (GSystemType) doesn't exists... Must be created"
+        raise Exception(error_message)
+
+      # Type-cast fetched field(s) into their appropriate type
+      start_time = datetime.datetime.strptime(start_time, "%m/%Y")
+      end_time = datetime.datetime.strptime(end_time, "%m/%Y")
+      nussd_course_type = unicode(nussd_course_type)
+
+      # Fetch registered NUSSD-Courses of given type
+      # For that first fetch GAttribute(s) whose having value of 'object_type' field
+      # as given type (nussd_course_type)
+      # From that you will get NUSSD-Courses (ObjectId) via 'subject' field
+      # And for name, you need to extract from GAttributes 'name' field
+      nc_cur = collection.Triple.find({'_type': "GAttribute", 'object_value': nussd_course_type})
+
+      # This below dict holds
+      # > key as ObjectId (string representation) of the given NUSSD course
+      #   >> String representation because it's going to be used in json.dumps() & it
+      #      requires keys to be in string format only
+      # > value as name of the given NUSSD course
+      nc_dict = {}
+
+      if nc_cur.count():
+        # If found, append them to a dict
+        for each in nc_cur:
+          if each.name.split(" -- ")[1] == "nussd_course_type":
+            nc_dict[str(each.subject)] = each.name.split(" -- ")[0]
+  
+      else:
+        # Otherwise, throw exception
+        error_message = "No such ("+nussd_course_type+") type of course(s) exists... register them first"
+        raise Exception(error_message)
+
+      # Search for already created announced-courses with given criteria
+      ac_cur = collection.Node.find({'member_of': announced_course_gt._id,
+                                    '$and': [
+                                      {'name': {'$regex': str(start_time), '$options': "i"}},
+                                      {'name': {'$regex': str(end_time), '$options': "i"}},
+                                      {'name': {'$regex': str(nussd_course_type), '$options': "i"}}
+                                    ]
+                                    })
+
+      if ac_cur.count():
+        # Iterate already existing announced-course(s)' instances
+        # > Iterate registered NUSSD-courses 
+        #   >> If match found between both of them
+        #   >> Then
+        #      >>> delete registered NUSSD-course entry from dict
+        #      >>> Add already existing Announced-course entry in it
+        #      >>> break inner for-loop, continue with next announced-course value
+        for each in ac_cur:
+          for k, v in nc_dict.iteritems():
+            if v in each.name:
+              del nc_dict[k]
+              nc_dict[str(each._id)] = each.name
+              break
+
+        response_dict["success"] = True
+        response_dict["message"] = "NOTE: Some announced-course(s) found which match given criteria."
+        response_dict["unset_nc"] = nc_dict
+
+      else:
+        response_dict["success"] = True
+        response_dict["message"] = "NOTE: No match found of announced-course instance(s) with given criteria."
+        response_dict["unset_nc"] = nc_dict
+
+      return HttpResponse(json.dumps(response_dict))
+
+    else:
+      error_message = "AnnouncedCourseError: Either not an ajax call or not a GET request!!!"
+      response_dict["message"] = error_message
+      return HttpResponse(json.dumps(response_dict))
+
+  except Exception as e:
+    error_message = "AnnouncedCourseError: " + str(e) + "!!!"
+    response_dict["message"] = error_message
+    return HttpResponse(json.dumps(response_dict))
 
