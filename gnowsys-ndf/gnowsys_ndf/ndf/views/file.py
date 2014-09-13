@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 
 from mongokit import paginator
-
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
@@ -117,35 +117,59 @@ def file(request, group_id, file_id=None):
       search_field = request.POST['search_field']
 
       datavisual = []
+      if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
 
-      files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]},
-                                    '$or':[
-                                        {'member_of': {'$all': [pandora_video_st._id]}}],
-                                    '$or': [
-                                      {'$and': [
-                                        {'name': {'$regex': search_field, '$options': 'i'}}, 
-                                        {'$or': [
-                                          {'access_policy': u"PUBLIC"},
-                                          {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                          ]
-                                        }
-                                        ]
-                                      },
-                                      {'$and': [
-                                        {'tags': {'$regex':search_field, '$options': 'i'}},
-                                        {'$or': [
-                                          {'access_policy': u"PUBLIC"},
-                                          {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                          ]
-                                        }
-                                        ]
-                                      }
-                                    ],
-                                    'group_set': {'$all': [ObjectId(group_id)]}
-                                  },
+          files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]},
+                                                '$or': [
+                                                    {'$and': [
+                                                        {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                        {'$or': [
+                                                            {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                        ]
+                                                     }
+                                                    ]
+                                                 },
+                                                    {'$and': [
+                                                        {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                        {'$or': [
+                                                            {'access_policy': u"PUBLIC"},
+                                                        {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                        ]
+                                                     }
+                                                    ]
+                                                 }
+                                                ],
+                                                'group_set': {'$all': [ObjectId(group_id)]}
+                                            },
 
-                                    {'member_of': {'$all': [pandora_video_st._id]}}]
-      }).sort('last_update', -1)
+                                               {'member_of': {'$all': [pandora_video_st._id]}}]
+                                    }).sort('last_update', -1)
+      else:
+          files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
+                                        '$or': [
+                                            {'$and': [
+                                                {'name': {'$regex': search_field, '$options': 'i'}},
+                                                {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                             }
+                                            ]
+                                         },
+                                            {'$and': [
+                                                {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                             }
+                                            ]
+                                         }
+                                        ],
+                                        'group_set': {'$all': [ObjectId(group_id)]}
+                                    }).sort('last_update', -1)
+
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
                                             '_type': 'File', 
                                             '$or': [
@@ -270,21 +294,36 @@ def file(request, group_id, file_id=None):
       # File list view
       title = GST_FILE.name
       datavisual = []
-      files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
-                                    '_type': 'File', 'fs_file_ids':{'$ne': []}, 
-                                    'group_set': {'$all': [ObjectId(group_id)]},
-                                    '$or': [
-                                      {'access_policy': u"PUBLIC"},
-                                      {'$and': [
-                                          {'access_policy': u"PRIVATE"}, 
-                                          {'created_by': request.user.id}
+      if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
+
+          files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
+                                                '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+                                                'group_set': {'$all': [ObjectId(group_id)]},
+                                                '$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [
+                                                        {'access_policy': u"PRIVATE"}, 
+                                                        {'created_by': request.user.id}
+                                                    ]
+                                                 }
+                                                ]
+                                            },
+                                               {'member_of': {'$all': [pandora_video_st._id]}}
+                                           ]}).sort("last_update", -1)
+      else:
+          files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
+                                        '_type': 'File', 'fs_file_ids':{'$ne': []},
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        '$or': [
+                                            {'access_policy': u"PUBLIC"},
+                                            {'$and': [
+                                                {'access_policy': u"PRIVATE"},
+                                                {'created_by': request.user.id}
+                                            ]
+                                         }
                                         ]
-                                      }
-                                    ]
-                                    },
-                                    {'member_of': {'$all': [pandora_video_st._id]}}
-                                       ]}).sort("last_update", -1)
-      
+                                    }).sort("last_update", -1)
+
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
                                             '_type': 'File','fs_file_ids': {'$ne': []}, 
                                             'group_set': {'$all': [ObjectId(group_id)]},
