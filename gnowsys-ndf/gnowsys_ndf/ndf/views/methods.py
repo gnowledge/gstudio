@@ -1180,7 +1180,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
   
-  ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
+  ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
     # Code for creation
     try:
@@ -1280,7 +1280,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
       # Iterate and find all relationships (including DELETED ones' also)
       nodes = collection.Triple.find({'_type': "GRelation", 
                                       'subject': subject_id, 
-                                      'relation_type': relation_type_node.get_dbref()
+                                      'relation_type.$id': relation_type_node._id
                                     })
 
       gr_node_list = []
@@ -1308,7 +1308,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         for nid in right_subject_id_or_list:
           gr_node = collection.Triple.one({'_type': "GRelation", 
                                             'subject': subject_id, 
-                                            'relation_type': relation_type_node.get_dbref(),
+                                            'relation_type.$id': relation_type_node._id,
                                             'right_subject': nid
                                           })
 
