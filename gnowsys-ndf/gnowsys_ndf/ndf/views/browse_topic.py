@@ -27,6 +27,7 @@ from gnowsys_ndf.ndf.views.methods import get_node_metadata
 #######################################################################################################################################
 db = get_database()
 collection = db[Node.collection_name]
+collection_tr = db[Triple.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
@@ -54,6 +55,31 @@ def themes(request, group_id, app_id=None, app_set_id=None):
         if app_ins:
             app_id = str(app_ins._id)
 
+
+    # Code for user shelf
+    shelves = []
+    shelf_list = {}
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    
+    if auth:
+      has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+      dbref_has_shelf = has_shelf_RT.get_dbref()
+      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelf_list = {}
+
+      if shelf:
+        for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+            shelves.append(shelf_name)
+
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_list[shelf_name.name].append(shelf_item.name)
+
+      else:
+        shelves = []
+    # End of user shelf
 
     appName = "browse topic"
     title = appName
@@ -95,12 +121,14 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     else:
         # This will show Themes as a card view on landing page of browse topic
         themes_cards = True
-        nodes_dict = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
-
+        if request.user.username:
+            nodes_dict = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
+        else:
+            nodes_dict = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'language': u"en",'group_set':{'$all': [ObjectId(group_id)]}})
 
     return render_to_response("ndf/theme.html",
                                {'theme_GST_id':theme_GST._id, 'themes_cards': themes_cards,
-                               'group_id': group_id,'groupid': group_id,'node': node,
+                               'group_id': group_id,'groupid': group_id,'node': node,'shelf_list': shelf_list,'shelves': shelves,
                                'nodes':nodes_dict,'app_id': app_id,'app_name': appName,
                                'title': title,'themes_list_items': themes_list_items,
                                'themes_hierarchy': themes_hierarchy, 'unfold': unfold,
@@ -151,6 +179,31 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
     if app_obj:
         app_id = app_obj._id
+
+
+    shelves = []
+    shelf_list = {}
+    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+    
+    if auth:
+      has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+      dbref_has_shelf = has_shelf_RT.get_dbref()
+      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+      shelf_list = {}
+
+      if shelf:
+        for each in shelf:
+            shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)}) 
+            shelves.append(shelf_name)
+
+            shelf_list[shelf_name.name] = []         
+            for ID in shelf_name.collection_set:
+              shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+              shelf_list[shelf_name.name].append(shelf_item.name)
+
+      else:
+        shelves = []
+
 	
     if request.method == "POST":
  
@@ -550,6 +603,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
         
     return render_to_response("ndf/theme.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
+                            'shelf_list': shelf_list,'shelves': shelves,
                             'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,'appId':app._id,
                             'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
                             'theme_GST_id': theme_GST._id,'theme_item_GST_id': theme_item_GST._id, 'topic_GST_id': topic_GST._id,

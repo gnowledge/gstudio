@@ -120,12 +120,14 @@ def create_edit_task(request, group_name, task_id=None):
         group_ins = collection.Node.find_one({'_type': "Group","_id": group_name})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
     if group_ins:
+
+            print "coming here"
             group_id = str(group_ins._id)
     else :
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-        if auth :
-            group_id = str(auth._id)
-
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    
     blank_dict = {}
     if task_id:
         task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
@@ -312,7 +314,8 @@ def delete_task(request, group_name, _id):
             node.delete()
     except Exception as e:
         print "Exception:", e
-    return HttpResponseRedirect(pageurl) 
+
+    return HttpResponseRedirect(reverse('task', kwargs={'group_name': group_name }))
 
 
 

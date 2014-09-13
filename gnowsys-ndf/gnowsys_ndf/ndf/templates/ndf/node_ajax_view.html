@@ -316,12 +316,8 @@ This section has been integrated to groupdashboard and appears in block app_acti
   </h1>
       <h1 class="subheader">
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
-          
-      {% if topic %}
-       <dd class="active"><a href="#contents"><i class="fi-page-multiple"></i> {% trans "Contents" %}</a></dd>
-      {% endif %}
 
-      <dd class="{% if not topic %}active{% endif %}"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
       <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes" %}</a></dd>
       <dd><a href="#view-discussion"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
 
@@ -410,7 +406,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
     <div class="tabs-content">
 
       <!-- Tab content -->
-      <div class="content {% if not topic %}active commentable-section {% endif %}" id="view-page" data-section-id="1">
+      <div class="content active commentable-section" id="view-page" data-section-id="1">
 	<div class="row">
 	<div class="small-4 columns">
         {% if node.prior_node|length > 0 %}
@@ -511,9 +507,27 @@ This section has been integrated to groupdashboard and appears in block app_acti
             <div>
               {% if 'image' in node.mime_type %}
               Resource Type: {{node.mime_type}}
-              <a href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-                <img src="{% url 'getFullImage' group_name_tag node  grid_fs_obj.filename %}" altname="{{node.name}}">
-              </a>
+
+              <!-- lightbox for displaying image gallary -->
+              <ul class="clearing-thumbs clearing-feature small-block-grid-2" data-clearing> 
+                {% for image in imageCollection %}
+
+                  {% get_grid_fs_object image as grid_fs_obj %}
+                  {% if node.pk == image.pk %}
+                    <li class="clearing-featured-img">
+                  {% else %}
+                    <li>
+                  {% endif %}
+                  
+                  <a href="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}">
+                    <img class="imgLightbox" src="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}" data-caption="{{image.name}}" name="{{image.pk}}">
+                  </a>
+                  </li> 
+
+                {% endfor %}
+              </ul>
+              <!--  -->
+              
               {% elif 'audio' in node.mime_type %}
               <div class="row">
                 <div class="small-12 columns">
@@ -540,6 +554,25 @@ This section has been integrated to groupdashboard and appears in block app_acti
                 <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
                 {{ grid_fs_obj.filename }}
               </a>
+
+              {% comment %}
+              {% elif 'pdf' in node.mime_type %}
+              <div class="row">
+                <div class="small-12 columns">
+                  <!-- <object type="application/pdf" width="400" height="500" data="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                    alt: <p>Your browser does not support the audio element </p>
+                  </object> -->
+                  <!-- <embed src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" width="600" height="500" alt="pdf" pluginspage="http://www.adobe.com/products/acrobat/readstep2.html"> -->
+                  <!-- <iframe src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" width="500" height="500"></iframe> -->
+                </div>
+              </div>
+              Resource Type: {{node.mime_type}}
+              <br/>
+                <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+                {{ grid_fs_obj.filename }}
+              </a>
+              {% endcomment %}
+              
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
@@ -601,14 +634,12 @@ This section has been integrated to groupdashboard and appears in block app_acti
         {% endwith %}
       </div>
       <!-- </div> -->
+      <!-- Resource contents of topic -->
 
-      </div>
-
-      <!-- Div included for setting default landing page for topic as an concept graph -->
       {% if topic %}
-        <div class="content" id="view-graph">  </div>
+        <!-- <div class="content" id="view-graph">  </div> -->
 
-        <div class="content active" id="contents"> 
+        <div class="content" id="contents"> 
           
           {% get_contents node.pk as contents %}
           {% for k,v in contents.items %}    
@@ -636,11 +667,14 @@ This section has been integrated to groupdashboard and appears in block app_acti
               {% endfor %}
             </fieldset>
 
-          {% endfor %}
-          
+          {% endfor %}          
 
         </div>
       {% endif %}
+      <!-- End of displaying topic page contents -->
+
+      </div>
+
 
       <!-- Content for Concept Graph -->
       <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
@@ -1030,6 +1064,11 @@ This section has been integrated to groupdashboard and appears in block app_acti
     $('#view-concept-graph').foundation('reveal', 'open'); 
   });
 
+  $(document).on('dblclick','.imgLightbox',function(){
+    var img_node = $(this).attr('name');
+    location.href = "/{{group_name_tag}}/image/details/"+img_node;
+  });
+
   $(document).on('close', '#view-concept-graph[data-reveal]', function () {
     $('#view-graph').append(svgdata);
   })
@@ -1103,12 +1142,40 @@ This section has been integrated to groupdashboard and appears in block app_acti
   // iframe for html content  
   function adjustIframeHt(){
 
-    iframeBodyHt = $("iframe#html-res-iframe").contents().find("body").height();
-    // console.log(iframeBodyHt);
-    $("iframe").height(iframeBodyHt + 50);
+    var iframeBodyHt = $("iframe#html-res-iframe").contents().find("body").height();
+    $("iframe#html-res-iframe").height(iframeBodyHt + 50);
+    
+    var changedHt;
+    
+    setTimeout(function(){
 
+      changedHt = $("iframe#html-res-iframe").contents().find("body").height();
+      if(changedHt > iframeBodyHt) { adjustIframeHt() }
+
+    }, 4000 );
+    
   }
 
-  $("document").ready(function(){ setTimeout(function() { adjustIframeHt() },2000) });
+  $("document").ready(function(){
+
+    setTimeout(function() { adjustIframeHt() },3000) 
+
+    // making <a> disabled of images in html pages in iframe
+    var imgInIframe = $("iframe#html-res-iframe").contents().find("img");
+    
+    imgInIframe.each(function(){
+      
+      var tempImgAnchor = $(this).parent("a");
+
+      // additional check if parent is <a> and if it contains url pattern: "/gstudio/resources/images/show/"
+      if(tempImgAnchor.is("a") && $(tempImgAnchor).attr("href").trim().contains("/gstudio/resources/images/show/"))
+      {
+        tempImgAnchor.attr("href", "");
+        tempImgAnchor.on("click", function(e){ e.preventDefault(); } ) 
+      }
+    
+    })
+
+  });
 
 </script>

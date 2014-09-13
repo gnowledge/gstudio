@@ -161,6 +161,14 @@
 {% endblock%}
 
 
+{% block shelf_content %}
+  {% if user.is_authenticated %}
+    {% include "ndf/shelf.html" %}
+  {% else %}
+  <h4>Please Login to create your shelf</h4>
+  {% endif %}  
+{% endblock %}
+
 {% block meta_content %}
 {% if user.is_authenticated %}
 {% user_access_policy groupid request.user as user_access %}
@@ -270,8 +278,10 @@
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   		<!-- Existing card list-->
-  		{% get_preferred_lang request group_id nodes "Theme" as nodes %}
-	
+  		{% if user.is_authenticated %}
+  			{% get_preferred_lang request group_id nodes "Theme" as nodes %}
+		{% endif %}
+		
 	  	{% for each in nodes %}
 		    <li class="card">
 		      <div class="page">

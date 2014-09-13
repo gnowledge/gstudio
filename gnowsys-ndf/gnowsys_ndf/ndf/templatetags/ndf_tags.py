@@ -469,6 +469,23 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 		return {'template': template2, 'widget_for': fields_name, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': groupid, 'groupid': groupid}
 
 
+
+@register.assignment_tag
+def shelf_allowed(node):
+	page_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Page'})
+	file_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'File'})
+	course_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Course'})
+	quiz_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'Quiz'})
+	topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
+
+	allowed_list = [page_GST._id,file_GST._id,course_GST._id,quiz_GST._id,topic_GST._id]
+
+	for each in node.member_of:
+		if each in allowed_list :
+			allowed = "True"
+			return allowed
+
+
 @register.inclusion_tag('ndf/gapps_menubar.html')
 def get_gapps_menubar(request, group_id):
 	"""Get Gapps menu-bar
@@ -1648,11 +1665,14 @@ def get_preferred_lang(request, group_id, nodes, node_type):
    node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
 
    if uname:
-      pref_lan=uname.preferred_languages
-   else:
-      pref_lan={}
-      pref_lan['primary']=request.LANGUAGE_CODE
-      pref_lan['default']=u"en"
+      if uname.has_key("preferred_languages"):
+         pref_lan=uname.preferred_languages
+      else:
+         pref_lan={}
+         pref_lan['primary']=request.LANGUAGE_CODE
+         pref_lan['default']=u"en"
+         uname.pref_lang=pref_lan
+         uname.save()
    try:
       for each in nodes:
          primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':each._id}]})
@@ -1919,7 +1939,7 @@ def html_widget(groupid, node_id, field):
 
     return {'template': 'ndf/html_field_widget.html',
             'field': field, 'field_type': field_type, 'field_value': field_value,
-            'node_id': node_id, 'groupid': groupid, 'node_dict': node_dict,
+            'node_id': node_id, 'group_id': groupid, 'groupid': groupid, 'node_dict': node_dict,
             'field_value_choices': field_value_choices,
             'is_base_field': is_base_field,
             'is_attribute_field': is_attribute_field,

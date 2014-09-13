@@ -72,7 +72,7 @@ description of what is expected from each feature.
 *** DONE Registration
 *** DONE subscription to a group
 *** DONE reporting changes to collaborators
-*** TODO moderators
+*** DONE moderators
 *** TODO members of a group based on configuration
 *** DONE members in a forum
 ** TODO sms and email support for interacting with the portal
@@ -113,7 +113,7 @@ description of what is expected from each feature.
 *** to the student
 *** to the mentors
 *** to the admins
-* DONE Management of Students, Volunteers, Mentors, Fellows 
+* DONE Management of Students, Trainers, Mentors, Fellows 
 * TODO distributed p2p sync between servers based on group mirroring
 * Application for citizen science projects
 ** DONE Observations app
@@ -135,12 +135,11 @@ description of what is expected from each feature.
 
 
    
-* TODO 
-
-  
+* Project Ideas for Interns
 
 ** concept mapping 
 ** custom app designer
 ** analytics
 *** reputation analysis
+*** badges
 ** wordnet

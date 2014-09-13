@@ -19,5 +19,6 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.file',
                        url(r'^/delete/(?P<_id>[\w-]+)$', 'delete_file', name='delete_file'),
                        url(r'^/edit_file/(?P<_id>[\w-]+)$', 'file_edit', name='file_edit'),
                        url(r'^/data-review/$', 'data_review', name='data_review'),
+                       url(r'^/data-review/page-no=(?P<page_no>\d+)/$', 'data_review', name='data_review_page'),
                        url(r'^/edit/(?P<_id>[\w-]+)$', 'file_edit', name='file_edit'),
 )

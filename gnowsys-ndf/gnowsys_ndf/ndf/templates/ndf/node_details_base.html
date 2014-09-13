@@ -201,7 +201,13 @@ $("#add_page").click(function() {
 {% endblock %}
 
 {% block shelf_content %}
-  {% include "ndf/shelf.html" %}  
+  {% if user.is_authenticated %}
+    {% shelf_allowed node as allowed %}
+  
+    {% include "ndf/shelf.html" %}
+  {% else %}
+  <h4>Please Login to create your shelf</h4>
+  {% endif %}  
 {% endblock %}
 
 

@@ -24,6 +24,7 @@ except ImportError:  # old pymongo
 # from gnowsys_ndf.ndf.views.methods import *
 # from gnowsys_ndf.ndf.views.file import *
 from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.views.course import *
 from gnowsys_ndf.ndf.views.event import *
 from gnowsys_ndf.ndf.views.person import *
 
@@ -274,7 +275,7 @@ def mis_detail(request, group_id, app_id=None, app_set_id=None, app_set_instance
         title =  systemtype.name +"-" +system.name
 
     variable = RequestContext(request, {
-                                        'groupid':group_id, 'app_name':app_name, 'app_id':app_id,
+                                        'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id,
                                         "app_collection_set":app_collection_set, "app_set_id":app_set_id, 
                                         "nodes":nodes_dict, "app_menu":app_menu, "app_set_template":app_set_template,
                                         "app_set_instance_template":app_set_instance_template, "app_set_name":app_set_name,
@@ -466,7 +467,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
                     newgsystem = collection.Node.one({'_id':f})
                 else:
                     template = "ndf/mis_list.html"
-                    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
+                    variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'already_uploaded_file':f})
                     return render_to_response(template, variable)
             else:
                 newgsystem = collection.File()
@@ -572,7 +573,7 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
     
     template = "ndf/"+template_prefix+"_create_edit.html"
-    variable = RequestContext(request, {'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
+    variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
       
 @login_required
