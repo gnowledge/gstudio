@@ -267,8 +267,12 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       if not course_gs:
         course_gs = collection.GSystem()
 
+      else:
+        if " -- " in nm:
+          nm = nm.split(" -- ")[0].lstrip().rstrip()
+
       c_name = unicode(nm + " -- " + nussd_course_type + " -- " + str(start_time) + " -- " + str(end_time))
-      course_gs.name = c_name
+      request.POST["name"] = c_name
 
       is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
 
