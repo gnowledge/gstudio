@@ -1,0 +1,10 @@
+{% extends "ndf/mis_base_list.html" %}
+{% load i18n %}
+
+{% block app_action_list %}
+<li>
+  <a href="{% url 'mis:mis_enroll' groupid app_id app_set_id %}">
+    {% trans "Enroll in Courses" %}
+  </a>
+</li>
+{% endblock %}
