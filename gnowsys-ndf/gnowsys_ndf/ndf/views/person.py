@@ -1,5 +1,6 @@
 ''' -- imports from python libraries -- '''
 # from datetime import datetime
+import datetime
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
@@ -17,6 +18,8 @@ try:
     from bson import ObjectId
 except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
+
+from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.ndf.models import Node, AttributeType, RelationType
@@ -89,7 +92,8 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = person_gst.name
   
-    template = "ndf/person_list.html"
+    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_list.html"
+    default_template = "ndf/person_list.html"
 
     if request.method=="POST":
       search = request.POST.get("search","")
@@ -100,7 +104,7 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       nodes = collection.Node.find({'member_of': person_gst._id, 'group_set': ObjectId(group_id)})
 
   if app_set_instance_id :
-    template = "ndf/person_details.html"
+    default_template = "ndf/person_details.html"
 
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
@@ -124,8 +128,8 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     # print "\n template-list: ", [template, default_template]
     # template = "ndf/fgh.html"
     # default_template = "ndf/dsfjhk.html"
-    # return render_to_response([template, default_template], 
-    return render_to_response(template, 
+    # return render_to_response(template, 
+    return render_to_response([template, default_template], 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
@@ -331,3 +335,84 @@ def person_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
     error_message = "\n PersonCreateEditViewError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+
+@login_required
+def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
+    """
+    Student enrollment
+    """
+    auth = None
+    if ObjectId.is_valid(group_id) is False :
+      group_ins = collection.Node.one({'_type': "Group","name": group_id})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+          group_id = str(auth._id)
+    else :
+      pass
+
+    app = None
+    if app_id is None:
+      app = collection.Node.one({'_type': "GSystemType", 'name': app_name})
+      if app:
+        app_id = str(app._id)
+    else:
+      app = collection.Node.one({'_id': ObjectId(app_id)})
+
+    app_name = app.name 
+
+    app_collection_set = [] 
+    app_set = ""
+    nodes = ""
+    title = ""
+
+    user_id = int(request.user.id)  # getting django user id
+    user_name = unicode(request.user.username)  # getting django user name
+
+    if request.user.id:
+      if auth is None:
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username)})
+      agency_type = auth.agency_type
+      agency_type_node = collection.Node.one({'_type': "GSystemType", 'name': agency_type}, {'collection_set': 1})
+      if agency_type_node:
+        for eachset in agency_type_node.collection_set:
+          app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
+
+    # Fetch required list of AttributeTypes
+    fetch_ATs = ["nussd_course_type", "degree_year"]
+    req_ATs = []
+
+    for each in fetch_ATs:
+      each = collection.Node.one({'_type': "AttributeType", 'name': each}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
+
+      if each["data_type"] == "IS()":
+        # Below code does little formatting, for example:
+        # data_type: "IS()" complex_value: [u"ab", u"cd"] dt:
+        # "IS(u'ab', u'cd')"
+        dt = "IS("
+        for v in each.complex_data_type:
+            dt = dt + "u'" + v + "'" + ", " 
+        dt = dt[:(dt.rfind(", "))] + ")"
+        each["data_type"] = dt
+
+      each["data_type"] = eval(each["data_type"])
+      each["value"] = None
+      req_ATs.append(each)
+
+    # Fetch required list of Colleges
+    college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+    mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
+    college_cur = collection.Node.find({'member_of': college._id, 'group_set': mis_admin._id}, {'name': 1}).sort('name', 1)
+
+    template = "ndf/student_enroll.html"
+    variable = RequestContext(request, {'groupid': group_id, 'group_id': group_id,
+                                        'title': title, 
+                                        'app_id':app_id, 'app_name': app_name, 
+                                        'app_collection_set': app_collection_set, 'app_set_id': app_set_id,
+                                        'ATs': req_ATs, 'colleges': college_cur
+                                        # 'nodes':nodes, 
+                                        })
+    return render_to_response(template, variable)
