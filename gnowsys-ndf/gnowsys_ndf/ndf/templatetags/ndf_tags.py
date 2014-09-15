@@ -1651,7 +1651,6 @@ def get_resource_collection(groupid, resource_type):
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
-
 @register.assignment_tag
 def get_preferred_lang(request, group_id, nodes, node_type):
    group=collection.Node.one({'_id':(ObjectId(group_id))})
@@ -1660,7 +1659,6 @@ def get_preferred_lang(request, group_id, nodes, node_type):
    primary_list=[]
    default_list=[]
    node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
-
    if uname:
       if uname.has_key("preferred_languages"):
          pref_lan=uname.preferred_languages
@@ -1670,6 +1668,11 @@ def get_preferred_lang(request, group_id, nodes, node_type):
          pref_lan['default']=u"en"
          uname.pref_lang=pref_lan
          uname.save()
+   else:
+      pref_lan={}
+      pref_lan[u'primary']=request.LANGUAGE_CODE
+      pref_lan[u'default']=u"en"
+      print pref_lan
    try:
       for each in nodes:
          primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':each._id}]})
