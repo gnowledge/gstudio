@@ -1696,7 +1696,7 @@ def get_preferred_lang(request, group_id, nodes, node_type):
          else:
             default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
             if default_nodes:
-               preferrd_list.append(default_nodes)
+               preferred_list.append(default_nodes)
                   
       if preferred_list:
          
