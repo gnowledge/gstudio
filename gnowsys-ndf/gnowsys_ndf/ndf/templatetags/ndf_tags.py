@@ -1657,8 +1657,9 @@ def get_resource_collection(groupid, resource_type):
 @register.assignment_tag
 def get_preferred_lang(request, group_id, nodes, node_type):
    group=collection.Node.one({'_id':(ObjectId(group_id))})
+   get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
    uname=collection.Node.one({'name':str(request.user.username), '_type': {'$in': ["Group", "Author"]}})
-   
+   preferred_list=[]
    primary_list=[]
    default_list=[]
    node=collection.Node.one({'name':node_type,'_type':'GSystemType'})
@@ -1678,20 +1679,28 @@ def get_preferred_lang(request, group_id, nodes, node_type):
       print pref_lan
    try:
       for each in nodes:
-         primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':each._id}]})
-         if primary_nodes:
-            primary_list.append(primary_nodes)
-            
+         get_rel=collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':each._id}]})
+         if get_rel:
+            for rel in list(get_rel):
+               rel_node=collection.Node.one({'_id':rel.right_subject})
+               if rel_node.language == pref_lan['primary']:
+                  primary_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['primary']},{'_id':rel_node._id}]})
+                  if primary_nodes:
+                     preferred_list.append(primary_nodes)
+                    
+               else:
+                  default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
+                  if default_nodes:
+                     preferred_list.append(default_nodes)
+              
          else:
             default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
             if default_nodes:
-               default_list.append(default_nodes)
+               preferred_list.append(default_nodes)
                   
-            
-      if primary_list:
-         return primary_list
-      if default_list:
-         return default_list
+      if preferred_list:
+         
+         return preferred_list
       
    except Exception as e:
       return 'error'
