@@ -278,7 +278,8 @@ def parse_data_create_gsystem(json_file_path):
                                     
                                 elif attr_value['data_type'] == datetime.datetime:
 
-                                    if key == "dob" or key == "date of birth":
+                                    # Use small-case altnames
+                                    if key in ["dob", "date of birth", "date of registration"]:
                                         json_document[key] = datetime.datetime.strptime(json_document[key], "%d/%m/%Y")
                                     else:
                                         json_document[key] = datetime.datetime.strptime(json_document[key], "%Y")
@@ -667,7 +668,7 @@ def perform_eval_type(eval_field, json_document, type_to_create, type_convert_ob
 def create_gattribute(subject_id, attribute_type_node, object_value):
     ga_node = None
 
-    ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
+    ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
 
     if ga_node is None:
         # Code for creation
@@ -736,7 +737,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id):
 
     gr_node = collection.Triple.one({'_type': "GRelation", 
                                      'subject': subject_id, 
-                                     'relation_type': relation_type_node.get_dbref(),
+                                     'relation_type.$id': relation_type_node._id,
                                      'right_subject': right_subject_id
                                  })
 

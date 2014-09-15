@@ -576,4 +576,37 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
     variable = RequestContext(request, {'group_id':group_id, 'groupid':group_id, 'app_name':app_name, 'app_id':app_id, "app_collection_set":app_collection_set, "app_set_id":app_set_id, "nodes":nodes, "systemtype_attributetype_set":systemtype_attributetype_set, "systemtype_relationtype_set":systemtype_relationtype_set, "create_new":"yes", "app_set_name":systemtype_name, 'title':title, 'File':File, 'tags':tags, "content_org":content_org, "system_id":system_id,"system_type":system_type,"mime_type":system_mime_type, "app_set_instance_name":app_set_instance_name, "app_set_instance_id":app_set_instance_id, 'location':location})
     return render_to_response(template, variable)
       
- 
+@login_required
+def mis_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
+    """
+    Redirects to student_enroll function of person-view.
+    """
+    if app_set_id:
+        app_set = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
+
+        view_file_extension = ".py"
+        app_set_view_file_name = ""
+        app_set_view_file_path = ""
+
+        if app_set.type_of:
+            app_set_type_of = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set.type_of[0])}, {'name': 1})
+            app_set_view_file_name = app_set_type_of.name.lower().replace(" ", "_")
+
+        else:
+            app_set_view_file_name = app_set.name.lower().replace(" ", "_")
+
+        app_set_view_file_path = os.path.join(os.path.dirname(__file__), app_set_view_file_name + view_file_extension)
+
+        if os.path.exists(app_set_view_file_path):
+            return eval(app_set_view_file_name + "_enroll")(request, group_id, app_id, app_set_id, app_set_instance_id, app_name)
+
+
+    template = "ndf/student_enroll.html"
+    variable = RequestContext(request, {'groupid': group_id, 
+                                        'title':title, 
+                                        'app_id':app_id, 'app_name': app_name, 
+                                        'app_collection_set': app_collection_set, 'app_set_id': app_set_id
+                                        # 'nodes':nodes, 
+                                        })
+    return render_to_response(template, variable)
+        
