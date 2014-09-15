@@ -198,13 +198,13 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     
     if (nid is None) and (not nlist):
       for each in drawer:               
-        dict_drawer[each._id] = each
+        dict_drawer[each._id] = each.name
 
 
     elif (nid is None) and (nlist):
       for each in drawer:
         if each._id not in nlist:
-          dict1[each._id] = each
+          dict1[each._id] = each.name
 
       for oid in nlist: 
         obj = collection.Node.one({'_id': oid})
@@ -218,7 +218,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       for each in drawer:
         if each._id != nid:
           if each._id not in nlist:  
-            dict1[each._id] = each
+            dict1[each._id] = each.name
           
       for oid in nlist: 
         obj = collection.Node.one({'_id': oid})
@@ -1180,7 +1180,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
   
-  ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type': attribute_type_node.get_dbref()})
+  ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
     # Code for creation
     try:
@@ -1280,7 +1280,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
       # Iterate and find all relationships (including DELETED ones' also)
       nodes = collection.Triple.find({'_type': "GRelation", 
                                       'subject': subject_id, 
-                                      'relation_type': relation_type_node.get_dbref()
+                                      'relation_type.$id': relation_type_node._id
                                     })
 
       gr_node_list = []
@@ -1308,7 +1308,7 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         for nid in right_subject_id_or_list:
           gr_node = collection.Triple.one({'_type': "GRelation", 
                                             'subject': subject_id, 
-                                            'relation_type': relation_type_node.get_dbref(),
+                                            'relation_type.$id': relation_type_node._id,
                                             'right_subject': nid
                                           })
 

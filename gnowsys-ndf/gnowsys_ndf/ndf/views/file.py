@@ -12,6 +12,9 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
+
+from mongokit import paginator
+from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
@@ -114,35 +117,59 @@ def file(request, group_id, file_id=None):
       search_field = request.POST['search_field']
 
       datavisual = []
+      if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
 
-      files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]},
-                                    '$or':[
-                                        {'member_of': {'$all': [pandora_video_st._id]}}],
-                                    '$or': [
-                                      {'$and': [
-                                        {'name': {'$regex': search_field, '$options': 'i'}}, 
-                                        {'$or': [
-                                          {'access_policy': u"PUBLIC"},
-                                          {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                          ]
-                                        }
-                                        ]
-                                      },
-                                      {'$and': [
-                                        {'tags': {'$regex':search_field, '$options': 'i'}},
-                                        {'$or': [
-                                          {'access_policy': u"PUBLIC"},
-                                          {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
-                                          ]
-                                        }
-                                        ]
-                                      }
-                                    ],
-                                    'group_set': {'$all': [ObjectId(group_id)]}
-                                  },
+          files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]},
+                                                '$or': [
+                                                    {'$and': [
+                                                        {'name': {'$regex': search_field, '$options': 'i'}}, 
+                                                        {'$or': [
+                                                            {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                        ]
+                                                     }
+                                                    ]
+                                                 },
+                                                    {'$and': [
+                                                        {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                        {'$or': [
+                                                            {'access_policy': u"PUBLIC"},
+                                                        {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                        ]
+                                                     }
+                                                    ]
+                                                 }
+                                                ],
+                                                'group_set': {'$all': [ObjectId(group_id)]}
+                                            },
 
-                                    {'member_of': {'$all': [pandora_video_st._id]}}]
-      }).sort('last_update', -1)
+                                               {'member_of': {'$all': [pandora_video_st._id]}}]
+                                    }).sort('last_update', -1)
+      else:
+          files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
+                                        '$or': [
+                                            {'$and': [
+                                                {'name': {'$regex': search_field, '$options': 'i'}},
+                                                {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                             }
+                                            ]
+                                         },
+                                            {'$and': [
+                                                {'tags': {'$regex':search_field, '$options': 'i'}},
+                                                {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                ]
+                                             }
+                                            ]
+                                         }
+                                        ],
+                                        'group_set': {'$all': [ObjectId(group_id)]}
+                                    }).sort('last_update', -1)
+
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]},
                                             '_type': 'File', 
                                             '$or': [
@@ -267,21 +294,36 @@ def file(request, group_id, file_id=None):
       # File list view
       title = GST_FILE.name
       datavisual = []
-      files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
-                                    '_type': 'File', 'fs_file_ids':{'$ne': []}, 
-                                    'group_set': {'$all': [ObjectId(group_id)]},
-                                    '$or': [
-                                      {'access_policy': u"PUBLIC"},
-                                      {'$and': [
-                                          {'access_policy': u"PRIVATE"}, 
-                                          {'created_by': request.user.id}
+      if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
+
+          files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
+                                                '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+                                                'group_set': {'$all': [ObjectId(group_id)]},
+                                                '$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [
+                                                        {'access_policy': u"PRIVATE"}, 
+                                                        {'created_by': request.user.id}
+                                                    ]
+                                                 }
+                                                ]
+                                            },
+                                               {'member_of': {'$all': [pandora_video_st._id]}}
+                                           ]}).sort("last_update", -1)
+      else:
+          files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
+                                        '_type': 'File', 'fs_file_ids':{'$ne': []},
+                                        'group_set': {'$all': [ObjectId(group_id)]},
+                                        '$or': [
+                                            {'access_policy': u"PUBLIC"},
+                                            {'$and': [
+                                                {'access_policy': u"PRIVATE"},
+                                                {'created_by': request.user.id}
+                                            ]
+                                         }
                                         ]
-                                      }
-                                    ]
-                                    },
-                                    {'member_of': {'$all': [pandora_video_st._id]}}
-                                       ]}).sort("last_update", -1)
-      
+                                    }).sort("last_update", -1)
+
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
                                             '_type': 'File','fs_file_ids': {'$ne': []}, 
                                             'group_set': {'$all': [ObjectId(group_id)]},
@@ -1013,14 +1055,14 @@ def file_edit(request,group_id,_id):
                                   context_instance=RequestContext(request)
                               )
 
-def data_review(request, group_id):
+# data review in File app
+def data_review(request, group_id, page_no=1):
   '''
-  To get all the information related to resource object in the group.
+  To get all the information related to every resource object in the group.
   '''
   # getting group obj from name
 
   group_obj = collection.Node.one({ "_type": {"$in":["Group", "Author"]}, "name": unicode(group_id) })
-
   
   # checking if passed group_id is group name or group Id
   if group_obj and (group_id == group_obj.name):
@@ -1051,13 +1093,18 @@ def data_review(request, group_id):
                                     ]
                                   }).sort("last_update", -1)
 
+
+  # implementing pagination: paginator.Paginator(cursor_obj, <int: page no>, <int: no of obj in each page>)
+  # (ref: https://github.com/namlook/mongokit/blob/master/mongokit/paginator.py)
+  paged_resources = paginator.Paginator(files_obj, page_no, 10)
+
   # list to hold resources instances with it's attributes and relations
   files_list = []
 
-  for each_resource in files_obj:
+  for each_resource in paged_resources.items:
     each_resource.get_neighbourhood(each_resource.member_of)
     files_list.append(collection.GSystem(each_resource))
-    # print "\n\n\n========"#, each_resource.keys()
+    # print "\n\n\n========", each_resource.keys()
     # for each, val in each_resource.iteritems():
       # print each, "--", val,"\n"
 
@@ -1066,7 +1113,9 @@ def data_review(request, group_id):
   return render_to_response("ndf/data_review.html",
                             {
                               "group_id": group_id, "groupid": group_id,
-                              "files": files_list
+                              "files": files_list, "page_info": paged_resources
                             },
                             context_instance=RequestContext(request)
                           )
+# ---END of data review in File app
+

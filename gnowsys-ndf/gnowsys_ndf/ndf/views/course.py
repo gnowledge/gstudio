@@ -1,5 +1,6 @@
 ''' -- imports from python libraries -- '''
 # from datetime import datetime
+import datetime
 
 ''' -- imports from installed packages -- '''
 from django.http import HttpResponseRedirect #, HttpResponse uncomment when to use
@@ -187,9 +188,8 @@ def course_detail(request, group_id, _id):
 @login_required
 def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance_id=None, app_name=None):
   """
-  Creates/Modifies document of given course-type.
+  Creates/Modifies document of given sub-types of Course(s).
   """
-  # print "\n Found course_create_edit n gone inn this...\n\n"
 
   auth = None
   if ObjectId.is_valid(group_id) is False :
@@ -214,7 +214,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   app_name = app.name 
 
-  # app_name = "mis"
   app_set = ""
   app_collection_set = []
   title = ""
@@ -236,9 +235,6 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
       for eachset in agency_type_node.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
-  # for eachset in app.collection_set:
-  #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
-
   if app_set_id:
     course_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     template = "ndf/" + course_gst.name.strip().lower().replace(' ', '_') + "_create_edit.html"
@@ -249,104 +245,123 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
   if app_set_instance_id:
     course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
 
-  property_order_list = get_property_order_with_value(course_gs)#.property_order
-  # print "\n property_order_list: ", property_order_list, "\n"
+  property_order_list = get_property_order_with_value(course_gs)
 
   if request.method == "POST":
     # [A] Save course-node's base-field(s)
-    # print "\n Going before....", type(course_gs), "\n course_gs.keys(): ", course_gs.keys()
-    # get_node_common_fields(request, course_gs, group_id, course_gst)
-    # print "\n Going after....", type(course_gs), "\n course_gs.keys(): ", course_gs.keys()
-    # print "\n course_gs: \n", course_gs.keys()
-    # for k, v in course_gs.items():
-    #   print "\n ", k, " -- ", v
-    is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
+    start_time = ""
+    if request.POST.has_key("start_time"):
+      start_time = request.POST.get("start_time", "")
+      start_time = datetime.datetime.strptime(start_time, "%m/%Y")
 
-    if is_changed:
-      # Remove this when publish button is setup on interface
-      course_gs.status = u"PUBLISHED"
+    end_time = ""
+    if request.POST.has_key("end_time"):
+      end_time = request.POST.get("end_time", "")
+      end_time = datetime.datetime.strptime(end_time, "%m/%Y")
 
-    course_gs.save(is_changed=is_changed)
-  
-    # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
-    for tab_details in property_order_list:
-      for field_set in tab_details[1]:
-        # field_set pattern -- {[field_set[0]:node_structure, field_set[1]:field_base/AT/RT_instance{'_id':, 'name':, 'altnames':}, field_set[2]:node_value]}
-        # field_set pattern -- {'_id', 'data_type', 'name', 'altnames', 'value'}
-        # print " ", field_set["name"]
+    nussd_course_type = ""
+    if request.POST.has_key("nussd_course_type"):
+      nussd_course_type = request.POST.get("nussd_course_type", "")
+      nussd_course_type = unicode(nussd_course_type)
 
-        # Fetch only Attribute field(s) / Relation field(s)
-        if field_set.has_key('_id'):
-          field_instance = collection.Node.one({'_id': field_set['_id']})
-          field_instance_type = type(field_instance)
+    unset_ac_options = []
+    if request.POST.has_key("unset-ac-options"):
+      unset_ac_options = request.POST.getlist("unset-ac-options")
 
-          if field_instance_type in [AttributeType, RelationType]:
-            
-            if field_instance["name"] == "attendees":
-              continue
+    else:
+      unset_ac_options = ["dummy"] # Just to execute loop at least once for Course Sub-Types other than 'Announced Course'
 
-            field_data_type = field_set['data_type']
+    for each in unset_ac_options:
+      if course_gst.name == u"Announced Course":
+        # Code to be executed only for 'Announced Course' GSystem(s)
+        sid, nm = each.split(">>")
 
-            # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
-            if field_instance_type == AttributeType:
+        course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
 
-              if "File" in field_instance["validators"]:
-                # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
-                
-                if field_instance["name"] in request.FILES:
-                  field_value = request.FILES[field_instance["name"]]
+        if not course_gs:
+          course_gs = collection.GSystem()
+
+        else:
+          if " -- " in nm:
+            nm = nm.split(" -- ")[0].lstrip().rstrip()
+
+        c_name = unicode(nm + " -- " + nussd_course_type + " -- " + str(start_time) + " -- " + str(end_time))
+        request.POST["name"] = c_name
+
+      is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
+
+      if is_changed:
+        # Remove this when publish button is setup on interface
+        course_gs.status = u"PUBLISHED"
+
+      course_gs.save(is_changed=is_changed)
+    
+      # [B] Store AT and/or RT field(s) of given course-node (i.e., course_gs)
+      for tab_details in property_order_list:
+        for field_set in tab_details[1]:
+          # Fetch only Attribute field(s) / Relation field(s)
+          if field_set.has_key('_id'):
+            field_instance = collection.Node.one({'_id': field_set['_id']})
+            field_instance_type = type(field_instance)
+            if field_instance_type in [AttributeType, RelationType]:
+              
+              field_data_type = field_set['data_type']
+
+              # Fetch field's value depending upon AT/RT and Parse fetched-value depending upon that field's data-type
+              if field_instance_type == AttributeType:
+
+                if "File" in field_instance["validators"]:
+                  # Special case: AttributeTypes that require file instance as it's value in which case file document's ObjectId is used
+                  
+                  if field_instance["name"] in request.FILES:
+                    field_value = request.FILES[field_instance["name"]]
+
+                  else:
+                    field_value = ""
+                  
+                  # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
+                  if field_value != '' and field_value != u'':
+                    file_name = course_gs.name + " -- " + field_instance["altnames"]
+                    content_org = ""
+                    tags = ""
+                    field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
 
                 else:
-                  field_value = ""
+                  # Other AttributeTypes 
+                  field_value = request.POST[field_instance["name"]]
+
+                if field_instance["name"] in ["start_time", "end_time"]: #, "registration_year"]:
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
+                else:
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+
+                if field_value:
+                  course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
+                  # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
+
+              else:
+                field_value_list = request.POST.getlist(field_instance["name"])
+
+                # field_instance_type = "GRelation"
+                for i, field_value in enumerate(field_value_list):
+                  field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
+                  field_value_list[i] = field_value
+
+                course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value_list)
                 
-                # Below 0th index is used because that function returns tuple(ObjectId, bool-value)
-                if field_value != '' and field_value != u'':
-                  file_name = course_gs.name + " -- " + field_instance["altnames"]
-                  content_org = ""
-                  tags = ""
-                  field_value = save_file(field_value, file_name, request.user.id, group_id, content_org, tags, oid=True)[0]
+                # if isinstance(course_gs_triple_instance, list):
+                #   print "\n"
+                #   for each in course_gs_triple_instance:
+                #     print " course_gs_triple_instance: ", each._id, " -- ", each.name
+                #   print "\n"
 
-              else:
-                # Other AttributeTypes 
-                field_value = request.POST[field_instance["name"]]
-
-              # field_instance_type = "GAttribute"
-              # print "\n Parsing data for: ", field_instance["name"]
-              if field_instance["name"] in ["12_passing_year", "degree_passing_year"]: #, "registration_year"]:
-                field_value = parse_template_data(field_data_type, field_value, date_format_string="%Y")
-              elif field_instance["name"] in ["dob", "registration_date"]:
-                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y")
-              else:
-                field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
-
-              if field_value:
-                course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
-                # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
-
-            else:
-              field_value_list = request.POST.getlist(field_instance["name"])
-
-              # field_instance_type = "GRelation"
-              for i, field_value in enumerate(field_value_list):
-                field_value = parse_template_data(field_data_type, field_value, field_instance=field_instance, date_format_string="%m/%d/%Y %H:%M")
-                field_value_list[i] = field_value
-
-              course_gs_triple_instance = create_grelation(course_gs._id, collection.RelationType(field_instance), field_value_list)
-              # if isinstance(course_gs_triple_instance, list):
-              #   print "\n"
-              #   for each in course_gs_triple_instance:
-              #     print " course_gs_triple_instance: ", each._id, " -- ", each.name
-              #   print "\n"
-
-              # else:
-              #   print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
+                # else:
+                #   print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
     
-    # return HttpResponseRedirect(reverse('page_details', kwargs={'group_id': group_id, 'app_id': page_node._id }))
     return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
   
   default_template = "ndf/course_create_edit.html"
-  # default_template = "ndf/"+template_prefix+"_create_edit.html"
-  context_variables = { 'groupid': group_id, 
+  context_variables = { 'groupid': group_id, 'group_id': group_id,
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
                         'title':title,
@@ -354,20 +369,16 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
                       }
 
   if app_set_instance_id:
+    course_gs.get_neighbourhood(course_gs.member_of)
     context_variables['node'] = course_gs
 
   try:
-    # print "\n template-list: ", [template, default_template]
-    # template = "ndf/fgh.html"
-    # default_template = "ndf/dsfjhk.html"
-    # return render_to_response([template, default_template], 
     return render_to_response([template, default_template], 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
   
   except TemplateDoesNotExist as tde:
-    # print "\n ", tde
     error_message = "\n CourseCreateEditViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
   
