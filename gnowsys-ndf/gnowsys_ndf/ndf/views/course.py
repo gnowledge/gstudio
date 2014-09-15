@@ -249,30 +249,44 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   if request.method == "POST":
     # [A] Save course-node's base-field(s)
-    start_time = request.POST.get("start_time", "")
-    end_time = request.POST.get("end_time", "")
-    nussd_course_type = request.POST.get("nussd_course_type", "")
+    start_time = ""
+    if request.POST.has_key("start_time"):
+      start_time = request.POST.get("start_time", "")
+      start_time = datetime.datetime.strptime(start_time, "%m/%Y")
 
-    unset_ac_options = request.POST.getlist("unset-ac-options")
+    end_time = ""
+    if request.POST.has_key("end_time"):
+      end_time = request.POST.get("end_time", "")
+      end_time = datetime.datetime.strptime(end_time, "%m/%Y")
 
-    start_time = datetime.datetime.strptime(start_time, "%m/%Y")
-    end_time = datetime.datetime.strptime(end_time, "%m/%Y")
-    nussd_course_type = unicode(nussd_course_type)
+    nussd_course_type = ""
+    if request.POST.has_key("nussd_course_type"):
+      nussd_course_type = request.POST.get("nussd_course_type", "")
+      nussd_course_type = unicode(nussd_course_type)
+
+    unset_ac_options = []
+    if request.POST.has_key("unset-ac-options"):
+      unset_ac_options = request.POST.getlist("unset-ac-options")
+
+    else:
+      unset_ac_options = ["dummy"] # Just to execute loop at least once for Course Sub-Types other than 'Announced Course'
 
     for each in unset_ac_options:
-      sid, nm = each.split(">>")
+      if course_gst.name == u"Announced Course":
+        # Code to be executed only for 'Announced Course' GSystem(s)
+        sid, nm = each.split(">>")
 
-      course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
+        course_gs = collection.Node.one({'_type': "GSystem", '_id': ObjectId(sid), 'member_of': course_gst._id})
 
-      if not course_gs:
-        course_gs = collection.GSystem()
+        if not course_gs:
+          course_gs = collection.GSystem()
 
-      else:
-        if " -- " in nm:
-          nm = nm.split(" -- ")[0].lstrip().rstrip()
+        else:
+          if " -- " in nm:
+            nm = nm.split(" -- ")[0].lstrip().rstrip()
 
-      c_name = unicode(nm + " -- " + nussd_course_type + " -- " + str(start_time) + " -- " + str(end_time))
-      request.POST["name"] = c_name
+        c_name = unicode(nm + " -- " + nussd_course_type + " -- " + str(start_time) + " -- " + str(end_time))
+        request.POST["name"] = c_name
 
       is_changed = get_node_common_fields(request, course_gs, group_id, course_gst)
 
