@@ -1991,7 +1991,16 @@ def get_file_node(request,file_name=""):
 	new=str(a[0].strip('[(\'u\''))
 	col_Group = db[Node.collection_name]
 	print new
-	filedoc=collection.Node.find({'_type':'File','name':unicode(new)})
+	ins_objectid  = ObjectId()
+	if  ins_objectid.is_valid(new) is False:
+		print "1new",new
+		filedoc=collection.Node.find({'_type':'File','name':unicode(new)})
+		print "files",filedoc
+	else:
+		print "2new",new
+		filedoc=collection.Node.find({'_type':'File','_id':ObjectId(new)})			
+		print "conte",filedoc
+	
 	if filedoc:
 		for i in filedoc:
 			file_list.append(i)	

@@ -151,7 +151,8 @@ def create_edit_task(request, group_name, task_id=None):
         tag=""
         if request.FILES.getlist('UploadTask'):
         	files=request.FILES.getlist('UploadTask')
-        	field_value = save_file(files[0], Assignee, request.user.id, group_id, content_org,tag)
+        	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag)
+        	
         
     	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
