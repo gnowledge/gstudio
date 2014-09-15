@@ -65,16 +65,19 @@
   <!-- current page title -->
   {% for key,value in breadcrumbs_list %}
   {% get_memberof_name key as member_of_name %}
-
+  
   <li id="{{key}}" class="active collection">
       <h5>
-          <a class="row" title="{{ member_of_name }} - {{ value }}">
-      <div class="small-2 columns text-center">
-        <i class="fi-play"></i>
-      </div>
-      <div class="small-10 columns" name="{{key}}">{{ value | truncatechars:20 }}</div>
-               </a>
-    </h5>
+        <a>
+        <div class="row" title="{{ member_of_name }} - {{ value }}">
+          <div class="small-2 columns">
+            <i class="fi-play"></i>
+          </div>
+          <div class="small-10 columns" name="{{key}}">{{ value | truncatechars:20 }}
+          </div>
+        </div>
+        </a>
+      </h5>
      
   </li>
 
@@ -86,16 +89,16 @@
     {% get_memberof_name each_node.pk as member_of_name %}
 
       <li id="{{each_node.pk}}">
-          <h6>
-        <a class="row" name="{{each_node.pk}}" title="{{member_of_name}} | {{ each_node.mime_type }}: {{ each_node.name }}">
-          <div class="small-2 small-push-2 columns text-center">
+        <a>
+        <div class="row" name="{{each_node.pk}}" title="{{member_of_name}} | {{ each_node.mime_type }}: {{ each_node.name }}">
+          <div class="small-5 columns">
 
             {% if member_of_name == "File" %}
               {% if "/zip" in each_node.mime_type %}
                 <i class="fi-archive"></i>
               {% elif "image" in each_node.mime_type %}
                 <!-- <i class="fi-camera"></i> -->
-                <img src="{% url 'getImageThumbnail' groupid each_node.pk %}">
+                <img src="{% url 'getImageThumbnail' group_id each_node.pk %}">
               {% elif "/pdf" in each_node.mime_type %}
                 <!-- <i class="fi-page-pdf"></i> -->
                 <img src="{% url 'getFileThumbnail' group_id each_node.pk %}">
@@ -116,11 +119,11 @@
 
           
           </div>
-          <div class="small-8 columns" >
+          <div class="small-7 columns" >
             {{ each_node.name | truncatechars:20 }}
           </div>
+        </div>
         </a>
-     </h6>
       </li>
 
     {% endfor %}
