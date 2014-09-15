@@ -169,7 +169,7 @@
 	{% if mode == "edit" %} 
 
 		<!-- overlay div for uploading files -->
-		<div id="image-uploader-overlay" class="reveal-modal small" style="z-index:1001;" data-reveal>
+		<div id="image-uploader-overlay" class="reveal-modal small" style="" data-reveal>
 			<a class="close-reveal-modal">&#215;</a>
 			<h3 class="text-center">Attach File</h3>
 			<hr/>			
@@ -1113,8 +1113,7 @@
 				  				var ajaxUrl = this.url,
 				  					listId = ajaxUrl.split("/")[5];
 		
-				  				$("#"+listId).children("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500);
-
+								$("#"+listId).find("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500); 
 				  				$.each(markerGeoJSON, function(i, val) {
 		
 				            		getID = JSON.parse(val).properties.id; 
@@ -1282,8 +1281,7 @@
 			  				{
 			  					tempMarker.feature.properties.ref = data[1]
 			  					tempMarker.feature.properties.created_at = formatedDateTime;
-			  					$("#"+listId).children("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500); 
-			  					
+			  					$("#"+listId).find("span").text(" "+data[0]+" ").fadeOut(300).fadeIn(500); 
 			  					$(".marker-alert-success").html("Good Work ! You had successfully <b><u>added</u></b> the Marker.").fadeIn(600, "swing").fadeOut(10000);
 
 			  				}
