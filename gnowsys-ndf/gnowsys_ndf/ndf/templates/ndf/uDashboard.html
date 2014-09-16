@@ -66,8 +66,8 @@
 
 		<div class="small-9 columns" style="padding-top:30px;">
 
-			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
-			{% blocktrans %}Registered on : &nbsp;{{DOJ}} {% endblocktrans %}
+			<h4><a href="#">{% trans "Welcome" %} {{username}} </a></h4>
+			{% trans "Registered on" %} : &nbsp;{{DOJ}}
 		</div>
 	</div>
 	
@@ -75,7 +75,7 @@
 	
   <div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
-			<b><a>{% blocktrans %}{{username}}'s Dashboard{% endblocktrans %}</a></b>
+			<b><a>{{username}}'s {% trans "Dashboard" %}</a></b>
 			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
 		</div>
 	</div>
@@ -84,7 +84,7 @@
 
 
   <div class = "row">
-    <h2>Groups:</h2>
+    <h2>{% trans "Groups": %}</h2>
     <hr></hr>
     <div class ="small-11 rows" id="trial">
       
@@ -203,7 +203,7 @@
     {% if not searching %}
     <div class="row">
       <div class="small-2 columns" align="right">
-       <h5> {% blocktrans %} No Assigned Tasks </b>{% endblocktrans %} </h5>
+       <h5> {% trans "No Assinged Task" %} </b></h5>
       </div>
     </div>
     {% endif %}
@@ -216,7 +216,7 @@
       
     </div>
 
-    <h2>Activities:</h2>
+    <h2>{% trans "Activities": %}</h2>
     <hr></hr>
     <div id="Activity">
       
@@ -264,7 +264,7 @@
     {% if not searching %}
     <div class="row">
       <div class="small-12 columns" align="left">
-       <h5> {% blocktrans %}No Recent Activities </b>{% endblocktrans %} </h5>
+       <h5> {% trans "No Recent Activities" %} </b></h5>
       </div>
     </div>
     {% endif %}

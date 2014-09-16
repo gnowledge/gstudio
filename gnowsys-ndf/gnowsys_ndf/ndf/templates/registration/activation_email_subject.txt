@@ -1,5 +1,4 @@
 {% load i18n %}
 
-{% blocktrans with sitename=site.name %}
-  Account registration for {{ sitename }}
-{% endblocktrans %}
+{% trans "Account registration for" %} {{ sitename }}
+

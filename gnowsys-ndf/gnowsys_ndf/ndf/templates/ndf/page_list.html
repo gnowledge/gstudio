@@ -72,14 +72,14 @@
 <header class="row">
   <dl class="tabs" data-tab data-options="deep_linking:true">
     <dd class="active"><a href="#panel2-1"><i class="fi-eye"></i> All Pages {% if page_nodes.count %}({{ page_nodes.count }}){% endif %}</a></dd>
-    {% blocktrans %}<dd><a href="#panel2-4"><i class="fi-page-multiple"></i> Collections</a></dd>{% endblocktrans %}
+    <dd><a href="#panel2-4"><i class="fi-page-multiple"></i> {% trans "Collections" %}</a></dd>
   </dl>
     {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}
   {% if user_access == "allow" %}
 
       <a class="small button" href="{% url 'page_create_edit' group_name_tag %}">
-	{% blocktrans %}<span class="fi-plus">&nbsp;&nbsp;Create {{title}}</span>{% endblocktrans %}
+	<span class="fi-plus">&nbsp;&nbsp;{% trans "Create" %} {{title}}</span>
       </a>
   
   {% endif %}
