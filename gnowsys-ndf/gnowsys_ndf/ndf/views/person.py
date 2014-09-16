@@ -85,9 +85,6 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
       for eachset in agency_type_node.collection_set:
         app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
-  # for eachset in app.collection_set:
-  #   app_collection_set.append(collection.Node.one({"_id":eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))
-
   if app_set_id:
     person_gst = collection.Node.one({'_type': "GSystemType", '_id': ObjectId(app_set_id)}, {'name': 1, 'type_of': 1})
     title = person_gst.name
@@ -98,23 +95,18 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
     if request.method=="POST":
       search = request.POST.get("search","")
       classtype = request.POST.get("class","")
-      # nodes = list(collection.Node.find({'name':{'$regex':search, '$options': 'i'},'member_of': {'$all': [person_gst._id]}}))
       nodes = collection.Node.find({'member_of': person_gst._id, 'name': {'$regex': search, '$options': 'i'}})
     else:
       nodes = collection.Node.find({'member_of': person_gst._id, 'group_set': ObjectId(group_id)})
 
-  if app_set_instance_id :
+  if app_set_instance_id:
+    template = "ndf/" + person_gst.name.strip().lower().replace(' ', '_') + "_details.html"
     default_template = "ndf/person_details.html"
 
     node = collection.Node.one({'_type': "GSystem", '_id': ObjectId(app_set_instance_id)})
     property_order_list = get_property_order_with_value(node)
-    # print "\n property_order_list: ", property_order_list, "\n"
     node.get_neighbourhood(node.member_of)
-  #   print "\n node.keys(): ", node.keys(), "\n"
 
-  # print "\n person_gst._id: ", person_gst._id
-
-  # default_template = "ndf/"+template_prefix+"_create_edit.html"
   context_variables = { 'groupid': group_id, 
                         'app_id': app_id, 'app_name': app_name, 'app_collection_set': app_collection_set, 
                         'app_set_id': app_set_id,
@@ -125,17 +117,12 @@ def person_detail(request, group_id, app_id=None, app_set_id=None, app_set_insta
                       }
 
   try:
-    # print "\n template-list: ", [template, default_template]
-    # template = "ndf/fgh.html"
-    # default_template = "ndf/dsfjhk.html"
-    # return render_to_response(template, 
     return render_to_response([template, default_template], 
                               context_variables,
                               context_instance = RequestContext(request)
                             )
   
   except TemplateDoesNotExist as tde:
-    # print "\n ", tde
     error_message = "\n PersonDetailListViewError: This html template (" + str(tde) + ") does not exists !!!\n"
     raise Http404(error_message)
   
