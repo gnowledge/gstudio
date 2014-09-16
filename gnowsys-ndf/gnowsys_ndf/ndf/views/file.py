@@ -15,6 +15,15 @@ from django_mongokit import get_database
 
 from mongokit import paginator
 from gnowsys_ndf.settings import GSTUDIO_SITE_VIDEO
+from gnowsys_ndf.settings import EXTRA_LANG_INFO
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_EDUCATIONAL_USE
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_INTERACTIVITY_TYPE
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CURRICULAR
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_AUDIENCE
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_TEXT_COMPLEXITY
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
@@ -42,6 +51,7 @@ from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
 from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
+from gnowsys_ndf.ndf.models import STATUS_CHOICES
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,set_all_urls
 
 
@@ -1056,6 +1066,7 @@ def file_edit(request,group_id,_id):
                               )
 
 # data review in File app
+@login_required
 def data_review(request, group_id, page_no=1):
   '''
   To get all the information related to every resource object in the group.
@@ -1113,7 +1124,17 @@ def data_review(request, group_id, page_no=1):
   return render_to_response("ndf/data_review.html",
                             {
                               "group_id": group_id, "groupid": group_id,
-                              "files": files_list, "page_info": paged_resources
+                              "files": files_list, "page_info": paged_resources,
+                              "static_educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+                              "static_language": EXTRA_LANG_INFO,
+                              "static_educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
+                              "static_interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
+                              "static_educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
+                              "static_educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
+                              "static_curricular": GSTUDIO_RESOURCES_CURRICULAR,
+                              "static_audience": GSTUDIO_RESOURCES_AUDIENCE,
+                              "static_status": list(STATUS_CHOICES),
+                              "static_textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
                             },
                             context_instance=RequestContext(request)
                           )
