@@ -46,9 +46,9 @@
     <header class="row" style="margin: 1rem 0 0 0 ;">
       <h2 class="small-12 columns">
         {% if node %}
-        {% blocktrans with title_var=title node_name=node.name %} Editing {{title_var}}: {{node_name}} {% endblocktrans %}
+        {% trans "Editing" %} {{title}}: {{node.name}}
         {% else %}
-        {% blocktrans with title_var=title %} Register a New {{title_var}} {% endblocktrans %}
+        {% trans "Register a " %} {{title}}
         {% endif %}
       </h2>
     </header>
@@ -62,7 +62,7 @@
         {% for tab_details in property_order_list %}
         <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
           <a href="#panel_{{tab_details.0}}" class="disable">
-            {% blocktrans with tab_name=tab_details.0 %} {{tab_name}} {% endblocktrans %}
+            {{tab_details.0}}
           </a>
         </dd>
         {% endfor %}
@@ -79,7 +79,7 @@
         <div class="row">
           <div class="small-3 columns"> 
             <label for="{{field.name}}" class="right inline">
-              {{field_label}}
+              {{field.altnames}}
             </label>
           </div>
           <div class="small-9 columns">
