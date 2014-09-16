@@ -360,7 +360,7 @@ if modified_by_cur.count > 0:
     for n in modified_by_cur:
 	#print n, "\n"
 	if u'required_for' not in n.keys():
-                
+          if n.has_key("contributors"):
             if n.contributors:
                 collection.update({'_id': n._id}, {'$set': {'modified_by': n.contributors[0]}}, upsert=False, multi=False)
             else:
