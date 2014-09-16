@@ -114,10 +114,10 @@ function get_all_data(){
         {% include "ndf/drawer_widget.html" with widget_for="collection_set"  %}
       </div>
 
-            {% blocktrans %}<label><input type="checkbox" id="checknotif" value="ON"> Send notification mails to all except the group owner</label>{% endblocktrans %}
+            <label><input type="checkbox" id="checknotif" value="ON"> {% trans "Send notification mails to all except the group owner" %}</label>
               
       <input type="button" id="#submitUserInvite" class="button small" value="submit" onClick="saveinvite()"> 
-     <a class="close-reveal-modal group">{% trans "&#215" %};</a>
+     <a class="close-reveal-modal group">&#215;</a>
 </div>
 </div>
 
