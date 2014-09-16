@@ -86,7 +86,6 @@ def forum(request, group_id, node_id=None):
 
       return render_to_response("ndf/forum.html",
                                 {'title': title,
-                                 'appId':app._id,
                                  'searching': True, 'query': search_field,
                                  'existing_forums': existing_forums, 'groupid':group_id, 'group_id':group_id
                                 }, 
@@ -115,7 +114,7 @@ def forum(request, group_id, node_id=None):
         
         forum_detail_list.append(temp_forum)
 
-      variables = RequestContext(request,{'existing_forums': forum_detail_list,'appId':app._id, 'groupid': group_id, 'group_id': group_id})
+      variables = RequestContext(request,{'existing_forums': forum_detail_list,'groupid': group_id, 'group_id': group_id})
       return render_to_response("ndf/forum.html",variables)
 
 
@@ -224,7 +223,7 @@ def create_forum(request,group_id):
                     ret = set_notif_val(request,colg._id,msg,activity,bx)
 
         # returning response to ndf/forumdetails.html
-        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'appId':app._id,'forum_id': colf._id }))
+        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id }))
 
         # variables=RequestContext(request,{'forum':colf})
         # return render_to_response("ndf/forumdetails.html",variables)
@@ -236,7 +235,7 @@ def create_forum(request,group_id):
     for each in available_nodes:
       nodes_list.append(each.name)
 
-    return render_to_response("ndf/create_forum.html",{'group_id':group_id,'appId':app._id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
+    return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 
 def display_forum(request,group_id,forum_id):
@@ -263,7 +262,6 @@ def display_forum(request,group_id,forum_id):
 
     variables = RequestContext(request,{
                                         'forum':forum,
-                                        'appId':app._id,
                                         'groupid':group_id,'group_id':group_id,
                                         'forum_created_by':usrname
                                         })
@@ -306,7 +304,6 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                                                 'group_id':group_id,
                                                 'eachrep':thread,
                                                 'user':request.user,
-                                                'appId':app._id,
                                                 'forum_created_by':usrname
                                             })
                 return render_to_response("ndf/thread_details.html",variables)
@@ -391,7 +388,6 @@ def create_thread(request, group_id, forum_id):
                                     {   'group_id':group_id,
                                         'groupid':group_id,
                                         'forum': forum,
-                                        'appId':app._id,
                                         'forum_threads': json.dumps(forum_threads),
                                         'forum_created_by':User.objects.get(id=forum.created_by).username
                                     },
@@ -528,7 +524,7 @@ def add_node(request,group_id):
             return render_to_response("ndf/refreshtwist.html",variables)
         else:
             templ=get_template('ndf/refreshthread.html')
-            html = templ.render(Context({'forum':forumobj,'user':request.user,'appId':app._id,'groupid':group_id,'group_id':group_id}))
+            html = templ.render(Context({'forum':forumobj,'user':request.user,'groupid':group_id,'group_id':group_id}))
             return HttpResponse(html)
 
 

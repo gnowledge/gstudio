@@ -1996,3 +1996,29 @@ def check_node_linked(node_id):
     error_message = " NodeUserLinkFindError - " + str(e)
     raise Exception(error_message)
 
+
+
+@register.assignment_tag
+
+def get_file_node(request,file_name=""):
+	file_list=[]
+	a=str(file_name).split(',')
+	new=str(a[0].strip('[(\'u\''))
+	col_Group = db[Node.collection_name]
+	print new
+	ins_objectid  = ObjectId()
+	if  ins_objectid.is_valid(new) is False:
+		print "1new",new
+		filedoc=collection.Node.find({'_type':'File','name':unicode(new)})
+		print "files",filedoc
+	else:
+		print "2new",new
+		filedoc=collection.Node.find({'_type':'File','_id':ObjectId(new)})			
+		print "conte",filedoc
+	
+	if filedoc:
+		for i in filedoc:
+			file_list.append(i)	
+	return file_list	
+
+

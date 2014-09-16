@@ -156,7 +156,7 @@ $('#hidden_watchers').val(selected);
   
 {% block body_content %}
 
-<form data-abide id="form-edit-node" method="POST" action="">
+<form data-abide id="form-edit-node" enctype="multipart/form-data"  method="POST" action="">
 {% csrf_token %}
     <h2 class="medium-12 columns">
       {% if node %}
@@ -232,12 +232,16 @@ $('#hidden_watchers').val(selected);
 	    </label>
 	  </div>
 	  <div class="medium-3 columns">
-
+	
+	
+	
+	
 	  </div>
 	</div>
 	<div class="row">
 	  <div class="medium-12 columns">
-	    <label>Description</label>
+	    <label>
+	    	<input type="file" name="UploadTask"  id="docFile" value= "" multiple/></label>
 	    <div id="contentlist" class="content">
 		<div class="">
 		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
@@ -257,6 +261,10 @@ $('#hidden_watchers').val(selected);
 		<input type="hidden" name="watchers" id="hidden_watchers" value="">
           </div>
 	{% endif %}
+
+        <input type="hidden" name="node" value="{{node.pk}}">
+        <input type="hidden" name="user" value="{{user.id}}">
+        <input type="hidden" name="page_url" value="{{request.path}}">
       <div class="row" >
 	<div class="medium-6 columns">
 	    <input type="submit" id="save-node" value="Save" class="button"/>
