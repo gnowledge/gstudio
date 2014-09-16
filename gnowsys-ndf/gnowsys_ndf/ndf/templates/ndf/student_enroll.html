@@ -123,7 +123,7 @@
           <select id="college" name="college" required="" style="float:left; width:98%">
             <option value="">{% trans "- - - Select College - - -" %}</option>
             {% for choice in colleges %}
-            <option value="{{choice.pk}}"> {{alt}} </option>
+            <option value="{{choice.pk}}"> {{choice.name}} </option>
             {% endfor %}
           </select>
           <i style="color:red; float:left display:inline">*</i>
