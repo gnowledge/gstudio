@@ -129,7 +129,7 @@
   {% if already_uploaded_file %}
 	<div class="row">
     <div class="small-12 columns">
-		{% blocktrans %}<p> <font size ="5" color="red">This file :{{already_uploaded_file}} Already uploaded please choose another file</font> </p>{% endblocktrans %}
+		{% blocktrans with already_uploaded_file as already_uploaded %}<p> <font size ="5" color="red">This file :{{already_uploaded}} Already uploaded please choose another file</font> </p>{% endblocktrans %}
     <div>
 	</div>
   <br/>

@@ -463,11 +463,11 @@
                   {% if switch_conditions %}     
       	    <input type="button" id="switch_group" class="button small" value="Publish in group/s">
       	    <div id="mySystemtype" class="reveal-modal" data-reveal >
-      	      {% blocktrans %}<h2>Select Groups</h2>{% endblocktrans %}
+      	      <h2>{% trans "Select Groups" %}
       	      <div id="module_drawer" >
       		{% include "ndf/drawer_widget.html" with widget_for="collection_set" %}
       	      </div>
-      	      <a class="close-reveal-modal st">{% trans "&#215" %};</a>
+      	      <a class="close-reveal-modal st">&#215;</a>
       	      <input type="button" id="save_switch_group" class="button small-10 small-push-1 column" value="Save">
       		</div>
       	    {% endif %}

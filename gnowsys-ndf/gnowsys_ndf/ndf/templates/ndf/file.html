@@ -63,15 +63,15 @@
 
 <header class="row">
    <dl class="tabs" data-tab data-options="deep_linking:true">
-     <dd class="active"><a href="#view-all"><i class="fi-eye"></i>All files {% if files.count %}({{ files.count }}){% endif %}</a></dd>
-     <dd><a href="#view-doc"><i class="fi-page-filled"></i>Documents {% if docCollection.count %}({{ docCollection.count }}){% endif %}</a></dd>
+     <dd class="active"><a href="#view-all"><i class="fi-eye"></i>{% trans "All files" %} {% if files.count %}({{ files.count }}){% endif %}</a></dd>
+     <dd><a href="#view-doc"><i class="fi-page-filled"></i>{% trans "Documents" %} {% if docCollection.count %}({{ docCollection.count }}){% endif %}</a></dd>
      {% if interactiveCollection.count %}
-      <dd><a href="#view-interactive"><i class="fi-arrows-compress"></i>Interactives ({{ interactiveCollection.count }})</a></dd>
+      <dd><a href="#view-interactive"><i class="fi-arrows-compress"></i>{% trans "Interactives" %} ({{ interactiveCollection.count }})</a></dd>
      {% endif %}
      {% if audioCollection.count %}
-      <dd><a href="#view-audio"><i class="fi-music"></i>Audios ({{ audioCollection.count }})</a></dd>
+      <dd><a href="#view-audio"><i class="fi-music"></i>{% trans "Audios" %} ({{ audioCollection.count }})</a></dd>
      {% endif %}
-     <dd><a href="#view-image"><i class="fi-camera"></i>Images {% if imageCollection.count %}({{ imageCollection.count }}){% endif %}</a></dd>
+     <dd><a href="#view-image"><i class="fi-camera"></i>{% trans "Images" %} {% if imageCollection.count %}({{ imageCollection.count }}){% endif %}</a></dd>
     {% if site.SITE_VIDEO == 'pandora_and_local' or site.SITE_VIDEO == 'local' %}
      <dd><a href="#view-video"><i class="fi-video"></i>{% trans "Videos" %}{% if videoCollection.count %}({{ videoCollection.count }}){% endif %}</a></dd>
     {% endif %}
@@ -431,14 +431,14 @@
     {% if searching and imageCollection.count > 0 %}
     <div class="row">
       <div class="small-12 columns end">
-        <p>Search Results: <span class="label success round">Found {{imageCollection.count}} {{title|lower}}{{imageCollection.count|pluralize}}.</span></p>
+        <p>{% trans "Search Results:" %} <span class="label success round">{% trans "Found" %} {{imageCollection.count}} {{title|lower}}{{imageCollection.count|pluralize}}.</span></p>
       </div>
     </div>
     
     {% elif searching and imageCollection.count == 0 %}
     <div class="row">
       <div class="small-12 columns">
-        <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{imageCollection.count|pluralize}} matched your search criteria!!!</span></p>
+        <p>{% trans "Search Results:" %} <span class="label alert">{% trans "No" %} {{title|lower}}{{imageCollection.count|pluralize}} {% trans "matched your search criteria!!!" %}</span></p>
       </div>  
     </div>  
     
