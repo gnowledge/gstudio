@@ -79,7 +79,7 @@
 			<th class="expand-width-3">Altname</th>
 			<th class="expand-width-6">content_org</th>
 			<th class="expand-width-2">Language</th>
-			<th class="right-border">tags</th>
+			<th class="expand-width-6 right-border">tags</th>
 
 			<!-- Attribution -->
 			<th class="expand-width-3">Created by</th>
@@ -480,6 +480,8 @@
 		var $resEditRow = $("tr#edit-row-" + oid);
 			resEditRowArr = $resEditRow.children();
 
+		var tempEditedFields = "";
+
 		// processing each element of row
 		for (var i = 1; i < resEditRowArr.length; i++)
 		{
@@ -489,15 +491,45 @@
 			{
 				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
 				{
-					isFieldEdited = resViewRowArr[4+0].textContent.trim() == resEditRowArr[5+0].firstElementChild.value.trim()? false: true;
+					if(resViewRowArr[4+i].textContent.trim() != resEditRowArr[i].firstElementChild.value.trim())
+					{
+						tempEditedFields += "\nFIELD: " + $(resEditRowArr[i]).attr("data-field") + "\n\n" + resViewRowArr[4+i].textContent.trim() + "\nChanged to:\n" + resEditRowArr[i].firstElementChild.value.trim() + "\n\n";
+					}
+
+					// console.log(resViewRowArr[4+i].textContent.trim() + "-------" + resEditRowArr[i].firstElementChild.value.trim())
 				}
 			}
 
-			// resEditRowArr[i].classList.add("hide-el");
 		};
 
-		$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
-		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
+		isFieldEdited = (tempEditedFields.length > 0) ? true: false;
+
+
+		if(isFieldEdited)
+		{
+			var cancelConfirm = "false"
+			
+			cancelConfirm = window.confirm("Please Note that following fields are changed:\n\n" + tempEditedFields + "\n\nAre you sure to want to cancel saving edited fields ?");
+			
+			if(cancelConfirm)
+			{
+				$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
+				for (var i = 1; i < resEditRowArr.length; i++)
+				{
+					resEditRowArr[i].classList.add("hide-el");
+				}
+				$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
+			}	
+		}
+		else
+		{
+			$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
+			for (var i = 1; i < resEditRowArr.length; i++)
+			{
+				resEditRowArr[i].classList.add("hide-el");
+			}
+			$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
+		}
 	}
 
 // </script>
