@@ -16,10 +16,8 @@
 
 <table class="medium-6 columns">
   <form method='post' action=''>
-      
-    <h2>{% trans "Register a new account" %}</h2>
-      
-    {% csrf_token %}
+     <h2>{% trans "Register a new account" %}</h2>
+     {% csrf_token %}
     {{ form }}
     <tr>
       <td></td>

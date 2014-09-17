@@ -3,19 +3,16 @@ import os
 import hashlib
 import datetime
 import json
-
 #from random import random
 #from random import choice
 
-# imports from installed packages 
 
+# imports from installed packages 
 #from django.conf import settings
 from django.contrib.auth.models import User
 #from django.contrib.auth.models import check_password
 #from django.core.validators import RegexValidator
 from django.db import models
-
-
 
 from django_mongokit import connection
 from django_mongokit import get_database
@@ -40,7 +37,6 @@ from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
 from gnowsys_ndf.ndf.rcslib import RCS
 from django.dispatch import receiver
 from registration.signals import user_registered
-
 
 
 NODE_TYPE_CHOICES = (
@@ -1093,8 +1089,8 @@ class GSystem(Node):
     use_schemaless = True
 
     structure = {        
-        # 'attribute_set': [ObjectId],		# ObjectIds of GAttributes
-        # 'relation_set': [ObjectId],		# ObjectIds of GRelations
+        'attribute_set': [dict],		# ObjectIds of GAttributes
+        'relation_set': [dict],		            # ObjectIds of GRelations
         'module_set': [dict],                   # Holds the ObjectId & SnapshotID (version_number) of collection elements 
                                                 # along with their sub-collection elemnts too 
         'author_set': [int],                     # List of Authors

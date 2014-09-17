@@ -66,8 +66,8 @@
 
 		<div class="small-9 columns" style="padding-top:30px;">
 
-			<h4><a href="#">{% blocktrans %}Welcome {{username}} {% endblocktrans %}</a></h4>
-			{% blocktrans %}Registered on : &nbsp;{{DOJ}} {% endblocktrans %}
+			<h4><a href="#">{% trans "Welcome" %} {{username}} </a></h4>
+			{% trans "Registered on" %} : &nbsp;{{DOJ}}
 		</div>
 	</div>
 	
@@ -75,21 +75,18 @@
 	
   <div class="row">
 		<div class="small-12 columns" style="padding-top:10px;">
-			<b><a>{% blocktrans %}{{username}}'s Dashboard{% endblocktrans %}</a></b>
+			<b><a>{{username}}'s {% trans "Dashboard" %}</a></b>
 			<hr style="border-width:1.4px; border-color:black; margin-top:5px;"/>
 		</div>
 	</div>
 </div>
 
-
-
   <div class = "row">
-    <h2>Groups:</h2>
+    <h2>{% trans "Groups:" %}</h2>
     <hr></hr>
     <div class ="small-11 rows" id="trial">
       
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-  
   
   {% for node in user_groups %}
     
@@ -135,13 +132,8 @@
 
   {% endfor %}
 
-  
-
 </ul>
 
-
-
-	
     </div>
 
 <!--<h2> Notifications:</h2> -->
@@ -158,7 +150,7 @@
     </div>
   </div>
   
-  <h2>Assigned Tasks:</h2>
+  <h2>{% trans "Assigned Tasks:" %}</h2>
   <hr></hr>
    <div id="Assigned Tasks" >
       
@@ -203,24 +195,22 @@
     {% if not searching %}
     <div class="row">
       <div class="small-2 columns" align="right">
-       <h5> {% blocktrans %} No Assigned Tasks </b>{% endblocktrans %} </h5>
+      <h5> {% trans "No Assinged Task" %} </h5>
       </div>
     </div>
     {% endif %}
 
   {% endfor %}
 
-  
-
 </ul>
       
     </div>
 
-    <h2>Activities:</h2>
+    <h2>{% trans "Activities:" %}</h2>
     <hr></hr>
     <div id="Activity">
       
-       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+      <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   
   
   {% for node in user_activity %}
@@ -252,9 +242,7 @@
       {% if res_type == 'group' %}
       <a class="small button expand" href="/{{node.pk}}">{% trans "Detail" %}</a>
       {% elif res_type %}
-      	 <a class="small button expand" href="{% url res_type group_id node.pk  %}">{% trans "Detail" %}</a> 
-
-      
+      	<a class="small button expand" href="{% url res_type group_id node.pk  %}">{% trans "Detail" %}</a> 
       {% endif %}
       
     </div>
@@ -264,22 +252,18 @@
     {% if not searching %}
     <div class="row">
       <div class="small-12 columns" align="left">
-       <h5> {% blocktrans %}No Recent Activities </b>{% endblocktrans %} </h5>
+       <h5> {% trans "No Recent Activities" %}</h5>
       </div>
     </div>
     {% endif %}
 
   {% endfor %}
 
-  
-
 </ul>
 
     </div>
   </div>
 </div>
-
-
 
 <script type="text/javascript">
 	$("input").each(function() {

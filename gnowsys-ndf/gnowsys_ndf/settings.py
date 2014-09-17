@@ -499,7 +499,8 @@ VERSIONING_COLLECTIONS = ['AttributeTypes', 'RelationTypes',
 
 # Absolute filesystem path to the directory that will hold all rcs-files 
 # (history-files corresponding to every json-file created for each document)
-RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/static/rcs-repo")
+RCS_REPO_DIR = os.path.join(PROJECT_ROOT, "ndf/rcs-repo")
+
 
 # Indicates the "hash-level-number", i.e the number of sub-directories that 
 # will be created for the corresponding document under it's 
