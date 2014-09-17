@@ -24,6 +24,7 @@ from gnowsys_ndf.settings import GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_CURRICULAR
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_AUDIENCE
 from gnowsys_ndf.settings import GSTUDIO_RESOURCES_TEXT_COMPLEXITY
+from gnowsys_ndf.settings import GSTUDIO_RESOURCES_LANGUAGES
 from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.management.commands.data_entry import create_gattribute
 from gnowsys_ndf.ndf.views.methods import get_node_metadata
@@ -1126,7 +1127,8 @@ def data_review(request, group_id, page_no=1):
                               "group_id": group_id, "groupid": group_id,
                               "files": files_list, "page_info": paged_resources,
                               "static_educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
-                              "static_language": EXTRA_LANG_INFO,
+                              # "static_language": EXTRA_LANG_INFO,
+                              "static_language": GSTUDIO_RESOURCES_LANGUAGES,
                               "static_educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
                               "static_interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
                               "static_educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
