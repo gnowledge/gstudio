@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-30 01:14+0530\n"
+"POT-Creation-Date: 2014-09-17 14:20+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,13 +17,347 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:67
+#: django-registration-email/registration_email/forms.py:67
+msgid "Remember me"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:73
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:95
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/login.html:17
+#: django-registration-email/registration_email/forms.py:73
+#: django-registration-email/registration_email/forms.py:95
+#: django-registration-email/registration_email/templates/registration/login.html:17
+msgid "Email"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:99
+#: django-registration-email/registration_email/forms.py:99
+msgid "Password"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:103
+#: django-registration-email/registration_email/forms.py:103
+msgid "Password (repeat)"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:118
+#: django-registration-email/registration_email/forms.py:118
+msgid "A user with that email already exists."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:131
+#: django-registration-email/registration_email/forms.py:131
+msgid "Please enter a valid name."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:138
+#: django-registration-email/registration_email/forms.py:138
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activate.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activate.html:8
+#: django-registration-email/registration_email/templates/registration/activate.html:5
+#: django-registration-email/registration_email/templates/registration/activate.html:8
+msgid "Activation failure"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activate.html:12
+#: django-registration-email/registration_email/templates/registration/activate.html:12
+msgid "We are sorry but something went wrong!"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activate.html:13
+#: django-registration-email/registration_email/templates/registration/activate.html:13
+msgid "The activation link you provided is broken or was already used."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:8
+#: django-registration-email/registration_email/templates/registration/activation_complete.html:5
+#: django-registration-email/registration_email/templates/registration/activation_complete.html:8
+#: gnowsys_ndf/ndf/templates/registration/activate.html:6
+#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:4
+msgid "Activation complete"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:12
+#: django-registration-email/registration_email/templates/registration/activation_complete.html:12
+msgid "You may now login with your username and password."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:14
+#: django-registration-email/registration_email/templates/registration/activation_complete.html:14
+msgid "Login now"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:16
+#: django-registration-email/registration_email/templates/registration/activation_complete.html:16
+msgid "Home"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_email.txt:5
+#: django-registration-email/registration_email/templates/registration/activation_email.txt:5
+#, python-format
+msgid ""
+"\n"
+"You have asked to register an account at %(site_name)s.\n"
+"If this wasn't you, please ignore this email.\n"
+"\n"
+"To activate this account, please click the following link within the next\n"
+"%(expiration_days)s days:\n"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_email.txt:15
+#: django-registration-email/registration_email/templates/registration/activation_email.txt:15
+msgid "Sincerely,"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_email_subject.txt:2
+#: django-registration-email/registration_email/templates/registration/activation_email_subject.txt:2
+msgid "Account Request"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/login.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/login.html:8
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/login.html:35
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_complete.html:13
+#: django-registration-email/registration_email/templates/registration/login.html:5
+#: django-registration-email/registration_email/templates/registration/login.html:8
+#: django-registration-email/registration_email/templates/registration/login.html:35
+#: django-registration-email/registration_email/templates/registration/password_reset_complete.html:13
+#: gnowsys_ndf/ndf/templates/ndf/base.html:209
+#: gnowsys_ndf/ndf/templates/registration/login.html:4
+#: gnowsys_ndf/ndf/templates/registration/login.html:40
+msgid "Login"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/login.html:31
+#: django-registration-email/registration_email/templates/registration/login.html:31
+#: gnowsys_ndf/ndf/templates/registration/login.html:36
+msgid "Forgot your password?"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/login.html:32
+#: django-registration-email/registration_email/templates/registration/login.html:32
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:19
+msgid "Register a new account"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/logout.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/logout.html:8
+#: django-registration-email/registration_email/templates/registration/logout.html:5
+#: django-registration-email/registration_email/templates/registration/logout.html:8
+#: gnowsys_ndf/ndf/templates/ndf/base.html:193
+msgid "Logout"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/logout.html:12
+#: django-registration-email/registration_email/templates/registration/logout.html:12
+msgid "You have been logged out."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_done.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_done.html:8
+#: django-registration-email/registration_email/templates/registration/password_change_done.html:5
+#: django-registration-email/registration_email/templates/registration/password_change_done.html:8
+msgid "Password change successful"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_done.html:12
+#: django-registration-email/registration_email/templates/registration/password_change_done.html:12
+msgid "Your password has been changed."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_done.html:13
+#: django-registration-email/registration_email/templates/registration/password_change_done.html:13
+msgid "Back to dashboard"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_form.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_form.html:8
+#: django-registration-email/registration_email/templates/registration/password_change_form.html:5
+#: django-registration-email/registration_email/templates/registration/password_change_form.html:8
+msgid "Password change"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_form.html:12
+#: django-registration-email/registration_email/templates/registration/password_change_form.html:12
+msgid "Please enter your old password, then enter your new password twice."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_form.html:23
+#: django-registration-email/registration_email/templates/registration/password_change_form.html:23
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:208
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:221
+msgid "Save"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_form.html:24
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_form.html:22
+#: django-registration-email/registration_email/templates/registration/password_change_form.html:24
+#: django-registration-email/registration_email/templates/registration/password_reset_form.html:22
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:5
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:37
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:6
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:33
+msgid "Reset password"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_complete.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_complete.html:8
+#: django-registration-email/registration_email/templates/registration/password_reset_complete.html:5
+#: django-registration-email/registration_email/templates/registration/password_reset_complete.html:8
+#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:5
+msgid "Password reset complete"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_complete.html:12
+#: django-registration-email/registration_email/templates/registration/password_reset_complete.html:12
+msgid "Please login with your new password."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:6
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:11
+#: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:6
+#: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:11
+msgid "Enter new password"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:6
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:13
+#: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:6
+#: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:13
+msgid "Error resetting password"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:19
+#: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:19
+msgid "Please enter your new password twice."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:30
+#: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:30
+msgid "Change my password"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:33
+#: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:33
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used. Please request a new password reset."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_done.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_done.html:8
+#: django-registration-email/registration_email/templates/registration/password_reset_done.html:5
+#: django-registration-email/registration_email/templates/registration/password_reset_done.html:8
+msgid "Password reset successful"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_done.html:12
+#: django-registration-email/registration_email/templates/registration/password_reset_done.html:12
+msgid "We have sent you instructions for setting your password."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_email.html:2
+#: django-registration-email/registration_email/templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_email.html:4
+#: django-registration-email/registration_email/templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_email.html:9
+#: django-registration-email/registration_email/templates/registration/password_reset_email.html:9
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_email.html:11
+#: django-registration-email/registration_email/templates/registration/password_reset_email.html:11
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_form.html:4
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_form.html:7
+#: django-registration-email/registration_email/templates/registration/password_reset_form.html:4
+#: django-registration-email/registration_email/templates/registration/password_reset_form.html:7
+#: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:4
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email_subject.txt:2
+msgid "Password reset"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_form.html:11
+#: django-registration-email/registration_email/templates/registration/password_reset_form.html:11
+msgid ""
+"Enter your e-mail address below, and we will send instructions for setting a "
+"new one."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_closed.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_closed.html:8
+#: django-registration-email/registration_email/templates/registration/registration_closed.html:5
+#: django-registration-email/registration_email/templates/registration/registration_closed.html:8
+msgid "Registration closed"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_closed.html:12
+#: django-registration-email/registration_email/templates/registration/registration_closed.html:12
+msgid "We are sorry but registration is temporarily closed."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_closed.html:13
+#: django-registration-email/registration_email/templates/registration/registration_closed.html:13
+msgid ""
+"Please come back shortly and try again. We apologize for the inconvenience."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_complete.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_complete.html:8
+#: django-registration-email/registration_email/templates/registration/registration_complete.html:5
+#: django-registration-email/registration_email/templates/registration/registration_complete.html:8
+msgid "Registration complete"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_complete.html:12
+#: django-registration-email/registration_email/templates/registration/registration_complete.html:12
+msgid "Thank you for your registration!"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_complete.html:13
+#: django-registration-email/registration_email/templates/registration/registration_complete.html:13
+msgid "You will receive an email with an activation link shortly."
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_form.html:5
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_form.html:8
+#: django-registration-email/registration_email/templates/registration/registration_form.html:5
+#: django-registration-email/registration_email/templates/registration/registration_form.html:8
+msgid "Registration form"
+msgstr ""
+
+#: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/registration_form.html:22
+#: django-registration-email/registration_email/templates/registration/registration_form.html:22
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:146
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:130
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:538
+msgid "Register"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/admin/base_site.html:7
 msgid "metaStudio administration"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:8
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:8
-#: gnowsys_ndf/ndf/templates/ndf/file.html:97
+#: gnowsys_ndf/ndf/templates/ndf/file.html:96
 msgid ""
 "Files Listed below are already uploaded. Duplicate file uploads are not "
 "possible."
@@ -36,20 +370,23 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:19
 #: gnowsys_ndf/ndf/templates/ndf/DocumentList.html:25
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:320
 #: gnowsys_ndf/ndf/templates/ndf/version_page.html:15
 msgid "View"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/ImageDashboard.html:29
+#: gnowsys_ndf/ndf/templates/ndf/base.html:99
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:21
 #: gnowsys_ndf/ndf/templates/ndf/file_search.html:16
+#: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:6
 #: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:29
 msgid "Search"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/ImageDashboard.html:34
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:25
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:97
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:125
 #: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:34
 msgid "Upload"
 msgstr ""
@@ -70,8 +407,8 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/UploadDoc.html:55
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:417
-#: gnowsys_ndf/ndf/templates/ndf/file.html:24
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:268
+#: gnowsys_ndf/ndf/templates/ndf/file.html:34
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:274
 #: gnowsys_ndf/ndf/templates/ndf/video_detail.html:15
 #: gnowsys_ndf/ndf/templates/ndf/video_edit.html:10
 msgid "Upload File"
@@ -135,7 +472,8 @@ msgid "You are not an authorised user. Please login to upload files."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:47
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:139
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:466
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:140
 msgid "Select Groups"
 msgstr ""
 
@@ -157,13 +495,13 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:114
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:120
-#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:138
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:353
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:144
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:368
 msgid "Creation date"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:116
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:205
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:207
 msgid "Member of"
 msgstr ""
 
@@ -182,8 +520,8 @@ msgid "RelationType_set"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/adminDashboard.html:173
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:762
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:378
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:828
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:393
 msgid "Translate"
 msgstr ""
 
@@ -192,23 +530,24 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:331
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:365
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:367
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:157
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:159
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:163
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:165
 msgid "Unknown"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/admin_fields.html:48
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:335
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:337
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:163
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:165
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:169
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:171
 msgid "Yes"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/admin_fields.html:49
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:341
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:169
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:171
+#: gnowsys_ndf/ndf/templates/ndf/file.html:441
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:175
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:177
 msgid "No"
 msgstr ""
 
@@ -224,6 +563,92 @@ msgstr ""
 msgid "HIDDEN"
 msgstr ""
 
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:82
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:53
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:49
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:53
+msgid "Editing"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:84
+msgid "Register an"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:92
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:60
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:63
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:59
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:63
+msgid "Fill"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:98
+#, python-format
+msgid " %(tab_name)s "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:115
+msgid "NUSSD Course Duration/Period"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:120
+msgid "From"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:128
+msgid "To"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:139
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:83
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:94
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:88
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:100
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:112
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:128
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:140
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:152
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:178
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:244
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:275
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:288
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:303
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:316
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:331
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:344
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:359
+#, python-format
+msgid " %(label_val)s "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:227
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:136
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:140
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:124
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:532
+msgid "Next"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:233
+msgid "Announce"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:236
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:145
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:149
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:133
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:541
+msgid "Update"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:245
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:154
+#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:158
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:142
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:550
+msgid "Previous"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:24
 msgid "Add Attendance"
 msgstr ""
@@ -233,7 +658,7 @@ msgid "Attendance"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:36
-#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:48
+#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:46
 msgid "Batch"
 msgstr ""
 
@@ -288,42 +713,118 @@ msgstr ""
 msgid "Menu"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:146
-#: gnowsys_ndf/ndf/templates/registration/login.html:4
-#: gnowsys_ndf/ndf/templates/registration/login.html:41
-msgid "Login"
+#: gnowsys_ndf/ndf/templates/ndf/base.html:159
+msgid "Set Language"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:180
+#: gnowsys_ndf/ndf/templates/ndf/base.html:191
+msgid "User Settings"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:243
 msgid "See more groups..."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:252
+#: gnowsys_ndf/ndf/templates/ndf/base.html:283
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:78
 msgid "Dashboard"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:345
+#: gnowsys_ndf/ndf/templates/ndf/base.html:294
+msgid "Actions"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:363
+msgid "User Guide"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:365
+msgid "About this Application"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:367
+msgid "About this Group"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:369
+#: gnowsys_ndf/ndf/templates/ndf/version_page.html:79
+#: gnowsys_ndf/ndf/templates/ndf/version_page.html:100
+#: gnowsys_ndf/ndf/templates/ndf/version_page.html:117
+msgid "Version"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:370
 msgid "About metaStudio"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:362
-#: gnowsys_ndf/ndf/templates/ndf/base.html:369
+#: gnowsys_ndf/ndf/templates/ndf/base.html:386
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:8
+#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:8
+msgid "About"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:388
+msgid "Partners"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:389
+#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:226
+#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:390
+msgid "Groups"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:390
+msgid "Terms of Service"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:391
+msgid "Privacy Policy"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:392
+msgid "Contribute"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:394
+msgid "Contact"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:404
 msgid "View Source Code"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/base.html:364
-#, python-format
-msgid "100%% स्वतंत्"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/base.html:376
+#: gnowsys_ndf/ndf/templates/ndf/base.html:411
 msgid ""
 "All material is licensed under a Creative Commons Attribution-Share Alike "
 "3.0 Unported License unless mentioned otherwise."
 msgstr ""
 
+#: gnowsys_ndf/ndf/templates/ndf/base.html:422
+msgid "Powered by"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:422
+msgid "Gnowsys-Studio"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:422
+msgid "at the"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:422
+msgid "Homi Bhabha Centre for Science Education"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/base.html:422
+msgid "TIFR"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:138
 #: gnowsys_ndf/ndf/templates/ndf/task_card_view.html:35
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:117
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:186
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:243
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:245
 msgid "Detail"
 msgstr ""
 
@@ -352,8 +853,8 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:136
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:107
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:111
-#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:141
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:355
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:147
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:370
 msgid "Edit"
 msgstr ""
 
@@ -384,9 +885,9 @@ msgid "Posted by "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/beta.html:50
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:484
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:501
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:524
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:483
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:500
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:587
 msgid "Download "
 msgstr ""
 
@@ -399,7 +900,7 @@ msgid "Nothing found!"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course.html:10
-msgid "About Course... <em>coming soon</em>"
+msgid " \"About Course... <em>coming soon</em>\" "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course.html:15
@@ -407,6 +908,9 @@ msgid "Courses"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course.html:22
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:285
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:294
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:300
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:30
 #: gnowsys_ndf/ndf/templates/ndf/task.html:29
 msgid "New"
@@ -418,15 +922,20 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course.html:52
 #: gnowsys_ndf/ndf/templates/ndf/course.html:59
-#: gnowsys_ndf/ndf/templates/ndf/file.html:112
-#: gnowsys_ndf/ndf/templates/ndf/file.html:119
-#: gnowsys_ndf/ndf/templates/ndf/file.html:196
-#: gnowsys_ndf/ndf/templates/ndf/file.html:203
-#: gnowsys_ndf/ndf/templates/ndf/file.html:295
-#: gnowsys_ndf/ndf/templates/ndf/file.html:378
-#: gnowsys_ndf/ndf/templates/ndf/file.html:385
-#: gnowsys_ndf/ndf/templates/ndf/file.html:468
-#: gnowsys_ndf/ndf/templates/ndf/file.html:475
+#: gnowsys_ndf/ndf/templates/ndf/file.html:111
+#: gnowsys_ndf/ndf/templates/ndf/file.html:118
+#: gnowsys_ndf/ndf/templates/ndf/file.html:201
+#: gnowsys_ndf/ndf/templates/ndf/file.html:208
+#: gnowsys_ndf/ndf/templates/ndf/file.html:279
+#: gnowsys_ndf/ndf/templates/ndf/file.html:286
+#: gnowsys_ndf/ndf/templates/ndf/file.html:356
+#: gnowsys_ndf/ndf/templates/ndf/file.html:363
+#: gnowsys_ndf/ndf/templates/ndf/file.html:434
+#: gnowsys_ndf/ndf/templates/ndf/file.html:441
+#: gnowsys_ndf/ndf/templates/ndf/file.html:512
+#: gnowsys_ndf/ndf/templates/ndf/file.html:519
+#: gnowsys_ndf/ndf/templates/ndf/file.html:595
+#: gnowsys_ndf/ndf/templates/ndf/file.html:602
 #: gnowsys_ndf/ndf/templates/ndf/group.html:54
 #: gnowsys_ndf/ndf/templates/ndf/group.html:59
 msgid "Search Results:"
@@ -449,9 +958,6 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course_create_edit.html:20
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:285
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:294
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:300
 #: gnowsys_ndf/ndf/templates/ndf/page_create_edit.html:19
 msgid "New "
 msgstr ""
@@ -465,6 +971,7 @@ msgid "Add or Remove Module:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/course_detail.html:47
+#: gnowsys_ndf/ndf/templates/ndf/module.html:34
 msgid "Modules"
 msgstr ""
 
@@ -504,7 +1011,7 @@ msgid "Forum name:"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/create_forum.html:113
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:127
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:143
 msgid "Description:"
 msgstr ""
 
@@ -657,27 +1164,29 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:118
-#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:136
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:351
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:142
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:366
 msgid "Title"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:119
-#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:137
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:352
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:143
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:841
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:367
 msgid "Created by"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:142
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:387
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:402
 msgid "No data to display"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:214
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:218
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:47
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:138
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:105
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:144
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:333
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:107
 msgid "Location"
 msgstr ""
 
@@ -696,8 +1205,8 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:386
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:391
 #: gnowsys_ndf/ndf/templates/ndf/location_widget.html:4
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:293
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:226
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:299
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:227
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:125
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:247
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:129
@@ -706,13 +1215,13 @@ msgid "Add Location"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:407
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:278
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:284
 #: gnowsys_ndf/ndf/templates/ndf/quiz_item_create_edit.html:95
 msgid "Tags"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/custom_template_for_app.html:427
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:309
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:315
 msgid "Content"
 msgstr ""
 
@@ -728,12 +1237,13 @@ msgstr ""
 msgid "Add selected to following drawer: "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:63
+#: gnowsys_ndf/ndf/templates/ndf/drawer_widget.html:65
 msgid "No content of selected type !"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:54
-msgid "Click here to change settings of"
+#, python-format
+msgid " Click here to change settings of %(name)s "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:63
@@ -787,53 +1297,58 @@ msgid "NOT ENCRYPTED"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/edit_group.html:212
-msgid "Click here to select apps for "
+#, python-format
+msgid " Click here to select apps for %(name)s "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:13
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:50
 msgid "Editing Event:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:15
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:52
 msgid "Create a New"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:21
-msgid "Tabs:"
+#: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:142
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:82
+msgid "Create"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:36
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:124
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:89
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:130
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:91
 msgid "Read"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:37
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:125
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:131
 msgid "Events"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:39
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:127
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:92
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:133
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:94
 msgid "Graph"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:41
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:129
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:94
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:135
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:339
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:96
 msgid "Concept Graph"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:42
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:131
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:96
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:137
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:342
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:98
 msgid "Collection Graph"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:49
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:139
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:108
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:145
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:322
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:110
 msgid "Discuss"
 msgstr ""
 
@@ -848,86 +1363,119 @@ msgid "Download"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/event_details.html:100
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:470
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:494
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:469
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:493
 msgid "Your browser does not support the video tag."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:11
-msgid ""
-"Upload your files from your computer to metaStudio. You can view the "
-"existing files in the group and create collections."
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/file.html:17
+#: gnowsys_ndf/ndf/templates/ndf/file.html:10
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:169
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:347
 msgid "Files"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:29
+#: gnowsys_ndf/ndf/templates/ndf/file.html:12
+msgid ""
+"Upload your files from your computer to metaStudio. You can view the "
+"existing files in the group and create collections."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:39
 msgid "Data Review"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:55
-#: gnowsys_ndf/ndf/templates/ndf/visualize.html:168
-msgid "Details"
+#: gnowsys_ndf/ndf/templates/ndf/file.html:48
+msgid "File Statistics"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:56
-#: gnowsys_ndf/ndf/templates/ndf/visualize.html:169
-msgid "100"
+#: gnowsys_ndf/ndf/templates/ndf/file.html:66
+msgid "All files"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:79
-#: gnowsys_ndf/ndf/templates/ndf/file.html:85
+#: gnowsys_ndf/ndf/templates/ndf/file.html:67
+msgid "Documents"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:69
+msgid "Interactives"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:72
+msgid "Audios"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:74
+#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:113
+#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:307
+msgid "Images"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:76
+#: gnowsys_ndf/ndf/templates/ndf/file.html:82
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:142
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:327
 msgid "Videos"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:82
+#: gnowsys_ndf/ndf/templates/ndf/file.html:79
 msgid "Pandora Videos"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:88
+#: gnowsys_ndf/ndf/templates/ndf/file.html:86
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:75
 msgid "Collections"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:100
+#: gnowsys_ndf/ndf/templates/ndf/file.html:99
 msgid "this file is already uploaded please choose different file"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:178
+#: gnowsys_ndf/ndf/templates/ndf/file.html:183
 msgid ""
 "This group doesn't have any files. <b>Be the first to upload a file!</b>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:270
+#: gnowsys_ndf/ndf/templates/ndf/file.html:258
 msgid ""
 "This group doesn't have any documents. <b>Be the first to upload a Document!"
 "</b> "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:359
+#: gnowsys_ndf/ndf/templates/ndf/file.html:335
+msgid ""
+"This group doesn't have any documents. <b>Be the first to upload a "
+"Interactive Document!</b> "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:413
+msgid ""
+"This group doesn't have any documents. <b>Be the first to upload a Audio!</"
+"b> "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:434
+msgid "Found"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:441
+msgid "matched your search criteria!!!"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/file.html:493
 msgid ""
 " This group doesn't have any images. <b>Be the first to upload an Image!</b> "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:449
+#: gnowsys_ndf/ndf/templates/ndf/file.html:576
 msgid ""
 "This group doesn't have any videos. <b>Be the first to upload a video!</b>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:533
+#: gnowsys_ndf/ndf/templates/ndf/file.html:702
 msgid "<h5>This group doesn't have any pan.do/ra videos.</h5>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/file.html:586
-msgid "View details"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/file.html:608
+#: gnowsys_ndf/ndf/templates/ndf/file.html:824
 msgid "This group doesn't have any collections."
 msgstr ""
 
@@ -1020,68 +1568,73 @@ msgid ""
 "b></h5> "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:132
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:131
 msgid " <span>Group members</span> "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:144
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:143
 msgid "Create a New Group"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:151
+#: gnowsys_ndf/ndf/templates/ndf/groupdashboard.html:150
 msgid "List Members"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:18
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:76
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:126
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:137
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:155
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:184
-msgid "Please select "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:27
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:48
-msgid "Please fill valid "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:34
-msgid "Please fill a valid  "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:41
-msgid "Please fill  "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:55
-msgid "Please set "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:68
-msgid "Please select  "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:99
-msgid "Upload! "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:171
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:13
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:96
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:104
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:154
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:165
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:183
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:199
 msgid "Please select"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:174
-msgid "Select"
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:29
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:44
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:59
+msgid "Please fill a valid"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:174
-#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:52
-#: gnowsys_ndf/notification/templates/notification/notice_settings.html:52
-msgid "Change"
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:70
+msgid "Please fill valid"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:83
+msgid "Please set"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:127
+msgid "Upload! "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:159
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:177
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:188
+#, python-format
+msgid " - - - Select %(alt)s - - - "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:161
+#, python-format
+msgid " %(choice)s "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:179
-msgid "Select "
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:193
+#, python-format
+msgid " %(alt)s "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:202
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:207
+msgid "Select"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/html_field_widget.html:202
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:52
+#: gnowsys_ndf/notification/templates/notification/notice_settings.html:52
+msgid "Change"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/image_detail.html:4
@@ -1107,19 +1660,14 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/invite_admins.html:120
-#: gnowsys_ndf/ndf/templates/ndf/invite_users.html:120
 #: gnowsys_ndf/ndf/templates/ndf/mis_base_list.html:50
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:192
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:300
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:464
-#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:111
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:198
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:306
 msgid "&#215"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/invite_users.html:117
-msgid ""
-"<label><input type=\"checkbox\" id=\"checknotif\" value=\"ON\"> Send "
-"notification mails to all except the group owner</label>"
+msgid "Send notification mails to all except the group owner"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/meeting.html:11
@@ -1134,7 +1682,7 @@ msgstr ""
 msgid "Start Meeting"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_base_create_edit.html:124
+#: gnowsys_ndf/ndf/templates/ndf/mis_base_create_edit.html:123
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:65
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:67
 #: gnowsys_ndf/ndf/templates/ndf/shelf.html:14
@@ -1167,76 +1715,77 @@ msgstr ""
 msgid "This group doesn't have a registered"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:126
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:132
 #, python-format
 msgid ""
-"<p> <font size =\"5\" color=\"red\">This file :%(already_uploaded_file)s "
-"Already uploaded please choose another file</font> </p>"
+"<p> <font size =\"5\" color=\"red\">This file :%(already_uploaded)s Already "
+"uploaded please choose another file</font> </p>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:143
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:149
 msgid "Please give title for "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:194
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:190
+msgid "Please select "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:200
 msgid "Attendence"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:198
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:204
 msgid "NUSSD Course"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:202
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:208
 msgid "FC Check"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:209
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:215
 msgid "Batches"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:213
+#: gnowsys_ndf/ndf/templates/ndf/mis_create_edit.html:219
 msgid "Batch Check"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:134
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:99
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:140
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:346
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:101
 msgid "Dependency Graph"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:414
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:420
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:249
 msgid "Make Module"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:425
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:430
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:431
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:436
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:230
 msgid "Publish"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:451
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:474
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:457
+#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:480
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:214
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:218
 msgid "Edit now"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_details.html:460
-msgid "<h2>Select Groups</h2>"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:106
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:112
 msgid ""
 " <h3>Are you sure you want to delete? All of the following related items "
 "also will be deleted:</h3> "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:175
+#: gnowsys_ndf/ndf/templates/ndf/mis_list.html:181
 msgid "<h3>No data to display</h3> "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/module.html:29
 msgid "<p>About Module... <em>coming soon</em></p>"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/module.html:34
-msgid " <h2>Modules</h2> "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/module.html:117
@@ -1268,69 +1817,32 @@ msgstr ""
 msgid "Accept invite  "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:186
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:189
 msgid "Collection Name "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:249
-msgid "Make Module "
-msgstr ""
-
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:321
-msgid "Contents "
+msgid "Changes"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:324
-msgid " View"
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:335
+msgid "Graphs"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:326
-msgid "Changes "
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:353
+msgid "Annotate"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:327
-#: gnowsys_ndf/ndf/templates/ndf/person_details.html:56
-msgid "Discuss "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:339
-#: gnowsys_ndf/ndf/templates/ndf/person_details.html:54
-msgid "Location "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:341
-msgid "Graphs "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:345
-#: gnowsys_ndf/ndf/templates/ndf/person_details.html:48
-msgid "Concept Graph "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:348
-#: gnowsys_ndf/ndf/templates/ndf/person_details.html:49
-msgid "Collection Graph "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:352
-#: gnowsys_ndf/ndf/templates/ndf/person_details.html:50
-msgid "Dependency Graph "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:357
-msgid "Annotate "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:415
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:414
 msgid "You may want to read these first: "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:654
-msgid "Recent changes "
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:720
+msgid "Recent changes"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:752
-msgid "In other languages:"
+#: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:818
+msgid "In other languages"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:78
@@ -1361,15 +1873,15 @@ msgstr ""
 msgid "Add events feature will be comming soon "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:49
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:50
 msgid "Editing:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:51
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:52
 msgid "Create:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:57
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:58
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:79
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:212
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:90
@@ -1380,63 +1892,63 @@ msgid ""
 "yourself."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:63
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:64
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:260
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:203
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:96
 msgid "Tag"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:78
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:79
 msgid "Node"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:81
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:82
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:64
 msgid "Requires"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:90
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:91
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:61
 msgid "Metadata"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:94
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:95
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:70
 msgid "Teaches"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:98
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:99
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:67
 msgid "Assesses"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:136
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:137
 msgid "Publish this resource in other group/s"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:155
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:156
 msgid "Settings"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:160
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:187
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:161
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:188
 msgid "Visibility"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:167
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:174
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:194
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:168
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:175
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:195
 msgid "Visible"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:170
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:177
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:197
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:171
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:178
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:198
 msgid "Hidden"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:209
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:210
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:113
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:236
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:124
@@ -1444,125 +1956,125 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:222
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:223
 msgid "Location:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:260
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:261
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:226
 msgid "Classify by:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:264
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:265
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:230
 msgid "Page"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:269
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:270
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:235
 msgid "File"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:274
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:275
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:240
 msgid "Image"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:281
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:282
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:247
 msgid "Video"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:294
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:295
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:53
 #: gnowsys_ndf/ndf/templates/ndf/quiz_list.html:80
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:260
 msgid "Quiz"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:320
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:321
 msgid "Please add or edit Metadata."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:324
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:325
 msgid "Age Range:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:326
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:327
 msgid "Target Audience:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:327
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
 msgid "Time Required: "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:327
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
 msgid "0-2M"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:327
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
 msgid "2-5M"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:327
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
 msgid "5-15M"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:327
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
 msgid "15-45M"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:329
 msgid "Interactivity Type: "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:329
 msgid "Active"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:329
 msgid "Mixed"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:328
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:329
 msgid "Expositive"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:329
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:330
 msgid "Based on Url: "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:330
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:331
 msgid "Educational Use:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:373
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:374
 msgid "Text Complexity"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:375
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:376
 msgid "Reading Level:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:377
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:378
 msgid "Educational Subject:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:378
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:379
 msgid "Educational Level:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:389
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:390
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:280
 msgid "Add or edit Teaches: "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:404
+#: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:405
 msgid "Add or edit Assesses:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:8
-msgid "Please enter a keyword. "
+#: gnowsys_ndf/ndf/templates/ndf/node_search_base.html:7
+msgid "Please enter a keyword.. "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/online.html:16
@@ -1617,60 +2129,42 @@ msgid ""
 "where anyone can contribute.  </p>\n"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/page_list.html:68
-msgid ""
-"<dd><a href=\"#panel2-4\"><i class=\"fi-page-multiple\"></i> Collections</"
-"a></dd>"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/page_list.html:75
-#, python-format
-msgid "<span class=\"fi-plus\">&nbsp;&nbsp;Create %(title)s</span>"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/page_list.html:160
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:167
 msgid ""
 " This group doesn't have any pages. <b>Be the first to create a Page!</b>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/page_list.html:227
+#: gnowsys_ndf/ndf/templates/ndf/page_list.html:234
 msgid " This group doesn't have any collections."
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:49
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:53
-#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:41
-#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:41
-msgid "Editing "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:51
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:55
-msgid "Register a New "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:59
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:63
-msgid "Fill"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:124
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:471
-msgid "Next"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:130
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:477
-msgid "Register"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:136
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:483
-msgid "Previous"
+msgid "Register a "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/person_details.html:46
 msgid "Graph "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:48
+msgid "Concept Graph "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:49
+msgid "Collection Graph "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:50
+msgid "Dependency Graph "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:54
+msgid "Location "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/person_details.html:56
+msgid "Discuss "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_create_edit.html:5
@@ -1816,6 +2310,10 @@ msgid ""
 "This group doesn't have any quiz-items. Be the first to create a Quiz-Item!"
 msgstr ""
 
+#: gnowsys_ndf/ndf/templates/ndf/rating.html:6
+msgid "Rating"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:3
 msgid "List Of Members. "
 msgstr ""
@@ -1857,55 +2355,93 @@ msgstr ""
 msgid "Shelf"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/shelf.html:53
-msgid "the resource already exists."
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/shelf.html:66
+#: gnowsys_ndf/ndf/templates/ndf/shelf.html:58
 msgid "Add "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:341
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:205
+#, python-format
+msgid " %(label_val)s   (Max. Size Limit 40kb) "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:218
+#, python-format
+msgid " %(label_val)s   (Max. Size Limit 200kb) "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:389
 msgid "Passing Year"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:352
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:400
 msgid "Passing Certificate"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:368
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:416
 msgid "Degree Name"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:376
-msgid "Degree Year"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:384
-msgid "Enroll. (or Roll) No."
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:395
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:427
 msgid "Stream(Main Subject)"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:403
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:440
+msgid "Degree Year"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:451
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:119
 msgid "College"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:411
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:464
+msgid "Enroll. (or Roll) No."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:475
 msgid "Registered for NSS?"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:427
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:491
+msgid "Date of Registration"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:7
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:78
+msgid "Enroll Students in Courses"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:93
 msgid "Registration Year"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:101
+msgid "Please set Registration Year"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:124
+msgid "- - - Select College - - -"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:130
+msgid "Please select College!"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:139
+msgid ""
+"NOTE: If selected all students (including enrolled ones) will be listed; "
+"otherwise only non-enrolled students will be shown."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/student_list.html:7
+msgid "Enroll in Courses"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/tag_browser.html:6
 msgid "Will appear very soon .... "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task.html:15
+#: gnowsys_ndf/ndf/templates/ndf/task.html:14
 #: gnowsys_ndf/ndf/templates/ndf/task_details.html:15
 msgid "Task"
 msgstr ""
@@ -1918,67 +2454,71 @@ msgstr ""
 msgid "Parent task:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:69
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:70
 msgid "Start date:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:77
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:78
 msgid "Priority:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:85
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:86
 msgid "Due date:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:93
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:94
 msgid "Assignee:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:101
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:102
 msgid "Estimated time:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:112
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:108
+msgid "Selected File"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:128
 msgid "Sub Task:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:146
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:162
 msgid "History:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:189
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:205
 msgid "Editing Name"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:192
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:205
-msgid "Save"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:194
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:206
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:210
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:222
 msgid "&#215;"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:198
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:214
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:88
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:157
 msgid "Description"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:204
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:219
 msgid "Fold"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:205
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:220
 msgid "Unfold"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:235
-#: gnowsys_ndf/ndf/templates/ndf/theme.html:314
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:250
+#: gnowsys_ndf/ndf/templates/ndf/theme.html:329
 msgid ""
 "Are you sure you want to delete? All of the related items for the following "
 "themes also will be deleted:"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:41
+#: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:41
+msgid "Editing "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/theme_create_edit.html:43
@@ -2050,16 +2590,11 @@ msgstr ""
 msgid "Tags: "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:8
-#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:8
-msgid "About"
-msgstr ""
-
 #: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:10
 msgid "<p><b>Dashboard</b> shows users' own activities in the site.</p>"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:32
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:31
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:32
 msgid "Change Profile Picture"
 msgstr ""
@@ -2069,28 +2604,52 @@ msgstr ""
 msgid "Upload Profile Picture"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:42
-msgid "image is already uploaded please choose different image"
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:43
+#, python-format
+msgid ""
+"%(already_uploaded)s image is already uploaded please choose different image "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:55
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:56
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:55
 msgid "Please wait for uploading profile picture"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:61
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:62
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:61
 msgid "You are Not Authorised user please login to upload profile picture"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:65
-#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:65
-msgid "Welcome "
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:69
+msgid "Welcome"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:66
-#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:66
-msgid "Registerd on: "
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:70
+msgid "Registered on"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:85
+msgid "Groups:"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:128
+msgid "No Groups </b>"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:153
+msgid "Assigned Tasks:"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:198
+msgid "No Assinged Task"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:209
+msgid "Activities:"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:255
+msgid "No Recent Activities"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:10
@@ -2099,6 +2658,14 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:42
 msgid "File is already uploaded. Please choose a different file."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:65
+msgid "Welcome "
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:66
+msgid "Registered on: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:80
@@ -2112,11 +2679,6 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:108
 msgid "Page not found !"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:113
-#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:307
-msgid "Images"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:137
@@ -2133,11 +2695,6 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:221
 msgid "Quiz not found ! "
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:226
-#: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:390
-msgid "Groups"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:246
@@ -2232,12 +2789,6 @@ msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/version_page.html:78
 msgid "Fields"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/ndf/version_page.html:79
-#: gnowsys_ndf/ndf/templates/ndf/version_page.html:100
-#: gnowsys_ndf/ndf/templates/ndf/version_page.html:117
-msgid "Version"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/videoDashboard.html:63
@@ -2335,15 +2886,23 @@ msgstr ""
 msgid "Awesome. I have it."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:10
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:168
+msgid "Details"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/visualize.html:169
+msgid "100"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:12
 msgid "items found "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:29
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:31
 msgid "Sorry, no topics are available."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:56
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:58
 #, python-format
 msgid ""
 " Tags Topic Display\n"
@@ -2354,46 +2913,46 @@ msgid ""
 "the same page.\n"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:73
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:75
 msgid ""
 "Select the topic from the panel on the left to view the details about that "
 "topic. The knowledge graph for that particular topic is also available on "
 "the same page."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:199
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:201
 msgid "Wikipedia Page Link:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:213
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:215
 msgid "Attributes:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:225
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:227
 msgid "Relations:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:230
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:232
 msgid "Sorry, no relations in this list."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:234
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:236
 msgid "Wikipedia Page:"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:237
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:239
 msgid "Your browser does not support iframes."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:243
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:245
 msgid "This data has been harvested from"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:243
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:245
 msgid "Wikidata Project"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:244
+#: gnowsys_ndf/ndf/templates/ndf/wikidata.html:246
 msgid ""
 "All structured data from the main and property namespace is available under "
 "the Creative Commons CC0 License. Text in the other namespaces is available "
@@ -2411,7 +2970,6 @@ msgid "You have received the following notice from the site: "
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/notification/email_subject.txt:1
-#: gnowsys_ndf/notification/templates/notification/email_subject.txt:1
 #, python-format
 msgid "[%(current_site)s] %(message)s"
 msgstr ""
@@ -2435,6 +2993,10 @@ msgstr ""
 msgid "Add one "
 msgstr ""
 
+#: gnowsys_ndf/ndf/templates/notification/notice_settings.html:18
+msgid "now"
+msgstr ""
+
 #: gnowsys_ndf/ndf/templates/notification/notice_settings.html:27
 #: gnowsys_ndf/notification/templates/notification/notice_settings.html:27
 msgid "Notification Type"
@@ -2456,79 +3018,109 @@ msgstr ""
 msgid "My status "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activate.html:4
-#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:4
-msgid "Activation complete"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/registration/activate.html:4
+#: gnowsys_ndf/ndf/templates/registration/activate.html:8
 msgid "Activation problem"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activate.html:14
+#: gnowsys_ndf/ndf/templates/registration/activate.html:19
 msgid "Thanks"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activate.html:14
+#: gnowsys_ndf/ndf/templates/registration/activate.html:19
 msgid "Your activation complete!"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activate.html:25
+#: gnowsys_ndf/ndf/templates/registration/activate.html:22
+msgid "You may"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:22
+msgid "using your email and password."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activate.html:27
 msgid ""
 "Oops! It seems that your activation key is invalid. Please check the url or "
 "try to reset your password again. "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:12
+#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:11
 msgid "Thanks, activation complete!"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:14
+#: gnowsys_ndf/ndf/templates/registration/activation_complete.html:13
 msgid "You may now login using the username and password."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activation_email.html:9
-msgid "Account registration "
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:13
+msgid "Account registration"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activation_email.html:11
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:16
 msgid ""
 "You (or someone pretending to be you) have asked to register an account at "
-"our site. "
+"our site."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activation_email.html:13
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:18
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:6
 msgid ""
 "If this wasn't you, please ignore this email and your address will be "
-"removed from our records. "
+"removed from our records."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.html:22
-msgid "Sincerely,"
+msgid ""
+"To activate this account, please click the following link within the next "
+"two days."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activation_email.html:23
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:27
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:13
+msgid "Sincerely"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.html:28
 msgid "Management Team"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/activation_email_subject.txt:1
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:5
+msgid ""
+"You (or someone pretending to be you) have asked to register an account at"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:8
+msgid ""
+"To activate this account, please click the following link within the next"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:9
+msgid "days"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:14
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:16
+msgid "Management"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email_subject.txt:3
 msgid "Account registration for"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/login.html:18
-msgid "Please give a valid email. "
+msgid "Either your email or password is incorrect."
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/login.html:36
-msgid "Forgot your password?"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/registration/login.html:46
-msgid "Don't have an account? Register yourself now. "
+#: gnowsys_ndf/ndf/templates/registration/login.html:44
+msgid "Don't have an account? Register yourself now."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/logout.html:4
 msgid "Logged out"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/logout.html:9
+msgid "You have sucessfully logged out."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/password_change_done.html:4
@@ -2540,20 +3132,20 @@ msgid "Your password has been successfully changed !"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/password_change_form.html:4
-#: gnowsys_ndf/ndf/templates/registration/password_change_form.html:19
+#: gnowsys_ndf/ndf/templates/registration/password_change_form.html:20
 msgid "Change password"
-msgstr ""
-
-#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:5
-msgid "Password reset complete"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:11
 msgid "Great! Your password has been reset! "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:12
-msgid "You may now log in "
+#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:13
+msgid "You may now"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_complete.html:13
+msgid "log in"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_confirm.html:4
@@ -2568,11 +3160,6 @@ msgstr ""
 msgid "Set password"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:4
-#: gnowsys_ndf/ndf/templates/registration/password_reset_email_subject.txt:1
-msgid "Password reset"
-msgstr ""
-
 #: gnowsys_ndf/ndf/templates/registration/password_reset_done.html:9
 msgid "Work done for you! "
 msgstr ""
@@ -2585,64 +3172,75 @@ msgstr ""
 msgid "Please check your email and click the link to continue. "
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:1
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:4
 msgid "Greetings"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:5
-#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:36
-msgid "Reset password"
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:5
+msgid ""
+"You are receiving this email because you requested that your password be "
+"reset on"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:18
-msgid ""
-"\n"
-"\t\t\n"
-"\t\t<br/>\n"
-"\t\t<h3>Forgot your password ? Don't worry ... </h3>\n"
-"\t\t\n"
-"\t\t<h4>Just enter your email below and we'll send you\n"
-"\t\tinstructions for creating a new one. </h4>\n"
-"\t\t<br/>\n"
-"\t\n"
-"\t"
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:6
+msgid "If you do not wish to reset your password, please ignore this message."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:13
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:15
+msgid "Best regards,"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:26
+msgid "Invalid email, Try another."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/password_reset_form.html:19
+msgid "Forgot your password ? Don't worry..."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/registration_closed.html:4
 msgid "Registration Closed"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/registration_closed.html:12
-msgid "Sorry, registration closed!  "
+#: gnowsys_ndf/ndf/templates/registration/registration_closed.html:10
+msgid "Sorry, registration closed!"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/registration_complete.html:4
 msgid "Activation email sent"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/registration_complete.html:8
-msgid ""
-"\n"
-"\t<h3>An activation email has been sent.</h3>\n"
-"\t<br/>\n"
-"\t<h4>Please check your email and click on the link to activate your account."
-"</h4>\n"
-"\t"
+#: gnowsys_ndf/ndf/templates/registration/registration_complete.html:7
+msgid "An activation email has been sent."
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/registration_complete.html:9
+msgid "Please check your email and click on the link to activate your account."
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/registration_form.html:5
 msgid "Register for an account"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/registration_form.html:20
-msgid "Group agency type"
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:24
+msgid ""
+"Password must contain atleast 8 characters, one uppercase letter and one "
+"numeral"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/registration_form.html:29
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:27
+msgid "Occupation"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:37
 msgid "Affiliation"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/registration/registration_form.html:36
+#: gnowsys_ndf/ndf/templates/registration/registration_form.html:45
 msgid "Send activation email"
 msgstr ""
 
@@ -2662,31 +3260,31 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: gnowsys_ndf/notification/models.py:44 gnowsys_ndf/notification/models.py:83
+#: gnowsys_ndf/notification/models.py:47 gnowsys_ndf/notification/models.py:86
 msgid "notice type"
 msgstr ""
 
-#: gnowsys_ndf/notification/models.py:45
+#: gnowsys_ndf/notification/models.py:48
 msgid "notice types"
 msgstr ""
 
-#: gnowsys_ndf/notification/models.py:82
+#: gnowsys_ndf/notification/models.py:85
 msgid "user"
 msgstr ""
 
-#: gnowsys_ndf/notification/models.py:84
+#: gnowsys_ndf/notification/models.py:87
 msgid "medium"
 msgstr ""
 
-#: gnowsys_ndf/notification/models.py:85
+#: gnowsys_ndf/notification/models.py:88
 msgid "send"
 msgstr ""
 
-#: gnowsys_ndf/notification/models.py:88
+#: gnowsys_ndf/notification/models.py:91
 msgid "notice setting"
 msgstr ""
 
-#: gnowsys_ndf/notification/models.py:89
+#: gnowsys_ndf/notification/models.py:92
 msgid "notice settings"
 msgstr ""
 
