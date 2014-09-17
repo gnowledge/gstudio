@@ -15,3 +15,5 @@ gunicorn
 markdown
 https://bitbucket.org/zalew/django-online-status/get/tip.zip
 git+https://github.com/anujag/django-registration-email.git
+stemming
+numpy

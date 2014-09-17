@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth.decorators import login_required
 import mongokit 
 
 ''' -- imports from application folders/files -- '''
@@ -1439,6 +1440,7 @@ def set_all_urls(member_of):
 
 
 # Method to create discussion thread for File and Page.
+@login_required
 def create_discussion(request, group_id, node_id):
   '''
   Method to create discussion thread for File and Page.
