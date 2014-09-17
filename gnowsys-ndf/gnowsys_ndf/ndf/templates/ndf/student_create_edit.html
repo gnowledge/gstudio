@@ -50,9 +50,9 @@
     <header class="row" style="margin: 1rem 0 0 0 ;">
       <h2 class="small-12 columns">
         {% if node %}
-        {% blocktrans with title_var=title node_name=node.name %} Editing {{title_var}}: {{node_name}} {% endblocktrans %}
+        {% trans "Editing" %} {{title}}: {{node.name}}
         {% else %}
-        {% blocktrans with title_var=title %} Register a New {{title_var}} {% endblocktrans %}
+        {% trans "Register a " %} {{title}}
         {% endif %}
       </h2>
     </header>
@@ -66,7 +66,7 @@
         {% for tab_details in property_order_list %}
         <dd {% if forloop.counter == 1 %}class="active"{% endif %} title="STEP-{{forloop.counter}}: Fill {{tab_details.0|lower}} details...">
           <a href="#panel_{{tab_details.0}}" class="disable">
-            {% blocktrans with tab_name=tab_details.0 %} {{tab_name}} {% endblocktrans %}
+            {{tab_details.0}}
           </a>
         </dd>
         {% endfor %}
@@ -119,8 +119,7 @@
           </div>
         </div>
 
-        <br>
-        <!-- For DOB, Gender, Religion -->
+        <!-- For Gender, DOB, Religion -->
         <div class="row">
           <div class="small-4 columns">
             <div class="row">
@@ -160,10 +159,9 @@
           </div>
         </div>
 
-        <br>
-        <!-- For other fields: 2 columns(6-6) -->
+        <!-- For Email-ID, Caste Category, Languages Known -->
         <div class="row">
-          <div class="small-6 columns">
+          <div class="small-4 columns">
             <div class="row">
               <div class="small-3 columns">
                 <label for="{{property_order_list.0.1.6.name}}" class="right inline"> {{property_order_list.0.1.6.altnames}} </label>
@@ -173,22 +171,19 @@
               </div>
             </div>
           </div>
-          <div class="small-6 columns">
+          <div class="small-4 columns">
             <div class="row">
-              <div class="small-3 columns">
+              <div class="small-4 columns">
                 <label for="{{property_order_list.0.1.7.name}}" class="right inline">
                   {% blocktrans with label_val=property_order_list.0.1.7.altnames %} {{label_val}} {% endblocktrans %} 
                 </label>
               </div>
-              <div class="small-9 columns">
+              <div class="small-8 columns">
                 {% html_widget groupid node.pk property_order_list.0.1.7 %}
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="row">
-          <div class="small-6 columns">
+          <div class="small-4 columns">
             <div class="row">
               <div class="small-3 columns">
                 <label for="{{property_order_list.0.1.8.name}}" class="right inline"> {{property_order_list.0.1.8.altnames}} </label>
@@ -198,16 +193,33 @@
               </div>
             </div>
           </div>
-          
+        </div>
+
+        <br>
+        <!-- For other fields: 2 columns(6-6) -->
+        <div class="row">
           <div class="small-6 columns">
             <div class="row">
               <div class="small-3 columns">
                 <label for="{{property_order_list.0.1.9.name}}" class="right inline">
-                  {% blocktrans with label_val=property_order_list.0.1.9.altnames %} {{label_val}} {% endblocktrans %}
+                  {% blocktrans with label_val=property_order_list.0.1.9.altnames %} {{label_val}}   (Max. Size Limit 40kb) {% endblocktrans %}
                 </label>
               </div>
               <div class="small-9 columns">
                 {% html_widget groupid node.pk property_order_list.0.1.9 %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="small-6 columns">
+            <div class="row">
+              <div class="small-3 columns">
+                <label for="{{property_order_list.0.1.10.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.10.altnames %} {{label_val}}   (Max. Size Limit 200kb) {% endblocktrans %}
+                </label>
+              </div>
+              <div class="small-9 columns">
+                {% html_widget groupid node.pk property_order_list.0.1.10 %}
               </div>
             </div>
           </div>
@@ -217,10 +229,10 @@
           <div class="small-6 columns">
             <div class="row">
               <div class="small-3 columns">
-                <label for="{{property_order_list.0.1.10.name}}" class="right inline"> {{property_order_list.0.1.10.altnames}} </label>
+                <label for="{{property_order_list.0.1.11.name}}" class="right inline"> {{property_order_list.0.1.11.altnames}} </label>
               </div>
               <div class="small-9 columns">
-                {% html_widget groupid node.pk property_order_list.0.1.10 %}
+                {% html_widget groupid node.pk property_order_list.0.1.11 %}
               </div>
             </div>
           </div>
@@ -228,12 +240,12 @@
           <div class="small-6 columns">
             <div class="row">
               <div class="small-3 columns">
-                <label for="{{property_order_list.0.1.11.name}}" class="right inline">
-                  {% blocktrans with label_val=property_order_list.0.1.11.altnames %} {{label_val}} {% endblocktrans %} 
+                <label for="{{property_order_list.0.1.12.name}}" class="right inline">
+                  {% blocktrans with label_val=property_order_list.0.1.12.altnames %} {{label_val}} {% endblocktrans %} 
                 </label>
               </div>
               <div class="small-9 columns">
-                {% html_widget groupid node.pk property_order_list.0.1.11 %}
+                {% html_widget groupid node.pk property_order_list.0.1.12 %}
               </div>
             </div>
           </div>
@@ -552,6 +564,38 @@
         yearRange: "" + lowerYearLimit + ":" + currentYear,
         maxDate: '0'
       });
+
+    // Signature Upload File Size Limit
+      
+
+      $("#uploadBtn_signature").change(function() {
+        var max_size = 40
+        var fsize=this.files[0].size
+        fsize=fsize/1024
+        if(fsize<=max_size){
+          $('#uploadFile_signature').val(this.value);
+          }
+        else {
+          alert("Sorry. Max File Size Limit Exceeded");
+          $(this).val("")
+          $('#uploadFile_signature').val(this.value);
+        }
+      });
+
+      $("#uploadBtn_user_photo").change(function() {
+        var max_size = 200
+        var fsize=this.files[0].size
+        fsize=fsize/1024
+        if(fsize<=max_size){
+          $('#uploadFile_user_photo').val(this.value);
+        }
+        else {
+          alert("Sorry. Max File Size Limit Exceeded");
+          $(this).val("")
+          $('#uploadFile_user_photo').val(this.value);
+        }
+      });
+
 
     // Settings for datepicker widget (only for year) ------------------------------------------------------------
       $(".date_year").datepicker({

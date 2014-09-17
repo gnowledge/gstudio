@@ -1,7 +1,6 @@
 
 // REQUIREMENTS.TXT
 pip install -U pyyaml nltk
-pip install numpy
 
 
 Install.txt-----------------

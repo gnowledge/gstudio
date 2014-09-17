@@ -17,6 +17,7 @@ except ImportError:  # old pymongo
     from pymongo.objectid import ObjectId
 
 from gnowsys_ndf.settings import GAPPS, MEDIA_ROOT
+from gnowsys_ndf.ndf.views.file import save_file
 from gnowsys_ndf.ndf.models import GSystemType, Node 
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields
 from gnowsys_ndf.ndf.views.notify import set_notif_val
@@ -73,7 +74,7 @@ def task_details(request, group_name, task_id):
           group_id = str(auth._id)
         
     task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
-    at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
+    at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"]
     blank_dict = {}
     history = []
     subtask = []
@@ -120,8 +121,6 @@ def create_edit_task(request, group_name, task_id=None):
         group_ins = collection.Node.find_one({'_type': "Group","_id": group_name})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
     if group_ins:
-
-            print "coming here"
             group_id = str(group_ins._id)
     else :
             auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -132,7 +131,7 @@ def create_edit_task(request, group_name, task_id=None):
     if task_id:
         task_node = collection.Node.one({'_type': u'GSystem', '_id': ObjectId(task_id)})
 	edit_task_node = task_node
-	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
+	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"]
     	
     else:
         task_node = collection.GSystem()
@@ -149,8 +148,14 @@ def create_edit_task(request, group_name, task_id=None):
         Estimated_time = request.POST.get("Estimated_time","")
 	watchers = request.POST.get("watchers","")
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
-	
 	if not task_id: # create
+        tag=""
+        if request.FILES.getlist('UploadTask'):
+        	files=request.FILES.getlist('UploadTask')
+        	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag)
+        	
+        
+    	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
 		if watchers:
 	     	    for each_watchers in watchers.split(','):
@@ -185,11 +190,11 @@ def create_edit_task(request, group_name, task_id=None):
 					change_list.append('Parent changed from '+parent_object.name+' to '+changed_object.name) # updated details
 
         task_node.save()
-	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"] # fields
+	at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time","Upload_Task"] # fields
 	if not task_id: # create
 	    for each in at_list:
-	         if request.POST.get(each,""):
-			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
+	         if request.POST.get(each,"")  :
+	         	attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
                		newattribute = collection.GAttribute()
                 	newattribute.subject = task_node._id
                 	newattribute.attribute_type = attributetype_key
@@ -201,6 +206,7 @@ def create_edit_task(request, group_name, task_id=None):
 			else:
 				newattribute.object_value = request.POST.get(each,"")
                 	newattribute.save()
+
 			a=request.POST.get("Group","")
 			if each == "Assignee" :
 				for i in request.POST.getlist(each,""):
@@ -224,7 +230,17 @@ def create_edit_task(request, group_name, task_id=None):
 					task_node.save()	
 					
             #creating and assigning the task for each seprated user
+                	if each == "Assignee" :
+				userlist.append(request.POST.get(each,""))
 	    userlist.append(request.user.username)
+	    if request.FILES.getlist('UploadTask'):
+                		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
+               			newattribute = collection.GAttribute()
+                		newattribute.subject = task_node._id
+                		newattribute.attribute_type = attributetype_key
+                		newattribute.object_value = field_value[0]
+                		newattribute.save()
+			
 	    for eachuser in list(set(userlist)):
 		activ="task reported"
 		msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
@@ -232,6 +248,7 @@ def create_edit_task(request, group_name, task_id=None):
 	        set_notif_val(request,group_id,msg,activ,bx)
 	else: #update
 	    for each in at_list:
+	        
 		if request.POST.get(each,""):
 			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
@@ -242,10 +259,11 @@ def create_edit_task(request, group_name, task_id=None):
 				
 			if attr : # already attribute exist 
 				if not attr.object_value == request.POST.get(each,"") :	
-					change_list.append(each.encode('utf8')+' changed from '+attr.object_value.encode('utf8')+' to '+request.POST.get(each,"").encode('utf8')) # updated details	  
+					change_list.append(each.encode('utf8')+' changed from '+attr.object_value.encode('utf8')+' to '+request.POST.get(each,"").encode('utf8')) # updated 	details					
 					attr.object_value = request.POST.get(each,"")
 					attr.save()
 					
+                		
 					
 			else :
 				attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
@@ -255,6 +273,17 @@ def create_edit_task(request, group_name, task_id=None):
                 		newattribute.object_value = request.POST.get(each,"")
                 		newattribute.save()
 				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
+				
+		elif each == 'Upload_Task' and request.FILES.getlist('UploadTask'):
+			
+			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
+        		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
+        		if attr:
+        			change_list.append(str(field_value[0])+' changed from '+str(attr.object_value)+' to '+str(field_value[0]))
+        			attr.object_value=field_value[0]
+        			attr.save()
+        		
+			
 	    userobj = User.objects.get(id=task_node.created_by)
 	    userlist.append(userobj.username)
 	    for each_author in task_node.author_set:
@@ -288,12 +317,14 @@ def create_edit_task(request, group_name, task_id=None):
 		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
         	attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
         	if attr:
-			blank_dict[each] = attr.object_value
+        		blank_dict[each] = attr.object_value
+        	
+        		
 	if task_node.prior_node :
 		pri_node = collection.Node.one({'_id':task_node.prior_node[0]})
 		blank_dict['parent'] = pri_node.name 
 		blank_dict['parent_id'] = str(pri_node._id)
-
+ 
     var = { 'title': 'Task','group_id': group_id, 'groupid': group_id,'appId':app._id, 'group_name': group_name, 'node':edit_task_node, 'task_id':task_id }
     var.update(blank_dict)
     context_variables = var

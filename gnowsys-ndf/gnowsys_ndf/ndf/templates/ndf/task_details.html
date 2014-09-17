@@ -54,6 +54,7 @@
 	  </div>
 	  <div class="medium-3 columns">
 	    <label>{% if parent %}{{parent}}{% else %} -- {% endif %}</label>
+
 	  </div>
 	<!</div>
 	<!<div class="row">
@@ -103,7 +104,22 @@
 	  <div class="medium-3 columns">
 	    <label>{% if Estimated_time %}{{Estimated_time}}{% else %} -- {% endif %}</label>
 	  </div>
-	  <div class="medium-6 columns">
+	  <div class="medium-3 columns">
+	  <label><b>{% trans "Selected File"  %}</b> </label>
+	  </div >
+	  <div class="medium-3 columns">
+	  {% if  Upload_Task %}
+	{% get_file_node request Upload_Task as new %}
+	{% for node in new %}
+	{% get_grid_fs_object node as grid_fs_obj %}
+	
+	<b><a href="{% url 'read_file' group_id node.pk grid_fs_obj.filename %}">{{grid_fs_obj.filename}}</a></b>
+	
+	{% endfor %}
+	{% else %}
+	--
+	{% endif %}
+	  
 	  </div>		
 	</div>
 	{% if subtask %}

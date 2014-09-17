@@ -21,6 +21,20 @@ class Command(BaseCommand):
     collection = get_database()[Node.collection_name]
     # Keep latest fields to be added at top
 
+    # Adds "relation_set" field (with default value as []) to all documents belonging to GSystems.
+    res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'relation_set': {'$exists': False}}, 
+                            {'$set': {'relation_set': []}}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'relation_set' field added to following no. of documents: ", res['n']
+
+    # Adds "attribute_set" field (with default value as []) to all documents belonging to GSystems.
+    res = collection.update({'_type': {'$nin': ["MetaType", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'attribute_set': {'$exists': False}}, 
+                            {'$set': {'attribute_set': []}}, 
+                            upsert=False, multi=True
+    )
+    print "\n 'attribute_set' field added to following no. of documents: ", res['n']
+
     # Adds "license" field (with default value as "") to all documents belonging to GSystems (except Author).
     res = collection.update({'_type': {'$nin': ["MetaType", "Author", "GSystemType", "RelationType", "AttributeType", "GRelation", "GAttribute", "ReducedDocs", "ToReduceDocs", "IndexedWordList", "node_holder"]}, 'license': {'$exists': False}}, 
                             {'$set': {'license': ""}}, 
