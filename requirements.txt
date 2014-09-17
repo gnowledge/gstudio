@@ -14,3 +14,4 @@ django-reversion==1.8.0
 gunicorn
 markdown
 https://bitbucket.org/zalew/django-online-status/get/tip.zip
+git+https://github.com/anujag/django-registration-email.git
