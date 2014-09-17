@@ -149,6 +149,7 @@ def create_edit_task(request, group_name, task_id=None):
         Estimated_time = request.POST.get("Estimated_time","")
 	watchers = request.POST.get("watchers","")
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+	
 	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
 		if watchers:
@@ -192,10 +193,37 @@ def create_edit_task(request, group_name, task_id=None):
                		newattribute = collection.GAttribute()
                 	newattribute.subject = task_node._id
                 	newattribute.attribute_type = attributetype_key
-                	newattribute.object_value = request.POST.get(each,"")
+			if each == 'Assignee':
+				if len(request.POST.getlist(each,""))>1:
+					newattribute.object_value = request.user.username
+				else:				
+					newattribute.object_value = request.POST.get(each,"")
+			else:
+				newattribute.object_value = request.POST.get(each,"")
                 	newattribute.save()
+			a=request.POST.get("Group","")
 			if each == "Assignee" :
-				userlist.append(request.POST.get(each,""))
+				for i in request.POST.getlist(each,""):
+				     if i != "":
+					userlist.append(i)
+				assigneelist=request.POST.getlist("Assignee","")	
+				for i in assigneelist:
+				    if i != "":
+				   	
+				        mul_task=""					
+					mul_task = collection.GSystem()
+					get_node_common_fields(request, mul_task, group_id, GST_TASK)
+					mul_task.save()
+					attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':"Assignee"})
+               				newattribute = collection.GAttribute()
+                			newattribute.subject = mul_task._id
+                			newattribute.attribute_type = attributetype_key
+                			newattribute.object_value = i
+                			newattribute.save()
+					task_node.collection_set.append(mul_task._id)
+					task_node.save()	
+					
+            #creating and assigning the task for each seprated user
 	    userlist.append(request.user.username)
 	    for eachuser in list(set(userlist)):
 		activ="task reported"
@@ -208,7 +236,10 @@ def create_edit_task(request, group_name, task_id=None):
 			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
 			if each == "Assignee" :
-				userlist.append(request.POST.get(each,""))
+				for i in request.POST.getlist(each,""):
+				     if i != "":
+					userlist.append(i)
+				
 			if attr : # already attribute exist 
 				if not attr.object_value == request.POST.get(each,"") :	
 					change_list.append(each.encode('utf8')+' changed from '+attr.object_value.encode('utf8')+' to '+request.POST.get(each,"").encode('utf8')) # updated details	  
@@ -274,6 +305,31 @@ def create_edit_task(request, group_name, task_id=None):
 
     
 @login_required    
+def task_collection(request,group_name,_id):
+    ins_objectid  = ObjectId()
+    task=[]
+    if ins_objectid.is_valid(group_name) is False :
+      group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+          group_id = str(auth._id)
+    else :
+        pass
+    collection_task=[]
+    node = collection.Node.one({'_id':ObjectId(_id)})
+    
+	
+    for each in node.collection_set:
+    	new = collection.Node.one({'_id':ObjectId(each)})
+	collection_task.append(new)		
+    template = "ndf/card_view.html"
+    variable = RequestContext(request, {'TASK_inst': collection_task,'group_name':group_name,'groupid':group_id})
+    return render_to_response(template, variable)
+    	
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
@@ -349,13 +405,17 @@ def check_filter(request,group_name,choice,status=None):
     TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     task_list=[]
     self_task=[]
+    sub_task_name=[]	
     send="This group doesn't have any files"
     #Task Completed 
+    
     for each in TASK_inst:
-    	 
-    	attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
+            
+     
+		
+	attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
     	attr1 = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key1._id})
-    	
+    		
     	if int(choice) == int(1):
     			self_task.append(each)
 
@@ -401,12 +461,11 @@ def check_filter(request,group_name,choice,status=None):
 
         	self_task.sort()
    
-        
         if not self_task:
         	send=message
         else:
         	send=""		
-
+    TASK_inst.rewind()
     template = "ndf/task_card_view.html"
     variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':send})
     return render_to_response(template, variable)

@@ -156,6 +156,42 @@ $('#hidden_watchers').val(selected);
   
 {% block body_content %}
 
+<script type="text/javascript">
+ update_user_list( function(data) {
+$.each(data, function(key,value){
+ $('#customDropdown2')
+ .append($("<option></option>")
+ .attr("value",value)
+ .text(value)
+ .attr("id",value));
+ var div = $("<div>"+"</div>")
+ .attr("class","row")
+ .appendTo($(".watchers"));
+ var input = $("<input> "+value)
+ .attr("type","checkbox")
+ .attr("id",value)
+ .appendTo(div);
+ });
+});
+
+function update_user_list(fn)
+{
+var ajurl ="{% url 'get_group_member_user' group_id %}";
+var user=new Array();
+var a;
+ $.ajax({
+ url:ajurl,
+ dataType:'json',
+ success: function(data){
+ fn(data);
+ },
+
+ });
+
+
+}
+</script> 
+
 <form data-abide id="form-edit-node" method="POST" action="">
 {% csrf_token %}
     <h2 class="medium-12 columns">
@@ -221,7 +257,7 @@ $('#hidden_watchers').val(selected);
 	<div class="row">
 	  <div class="medium-6 columns">
 	    <label>Assignee</label>
-	   	<select name="Assignee" class="medium" id="customDropdown2" data-invalid="">
+	   	<select   name="Assignee" class="medium" id="customDropdown2" data-invalid="">
 			<option value="" selected="selected"></option>
 		</select>
 	  </div>
@@ -231,17 +267,40 @@ $('#hidden_watchers').val(selected);
 	    <small class="error">Please give Time in HH:MM:SS</small>
 	    </label>
 	  </div>
-	  <div class="medium-3 columns">
-
+	</div>	
+	{% get_existing_groups as groups %}
+	<div class="row" id="AssigneeType">	
+	  
+	  <div class="medium-9 columns">
+	   
+	    <legend>
+            <label>Select Memebers : <input type="checkbox" onClick='toggle(this)' id="selectAllOptions" checked="" /> Select/Deselect All</label>
+	
+	    <feildset>
+		<div id="list">
+		<!--<input type="checkbox" value="" name= "author_Set" selected="selected">    --> 
+		</div>
+						</feildset>
+						
 	  </div>
+				
 	</div>
+	<!--
 	<div class="row">
+		<div class="medium-9 columns">	
+			<fieldset>
+                        <input type="radio" name="single" value="Single Assignee" onClick='toggle(this)'>Single Assignee &nbsp;&nbsp;&nbsp;
+			<input type="radio" name="single" value="Group Assignee" onClick='toggle(this)'>Group Assignee <br>
+			</fieldset>
+		</div>
+		-->
 	  <div class="medium-12 columns">
 	    <label>Description</label>
 	    <div id="contentlist" class="content">
 		<div class="">
 		{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value="" %}
 		</div>
+		
 	    </div>
 	  </div>
 	</div>	
@@ -264,6 +323,65 @@ $('#hidden_watchers').val(selected);
       </div>
     </div>
 </form>
+<script type="text/javascript">
+$("#document").ready(function(){
+
+		var select=document.getElementById("selectAllOptions");
+		select.checked=false;
+
+		});
+function toggle(source) {
+	
+       if ((source.value) == 'Single Assignee')
+	{
+       		document.getElementById("AssigneeType").style.visibility= "hidden" ;
+      	        document.getElementById("group").style.visibility= "hidden" ;
+	}
+	else if ((source.value) == 'Group Assignee')
+	{
+		document.getElementById("AssigneeType").style.visibility= "visible" ;
+      	        document.getElementById("group").style.visibility= "visible" ;
+		var check=document.getElementById("AssignTaskGroup");
+		check.checked=false;
+	}
+      /*Selects All the Assignes from the DropDown List */
+       var x = document.getElementById("selectAllOptions").checked;
+       var y = document.getElementById("customDropdown2");
+       select_values("customDropdown2")		
+       checkboxes = document.getElementsByName('Assignee');
+       for(var i=0;i<=checkboxes.length;i++){
+		
+        if(x == true){checkboxes[i].checked=true;}
+	else{checkboxes[i].checked=false;
+	
+document.getElementById("list").innerHTML = "";}
+    					    }
+	
+}
+
+function select_values(source)
+{	
+        document.getElementById("list").innerHTML = ""; 
+	var y = document.getElementById(source);
+	for(var i=1;i<y.length;i++)
+	{	
+		var checkbox = document.createElement('input');
+		checkbox.type = "checkbox";
+		checkbox.name = "Assignee";
+		var a= y[i].value;
+		checkbox.value = a	
+		checkbox.id = "id";
+		var label = document.createElement('label')
+		label.appendChild(document.createTextNode(String(y[i].value)));
+
+		var element = document.getElementById("list");
+		element.appendChild(checkbox);
+		element.appendChild(label);
+	}	
+	
+}
+
+</script>
 
 {% endblock %}
 

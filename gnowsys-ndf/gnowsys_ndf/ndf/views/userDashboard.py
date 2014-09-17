@@ -260,8 +260,8 @@ def uDashboard(request, group_id):
     for i in group_cur:
         group_list.append(i)
         
-    user_task = get_user_task(userObject)
-    user_notification = get_user_notification(userObject)
+    #user_task = get_user_task(userObject)
+    #user_notification = get_user_notification(userObject)
     #user_activity = get_user_activity(userObject)
     activity = ""
     activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},

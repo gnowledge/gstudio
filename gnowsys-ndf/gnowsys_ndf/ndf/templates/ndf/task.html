@@ -97,10 +97,11 @@
 </div>
 
 <script type="text/javascript">
-
+ 	
 $("#p1").ready(function (){
   
   $.ajax({
+	  			
       url: "{% url 'check_filter' group_name 1 'None' %}",
 
       type: "GET",
