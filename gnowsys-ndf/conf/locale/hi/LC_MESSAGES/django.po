@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-16 16:52+0530\n"
+"POT-Creation-Date: 2014-09-17 14:20+0530\n"
 "PO-Revision-Date: 2014-08-30 13:37+0530\n"
 "Last-Translator: user <ravikrishna010586@gmail.com>\n"
 "Language-Team: NROER\n"
@@ -30,54 +30,49 @@ msgstr "सदस्य चुनें"
 #: django-registration-email/registration_email/forms.py:95
 #: django-registration-email/registration_email/templates/registration/login.html:17
 msgid "Email"
-msgstr ""
+msgstr "ईमेल"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:99
 #: django-registration-email/registration_email/forms.py:99
-#, fuzzy
 msgid "Password"
 msgstr "कूटशब्द फिर सेट करें"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:103
 #: django-registration-email/registration_email/forms.py:103
-#, fuzzy
 msgid "Password (repeat)"
 msgstr "कूटशब्द फिर सेट करें"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:118
 #: django-registration-email/registration_email/forms.py:118
-#, fuzzy
 msgid "A user with that email already exists."
 msgstr "संसाधन पहले से ही उपलब्ध है"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:131
 #: django-registration-email/registration_email/forms.py:131
-#, fuzzy
 msgid "Please enter a valid name."
 msgstr "कृपया एक वैद्य ईमेल दीजिए"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/forms.py:138
 #: django-registration-email/registration_email/forms.py:138
 msgid "The two password fields didn't match."
-msgstr ""
+msgstr "दो पासवर्ड क्षेत्रों से मेल नहीं खाती."
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activate.html:5
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activate.html:8
 #: django-registration-email/registration_email/templates/registration/activate.html:5
 #: django-registration-email/registration_email/templates/registration/activate.html:8
-#, fuzzy
 msgid "Activation failure"
 msgstr "सक्रियता ईमेल भेज दिया गया है"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activate.html:12
 #: django-registration-email/registration_email/templates/registration/activate.html:12
 msgid "We are sorry but something went wrong!"
-msgstr ""
+msgstr "क्षमा करें, लेकिन कुछ गलत हो गया!"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activate.html:13
 #: django-registration-email/registration_email/templates/registration/activate.html:13
 msgid "The activation link you provided is broken or was already used."
-msgstr ""
+msgstr "आपके द्वारा दी सक्रियण लिंक टूट गया है या पहले से ही इस्तेमाल किया गया था."
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:5
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:8
@@ -90,15 +85,13 @@ msgstr "सक्रियता पूर्ण हुई"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:12
 #: django-registration-email/registration_email/templates/registration/activation_complete.html:12
-#, fuzzy
 msgid "You may now login with your username and password."
 msgstr "अब आप लॉगिंन करने के लिए उपभोक्ता नाम तथा कूटशब्द का प्रयोग कर सकते हैं।"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:14
 #: django-registration-email/registration_email/templates/registration/activation_complete.html:14
-#, fuzzy
 msgid "Login now"
-msgstr "लॉगिन"
+msgstr "अब लॉगिन"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/activation_complete.html:16
 #: django-registration-email/registration_email/templates/registration/activation_complete.html:16
@@ -145,14 +138,12 @@ msgstr "लॉगिन"
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/login.html:31
 #: django-registration-email/registration_email/templates/registration/login.html:31
 #: gnowsys_ndf/ndf/templates/registration/login.html:36
-#, fuzzy
 msgid "Forgot your password?"
 msgstr "आप कूटशब्द भूल गए"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/login.html:32
 #: django-registration-email/registration_email/templates/registration/login.html:32
 #: gnowsys_ndf/ndf/templates/registration/registration_form.html:19
-#, fuzzy
 msgid "Register a new account"
 msgstr "अकाउन्ट हेतु पंजीकरण"
 
@@ -173,19 +164,16 @@ msgstr ""
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_done.html:8
 #: django-registration-email/registration_email/templates/registration/password_change_done.html:5
 #: django-registration-email/registration_email/templates/registration/password_change_done.html:8
-#, fuzzy
 msgid "Password change successful"
 msgstr "कूटशब्द बदलें"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_done.html:12
 #: django-registration-email/registration_email/templates/registration/password_change_done.html:12
-#, fuzzy
 msgid "Your password has been changed."
 msgstr "आपका कूटशब्द सफलतापूर्वक बदल गया है"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_done.html:13
 #: django-registration-email/registration_email/templates/registration/password_change_done.html:13
-#, fuzzy
 msgid "Back to dashboard"
 msgstr "डैसबोर्"
 
@@ -193,20 +181,18 @@ msgstr "डैसबोर्"
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_form.html:8
 #: django-registration-email/registration_email/templates/registration/password_change_form.html:5
 #: django-registration-email/registration_email/templates/registration/password_change_form.html:8
-#, fuzzy
 msgid "Password change"
 msgstr "कूटशब्द बदलें"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_form.html:12
 #: django-registration-email/registration_email/templates/registration/password_change_form.html:12
-#, fuzzy
 msgid "Please enter your old password, then enter your new password twice."
 msgstr "फिर से सेट करने के लिए अपना नया कूटशब्द भरें"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_change_form.html:23
 #: django-registration-email/registration_email/templates/registration/password_change_form.html:23
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:192
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:205
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:208
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:221
 msgid "Save"
 msgstr "सहेजें"
 
@@ -231,7 +217,6 @@ msgstr "कूटशब्द फिर सेट करें पूर्ण �
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_complete.html:12
 #: django-registration-email/registration_email/templates/registration/password_reset_complete.html:12
-#, fuzzy
 msgid "Please login with your new password."
 msgstr "अब आप लॉगिंन करने के लिए उपभोक्ता नाम तथा कूटशब्द का प्रयोग कर सकते हैं।"
 
@@ -247,19 +232,16 @@ msgstr "रीसेट कूटशब्द"
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:13
 #: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:6
 #: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:13
-#, fuzzy
 msgid "Error resetting password"
 msgstr "रीसेट कूटशब्द"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:19
 #: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:19
-#, fuzzy
 msgid "Please enter your new password twice."
 msgstr "कृपया अपना कीवर्ड भरें"
 
 #: django-registration-email/build/lib.linux-x86_64-2.7/registration_email/templates/registration/password_reset_confirm.html:30
 #: django-registration-email/registration_email/templates/registration/password_reset_confirm.html:30
-#, fuzzy
 msgid "Change my password"
 msgstr "कूटशब्द बदलें"
 
@@ -372,7 +354,7 @@ msgstr "पंजीकरण पंजीकरण वर्ष"
 #: django-registration-email/registration_email/templates/registration/registration_form.html:22
 #: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:146
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:130
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:526
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:538
 msgid "Register"
 msgstr "पंजीकरण"
 
@@ -596,14 +578,15 @@ msgstr "छिपा हुआ"
 #: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:82
 #: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:53
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:49
-#, fuzzy, python-format
-msgid " Editing %(title_var)s: %(node_name)s "
-msgstr "संपादन %(शीर्षक): %(नोड_नाम)"
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:53
+#, fuzzy
+msgid "Editing"
+msgstr "संपादन:"
 
 #: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:84
-#, fuzzy, python-format
-msgid " Register an %(title_var)s "
-msgstr "एक नया बनाएँ %(शीर्षक)"
+#, fuzzy
+msgid "Register an"
+msgstr "नया पंजीकरण"
 
 #: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:92
 #: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:60
@@ -614,8 +597,6 @@ msgid "Fill"
 msgstr "फ़ाइल"
 
 #: gnowsys_ndf/ndf/templates/ndf/announced_course_create_edit.html:98
-#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:69
-#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:65
 #, fuzzy, python-format
 msgid " %(tab_name)s "
 msgstr " %(शीर्षक)"
@@ -639,19 +620,18 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:88
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:100
 #: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:112
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:129
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:141
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:153
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:180
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:206
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:232
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:263
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:276
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:291
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:304
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:319
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:332
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:347
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:128
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:140
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:152
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:178
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:244
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:275
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:288
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:303
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:316
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:331
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:344
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:359
 #, python-format
 msgid " %(label_val)s "
 msgstr ""
@@ -660,7 +640,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:136
 #: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:140
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:124
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:520
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:532
 msgid "Next"
 msgstr "आगे"
 
@@ -672,7 +652,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:145
 #: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:149
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:133
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:529
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:541
 msgid "Update"
 msgstr ""
 
@@ -680,7 +660,7 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/ndf/event_create_edit.html:154
 #: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:158
 #: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:142
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:538
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:550
 #, fuzzy
 msgid "Previous"
 msgstr "पिछला"
@@ -694,7 +674,7 @@ msgid "Attendance"
 msgstr "उपस्थिति"
 
 #: gnowsys_ndf/ndf/templates/ndf/attendees_widget.html:36
-#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:48
+#: gnowsys_ndf/ndf/templates/ndf/batch_detail.html:46
 msgid "Batch"
 msgstr ""
 "\t\n"
@@ -810,10 +790,9 @@ msgstr "बारे में"
 
 #: gnowsys_ndf/ndf/templates/ndf/base.html:388
 msgid "Partners"
-msgstr ""
+msgstr "सहभागी"
 
 #: gnowsys_ndf/ndf/templates/ndf/base.html:389
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:87
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:226
 #: gnowsys_ndf/ndf/templates/ndf/userDashboard.html:390
 msgid "Groups"
@@ -821,7 +800,7 @@ msgstr "समूह"
 
 #: gnowsys_ndf/ndf/templates/ndf/base.html:390
 msgid "Terms of Service"
-msgstr ""
+msgstr "सेवा की शर्तें"
 
 #: gnowsys_ndf/ndf/templates/ndf/base.html:391
 msgid "Privacy Policy"
@@ -869,10 +848,10 @@ msgstr "टीआईएफआर"
 
 #: gnowsys_ndf/ndf/templates/ndf/batch.html:138
 #: gnowsys_ndf/ndf/templates/ndf/task_card_view.html:35
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:120
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:194
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:253
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:255
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:117
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:186
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:243
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:245
 msgid "Detail"
 msgstr "विस्तार"
 
@@ -1069,7 +1048,7 @@ msgid "Forum name:"
 msgstr "फोरम नाम"
 
 #: gnowsys_ndf/ndf/templates/ndf/create_forum.html:113
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:127
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:143
 msgid "Description:"
 msgstr "विवरणः"
 
@@ -1919,17 +1898,14 @@ msgid "Collection Name "
 msgstr "संग्रह का नाम"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:321
-#, fuzzy
 msgid "Changes"
 msgstr "बदलें"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:335
-#, fuzzy
 msgid "Graphs"
 msgstr "ग्राफ"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:353
-#, fuzzy
 msgid "Annotate"
 msgstr "टिप्पण"
 
@@ -1938,12 +1914,10 @@ msgid "You may want to read these first: "
 msgstr "आप पहले ये पढ़ना चाहेंगे"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:720
-#, fuzzy
 msgid "Recent changes"
 msgstr "हालिया बदलाव"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_ajax_view.html:818
-#, fuzzy
 msgid "In other languages"
 msgstr "अन्य भाषा में"
 
@@ -1952,7 +1926,6 @@ msgid "Add resources in this topic "
 msgstr "इस प्रकरण पर संसाधन जोड़े"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_details_base.html:83
-#, fuzzy
 msgid "Add Page "
 msgstr "टैग जोड़ें"
 
@@ -2018,9 +1991,8 @@ msgstr "मेटाडाटा"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:95
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:70
-#, fuzzy
 msgid "Teaches"
-msgstr "सिखाता है*"
+msgstr "सिखाता है"
 
 #: gnowsys_ndf/ndf/templates/ndf/node_edit_base.html:99
 #: gnowsys_ndf/ndf/templates/ndf/topic_create_edit.html:67
@@ -2183,12 +2155,6 @@ msgstr "आकलन जोड़ें या संपादित करे�
 msgid "Please enter a keyword.. "
 msgstr "कृपया अपना कीवर्ड भरें"
 
-#: gnowsys_ndf/ndf/templates/ndf/nussd_course_create_edit.html:55
-#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:51
-#, fuzzy, python-format
-msgid " Register a New %(title_var)s "
-msgstr "एक नया बनाएँ %(शीर्षक)"
-
 #: gnowsys_ndf/ndf/templates/ndf/online.html:16
 msgid "<h2>Meeting</h2>"
 msgstr "<h2>बैठक</h2>"
@@ -2251,8 +2217,12 @@ msgstr "इस समूह में कोई पृष्ठ नहीं ह
 msgid " This group doesn't have any collections."
 msgstr "इस समूह में कोई संग्रह नहीं है"
 
+#: gnowsys_ndf/ndf/templates/ndf/person_create_edit.html:51
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:55
+msgid "Register a "
+msgstr "नया पंजीकरण"
+
 #: gnowsys_ndf/ndf/templates/ndf/person_details.html:46
-#, fuzzy
 msgid "Graph "
 msgstr "ग्राफ"
 
@@ -2317,9 +2287,19 @@ msgid ""
 "      <li>By using 'Quiz-Item' button corresponding to the Quiz.</li>\n"
 "    </ol>  </p>\n"
 msgstr ""
+"  <p class=\"text-justify\">\n"
+"  एक <b>प्रश्नोत्तरी</b> के अनुक्रम संग्रह है <b>प्रश्नोत्तरी आइटम</b>.एक प्रश्नोत्तरी आइटम "
+"तीन प्रकार के किसी भी हो सकता है: <strong><i>कम प्रतिक्रिया, एक विकल्प</i></"
+"strong> और <strong><i>बहुविकल्प</i></strong>. <i>प्रतिक्रिया सबमिट करें</i> और "
+"<i>मैच निम्नलिखित</i> प्रकार के बहुत जल्द ही लागू किया जाएगा.\n"
+"  </p>\n"
+"  <p class=\"text-justify\">आप दो तरह से एक प्रश्नोत्तरी का निर्माण कर सकते हैं:\n"
+"    <ol  class=\"text-justify\">\n"
+"      <li>संपादन करके, प्रश्नोत्तरी नोड (संग्रह की सूची के माध्यम से).</li>\n"
+"      <li>'क्विज आइटम' का उपयोग करके बटन प्रश्नोत्तरी के लिए इसी.</li>\n"
+"    </ol>  </p>\n"
 
 #: gnowsys_ndf/ndf/templates/ndf/quiz_details.html:20
-#, fuzzy
 msgid "Quiz "
 msgstr "प्रश्नोत्तरी"
 
@@ -2430,12 +2410,10 @@ msgstr ""
 "सकते हैं</b>"
 
 #: gnowsys_ndf/ndf/templates/ndf/rating.html:6
-#, fuzzy
 msgid "Rating"
 msgstr "ग्रीटिंग/अभिनंदन"
 
 #: gnowsys_ndf/ndf/templates/ndf/refresh_subscribed_users.html:3
-#, fuzzy
 msgid "List Of Members. "
 msgstr "सदस्यों की सूची"
 
@@ -2480,68 +2458,63 @@ msgstr "शेल्फ"
 msgid "Add "
 msgstr "जोड़ें"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:53
-#, fuzzy
-msgid "Editing"
-msgstr "संपादन:"
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:205
+#, python-format
+msgid " %(label_val)s   (Max. Size Limit 40kb) "
+msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:55
-#, fuzzy
-msgid "Register a New"
-msgstr "नया पंजीकरण"
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:218
+#, python-format
+msgid " %(label_val)s   (Max. Size Limit 200kb) "
+msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:377
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:389
 msgid "Passing Year"
 msgstr "उत्तीर्ण वर्ष"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:388
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:400
 msgid "Passing Certificate"
 msgstr "उत्तीर्ण प्रमाण-पत्र"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:404
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:416
 msgid "Degree Name"
 msgstr "उपाधि का नाम"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:415
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:427
 msgid "Stream(Main Subject)"
 msgstr "वर्ग (मुख्य विषय)"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:428
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:440
 msgid "Degree Year"
 msgstr "उपाधि वर्ष"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:439
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:451
 #: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:119
 msgid "College"
 msgstr "महाविद्यालय"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:452
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:464
 msgid "Enroll. (or Roll) No."
 msgstr "पंजीकरण (या अनुक्रमांक) संख्या"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:463
-#, fuzzy
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:475
 msgid "Registered for NSS?"
 msgstr "एन.एस.एस. हेतु पंजीकरण"
 
-#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:479
-#, fuzzy
+#: gnowsys_ndf/ndf/templates/ndf/student_create_edit.html:491
 msgid "Date of Registration"
 msgstr "पंजीकरण पंजीकरण वर्ष"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:7
 #: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:78
-#, fuzzy
 msgid "Enroll Students in Courses"
 msgstr "बुनियादी पाठ्यक्रम"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:93
-#, fuzzy
 msgid "Registration Year"
 msgstr "पंजीकरण पंजीकरण वर्ष"
 
 #: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:101
-#, fuzzy
 msgid "Please set Registration Year"
 msgstr "पंजीकरण पंजीकरण वर्ष"
 
@@ -2550,7 +2523,6 @@ msgid "- - - Select College - - -"
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/student_enroll.html:130
-#, fuzzy
 msgid "Please select College!"
 msgstr "कृपया चुनें"
 
@@ -2561,7 +2533,6 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/ndf/student_list.html:7
-#, fuzzy
 msgid "Enroll in Courses"
 msgstr "समस्त पाठ्यक्रम"
 
@@ -2582,45 +2553,48 @@ msgstr "नया कार्य"
 msgid "Parent task:"
 msgstr "मूल कार्यः"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:69
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:70
 msgid "Start date:"
 msgstr "आरंभ तिथिः"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:77
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:78
 msgid "Priority:"
 msgstr "प्राथमिकता:"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:85
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:86
 msgid "Due date:"
 msgstr "नियत तिथि:"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:93
-#, fuzzy
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:94
 msgid "Assignee:"
-msgstr "कार्य प्रदाता*"
+msgstr "कार्य प्रदाता"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:101
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:102
 msgid "Estimated time:"
 msgstr "अनुमानित समयः"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:112
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:108
+msgid "Selected File"
+msgstr "चुनें"
+
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:128
 msgid "Sub Task:"
 msgstr "उप-कार्य"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:146
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:162
 msgid "History:"
 msgstr "इतिहासः"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:189
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:205
 msgid "Editing Name"
 msgstr "नाम संपादन"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:194
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:206
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:210
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:222
 msgid "&#215;"
 msgstr "&#215;"
 
-#: gnowsys_ndf/ndf/templates/ndf/task_details.html:198
+#: gnowsys_ndf/ndf/templates/ndf/task_details.html:214
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:88
 #: gnowsys_ndf/ndf/templates/ndf/translation_page.html:157
 msgid "Description"
@@ -2761,21 +2735,31 @@ msgstr "स्वागत है"
 msgid "Registered on"
 msgstr "पंजीकरण खुलें हैं"
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:131
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:85
+#, fuzzy
+msgid "Groups:"
+msgstr "समूह"
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:128
 #, fuzzy
 msgid "No Groups </b>"
 msgstr "<h3>समूह</h3>"
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:206
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:153
+#, fuzzy
+msgid "Assigned Tasks:"
+msgstr "कार्य प्रदाता*"
+
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:198
 msgid "No Assinged Task"
 msgstr ""
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:219
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:209
 #, fuzzy
-msgid "Activities"
+msgid "Activities:"
 msgstr "सक्रिय"
 
-#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:267
+#: gnowsys_ndf/ndf/templates/ndf/uDashboard.html:255
 msgid "No Recent Activities"
 msgstr ""
 
@@ -3197,6 +3181,7 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.html:18
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:6
 msgid ""
 "If this wasn't you, please ignore this email and your address will be "
 "removed from our records."
@@ -3209,6 +3194,7 @@ msgid ""
 msgstr ""
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.html:27
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:13
 #, fuzzy
 msgid "Sincerely"
 msgstr "ईमानदारी से"
@@ -3218,23 +3204,24 @@ msgid "Management Team"
 msgstr "प्रबंधन दल"
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email.txt:5
-#, python-format
 msgid ""
-"\n"
-"\n"
-"You (or someone pretending to be you) have asked to register an account at\n"
-"%(sitename)s.  If this wasn't you, please ignore this email\n"
-"and your address will be removed from our records.\n"
-"\n"
-"To activate this account, please click the following link within the next \n"
-"%(expiration_days)s days:\n"
-"\n"
-"http://%(siteurl)s%(activation_key_url)s\n"
-"\n"
-"Sincerely,\n"
-"%(sitename)s Management\n"
-"\n"
+"You (or someone pretending to be you) have asked to register an account at"
 msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:8
+msgid ""
+"To activate this account, please click the following link within the next"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:9
+msgid "days"
+msgstr ""
+
+#: gnowsys_ndf/ndf/templates/registration/activation_email.txt:14
+#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:16
+#, fuzzy
+msgid "Management"
+msgstr "प्रबंधन दल"
 
 #: gnowsys_ndf/ndf/templates/registration/activation_email_subject.txt:3
 #, fuzzy
@@ -3331,11 +3318,6 @@ msgstr ""
 #: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:15
 msgid "Best regards,"
 msgstr ""
-
-#: gnowsys_ndf/ndf/templates/registration/password_reset_email.html:16
-#, fuzzy
-msgid "Management"
-msgstr "प्रबंधन दल"
 
 #: gnowsys_ndf/ndf/templates/registration/password_reset_error_form.html:26
 msgid "Invalid email, Try another."
@@ -3466,231 +3448,10 @@ msgid ""
 "        "
 msgstr ""
 
-#~ msgid ""
-#~ "Powered by <a href=\"https://github.com/gnowledge/gstudio\" target="
-#~ "\"_blank\">Gnowsys-Studio</a> at the <a href=\"http://www.hbcse.tifr.res."
-#~ "in/\" target=\"_blank\">Homi Bhabha Centre for Science Education</a>, <a "
-#~ "href=\"http://www.tifr.res.in/\" target=\"_blank\">TIFR</a>."
-#~ msgstr ""
-#~ "विज्ञान शिक्षा, टीआईएफआर के लिए होमी भाभा सेंटर में Gnowsys स्टूडियो द्वारा संचालित."
+#, fuzzy
+#~ msgid " Editing %(title_var)s: %(node_name)s "
+#~ msgstr "संपादन %(शीर्षक): %(नोड_नाम)"
 
 #, fuzzy
-#~ msgid " Please select %(alt)s! "
-#~ msgstr "कृपया चुनें"
-
-#, fuzzy
-#~ msgid " Please fill a valid %(alt)s! "
-#~ msgstr "कृपया वैध भरें"
-
-#, fuzzy
-#~ msgid " Please fill valid %(alt)s! "
-#~ msgstr "कृपया वैध भरें"
-
-#, fuzzy
-#~ msgid " Please set %(alt)s! "
-#~ msgstr "कृपया व्यवस्थति करें % (क्षेत्र .विकल्प नाम)s!!!"
-
-#, fuzzy
-#~ msgid " Select %(alt)s "
-#~ msgstr "चुनें"
-
-#~ msgid "<h2>Select Groups</h2>"
-#~ msgstr "<h2>समूह चुनें</h2>"
-
-#~ msgid " <h2>Modules</h2> "
-#~ msgstr " <h2>मॉड्यूल</h2> "
-
-#, fuzzy
-#~ msgid "Welcome %(username)s "
-#~ msgstr "स्वागत %(उपभोक्ता नाम)"
-
-#, fuzzy
-#~ msgid "Registered on : &nbsp;%(DOJ)s "
-#~ msgstr "पंजीकरण खुलें हैं"
-
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "Password reset %(sitename)s\n"
-#~ msgstr "कूटशब्द फिर सेट करें %(साईट नाम)"
-
-#~ msgid "Tabs:"
-#~ msgstr "टैब:"
-
-#~ msgid "View details"
-#~ msgstr "विवरण देखें"
-
-#~ msgid "Make Module "
-#~ msgstr "मॉड्यूल बनाओ"
-
-#~ msgid "Contents "
-#~ msgstr "विषय सूची"
-
-#~ msgid " View"
-#~ msgstr "देखें"
-
-#~ msgid "image is already uploaded please choose different image"
-#~ msgstr "यह छवि पहले से अपलोड है कृपया अन्य छवि चुनिए"
-
-#~ msgid "Group agency type"
-#~ msgstr ""
-#~ "\n"
-#~ "समूह एजेंसी प्रकार"
-
-#~ msgid "New %(title)s"
-#~ msgstr "नये %(शीर्षक)"
-
-#~ msgid "sdf"
-#~ msgstr "एस.डी.एफ."
-
-#~ msgid "<h3>Modules</h3>"
-#~ msgstr "<h3>मॉड्यूल</h3>"
-
-#~ msgid "<h3>Add New File:</h3>"
-#~ msgstr " <h3>नयी फाइल जोड़ें:</h3>"
-
-#~ msgid "<h3>Quiz</h3>"
-#~ msgstr "<एच3>प्रश्नोत्तरी</एच3>"
-
-#~ msgid "Sub_Class_of"
-#~ msgstr "की उप कक्षा"
-
-#~ msgid "Gnowledge Lab"
-#~ msgstr "जीनॉलेज लैब"
-
-#~ msgid "Tata Institute of Fundamental Research (TIFR), India"
-#~ msgstr "टाटा मूलभूत अनुसंधान संस्थान (टी.आई.एफ.आर.)भारत"
-
-#~ msgid "100%% Software Freedom"
-#~ msgstr "100 %% सॉफ्टवेयर स्वतंत्रता"
-
-#~ msgid " New %(title)s "
-#~ msgstr "नये %(शीर्षक)"
-
-#, fuzzy
-#~ msgid "Following policy"
-#~ msgstr "निम्नलिखित नीति*"
-
-#~ msgid "Please select %(field.altnames)s!!!"
-#~ msgstr "कृपया चुनें % (क्षेत्र .विकल्प नाम)s!!!"
-
-#~ msgid ""
-#~ "\n"
-#~ "  <p>\n"
-#~ "    Lets u have video chat.\n"
-#~ "  </p>\n"
-#~ msgstr "आइये वीडियो चैट करें"
-
-#~ msgid ""
-#~ "<h3>Are you sure you want to delete? All of the following related items "
-#~ "also will be deleted:</h3>"
-#~ msgstr "क्या आप मिटानें के लिए तैयार है। ऐसा करने से सभी संबंधित वस्तुएँ भी मिट जायेंगी"
-
-#~ msgid "<small class=\"error\">Please fill username !!</small>"
-#~ msgstr "<small class=\"error\">कृपया उपभोक्ता नाम भेरें!!</small>"
-
-#~ msgid ""
-#~ " This group doesn't have any events. <b>Be the first to create the "
-#~ "%(title)s event!</b> "
-#~ msgstr ""
-#~ "इस समूह में कोई इवेंट नहीं है। आप इवेंट बनाने वाले प्रथम व्यक्ति हो सकते हैं % (शीर्षक)इवेंट</"
-#~ "b>"
-
-#~ msgid "Languages"
-#~ msgstr "भाषाएँ"
-
-#~ msgid "Click here to publish %(node.name)s in group/s"
-#~ msgstr "प्रकाशित हेतु यहाँ क्लिक करें %(नोड.नाम) समूह में"
-
-#~ msgid "Add or edit Metadata - Please spend a few minutes"
-#~ msgstr "मेटाडेटा जोड़े या संपादित करें - कृपया कुछ ही मिनट खर्च करें"
-
-#~ msgid " <h3>Pages</h3>"
-#~ msgstr "<एच3>पृष्ठ</एच3>"
-
-#~ msgid "<h4>Tabs:</h4>"
-#~ msgstr "<एच4>टेब:</एच4>"
-
-#~ msgid ""
-#~ "   \n"
-#~ " %(title)s Item "
-#~ msgstr " %(शीर्षक)वस्तु"
-
-#~ msgid ""
-#~ "   \n"
-#~ "+ Add %(title)s</a>"
-#~ msgstr "+ जोड़ें %(शीर्षक)</ए>"
-
-#~ msgid " + Add %(title)s"
-#~ msgstr "+ जोड़ें %(शीर्षक)"
-
-#~ msgid ""
-#~ "   \n"
-#~ "+ Add %(title)s Item</a>"
-#~ msgstr "+ जोड़ें %(शीर्षक)</ए>"
-
-#~ msgid "<li><h3>Question</h3></li>"
-#~ msgstr "<li><h3>प्रश्न</h3></li>"
-
-#~ msgid " <h3>Quizzes</h3>"
-#~ msgstr "<एच3>प्रश्नोत्तरी</एच3>"
-
-#~ msgid ""
-#~ "   \n"
-#~ "+ Add %(title)s "
-#~ msgstr "+ जोड़ें %(शीर्षक)"
-
-#~ msgid ""
-#~ "   \n"
-#~ "+ Add %(title)s Item "
-#~ msgstr "+ जोड़ें %(शीर्षक)वस्तु"
-
-#~ msgid "<h5>Quiz</h5>"
-#~ msgstr "<एच5>प्रश्नोत्तरी</एच5>"
-
-#~ msgid " <h5>Quiz Items</h5>"
-#~ msgstr "<एच5>प्रश्नोत्तरी वस्तु</एच5>"
-
-#~ msgid ""
-#~ "\n"
-#~ "<h3>List Of Members.</h3>"
-#~ msgstr "<एच3>सदस्यों की सूची.</एच3>"
-
-#~ msgid ""
-#~ "\n"
-#~ "<h3> For Course:%(course_name)s</h3>"
-#~ msgstr "<एच3> पाठ्यक्रम हेतुः:%(पाठ्यक्रम_नाम)</एच3>"
-
-#~ msgid ""
-#~ "\n"
-#~ "Add %(node.name)s"
-#~ msgstr "जोड़ें %(नोड.नाम)"
-
-#~ msgid ""
-#~ "This group doesn't have any tasks. <b>Be the first to create a Task!</b>"
-#~ msgstr ""
-#~ "इस समूह में कोई कार्य नहीं है। <b>आप कार्य बनाने वाले प्रथम व्यक्ति हो सकते हैं</b>"
-
-#~ msgid "Create a New %(title)s"
+#~ msgid " Register an %(title_var)s "
 #~ msgstr "एक नया बनाएँ %(शीर्षक)"
-
-#~ msgid "%(title)s Name"
-#~ msgstr "%(शीर्षक)नाम"
-
-#~ msgid "%(title)s Name "
-#~ msgstr "%(शीर्षक)नाम"
-
-#~ msgid " Private "
-#~ msgstr "निजी"
-
-#~ msgid " modified: %(each.resource)s"
-#~ msgstr "संशोधित :%(प्रत्येक. संसाधन)"
-
-#~ msgid "Status for user \"%(example_user.username)s\""
-#~ msgstr "उपभोक्ता हेतु स्थिति \"%(उदाहरण_उपभोक्ता.उपभोक्ता नाम)\""
-
-#~ msgid "My status (\"%(user.username)s\")"
-#~ msgstr "मेरी स्थिति (\"%(उपभोक्ता.उपभोक्ता नाम)\")"
-
-#~ msgid "Your username and password didn't match. Please try again."
-#~ msgstr "आपका उपभोक्ता नाम तथा कूटशब्द मिल नहीं रहा कृपया दोबारा प्रयास करें"
