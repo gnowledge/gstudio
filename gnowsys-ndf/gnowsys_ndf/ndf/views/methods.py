@@ -58,10 +58,12 @@ def forum_notification_status(group_id,user_id):
   grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
   auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
   at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
+  list_at_pref=[]
   if at_user_pref:
     poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
     if poss_attrs:
-      list_at_pref=poss_attrs['user_preference_off']['object_value']
+      if poss_attrs.has_key('user_preference_off'):
+        list_at_pref=poss_attrs['user_preference_off']['object_value']
       if grp_obj in list_at_pref:
         return False
       else:
