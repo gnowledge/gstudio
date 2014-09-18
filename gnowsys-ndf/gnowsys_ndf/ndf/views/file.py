@@ -43,6 +43,7 @@ from gnowsys_ndf.ndf.models import Node, GRelation, Triple
 from gnowsys_ndf.ndf.models import GSystemType#, GSystem uncomment when to use
 from gnowsys_ndf.ndf.models import File
 from gnowsys_ndf.ndf.views.methods import get_node_common_fields,create_grelation_list,set_all_urls
+from endless_pagination.decorators import page_template
 
 
 
@@ -62,8 +63,9 @@ pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id})
 
 lock=threading.Lock()
 count = 0    
+@page_template('ndf/pandoracollection.html', key='pvideo')
 
-def file(request, group_id, file_id=None):
+def file(request, group_id, file_id=None, extra_context=None):
     """
    * Renders a list of all 'Files' available within the database.
     """
@@ -269,7 +271,9 @@ def file(request, group_id, file_id=None):
                                                 ],
                                                 'group_set': {'$all': [ObjectId(group_id)]}
                                             }).sort("last_update", -1)
-
+      context={'pandoraCollection':pandoraCollection,'pvideo':pandoraCollection,'ps':"#view-pandora-video"}
+      if extra_context is not None:
+        context.update(extra_context)
       datavisual.append({"name":"Doc", "count":docCollection.count()})
       datavisual.append({"name":"Image","count":imageCollection.count()})
       datavisual.append({"name":"Video","count":videoCollection.count()})
@@ -282,9 +286,9 @@ def file(request, group_id, file_id=None):
                                  'appId':app._id,
                                  'searching': True, 'query': search_field,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
-                                 'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection, 
+                                 'files': files,'context':context,'docCollection': docCollection, 'imageCollection': imageCollection, 
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection,
-                                 'pandoraCollection': pandoraCollection,
+                                 'pandoraCollection': pandoraCollection,'pvideo':pandoraCollection,'ps':"#view-pandora-video",
                                  'is_video':is_video,'groupid': group_id, 'group_id':group_id,"datavisual":datavisual
                                 }, 
                                 context_instance=RequestContext(request)
@@ -408,7 +412,7 @@ def file(request, group_id, file_id=None):
                                  # 'sourceid':source_id_set,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection, 
-                                 'pandoraCollection':get_member_set,'is_video':is_video,'groupid': group_id,
+                                 'pandoraCollection':get_member_set,'pvideo':get_member_set,'ps':"#view-pandora-video",'is_video':is_video,'groupid': group_id,
                                  'group_id':group_id,"datavisual":datavisual
                                 }, 
                                 context_instance = RequestContext(request))
