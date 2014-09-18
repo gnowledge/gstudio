@@ -98,6 +98,10 @@ def task_details(request, group_name, task_id):
 			else :
 				postnode_task = sys_each_postnode.altnames
 			history.append({'id':str(sys_each_postnode._id), 'name':sys_each_postnode.name, 'created_by':sys_each_postnode_user.username, 'created_at':sys_each_postnode.created_at, 'altnames':eval(postnode_task), 'content':sys_each_postnode.content})
+    	
+    if  task_node.collection_set:
+		
+	blank_dict['collection']='True'
     history.reverse()
     var = { 'title': task_node.name,'group_id': group_id, 'appId':app._id, 'groupid': group_id, 'group_name': group_name, 'node':task_node, 'history':history, 'subtask':subtask}
     var.update(blank_dict)
