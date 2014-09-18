@@ -328,6 +328,15 @@
 	</tbody>
 </table>
 
+<a href="#" data-reveal-id="myModal">Click Me For A Modal</a>
+
+<div id="myModal" class="reveal-modal" data-reveal>
+  <h2>Awesome. I have it.</h2>
+  <p class="lead">Your couch.  It is mine.</p>
+  <p>I'm a cool paragraph that lives inside of an even cooler modal. Wins!</p>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+
 <!-- END of Looping through each resource -->
 
 {% endblock %}
@@ -453,7 +462,7 @@
 
 		if(editedRowName.length > 0 || editedRowId.length > 0)
 		{
-			alert("At a time you could edit only one row. \nNow you are editing :" + editedRowName + "\n\nPlease 'SAVE' or 'CANCEL' the changes to edit any other row!");
+			alert("At a time you could edit only one row. \n\nNow you are editing: '" + editedRowName + "'\n\nPlease 'SAVE' or 'CANCEL' the changes to edit any other row!");
 
 			return true; // Row editing is going on.
 		}
@@ -461,23 +470,34 @@
 		{
 			return false; // NO row is being editing now.
 		}
-
 	}
 
 
 	function setCurrEditRowToNone()
 	{
-
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", "");
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", "");
+	}
+
+
+	function changeSaveCancelToEdit(oid, resEditRowArr)
+	{
+		$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
+		for (var i = 1; i < resEditRowArr.length; i++)
+		{
+			resEditRowArr[i].classList.add("hide-el");
+		}
+		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
+		setCurrEditRowToNone();
 	}
 
 
 	// action on edit click:
 	function editResRow(oid)
 	{
+
 		// exit from the function if any other row is being edited now.
-		if(checkCurrEditRow()){ return 0; }
+		if(checkCurrEditRow()){ return false; }
 
 		// fetching resource object edit row
 		var $resEditRow = $("tr#edit-row-" + oid),
@@ -495,9 +515,6 @@
 		};
 		
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
-		// resRowArr.each(function(i){
-		// 	console.log(this)
-		// })
 
 	}
 
@@ -505,21 +522,20 @@
 	function CancelEditResRow(oid)
 	{
 
-
-		// fetching resource object view row
+		// fetching resource object VIEW row
 		var $resViewRow = $("tr#view-row-" + oid),
 			resViewRowArr = $resViewRow.children();
 
-		// fetching resource object edit row
+		// fetching resource object EDIT row
 		var $resEditRow = $("tr#edit-row-" + oid);
 			resEditRowArr = $resEditRow.children();
 
+		// to show details on confirm popup
 		var tempEditedFields = "";
 
 		// processing each element of row
 		for (var i = 1; i < resEditRowArr.length; i++)
 		{
-
 			// checking if the values in textboxes are changed
 			if(resEditRowArr[i].firstElementChild)
 			{
@@ -531,8 +547,6 @@
 						+ resViewRowArr[4+i].textContent.trim() + ")\nChanged to:\n(" 
 						+ resEditRowArr[i].firstElementChild.value.trim() + ")\n\n";
 					}
-
-					// console.log(resViewRowArr[4+i].textContent.trim() + "-------" + resEditRowArr[i].firstElementChild.value.trim())
 				}
 			}
 
@@ -549,24 +563,12 @@
 			
 			if(cancelConfirm)
 			{
-				$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
-				for (var i = 1; i < resEditRowArr.length; i++)
-				{
-					resEditRowArr[i].classList.add("hide-el");
-				}
-				$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
-				setCurrEditRowToNone();
+				changeSaveCancelToEdit(oid, resEditRowArr);
 			}	
 		}
 		else
 		{
-			$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
-			for (var i = 1; i < resEditRowArr.length; i++)
-			{
-				resEditRowArr[i].classList.add("hide-el");
-			}
-			$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
-			setCurrEditRowToNone();
+			changeSaveCancelToEdit(oid, resEditRowArr)
 		}
 	}
 
