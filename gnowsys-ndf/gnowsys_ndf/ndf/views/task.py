@@ -148,7 +148,7 @@ def create_edit_task(request, group_name, task_id=None):
         Estimated_time = request.POST.get("Estimated_time","")
 	watchers = request.POST.get("watchers","")
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
-	if not task_id: # create
+	
         tag=""
         if request.FILES.getlist('UploadTask'):
         	files=request.FILES.getlist('UploadTask')
@@ -229,11 +229,7 @@ def create_edit_task(request, group_name, task_id=None):
 					task_node.collection_set.append(mul_task._id)
 					task_node.save()	
 					
-            #creating and assigning the task for each seprated user
-                	if each == "Assignee" :
-				userlist.append(request.POST.get(each,""))
-	    userlist.append(request.user.username)
-	    if request.FILES.getlist('UploadTask'):
+            if request.FILES.getlist('UploadTask'):
                 		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
                			newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
