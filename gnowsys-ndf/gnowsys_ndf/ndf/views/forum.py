@@ -218,7 +218,10 @@ def create_forum(request,group_id):
             msg=usrname+" has added a forum in the group -'"+colg.name+"'\n"+"Please visit "+link+" to see the forum."
             if bx:
                 auth = collection.Node.one({'_type': 'Author', 'name': unicode(bx.username) })
-                no_check=forum_notification_status(colg._id,auth._id)
+                if colg._id and auth:
+                    no_check=forum_notification_status(colg._id,auth._id)
+                else:
+                    no_check=True
                 if no_check:
                     ret = set_notif_val(request,colg._id,msg,activity,bx)
 
