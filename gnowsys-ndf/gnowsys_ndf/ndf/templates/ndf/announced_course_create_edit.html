@@ -45,7 +45,7 @@
 /* Resetting css-properties for fieldset (also legend, input) */
   /* fieldset (padding-bottom) */ 
   fieldset {
-    padding: 1.25rem 1.25rem 0 1.25rem !important;
+    padding: 1.25rem 1.25rem 1.25rem 1.25rem !important;
   }
 
   /* legend (background-color) */
@@ -145,7 +145,7 @@
           </div>
 
           <div class="small-2 small-centered columns">
-            <div class="button small round expand" id="find_ac">Find</div>
+            <input type="button" id="find_ac" value="Find" class="button small round expand"/>
           </div>
         </fieldset>
 
@@ -364,6 +364,11 @@
           hideFieldsetSubmit();
         }
       });
+
+    // If Find button is disabled, enable it
+      if ($("#find_ac").attr("disabled") == "disabled") {
+        $("#find_ac").removeAttr("disabled");
+      }
   });
 
 // Tabs navigation: Enable and Disable tabs in sequential manner using Next & Previous buttons -------------------
@@ -391,44 +396,13 @@
     $(".ui-datepicker-calendar").hide();
   });
 
-// Tranferring values from multiple selection widget into outer dropdown -----------------------------------------
-  $(document).on('closed', '[data-reveal]', function () {
-    /*
-     *  On closing of reveal-modal
-     */
-    var widget_for = $(this).attr('id').replace('_modal', '')
+// If any of the Input field of fieldset (sc) is changed -------------------------------------------------
+  $("#sc :input").on('change click', function(){
+    // hide fieldsets & submit button 
+    hideFieldsetSubmit();
 
-    // First empty all values of given field (dropdown/select)
-    $("select#" + widget_for).empty();
-
-    // Fetching class name of hidden input element(s) of drawer2 from corresponding drawer-widget
-    class_value = ".node_id." + widget_for + "_values"
-    right_drawer_len = $(class_value).size()
-
-    if (right_drawer_len > 0) {
-      $(class_value).each(function (){
-        // ObjectId & name of the resource inside drawer2 from corresponding drawer-widget
-        resource_id = $(this).val()
-        resource_name = $(this).attr('name')
-
-        // Make very first entry as given below
-        $("select#" + widget_for).append(
-            $("<option></option>")
-              .attr("value", resource_id)
-              .attr("selected", "selected")
-              .text(resource_name)
-        );
-      });
-    }
-
-    else {
-      // Make very first entry as given below
-      $("select#" + widget_for).append(
-          $("<option></option>")
-            .attr("value", "")
-            .text("- - - Select - - -")
-      );
-    }
+    // Enable Find button (find_ac)
+    $("#find_ac").removeAttr('disabled');
   });
 
 // Select/Deselect all checbox(es) ['unset-ac-options'] based on state of checkbox ['selectAllOptions'] ----------
@@ -456,11 +430,6 @@
 
   // Enable/Disable Announce (submit) button, if none of the checkbox is selected
     $("#announce-course").attr("disabled", !optionState);
-  });
-
-// Hide Fieldset & submit button, if course type is changed ------------------------------------------------------
-  $("#nussd_course_type").on("change", function(){
-    hideFieldsetSubmit();
   });
 
 // On click of Find (Setup Ajax call) ----------------------------------------------------------------------------
@@ -530,6 +499,18 @@
               
               dict_len = dict_len - 1;
             });
+
+            // If nussd_course_type is Foundation Course disable all checkboxes
+            if (nussd_course_type == "Foundation Course") {
+              // alert("Foundation Course found!")
+              $("#selectAllOptions").attr("disabled", "disabled");
+              $(".unsetOption").attr("disabled", "disabled");
+            }
+
+            else {
+              $("#selectAllOptions").removeAttr("disabled", "disabled");
+              $(".unsetOption").removeAttr("disabled", "disabled");
+            }
           }
 
           else {
@@ -571,12 +552,19 @@
     }
   });
 
-// On click of Register/Update -----------------------------------------------------------------------------------
-  // $(document).on("click", "#announce-course", function() {
-  // // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
-  //   // $(".content").find(":input[disabled]").each(function(){
-  //   //   $(this).removeAttr('disabled');
-  //   // });
-  // });
+// On close event of reveal-modal (alertModal) -------------------------------------------------------------
+  $(document).on('closed.fndtn.reveal', '#alertModal[data-reveal]', function () {
+    if ($(this).hasClass('success')) {
+      // Disable 'Find' button, which gets enable only when any of the input element
+      // of the fieldset (fsSc) is changed
+      $("#find_ac").attr('disabled', "disabled");
+    }
+  });
 
+// On click of Register/Update -----------------------------------------------------------------------------------
+  $(document).on("click", "#announce-course", function() {
+  // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
+    $("#selectAllOptions").removeAttr("disabled", "disabled");
+    $(".unsetOption").removeAttr("disabled", "disabled");
+  });
 {% endblock %}
