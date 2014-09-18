@@ -2,7 +2,7 @@
 from django.conf import global_settings
 from django.utils.translation import ugettext
 import os
-DEBUG = True
+DEBUG = False
 # ALLOWED_HOSTS = ["127.0.0.1"]
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
