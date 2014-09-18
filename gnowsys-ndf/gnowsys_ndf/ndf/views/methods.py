@@ -126,7 +126,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
     reply_GST_id = collection.Node.one({'_type': 'GSystemType', 'name': 'Reply'}, {'_id':1})
     
     drawer = None    
-    
+
     if checked:     
       if checked == "Page":
  
@@ -192,9 +192,14 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         drawer = checked
 
     else:
-      # For heterogeneous collection      
-      if theme_GST_id or topic_GST_id or theme_item_GST or forum_GST_id or reply_GST_id:
+      # For heterogeneous collection
+      if type(checked) == list:
+        # Special case: used while dealing with RelationType widget
+        drawer = checked
+
+      elif theme_GST_id or topic_GST_id or theme_item_GST or forum_GST_id or reply_GST_id:
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'member_of':{'$nin':[theme_GST_id._id,theme_item_GST._id, topic_GST_id._id, reply_GST_id._id, forum_GST_id._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})   
+      
       else:
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]} })
            
@@ -319,6 +324,7 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
     name =request.POST.get('name','')
     content_org = request.POST.get('content_org')
     tags = request.POST.get('tags')
+
   language= request.POST.get('lan')
   sub_theme_name = request.POST.get("sub_theme_name", '')
   add_topic_name = request.POST.get("add_topic_name", '')
@@ -1195,8 +1201,14 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
       
       ga_node.status = u"PUBLISHED"
       ga_node.save()
-      #info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
-      #print "\n ", info_message
+      info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+      print "\n ", info_message
+
+      # Fetch corresponding document & append into it's attribute_set
+      collection.update({'_id': subject_id}, 
+                        {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
+                        upsert=False, multi=False
+                      )
 
     except Exception as e:
       error_message = "\n GAttributeCreateError: " + str(e) + "\n"
@@ -1205,20 +1217,24 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
   else:
     # Code for updation
     is_ga_node_changed = False
+    old_object_value = None
 
     try:
       if type(ga_node.object_value) == list:
         if set(ga_node.object_value) != set(object_value):
+          old_object_value = ga_node.object_value
           ga_node.object_value = object_value
           is_ga_node_changed = True
 
       elif type(ga_node.object_value) == dict:
         if cmp(ga_node.object_value, object_value) != 0:
+          old_object_value = ga_node.object_value
           ga_node.object_value = object_value
           is_ga_node_changed = True
 
       else:
         if ga_node.object_value != object_value:
+          old_object_value = ga_node.object_value
           ga_node.object_value = object_value
           is_ga_node_changed = True
 
@@ -1226,9 +1242,15 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
         ga_node.status = u"PUBLISHED"
         ga_node.save()
         info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+        print "\n ", info_message
 
+        # Fetch corresponding document & update it's attribute_set with proper value
+        collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
+                          {'$set': {'attribute_set.$.'+attribute_type_node.name: ga_node.object_value}}, 
+                          upsert=False, multi=False)
       else:
         info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+        print "\n ", info_message
 
     except Exception as e:
       error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
@@ -1304,6 +1326,11 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
           info_message = " MultipleGRelation: GRelation ("+n.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
           print "\n", info_message
 
+          collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                            {'$pull': {'relation_set.$.'+relation_type_node.name: n.right_subject}}, 
+                            upsert=False, multi=False
+                          )
+
       if right_subject_id_or_list:
         # If still ObjectId list persists, it means either they are new ones' or from deleted ones'
         # For deleted one's, find them and modify their status to PUBLISHED
@@ -1328,6 +1355,26 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             info_message = " MultipleGRelation: GRelation ("+gr_node.name+") created successfully.\n"
             print "\n", info_message
 
+            left_subject = collection.Node.one({'_id': subject_id}, {'relation_set': 1})
+
+            rel_exists = False
+            for each_dict in left_subject.relation_set:
+              if relation_type_node.name in each_dict:
+                rel_exists = True
+                break
+
+            if not rel_exists:
+              # Fetch corresponding document & append into it's relation_set
+              collection.update({'_id': subject_id}, 
+                                {'$addToSet': {'relation_set': {relation_type_node.name: [nid]}}}, 
+                                upsert=False, multi=False
+                              )
+            else:
+              collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                                {'$addToSet': {'relation_set.$.'+relation_type_node.name: nid}}, 
+                                upsert=False, multi=False
+                              )
+
             gr_node_list.append(gr_node)
 
           else:
@@ -1339,6 +1386,11 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
               info_message = " MultipleGRelation: GRelation ("+gr_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
               print "\n", info_message
 
+              collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                                {'$addToSet': {'relation_set.$.'+relation_type_node.name: gr_node.right_subject}}, 
+                                upsert=False, multi=False
+                              )
+
               gr_node_list.append(gr_node)
 
             else:
@@ -1349,7 +1401,6 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
 
     else:
       # For dealing with single relation (one to one)
-
       gr_node = None
 
       if isinstance(right_subject_id_or_list, list):
@@ -1377,6 +1428,11 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
             info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
             print "\n", info_message
 
+            collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                              {'$addToSet': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
+                              upsert=False, multi=False
+                            )
+
           elif node.status == u"PUBLISHED":
             info_message = " SingleGRelation: GRelation ("+node.name+") already exists !\n"
             print "\n", info_message
@@ -1386,6 +1442,11 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
           if node.status == u'PUBLISHED':
             node.status = u"DELETED"
             node.save()
+
+            collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                              {'$pull': {'relation_set.$.'+relation_type_node.name: node.right_subject}}, 
+                              upsert=False, multi=False
+                            )
 
             info_message = " SingleGRelation: GRelation ("+node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
             print "\n", info_message 
@@ -1403,6 +1464,26 @@ def create_grelation(subject_id, relation_type_node, right_subject_id_or_list, *
         gr_node.save()
         info_message = " GRelation ("+gr_node.name+") created successfully.\n"
         print "\n", info_message
+
+        left_subject = collection.Node.one({'_id': subject_id}, {'relation_set': 1})
+
+        rel_exists = False
+        for each_dict in left_subject.relation_set:
+          if relation_type_node.name in each_dict:
+            rel_exists = True
+            break
+
+        if not rel_exists:
+          # Fetch corresponding document & append into it's relation_set
+          collection.update({'_id': subject_id}, 
+                            {'$addToSet': {'relation_set': {relation_type_node.name: [right_subject_id_or_list]}}}, 
+                            upsert=False, multi=False
+                          )
+        else:
+          collection.update({'_id': subject_id, 'relation_set.'+relation_type_node.name: {'$exists': True}}, 
+                            {'$addToSet': {'relation_set.$.'+relation_type_node.name: right_subject_id_or_list}}, 
+                            upsert=False, multi=False
+                          )
 
       return gr_node
 

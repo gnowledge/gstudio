@@ -349,12 +349,13 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
     else:
       app = collection.Node.one({'_id': ObjectId(app_id)})
 
-    app_name = app.name 
+    app_name = app.name
 
     app_collection_set = [] 
     app_set = ""
     nodes = ""
     title = ""
+    template_prefix = "mis"
 
     user_id = int(request.user.id)  # getting django user id
     user_name = unicode(request.user.username)  # getting django user name
@@ -368,38 +369,59 @@ def person_enroll(request, group_id, app_id, app_set_id=None, app_set_instance_i
         for eachset in agency_type_node.collection_set:
           app_collection_set.append(collection.Node.one({"_id": eachset}, {'_id': 1, 'name': 1, 'type_of': 1}))      
 
-    # Fetch required list of AttributeTypes
-    fetch_ATs = ["nussd_course_type", "degree_year"]
-    req_ATs = []
+    if request.method == "POST":
+      student_enroll_list = request.POST.get("student_enroll_list", "")
+      announced_courses_list = request.POST.get("announced_courses_list", "")
 
-    for each in fetch_ATs:
-      each = collection.Node.one({'_type': "AttributeType", 'name': each}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
+      if student_enroll_list != '':
+        student_enroll_list = [ObjectId(each.strip()) for each in student_enroll_list.split(",")]
 
-      if each["data_type"] == "IS()":
-        # Below code does little formatting, for example:
-        # data_type: "IS()" complex_value: [u"ab", u"cd"] dt:
-        # "IS(u'ab', u'cd')"
-        dt = "IS("
-        for v in each.complex_data_type:
-            dt = dt + "u'" + v + "'" + ", " 
-        dt = dt[:(dt.rfind(", "))] + ")"
-        each["data_type"] = dt
+      if announced_courses_list != '':
+        announced_courses_list = [ObjectId(each.strip()) for each in announced_courses_list.split(",")]
 
-      each["data_type"] = eval(each["data_type"])
-      each["value"] = None
-      req_ATs.append(each)
+      # Fetch selected_course RelationType
+      selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"})
 
-    # Fetch required list of Colleges
-    college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
-    mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
-    college_cur = collection.Node.find({'member_of': college._id, 'group_set': mis_admin._id}, {'name': 1}).sort('name', 1)
+      for student_id in student_enroll_list:
+        if announced_courses_list:
+          gr = create_grelation(student_id, selected_course_RT, announced_courses_list)
 
-    template = "ndf/student_enroll.html"
-    variable = RequestContext(request, {'groupid': group_id, 'group_id': group_id,
-                                        'title': title, 
-                                        'app_id':app_id, 'app_name': app_name, 
-                                        'app_collection_set': app_collection_set, 'app_set_id': app_set_id,
-                                        'ATs': req_ATs, 'colleges': college_cur
-                                        # 'nodes':nodes, 
-                                        })
-    return render_to_response(template, variable)
+      return HttpResponseRedirect(reverse(app_name.lower()+":"+template_prefix+'_app_detail', kwargs={'group_id': group_id, "app_id":app_id, "app_set_id":app_set_id}))
+
+    else:
+      # Fetch required list of AttributeTypes
+      fetch_ATs = ["nussd_course_type", "degree_year"]
+      req_ATs = []
+
+      for each in fetch_ATs:
+        each = collection.Node.one({'_type': "AttributeType", 'name': each}, {'_type': 1, '_id': 1, 'data_type': 1, 'complex_data_type': 1, 'name': 1, 'altnames': 1})
+
+        if each["data_type"] == "IS()":
+          # Below code does little formatting, for example:
+          # data_type: "IS()" complex_value: [u"ab", u"cd"] dt:
+          # "IS(u'ab', u'cd')"
+          dt = "IS("
+          for v in each.complex_data_type:
+              dt = dt + "u'" + v + "'" + ", " 
+          dt = dt[:(dt.rfind(", "))] + ")"
+          each["data_type"] = dt
+
+        each["data_type"] = eval(each["data_type"])
+        each["value"] = None
+        req_ATs.append(each)
+
+      # Fetch required list of Colleges
+      # college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
+      # mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'_id': 1})
+      # college_cur = collection.Node.find({'member_of': college._id, 'group_set': mis_admin._id}, {'name': 1}).sort('name', 1)
+      college_cur = None
+      
+      template = "ndf/student_enroll.html"
+      variable = RequestContext(request, {'groupid': group_id, 'group_id': group_id,
+                                          'title': title, 
+                                          'app_id':app_id, 'app_name': app_name, 
+                                          'app_collection_set': app_collection_set, 'app_set_id': app_set_id,
+                                          'ATs': req_ATs, 'colleges': college_cur
+                                          # 'nodes':nodes, 
+                                          })
+      return render_to_response(template, variable)
