@@ -287,15 +287,16 @@ class Node(DjangoDocument):
                     if mem:
                         member_of_names.append(mem.name)
         else:
-            for each_member_id in self.gsystem_type:
-                if type(each_member_id) == ObjectId:
-                    _id = each_member_id
-                else:
-                    _id = each_member_id['$oid']
-                if _id:
-                    mem=collection.Node.one({'_id': ObjectId(_id)})
-                    if mem:
-                        member_of_names.append(mem.name)
+            if self.has_key("gsystem_type"):
+                for each_member_id in self.gsystem_type:
+                    if type(each_member_id) == ObjectId:
+                        _id = each_member_id
+                    else:
+                        _id = each_member_id['$oid']
+                    if _id:
+                        mem=collection.Node.one({'_id': ObjectId(_id)})
+                        if mem:
+                            member_of_names.append(mem.name)
         return member_of_names
 
     @property        

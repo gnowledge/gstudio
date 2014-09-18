@@ -3,7 +3,7 @@ from django.conf import global_settings
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
-DEBUG = True
+DEBUG = False
 # ALLOWED_HOSTS = ["127.0.0.1"]
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
@@ -11,7 +11,6 @@ DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 LANGUAGES = (('en', 'English'),('hi', 'Hindi'))
 
 # ('mr', 'Marathi'),('mun','Munda'),('mni','Manipuri'),('ori','Oriya'),('pi','Pali'),('raj','Rajasthani'),('lah','Lahnda'),('gu','Gujarati'),('ks','Kashmiri'), ('kok','Konkani'), ('kha','Khasi'), ('dra','Dravidian'), ('gon','Gondi'), ('bra','Braj'), ('mi','Malayalam'), ('mai','Maithili'), ('mag','Magahi'), ('lus','Lushai'), ('bh','Bihari'), ('kru','Kurukh'), ('awa','Awadhi'),('sa','Sanskrit'),('sat','Santali'), ('him','Himachali'), ('sd','Sindhi'), ('af', 'Afrikaans'), ('as','Assamese'),('ar', 'Arabic'), ('az', 'Azerbaijani'), ('bg', 'Bulgarian'), ('be', 'Belarusian'), ('bn', 'Bengali'), ('br', 'Breton'), ('bs', 'Bosnian'), ('ca', 'Catalan'),('bho','Bhojpuri'), ('cs', 'Czech'), ('cy', 'Welsh'), ('da', 'Danish'), ('de', 'German'), ('el', 'Greek'), ('en-gb', 'British English'), ('eo', 'Esperanto'), ('es', 'Spanish'), ('es-ar', 'Argentinian Spanish'), ('es-mx', 'Mexican Spanish'), ('es-ni', 'Nicaraguan Spanish'), ('es-ve', 'Venezuelan Spanish'), ('et', 'Estonian'), ('eu', 'Basque'), ('fa', 'Persian'), ('fi', 'Finnish'), ('fr', 'French'), ('fy-nl', 'Frisian'), ('ga', 'Irish'), ('gl', 'Galician'), ('he', 'Hebrew'),('hr', 'Croatian'), ('hu', 'Hungarian'), ('ia', 'Interlingua'), ('id', 'Indonesian'), ('is', 'Icelandic'), ('it', 'Italian'), ('ja', 'Japanese'), ('ka', 'Georgian'), ('kk', 'Kazakh'), ('km', 'Khmer'), ('kn', 'Kannada'), ('ko', 'Korean'), ('lb', 'Luxembourgish'), ('lt', 'Lithuanian'), ('lv', 'Latvian'), ('mk', 'Macedonian'), ('ml', 'Malayalam'), ('mn', 'Mongolian'), ('my', 'Burmese'), ('nb', 'Norwegian Bokmal'), ('ne', 'Nepali'), ('nl', 'Dutch'), ('nn', 'Norwegian Nynorsk'), ('os', 'Ossetic'), ('pa', 'Punjabi'), ('pl', 'Polish'), ('pt', 'Portuguese'), ('pt-br', 'Brazilian Portuguese'), ('ro', 'Romanian'), ('ru', 'Russian'), ('sk', 'Slovak'), ('sl', 'Slovenian'), ('sq', 'Albanian'), ('sr', 'Serbian'), ('sr-latn', 'Serbian Latin'), ('sv', 'Swedish'), ('sw', 'Swahili'), ('ta', 'Tamil'), ('te', 'Telugu'), ('th', 'Thai'), ('tr', 'Turkish'), ('tt', 'Tatar'), ('udm', 'Udmurt'), ('uk', 'Ukrainian'), ('ur', 'Urdu'), ('vi', 'Vietnamese'), ('zh-cn', 'Simplified Chinese'), ('zh-tw', 'Traditional Chinese')) 
-
 
 EXTRA_LANG_INFO = {
     'mr': {
@@ -191,8 +190,6 @@ import django.conf.locale
 LANG_INFO = dict(django.conf.locale.LANG_INFO.items() + EXTRA_LANG_INFO.items())
 django.conf.locale.LANG_INFO = LANG_INFO
 
-
-
 # Languages using BiDi (right-to-left) layout
 #LANGUAGES_BIDI = global_settings.LANGUAGES_BIDI + ("mni",) 
 
@@ -257,6 +254,13 @@ SITE_ID = 1
 # to load the internationalization machinery.
 
 USE_I18N = True
+
+# Setting system's default encoding to 'utf-8'
+# By defalut, it's 'ascii'
+# Comes handy while writing unicode text into a file
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
@@ -417,7 +421,6 @@ LOGIN_REDIRECT_URL = "/"
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-
 META_TYPE = [u"GAPP",u"factory_types",u"Mapping_relations"]
 
 GROUP_AGENCY_TYPES=["Partner","GovernmentAgency","NGO","College","University","School","Institution","Project","SpecialInterestGroup"]
@@ -542,3 +545,21 @@ USERS_ONLINE__TIME_OFFLINE = 10
 #USERS_ONLINE__CACHE_PREFIX_USER
 #USERS_ONLINE__CACHE_USERS
 
+
+GSTUDIO_RESOURCES_EDUCATIONAL_USE = [ "Images", "Audios", "Videos", "Interactives", "Documents", "Maps", "Events", "Publications"]
+
+GSTUDIO_RESOURCES_INTERACTIVITY_TYPE = [ "Active", "Expositive", "Mixed" ]
+
+GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT = [ "NCF", "State", "All" ]
+
+GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL = [ "Primary", "Upper Primary", "Secondary", "Senior Secondary", "Tertiary", "Primary and Upper Primary", "Primary, Upper Primary and Secondary", "Primary, Upper Primary, Secondary and Senior Secondary", "Secondary and Senior Secondary", "Upper Primary, Secondary and Senior Secondary", "Upper Primary and Secondary", "Upper Primary and Senior Secondary" ]
+
+GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT = [ "Language", "Mathematics", "Environmental Studies", "Science", "Chemistry", "Physics", "Biology", "Social Science", "History", "Geography", "Political Science", "Economics", "Sociology", "Psychology", "Commerce", "Business Studies", "Accountancy" ]
+
+GSTUDIO_RESOURCES_CURRICULAR = [ "True", "False" ]
+
+GSTUDIO_RESOURCES_AUDIENCE = [ "Teachers", "Students", "Teacher educators", "Teachers and Students", "Teachers, Students and Teacher educators" ]
+
+GSTUDIO_RESOURCES_TEXT_COMPLEXITY = [ "Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard" ]
+
+GSTUDIO_RESOURCES_LANGUAGES = [ "English","Gujarati" ,"Hindi" ,"Manipuri" ,"Marathi" ,"Mizo" ,"Telugu" ]

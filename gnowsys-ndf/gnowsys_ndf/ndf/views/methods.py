@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth.decorators import login_required
 import mongokit 
 
 ''' -- imports from application folders/files -- '''
@@ -57,10 +58,12 @@ def forum_notification_status(group_id,user_id):
   grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
   auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
   at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
+  list_at_pref=[]
   if at_user_pref:
     poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
     if poss_attrs:
-      list_at_pref=poss_attrs['user_preference_off']['object_value']
+      if poss_attrs.has_key('user_preference_off'):
+        list_at_pref=poss_attrs['user_preference_off']['object_value']
       if grp_obj in list_at_pref:
         return False
       else:
@@ -1439,6 +1442,7 @@ def set_all_urls(member_of):
 
 
 # Method to create discussion thread for File and Page.
+@login_required
 def create_discussion(request, group_id, node_id):
   '''
   Method to create discussion thread for File and Page.
