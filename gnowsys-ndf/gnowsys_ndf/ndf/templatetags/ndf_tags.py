@@ -1676,11 +1676,10 @@ def get_preferred_lang(request, group_id, nodes, node_type):
       pref_lan={}
       pref_lan[u'primary']=request.LANGUAGE_CODE
       pref_lan[u'default']=u"en"
-      print pref_lan
    try:
       for each in nodes:
          get_rel=collection.Node.find({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':each._id}]})
-         if get_rel:
+         if get_rel.count() > 0:
             for rel in list(get_rel):
                rel_node=collection.Node.one({'_id':rel.right_subject})
                if rel_node.language == pref_lan['primary']:
@@ -1693,13 +1692,12 @@ def get_preferred_lang(request, group_id, nodes, node_type):
                   if default_nodes:
                      preferred_list.append(default_nodes)
               
-         else:
+         elif get_rel.count() == 0:
             default_nodes=collection.Node.one({'$and':[{'member_of':node._id},{'group_set':group._id},{'language':pref_lan['default']},{'_id':each._id}]})
             if default_nodes:
                preferred_list.append(default_nodes)
                   
       if preferred_list:
-         
          return preferred_list
       
    except Exception as e:

@@ -583,20 +583,134 @@
 
     </ul>
 
-   {% paginate %}
+    {% paginate %}
   </div>
 
   <!-- Tab View #5 - pandora Videos -->
-  <div class="class" id="view-pandora-video">
-    {% include "ndf/pandoracollection.html" %}
+  <div class="content" id="view-pandora-video">
+
+    {% if searching and pandoraCollection.count > 0 %}
+    <div class="row">
+      <div class="small-12 columns end">
+        <p>{% trans "Search Results:" %} <span class="label success round">Found {{pandoraCollection.count}} {{title|lower}}{{pandoraCollection.count|pluralize}}.</span></p>
+      </div>
+    </div>
+    
+    {% elif searching and pandoraCollection.count == 0 %}
+    <div class="row">
+      <div class="small-12 columns">
+        <p>{% trans "Search Results:" %} <span class="label alert">No {{title|lower}}{{pandoraCollection.count|pluralize}} matched your search criteria!!!</span></p>
+      </div>  
+    </div>  
+    
+    {% endif %}
+
+
+    <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
+
+      {% autopaginate pandoraCollection 25 %}
+    
+      {% for each in pandoraCollection %}
+      {% get_source_id each.pk as source_id %}
+      {% get_user_object each.created_by as user_obj %}
+
+      <!-- new -->
+        <li class="card">
+        <div class="file">
+          <div class="row">
+            <div class="small-7 columns">
+              <div class="label-list">{% for tag in each.tags|slice:":3" %}
+                  <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
+                {% endfor %}</div>
+
+                
+              <header>
+                <h5>
+                  {{ each.name }}{% if each.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+                </h5>
+              </header>
+            </div>
+            <div class="small-5 columns">
+              {% if "video" in each.mime_type and each.member_of_names_list|join:', ' != "Pandora_video" %}
+                <img src="{% url 'getFileThumbnail' group_id each.pk %}">
+              {% elif "video" in each.mime_type and each.member_of_names_list|join:', ' == "Pandora_video" %}
+                <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+              {% endif %}
+            </div>
+          </div>
+
+          <a href ="{% url 'video_detail' group_name_tag each %}?vid_id={{src_id}}">
+          <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+          
+          <footer>
+            <div class="small-6 columns">{{each.mime_type|truncatechars:15}}</div>
+            <div class="small-6 columns"><div class="right"><strong>{{each.file_size.size}}</strong> {{each.file_size.unit}}</div></div>
+          </footer>
+          </a>
+
+        </div>
+        </li>    
+
+      <!-- Previous -->
+      {% comment %}
+      <!-- <li class="card">
+        <div class="file">
+
+        <header>
+          <div class="th">
+          <a href="http://wetube.gnowledge.org/{{source_id}}/480p.webm">
+          <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+          </a>
+          </div>
+
+          <h4>{{each.name}}</h4>
+
+          <div>
+            <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
+              <br/>
+              by <span href="#" class="user" data-gnow="">@wetube.gnowledge.org</span>
+            </small>
+          </div>
+        </header>
+
+        <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+
+        <a class="button expand" href ="{% url 'video_detail' group_name_tag each %}?vid_id={{src_id}}">View details</a>
+	{% comment %}
+        {% get_user_object each.created_by as user_obj %}
+          {% if user_obj.username = user.username or request.user.is_superuser %}
+
+        <a class="button alert tiny" href="{% url 'delete_file' group_name_tag each %}?next={{request.path}}">Delete </a>
+
+	{% endif %}
+	{#% endcomment %#}
+        <footer class="row">
+          <div class="small-6 columns">{{each.mime_type|truncatechars:15}}</div>
+          <div class="small-6 columns"><div class="right"><strong>{{each.file_size.size}}</strong> {{each.file_size.unit}}</div></div>
+        </footer>
+
+        </div>
+      </li> -->
+      {% endcomment %}
+      <!-- Previous -->
+
+      {% empty %}
+        {% if not searching %}
+          <div class="row">
+            <div class="small-12 columns">
+              {% blocktrans %}<h5>This group doesn't have any pan.do/ra videos.</h5>{% endblocktrans %}
+            </div>
+          </div>
+        {% endif %}
+
+
+      {% endfor %}
+      
+    </ul>
+
+  {% paginate %}
 
   </div>
-{% block js %}
-    {{ block.super }}
-    <script src="/static/ndf/js/endless-pagination.js"></script>
-    <script>$.endlessPaginate();</script>
-{% endblock %}
-
   <div class="content" id="view-collection">
     {% get_resource_collection groupid title as file_collections %}
 
@@ -838,6 +952,7 @@ next.hide();
 alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
 {% endif %}
 {% endblock %}
+
 
 
 

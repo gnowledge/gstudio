@@ -44,7 +44,7 @@ ator":"==","key":"project","value":"NROER"}],"operator":"&"},"range":[0,totalVid
     pandora_video_id=[]
     
     source_id_set=[]
-    for each in allVideosData[:10]:
+    for each in allVideosData:
         gattribute=collection.Node.one({'$and':[{'object_value':each['id']},{'_type':'GAttribute'},{'attribute_type.$id':source_id_at._id}]})
         if gattribute is None:
             #gs=collection.GSystem()                                                                                     
