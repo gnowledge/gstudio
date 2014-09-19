@@ -21,7 +21,7 @@ col_Group = db[Node.collection_name]
 sitename=Site.objects.all()[0]
 
 def ratings(request,group_id):
-    rating=request.POST['rating']
+    rating=request.POST.get('rating', '')
     node=col_Group.Node.one({'_id':ObjectId(group_id)})
     ratedict={}
     ratedict['score']=int(rating)
