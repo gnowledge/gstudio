@@ -1,8 +1,9 @@
  # Django settings for gnowsys-ndf project.
 from django.conf import global_settings
+#from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 from django.utils.translation import ugettext
 import os
-DEBUG = False
+DEBUG = True
 # ALLOWED_HOSTS = ["127.0.0.1"]
 TEMPLATE_DEBUG = DEBUG
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
@@ -373,6 +374,7 @@ INSTALLED_APPS = (
     'reversion',		#textb
     'django.contrib.flatpages',	#textb
     'online_status',                       #for online_users     
+#    'endless_pagination',
     'registration_email',
 )
 
