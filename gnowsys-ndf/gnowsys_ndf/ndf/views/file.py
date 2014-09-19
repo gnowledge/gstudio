@@ -1,4 +1,4 @@
-''' -- imports from python libraries -- '''
+''' -- Imports from python libraries -- '''
 from django.template.defaultfilters import slugify
 import hashlib # for calculating md5
 # import os -- Keep such imports here
@@ -1057,7 +1057,9 @@ def file_edit(request,group_id,_id):
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:
-	file_node.get_neighbourhood(file_node.member_of)
+        if file_node:
+            file_node.get_neighbourhood(file_node.member_of)
+
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,
                                     'group_id': group_id,
