@@ -175,6 +175,7 @@
 		{% endfor %}
 		<div align="right">
 			<label>- Updated by <em>{{ each_history.created_by }}  {{ each_history.created_at|timesince }}</em> ago</label>
+					
 		</div>
 	</div>
 {% empty %}
@@ -194,8 +195,11 @@
           {% endfor %}
         </div>
       </small>
-     <a href="{% url 'task_edit' group_name node %}" class="small button split edit"><i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span></a> 
 
+			{% if collection != 'True' %}
+			
+     <a href="{% url 'task_edit' group_name node %}" class="small button split edit"><i class="fi-pencil"></i> Update <span data-dropdown="edit-options"></span></a> 
+			{% endif %}
     </div>
 
   </section>
