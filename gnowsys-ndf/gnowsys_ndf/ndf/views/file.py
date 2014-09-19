@@ -1,4 +1,4 @@
-''' -- imports from python libraries -- '''
+''' -- Imports from python libraries -- '''
 from django.template.defaultfilters import slugify
 import hashlib # for calculating md5
 # import os -- Keep such imports here
@@ -970,7 +970,7 @@ def getFileThumbnail(request, group_id, _id):
           if (file_node.fs.files.exists(file_fs)):
             # f = file_node.fs.files.get(ObjectId(file_fs))
             ## This is to display the thumbnail properly, depending upon the size of file.
-            f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
+            f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[ len(file_node.fs_file_ids) - 1 ]))
             # if (file_node.fs.files.exists(file_node.fs_file_ids[1])):
             #     f = file_node.fs.files.get(ObjectId(file_node.fs_file_ids[1]))
             return HttpResponse(f.read(), content_type=f.content_type)
@@ -1057,7 +1057,9 @@ def file_edit(request,group_id,_id):
         return HttpResponseRedirect(reverse('file_detail', kwargs={'group_id': group_id, '_id': file_node._id}))
         
     else:
-	file_node.get_neighbourhood(file_node.member_of)
+        if file_node:
+            file_node.get_neighbourhood(file_node.member_of)
+
         return render_to_response("ndf/document_edit.html",
                                   { 'node': file_node,
                                     'group_id': group_id,
