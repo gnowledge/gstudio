@@ -10,9 +10,9 @@ from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.http import Http404
 from django.core.urlresolvers import reverse
-
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
@@ -30,14 +30,16 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
+from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
+from gnowsys_ndf.ndf.org2any import org2html
 from gnowsys_ndf.ndf.views.file import * 
 from gnowsys_ndf.ndf.views.methods import check_existing_group, get_drawers, get_node_common_fields, create_grelation
-from gnowsys_ndf.settings import GAPPS
-from gnowsys_ndf.mobwrite.models import ViewObj
 from gnowsys_ndf.ndf.templatetags.ndf_tags import get_profile_pic
-from gnowsys_ndf.ndf.org2any import org2html
+from gnowsys_ndf.ndf.templatetags.ndf_tags import edit_drawer_widget
+
+from gnowsys_ndf.mobwrite.models import ViewObj
 
 import json
 from bson.objectid import ObjectId
@@ -1996,10 +1998,32 @@ def get_announced_courses(request, group_id):
       start_time = request.GET.get("start_time", "")
       end_time = request.GET.get("end_time", "")
       nussd_course_type = request.GET.get("nussd_course_type", "")
+      college_groups = []
 
       # Check whether any field has missing value or not
       if start_time == "" or end_time == "" or nussd_course_type == "":
         error_message = "Invalid data: No data found in any of the field(s)!!!"
+        raise Exception(error_message)
+
+      # Fetch "Announced Course" GSystemType
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
+      if not mis_admin:
+        # If not found, throw exception
+        error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
+        raise Exception(error_message)
+
+      # Fetch "has_group" RelationType
+      has_group_RT = collection.Node.one({'_type': "RelationType", 'name': "has_group"}, {'_id': 1})
+      if not has_group_RT:
+        # If not found, throw exception
+        error_message = "'has_group' (RelationType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+
+      # Fetch "Announced Course" GSystemType
+      nussd_course_gt = collection.Node.one({'_type': "GSystemType", 'name': "NUSSD Course"})
+      if not nussd_course_gt:
+        # If not found, throw exception
+        error_message = "'NUSSD Course' (GSystemType) doesn't exists... Please create it first"
         raise Exception(error_message)
 
       # Fetch "Announced Course" GSystemType
@@ -2009,17 +2033,45 @@ def get_announced_courses(request, group_id):
         error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first"
         raise Exception(error_message)
 
+      # Fetch all college groups
+      college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'name': 1})
+      if not college:
+        # If not found, throw exception
+        error_message = "'College' (GSystemType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      else:
+        college_gs = collection.Node.find({'member_of': college._id, 'group_set': mis_admin._id}, {'_id': 1})
+        for each in college_gs:
+          cg = collection.Triple.one({'_type': "GRelation", 'subject': each._id, 'relation_type.$id': has_group_RT._id}, {'right_subject': 1})
+          if cg:
+            college_groups.append(cg.right_subject)
+
       # Type-cast fetched field(s) into their appropriate type
       start_time = datetime.datetime.strptime(start_time, "%m/%Y")
       end_time = datetime.datetime.strptime(end_time, "%m/%Y")
       nussd_course_type = unicode(nussd_course_type)
 
+      groups_to_search_from = []
+      if ObjectId(group_id) == mis_admin._id or ObjectId(group_id) in college_groups:
+        groups_to_search_from = college_groups
+        groups_to_search_from.append(mis_admin._id)
+
+      else:
+        groups_to_search_from = [ObjectId(group_id)]
+
       # Fetch registered NUSSD-Courses of given type
+      nc_cur = collection.Node.find({'member_of': nussd_course_gt._id, 
+                                      'group_set': {'$in': groups_to_search_from},
+                                      'attribute_set.nussd_course_type': nussd_course_type
+                                    },
+                                    {'name': 1}
+                                  )
+
       # For that first fetch GAttribute(s) whose having value of 'object_type' field
       # as given type (nussd_course_type)
       # From that you will get NUSSD-Courses (ObjectId) via 'subject' field
       # And for name, you need to extract from GAttributes 'name' field
-      nc_cur = collection.Triple.find({'_type': "GAttribute", 'object_value': nussd_course_type})
+      # nc_cur = collection.Triple.find({'_type': "GAttribute", 'object_value': nussd_course_type})
 
       # This below dict holds
       # > key as ObjectId (string representation) of the given NUSSD course
@@ -2027,25 +2079,22 @@ def get_announced_courses(request, group_id):
       #      requires keys to be in string format only
       # > value as name of the given NUSSD course
       nc_dict = {}
-
       if nc_cur.count():
         # If found, append them to a dict
         for each in nc_cur:
-          if each.name.split(" -- ")[1] == "nussd_course_type":
-            nc_dict[str(each.subject)] = each.name.split(" -- ")[0]
+          nc_dict[str(each._id)] = each.name
   
       else:
         # Otherwise, throw exception
-        error_message = "No such ("+nussd_course_type+") type of course(s) exists... register them first"
+        error_message = "No such ("+nussd_course_type+") type of course exists... register it first"
         raise Exception(error_message)
 
       # Search for already created announced-courses with given criteria
-      ac_cur = collection.Node.find({'member_of': announced_course_gt._id,
-                                    '$and': [
-                                      {'name': {'$regex': str(start_time), '$options': "i"}},
-                                      # {'name': {'$regex': str(end_time), '$options': "i"}},
-                                      {'name': {'$regex': str(nussd_course_type), '$options': "i"}}
-                                    ]
+      ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
+                                      'group_set': {'$in': groups_to_search_from},
+                                      'attribute_set.start_time': start_time, 
+                                      'attribute_set.end_time': end_time,
+                                      'attribute_set.nussd_course_type': nussd_course_type
                                     })
 
       if ac_cur.count():
@@ -2105,12 +2154,20 @@ def get_anncourses_allstudents(request, group_id):
       nussd_course_type = request.GET.get("nussd_course_type", "")
       registration_year = request.GET.get("registration_year", "")
       degree_year = request.GET.get("degree_year", "")
-      college = request.GET.get("college", "")
+      # college = request.GET.get("college", "")
       all_students = request.GET.get("all_students", "")
+      college_groups = []   # List of ObjectIds
 
       # Check whether any field has missing value or not
       if nussd_course_type == "" or registration_year == "" or degree_year == "" or all_students == "":
         error_message = "Invalid data: No data found in any of the field(s)!!!"
+        raise Exception(error_message)
+
+      # Fetch "Announced Course" GSystemType
+      mis_admin = collection.Node.one({'_type': "Group", 'name': "MIS_admin"}, {'name': 1})
+      if not mis_admin:
+        # If not found, throw exception
+        error_message = "'MIS_admin' (Group) doesn't exists... Please create it first"
         raise Exception(error_message)
 
       # Fetch "Announced Course" GSystemType
@@ -2120,11 +2177,11 @@ def get_anncourses_allstudents(request, group_id):
         error_message = "'Announced Course' (GSystemType) doesn't exists... Please create it first"
         raise Exception(error_message)
 
-      # Fetch "start_time" AttributeType
-      start_time_AT = collection.Node.one({'_type': "AttributeType", 'name': "start_time"}, {'_id': 1})
-      if not start_time_AT:
+      # Fetch "selected_course_RT" RelationType
+      selected_course_RT = collection.Node.one({'_type': "RelationType", 'name': "selected_course"}, {'_id': 1})
+      if not selected_course_RT:
         # If not found, throw exception
-        error_message = "'start_time' (AttributeType) doesn't exists... Please create it first"
+        error_message = "'selected_course' (RelationType) doesn't exists... Please create it first"
         raise Exception(error_message)
 
       # Fetch "has_group" RelationType
@@ -2134,54 +2191,94 @@ def get_anncourses_allstudents(request, group_id):
         error_message = "'has_group' (RelationType) doesn't exists... Please create it first"
         raise Exception(error_message)
 
+      # Fetch all college groups
+      college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'name': 1})
+      if not college:
+        # If not found, throw exception
+        error_message = "'College' (GSystemType) doesn't exists... Please create it first"
+        raise Exception(error_message)
+      else:
+        college_gs = collection.Node.find({'member_of': college._id, 'group_set': mis_admin._id}, {'_id': 1})
+        for each in college_gs:
+          cg = collection.Triple.one({'_type': "GRelation", 'subject': each._id, 'relation_type.$id': has_group_RT._id}, {'right_subject': 1})
+          if cg:
+            college_groups.append(cg.right_subject)
+
       # Type-cast fetched field(s) into their appropriate type
       nussd_course_type = unicode(nussd_course_type)
       # registration_year = datetime.datetime.strptime(registration_year, "%Y")
-      degree_year = unicode(degree_year)
-      college_group = collection.Triple.one({'_type': "GRelation", 'subject': ObjectId(college), 'relation_type.$id': has_group_RT._id})
-
-      # Based on registration_year, fetch corresponding Announced Course(s)
-      ac_cur = collection.Node.find({'_type': "GSystem", 
-                                      'member_of': announced_course_gt._id, 
-                                      '$and': [
-                                        {'name': {'$regex': str(nussd_course_type), '$options': "i"}},
-                                        {'name': {'$regex': registration_year, '$options': "i"}}
-                                      ]
-                                    })
-      if not ac_cur.count():
-        # If no documents found, throw exception
-        error_message = "'Announced Course' of given type ("+nussd_course_type+") doesn't exists for given year ("+registration_year+")... Please create it first"
-        raise Exception(error_message)
-
       # As there is no proper mechanism to search on datetime object in mongodb
       # Preparing greater than equal to and less than equal to values
       date_lte = datetime.datetime.strptime("31/12/"+registration_year, "%d/%m/%Y")
       date_gte = datetime.datetime.strptime("1/1/"+registration_year, "%d/%m/%Y")
+      degree_year = unicode(degree_year)
+      # college_group = college_group.right_subject
+
+      groups_to_search_from = []
+      if ObjectId(group_id) == mis_admin._id or ObjectId(group_id) in college_groups:
+        groups_to_search_from = college_groups
+        groups_to_search_from.append(mis_admin._id)
+
+      else:
+        groups_to_search_from = [ObjectId(group_id)]
+
+      # Based on registration_year, fetch corresponding Announced Course(s)
+      ac_cur = collection.Node.find({'member_of': announced_course_gt._id, 
+                                      'group_set': {'$in': groups_to_search_from},
+                                      'attribute_set.start_time': {'$lte': date_lte}, 
+                                      'attribute_set.end_time': {'$gte': date_gte},
+                                      'attribute_set.nussd_course_type': nussd_course_type
+                                    })
+      if not ac_cur.count():
+        # If no documents found, throw exception
+        error_message = "'Announced Course' of given type ("+nussd_course_type+") doesn't exists for given year ("+registration_year+")... Please announce it first"
+        raise Exception(error_message)
+
       ac_list = []
       for each in ac_cur:
-        # For found Announced Courses
-        # Finding start_time which falls between above date range 
-        each_st = collection.Triple.one({'_type': "GAttribute", 'subject': each._id, 
-                                      'attribute_type.$id': start_time_AT._id,
-                                      'object_value': {'$gte': date_gte, '$lte': date_lte}
-                                    })
-        if each_st:
-          # If match found, append that Announced Course into a list
-          val = [str(each._id), each.name]
-          if val not in ac_list:
-            ac_list.append(val)
+        val = [str(each._id), each.name]
+        if val not in ac_list:
+          ac_list.append(val)
 
       # Sort list based on Announced Course's name field
       # which is 2nd element in each entry
       ac_list.sort(key=itemgetter(1))
 
+      student = collection.Node.one({'_type': "GSystemType", 'name': "Student"})
+
       if all_students == u"true":
         all_students_text = "All students (including enrolled ones)"
+        res = collection.Node.find({'member_of': student._id, 
+                                      'group_set': {'$in': groups_to_search_from},
+                                      'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
+                                      'attribute_set.degree_year': degree_year
+                                    },
+                                    {'_id': 1,'name': 1}
+                                  )
+        all_students_text += " [Count("+str(res.count())+")]"
+        drawer_template_context = edit_drawer_widget("", group_id, None, list(res))
 
       elif all_students == u"false":
         all_students_text = "Only non-enrolled students"
+        res = collection.Node.find({'member_of': student._id, 
+                                      'group_set': {'$in': groups_to_search_from},
+                                      'relation_set.selected_course': {'$exists': False},
+                                      'attribute_set.registration_date': {'$gte': date_gte, '$lte': date_lte},
+                                      'attribute_set.degree_year': degree_year
+                                    },
+                                    {'_id': 1,'name': 1}
+                                  )
+        all_students_text += " [Count("+str(res.count())+")]"
+        drawer_template_context = edit_drawer_widget("", group_id, None, list(res))
+
+      drawer_template_context["widget_for"] = "student_enroll"
+      drawer_widget = render_to_string('ndf/drawer_widget.html', 
+                                        drawer_template_context,
+                                        context_instance = RequestContext(request)
+                                      )
 
       response_dict["announced_courses"] = ac_list
+      response_dict["drawer_widget"] = drawer_widget
 
       response_dict["success"] = True
       response_dict["message"] = "NOTE: " + all_students_text + " are listed along with announced courses ("+nussd_course_type+")"

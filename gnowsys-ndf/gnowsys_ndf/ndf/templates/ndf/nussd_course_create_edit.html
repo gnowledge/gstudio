@@ -52,7 +52,7 @@
         {% if node %}
         {% trans "Editing" %} {{title}}: {{node.name}}
         {% else %}
-        {% trans "Register a New" %] {{title}}
+        {% trans "Register " %} {{title}}
         {% endif %}
       </h2>
     </header>
@@ -108,8 +108,6 @@
           </div>
         </div>    
       </div>
-
-      <input type="hidden" id="name" name="name" value="">
     </div>
 
   </form>
@@ -260,28 +258,7 @@
   });
 
 // On click of Register/Update -----------------------------------------------------------------------------------
-  $(document).on("click", "#save-node", function() {
-  // Store concatenated first, middle & last name field's values into name field (hidden input field) ------------
-    name = ""
-    first_name = $("#first_name").val().trim()
-    middle_name = $("#middle_name").val().trim()
-    last_name = $("#last_name").val().trim()
-
-    name = first_name
-    if (middle_name != "") {
-      name = first_name + " " + middle_name
-    }
-
-    if (last_name != "") {
-      name = name + " " + last_name
-    }
-
-    $("#name").val(name)
-
-  // Enable any disabled field as disabled values can't be fetched in views --------------------------------------
-    $(".content").find(":input[disabled]").each(function(){
-      $(this).removeAttr('disabled');
-    });
-  });
-
+  // $(document).on("click", "#save-node", function() {
+  // // Store concatenated first, middle & last name field's values into name field (hidden input field) ------------
+  // });
 {% endblock %}

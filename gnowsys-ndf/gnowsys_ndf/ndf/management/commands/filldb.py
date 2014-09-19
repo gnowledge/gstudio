@@ -423,7 +423,9 @@ def clean_structure():
   # ------------------------------------------------------------------------------------
   # Keeping timeout=False, as cursor may exceeds it's default time i.e. 10 mins for which it remains alive
   # Needs to be expicitly close
-  gs = collection.Node.find({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 'attribute_set': [], 'relation_set': []}, timeout=False)
+  gs = collection.Node.find({'_type': {'$in': ["GSystem", "File", "Group", "Author"]}, 
+                              '$or': [{'attribute_set': []}, {'relation_set': []}] 
+                            }, timeout=False)
 
   for each_gs in gs:
     attr_list = []  # attribute-list
@@ -458,12 +460,12 @@ def clean_structure():
       # print "\n"
       for each_gar in ga["result"]:
         if each_gar:
-          key_name = get_database().dereference(each_gar["key_val"])
-          # print "\t", key_name["name"], " -- ", each_gar["value_val"]
+          key_node = get_database().dereference(each_gar["key_val"])
+          # print "\t", key_node["name"], " -- ", each_gar["value_val"]
           # Append corresponding GAttribute as key-value pair in given attribute-list
           # key: attribute-type name
           # value: object_value from GAttribute document
-          attr_list.append({key_name["name"]: each_gar["value_val"]})
+          attr_list.append({key_node["name"]: each_gar["value_val"]})
 
     if gr:
       # If any GRelation found
@@ -473,12 +475,23 @@ def clean_structure():
       # print "\n"
       for each_grr in gr["result"]:
         if each_grr:
-          key_name = get_database().dereference(each_grr["key_val"])
-          # print "\t", key_name["name"], " -- ", each_grr["value_val"]
+          key_node = get_database().dereference(each_grr["key_val"])
+          # print "\t", key_node["name"], " -- ", each_grr["value_val"]
           # Append corresponding GRelation as key-value pair in given relation-list
           # key: relation-type name
           # value: right_subject from GRelation document
-          rel_list.append({key_name["name"]: each_grr["value_val"]})
+          if not rel_list:
+            rel_list.append({key_node["name"]: [each_grr["value_val"]]})
+
+          else:
+            key_found = False
+            for each in rel_list:
+              if each.has_key(key_node["name"]):
+                each[key_node["name"]].append(each_grr["value_val"])
+                key_found = True
+
+            if not key_found:
+              rel_list.append({key_node["name"]: [each_grr["value_val"]]})
 
     info_message = ""
     if attr_list:
