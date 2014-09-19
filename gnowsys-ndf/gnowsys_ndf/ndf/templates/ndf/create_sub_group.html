@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load ndf_tags %}
 
-{% block title %} Create a new group {% endblock %}
+{% block title %} Create a sub group of {{maingroup}}{% endblock %}
 
 {% block meta_content %}
 {% blocktrans %}<h3>Types of Groups</h3>
@@ -28,7 +28,7 @@
 
   {% block body_content %} 
 
-  <h2>{% trans "Create a new user group" %}</h2>
+  <h2>{% blocktrans %} Create a sub group of {{maingroup}}  {% endblocktrans %}</h2>
   {% get_existing_groups as groups%}
 
 
