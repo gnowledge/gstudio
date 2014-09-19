@@ -111,7 +111,7 @@
 
 			<!-- Advance -->
 			<th class="expand-width-3">Reading Level</th>
-			<th class="expand-width-3">Time Required</th>
+			<th>Time Required</th>
 			<th class="expand-width-3">Text Complexity</th>
 
 		</tr>
@@ -226,7 +226,9 @@
 			<td class="hide-el" data-field="license"><input type="text" value="{{ resource.licence }}" /></td>
 			<td class="hide-el" data-field="source"><input type="text" value="{{ resource.source }}" /></td>
 			<td class="hide-el" data-field="basenodeurl"><input type="text" value="{{ resource.basedonurl }}" /></td>
-			<td class="hide-el" data-field="translation_of"></td>
+			<td class="hide-el" data-field="translation_of">
+				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+			</td>
 			<td class="hide-el right-border" data-field="adaptation_of" ><input type="text" value="{{ resource.adaption_of }}" /></td>
 
 			<!-- LRMI -->
@@ -289,8 +291,12 @@
 				{% endfor %}
 				</select>
 			</td>
-			<td class="hide-el" data-field="teaches"></td>
-			<td class="hide-el" data-field="prior_node"></td>
+			<td class="hide-el" data-field="teaches">
+				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+			</td>
+			<td class="hide-el" data-field="prior_node">
+				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+			</td>
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
 					<option value="False">False</option>
@@ -313,7 +319,9 @@
 
 			<!-- Advance -->
 			<td class="hide-el" data-field="readinglevel"></td>
-			<td class="hide-el" data-field="timerequired"></td>
+			<td class="hide-el" data-field="timerequired">
+				<input type="text" class="time-required" value=""/>
+			</td>
 			<td class="hide-el" data-field="textcomplexity" class="right-border">
 				<select name="textcomplexity">
 					<option value="None">None</option>
@@ -433,6 +441,14 @@
 		</div>
 
 	{% endif %}
+
+	<!-- Datetimepicker  -->
+	<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
 {% endblock %}
 <!-- -END of Pagination -->
 
@@ -550,14 +566,12 @@
 				}
 				else if((resEditRowArr[i].firstElementChild.type == "button"))
 				{
-					aaa = resEditRowArr[i];
-
 					// check if it had 'data-content-org' attribute
 					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
 					{
 						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value)
 						{
-							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed."
+							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
 						}
 					}
 				}
@@ -585,6 +599,11 @@
 		}
 	}
 
+	// $('.time-required').timepicker();
+	$('.time-required').timepicker({
+		timeOnlyTitle: 'Choose Time Required',
+		minDate: new Date(2050, 1, 1)
+	});
 
 	// // opening the orgit down editor and setting the value in textarea
 	// function openOrgEditor(oid)
