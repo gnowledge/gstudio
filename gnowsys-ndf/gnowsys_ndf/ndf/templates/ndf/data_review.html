@@ -200,7 +200,7 @@
 			<td class="hide-el" data-field="name"><input type="text" value="{{ resource.name }}" /></td>
 			<td class="hide-el" data-field="altnames"><input type="text" value="{{ resource.altnames }}" /></td>
 			<td class="hide-el" data-field="content_org">
-				<input type="button" class="button tiny expand" value="Edit content in editor" data-content-org="{{ resource.content_org }}" data-content-org-row-id="{{resource.pk}}" onclick="openOrgEditor('{{resource.pk}}')" />
+				<input type="button" data-reveal-id="content_org_overlay" class="button tiny expand" value="Edit content in editor" data-content-org="{{ resource.content_org }}" data-content-org-row-id="{{resource.pk}}" />
 			</td>
 			<td class="hide-el" data-field="language">
 				<select name="language">
@@ -509,6 +509,10 @@
 		{
 			resEditRowArr[i].classList.remove("hide-el");
 		};
+
+		// setting orgitdown_data_reveal_editor content to content_org of current row object.
+		content_org = $("input[data-content-org-row-id="+oid+"]").attr("data-content-org");
+		document.getElementById("orgitdown_data_reveal_editor").value = content_org;
 		
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
 
@@ -544,6 +548,19 @@
 						+ resEditRowArr[i].firstElementChild.value.trim() + ")\n\n";
 					}
 				}
+				else if((resEditRowArr[i].firstElementChild.type == "button"))
+				{
+					aaa = resEditRowArr[i];
+
+					// check if it had 'data-content-org' attribute
+					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
+					{
+						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value)
+						{
+							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed."
+						}
+					}
+				}
 			}
 
 		};
@@ -569,14 +586,12 @@
 	}
 
 
-	// opening the orgit down editor and setting the value in textarea
-	function openOrgEditor(oid)
-	{
-		content_org = $("input[data-content-org-row-id="+oid+"]").attr("data-content-org");
-		document.getElementById("orgitdown_data_reveal_editor").value = content_org;
+	// // opening the orgit down editor and setting the value in textarea
+	// function openOrgEditor(oid)
+	// {
 
-		$('#content_org_overlay').foundation('reveal', 'open');
-	}
+	// 	// $('#content_org_overlay').foundation('reveal', 'open');
+	// }
 
 // </script>
 {% endblock %}
