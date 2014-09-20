@@ -61,15 +61,34 @@ def search_page(request, group_id):
 def getRenderableContext(group_id):
 	col = get_database()[Node.collection_name]
 	temp = col.Node.find({"_type":"GSystemType"}, {"name":1, "_id":0})
-
+        ins_objectid = ObjectId()
 	allGSystems = []
+        allGroups=[]
 	for gs in temp:
 		allGSystems.append(gs.name)
 
-	allGroups = get_public_groups()								# LIST OF ALL PUBLIC GROUPS
+	#allGroups = get_public_groups()								# LIST OF ALL PUBLIC GROUPS
+  
+        if ins_objectid.is_valid(group_id) is False :
+                group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                if group_ins:
+                        group_id = str(group_ins._id)
+                else:
+                        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                        if auth :
+                                      group_id = str(auth._id)
+                                      group_ins=auth
+	else:
+                group_ins = collection.Node.find_one({'_type': "Group","_id":ObjectId(group_id)})     
+                
+        if not group_ins:
+                
+                group_ins = collection.Node.find_one({'_type': "Author","_id":ObjectId(group_id)})        
+        allGroups.append(group_ins.name)
 	allUsers = populate_list_of_group_members(allGroups)		# LIST OF ALL USERS IN PUBLIC GROUPS
 	memList = populate_list_of_members()						# LIST OF ALL USERS
-
+        
 	return {"allGSystems":allGSystems, "groupid":group_id, "allGroups":allGroups, "authors":memList, "allUsers":allUsers, "group_id":group_id}
 	
 
@@ -155,8 +174,8 @@ def results_search(request, group_id):
 	# STORES OBJECTID OF EVERY SEARCH RESULT TO CHECK FOR DUPLICATES
 	all_ids = []
 
-	try:
-		if request.method == "GET":
+	print "getting exceuted"
+        if request.method == "GET":
 			try:
 				user_reqd_name = str(request.GET['users'])
 			except Exception:
@@ -165,7 +184,10 @@ def results_search(request, group_id):
 
 			# CONVERT USERNAME TO INTEGER
 			if user_reqd_name != "all":
-				user_reqd = int(User.objects.get(username = user_reqd_name).pk)
+                                #Query writtent o avoid the error due to User.Object
+                                auth = collection.Node.one({'_type': 'Author', 'name': user_reqd_name })
+                                if auth:
+                                        user_reqd = int(auth.created_by)
 	 		
 			search_str_user = str(request.GET['search_text']).strip()							# REMOVE LEADING / TRAILING SPACES
 			search_str_user = search_str_user.lower()											# CONVERT TO LOWERCASE
@@ -189,8 +211,8 @@ def results_search(request, group_id):
 			# GET A CURSOR ON ALL THE GSYSTEM TYPES 
 			all_GSystemTypes = col.Node.find({"_type":"GSystemType"}, {"_id":1})
 			
-			public_groups = get_public_groups()					# GET LIST OF PUBLIC GROUPS
-			public_groups = group_name_to_id(public_groups)		# CONVERT GROUP NAMES TO OBJECTIDS
+			#public_groups = get_public_groups()					# GET LIST OF PUBLIC GROUPS
+			#public_groups = group_name_to_id(public_groups)		# CONVERT GROUP NAMES TO OBJECTIDS
 
 			if (search_by_name == True):						# IF TRUE, THEN SEARCH BY NAME
 				all_GSystemTypes.rewind()
@@ -205,29 +227,36 @@ def results_search(request, group_id):
 					by any user
 				"""
 				for GSType in all_GSystemTypes:					# Search in all GSystem types
-
+                                        
 					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
+                                        #print "group id",group_id
 					if user_reqd != -1:				# 
-						exact_match = col.Node.find({"member_of":GSType._id, "created_by":user_reqd, "access_policy":"PUBLIC", "name":{"$regex":search_str_user, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-					else:
-						exact_match = col.Node.find({"member_of":GSType._id, "access_policy":"PUBLIC", "name":{"$regex":search_str_user, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})					
+						exact_match = col.Node.find({'$and':[{"member_of":GSType._id},{"created_by":user_reqd},{"group_set":group_id},{"access_policy":"PUBLIC"},{"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 
-					# SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
+					else:
+						exact_match = col.Node.find({'$and':[{"member_of":ObjectId(GSType._id)},{"access_policy":"PUBLIC"},{"group_set":ObjectId(group_id)},{"name":{"$regex":search_str_user,"$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+                                                
+                                        # SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
+                                        #exact_match.rewind()
+                                        
 					exact_match = list(exact_match)				
 					
 					"""
 					For each matching GSystem, see if the GSystem has already been added to the list of ids and add if not added.
 					result is added only if belongs to the list of public groups
 					"""
-					for j in exact_match:
+                                	for j in exact_match:
+                                               
+                                                j.name=(j.name).replace('"',"'")
+                                                
 						if j._id not in all_ids:
 							grps = j.group_set
-							for gr in public_groups:
-								if gr in grps:
-									j = addType(j)
-									search_results_ex['name'].append(j)
-									all_ids.append(j['_id'])
-									break
+							#for gr in public_groups:
+							#	if gr in grps:
+                                                        j = addType(j)
+                                                        search_results_ex['name'].append(j)
+                                                        all_ids.append(j['_id'])
+                                                        
 
 					# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY
 					search_results_ex['name'] = sort_names_by_similarity(search_results_ex['name'], search_str_user)
@@ -240,9 +269,12 @@ def results_search(request, group_id):
 					while c < len_stemmed:	
 						word = search_str_stemmed[c]
 						if user_reqd != -1:					# user_reqd = -1  =>  search all users, else user_reqd = pk of user
-							temp = col.Node.find({"member_of":GSType._id, "created_by":user_reqd, "access_policy":"PUBLIC", "name":{"$regex":word, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+							temp = col.Node.find({'$and':[{"member_of":GSType._id},{"created_by":user_reqd},{"group_set":group_id},{"access_policy":"PUBLIC"},{"name":{"$regex":word, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 						else:								# search all users in created by 
-							temp = col.Node.find({"member_of":GSType._id, "access_policy":"PUBLIC", "name":{"$regex":word, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+							temp = col.Node.find({'$and':[{"member_of":GSType._id},{"access_policy":"PUBLIC"},{"group_set":group_id},{"name":{"$regex":word, "$options":"i"}}]},
+
+                                                                             {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+                                                        
 						split_stem_match.append(temp)
 						c += 1
 					
@@ -253,15 +285,16 @@ def results_search(request, group_id):
 					for j in split_stem_match:
 						c = 0
 						for k in j:
+                                                        k.name=(k.name).replace('"',"'")
 							if (k._id not in all_ids):				# check if this GSYstem has already been added to search results
-								grps = k.group_set					# group_set holds all the groups that the current GSystem is published in
-								for gr in public_groups:			# for each public group
-									if gr in grps:					# check that the GSystem should belong to at least one public group
-										k = addType(k)				# adds the link and datetime to the 
-										search_results_st['name'].append(k)
-										all_ids.append(k['_id'])	# append to the list of all ids of GSYstems in the results
-										c += 1
-										break
+								#grps = k.group_set					# group_set holds all the groups that the current GSystem is published in
+								#for gr in public_groups:			# for each public group
+								#	if gr in grps:					# check that the GSystem should belong to at least one public group
+                                                                k = addType(k)				# adds the link and datetime to the 
+                                                                search_results_st['name'].append(k)
+                                                                all_ids.append(k['_id'])	# append to the list of all ids of GSYstems in the results
+                                                                c += 1
+                                                               
 
 					# SORTS THE SEARCH RESULTS BY SIMILARITY WITH THE SEARCH QUERY			
 					search_results_st['name'] = sort_names_by_similarity(search_results_st['name'], search_str_user)
@@ -273,19 +306,20 @@ def results_search(request, group_id):
 				for GSType in all_GSystemTypes:
 					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
 					if user_reqd != -1:				
-						exact_match = col.Node.find({"member_of":GSType._id, "created_by":user_reqd, "access_policy":"PUBLIC", "tags":search_str_user}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						exact_match = col.Node.find({'$and':[{"member_of":GSType._id},{"created_by":user_reqd},{"group_set":group_id},{"access_policy":"PUBLIC"},{"tags":search_str_user}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 					else:
-						exact_match = col.Node.find({"member_of":GSType._id, "access_policy":"PUBLIC", "tags":search_str_user}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+						exact_match = col.Node.find({'$and':[{"member_of":GSType._id},{"access_policy":"PUBLIC"},{"group_set":group_id},{"tags":search_str_user}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 										
 					for j in exact_match:
+                                                j.name=(j.name).replace('"',"'")
 						if j._id not in all_ids:
-							grps = j.group_set
-							for gr in public_groups:
-								if gr in grps:
-									j = addType(j)
-									search_results_ex['tags'].append(j)
-									all_ids.append(j['_id'])
-									break
+							#grps = j.group_set
+							#for gr in public_groups:
+							#	if gr in grps:
+                                                        j = addType(j)
+                                                        search_results_ex['tags'].append(j)
+                                                        all_ids.append(j['_id'])
+                                                        
 
 					search_results_ex['tags'] = sort_names_by_similarity(search_results_ex['tags'], search_str_user)
 
@@ -297,9 +331,9 @@ def results_search(request, group_id):
 					while c < len_stemmed:
 						word = search_str_stemmed[c]
 						if user_reqd != -1:					
-							temp = col.Node.find({"member_of":GSType._id, "tags":word, "created_by":user_reqd, "access_policy":"PUBLIC"}, {"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
+							temp = col.Node.find({'$and':[{"member_of":GSType._id},{"tags":word},{"created_by":user_reqd},{"group_set":group_id},{"access_policy":"PUBLIC"}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "group_set":1, "last_update":1, "url":1})
 						else:
-							temp = col.Node.find({"member_of":GSType._id, "tags":word, "access_policy":"PUBLIC"}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
+							temp = col.Node.find({'$and':[{"member_of":GSType._id},{"tags":word},{"access_policy":"PUBLIC"},{"group_set":group_id}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
 						
 						split_stem_match.append(temp)
 						c += 1
@@ -312,16 +346,16 @@ def results_search(request, group_id):
 					for j in split_stem_match:
 						c = 0
 						for k in j:
+                                                        k.name=(k.name).replace('"',"'")
 							if k._id not in all_ids:
-								grps = k.group_set
-								for gr in public_groups:
-									if gr in grps:
-										k = addType(k)
-										search_results_st['tags'].append(k)
-										all_ids.append(k['_id'])
-										c += 1
-										break
-
+								#grps = k.group_set
+								#for gr in public_groups:
+								#	if gr in grps:
+                                                                k = addType(k)
+                                                                search_results_st['tags'].append(k)
+                                                                all_ids.append(k['_id'])
+                                                                c += 1
+                                                                
 			"""
 			The following lines implement search over the contents of all GSystems.
 			It uses the Map Reduce algorithm to keep track of which GSystems contain which words and how many times.
@@ -359,25 +393,29 @@ def results_search(request, group_id):
 
 				for docId in sorted_content_match_pairs:
 					doc = col.Node.find_one({"_id":docId['doc_id'], "access_policy":"PUBLIC"}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "group_set":1, "url":1})
-					grps = doc.group_set
+                                        try:
+                                                grps = doc.group_set
 					
-					"""
-					For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
-					Result is added only if belongs to the list of public groups and has public access policy
-					"""
-					for gr in public_groups:
-						if gr in grps:
-							doc = addType(doc)
-							if user_reqd != -1:
+                                                """
+                                                For each matching GSystem, see if the GSystem has already been returned in search results and add if not already added.
+                                                Result is added only if belongs to the list of public groups and has public access policy
+                                                """
+                                                #for gr in public_groups:
+                                                #	if gr in grps:
+                                                doc = addType(doc)
+                                                #matching for current group Only
+                                                if group_id in grps:
+                                                        if user_reqd != -1:
 								if User.objects.get(username=doc['created_by']).pk == user_reqd:
 									search_results_st['content'].append(doc)
-							else:
+                                                        else:
 								search_results_st['content'].append(doc)
-
+                                        except:
+                                                pass
 			#search_results = json.dumps(search_results, cls=Encoder)
-			memList = populate_list_of_members()
-	except Exception:
-		pass
+                        memList = populate_list_of_members()
+	
+	
 
 	search_results = json.dumps(search_results, cls=Encoder)
 	#print "search_results:", search_results
@@ -411,7 +449,7 @@ def results_search_group(request, group_id):
 	search_by_contents = 0
 	user = ""
 	user_reqd = -1
-
+        
 	try:
 		if request.method == "GET":
 			try:
@@ -482,15 +520,16 @@ def results_search_group(request, group_id):
 
 					# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
 					if user_reqd != -1:				
-						exact_match = col.Node.find({"member_of":GSType._id, "created_by":user_reqd, "access_policy":"PUBLIC", "group_set":group_id, "name":{"$regex":search_str_user, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+						exact_match = col.Node.find({'$and':[{"member_of":GSType._id},{"created_by":user_reqd}, {"access_policy":"PUBLIC"},{"group_set":group_id},{"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 					else:
-						exact_match = col.Node.find({"member_of":GSType._id, "access_policy":"PUBLIC", "group_set":group_id, "name":{"$regex":search_str_user, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})					
+						exact_match = col.Node.find({'$and'[{"member_of":GSType._id},{ "access_policy":"PUBLIC"}, {"group_set":group_id}, {"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})					
 
 					# SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
 					exact_match = list(exact_match)				
 					#exact_match = sort_names_by_similarity(exact_match, search_str_user)
 
 					for j in exact_match:
+                                                j.name=(j.name).replace('"',"'")
 						if j._id not in all_ids:
 							j = addType(j)
 							search_results_ex['name'].append(j)
@@ -505,9 +544,9 @@ def results_search_group(request, group_id):
 					while c < len_stemmed:
 						word = search_str_stemmed[c]
 						if user_reqd != -1:
-							temp = col.Node.find({"member_of":GSType._id, "group_set":group_id, "created_by":user_reqd, "access_policy":"PUBLIC", "name":{"$regex":word, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+							temp = col.Node.find({'$and':[{"member_of":GSType._id},{ "group_set":group_id},{ "created_by":user_reqd},{ "access_policy":"PUBLIC"},{ "name":{"$regex":word, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 						else:
-							temp = col.Node.find({"member_of":GSType._id, "group_set":group_id, "access_policy":"PUBLIC", "name":{"$regex":word, "$options":"i"}}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
+							temp = col.Node.find({'$and':[{"member_of":GSType._id},{ "group_set":group_id}, {"access_policy":"PUBLIC"}, {"name":{"$regex":word, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 						#temp_sorted = sort_names_by_similarity(temp, search_str_user)
 						split_stem_match.append(temp)#temp_sorted)
 						c += 1
@@ -515,6 +554,7 @@ def results_search_group(request, group_id):
 					for j in split_stem_match:
 						c = 0
 						for k in j:
+                                                        k.name=(k.name).replace('"',"'")
 							if (k._id not in all_ids):
 								k = addType(k)
 								search_results_st['name'].append(k)
@@ -538,6 +578,7 @@ def results_search_group(request, group_id):
 					#exact_match = sort_names_by_similarity(exact_match, search_str_user)
 					
 					for j in exact_match:
+                                                j.name=(j.name).replace('"',"'")
 						if j._id not in all_ids:
 							j = addType(j)
 							search_results_ex['tags'].append(j)
@@ -564,6 +605,7 @@ def results_search_group(request, group_id):
 					for j in split_stem_match:
 						c = 0
 						for k in j:
+                                                        k.name=(k.name).replace('"',"'")
 							if k._id not in all_ids:
 								k = addType(k)
 								search_results_st['tags'].append(k)
@@ -717,8 +759,9 @@ def group_name_to_id(groupNames):
 	col = get_database()[Node.collection_name]
 
 	for gr in groupNames:
-		sg_gr = col.Node.one({"_type":"Group", "name":gr})
-		allGroups.append(sg_gr._id)
+		sg_gr = col.Node.find({"_type":"Group", "name":gr})
+		for each in sg_gr:
+                        allGroups.append(each._id)
 
 	return allGroups
 
@@ -845,14 +888,16 @@ def addType(obj):
 	#i = ObjectId(obj.member_of[0])
 	#links = collection.Node.find({"member_of":i, "required_for":"Links"}, {"link":1})
 	##print "links count", links.count(), "\n"
-
+        auth = collection.Node.one({'_type': 'Author', 'created_by': obj.created_by})
+        
 	#for ob in links:
 	obj2 = {}
 
 	obj2['_id'] = obj._id
 	obj2['name'] = obj.name
 	obj2['link'] = obj.url
-	obj2['created_by'] = User.objects.get(pk=obj.created_by).username
+	if auth:
+                obj2['created_by'] = auth.name
 	##print "lst update: ", type(obj.last_update)
 	obj2['last_update'] = str(obj.last_update.date())
 	#datetime.datetime.strptime(obj.last_update, "%Y-%m-%dT%H:%M:%S.%fZ").date()
