@@ -98,9 +98,9 @@
                       name="search_form" method="GET" >
               <input type="text" name="search_text" id="search_text" placeholder='{% trans "Search" %} {{group_object.name}}' autocomplete="off" required/>
                 <div class="hide">
-                <input type="checkbox" name="search_fields" id="chk_name" value="name" />Name
-	<input type="checkbox" name="search_fields" id="chk_tags" value="tags" />Tags 
-	<input type="checkbox" name="search_fields" id="chk_content" value="contents" />Content <br>
+                <input type="checkbox" name="search_fields" id="chk_name" value="name" checked />Name
+	<input type="checkbox" name="search_fields" id="chk_tags" value="tags" checked />Tags 
+	<input type="checkbox" name="search_fields" id="chk_content" value="contents" checked />Content <br>
                     <select name="users">
 		<option value="all">All users</option>
 		{% for mem in authors %}		
