@@ -1199,7 +1199,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
       ga_node.subject = subject_id
       ga_node.attribute_type = attribute_type_node
 
-      if object_value == None:
+      if (not object_value) and type(object_value) != bool:
         object_value = u"None"
         ga_node.status = u"DELETED"
 
@@ -1233,7 +1233,7 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
     is_ga_node_changed = False
     old_object_value = None
     try:
-      if object_value == None:
+      if (not object_value) and type(object_value) != bool:
         old_object_value = ga_node.object_value
 
         ga_node.status = u"DELETED"
