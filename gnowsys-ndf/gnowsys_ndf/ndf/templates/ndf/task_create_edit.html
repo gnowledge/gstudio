@@ -89,9 +89,10 @@ var users = [];
   });
 return users;
 }
+
 $.each(user_list, function(key,value) {   
      $('#customDropdown2')
-         .append($("<option></option>")
+	.append($("<option></option>")
          .attr("value",value)
          .text(value)
 	 .attr("id",value)); 
@@ -102,6 +103,7 @@ $.each(user_list, function(key,value) {
 		 .attr("type","checkbox")
 		 .attr("id",value) 
 		 .appendTo(div);
+							
 });
 {% if Status %}
 var edit_Status  = document.getElementById("customDropdown")
@@ -118,7 +120,7 @@ edit_Assignee.selectedIndex = edit_Assignee.options.{{Assignee}}.index
 
 var selected = new Array();
 $(document).on('click',"#save-node",function(){
-$('input:checkbox:checked').each(function() {     selected.push(this.id);});
+$('form-edit-node input:checkbox:checked').each(function() {     selected.push(this.id);});
 $('#hidden_watchers').val(selected);
 });
 
