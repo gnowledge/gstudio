@@ -2,6 +2,39 @@
 {% load pagination_tags %}
 {% load ndf_tags %}
 {% load i18n %}
+<style type="text/css"> 
+#created {
+    background-color: #ffff7f;
+}
+#New{
+background-color: #7fe8bf;
+}
+
+#Rejected{
+background-color: #ffad99;
+}
+#InProgress{
+background-color: #7fe8bf;
+}
+#Closed{
+background-color: #FFFFFF;
+}
+#Feedback{
+background-color: #b7b7b7;
+}
+#Resolved{
+background-color: #FFFFFF;
+}
+#Pending{
+background-color: #ffad99;
+}
+#Assigned{
+background-color: #a1a57f;
+}
+#completed{
+background-color: #FFFFFF;
+}
+</style>
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
   {% autopaginate TASK_inst 23 %}
@@ -10,7 +43,7 @@
     
   {% get_version_of_module node.pk as version %}
   <li class="card">
-    <div class="course">
+    <div class="course" id={{node.type}}>
       <header>
         <div class="label-list">
           {% for tag in node.tags|slice:":3" %}
