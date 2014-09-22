@@ -1094,7 +1094,7 @@ def data_review(request, group_id, page_no=1):
   file_id = collection.Node.find_one({'_type':"GSystemType", "name":"File"}, {"_id":1})
 
   # print group_obj
-  files_obj = collection.Node.find({'member_of': {'$all': [ObjectId(file_id._id)]}, 
+  files_obj = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id._id)]}, 
                                     '_type': 'File', 'fs_file_ids':{'$ne': []}, 
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$or': [
@@ -1104,10 +1104,12 @@ def data_review(request, group_id, page_no=1):
                                           {'created_by': request.user.id}
                                         ]
                                       }
-                                    ]
-                                  }).sort("last_update", -1)
+                                    ]},
+                                      {'member_of': {'$all': [pandora_video_st._id]}}
 
-
+                                       ]}).sort("last_update", -1)
+                                 
+  
   # implementing pagination: paginator.Paginator(cursor_obj, <int: page no>, <int: no of obj in each page>)
   # (ref: https://github.com/namlook/mongokit/blob/master/mongokit/paginator.py)
   paged_resources = paginator.Paginator(files_obj, page_no, 10)
