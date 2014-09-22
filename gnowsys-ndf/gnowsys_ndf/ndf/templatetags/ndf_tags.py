@@ -2022,7 +2022,9 @@ def get_file_node(request,file_name=""):
 
 @register.filter(name='jsonify')
 def jsonify(value):
-	"""
-	Parses python value into json-type (useful in converting python list/dict into javascript/json object).
-	"""
+  """
+  Parses python value into json-type (useful in converting python list/dict into javascript/json object).
+  """
   return json.dumps(value)
+
+
