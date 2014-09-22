@@ -8,6 +8,7 @@ urlpatterns = patterns('gnowsys_ndf.ndf.views.group',
 		       url(r'^/edit_group/', 'edit_group', name='edit_group'),
 		       url(r'^/switch_group/(?P<node_id>[\w-]+)$', 'switch_group', name='switch_group'),
 		       url(r'^/app_selection/', 'app_selection', name='app_selection'),
+		       url(r'^/create_sub_group/', 'create_sub_group', name='create_sub_group'),
 
 
 )
