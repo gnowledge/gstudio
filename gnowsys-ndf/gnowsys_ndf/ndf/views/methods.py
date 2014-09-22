@@ -984,7 +984,7 @@ def get_property_order_with_value(node):
 
           base_field = {
             'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
-            'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Content", 'required': False},
+            'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Description", 'required': False},
             # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
             'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
             # 'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
@@ -1188,6 +1188,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
 def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
+  info_message = ""
   
   ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
@@ -1197,18 +1198,31 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
 
       ga_node.subject = subject_id
       ga_node.attribute_type = attribute_type_node
-      ga_node.object_value = object_value
-      
-      ga_node.status = u"PUBLISHED"
-      ga_node.save()
-      info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
-      print "\n ", info_message
 
-      # Fetch corresponding document & append into it's attribute_set
-      collection.update({'_id': subject_id}, 
-                        {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
-                        upsert=False, multi=False
-                      )
+      if object_value == None:
+        object_value = u"None"
+        ga_node.status = u"DELETED"
+
+      else:
+        ga_node.status = u"PUBLISHED"
+
+      ga_node.object_value = object_value
+      ga_node.save()
+
+      if object_value == u"None":
+        info_message = " GAttribute ("+ga_node.name+") created successfully with status as 'DELETED'!\n"
+        print "\n ", info_message
+
+      else:
+        info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+        print "\n ", info_message
+
+        # Fetch corresponding document & append into it's attribute_set
+        collection.update({'_id': subject_id}, 
+                          {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
+                          upsert=False, multi=False
+                        )
+
 
     except Exception as e:
       error_message = "\n GAttributeCreateError: " + str(e) + "\n"
@@ -1218,39 +1232,79 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
     # Code for updation
     is_ga_node_changed = False
     old_object_value = None
-
     try:
-      if type(ga_node.object_value) == list:
-        if set(ga_node.object_value) != set(object_value):
-          old_object_value = ga_node.object_value
-          ga_node.object_value = object_value
-          is_ga_node_changed = True
+      if object_value == None:
+        old_object_value = ga_node.object_value
 
-      elif type(ga_node.object_value) == dict:
-        if cmp(ga_node.object_value, object_value) != 0:
-          old_object_value = ga_node.object_value
-          ga_node.object_value = object_value
-          is_ga_node_changed = True
-
-      else:
-        if ga_node.object_value != object_value:
-          old_object_value = ga_node.object_value
-          ga_node.object_value = object_value
-          is_ga_node_changed = True
-
-      if is_ga_node_changed:
-        ga_node.status = u"PUBLISHED"
+        ga_node.status = u"DELETED"
         ga_node.save()
-        info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+        info_message = " GAttribute ("+ga_node.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
         print "\n ", info_message
 
         # Fetch corresponding document & update it's attribute_set with proper value
         collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
-                          {'$set': {'attribute_set.$.'+attribute_type_node.name: ga_node.object_value}}, 
+                          {'$pull': {'attribute_set': {attribute_type_node.name: old_object_value}}}, 
                           upsert=False, multi=False)
+
       else:
-        info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
-        print "\n ", info_message
+        if type(ga_node.object_value) == list:
+          if type(ga_node.object_value[0]) == dict:
+            old_object_value = ga_node.object_value
+
+            if len(old_object_value) != len(object_value):
+              ga_node.object_value = object_value
+              is_ga_node_changed = True
+
+            else:
+              pairs = zip(old_object_value, object_value)
+              if any(x != y for x, y in pairs):
+                ga_node.object_value = object_value
+                is_ga_node_changed = True
+
+          elif set(ga_node.object_value) != set(object_value):
+            old_object_value = ga_node.object_value
+            ga_node.object_value = object_value
+            is_ga_node_changed = True
+
+        elif type(ga_node.object_value) == dict:
+          if cmp(ga_node.object_value, object_value) != 0:
+            old_object_value = ga_node.object_value
+            ga_node.object_value = object_value
+            is_ga_node_changed = True
+
+        else:
+          if ga_node.object_value != object_value:
+            old_object_value = ga_node.object_value
+            ga_node.object_value = object_value
+            is_ga_node_changed = True
+
+        if is_ga_node_changed:
+          if ga_node.status == u"DELETED":
+            ga_node.status = u"PUBLISHED"
+            ga_node.save()
+
+            info_message = " GAttribute ("+ga_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            print "\n", info_message
+
+            # Fetch corresponding document & append into it's attribute_set
+            collection.update({'_id': subject_id}, 
+                              {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
+                              upsert=False, multi=False)
+
+          else:
+            ga_node.status = u"PUBLISHED"
+            ga_node.save()
+
+            info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+            print "\n ", info_message
+
+            # Fetch corresponding document & update it's attribute_set with proper value
+            collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
+                              {'$set': {'attribute_set.$.'+attribute_type_node.name: ga_node.object_value}}, 
+                              upsert=False, multi=False)
+        else:
+          info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+          print "\n ", info_message
 
     except Exception as e:
       error_message = "\n GAttributeUpdateError: " + str(e) + "\n"
