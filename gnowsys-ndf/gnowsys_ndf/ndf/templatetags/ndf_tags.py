@@ -446,18 +446,18 @@ def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_wi
 			for each in collection.Node.find({"_type": types}):
 				if fields_value_id_list:
 					if each._id not in fields_value_id_list:
-						drawer1[each._id] = each
+						drawer1[each._id] = each.name
 				else:
-					drawer1[each._id] = each
+					drawer1[each._id] = each.name
 
 		if types in ["all_types"]:
 			for each in alltypes:
 				for eachnode in collection.Node.find({"_type": each}):
 					if fields_value_id_list:
 						if eachnode._id not in fields_value_id_list:
-							drawer1[eachnode._id] = eachnode
+							drawer1[eachnode._id] = eachnode.name
 					else:
-						drawer1[eachnode._id] = eachnode
+						drawer1[eachnode._id] = eachnode.name
 
 		if fields_value_id_list:
 			drawer2 = []
@@ -1289,18 +1289,19 @@ def get_grid_fs_object(f):
 	return grid_fs_obj
 
 @register.inclusion_tag('ndf/admin_class.html')
-def get_class_list(class_name):
+def get_class_list(group_id,class_name):
 	"""Get list of class 
 	"""
+        print "in get_class"
 	class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "MetaType", "GRelation", "GAttribute"]
-	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data"}
+	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data","groupid":group_id}
 
 @register.inclusion_tag('ndf/admin_class.html')
-def get_class_type_list(class_name):
+def get_class_type_list(group_id,class_name):
 	"""Get list of class 
 	"""
 	class_list = ["GSystemType", "RelationType", "AttributeType"]
-	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"designer"}
+	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"designer","groupid":group_id}
 
 @register.assignment_tag
 def get_Object_count(key):

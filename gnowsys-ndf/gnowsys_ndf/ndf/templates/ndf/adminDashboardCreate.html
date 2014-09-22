@@ -4,9 +4,9 @@
 {% block title %} Admin {% endblock %}
 {% block meta_content %}
      {% ifequal url 'data' %}
-	{% get_class_list class_name %}
+	{% get_class_list groupid class_name %}
      {% else %}
-        {% get_class_type_list class_name %}
+        {% get_class_type_list groupid class_name %}
      {% endifequal %}
 {% endblock %}
 
@@ -202,11 +202,10 @@ $("#lan option[value={{v}}]").remove();
   
   $("form").submit(function(event) {
     flag = 0;
-  
     for(each in type_list){
       eval(type_list[each] + "()");
     }
-  
+    alert(required_fields);
     for(reqfields in required_fields){
   
       if($("#definitionlist [name = "+required_fields[reqfields]+" ]").val()){
