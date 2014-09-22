@@ -304,10 +304,10 @@
 				</select>
 			</td>
 			<td class="hide-el" data-field="teaches">
-				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+				<input type="button" data-reveal-id="teaches-overlay" class="button tiny expand" value="Edit in drawer"/>
 			</td>
 			<td class="hide-el" data-field="prior_node">
-				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+				<input type="button" data-reveal-id="prior-node-overlay" class="button tiny expand" value="Edit in drawer"/>
 			</td>
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
@@ -353,6 +353,19 @@
   <a class="close-reveal-modal">&#215;</a>
 </div>
 
+<div id="teaches-overlay" class="reveal-modal" data-reveal>
+	teaches
+	<div id="teaches-drawer">
+		
+	</div>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+
+<div id="prior-node-overlay" class="reveal-modal" data-reveal>
+	prior node
+	<div id="prior-node-drawer"></div>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
 <!-- END of Looping through each resource -->
 
 {% endblock %}
@@ -551,6 +564,8 @@
 
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
 
+		populateTeachesPriorNode(oid, "teaches");
+
 	}
 
 	// action on cancel button click
@@ -617,6 +632,32 @@
 			changeSaveCancelToEdit(oid, resEditRowArr)
 		}
 	}
+
+
+	function populateTeachesPriorNode(oid, field, app="")
+	{
+
+		// $("#save-node").css("display", "none");
+		// $('#teaches-drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+// editdrawerwidget tag
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: oid,
+				field: field,
+				app: app, // gapp name
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				$("#teaches-drawer").html(data);
+				// $("#save-node").css("display", "block");
+			}
+		});
+
+	}
+    
 
 	// $('.time-required').timepicker();
 	$('.time-required').timepicker({
