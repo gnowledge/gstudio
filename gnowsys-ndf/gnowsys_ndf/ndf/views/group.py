@@ -314,7 +314,6 @@ def populate_list_of_group_members(group_id):
     except:
         return []
 
-
 def group_dashboard(request,group_id=None):
 
   if ins_objectid.is_valid(group_id) is False :
@@ -584,104 +583,104 @@ def publish_group(request,group_id,node):
 
 
 def create_sub_group(request,group_id):
-  ins_objectid  = ObjectId()
-  grpname=""
-  if ins_objectid.is_valid(group_id) is False :
-    group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-    if group_ins:
-        grpname=group_ins.name 
-        group_id = str(group_ins._id)
-    else :
-      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
-      if auth :
-        group_id = str(auth._id)
-        grpname=auth.name	
-  else :
-      group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
-      grpname=group_ins.name
-      pass
+  try:
+      ins_objectid  = ObjectId()
+      grpname=""
+      if ins_objectid.is_valid(group_id) is False :
+          group_ins = collection.Node.find_one({'_type': "Group","name": group_id}) 
+          auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+          if group_ins:
+              grpname=group_ins.name 
+              group_id = str(group_ins._id)
+          else :
+              auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+              if auth :
+                  group_id = str(auth._id)
+                  grpname=auth.name	
+      else :
+          group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_id)})
+          if group_ins:
+              grpname=group_ins.name
+              pass
+          else:
+              group_ins = collection.Node.find_one({'_type': "Author","_id": ObjectId(group_id)})
+              if group_ins:
+                  grpname=group_ins.name
+                  pass
 
-  if request.method == "POST":
-    col_Group = db[Group.collection_name]
-    colg = col_Group.Group()
-    Mod_colg=col_Group.Group()
-
-    cname=request.POST.get('groupname', "")
-    colg.altnames=cname
-    colg.name = unicode(cname)
-    colg.member_of.append(gst_group._id)
-    usrid = int(request.user.id)
-  
-    colg.created_by = usrid
-    if usrid not in colg.author_set:
-      colg.author_set.append(usrid)
-
-    colg.modified_by = usrid
-    if usrid not in colg.contributors:
-      colg.contributors.append(usrid)
-
-    colg.group_type = request.POST.get('group_type', "")        
-    colg.edit_policy = request.POST.get('edit_policy', "")
-    colg.subscription_policy = request.POST.get('subscription', "")
-    colg.visibility_policy = request.POST.get('existance', "")
-    colg.disclosure_policy = request.POST.get('member', "")
-    colg.encryption_policy = request.POST.get('encryption', "")
-    colg.agency_type=request.POST.get('agency_type',"")
-    colg.save()
+      if request.method == "POST":
+          col_Group = db[Group.collection_name]
+          colg = col_Group.Group()
+          Mod_colg=col_Group.Group()
+          cname=request.POST.get('groupname', "")
+          colg.altnames=cname
+          colg.name = unicode(cname)
+          colg.member_of.append(gst_group._id)
+          usrid = int(request.user.id)
+          colg.created_by = usrid
+          if usrid not in colg.author_set:
+              colg.author_set.append(usrid)
+          colg.modified_by = usrid
+          if usrid not in colg.contributors:
+              colg.contributors.append(usrid)
+          colg.group_type = request.POST.get('group_type', "")        
+          colg.edit_policy = request.POST.get('edit_policy', "")
+          colg.subscription_policy = request.POST.get('subscription', "")
+          colg.visibility_policy = request.POST.get('existance', "ANNOUNCED")
+          colg.disclosure_policy = request.POST.get('member', "DISCLOSED_TO_MEM")
+          colg.encryption_policy = request.POST.get('encryption', "NOT_ENCRYPTED")
+          colg.agency_type=request.POST.get('agency_type',"")
+          if group_id:
+              colg.prior_node.append(group_ins._id)
+          colg.save()
+          #save subgroup_id in post_node of parent group 
+          group_ins.post_node.append(colg._id)
+          group_ins.save()
     
-    if colg.edit_policy == "EDITABLE_MODERATED":
-      Mod_colg.altnames = cname + "Mod" 
-      Mod_colg.name = cname + "Mod"     
-      Mod_colg.group_type = "PRIVATE"
+          if colg.edit_policy == "EDITABLE_MODERATED":
+              Mod_colg.altnames = cname + "Mod" 
+              Mod_colg.name = cname + "Mod"     
+              Mod_colg.group_type = "PRIVATE"
+              Mod_colg.created_by = usrid
+              if usrid not in Mod_colg.author_set:
+                  Mod_colg.author_set.append(usrid)
+              Mod_colg.modified_by = usrid
+              if usrid not in Mod_colg.contributors:
+                  Mod_colg.contributors.append(usrid)
+              Mod_colg.prior_node.append(colg._id)
+              Mod_colg.save() 
 
-      Mod_colg.created_by = usrid
-      if usrid not in Mod_colg.author_set:
-        Mod_colg.author_set.append(usrid)
-
-      Mod_colg.modified_by = usrid
-      if usrid not in Mod_colg.contributors:
-        Mod_colg.contributors.append(usrid)
-
-      Mod_colg.prior_node.append(colg._id)
-      Mod_colg.save() 
-
-      colg.post_node.append(Mod_colg._id)
-      colg.save()
-
-    auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
-
-    has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
-    dbref_has_shelf = has_shelf_RT.get_dbref()
-
-    shelves = []
-    shelf_list = {}
+              colg.post_node.append(Mod_colg._id)
+              colg.save()
+          auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) }) 
+          has_shelf_RT = collection.Node.one({'_type': 'RelationType', 'name': u'has_shelf' })
+          dbref_has_shelf = has_shelf_RT.get_dbref()
+          shelves = []
+          shelf_list = {}
     
-    if auth:
-      shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
+          if auth:
+              shelf = collection_tr.Triple.find({'_type': 'GRelation', 'subject': ObjectId(auth._id), 'relation_type': dbref_has_shelf })        
 
-      if shelf:
-        for each in shelf:
-          shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
-          shelves.append(shelf_name)
-
-          shelf_list[shelf_name.name] = []         
-          for ID in shelf_name.collection_set:
-            shelf_item = collection.Node.one({'_id': ObjectId(ID) })
-            shelf_list[shelf_name.name].append(shelf_item.name)
+              if shelf:
+                  for each in shelf:
+                      shelf_name = collection.Node.one({'_id': ObjectId(each.right_subject)})           
+                      shelves.append(shelf_name)
+                      shelf_list[shelf_name.name] = []         
+                      for ID in shelf_name.collection_set:
+                          shelf_item = collection.Node.one({'_id': ObjectId(ID) })
+                          shelf_list[shelf_name.name].append(shelf_item.name)
                   
-      else:
-        shelves = []
+              else:
+                  shelves = []
 
-    return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'appId':app._id,'node':colg,'user':request.user,
+          return render_to_response("ndf/groupdashboard.html",{'groupobj':colg,'appId':app._id,'node':colg,'user':request.user,
                                                          'groupid':group_id,'group_id':group_id,
                                                          'shelf_list': shelf_list,'shelves': shelves
                                                         },context_instance=RequestContext(request))
-
-  available_nodes = collection.Node.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
-
-  nodes_list = []
-  for each in available_nodes:
-    nodes_list.append(each.name)
-  return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
-    
+      available_nodes = collection.Node.find({'_type': u'Group', 'member_of': ObjectId(gst_group._id) })
+      nodes_list = []
+      for each in available_nodes:
+          nodes_list.append(each.name)
+      return render_to_response("ndf/create_sub_group.html", {'groupid':group_id,'maingroup':grpname,'group_id':group_id,'nodes_list': nodes_list},RequestContext(request))
+  except Exception as e:
+      print "Exception in create subgroup "+str(e)

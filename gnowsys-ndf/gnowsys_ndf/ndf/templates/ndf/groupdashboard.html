@@ -13,7 +13,8 @@
 
 <!-- Ajax for getting user List  -->
 <script type="text/javascript">
-  jQuery(document).ready(function($) { 
+  jQuery(document).ready(function($) {
+
   $('#btn_list_member').on("click",function() {
   var ajurl ="{% url 'get_author_set_users' groupid %}?_id={{node.pk}}";
   $.ajax({
@@ -160,6 +161,9 @@ $(document).ready(function()
 
   <input type="hidden" id="groupname" value="{{node}}">
   {% if user.is_authenticated %}
+     {% if user.is_superuser or node.created_by == user.id %}
+         <li><a href="{% url 'create_sub_group' group_id %}" >create subgroup</li>
+     {% endif %}
   {% if user_is_joined == "joined" %}
     {% if is_user_group and node.created_by != request.user %}
     <li><input class="button" type="submit" id="notify" value="Stop following"></li>

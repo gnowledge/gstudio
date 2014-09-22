@@ -32,7 +32,7 @@
   {% get_existing_groups as groups%}
 
 
-  <form class="row" method="post" action="{% url 'create_group' group_id %}">
+  <form class="row" method="post" action="{% url 'create_sub_group' group_id %}">
     {% csrf_token %}
 
      <div class="small-12 columns" style='display:table;  border:1px;   border-spacing:10px; '>
