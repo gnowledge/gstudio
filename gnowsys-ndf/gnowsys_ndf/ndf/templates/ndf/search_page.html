@@ -29,7 +29,7 @@
 {% block body_content %} 
 
 <dl class="accordion" data-accordion>
-    <dd class="accordion-navigation">
+    <dd class="accordion-navigation" data-options="deep_linking:true">
           <a href="#panel1">Search</a>
           <div id="panel1" class="content active">
             
@@ -53,12 +53,19 @@
 
                         <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" />
                       </form>
-
+		
+			<hr>
+			<h3>Results</h3>
+			<div id="results" width="100%" style="position:relative">
+			
+			</div>
+			
           </div>
+		
     </dd>
-    <dd class="accordion-navigation">
+    <dd class="accordion-navigation"  >
         <a href="#panel2">Advanced Search</a>
-        <div id="panel2" class="content">
+        <div id="panel2" class="content" >
                         <!-- <h3>Advanced Search</h3> -->
 
                         <form name="search_form" method="GET" action="{% url 'advanced_search_results' groupid %}">
@@ -103,9 +110,16 @@
                         </ul>
                         <input type="submit" class="button" name="subButton2" id="subButton2" value="Submit" />
                       </form>
-
+			
+			<hr>
+			<h3>Results</h3>
+			<div id="resultsadv"   width="100%" style="position:relative">
+			
+			</div>
+	</div>		
+	
     </dd>
-    <dd class="accordion-navigation">
+    <dd class="accordion-navigation"  >
       <a href="#panel3">Graph Search</a>
       <div id="panel3" class="content">
 
@@ -119,7 +133,7 @@
             </form>
 
     </dd>
-    <dd class="accordion-navigation">
+    <dd class="accordion-navigation" hidden >
       <a href="#panel4">Semantic Search</a>
       <div id="panel4" class="content">
         <h6><i>(Under Construction)</i></h6>
@@ -133,15 +147,9 @@
         
     </dd>
 </dl>
-<hr>
-<h3>Results</h3>
-<div id="results" width="100%" style="position:relative">
-
-</div>
 <div id="pages">
   
 </div>
-
 <script>
   /********************************************************************************
   THIS SCRIPT EXTRACTS THE GET VARIABLES FROM THE URL AND CONVERTS IT INTO A DICTIONARY - "VARS"  
@@ -186,7 +194,9 @@
     }
     
     function parse_data_kwd(sData) {
-
+	$("#panel1").addClass("active");
+        $("#panel2").removeClass("active");
+  	
       // -------------------------------- SEARCH BY NAME ------------------------------------------- //
       var a = sData.exact.name.length;
         html_div[cur_page] = '<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">';      
@@ -391,7 +401,9 @@
   }
     
     function parse_data_adv(sData) {
-
+	$("#panel2").addClass("active");
+  	$("#panel1").removeClass("active");
+  
       var a = sData.length;
 
       html_div[cur_page] = "<ul class='small-block-grid-1 medium-block-grid-3 large-block-grid-4'>";      
@@ -411,7 +423,7 @@
           }
         }
       }
-      $("#results").html(html_div[page_no]);
+      $("#resultsadv").html(html_div[page_no]);
 
       pages = "<h6>Pages:</h6><hr>";
       for (i=0; i < cur_page+1; i++) {
@@ -420,7 +432,6 @@
       //pages+="</ul>";
       $("#pages").html(pages);
     }
-
   
   $('#GSystems').change(function() {
 
@@ -592,7 +603,9 @@
   });
   function scrollTo(hash) {
     location.hash = "#" + hash;
+    
   }
+
 
 </script>
 
