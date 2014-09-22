@@ -46,7 +46,19 @@
 	.show-el input, .show-el select{
 		display: block;
 	}
+
+	.show-view-border{
+		border: solid #43ac6a;
+		border-bottom: none;
+	}
 	
+	.show-edit-border{
+		border: solid #43ac6a;
+		border-top: none;
+	}
+
+
+
 {% endblock %}
 
 {% block body_content %}
@@ -491,7 +503,7 @@
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", "");
 	}
 
-
+	// hiding save/cancel buttons and showing edit button again
 	function changeSaveCancelToEdit(oid, resEditRowArr)
 	{
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
@@ -499,6 +511,10 @@
 		{
 			resEditRowArr[i].classList.add("hide-el");
 		}
+
+		$("tr#view-row-" + oid).removeClass("show-view-border");
+		$("tr#edit-row-" + oid).removeClass("show-edit-border");
+
 		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
 		setCurrEditRowToNone();
 	}
@@ -529,7 +545,10 @@
 		// setting orgitdown_data_reveal_editor content to content_org of current row object.
 		content_org = $("input[data-content-org-row-id="+oid+"]").attr("data-content-org");
 		document.getElementById("orgitdown_data_reveal_editor").value = content_org;
-		
+
+		$resEditRow.addClass("show-edit-border");
+		$("tr#view-row-" + oid).addClass("show-view-border");
+
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
 
 	}
@@ -557,7 +576,7 @@
 			{
 				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
 				{
-					if(resViewRowArr[4+i].textContent.trim() != resEditRowArr[i].firstElementChild.value.trim())
+					if((resViewRowArr[4+i].textContent.trim() != 'None') && (resViewRowArr[4+i].textContent.trim() != resEditRowArr[i].firstElementChild.value.trim()))
 					{
 						tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n(" 
 						+ resViewRowArr[4+i].textContent.trim() + ")\nChanged to:\n(" 
