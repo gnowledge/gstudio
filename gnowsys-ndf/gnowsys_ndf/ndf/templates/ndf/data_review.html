@@ -111,7 +111,7 @@
 
 			<!-- Advance -->
 			<th class="expand-width-3">Reading Level</th>
-			<th class="expand-width-3">Time Required</th>
+			<th>Time Required</th>
 			<th class="expand-width-3">Text Complexity</th>
 
 		</tr>
@@ -200,7 +200,7 @@
 			<td class="hide-el" data-field="name"><input type="text" value="{{ resource.name }}" /></td>
 			<td class="hide-el" data-field="altnames"><input type="text" value="{{ resource.altnames }}" /></td>
 			<td class="hide-el" data-field="content_org">
-				<input type="button" class="button tiny expand" value="Edit content in editor" data-content-org="{{ resource.content_org }}" />
+				<input type="button" data-reveal-id="content_org_overlay" class="button tiny expand" value="Edit content in editor" data-content-org="{{ resource.content_org }}" data-content-org-row-id="{{resource.pk}}" />
 			</td>
 			<td class="hide-el" data-field="language">
 				<select name="language">
@@ -226,7 +226,9 @@
 			<td class="hide-el" data-field="license"><input type="text" value="{{ resource.licence }}" /></td>
 			<td class="hide-el" data-field="source"><input type="text" value="{{ resource.source }}" /></td>
 			<td class="hide-el" data-field="basenodeurl"><input type="text" value="{{ resource.basedonurl }}" /></td>
-			<td class="hide-el" data-field="translation_of"></td>
+			<td class="hide-el" data-field="translation_of">
+				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+			</td>
 			<td class="hide-el right-border" data-field="adaptation_of" ><input type="text" value="{{ resource.adaption_of }}" /></td>
 
 			<!-- LRMI -->
@@ -289,8 +291,12 @@
 				{% endfor %}
 				</select>
 			</td>
-			<td class="hide-el" data-field="teaches"></td>
-			<td class="hide-el" data-field="prior_node"></td>
+			<td class="hide-el" data-field="teaches">
+				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+			</td>
+			<td class="hide-el" data-field="prior_node">
+				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+			</td>
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
 					<option value="False">False</option>
@@ -313,7 +319,9 @@
 
 			<!-- Advance -->
 			<td class="hide-el" data-field="readinglevel"></td>
-			<td class="hide-el" data-field="timerequired"></td>
+			<td class="hide-el" data-field="timerequired">
+				<input type="text" class="time-required" value=""/>
+			</td>
 			<td class="hide-el" data-field="textcomplexity" class="right-border">
 				<select name="textcomplexity">
 					<option value="None">None</option>
@@ -327,6 +335,11 @@
 		{% endfor %}
 	</tbody>
 </table>
+
+<div id="content_org_overlay" class="reveal-modal" data-reveal>
+  {% include "ndf/add_editor.html" with var_name="data_reveal_editor" var_placeholder="Enter your content here."  %}
+  <a class="close-reveal-modal">&#215;</a>
+</div>
 
 <!-- END of Looping through each resource -->
 
@@ -428,6 +441,14 @@
 		</div>
 
 	{% endif %}
+
+	<!-- Datetimepicker  -->
+	<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script> <!-- checked -->
+	<script src="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-sliderAccess.js"></script> <!-- checked -->
+	<link rel="stylesheet" href="/static/ndf/bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"> <!-- checked -->
+	<link rel="stylesheet" type="text/css" href="/static/ndf/bower_components/jquery-ui/themes/smoothness/jquery-ui.css"> <!-- checked -->
+
 {% endblock %}
 <!-- -END of Pagination -->
 
@@ -453,7 +474,7 @@
 
 		if(editedRowName.length > 0 || editedRowId.length > 0)
 		{
-			alert("At a time you could edit only one row. \nNow you are editing :" + editedRowName + "\n\nPlease 'SAVE' or 'CANCEL' the changes to edit any other row!");
+			alert("At a time you could edit only one row. \n\nNow you are editing: '" + editedRowName + "'\n\nPlease 'SAVE' or 'CANCEL' the changes to edit any other row!");
 
 			return true; // Row editing is going on.
 		}
@@ -461,23 +482,34 @@
 		{
 			return false; // NO row is being editing now.
 		}
-
 	}
 
 
 	function setCurrEditRowToNone()
 	{
-
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-id", "");
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", "");
+	}
+
+
+	function changeSaveCancelToEdit(oid, resEditRowArr)
+	{
+		$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
+		for (var i = 1; i < resEditRowArr.length; i++)
+		{
+			resEditRowArr[i].classList.add("hide-el");
+		}
+		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
+		setCurrEditRowToNone();
 	}
 
 
 	// action on edit click:
 	function editResRow(oid)
 	{
+
 		// exit from the function if any other row is being edited now.
-		if(checkCurrEditRow()){ return 0; }
+		if(checkCurrEditRow()){ return false; }
 
 		// fetching resource object edit row
 		var $resEditRow = $("tr#edit-row-" + oid),
@@ -493,11 +525,12 @@
 		{
 			resEditRowArr[i].classList.remove("hide-el");
 		};
+
+		// setting orgitdown_data_reveal_editor content to content_org of current row object.
+		content_org = $("input[data-content-org-row-id="+oid+"]").attr("data-content-org");
+		document.getElementById("orgitdown_data_reveal_editor").value = content_org;
 		
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
-		// resRowArr.each(function(i){
-		// 	console.log(this)
-		// })
 
 	}
 
@@ -505,21 +538,20 @@
 	function CancelEditResRow(oid)
 	{
 
-
-		// fetching resource object view row
+		// fetching resource object VIEW row
 		var $resViewRow = $("tr#view-row-" + oid),
 			resViewRowArr = $resViewRow.children();
 
-		// fetching resource object edit row
+		// fetching resource object EDIT row
 		var $resEditRow = $("tr#edit-row-" + oid);
 			resEditRowArr = $resEditRow.children();
 
+		// to show details on confirm popup
 		var tempEditedFields = "";
 
 		// processing each element of row
 		for (var i = 1; i < resEditRowArr.length; i++)
 		{
-
 			// checking if the values in textboxes are changed
 			if(resEditRowArr[i].firstElementChild)
 			{
@@ -531,8 +563,17 @@
 						+ resViewRowArr[4+i].textContent.trim() + ")\nChanged to:\n(" 
 						+ resEditRowArr[i].firstElementChild.value.trim() + ")\n\n";
 					}
-
-					// console.log(resViewRowArr[4+i].textContent.trim() + "-------" + resEditRowArr[i].firstElementChild.value.trim())
+				}
+				else if((resEditRowArr[i].firstElementChild.type == "button"))
+				{
+					// check if it had 'data-content-org' attribute
+					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
+					{
+						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value)
+						{
+							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
+						}
+					}
 				}
 			}
 
@@ -549,26 +590,27 @@
 			
 			if(cancelConfirm)
 			{
-				$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
-				for (var i = 1; i < resEditRowArr.length; i++)
-				{
-					resEditRowArr[i].classList.add("hide-el");
-				}
-				$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
-				setCurrEditRowToNone();
+				changeSaveCancelToEdit(oid, resEditRowArr);
 			}	
 		}
 		else
 		{
-			$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
-			for (var i = 1; i < resEditRowArr.length; i++)
-			{
-				resEditRowArr[i].classList.add("hide-el");
-			}
-			$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
-			setCurrEditRowToNone();
+			changeSaveCancelToEdit(oid, resEditRowArr)
 		}
 	}
+
+	// $('.time-required').timepicker();
+	$('.time-required').timepicker({
+		timeOnlyTitle: 'Choose Time Required',
+		minDate: new Date(2050, 1, 1)
+	});
+
+	// // opening the orgit down editor and setting the value in textarea
+	// function openOrgEditor(oid)
+	// {
+
+	// 	// $('#content_org_overlay').foundation('reveal', 'open');
+	// }
 
 // </script>
 {% endblock %}

@@ -5,9 +5,9 @@
 {% block title %} Admin {% endblock %}
 {% block meta_content %}
      {% ifequal url 'data' %}
-	{% get_class_list class_name %}
+	{% get_class_list groupid class_name %}
      {% else %}
-        {% get_class_type_list class_name %}
+        {% get_class_type_list groupid class_name %}
      {% endifequal %}
 {% endblock %}
 {% block style %}
