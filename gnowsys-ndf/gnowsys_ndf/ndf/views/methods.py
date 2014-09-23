@@ -149,7 +149,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         # For prior-node-list
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "QuizObj":
+      elif checked == "QuizObj" or checked == "assesses":
         # For collection-list
         gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
         gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
@@ -202,40 +202,42 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       
       else:
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]} })
-           
     
-    if (nid is None) and (not nlist):
-      for each in drawer:               
-        dict_drawer[each._id] = each.name
+
+    #kept this bellow commented part for future reference,(Don't delete this)
+    
+    # if (nid is None) and (not nlist):
+    #   for each in drawer:               
+    #     dict_drawer[each._id] = each.name
 
 
-    elif (nid is None) and (nlist):
-      for each in drawer:
-        if each._id not in nlist:
-          dict1[each._id] = each.name
+    # elif (nid is None) and (nlist):
+    #   for each in drawer:
+    #     if each._id not in nlist:
+    #       dict1[each._id] = each.name
 
-      for oid in nlist: 
-        obj = collection.Node.one({'_id': oid})
-        dict2.append(obj)        
+    #   for oid in nlist: 
+    #     obj = collection.Node.one({'_id': oid})
+    #     dict2.append(obj)        
 
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
+    #   dict_drawer['1'] = dict1
+    #   dict_drawer['2'] = dict2
 
     
-    else:
-      for each in drawer:
-        if each._id != nid:
-          if each._id not in nlist:  
-            dict1[each._id] = each.name
+    # else:
+    #   for each in drawer:
+    #     if each._id != nid:
+    #       if each._id not in nlist:  
+    #         dict1[each._id] = each.name
           
-      for oid in nlist: 
-        obj = collection.Node.one({'_id': oid})
-        dict2.append(obj)
+    #   for oid in nlist: 
+    #     obj = collection.Node.one({'_id': oid})
+    #     dict2.append(obj)
       
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
+    #   dict_drawer['1'] = dict1
+    #   dict_drawer['2'] = dict2
 
-    return dict_drawer
+    return drawer
 
 # get type of resource
 def get_resource_type(request,node_id):
@@ -485,9 +487,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   #     node.collection_set.append(node_id)
     
   #   i = i+1
-
+ 
+    
   if collection_list != '':
     collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
+    print "collection_list: ",collection_list,"\n\n"
 
   if set(node.collection_set) != set(collection_list):
     i = 0
@@ -800,16 +804,19 @@ def get_node_metadata_fields(request, node, node_type):
 			field_value=(request.POST.get(at.name,""))
 	
 			create_gattribute(node._id,at,field_value)
+
+      print "field_value: ",atname," : ",field_value,"\n"
 """
 
 def get_node_metadata(request,node,node_type):
-	attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
-	if(node.has_key('_id')):
-		for atname in attribute_type_list:
-			field_value=unicode(request.POST.get(atname,""))
-			at=collection.Node.one({"_type":"AttributeType","name":atname})	
-			if(at!=None):
-				create_gattribute(node._id,at,field_value)		
+  attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
+  if(node.has_key('_id')):
+    for atname in attribute_type_list:
+      field_value=unicode(request.POST.get(atname,""))
+
+      at=collection.Node.one({"_type":"AttributeType","name":atname})	
+      if(at!=None):
+        create_gattribute(node._id,at,field_value)		
 """			
 def create_AttributeType(name, data_type, system_name, user_id):
 
