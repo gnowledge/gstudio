@@ -59,10 +59,13 @@
     <small class="error">{% trans "Please fill a valid" %} {{field.altnames}}! </small>
     {% endif %}
 
-  {% elif field_type == "long" %}
+  {% elif field_type == "int" or field_type == "float" or field_type == "long" %}
     <input type="text" id="{{field.name}}" name="{{field.name}}" value="{{field_value|default_if_none:''}}" 
+          placeholder="{{field.help_text|default_if_none:''}}" 
+          {% if field.editable and not field.editable %}readonly{% endif %} 
           {% if is_required_field %}required{% endif %} 
           maxlength="{{field.maxlength}}" 
+          pattern="{% if field.validators|length > 1 %}{{field.validators.1}}{% endif %}"
           style="float:left; width:95%"
     />
     {% if is_required_field %}
