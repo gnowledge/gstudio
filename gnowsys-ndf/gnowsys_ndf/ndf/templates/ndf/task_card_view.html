@@ -37,12 +37,12 @@ background-color: #FFFFFF;
 </style>
 
 <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-  {% autopaginate TASK_inst 23 %}
+
  
   {% for node in TASK_inst %}
     
   {% get_version_of_module node.pk as version %}
-  <li class="card">
+  <li class="card" class="pagination">
     <div class="course" id={{node.type}}>
       <header>
         <div class="label-list">
@@ -87,6 +87,6 @@ background-color: #FFFFFF;
 
   {% endfor %}
 
-  {% paginate %}
+  
 
 </ul>

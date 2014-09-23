@@ -110,7 +110,7 @@ def task_details(request, group_name, task_id):
     return render_to_response(template, variables)
 
 @login_required
-def create_edit_task(request, group_name, task_id=None):
+def create_edit_task(request, group_name, task_id=None,task=None,count=0):
     """Creates/Modifies details about the given Task.
     """
     edit_task_node = ""
@@ -139,7 +139,7 @@ def create_edit_task(request, group_name, task_id=None):
     	
     else:
         task_node = collection.GSystem()
-
+    userlist=[] 	
     if request.method == "POST": # create or edit
         name = request.POST.get("name","")
         content_org = request.POST.get("content_org","")
@@ -154,11 +154,12 @@ def create_edit_task(request, group_name, task_id=None):
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
 	
         tag=""
+	field_value=[]
         if request.FILES.getlist('UploadTask'):
         	files=request.FILES.getlist('UploadTask')
         	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag)
-        	
-        
+	
+ 
     	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
 		if watchers:
@@ -202,50 +203,41 @@ def create_edit_task(request, group_name, task_id=None):
                		newattribute = collection.GAttribute()
                 	newattribute.subject = task_node._id
                 	newattribute.attribute_type = attributetype_key
-			if each == 'Assignee':
-				if len(request.POST.getlist(each,""))>1:
+			if each == 'Assignee' and len(request.POST.getlist("Assignee",""))>1:
+				if count == 0:
 					newattribute.object_value = request.user.username
-				else:				
-					newattribute.object_value = request.POST.get(each,"")
+                                else:
+					assignee_list=[]
+                                        assignee_list=(request.POST.getlist(each,""))
+                                        newattribute.object_value = assignee_list[count]
 			else:
 				newattribute.object_value = request.POST.get(each,"")
                 	newattribute.save()
-
-			a=request.POST.get("Group","")
-			if each == "Assignee" and len(request.POST.getlist(each,""))>1:
-				for i in request.POST.getlist(each,""):
-				     if i != "":
-					userlist.append(i)
-				assigneelist=request.POST.getlist("Assignee","")	
-				for i in assigneelist:
-				    if i != "":
-				   	
-				        mul_task=""					
-					mul_task = collection.GSystem()
-					get_node_common_fields(request, mul_task, group_id, GST_TASK)
-					mul_task.save()
-					attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':"Assignee"})
-               				newattribute = collection.GAttribute()
-                			newattribute.subject = mul_task._id
-                			newattribute.attribute_type = attributetype_key
-                			newattribute.object_value = i
-                			newattribute.save()
-					task_node.collection_set.append(mul_task._id)
-					task_node.save()	
-					
-            if request.FILES.getlist('UploadTask'):
-                		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
+	    if request.FILES.getlist('UploadTask'):
+                                attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
                			newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
                 		newattribute.object_value = field_value[0]
                 		newattribute.save()
+	    if  int(len(request.POST.getlist("Assignee","")))>1:
+              if task is None:
+               		Task=collection.Node.find_one({"_id":ObjectId(task_node._id)})
 			
-	    for eachuser in list(set(userlist)):
-		activ="task reported"
-		msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
-		bx=User.objects.get(username =eachuser)
-	        set_notif_val(request,group_id,msg,activ,bx)
+	      else:
+			Task=collection.Node.find_one({"_id":ObjectId(task)})
+			Task.collection_set.append(task_node._id)
+	      Task.save()
+		
+	      if int(count) <int(len(request.POST.getlist("Assignee",""))-1):
+		create_edit_task(request, group_name, task_id,Task._id,count=count+1)
+	    if count == 0:		
+	      for eachuser in (request.POST.getlist("Assignee","")):
+		if eachuser != "":	
+			activ="task reported"
+			msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
+			bx=User.objects.get(username =eachuser)
+	       		set_notif_val(request,group_id,msg,activ,bx)
 	else: #update
 	    for each in at_list:
 	        
@@ -430,7 +422,7 @@ def check_filter(request,group_name,choice,status=None):
     attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Status'})
     attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
     
-    print "attribute",attributetype_key1._id
+    
     Completed_Status_List=['Resolved','Closed']
     title = "Task"
     TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
