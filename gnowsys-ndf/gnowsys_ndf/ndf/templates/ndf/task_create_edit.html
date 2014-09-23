@@ -166,42 +166,6 @@ $('#hidden_watchers').val(selected);
   
 {% block body_content %}
 
-<script type="text/javascript">
-	 update_user_list( function(data) {
-	$.each(data, function(key,value){
-	 $('#customDropdown2')
-	 .append($("<option></option>")
-	 .attr("value",value)
-	 .text(value)
-	 .attr("id",value));
-	var div = $("<div>"+"</div>")
-	 .attr("class","row")
-	 .appendTo($(".watchers"));
-	 var input = $("<input> "+value)
-	 .attr("type","checkbox")
-	 .attr("id",value)
-	 .appendTo(div);
-	 });
-	});
-	
-	function update_user_list(fn)
-	{
-	var ajurl ="{% url 'get_group_member_user' group_id %}";
-	var user=new Array();
-	var a;
-	 $.ajax({
-	 url:ajurl,
-	 dataType:'json',
-	 success: function(data){
-	 fn(data);
-	 },
-	
-	 });
-	
-	
-	}
-	
-	</script> 
 
 <form data-abide id="form-edit-node" enctype="multipart/form-data"  method="POST" action="">
 
