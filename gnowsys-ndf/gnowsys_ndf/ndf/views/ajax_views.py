@@ -114,9 +114,7 @@ def select_drawer(request, group_id):
                                       },
                                       context_instance=RequestContext(request)
             )
-          
         else:          
-            
           # For creating a resource collection   
           if node_id is None:                             
             drawer = get_drawers(group_id, node_id, [], checked)  
@@ -128,10 +126,8 @@ def select_drawer(request, group_id):
                                        }, 
                                        context_instance=RequestContext(request)
             )
-
           # For editing a resource collection   
           else:
-
             drawer = get_drawers(group_id, node_id, [], checked)  
        
             return render_to_response("ndf/drawer_widget.html", 
@@ -141,21 +137,41 @@ def select_drawer(request, group_id):
                                        }, 
                                        context_instance=RequestContext(request)
             )
-
-            
 # This ajax view renders the output as "node view" by clicking on collections
 def collection_nav(request, group_id):
-    
+    imageCollection=""
     if request.is_ajax() and request.method == "POST":    
       node_id = request.POST.get("node_id", '')
       
       collection = db[Node.collection_name]
+      imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+                                              '_type': 'File', 
+                                              '$or': [
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                      {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                ,
+                                                {'$and': [
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                  ]
+                                                }
+                                              ],
+                                              'group_set': {'$all': [ObjectId(group_id)]}
+                                            }).sort("last_update", -1)
+
 
       node_obj = collection.Node.one({'_id': ObjectId(node_id)})
       return render_to_response('ndf/node_ajax_view.html', 
                                   { 'node': node_obj,
                                     'group_id': group_id,
-                                    'groupid':group_id
+                                    'groupid':group_id,
+                                    'imageCollection':imageCollection
                                   },
                                   context_instance = RequestContext(request)
       )
