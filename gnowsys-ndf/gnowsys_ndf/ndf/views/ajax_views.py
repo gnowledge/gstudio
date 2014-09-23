@@ -358,7 +358,6 @@ def search_drawer(request, group_id):
       
 
             
->>>>>>> Stashed changes
 # This ajax view renders the output as "node view" by clicking on collections
 def collection_nav(request, group_id):
     imageCollection=""
