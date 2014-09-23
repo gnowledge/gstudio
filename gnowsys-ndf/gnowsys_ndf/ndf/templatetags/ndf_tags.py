@@ -9,14 +9,14 @@ from django.http import Http404
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
-
+from mongokit import paginator
 
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
 from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY
-from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
-
+# from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
+from gnowsys_ndf.settings import *
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
@@ -25,8 +25,8 @@ from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
 
-from gnowsys_ndf.settings import LANGUAGES
-from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
+# from gnowsys_ndf.settings import LANGUAGES
+# from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
@@ -338,14 +338,59 @@ def get_all_replies(parent):
 	 return ex_reply
 
 
+@register.assignment_tag
+def get_metadata_values():
+
+	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
+				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+				"timerequired": GSTUDIO_RESOURCES_TIME_REQUIRED, "audience": GSTUDIO_RESOURCES_AUDIENCE , "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY,
+				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL}
+
+
+	return metadata
+
+
+@register.assignment_tag
+def get_attribute_value(node_id, attr):
+
+	node_attr = None
+	if node_id:
+		node = collection.Node.one({'_id': ObjectId(node_id) })
+		# print "node: ",node.name,"\n"
+		# print "attr: ",attr,"\n"
+
+		if node:
+			gattr = collection.Node.one({'_type': 'AttributeType', 'name': unicode(attr) })
+			node_attr = collection.Node.one({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": node._id })	
+
+	if node_attr:
+		attr_val = node_attr.object_value
+	else:
+		attr_val = ""
+
+	# print "attr_val: ",attr_val,"\n"
+	return attr_val
+
+
+
+
+
 @register.inclusion_tag('ndf/drawer_widget.html')
 def edit_drawer_widget(field, group_id, node, checked=None):
 
+	drawer = None
 	drawers = None
 	drawer1 = None
 	drawer2 = None
+	dict_drawer = {}
+	dict1 = {}
+	dict2 = []
+	nlist=[]
+	page_no = 1
+	node = None
 
 	if node:
+		node_id = node._id
 		if field == "collection":
 			if checked == "Quiz":
 				checked = "QuizItem"
@@ -353,19 +398,23 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 				checked = "Theme"
 			else:
 				checked = None
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+
+			nlist = node.collection_set
+			drawers = get_drawers(group_id, node._id, nlist, checked)
 		elif field == "prior_node":
 			checked = None
-			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+			nlist = node.prior_node
+			drawers = get_drawers(group_id, node._id, nlist, checked)
 		elif field == "module":
 			checked = "Module"
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+			nlist = node.collection_set
+			drawers = get_drawers(group_id, node._id, nlist, checked)
 		elif type(checked) == list:
 			# Special case used while dealing with RelationType widget
 			drawers = get_drawers(group_id, node['_id'], node[field], checked)
 		
-		drawer1 = drawers['1']
-		drawer2 = drawers['2']
+		# drawer1 = drawers['1']
+		# drawer2 = drawers['2']
 
 	else:
 		if field == "collection" and checked == "Quiz":
@@ -387,7 +436,40 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 
 		drawer1 = get_drawers(group_id, None, [], checked)
 
-	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
+
+	paged_resources = paginator.Paginator(drawer, page_no, 10)
+
+	drawer.rewind()
+
+	if node_id:
+
+		for each in paged_resources.items:
+			if each._id != node._id:
+				if each._id not in nlist:  
+					dict1[each._id] = each
+
+		for oid in nlist: 
+			obj = collection.Node.one({'_id': oid})
+			dict2.append(obj)
+
+		dict_drawer['1'] = dict1
+		dict_drawer['2'] = dict2
+
+	else:
+		if (node is None) and (not nlist):
+			for each in paged_resources.items:               
+				dict_drawer[each._id] = each
+
+
+	drawers = dict_drawer
+	if not node_id:
+		drawer1 = drawers
+	else:
+		drawer1 = drawers['1']
+		drawer2 = drawers['2']
+
+
+	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, "page_info": paged_resources,'node_id': node_id,'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):

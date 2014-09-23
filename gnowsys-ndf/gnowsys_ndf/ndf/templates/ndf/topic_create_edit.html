@@ -402,19 +402,85 @@ background-repeat:no-repeat; background-size: 48px 48px
 		});
 
 		var cn_list = cn_arr.join(',');
-
+		var homo_coll = this.value;
+		$("#save-node").hide();
+		
 		$.ajax({
 			type: "POST",
 			url: "{% url 'select_drawer' groupid %}",
 			datatype: "html",
 			data:{
-				homo_collection: this.value,
+				homo_collection: homo_coll,
 				collection_list: cn_list,
 				node_id: '{{node.pk}}',
+				page_no: 1,
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
-			success: function(data) {
-				$("#collection_drawer").html(data);
+			success: function cnt(data) {
+				
+				if ($.trim(data) === "Warning") {
+
+					var r = confirm("Please save the element before going ahead\nDo you want to save ?");
+		            if (r == true){
+
+		            	$.ajax({
+							type: "POST",
+							url: "{% url 'select_drawer' groupid %}",
+							datatype: "html",
+							data:{							
+								homo_collection: homo_coll,
+								collection_list: cn_list,
+								node_id: '{{node.pk}}',
+								selection_save: "True",
+								page_no: 1,
+								csrfmiddlewaretoken: '{{ csrf_token }}'
+							},
+							success: function(data) {													
+								// cnt(data)
+								alert("Saved element in collection Successfully");
+								$("input:radio").prop('checked', false);
+								$(".collection_tab").trigger('click');
+								// location.reload(true);
+							}
+
+						});
+		            }
+		            else{
+
+		            	$("input:radio").prop('checked', false);
+						$(".collection_tab").trigger('click');
+		            }
+
+		        }
+		        else{
+
+		        	$("#collection_drawer").html(data);
+				
+					$(".next_prev").click(function() {
+						
+						// alert(this.name);
+					 	$.ajax({
+							type: "POST",
+							url: "{% url 'select_drawer' groupid %}",
+							datatype: "html",
+							data:{							
+								homo_collection: homo_coll,
+								collection_list: cn_list,
+								node_id: '{{node.pk}}',
+								page_no: this.name,
+								csrfmiddlewaretoken: '{{ csrf_token }}'
+							},
+							success: function(data) {													
+								cnt(data)
+							}
+
+						});
+					});
+
+		        }
+
+
+				
 			}
 		});
 
@@ -434,13 +500,38 @@ background-repeat:no-repeat; background-size: 48px 48px
 				node_id: '{{node.pk}}',
 				field: "collection",
 				app:"{{title}}",
+				page_no: 1,
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
-			success: function(data) {
-				// alert(data);
+			success: function cnt(data) {
+
 				$("#collection_drawer").html(data);
+				$("#module_drawer").html(data);
 				$("#SelectApp").css("display", "block");				
 				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "collection",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+
+				});
+				
 			}
 		});
 
@@ -460,12 +551,35 @@ background-repeat:no-repeat; background-size: 48px 48px
 				node_id: '{{node.pk}}',
 				field: "prior_node",
 				app: "{{title}}",
+				page_no: 1,
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
-			success: function(data) {
-				 //alert(data);
+			success: function cnt(data) {
+				// alert(data);
 				$("#prior_node_drawer").html(data);
 				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "prior_node",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+				});
+
 			}
 		});
 
@@ -485,12 +599,35 @@ background-repeat:no-repeat; background-size: 48px 48px
 				node_id: '{{node.pk}}',
 				field: "teaches",
 				app: "{{title}}",
+				page_no: 1,
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
-			success: function(data) {
-				 //alert(data);
+			success: function cnt(data) {
 				$("#teaches_drawer").html(data);
 				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "teaches",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+
+				});
+
 			}
 		});
 
@@ -510,12 +647,36 @@ background-repeat:no-repeat; background-size: 48px 48px
 				node_id: '{{node.pk}}',
 				field: "assesses",
 				app: "{{title}}",
+				page_no: 1,
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
-			success: function(data) {
+			success: function cnt(data) {
 				 //alert(data);
 				$("#assesses_drawer").html(data);
 				$("#save-node").css("display", "block");
+
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "assesses",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+
+				});
+
 			}
 		});
 
