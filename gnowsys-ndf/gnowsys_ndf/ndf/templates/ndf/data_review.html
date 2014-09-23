@@ -57,6 +57,27 @@
 		border-top: none;
 	}
 
+	/* drawer CSS */
+	.resource-drawer { 
+		border-color: #D3D3D3; border-style: solid; 
+		padding: 0 !important; 
+		overflow-y: auto;
+	}
+
+	.resource-drawer li.bullet-item:hover{
+		background-color: #ecf0f1; cursor:pointer;
+	}
+
+	.posted-by{ color: #808080; font-size: small; }
+
+	.selected-resource { background-color:lightgray !important ; }
+
+	.resource-type-image {
+		height:40px; 		
+		background-repeat:no-repeat; background-size: 48px 48px
+	}
+	/* ---END of drawer CSS */
+
 
 
 {% endblock %}
@@ -355,15 +376,13 @@
 
 <div id="teaches-overlay" class="reveal-modal" data-reveal>
 	teaches
-	<div id="teaches-drawer">
-		
-	</div>
+	<div id="teaches_drawer"></div>
 	<a class="close-reveal-modal">&#215;</a>
 </div>
 
 <div id="prior-node-overlay" class="reveal-modal" data-reveal>
 	prior node
-	<div id="prior-node-drawer"></div>
+	<div id="prior_node_drawer"></div>
 	<a class="close-reveal-modal">&#215;</a>
 </div>
 <!-- END of Looping through each resource -->
@@ -473,6 +492,7 @@
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
 
 		populateTeachesPriorNode(oid, "teaches");
+		populateTeachesPriorNode(oid, "prior_node");
 
 	}
 
@@ -511,7 +531,7 @@
 					// check if it had 'data-content-org' attribute
 					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
 					{
-						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value)
+						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value.trim())
 						{
 							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
 						}
@@ -546,7 +566,7 @@
 	{
 
 		// $("#save-node").css("display", "none");
-		// $('#teaches-drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+		// $('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
 // editdrawerwidget tag
 		$.ajax({
 			type: "POST",
@@ -556,10 +576,18 @@
 				node_id: oid,
 				field: field,
 				app: app, // gapp name
+				page_no: 1,
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function(data) {
-				$("#teaches-drawer").html(data);
+				if(field == "teaches")
+				{
+					$("#teaches_drawer").html(data);
+				}
+				else if(field == "prior_node")
+				{
+					$("#prior_node_drawer").html(data);	
+				}
 				// $("#save-node").css("display", "block");
 			}
 		});
