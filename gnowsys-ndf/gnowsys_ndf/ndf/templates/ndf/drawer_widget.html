@@ -536,6 +536,7 @@
           },
           success: function(data) {
              //alert(data);
+            $(".searching").css("display", "none");             
             if (field == "collection"){
               $("#collection_drawer").html(data);  
             }
