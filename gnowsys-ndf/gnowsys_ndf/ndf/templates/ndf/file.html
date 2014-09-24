@@ -151,11 +151,14 @@
               <img src="{% url 'getImageThumbnail' group_id file.pk %}">
             {% elif "audio" in file.mime_type %}
               <span class="fi-music" style="font-size:40px"></span>
+             {% elif "Pandora_video" in file.member_of_names_list and "video" in file.mime_type %}
+	      
+              {% get_source_id file.pk as source_id %}
+	      
+              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+                        
             {% elif "video" in file.mime_type and file.member_of_names_list|join:', ' != "Pandora_video" %}
               <img src="{% url 'getFileThumbnail' group_id file.pk %}">
-            {% elif file.member_of_names_list|join:', ' == "Pandora_video" and "video" in file.mime_type %}
-              {% get_source_id file.pk as source_id %}
-              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
             {% else %}
               <span class="fi-page-filled" style="font-size:40px"></span>
             {% endif %}
@@ -547,11 +550,12 @@
               </header>
             </div>
             <div class="small-5 columns">
-              {% if "video" in video.mime_type and video.member_of_names_list|join:', ' != "Pandora_video" %}
+	      {% if "video" in video.mime_type and video.member_of_names_list|join:', ' == "Pandora_video" %}
+              {% get_source_id video.pk as source_id %}
+              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+                            
+	      {% elif "video" in video.mime_type and video.member_of_names_list|join:', ' != "Pandora_video" %}
                 <img src="{% url 'getFileThumbnail' group_id video.pk %}">
-              {% elif "video" in video.mime_type and video.member_of_names_list|join:', ' == "Pandora_video" %}
-                {% get_source_id video.pk as source_id %}
-                <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
               {% endif %}
             </div>
           </div>
@@ -631,10 +635,11 @@
               </header>
             </div>
             <div class="small-5 columns">
-              {% if "video" in each.mime_type and each.member_of_names_list|join:', ' != "Pandora_video" %}
+	      {% if "video" in each.mime_type and "Pandora_video" in each.member_of_names_list %}
+	      <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+                            
+	      {% elif "video" in each.mime_type and each.member_of_names_list|join:', ' != "Pandora_video" %}
                 <img src="{% url 'getFileThumbnail' group_id each.pk %}">
-              {% elif "video" in each.mime_type and each.member_of_names_list|join:', ' == "Pandora_video" %}
-                <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
               {% endif %}
             </div>
           </div>
@@ -744,9 +749,6 @@
               <span class="fi-music" style="font-size:40px"></span>
             {% elif "video" in file.mime_type and file.member_of_names_list|join:', ' != "Pandora_video" %}
               <img src="{% url 'getFileThumbnail' group_id file.pk %}">
-            {% elif file.member_of_names_list|join:', ' == "Pandora_video" and "video" in file.mime_type %}
-              {% get_source_id file.pk as source_id %}
-              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
             {% else %}
               <span class="fi-page-filled" style="font-size:40px"></span>
             {% endif %}
