@@ -608,5 +608,28 @@
 	// 	// $('#content_org_overlay').foundation('reveal', 'open');
 	// }
 
+	
+				$(".next_prev").click(function() {
+					
+					// alert(this.name);
+				 	$.ajax({
+						type: "POST",
+						url: "{% url 'drawer_widget' group_id %}",
+						datatype: "html",
+						data:{							
+							field: "assesses",
+							node_id: '{{node.pk}}',
+							app:"{{title}}",
+							page_no: this.name,
+							csrfmiddlewaretoken: '{{ csrf_token }}'
+						},
+						success: function(data) {													
+							cnt(data)
+						}
+
+					});
+
+				});
+
 // </script>
 {% endblock %}
