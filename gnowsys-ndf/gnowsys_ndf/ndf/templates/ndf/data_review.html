@@ -46,7 +46,40 @@
 	.show-el input, .show-el select{
 		display: block;
 	}
+
+	.show-view-border{
+		border: solid #43ac6a;
+		border-bottom: none;
+	}
 	
+	.show-edit-border{
+		border: solid #43ac6a;
+		border-top: none;
+	}
+
+	/* drawer CSS */
+	.resource-drawer { 
+		border-color: #D3D3D3; border-style: solid; 
+		padding: 0 !important; 
+		overflow-y: auto;
+	}
+
+	.resource-drawer li.bullet-item:hover{
+		background-color: #ecf0f1; cursor:pointer;
+	}
+
+	.posted-by{ color: #808080; font-size: small; }
+
+	.selected-resource { background-color:lightgray !important ; }
+
+	.resource-type-image {
+		height:40px; 		
+		background-repeat:no-repeat; background-size: 48px 48px
+	}
+	/* ---END of drawer CSS */
+
+
+
 {% endblock %}
 
 {% block body_content %}
@@ -292,10 +325,10 @@
 				</select>
 			</td>
 			<td class="hide-el" data-field="teaches">
-				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+				<input type="button" data-reveal-id="teaches-overlay" class="button tiny expand" value="Edit in drawer"/>
 			</td>
 			<td class="hide-el" data-field="prior_node">
-				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+				<input type="button" data-reveal-id="prior-node-overlay" class="button tiny expand" value="Edit in drawer"/>
 			</td>
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
@@ -341,6 +374,17 @@
   <a class="close-reveal-modal">&#215;</a>
 </div>
 
+<div id="teaches-overlay" class="reveal-modal" data-reveal>
+	teaches
+	<div id="teaches_drawer"></div>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
+
+<div id="prior-node-overlay" class="reveal-modal" data-reveal>
+	prior node
+	<div id="prior_node_drawer"></div>
+	<a class="close-reveal-modal">&#215;</a>
+</div>
 <!-- END of Looping through each resource -->
 
 {% endblock %}
@@ -348,99 +392,7 @@
 <!-- Pagination -->
 {% block data_review_pagination %}
 
-	{% if page_info.num_pages > 1 %}
-
-		<div class="pagination-centered">
-			<ul class="pagination" role="menubar" aria-label="Pagination">
-				
-				{% if page_info.num_pages < 11 %}
-				
-
-					{% for each_page in page_info.page_range %}
-
-						{% if page_info.current_page == each_page %}
-						<li class="current">
-						{% else %}
-						<li>
-						{% endif %}
-							<a href="{% url 'data_review_page' group_name_tag each_page %}"> {{ each_page }} </a>
-						</li>
-
-					{% endfor %}
-				
-				{% else %}
-
-					{% if page_info.has_previous %}
-
-						<!-- for  << previous  text -->
-						<li class="arrow">
-							<a href="{% url 'data_review_page' group_name_tag page_info.previous_page %}">&laquo; Previous</a>
-						</li>
-
-						<!-- for page 1, page 2 and ... -->
-						{% if page_info.previous_page|add:"-2" != 1 and page_info.previous_page|add:"-2" > 0 %}
-							<li><a href="{% url 'data_review_page' group_name_tag 1 %}">1</a></li>
-							<li><a href="{% url 'data_review_page' group_name_tag 2 %}">2</a></li>
-							<li class="unavailable" aria-disabled="true"><span class="subheader">&hellip;</span></li>
-						{% endif %}
-			
-						<!-- for previous page -->
-						<li>
-							<a href="{% url 'data_review_page' group_name_tag page_info.previous_page %}">
-								{{ page_info.previous_page }}
-							</a>
-						</li>
-					{% endif %}
-
-					<!-- for current page -->
-					<li class="current"><a href="">{{ page_info.current_page }}</a></li>
-					
-
-					{% if page_info.has_next %}
-
-						<!-- for next page -->
-						<li>
-							<a href="{% url 'data_review_page' group_name_tag page_info.next_page %}">
-								{{ page_info.next_page }}
-							</a>
-						</li>
-						{% if page_info.next_page != page_info.num_pages %}
-							
-							{% if page_info.next_page != page_info.num_pages|add:"-1" %}
-
-								<!-- for .... -->
-								{% if page_info.next_page != page_info.num_pages|add:"-2" %}
-									<li class="unavailable" aria-disabled="true"><span class="subheader">&hellip;</span></li>
-								{% endif %}
-				
-								<!-- for secondlast page -->
-								<li>
-									<a href="{% url 'data_review_page' group_name_tag page_info.num_pages|add:'-1' %}">
-										{{ page_info.num_pages|add:"-1" }}
-									</a>
-								</li>
-							{% endif %}
-							
-							<!-- for last page -->
-							<li>
-								<a href="{% url 'data_review_page' group_name_tag page_info.num_pages %}">
-									{{ page_info.num_pages }}
-								</a>
-							</li>
-						{% endif %}
-
-						<!-- for text Next >> -->
-						<li class="arrow">
-							<a href="{% url 'data_review_page' group_name_tag page_info.next_page %}">Next &raquo;</a>
-						</li>
-				
-					{% endif %}
-
-				{% endif %}
-			</ul>
-		</div>
-
-	{% endif %}
+	{% include 'ndf/pagination.html' %}
 
 	<!-- Datetimepicker  -->
 	<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
@@ -491,7 +443,7 @@
 		document.getElementById("currently-edited-row").setAttribute("data-edited-row-name", "");
 	}
 
-
+	// hiding save/cancel buttons and showing edit button again
 	function changeSaveCancelToEdit(oid, resEditRowArr)
 	{
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeOut(0);
@@ -499,6 +451,10 @@
 		{
 			resEditRowArr[i].classList.add("hide-el");
 		}
+
+		$("tr#view-row-" + oid).removeClass("show-view-border");
+		$("tr#edit-row-" + oid).removeClass("show-edit-border");
+
 		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
 		setCurrEditRowToNone();
 	}
@@ -529,8 +485,14 @@
 		// setting orgitdown_data_reveal_editor content to content_org of current row object.
 		content_org = $("input[data-content-org-row-id="+oid+"]").attr("data-content-org");
 		document.getElementById("orgitdown_data_reveal_editor").value = content_org;
-		
+
+		$resEditRow.addClass("show-edit-border");
+		$("tr#view-row-" + oid).addClass("show-view-border");
+
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
+
+		populateTeachesPriorNode(oid, "teaches");
+		populateTeachesPriorNode(oid, "prior_node");
 
 	}
 
@@ -557,7 +519,7 @@
 			{
 				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
 				{
-					if(resViewRowArr[4+i].textContent.trim() != resEditRowArr[i].firstElementChild.value.trim())
+					if((resViewRowArr[4+i].textContent.trim() != 'None') && (resViewRowArr[4+i].textContent.trim() != resEditRowArr[i].firstElementChild.value.trim()))
 					{
 						tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n(" 
 						+ resViewRowArr[4+i].textContent.trim() + ")\nChanged to:\n(" 
@@ -569,7 +531,7 @@
 					// check if it had 'data-content-org' attribute
 					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
 					{
-						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value)
+						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value.trim())
 						{
 							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
 						}
@@ -598,6 +560,40 @@
 			changeSaveCancelToEdit(oid, resEditRowArr)
 		}
 	}
+
+
+	function populateTeachesPriorNode(oid, field, app="")
+	{
+
+		// $("#save-node").css("display", "none");
+		// $('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
+// editdrawerwidget tag
+		$.ajax({
+			type: "POST",
+			url: "{% url 'drawer_widget' groupid %}",
+			datatype: "html",
+			data:{
+				node_id: oid,
+				field: field,
+				app: app, // gapp name
+				page_no: 1,
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+				if(field == "teaches")
+				{
+					$("#teaches_drawer").html(data);
+				}
+				else if(field == "prior_node")
+				{
+					$("#prior_node_drawer").html(data);	
+				}
+				// $("#save-node").css("display", "block");
+			}
+		});
+
+	}
+    
 
 	// $('.time-required').timepicker();
 	$('.time-required').timepicker({

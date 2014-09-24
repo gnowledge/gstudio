@@ -249,6 +249,7 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
   if request.method == "POST":
     # [A] Save course-node's base-field(s)
+
     start_time = ""
     if request.POST.has_key("start_time"):
       start_time = request.POST.get("start_time", "")
@@ -328,16 +329,46 @@ def course_create_edit(request, group_id, app_id, app_set_id=None, app_set_insta
 
                 else:
                   # Other AttributeTypes 
-                  field_value = request.POST[field_instance["name"]]
+                  # field_value = request.POST[field_instance["name"]]
+                  field_value = request.POST.get(field_instance["name"], "")
 
                 if field_instance["name"] in ["start_time", "end_time"]: #, "registration_year"]:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%Y")
+
+                elif field_instance["name"] in ["mast_tr_qualifications", "voln_tr_qualifications"]:
+                  # Needs sepcial kind of parsing
+                  field_value = []
+                  tr_qualifications = request.POST.get(field_instance["name"], '')
+                  
+                  if tr_qualifications:
+                    qualifications_dict = {}
+                    tr_qualifications = [each.strip() for each in tr_qualifications.split(",")]
+                    
+                    for i, each in enumerate(tr_qualifications):
+                      if (i % 2) == 0:
+                        if each == "true":
+                          qualifications_dict["mandatory"] = True
+                        elif each == "false":
+                          qualifications_dict["mandatory"] = False
+
+                      else:
+                        qualifications_dict["text"] = unicode(each)
+                        field_value.append(qualifications_dict)
+                        qualifications_dict = {}
+
+                elif field_instance["name"] in ["max_marks", "min_marks"]:
+                  # Needed because both these fields' values are dependent upon evaluation_type field's value
+                  evaluation_type = request.POST.get("evaluation_type", "")
+                  if evaluation_type == u"Continuous":
+                    field_value = None
+                  field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
+
                 else:
                   field_value = parse_template_data(field_data_type, field_value, date_format_string="%m/%d/%Y %H:%M")
 
-                if field_value:
-                  course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
-                  # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
+                # if field_value:
+                course_gs_triple_instance = create_gattribute(course_gs._id, collection.AttributeType(field_instance), field_value)
+                # print "\n course_gs_triple_instance: ", course_gs_triple_instance._id, " -- ", course_gs_triple_instance.name
 
               else:
                 field_value_list = request.POST.getlist(field_instance["name"])

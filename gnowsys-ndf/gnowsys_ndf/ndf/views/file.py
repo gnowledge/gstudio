@@ -287,7 +287,6 @@ def file(request, group_id, file_id=None):
       datavisual = json.dumps(datavisual)
 
       already_uploaded = request.GET.getlist('var', "")
-
       return render_to_response("ndf/file.html",
                                 {'title': title,
                                  'appId':app._id,
@@ -306,7 +305,6 @@ def file(request, group_id, file_id=None):
       title = GST_FILE.name
       datavisual = []
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
-
           files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
                                                 '_type': 'File', 'fs_file_ids':{'$ne': []}, 
                                                 'group_set': {'$all': [ObjectId(group_id)]},
@@ -405,7 +403,6 @@ def file(request, group_id, file_id=None):
               # for each in pandora_video_id:
               #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
                    
-
       datavisual.append({"name":"Doc", "count":docCollection.count()})
       datavisual.append({"name":"Image","count":imageCollection.count()})
       datavisual.append({"name":"Video","count":videoCollection.count()})
@@ -873,6 +870,7 @@ def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
     ins_objectid  = ObjectId()
+    imageCollection=""
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -896,6 +894,27 @@ def file_detail(request, group_id, _id):
         if file_node.mime_type == 'video':      
             file_template = "ndf/video_detail.html"
         elif 'image' in file_node.mime_type:
+            imageCollection=imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+                                              '_type': 'File', 
+                                              '$or': [
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                      {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                ,
+                                                {'$and': [
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                  ]
+                                                }
+                                              ],
+                                              'group_set': {'$all': [ObjectId(group_id)]}
+                                            }).sort("last_update", -1)
+
             file_template = "ndf/image_detail.html"
         else:
             file_template = "ndf/document_detail.html"
@@ -938,7 +957,8 @@ def file_detail(request, group_id, _id):
                                 'annotations' : annotations,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
-                                'breadcrumbs_list': breadcrumbs_list
+                                'breadcrumbs_list': breadcrumbs_list,
+                                'imageCollection':imageCollection,
                               },
                               context_instance = RequestContext(request)
                              )
