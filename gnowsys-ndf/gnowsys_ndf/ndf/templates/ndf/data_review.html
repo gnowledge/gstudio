@@ -220,7 +220,7 @@
 					Edit
 				</div>
 				<div class="row" style="display:none;" data-id="save-cancel-div-{{resource.pk}}">
-					<span class="small-push-1 small-4 columns button success tiny" data-id="save-btn-{{resource.pk}}">
+					<span class="small-push-1 small-4 columns button success tiny" onclick="saveResource('{{resource.pk}}')" data-id="save-btn-{{resource.pk}}">
 						Save
 					</span>
 					<span class="small-pull-1 small-4 columns button alert tiny" data-id="cancel-btn-{{resource.pk}}" onclick="CancelEditResRow('{{resource.pk}}')">
@@ -460,6 +460,7 @@
 	}
 
 
+
 	// action on edit click:
 	function editResRow(oid)
 	{
@@ -496,8 +497,8 @@
 
 	}
 
-	// action on cancel button click
-	function CancelEditResRow(oid)
+
+	function getEditSummary(oid, msg, action)
 	{
 
 		// fetching resource object VIEW row
@@ -511,6 +512,8 @@
 		// to show details on confirm popup
 		var tempEditedFields = "";
 
+		nodeObj = new Object()
+
 		// processing each element of row
 		for (var i = 1; i < resEditRowArr.length; i++)
 		{
@@ -519,55 +522,128 @@
 			{
 				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
 				{
-					if((resViewRowArr[4+i].textContent.trim() != 'None') && (resViewRowArr[4+i].textContent.trim() != resEditRowArr[i].firstElementChild.value.trim()))
+					var tempEditFieldVal = resEditRowArr[i].firstElementChild.value.trim(),
+						tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
+
+					if((tempViewFieldVal != 'None') && (tempViewFieldVal != tempEditFieldVal))
 					{
 						tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n(" 
-						+ resViewRowArr[4+i].textContent.trim() + ")\nChanged to:\n(" 
-						+ resEditRowArr[i].firstElementChild.value.trim() + ")\n\n";
+						+ tempViewFieldVal + ")\nChanged to:\n(" 
+						+ tempEditFieldVal + ")\n\n";
 					}
+
+					// adding the key value pair in nodeObj
+					nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempEditFieldVal;
 				}
 				else if((resEditRowArr[i].firstElementChild.type == "button"))
 				{
-					// check if it had 'data-content-org' attribute
+					// 'content-org' field
 					if(resEditRowArr[i].getAttribute("data-field") == "content_org")
 					{
-						if(resViewRowArr[4+i].getAttribute("title").trim() != document.getElementById("orgitdown_data_reveal_editor").value.trim())
+						var tempContentOrg = document.getElementById("orgitdown_data_reveal_editor").value.trim();
+
+						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
 						{
 							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
 						}
+
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempContentOrg;
+					}
+					// 'prior_node' field and 'teaches' relation
+					else if((resEditRowArr[i].getAttribute("data-field") == "teaches") || (resEditRowArr[i].getAttribute("data-field") == "prior_node"))
+					{
+						var tempContentOrg = document.getElementById("orgitdown_data_reveal_editor").value.trim();
+
+						// if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
+						// {
+						// 	tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
+						// }
+
+						// nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempContentOrg;
 					}
 				}
-			}
 
+			}
 		};
 
 		isFieldEdited = (tempEditedFields.length > 0) ? true: false;
 
-
 		if(isFieldEdited)
 		{
-			var cancelConfirm = "false"
+			var saveCancelConfirm = "false"
 			
-			cancelConfirm = window.confirm("Please Note that following fields are changed:\n\n" + tempEditedFields + "\n\nAre you sure that you don't want to save these edited fields ?\nIf yes click - 'OK' or else click 'cancel'.");
+			saveCancelConfirm = window.confirm("Please Note that following fields are changed:\n\n" + tempEditedFields + msg);
 			
-			if(cancelConfirm)
+			if(saveCancelConfirm)
 			{
+				if(action == "save")
+				{
+					return [true, nodeObj];
+				}
 				changeSaveCancelToEdit(oid, resEditRowArr);
 			}	
 		}
 		else
 		{
+			if(action == "save")
+			{
+				alert("No field is edited or changed to save !")
+				return [false, nodeObj];
+			}
+
 			changeSaveCancelToEdit(oid, resEditRowArr)
 		}
+
+	}
+
+
+	function saveResource(oid)
+	{
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid);
+			resEditRowArr = $resEditRow.children();
+
+		var msg = "To save above changes click on - 'OK'."
+
+		// to show details on confirm popup; getEditSummary returns: [bool, nodeObject]
+		var nodeData = getEditSummary(oid, msg, "save");
+
+		if(nodeData[0])
+		{
+
+			$.ajax({
+
+				type: "POST",
+				url: "{% url 'data_review_save' groupid %}",
+				data:{
+					node_oid: oid,
+					a: JSON.stringify(nodeData[1]),
+					csrfmiddlewaretoken: '{{ csrf_token }}'
+				},
+				success: function(){
+					alert("Resource is successfully saved.");
+					changeSaveCancelToEdit(oid, resEditRowArr)
+				}
+			})
+		}
+
+
+	}
+
+
+	// action on cancel button click
+	function CancelEditResRow(oid)
+	{
+		var msg="\n\nAre you sure that you don't want to save these edited fields ?\nIf yes click - 'OK' or else click 'cancel'."
+
+		// to show details on confirm popup and show edit button
+		getEditSummary(oid, msg, "cancel");
 	}
 
 
 	function populateTeachesPriorNode(oid, field, app="")
 	{
 
-		// $("#save-node").css("display", "none");
-		// $('#teaches_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
-// editdrawerwidget tag
 		$.ajax({
 			type: "POST",
 			url: "{% url 'drawer_widget' groupid %}",
@@ -591,7 +667,6 @@
 				// $("#save-node").css("display", "block");
 			}
 		});
-
 	}
     
 
@@ -601,35 +676,6 @@
 		minDate: new Date(2050, 1, 1)
 	});
 
-	// // opening the orgit down editor and setting the value in textarea
-	// function openOrgEditor(oid)
-	// {
-
-	// 	// $('#content_org_overlay').foundation('reveal', 'open');
-	// }
-
-	
-				$(".next_prev").click(function() {
-					
-					// alert(this.name);
-				 	$.ajax({
-						type: "POST",
-						url: "{% url 'drawer_widget' group_id %}",
-						datatype: "html",
-						data:{							
-							field: "assesses",
-							node_id: '{{node.pk}}',
-							app:"{{title}}",
-							page_no: this.name,
-							csrfmiddlewaretoken: '{{ csrf_token }}'
-						},
-						success: function(data) {													
-							cnt(data)
-						}
-
-					});
-
-				});
 
 // </script>
 {% endblock %}

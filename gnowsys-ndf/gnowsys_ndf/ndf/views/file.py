@@ -1167,3 +1167,15 @@ def data_review(request, group_id, page_no=1):
 # ---END of data review in File app
 
 
+# saving resource object of data review
+@login_required
+def data_review_save(request, group_id):
+  '''
+  Method to save each and every data-row edit of data review app
+  '''
+
+  node_oid = request.POST.get("node_oid","")
+  aaa = request.POST.get("a","")
+  print "----------", json.loads(aaa)
+
+  return HttpResponse("hhh")
