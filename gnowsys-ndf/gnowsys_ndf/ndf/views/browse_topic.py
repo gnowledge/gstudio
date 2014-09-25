@@ -217,9 +217,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
             nodes_list = []
             name = request.POST.get('name')
             collection_list = request.POST.get('collection_list','')
-	    prior_node_list = request.POST.get('prior_node_list','')
-	    teaches_list = request.POST.get('teaches_list','')
-	    assesses_list = request.POST.get('assesses_list','')
+            prior_node_list = request.POST.get('prior_node_list','')
+            teaches_list = request.POST.get('teaches_list','')
+            assesses_list = request.POST.get('assesses_list','')
 	    
             
             # To find the root nodes to maintain the uniquness while creating and editing themes
@@ -286,7 +286,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 themes_list_items = False				
                 create_edit = False
                 themes_hierarchy = True
-                
+
                 theme_topic_node = collection.Node.one({'_id': ObjectId(app_GST._id)})
                 
                 # For edititng themes 
@@ -305,8 +305,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
                     if translate != "true":
                         # For storing and maintaning collection order
-                        theme_topic_node.collection_set = []
                         if collection_list != '':
+                            theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
                             
                         i = 0
@@ -317,6 +317,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 theme_topic_node.collection_set.append(node_id)
                                 
                             i = i+1
+                            
                         theme_topic_node.save() 
                         # End of storing collection
 
@@ -385,8 +386,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     nodes_list = json.dumps(nodes_list)
                     # End of finding unique sub themes
 
-
-                    
                                 
                     if name:
                         if theme_topic_node._id in root_themes_id:  
@@ -401,9 +400,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 
 
                     if translate != "true":
-                        # For storing and maintaning collection order
-                        theme_topic_node.collection_set = []
+                        # For storing and maintaning collection order                        
                         if collection_list != '':
+                            theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
                             
                         i = 0
@@ -458,8 +457,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
                         if collection_list:
                             # For storing and maintaning collection order
-                            theme_topic_node.collection_set = []
                             if collection_list != '':
+                                theme_topic_node.collection_set = []
                                 collection_list = collection_list.split(",")
             
                             i = 0
@@ -478,8 +477,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         get_node_metadata(request,theme_topic_node,topic_GST)
                         
                         
-                        theme_topic_node.prior_node = []
                         if prior_node_list != '':
+                            theme_topic_node.prior_node = []
                             prior_node_list = prior_node_list.split(",")
                             
                         i = 0
