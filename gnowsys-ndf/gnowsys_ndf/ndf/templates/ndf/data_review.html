@@ -610,18 +610,18 @@
 
 		if(nodeData[0])
 		{
-
+			// console.log(JSON.stringify(nodeData[1]))
 			$.ajax({
 
 				type: "POST",
 				url: "{% url 'data_review_save' groupid %}",
 				data:{
 					node_oid: oid,
-					a: JSON.stringify(nodeData[1]),
+					node_details: JSON.stringify(nodeData[1]),
 					csrfmiddlewaretoken: '{{ csrf_token }}'
 				},
-				success: function(){
-					alert("Resource is successfully saved.");
+				success: function(data){
+					alert("Resource is successfully saved." + data);
 					changeSaveCancelToEdit(oid, resEditRowArr)
 				}
 			})
