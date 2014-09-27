@@ -172,11 +172,11 @@
 			<!-- Attribution -->
 			<td class="view">{{ resource.creator }}</td>
 			<td class="view">{{ resource.other_contributors }}</td>
-			<td class="view">{{ resource.licence }}</td>
+			<td class="view">{{ resource.license }}</td>
 			<td class="view">{{ resource.source }}</td>
 			<td class="view">{{ resource.basedonurl }}</td>
 			<td class="view">{{ resource.translation_of }}</td>
-			<td class="view right-border">{{ resource.adaption_of }}</td>
+			<td class="view right-border">{{ resource.adaptation_of }}</td>
 
 			<!-- LRMI -->
 			<td class="view">{{ resource.educationaluse }}</td>
@@ -254,15 +254,15 @@
 			</td>
 
 			<!-- Attribution -->
-			<td class="hide-el" data-field="created_by"><input type="text" value="{{ resource.creator }}" /></td>
-			<td class="hide-el" data-field="contributors"><input type="text" value="{{ resource.other_contributors }}" /></td>
-			<td class="hide-el" data-field="license"><input type="text" value="{{ resource.licence }}" /></td>
+			<td class="hide-el" data-field="creator"><input type="text" value="{{ resource.creator }}" /></td>
+			<td class="hide-el" data-field="other_contributors"><input type="text" value="{{ resource.other_contributors }}" /></td>
+			<td class="hide-el" data-field="license"><input type="text" value="{{ resource.license }}" /></td>
 			<td class="hide-el" data-field="source"><input type="text" value="{{ resource.source }}" /></td>
-			<td class="hide-el" data-field="basenodeurl"><input type="text" value="{{ resource.basedonurl }}" /></td>
+			<td class="hide-el" data-field="basedonurl"><input type="text" value="{{ resource.basedonurl }}" /></td>
 			<td class="hide-el" data-field="translation_of">
 				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
 			</td>
-			<td class="hide-el right-border" data-field="adaptation_of" ><input type="text" value="{{ resource.adaption_of }}" /></td>
+			<td class="hide-el right-border" data-field="adaptation_of" ><input type="text" value="{{ resource.adaptation_of }}" /></td>
 
 			<!-- LRMI -->
 			<!-- <td class="view">{{ resource.educationaluse }}</td> -->
@@ -353,7 +353,7 @@
 			<!-- Advance -->
 			<td class="hide-el" data-field="readinglevel"></td>
 			<td class="hide-el" data-field="timerequired">
-				<input type="text" class="time-required" value=""/>
+				<input type="text" class="time-required" value="{{resource.timerequired}}"/>
 			</td>
 			<td class="hide-el" data-field="textcomplexity" class="right-border">
 				<select name="textcomplexity">
@@ -525,7 +525,7 @@
 					var tempEditFieldVal = resEditRowArr[i].firstElementChild.value.trim(),
 						tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
 
-					if((tempViewFieldVal != 'None') && (tempViewFieldVal != tempEditFieldVal))
+					if(tempViewFieldVal != tempEditFieldVal)
 					{
 						tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n(" 
 						+ tempViewFieldVal + ")\nChanged to:\n(" 
