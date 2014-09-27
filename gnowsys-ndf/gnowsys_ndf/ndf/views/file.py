@@ -1212,11 +1212,18 @@ def data_review_save(request, group_id):
 
     # overwriting request.POST with newly created QueryDict instance post_req
     request.POST = post_req
-    # print "\n---\n", request.POST, "\n---\n"
+    print "\n---\n", request.POST, "\n---\n"
 
+    license = request.POST.get('license', '')
+    
     file_node = collection.File.one({"_id": ObjectId(node_oid)})
     if request.method == "POST":
-        file_node.save(get_node_common_fields(request, file_node, group_id, GST_FILE))
+        get_node_common_fields(request, file_node, group_id, GST_FILE)
+        file_node.license = license if license else file_node.license
+        file_node.save()
+
+    # to fill/update attributes of the node
+    get_node_metadata(request, file_node, GST_FILE)
 
     return HttpResponse("")
 
