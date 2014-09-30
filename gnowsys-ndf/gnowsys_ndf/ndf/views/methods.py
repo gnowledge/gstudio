@@ -341,6 +341,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
+  altnames = request.POST.get('altnames', '')
+  featured = request.POST.get('featured', '')
+  status = request.POST.get('status', '')
 
   if map_geojson_data:
     map_geojson_data = map_geojson_data + ","
@@ -384,6 +387,16 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: name"
       is_changed = True
   
+  if altnames:
+    if node.altnames != altnames:
+      node.altnames = altnames
+      is_changed = True
+
+  if (featured == True) or (featured == False) :
+    if node.featured != featured:
+      node.featured = featured
+      is_changed = True
+
   if sub_theme_name:
     if node.name != sub_theme_name:
       node.name = sub_theme_name
@@ -582,6 +595,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     if usrid not in node.contributors:
       node.contributors.append(usrid)
+
+  if status:
+    if node.status != status:
+      node.status = status
+      is_changed = True
 
   # print "\n Reached here ...\n\n"
   return is_changed
@@ -808,16 +826,26 @@ def get_node_metadata_fields(request, node, node_type):
       print "field_value: ",atname," : ",field_value,"\n"
 """
 
-def get_node_metadata(request,node,node_type):
-  attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
-  if(node.has_key('_id')):
-    for atname in attribute_type_list:
-      field_value=unicode(request.POST.get(atname,""))
 
-      at=collection.Node.one({"_type":"AttributeType","name":atname})	
-      if(at!=None):
-        create_gattribute(node._id,at,field_value)		
-"""			
+def get_node_metadata(request, node, node_type):
+    attribute_type_list = ["age_range", "audience", "timerequired",
+                           "interactivitytype", "basedonurl", "educationaluse",
+                           "textcomplexity", "readinglevel", "educationalsubject",
+                           "educationallevel", "curricular", "educationalalignment",
+                           "adaptation_of", "other_contributors", "creator", "source"
+                          ]
+
+    if(node.has_key('_id')):
+
+        for atname in attribute_type_list:
+
+            field_value = unicode(request.POST.get(atname, ""))
+            at = collection.Node.one({"_type": "AttributeType", "name": atname})	
+
+            if(at is not None):
+                create_gattribute(node._id, at, field_value)
+
+"""
 def create_AttributeType(name, data_type, system_name, user_id):
 
 	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
