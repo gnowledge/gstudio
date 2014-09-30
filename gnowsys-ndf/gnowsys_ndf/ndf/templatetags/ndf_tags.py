@@ -14,7 +14,7 @@ from mongokit import paginator
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY
+from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
 # from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
 from gnowsys_ndf.settings import *
 
@@ -1737,6 +1737,26 @@ def get_resource_collection(groupid, resource_type):
     error_message = "\n CollectionsFindError: " + str(e) + " !!!\n"
     raise Exception(error_message)
 
+@register.assignment_tag
+def app_translations(request, app_dict):
+   app_id=app_dict['id']
+   get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   if request.LANGUAGE_CODE != GSTUDIO_SITE_DEFAULT_LANGUAGE:
+      get_rel=collection.Node.one({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':ObjectId(app_id)}]})
+      if get_rel:
+         get_trans=collection.Node.one({'_id':get_rel.right_subject})
+         if get_trans.language == request.LANGUAGE_CODE:
+            return get_trans.name
+         else:
+            app_name=collection.Node.one({'_id':ObjectId(app_id)})
+            return app_name.name
+      else:
+         app_name=collection.Node.one({'_id':ObjectId(app_id)})
+         return app_name.name
+   else:
+      app_name=collection.Node.one({'_id':ObjectId(app_id)})
+      return app_name.name
+      
 @register.assignment_tag
 def get_preferred_lang(request, group_id, nodes, node_type):
    group=collection.Node.one({'_id':(ObjectId(group_id))})
