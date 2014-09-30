@@ -456,7 +456,7 @@
 
 		$("tr#view-row-" + oid).removeClass("show-view-border");
 		$("tr#view-row-" + oid).css("opacity", 1);
-		
+
 		$("tr#edit-row-" + oid).removeClass("show-edit-border");
 
 		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
@@ -608,6 +608,71 @@
 	}
 
 
+	// function for setting the values in the view of data row.
+	function setViewByEditData(oid)
+	{
+		// fetching resource object VIEW row
+		var $resViewRow = $("tr#view-row-" + oid),
+			resViewRowArr = $resViewRow.children();
+
+		// fetching resource object EDIT row
+		var $resEditRow = $("tr#edit-row-" + oid);
+			resEditRowArr = $resEditRow.children();
+
+		// processing each element of row
+		for (var i = 1; i < resEditRowArr.length; i++)
+		{
+			// checking if the values in textboxes are changed
+			if(resEditRowArr[i].firstElementChild)
+			{
+				if((resEditRowArr[i].firstElementChild.type == "text") || (resEditRowArr[i].firstElementChild.type == "select-one"))
+				{
+					var tempEditFieldVal = resEditRowArr[i].firstElementChild.value.trim(),
+						tempViewFieldVal = resViewRowArr[4+i].textContent.trim();
+
+					if(tempViewFieldVal != tempEditFieldVal)
+					{
+						resViewRowArr[4+i].textContent = resEditRowArr[i].firstElementChild.value.trim();						
+					}
+				}
+				else if((resEditRowArr[i].firstElementChild.type == "button"))
+				{
+					var tempEditField = resEditRowArr[i].getAttribute("data-field");
+
+					// 'content-org' field
+					if(tempEditField == "content_org")
+					{
+						var tempContentOrg = document.getElementById("orgitdown_data_reveal_editor").value.trim();
+
+						if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
+						{
+							resViewRowArr[4+i].title = tempContentOrg;
+							resViewRowArr[4+i].textContent = tempContentOrg.substr(0, 60) + "..."
+						}
+
+					}
+					// 'prior_node' field and 'teaches' relation edit checking
+					else if((tempEditField == "teaches") || (tempEditField == "prior_node"))
+					{
+						var tempPrevDrawerFields = $("#"+ tempEditField +"-overlay").attr("data-right-drawer-list");
+						var tempCurrDrawerFields = $("#" + tempEditField + "_list").val();
+
+						if(tempPrevDrawerFields != tempCurrDrawerFields)
+						{
+							var tempArr = [];
+							$("#"+ tempEditField +"_drawer2").find(".node_id").each(function(){tempArr.push(this.getAttribute("name"))});
+
+							resViewRowArr[4+i].textContent = tempArr.toString()	;
+						}
+					}
+				}
+
+			}
+		}
+	}
+
+
+
 	function saveResource(oid)
 	{
 		// fetching resource object EDIT row
@@ -633,6 +698,7 @@
 				},
 				success: function(data){
 					alert("Resource is successfully saved." + data);
+					setViewByEditData(oid);
 					changeSaveCancelToEdit(oid, resEditRowArr)
 				}
 			})
