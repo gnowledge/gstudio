@@ -1212,7 +1212,6 @@ def data_review_save(request, group_id):
 
     # overwriting request.POST with newly created QueryDict instance post_req
     request.POST = post_req
-    print "\n---\n", request.POST, "\n---\n"
 
     license = request.POST.get('license', '')
     
@@ -1224,6 +1223,18 @@ def data_review_save(request, group_id):
 
     # to fill/update attributes of the node
     get_node_metadata(request, file_node, GST_FILE)
+
+    teaches_list = request.POST.get('teaches','') # get the teaches list 
+
+    if teaches_list !='':
+        teaches_list=teaches_list.split(",")
+        create_grelation_list(file_node._id,"teaches",teaches_list)
+
+    assesses_list = request.POST.get('assesses_list','')
+    
+    if assesses_list !='':
+        assesses_list=assesses_list.split(",")
+        create_grelation_list(file_node._id,"assesses",assesses_list)
 
     return HttpResponse("")
 

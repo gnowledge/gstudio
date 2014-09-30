@@ -192,12 +192,12 @@
 			<td class="view">{{ resource.audience }}</td>
 			<td class="view">
 				{% for each_teaches in resource.teaches %}
-					{{ each_teaches.name }}
+					{{ each_teaches.name }}{% if not forloop.last %}, {% endif %}
 				{% endfor %}
 			</td>
 			<td class="view"><!-- prior_node processing -->
 				{% for index_key, each_node in resource.prior_node_dict.items %}
-					{{ each_node.name }}
+					{{ each_node.name }}{% if not forloop.last %}, {% endif %}
 				{% endfor %}
 			</td>
 			<td class="view">{{ resource.featured }}</td>
@@ -260,7 +260,7 @@
 			<td class="hide-el" data-field="source"><input type="text" value="{{ resource.source }}" /></td>
 			<td class="hide-el" data-field="basedonurl"><input type="text" value="{{ resource.basedonurl }}" /></td>
 			<td class="hide-el" data-field="translation_of">
-				<input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/>
+				<!-- <input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/> -->
 			</td>
 			<td class="hide-el right-border" data-field="adaptation_of" ><input type="text" value="{{ resource.adaptation_of }}" /></td>
 
@@ -552,7 +552,10 @@
 					// 'prior_node' field and 'teaches' relation
 					else if((resEditRowArr[i].getAttribute("data-field") == "teaches") || (resEditRowArr[i].getAttribute("data-field") == "prior_node"))
 					{
-						var tempContentOrg = document.getElementById("orgitdown_data_reveal_editor").value.trim();
+						getDrawerVals();
+
+						nodeObj.prior_node_list = document.getElementById("prior_node_list").value;
+						nodeObj.teaches = document.getElementById("teaches_list").value;
 
 						// if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
 						// {
@@ -627,7 +630,6 @@
 			})
 		}
 
-
 	}
 
 
@@ -676,6 +678,43 @@
 		minDate: new Date(2050, 1, 1)
 	});
 
+
+	function getDrawerVals()
+	{
+                      
+      	pn_arr = []
+		cn_arr = []
+		md_arr = [] //for adding module
+		tch_arr=[]  // for teaches
+		assess_arr=[] // for assesses		
+
+ 		$(".node_id").each(function (){
+			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
+				pn_arr.push($(this).val());
+			}
+
+			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+				cn_arr.push($(this).val());
+			}
+
+			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
+  				md_arr.push($(this).val());
+  			}
+			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
+				tch_arr.push($(this).val());
+			}
+			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				assess_arr.push($(this).val());
+			}
+		});
+
+		$("#prior_node_list").val(pn_arr);
+		// $("#collection_list").val(cn_arr) ;
+		// $("#module_list").val(md_arr);
+		$("#teaches_list").val(tch_arr);
+		// $("#assesses_list").val(assess_arr);
+
+	}
 
 // </script>
 {% endblock %}
