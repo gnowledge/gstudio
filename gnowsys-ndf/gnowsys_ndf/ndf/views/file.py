@@ -1196,9 +1196,9 @@ def data_review_save(request, group_id):
 
     # updating some key names of dictionary as per get_node_common_fields.
     node_details["lan"] = node_details.pop("language")
+    node_details["prior_node_list"] = node_details.pop("prior_node")
     node_details["login-mode"] = node_details.pop("access_policy")
-    # node_details["prior_node_list"] = node_details.pop("access_policy") edit following in future
-    # node_details["collection_list"] = node_details.pop("access_policy")
+    # node_details["collection_list"] = node_details.pop("collection") for future use
 
     # Making copy of POST QueryDict instance.
     # To make it mutable and fill in node_details value/s.
@@ -1212,6 +1212,7 @@ def data_review_save(request, group_id):
 
     # overwriting request.POST with newly created QueryDict instance post_req
     request.POST = post_req
+    # print "\n---\n", request.POST, "\n---\n"
 
     license = request.POST.get('license', '')
     

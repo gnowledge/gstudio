@@ -262,7 +262,9 @@
 			<td class="hide-el" data-field="translation_of">
 				<!-- <input type="button" fill-data-reveal-id="" class="button tiny expand" value="Testing"/> -->
 			</td>
-			<td class="hide-el right-border" data-field="adaptation_of" ><input type="text" value="{{ resource.adaptation_of }}" /></td>
+			<td class="hide-el right-border" data-field="adaptation_of" >
+				<input type="text" value="{{ resource.adaptation_of }}" />
+			</td>
 
 			<!-- LRMI -->
 			<!-- <td class="view">{{ resource.educationaluse }}</td> -->
@@ -328,7 +330,7 @@
 				<input type="button" data-reveal-id="teaches-overlay" class="button tiny expand" value="Edit in drawer"/>
 			</td>
 			<td class="hide-el" data-field="prior_node">
-				<input type="button" data-reveal-id="prior-node-overlay" class="button tiny expand" value="Edit in drawer"/>
+				<input type="button" data-reveal-id="prior_node-overlay" class="button tiny expand" value="Edit in drawer"/>
 			</td>
 			<td class="hide-el" data-field="featured">
 				<select name="featured">
@@ -374,13 +376,13 @@
   <a class="close-reveal-modal">&#215;</a>
 </div>
 
-<div id="teaches-overlay" class="reveal-modal" data-reveal>
+<div id="teaches-overlay" data-right-drawer-list="" class="reveal-modal" data-reveal>
 	teaches
 	<div id="teaches_drawer"></div>
 	<a class="close-reveal-modal">&#215;</a>
 </div>
 
-<div id="prior-node-overlay" class="reveal-modal" data-reveal>
+<div id="prior_node-overlay" data-right-drawer-list="" class="reveal-modal" data-reveal>
 	prior node
 	<div id="prior_node_drawer"></div>
 	<a class="close-reveal-modal">&#215;</a>
@@ -453,6 +455,8 @@
 		}
 
 		$("tr#view-row-" + oid).removeClass("show-view-border");
+		$("tr#view-row-" + oid).css("opacity", 1);
+		
 		$("tr#edit-row-" + oid).removeClass("show-edit-border");
 
 		$("div[data-id='edit-btn-" + oid +"']").fadeIn(800);
@@ -489,6 +493,7 @@
 
 		$resEditRow.addClass("show-edit-border");
 		$("tr#view-row-" + oid).addClass("show-view-border");
+		$("tr#view-row-" + oid).css("opacity", 0.25);
 
 		$("div[data-id='save-cancel-div-" + oid +"']").fadeIn(800);
 
@@ -549,20 +554,23 @@
 
 						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempContentOrg;
 					}
-					// 'prior_node' field and 'teaches' relation
+					// 'prior_node' field and 'teaches' relation edit checking
 					else if((resEditRowArr[i].getAttribute("data-field") == "teaches") || (resEditRowArr[i].getAttribute("data-field") == "prior_node"))
 					{
+						// calling following to fill values in hidden _list/s
 						getDrawerVals();
 
-						nodeObj.prior_node_list = document.getElementById("prior_node_list").value;
-						nodeObj.teaches = document.getElementById("teaches_list").value;
+						var tempPrevDrawerFields = $("#"+ resEditRowArr[i].getAttribute("data-field") +"-overlay").attr("data-right-drawer-list");
+						var tempCurrDrawerFields = $("#" + resEditRowArr[i].getAttribute("data-field") + "_list").val();
 
-						// if(resViewRowArr[4+i].getAttribute("title").trim() != tempContentOrg)
-						// {
-						// 	tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n content_org's content is changed.\n\n"
-						// }
+						if(tempPrevDrawerFields != tempCurrDrawerFields)
+						{
+							// console.log(resEditRowArr[i].getAttribute("data-field") + tempPrevDrawerFields);
+							// console.log(resEditRowArr[i].getAttribute("data-field") + tempCurrDrawerFields);
+							tempEditedFields += "\n-------| FIELD: " + $(resEditRowArr[i]).attr("data-field") + " |-------\n\n Element's in right drawer are changed.\n\n"
+						}
 
-						// nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempContentOrg;
+						nodeObj[resEditRowArr[i].attributes.getNamedItem("data-field").value] = tempCurrDrawerFields;
 					}
 				}
 
@@ -666,13 +674,17 @@
 				{
 					$("#prior_node_drawer").html(data);	
 				}
-				// $("#save-node").css("display", "block");
+			
+				getDrawerVals();
+				$("#teaches-overlay").attr("data-right-drawer-list", $("#teaches_list").val());
+				$("#prior_node-overlay").attr("data-right-drawer-list", $("#prior_node_list").val());
+
 			}
 		});
 	}
     
 
-	// $('.time-required').timepicker();
+	// set inputbox to timepicker
 	$('.time-required').timepicker({
 		timeOnlyTitle: 'Choose Time Required',
 		minDate: new Date(2050, 1, 1)
@@ -682,36 +694,36 @@
 	function getDrawerVals()
 	{
                       
-      	pn_arr = []
-		cn_arr = []
-		md_arr = [] //for adding module
-		tch_arr=[]  // for teaches
-		assess_arr=[] // for assesses		
+      	var pn_arr = [],
+			cn_arr = [],
+			md_arr = [], //for adding module
+			tch_arr = [],  // for teaches
+			assess_arr = []; // for assesses		
 
  		$(".node_id").each(function (){
 			if ($(this).parent(".bullet-item").parent("#prior_node_drawer2").attr("id") == "prior_node_drawer2") {
 				pn_arr.push($(this).val());
 			}
-
-			if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
-				cn_arr.push($(this).val());
-			}
-
-			if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
-  				md_arr.push($(this).val());
-  			}
 			if ($(this).parent(".bullet-item").parent("#teaches_drawer2").attr("id") == "teaches_drawer2") {
 				tch_arr.push($(this).val());
 			}
-			if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
-				assess_arr.push($(this).val());
-			}
+
+			// if ($(this).parent(".bullet-item").parent("#collection_drawer2").attr("id") == "collection_drawer2") {
+			// 	cn_arr.push($(this).val());
+			// }
+
+			// if ($(this).parent(".bullet-item").parent("#module_drawer2").attr("id") == "module_drawer2") {
+  	// 			md_arr.push($(this).val());
+  	// 		}
+			// if ($(this).parent(".bullet-item").parent("#assesses_drawer2").attr("id") == "assesses_drawer2") {
+				// assess_arr.push($(this).val());
+			// }
 		});
 
 		$("#prior_node_list").val(pn_arr);
+		$("#teaches_list").val(tch_arr);
 		// $("#collection_list").val(cn_arr) ;
 		// $("#module_list").val(md_arr);
-		$("#teaches_list").val(tch_arr);
 		// $("#assesses_list").val(assess_arr);
 
 	}
