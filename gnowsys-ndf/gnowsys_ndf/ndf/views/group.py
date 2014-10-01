@@ -369,16 +369,12 @@ def group_dashboard(request,group_id=None):
     grpid=groupobj['_id']
     pass
 
-  if groupobj.status == u"DRAFT":
-    groupobj, ver = get_page(request, groupobj)
-
   # Call to get_neighbourhood() is required for setting-up property_order_list
   groupobj.get_neighbourhood(groupobj.member_of)
 
   property_order_list = []
   if groupobj.has_key("group_of"):
     if groupobj['group_of']:
-      # print "\n ", groupobj['group_of'][0], "\n"
       college = collection.Node.one({'_type': "GSystemType", 'name': "College"}, {'_id': 1})
 
       if college:
