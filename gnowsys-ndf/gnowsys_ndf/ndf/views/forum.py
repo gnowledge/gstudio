@@ -116,7 +116,9 @@ def forum(request, group_id, node_id=None):
         temp_forum['html_content'] = each.html_content
         temp_forum['contributors'] = each.contributors
         temp_forum['id'] = each._id
-        temp_forum['threads'] = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(each._id)}]}).count()
+        temp_forum['threads'] = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(each._id)}],
+'status':{'$nin':['HIDDEN']}
+}).count()
         
         forum_detail_list.append(temp_forum)
 
@@ -417,7 +419,7 @@ def display_thread(request,group_id, thread_id, forum_id=None):
         
         for each in thread.prior_node:
             forum=collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
-        
+            print "is forum",forum.name    
             if forum:
                 usrname = User.objects.get(id=forum.created_by).username
                 variables = RequestContext(request,
@@ -704,3 +706,28 @@ def delete_forum(request,group_id,node_id,relns=None):
     
     op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
     return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id}))
+
+
+def delete_thread(request,group_id,node_id):
+    """ Changing status of thread to HIDDEN
+    """
+    print "in delete thread",thread_id
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    
+    op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id}))
+    
+
+def edit_thread(request,group_id,thread_id):
+    return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id})) 

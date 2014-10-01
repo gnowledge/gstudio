@@ -1,5 +1,6 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
+{% load i18n %}
 {% block title %}{{thread.name}}{% endblock %}
 
 
@@ -69,15 +70,32 @@ color: #7a7a7a;
 {% get_group_name groupid as group_name_tag %}
 
 	<h3>
-		<a href="/{{groupid}}/forum/show/{{forum}}" title="Forum Name">
+		<a href="/{{groupid}}/forum/{{forum}}" title="Forum Name">
 			{{forum.name}}
 		</a>
 {% if thread %}
+  {% get_group_name groupid as group_name_tag %}
+
 		&nbsp; <i class="fi-shuffle"></i> &nbsp;
 		<span title="Thread Name">{{thread.name}}</span>
 	</h3>
+        {% get_edit_url thread.pk as edit_url %}
+   
+	 {% if user.is_superuser or thread.created_by == user.id %}
+ <a href="{% url edit_url group_name_tag thread.pk %}" class="small button split edit"><i class="fi-pencil"></i>{% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
+    {% endif %}
+  
+      <ul id="edit-options" data-dropdown-content class="f-dropdown">
+            <li>
 
-	<div class="row forum-summary">
+            {% if thread.created_by == request.user.id %}
+      <a class="tiny alert button" href="{% url 'thread_delete' group_name_tag thread %}">{% trans "Delete" %}</a>
+      {% endif %}
+
+            </li>
+
+      </ul>
+             <div class="row forum-summary">
 		<div class="small-2 columns">
 			<a class="user"></a>
 			<br/><br/>
@@ -87,6 +105,7 @@ color: #7a7a7a;
 		</div>
 		<div class="small-10 columns">
 			<font size ="5">Thread: {{thread.name}} </font>
+
 				<!-- <hr style="margin:0.5rem 0;" /> -->
 				<br/><br/>      
 				<blockquote>
