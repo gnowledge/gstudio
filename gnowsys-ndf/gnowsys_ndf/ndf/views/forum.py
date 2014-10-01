@@ -22,7 +22,7 @@ from django_mongokit import get_database
 
 ''' -- imports from gstudio -- '''
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
-from gnowsys_ndf.ndf.views.methods import set_all_urls
+from gnowsys_ndf.ndf.views.methods import set_all_urls,check_delete
 from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
@@ -59,9 +59,13 @@ def forum(request, group_id, node_id=None):
         if group_ins:
             group_id = str(group_ins._id)
         else :
-            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            auth = collection.Node.find_one({'_type': 'Author', 'name': unicode(request.user.username) })
             if auth :
                 group_id = str(auth._id)
+            else :
+                auth = collection.Node.find_one({'_type': 'Author', 'name': unicode(group_id) })
+                if auth:
+                    group_id=str(auth._id)
     else :
         pass
 
@@ -81,7 +85,8 @@ def forum(request, group_id, node_id=None):
       existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(forum_st._id)]},
                                          '$or': [{'name': {'$regex': search_field, '$options': 'i'}}, 
                                                  {'tags': {'$regex':search_field, '$options': 'i'}}], 
-                                         'group_set': {'$all': [ObjectId(group_id)]}
+                                         'group_set': {'$all': [ObjectId(group_id)]},
+                                     'status':{'$nin':['HIDDEN']}
                                      }).sort('last_update', -1)
 
       return render_to_response("ndf/forum.html",
@@ -95,8 +100,9 @@ def forum(request, group_id, node_id=None):
     elif forum_st._id == ObjectId(node_id):
       
       # Forum list view
-
-      existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]}}).sort('last_update', -1)
+      existing_forums = collection.Node.find({'member_of': {'$all': [ObjectId(node_id)]}, 'group_set': {'$all': [ObjectId(group_id)]},
+'status':{'$nin':['HIDDEN']}
+}).sort('last_update', -1)
       forum_detail_list = []
 
       for each in existing_forums:
@@ -241,6 +247,120 @@ def create_forum(request,group_id):
     return render_to_response("ndf/create_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list},RequestContext(request))
 
 
+def edit_forum(request,group_id,forum_id):    
+    '''
+    Method to create forum and Retrieve all the forums
+    '''
+    forum=collection.Node.one({'_id':ObjectId(forum_id)})
+    # method to convert group_id to ObjectId if it is groupname
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    
+
+    # getting all the values from submitted form
+    if request.method == "POST":
+
+        colg = collection.Group.one({'_id':ObjectId(group_id)}) # getting group ObjectId
+
+        colf = collection.Node.one({'_id':ObjectId(forum_id)}) # creating new/empty GSystem object
+
+        name = unicode(request.POST.get('forum_name',"")) # forum name
+        colf.name = name
+        
+        content_org = request.POST.get('content_org',"") # forum content
+        if content_org:
+            colf.content_org = unicode(content_org)
+            usrname = request.user.username
+            filename = slugify(name) + "-" + usrname + "-"
+            colf.content = org2html(content_org, file_prefix=filename)
+        
+        usrid = int(request.user.id)
+        usrname = unicode(request.user.username)
+        
+        colf.modified_by = usrid
+
+        if usrid not in colf.contributors:
+            colf.contributors.append(usrid)
+        
+
+        ################# ADDED 14th July.Its done!
+        colf.access_policy = u"PUBLIC"
+        colf.url = set_all_urls(colf.member_of)
+
+        ### currently timed forum feature is not in use ###
+        # sdate=request.POST.get('sdate',"")
+        # shrs= request.POST.get('shrs',"") 
+        # smts= request.POST.get('smts',"")
+        
+        # edate= request.POST.get('edate',"")
+        # ehrs= request.POST.get('ehrs',"")
+        # emts=request.POST.get('emts',"")
+        
+        # start_dt={}
+        # end_dt={}
+        
+        # if not shrs:
+        #     shrs=0
+        # if not smts:
+        #     smts=0
+        # if sdate:
+        #     sdate1=sdate.split("/") 
+        #     st_date = datetime.datetime(int(sdate1[2]),int(sdate1[0]),int(sdate1[1]),int(shrs),int(smts))
+        #     start_dt[start_time.name]=st_date
+        
+        # if not ehrs:
+        #     ehrs=0
+        # if not emts:
+        #     emts=0
+        # if edate:
+        #     edate1=edate.split("/")
+        #     en_date= datetime.datetime(int(edate1[2]),int(edate1[0]),int(edate1[1]),int(ehrs),int(emts))
+        #     end_dt[end_time.name]=en_date
+       # colf.attribute_set.append(start_dt)
+       # colf.attribute_set.append(end_dt)
+        colf.save()
+
+        '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
+        link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
+        for each in colg.author_set:
+            bx=User.objects.get(id=each)
+            activity="Edited forum"
+            msg=usrname+" has edited forum -" +colf.name+" in the group -'"+colg.name+"'\n"+"Please visit "+link+" to see the forum."
+            if bx:
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(bx.username) })
+                if colg._id and auth:
+                    no_check=forum_notification_status(colg._id,auth._id)
+                else:
+                    no_check=True
+                if no_check:
+                    ret = set_notif_val(request,colg._id,msg,activity,bx)
+
+        # returning response to ndf/forumdetails.html
+        return HttpResponseRedirect(reverse('show', kwargs={'group_id':group_id,'forum_id': colf._id }))
+
+        # variables=RequestContext(request,{'forum':colf})
+        # return render_to_response("ndf/forumdetails.html",variables)
+
+    # getting all the GSystem of forum to provide autocomplete/intellisence of forum names
+    available_nodes = collection.Node.find({'_type': u'GSystem', 'member_of': ObjectId(forum_st._id) })
+
+    nodes_list = []
+    for each in available_nodes:
+      nodes_list.append(each.name)
+    return render_to_response("ndf/edit_forum.html",{'group_id':group_id,'groupid':group_id, 'nodes_list': nodes_list,'forum':forum},RequestContext(request))
+
+
+
 def display_forum(request,group_id,forum_id):
     
     forum = collection.Node.one({'_id': ObjectId(forum_id)})
@@ -310,7 +430,19 @@ def display_thread(request,group_id, thread_id, forum_id=None):
                                                 'forum_created_by':usrname
                                             })
                 return render_to_response("ndf/thread_details.html",variables)
-    except:
+        usrname = User.objects.get(id=thread.created_by).username
+        variables= RequestContext(request,
+                                            {   'forum':thread,
+                                                'thread':None,
+                                                'groupid':group_id,
+                                                'group_id':group_id,
+                                                'eachrep':thread,
+                                                'user':request.user,
+                                                'forum_created_by':usrname
+                                            })
+        return render_to_response("ndf/thread_details.html",variables)    
+    except Exception as e:
+        print "Exception in thread_details "+str(e)
         pass
 
 
@@ -515,7 +647,6 @@ def add_node(request,group_id):
             no_check=forum_notification_status(group_id,auth._id)
             if no_check:
                 ret = set_notif_val(request,group_id,msg,activity,bx)
-        print "in add_node"        
         if node == "Reply":
             # if exstng_reply:
             #     exstng_reply.prior_node =[]
@@ -553,3 +684,23 @@ def get_profile_pic(username):
         img_obj = "" 
 
     return img_obj
+
+@check_delete
+def delete_forum(request,group_id,node_id,relns=None):
+    """ Changing status of forum to HIDDEN
+    """
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    
+    op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id}))
