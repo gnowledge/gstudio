@@ -568,63 +568,6 @@ def shelf_allowed(node):
 			return allowed
 
 
-@register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(request, group_id):
-	"""Get Gapps menu-bar
-	"""
-	try:
-		selectedGapp = request.META["PATH_INFO"]
-		group_name = ""
-		collection = db[Node.collection_name]
-		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
-		gapps = {}
-		i = 0;
-		meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-		
-		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
-		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
-
-		# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
-		not_in_menu_bar = []
-		if group_obj.name == "home":
-			# From "home" group hide following GAPPS: Image, Video
-			not_in_menu_bar = ["Image", "Video"]
-		else :
-			# From other remaining groups hide following GAPPS: Group, Image, Video
-			not_in_menu_bar = ["Image", "Video", "Group"]
-
-		# Defalut GAPPS to be listed on gapps-meubar/gapps-iconbar
-		global DEFAULT_GAPPS_LIST
-		if not DEFAULT_GAPPS_LIST:
-			# If DEFAULT_GAPPS_LIST is empty, set bulit-in GAPPS (setting_gapps) list from settings file
-			DEFAULT_GAPPS_LIST = setting_gapps
-
-		for node in GAPPS:
-			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
-			if node:
-				if node.name not in not_in_menu_bar and node.name in DEFAULT_GAPPS_LIST:
-					i = i+1;
-					gapps[i] = {'id': node._id, 'name': node.name.lower()}
-
-		if len(selectedGapp.split("/")) > 2 :
-			selectedGapp = selectedGapp.split("/")[2]
-		else :
-			selectedGapp = selectedGapp.split("/")[1]
-		if group_id == None:
-			group_id=gpid._id
-		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
-		if not group_obj:
-			group_id=gpid._id
-		else :
-			group_name = group_obj.name
-
-		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
-	except invalid_id:
-		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-		group_id=gpid._id
-		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
-
 # This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
 @register.inclusion_tag('ndf/gapps_iconbar.html')
 def get_gapps_iconbar(request, group_id):
