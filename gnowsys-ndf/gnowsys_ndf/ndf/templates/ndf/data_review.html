@@ -717,9 +717,11 @@
 	}
 
 
-	function populateTeachesPriorNode(oid, field, app="")
+	function populateTeachesPriorNode(oid, field)
 	{
 
+		var app = "";
+		
 		$.ajax({
 			type: "POST",
 			url: "{% url 'drawer_widget' groupid %}",
