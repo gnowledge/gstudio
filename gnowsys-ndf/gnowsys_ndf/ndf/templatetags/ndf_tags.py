@@ -938,7 +938,7 @@ def get_edit_url(groupid):
 	if node._type == 'GSystem':
 
 		type_name = collection.Node.one({'_id': node.member_of[0]}).name
-
+                
 		if type_name == 'Quiz':
 			return 'quiz_edit'    
 		elif type_name == 'Page':
@@ -947,6 +947,8 @@ def get_edit_url(groupid):
 			return 'theme_topic_create'
 		elif type_name == 'QuizItem':
 			return 'quiz_item_edit'
+                elif type_name == 'Forum':
+                        return 'edit_forum'
 
 	elif node._type == 'Group' or node._type == 'Author' :
 		return 'edit_group'

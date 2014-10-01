@@ -42,6 +42,23 @@ coln=db[GSystem.collection_name]
 grp_st=coln.Node.one({'$and':[{'_type':'GSystemType'},{'name':'Group'}]})
 ins_objectid  = ObjectId()
 
+def check_delete(main):
+  try:
+    def check(*args, **kwargs):
+      relns=""
+      node_id=kwargs['node_id']
+      ins_objectid  = ObjectId()
+      if ins_objectid.is_valid(node_id) :
+        node=collection.Node.one({'_id':ObjectId(node_id)})
+        relns=node.get_possible_relations(node.member_of)
+        attrbts=node.get_possible_attributes(node.member_of)
+        return main(*args, **kwargs)
+      else:
+        print "Not a valid id"
+    return check 
+  except Exception as e:
+    print "Error in check_delete "+str(e)
+
 def get_all_resources_for_group(group_id):
   if ins_objectid.is_valid(group_id):
     obj_resources=coln.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'File'}]},{'group_set':{'$all':[ObjectId(group_id)]}},{'member_of':{'$nin':[grp_st._id]}}]})
