@@ -963,6 +963,7 @@ def get_edit_url(groupid):
 	if node._type == 'GSystem':
 
 		type_name = collection.Node.one({'_id': node.member_of[0]}).name
+                print "typename=",type_name
                 
 		if type_name == 'Quiz':
 			return 'quiz_edit'    
@@ -974,6 +975,9 @@ def get_edit_url(groupid):
 			return 'quiz_item_edit'
                 elif type_name == 'Forum':
                         return 'edit_forum'
+                elif type_name == 'Twist' or type_name == 'Thread':
+                        return 'edit_thread'
+
 
 	elif node._type == 'Group' or node._type == 'Author' :
 		return 'edit_group'
