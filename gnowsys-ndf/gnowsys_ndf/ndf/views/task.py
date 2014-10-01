@@ -98,6 +98,10 @@ def task_details(request, group_name, task_id):
 			else :
 				postnode_task = sys_each_postnode.altnames
 			history.append({'id':str(sys_each_postnode._id), 'name':sys_each_postnode.name, 'created_by':sys_each_postnode_user.username, 'created_at':sys_each_postnode.created_at, 'altnames':eval(postnode_task), 'content':sys_each_postnode.content})
+    	
+    if  task_node.collection_set:
+		
+	blank_dict['collection']='True'
     history.reverse()
     var = { 'title': task_node.name,'group_id': group_id, 'appId':app._id, 'groupid': group_id, 'group_name': group_name, 'node':task_node, 'history':history, 'subtask':subtask}
     var.update(blank_dict)
@@ -106,7 +110,7 @@ def task_details(request, group_name, task_id):
     return render_to_response(template, variables)
 
 @login_required
-def create_edit_task(request, group_name, task_id=None):
+def create_edit_task(request, group_name, task_id=None,task=None,count=0):
     """Creates/Modifies details about the given Task.
     """
     edit_task_node = ""
@@ -135,7 +139,7 @@ def create_edit_task(request, group_name, task_id=None):
     	
     else:
         task_node = collection.GSystem()
-
+    userlist=[] 	
     if request.method == "POST": # create or edit
         name = request.POST.get("name","")
         content_org = request.POST.get("content_org","")
@@ -148,12 +152,14 @@ def create_edit_task(request, group_name, task_id=None):
         Estimated_time = request.POST.get("Estimated_time","")
 	watchers = request.POST.get("watchers","")
         GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
+	
         tag=""
+	field_value=[]
         if request.FILES.getlist('UploadTask'):
         	files=request.FILES.getlist('UploadTask')
         	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag)
-        	
-        
+	
+ 
     	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
 		if watchers:
@@ -197,24 +203,41 @@ def create_edit_task(request, group_name, task_id=None):
                		newattribute = collection.GAttribute()
                 	newattribute.subject = task_node._id
                 	newattribute.attribute_type = attributetype_key
-                	newattribute.object_value = request.POST.get(each,"")
+			if each == 'Assignee' and len(request.POST.getlist("Assignee",""))>1:
+				if count == 0:
+					newattribute.object_value = request.user.username
+                                else:
+					assignee_list=[]
+                                        assignee_list=(request.POST.getlist(each,""))
+                                        newattribute.object_value = assignee_list[count]
+			else:
+				newattribute.object_value = request.POST.get(each,"")
                 	newattribute.save()
-                	if each == "Assignee" :
-				userlist.append(request.POST.get(each,""))
-	    userlist.append(request.user.username)
 	    if request.FILES.getlist('UploadTask'):
-                		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
+                                attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Upload_Task'})
                			newattribute = collection.GAttribute()
                 		newattribute.subject = task_node._id
                 		newattribute.attribute_type = attributetype_key
                 		newattribute.object_value = field_value[0]
                 		newattribute.save()
+	    if  int(len(request.POST.getlist("Assignee","")))>1:
+              if task is None:
+               		Task=collection.Node.find_one({"_id":ObjectId(task_node._id)})
 			
-	    for eachuser in list(set(userlist)):
-		activ="task reported"
-		msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
-		bx=User.objects.get(username =eachuser)
-	        set_notif_val(request,group_id,msg,activ,bx)
+	      else:
+			Task=collection.Node.find_one({"_id":ObjectId(task)})
+			Task.collection_set.append(task_node._id)
+	      Task.save()
+		
+	      if int(count) <int(len(request.POST.getlist("Assignee",""))-1):
+		create_edit_task(request, group_name, task_id,Task._id,count=count+1)
+	    if count == 0:		
+	      for eachuser in (request.POST.getlist("Assignee","")):
+		if eachuser != "":	
+			activ="task reported"
+			msg="Task '"+task_node.name+"' has been reported by "+request.user.username+"\n     - Status: "+request.POST.get('Status','')+"\n     - Assignee: "+request.POST.get('Assignee','')+"\n     -  Url: http://"+sitename.name+"/"+group_name.replace(" ","%20").encode('utf8')+"/task/"+str(task_node._id)+"/"
+			bx=User.objects.get(username =eachuser)
+	       		set_notif_val(request,group_id,msg,activ,bx)
 	else: #update
 	    for each in at_list:
 	        
@@ -222,7 +245,10 @@ def create_edit_task(request, group_name, task_id=None):
 			attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
         		attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
 			if each == "Assignee" :
-				userlist.append(request.POST.get(each,""))
+				for i in request.POST.getlist(each,""):
+				     if i != "":
+					userlist.append(i)
+				
 			if attr : # already attribute exist 
 				if not attr.object_value == request.POST.get(each,"") :	
 					change_list.append(each.encode('utf8')+' changed from '+attr.object_value.encode('utf8')+' to '+request.POST.get(each,"").encode('utf8')) # updated 	details					
@@ -302,6 +328,31 @@ def create_edit_task(request, group_name, task_id=None):
 
     
 @login_required    
+def task_collection(request,group_name,_id):
+    ins_objectid  = ObjectId()
+    task=[]
+    if ins_objectid.is_valid(group_name) is False :
+      group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
+      auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+      if group_ins:
+        group_id = str(group_ins._id)
+      else :
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if auth :
+          group_id = str(auth._id)
+    else :
+        pass
+    collection_task=[]
+    node = collection.Node.one({'_id':ObjectId(_id)})
+    
+	
+    for each in node.collection_set:
+    	new = collection.Node.one({'_id':ObjectId(each)})
+	collection_task.append(new)		
+    template = "ndf/card_view.html"
+    variable = RequestContext(request, {'TASK_inst': collection_task,'group_name':group_name,'groupid':group_id})
+    return render_to_response(template, variable)
+    	
 def delete_task(request, group_name, _id):
     """This method will delete task object and its Attribute and Relation
     """
@@ -370,27 +421,36 @@ def check_filter(request,group_name,choice,status=None):
     GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
     attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Status'})
     attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
-    attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
+    
     
     Completed_Status_List=['Resolved','Closed']
     title = "Task"
     TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
     task_list=[]
     self_task=[]
+    sub_task_name=[]	
     send="This group doesn't have any files"
     #Task Completed 
+    
     for each in TASK_inst:
-    	 
-    	attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
-    	attr1 = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key1._id})
-    	
+            
+     
+		
+	attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
+    	attr1 = collection.Node.find_one({"_type":"GAttribute", "attribute_type.$id":attributetype_key1._id,"object_value":request.user.username})
+    		
     	if int(choice) == int(1):
+			if attr:
+				if attr.object_value == "In Progress":
+					each['type']="InProgress"
+				each['type']=attr.object_value
     			self_task.append(each)
 
     	if int(choice) == int(2):
     		message="No Completed Task"
     		if attr:
     			if attr.object_value in Completed_Status_List:
+				    each['type']='completed'	
     				    self_task.append(each)
                         
 
@@ -402,18 +462,20 @@ def check_filter(request,group_name,choice,status=None):
     		message="No Task Created"
     		auth1 = collection.Node.one({'_type': 'Author', 'created_by': creator_id })   
     		if auth.name == auth1.name:
+			each['type']='created'
     	  		self_task.append(each)
     	           
     	#Task Assign To me
     	elif int(choice) == int(4):
-    			message="Nothing Assigned"         
-    			if attr1:
-                            if attr.object_value == request.user:
-                                self_task.append(each)
+    			message="Nothing Assigned"
+			if attr1:
+			    each['type']='Assigned'	
+			    self_task.append(each)
                                 
     	elif int(choice) == int(5):
 				message="No Pending Task"
 				if attr:
+					each['type']='Pending'	
                             		if attr.object_value not in Completed_Status_List and attr.object_value != 'Rejected':
                   						self_task.append(each)
                 				
@@ -424,17 +486,17 @@ def check_filter(request,group_name,choice,status=None):
         	if attr:
         		#This Dictionary created saves the status and 'Task Node' i.e 'In Progress':'Node'
         		if attr.object_value == status:
+					each['type']=status
         				self_task.append(each)
                     	
 
         	self_task.sort()
    
-        
         if not self_task:
         	send=message
         else:
         	send=""		
-
+    TASK_inst.rewind()
     template = "ndf/task_card_view.html"
     variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':send})
     return render_to_response(template, variable)
