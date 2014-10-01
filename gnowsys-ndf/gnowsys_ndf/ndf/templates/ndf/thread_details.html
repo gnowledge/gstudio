@@ -72,6 +72,7 @@ color: #7a7a7a;
 		<a href="/{{groupid}}/forum/show/{{forum}}" title="Forum Name">
 			{{forum.name}}
 		</a>
+{% if thread %}
 		&nbsp; <i class="fi-shuffle"></i> &nbsp;
 		<span title="Thread Name">{{thread.name}}</span>
 	</h3>
@@ -143,7 +144,10 @@ color: #7a7a7a;
 			</div>
 		</div>
 	</div>
+{% else %}
+<p>“This forum dosen't have any threads. Be the first to create a thread!”</p>
 
+{% endif %}
 {% endblock %}
 
 
