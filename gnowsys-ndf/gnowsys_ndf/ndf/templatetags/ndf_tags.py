@@ -9,14 +9,14 @@ from django.http import Http404
 from django.template import Library
 from django.template import RequestContext,loader
 from django.shortcuts import render_to_response, render
-
+from mongokit import paginator
 
 from mongokit import IS
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY
-from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
-
+from gnowsys_ndf.settings import GAPPS as setting_gapps, DEFAULT_GAPPS_LIST, META_TYPE, CREATE_GROUP_VISIBILITY, GSTUDIO_SITE_DEFAULT_LANGUAGE
+# from gnowsys_ndf.settings import GSTUDIO_SITE_LOGO,GSTUDIO_COPYRIGHT,GSTUDIO_GIT_REPO,GSTUDIO_SITE_PRIVACY_POLICY, GSTUDIO_SITE_TERMS_OF_SERVICE,GSTUDIO_ORG_NAME,GSTUDIO_SITE_ABOUT,GSTUDIO_SITE_POWEREDBY,GSTUDIO_SITE_PARTNERS,GSTUDIO_SITE_GROUPS,GSTUDIO_SITE_CONTACT,GSTUDIO_ORG_LOGO,GSTUDIO_SITE_CONTRIBUTE,GSTUDIO_SITE_VIDEO,GSTUDIO_SITE_LANDING_PAGE
+from gnowsys_ndf.settings import *
 
 from gnowsys_ndf.ndf.models import *
 from gnowsys_ndf.ndf.views.methods import check_existing_group,get_all_gapps,get_all_resources_for_group
@@ -25,8 +25,8 @@ from gnowsys_ndf.mobwrite.models import TextObj
 from pymongo.errors import InvalidId as invalid_id
 from django.contrib.sites.models import Site
 
-from gnowsys_ndf.settings import LANGUAGES
-from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
+# from gnowsys_ndf.settings import LANGUAGES
+# from gnowsys_ndf.settings import GROUP_AGENCY_TYPES,AUTHOR_AGENCY_TYPES
 
 from gnowsys_ndf.ndf.node_metadata_details import schema_dict
 
@@ -338,14 +338,59 @@ def get_all_replies(parent):
 	 return ex_reply
 
 
+@register.assignment_tag
+def get_metadata_values():
+
+	metadata = {"educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE, "interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
+				"educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL, "educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+				"timerequired": GSTUDIO_RESOURCES_TIME_REQUIRED, "audience": GSTUDIO_RESOURCES_AUDIENCE , "textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY,
+				"age_range": GSTUDIO_RESOURCES_AGE_RANGE ,"readinglevel": GSTUDIO_RESOURCES_READING_LEVEL}
+
+
+	return metadata
+
+
+@register.assignment_tag
+def get_attribute_value(node_id, attr):
+
+	node_attr = None
+	if node_id:
+		node = collection.Node.one({'_id': ObjectId(node_id) })
+		# print "node: ",node.name,"\n"
+		# print "attr: ",attr,"\n"
+
+		if node:
+			gattr = collection.Node.one({'_type': 'AttributeType', 'name': unicode(attr) })
+			node_attr = collection.Node.one({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": node._id })	
+
+	if node_attr:
+		attr_val = node_attr.object_value
+	else:
+		attr_val = ""
+
+	# print "attr_val: ",attr_val,"\n"
+	return attr_val
+
+
+
+
+
 @register.inclusion_tag('ndf/drawer_widget.html')
 def edit_drawer_widget(field, group_id, node, checked=None):
 
+	drawer = None
 	drawers = None
 	drawer1 = None
 	drawer2 = None
+	dict_drawer = {}
+	dict1 = {}
+	dict2 = []
+	nlist=[]
+	page_no = 1
+	node = None
 
 	if node:
+		node_id = node._id
 		if field == "collection":
 			if checked == "Quiz":
 				checked = "QuizItem"
@@ -353,19 +398,23 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 				checked = "Theme"
 			else:
 				checked = None
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+
+			nlist = node.collection_set
+			drawers = get_drawers(group_id, node._id, nlist, checked)
 		elif field == "prior_node":
 			checked = None
-			drawers = get_drawers(group_id, node._id, node.prior_node, checked)
+			nlist = node.prior_node
+			drawers = get_drawers(group_id, node._id, nlist, checked)
 		elif field == "module":
 			checked = "Module"
-			drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+			nlist = node.collection_set
+			drawers = get_drawers(group_id, node._id, nlist, checked)
 		elif type(checked) == list:
 			# Special case used while dealing with RelationType widget
 			drawers = get_drawers(group_id, node['_id'], node[field], checked)
 		
-		drawer1 = drawers['1']
-		drawer2 = drawers['2']
+		# drawer1 = drawers['1']
+		# drawer2 = drawers['2']
 
 	else:
 		if field == "collection" and checked == "Quiz":
@@ -387,7 +436,40 @@ def edit_drawer_widget(field, group_id, node, checked=None):
 
 		drawer1 = get_drawers(group_id, None, [], checked)
 
-	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, 'group_id': group_id,'groupid': group_id}
+
+	paged_resources = paginator.Paginator(drawer, page_no, 10)
+
+	drawer.rewind()
+
+	if node_id:
+
+		for each in paged_resources.items:
+			if each._id != node._id:
+				if each._id not in nlist:  
+					dict1[each._id] = each
+
+		for oid in nlist: 
+			obj = collection.Node.one({'_id': oid})
+			dict2.append(obj)
+
+		dict_drawer['1'] = dict1
+		dict_drawer['2'] = dict2
+
+	else:
+		if (node is None) and (not nlist):
+			for each in paged_resources.items:               
+				dict_drawer[each._id] = each
+
+
+	drawers = dict_drawer
+	if not node_id:
+		drawer1 = drawers
+	else:
+		drawer1 = drawers['1']
+		drawer2 = drawers['2']
+
+
+	return {'template': 'ndf/drawer_widget.html', 'widget_for': field, 'drawer1': drawer1, 'drawer2': drawer2, "page_info": paged_resources,'node_id': node_id,'group_id': group_id,'groupid': group_id}
 
 @register.inclusion_tag('tags/dummy.html')
 def list_widget(fields_name, fields_type, fields_value, template1='ndf/option_widget.html',template2='ndf/drawer_widget.html'):
@@ -485,63 +567,6 @@ def shelf_allowed(node):
 			allowed = "True"
 			return allowed
 
-
-@register.inclusion_tag('ndf/gapps_menubar.html')
-def get_gapps_menubar(request, group_id):
-	"""Get Gapps menu-bar
-	"""
-	try:
-		selectedGapp = request.META["PATH_INFO"]
-		group_name = ""
-		collection = db[Node.collection_name]
-		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-#    gst_cur = collection.Node.find({'_type': 'GSystemType', 'name': {'$in': GAPPS}})
-		gapps = {}
-		i = 0;
-		meta_type = collection.Node.one({'$and':[{'_type':'MetaType'},{'name': META_TYPE[0]}]})
-		
-		GAPPS = collection.Node.find({'$and':[{'_type':'GSystemType'},{'member_of':{'$all':[meta_type._id]}}]}).sort("created_at")
-		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
-
-		# Forcefully setting GAPPS (Image, Video & Group) to be hidden from group(s)
-		not_in_menu_bar = []
-		if group_obj.name == "home":
-			# From "home" group hide following GAPPS: Image, Video
-			not_in_menu_bar = ["Image", "Video"]
-		else :
-			# From other remaining groups hide following GAPPS: Group, Image, Video
-			not_in_menu_bar = ["Image", "Video", "Group"]
-
-		# Defalut GAPPS to be listed on gapps-meubar/gapps-iconbar
-		global DEFAULT_GAPPS_LIST
-		if not DEFAULT_GAPPS_LIST:
-			# If DEFAULT_GAPPS_LIST is empty, set bulit-in GAPPS (setting_gapps) list from settings file
-			DEFAULT_GAPPS_LIST = setting_gapps
-
-		for node in GAPPS:
-			#node = collection.Node.one({'_type': 'GSystemType', 'name': app, 'member_of': {'$all': [meta_type._id]}})
-			if node:
-				if node.name not in not_in_menu_bar and node.name in DEFAULT_GAPPS_LIST:
-					i = i+1;
-					gapps[i] = {'id': node._id, 'name': node.name.lower()}
-
-		if len(selectedGapp.split("/")) > 2 :
-			selectedGapp = selectedGapp.split("/")[2]
-		else :
-			selectedGapp = selectedGapp.split("/")[1]
-		if group_id == None:
-			group_id=gpid._id
-		group_obj=collection.Group.one({'_id':ObjectId(group_id)})
-		if not group_obj:
-			group_id=gpid._id
-		else :
-			group_name = group_obj.name
-
-		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id, 'group_name':group_name}
-	except invalid_id:
-		gpid=collection.Group.one({'$and':[{'_type':u'Group'},{'name':u'home'}]})
-		group_id=gpid._id
-		return {'template': 'ndf/gapps_menubar.html', 'request': request, 'gapps': gapps, 'selectedGapp':selectedGapp,'groupid':group_id}
 
 # This function is a duplicate of get_gapps_menubar and modified for the gapps_iconbar.html template to shows apps in the sidebar instead
 @register.inclusion_tag('ndf/gapps_iconbar.html')
@@ -1662,6 +1687,26 @@ def get_resource_collection(groupid, resource_type):
     raise Exception(error_message)
 
 @register.assignment_tag
+def app_translations(request, app_dict):
+   app_id=app_dict['id']
+   get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
+   if request.LANGUAGE_CODE != GSTUDIO_SITE_DEFAULT_LANGUAGE:
+      get_rel=collection.Node.one({'$and':[{'_type':"GRelation"},{'relation_type.$id':get_translation_rt._id},{'subject':ObjectId(app_id)}]})
+      if get_rel:
+         get_trans=collection.Node.one({'_id':get_rel.right_subject})
+         if get_trans.language == request.LANGUAGE_CODE:
+            return get_trans.name
+         else:
+            app_name=collection.Node.one({'_id':ObjectId(app_id)})
+            return app_name.name
+      else:
+         app_name=collection.Node.one({'_id':ObjectId(app_id)})
+         return app_name.name
+   else:
+      app_name=collection.Node.one({'_id':ObjectId(app_id)})
+      return app_name.name
+      
+@register.assignment_tag
 def get_preferred_lang(request, group_id, nodes, node_type):
    group=collection.Node.one({'_id':(ObjectId(group_id))})
    get_translation_rt=collection.Node.one({'$and':[{'_type':'RelationType'},{'name':u"translation_of"}]})
@@ -2025,5 +2070,12 @@ def get_file_node(request,file_name=""):
 		for i in filedoc:
 			file_list.append(i)	
 	return file_list	
+
+@register.filter(name='jsonify')
+def jsonify(value):
+  """
+  Parses python value into json-type (useful in converting python list/dict into javascript/json object).
+  """
+  return json.dumps(value)
 
 

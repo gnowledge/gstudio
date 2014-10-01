@@ -12,6 +12,7 @@ from django.template import RequestContext
 
 from django_mongokit import get_database
 from gnowsys_ndf.settings import LANGUAGES
+from mongokit import paginator
 
 try:
     from bson import ObjectId
@@ -216,9 +217,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
             nodes_list = []
             name = request.POST.get('name')
             collection_list = request.POST.get('collection_list','')
-	    prior_node_list = request.POST.get('prior_node_list','')
-	    teaches_list = request.POST.get('teaches_list','')
-	    assesses_list = request.POST.get('assesses_list','')
+            prior_node_list = request.POST.get('prior_node_list','')
+            teaches_list = request.POST.get('teaches_list','')
+            assesses_list = request.POST.get('assesses_list','')
 	    
             
             # To find the root nodes to maintain the uniquness while creating and editing themes
@@ -285,7 +286,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 themes_list_items = False				
                 create_edit = False
                 themes_hierarchy = True
-                
+
                 theme_topic_node = collection.Node.one({'_id': ObjectId(app_GST._id)})
                 
                 # For edititng themes 
@@ -304,8 +305,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
                     if translate != "true":
                         # For storing and maintaning collection order
-                        theme_topic_node.collection_set = []
                         if collection_list != '':
+                            theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
                             
                         i = 0
@@ -316,6 +317,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 theme_topic_node.collection_set.append(node_id)
                                 
                             i = i+1
+                            
                         theme_topic_node.save() 
                         # End of storing collection
 
@@ -332,13 +334,26 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 elif theme_item_GST._id in app_GST.member_of and translate != "true":
 
                     title = "Theme Item"
+                    dict_drawer = {}
+                    dict2 = []
                     node = app_GST
                     prior_theme_collection = [] 
                     parent_nodes_collection = ""
                     # To display the theme-topic drawer while create or edit theme
                     checked = "theme_item"
-                    drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-                    drawer = drawers['2']
+                    # drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+
+                    # Code for fetching drawer2 
+                    for k in node.collection_set:
+                        obj = collection.Node.one({'_id': ObjectId(k) })
+                        dict2.append(obj)
+
+                    dict_drawer['2'] = dict2
+
+                    # drawers = dict_drawer
+                    # End of code for drawer2
+
+                    drawer = dict_drawer['2']
                     
                     # To find themes uniqueness within the context of its parent Theme collection, while editing theme item
                     nodes = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
@@ -371,8 +386,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     nodes_list = json.dumps(nodes_list)
                     # End of finding unique sub themes
 
-
-                    
                                 
                     if name:
                         if theme_topic_node._id in root_themes_id:  
@@ -387,9 +400,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 
 
                     if translate != "true":
-                        # For storing and maintaning collection order
-                        theme_topic_node.collection_set = []
+                        # For storing and maintaning collection order                        
                         if collection_list != '':
+                            theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
                             
                         i = 0
@@ -444,8 +457,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
                         if collection_list:
                             # For storing and maintaning collection order
-                            theme_topic_node.collection_set = []
                             if collection_list != '':
+                                theme_topic_node.collection_set = []
                                 collection_list = collection_list.split(",")
             
                             i = 0
@@ -464,8 +477,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         get_node_metadata(request,theme_topic_node,topic_GST)
                         
                         
-                        theme_topic_node.prior_node = []
                         if prior_node_list != '':
+                            theme_topic_node.prior_node = []
                             prior_node_list = prior_node_list.split(",")
                             
                         i = 0
@@ -544,13 +557,21 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 # For editing theme item
                 if theme_item_GST._id in app_GST.member_of:
                     title = "Theme Item"
+                    dict_drawer = {}
+                    dict2 = []
                     node = app_GST
                     prior_theme_collection = [] 
                     parent_nodes_collection = ""
                     # To display the theme-topic drawer while create or edit theme
                     checked = "theme_item"
-                    drawers = get_drawers(group_id, node._id, node.collection_set, checked)
-                    drawer = drawers['2']
+                    # drawers = get_drawers(group_id, node._id, node.collection_set, checked)
+                    for k in node.collection_set:
+                        obj = collection.Node.one({'_id': ObjectId(k) })
+                        dict2.append(obj)
+
+                    dict_drawer['2'] = dict2
+
+                    drawer = dict_drawer['2']
                     
                     # To find themes uniqueness within the context of its parent Theme collection, while editing theme name
                     nodes = collection.Node.find({'member_of': {'$all': [theme_item_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
@@ -600,7 +621,22 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 	                           },context_instance = RequestContext(request)
 	        )
         
-        
+    if title == "Topic":
+        return render_to_response("ndf/node_edit_base.html",
+                       {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
+                        'shelf_list': shelf_list,'shelves': shelves,
+                        'create_edit': create_edit, 'themes_hierarchy': themes_hierarchy,'app_id': app_id,'appId':app._id,
+                        'nodes_list': nodes_list,'title': title,'node': node, 'parent_nodes_collection': parent_nodes_collection,
+                        'theme_GST_id': theme_GST._id,'theme_item_GST_id': theme_item_GST._id, 'topic_GST_id': topic_GST._id,
+                        'themes_list_items': themes_list_items,'nodes':nodes_dict,'lan':LANGUAGES
+
+                       },context_instance = RequestContext(request)
+                              
+        )
+
+
+
+
     return render_to_response("ndf/theme.html",
                        {'group_id': group_id,'groupid': group_id, 'drawer': drawer, 'themes_cards': themes_cards,
                             'shelf_list': shelf_list,'shelves': shelves,

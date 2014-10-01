@@ -14,7 +14,6 @@
 <input type="hidden" value="{{newgroup}}">
 
 <ul class="app button-group medium-8 columns">
-    
     {% for index_key, app_dict in gapps.items %}
 
     {% check_is_gapp_for_gstaff groupid app_dict request.user as gstaff_access_for_gapp %}
@@ -30,7 +29,7 @@
         
     <a class="
   	{{app_dict.name|title}} app small button rounded" href="{% url 'GAPPS' group_name_tag app_dict.name|lower %}">
-      <i class='fi-play'></i> {{app_dict.name|title}}
+      <i class='fi-play'></i>{% app_translations request app_dict as app_name %}{{app_name}}
     </a>  
         </li>
     {% endif %}

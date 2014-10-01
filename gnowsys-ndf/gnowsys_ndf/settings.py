@@ -563,3 +563,12 @@ GSTUDIO_RESOURCES_AUDIENCE = [ "Teachers", "Students", "Teacher educators", "Tea
 GSTUDIO_RESOURCES_TEXT_COMPLEXITY = [ "Easy", "Moderately Easy", "Intermediate", "Moderately Hard", "Hard" ]
 
 GSTUDIO_RESOURCES_LANGUAGES = [ "English","Gujarati" ,"Hindi" ,"Manipuri" ,"Marathi" ,"Mizo" ,"Telugu" ]
+
+GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above" ] 
+
+GSTUDIO_RESOURCES_TIME_REQUIRED = [ "0-2M","2-5M", "5-15M", "15-45M" ]
+
+GSTUDIO_RESOURCES_AGE_RANGE = [ "5-10","11-20", "21-30", "31-40", "41 and above" ] 
+
+GSTUDIO_RESOURCES_READING_LEVEL = [  ] 
+

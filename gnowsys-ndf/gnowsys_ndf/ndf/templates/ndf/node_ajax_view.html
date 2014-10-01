@@ -318,7 +318,14 @@ This section has been integrated to groupdashboard and appears in block app_acti
       <dl class="tabs" data-tab data-options="deep_linking:true"> 
 
       <dd class="active"><a href="#view-page"><i class="fi-eye"></i> {% trans "View" %}</a></dd>
+      {% comment %}
+      <!--
+      # This code has been commented out because this coding is 
+        effecting performance in displaying node details
+
       <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes" %}</a></dd>
+      -->
+      {% endcomment %}
       <dd><a href="#view-discussion"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
 
     </dl>
@@ -330,6 +337,11 @@ This section has been integrated to groupdashboard and appears in block app_acti
 
   <!-- Modal links for associated views like graphs and map-->
   <ul class="side-nav">
+
+  {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
+    <!-- Below code/widgets will only be shown for all resource instances/documents
+         which are neither Topic nor Concept
+    -->
     <li><a data-reveal-id="view-map-widget"><i class="fi-marker"></i> {% trans "Location" %}</a></li>
 
     <li><a href="#" data-dropdown="graph-list" data-options="is_hover:true;align:left"><i class="fi-share"></i> {% trans "Graphs" %}</a>
@@ -346,6 +358,7 @@ This section has been integrated to groupdashboard and appears in block app_acti
       <li><a href="#view-dependency-graph" data-reveal-id="view-dependency-graph">{% trans "Dependency Graph" %}</a></li>
       {% endif %}               
     </ul>
+  {% endif %}
 
     <!-- 
     <li>
@@ -402,60 +415,59 @@ This section has been integrated to groupdashboard and appears in block app_acti
 <div class="row">
 	
   <section class="medium-9 columns content">
-
     <div class="tabs-content">
-
       <!-- Tab content -->
       <div class="content active commentable-section" id="view-page" data-section-id="1">
-	<div class="row">
-	<div class="small-4 columns">
-        {% if node.prior_node|length > 0 %}
-        <div class="panel">
-          <h6>{% trans "You may want to read these first: " %}</h6>
-          {% for index_key, each_node in node.prior_node_dict.items %}
-          {% get_grid_fs_object each_node as grid_fs_obj %}
-          {% if each_node.mime_type %}
-          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-          {% else %}
-          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-          {% endif %}
-          {% endfor %}
+      	<div class="row">
+          <div class="small-4 columns">
+            {% if node.prior_node|length > 0 %}
+            <div class="panel">
+              <h6>{% trans "You may want to read these first: " %}</h6>
+              {% for index_key, each_node in node.prior_node_dict.items %}
+              {% get_grid_fs_object each_node as grid_fs_obj %}
+              {% if each_node.mime_type %}
+              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+              {% else %}
+              <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+              {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="small-4 columns">
+            {% if node.teaches %}
+            <div class="panel">
+  		        <h6>This resource teaches you: </h6>
+              {% for  each_node in node.teaches %}
+              {% get_grid_fs_object each_node as grid_fs_obj %}
+              {% if each_node.mime_type %}
+              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+              {% else %}
+              <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>
+              {% if not forloop.last %},&nbsp; {% endif %}
+              {% endif %}
+              {% endfor %}
+          	</div>
+            {% endif %}
+          </div>
+
+          <div class="small-4 columns">
+            {% if node.assesses %}
+            <div class="panel">
+              <h6>This resource assesses these</h6>
+              {% for  each_node in node.assesses %}
+              {% get_grid_fs_object each_node as grid_fs_obj %}
+              {% if each_node.mime_type %}
+              <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
+              {% else %}
+              <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
+              {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
         </div>
-        {% endif %}
-	</div>
-	<div class="small-4 columns">
-	{% if node.teaches %}
-	<div class="panel">
-		<h6>This resource teaches you: </h6>
-		
-	 {% for  each_node in node.teaches %}
-	 {% get_grid_fs_object each_node as grid_fs_obj %}
-          {% if each_node.mime_type %}
-          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-          {% else %}
-          <a href="{% url 'topic_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>
-          {% if not forloop.last %},&nbsp; {% endif %}
-          {% endif %}
-          {% endfor %}
-	</div>
-	{% endif %}
-	</div>
-	<div class="small-4 columns">
-	{% if node.assesses %}
-	<div class="panel">
-		<h6>This resource assesses these</h6>
-	 {% for  each_node in node.assesses %}
-	 {% get_grid_fs_object each_node as grid_fs_obj %}
-          {% if each_node.mime_type %}
-          <a href="{% url 'read_file' group_name_tag each_node.pk  grid_fs_obj.filename %}">{{ each_node.name }}</a>,&nbsp;
-          {% else %}
-          <a href="{% url 'page_details' group_name_tag each_node.pk %}">{{ each_node.name }}</a>,&nbsp;
-          {% endif %}
-          {% endfor %}
-	</div>
-	{% endif %}
-	</div>
-	</div>
 	
         <!-- Code for showing media details -->
         {% if node.mime_type %}
@@ -463,128 +475,128 @@ This section has been integrated to groupdashboard and appears in block app_acti
           {% get_grid_fs_object node as grid_fs_obj %}
 
           {% if 'Pandora_video' in node.member_of_names_list %}
-            <div>
-              <video width="480px" poster="http://wetube.gnowledge.org/{{video_obj}}/icon128.jpg" controls>
-                  <source src="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" type="video/webm"> 
-                  {% trans "Your browser does not support the video tag." %}
-              </video><br/><br/>
+          <div>
+            {% get_source_id node.pk as source_id %}
+            <video width="480px" poster="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg" controls>
+              <source src="http://wetube.gnowledge.org/{{source_id}}/480p.webm" type="video/webm"> 
+              {% trans "Your browser does not support the video tag." %}
+            </video><br/><br/>
 
-              {% get_pandoravideo_metadata video_obj as metadata %}
-              {% for k,v in metadata.items %} 
-                    {% if k != "cuts" %}
-                      <h3>{{k}} : {{v}}<h3>
-                      <br/>
-                    {% endif %}
-              {% endfor %}
-              {% if user.is_authenticated %}
+            {% get_pandoravideo_metadata video_obj as metadata %}
+            {% for k,v in metadata.items %} 
+              {% if k != "cuts" %}
+                <h3>{{k}} : {{v}}<h3>
                 <br/>
-                <br/>
-                <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
-                  <span class="fi-download large"> {% trans "Download " %} </span>
-                </a>
               {% endif %}
-            </div>
+            {% endfor %}
+
+            {% if user.is_authenticated %}
+              <br/>
+              <br/>
+              <a class="button tiny secondary" href="http://wetube.gnowledge.org/{{video_obj}}/480p.webm" download="480.webm">
+                <span class="fi-download large"> {% trans "Download " %} </span>
+              </a>
+            {% endif %}
+          </div>
 
           {% elif 'video' in node.mime_type %}
-            <div>
-              <video width="640px" controls buffered>
-                <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
-                <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
-                {% trans "Your browser does not support the video tag." %}
-              </video>
+    	    <div>
+            <video width="640px" controls buffered>
+              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/webm">
+              <source src="{% url 'getFullvideo' group_name_tag node %}" type="video/ogg">    
+              {% trans "Your browser does not support the video tag." %}
+            </video>
 
-              {% if user.is_authenticated %}
+            {% if user.is_authenticated %}
               <br/>
               <br/>
               <a class="button small secondary" href="{% url 'getFullvideo' group_name_tag node %}" download="{{ grid_fs_obj.filename }}">
                 <span class="fi-download large"> {% trans "Download " %} </span>
               </a>
-              {% endif %}
-            </div>
+            {% endif %}
+          </div>
 
           {% else %}    
-            
             <div>
               {% if 'image' in node.mime_type %}
-              Resource Type: {{node.mime_type}}
+                Resource Type: {{node.mime_type}}
 
-              <!-- lightbox for displaying image gallary -->
-              <ul class="clearing-thumbs clearing-feature small-block-grid-2" data-clearing> 
-                {% for image in imageCollection %}
-
-                  {% get_grid_fs_object image as grid_fs_obj %}
-                  {% if node.pk == image.pk %}
+                <!-- lightbox for displaying image gallary -->
+                <ul class="clearing-thumbs clearing-feature small-block-grid-2" data-clearing> 
+                  {% for image in imageCollection %}
+                    {% get_grid_fs_object image as grid_fs_obj %}
+                    {% if node.pk == image.pk %}
                     <li class="clearing-featured-img">
-                  {% else %}
+                    {% else %}
                     <li>
-                  {% endif %}
-                  
-                  <a href="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}">
-                    <img class="imgLightbox" src="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}" data-caption="{{image.name}}" name="{{image.pk}}">
-                  </a>
-                  </li> 
-
-                {% endfor %}
-              </ul>
-              <!--  -->
+                    {% endif %}
+                      <a href="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}">
+                        <img class="imgLightbox" src="{% url 'getFullImage' group_name_tag image grid_fs_obj.filename %}" data-caption="{{image.name}}" name="{{image.pk}}">
+                      </a>
+                    </li> 
+                  {% endfor %}
+                </ul>
+                <!--  -->
               
               {% elif 'audio' in node.mime_type %}
-              <div class="row">
-                <div class="small-12 columns">
-                  <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
-                    <p>Your browser does not support the audio element </p>
-                  </audio>
+                <div class="row">
+                  <div class="small-12 columns">
+                    <audio src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" controls loop>
+                      <p>Your browser does not support the audio element </p>
+                    </audio>
+                  </div>
                 </div>
-              </div>
-              Resource Type: {{node.mime_type}}
-              <br/>
+                Resource Type: {{node.mime_type}}
+                <br/>
                 <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-                {{ grid_fs_obj.filename }}
-              </a>
+                  {{ grid_fs_obj.filename }}
+                </a>
+              
               {% elif 'html' in node.mime_type %}
-              <!-- <div class="row"> -->
-                <!-- <div class="small-12 columns"> -->
-                  <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                    <p>Your browser does not support the audio element </p>
-                  </iframe>
+                <!-- <div class="row"> -->
+                  <!-- <div class="small-12 columns"> -->
+                    <iframe id="html-res-iframe" width="100%" seamless="seamless" src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                      <p>Your browser does not support the audio element </p>
+                    </iframe>
+                  <!-- </div> -->
                 <!-- </div> -->
-              <!-- </div> -->
-              Resource Type: {{node.mime_type}}
-              <br/>
+                Resource Type: {{node.mime_type}}
+                <br/>
                 <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-                {{ grid_fs_obj.filename }}
-              </a>
+                  {{ grid_fs_obj.filename }}
+                </a>
 
               {% comment %}
-              {% elif 'pdf' in node.mime_type %}
-              <div class="row">
-                <div class="small-12 columns">
-                  <!-- <object type="application/pdf" width="400" height="500" data="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
-                    alt: <p>Your browser does not support the audio element </p>
-                  </object> -->
-                  <!-- <embed src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" width="600" height="500" alt="pdf" pluginspage="http://www.adobe.com/products/acrobat/readstep2.html"> -->
-                  <!-- <iframe src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" width="500" height="500"></iframe> -->
+                {% elif 'pdf' in node.mime_type %}
+                <div class="row">
+                  <div class="small-12 columns">
+                    <!-- <object type="application/pdf" width="400" height="500" data="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
+                      alt: <p>Your browser does not support the audio element </p>
+                    </object> -->
+                    <!-- <embed src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" width="600" height="500" alt="pdf" pluginspage="http://www.adobe.com/products/acrobat/readstep2.html"> -->
+                    <!-- <iframe src="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" width="500" height="500"></iframe> -->
+                  </div>
                 </div>
-              </div>
-              Resource Type: {{node.mime_type}}
-              <br/>
-                <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
-                {{ grid_fs_obj.filename }}
-              </a>
+                Resource Type: {{node.mime_type}}
+                <br/>
+                  <a target="_" href="{% url 'getFullImage' group_name_tag node grid_fs_obj.filename %}">
+                  {{ grid_fs_obj.filename }}
+                </a>
               {% endcomment %}
               
               {% else %}
                 <a href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}">
                   {{ grid_fs_obj.filename }}
                 </a>
+
               {% endif %}
 
               {% if user.is_authenticated %}
-              <br/>
-              <br/>
-              <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
-                <span class="fi-download large"> {% trans "Download " %} </span>
-              </a>
+                <br/>
+                <br/>
+                <a class="button small secondary" href="{% url 'read_file' group_name_tag node grid_fs_obj.filename %}" download="{{ grid_fs_obj.filename }}">
+                  <span class="fi-download large"> {% trans "Download " %} </span>
+                </a>
               {% endif %}
             </div>
     
@@ -595,9 +607,9 @@ This section has been integrated to groupdashboard and appears in block app_acti
         {% block add_fields %} {% endblock %}
 
         <ul class="inline-list">
-        {% if user.is_authenticated %}
-        {% block add_list %}{% endblock %}
-        {% endif %}
+          {% if user.is_authenticated %}
+          {% block add_list %}{% endblock %}
+          {% endif %}
         </ul>
 
         {% for tab_name, tab_fields_list in property_order_list %}
@@ -625,210 +637,206 @@ This section has been integrated to groupdashboard and appears in block app_acti
           <br>
           {% endfor %}
         {% endfor %}
-      <!-- <div id="commentable-area"> -->
-      <div>
-        {% with node.html_content|safe as description %}
-        {% if description != "None" %}
-      	<span itemprop="{{schema.1.description}}">{{ description }}</span>
-        {% endif %}
-        {% endwith %}
-      </div>
-      <!-- </div> -->
-      <!-- Resource contents of topic -->
-
-      {% if topic %}
-        <!-- <div class="content" id="view-graph">  </div> -->
-
-        <div class="content" id="contents"> 
-          
-          {% get_contents node.pk as contents %}
-          {% for k,v in contents.items %}    
-
-            <fieldset id="{{k}}">
-              <legend>{{k}}</legend>
-
-              {% for e in v %}
-                {% if k == "Images" %}
-                    <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
-                      <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
-                      <br/><div>{{e.0}}</div>
-                    </a>&nbsp;&nbsp;&nbsp;&nbsp;
-
-                {% elif k == "Videos" %}
-                    <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
-                      <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
-                      <br/><div>{{e.0}}</div>
-                    </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-                {% else %}
-                    <a href ="{% url 'file_detail' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
-                {% endif %}
-                
-              {% endfor %}
-            </fieldset>
-
-          {% endfor %}          
-
-        </div>
-      {% endif %}
-      <!-- End of displaying topic page contents -->
-
-      </div>
-
-
-      <!-- Content for Concept Graph -->
-      <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
-        <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
-        {% include "ndf/graph_concept.html" %}
-      </div>
       
-      <!-- Content for Collection Graph -->
-      {% if node.collection_set %}
-        <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
-        	<a class="close-reveal-modal">&#215;</a>
-        	{% include "ndf/graph_collection.html" %}
+        <!-- <div id="commentable-area"> -->
+        <div>
+          {% with node.html_content|safe as description %}
+          {% if description != "None" %}
+        	<span itemprop="{{schema.1.description}}">{{ description }}</span>
+          {% endif %}
+          {% endwith %}
         </div>
-      {% endif %}
+        <!-- </div> -->
+        <!-- Resource contents of topic -->
 
-      <!-- Content for dependency Graph -->
-      {% if node.prior_node %}
-        <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
-         <a class="close-reveal-modal">&#215;</a>
-         {% include "ndf/graph_dependency.html" %}
-        </div>
-      {% endif %}
-     
-     <!-- Tab View Map Widget -->
-     <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
-       <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
-       <a class="close-reveal-modal" >&#215;</a>
-       {% include "ndf/map_widget.html" with mode="read" %}
-       <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
-       <!-- #{#%# endif %} -->
-     </div>
+        {% if topic %}
+          <!-- <div class="content" id="view-graph">  </div> -->
 
-
-          <!-- View node change history area -->
-    <div id="view-changes" class="content">
-        
-        <p>
-        {{ node.member_of_names_list.0 }} 
-        Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
-            </p>
-        
-          <h4>{% trans "Recent changes" %}:</h4>
-        <ul class="side-nav">
-        {% for seq_no, version_no in node.version_dict.items|slice:"-20:" reversed %}
-          <li title="Version #{{version_no}}">
-            {% if forloop.last and forloop.counter > 5 %}
-            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">All Changes</a>
+          <div class="content" id="contents"> 
             
-            {% else %}
-            <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
+            {% get_contents node.pk as contents %}
+            {% for k,v in contents.items %}    
 
-            {% endif %}
-          </li> 
-          {% endfor %}
-        </ul>
-          
-      
+              <fieldset id="{{k}}">
+                <legend>{{k}}</legend>
 
-        
-        </div>
-        
-        
-    <!-- discussion content area -->
-    <div id="view-discussion" class="content">
-    {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+                {% for e in v %}
+                  {% if k == "Images" %}
+                      <a href ="{% url 'image_detail' group_name_tag e.1 %}" style="display: inline-block">
+                        <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}" />  
+                        <br/><div>{{e.0}}</div>
+                      </a>&nbsp;&nbsp;&nbsp;&nbsp;
 
-      <br/>
-      <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
-      {% if all_replies %}
-        Initiate New Discussion Thread
-      {% else %}
-        Initiate discussion on {{ node.name }}
-      {% endif %}
-       </div>
+                  {% elif k == "Videos" %}
+                      <a href ="{% url 'video_detail' group_name_tag e.1 %}" style="display: inline-block">
+                        <img src="{% url 'getFileThumbnail' group_name_tag e.1 %}">
+                        <br/><div>{{e.0}}</div>
+                      </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-      <div id="replies-area">
-        
-        <!-- populating replies -->
-        {% for each_reply in all_replies %}
+                  {% else %}
+                      <a href ="{% url 'file_detail' group_name_tag e.1 %}"> {{e.0}} </a>&nbsp;&nbsp;&nbsp;
+                  {% endif %}
+                  
+                {% endfor %}
+              </fieldset>
 
-          <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-priornode-id="{{ each_reply.prior_node }}">
-            
-            <div class="row"> 
-              <div class="small-3 columns">
-                <a class="text-center" href="/home/{{each_reply.userid}}/dashboard">
-                  <span class="align-center"><i class="fi-torso"></i></span>
-                  <label>{{ each_reply.username }}</label>
-                </a>
-              </div>
-              <div class="small-9 columns">
-                {% spaceless %}
-                  {{each_reply.HTMLcontent | safe }}
-                {% endspaceless %}
-              </div>
-            </div>
-            
-            <div class="row">
-              <div class="small-9 columns"> <small>{{ each_reply.last_update }}</small> </div>
-              <div class='reply-btn text-right small-3 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
-                reply
-              </div>
-            </div>
+            {% endfor %}          
 
           </div>
+        {% endif %}
+        <!-- End of displaying topic page contents -->
+      </div>
 
-        {% endfor %}
-        <!-- END of populating replies -->
+      {% if "Topic" in node.member_of_names_list or "Concept" in node.member_of_names_list %}
+        <!-- Below code/widgets will only be shown for all resource instances/documents
+             which are neither Topic nor Concept
+        -->
+
+        <!-- Content for Concept Graph -->
+        <div class="content reveal-modal graph-div" id="view-concept-graph" data-reveal>
+          <a class="close-reveal-modal" id="closeviewconceptgraph">&#215;</a>
+          {% include "ndf/graph_concept.html" %}
+        </div>
         
+        <!-- Content for Collection Graph -->
+        {% if node.collection_set %}
+          <div class="content reveal-modal graph-div" id="view-collection-graph" data-reveal>    
+          	<a class="close-reveal-modal">&#215;</a>
+          	{% include "ndf/graph_collection.html" %}
+          </div>
+        {% endif %}
+
+        <!-- Content for dependency Graph -->
+        {% if node.prior_node %}
+          <div class="content reveal-modal graph-div" id="view-dependency-graph" data-reveal>    
+           <a class="close-reveal-modal">&#215;</a>
+           {% include "ndf/graph_dependency.html" %}
+          </div>
+        {% endif %}
+       
+        <!-- Tab View Map Widget -->
+        <div class="content reveal-modal graph-div" id="view-map-widget" data-reveal>
+          <!-- #{#%# if '/details/' in request.path  or '/image_detail/' in request.path  or '/video_detail/' in request.path%} -->
+          <a class="close-reveal-modal" >&#215;</a>
+          {% include "ndf/map_widget.html" with mode="read" %}
+          <!-- <div style="background-color:gray; width:100%; height:80%;"></div> -->
+          <!-- #{#%# endif %} -->
+        </div>
+
+        <!-- View node change history area -->
+        {% comment %}
+        <!--
+        # This code has been commented out because this coding is 
+          effecting performance in displaying node details
+
+        # This needs to be see in details and change accordingly
+
+        <div id="view-changes" class="content">
+          <p>
+            {{ node.member_of_names_list.0 }} 
+            Edited {{ node.last_update|timesince }} ago by <a class="user" href="{% url 'dashboard' node.modified_by %}">{{node.user_details_dict.modified_by}}</a>
+          </p>
+          
+          <h4>{% trans "Recent changes" %}:</h4>
+          <ul class="side-nav">
+            {% for seq_no, version_no in node.version_dict.items|slice:"-20:" reversed %}
+              <li title="Version #{{version_no}}">
+                {% if forloop.last and forloop.counter > 5 %}
+                <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">All Changes</a>
+                
+                {% else %}
+                <a href="{% url 'node_version' group_name_tag node.pk version_no %}" style="padding-left:5px;">{{version_no}}</a>
+
+                {% endif %}
+              </li> 
+            {% endfor %}
+          </ul>
+        </div>
+        -->
+        {% endcomment %}
+      {% endif %}
+        
+      <!-- discussion content area -->
+      <div id="view-discussion" class="content">
+      {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+
+        <br/>
+        <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
+        {% if all_replies %}
+          Initiate New Discussion Thread
+        {% else %}
+          Initiate discussion on {{ node.name }}
+        {% endif %}
+         </div>
+
+        <div id="replies-area">
+          
+          <!-- populating replies -->
+          {% for each_reply in all_replies %}
+
+            <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-priornode-id="{{ each_reply.prior_node }}">
+              
+              <div class="row"> 
+                <div class="small-3 columns">
+                  <a class="text-center" href="/home/{{each_reply.userid}}/dashboard">
+                    <span class="align-center"><i class="fi-torso"></i></span>
+                    <label>{{ each_reply.username }}</label>
+                  </a>
+                </div>
+                <div class="small-9 columns">
+                  {% spaceless %}
+                    {{each_reply.HTMLcontent | safe }}
+                  {% endspaceless %}
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="small-9 columns"> <small>{{ each_reply.last_update }}</small> </div>
+                <div class='reply-btn text-right small-3 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
+                  reply
+                </div>
+              </div>
+
+            </div>
+
+          {% endfor %}
+          <!-- END of populating replies -->
+        </div>
+
+        <!-- orgitdown container -->
+        <div id="org" style="" class="reveal-modal small" data-reveal>
+          <!-- Reply : -->
+          <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
+          <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
+          <input type="hidden" id="prior-node" style="visibility:hidden" value="">
+          <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
+        </div>
+        <!-- end of orgit down container -->
       </div>
-
-      <!-- orgitdown container   -->
-      <div id="org" style="" class="reveal-modal small" data-reveal>
-        <!-- Reply : -->
-
-        <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
-
-        <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
-
-        <input type="hidden" id="prior-node" style="visibility:hidden" value="">
-        <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
-
-      </div>
-      <!-- end of orgit down container -->
-
-    </div>
-    <!-- END of discussion content area -->     
-
+      <!-- END of discussion content area -->     
     </div><!-- end of tab's content -->
   </section>
 
   <section class="medium-3 columns">
-    
-      <div>
-      {% include "ndf/rating.html" %} 
-      </div>
     <div>
-        
-     
-      <ul class="side-nav">
-          <li>{% trans "In other languages" %}</li>
-      {% get_possible_translations node as tran %}
-     {% for each in tran %}
-        {% for k,v in each.items %}
-        <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
-        {% endfor %}
-      {% endfor %}
-          
-          <!-- This button translates given resource -->
-          <li>
-            <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
-          </li>
-          
-          </ul>
+    {% include "ndf/rating.html" %} 
+    </div>
 
+    <div>
+      <ul class="side-nav">
+        <li>{% trans "In other languages" %}</li>
+        {% get_possible_translations node as tran %}
+        {% for each in tran %}
+          {% for k,v in each.items %}
+          <li><a href="{% url 'page_details' groupid k %}">{{v}}</a></li>
+          {% endfor %}
+        {% endfor %}
+          
+        <!-- This button translates given resource -->
+        <li>
+          <a href="{% url 'node_translation' group_name_tag node %} ">{% trans "Translate" %}</a>
+        </li>
+      </ul>
     </div>
   </section>
 

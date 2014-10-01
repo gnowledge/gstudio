@@ -372,6 +372,7 @@ def create_rts(factory_relation_types,user_id):
     subject_type_id_list = []
     object_type_id_list = []
     for key,value in each.items():
+      print key,value
       at_name = key
       inverse_name = value['inverse_name']
 
@@ -382,11 +383,20 @@ def create_rts(factory_relation_types,user_id):
           meta_type_id = meta_type._id
 
       for s in value['subject_type']:
+        
         node_s = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
+        if node_s is None:
+          node_s = collection.Node.one({'$and':[{'_type': u'MetaType'},{'name': s}]})
+          
         subject_type_id_list.append(node_s._id)
+       
       for rs in value['object_type']:
         node_rs = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': rs}]})
+        if node_rs is None:
+          node_rs =collection.Node.one({'$and':[{'_type': u'MetaType'},{'name': rs}]})
+  
         object_type_id_list.append(node_rs._id)
+        
     create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id)
 
 def create_sts(factory_gsystem_types,user_id):

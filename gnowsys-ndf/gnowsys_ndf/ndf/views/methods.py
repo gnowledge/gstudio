@@ -166,7 +166,7 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
         # For prior-node-list
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]}})
 
-      elif checked == "QuizObj":
+      elif checked == "QuizObj" or checked == "assesses":
         # For collection-list
         gst_quiz_id = collection.Node.one({'_type': "GSystemType", 'name': "Quiz"})._id
         gst_quiz_item_id = collection.Node.one({'_type': "GSystemType", 'name': "QuizItem"})._id
@@ -219,40 +219,42 @@ def get_drawers(group_id, nid=None, nlist=[], checked=None):
       
       else:
         drawer = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'group_set': {'$all': [ObjectId(group_id)]} })
-           
     
-    if (nid is None) and (not nlist):
-      for each in drawer:               
-        dict_drawer[each._id] = each.name
+
+    #kept this bellow commented part for future reference,(Don't delete this)
+    
+    # if (nid is None) and (not nlist):
+    #   for each in drawer:               
+    #     dict_drawer[each._id] = each.name
 
 
-    elif (nid is None) and (nlist):
-      for each in drawer:
-        if each._id not in nlist:
-          dict1[each._id] = each.name
+    # elif (nid is None) and (nlist):
+    #   for each in drawer:
+    #     if each._id not in nlist:
+    #       dict1[each._id] = each.name
 
-      for oid in nlist: 
-        obj = collection.Node.one({'_id': oid})
-        dict2.append(obj)        
+    #   for oid in nlist: 
+    #     obj = collection.Node.one({'_id': oid})
+    #     dict2.append(obj)        
 
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
+    #   dict_drawer['1'] = dict1
+    #   dict_drawer['2'] = dict2
 
     
-    else:
-      for each in drawer:
-        if each._id != nid:
-          if each._id not in nlist:  
-            dict1[each._id] = each.name
+    # else:
+    #   for each in drawer:
+    #     if each._id != nid:
+    #       if each._id not in nlist:  
+    #         dict1[each._id] = each.name
           
-      for oid in nlist: 
-        obj = collection.Node.one({'_id': oid})
-        dict2.append(obj)
+    #   for oid in nlist: 
+    #     obj = collection.Node.one({'_id': oid})
+    #     dict2.append(obj)
       
-      dict_drawer['1'] = dict1
-      dict_drawer['2'] = dict2
+    #   dict_drawer['1'] = dict1
+    #   dict_drawer['2'] = dict2
 
-    return dict_drawer
+    return drawer
 
 # get type of resource
 def get_resource_type(request,node_id):
@@ -356,6 +358,9 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   module_list = request.POST.get('module_list','')
   map_geojson_data = request.POST.get('map-geojson-data')
   user_last_visited_location = request.POST.get('last_visited_location')
+  altnames = request.POST.get('altnames', '')
+  featured = request.POST.get('featured', '')
+  status = request.POST.get('status', '')
 
   if map_geojson_data:
     map_geojson_data = map_geojson_data + ","
@@ -399,6 +404,16 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
       # print "\n Changed: name"
       is_changed = True
   
+  if altnames:
+    if node.altnames != altnames:
+      node.altnames = altnames
+      is_changed = True
+
+  if (featured == True) or (featured == False) :
+    if node.featured != featured:
+      node.featured = featured
+      is_changed = True
+
   if sub_theme_name:
     if node.name != sub_theme_name:
       node.name = sub_theme_name
@@ -502,9 +517,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
   #     node.collection_set.append(node_id)
     
   #   i = i+1
-
+ 
+    
   if collection_list != '':
     collection_list = [ObjectId(each.strip()) for each in collection_list.split(",")]
+    print "collection_list: ",collection_list,"\n\n"
 
   if set(node.collection_set) != set(collection_list):
     i = 0
@@ -595,6 +612,11 @@ def get_node_common_fields(request, node, group_id, node_type, coll_set=None):
 
     if usrid not in node.contributors:
       node.contributors.append(usrid)
+
+  if status:
+    if node.status != status:
+      node.status = status
+      is_changed = True
 
   # print "\n Reached here ...\n\n"
   return is_changed
@@ -817,17 +839,30 @@ def get_node_metadata_fields(request, node, node_type):
 			field_value=(request.POST.get(at.name,""))
 	
 			create_gattribute(node._id,at,field_value)
+
+      print "field_value: ",atname," : ",field_value,"\n"
 """
 
-def get_node_metadata(request,node,node_type):
-	attribute_type_list = ["age_range","audience","timerequired","interactivitytype","basedonurl","educationaluse","textcomplexity","readinglevel","educationalsubject","educationallevel"]         
-	if(node.has_key('_id')):
-		for atname in attribute_type_list:
-			field_value=unicode(request.POST.get(atname,""))
-			at=collection.Node.one({"_type":"AttributeType","name":atname})	
-			if(at!=None):
-				create_gattribute(node._id,at,field_value)		
-"""			
+
+def get_node_metadata(request, node, node_type):
+    attribute_type_list = ["age_range", "audience", "timerequired",
+                           "interactivitytype", "basedonurl", "educationaluse",
+                           "textcomplexity", "readinglevel", "educationalsubject",
+                           "educationallevel", "curricular", "educationalalignment",
+                           "adaptation_of", "other_contributors", "creator", "source"
+                          ]
+
+    if(node.has_key('_id')):
+
+        for atname in attribute_type_list:
+
+            field_value = unicode(request.POST.get(atname, ""))
+            at = collection.Node.one({"_type": "AttributeType", "name": atname})	
+
+            if(at is not None):
+                create_gattribute(node._id, at, field_value)
+
+"""
 def create_AttributeType(name, data_type, system_name, user_id):
 
 	cursor = collection.Node.one({"name":unicode(name), "_type":u"AttributeType"})
@@ -1001,7 +1036,7 @@ def get_property_order_with_value(node):
 
           base_field = {
             'name': {'name': "name", '_type': "BaseField", 'altnames': "Name", 'required': True},
-            'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Content", 'required': False},
+            'content_org': {'name': "content_org", '_type': "BaseField", 'altnames': "Description", 'required': False},
             # 'featured': {'name': "featured", '_type': "BaseField", 'altnames': "Featured"},
             'location': {'name': "location", '_type': "BaseField", 'altnames': "Location", 'required': False},
             # 'status': {'name': "status", '_type': "BaseField", 'altnames': "Status", 'required': False},
@@ -1205,6 +1240,7 @@ def parse_template_data(field_data_type, field_value, **kwargs):
 
 def create_gattribute(subject_id, attribute_type_node, object_value):
   ga_node = None
+  info_message = ""
   
   ga_node = collection.Triple.one({'_type': "GAttribute", 'subject': subject_id, 'attribute_type.$id': attribute_type_node._id})
   if ga_node is None:
@@ -1214,18 +1250,31 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
 
       ga_node.subject = subject_id
       ga_node.attribute_type = attribute_type_node
-      ga_node.object_value = object_value
-      
-      ga_node.status = u"PUBLISHED"
-      ga_node.save()
-      info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
-      print "\n ", info_message
 
-      # Fetch corresponding document & append into it's attribute_set
-      collection.update({'_id': subject_id}, 
-                        {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
-                        upsert=False, multi=False
-                      )
+      if (not object_value) and type(object_value) != bool:
+        object_value = u"None"
+        ga_node.status = u"DELETED"
+
+      else:
+        ga_node.status = u"PUBLISHED"
+
+      ga_node.object_value = object_value
+      ga_node.save()
+
+      if object_value == u"None":
+        info_message = " GAttribute ("+ga_node.name+") created successfully with status as 'DELETED'!\n"
+        print "\n ", info_message
+
+      else:
+        info_message = " GAttribute ("+ga_node.name+") created successfully.\n"
+        print "\n ", info_message
+
+        # Fetch corresponding document & append into it's attribute_set
+        collection.update({'_id': subject_id}, 
+                          {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
+                          upsert=False, multi=False
+                        )
+
 
     except Exception as e:
       error_message = "\n GAttributeCreateError: " + str(e) + "\n"
@@ -1235,39 +1284,79 @@ def create_gattribute(subject_id, attribute_type_node, object_value):
     # Code for updation
     is_ga_node_changed = False
     old_object_value = None
-
     try:
-      if type(ga_node.object_value) == list:
-        if set(ga_node.object_value) != set(object_value):
-          old_object_value = ga_node.object_value
-          ga_node.object_value = object_value
-          is_ga_node_changed = True
+      if (not object_value) and type(object_value) != bool:
+        old_object_value = ga_node.object_value
 
-      elif type(ga_node.object_value) == dict:
-        if cmp(ga_node.object_value, object_value) != 0:
-          old_object_value = ga_node.object_value
-          ga_node.object_value = object_value
-          is_ga_node_changed = True
-
-      else:
-        if ga_node.object_value != object_value:
-          old_object_value = ga_node.object_value
-          ga_node.object_value = object_value
-          is_ga_node_changed = True
-
-      if is_ga_node_changed:
-        ga_node.status = u"PUBLISHED"
+        ga_node.status = u"DELETED"
         ga_node.save()
-        info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+        info_message = " GAttribute ("+ga_node.name+") status updated from 'PUBLISHED' to 'DELETED' successfully.\n"
         print "\n ", info_message
 
         # Fetch corresponding document & update it's attribute_set with proper value
         collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
-                          {'$set': {'attribute_set.$.'+attribute_type_node.name: ga_node.object_value}}, 
+                          {'$pull': {'attribute_set': {attribute_type_node.name: old_object_value}}}, 
                           upsert=False, multi=False)
+
       else:
-        info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
-        print "\n ", info_message
+        if type(ga_node.object_value) == list:
+          if type(ga_node.object_value[0]) == dict:
+            old_object_value = ga_node.object_value
+
+            if len(old_object_value) != len(object_value):
+              ga_node.object_value = object_value
+              is_ga_node_changed = True
+
+            else:
+              pairs = zip(old_object_value, object_value)
+              if any(x != y for x, y in pairs):
+                ga_node.object_value = object_value
+                is_ga_node_changed = True
+
+          elif set(ga_node.object_value) != set(object_value):
+            old_object_value = ga_node.object_value
+            ga_node.object_value = object_value
+            is_ga_node_changed = True
+
+        elif type(ga_node.object_value) == dict:
+          if cmp(ga_node.object_value, object_value) != 0:
+            old_object_value = ga_node.object_value
+            ga_node.object_value = object_value
+            is_ga_node_changed = True
+
+        else:
+          if ga_node.object_value != object_value:
+            old_object_value = ga_node.object_value
+            ga_node.object_value = object_value
+            is_ga_node_changed = True
+
+        if is_ga_node_changed:
+          if ga_node.status == u"DELETED":
+            ga_node.status = u"PUBLISHED"
+            ga_node.save()
+
+            info_message = " GAttribute ("+ga_node.name+") status updated from 'DELETED' to 'PUBLISHED' successfully.\n"
+            print "\n", info_message
+
+            # Fetch corresponding document & append into it's attribute_set
+            collection.update({'_id': subject_id}, 
+                              {'$addToSet': {'attribute_set': {attribute_type_node.name: object_value}}}, 
+                              upsert=False, multi=False)
+
+          else:
+            ga_node.status = u"PUBLISHED"
+            ga_node.save()
+
+            info_message = " GAttribute ("+ga_node.name+") updated successfully.\n"
+            print "\n ", info_message
+
+            # Fetch corresponding document & update it's attribute_set with proper value
+            collection.update({'_id': subject_id, 'attribute_set.'+attribute_type_node.name: old_object_value}, 
+                              {'$set': {'attribute_set.$.'+attribute_type_node.name: ga_node.object_value}}, 
+                              upsert=False, multi=False)
+        else:
+          info_message = " GAttribute ("+ga_node.name+") already exists (Nothing updated) !\n"
+          print "\n ", info_message
 
     except Exception as e:
       error_message = "\n GAttributeUpdateError: " + str(e) + "\n"

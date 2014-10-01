@@ -152,8 +152,6 @@
             by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
           </div>
         <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
-        <span class="right"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</span>
-          
       </footer>
 </a>
       </div>
@@ -215,15 +213,13 @@
       {% endif %}
       {% endif %} 
 
-      <footer class="row">
-        <div class="small-7 columns"><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</div>
-        <div class="small-5 columns"><div class="right"><strong>{{node.version_dict|length}}</strong> Edit{{node.version_dict|pluralize}}</div></div>
-          <div>
-            <small class="subheader">{{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+      <footer>
+          <div class="age">
+            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
             <br/>
-            by <a class="user" data-gnow="" href="{% url 'dashboard' node.created_by %}">{{node.user_details_dict.created_by}}</a> 
-            </small>
+            by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
           </div>
+        <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
       </footer>
 
       </div>

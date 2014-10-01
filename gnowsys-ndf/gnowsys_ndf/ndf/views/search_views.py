@@ -522,7 +522,7 @@ def results_search_group(request, group_id):
 					if user_reqd != -1:				
 						exact_match = col.Node.find({'$and':[{"member_of":GSType._id},{"created_by":user_reqd}, {"access_policy":"PUBLIC"},{"group_set":group_id},{"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})
 					else:
-						exact_match = col.Node.find({'$and'[{"member_of":GSType._id},{ "access_policy":"PUBLIC"}, {"group_set":group_id}, {"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})					
+						exact_match = col.Node.find({'$and':[{"member_of":GSType._id},{ "access_policy":"PUBLIC"}, {"group_set":group_id}, {"name":{"$regex":search_str_user, "$options":"i"}}]}, {"name":1, "_id":1, "member_of":1, "created_by":1, "last_update":1, "url":1})					
 
 					# SORT THE NAMES ACCORDING TO THEIR SIMILARITY WITH THE SEARCH STRING
 					exact_match = list(exact_match)				
