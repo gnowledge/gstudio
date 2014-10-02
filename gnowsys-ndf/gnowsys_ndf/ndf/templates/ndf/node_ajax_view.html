@@ -211,11 +211,11 @@
         {% check_group node as is_group %}
         {% if is_group %}
           {% if user.is_superuser or node.created_by == user.id %}
-          <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
+          <a href="{% url edit_url group_name_tag %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
           {% endif %}
 
         {% else %}
-          <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
+          <a href="{% url edit_url group_name_tag node %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
         {% endif %}    
 
         <ul id="edit-options" data-dropdown-content class="f-dropdown">

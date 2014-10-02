@@ -454,7 +454,7 @@
             {% ifequal created_user request.user %}     
         	  
               <a href="{#% url edit_url node %#}" class="small button split edit">
-        	      <i class="fi-pencil"></i> {% trans "Edit now" %} <span data-dropdown="edit-options"></span>
+        	      <i class="fi-pencil"></i> {% trans "Edit" %} <span data-dropdown="edit-options"></span>
         	    </a> 
             
             {% endifequal %}
@@ -477,7 +477,7 @@
             {% else %}
             <a href="{% url 'mis-po:mis_app_instance_edit' groupid app_id app_set_id app_set_instance_id %}" class="small button split edit">
             {% endif %}
-      	      <i class="fi-pencil"></i> {% trans "Edit now" %} <span data-dropdown="edit-options"></span>
+      	      <i class="fi-pencil"></i> {% trans "Edit" %} <span data-dropdown="edit-options"></span>
       	    </a>
 
       	    <ul id="edit-options" class="f-dropdown">

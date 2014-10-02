@@ -82,7 +82,7 @@ color: #7a7a7a;
         {% get_edit_url thread.pk as edit_url %}
    
 	 {% if user.is_superuser or thread.created_by == user.id %}
- <a href="{% url edit_url group_name_tag thread.pk %}" class="small button split edit"><i class="fi-pencil"></i>{% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
+ <a href="{% url edit_url group_name_tag thread.pk %}" class="small button split edit"><i class="fi-pencil"></i>{% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
     {% endif %}
   
       <ul id="edit-options" data-dropdown-content class="f-dropdown">

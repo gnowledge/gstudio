@@ -96,7 +96,7 @@
     {% get_group_name groupid as group_name_tag %}
 
     {% if user.is_superuser or forum.created_by == user.id %}
- <a href="{% url edit_url group_name_tag forum.pk %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit now" %}<span data-dropdown="edit-options"></span></a>
+ <a href="{% url edit_url group_name_tag forum.pk %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
     {% endif %}
   
 <ul id="edit-options" data-dropdown-content class="f-dropdown">
