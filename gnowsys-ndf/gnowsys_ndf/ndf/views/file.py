@@ -65,9 +65,6 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'}
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
 app=collection.Node.one({'name':u'File','_type':'GSystemType'})
-pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id})
-     
-    
 
 # VIEWS DEFINED FOR GAPP -- 'FILE'
 
@@ -121,6 +118,8 @@ def file(request, group_id, file_id=None):
         shelves = []
     # End of user shelf
 
+    pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id, 'group_set': ObjectId(group_id) })
+
     if request.method == "POST":
       # File search view
       title = GST_FILE.name
@@ -154,7 +153,10 @@ def file(request, group_id, file_id=None):
                                                 'group_set': {'$all': [ObjectId(group_id)]}
                                             },
 
-                                               {'member_of': {'$all': [pandora_video_st._id]}}]
+                                               {'member_of': {'$all': [pandora_video_st._id]},
+                                                'group_set': {'$all': [ObjectId(group_id)]}
+                                               }
+                                              ]
                                     }).sort('last_update', -1)
       else:
           files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
@@ -316,8 +318,9 @@ def file(request, group_id, file_id=None):
                                                     ]
                                                  }
                                                 ]
-                                            },
-                                               {'member_of': {'$all': [pandora_video_st._id]}}
+                                                },{'member_of': {'$all': [pandora_video_st._id]}, 
+                                                  'group_set': {'$all': [ObjectId(group_id)]}
+                                                  }
                                            ]}).sort("last_update", -1)
       else:
           files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
@@ -387,8 +390,7 @@ def file(request, group_id, file_id=None):
 
       # pandora_video_id = []
       # source_id_set=[]
-      get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'File'}]})
-      
+      get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'group_set': ObjectId(group_id)},{'_type':'File'}]})
       #for each in get_member_set:
   
        #  pandora_video_id.append(each['_id'])

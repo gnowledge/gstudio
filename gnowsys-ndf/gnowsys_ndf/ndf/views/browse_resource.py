@@ -22,7 +22,6 @@ collection = db[Node.collection_name]
 collection_tr = db[Triple.collection_name]
 GST_browse_resource = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Browse Resource'})
 app = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Browse Resource'})
-pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id})
 
 #######################################################################################################################################
 
@@ -71,6 +70,8 @@ def resource_list(request,group_id,app_id=None):
 	    shelves = []
 	# End of user shelf
 
+	pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id, 'group_set': ObjectId(group_id) })
+
 	# if GST_browse_resource._id == ObjectId(app_id):
 	"""
 	* Renders a list of all 'Resources(XCR)' available within the database.
@@ -92,21 +93,11 @@ def resource_list(request,group_id,app_id=None):
 	                                  }
 	                                ]
 	                              },
-                                    {'member_of': {'$all': [pandora_video_st._id]}}
+                                    {'member_of': {'$all': [pandora_video_st._id]},
+                                     'group_set': ObjectId(group_id)
+                                    }
                                        ]}).sort("last_update", -1)
 
-	# docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
-	#                                         '_type': 'File','fs_file_ids': {'$ne': []}, 
-	#                                         'group_set': {'$all': [ObjectId(group_id)]},
-	#                                         '$or': [
-	#                                           {'access_policy': u"PUBLIC"},
-	#                                           {'$and': [
-	#                                             {'access_policy': u"PRIVATE"}, 
-	#                                             {'created_by': request.user.id}
-	#                                             ]
-	#                                           }
-	#                                         ]
-	#                                       }).sort("last_update", -1)
 	  
 	imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
 	                                          '_type': 'File','fs_file_ids': {'$ne': []}, 
@@ -141,9 +132,9 @@ def resource_list(request,group_id,app_id=None):
 		coll.append(each._id)
 
 	gattr = collection.Node.one({'_type': 'AttributeType', 'name': u'educationaluse'})
-	interCollection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": {'$in': coll} ,"object_value": "Interactives"}).sort("last_update", -1)
-	d_Collection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
-	aud_Collection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, "subject": {'$in': coll} ,"object_value": "Audios"}).sort("last_update", -1)
+	interCollection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, 'group_set': ObjectId(group_id),"subject": {'$in': coll} ,"object_value": "Interactives"}).sort("last_update", -1)
+	d_Collection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, 'group_set': ObjectId(group_id),"subject": {'$in': coll} ,"object_value": "Documents"}).sort("last_update", -1)
+	aud_Collection = collection.Node.find({'_type': "GAttribute", 'attribute_type.$id': gattr._id, 'group_set': ObjectId(group_id),"subject": {'$in': coll} ,"object_value": "Audios"}).sort("last_update", -1)
 
 	# For manipulating documents
 	doc = []
@@ -172,7 +163,7 @@ def resource_list(request,group_id,app_id=None):
 	files.rewind()
 	already_uploaded = request.GET.getlist('var', "")
 
-	get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'File'}]})
+	get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'group_set': ObjectId(group_id)},{'_type':'File'}]})
 
 	datavisual.append({"name":"Doc", "count":docCollection.count()})
 	datavisual.append({"name":"Image","count":imageCollection.count()})
