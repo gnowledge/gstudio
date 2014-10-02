@@ -20,7 +20,7 @@
 
 
 {% block meta_content %}
-  <h3>x{% trans "Quizzes" %}</h3>
+  <h2 class="subheader">x{% trans "Quizzes" %}</h2>
 
  {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}

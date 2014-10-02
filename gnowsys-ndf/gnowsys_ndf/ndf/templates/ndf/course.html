@@ -12,7 +12,7 @@
 
 
 {% block meta_content %}
-  <h3>{% trans "Courses" %}</h3>
+  <h2 class="subheader">{% trans "Courses" %}</h2>
 
  {% if user.is_authenticated %}
   {% user_access_policy groupid request.user as user_access %}

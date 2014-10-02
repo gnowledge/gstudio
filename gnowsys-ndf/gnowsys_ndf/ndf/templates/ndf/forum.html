@@ -31,7 +31,7 @@
 
 
 {% block meta_content %}
-  {% blocktrans %}<h3>Forums</h3>{% endblocktrans %}
+  {% blocktrans %}<h2 class="subheader">Forums</h2>{% endblocktrans %}
 
  {% if user.is_authenticated %}
 	{% user_access_policy groupid request.user as user_access %}
