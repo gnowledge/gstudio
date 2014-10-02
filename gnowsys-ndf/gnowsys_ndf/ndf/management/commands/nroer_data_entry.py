@@ -35,10 +35,10 @@ from gnowsys_ndf.settings import GAPPS
 from gnowsys_ndf.ndf.models import Node, File
 from gnowsys_ndf.ndf.models import GSystemType, AttributeType, RelationType
 from gnowsys_ndf.ndf.models import GSystem, GAttribute, GRelation
-from gnowsys_ndf.ndf.management.commands.data_entry import create_grelation, create_gattribute
+# from gnowsys_ndf.ndf.management.commands.data_entry import create_grelation, create_gattribute
 from gnowsys_ndf.ndf.org2any import org2html
 # from gnowsys_ndf.ndf.views.file import save_file, getFileSize
-# from gnowsys_ndf.ndf.views.methods import create_gattribute
+from gnowsys_ndf.ndf.views.methods import create_grelation, create_gattribute
 
 ##############################################################################
 
@@ -296,7 +296,6 @@ def parse_data_create_gsystem(json_file_path):
             # node = collection.File.one({ "_id": ObjectId('') })
             # print node, "\n"
 
-
             # starting processing for the attributes and relations saving
             if node and attribute_relation_list:
 
@@ -305,7 +304,6 @@ def parse_data_create_gsystem(json_file_path):
 
                 relation_list = []
                 json_document['name'] = node.name
-
 
                 # Write code for setting atrributes
                 for key in attribute_relation_list:
@@ -413,7 +411,7 @@ def parse_data_create_gsystem(json_file_path):
 
                 gst_possible_relations_dict = node.get_possible_relations(file_gst._id)
 
-                # Write code for setting relations
+                # processing each entry in relation_list
                 for key in relation_list:
                   is_relation = True
 
@@ -491,10 +489,9 @@ def parse_data_create_gsystem(json_file_path):
                               else:
                                 return None
 
-
                           # -----------------------------                  
 
-
+                        # most often the data is hierarchy sep by ":"
                         if ":" in json_document[key]:
                           formatted_list = []
                           temp_teaches_list = json_document[key].replace("\n", "").split(":")
@@ -515,12 +512,12 @@ def parse_data_create_gsystem(json_file_path):
                             log_list.append(error_message)
                             break
                         
+                        # sometimes direct leaf-node may be present without hierarchy and ":"
                         else:
                           formatted_list = list(json_document[key].strip())
                           right_subject_id = []
                           right_subject_id.append(_get_id_from_hierarchy(formatted_list))
                           json_document[key] = right_subject_id
-
 
                         # print "\n----------", json_document[key]
                         info_message = "\n- For GRelation parsing content | key: " + str(rel_key) + " -- " + str(json_document[key])
@@ -554,12 +551,26 @@ def parse_data_create_gsystem(json_file_path):
                                                                     'subject_type': {'$in': rel_subject_type}
                                                             })
 
-                          info_message = "\n- Creating GRelation ("+ str(node.name)+ " -- "+ str(rel_key)+ " -- "+ str(right_subject_id)+") ..."
+
+                          right_subject_id_or_list = []
+                          right_subject_id_or_list.append(ObjectId(right_subject_id))
+                          
+                          nodes = collection.Triple.find({'_type': "GRelation", 
+                                      'subject': subject_id, 
+                                      'relation_type.$id': relation_type_node._id
+                                    })
+
+                          # sending list of all the possible right subject to relation
+                          for n in nodes:
+                            if not n.right_subject in right_subject_id_or_list:
+                              right_subject_id_or_list.append(n.right_subject)
+
+                          info_message = "\n- Creating GRelation ("+ str(node.name)+ " -- "+ str(rel_key)+ " -- "+ str(right_subject_id_or_list)+") ..."
                           print info_message
                           log_list.append(str(info_message))
-                          gr_node = create_grelation(subject_id, relation_type_node, right_subject_id)
-                          
-                          info_message = "\n Grelation created (gr_node): "+ str(gr_node.name) + "\n"
+                          gr_node = create_grelation(subject_id, relation_type_node, right_subject_id_or_list)
+                                                    
+                          info_message = "\n- Grelation processing done.\n"
                           print info_message
                           log_list.append(str(info_message))
 
@@ -589,135 +600,143 @@ def parse_data_create_gsystem(json_file_path):
 
 def create_resource_gsystem(resource_data):
   
-  # fetching resource from url
-  resource_link = resource_data.get("resource_link")
-  files = urllib2.urlopen(resource_link)
-  files = io.BytesIO(files.read())
-  filename = resource_link.split("/")[-1]
-  filemd5 = hashlib.md5(files.read()).hexdigest()
-  size, unit = getFileSize(files)
-  size = {'size':round(size, 2), 'unit':unicode(unit)}
-  
-  fcol = get_database()[File.collection_name]
-  fileobj = fcol.File()
-
-  check_obj_by_name = collection.File.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
-  # print "\n====", check_obj_by_name
-
-  if fileobj.fs.files.exists({"md5":filemd5}) or check_obj_by_name:
+    # fetching resource from url
+    resource_link = resource_data.get("resource_link")
+    files = urllib2.urlopen(resource_link)
+    files = io.BytesIO(files.read())
+    filename = resource_link.split("/")[-1]
+    filemd5 = hashlib.md5(files.read()).hexdigest()
+    size, unit = getFileSize(files)
+    size = {'size':round(size, 2), 'unit':unicode(unit)}
     
-    coll_oid = get_database()['fs.files']
-    cur_oid = coll_oid.find_one({"md5":filemd5})
-    # printing appropriate error message
-    if check_obj_by_name:
-      info_message = "\n- Resource with same name of "+ str(resource_data["name"]) +" and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name._id)
-      log_list.append(str(info_message))
-    else:      
-      info_message = "\n- Resource file exists in DB: " + str(cur_oid._id)
-      log_list.append(str(info_message))
-    return None
+    fcol = get_database()[File.collection_name]
+    fileobj = fcol.File()
 
-  else:
-    info_message = "\n- Creating resource: " + str(resource_data["name"])
-    log_list.append(str(info_message))
-    
-    files.seek(0)
-    filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
+    check_obj_by_name = collection.File.find_one({"_type":"File", 'member_of': {'$all': [ObjectId(file_gst._id)]}, 'group_set': {'$all': [ObjectId(home_group._id)]}, "name": unicode(resource_data["name"]) })
+    # print "\n====", check_obj_by_name
 
-    # filling values in fileobj
-    name = unicode(resource_data["name"])
-    fileobj.name = name
-    fileobj.created_by = resource_data["created_by"]
-    fileobj.group_set.append(home_group._id)
-    fileobj.member_of.append(file_gst._id)
-    
-    # storing content_org and content
-    content_org = resource_data["content_org"]
+    if fileobj.fs.files.exists({"md5":filemd5}) or check_obj_by_name:
+        
+        coll_oid = get_database()['fs.files']
+        cur_oid = coll_oid.find_one({"md5":filemd5})
+        
+        # printing appropriate error message
+        if check_obj_by_name:
+            info_message = "\n- Resource with same name of '"+ str(resource_data["name"]) +"' and _type 'File' exist in the group. Ref _id: "+ str(check_obj_by_name._id)
+            print info_message
+            log_list.append(str(info_message))
+        else:      
+            info_message = "\n- Resource file exists in DB: '" + str(cur_oid._id) + "'"
+            print info_message
+            log_list.append(str(info_message))
 
-    if content_org:
-      fileobj.content_org = unicode(content_org)
-      # Required to link temporary files with the current user who is modifying this document
-      # usrname = request.user.username
-      filename = slugify(name) + "-" + "nroer_team"
-      fileobj.content = org2html(content_org, file_prefix=filename)
+        return check_obj_by_name
 
-    # fileobj.tags = resource_data["tags"]
-
-    # tags:
-    if not type(resource_data["tags"]) is list:
-      tag_list = resource_data["tags"].replace("\n", "").split(",")
-      temp_tag_list = []
-      for each_tag in tag_list:
-        if each_tag:
-          temp_tag_list.append(each_tag.strip())
-      fileobj.tags = temp_tag_list
     else:
-      fileobj.tags = resource_data["tags"]
+        # creating new resource
+        info_message = "\n- Creating resource: " + str(resource_data["name"])
+        log_list.append(str(info_message))
+        print info_message
+        
+        files.seek(0)
+        filetype = magic.from_buffer(files.read(100000), mime = 'true')               #Gusing filetype by python-magic
 
-    fileobj.language = resource_data["language"]
-    # username = User.objects.get(id=userid).username
-    fileobj.access_policy = u"PUBLIC"
-    # print title, "\n----------\n", userid, "\n", group_id, "\n", content_org, "\n", tags, "\n", language, "\n", access_policy
-    fileobj.altnames = resource_data["altnames"]
-    fileobj.featured = resource_data["featured"]
+        # filling values in fileobj
+        name = unicode(resource_data["name"])
+        fileobj.name = name
+        fileobj.created_by = resource_data["created_by"]
+        fileobj.group_set.append(home_group._id)
+        fileobj.member_of.append(file_gst._id)
+        
+        # storing content_org and content
+        content_org = resource_data["content_org"]
 
-    # if resource_data[contributors]
-    #   contrib_list = resource_data[contributors].split(",")
+        if content_org:
+            fileobj.content_org = unicode(content_org)
+            # Required to link temporary files with the current user who is modifying this document
+            # usrname = request.user.username
+            filename = slugify(name) + "-" + "nroer_team"
+            fileobj.content = org2html(content_org, file_prefix=filename)
 
-    #   temp_contributors = []
-    #   for each_user in contrib_list:
-    #     user_id = get_user_id(each_user.strip())
-    #     if user_id:
-    #       temp_contributors.append(user_id)
-    #       resource_data[contributors] = temp_contributors
-    # else:
-    #   resource_data[contributors] = []
+        # fileobj.tags = resource_data["tags"]
 
-    # fileobj.contributors = resource_data[contributors]
-    user_id = get_user_id("nroer_team")
-    fileobj.contributors.append(user_id)
+        # tags:
+        if not type(resource_data["tags"]) is list:
+            tag_list = resource_data["tags"].replace("\n", "").split(",")
+            temp_tag_list = []
+            for each_tag in tag_list:
+              if each_tag:
+                temp_tag_list.append(each_tag.strip())
+            fileobj.tags = temp_tag_list
+        else:
+            fileobj.tags = resource_data["tags"]
 
-    fileobj.license = resource_data["license"]
-    fileobj.status = u"PUBLISHED"
+        fileobj.language = resource_data["language"]
+        # username = User.objects.get(id=userid).username
+        fileobj.access_policy = u"PUBLIC"
+        # print title, "\n----------\n", userid, "\n", group_id, "\n", content_org, "\n", tags, "\n", language, "\n", access_policy
+        fileobj.altnames = resource_data["altnames"]
+        fileobj.featured = resource_data["featured"]
 
-    fileobj.file_size = size
-    fileobj.mime_type = filetype
-    fileobj.modified_by = user_id
-    fileobj.save()
+        # if resource_data[contributors]
+        #   contrib_list = resource_data[contributors].split(",")
 
-    log_list.append("\n- Created resource/GSystem object of name: '" + fileobj.name + "' having ObjectId: " + fileobj._id.__str__())
+        #   temp_contributors = []
+        #   for each_user in contrib_list:
+        #     user_id = get_user_id(each_user.strip())
+        #     if user_id:
+        #       temp_contributors.append(user_id)
+        #       resource_data[contributors] = temp_contributors
+        # else:
+        #   resource_data[contributors] = []
 
-    files.seek(0)
-    objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
-    collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
+        # fileobj.contributors = resource_data[contributors]
+        user_id = get_user_id("nroer_team")
+        fileobj.contributors.append(user_id)
 
-    log_list.append("\n- Saved resource into gridfs. \n")
-    # print "\n----------", fileobj
+        fileobj.license = resource_data["license"]
+        fileobj.status = u"PUBLISHED"
+
+        fileobj.file_size = size
+        fileobj.mime_type = filetype
+        fileobj.modified_by = user_id
+        fileobj.save()
+
+        info_message = "\n- Created resource/GSystem object of name: '" + fileobj.name + "' having ObjectId: " + fileobj._id.__str__()
+        log_list.append(info_message)
+        print info_message
+
+        files.seek(0)
+        objectid = fileobj.fs.files.put(files.read(), filename=filename, content_type=filetype) #store files into gridfs
+        collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':objectid}})
+
+        log_list.append("\n- Saved resource into gridfs. \n")
+        # print "\n----------", fileobj
+        
+        # filetype1 = mimetypes.guess_type(filename)[0]
+        # print filetype1
+
+        '''storing thumbnail of pdf and svg files  in saved object'''        
+        if 'pdf' in filetype or 'svg' in filetype:
+            thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
+            tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
+            collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+         
+        
+        '''storing thumbnail of image in saved object'''
+        if 'image' in filetype:
+            collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
+            thumbnailimg = convert_image_thumbnail(files)
+            tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
+            collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
+            
+            files.seek(0)
+            mid_size_img = convert_mid_size_image(files)
+            if  mid_size_img:
+                mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
+                collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
     
-    # filetype1 = mimetypes.guess_type(filename)[0]
-    # print filetype1
-
-    '''storing thumbnail of pdf and svg files  in saved object'''        
-    if 'pdf' in filetype or 'svg' in filetype:
-      thumbnail_pdf = convert_pdf_thumbnail(files,fileobj._id)
-      tobjectid = fileobj.fs.files.put(thumbnail_pdf.read(), filename=filename+"-thumbnail", content_type=filetype)
-      collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-     
-    
-    '''storing thumbnail of image in saved object'''
-    if 'image' in filetype:
-      collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'member_of':GST_IMAGE._id}})
-      thumbnailimg = convert_image_thumbnail(files)
-      tobjectid = fileobj.fs.files.put(thumbnailimg, filename=filename+"-thumbnail", content_type=filetype)
-      collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':tobjectid}})
-      
-      files.seek(0)
-      mid_size_img = convert_mid_size_image(files)
-      if  mid_size_img:
-        mid_img_id = fileobj.fs.files.put(mid_size_img, filename=filename+"-mid_size_img", content_type=filetype)
-        collection.File.find_and_modify({'_id':fileobj._id},{'$push':{'fs_file_ids':mid_img_id}})
-  
-    return fileobj
+        return fileobj
 
 
 def getFileSize(File):
