@@ -69,25 +69,34 @@
   
   <!-- Existing card list-->
   {% get_group_type request.path request.user as group_type %}
-  
+  {% group_type_info groupid request.user as grouptype %}
+
   {% autopaginate group_nodes 23 %}
 
   {% for node in group_nodes %}
   {% if node.name != request.user.username %}
   
-  <li class="card">
-    <div class="group">
+    <li class="card">
+      {% if grouptype == "Moderated" %}
+        {% if node.status == "DRAFT" %}
+          <div class="draft group">
+        {% elif node.status == "PUBLISHED" %}
+          <div class="published group">
+        {% endif %}
+      {% else %}
+        <div class='{% if node.status == "PUBLISHED" %}published{% endif %} group'>
+      {% endif %} 
+
+      <a  href="/{{node.pk}}">
+      <div class="row">
+        <div class="small-10 columns">                             
+            <b>
+              {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+            </b>
+        </div>
+      </div>
       
-        <div class="label-list">{% for tag in node.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-          {% endfor %}</div>
-        
-        <a  href="/{{node.pk}}">
-      <header>
-        <h5>{{ node.name }}</h5>
-      </header>
-      
-      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+      <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
       
       <footer>
           <div class="age">
@@ -98,6 +107,13 @@
         <span class="right"><strong>{{obj_count}}</strong> Objects</span>
       </footer>
       </a>
+
+      <div class="label-list small-12 columns">
+        {% for tag in node.tags|slice:":3" %}
+          <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
+        {% endfor %}
+      </div>
+
     </div>
   </li>
   {% endif %}
