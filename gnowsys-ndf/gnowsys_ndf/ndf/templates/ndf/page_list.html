@@ -117,53 +117,53 @@
 
 {% autopaginate page_nodes 23 %}
 
+  {% group_type_info groupid request.user as grouptype %}
+
   <!-- Existing card list-->
   {% for node in page_nodes %}
-  
-    <li class="card">
-        
-        {% group_type_info groupid request.user as grouptype %}
-        
-      {% if grouptype == "Moderated" %}
-      {% if node.status == "DRAFT" %}
-      <div class="draft page">
-      {% endif %}
-           {% if node.status == "PUBLISHED" %}
-      <div class="published page">
-      {% endif %}
-          
-          {% else %}
-          
-          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} page'>
-              
-      {% endif %} 
-              
-          <div class="label-list">{% for tag in node.tags|slice:":3" %}
-          <a href="{% url 'tag_info' groupid tag %}"><span class="label">{{tag}}</span></a>
-        {% endfor %}</div>
-             
-              <a href="{% url 'page_details' group_name_tag node %}">
-      <header>
-        <h5>
-          {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-        </h5>
-      </header>
-      
-      <p>{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-  
-      <footer>
-          <div class="age">
-            {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
-            <br/>
-            by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
-          </div>
-        <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
-      </footer>
-</a>
-      </div>
-    </li>  
-  
 
+      <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if node.status == "DRAFT" %}
+            <div class="draft page">
+          {% elif node.status == "PUBLISHED" %}
+            <div class="published page">
+          {% endif %}
+        {% else %}
+          <div class='{% if node.status == "PUBLISHED" %}published{% endif %} page'>
+        {% endif %} 
+
+          <a href="{% url 'page_details' group_name_tag node %}">
+          <div class="row">
+            <div class="small-10 columns">                             
+                <b>
+                  {{ node.name }}{% if node.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+                </b>
+            </div>
+          </div>
+          
+          <span style="font-size:12px;">{{ node.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+
+          <footer>
+            <div class="age">
+              {{ node.member_of_names_list|join:', ' }} created {{node.created_at|timesince}} ago 
+              <br/>
+              by <span class="user" href="{% url 'dashboard' node.created_by %}" data-gnow="">{{node.user_details_dict.created_by}}</span> 
+            </div>
+            <span><strong>{{node.contributors|length}}</strong> Contributor{{node.contributors|pluralize}}</span>
+          </footer>
+          </a>
+
+          <div class="label-list small-12 columns">
+          {% for tag in node.tags|slice:":3" %}
+            <a href="{% url 'tag_info' groupid tag %}"><span class="label" style="background-color:yellow;">{{tag}}</span></a>
+          {% endfor %}
+          </div>
+
+        
+        </div>
+      </li>
+      
   {% empty %}
     {% if not searching %}
       <div class="row">
