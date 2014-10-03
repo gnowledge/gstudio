@@ -152,28 +152,28 @@
 
           <a href="{% url 'file_detail' group_name_tag file %}">
           <div class="row">
-          <div class="small-8 columns">
-            <b>
-              {{ file.name }}{% if file.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-            </b>
-          </div>
-          <div class="small-4 columns">
-            {% if "image" in file.mime_type %}
-              <img src="{% url 'getImageThumbnail' group_id file.pk %}">
-            {% elif "audio" in file.mime_type %}
-              <span class="fi-music" style="font-size:40px"></span>
-             {% elif "Pandora_video" in file.member_of_names_list and "video" in file.mime_type %}
-	      
-              {% get_source_id file.pk as source_id %}
-	      
-              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
-                        
-            {% elif "video" in file.mime_type and file.member_of_names_list|join:', ' != "Pandora_video" %}
-              <img src="{% url 'getFileThumbnail' group_id file.pk %}">
-            {% else %}
-              <span class="fi-page-filled" style="font-size:40px"></span>
-            {% endif %}
-          </div>
+            <div class="small-8 column">
+              <b>
+                {{ file.name }} {% if file.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+              </b>
+            </div>
+            <div class="small-4 column">
+              {% if "image" in file.mime_type %}
+                <img src="{% url 'getImageThumbnail' group_id file.pk %}"/>
+              {% elif "audio" in file.mime_type %}
+                <span class="fi-music" style="font-size:40px"></span>
+               {% elif "Pandora_video" in file.member_of_names_list and "video" in file.mime_type %}
+  	      
+                {% get_source_id file.pk as source_id %}
+  	      
+                <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg"/>
+                          
+              {% elif "video" in file.mime_type and file.member_of_names_list|join:', ' != "Pandora_video" %}
+                <video width="100px;" src="{% url 'getFileThumbnail' group_id file.pk %}"/>                  
+              {% else %}
+                <span class="fi-page-filled" style="font-size:40px"></span>
+              {% endif %}
+            </div>
           </div>
             
             <span style="font-size:12px;">{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span></br>
@@ -618,7 +618,7 @@
                 <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
                             
               {% elif "video" in video.mime_type and video.member_of_names_list|join:', ' != "Pandora_video" %}
-                <img src="{% url 'getFileThumbnail' group_id video.pk %}">
+                <video width="100px;" src="{% url 'getFileThumbnail' group_id video.pk %}"/>                  
               {% endif %}
             </div>
           </div>
@@ -710,7 +710,7 @@
               <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
                             
             {% elif "video" in each.mime_type and each.member_of_names_list|join:', ' != "Pandora_video" %}
-              <img src="{% url 'getFileThumbnail' group_id each.pk %}">
+              <video width="100px;" src="{% url 'getFileThumbnail' group_id each.pk %}"/>                  
             {% endif %}
             </div>
           </div>
@@ -786,7 +786,7 @@
               {% elif "audio" in file.mime_type %}
                 <span class="fi-music" style="font-size:40px"></span>
               {% elif "video" in file.mime_type and file.member_of_names_list|join:', ' != "Pandora_video" %}
-                <img src="{% url 'getFileThumbnail' group_id file.pk %}">
+                <video width="100px;" src="{% url 'getFileThumbnail' group_id file.pk %}"/> 
               {% else %}
                 <span class="fi-page-filled" style="font-size:40px"></span>
               {% endif %}
