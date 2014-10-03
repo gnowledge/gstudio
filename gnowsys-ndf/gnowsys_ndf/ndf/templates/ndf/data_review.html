@@ -394,7 +394,7 @@
 <!-- Pagination -->
 {% block data_review_pagination %}
 
-	{% include 'ndf/pagination.html' %}
+	{% include 'ndf/pagination.html' with urlname="data_review_page" first_arg=group_name_tag second_arg="" third_arg="" %}
 
 	<!-- Datetimepicker  -->
 	<script src="/static/ndf/bower_components/jquery-ui/jquery-ui.js"></script> <!-- checked -->
