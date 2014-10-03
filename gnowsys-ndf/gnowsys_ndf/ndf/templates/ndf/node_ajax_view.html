@@ -326,7 +326,23 @@ This section has been integrated to groupdashboard and appears in block app_acti
       <dd><a href="#view-changes"><i class="fi-clock"></i> {% trans "Changes" %}</a></dd>
       -->
       {% endcomment %}
-      <dd><a href="#view-discussion"><i class="fi-comment"></i> {% trans "Discuss" %}</a></dd>
+      
+      <!-- calling ndf tags for discussion replies -->
+      {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
+
+      <dd>
+        <a href="#view-discussion"><i class="fi-comment"></i> 
+          {% if all_replies %}
+            <span title="{{ all_replies | length }} &nbsp;{% trans 'Comments' %}">
+              {% trans "Join Discussion" %} ({{ all_replies | length }})
+            </span>
+          {% else %}
+            <span title="{% trans 'Be the first to start a discussion' %}">
+              {% trans "Begin Discussion" %}
+            </span>
+          {% endif %}
+        </a>
+      </dd>
 
     </dl>
   </h1>
@@ -755,65 +771,11 @@ This section has been integrated to groupdashboard and appears in block app_acti
         -->
         {% endcomment %}
       {% endif %}
-        
+      
       <!-- discussion content area -->
-      <div id="view-discussion" class="content">
-      {% get_disc_replies node.pk group_id global_disc_all_replies as all_replies %}
-
-        <br/>
-        <div onclick="createDiscussion()" id="create-discussion" data-id="{{ node.pk }}" class="button" style="margin-bottom:0;">
-        {% if all_replies %}
-          Initiate New Discussion Thread
-        {% else %}
-          Initiate discussion on {{ node.name }}
-        {% endif %}
-         </div>
-
-        <div id="replies-area">
-          
-          <!-- populating replies -->
-          {% for each_reply in all_replies %}
-
-            <div style="margin-left:calc({{each_reply.level}} * 48px); {% if each_reply.level == 1 %}margin-top:25px;{% endif %}" class="disc-replies" data-priornode-id="{{ each_reply.prior_node }}">
-              
-              <div class="row"> 
-                <div class="small-3 columns">
-                  <a class="text-center" href="/home/{{each_reply.userid}}/dashboard">
-                    <span class="align-center"><i class="fi-torso"></i></span>
-                    <label>{{ each_reply.username }}</label>
-                  </a>
-                </div>
-                <div class="small-9 columns">
-                  {% spaceless %}
-                    {{each_reply.HTMLcontent | safe }}
-                  {% endspaceless %}
-                </div>
-              </div>
-              
-              <div class="row">
-                <div class="small-9 columns"> <small>{{ each_reply.last_update }}</small> </div>
-                <div class='reply-btn text-right small-3 columns' data-id='{{ each_reply.oid }}' onclick='openOrgEditor($(this))' data-org-content='{{ each_reply.ORGcontent }}'>
-                  reply
-                </div>
-              </div>
-
-            </div>
-
-          {% endfor %}
-          <!-- END of populating replies -->
-        </div>
-
-        <!-- orgitdown container -->
-        <div id="org" style="" class="reveal-modal small" data-reveal>
-          <!-- Reply : -->
-          <textarea id="orgitdownreps" name="content_org" placeholder="Enter your reply text here."></textarea>
-          <input data-id="{{ node.pk }}" type="button" value="Post"  class="button expand reply-button" onclick="addReply($(this))">
-          <input type="hidden" id="prior-node" style="visibility:hidden" value="">
-          <!-- <input type="hidden" id="thd" style="visibility:hidden" value=""> -->
-        </div>
-        <!-- end of orgit down container -->
-      </div>
+        {% include 'ndf/discussion.html' %}
       <!-- END of discussion content area -->     
+
     </div><!-- end of tab's content -->
   </section>
 
@@ -853,206 +815,6 @@ This section has been integrated to groupdashboard and appears in block app_acti
     
     
 <script type="text/javascript">
-
-  // for discussion tab
-  // storing ndf_tags return values in JS variables
-  {% user_access_policy groupid request.user as user_access %}
-  var user_access = "{{ user_access }}"; // "allow" or "disallow"
-
-  {% edit_policy groupid node request.user as status %}
-  var edit_policy = "{{ status }}"; // "allow" or "disallow"
-
-  $("#orgitdownreps").orgitdown(mySettings);
-
-  function createDiscussion()
-  {
-
-    if( user_access == "allow" && edit_policy == "allow" )
-    {  
-        // ajax to create thread for first time.
-        $.ajax({
-
-          url: "{% url 'create_discussion' group_id node.pk %}",
-
-          success: function(data){
-
-            data = JSON.parse(data);
-
-            if( (data[0] == "thread-created") || (data[0] == "Thread-exist") )
-            {
-
-                // $("#create-discussion").hide();
-
-                // changing method to behave same as sub-reply button
-                $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
-
-                $("#prior-node").val("{{ node.pk }}") // _id
-                // $("input[data-id='{{ node.pk }}']").val("{{ node.pk }}") // _id
-                
-                $("#create-discussion").trigger("click");
-              }
-              // else if( data[0] == "Thread-exist" ){
-              //   // alert(data)
-              //   $("#create-discussion").hide();
-              //   $("#prior-node").val("{{ node.pk }}") // _id         
-              //   // changing method to behave same as sub-reply button   
-              //   $("#create-discussion").attr("onclick", "openOrgEditor($(this))");
-              //   $("create-discussion").trigger("click");
-              // }
-              else{ alert(data) }
-
-            }//,
-          // complete: function(){
-            // $("#prior-node").val("") // removing _id
-          // }
-
-        });
-        // --- END ajax and create thread for first time.
-      }
-      else
-      {
-        alert("To start discussion you need to login and be the member of this group.");
-      }
-
-    }
-  // --- END of createDiscussion()
-
-
-  // function called by "Add Reply" and "Reply" buttons to open editor
-  function openOrgEditor(sourceObj)
-  {
-    if( user_access == "allow" && edit_policy == "allow" )
-    {
-
-      var sourceObjDataId = $(sourceObj).attr("data-id"); // prior-node _id
-      $("#prior-node").val(sourceObjDataId);
-      
-      // tempOrgObj = $("#org").clone(true, true);
-      // console.log($(sourceObj));
-      
-      // $("#org").detach();
-      
-      // if( sourceObjDataId == "{{ node.pk }}")
-      // {
-      //   $('div[data-id="'+ sourceObjDataId +'"]').after(tempOrgObj);
-      // }
-      // else
-      // {
-      //   $tempPrior = $('div[data-id="'+ sourceObjDataId +'"]').parent();
-      //   calcMargLeft = $tempPrior.css("margin-left");
-      //   calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
-
-      //   $('div[data-id="'+ sourceObjDataId +'"]').parent().after(tempOrgObj);
-      // }
-      
-      // $("#org").fadeIn();
-      // if( sourceObjDataId != "{{ node.pk }}")
-      // {
-        $('#org').foundation('reveal', 'open');
-      // }
-    }
-    else
-    {
-      alert("To start discussion you need to login and be the member of this group.");
-    }
-  }
-
-
-  function addReply(sourceObj)
-  {
-    $('#org').foundation('reveal', 'close');
-
-    var priorNodeId = $("#prior-node").val(),
-        replyContent = $("#orgitdownreps").val().trim();
-
-    // If reply is non empty - make ajax to save reply.
-    if( (replyContent.length > 0) && (priorNodeId.length == 24) )
-    {
-
-      $.ajax({
-        
-        type: "POST",
-
-        url: "{% url 'discussion_reply' group_id %}",
-
-        data: { 
-
-          "csrfmiddlewaretoken": "{{ csrf_token }}",
-          "prior_node_id": priorNodeId,
-          "reply_text_content": replyContent
-        },
-
-        success: function(data){
-            
-            data = JSON.parse(data);
-            aaa = data;
-
-            if( data[0] == "reply_saved" )
-            {
-              
-              $("#org").fadeOut();          // hide editor
-              $("#orgitdownreps").val("");  // make textarea empty
-
-              if(priorNodeId == "{{ node.pk }}")  // main reply
-              {
-                // change the text of Start discussion and make it visible
-                $("#create-discussion").html("Initiate New Discussion Thread");                
-                // $("#create-discussion").fadeIn();
-
-                // [0:"status_info", 1:"reply_id", 2:"prior_node", 3:"html_content", 4:"org_content", 5:"user_id", 6:"user_name", 7:"created_at" ]
-
-                // add reply text content after #replies-area
-                $("#replies-area").prepend(
-                  "<div style='margin-top:20px;' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
-                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
-                  + "<span class='align-center'><i class='fi-torso'></i></span>"
-                  + "<label>" + data[6] + "</label></a></div>"
-                  + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
-
-                  + "<div class='row'><div class='small-9 columns'><small>"
-                  + data[7] + "</small></div> <div data-org-content='"
-                  + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-                  + data[1] + "' class='reply-btn text-right small-3 columns'> reply </div></div></div>"
-                  ).fadeIn(8000);
-
-              }
-              else  // sub-reply
-              {
-                $tempPrior = $('div[data-id="'+ priorNodeId +'"]').parent().parent();
-                calcMargLeft = $tempPrior.css("margin-left");
-                calcMargLeft = (parseFloat(calcMargLeft, 10) + 48) + "px";
-
-                // add reply text content as sub-reply
-                $($tempPrior).after(
-                "<div style='margin-left:"+ calcMargLeft +"' data-priornode-id='"+ data[2] +"' class='disc-replies'>"
-                  + "<div class='row'><div class='small-3 columns'><a href='/home/"+ data[5] +"/dashboard' class='text-center'>"
-                  + "<span class='align-center'><i class='fi-torso'></i></span>"
-                  + "<label>" + data[6] + "</label></a></div>"
-                  + "<div class='small-9 columns'>"+ data[3] +"</div></div>"
-
-                  + "<div class='row'><div class='small-9 columns'><small>"
-                  + data[7] + "</small></div> <div data-org-content='"
-                  + data[4] + "' onclick='openOrgEditor($(this))' data-id='" 
-                  + data[1] + "' class='reply-btn text-right small-3 columns'> reply </div></div></div>"
-                  ).fadeIn(8000);
-              }
-            }
-            else if( data[0] == "no_content" ){
-              
-              alert("Please provide the reply content.")
-            }
-            else { alert(data) }
-          }
-      });// --- END of ajax to save reply    
-    }
-    else // content is not provided
-    {
-      alert("Please provide the reply content.")
-    } // --- END of IF-ELSE
-  
-  } // --- END of addReply()
-
-  // --- END of discussion code ----
 
 
   // Taken value of svg data of that node globally
