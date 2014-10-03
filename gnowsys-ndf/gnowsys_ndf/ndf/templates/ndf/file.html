@@ -108,6 +108,8 @@
   </div>
   {% endif %}
 
+  {% group_type_info groupid request.user as grouptype %}
+
   <!-- Tab View #1 - All -->
   <div class="content row active" id="view-all">
 
@@ -137,22 +139,25 @@
       {% for file in files %}      
       {% get_grid_fs_object file as grid_fs_obj %}
 
-        <!--new  -->
-        <li class="card">
-        <div class="file">
+      <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if file.status == "DRAFT" %}
+            <div class="draft">
+          {% elif file.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if file.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
+
+          <a href="{% url 'file_detail' group_name_tag file %}">
           <div class="row">
-          <div class="small-7 columns">
-            <div class="label-list">{% for tag in file.tags|slice:":3" %}
-                <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-              {% endfor %}</div>
-              
-            <header>
-              <h5>
-                {{ file.name }}{% if file.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-              </h5>
-            </header>
+          <div class="small-8 columns">
+            <b>
+              {{ file.name }}{% if file.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+            </b>
           </div>
-          <div class="small-5 columns">
+          <div class="small-4 columns">
             {% if "image" in file.mime_type %}
               <img src="{% url 'getImageThumbnail' group_id file.pk %}">
             {% elif "audio" in file.mime_type %}
@@ -170,15 +175,21 @@
             {% endif %}
           </div>
           </div>
-
-            <a href="{% url 'file_detail' group_name_tag file %}">
-            <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+            
+            <span style="font-size:12px;">{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span></br>
             
             <footer>
               <div class="small-6 columns">{{file.mime_type|truncatechars:15}}</div>
               <div class="small-6 columns"><div class="right"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div></div>
             </footer>
             </a>
+
+            <div class="label-list small-12 columns">
+              {% for tag in file.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>{% endfor %}
+            </div>
 
     
         </div>
@@ -229,37 +240,48 @@
 
       {% for doc in docCollection %}      
       {% get_grid_fs_object doc as grid_fs_obj %}
+
       <li class="card">
-        <div class="file">
-	        <div class="row">
-            <div class="small-7 columns">
-              <div class="label-list">{% for tag in doc.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-                {% endfor %}</div>
-                
-              <header>
-                <h5>
+        {% if grouptype == "Moderated" %}
+          {% if doc.status == "DRAFT" %}
+            <div class="draft">
+          {% elif doc.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if doc.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
+
+          <a href="{% url 'file_detail' group_name_tag doc %}">
+          <div class="row">
+            <div class="small-8 columns">                             
+                <b>
                   {{ doc.name }}{% if doc.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </h5>
-              </header>
+                </b>
             </div>
-            <div class="small-5 columns">
+            <div class="small-4 columns">
               <span class="fi-page-filled" style="font-size:40px"></span>
             </div>
           </div>
-          <a href="{% url 'file_detail' group_name_tag doc %}">
-          <p>{{ doc.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
           
+          <span style="font-size:12px;">{{ doc.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+
           <footer>
             <div class="small-6 columns">{{doc.mime_type|truncatechars:15}}</div>
             <div class="small-6 columns"><div class="right"><strong>{{doc.file_size.size}}</strong> {{doc.file_size.unit}}</div></div>
           </footer>
           </a>
 
-	  
+          <div class="label-list small-12 columns">
+            {% for tag in doc.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>
+            {% endfor %}
+          </div>
+        
         </div>
       </li>
-
       {% empty %}
         {% if not searching %}
           <div class="row">
@@ -306,34 +328,46 @@
       {% autopaginate interactiveCollection 23 %}
       {% for inter in interactiveCollection %}      
       {% get_grid_fs_object inter as grid_fs_obj %}
+      
       <li class="card">
-        <div class="file">
+        {% if grouptype == "Moderated" %}
+          {% if inter.status == "DRAFT" %}
+            <div class="draft">
+          {% elif inter.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if inter.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
+
+          <a href="{% url 'file_detail' group_name_tag inter %}">
           <div class="row">
-            <div class="small-7 columns">
-              <div class="label-list">{% for tag in inter.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-                {% endfor %}</div>
-                
-              <header>
-                <h5>
+            <div class="small-8 columns">                             
+                <b>
                   {{ inter.name }}{% if inter.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </h5>
-              </header>
+                </b>
             </div>
-            <div class="small-5 columns">
+            <div class="small-4 columns">
               <span class="fi-arrows-compress" style="font-size:40px"></span>
             </div>
           </div>
-
-          <a href="{% url 'file_detail' group_name_tag inter %}">
-          <p>{{ inter.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
           
+          <span style="font-size:12px;">{{ inter.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+
           <footer>
             <div class="small-6 columns">{{inter.mime_type|truncatechars:15}}</div>
             <div class="small-6 columns"><div class="right"><strong>{{inter.file_size.size}}</strong> {{inter.file_size.unit}}</div></div>
           </footer>
           </a>
 
+          <div class="label-list small-12 columns">
+            {% for tag in inter.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>
+            {% endfor %}
+          </div>
+        
         </div>
       </li>
 
@@ -383,37 +417,49 @@
       {% autopaginate audioCollection 23 %}
       {% for audio in audioCollection %}      
       {% get_grid_fs_object audio as grid_fs_obj %}
+      
       <li class="card">
-        <div class="file">
-          <div class="row">
-            <div class="small-7 columns">
-              <div class="label-list">{% for tag in audio.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-                {% endfor %}</div>
+        {% if grouptype == "Moderated" %}
+          {% if audio.status == "DRAFT" %}
+            <div class="draft">
+          {% elif audio.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if audio.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
 
-                
-              <header>
-                <h5>
+          <a href="{% url 'file_detail' group_name_tag audio %}">
+          <div class="row">
+            <div class="small-8 columns">                             
+                <b>
                   {{ audio.name }}{% if audio.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </h5>
-              </header>
+                </b>
             </div>
-            <div class="small-5 columns">
+            <div class="small-4 columns">
               <span class="fi-music" style="font-size:40px"></span>
             </div>
           </div>
-
-          <a href="{% url 'file_detail' group_name_tag audio %}">
-          <p>{{ audio.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
           
+          <span style="font-size:12px;">{{ audio.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+
           <footer>
             <div class="small-6 columns">{{audio.mime_type|truncatechars:15}}</div>
             <div class="small-6 columns"><div class="right"><strong>{{audio.file_size.size}}</strong> {{audio.file_size.unit}}</div></div>
           </footer>
           </a>
 
+          <div class="label-list small-12 columns">
+            {% for tag in audio.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>
+            {% endfor %}
+          </div>
+        
         </div>
       </li>
+
 
       {% empty %}
         {% if not searching %}
@@ -460,37 +506,46 @@
       <!-- Existing card list-->
       {% for image in imageCollection %}
       {% get_grid_fs_object image as grid_fs_obj %}
-       
-        <!-- new -->
-        <li class="card">
-        <div class="file">
-          <div class="row">
-            <div class="small-7 columns">
-              <div class="label-list">{% for tag in image.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-                {% endfor %}</div>
+        
+      <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if image.status == "DRAFT" %}
+            <div class="draft">
+          {% elif image.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if image.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
 
-                
-              <header>
-                <h5>
+          <a href ="{% url 'image_detail' group_name_tag image %}">
+          <div class="row">
+            <div class="small-8 columns">                             
+                <b>
                   {{ image.name }}{% if image.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </h5>
-              </header>
+                </b>
             </div>
-            <div class="small-5 columns">
+            <div class="small-4 columns">
               <img src="{% url 'getImageThumbnail' group_id image.pk %}">
             </div>
           </div>
-
-          <a href ="{% url 'image_detail' group_name_tag image %}">
-          <p>{{ image.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
           
+          <span style="font-size:12px;">{{ image.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+
           <footer>
             <div class="small-6 columns">{{image.mime_type|truncatechars:15}}</div>
             <div class="small-6 columns"><div class="right"><strong>{{image.file_size.size}}</strong> {{image.file_size.unit}}</div></div>
           </footer>
           </a>
 
+          <div class="label-list small-12 columns">
+            {% for tag in image.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>
+            {% endfor %}
+          </div>
+        
         </div>
         </li>
         <!-- end new -->
@@ -539,45 +594,53 @@
       {% for video in videoCollection %}
       {% get_grid_fs_object video as grid_fs_obj %}
 
-      <!-- new -->
-        <li class="card">
-        <div class="file">
-          <div class="row">
-            <div class="small-7 columns">
-              <div class="label-list">{% for tag in video.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-                {% endfor %}</div>
+      <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if video.status == "DRAFT" %}
+            <div class="draft">
+          {% elif video.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if video.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
 
-                
-              <header>
-                <h5>
+          <a href ="{% url 'video_detail' group_name_tag video %}">
+          <div class="row">
+            <div class="small-8 columns">                             
+                <b>
                   {{ video.name }}{% if video.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </h5>
-              </header>
+                </b>
             </div>
-            <div class="small-5 columns">
-	      {% if "video" in video.mime_type and video.member_of_names_list|join:', ' == "Pandora_video" %}
+            <div class="small-4 columns">
+              {% if "video" in video.mime_type and video.member_of_names_list|join:', ' == "Pandora_video" %}
               {% get_source_id video.pk as source_id %}
-              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+                <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
                             
-	      {% elif "video" in video.mime_type and video.member_of_names_list|join:', ' != "Pandora_video" %}
+              {% elif "video" in video.mime_type and video.member_of_names_list|join:', ' != "Pandora_video" %}
                 <img src="{% url 'getFileThumbnail' group_id video.pk %}">
               {% endif %}
             </div>
           </div>
-
-          <a href ="{% url 'video_detail' group_name_tag video %}">
-          <p>{{ video.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
           
+          <span style="font-size:12px;">{{ video.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+
           <footer>
             <div class="small-6 columns">{{video.mime_type|truncatechars:15}}</div>
             <div class="small-6 columns"><div class="right"><strong>{{video.file_size.size}}</strong> {{video.file_size.unit}}</div></div>
           </footer>
           </a>
 
+          <div class="label-list small-12 columns">
+            {% for tag in video.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>
+            {% endfor %}
+          </div>
+        
         </div>
         </li>
-        <!-- end new -->
       
       {% empty %}
         {% if not searching %}
@@ -624,86 +687,52 @@
       {% get_source_id each.pk as source_id %}
       {% get_user_object each.created_by as user_obj %}
 
-      <!-- new -->
-        <li class="card">
-        <div class="file">
-          <div class="row">
-            <div class="small-7 columns">
-              <div class="label-list">{% for tag in each.tags|slice:":3" %}
-                  <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-                {% endfor %}</div>
-
-                
-              <header>
-                <h5>
-                  {{ each.name }}{% if each.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-                </h5>
-              </header>
-            </div>
-            <div class="small-5 columns">
-	      {% if "video" in each.mime_type and "Pandora_video" in each.member_of_names_list %}
-	      <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
-                            
-	      {% elif "video" in each.mime_type and each.member_of_names_list|join:', ' != "Pandora_video" %}
-                <img src="{% url 'getFileThumbnail' group_id each.pk %}">
-              {% endif %}
-            </div>
-          </div>
+      <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if each.status == "DRAFT" %}
+            <div class="draft">
+          {% elif each.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if each.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
 
           <a href ="{% url 'video_detail' group_name_tag each %}?vid_id={{src_id}}">
-          <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+          <div class="row">
+            <div class="small-8 columns">                             
+                <b>
+                  {{ each.name }}{% if each.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+                </b>
+            </div>
+            <div class="small-4 columns">
+            {% if "video" in each.mime_type and "Pandora_video" in each.member_of_names_list %}
+              <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
+                            
+            {% elif "video" in each.mime_type and each.member_of_names_list|join:', ' != "Pandora_video" %}
+              <img src="{% url 'getFileThumbnail' group_id each.pk %}">
+            {% endif %}
+            </div>
+          </div>
           
+          <span style="font-size:12px;">{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
+
           <footer>
             <div class="small-6 columns">{{each.mime_type|truncatechars:15}}</div>
             <div class="small-6 columns"><div class="right"><strong>{{each.file_size.size}}</strong> {{each.file_size.unit}}</div></div>
           </footer>
           </a>
 
-        </div>
-        </li>    
-
-      <!-- Previous -->
-      {% comment %}
-      <!-- <li class="card">
-        <div class="file">
-
-        <header>
-          <div class="th">
-          <a href="http://wetube.gnowledge.org/{{source_id}}/480p.webm">
-          <img src="http://wetube.gnowledge.org/{{source_id}}/icon128.jpg">
-          </a>
+          <div class="label-list small-12 columns">
+            {% for tag in each.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>
+            {% endfor %}
           </div>
-
-          <h4>{{each.name}}</h4>
-
-          <div>
-            <small class="subheader">{{ each.member_of_names_list|join:', ' }} created {{each.created_at|timesince}} ago 
-              <br/>
-              by <span href="#" class="user" data-gnow="">@wetube.gnowledge.org</span>
-            </small>
-          </div>
-        </header>
-
-        <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-
-        <a class="button expand" href ="{% url 'video_detail' group_name_tag each %}?vid_id={{src_id}}">View details</a>
-	{% comment %}
-        {% get_user_object each.created_by as user_obj %}
-          {% if user_obj.username = user.username or request.user.is_superuser %}
-
-        <a class="button alert tiny" href="{% url 'delete_file' group_name_tag each %}?next={{request.path}}">Delete </a>
-
-	{% endif %}
-	{#% endcomment %#}
-        <footer class="row">
-          <div class="small-6 columns">{{each.mime_type|truncatechars:15}}</div>
-          <div class="small-6 columns"><div class="right"><strong>{{each.file_size.size}}</strong> {{each.file_size.unit}}</div></div>
-        </footer>
-
+        
         </div>
-      </li> -->
-      {% endcomment %}
-      <!-- Previous -->
+        </li>
 
       {% empty %}
         {% if not searching %}
@@ -732,96 +761,56 @@
 
       {% for file in file_collections %}
       {% get_grid_fs_object file as grid_fs_obj %}
+       
+      <li class="card">
+        {% if grouptype == "Moderated" %}
+          {% if file.status == "DRAFT" %}
+            <div class="draft">
+          {% elif file.status == "PUBLISHED" %}
+            <div class="published">
+          {% endif %}
+        {% else %}
+          <div class='{% if file.status == "PUBLISHED" %}published{% endif %}'>
+        {% endif %} 
 
-      <!--new  -->
-        <li class="card">
-        <div class="file">
+          <a href="{% url 'file_detail' group_name_tag file %}">
           <div class="row">
-          <div class="small-7 columns">
-            <div class="label-list">{% for tag in file.tags|slice:":3" %}
-                <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-              {% endfor %}</div>
-              
-            <header>
-              <h5>
-                {{ file.name }}{% if file.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-              </h5>
-            </header>
-          </div>
-          <div class="small-5 columns">
-            {% if "image" in file.mime_type %}
-              <img src="{% url 'getImageThumbnail' group_id file.pk %}">
-            {% elif "audio" in file.mime_type %}
-              <span class="fi-music" style="font-size:40px"></span>
-            {% elif "video" in file.mime_type and file.member_of_names_list|join:', ' != "Pandora_video" %}
-              <img src="{% url 'getFileThumbnail' group_id file.pk %}">
-            {% else %}
-              <span class="fi-page-filled" style="font-size:40px"></span>
-            {% endif %}
-          </div>
-          </div>
-
-            <a href="{% url 'file_detail' group_name_tag file %}">
-            <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-            
-            <footer>
-              <div class="small-6 columns">{{file.mime_type|truncatechars:15}}</div>
-              <div class="small-6 columns"><div class="right"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div></div>
-            </footer>
-            </a>
-
-    
-        </div>
-      </li>
-        <!-- end new --> 
-
-        {% comment %}
-      <!-- <li class="card">
-        <div class="file">
-    
-          <header>
-            <div class="label-list">
-            {% for tag in file.tags|slice:":3" %}
-              <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-            {% endfor %}
+            <div class="small-8 columns">                             
+                <b>
+                  {{ file.name }}{% if file.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+                </b>
             </div>
-
-            <div class="th">
-            <a href="{% url 'read_file' group_name_tag file.pk grid_fs_obj.filename %}">
-              <img src="{% url 'getFileThumbnail' group_name_tag file %}">
-            </a>
+            <div class="small-4 columns">
+              {% if "image" in file.mime_type %}
+                <img src="{% url 'getImageThumbnail' group_id file.pk %}">
+              {% elif "audio" in file.mime_type %}
+                <span class="fi-music" style="font-size:40px"></span>
+              {% elif "video" in file.mime_type and file.member_of_names_list|join:', ' != "Pandora_video" %}
+                <img src="{% url 'getFileThumbnail' group_id file.pk %}">
+              {% else %}
+                <span class="fi-page-filled" style="font-size:40px"></span>
+              {% endif %}
             </div>
-      
-            <h4>{{file.name|truncatechars:20}}{% if file.collection_set %}<i class="fi-page-multiple"></i>{% endif %}
-            <div>
-            <small class="subheader">
-              {{ file.member_of_names_list|join:', ' }} created {{file.created_at|timesince}} ago
-              <br/>
-              by <a class="user" href="{% url 'dashboard' file.created_by %}" data-gnow="">{{file.user_details_dict.created_by}}</a> 
-            </small>
-            </div>
-            </h4>
-          </header>
+          </div>
+          
+          <span style="font-size:12px;">{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
 
-          <p>{{ file.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
-
-          <a class="button expand" href ="{% url 'file_detail' group_name_tag file %}">{% trans "View details" %}</a>
-	  {% comment %}
-          {% get_user_object file.created_by as user_obj %}
-          {% if user_obj.username = user.username or request.user.is_superuser %}
-
-          <a class="button alert tiny" href="{% url 'delete_file' group_name_tag file %}?next={{request.path}}">{% trans "Delete" %} </a>
-
-	  {% endif %}
-	  {#% endcomment %#}
-          <footer class="row">
+          <footer>
             <div class="small-6 columns">{{file.mime_type|truncatechars:15}}</div>
             <div class="small-6 columns"><div class="right"><strong>{{file.file_size.size}}</strong> {{file.file_size.unit}}</div></div>
           </footer>
-    
+          </a>
+
+          <div class="label-list small-12 columns">
+            {% for tag in file.tags|slice:":3" %}
+              <a href="{% url 'tag_info' group_name_tag tag %}">
+                <span class="label" style="background-color:yellow">{{tag}}</span>
+              </a>
+            {% endfor %}
+          </div>
+        
         </div>
-      </li> -->
-      {% endcomment %}
+        </li>
 
       {% empty %}
         {% if not searching %}
