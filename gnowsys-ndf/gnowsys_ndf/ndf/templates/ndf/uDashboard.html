@@ -81,8 +81,21 @@
 	</div>
 </div>
 
+
+<div class= "row">
+	<div class= "small-6 columns">
+        <h2>{% trans "My Groups:" %}</h2>
+	</div>
+</div>  
+<div class= "column">	 
+  	<div class= "small-12 rows" align="right">
+		{% if user_groups %}
+   		<a  href="/{{group_id}}/group">	{% trans "Show more..." %} </a>
+		{% endif %}
+	</div>
+</div>   
   
-    <h2>{% trans "My Groups:" %}</h2>
+    
     <hr></hr>
   
       
@@ -151,8 +164,23 @@
     </div>
   </div>
   {% if user_task %}
-  <h2>{% trans "My Tasks:" %}</h2>
-  <hr></hr>
+  
+  
+
+<div class= "row">
+	<div class= "small-6 columns">
+        <h2>{% trans "My Tasks:" %}</h2>
+	</div>
+</div>  
+<div class= "column">	 
+  	<div class= "small-12 rows" align="right">
+		{% if user_task %}
+   		<a  href="/{{group_name_tag}}/task">	{% trans "Show more..." %} </a>
+		{% endif %}
+	</div>
+</div>   
+  
+	<hr></hr>
    <div id="Assigned Tasks" >
       
      	<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
@@ -207,8 +235,21 @@
       
     </div>
 {% endif %}
-    <h2>{% trans "My Activities:" %}</h2>
-    <hr></hr>
+    
+
+<div class= "row">
+	<div class= "small-6 columns">
+        <h2>{% trans "My Activities:" %}</h2>
+	</div>
+</div>  
+<div class= "column">	 
+  	<div class= "small-12 rows" align="right">
+		{% if user_activity %}
+   		<a  href="/{{group_id}}/useractivity">	{% trans "Show more..." %} </a>
+		{% endif %}
+	</div>
+</div>     
+	  <hr></hr>
     <div id="Activity">
       
       <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">

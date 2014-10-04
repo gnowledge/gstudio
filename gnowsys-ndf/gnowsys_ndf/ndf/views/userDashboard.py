@@ -384,6 +384,7 @@ def user_preferences(request,group_id,auth_id):
     except Exception as e:
         print "Exception in userpreference view "+str(e)
         return HttpResponse("Failure")
+
 def user_template_view(request,group_id):
     
     auth_group = None
@@ -431,3 +432,30 @@ def user_template_view(request,group_id):
     #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
     variable = RequestContext(request, {'TASK_inst':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
     return render_to_response(template, variable)
+
+@login_required
+def user_activity(request, group_id):
+    activity_user = collection.Node.find({'$and':[{'$or':[{'_type':'GSystem'},{'_type':'group'},{'_type':'File'}]},
+                                                 
+                                                 {'$or':[{'created_by':request.user.id}, {'modified_by':request.user.id}]}] 
+
+                                                 }).sort('last_update', -1)
+    blank_list=[]
+    for each in activity_user:
+      if each.created_by == each.modified_by :
+        if each.last_update == each.created_at:
+          activity =  'created'
+        else :
+          activity =  'modified'
+      else :
+        activity =  'created'
+      if each._type == 'Group':
+        blank_list.append(each)
+      else :
+        member_of = collection.Node.find_one({"_id":each.member_of[0]})
+        blank_list.append(each)
+    template = "ndf/User_Activity.html"
+    #variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name,'group_id': group_id, 'groupid': group_id,'send':send})
+    variable = RequestContext(request, {'user_activity':blank_list,'group_name':group_id,'group_id': group_id, 'groupid': group_id})
+    return render_to_response(template, variable)
+
