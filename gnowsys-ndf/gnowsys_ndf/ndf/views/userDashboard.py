@@ -300,8 +300,9 @@ def uDashboard(request, group_id):
     attributetype_assignee = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
     attr_assignee = collection.Node.find({"_type":"GAttribute", "attribute_type.$id":attributetype_assignee._id, "object_value":request.user.username}).sort('last_update',-1).limit(10)
     for attr in attr_assignee :
-     task_node = collection.Node.find_one({'_id':attr.subject})
-     user_assigned.append(task_node) 
+     task_node = collection.Node.one({'_id':attr.subject})
+     if task_node:	
+     	user_assigned.append(task_node) 
     
                                                           
     obj = collection.Node.find({'_type': {'$in' : [u"GSystem", u"File"]}, 'contributors': int(ID) ,'group_set': {'$all': [ObjectId(group_id)]}})
