@@ -81,8 +81,24 @@ class Command(BaseCommand):
           meta_type = create_meta_type(user_id) #creating MetaType
         
         for each in GAPPS:
+
+          # Temporarily made this change for renaming "Browse Topic & Browse Resource" untill all servers will be updated
+          if each == "Topics":
+            br_topic = collection.Node.one({'_type':'GSystemType', 'name': 'Browse Topic'})
+            if br_topic:
+              br_topic.name = unicode(each)
+              br_topic.save()
+
+          if each == "E-Library":
+            br_resource = collection.Node.one({'_type':'GSystemType', 'name': 'Browse Resource'})
+            if br_resource:
+              br_resource.name = unicode(each)
+              br_resource.save()
+          # Keep above part untill all servers updated
+          
           node_doc = collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':each}]})
           if (node_doc == None or each != node_doc['name']):
+
             gst_node=collection.GSystemType()
             gst_node.name = unicode(each)
             gst_node.created_by = user_id
