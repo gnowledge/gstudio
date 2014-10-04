@@ -409,16 +409,16 @@ def create_sts(factory_gsystem_types,user_id):
       meta_type_id = meta_type._id
     create_gsystem_type(name, user_id, meta_type_id)
 
-  # For creating Browse Topic as a collection of Theme & Topic
+  # For creating Topics as a collection of Theme & Topic
   theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
   topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-  br_topic = collection.Node.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
-  if not br_topic.collection_set:
-    br_topic.collection_set.append(theme_GST._id)
-    br_topic.collection_set.append(topic_GST._id)
-    br_topic.created_by = 1
-    br_topic.modified_by = 1
-    br_topic.save()
+  topics = collection.Node.one({'_type': 'GSystemType', 'name': 'Topics'})
+  if not topics.collection_set:
+    topics.collection_set.append(theme_GST._id)
+    topics.collection_set.append(topic_GST._id)
+    topics.created_by = 1
+    topics.modified_by = 1
+    topics.save()
 
 def clean_structure():
   '''
