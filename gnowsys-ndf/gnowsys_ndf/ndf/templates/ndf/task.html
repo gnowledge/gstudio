@@ -36,14 +36,14 @@
   
 {% block body_content %}
 
-<header class="row">
-  <dl class="tabs" data-tab data-options="deep_linking:true">
+<header class="row" >
+  <dl class="tabs" data-tab data-options="deep_linking:true" >
     <dd class="active"><a href="#panel2-1" id="p1"><i class="fi-eye"></i> All Task {% if TASK_inst.count %}({{ TASK_inst.count }}){% endif %}</a></dd>
-  <dd ><a href="#panel2-2" id="p2" name="Completed"> Completed </a></dd>
-  <dd ><a href="#panel2-3" id="p3" name="Createdbyme"> Created by me </a></dd>
-  <dd ><a href="#panel2-4" id="p4" name="Assignedtome"> Assigned to me </a></dd> 
-  <dd ><a href="#panel2-5" id="p5" name="pending"> pending </a></dd> 
-  <dd ><a href="#panel2-6" id="p6" name="Statuswise"> Status Wise </a></dd>
+  <dd ><a href="#panel2-2" id="p2" name="Completed" onClick="$('#example').empty()"> Completed </a></dd>
+  <dd ><a href="#panel2-3" id="p3" name="Createdbyme" onClick="$('#example').empty()"> Created by me </a></dd>
+  <dd ><a href="#panel2-4" id="p4" name="Assignedtome" onClick="$('#example').empty()"> Assigned to me </a></dd> 
+  <dd ><a href="#panel2-5" id="p5" name="pending" onClick="$('#example').empty()"> pending </a></dd> 
+  <dd ><a href="#panel2-6" id="p6" name="Statuswise" onClick="$('#example').empty()"> Status Wise </a></dd>
 
 
   </dl>
@@ -55,7 +55,7 @@
 
 <div class="tabs-content">
   <div class="content active" id="panel2-1">
-    
+
   </div>
   <div class="content" id="panel2-2">
     
@@ -75,9 +75,10 @@
  
   <div class="content" id="panel2-6">
 
-    <div class="small-3 end columns">
-  <select id="filter"><option id="1" onClick="showHide()" value="New">New </option>
-  
+ <div class="small-3 end columns">
+  <select id="filter">
+  <option id="0" onClick="showHide()" value="New">  </option>
+  <option id="1" onClick="showHide()" value="New"> New </option>
   <option id="2" onClick="showHide()" value="In Progress"> In Progress </option>
   <option id="3" onClick="showHide()" value="Resolved"> Resolved </option>
   <option id="4" onClick="showHide()" value="Feedback"> Feedback</option>
@@ -87,26 +88,31 @@
   </select>
   </div>
   
-<div class="content" id="example">
-    
-  </div>
-
+	
   </div>
   
 
 </div>
+<div class="medium-12 columns" id="example">
+    
+  </div>
 
 <script type="text/javascript">
+	
+
+var dyurl="{% url 'check_filter' group_name 1 'None' %}"
+
 
 $("#p1").ready(function (){
-  
-  $.ajax({
-      url: "{% url 'check_filter' group_name 1 'None' %}",
+location.hash='panel2-1' 
+$('#example').empty() 
+$.ajax({
+      url: dyurl,
 
       type: "GET",
       
       success: function(data){
-        $("#panel2-1").html(data)      
+        $("#example").html(data)      
       },
       
       complete: function(){
@@ -123,7 +129,7 @@ $("#p2").click(function (){
       type: "GET",
       
       success: function(data){
-        $("#panel2-2").html(data)      
+        $("#example").html(data)      
       },
       
       complete: function(){
@@ -140,7 +146,7 @@ $("#p3").click(function (){
       type: "GET",
       
       success: function(data){
-        $("#panel2-3").html(data)      
+        $("#example").html(data)      
       },
       
       complete: function(){
@@ -156,7 +162,7 @@ $("#p4").click(function (){
       type: "GET",
       
       success: function(data){
-        $("#panel2-4").html(data)      
+        $("#example").html(data)      
       },
       
       complete: function(){
@@ -172,7 +178,7 @@ $("#p5").click(function (){
       type: "GET",
       
       success: function(data){
-        $("#panel2-5").html(data)      
+        $("#example").html(data)      
       },
       
       complete: function(){
@@ -184,8 +190,9 @@ $("#p5").click(function (){
 
 function showHide()
  {
-   
+  
   var val = document.getElementById("filter").value;
+  
  if (val == "New")
  {
   

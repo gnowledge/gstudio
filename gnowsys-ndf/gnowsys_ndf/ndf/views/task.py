@@ -3,12 +3,15 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response #render  uncomment when to use
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django_mongokit import get_database
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from mongokit import paginator			
+import datetime
 import json
 from gnowsys_ndf.ndf.models import NodeJSONEncoder
 try:
@@ -220,7 +223,7 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
                 		newattribute.attribute_type = attributetype_key
                 		newattribute.object_value = field_value[0]
                 		newattribute.save()
-	    if  int(len(request.POST.getlist("Assignee","")))>1:
+	    if  int(len(request.POST.getlist("Assignee","")))<1:
               if task is None:
                		Task=collection.Node.find_one({"_id":ObjectId(task_node._id)})
 			
@@ -398,7 +401,7 @@ def delete_task(request, group_name, _id):
 
 
 
-def check_filter(request,group_name,choice,status=None):
+def check_filter(request,group_name,choice=1,status='New',each_page=1):
     at_list = ["Status", "start_time", "Priority", "end_time", "Assignee", "Estimated_time"]
     blank_dict = {}
     history = []
@@ -419,10 +422,17 @@ def check_filter(request,group_name,choice,status=None):
         pass
     #section to get the Tasks 
     GST_TASK = collection.Node.one({'_type': "GSystemType", 'name': 'Task'})
-    attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Status'})
+    
     attributetype_key1 = collection.Node.find_one({"_type":'AttributeType', 'name':'Assignee'})
     
+    black_list=[]
+    head=[]
+    largest=[]		
+    #for each in TASK_inst:
     
+    
+	
+    		
     Completed_Status_List=['Resolved','Closed']
     title = "Task"
     TASK_inst = collection.GSystem.find({'member_of': {'$all': [GST_TASK._id]}, 'group_set': {'$all': [ObjectId(group_id)]}})
@@ -430,74 +440,67 @@ def check_filter(request,group_name,choice,status=None):
     self_task=[]
     sub_task_name=[]	
     send="This group doesn't have any files"
-    #Task Completed 
-    
+    #Task Completed
+    	
     for each in TASK_inst:
-            
-     
-		
-	attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
-    	attr1 = collection.Node.find_one({"_type":"GAttribute", "attribute_type.$id":attributetype_key1._id,"object_value":request.user.username})
-    		
-    	if int(choice) == int(1):
-			if attr:
-				if attr.object_value == "In Progress":
-					each['type']="InProgress"
-				each['type']=attr.object_value
-    			self_task.append(each)
-
-    	if int(choice) == int(2):
-    		message="No Completed Task"
-    		if attr:
-    			if attr.object_value in Completed_Status_List:
-				    each['type']='completed'	
-    				    self_task.append(each)
-                        
-
-
-    	#Task Created By Me
-        elif int(choice) == int(3):
-	 		
-    		creator_id=each.created_by
-    		message="No Task Created"
-    		auth1 = collection.Node.one({'_type': 'Author', 'created_by': creator_id })   
+    	 attr_value={}
+	 for attrvalue in at_list:
+		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':attrvalue})
+		attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
+		if attr:
+			attr_value.update({attrvalue:attr.object_value})
+		else:
+			attr_value.update({attrvalue:"--"})
+	 attr_value.update({'id':each._id})
+	 attr_value.update({'Name':each.name})
+	 if int(choice) == int(1):
+		 black_list.append(dict(attr_value))
+	 if int(choice) == int(2):
+		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Status'})
+		attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
+		if attr:
+			if attr.object_value in Completed_Status_List:
+				black_list.append(dict(attr_value))
+	 if int(choice) == int(3):
+		auth1 = collection.Node.one({'_type': 'Author', 'created_by': each.created_by })   
     		if auth.name == auth1.name:
-			each['type']='created'
-    	  		self_task.append(each)
-    	           
-    	#Task Assign To me
-    	elif int(choice) == int(4):
-    			message="Nothing Assigned"
-			if attr1:
-			    each['type']='Assigned'	
-			    self_task.append(each)
-                                
-    	elif int(choice) == int(5):
-				message="No Pending Task"
-				if attr:
-					each['type']='Pending'	
-                            		if attr.object_value not in Completed_Status_List and attr.object_value != 'Rejected':
-                  						self_task.append(each)
-                				
+			black_list.append(dict(attr_value))
+	 if int(choice) == int(4):
+		attr1 = collection.Node.find_one({"_type":"GAttribute","subject":each._id, "attribute_type.$id":attributetype_key1._id,"object_value":request.user.username})
+		if attr1:
+			black_list.append(dict(attr_value))
+	 if int(choice) == int(5):
+		for value in ("Status","end_time"):
+			attributetype_key = collection.Node.find_one({"_type":'AttributeType','name':value})
+			attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
+			if attr:
+				if value == "end_time":
+					if ((attr.object_value) > unicode(datetime.date.today())) is False:
+						black_list.append(dict(attr_value))	
+				elif attr.object_value not in Completed_Status_List and attr.object_value != 'Rejected':
+						black_list.append(dict(attr_value))
+	 if int(choice) == int(6):
+		attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':'Status'})
+		attr = collection.Node.find_one({"_type":"GAttribute", "subject":each._id, "attribute_type.$id":attributetype_key._id})
+		if attr:
+			if attr.object_value == status:
+					black_list.append(dict(attr_value))
+    		
+     
+    		 
+    
 
-        #Task Listing According to the Status
-        elif int(choice)==int(6):
-        	message="No"+" "+status+" "+"Task"
-        	if attr:
-        		#This Dictionary created saves the status and 'Task Node' i.e 'In Progress':'Node'
-        		if attr.object_value == status:
-					each['type']=status
-        				self_task.append(each)
-                    	
-
-        	self_task.sort()
-   
-        if not self_task:
-        	send=message
-        else:
-        	send=""		
+    paged_resources = Paginator(black_list,10)
+    files_list = []
+    for each_resource in (paged_resources.page(each_page)).object_list:
+		files_list.append(each_resource)
+    
+    count_list=[]
+    #count_list.append(TASK_inst.count())			 			
     TASK_inst.rewind()
+    count=len(black_list)	
+    	
     template = "ndf/task_card_view.html"
-    variable = RequestContext(request, {'TASK_inst': self_task,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':send})
+    variable = RequestContext(request, {'TASK_inst':files_list,'group_name':group_name, 'appId':app._id, 'group_id': group_id, 'groupid': group_id,'send':send,'count':count_list,'TASK_obj':TASK_inst,"page_info":paged_resources,'page_no':each_page,'choice':choice,'status':status})
     return render_to_response(template, variable)
     #return HttpResponse(json.dumps(self_task,cls=NodeJSONEncoder))
