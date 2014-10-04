@@ -20,9 +20,9 @@ from gnowsys_ndf.ndf.views.file import *
 db = get_database()
 collection = db[Node.collection_name]
 collection_tr = db[Triple.collection_name]
-GST_browse_resource = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Browse Resource'})
+e_library_GST = collection.GSystemType.one({'_type':'GSystemType', 'name': 'E-Library'})
 pandora_video_st = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Pandora_video'})
-app = collection.GSystemType.one({'_type':'GSystemType', 'name': 'Browse Resource'})
+app = collection.GSystemType.one({'_type':'GSystemType', 'name': 'E-Library'})
 
 #######################################################################################################################################
 
@@ -42,7 +42,7 @@ def resource_list(request,group_id,app_id=None):
 	else :
 	    pass
 	if app_id is None:
-	    app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'Browse Resource'})
+	    app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'E-Library'})
 	    if app_ins:
 	        app_id = str(app_ins._id)
 
@@ -73,11 +73,11 @@ def resource_list(request,group_id,app_id=None):
 
 	pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id, 'group_set': ObjectId(group_id) })
 
-	# if GST_browse_resource._id == ObjectId(app_id):
+	# if e_library_GST._id == ObjectId(app_id):
 	"""
 	* Renders a list of all 'Resources(XCR)' available within the database.
 	"""
-	title = GST_browse_resource.name
+	title = e_library_GST.name
 
 	file_id = GST_FILE._id
 	datavisual = []

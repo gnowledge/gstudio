@@ -58,7 +58,7 @@
 	        					{% user_access_policy groupid request.user as user_access %}
 	        					{% if user_access == "allow" %}
 
-	                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/browse topic/'+node.id+'/"> </a>' 
+	                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
 
 	                			{% endif %}
 	            			);	            			
@@ -70,7 +70,7 @@
 	        					{% user_access_policy groupid request.user as user_access %}
 	        					{% if user_access == "allow" %}
 
-	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
 	                			
 	                			{% endif %}
             				);
@@ -272,7 +272,7 @@
 	<!-- For displaying themes items -->
 	{% if themes_cards  %}
 
-	<h2>Themes</h2><hr/>
+	<h3 class="subheader">Themes</h3><hr/>
 		<div class="content row" id="panel2-4">
 
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
