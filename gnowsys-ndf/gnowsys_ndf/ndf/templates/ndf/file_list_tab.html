@@ -91,12 +91,12 @@
         {% if not searching %}
           <div class="row">
             <div class="small-12 columns">
-       
-      {% if res_type_name="collection" %}
-        <h5>{% trans "This group doesn't have any collections." %}</h5>
-      {% else %}
-        <h5> {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %} </h5>
-      {% endif %}
+        
+              {% if res_type_name == "collection" %}
+                <h5>{% trans "This group doesn't have any collections." %}</h5>
+              {% else %}
+                <h5> {% blocktrans %}This group doesn't have any files. <b>Be the first to upload a file!</b>{% endblocktrans %} </h5>
+              {% endif %}
 
             </div>
           </div>
