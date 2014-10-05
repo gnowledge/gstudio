@@ -231,7 +231,7 @@ def results_search(request, group_id):
                                 	        
 				# EXACT MATCH OF SEARCH_USER_STR IN NAME OF GSYSTEMS OF ONE GSYSTEM TYPE
                                 #print "group id",group_id
-				
+				print "getin user",user_reqd
 				if user_reqd != -1:				# 
 						exact_match = col.Node.find({'$and':[{"created_by":user_reqd},
 									   {"group_set":ObjectId(group_id)},
