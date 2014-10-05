@@ -49,63 +49,65 @@
   </dl>
   
 </header>
-
-  
-  
-
-<div class="tabs-content">
-  <div class="content active" id="panel2-1">
-
-  </div>
-  <div class="content" id="panel2-2">
-    
-  </div>
-  
-  <div class="content" id="panel2-3">
+<div class="tabs-content" id="tag">
+  <div class="content" id="panel2-1">
 
   </div>
   
-  <div class="content" id="panel2-4">
-    
-  </div>
-
-  <div class="content" id="panel2-5">
-    
-  </div>
- 
   <div class="content" id="panel2-6">
+ 	<div class="row">
+ 		<div class="small-3  rows">
+ 			 <select id="filter">
+  				<option id="0" onClick="showHide()" value="New">  </option>
+  				<option id="1" onClick="showHide()" value="New"> New </option>
+  				<option id="2" onClick="showHide()" value="In Progress"> In Progress </option>
+  				<option id="3" onClick="showHide()" value="Resolved"> Resolved </option>
+  				<option id="4" onClick="showHide()" value="Feedback"> Feedback</option>
+  				<option id="5" onClick="showHide()" value="Closed"> Closed </option>
+  				<option id="6" onClick="showHide()" value="Rejected"> Rejected </option>
 
- <div class="small-3 end columns">
-  <select id="filter">
-  <option id="0" onClick="showHide()" value="New">  </option>
-  <option id="1" onClick="showHide()" value="New"> New </option>
-  <option id="2" onClick="showHide()" value="In Progress"> In Progress </option>
-  <option id="3" onClick="showHide()" value="Resolved"> Resolved </option>
-  <option id="4" onClick="showHide()" value="Feedback"> Feedback</option>
-  <option id="5" onClick="showHide()" value="Closed"> Closed </option>
-  <option id="6" onClick="showHide()" value="Rejected"> Rejected </option>
-
-  </select>
-  </div>
-  
-	
+  			 </select>
+  		</div>
+  	</div>
   </div>
   
 
 </div>
-<div class="medium-12 columns" id="example">
-    
-  </div>
+
+<div class="row">
+	<div  id="example">
+    	</div>
+</div>
 
 <script type="text/javascript">
 	
 
 var dyurl="{% url 'check_filter' group_name 1 'None' %}"
 
-
+$("#document").ready(function(){
 $("#p1").ready(function (){
 location.hash='panel2-1' 
-$('#example').empty() 
+$('#example').empty()
+$('#tag').hide() 
+$.ajax({
+      url: dyurl,
+
+      type: "GET",
+      
+      success: function(data){
+        $("#example").html(data)      
+      },
+      
+      complete: function(){
+        // $('#Student').foundation('reveal', 'open');
+      }
+    });
+});
+
+$("#p1").click(function (){
+location.hash='panel2-1' 
+$('#example').empty()
+$('#tag').hide() 
 $.ajax({
       url: dyurl,
 
@@ -122,7 +124,8 @@ $.ajax({
 });
 
 $("#p2").click(function (){
-  
+ $('#tag').hide();
+$('#example').empty() 
   $.ajax({
       url: "{% url 'check_filter' group_name 2 'None' %}",
 
@@ -139,7 +142,8 @@ $("#p2").click(function (){
 });
 
 $("#p3").click(function (){
-  
+ $('#tag').hide(); 
+$('#example').empty()
   $.ajax({
       url: "{% url 'check_filter' group_name 3 'None' %}",
 
@@ -155,7 +159,8 @@ $("#p3").click(function (){
     });
 });
 $("#p4").click(function (){
-  
+ $('#tag').hide();
+$('#example').empty() 
   $.ajax({
       url: "{% url 'check_filter' group_name 4 'None' %}",
 
@@ -171,7 +176,8 @@ $("#p4").click(function (){
     });
 });
 $("#p5").click(function (){
-  
+ $('#tag').hide();
+$('#example').empty() 
   $.ajax({
       url: "{% url 'check_filter' group_name 5 'None' %}",
 
@@ -187,12 +193,17 @@ $("#p5").click(function (){
     });
 });
 
+$("#p6").click(function (){
 
+ $('#tag').show();
+
+});
+
+});
 function showHide()
  {
   
-  var val = document.getElementById("filter").value;
-  
+  var val = document.getElementById("filter").value; 
  if (val == "New")
  {
   
