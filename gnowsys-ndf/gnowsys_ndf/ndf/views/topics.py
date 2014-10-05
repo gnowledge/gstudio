@@ -32,7 +32,7 @@ collection_tr = db[Triple.collection_name]
 theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
 topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
 theme_item_GST= collection.Node.one({'_type': 'GSystemType', 'name': 'theme_item'})
-app=collection.Node.one({'name':u'Browse Topic','_type':'GSystemType'})
+app=collection.Node.one({'name':u'Topics','_type':'GSystemType'})
 #######################################################################################################################################
 list_trans_coll = []
 coll_set_dict={}
@@ -52,7 +52,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     else :
         pass
     if app_id is None:
-        app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'Browse Topic'})
+        app_ins = collection.Node.find_one({'_type':'GSystemType', 'name': 'Topics'})
         if app_ins:
             app_id = str(app_ins._id)
 
@@ -82,7 +82,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
         shelves = []
     # End of user shelf
 
-    appName = "browse topic"
+    appName = "topics"
     title = appName
     nodes_dict = []
     themes_list_items = ""
@@ -93,7 +93,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
     unfold_tree = request.GET.get('unfold','')
     unfold = "false"
 
-    br_topic_GST = collection.Node.find_one({'_type':'GSystemType', 'name': 'Browse Topic'})
+    topics_GST = collection.Node.find_one({'_type':'GSystemType', 'name': 'Topics'})
     
     if unfold_tree:
         unfold = unfold_tree
@@ -112,7 +112,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
                 nodes_dict.append({"id":str(each._id), "name":each.name, "created_by":User.objects.get(id=each.created_by).username, "created_at":each.created_at})
 
     # to display the tree hierarchy of themes items inside particular theme(Here app_id defines the Theme id)
-    elif ObjectId(app_id) != br_topic_GST._id:
+    elif ObjectId(app_id) != topics_GST._id:
         themes_hierarchy = True
         themes_cards = ""
         Theme_obj = collection.Node.one({'_id': ObjectId(app_id)})
@@ -120,7 +120,7 @@ def themes(request, group_id, app_id=None, app_set_id=None):
             node = Theme_obj
 
     else:
-        # This will show Themes as a card view on landing page of browse topic
+        # This will show Themes as a card view on landing page of Topics
         themes_cards = True
         if request.user.username:
             nodes_dict = collection.Node.find({'member_of': {'$all': [theme_GST._id]},'group_set':{'$all': [ObjectId(group_id)]}})
@@ -217,9 +217,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
             nodes_list = []
             name = request.POST.get('name')
             collection_list = request.POST.get('collection_list','')
-	    prior_node_list = request.POST.get('prior_node_list','')
-	    teaches_list = request.POST.get('teaches_list','')
-	    assesses_list = request.POST.get('assesses_list','')
+            prior_node_list = request.POST.get('prior_node_list','')
+            teaches_list = request.POST.get('teaches_list','')
+            assesses_list = request.POST.get('assesses_list','')
 	    
             
             # To find the root nodes to maintain the uniquness while creating and editing themes
@@ -286,7 +286,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                 themes_list_items = False				
                 create_edit = False
                 themes_hierarchy = True
-                
+
                 theme_topic_node = collection.Node.one({'_id': ObjectId(app_GST._id)})
                 
                 # For edititng themes 
@@ -305,8 +305,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
                     if translate != "true":
                         # For storing and maintaning collection order
-                        theme_topic_node.collection_set = []
                         if collection_list != '':
+                            theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
                             
                         i = 0
@@ -317,6 +317,7 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 theme_topic_node.collection_set.append(node_id)
                                 
                             i = i+1
+                            
                         theme_topic_node.save() 
                         # End of storing collection
 
@@ -385,8 +386,6 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                     nodes_list = json.dumps(nodes_list)
                     # End of finding unique sub themes
 
-
-                    
                                 
                     if name:
                         if theme_topic_node._id in root_themes_id:  
@@ -401,9 +400,9 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                                 
 
                     if translate != "true":
-                        # For storing and maintaning collection order
-                        theme_topic_node.collection_set = []
+                        # For storing and maintaning collection order                        
                         if collection_list != '':
+                            theme_topic_node.collection_set = []
                             collection_list = collection_list.split(",")
                             
                         i = 0
@@ -458,8 +457,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
 
                         if collection_list:
                             # For storing and maintaning collection order
-                            theme_topic_node.collection_set = []
                             if collection_list != '':
+                                theme_topic_node.collection_set = []
                                 collection_list = collection_list.split(",")
             
                             i = 0
@@ -478,8 +477,8 @@ def theme_topic_create_edit(request, group_id, app_set_id=None):
                         get_node_metadata(request,theme_topic_node,topic_GST)
                         
                         
-                        theme_topic_node.prior_node = []
                         if prior_node_list != '':
+                            theme_topic_node.prior_node = []
                             prior_node_list = prior_node_list.split(",")
                             
                         i = 0

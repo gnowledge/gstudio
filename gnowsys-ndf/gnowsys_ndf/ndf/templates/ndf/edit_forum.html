@@ -1,7 +1,7 @@
 {% extends "ndf/base.html" %}
 {% load ndf_tags %}
 {% load i18n %}
-{% block title %}Create Forum{% endblock %}
+{% block title %}Edit Forum{% endblock %}
 
 {% block head %}
     
@@ -53,24 +53,24 @@
 
 
 {% block meta_content %}
-{% blocktrans %}  <h3 class="subheader">Starting Discussions</h3>
+{% blocktrans %}  <h3 class="subheader">Existing Discussion</h3>
   <p class="text-justify">Use a relevant topic for the <b>forum</b> so that interested people can join the discussion</p> {% endblocktrans %}
 {% endblock %}
 
 {% block body_content %} 
     
-  <h2>{% trans "Create a new discussion thread" %}</h2>
+  <h2>{% trans "Edit this discussion thread" %}</h2>
   <hr/>
 
-  <form id="create_forum" method="POST">
+  <form id="edit_forum" method="POST">
   {% csrf_token %}
 
     <!-- forum name   -->
     <div class="row">
       <div class="large-2 medium-4 columns "><h5><b>{% trans "Forum name:" %} </b></h5></div>
       <div class="large-pull-4 large-6 medium-8 columns">
-        <input type="text" placeholder="Enter the name of forum here" 
-        name="forum_name" id="forum_name">
+        <input type="text" placeholder="Forum Name " 
+        name="forum_name" id="forum_name" value="{{forum.name}}">
       </div>
     </div>
     <br/><br/>
@@ -97,7 +97,7 @@
            style="padding:0 1.65em 0 1.4em;">
 
         <textarea id="orgitdown" name="content_org" 
-        placeholder="Some description about forum ..."></textarea>
+        placeholder="Some description about forum ..." value=""></textarea>
         <div id="message" style="display:none; color:red"></div>
         <input type="hidden" id="nodes_list" value="{{nodes_list}}">                  
         <!-- <input type="button" id="save_edit_cont" class="button" value="Save"> -->
@@ -107,9 +107,9 @@
       <!-- Final Create forum button -->
       <div class="large-8 columns">
 
-        <input type="submit" id="forum" value="Create Forum" style="display:none">
+        <input type="submit" id="forum" value="Edit Forum" style="display:none">
 
-        <input type="button" id="save_form" class="button expand" value="Create forum" onclick="saveforum()">
+        <input type="button" id="save_form" class="button expand" value="Save forum" onclick="saveforum()">
       </div>
 
     </div>
@@ -197,6 +197,8 @@
 
   // method to provide autocomplete/intellisence of forum names
   $(document).ready(function(){
+    var content_var = "{{forum.content_org}}";
+    $("#orgitdown").val(content_var);
     $("#forum_name").change(function(){
 
       var name = $("#forum_name").val();

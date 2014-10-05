@@ -65,9 +65,6 @@ GST_IMAGE = collection.GSystemType.one({'name': GAPPS[3], '_type':'GSystemType'}
 GST_VIDEO = collection.GSystemType.one({'name': GAPPS[4], '_type':'GSystemType'})
 pandora_video_st = collection.Node.one({'$and':[{'name':'Pandora_video'}, {'_type':'GSystemType'}]})
 app=collection.Node.one({'name':u'File','_type':'GSystemType'})
-pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id})
-     
-    
 
 # VIEWS DEFINED FOR GAPP -- 'FILE'
 
@@ -121,6 +118,8 @@ def file(request, group_id, file_id=None):
         shelves = []
     # End of user shelf
 
+    pandoravideoCollection=collection.Node.find({'member_of':pandora_video_st._id, 'group_set': ObjectId(group_id) })
+
     if request.method == "POST":
       # File search view
       title = GST_FILE.name
@@ -154,7 +153,10 @@ def file(request, group_id, file_id=None):
                                                 'group_set': {'$all': [ObjectId(group_id)]}
                                             },
 
-                                               {'member_of': {'$all': [pandora_video_st._id]}}]
+                                               {'member_of': {'$all': [pandora_video_st._id]},
+                                                'group_set': {'$all': [ObjectId(group_id)]}
+                                               }
+                                              ]
                                     }).sort('last_update', -1)
       else:
           files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
@@ -287,7 +289,6 @@ def file(request, group_id, file_id=None):
       datavisual = json.dumps(datavisual)
 
       already_uploaded = request.GET.getlist('var', "")
-
       return render_to_response("ndf/file.html",
                                 {'title': title,
                                  'appId':app._id,
@@ -306,7 +307,6 @@ def file(request, group_id, file_id=None):
       title = GST_FILE.name
       datavisual = []
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
-
           files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
                                                 '_type': 'File', 'fs_file_ids':{'$ne': []}, 
                                                 'group_set': {'$all': [ObjectId(group_id)]},
@@ -318,8 +318,9 @@ def file(request, group_id, file_id=None):
                                                     ]
                                                  }
                                                 ]
-                                            },
-                                               {'member_of': {'$all': [pandora_video_st._id]}}
+                                                },{'member_of': {'$all': [pandora_video_st._id]}, 
+                                                  'group_set': {'$all': [ObjectId(group_id)]}
+                                                  }
                                            ]}).sort("last_update", -1)
       else:
           files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
@@ -389,8 +390,7 @@ def file(request, group_id, file_id=None):
 
       # pandora_video_id = []
       # source_id_set=[]
-      get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'_type':'File'}]})
-      
+      get_member_set = collection.Node.find({'$and':[{'member_of': {'$all': [ObjectId(pandora_video_st._id)]}},{'group_set': ObjectId(group_id)},{'_type':'File'}]})
       #for each in get_member_set:
   
        #  pandora_video_id.append(each['_id'])
@@ -405,7 +405,6 @@ def file(request, group_id, file_id=None):
               # for each in pandora_video_id:
               #     get_video = collection.GSystem.find({'member_of': {'$all': [ObjectId(file_id)]}, '_type': 'File', 'group_set': {'$all': [ObjectId(group_id)]}})
                    
-
       datavisual.append({"name":"Doc", "count":docCollection.count()})
       datavisual.append({"name":"Image","count":imageCollection.count()})
       datavisual.append({"name":"Video","count":videoCollection.count()})
@@ -873,6 +872,7 @@ def file_detail(request, group_id, _id):
     """Depending upon mime-type of the node, this view returns respective display-view.
     """
     ins_objectid  = ObjectId()
+    imageCollection=""
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
@@ -896,6 +896,27 @@ def file_detail(request, group_id, _id):
         if file_node.mime_type == 'video':      
             file_template = "ndf/video_detail.html"
         elif 'image' in file_node.mime_type:
+            imageCollection=imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
+                                              '_type': 'File', 
+                                              '$or': [
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                      {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                ,
+                                                {'$and': [
+                                                  {'$or': [
+                                                    {'access_policy': u"PUBLIC"},
+                                                    {'$and': [{'access_policy': u"PRIVATE"}, {'created_by': request.user.id}]}
+                                                    ]
+                                                  }
+                                                  ]
+                                                }
+                                              ],
+                                              'group_set': {'$all': [ObjectId(group_id)]}
+                                            }).sort("last_update", -1)
+
             file_template = "ndf/image_detail.html"
         else:
             file_template = "ndf/document_detail.html"
@@ -938,7 +959,8 @@ def file_detail(request, group_id, _id):
                                 'annotations' : annotations,
                                 'shelf_list': shelf_list,
                                 'shelves': shelves, 
-                                'breadcrumbs_list': breadcrumbs_list
+                                'breadcrumbs_list': breadcrumbs_list,
+                                'imageCollection':imageCollection,
                               },
                               context_instance = RequestContext(request)
                              )
@@ -1068,82 +1090,155 @@ def file_edit(request,group_id,_id):
                                   context_instance=RequestContext(request)
                               )
 
+
 # data review in File app
 @login_required
 def data_review(request, group_id, page_no=1):
-  '''
-  To get all the information related to every resource object in the group.
-  '''
-  # getting group obj from name
+    '''
+    To get all the information related to every resource object in the group.
+    '''
+    # getting group obj from name
 
-  group_obj = collection.Node.one({ "_type": {"$in":["Group", "Author"]}, "name": unicode(group_id) })
-  
-  # checking if passed group_id is group name or group Id
-  if group_obj and (group_id == group_obj.name):
-    group_name = group_id
-    group_id = group_obj._id
-  
-  else: # passes group_id is _id and not name
-    ins_objectid  = ObjectId()
-    if ins_objectid.is_valid(group_id):
-      group_obj = collection.Node.one({ "_id":ObjectId(group_id) }) # retrieve Obj by _id
-      if group_obj:
-        group_name = group_obj.name
-        group_id = group_id       # for clarity
+    group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
 
-  file_id = collection.Node.find_one({'_type':"GSystemType", "name":"File"}, {"_id":1})
+    # checking if passed group_id is group name or group Id
+    if group_obj and (group_id == group_obj.name):
+        # group_name = group_id
+        group_id = group_obj._id
+      
+    else:  # passes group_id is _id and not name
+        ins_objectid = ObjectId()
+        if ins_objectid.is_valid(group_id):
+            # retrieve Obj by _id
+            group_obj = collection.Node.one({"_id": ObjectId(group_id)})
+            if group_obj:
+                # group_name = group_obj.name
+                group_id = group_id       # for clarity
 
-  # print group_obj
-  files_obj = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id._id)]}, 
-                                    '_type': 'File', 'fs_file_ids':{'$ne': []}, 
+    file_id = collection.Node.find_one({'_type': "GSystemType", "name": "File"}, {"_id": 1})
+
+    # print group_obj
+    files_obj = collection.Node.find({'$or': [
+                                    {'member_of': {'$all': [ObjectId(file_id._id)]},
+                                    '_type': 'File', 'fs_file_ids': {'$ne': []},
                                     'group_set': {'$all': [ObjectId(group_id)]},
                                     '$or': [
-                                      {'access_policy': u"PUBLIC"},
-                                      {'$and': [
-                                          {'access_policy': u"PRIVATE"}, 
-                                          {'created_by': request.user.id}
-                                        ]
-                                      }
+                                        {'access_policy': u"PUBLIC"},
+                                        {'$and': [
+                                            {'access_policy': u"PRIVATE"},
+                                            {'created_by': request.user.id}
+                                            ]
+                                        }
                                     ]},
-                                      {'member_of': {'$all': [pandora_video_st._id]}}
-
-                                       ]}).sort("last_update", -1)
+                                        {'member_of': {'$all': [pandora_video_st._id]}}
+                                        ]}).sort("last_update", -1)
                                  
-  
-  # implementing pagination: paginator.Paginator(cursor_obj, <int: page no>, <int: no of obj in each page>)
-  # (ref: https://github.com/namlook/mongokit/blob/master/mongokit/paginator.py)
-  paged_resources = paginator.Paginator(files_obj, page_no, 10)
+    # implementing pagination: paginator.Paginator(cursor_obj, <int: page no>, <int: no of obj in each page>)
+    # (ref: https://github.com/namlook/mongokit/blob/master/mongokit/paginator.py)
+    paged_resources = paginator.Paginator(files_obj, page_no, 10)
 
-  # list to hold resources instances with it's attributes and relations
-  files_list = []
+    # list to hold resources instances with it's attributes and relations
+    files_list = []
 
-  for each_resource in paged_resources.items:
-    each_resource.get_neighbourhood(each_resource.member_of)
-    files_list.append(collection.GSystem(each_resource))
-    # print "\n\n\n========", each_resource.keys()
-    # for each, val in each_resource.iteritems():
-      # print each, "--", val,"\n"
+    for each_resource in paged_resources.items:
+        each_resource.get_neighbourhood(each_resource.member_of)
+        files_list.append(collection.GSystem(each_resource))
+        # print "\n\n\n========", each_resource.keys()
+        # for each, val in each_resource.iteritems():
+          # print each, "--", val,"\n"
 
-  files_obj.close();
+    files_obj.close()
 
-  return render_to_response("ndf/data_review.html",
-                            {
-                              "group_id": group_id, "groupid": group_id,
-                              "files": files_list, "page_info": paged_resources,
-                              "static_educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
-                              # "static_language": EXTRA_LANG_INFO,
-                              "static_language": GSTUDIO_RESOURCES_LANGUAGES,
-                              "static_educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
-                              "static_interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
-                              "static_educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
-                              "static_educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
-                              "static_curricular": GSTUDIO_RESOURCES_CURRICULAR,
-                              "static_audience": GSTUDIO_RESOURCES_AUDIENCE,
-                              "static_status": list(STATUS_CHOICES),
-                              "static_textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
-                            },
-                            context_instance=RequestContext(request)
-                          )
+    return render_to_response("ndf/data_review.html",
+        {
+            "group_id": group_id, "groupid": group_id,
+            "files": files_list, "page_info": paged_resources,
+            "static_educationalsubject": GSTUDIO_RESOURCES_EDUCATIONAL_SUBJECT,
+            # "static_language": EXTRA_LANG_INFO,
+            "static_language": GSTUDIO_RESOURCES_LANGUAGES,
+            "static_educationaluse": GSTUDIO_RESOURCES_EDUCATIONAL_USE,
+            "static_interactivitytype": GSTUDIO_RESOURCES_INTERACTIVITY_TYPE,
+            "static_educationalalignment": GSTUDIO_RESOURCES_EDUCATIONAL_ALIGNMENT,
+            "static_educationallevel": GSTUDIO_RESOURCES_EDUCATIONAL_LEVEL,
+            "static_curricular": GSTUDIO_RESOURCES_CURRICULAR,
+            "static_audience": GSTUDIO_RESOURCES_AUDIENCE,
+            "static_status": list(STATUS_CHOICES),
+            "static_textcomplexity": GSTUDIO_RESOURCES_TEXT_COMPLEXITY
+        },
+        context_instance=RequestContext(request)
+    )
 # ---END of data review in File app
 
 
+# saving resource object of data review
+@login_required
+def data_review_save(request, group_id):
+    '''
+    Method to save each and every data-row edit of data review app
+    '''
+
+    # getting group obj from name
+    group_obj = collection.Node.one({"_type": {"$in": ["Group", "Author"]}, "name": unicode(group_id)})
+
+    # checking if passed group_id is group name or group Id
+    if group_obj and (group_id == group_obj.name):
+        group_id = group_obj._id
+  
+    else:  # passes group_id is _id and not name
+        ins_objectid = ObjectId()
+        if ins_objectid.is_valid(group_id):
+            # retrieve Obj by _id
+            group_obj = collection.Node.one({"_id": ObjectId(group_id)})
+            if group_obj:
+                group_id = group_id       # for clarity
+
+    node_oid = request.POST.get("node_oid", "")
+    node_details = request.POST.get("node_details", "")
+    node_details = json.loads(node_details)
+
+    # updating some key names of dictionary as per get_node_common_fields.
+    node_details["lan"] = node_details.pop("language")
+    node_details["prior_node_list"] = node_details.pop("prior_node")
+    node_details["login-mode"] = node_details.pop("access_policy")
+    # node_details["collection_list"] = node_details.pop("collection") for future use
+
+    # Making copy of POST QueryDict instance.
+    # To make it mutable and fill in node_details value/s.
+    post_req = request.POST.copy()
+
+    # removing node_details dict from req
+    post_req.pop('node_details')
+    
+    # adding values to post req
+    post_req.update(node_details)
+
+    # overwriting request.POST with newly created QueryDict instance post_req
+    request.POST = post_req
+    # print "\n---\n", request.POST, "\n---\n"
+
+    license = request.POST.get('license', '')
+    
+    file_node = collection.File.one({"_id": ObjectId(node_oid)})
+    if request.method == "POST":
+        get_node_common_fields(request, file_node, group_id, GST_FILE)
+        file_node.license = license if license else file_node.license
+        file_node.save()
+
+    # to fill/update attributes of the node
+    get_node_metadata(request, file_node, GST_FILE)
+
+    teaches_list = request.POST.get('teaches','') # get the teaches list 
+
+    if teaches_list !='':
+        teaches_list=teaches_list.split(",")
+        create_grelation_list(file_node._id,"teaches",teaches_list)
+
+    assesses_list = request.POST.get('assesses_list','')
+    
+    if assesses_list !='':
+        assesses_list=assesses_list.split(",")
+        create_grelation_list(file_node._id,"assesses",assesses_list)
+
+    return HttpResponse("")
+
+# ---END of data review saving.

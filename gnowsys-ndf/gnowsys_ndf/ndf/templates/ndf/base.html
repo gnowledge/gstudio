@@ -244,10 +244,6 @@
       	    </ul>
       	  </li>
             
-<!-- Extra group selector-->
-            {% get_gapps_menubar request groupid %}
-            
-
       	</ul>
         <!-- Closes Left Nav section -->
       </section>
@@ -276,7 +272,7 @@
               
               <ul class="button-group medium-2 columns">
                 <li class="left">
-                  <a id="toggle-shelf" class="button left-off-canvas-toggle" ><i class='fi-book-bookmark'></i></a> 
+                  <!-- <a id="toggle-shelf" class="button left-off-canvas-toggle">--><i class='button fi-book-bookmark' disabled></i><!--</a>  -->
                 </li>
 
                 <li>
@@ -299,7 +295,8 @@
                   {% endif %}
                   
                   <li class="right">
-<a id="toggle-help" class="button right-off-canvas-toggle" ><i class='fi-lightbulb'></i></a> 
+                    <!--<a id="toggle-help" class="button right-off-canvas-toggle" >--><i class='button fi-lightbulb' disabled></i>
+                    <!--</a> -->
                   </li>
                   
                   </ul>

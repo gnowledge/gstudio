@@ -58,7 +58,7 @@
 	        					{% user_access_policy groupid request.user as user_access %}
 	        					{% if user_access == "allow" %}
 
-	                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/browse topic/'+node.id+'/"> </a>' 
+	                				'&nbsp;&nbsp;<a id="top" class="topic" href="/{{groupid}}/topics/'+node.id+'/"> </a>' 
 
 	                			{% endif %}
 	            			);	            			
@@ -70,7 +70,7 @@
 	        					{% user_access_policy groupid request.user as user_access %}
 	        					{% if user_access == "allow" %}
 
-	                				'&nbsp;&nbsp;<a href="/{{groupid}}/browse topic/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
+	                				'&nbsp;&nbsp;<a href="/{{groupid}}/topics/'+node.id+'/"> <i class="fi-pencil edit"></i></a> &nbsp;&nbsp; <a id='+node.id+' class="objectsCheckbox"> <input type="checkbox"> </a>' 
 	                			
 	                			{% endif %}
             				);
@@ -272,29 +272,36 @@
 	<!-- For displaying themes items -->
 	{% if themes_cards  %}
 
-	<h2>Themes</h2><hr/>
+	<h3 class="subheader">Themes</h3><hr/>
 		<div class="content row" id="panel2-4">
 
 		<ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
 
   		<!-- Existing card list-->
-                {% get_preferred_lang request group_id nodes "Theme" as nodes %}
-		
+        {% get_preferred_lang request group_id nodes "Theme" as nodes %}
+		{% group_type_info groupid request.user as grouptype %}
 	  	{% for each in nodes %}
-		    <li class="card">
-		      <div class="page">
-		      	<div class="label-list">{% for tag in each.tags|slice:":3" %}
-		          <a href="{% url 'tag_info' group_name_tag tag %}"><span class="label">{{tag}}</span></a>
-		        {% endfor %}</div>
 
-		        <a href="{% url 'theme_page' group_name_tag each.pk %}">
-		      <header>
-		        <h5>
-		          {{ each.name }}{% if each.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
-		        </h5>
-		      </header>
+	      <li class="card">
+	        {% if grouptype == "Moderated" %}
+	          {% if each.status == "DRAFT" %}
+	            <div class="draft page">
+	          {% elif each.status == "PUBLISHED" %}
+	            <div class="published page">
+	          {% endif %}
+	        {% else %}
+	          <div class='{% if each.status == "PUBLISHED" %}published{% endif %} page'>
+	        {% endif %} 
 
-		      <p>{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</p>
+		      <a href="{% url 'theme_page' group_name_tag each.pk %}">
+		      <div class="row">
+            	<div class="small-10 columns">                             
+	                <b>
+	                  {{ each.name }}{% if each.collection_set %} <i class="fi-page-multiple"></i> {% endif %}
+	                </b>
+            	</div>
+          	  </div>
+		      <span style="font-size:12px;">{{ each.html_content|default_if_none:"Add some description."|safe|striptags|truncatechars:75 }}</span><br/>
 		      
 		      <footer>
 		          <div class="age">
@@ -307,6 +314,14 @@
           
       		  </footer>
       		  </a>
+
+      		  <div class="label-list small-12 columns">
+	            {% for tag in each.tags|slice:":3" %}
+	              <a href="{% url 'tag_info' group_name_tag tag %}">
+	                <span class="label" style="background-color:yellow">{{tag}}</span>
+	              </a>
+	            {% endfor %}
+	          </div>
 
 		      </div>
 		    </li>  

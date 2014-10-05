@@ -5,16 +5,6 @@
 
 {% block meta_content %}
 
-<h2>{% trans "Media" %}</h2>
-
-{% if user.is_authenticated %}
-{% user_access_policy groupid request.user as user_access %}
-{% if user_access == "allow" %}
-<br/>
-<a class="button small" href="{% url 'uploadDoc' group_name_tag %}?next={{request.path}}">
-  <span class="fi-upload">  {% trans "Upload File" %}</span>
-</a>
-{% endif %}
-{% endif %}
+<h2 class="subheader">{% trans "Media" %}</h2>
 
 {% endblock %}

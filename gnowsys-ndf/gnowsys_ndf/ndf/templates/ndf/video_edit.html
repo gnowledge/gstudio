@@ -2,13 +2,6 @@
 {% load i18n %}
 {% block meta_content %}
 
-<h2>{% trans "Gallery" %}</h2>
-
-{% if user.is_authenticated %}
-<br/>
-<a class="button small" href="{% url 'uploadDoc' groupid %}?next={{request.path}}">
-  <span class="fi-upload">  {% trans "Upload File" %}</span>
-</a>
-{% endif %}
+<h3 class="subheader">{% trans "Editor" %}</h3>
 
 {% endblock %}

@@ -81,8 +81,24 @@ class Command(BaseCommand):
           meta_type = create_meta_type(user_id) #creating MetaType
         
         for each in GAPPS:
+
+          # Temporarily made this change for renaming "Browse Topic & Browse Resource" untill all servers will be updated
+          if each == "Topics":
+            br_topic = collection.Node.one({'_type':'GSystemType', 'name': 'Browse Topic'})
+            if br_topic:
+              br_topic.name = unicode(each)
+              br_topic.save()
+
+          if each == "E-Library":
+            br_resource = collection.Node.one({'_type':'GSystemType', 'name': 'Browse Resource'})
+            if br_resource:
+              br_resource.name = unicode(each)
+              br_resource.save()
+          # Keep above part untill all servers updated
+          
           node_doc = collection.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':each}]})
           if (node_doc == None or each != node_doc['name']):
+
             gst_node=collection.GSystemType()
             gst_node.name = unicode(each)
             gst_node.created_by = user_id
@@ -372,6 +388,7 @@ def create_rts(factory_relation_types,user_id):
     subject_type_id_list = []
     object_type_id_list = []
     for key,value in each.items():
+      print key,value
       at_name = key
       inverse_name = value['inverse_name']
 
@@ -382,11 +399,20 @@ def create_rts(factory_relation_types,user_id):
           meta_type_id = meta_type._id
 
       for s in value['subject_type']:
+        
         node_s = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': s}]})
+        if node_s is None:
+          node_s = collection.Node.one({'$and':[{'_type': u'MetaType'},{'name': s}]})
+          
         subject_type_id_list.append(node_s._id)
+       
       for rs in value['object_type']:
         node_rs = collection.Node.one({'$and':[{'_type': u'GSystemType'},{'name': rs}]})
+        if node_rs is None:
+          node_rs =collection.Node.one({'$and':[{'_type': u'MetaType'},{'name': rs}]})
+  
         object_type_id_list.append(node_rs._id)
+        
     create_relation_type(at_name, inverse_name, user_id, subject_type_id_list, object_type_id_list, meta_type_id)
 
 def create_sts(factory_gsystem_types,user_id):
@@ -399,16 +425,16 @@ def create_sts(factory_gsystem_types,user_id):
       meta_type_id = meta_type._id
     create_gsystem_type(name, user_id, meta_type_id)
 
-  # For creating Browse Topic as a collection of Theme & Topic
+  # For creating Topics as a collection of Theme & Topic
   theme_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Theme'})
   topic_GST = collection.Node.one({'_type': 'GSystemType', 'name': 'Topic'})
-  br_topic = collection.Node.one({'_type': 'GSystemType', 'name': 'Browse Topic'})
-  if not br_topic.collection_set:
-    br_topic.collection_set.append(theme_GST._id)
-    br_topic.collection_set.append(topic_GST._id)
-    br_topic.created_by = 1
-    br_topic.modified_by = 1
-    br_topic.save()
+  topics = collection.Node.one({'_type': 'GSystemType', 'name': 'Topics'})
+  if not topics.collection_set:
+    topics.collection_set.append(theme_GST._id)
+    topics.collection_set.append(topic_GST._id)
+    topics.created_by = 1
+    topics.modified_by = 1
+    topics.save()
 
 def clean_structure():
   '''

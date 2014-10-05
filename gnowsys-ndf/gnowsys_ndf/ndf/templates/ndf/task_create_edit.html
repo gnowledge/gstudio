@@ -141,27 +141,12 @@ $('#hidden_watchers').val(selected);
 
 
 {% block meta_content %}
-  <h2>Task </h2>
+  <h3 class="subheader">{% trans "Task Editor" %} </h3>
 {% endblock %}
 
 
 {% block search_content %}
   {% include "ndf/node_search_base.html" %}
-{% endblock %}
-
-{% block related_content %}
-  {% if user.is_authenticated %}
-  {% user_access_policy groupid request.user as user_access %}
-  {% if user_access == "allow" %}
-  <br/>
-     <div class="task">
-      <br/>
-      <a class="button medium" href="{% url 'task_create_edit' group_name %}">
-      	<span class="fi-plus">&nbsp;&nbsp;New Task</span>
-      </a>
-    </div>
-  {% endif %}
-  {% endif %}
 {% endblock %}
   
 {% block body_content %}

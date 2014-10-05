@@ -70,34 +70,32 @@ background-repeat:no-repeat; background-size: 48px 48px
     <div class="edit-card">
         
 	    <div class="row">
-	    	<nav class="large-12 columns">
-	      	<dl class="tabs" data-tab data-options="deep_linking:true">
-				<dd class="active" title="Click here to add Name, Description, Privacy and Tags">
+	      	<dl class="tabs pill large-12 columns">
+				<dd class="active" id="node_tab" title="Click here to add Name, Description, Privacy and Tags">
 		  		<!-- change name of collection tab overide block in your code -->
-		  			<a class="node_tab" href="#panel-name-description">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
+		  			<a class="node_tab">{% block page_tab %} {% trans "Node" %} {% endblock %}</a>
 				</dd>
-				<dd title="Click here to add/edit Prior Node">
-				  	<a href="#panel-prior-node" class="prior_node_tab">{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
+				<dd id="pr_node_tab" title="Click here to add/edit Prior Node">
+				  	<a class="prior_node_tab">{% block prior_node_tab %} {% trans "Requires" %} {% endblock %}</a>
 				</dd>
 				<!-- change name of collection tab overide block in your code -->
-				<dd title="Click here to add/edit collection">
-				  	<a href="#panel-collection" class="collection_tab">{% block collection_tab %} {% trans "Collection" %} {% endblock %}</a> 
+				<dd id="coll_tab" title="Click here to add/edit collection">
+				  	<a class="collection_tab">{% block collection_tab %} {% trans "Collection" %} {% endblock %}</a>
 				</dd>  
 
 				<!-- change name of metadata tab overide block in your code -->
-				<dd title="Click here to add/edit metadata">
-				  	<a href="#panel-metadata" class="metadata_tab">{% trans "Metadata" %} </a> 
+				<dd id="meta_tab" title="Click here to add/edit metadata">
+				  	<a class="metadata_tab">{% trans "Metadata" %} </a> 
 				</dd>  
 		
-				<dd title="Click here to add/edit teaches">
-				 	<a href="#panel-teaches" class="teaches_tab" >{% trans "Teaches" %} </a> 
+				<dd id="teach_tab" title="Click here to add/edit teaches">
+				 	<a class="teaches_tab" >{% trans "Teaches" %} </a> 
 				</dd>
 		
-				<dd title="Click here to add/edit teaches">
-				 	<a href="#panel-assesses" class="assesses_tab" >{% trans "Assesses" %} </a> 
+				<dd id="asses_tab" title="Click here to add/edit teaches">
+				 	<a class="assesses_tab" >{% trans "Assesses" %} </a> 
 				</dd>	
 	     	</dl>     
-	   		</nav>           
 	            
 	   	</div>
 	</div>
@@ -219,7 +217,7 @@ background-repeat:no-repeat; background-size: 48px 48px
     
     {% block prior_node %}
 
-    <div class="content" id="panel-prior-node">
+    <div class="content" style="display:none;" id="panel-prior-node">
       <div class="row">
 		<div class="small-12 columns">
 		  	<div id="prior_node_drawer">
@@ -233,7 +231,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
     {% block collection %}
 
-    <div class="content" id="panel-collection">
+    <div class="content" style="display:none;" id="panel-collection">
 	    <div class="row">
 			<div class="small-12 columns" {% ifequal title "Quiz" %}style="display:none;"{% endifequal %}></div>
 		</div>
@@ -282,7 +280,7 @@ background-repeat:no-repeat; background-size: 48px 48px
       
     {% endblock %}
     
-    <div class="content" id="panel-metadata" style="width:95%;" >      
+    <div class="content" id="panel-metadata" style="width:95%; display:none;" >      
       	<div class="row">
 		  	<h3>{% trans "Please add or edit Metadata." %} </h3>
 
@@ -377,7 +375,7 @@ background-repeat:no-repeat; background-size: 48px 48px
 
         
    
-    <div class="content" id="panel-teaches"  style="width:95%;">
+    <div class="content" id="panel-teaches"  style="width:95%; display:none;">
   		<div class="row">
 			<div class="small-12 columns">
   				<h5>{% trans "Add or edit Teaches: " %}</h5>
@@ -392,7 +390,7 @@ background-repeat:no-repeat; background-size: 48px 48px
       	</div>
     </div>
 	
-    <div class="content" id="panel-assesses"  style="width:95%;">
+    <div class="content" id="panel-assesses"  style="width:95%; dsplay:none;">
   		<div class="row">
 			<div class="small-12 columns">
   				<h5>{% trans "Add or edit Assesses:" %} </h5>
@@ -516,14 +514,7 @@ $(document).ready(function(){
 		$(".assesses_tab").show();
 
 	} 
-
-	$(".prior_node_tab").trigger('click');
-	$(".metadata_tab").trigger('click');
-	$(".teaches_tab").trigger('click');
-	$(".assesses_tab").trigger('click');
-	$(".collection_tab").trigger('click');
-	$(".node_tab").trigger('click');
-
+	
 	$("#name_id").change(function(){
 
 		var name = $("#name_id").val();
@@ -585,7 +576,6 @@ $(document).ready(function(){
 						datatype: "html",
 						data:{							
 							homo_collection: homo_coll,
-							collection_list: cn_list,
 							node_id: node_id,
 							page_no: this.name,
 							csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -603,79 +593,46 @@ $(document).ready(function(){
 		});
 
 	});
-				
-	// 			if ($.trim(data) === "Warning") {
+	
 
-	// 				var r = confirm("Do you want to save this selection for collection ?");
-	// 	            if (r == true){
+	$(".node_tab").click(function() {
+		// for activating "panel-name-description" div and deactivate other div's
+		$("#panel-prior-node").css("display", "none");
+		$("#panel-teaches").css("display", "none");
+		$("#panel-assesses").css("display", "none");
+		$("#panel-collection").css("display", "none");
+		$("#panel-metadata").css("display", "none");
+		$("#panel-name-description").css("display", "block");
+		// For highlighting current clicked element
+		$("#pr_node_tab").removeClass("active");
+		$("#teach_tab").removeClass("active");
+		$("#asses_tab").removeClass("active");
+		$("#coll_tab").removeClass("active");
+		$("#meta_tab").removeClass("active");
+		$("#node_tab").addClass("active");		
 
-	// 	            	$.ajax({
-	// 						type: "POST",
-	// 						url: "{#% url 'select_drawer' groupid %#}",
-	// 						datatype: "html",
-	// 						data:{							
-	// 							homo_collection: homo_coll,
-	// 							collection_list: cn_list,
-	// 							node_id: '{{node.pk}}',
-	// 							selection_save: "True",
-	// 							page_no: 1,
-	// 							csrfmiddlewaretoken: '{{ csrf_token }}'
-	// 						},
-	// 						success: function(data) {													
-	// 							// cnt(data)
-	// 							alert("Saved element in collection Successfully");
-	// 							$("input:radio").prop('checked', false);
-	// 							$(".collection_tab").trigger('click');
-	// 							// location.reload(true);
-	// 						}
+	});	
 
-	// 					});
-	// 	            }
-	// 	            else{
+	$(".metadata_tab").click(function() {
+		// for activating "panel-metadata" div and deactivate other div's
+		$("#panel-prior-node").css("display", "none");
+		$("#panel-teaches").css("display", "none");
+		$("#panel-assesses").css("display", "none");
+		$("#panel-collection").css("display", "none");
+		$("#panel-name-description").css("display", "none");
+		$("#panel-metadata").css("display", "block");
+		// For highlighting current clicked element
+		$("#pr_node_tab").removeClass("active");
+		$("#teach_tab").removeClass("active");
+		$("#asses_tab").removeClass("active");
+		$("#coll_tab").removeClass("active");
+		$("#node_tab").removeClass("active");
+		$("#meta_tab").addClass("active");
 
-	// 	            	$("input:radio").prop('checked', false);
-	// 					$(".collection_tab").trigger('click');
-	// 	            }
-
-	// 	        }
-	// 	        else{
-
-	// 	        	$("#collection_drawer").html(data);
-				
-	// 				$(".next_prev").click(function() {
-						
-	// 					// alert(this.name);
-	// 				 	$.ajax({
-	// 						type: "POST",
-	// 						url: "{#% url 'select_drawer' groupid %#}",
-	// 						datatype: "html",
-	// 						data:{							
-	// 							homo_collection: homo_coll,
-	// 							collection_list: cn_list,
-	// 							node_id: '{{node.pk}}',
-	// 							page_no: this.name,
-	// 							csrfmiddlewaretoken: '{{ csrf_token }}'
-	// 						},
-	// 						success: function(data) {													
-	// 							cnt(data)
-	// 						}
-
-	// 					});
-	// 				});
-
-	// 	        }
-
-
-				
-	// 		}
-	// 	});
-
-	// });
-
-
+	});			
 
 	$(".prior_node_tab").click(function() {
-		
+
 		$("#save-node").css("display", "none");
 		$('#prior_node_drawer').html('<img src="/static/ndf/images/ajax-wait.gif" height="40" width="40"> loading...');
 
@@ -691,7 +648,21 @@ $(document).ready(function(){
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function cnt(data) {
-				// alert(data);
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+				$("#panel-teaches").css("display", "none");
+				$("#panel-assesses").css("display", "none");
+				$("#panel-collection").css("display", "none");
+				$("#panel-metadata").css("display", "none");
+				$("#panel-name-description").css("display", "none");
+				$("#panel-prior-node").css("display", "block");
+				// For highlighting current clicked element
+				$("#teach_tab").removeClass("active");
+				$("#asses_tab").removeClass("active");
+				$("#coll_tab").removeClass("active");
+				$("#meta_tab").removeClass("active");
+				$("#node_tab").removeClass("active");
+				$("#pr_node_tab").addClass("active");
+				// To fill the drawer with returned data from ajax
 				$("#prior_node_drawer").html(data);
 				$("#save-node").css("display", "block");
 
@@ -741,7 +712,21 @@ $(document).ready(function(){
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function cnt(data) {
-
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+				$("#panel-prior-node").css("display", "none");
+				$("#panel-name-description").css("display", "none");
+				$("#panel-teaches").css("display", "none");
+				$("#panel-metadata").css("display", "none");
+				$("#panel-assesses").css("display", "none");
+				$("#panel-collection").css("display", "block");
+				// For highlighting current clicked element
+				$("#node_tab").removeClass("active");
+				$("#pr_node_tab").removeClass("active");
+				$("#meta_tab").removeClass("active");
+				$("#teach_tab").removeClass("active");
+				$("#asses_tab").removeClass("active");
+				$("#coll_tab").addClass("active");
+				// To fill the drawer with returned data from ajax
 				$("#collection_drawer").html(data);
 				$("#module_drawer").html(data);
 				$("#SelectApp").css("display", "block");				
@@ -793,6 +778,21 @@ $(document).ready(function(){
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function cnt(data) {
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+				$("#panel-assesses").css("display", "none");
+				$("#panel-collection").css("display", "none");
+				$("#panel-name-description").css("display", "none");
+				$("#panel-prior-node").css("display", "none");
+				$("#panel-metadata").css("display", "none");
+				$("#panel-teaches").css("display", "block");
+				// For highlighting current clicked element
+				$("#asses_tab").removeClass("active");
+				$("#coll_tab").removeClass("active");
+				$("#node_tab").removeClass("active");
+				$("#meta_tab").removeClass("active");
+				$("#pr_node_tab").removeClass("active");
+				$("#teach_tab").addClass("active");
+				// To fill the drawer with returned data from ajax
 				$("#teaches_drawer").html(data);
 				$("#save-node").css("display", "block");
 
@@ -841,7 +841,21 @@ $(document).ready(function(){
 				csrfmiddlewaretoken: '{{ csrf_token }}'
 			},
 			success: function cnt(data) {
-				 //alert(data);
+				// for activating div for filling the returned data from ajax according to clicked element and deactivate other div's 
+				$("#panel-collection").css("display", "none");
+				$("#panel-name-description").css("display", "none");
+				$("#panel-prior-node").css("display", "none");
+				$("#panel-metadata").css("display", "none");
+				$("#panel-teaches").css("display", "none");
+				$("#panel-assesses").css("display", "block");
+				// For highlighting current clicked element
+				$("#coll_tab").removeClass("active");
+				$("#node_tab").removeClass("active");
+				$("#meta_tab").removeClass("active");
+				$("#pr_node_tab").removeClass("active");
+				$("#teach_tab").removeClass("active");
+				$("#asses_tab").addClass("active");
+				// To fill the drawer with returned data from ajax
 				$("#assesses_drawer").html(data);
 				$("#save-node").css("display", "block");
 
