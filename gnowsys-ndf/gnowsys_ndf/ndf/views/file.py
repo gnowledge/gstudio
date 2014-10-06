@@ -71,7 +71,7 @@ app=collection.Node.one({'name':u'File','_type':'GSystemType'})
 lock=threading.Lock()
 count = 0    
 
-def file(request, group_id, file_id=None):
+def file(request, group_id, file_id=None, page_no=1):
     """
    * Renders a list of all 'Files' available within the database.
     """
@@ -322,6 +322,8 @@ def file(request, group_id, file_id=None):
                                                   'group_set': {'$all': [ObjectId(group_id)]}
                                                   }
                                            ]}).sort("last_update", -1)
+          file_pages = paginator.Paginator(files, page_no, 24)
+
       else:
           files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
                                         '_type': 'File', 'fs_file_ids':{'$ne': []},
@@ -336,6 +338,9 @@ def file(request, group_id, file_id=None):
                                         ]
                                     }).sort("last_update", -1)
 
+          file_pages = paginator.Paginator(files, page_no, 24)
+
+
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
                                             '_type': 'File','fs_file_ids': {'$ne': []}, 
                                             'group_set': {'$all': [ObjectId(group_id)]},
@@ -349,6 +354,8 @@ def file(request, group_id, file_id=None):
                                             ]
                                           }).sort("last_update", -1)
       
+      doc_pages = paginator.Paginator(docCollection, page_no, 24)
+
       imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
                                               '_type': 'File','fs_file_ids': {'$ne': []}, 
                                               'group_set': {'$all': [ObjectId(group_id)]},
@@ -361,6 +368,8 @@ def file(request, group_id, file_id=None):
                                                 }
                                               ]
                                             }).sort("last_update", -1)
+
+      image_pages = paginator.Paginator(imageCollection, page_no, 24)
       
       videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, 
                                               '_type': 'File','fs_file_ids': {'$ne': []}, 
@@ -374,6 +383,8 @@ def file(request, group_id, file_id=None):
                                                 }
                                               ]
                                             }).sort("last_update", -1)
+
+      video_pages = paginator.Paginator(videoCollection, page_no, 24)
       
       already_uploaded = request.GET.getlist('var', "")     
 
@@ -416,6 +427,8 @@ def file(request, group_id, file_id=None):
                                  'appId':app._id,
                                  'already_uploaded': already_uploaded,'shelf_list': shelf_list,'shelves': shelves,
                                  # 'sourceid':source_id_set,
+                                 'file_pages': file_pages, 'image_pages': image_pages,
+                                 'doc_pages': doc_pages, 'video_pages': video_pages,
                                  'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
                                  'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection, 
                                  'pandoraCollection':get_member_set,'is_video':is_video,'groupid': group_id,
