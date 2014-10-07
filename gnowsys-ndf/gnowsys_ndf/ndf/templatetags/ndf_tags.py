@@ -148,6 +148,7 @@ def get_node_ratings(request,node):
                 dic={}
                 cnt=0
                 userratng=0
+                tot_ratng=0
                 for each in node.rating:
                      if each['user_id'] == user.id:
                              userratng=each['score']
@@ -158,8 +159,12 @@ def get_node_ratings(request,node):
                         tot_ratng=0
                         avg_ratng=0.0
                 else:
-                        tot_ratng=len(node.rating)-cnt
-                        avg_ratng=float(sum)/tot_ratng
+                        if node.rating:
+                           tot_ratng=len(node.rating)-cnt
+                        if tot_ratng:
+                           avg_ratng=float(sum)/tot_ratng
+                        else:
+                           avg_ratng=0.0
                 dic['avg']=avg_ratng
                 dic['tot']=tot_ratng
                 dic['user_rating']=userratng
@@ -333,7 +338,7 @@ def get_all_replies(parent):
 	 gs_collection = db[Node.collection_name]
 	 ex_reply=""
 	 if parent:
-		 ex_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}]})
+		 ex_reply=gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(parent._id)}],'status':{'$nin':['HIDDEN']}})
 		 ex_reply.sort('created_at',-1)
 	 return ex_reply
 
@@ -730,7 +735,7 @@ def get_disc_replies( oid, group_id, global_disc_all_replies, level=1 ):
 def get_forum_twists(forum):
 	gs_collection = db[Node.collection_name]
 	ret_replies = []
-	exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+	exstng_reply = gs_collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
 	exstng_reply.sort('created_at')
 	global global_thread_rep_counter 		# to acces global global_thread_rep_counter and reset it to zero
 	global global_thread_latest_reply
@@ -963,7 +968,6 @@ def get_edit_url(groupid):
 	if node._type == 'GSystem':
 
 		type_name = collection.Node.one({'_id': node.member_of[0]}).name
-                print "typename=",type_name
                 
 		if type_name == 'Quiz':
 			return 'quiz_edit'    
@@ -1323,7 +1327,6 @@ def get_grid_fs_object(f):
 def get_class_list(group_id,class_name):
 	"""Get list of class 
 	"""
-        print "in get_class"
 	class_list = ["GSystem", "File", "Group", "GSystemType", "RelationType", "AttributeType", "MetaType", "GRelation", "GAttribute"]
 	return {'template': 'ndf/admin_class.html', "class_list": class_list, "class_name":class_name,"url":"data","groupid":group_id}
 

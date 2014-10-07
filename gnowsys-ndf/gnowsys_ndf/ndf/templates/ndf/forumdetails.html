@@ -89,12 +89,11 @@
 
     <h2>{% trans "Forum:" %} 
     <a title="{{forum.name}}" href="#">
-     <a href="/{{groupid}}/forum/show/{{forum}}">
+     <a href="/{{groupid}}/forum/{{forum}}">
         {{forum.name}}</a></h2>
     </a>
     {% get_edit_url forum.pk as edit_url %}
-    {% get_group_name groupid as group_name_tag %}
-
+   
     {% if user.is_superuser or forum.created_by == user.id %}
  <a href="{% url edit_url group_name_tag forum.pk %}" class="small button split edit"><i class="fi-pencil"></i> {% trans "Edit" %}<span data-dropdown="edit-options"></span></a>
     {% endif %}

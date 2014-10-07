@@ -139,9 +139,17 @@
 <div class="row">
   <div class="small-2 columns">
     <button id="reply_forum{{eachrep}}" class="button large postfix" style="height: 2.5em;">
-      Reply &nbsp;|&nbsp; <i class="fi-refresh"></i>
+      Reply  &nbsp;|&nbsp; <i class="fi-refresh"></i>
     </button>
  </div>
+    {% get_group_name groupid as group_name_tag %}
+
+   {% if eachrep.created_by == user_obj.id %}
+     {% if eachrep != thread %}
+       <a class="tiny alert button" href="{% url 'reply_delete' group_name_tag forum thread eachrep %}">{% trans "Delete" %}</a>
+     {% endif %}
+   {% endif %}
+
 </div>
 
 <div id="org{{eachrep}}" style="display:none; margin-left:1em;" class="try">
