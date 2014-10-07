@@ -72,20 +72,23 @@ def get_all_gapps():
 
 #checks forum notification turn off for an author object
 def forum_notification_status(group_id,user_id):
-  grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
-  auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
-  at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
-  list_at_pref=[]
-  if at_user_pref:
-    poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
-    if poss_attrs:
-      if poss_attrs.has_key('user_preference_off'):
-        list_at_pref=poss_attrs['user_preference_off']['object_value']
-      if grp_obj in list_at_pref:
-        return False
-      else:
-        return True
-
+  try:
+    grp_obj=coln.Node.one({'_id':ObjectId(group_id)})
+    auth_obj=coln.Node.one({'_id':ObjectId(user_id)})
+    at_user_pref=collection.Node.one({'$and':[{'_type':'AttributeType'},{'name':'user_preference_off'}]})
+    list_at_pref=[]
+    if at_user_pref:
+      poss_attrs=auth_obj.get_possible_attributes(at_user_pref._id)
+      if poss_attrs:
+        if poss_attrs.has_key('user_preference_off'):
+          list_at_pref=poss_attrs['user_preference_off']['object_value']
+        if grp_obj in list_at_pref:
+          return False
+        else:
+          return True
+    return True
+  except Exception as e:
+    print "Exception in forum notification status check "+str(e)
 def get_forum_repl_type(forrep_id):
   forum_st = coln.GSystemType.one({'$and':[{'_type':'GSystemType'},{'name':GAPPS[5]}]})
   obj=coln.GSystem.one({'_id':ObjectId(forrep_id)})
