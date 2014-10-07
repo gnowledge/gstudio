@@ -159,12 +159,10 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 	
         tag=""
 	field_value=[]
-        if request.FILES.getlist('UploadTask'):
+	if request.FILES.getlist('UploadTask'):
         	files=request.FILES.getlist('UploadTask')
         	field_value = save_file(files[0],files[0], request.user.id, group_id, content_org,tag)
-	
- 
-    	if not task_id: # create
+	if not task_id: # create
         	get_node_common_fields(request, task_node, group_id, GST_TASK)
 		if watchers:
 	     	    for each_watchers in watchers.split(','):
@@ -235,7 +233,8 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 		
 	      if int(count) <int(len(request.POST.getlist("Assignee",""))-1):
 		create_edit_task(request, group_name, task_id,Task._id,count=count+1)
-	    if count == 0:		
+	    if count == 0:	
+	      request.POST.getlist("Assignee","").append(request.user.username)		
 	      for eachuser in (request.POST.getlist("Assignee","")):
 		if eachuser != "":	
 			activ="task reported"
@@ -252,15 +251,12 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 				for i in request.POST.getlist(each,""):
 				     if i != "":
 					userlist.append(i)
-				
+				userlist.append(request.user.username)		
 			if attr : # already attribute exist 
 				if not attr.object_value == request.POST.get(each,"") :	
 					change_list.append(each.encode('utf8')+' changed from '+attr.object_value.encode('utf8')+' to '+request.POST.get(each,"").encode('utf8')) # updated 	details					
 					attr.object_value = request.POST.get(each,"")
 					attr.save()
-					
-                		
-					
 			else :
 				attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
                			newattribute = collection.GAttribute()
@@ -278,6 +274,13 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
         			change_list.append(str(field_value[0])+' changed from '+str(attr.object_value)+' to '+str(field_value[0]))
         			attr.object_value=field_value[0]
         			attr.save()
+                        else :
+				newattribute = collection.GAttribute()
+                		newattribute.subject = task_node._id
+                		newattribute.attribute_type = attributetype_key
+                		newattribute.object_value = field_value[0]
+                		newattribute.save()
+				change_list.append(each.encode('utf8')+' set to '+request.POST.get(each,"").encode('utf8')) # updated details
         		
 			
 	    userobj = User.objects.get(id=task_node.created_by)
