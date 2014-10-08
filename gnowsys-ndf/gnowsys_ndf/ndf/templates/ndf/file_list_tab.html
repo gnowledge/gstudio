@@ -108,17 +108,4 @@
 <!-- #{#% include 'ndf/pagination.html' with urlname="data_review_page" first_arg=group_name_tag second_arg="" third_arg="" %} -->
 {% paginate %}
 
-{% include 'ndf/pagination.html' with urlname="file_page" first_arg=group_name_tag second_arg="" third_arg="" %}
-
-<script type="text/javascript">
-
-// pagination ajax  
-$('ul.pagination a').click(function(e)
-{
-    e.preventDefault();
-
-    
-    
-});
-
-</script>
+{% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
