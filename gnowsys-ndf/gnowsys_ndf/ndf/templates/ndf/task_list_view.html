@@ -37,6 +37,7 @@ background-color: #FFFFFF;
 }
 </style>
 -->
+
 {% block body_content %}
 
 
@@ -51,7 +52,7 @@ background-color: #FFFFFF;
         
 	<thead>
 		
-		<tr  >
+		<tr>
                       
 			{%for i in TASK_inst.0 %}
 			{% if i != "id"%}
@@ -71,12 +72,13 @@ background-color: #FFFFFF;
 		<tr id="view-row-{{i.id}}">
 					
 	        		{% for j,v in i.items %}
-				{% if j != "id"%}			         
-			  <td class="view" ><a href="{% url 'task_details' group_id i.id %}" >{{v}} </a></td>
+				{% if j != "id"%}
+								         
+			  <td class="view" ><a href="{% url 'task_details' group_name i.id %}" >{{v}} </a></td>
 				{% endif %}	
 			        						 
 			{% endfor %}
-			<td> <a class="tiny button" href="{% url 'task_edit' group_id i.id %}"> Update </td>						
+			<td> <a class="tiny button" href="{% url 'task_edit' group_name i.id %}"> Update </td>						
 		</tr>	
 		
 		{% endfor %}

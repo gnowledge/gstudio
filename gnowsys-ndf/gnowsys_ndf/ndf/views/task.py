@@ -81,7 +81,6 @@ def task_details(request, group_name, task_id):
     blank_dict = {}
     history = []
     subtask = []
-    print "group_id",group_id	
     for each in at_list:
 	attributetype_key = collection.Node.find_one({"_type":'AttributeType', 'name':each})
         attr = collection.Node.find_one({"_type":"GAttribute", "subject":task_node._id, "attribute_type.$id":attributetype_key._id})
@@ -102,7 +101,6 @@ def task_details(request, group_name, task_id):
 			else :
 				postnode_task = sys_each_postnode.altnames
 			history.append({'id':str(sys_each_postnode._id), 'name':sys_each_postnode.name, 'created_by':sys_each_postnode_user.username, 'created_at':sys_each_postnode.created_at, 'altnames':eval(postnode_task), 'content':sys_each_postnode.content})
-    	
     if  task_node.collection_set:
 		
 	blank_dict['collection']='True'
@@ -126,8 +124,8 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
         group_ins = collection.Node.find_one({'_type': "Group","name": group_name})
         auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
     elif ins_objectid.is_valid(group_name) is True :
-        group_ins = collection.Node.find_one({'_type': "Group","_id": group_name})
-        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
+        group_ins = collection.Node.find_one({'_type': "Group","_id": ObjectId(group_name)})
+	auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })  
     if group_ins:
             group_id = str(group_ins._id)
     else :
@@ -320,7 +318,6 @@ def create_edit_task(request, group_name, task_id=None,task=None,count=0):
 		pri_node = collection.Node.one({'_id':task_node.prior_node[0]})
 		blank_dict['parent'] = pri_node.name 
 		blank_dict['parent_id'] = str(pri_node._id)
- 
     var = { 'title': 'Task','group_id': group_id, 'groupid': group_id,'appId':app._id, 'group_name': group_name, 'node':edit_task_node, 'task_id':task_id }
     var.update(blank_dict)
     context_variables = var
