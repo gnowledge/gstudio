@@ -173,14 +173,14 @@
   <!-- Tab View #1 - All -->
   <div class="content row active" id="view-all">
 
-    {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" res_type_name="" page_info=file_pages %}
+    {% include "ndf/file_list_tab.html" with resource_type=files detail_urlname="file_detail" filetype="all" res_type_name="" page_info=file_pages %}
 
   </div>
 
   <!-- Tab View 2 - Documents -->
   <div class="content" id="view-doc">
 
-    {% include "ndf/file_list_tab.html" with resource_type=docCollection detail_urlname="file_detail" res_type_name="" page_info=doc_pages %}
+    {% include "ndf/file_list_tab.html" with resource_type=docCollection detail_urlname="file_detail" filetype="doc" res_type_name="" page_info=doc_pages %}
 
   </div>
 
@@ -189,7 +189,7 @@
   {% if interactiveCollection %}
     <div class="content" id="view-interactive">
 
-      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" res_type_name="" page_info="" %}
+      {% include "ndf/file_list_tab.html" with resource_type=interactiveCollection detail_urlname="file_detail" filetype="interactives" res_type_name="" page_info="" %}
 
     </div>
   {% endif %}
@@ -199,7 +199,7 @@
   {% if audioCollection %}
     <div class="content" id="view-audio">
 
-      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" res_type_name="" page_info="" %}
+      {% include "ndf/file_list_tab.html" with resource_type=audioCollection detail_urlname="file_detail" filetype="audio" res_type_name="" page_info="" %}
 
     </div>
   {% endif %}
@@ -207,21 +207,21 @@
   <!-- Tab View #3 - Images -->
   <div class="content" id="view-image">
 
-    {% include "ndf/file_list_tab.html" with resource_type=imageCollection detail_urlname="image_detail" res_type_name="" page_info=image_pages %}
+    {% include "ndf/file_list_tab.html" with resource_type=imageCollection detail_urlname="image_detail" filetype="image" res_type_name="" page_info=image_pages %}
 
   </div>
 
   <!-- Tab View #4 - Videos -->
   <div class="content" id="view-video">
 
-    {% include "ndf/file_list_tab.html" with resource_type=videoCollection detail_urlname="video_detail" res_type_name="" page_info=video_pages %}
+    {% include "ndf/file_list_tab.html" with resource_type=videoCollection detail_urlname="video_detail" filetype="video" res_type_name="" page_info=video_pages %}
 
   </div>
 
   <!-- Tab View #5 - pandora Videos -->
   <div class="content" id="view-pandora-video">
 
-    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" res_type_name="" page_info="" %}
+    {% include "ndf/file_list_tab.html" with resource_type=pandoraCollection detail_urlname="video_detail" filetype="pandora-video" res_type_name="" page_info="" %}
 
   </div>
   
@@ -229,7 +229,7 @@
 
     {% get_resource_collection groupid title as file_collections %}
 
-    {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" res_type_name="collection" %}
+    {% include "ndf/file_list_tab.html" with resource_type=file_collections detail_urlname="file_detail" filetype="collection" res_type_name="collection" %}
 
   </div>
 
@@ -353,5 +353,45 @@ else{
   {% if is_video %}
     alert("Your video file uploaded succesfully, But still in process, play video about 1 hour after");
   {% endif %}
+
+
+// <script type="text/javascript">
+
+// pagination ajax  
+$('ul.pagination a').click(function(e)
+{
+    e.preventDefault();
+
+    var filetype = this.href.split("/")[5],
+        page_no = this.text.trim(),
+        no_of_objs_pp = 24,
+        url = this.href.substr(this.href.search(this.host)+this.host.length);
+
+    console.log(filetype);
+    aaa = this;
+
+    var tabContainerDiv = $(this).closest("div.content");
+    $.ajax({
+
+      type: 'POST',
+      url: url,
+      datatype: 'html',
+      data: {
+
+        filetype: filetype,
+        page_no: page_no,
+        no_of_objs_pp: no_of_objs_pp,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data){
+
+        $(tabContainerDiv).html(data);
+      }
+
+    })
+    
+});
+
+// </script>
 
 {% endblock %}
