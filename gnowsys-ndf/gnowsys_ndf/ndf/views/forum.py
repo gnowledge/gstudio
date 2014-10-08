@@ -752,16 +752,15 @@ def delete_thread(request,group_id,forum_id,node_id):
     exstng_reply.sort('created_at')
     for each in exstng_reply:
         forum_threads.append(each.name)
-    
-    return render_to_response("ndf/create_thread.html",
-                                    {   'group_id':group_id,
-                                        'groupid':group_id,
-                                        'forum': forum,
-                                        'forum_threads': json.dumps(forum_threads),
+    variables = RequestContext(request,{
+                                        'forum':forum,
+                                        'groupid':group_id,'group_id':group_id,
                                         'forum_created_by':User.objects.get(id=forum.created_by).username
-                                    },
-                              RequestContext(request))
+                                        })
 
+    return render_to_response("ndf/forumdetails.html",variables)
+
+   
 def edit_thread(request,group_id,forum_id,thread_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
