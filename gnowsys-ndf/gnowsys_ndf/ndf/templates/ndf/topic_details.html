@@ -1,8 +1,18 @@
-{% extends "ndf/node_details_base.html" %}
 {% load i18n %}
 {% block meta_content %}
   <h2>{% trans "Topic" %}</h2>
 {% endblock %}
+
+{% block collection_content %}
+  <div id="view_collection">
+    {% include "ndf/collection_ajax_view.html" %}  
+  </div>
+
+<a class="close-reveal-modal">&#215;</a>
+
+{% endblock %}
+
+
 
 
 

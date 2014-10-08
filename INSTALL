@@ -97,7 +97,10 @@ Use corresponding package names if you are using an RPM based distro
     (5) To install JS/CSS dependencies: (Navigate to project root - cd gstudio/gnowsys-ndf )
         bower install
 
-7. To run "gstudio" project, perform following steps: 
+7.  Install Search Dependencies
+    Follow instructions in search_dependencies.txt
+
+8. To run "gstudio" project, perform following steps: 
 
     (1) Make sure you are in the virtualenv-folder and it's activated
         (source bin/activate).  
@@ -112,7 +115,9 @@ Use corresponding package names if you are using an RPM based distro
 
         (b) python manage.py filldb 
 
-        (c) python manage.py runserver 
+        (c) python manage.py sync_existing_documents
+
+        (d) python manage.py runserver 
 
 
 * After running (c) point your browser to http://localhost:8000 to see
@@ -120,6 +125,8 @@ Use corresponding package names if you are using an RPM based distro
 
 * Since gstudio is frequently updated, please obtain the latest code
   from git repo. After each update run (a) & (b) commands before running (c).
+
+  git pull origin mongokit
 
 8. To edit SCSS/SAAS stylesheets:
 

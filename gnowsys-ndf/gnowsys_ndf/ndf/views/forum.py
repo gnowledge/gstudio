@@ -145,7 +145,6 @@ def create_forum(request,group_id):
     else :
         pass
     
-
     # getting all the values from submitted form
     if request.method == "POST":
 
@@ -221,7 +220,11 @@ def create_forum(request,group_id):
         '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
         link="http://"+sitename+"/"+str(colg._id)+"/forum/"+str(colf._id)
         for each in colg.author_set:
-            bx=User.objects.get(id=each)
+            bx=User.objects.filter(id=each)
+            if bx:
+                bx=User.objects.get(id=each)
+            else:
+                continue
             activity="Added forum"
             msg=usrname+" has added a forum in the group -'"+colg.name+"'\n"+"Please visit "+link+" to see the forum."
             if bx:
@@ -364,7 +367,6 @@ def edit_forum(request,group_id,forum_id):
 
 
 def display_forum(request,group_id,forum_id):
-    
     forum = collection.Node.one({'_id': ObjectId(forum_id)})
 
     usrname = User.objects.get(id=forum.created_by).username
@@ -399,7 +401,6 @@ def display_thread(request,group_id, thread_id, forum_id=None):
     '''
     Method to display thread and it's content
     '''
-    
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -419,7 +420,6 @@ def display_thread(request,group_id, thread_id, forum_id=None):
         
         for each in thread.prior_node:
             forum=collection.GSystem.one({'$and':[{'member_of': {'$all': [forum_st._id]}},{'_id':ObjectId(each)}]})
-            print "is forum",forum.name    
             if forum:
                 usrname = User.objects.get(id=forum.created_by).username
                 variables = RequestContext(request,
@@ -464,9 +464,8 @@ def create_thread(request, group_id, forum_id):
     # print forum_data
 
     forum_threads = []
-    exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+    exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
     exstng_reply.sort('created_at')
-    
     for each in exstng_reply:
         forum_threads.append(each.name)
     
@@ -506,6 +505,25 @@ def create_thread(request, group_id, forum_id):
         
         colrep.group_set.append(colg._id)
         colrep.save()
+
+        '''Code to send notification to all members of the group except those whose notification preference is turned OFF'''
+        link="http://"+sitename+"/"+str(colg._id)+"/forum/thread/"+str(colrep._id)
+        for each in colg.author_set:
+            bx=User.objects.filter(id=each)
+            if bx:
+                bx=User.objects.get(id=each)
+            else:
+                continue
+            activity="Added thread"
+            msg=request.user.username+" has added a thread in the forum " + forum.name + " in the group -'" + colg.name+"'\n"+"Please visit "+link+" to see the thread."
+            if bx:
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(bx.username) })
+                if colg._id and auth:
+                    no_check=forum_notification_status(colg._id,auth._id)
+                else:
+                    no_check=True
+                if no_check:
+                    ret = set_notif_val(request,colg._id,msg,activity,bx)
 
         variables = RequestContext(request,
                                      {   'forum':forum,
@@ -559,7 +577,6 @@ def add_node(request,group_id):
         forumobj = ""
         groupobj = ""
 
-        print "\n node:", node, "\n thread: ", thread, "\n forumid: ", forumid, "\n supnode: ", sup_id, "\n twistname: ", tw_name
     
         colg = collection.Group.one({'_id':ObjectId(group_id)})
 
@@ -621,29 +638,30 @@ def add_node(request,group_id):
         
         if node == "Twist" :  
             url="http://"+sitename+"/"+str(group_id)+"/forum/thread/"+str(colrep._id)
-            activity=str(request.user.username)+" -added a thread '"
+            activity=request.user.username+" -added a thread '"
             prefix="' on the forum '"+forumobj.name+"'"
             nodename=name
         
         if node == "Reply":
             threadobj=collection.GSystem.one({"_id": ObjectId(thread)})
             url="http://"+sitename+"/"+str(group_id)+"/forum/thread/"+str(threadobj._id)
-            activity=str(request.user.username)+" -added a reply "
+            activity=request.user.username+" -added a reply "
             prefix=" on the thread '"+threadobj.name+"' on the forum '"+forumobj.name+"'"
             nodename=""
 
         link = url
 
         for each in colg.author_set:
-            bx=User.objects.get(id=each)
-            msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"'\n"+"Please visit "+link+" to see the updated page"
-            if bx:
-                no_check=forum_notification_status(group_id,auth._id)
-                if no_check:
-                    ret = set_notif_val(request,group_id,msg,activity,bx)
+            if each != colg.created_by:
+                bx=User.objects.get(id=each)
+                msg=activity+"-"+nodename+prefix+" in the group '"+ groupname +"'\n"+"Please visit "+link+" to see the updated page"
+                if bx:
+                    no_check=forum_notification_status(group_id,auth._id)
+                    if no_check:
+                        ret = set_notif_val(request,group_id,msg,activity,bx)
         
         bx=User.objects.get(id=colg.created_by)
-        msg=activity+"-"+nodename+prefix+" in the group '"+str(groupname)+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"   
+        msg=activity+"-"+nodename+prefix+" in the group '"+groupname+"' created by you"+"\n"+"Please visit "+link+" to see the updated page"   
         
         if bx:
             no_check=forum_notification_status(group_id,auth._id)
@@ -708,10 +726,43 @@ def delete_forum(request,group_id,node_id,relns=None):
     return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id}))
 
 
-def delete_thread(request,group_id,node_id):
+def delete_thread(request,group_id,forum_id,node_id):
     """ Changing status of thread to HIDDEN
     """
-    print "in delete thread",thread_id
+    ins_objectid  = ObjectId()
+    if ins_objectid.is_valid(node_id) : 
+        thread=collection.Node.one({'_id':ObjectId(node_id)})
+    else:
+        return
+    forum = collection.Node.one({'_id': ObjectId(forum_id)})
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    forum_threads = []
+    exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}],'status':{'$nin':['HIDDEN']}})
+    exstng_reply.sort('created_at')
+    for each in exstng_reply:
+        forum_threads.append(each.name)
+    
+    return render_to_response("ndf/create_thread.html",
+                                    {   'group_id':group_id,
+                                        'groupid':group_id,
+                                        'forum': forum,
+                                        'forum_threads': json.dumps(forum_threads),
+                                        'forum_created_by':User.objects.get(id=forum.created_by).username
+                                    },
+                              RequestContext(request))
+
+def edit_thread(request,group_id,forum_id,thread_id):
     ins_objectid  = ObjectId()
     if ins_objectid.is_valid(group_id) is False :
         group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
@@ -724,10 +775,55 @@ def delete_thread(request,group_id,node_id):
                 group_id = str(auth._id)
     else :
         pass
-    
-    op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
-    return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id}))
-    
+    forum=collection.Node.one({'_id':ObjectId(forum_id)})
+    thread=collection.Node.one({'_id':ObjectId(thread_id)}) 
+    exstng_reply = collection.GSystem.find({'$and':[{'_type':'GSystem'},{'prior_node':ObjectId(forum._id)}]})
+    nodes=[]
+    exstng_reply.sort('created_at')
+    for each in exstng_reply:
+        nodes.append(each.name)
+    request.session['nodes']=json.dumps(nodes)
+#   
+    if request.method == 'POST':
+        name = unicode(request.POST.get('thread_name',"")) # thread name
+        thread.name = name
+        
+        content_org = request.POST.get('content_org',"") # thread content
+        if content_org:
+            thread.content_org = unicode(content_org)
+            usrname = request.user.username
+            filename = slugify(name) + "-" + usrname + "-"
+            thread.content = org2html(content_org, file_prefix=filename)
+        thread.save() 
+        variables=variables = RequestContext(request,{'group_id':group_id,'thread_id': thread._id,'nodes':json.dumps(nodes)})
+        return HttpResponseRedirect(reverse('thread', kwargs={'group_id':group_id,'thread_id': thread._id }))    
+    else:
+        return render_to_response("ndf/edit_thread.html",
+                                    {   'group_id':group_id,
+                                        'groupid':group_id,
+                                        'forum': forum,
+                                        'thread':thread,
+                                        'forum_created_by':User.objects.get(id=forum.created_by).username
+                                    },
+                              RequestContext(request))
 
-def edit_thread(request,group_id,thread_id):
-    return HttpResponseRedirect(reverse('forum', kwargs={'group_id': group_id})) 
+
+def delete_reply(request,group_id,forum_id,thread_id,node_id):
+    ins_objectid  = ObjectId()    
+    if ins_objectid.is_valid(group_id) is False :
+        group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+        auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+        if group_ins:
+            group_id = str(group_ins._id)
+        else :
+            auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+            if auth :
+                group_id = str(auth._id)
+    else :
+        pass
+    op = collection.update({'_id': ObjectId(node_id)}, {'$set': {'status': u"HIDDEN"}})
+    forumobj=collection.Node.one({"_id": ObjectId(forum_id)})
+    threadobj=collection.Node.one({"_id": ObjectId(thread_id)})
+    variables=RequestContext(request,{'thread':threadobj,'user':request.user,'forum':forumobj,'groupid':group_id,'group_id':group_id})
+    return HttpResponseRedirect(reverse('thread', kwargs={'group_id':group_id,'thread_id': threadobj._id }))
+#    return render_to_response("ndf/replytwistrep.html",variables)    

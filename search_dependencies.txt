@@ -2,7 +2,6 @@
 // REQUIREMENTS.TXT
 pip install -U pyyaml nltk
 
-
 Install.txt-----------------
 1. Activate the environment
 2. Go to gstudio/gnowsys-ndf (directory containing manage.py)
@@ -16,7 +15,7 @@ Install.txt-----------------
 	-- Download the module with identifier - "stopwords"
 	-- Download the module with identifier - "wordnet"
 	-- Go to "Models" tab
-	-- Download the module with identifier - "maxnet_treebank_pos_tag"
+	-- Download the module with identifier - "maxnet_treebank_pos_tagger"
 	-- Download the module with identifier - "punkt"
 
 	Case 2: GUI Does not open

@@ -90,11 +90,15 @@
 			        // The clicked node is 'event.node'
 			        var node = event.node;
 			        
-			        // If its topic node i.e no children of this node then show the detail veiw for topic
+			        // If its topic node i.e no children of this node then show the detail view for topic
 			  		if( node.children[0] == null ){
 
 			  			if (node.node_type == "Topic"){
-		  					location.href = "/{{group_name_tag}}/topic_details/"+node.id+"";    	
+                                                 console.log('clicked node:' + node.id );
+               $('#myModal2').foundation('reveal', 'open', {
+                 url:"/{{group_name_tag}}/topic_details/"+node.id+"",
+               } );    	      
+                                                
 			  			}
 				        
 			  		}
@@ -173,6 +177,7 @@
 {% if user.is_authenticated %}
 {% user_access_policy groupid request.user as user_access %}
 
+
 <ul class="no-bullet" id="app-set-item"> 
 
     {% get_memberof_objects_count theme_GST_id groupid as count %}
@@ -212,6 +217,8 @@
 
 {% block body_content %}
 {% user_access_policy groupid request.user as user_access %}
+
+      	<div id="myModal2" class="reveal-modal" style="height:500px;overflow:hidden;width:80%" data-reveal>  <a class="close-reveal-modal" >&#215;</a> </div>
 
 	{% if themes_hierarchy %}
 
