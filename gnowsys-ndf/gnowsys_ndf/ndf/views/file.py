@@ -306,6 +306,8 @@ def file(request, group_id, file_id=None, page_no=1):
       # File list view
       title = GST_FILE.name
       datavisual = []
+      no_of_objs_pp = 24
+
       if GSTUDIO_SITE_VIDEO == "pandora" or GSTUDIO_SITE_VIDEO == "pandora_and_local":
           files = collection.Node.find({'$or':[{'member_of': {'$all': [ObjectId(file_id)]}, 
                                                 '_type': 'File', 'fs_file_ids':{'$ne': []}, 
@@ -322,7 +324,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                                   'group_set': {'$all': [ObjectId(group_id)]}
                                                   }
                                            ]}).sort("last_update", -1)
-          file_pages = paginator.Paginator(files, page_no, 24)
+          file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
 
       else:
           files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
@@ -338,7 +340,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                         ]
                                     }).sort("last_update", -1)
 
-          file_pages = paginator.Paginator(files, page_no, 24)
+          file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
 
 
       docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
@@ -354,7 +356,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                             ]
                                           }).sort("last_update", -1)
       
-      doc_pages = paginator.Paginator(docCollection, page_no, 24)
+      doc_pages = paginator.Paginator(docCollection, page_no, no_of_objs_pp)
 
       imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
                                               '_type': 'File','fs_file_ids': {'$ne': []}, 
@@ -369,7 +371,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                               ]
                                             }).sort("last_update", -1)
 
-      image_pages = paginator.Paginator(imageCollection, page_no, 24)
+      image_pages = paginator.Paginator(imageCollection, page_no, no_of_objs_pp)
       
       videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, 
                                               '_type': 'File','fs_file_ids': {'$ne': []}, 
@@ -384,7 +386,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                               ]
                                             }).sort("last_update", -1)
 
-      video_pages = paginator.Paginator(videoCollection, page_no, 24)
+      video_pages = paginator.Paginator(videoCollection, page_no, no_of_objs_pp)
       
       already_uploaded = request.GET.getlist('var', "")     
 
@@ -437,6 +439,51 @@ def file(request, group_id, file_id=None, page_no=1):
                                 context_instance = RequestContext(request))
     else:
       return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
+
+
+def paged_file_objs(request, group_id, filetype, page_no):
+
+    # if request.is_ajax() and request.method == "POST":
+        print "jhjhjhjhjh"
+        no_of_objs_pp = 24
+
+        ins_objectid  = ObjectId()
+
+        if ins_objectid.is_valid(group_id) is False :
+            group_ins = collection.Node.find_one({'_type': "Group","name": group_id})
+            if group_ins:
+                group_id = str(group_ins._id)
+            else :
+                auth = collection.Node.one({'_type': 'Author', 'name': unicode(request.user.username) })
+                if auth :
+                    group_id = str(auth._id)
+
+        file_ins = collection.Node.find_one({'_type':"GSystemType", "name":"File"})
+        if file_ins:
+            file_id = str(file_ins._id)
+
+        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
+                                            '_type': 'File', 'fs_file_ids':{'$ne': []},
+                                            'group_set': {'$all': [ObjectId(group_id)]},
+                                            '$or': [
+                                                {'access_policy': u"PUBLIC"},
+                                                {'$and': [
+                                                    {'access_policy': u"PRIVATE"},
+                                                    {'created_by': request.user.id}
+                                                ]
+                                             }
+                                            ]
+                                        }).sort("last_update", -1)
+
+        file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
+
+
+        return render_to_response ("ndf/file_list_tab.html", {
+                "group_id": group_id, "group_name_tag": group_id,
+                "resource_type": files, "detail_urlname": "file_detail", 
+                "filetype": "all", "res_type_name": "", "page_info": file_pages
+            },
+            context_instance=RequestContext(request))
         
 @login_required    
 def uploadDoc(request, group_id):
