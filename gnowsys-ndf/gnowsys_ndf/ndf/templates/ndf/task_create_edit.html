@@ -128,11 +128,19 @@ edit_Assignee.selectedIndex = edit_Assignee.options.{{Assignee}}.index
 
 var selected = new Array();
 $(document).on('click',"#save-node",function(){
-$('form-edit-node input:checkbox:checked').each(function() {     selected.push(this.id);});
-$('#hidden_watchers').val(selected);
+var startDate = new Date($('#start_date').val());
+var endDate = new Date($('#end_date').val());
+<!-- To check if due-date entered is greater than start-date -->
+if (startDate <= endDate){
+	$('form-edit-node input:checkbox:checked').each(function()
+		{selected.push(this.id);});
+	$('#hidden_watchers').val(selected);
+  }
+else  {
+    alert("Due Date cannot be before Start Date");
+    event.preventDefault();
+  }
 });
-
-
 
 {% endblock %}
 
@@ -195,7 +203,7 @@ $('#hidden_watchers').val(selected);
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Start date</label>
-	    <input name="start_time" type="text" placeholder="select date..." onfocus="showCalendarControl(this);" value="{{start_time}}">
+	    <input name="start_time" id = "start_date" type="text" placeholder="select date..." onfocus="showCalendarControl(this);" value="{{start_time}}">
 	  </div>
 	</div>	
 
@@ -212,7 +220,7 @@ $('#hidden_watchers').val(selected);
 	  </div>
 	  <div class="medium-6 columns">
 	    <label>Due date</label>
-	    <input name="end_time" type="text" placeholder="select date..." onfocus="showCalendarControl(this);" value="{{end_time}}">
+	    <input name="end_time" id = "end_date"  type="text" placeholder="select date..." onfocus="showCalendarControl(this);" value="{{end_time}}">
 	  </div>
 	</div>	
 	<div class="row">
