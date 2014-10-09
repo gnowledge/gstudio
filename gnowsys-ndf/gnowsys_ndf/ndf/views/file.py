@@ -324,6 +324,7 @@ def file(request, group_id, file_id=None, page_no=1):
                                                   'group_set': {'$all': [ObjectId(group_id)]}
                                                   }
                                            ]}).sort("last_update", -1)
+
           file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
 
           files_pc = [ each_file for each_file in file_pages.items ]
@@ -455,10 +456,9 @@ def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_n
 
 
 def paged_file_objs(request, group_id, filetype, page_no):
-    # print request.is_ajax(), "````````", request.method
 
     if request.is_ajax() and request.method == "POST":
-        print "\n\njhjhjhjhjh", group_id, "----", filetype, "---", page_no
+
         no_of_objs_pp = 24
 
         ins_objectid  = ObjectId()
@@ -476,33 +476,27 @@ def paged_file_objs(request, group_id, filetype, page_no):
         if file_ins:
             file_id = str(file_ins._id)
 
-        files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
-                                            '_type': 'File', 'fs_file_ids':{'$ne': []},
-                                            'group_set': {'$all': [ObjectId(group_id)]},
-                                            '$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [
-                                                    {'access_policy': u"PRIVATE"},
-                                                    {'created_by': request.user.id}
-                                                ]
-                                             }
-                                            ]
-                                        }).sort("last_update", -1)
-        print files.count(), "  cccccccc"
+      
+        if filetype == "all":
+            result_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp)
+        elif filetype == "doc":
+            result_dict = get_query_cursor_filetype('$nin', [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
+        elif filetype == "image":
+            result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp)
+        elif filetype == "video":
+            result_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
-        file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
-
-        files_list = [ each_file for each_file in file_pages.items ]
+        result_cur = result_dict["result_cur"]
+        result_paginated_cur = result_dict["result_paginated_cur"]
+        result_pages = result_dict["result_pages"]
 
         return render_to_response ("ndf/file_list_tab.html", {
                 "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
-                "resource_type": files_list, "detail_urlname": "file_detail", 
-                "filetype": "all", "res_type_name": "", "page_info": file_pages
+                "resource_type": result_paginated_cur, "detail_urlname": "file_detail", 
+                "filetype": filetype, "res_type_name": "", "page_info": result_pages
             }, 
             context_instance = RequestContext(request))
-    else:
-        print "elseeeeeeeeeeeeeeeeeee"
-        return "jjjj"
+
         
 @login_required    
 def uploadDoc(request, group_id):

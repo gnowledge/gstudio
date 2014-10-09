@@ -1,5 +1,4 @@
 {% load i18n %}
-{% load pagination_tags %}
 {% load ndf_tags %}
 
 {% if searching and resource_type.count > 0 %}
@@ -21,7 +20,6 @@
 <ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-4">
 
   <!-- Existing card list-->
-  {% autopaginate resource_type 24 %}
 
   {% for each_res in resource_type %}      
     {% get_grid_fs_object each_res as grid_fs_obj %}
@@ -105,7 +103,5 @@
   {% endfor %}
   
 </ul>
-<!-- #{#% include 'ndf/pagination.html' with urlname="data_review_page" first_arg=group_name_tag second_arg="" third_arg="" %} -->
-{% paginate %}
 
 {% include 'ndf/pagination.html' with urlname="paged_file_objs" first_arg=group_name_tag second_arg=filetype third_arg="" %}
