@@ -605,7 +605,10 @@ def save_file(files,title, userid, group_id, content_org, tags, img_type = None,
                     fileobj.content_org = unicode(content_org)
                     # Required to link temporary files with the current user who is modifying this document
                     filename_content = slugify(title) + "-" + usrname + "-"
-                    fileobj.content = org2html(content_org, file_prefix = filename_content)
+                    if GSTUDIO_SITE_EDITOR == "aloha":
+                        fileobj.content = unicode(content_org)
+                    else:
+                        fileobj.content = org2html(content_org, file_prefix = filename_content)
                 fileobj.tags = [unicode(t.strip()) for t in tags.split(",") if t != ""]
             
             fileobj.save()

@@ -223,7 +223,12 @@
 
           <div class="row">
             <div  class="small-7 end columns">
-            {% include "ndf/add_editor.html" %}
+	      {% gstudio_site_editor as editor %}
+	      {% if editor == "aloha" %}
+                  {% include "ndf/add_editor.html" %}
+	      {% else %}
+	         {% include "ndf/add_aloha_editor.html" %}
+	      {% endif %}
             </div>
           </div>
 
@@ -317,7 +322,12 @@
 			<div class="small-7 end columns">
 				<div id="label-content" class="content">
 					<div class="">
+					  {% gstudio_site_editor as editor %}
+					  {% if editor == "aloha" %}
+					  {% include "ndf/add_aloha_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=content_org node_id=app_set_instance_id %}
+					  {% else %}
 					{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=content_org node_id=app_set_instance_id %}
+					  {% endif %}
 					</div>
 				</div>
 			</div>

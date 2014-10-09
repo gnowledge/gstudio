@@ -108,11 +108,17 @@ background-repeat:no-repeat; background-size: 48px 48px
   		<div id="message" style="display:none; color:red"></div>
 
     	<div class="active content row" id="panel-name-description">
-      		<div class="medium-8 columns">					
+      		<div class="medium-8 columns">
+		  {% gstudio_site_editor as editor %}
+		  {% if editor == "aloha" %}
+		  {% include "ndf/add_aloha_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+		  {% else %}
+		  		  
+		  {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk %}
+		  {% endif %}	
+		  
+	</div>
 		
-			    {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
-
-			</div>
 			<!--  -->
 			<div class="large-4 columns">
 	            <div class="panel">                

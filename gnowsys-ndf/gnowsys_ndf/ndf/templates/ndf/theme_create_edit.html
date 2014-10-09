@@ -129,7 +129,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-12 columns">
-		    			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+					  {% gstudio_site_editor as editor %}
+					  {% if editor == "aloha" %}
+                                               {% include "ndf/add_aloha_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+					  {% else %}
+		    			       {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" var_value=node.content_org|default_if_none:"" node_id=node.pk%}
+					  {% endif %}
 		  			</div>
 				</div>
 
@@ -251,7 +256,12 @@ background-repeat:no-repeat; background-size: 48px 48px
 
 				<div class="row">
 		  			<div class="medium-12 columns">
-		    			{% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+					  {% gstudio_site_editor as editor %}
+					  {% if editor == "aloha" %}
+                                                {% include "ndf/add_aloha_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+					  {% else %}
+					        {% include "ndf/add_editor.html" with var_name="content_org" var_placeholder="Enter the content here" %}
+					  {% endif %}
 		  			</div>
 				</div>
 

@@ -23,7 +23,7 @@ from django_mongokit import get_database
 ''' -- imports from gstudio -- '''
 from gnowsys_ndf.ndf.views.methods import get_forum_repl_type,forum_notification_status
 from gnowsys_ndf.ndf.views.methods import set_all_urls
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_EDITOR
 from gnowsys_ndf.ndf.models import GSystemType, GSystem,Node
 from gnowsys_ndf.ndf.views.notify import set_notif_val
 from gnowsys_ndf.ndf.org2any import org2html
@@ -153,7 +153,10 @@ def create_forum(request,group_id):
             colf.content_org = unicode(content_org)
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colf.content = org2html(content_org, file_prefix=filename)
+            if GSTUDIO_SITE_EDITOR == "aloha":
+                colf.content=content_org
+            else:
+                colf.content = org2html(content_org, file_prefix=filename)
         
         usrid = int(request.user.id)
         usrname = unicode(request.user.username)
@@ -361,7 +364,10 @@ def create_thread(request, group_id, forum_id):
             # Required to link temporary files with the current user who is modifying this document
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colrep.content = org2html(content_org, file_prefix=filename)
+            if GSTUDIO_SITE_EDITOR == "aloha":
+                colrep.content=content_org
+            else:
+                colrep.content = org2html(content_org, file_prefix=filename)
 
         usrid=int(request.user.id)
         colrep.created_by=usrid
@@ -454,7 +460,10 @@ def add_node(request,group_id):
             # Required to link temporary files with the current user who is modifying this document
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colrep.content = org2html(content_org, file_prefix = filename)
+            if GSTUDIO_SITE_EDITOR == "aloha":
+                colrep.content=content_org
+            else:
+                colrep.content = org2html(content_org, file_prefix = filename)
 
         usrid = int(request.user.id)
         colrep.created_by = usrid
@@ -471,7 +480,10 @@ def add_node(request,group_id):
             # Required to link temporary files with the current user who is modifying this document
             usrname = request.user.username
             filename = slugify(name) + "-" + usrname + "-"
-            colrep.content = org2html(content_org, file_prefix=filename)
+            if GSTUDIO_SITE_EDITOR == "aloha":
+                colrep.content=content_org
+            else:
+                colrep.content = org2html(content_org, file_prefix=filename)
 
         usrid=int(request.user.id)
         colrep.created_by=usrid

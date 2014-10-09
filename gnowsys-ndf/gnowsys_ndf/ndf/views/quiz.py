@@ -22,7 +22,7 @@ except ImportError:  # old pymongo
 
 
 ''' -- imports from application folders/files -- '''
-from gnowsys_ndf.settings import GAPPS
+from gnowsys_ndf.settings import GAPPS, GSTUDIO_SITE_EDITOR
 
 from gnowsys_ndf.ndf.models import Node, GSystemType, GSystem
 from gnowsys_ndf.ndf.models import QUIZ_TYPE_CHOICES
@@ -194,7 +194,10 @@ def create_edit_quiz_item(request, group_id, node_id=None):
         # Required to link temporary files with the current user who is modifying this document
         usrname = request.user.username
         filename = slugify(name) + "-" + usrname + "-"
-        quiz_item_node.content = org2html(question, file_prefix=filename)
+        if GSTUDIO_SITE_EDITOR == "aloha":
+            quiz_item_node.content=content_org
+        else:
+            quiz_item_node.content = org2html(question, file_prefix=filename)
 
         # If "quiz_type" is either 'Single-Choice' or 'Multiple-Choice', then only extract options
         options = []

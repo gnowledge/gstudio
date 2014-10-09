@@ -493,7 +493,10 @@ def mis_create_edit(request, group_id, app_id, app_set_id=None, app_set_instance
         if content_org:
             usrname = request.user.username
             filename = slugify(newgsystem.name) + "-" + usrname
-            newgsystem.content = org2html(content_org, file_prefix=filename)
+            if GSTUDIO_SITE_EDITOR == "aloha":
+                newgsystem.content=content_org
+            else:
+                newgsystem.content = org2html(content_org, file_prefix=filename)
             newgsystem.content_org = content_org
 
         # check if map markers data exist in proper format then add it into newgsystem

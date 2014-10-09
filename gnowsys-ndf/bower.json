@@ -36,7 +36,8 @@
     "d3-tip": "~0.6.4",
     "side-comments": "aroc/side-comments#~0.0.3",
     "slick-carousel": "#latest",
-    "onepage-scroll": "#latest"
+    "onepage-scroll": "#latest",
+    "aloha-editor": "#latest"
   },
   "resolutions": {
     "jquery": "2.1.1"

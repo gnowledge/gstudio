@@ -2235,7 +2235,10 @@ def edit_task_content(request, group_id):
   	# Required to link temporary files with the current user who is modifying this document
     	usrname = request.user.username
     	filename = slugify(task.name) + "-" + usrname + "-"
-    	task.content = org2html(content_org, file_prefix=filename)
+        if GSTUDIO_SITE_EDITOR == "aloha":
+            task.content=content_org
+        else:
+            task.content = org2html(content_org, file_prefix=filename)
 	task.save()
         return HttpResponse(task.content)
     else:
