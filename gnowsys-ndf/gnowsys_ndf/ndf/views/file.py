@@ -326,67 +326,34 @@ def file(request, group_id, file_id=None, page_no=1):
                                            ]}).sort("last_update", -1)
           file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
 
+          files_pc = [ each_file for each_file in file_pages.items ]
+
       else:
-          files = collection.Node.find({'member_of': {'$all': [ObjectId(file_id)]},
-                                        '_type': 'File', 'fs_file_ids':{'$ne': []},
-                                        'group_set': {'$all': [ObjectId(group_id)]},
-                                        '$or': [
-                                            {'access_policy': u"PUBLIC"},
-                                            {'$and': [
-                                                {'access_policy': u"PRIVATE"},
-                                                {'created_by': request.user.id}
-                                            ]
-                                         }
-                                        ]
-                                    }).sort("last_update", -1)
+        files_dict = get_query_cursor_filetype('$all', [ObjectId(file_id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
-          file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
+        files_pc = files_dict["result_paginated_cur"]
+        file_pages = files_dict["result_pages"]
 
+      # --- for documents ---
+      doc = get_query_cursor_filetype('$nin', [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
-      docCollection = collection.Node.find({'member_of': {'$nin': [ObjectId(GST_IMAGE._id), ObjectId(GST_VIDEO._id)]}, 
-                                            '_type': 'File','fs_file_ids': {'$ne': []}, 
-                                            'group_set': {'$all': [ObjectId(group_id)]},
-                                            '$or': [
-                                              {'access_policy': u"PUBLIC"},
-                                              {'$and': [
-                                                {'access_policy': u"PRIVATE"}, 
-                                                {'created_by': request.user.id}
-                                                ]
-                                              }
-                                            ]
-                                          }).sort("last_update", -1)
-      
-      doc_pages = paginator.Paginator(docCollection, page_no, no_of_objs_pp)
+      docCollection = doc["result_cur"]
+      docs_pc = doc["result_paginated_cur"]
+      doc_pages = doc["result_pages"]
 
-      imageCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_IMAGE._id)]}, 
-                                              '_type': 'File','fs_file_ids': {'$ne': []}, 
-                                              'group_set': {'$all': [ObjectId(group_id)]},
-                                              '$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [
-                                                  {'access_policy': u"PRIVATE"}, 
-                                                  {'created_by': request.user.id}
-                                                  ]
-                                                }
-                                              ]
-                                            }).sort("last_update", -1)
+      # --- for images ---
+      image_dict = get_query_cursor_filetype('$all', [ObjectId(GST_IMAGE._id)], group_id, request.user.id, page_no, no_of_objs_pp)
 
-      image_pages = paginator.Paginator(imageCollection, page_no, no_of_objs_pp)
-      
-      videoCollection = collection.Node.find({'member_of': {'$all': [ObjectId(GST_VIDEO._id)]}, 
-                                              '_type': 'File','fs_file_ids': {'$ne': []}, 
-                                              'group_set': {'$all': [ObjectId(group_id)]},
-                                              '$or': [
-                                                {'access_policy': u"PUBLIC"},
-                                                {'$and': [
-                                                  {'access_policy': u"PRIVATE"}, 
-                                                  {'created_by': request.user.id}
-                                                  ]
-                                                }
-                                              ]
-                                            }).sort("last_update", -1)
+      imageCollection = image_dict["result_cur"]
+      images_pc = image_dict["result_paginated_cur"]
+      image_pages = image_dict["result_pages"]
 
-      video_pages = paginator.Paginator(videoCollection, page_no, no_of_objs_pp)
+      # --- for videos ---
+      video_dict = get_query_cursor_filetype('$all', [ObjectId(GST_VIDEO._id)], group_id, request.user.id, page_no, no_of_objs_pp)
+
+      videoCollection = video_dict["result_cur"]
+      videos_pc = video_dict["result_paginated_cur"]
+      video_pages = video_dict["result_pages"]
       
       already_uploaded = request.GET.getlist('var', "")     
 
@@ -431,8 +398,8 @@ def file(request, group_id, file_id=None, page_no=1):
                                  # 'sourceid':source_id_set,
                                  'file_pages': file_pages, 'image_pages': image_pages,
                                  'doc_pages': doc_pages, 'video_pages': video_pages,
-                                 'files': files, 'docCollection': docCollection, 'imageCollection': imageCollection,
-                                 'videoCollection': videoCollection,'pandoravideoCollection':pandoravideoCollection, 
+                                 'files': files_pc, 'docCollection': docs_pc, 'imageCollection': images_pc,
+                                 'videoCollection': videos_pc, 'pandoravideoCollection':pandoravideoCollection, 
                                  'pandoraCollection':get_member_set,'is_video':is_video,'groupid': group_id,
                                  'group_id':group_id,"datavisual":datavisual
                                 }, 
@@ -441,10 +408,57 @@ def file(request, group_id, file_id=None, page_no=1):
       return HttpResponseRedirect(reverse('homepage',kwargs={'group_id': group_id, 'groupid':group_id}))
 
 
-def paged_file_objs(request, group_id, filetype, page_no):
+def get_query_cursor_filetype(operator, member_of_list, group_id, userid, page_no, no_of_objs_pp):
+    '''
+    This method used to fire mongoDB query and send its result along with pagination details. This method is specially for "_type": "File" objects only.
 
-    # if request.is_ajax() and request.method == "POST":
-        print "jhjhjhjhjh"
+    Arguments:
+    -- operator : it's mongoDB operators like "$all", "$nin", "$or", ..., etc.
+    -- member_of_list : It's list of member_of. Example: [ObjectId('5401eb2c90b550696393b9df')] 
+    -- group_id : Group's "_id".
+    -- userid : Example. request.user.id
+    -- page_no : It's page no required for getting appropriate paginated cursor.
+    -- no_of_objs_pp : No. of objects to be shown per page.
+
+    Result: It gives result as dictionary. {"result_cur": "", "result_pages":"", "result_paginated_cur": ""}
+    -- result_cur : It's mongoDB cursor.
+    -- result_pages : It's mongokit.paginator cursor. Containing all the info for pagination.
+    -- result_paginated_cur : It's list of length no_of_objs_pp, containig objects according to asked page.
+ 
+    '''
+
+    result_dict = {"result_cur": "", "result_pages":"", "result_paginated_cur": ""}
+
+    result_cur = collection.Node.find({'member_of': {operator: member_of_list},
+                                    '_type': 'File', 'fs_file_ids':{'$ne': []},
+                                    'group_set': {'$all': [ObjectId(group_id)]},
+                                    '$or': [
+                                        {'access_policy': u"PUBLIC"},
+                                        {'$and': [
+                                            {'access_policy': u"PRIVATE"},
+                                            {'created_by': userid}
+                                        ]
+                                     }
+                                    ]
+                                }).sort("last_update", -1)
+
+    if result_cur:
+        result_dict["result_cur"] = result_cur
+
+        result_pages = paginator.Paginator(result_cur, page_no, no_of_objs_pp)
+        result_dict["result_pages"] = result_pages
+
+        result_paginated_cur = [ each_file for each_file in result_pages.items ]
+        result_dict["result_paginated_cur"] = result_paginated_cur
+
+    return result_dict
+
+
+def paged_file_objs(request, group_id, filetype, page_no):
+    # print request.is_ajax(), "````````", request.method
+
+    if request.is_ajax() and request.method == "POST":
+        print "\n\njhjhjhjhjh", group_id, "----", filetype, "---", page_no
         no_of_objs_pp = 24
 
         ins_objectid  = ObjectId()
@@ -474,16 +488,21 @@ def paged_file_objs(request, group_id, filetype, page_no):
                                              }
                                             ]
                                         }).sort("last_update", -1)
+        print files.count(), "  cccccccc"
 
         file_pages = paginator.Paginator(files, page_no, no_of_objs_pp)
 
+        files_list = [ each_file for each_file in file_pages.items ]
 
         return render_to_response ("ndf/file_list_tab.html", {
-                "group_id": group_id, "group_name_tag": group_id,
-                "resource_type": files, "detail_urlname": "file_detail", 
+                "group_id": group_id, "group_name_tag": group_id, "groupid": group_id,
+                "resource_type": files_list, "detail_urlname": "file_detail", 
                 "filetype": "all", "res_type_name": "", "page_info": file_pages
-            },
-            context_instance=RequestContext(request))
+            }, 
+            context_instance = RequestContext(request))
+    else:
+        print "elseeeeeeeeeeeeeeeeeee"
+        return "jjjj"
         
 @login_required    
 def uploadDoc(request, group_id):
